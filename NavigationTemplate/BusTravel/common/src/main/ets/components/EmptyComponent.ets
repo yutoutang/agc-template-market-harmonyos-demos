@@ -1,4 +1,4 @@
-@Component
+@ComponentV2
 export struct EmptyComponent {
   private outerHeight?: number | string = '100%';
 

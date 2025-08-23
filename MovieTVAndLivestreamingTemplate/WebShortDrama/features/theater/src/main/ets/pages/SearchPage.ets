@@ -53,37 +53,32 @@ struct SearchPage {
 
   @Builder
   titleBuilder() {
-    Text(getString('app.string.drama_search_title'))
-      .height('100%')
-      .margin({
-        left: 8
-      })
-      .fontSize(20)
-      .fontWeight(FontWeight.Bold)
-      .fontColor(getColor('app.color.bold_font_color'))
+    SearchPanel({
+      textController: this.textController,
+      searchText: this.searchText,
+      searchResult: this.searchResult,
+      isEdit: this.isEdit,
+      inputValueChangedEvent: (value: string) => {
+        this.searchText = value
+      },
+      inputFocusEvent: () => {
+        this.searchResult = undefined
+        this.isEdit = true
+      },
+      searchEvent: async (text: string) => {
+        this.doSearch(text, this.textController)
+      },
+      isInput: true,
+      clearText: () => {
+        this.searchText = ''
+      }
+    })
   }
 
   build() {
     NavDestination() {
       Scroll() {
         Column() {
-          SearchPanel({
-            textController: this.textController,
-            searchText: this.searchText,
-            searchResult: this.searchResult,
-            isEdit: this.isEdit,
-            inputValueChangedEvent: (value: string) => {
-              this.searchText = value
-            },
-            inputFocusEvent: () => {
-              this.searchResult = undefined
-              this.isEdit = true
-            },
-            searchEvent: async (text: string) => {
-              this.doSearch(text, this.textController)
-            },
-            isInput: true
-          })
           if (this.searchText && this.isEdit) {
             SearchTipPanel({
               searchText: this.searchText,
@@ -134,6 +129,7 @@ struct SearchPage {
           this.isEdit = false
         })
       }
+      .edgeEffect(EdgeEffect.Spring)
       .scrollBar(BarState.Off)
       .onReachEnd(async () => {
         if (!this.isEdit && this.searchResult) {
@@ -146,19 +142,18 @@ struct SearchPage {
       })
     }
     .title(this.titleBuilder())
-    .backgroundColor(getColor('app.color.normal_background_color'))
+    .backgroundColor('#F1F3F5')
     .padding({ top: `${px2vp(this.statusBarHeight.value)}vp`, bottom: `${px2vp(this.aiBarHeight.value)}vp` })
   }
 
-  onDramaClick(option: DramaCoverVM) {
+  onDramaClick(option: DramaCoverVM, callback?: (popInfo: PopInfo) => void) {
     appRouter.push({
       builderName: NAV_PAGE_NAME.ShortDramaDetailPage.name,
       params: {
         dramaInfo: new DramaInfo({ id: option.dramaId }),
-      },
+      }, popCallback: callback
     })
   }
-
 }
 
 @Builder

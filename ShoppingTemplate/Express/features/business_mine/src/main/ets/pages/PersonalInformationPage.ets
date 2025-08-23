@@ -50,15 +50,6 @@ export struct PersonalInformationPage {
                     }
                   });
               });
-
-            Row() {
-              Image($r('app.media.ic_arrow_right'))
-                .width(12)
-                .height(24)
-            }
-            .margin({
-              right: 8,
-            });
           }
           .backgroundColor($r('sys.color.white'))
           .height(56)
@@ -67,35 +58,20 @@ export struct PersonalInformationPage {
 
           Column() {
             Row() {
-              Row() {
-                Text('昵称')
-                  .fontSize(16)
-                  .layoutWeight(1)
-                  .lineHeight(22)
-              }
-              .width('25%')
+              Text('昵称')
+                .fontSize(16)
+                .layoutWeight(1)
+                .lineHeight(22)
 
               Row() {
-                Row() {
-                  Text(this.vm.userInfo.nickname)
-                    .fontSize(14)
-                    .fontWeight(FontWeight.Regular)
-                    .fontColor($r('sys.color.font_secondary'))
-                    .maxLines(1)
-                    .textOverflow({ overflow: TextOverflow.Ellipsis })
-                    .margin({ right: 8 })
-                }
-                .flexGrow(1)
-                .justifyContent(FlexAlign.End)
-
-                Image($r('app.media.ic_arrow_right'))
-                  .width(12)
-                  .height(24)
+                Text(this.vm.userInfo.nickname)
+                  .fontSize(14)
+                  .fontWeight(FontWeight.Regular)
+                  .fontColor($r('sys.color.font_secondary'))
+                Image($r('app.media.ic_arrow_right')).rightIconStyle();
               }
-              .width('75%')
-              .justifyContent(FlexAlign.End)
             }
-            .padding({ top: 13, bottom: 13 })
+            .formContainerStyle()
             .onClick(() => {
               RouterModule.push({ url: RouterMap.Edit_Name_Page })
             })
@@ -112,20 +88,44 @@ export struct PersonalInformationPage {
                   .fontSize(14)
                   .fontWeight(FontWeight.Regular)
                   .fontColor($r('sys.color.font_secondary'))
-                  .margin({ right: 8 })
+                Image($r('app.media.ic_arrow_right')).rightIconStyle();
               }
             }
-            .padding({ top: 13, bottom: 13 })
+            .formContainerStyle()
+            .onClick(() => {
+              RouterModule.push({ url: RouterMap.Edit_Phone_Page })
+            })
           }
-          .padding({ left: 12, right: 8 })
           .backgroundColor($r('sys.color.white'))
           .borderRadius(16);
         }
         .margin({ left: 16, right: 16 })
       }
       .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
     }
     .title('个人信息')
     .backgroundColor($r('sys.color.background_secondary'))
   }
+}
+
+
+@Extend(Row)
+function formContainerStyle() {
+  .width('100%')
+  .alignItems(VerticalAlign.Center)
+  .borderRadius(16)
+  .padding({
+    top: 12,
+    bottom: 12,
+    left: 12,
+    right: 4,
+  })
+}
+
+@Extend(Image)
+function rightIconStyle() {
+  .width(24)
+  .height(24)
+  .margin({ left: 4 })
 }

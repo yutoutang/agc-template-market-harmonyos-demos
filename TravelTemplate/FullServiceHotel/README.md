@@ -1,19 +1,30 @@
-# 旅游(综合酒店)行业模板快速入门
+# 旅游(酒店)行业模板快速入门
 
 ## 目录
 
 - [功能介绍](#功能介绍)
-- [环境要求](#环境要求)
+- [约束与限制](#约束与限制)
 - [快速入门](#快速入门)
 - [示例效果](#示例效果)
-- [权限要求](#权限要求)
 - [开源许可协议](#开源许可协议)
-
 
 
 ## 功能介绍
 
-本模板为综合酒店类元服务提供了常用功能的开发样例，模板主要分首页、会员和我的三大模块：
+您可以基于此模板直接定制应用，也可以挑选此模板中提供的多种组件使用，从而降低您的开发难度，提高您的开发效率。
+
+本模板提供如下组件，所有组件存放在工程根目录的components下，如果您仅需使用组件，可参考对应组件的指导链接；如果您使用此模板，请参考本文档。
+
+| 组件                                   | 描述                                                         | 使用指导                                                 |
+| -------------------------------------- | ------------------------------------------------------------ | -------------------------------------------------------- |
+| 拨号组件（module_call_dialog）         | 可根据传入的电话号码拉起拨号弹窗，并在确认后自动拉起拨号面板 | [使用指导](./components/module_call_dialog/README.md)    |
+| 酒店日期选择组件（module_date_selector） | 酒店预订时需要使用的日期选择器组件，支持选择入住时间范围和房间个数 | [使用指导](./components/module_date_selector/README.md)  |
+| 店铺评价组件（module_store_comments）  | 提供店铺评价组件，可查看评价列表并发表匿名评价               | [使用指导](./components/module_store_comments/README.md) |
+| 申请权限许可组件（module_privacy_agreement） | 提供申请权限许可组件，可在应用首启需要用户同意隐私政策和其他协议时使用 | [使用指导](./components/module_privacy_agreement/README.md) |
+
+
+
+本模板为综合酒店类应用提供了常用功能的开发样例，模板主要分首页、会员和我的三大模块：
 
 * 首页：提供公告、会员信息、热销商品的展示，支持酒店、餐饮、宴会厅的预订。
 
@@ -24,9 +35,9 @@
 本模板已集成华为账号、地图、支付等服务，只需做少量配置和定制即可快速实现华为账号的登录、酒店位置定位导航和购买商品等功能。
 
 
-| 首页                                                  | 会员                                                  | 我的                                                  |
-|-----------------------------------------------------|-----------------------------------------------------|-----------------------------------------------------|
-| <img src="screenshots/首页.png" alt="首页" width="300"> | <img src="screenshots/会员.png" alt="会员" width="300"> | <img src="screenshots/我的.png" alt="我的" width="300"> |
+| 首页                                                    | 会员                                                   | 我的                                                    |
+|-------------------------------------------------------|------------------------------------------------------|-------------------------------------------------------|
+| <img src="screenshots/home.png" alt="首页" width="300"> | <img src="screenshots/vip.png" alt="会员" width="300"> | <img src="screenshots/mine.png" alt="我的" width="300"> |
 
 
 
@@ -77,9 +88,7 @@
       |-- 用户信息
       |-- 会员卡片
       |-- 我的订单
-      |-- 隐私政策
-      └-- 账号设置
-           └-- 修改信息
+      └-- 设置
 ```
 
 
@@ -89,12 +98,9 @@
 ```ts
 FullServiceHotel
   |- commons                                       // 公共层
-  |   |- commonlib/src/main/ets                    // 公共工具模块(har)
-  |   |    |- constants 
-  |   |    |     CommonContants.ets                // 公共常量
-  |   |    |     CommonEnum.ets                    // 公共枚举
-  |   |    |- types 
-  |   |    |     Types.ets                         // 公共类型
+  |   |- commonlib/src/main/ets                    // 公共工具模块
+  |   |    |- constants                            // 公共常量
+  |   |    |- types                                // 公共类型
   |   |    └- utils 
   |   |          AccountUtil.ets                   // 账号管理工具
   |   |          FormatUtil.ets                    // 日历、图片等格式管理工具
@@ -102,92 +108,79 @@ FullServiceHotel
   |   |          Logger.ets                        // 日志管理工具
   |   |          RouterModule.ets                  // 路由管理类
   |   |          PopViewUtils.ets                  // 公共弹窗
-  |   |          TelUtil.ets                       // 拨号管理工具
   |   |          WindowUtil.ets                    // 窗口管理工具
   |   |  
-  |   |- componentlib/src/main/ets                 // 公共组件模块(har)
+  |   |- componentlib/src/main/ets                 // 公共组件模块
   |   |     └- components 
   |   |          CommonBanner.ets                  // 公共沉浸式顶栏             
   |   |          CommonButton.ets                  // 公共按钮         
   |   |          CommonDivider.ets                 // 公共分割线          
   |   |          CommonHeader.ets                  // 公共标题栏         
   |   |          CommonScroll.ets                  // 公共沉浸式滚动栏         
-  |   |          VipCard.ets                       // 会员卡组件 
+  |   |          CommonTagList.ets                 // 会员卡组件 
   |   |   
-  |   └- network/src/main/ets                      // 网络模块(har)
+  |   └- network/src/main/ets                      // 网络模块
   |        |- apis                                 // 网络接口  
   |        |- mocks                                // 数据mock   
   |        |- models                               // 网络库封装    
   |        └- types                                // 请求和响应类型   
   |
-  |- entry                                         // 应用层主包(hap)  
+  |- components                                    // 业务组件层
+  |   |- module_call_dialog                        // 拨号组件
+  |   |- module_date_selector                      // 酒店日期选择组件   
+  |   |- module_login                              // 登录组件   
+  |   |- module_store_comments                     // 店铺评价组件   
+  |   |- module_privacy_agreement                  // 申请权限许可组件   
+  |   └- module_ui_base                            // 组件通用能力封装  
+  |
+  |- entry                                         // 应用层主包 
   |   └-  src/main/ets                                               
-  |        |- entryability                                                               
-  |        |- entryformability                                                        
+  |        |- entryability                                                      
+  |        |- entryformability                                                   
   |        |- pages                              
-  |        |    EmptyPage.ets                      // 入口页面
+  |        |    Index.ets                          // 入口页面
   |        |    MainEntry.ets                      // 主页面
+  |        |    SafePage.ets                       // 应用启动安全拦截页
   |        |- types                                // interface接口定义
-  |        |- viewmodels                           // 与页面一一对应的vm层          
+  |        |- viewmodels                           // 与页面一一对应的vm层 
   |        └- widget                               // 卡片页面 
   |                                            
-  |- features/service                              // 特性层
-  |   |- banquet/src/main/ets                      // 宴会厅模块(hsp)
-  |   |    |- common                               // 常量
-  |   |    |- components                           // 抽离组件         
-  |   |    |- pages                               
-  |   |    |    BanquetHotelListPage.ets           // 酒店列表页
-  |   |    |    BanquetInfoPage.ets                // 宴会厅详情页
-  |   |    |    BanquetListPage.ets                // 宴会厅列表页
-  |   |    |- types                                // interface类型定义
-  |   |    └- viewmodels                           // 与页面一一对应的vm层          
-  |   |     
-  |   |- catering/src/main/ets                     // 订餐模块(hsp)
-  |   |    |- components                           // 抽离组件   
-  |   |    |- mapper                               // 接口数据到页面数据类型映射 
-  |   |    |- models                               // class类型定义     
-  |   |    |- pages                               
-  |   |    |    FoodInfoPage.ets                   // 套餐详情页
-  |   |    |    FoodOrderSubmitPage.ets            // 套餐预下单页
-  |   |    |    RestaurantListPage.ets             // 餐厅列表页
-  |   |    |    RestaurantPage.ets                 // 餐厅详情页
-  |   |    └- viewmodels                           // 与页面一一对应的vm层  
-  |   |  
-  |   |- comments/src/main/ets                     // 评论模块(hsp)
-  |   |    |- components                           // 抽离组件   
-  |   |    |- constants                            // 常量 
-  |   |    |- models                               // class类型定义     
-  |   |    |- pages                               
-  |   |    |    CommentListPage.ets                // 评论列表页
-  |   |    |    SubmitCommentPage.ets              // 提交评论页
-  |   |    |- types                                // interface类型定义
-  |   |    └- viewmodels                           // 与页面一一对应的vm层   
-  |   | 
-  |   |- commonservice/src/main/ets                // 其他服务模块(hsp)
-  |   |    |- Introduction                         // 酒店介绍   
-  |   |    |- Location                             // 酒店位置 
-  |   |    |- MyOrders                             // 用户订单     
-  |   |    └- PrivacyPolicy                        // 隐私政策    
-  |   | 
-  |   └- hotel/src/main/ets                        // 订餐模块(hsp)
-  |        |- components                           // 抽离组件   
-  |        |- constants                            // 常量 
-  |        |- mapper                               // 接口数据到页面数据类型映射 
-  |        |- models                               // class类型定义     
-  |        |- pages                               
-  |        |    HotelListPage.ets                  // 酒店列表页
-  |        |    HotelOrderPage.ets                 // 酒店客房预下单页
-  |        |    RoomInfoPage.ets                   // 客房详情页
-  |        |    RoomListPage.ets                   // 客房列表页
-  |        |- types                                // interface类型定义
-  |        └- viewmodels                           // 与页面一一对应的vm层 
-  |    
-  └- features/tabs    
-      |- hotel                                     // 酒店tab页功能组合(hsp)
+  └- features                                      // 特性层
+      |- banquet/src/main/ets                      // 宴会厅模块    
+      |    └- pages                               
+      |         BanquetHotelListPage.ets           // 酒店列表页
+      |         BanquetInfoPage.ets                // 宴会厅详情页
+      |         BanquetListPage.ets                // 宴会厅列表页     
+      |     
+      |- catering/src/main/ets                     // 订餐模块 
+      |    └- pages                               
+      |         FoodInfoPage.ets                   // 套餐详情页
+      |         FoodOrderSubmitPage.ets            // 套餐预下单页
+      |         RestaurantListPage.ets             // 餐厅列表页
+      |         RestaurantPage.ets                 // 餐厅详情页
       | 
-      |- mine                                      // 我的tab页功能组合(hsp)
+      |- commonservice/src/main/ets                // 其他服务模块
+      |    |- Comments                             // 评价
+      |    |- Introduction                         // 酒店介绍   
+      |    |- Location                             // 酒店位置 
+      |    |- Login                                // 登录
+      |    |- MyOrders                             // 用户订单     
+      |    └- PrivacyPolicy                        // 隐私政策    
       | 
-      └- vip                                       // vip的tab页功能组合(hsp)
+      |- hotel/src/main/ets                        // 订餐模块  
+      |    └- pages                               
+      |         HotelListPage.ets                  // 酒店列表页
+      |         HotelOrderPage.ets                 // 酒店客房预下单页
+      |         RoomInfoPage.ets                   // 客房详情页
+      |         RoomListPage.ets                   // 客房列表页
+	  |
+      └- settings/src/main/ets                     // 设置   
+           └- views                               
+                AgreementPage.ets                  // 隐私政策页
+                AgreementPreviewPage.ets           // 政策和协议预览页
+                LoginPage.ets                      // 登录页
+                ProfileEditPage.ets                // 账户信息修改页
+                SettingPage.ets                    // 设置页
 ```
 
 
@@ -195,20 +188,19 @@ FullServiceHotel
 
 
 
-
-
-## 环境要求
+## 约束与限制
 
 ### 软件
 
-* DevEco Studio版本：DevEco Studio 5.0.0 Release及以上
-* HarmonyOS SDK版本：HarmonyOS 5.0.0 Release SDK及以上
+* DevEco Studio版本：DevEco Studio5.0.4 Release及以上
+* HarmonyOS SDK版本：HarmonyOS5.0.4 Release SDK及以上
+* 设备类型：华为手机（包括双折叠和阔折叠）
+* 系统版本：HarmonyOS 5.0.4(16)及以上
 
-### 硬件
+### 权限要求
 
-* 设备类型：华为手机（直板机）
-* HarmonyOS版本：HarmonyOS 5.0.0 Release及以上
-
+* 获取位置权限：ohos.permission.APPROXIMATELY_LOCATION，ohos.permission.LOCATION。
+* 网络权限：ohos.permission.INTERNET
 
 
 ## 快速入门
@@ -217,61 +209,44 @@ FullServiceHotel
 
 在运行此模板前，需要完成以下配置：
 
-1. 在AppGallery Connect创建元服务，将包名配置到模板中。
+1. 在AppGallery Connect创建应用，将包名配置到模板中。
 
-   a. 参考[创建元服务](https://developer.huawei.com/consumer/cn/doc/app/agc-help-createharmonyapp-0000001945392297)为元服务创建APP ID，并将APP ID与元服务进行关联。
+   a. 参考[创建HarmonyOS应用](https://developer.huawei.com/consumer/cn/doc/app/agc-help-create-app-0000002247955506)为应用创建APP ID，并将APP ID与应用进行关联。
 
-   b. 返回应用列表页面，查看元服务的包名。
+   b. 返回应用列表页面，查看应用的包名。
 
-   c. 将模板工程根目录下AppScope/app.json5文件中的bundleName替换为创建元服务的包名。
+   c. 将模板工程根目录下AppScope/app.json5文件中的bundleName替换为创建应用的包名。
 
-2. 配置服务器域名。
+2. 配置华为账号服务。
 
-   本模板接口均采用mock数据，由于元服务包体大小有限制，部分图片资源将从云端拉取，所以需为模板项目[配置服务器域名](https://developer.huawei.com/consumer/cn/doc/atomic-guides/agc-help-harmonyos-server-domain)，“httpRequest合法域名”需要配置为：`https://agc-storage-drcn.platform.dbankcloud.cn`
+   a. 将应用的client ID配置到entry/src/main路径下的module.json5文件中，详细参考：[配置Client ID](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-client-id)。
 
-3. 配置华为账号服务。
-
-   a. 将元服务的client ID配置到entry/src/main路径下的module.json5文件，详细参考：[配置Client ID](https://developer.huawei.com/consumer/cn/doc/atomic-guides/account-atomic-client-id)。
-
-   b. 如需获取用户真实手机号，需要申请phone权限，详细参考：[配置scope权限](https://developer.huawei.com/consumer/cn/doc/atomic-guides/account-guide-atomic-permissions)，并在端侧使用快速验证手机号码Button进行[验证获取手机号码](https://developer.huawei.com/consumer/cn/doc/atomic-guides/account-guide-atomic-get-phonenumber)。
+   b. 申请华为账号一键登录所需的quickLoginMobilePhone权限，详细参考：[配置scope权限](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-config-permissions)。
 
 4. 配置地图服务。
 
-   a. 将元服务的client ID配置到entry/src/main路径下的module.json5文件，如果华为账号服务已配置，可跳过此步骤。
+   a. 将应用的client ID配置到entry/src/main路径下的module.json5文件，如果华为账号服务已配置，可跳过此步骤。
 
    b. [开通地图服务](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/map-config-agc)。
 
-5. 配置支付服务。
+4. 配置支付服务。
 
    华为支付当前仅支持商户接入，在使用服务前，需要完成商户入网、开发服务等相关配置，本模板仅提供了端侧集成的示例。详细参考：[支付服务接入准备](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/payment-preparations)
 
-6. 对元服务进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing#section297715173233)。
+5. 对应用进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing#section297715173233)。
 
-7. 添加手工签名所用证书对应的公钥指纹。详细参考：[配置应用签名证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-signature-info-0000001628566748#section5181019153511)
+6. 添加手工签名所用证书对应的公钥指纹。详细参考：[配置应用签名证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-cert-fingerprint-0000002278002933)
 
 ###  运行调试工程
 
-1. 用USB线连接调试手机和PC。
+1. 连接调试手机和PC。
 
-2. 配置多模块调试：由于本模板存在多个模块，运行时需确保所有模块安装至调试设备。
+2. 菜单选择“Run > Run 'entry' ”或者“Run > Debug 'entry' ”，运行或调试模板工程。
 
-   a. 运行模块选择“entry”。
-
-   b. 下拉框选择“Edit Configurations”，在“Run/Debug Configurations”界面，选择“Deploy Multi Hap”页签，勾选上模板中所有模块。
-
-   ![调试步骤](screenshots/调试步骤.png)
-
-   c. 点击"Run"，运行模板工程。
 
 ## 示例效果
 
    <img src="screenshots/display.gif" alt="display" width="300">
-
-
-## 权限要求
-
-* 获取位置权限：ohos.permission.APPROXIMATELY_LOCATION，ohos.permission.LOCATION。
-* 网络权限：ohos.permission.INTERNET	
 
 
 ## 开源许可协议

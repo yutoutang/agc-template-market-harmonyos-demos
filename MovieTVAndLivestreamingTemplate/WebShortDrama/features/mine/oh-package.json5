@@ -11,6 +11,10 @@
     "@agctemplate/utils": "1.0.0",
     "@agctemplate/server": "1.0.0",
     "@agctemplate/common": "1.0.0",
-    "@agctemplate/detail": "1.0.0"
+    "@agctemplate/detail": "1.0.0",
+    "@agctemplate/feed_back": "file:../../components/feed_back",
+    "vip_center": "file:../../components/vip_center",
+    "@agctemplate/open_ads": "1.0.0",
+    "@agctemplate/module_login": "1.0.0"
   }
 }

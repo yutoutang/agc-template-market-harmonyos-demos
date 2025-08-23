@@ -9,7 +9,8 @@
   "dependencies": {
     "commonlib": "file:../../commons/commonlib",
     "network": "file:../../commons/network",
-    "uicalendarpicker": "file:../../commons/uicalendarpicker"
+    "module_calendar_picker": "file:../../components/module_calendar_picker",
+    "module_person_manage": "file:../../components/module_person_manage"
   },
   "devDependencies": {},
   "dynamicDependencies": {}

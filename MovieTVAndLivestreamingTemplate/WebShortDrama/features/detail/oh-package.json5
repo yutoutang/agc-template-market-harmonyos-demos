@@ -12,6 +12,10 @@
     "@agctemplate/server": "1.0.0",
     "@agctemplate/common": "1.0.0",
     "@agctemplate/theater": "1.0.0",
-    "@agctemplate/video_swiper": "1.0.0"
+    "video_swiper": "1.0.0",
+    "@agctemplate/module_share": "1.0.0",
+    "vip_center": "file:../../components/vip_center",
+    'base_apis': 'file:../../components/base_apis',
+    'aggregated_payment': 'file:../../sdk/aggregated_payment'
   }
 }

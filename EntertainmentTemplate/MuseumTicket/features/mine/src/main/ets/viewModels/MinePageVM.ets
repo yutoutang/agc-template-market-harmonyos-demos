@@ -1,7 +1,8 @@
-import { RouterMap, FormatUtil, RouterModule, AccountUtil, UserInfo } from 'commonlib';
-import { RecommendListItem, Contacts } from '../types/Index';
-import { GetUserInfoResp, https } from 'network';
 import { promptAction } from '@kit.ArkUI';
+import { GetUserInfoResp, https } from 'network';
+import { FormatUtil, AccountUtil, UserInfo, Logger } from 'commonlib';
+import { RecommendListItem, Contacts } from '../types/Index';
+
 
 const TAG = '[MinePageVM]';
 
@@ -57,28 +58,6 @@ export class MinePageVM {
     }
   }
 
-  public async getContactsList() {
-    const res = await https.getContacts();
-    if (res.code === 0) {
-      this.contactList = res.data;
-    }
-  }
-
-
-  public async delContacts() {
-    const res = await https.delContacts(this.delPersonId);
-    if (res.code === 0) {
-      this.contactList = this.contactList.filter((item) => item.personID !== this.delPersonId);
-    }
-  }
-
-  public getContactInfo() {
-    const params: Record<string, Contacts> | undefined = RouterModule.getNavParam({ url: RouterMap.EDIT_VISITOR });
-    if (params) {
-      this.contactInfo = params.contactInfo;
-    }
-  }
-
 
   public async getBannerImg() {
     const res = await https.getBannerImg({ pageType: 2 });
@@ -106,6 +85,27 @@ export class MinePageVM {
     if (res.code === 0) {
       this.updateUserInfo(res.data);
     }
+  }
+
+  public mockBindPhone() {
+    AlertDialog.show({
+      title: '提示',
+      message: '元服务未获取phone权限或用户授权，点击确定将模拟创建关联账号？',
+      height: 170,
+      alignment: DialogAlignment.Center,
+      primaryButton: {
+        value: '取消',
+        action: () => {
+          Logger.info(TAG, '取消模拟创建关联账号');
+        },
+      },
+      secondaryButton: {
+        value: '确定',
+        action: () => {
+          this.bindPone('0');
+        },
+      },
+    });
   }
 
 

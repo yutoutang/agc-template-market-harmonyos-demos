@@ -1,0 +1,16 @@
+{
+  "name": "commonservice",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "componentlib": "file:../../commons/componentlib",
+    "commonlib": "file:../../commons/commonlib",
+    "network": "file:../../commons/network",
+    "module_store_comments": "file:../../components/module_store_comments",
+    "module_call_dialog": "file:../../components/module_call_dialog",
+    "module_login": "file:../../components/module_login"
+  }
+}

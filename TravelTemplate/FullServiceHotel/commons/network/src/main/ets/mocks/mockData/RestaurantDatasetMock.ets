@@ -48,7 +48,7 @@ const meal2: MealPackage = {
   id: 1102,
 };
 const meal3: MealPackage = {
-  image: MockImageMap.IMG_MEAL1,
+  image: MockImageMap.IMG_MEAL4,
   monthlySell: 7,
   discountedPrice: 98,
   price: 195,

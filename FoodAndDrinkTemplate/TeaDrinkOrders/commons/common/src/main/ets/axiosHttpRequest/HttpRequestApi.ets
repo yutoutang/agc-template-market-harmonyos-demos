@@ -6,8 +6,8 @@ import {
   BaseResponse,
   CouponResp,
   DishesType,
-  Good,
-  GoodSpecInfo,
+  Goods,
+  GoodsSpecInfo,
   HmSystem,
   MyCar,
   MyCoupon,
@@ -58,7 +58,7 @@ export async function getOpenLoginHm(code: string = '') {
   let params = {
     storeId: storeInfo.storeId,
     userId: userInfo.userInfo.id,
-    code: code ?? AppStorage.get('authCode') as string,
+    code: code,
   } as CommonReq
   return AxiosRequest.get<BaseResponse<UserInfo>>({
     url: RequestUrl.GET_OPEN_LOGIN_HM_URL,
@@ -122,16 +122,16 @@ export function getDishesList(storeId: string) {
 }
 
 /**
- * 通过goodId接口获取商品详情
- * @param goodId
+ * 通过goodsId接口获取商品详情
+ * @param goodsId
  * @returns
  */
-export function getGoodInfo(goodId: string) {
+export function getGoodsInfo(goodsId: string) {
   let params = {
-    goodId: goodId,
+    goodsId: goodsId,
   } as CommonReq
-  return AxiosRequest.get<Good>({
-    url: RequestUrl.GET_GOOD_INFO_URL,
+  return AxiosRequest.get<Goods>({
+    url: RequestUrl.GET_GOODS_INFO_URL,
     showLoading: true,
     headers: {} as AxiosRequestHeaders,
     params,
@@ -140,18 +140,18 @@ export function getGoodInfo(goodId: string) {
 
 /**
  * 获取单个商品规格信息
- * @param goodId
+ * @param goodsId
  * @param combination
  * @returns
  */
-export function getGoodSpec(goodId: string, combination: PackageSpec[]) {
+export function getGoodsSpec(goodsId: string, combination: PackageSpec[]) {
   let params = {
-    goodId: goodId,
+    goodsId: goodsId,
     spec: combination.map(item => item.specName).join(','),
     combination: combination,
   } as CommonReq
-  return AxiosRequest.get<BaseResponse<GoodSpecInfo>>({
-    url: RequestUrl.GET_GOOD_SPEC_URL,
+  return AxiosRequest.get<BaseResponse<GoodsSpecInfo>>({
+    url: RequestUrl.GET_GOODS_SPEC_URL,
     showLoading: true,
     headers: {} as AxiosRequestHeaders,
     params,
@@ -160,17 +160,17 @@ export function getGoodSpec(goodId: string, combination: PackageSpec[]) {
 
 /**
  * 16、规格饮品到购物车
- * @param goodId
+ * @param goodsId
  * @param n
  * @param num
  * @returns
  */
-export function addCarBySpec(goodId: string, n: GoodSpecInfo, num: number) {
+export function addCarBySpec(goodsId: string, n: GoodsSpecInfo, num: number) {
   let userInfo: UserInfoModel = AppStorageV2.connect(UserInfoModel, () => new UserInfoModel())!;
   let storeInfo: StoreInfoModel = AppStorageV2.connect(StoreInfoModel, () => new StoreInfoModel())!;
   let params: AddCarReq = {
     money: n.money ?? '',
-    goodId: goodId,
+    goodsId: goodsId,
     storeId: storeInfo.storeId,
     userId: userInfo.userInfo.id,
     num: num,

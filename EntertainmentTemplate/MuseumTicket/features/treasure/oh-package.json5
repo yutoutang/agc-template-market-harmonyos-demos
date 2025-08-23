@@ -1,0 +1,14 @@
+{
+  "name": "treasure",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "packageType": "InterfaceHar",
+  "dependencies": {
+    "commonlib": "file:../../commons/commonlib",
+    "module_page_swiper": "file:../../components/module_page_swiper",
+    "network": "file:../../commons/network"
+  }
+}

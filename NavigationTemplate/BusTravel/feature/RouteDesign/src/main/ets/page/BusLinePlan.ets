@@ -1,48 +1,27 @@
-import { ItemRestriction, SegmentButton, SegmentButtonIconTextItem, SegmentButtonOptions } from '@kit.ArkUI';
-import { RealTimeBus } from './realTimeBus';
-import { RouteEntryVM } from 'common';
-import { TravelPlan } from './TravelPlan';
-import { Permissions } from '@kit.AbilityKit';
-import { RandomCountdown } from '../components/RandomCountdown';
+import { Permissions } from '@kit.AbilityKit'
+import { RouteEntryVM } from 'common'
+import { RealTimeBus } from './realTimeBus'
+import { TravelPlan } from './TravelPlan'
+import { RandomCountdown } from '../components/RandomCountdown'
+import { CustomSegmentButton } from '../components/CustomSegmentButton'
+import { ButtonItem, ButtonOptions } from '../viewmodels/ButtonItems'
 
 @Builder
 export function BusLinePlanBuilder() {
   BusLinePlan()
 }
 
-@Component
+@ComponentV2
 export struct BusLinePlan {
-  @Provide('busLineTimeList') busLineTimeList: Map<string, RandomCountdown> = new Map()
-  permissions: Array<Permissions> = ['ohos.permission.APPROXIMATELY_LOCATION', 'ohos.permission.LOCATION'];
-  vm: RouteEntryVM = RouteEntryVM.instance;
-  @State @Watch('refreshIndex') mTabSelectedIndex: number[] = [0]
-  @State @Watch('refreshPage') mCurrentIndex: number = 0;
-  @State tabOptions: SegmentButtonOptions = SegmentButtonOptions.capsule({
-    buttons: [
-      { text: '实时公交', icon: $r('app.media.bus'), selectedIcon: $r('app.media.bus_select') },
-      { text: '路线规划', icon: $r('app.media.route'), selectedIcon: $r('app.media.route_select') },
-    ] as ItemRestriction<SegmentButtonIconTextItem>,
-    imageSize: { width: '24lpx', height: '24lpx' },
-    selectedBackgroundColor: $r('app.color.system_color_green'),
-    selectedFontColor: $r('sys.color.font_on_primary'),
-    fontColor: $r('sys.color.font_secondary'),
-    fontSize: $r('sys.float.Body_M'),
-    selectedFontSize: $r('sys.float.Body_M'),
-    textPadding: '4lpx'
-  });
-  @State tabSelectedIndexes: number[] = [0];
-  private controller: TabsController = new TabsController();
+  @Provider('busLineTimeList') busLineTimeList: Map<string, RandomCountdown> = new Map()
+  permissions: Array<Permissions> = ['ohos.permission.APPROXIMATELY_LOCATION', 'ohos.permission.LOCATION']
+  vm: RouteEntryVM = RouteEntryVM.instance
+  tabOptions: ButtonOptions =
+    new ButtonOptions([{ text: '实时公交', icon: $r('app.media.bus'), selectedIcon: $r('app.media.bus_select') },
+      { text: '路线规划', icon: $r('app.media.route'), selectedIcon: $r('app.media.route_select') },] as ButtonItem[])
+  @Local tabSelectedIndex: number = 0
+  private controller: TabsController = new TabsController()
   scroller: Scroller = new Scroller()
-
-  //Tabs刷新SegmentButton (Tabs => SegmentButton)
-  refreshPage() {
-    this.mTabSelectedIndex = [this.mCurrentIndex]
-  }
-
-  //SegmentButton刷新Tabs (SegmentButton => Tabs)
-  refreshIndex() {
-    this.controller.changeIndex(this.mTabSelectedIndex[0])
-  }
 
   @Builder
   topTitle() {
@@ -63,19 +42,20 @@ export struct BusLinePlan {
         Column() {
           this.topTitle()
           Row() {
-            SegmentButton({
-              options: this.tabOptions,
-              selectedIndexes: this.mTabSelectedIndex
+            CustomSegmentButton({
+              buttonOptions: this.tabOptions,
+              selectIndex: this.tabSelectedIndex,
+              onSelectIndexChange: (index: number) => {
+                this.tabSelectedIndex = index
+              }
             })
-              .width('328lpx')
-              .height('63lpx')
           }
           .height('64lpx')
           .width('330lpx')
           .margin({ bottom: '24lpx' })
           .justifyContent(FlexAlign.SpaceBetween)
 
-          Tabs({ controller: this.controller }) {
+          Tabs({ controller: this.controller,index: this.tabSelectedIndex }) {
             TabContent() {
               RealTimeBus()
             }
@@ -86,15 +66,14 @@ export struct BusLinePlan {
           }
           .barHeight(0)
           .onChange((index: number) => {
-            this.mCurrentIndex = index;
-
+            this.tabSelectedIndex = index
           })
           //使用onAnimationStart，动画开始执行至targetIndex时进行刷新
           .onAnimationStart((index: number, targetIndex: number, event: TabsAnimationEvent) => {
             if (index === targetIndex) {
               return
             }
-            this.mCurrentIndex = targetIndex
+            this.tabSelectedIndex = targetIndex
           })
 
           Blank()

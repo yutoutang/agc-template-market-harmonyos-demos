@@ -10,6 +10,14 @@
 
 ## 功能介绍
 
+您可以基于此模板直接定制元服务，也可以挑选此模板中提供的多种组件使用，从而降低您的开发难度，提高您的开发效率。
+
+此模板提供如下组件，所有组件存放在工程根目录的components下，如果您仅需使用组件，可参考对应组件的指导链接；如果您使用此模板，请参考本文档。
+
+| 组件                                              | 描述                     | 使用指导                                                     |
+| :------------------------------------------------ | :----------------------- | :----------------------------------------------------------- |
+| 元服务关联账号组件（automatic_association_count） | 元服务关联账号、解除关联 | [使用指导](components/automatic_association_count/README.md) |
+
 本模板为医保元服务提供了常用功能的开发样例，模板主要分首页、服务、医保码、资讯、和我的五大模块：
 
 * 首页：主要提供医保码展示，长辈模式，以及热点查询，便民服务等功能
@@ -24,8 +32,8 @@
 
 本模板已集成华为账号、定位、地图等服务，只需做少量配置和定制即可快速实现华为账号的登录、位置定位等功能，从而快速完成相关功能的实现。
 
-| 首页                           | 服务                              | 我的                           | 资讯                           |
-|------------------------------|---------------------------------|------------------------------|------------------------------|
+| 首页                                                   | 服务                                                      | 我的                                                   | 资讯                                                   |
+| ------------------------------------------------------ | --------------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------ |
 | <img src="screenshot/home.png" alt="首页" width="300"> | <img src="screenshot/service.png" alt="服务" width="300"> | <img src="screenshot/mine.png" alt="我的" width="300"> | <img src="screenshot/news.png" alt="资讯" width="300"> |
 
 本模板主要页面及核心功能如下所示：
@@ -137,6 +145,7 @@
    │  └──widget                              // 服务卡片    
    └──phone/src/main/resources               // 资源文件目录
 ```
+
 ## 约束与限制
 
 ### 环境
@@ -144,16 +153,12 @@
 * DevEco Studio版本：DevEco Studio 5.0.4 Release及以上
 * HarmonyOS SDK版本：HarmonyOS 5.0.4 Release SDK及以上
 * 设备类型：华为手机（直板机）
-* HarmonyOS版本：HarmonyOS 5.0.4 Release及以上
+* 系统版本：HarmonyOS 5.0.4(16)及以上
 
 ### 权限要求
 
 * 获取位置权限：ohos.permission.APPROXIMATELY_LOCATION
 * 网络权限：ohos.permission.INTERNET
-
-### 调试
-
-本模板不支持使用模拟器调试，请使用真机进行调试
 
 ## 快速入门
 
@@ -163,7 +168,7 @@
 
 1. 在AppGallery Connect创建元服务，将包名配置到模板中。
 
-   a. 参考[创建元服务](https://developer.huawei.com/consumer/cn/doc/app/agc-help-createharmonyapp-0000001945392297)为元服务创建APP ID，并将APP ID与元服务进行关联。
+   a. 参考[创建元服务](https://developer.huawei.com/consumer/cn/doc/app/agc-help-create-app-0000002247955506)为元服务创建APP ID，并将APP ID与元服务进行关联。
 
    b. 返回应用列表页面，查看元服务的包名。
 
@@ -171,15 +176,15 @@
 
 2. 配置地图服务。
 
-   a. 参考[开通地图服务](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/map-config-agc) 依次开通地图服务、位置服务、定位服务。
+   a. 参考[开通地图服务](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/map-config-agc)。
 
-   <img src="screenshot/img_14.png" alt="开通服务" width="600">
+   <img src="screenshot/img_14.png" alt="开通服务" width="1200">
 
 3. 本模板是端云一体模版，采用云函数接口的方式mock请求数据，所以需要部署云函数以及云数据库。
 
    a. [开通元函数服务](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/cloudfoundation-enable-function)和[开通云数据库服务](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/cloudfoundation-enable-database)
 
-   b. 在CloudProgram/cloud-config.json文件中配置相关信息，依次填写当前项目的appId、appName、projectId、teamId、projectName，相关信息查询参考[查看应用基本信息](https://developer.huawei.com/consumer/cn/doc/app/agc-help-appinfo-0000001100014694) 。
+   b. 在CloudProgram/cloud-config.json文件中配置相关信息，依次填写当前项目的appId、appName、projectId、teamId、projectName，相关信息查询参考[查看应用基本信息](https://developer.huawei.com/consumer/cn/doc/app/agc-help-view-app-info-0000002282674569) 。
 
    <img src="screenshot/img_19.png" alt="配置信息" width="600">
    <img src="screenshot/img_18.png" alt="查询信息" width="600">
@@ -192,7 +197,7 @@
    d. 打开云函数中govn-userinfo函数的[AxiosApi.ts](../CloudProgram/cloudfunctions/govn-userinfo/AxiosApi.ts)文件，将getAccessToken方法中的client_id以及client_secret修改为你当前项目下对应应用的client_id和client_secret。
 
    <img src="screenshot/img_24.png" alt="配置id和secret" width="600">
-   
+
    e. 部署云函数。右击goven-userinfo，点击Deploy 'goven-userinfo'部署云函数，类似操作部署home-service、informations-service和service-list。
 
    <img src="screenshot/img_11.png" alt="部署云函数">
@@ -205,7 +210,7 @@
 
    a. [开通预加载服务](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/cloudfoundation-enable-prefetch)。
 
-   b. 为预加载绑定签名部署的云函数home-service。
+   b. 为预加载绑定前面部署的云函数home-service。
 
    <img src="screenshot/img_13.png" alt="选择云函数" width="600">
 
@@ -217,11 +222,9 @@
 
    b. 如需获取用户真实手机号，需要申请phone权限，详细参考：[配置scope权限](https://developer.huawei.com/consumer/cn/doc/atomic-guides/account-guide-atomic-permissions)，并在端侧使用快速验证手机号码Button进行[验证获取手机号码](https://developer.huawei.com/consumer/cn/doc/atomic-guides/account-guide-atomic-get-phonenumber)。
 
-6. 为元服务[配置服务器域名](https://developer.huawei.com/consumer/cn/doc/atomic-guides/agc-help-harmonyos-server-domain)，配置httpRequest合法域名即可。
-   
-7. 对元服务进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing)。
+6. 对元服务进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing#section297715173233)。
 
-8. 添加手工签名所用证书对应的公钥指纹。详细参考：[配置应用签名证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-signature-info-0000001628566748#section5181019153511)。
+7. 添加手工签名所用证书对应的公钥指纹。详细参考：[配置应用签名证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-cert-fingerprint-0000002278002933)。
 
 ### 运行调试工程
 

@@ -1,5 +1,6 @@
-import { AppStorageBank, getUserInfo, UserInfo } from 'lib_foundation';
 import { AppStorageV2 } from '@kit.ArkUI';
+import { getUserInfo } from 'lib_foundation';
+import { AppStorageBank, IUserInfo, UserInfo } from 'module_base'
 
 @ObservedV2
 export class QuickLoginPageVM {
@@ -16,6 +17,6 @@ export class QuickLoginPageVM {
 
   public async login() {
     const res = await getUserInfo();
-    AppStorageBank.updateUserInfo(res)
+    AppStorageBank.updateUserInfo(res as IUserInfo)
   }
 }

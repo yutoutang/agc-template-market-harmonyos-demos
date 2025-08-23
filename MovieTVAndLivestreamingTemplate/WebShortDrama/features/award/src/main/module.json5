@@ -1,0 +1,10 @@
+{
+  "module": {
+    "name": "award",
+    "type": "har",
+    "deviceTypes": [
+      "default",
+      "tablet"
+    ]
+  }
+}

@@ -11,6 +11,10 @@
     {
       "name": "EntryAbility_label",
       "value": "出行模板"
+    },
+    {
+      "name": "agcit_huawei_bus_travel",
+      "value": "1.0.2"
     }
   ]
 }

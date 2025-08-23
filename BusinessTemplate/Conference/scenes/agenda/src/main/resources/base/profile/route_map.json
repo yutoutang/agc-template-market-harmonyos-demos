@@ -1,0 +1,29 @@
+{
+  "routerMap": [
+    {
+      "name": "Agenda",
+      "pageSourceFile": "src/main/ets/pages/Agenda.ets",
+      "buildFunction": "AgendaBuilder"
+    },
+    {
+      "name": "AgendaDetail",
+      "pageSourceFile": "src/main/ets/pages/AgendaDetail.ets",
+      "buildFunction": "AgendaDetailBuilder"
+    },
+    {
+      "name": "AgendaSearchAndFilter",
+      "pageSourceFile": "src/main/ets/pages/AgendaSearchAndFilter.ets",
+      "buildFunction": "AgendaSearchAndFilterBuilder"
+    },
+    {
+      "name": "ActivityListLevelTwo",
+      "pageSourceFile": "src/main/ets/pages/ActivityListLevelTwo.ets",
+      "buildFunction": "ActivityListLevelTwoBuilder"
+    },
+    {
+      "name": "AgendaSearchResult",
+      "pageSourceFile": "src/main/ets/pages/AgendaSearchResult.ets",
+      "buildFunction": "AgendaSearchResultBuilder"
+    }
+  ]
+}

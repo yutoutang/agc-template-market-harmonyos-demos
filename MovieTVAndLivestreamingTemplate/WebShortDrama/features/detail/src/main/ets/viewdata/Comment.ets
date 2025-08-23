@@ -1,4 +1,4 @@
-import { BasicDataSource } from '@agctemplate/video_swiper';
+import { BasicDataSource } from 'video_swiper';
 
 /**
  * 评论属性

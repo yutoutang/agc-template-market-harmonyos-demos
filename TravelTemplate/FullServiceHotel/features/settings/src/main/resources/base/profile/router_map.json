@@ -1,0 +1,29 @@
+{
+  "routerMap": [
+    {
+      "name": "LoginPage",
+      "pageSourceFile": "src/main/ets/views/LoginPage.ets",
+      "buildFunction": "LoginPageBuilder"
+    },
+    {
+      "name": "SettingPage",
+      "pageSourceFile": "src/main/ets/views/SettingPage.ets",
+      "buildFunction": "SettingPageBuilder"
+    },
+    {
+      "name": "AgreementPage",
+      "pageSourceFile": "src/main/ets/views/AgreementPage.ets",
+      "buildFunction": "AgreementPageBuilder"
+    },
+    {
+      "name": "AgreementPreviewPage",
+      "pageSourceFile": "src/main/ets/views/AgreementPreviewPage.ets",
+      "buildFunction": "AgreementPreviewPageBuilder"
+    },
+    {
+      "name": "ProfileEditPage",
+      "pageSourceFile": "src/main/ets/views/ProfileEditPage.ets",
+      "buildFunction": "profileEditPageBuilder"
+    }
+  ]
+}

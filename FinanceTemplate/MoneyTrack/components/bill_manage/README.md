@@ -1,169 +1,168 @@
-# bill_manage组件包快速入门
+# 账单管理组件快速入门
 
-## BillManageSheet
+- [简介](#简介)
+- [约束与限制](#约束与限制)
+- [快速入门](#快速入门)
+- [API参考](#API参考)
+- [示例代码](#示例代码)
 
-### 简介
 
-`BillManageSheet` 组件用于管理账单信息，支持初始化账单数据、处理确认操作和资源管理操作。
 
-<img src="snapshots/BillManageSheetIntro.PNG" alt="BillManageSheetIntro" width="300">
+## 简介
 
-### 使用
+本组件提供以下两个账单管理页面：
 
-1. 组件依赖
+- BillManageSheet用于管理账单信息，支持初始化账单数据、处理确认操作和资源管理操作。
 
-   由于BillManageSheet组件依赖**bill_base har**包，所以需要将模板根目录的components下**bill_base **
-   目录拷贝至您的工程相应目录，拷贝完成后，在工程目录的`oh-package.json5`文件添加依赖。点击`file->Sync and Refresh Project`
-   进行依赖安装。
+- ResourceManageSheet用于管理账单来源分类的组件，支持处理弹出操作以及删除操作的成功回调。
+
+| BillManageSheet                                              | ResourceManageSheet                                          |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| <img src="snapshots/BillManageSheetIntro.PNG" alt="BillManageSheetIntro" height="500"> | <img src="snapshots/ResourceManageSheetIntro.PNG" alt="ResourceManageSheetIntro" height="500"> |
+
+
+
+## 约束与限制
+
+### 环境
+
+* DevEco Studio版本：DevEco Studio 5.0.2 Release及以上
+* HarmonyOS SDK版本：HarmonyOS 5.0.2 Release SDK及以上
+* 设备类型：华为手机（包括双折叠和阔折叠）
+* 系统版本：HarmonyOS 5.0.2(14)及以上
+
+
+## 快速入门
+
+1. 安装组件。
+
+   如果是在DevEvo Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
+
+   如果是从生态市场下载组件，请参考以下步骤安装组件。
+
+   a. 解压下载的组件包，将包中所有文件夹拷贝至您工程根目录的XXX目录下。
+   b. 在项目根目录build-profile.json5添加bill_base和bill_manage模块。
 
    ```typescript
-   // bill_manage/oh-package.json5
-   // BillManageSheet，注意依赖路径为实际工程的相对路径
-   "dependencies": {
-     "bill_base ": "file:../bill_base "
-   }
-   ```
-
-2. 安装组件。
-
-   ```ts
-   // 在项目根目录build-profile.json5填写bill_base和bill_manage路径，注意路径为实际工程的相对路径
+   // 在项目根目录build-profile.json5填写bill_base和bill_manage路径。其中XXX为组件存放的目录名
      "modules": [
        {
          "name": "bill_base",
-         "srcPath": "./bill_base",
+         "srcPath": "./XXX/bill_base"
        },
        {
          "name": "bill_manage",
-         "srcPath": "./bill_manage",
+         "srcPath": "./XXX/bill_manage"
        }
      ]
    ```
 
+2. 在根目录oh-package.json5中添加依赖。
+
    ```typescript
-   // 需要使用组件的模块/oh-package.json5 例如entry/oh-package.json5
+   // XXX为组件存放的目录名称
    "dependencies": {
-     "bill_manage": "file:../bill_manage"
+     "bill_manage": "file:./XXX/bill_manage",
+     "bill_base": "file:./XXX/bill_base"
    }
    ```
 
-3. 引入组件与相关数据结构定义
+3. 使用BillManageSheet组件。
+
+   a. 引入组件句柄。
 
    ```ts
    import { BillManageSheet, billManageSheetBuilder } from 'bill_manage';
    ```
 
-4. 调用组件。
+   b. 调用组件，详见[示例1](#示例1 （新增、编辑账单）)。
+
+4. 使用ResourceManageSheet组件。
+
+   a. 引入组件句柄。
 
    ```ts
-   import { BillManageSheet, billManageSheetBuilder } from 'bill_manage';
-
-   @Entry
-   @ComponentV2
-   struct BillManageSheetExample1 {
-     @Local showCreateSheet: boolean = false;
-     @Local stack: NavPathStack = new NavPathStack();
-
-     @Builder
-     pageMap(url: string) {
-       if (url === 'useComponent') {
-         UseComponent();
-       }
-     }
-
-     build() {
-       Navigation(this.stack) {
-         Column({ space: 24 }) {
-           Text('使用方式1：直接使用组件嵌入页面');
-           Button('打开')
-             .onClick(() => {
-               this.stack.pushPath({ name: 'useComponent' });
-             });
-           Text('使用方式2：使用bindSheet拉起半模态弹框使用');
-           Button('打开')
-             .onClick(() => {
-               this.showCreateSheet = !this.showCreateSheet;
-             })
-             .bindSheet($$this.showCreateSheet,
-               billManageSheetBuilder({}), {
-                 title: { title: '选择资产类型' },
-                 detents: [SheetSize.FIT_CONTENT],
-               });
-         };
-
-       }
-       .navDestination(this.pageMap);
-     }
-   }
-
-   @ComponentV2
-   struct UseComponent {
-     build() {
-       NavDestination() {
-         BillManageSheet();
-       }
-       .title('创建账单');
-     }
-   }
+   import { ResourceManageSheet, resourceManageSheetBuilder } from 'bill_manage';
    ```
 
-<img src="snapshots/BillManageSheetDisplay.gif" alt="BillManageSheetDisplay" width="300">
+   b. 调用组件，详见[示例2](示例2 （新增账单来源分类，删除分类）)。
 
-### API参考
 
-#### 子组件
 
-无
+## API参考
 
-#### 接口
+### 接口
 
-BillManageSheet(option?:BillManageSheetOptions)
+#### BillManageSheet(option?:BillManageSheetOptions)
 
-创建账单组件。
-
-billManageSheetBuilder(options: BillManageSheetOptions)
-
-创建账单组件Builder方法。
+创建、编辑账单组件。
 
 **参数：**
 
-| 参数名     | 类型                                                    | 必填 | 说明           |
-|---------|-------------------------------------------------------|----|--------------|
-| options | [BillManageSheetOptions](#BillManageSheetOptions对象说明) | 否  | 配置创建账单组件的参数。 |
+| 参数名 | 类型                                                      | 是否必填 | 说明                           |
+| ------ | --------------------------------------------------------- | -------- | ------------------------------ |
+| option | [BillManageSheetOptions](#BillManageSheetOptions对象说明) | 否       | 配置创建、编辑账单组件的参数。 |
 
-#### BillManageSheetOptions对象说明
 
-| 名称                   | 类型                                                      | 是否必填 | 说明                          |
-|----------------------|---------------------------------------------------------|------|-----------------------------|
-| initBill             | [BillManageModel](#BillManageModel对象说明) \| undefined    | 否    | 初始化账单数据，用于展示或编辑现有账单。        |
-| handleConfirm        | (data: [BillManageModel](#BillManageModel对象说明)) => void | 否    | 确认操作事件回调函数，接收用户交易数据 `data`。 |
-| handleResourceManage | () => void                                              | 否    | 资源管理操作事件回调函数，用于处理资源管理逻辑。    |
 
-#### BillManageModel对象说明
+#### ResourceManageSheet(option?:ResourceManageSheetOptions)
 
-| 名称            | 类型                                          | 是否必填 | 说明                     |
-|---------------|---------------------------------------------|------|------------------------|
-| accountId     | number                                      | 是    | 账户 ID，标识当前账单所属的账户。     |
-| type          | [BalanceChangeType](#BalanceChangeType枚举说明) | 是    | 交易类型，表示账单的类型（如收入或支出）   |
-| transactionId | number \| undefined                         | 否    | 交易 ID，用于标识具体的交易记录，可选   |
-| resource      | number                                      | 是    | 资源 ID，表示账单相关的资源信息。     |
-| amount        | number                                      | 是    | 交易金额，表示账单的金额。          |
-| date          | string                                      | 是    | 交易日期，格式为 `yyyy-mm-dd`。 |
-| note          | string \| undefined                         | 否    | 备注信息，用于记录账单的额外说明，可选。   |
-| assetId       | number \| undefined                         | 否    | 资产 ID，表示账单相关的资产信息，可选。  |
+创建、编辑来源分类组件。
 
-#### BalanceChangeType枚举说明
+**参数：**
 
-`BalanceChangeType` 是一个枚举类型，表示余额变化的类型，用于区分收入和支出。
+| 参数名 | 类型                                                         | 是否必填 | 说明                               |
+| ------ | ------------------------------------------------------------ | -------- | ---------------------------------- |
+| option | [ResourceManageSheetOptions](#ResourceManageSheetOptions对象说明) | 否       | 配置创建、编辑来源分类组件的参数。 |
 
-| 名称      | 值         | 说明 |
-|---------|-----------|----|
+
+
+### BillManageSheetOptions对象说明
+
+| 名称                 | 类型                                                        | 是否必填 | 说明                                             |
+| -------------------- | ----------------------------------------------------------- | -------- | ------------------------------------------------ |
+| initBill             | [BillManageModel](#BillManageModel对象说明) \| undefined    | 否       | 初始化账单数据，用于展示或编辑现有账单。         |
+| handleConfirm        | (data: [BillManageModel](#BillManageModel对象说明)) => void | 否       | 确认操作事件回调函数，接收用户交易数据 `data`。  |
+| handleResourceManage | () => void                                                  | 否       | 资源管理操作事件回调函数，用于处理资源管理逻辑。 |
+
+
+
+### ResourceManageSheetOptions对象说明
+
+| 名称                | 类型                  | 说明                                                         |
+| ------------------- | --------------------- | ------------------------------------------------------------ |
+| handleAddSuccess    | () => void            | 处理弹出操作的事件回调函数。                                 |
+| handleDeleteSuccess | (key: number) => void | 处理删除操作成功时的事件回调函数，接收被删除项的唯一标识 `key`。 |
+
+
+
+### BillManageModel对象说明
+
+| 名称          | 类型                                            | 是否必填 | 说明                                     |
+| ------------- | ----------------------------------------------- | -------- | ---------------------------------------- |
+| accountId     | number                                          | 是       | 账户 ID，标识当前账单所属的账户。        |
+| type          | [BalanceChangeType](#BalanceChangeType枚举说明) | 是       | 交易类型，表示账单的类型（如收入或支出） |
+| transactionId | number \| undefined                             | 否       | 交易 ID，用于标识具体的交易记录，可选    |
+| resource      | number                                          | 是       | 资源 ID，表示账单相关的资源信息。        |
+| amount        | number                                          | 是       | 交易金额，表示账单的金额。               |
+| date          | string                                          | 是       | 交易日期，格式为 `yyyy-mm-dd`。          |
+| note          | string \| undefined                             | 否       | 备注信息，用于记录账单的额外说明，可选。 |
+| assetId       | number \| undefined                             | 否       | 资产 ID，表示账单相关的资产信息，可选。  |
+
+
+
+### BalanceChangeType枚举说明
+
+| 名称    | 值        | 说明 |
+| ------- | --------- | ---- |
 | EXPENSE | 'expense' | 支出 |
 | INCOME  | 'income'  | 收入 |
 
-### 示例代码
 
-#### 示例1 （新增、编辑账单）
+
+## 示例代码
+
+### 示例1 （新增、编辑账单）
 
 ```ts
 import { BillManageModel, billManageSheetBuilder } from 'bill_manage';
@@ -215,6 +214,7 @@ struct BillManageSheetExample1 {
       }), {
         title: { title: '选择资产类型' },
         detents: [SheetSize.FIT_CONTENT],
+        preferType:SheetType.BOTTOM,
       });
   }
 }
@@ -224,152 +224,9 @@ struct BillManageSheetExample1 {
 
 <img src="snapshots/BillManageSheetExample1.gif" alt="BillManageSheetExample1" width="300">
 
-## ResourceManageSheet
-
-### 简介
-
-`ResourceManageSheet` 是一个用于管理账单来源分类的组件，支持处理弹出操作以及删除操作的成功回调。
-
-<img src="snapshots/ResourceManageSheetIntro.PNG" alt="ResourceManageSheetIntro" width="300">
-
-### 使用
-
-1. 组件依赖
-
-   由于BillManageSheet组件依赖**bill_base har**包，所以需要将模板根目录的components下**bill_base **
-   目录拷贝至您的工程相应目录，拷贝完成后，在工程目录的`oh-package.json5`文件添加依赖。点击`file->Sync and Refresh Project`
-   进行依赖安装。
-
-   ```typescript
-   // bill_manage/oh-package.json5
-   // BillManageSheet，注意依赖路径为实际工程的相对路径
-   "dependencies": {
-     "bill_base ": "file:../bill_base "
-   }
-   ```
-
-2. 安装组件。
-
-   ```ts
-   // 在项目根目录build-profile.json5填写bill_base和bill_manage路径，注意路径为实际工程的相对路径
-     "modules": [
-       {
-         "name": "bill_base",
-         "srcPath": "./bill_base",
-       },
-       {
-         "name": "bill_manage",
-         "srcPath": "./bill_manage",
-       }
-     ]
-   ```
-
-   ```typescript
-   // 需要使用组件的模块/oh-package.json5 例如entry/oh-package.json5
-   "dependencies": {
-     "bill_manage": "file:../bill_manage"
-   }
-   ```
-
-3. 引入组件与相关数据结构定义
-
-   ```ts
-   import {
-     ResourceManageSheet,
-     resourceManageSheetBuilder,
-   } from 'asset_manage';
-   ```
-
-4. 调用组件.
-
-   ```ts
-   import { ResourceManageSheet, resourceManageSheetBuilder } from 'bill_manage';
-
-   @Entry
-   @ComponentV2
-   struct ResourceManageSheet1Example1 {
-     @Local showSheet: boolean = false;
-     @Local stack: NavPathStack = new NavPathStack();
-
-     @Builder
-     pageMap(url: string) {
-       if (url === 'useComponent') {
-         UseComponent();
-       }
-     }
-
-     build() {
-       Navigation(this.stack) {
-         Column({ space: 24 }) {
-           Text('使用方式1：直接使用组件嵌入页面');
-           Button('打开')
-             .onClick(() => {
-               this.stack.pushPath({ name: 'useComponent' });
-             });
-           Text('使用方式2：使用bindSheet拉起半模态弹框使用');
-           Button('打开')
-             .onClick(() => {
-               this.showSheet = !this.showSheet;
-             })
-             .bindSheet($$this.showSheet,
-               resourceManageSheetBuilder({}), {
-                 title: { title: '分类管理' },
-                 detents: [SheetSize.FIT_CONTENT],
-               });
-         };
-
-       }
-       .navDestination(this.pageMap);
-     }
-   }
 
 
-   @ComponentV2
-   struct UseComponent {
-     build() {
-       NavDestination() {
-         ResourceManageSheet();
-       }
-       .title('创建账单');
-     }
-   }
-
-   ```
-
-<img src="snapshots/ResourceManageSheetDisplay.gif" alt="ResourceManageSheetDisplay" width="300">
-
-### API参考
-
-#### 子组件
-
-无
-
-#### 接口
-
-ResourceManageSheet(option?:ResourceManageSheetOptions)
-
-创建账单组件。
-
-resourceManageSheetBuilder(options: ResourceManageSheetOptions)
-
-创建账单组件Builder方法。
-
-**参数：**
-
-| 参数名     | 类型                                                            | 必填 | 说明           |
-|---------|---------------------------------------------------------------|----|--------------|
-| options | [ResourceManageSheetOptions](#ResourceManageSheetOptions对象说明) | 否  | 配置创建资产组件的参数。 |
-
-#### ResourceManageSheetOptions对象说明
-
-| 名称                  | 类型                    | 说明                                  |
-|---------------------|-----------------------|-------------------------------------|
-| handleAddSuccess    | () => void            | 处理弹出操作的事件回调函数。                      |
-| handleDeleteSuccess | (key: number) => void | 处理删除操作成功时的事件回调函数，接收被删除项的唯一标识 `key`。 |
-
-### 示例代码
-
-#### 示例1 （新增账单来源分类，删除分类）
+### 示例2 （新增账单来源分类，删除分类）
 
 ```ts
 import { promptAction } from '@kit.ArkUI';
@@ -452,3 +309,10 @@ struct ResourceManageSheetExample1 {
 ```
 
 <img src="snapshots/ResourceManageSheetExample1.gif" alt="ResourceManageSheetExample1" width="300">
+
+
+
+
+
+
+

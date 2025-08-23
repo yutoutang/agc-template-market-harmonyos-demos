@@ -23,6 +23,7 @@ export async function getRankList(category: string, pageNum?: number): Promise<A
       item.episodes = cover.totalCount
       item.latestUpdate = cover.latestUpdate
       item.rankId = parseInt(cover.id)
+      item.tags = cover.category
       return item
     })
   return Promise.resolve(result)
@@ -44,6 +45,7 @@ export async function getSearchList(searchText: string, pageNum: number): Promis
       item.episodes = cover.totalCount
       item.latestUpdate = cover.latestUpdate
       item.rankId = parseInt(cover.id)
+      item.tags = cover.category
       return item
     })
   return Promise.resolve(result)
@@ -64,6 +66,29 @@ export async function getRecommendList(pageNum: number): Promise<Array<DramaCove
       item.episodes = cover.totalCount
       item.latestUpdate = cover.latestUpdate
       item.rankId = parseInt(cover.id)
+      item.tags = cover.category
+      return item
+    })
+  return Promise.resolve(result)
+}
+
+export async function getVipRecommendList(pageNum: number): Promise<Array<DramaCoverVM>> {
+  let list = await container.resolve(RequestAPI).getVipRecommendDramaList({
+    pageSize: 10,
+    pageNum: pageNum
+  })
+  const result = list.getBody().data
+    .map(cover => {
+      const item = new DramaCoverVM()
+      item.dramaId = cover.id
+      item.imagePath = cover.coverUrl
+      item.title = cover.name
+      item.content = cover.description
+      item.episodes = cover.totalCount
+      item.latestUpdate = cover.latestUpdate
+      item.rankId = parseInt(cover.id)
+      item.tags = cover.category
+      item.isVip = cover.isVip
       return item
     })
   return Promise.resolve(result)

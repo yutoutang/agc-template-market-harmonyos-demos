@@ -1,0 +1,15 @@
+{
+  "name": "explain",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "packageType": "InterfaceHar",
+  "dependencies": {
+    "commonlib": "file:../../commons/commonlib",
+    "network": "file:../../commons/network",
+    "module_card_swiper": "file:../../components/module_card_swiper",
+    "module_person_manage": "file:../../components/module_person_manage"
+  }
+}

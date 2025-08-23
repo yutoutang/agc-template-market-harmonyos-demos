@@ -3,7 +3,7 @@ export function PrivacyPolicyDetailPageBuilder() {
   PrivacyPolicyDetailPage()
 }
 
-@Component
+@ComponentV2
 export struct PrivacyPolicyDetailPage {
   build() {
     NavDestination(){

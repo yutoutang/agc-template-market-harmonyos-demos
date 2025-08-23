@@ -1,0 +1,20 @@
+{
+  "string": [
+    {
+      "name": "shared_desc",
+      "value": "description"
+    },
+    {
+      "name": "hwid_no_internet_connect",
+      "value": "No Internet connection. Check your network settings. "
+    },
+    {
+      "name": "hwid_text_button_known",
+      "value": "OK"
+    },
+    {
+      "name": "whiteUrls",
+      "value": "{\"UrlPermissionList\":[{\"host\":\"developer.huawei.com\"},{\"host\":\"agreement-drcn.hispace.dbankcloud.cn\"},{\"host\":\"beian.miit.gov.cn\"},{\"host\":\"hw.vhallyun.com\"},{\"host\":\"live.huawei.com\"},{\"host\":\"term.developer.huaweicloud.com\"},{\"host\":\"hwyhw-static.smarket.net.cn\"},{\"host\":\"hdc2025.alfx.com.cn\"}]}"
+    }
+  ]
+}

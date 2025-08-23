@@ -1,6 +1,6 @@
 import { ComponentContent, promptAction, window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { Logger } from './Logger';
+import { Logger } from 'bill_base';
 
 const TAG: string = '[PopViewUtil]';
 

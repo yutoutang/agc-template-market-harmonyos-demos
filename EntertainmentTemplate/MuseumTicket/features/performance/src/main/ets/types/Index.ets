@@ -71,14 +71,7 @@ export interface TimeTicketInfo {
 }
 
 
-// 常用联系人 (获取，修改，新增)
-export interface Contacts {
-  personID: string,
-  cardType: string,
-  name: string,
-  phone: string,
-  cardID: string
-}
+
 
 export interface TicketListItem {
   ticketType: string,

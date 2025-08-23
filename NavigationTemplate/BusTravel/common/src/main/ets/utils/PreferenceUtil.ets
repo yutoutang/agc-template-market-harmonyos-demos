@@ -1,72 +1,52 @@
-import dataPreferences from '@ohos.data.preferences'
-import common from '@ohos.app.ability.common';
+import { preferences } from '@kit.ArkData';
+import { Logger } from '../logger'
 
-class PreferencesUtil {
-  preMap: Map<string, dataPreferences.Preferences> = new Map()
+const TAG = '[PreferenceUtils]';
 
-  //创建Preferences实例
-  async loadPreferences(context: common.UIAbilityContext, name: string) {
-    try {
-      let pref = await dataPreferences.getPreferences(context, name)
-      this.preMap.set(name, pref)
-    } catch (e) {
-      // ...
-    }
+/**
+ * 持久化管理类
+ */
+export class PreferenceUtils {
+  private static preferenceRecord: Map<string, PreferenceUtils> = new Map();
+  private dataPreferences: preferences.Preferences | null = null;
+
+  private constructor(context: Context, fileName: string) {
+    preferences.removePreferencesFromCacheSync(context, fileName);
+    this.dataPreferences = preferences.getPreferencesSync(context, { name: fileName });
+    Logger.info(TAG, `PreferenceUtil: ${fileName} init: ${this.dataPreferences !== null}`);
   }
 
-  //写入数据
-  async putPreferencesValue(name: string, key: string, value: dataPreferences.ValueType) {
-    if (!this.preMap.has(name)) {
-
+  public static getInstance(context?: Context, fileName: string = 'default') {
+    if (PreferenceUtils.preferenceRecord.has(fileName)) {
+      return PreferenceUtils.preferenceRecord.get(fileName)!!;
     }
-    try {
-      let pref = this.preMap.get(name) as dataPreferences.Preferences
-      //写入数据
-      await pref.put(key, value)
-      //写入文件
-      await pref.flush()
-    } catch (e) {
-      // ...
-    }
+    let ctx = context || getContext();
+    let preferenceUtil: PreferenceUtils = new PreferenceUtils(ctx, fileName);
+    PreferenceUtils.preferenceRecord.set(fileName, preferenceUtil);
+    return preferenceUtil;
   }
 
-  //获取数据
-  async getPreferencesValue(name: string, key: string,
-    defValue: dataPreferences.ValueType): Promise<dataPreferences.ValueType | undefined> {
-    if (!this.preMap.has(name)) {
-      return undefined
+  public put(key: string, value: Object | string | boolean) {
+    if (!this.dataPreferences) {
+      Logger.info(TAG, 'PreferenceUtil: dataPreferences is null');
     }
     try {
-      let pref = this.preMap.get(name) as dataPreferences.Preferences
-      //写入数据
-      let value = await pref.get(key, defValue)
-      return value
+      this.dataPreferences?.putSync(key, value);
+      this.dataPreferences?.flush();
+      Logger.info(TAG, `PreferenceUtil: put: ${key} = ${JSON.stringify(value)}`)
     } catch (e) {
-      return undefined
+      Logger.info(TAG, `PreferenceUtil: put error: ${JSON.stringify(e)}`);
     }
   }
 
-  //判断是否包含key
-  hasPreferenceskey(name: string, key: string): boolean | undefined {
-    if (!this.preMap.has(name)) {
-      return false
+  public get(key: string, defaultValue?: Object | string | boolean) {
+    try {
+      let data = this.dataPreferences?.getSync(key, defaultValue);
+      Logger.info(TAG, `PreferenceUtil: get: ${key} = ${JSON.stringify(data)}`);
+      return data;
+    } catch (e) {
+      Logger.info(TAG, `PreferenceUtil: get error: ${JSON.stringify(e)}`);
+      return defaultValue;
     }
-    let pref = this.preMap.get(name) as dataPreferences.Preferences
-    let isExist: boolean = pref.hasSync(key);
-    return isExist
-  }
-
-  //删除指定key
-  async deletePreferenceskey(name: string, key: string) {
-    if (!this.preMap.has(name)) {
-      return
-    }
-    let pref = this.preMap.get(name) as dataPreferences.Preferences
-    //删除
-    pref.deleteSync(key);
-    //刷盘
-    await pref.flush()
   }
 }
-
-export const preferencesUtil = new PreferencesUtil()

@@ -1,22 +1,104 @@
-import { jumpDetailPage } from '@agctemplate/detail';
-import { getColor, getString } from '@agctemplate/resources';
-import { DramaInfo } from '@agctemplate/server';
+import { getColor, getMedia, getString } from '@agctemplate/resources';
 
 @ComponentV2
 export struct VideoSeries {
   @Param @Require title: string;
   @Param @Require currentEpisode: number;
-  @Param @Require episodesDes: string;
+  @Param @Require totalCount: number;
+  @Param @Require likeCount: number;
+  @Param @Require isLike: boolean
   @Param @Require cover: string; // 封面
+  @Param @Require isVip: boolean
+  @Param isDeleting: boolean = false
+  @Local isSelect: boolean = false
   @Event onContinueWatch: () => void
+  @Event isSelectBack: (isSelect: boolean) => void
+
+  @Monitor('isDeleting')
+  onChange() {
+    this.isSelect = false
+  }
 
   build() {
-    Row() {
-      Image(this.cover).width(68).height(90).margin({ right: 16 })
+    Column() {
+      Stack({ alignContent: Alignment.TopEnd }) {
+        Image(this.isSelect ? getMedia('app.media.icon_Checked') : getMedia('app.media.icon_ans_common'))
+          .width(20)
+          .aspectRatio(1)
+          .offset({ x: -6, y: 6 })
+          .onClick(() => {
+            this.isSelect = !this.isSelect
+            this.isSelectBack(this.isSelect)
+          })
+          .visibility(this.isDeleting ? Visibility.Visible : Visibility.Hidden)
+          .zIndex(2)
+
+        if (this.isVip === true) {
+          Image(getMedia('app.media.vip'))
+            .width(28)
+            .height(16)
+            .position({ left: 76 })
+            .zIndex(1)
+        }
+
+        Stack({ alignContent: Alignment.BottomEnd }) {
+          Image(this.cover)
+            .width(104).height(138)
+
+          if (this.isDeleting) {
+            Row()
+              .width(104)
+              .height(138)
+              .backgroundColor('#000000')
+              .opacity(0.4)
+              .borderRadius(8)
+          }
+
+          if (!this.isLike) {
+            Text(`${this.totalCount}集全`)
+              .fontSize(10)
+              .lineHeight(13)
+              .fontColor($r('sys.color.font_on_primary'))
+              .padding({
+                top: 1,
+                right: 8,
+                bottom: 1,
+                left: 8
+              })
+              .backgroundColor('rgba(0, 0, 0, 0.4)')
+              .borderRadius(14)
+              .offset({
+                x: -2, y: -10
+              })
+          } else {
+            Row({ space: 2.5 }) {
+              Image(getMedia('app.media.thumb_up_white'))
+                .width(9)
+              Text(`${this.likeCount}`)
+                .fontSize(10)
+                .lineHeight(13)
+                .fontColor($r('sys.color.font_on_primary'))
+            }
+            .padding({
+              top: 1,
+              right: 8,
+              bottom: 1,
+              left: 8
+            })
+            .backgroundColor('rgba(0, 0, 0, 0.4)')
+            .borderRadius(14)
+            .offset({
+              x: -2, y: -10
+            })
+          }
+
+        }
+      }
+
       Column() {
         Text(this.title)
-          .fontSize($r('sys.float.Subtitle_M'))
-          .fontWeight(FontWeight.Medium)
+          .fontSize(14)
+          .lineHeight(19)
           .fontColor($r('sys.color.font_primary'))
           .maxLines(1)
           .textOverflow({
@@ -25,46 +107,27 @@ export struct VideoSeries {
           .margin({ top: 8 })
 
         Text(getString('app.string.have_watch', `${this.currentEpisode}`))
-          .fontSize($r('sys.float.Body_S'))
-          .fontWeight(FontWeight.Regular)
-          .fontColor(getColor('app.color.orange'))
+          .fontSize(12)
+          .lineHeight(16)
+          .fontColor($r('sys.color.font_tertiary'))
           .maxLines(1)
           .textOverflow({
             overflow: TextOverflow.Ellipsis
           })
           .margin({ top: 2 })
-
-        Text(this.episodesDes)
-          .fontSize($r('sys.float.Body_S'))
-          .fontWeight(FontWeight.Regular)
-          .fontColor($r('sys.color.font_secondary'))
-          .maxLines(1)
-          .textOverflow({
-            overflow: TextOverflow.Ellipsis
-          })
-          .margin({ top: 12 })
-
       }
+      .width('100%')
       .alignItems(HorizontalAlign.Start)
-      .height('100%')
       .layoutWeight(1)
 
-      Text(getString('app.string.continue_watch'))
-        .borderRadius(16)
-        .fontSize($r('sys.float.Body_M'))
-        .fontWeight(FontWeight.Medium)
-        .fontColor(getColor('app.color.orange'))
-        .backgroundColor($r('sys.color.comp_background_tertiary'))
-        .height(28)
-        .padding({ left: 8, right: 8 })
-        .width('auto')
-        .onClick(() => {
-          if (this.onContinueWatch) {
-            this.onContinueWatch()
-          }
-        })
-    }.width('100%')
-    .height(90)
+    }
+    .width(104)
+    .height(183)
     .margin({ top: 8, bottom: 8 })
+    .onClick(() => {
+      if (this.onContinueWatch) {
+        this.onContinueWatch()
+      }
+    })
   }
 }

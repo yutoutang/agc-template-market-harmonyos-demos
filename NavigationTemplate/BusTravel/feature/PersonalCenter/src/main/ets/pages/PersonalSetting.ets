@@ -4,7 +4,8 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import { FunctionalButton, functionalButtonComponentManager } from '@kit.ScenarioFusionKit';
 import { authentication } from '@kit.AccountKit';
 import { util } from '@kit.ArkTS';
-import { getDataFromJSON, RouteEntryVM, UserInfo } from 'common'
+import { AppStorageV2 } from '@kit.ArkUI'
+import { getDataFromJSON, GlobalState, RouteEntryVM, UserInfoModel } from 'common'
 import { PersonalSet } from '../model/PersonalSet'
 
 
@@ -13,23 +14,19 @@ export function PersonalSettingBuilder() {
   PersonalSetting()
 }
 
-@Component
+@ComponentV2
 export struct PersonalSetting {
-  @StorageLink('isLogin') isLogin: boolean = AppStorage.get('isLogin') ?? false;
-  @StorageLink('userInfo') userInfo: UserInfo = AppStorage.get('userInfo') ?? new UserInfo();
-  @StorageLink('cloudCard') cloudCard: boolean = AppStorage.get('cloudCard') ?? false;
-  @StorageLink('avatarUri') avatarUri: ResourceStr = $r('app.media.iconface');
-  @StorageLink('nickNameValue') nickNameValue: string = '华为用户';
-  @State personalSetItems: Array<PersonalSet> = []
+  @Local userInfo: UserInfoModel = AppStorageV2.connect(UserInfoModel, 'UserInfoModel', () => new UserInfoModel())!
+  @Local personalSetItems: Array<PersonalSet> = []
   vm: RouteEntryVM = RouteEntryVM.instance;
-  @State appCache: number = 100.3
-  @State isShow: Boolean = false;
-  @State notifyToggle: boolean = false;
-  @State quickLoginAnonymousPhone: string = this.userInfo.phoneNumber; // 获取匿名手机号
+  @Local appCache: number = 100.3
+  @Local isShow: Boolean = false;
+  @Local notifyToggle: boolean = false;
+  @Local quickLoginAnonymousPhone: string = this.userInfo.phoneNumber; // 获取匿名手机号
   domainId: number = 0x0000;
   logTag: string = 'QuickLoginButtonComponent';
-  @State nickName: string = ''
-  @State isNickNameShow: Boolean = false;
+  @Local nickName: string = ''
+  @Local isNickNameShow: Boolean = false;
 
   async aboutToAppear(): Promise<void> {
     this.initDataSource()
@@ -99,7 +96,7 @@ export struct PersonalSetting {
         .fontWeight(FontWeight.Medium)
         .backgroundColor($r('app.color.system_color_green'))
         .onClick(() => {
-          this.nickNameValue=this.nickName
+          this.userInfo.nickName = this.nickName
           this.isNickNameShow = false;
       })
     }
@@ -122,7 +119,7 @@ export struct PersonalSetting {
             styleOption: {
               styleConfig: new functionalButtonComponentManager.ButtonConfig()
                 .type(ButtonType.Normal)
-                .backgroundImage(this.avatarUri)
+                .backgroundImage(this.userInfo.avatarUri)
                 .backgroundImageSize(ImageSize.Cover)
                 .width(40)
                 .height(40)
@@ -139,14 +136,9 @@ export struct PersonalSetting {
             }
             // 成功日志处理
             hilog.info(0x0000, 'testTag', 'succeeded in choosing avatar');
-            this.avatarUri = data.avatarUri!;
+            this.userInfo.avatarUri = data.avatarUri!;
           })
         })
-
-        Image($r('app.media.icon_right'))
-          .height(24)
-          .width(24)
-          .margin({ left: 4 })
       }
 
     }
@@ -166,7 +158,7 @@ export struct PersonalSetting {
           .fontSize(16)
           .fontWeight(FontWeight.Medium)
         Row() {
-          Text(this.nickNameValue)
+          Text(this.userInfo.nickName)
           Image($r('app.media.ic_public_brush'))
             .height(24)
             .width(24)
@@ -228,12 +220,13 @@ export struct PersonalSetting {
         .height('100%')
         .align(Alignment.TopStart)
         .backgroundImageSize(ImageSize.Auto)
-        .backgroundColor('#F5F5F5')
       }
       .scrollable(ScrollDirection.Vertical)
       .scrollBar(BarState.Auto)
       .scrollBarWidth('0vp')
       .edgeEffect(EdgeEffect.Spring)
+      .backgroundColor('#F5F5F5')
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
     }
     .hideTitleBar(false)
     .title('个人设置')

@@ -60,7 +60,7 @@ export class HomeVM {
       this.sheet.sheetHeight = 360;
       this.sheet.title = '选择月份';
     } else if (type === HomeSheetType.TYPE) {
-      this.sheet.sheetHeight = 520;
+      this.sheet.sheetHeight = 540;
       this.sheet.title = '选择类型';
     }
   }

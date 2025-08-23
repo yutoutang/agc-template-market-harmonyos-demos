@@ -1,4 +1,4 @@
-import { DialogMap, RouterMap } from '../constants/CommonEnums';
+import { RouterMap } from '../constants/CommonEnums';
 import { Logger } from './Logger';
 
 const TAG: string = '[RouterModule]';
@@ -75,7 +75,7 @@ export class RouterModule {
 }
 
 export interface NavRouterInfo {
-  url: RouterMap | DialogMap;
+  url: RouterMap;
 
   mode?: NavDestinationMode;
 

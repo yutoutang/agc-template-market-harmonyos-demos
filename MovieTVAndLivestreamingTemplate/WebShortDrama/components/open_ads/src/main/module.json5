@@ -1,0 +1,9 @@
+{
+  "module": {
+    "name": "open_ads",
+    "type": "har",
+    "deviceTypes": [
+      "default"
+    ]
+  }
+}

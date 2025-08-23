@@ -1,5 +1,5 @@
-import { BaseResponse } from '../types/BaseResponse';
 import {
+  CancelPaymentRequest,
   GetMealDetailRequest,
   GetOrderDetailRequest,
   GetRestaurantListRequest,
@@ -10,6 +10,7 @@ import {
   SubmitCommentRequest,
   UpdateUserInfoRequest,
 } from '../types/AxiosRequestParam';
+import { BaseResponse } from '../types/BaseResponse';
 import {
   GetBanquetRoomDetailResp,
   GetBanquetRoomListResp,
@@ -36,11 +37,11 @@ import {
   PrepayResp,
   GetBanquetHotelListResp
 } from '../types/responseTypes';
+import { BanquetDatasetMock } from './mockData/BanquetDatasetMock';
+import { HotelDatasetMock } from './mockData/HotelDatasetMock';
 import { OrderDatasetMock } from './mockData/OrderDatasetMock';
 import { RestaurantDatasetMock } from './mockData/RestaurantDatasetMock';
-import { HotelDatasetMock } from './mockData/HotelDatasetMock';
 import { StoreConfigDatasetMock } from './mockData/StoreConfigDatasetMock';
-import { BanquetDatasetMock } from './mockData/BanquetDatasetMock';
 import { UserManagementMock } from './mockData/UserManagementMock';
 
 class HttpsApiMock {
@@ -177,6 +178,11 @@ class HttpsApiMock {
   // 团购套餐预下单
   public prepayMeal(data: PrepayMealRequest): Promise<BaseResponse<PrepayResp>> {
     return Promise.resolve(OrderDatasetMock.prepayMeal(data));
+  }
+
+  // 取消订单
+  public cancelPayment(data: CancelPaymentRequest): Promise<BaseResponse> {
+    return Promise.resolve(OrderDatasetMock.cancelPayment(data))
   }
 }
 

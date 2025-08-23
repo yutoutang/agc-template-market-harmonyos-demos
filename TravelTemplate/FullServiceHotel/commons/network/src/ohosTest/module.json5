@@ -3,8 +3,7 @@
     "name": "network_test",
     "type": "feature",
     "deviceTypes": [
-      "phone",
-      "tablet"
+      "phone"
     ],
     "deliveryWithInstall": true,
     "installationFree": true

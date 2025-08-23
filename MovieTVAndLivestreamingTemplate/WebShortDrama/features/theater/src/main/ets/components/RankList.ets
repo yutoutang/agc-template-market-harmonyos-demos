@@ -1,11 +1,12 @@
+import { WindowManager } from '@agctemplate/utils'
 import { DramaCoverVM } from '../viewmodels/DramaCoverVM'
+import { onDramaClick } from './BannerPanel'
 import { DramaCover } from './DramaCover'
 
 @ComponentV2
 export struct RankList {
   @Param @Require dramaList: Array<DramaCoverVM>
-  @Event onDramaClick: Function
-  @Param @Require scroller: Scroller | undefined
+  @Param scroller: Scroller | undefined = undefined
   @Event loadNextPage: Function
   @Param @Require isVertical: boolean
 
@@ -27,9 +28,10 @@ export struct RankList {
             left: this.isVertical ? 0 : ([1, 2].indexOf(index + 1) !== -1 ? 12 : 6)
           })
           .onClick(() => {
-            if (this.onDramaClick) {
-              this.onDramaClick(drama)
-            }
+            onDramaClick(drama,
+              () => {
+                WindowManager.setWindowSystemBarProperties({ statusBarContentColor: '#e6000000' })
+              })
           })
         },
         (drama: DramaCoverVM, index: number) => drama.dramaId + index
@@ -40,6 +42,10 @@ export struct RankList {
     .listDirection(this.isVertical ? Axis.Vertical : Axis.Horizontal)
     .lanes(this.isVertical ? 1 : 2)
     .scrollBar(BarState.Off)
+    .nestedScroll({
+      scrollForward: NestedScrollMode.PARENT_FIRST,
+      scrollBackward: NestedScrollMode.SELF_FIRST
+    })
     .onScrollIndex((start: number, end: number) => {
       if (end >= this.dramaList.length - 1) {
         this.loadNextPage()

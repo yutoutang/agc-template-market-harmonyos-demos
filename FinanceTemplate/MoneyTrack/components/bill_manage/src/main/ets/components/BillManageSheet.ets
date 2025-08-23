@@ -1,4 +1,11 @@
-import { BalanceChangeType, BalanceResourceItem, BillConstants } from 'bill_base';
+import {
+  BalanceChangeType,
+  BalanceResourceItem,
+  BillConstants,
+  BreakpointStorage,
+  BreakpointSystem,
+  BreakpointTypeEnum,
+} from 'bill_base';
 import { BillManageModel } from '../commons/Models';
 
 import { AddBillVM } from '../viewmodels/AddBillVM';
@@ -37,6 +44,15 @@ export struct BillManageSheet {
   windowClass: window.Window | undefined = undefined;
   @Local
   resourceGridH: number = 312;
+  @Local curBreakpoint: BreakpointStorage = BreakpointSystem.currentBreakpoint
+
+  @Computed
+  get typeGridTemplate() {
+    if (this.curBreakpoint.value === BreakpointTypeEnum.SM) {
+      return '1fr 1fr 1fr 1fr 1fr'
+    }
+    return '1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr'
+  }
 
   @Monitor('initBill')
   initData() {
@@ -47,6 +63,7 @@ export struct BillManageSheet {
 
   async aboutToAppear() {
     this.initData();
+    BreakpointSystem.register(this.getUIContext())
     this.windowClass = await window.getLastWindow(getContext());
     if (this.windowClass) {
       const type = this.windowClass.getWindowStatus();
@@ -63,25 +80,30 @@ export struct BillManageSheet {
     }
   }
 
-
   getGridHeight(type: window.WindowStatusType) {
     if (type === window.WindowStatusType.FLOATING) {
       this.resourceGridH = 90;
     } else if (type === window.WindowStatusType.FULL_SCREEN) {
-      this.resourceGridH = 312;
+      this.resourceGridH = 300;
     }
   }
 
   build() {
     Column() {
-      Column() {
-        // 账单类型选择
-        this.typeOptionBuilder();
-        // 账单来源选择
-        this.resourceGroupBuilder();
+      // 账单类型选择
+      this.typeOptionBuilder();
+      Scroll() {
+        Column() {
+          // 账单来源选择
+          this.resourceGroupBuilder();
+        }
+        .justifyContent(FlexAlign.Start)
+        .alignItems(HorizontalAlign.Start)
       }
-      .justifyContent(FlexAlign.Start)
-      .alignItems(HorizontalAlign.Start)
+      .scrollBar(BarState.Off)
+      .align(Alignment.Top)
+      .edgeEffect(EdgeEffect.Spring)
+      .layoutWeight(1)
       .padding(16);
 
       // 金额和自定义信息输入
@@ -116,7 +138,9 @@ export struct BillManageSheet {
           this.vm.handleTypeChange(BalanceChangeType.INCOME);
         });
     }
-    .margin({ bottom: 24 });
+    .width('100%')
+    .justifyContent(FlexAlign.Start)
+    .padding(16);
   }
 
   @Builder
@@ -127,11 +151,9 @@ export struct BillManageSheet {
           Column() {
             Image(this.vm.billData.resource === item.key ? item.icon : item.uncheckedIcon).width(40).height(40);
             Text(item.name)
-              .fontSize(BillConstants.FONT_SIZE_12)
-              .fontWeight(FontWeight.Regular)
-              .margin({ top: 12 })
+              .resourceLabelStyle()
               .fontColor(this.vm.billData.resource === item.key ? BillConstants.FONT_COLOR_LEVEL1 :
-              BillConstants.FONT_COLOR_LEVEL2);
+                BillConstants.FONT_COLOR_LEVEL2);
           };
         }
         .onClick(() => {
@@ -141,20 +163,17 @@ export struct BillManageSheet {
       GridItem() {
         Column() {
           Image($r('app.media.ic_manage_resource')).width(40).height(40);
-          Text('分类管理')
-            .fontSize(BillConstants.FONT_SIZE_12)
-            .fontWeight(FontWeight.Regular)
-            .margin({ top: 12 })
-            .fontColor(BillConstants.FONT_COLOR_LEVEL2);
+          Text('分类管理').resourceLabelStyle()
         };
       }
       .onClick(() => {
         this.handleResourceManage?.();
       });
     }
-    .columnsTemplate('1fr 1fr 1fr 1fr 1fr')
+    .columnsTemplate(this.typeGridTemplate)
     .rowsGap(16)
     .height(this.resourceGridH)
+    .scrollBar(BarState.Off)
     .edgeEffect(EdgeEffect.Spring);
   }
 }
@@ -165,7 +184,7 @@ function typeOptionStyle(isChecked: boolean, type: BalanceChangeType) {
   .fontColor(isChecked ? BillConstants.FONT_COLOR_1_INVERT : BillConstants.FONT_COLOR_LEVEL1)
   .backgroundColor(isChecked ?
     type === BalanceChangeType.EXPENSE ? BillConstants.THEME_COLOR : BillConstants.THEME_COLOR_SECOND :
-  BillConstants.BACKGROUND_COLOR_GREY_2)
+    BillConstants.BACKGROUND_COLOR_GREY_2)
   .padding({
     left: 24,
     right: 24,
@@ -174,4 +193,12 @@ function typeOptionStyle(isChecked: boolean, type: BalanceChangeType) {
   })
   .borderRadius(BillConstants.BORDER_RADIUS_CAPSULE)
   .margin({ right: 12 });
+}
+
+@Extend(Text)
+function resourceLabelStyle() {
+  .fontSize(BillConstants.FONT_SIZE_12)
+  .fontWeight(FontWeight.Regular)
+  .margin({ top: 8 })
+  .fontColor(BillConstants.FONT_COLOR_LEVEL2);
 }

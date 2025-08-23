@@ -2,10 +2,10 @@
  * Use these variables when you tailor your ArkTS code. They must be of the const type.
  */
 export const HAR_VERSION = '1.0.0';
-export const BUILD_MODE_NAME = 'debug';
-export const DEBUG = true;
+export const BUILD_MODE_NAME = 'release';
+export const DEBUG = false;
 export const TARGET_NAME = 'default';
-export const CLIENT_ID = '102262129';
+export const CLIENT_ID = '112377711';
 
 /**
  * BuildProfile Class is used only for compatibility purposes.

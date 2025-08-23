@@ -1,5 +1,5 @@
 import { mapEpisodeInfo } from '../mapper/DramaDetailMapper';
-import { VideoPlayDataSource } from '@agctemplate/video_swiper';
+import { VideoPlayDataSource } from 'video_swiper';
 import { EpisodeInfo, DramaInfo, RequestAPI } from '@agctemplate/server';
 import { DetailVideoData } from '../models/DetailVideoData';
 import { BaseResponse, container, Logger } from '@agctemplate/utils';
@@ -32,12 +32,14 @@ export class ShortDramaDetailListVM {
 
   async init(continueVideoData: ContinueVideoData) {
     try {
+      this.data.videoList = []
       let res: BaseResponse<EpisodeListRes> =
         await container.resolve(RequestAPI).getEpisodeList(continueVideoData.dramaInfo.id)
       let dramaListRes: EpisodeListRes = res.getBody();
       this.dramaInfo = dramaListRes.dramaInfo
       let dramaSocialInfo: DramaSocialInfo =
-        new DramaSocialInfo(this.dramaInfo.id, this.dramaInfo.isFavorite, this.dramaInfo.favoriteCount)
+        new DramaSocialInfo(this.dramaInfo.id, this.dramaInfo.isFavorite, this.dramaInfo.favoriteCount,
+          this.dramaInfo.isLike, this.dramaInfo.likeCount)
       dramaListRes.episodeList?.map((episodeInfo: EpisodeInfo) => {
         let videoData: DetailVideoData = mapEpisodeInfo(episodeInfo)
         videoData.videoMask.dramaInfo = this.dramaInfo

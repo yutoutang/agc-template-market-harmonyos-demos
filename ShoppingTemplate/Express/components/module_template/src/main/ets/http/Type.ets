@@ -1,13 +1,9 @@
+import { IAddrInfo } from 'module_base';
 
-export interface IAddrInfo {
-  id: number,
-  name: string,
-  cellphone: string,
-  province: string,
-  city: string,
-  area: string,
-  detailAddress: string,
-  isDefault: boolean
+export enum OrderType {
+  ALL = '全部',
+  SEND = '寄快递',
+  RECEIVE = '收快递',
 }
 
 export interface IGoods {
@@ -32,4 +28,9 @@ export interface ITemplate {
 export interface ISetting {
   text: string,
   value: number,
+}
+
+export interface IAddressParam {
+  type: OrderType,
+  address: IAddrInfo,
 }

@@ -3,19 +3,18 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import i18n from '@ohos.i18n';
-import { Common, preferencesUtil } from 'common'
+import { Logger } from 'common'
 
 export default class EntryAbility extends UIAbility {
   async onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): Promise<void> {
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onCreate');
-    console.log(' EntryAbility onCreate');
+    Logger.info(' EntryAbility onCreate');
     try {
       i18n.System.setAppPreferredLanguage('zh'); // 设置应用当前的偏好语言为 "zh"
     } catch(error) {
       let err: BusinessError = error as BusinessError;
-      console.error(`call System.setAppPreferredLanguage failed, error code: ${err.code}, message: ${err.message}.`);
+      Logger.error(`call System.setAppPreferredLanguage failed, error code: ${err.code}, message: ${err.message}.`);
     }
-    await preferencesUtil.loadPreferences(this.context, Common.CLOUDCARD) // 有问题 等会改
   }
 
   onDestroy(): void {

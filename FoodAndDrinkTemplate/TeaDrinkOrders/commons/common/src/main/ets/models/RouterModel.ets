@@ -1,4 +1,4 @@
-import { CarGoodInfo, Good, StoreInfo } from './ResponseModel';
+import { CarGoodsInfo, Goods, StoreInfo } from './ResponseModel';
 
 export interface HwMapModel {
   latitude: number,
@@ -6,8 +6,8 @@ export interface HwMapModel {
   storeInfo: StoreInfo
 }
 
-export interface GoodRouter {
-  goodInfo: Good,
+export interface GoodsRouter {
+  goodsInfo: Goods,
 }
 
 export interface IndexPageRouter {
@@ -36,7 +36,7 @@ export interface ImageRouter {
 }
 
 export interface ConfirmOrderRouter {
-  carGoods: Array<CarGoodInfo>;
+  carGoods: Array<CarGoodsInfo>;
 }
 
 export interface FormCardJump {

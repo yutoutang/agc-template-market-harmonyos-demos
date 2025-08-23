@@ -1,0 +1,52 @@
+{
+  "routerMap": [
+    {
+      "name": "ProfileEdit",
+      "pageSourceFile": "src/main/ets/pages/ProfileEditPage.ets",
+      "buildFunction": "profileEditPageBuilder",
+      "data": {
+        "description": "用户信息编辑页面"
+      }
+    },
+    {
+      "name": "QuickLogin",
+      "pageSourceFile": "src/main/ets/pages/QuickLoginPage.ets",
+      "buildFunction": "quickLoginPageBuilder",
+      "data": {
+        "description": "快速登录页面"
+      }
+    },
+    {
+      "name": "SettingPage",
+      "pageSourceFile": "src/main/ets/pages/SettingPage.ets",
+      "buildFunction": "settingPageBuilder",
+      "data": {
+        "description": "相关设置页面"
+      }
+    },
+    {
+      "name": "PrivacyPolicy",
+      "pageSourceFile": "src/main/ets/pages/PrivacyPolicyPage.ets",
+      "buildFunction": "privacyPolicyPageBuilder",
+      "data": {
+        "description": "隐私协议页面"
+      }
+    },
+    {
+      "name": "VoiceBroadcast",
+      "pageSourceFile": "src/main/ets/pages/BroadcastPage.ets",
+      "buildFunction": "broadcastPageBuilder",
+      "data": {
+        "description": "语言播报页面"
+      }
+    },
+    {
+      "name": "IndicesPage",
+      "pageSourceFile": "src/main/ets/pages/IndicesPage.ets",
+      "buildFunction": "indicesPageBuilder",
+      "data": {
+        "description": "生活指数页面"
+      }
+    }
+  ]
+}

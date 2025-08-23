@@ -1,0 +1,12 @@
+{
+  "module": {
+    "name": "login_info_test",
+    "type": "feature",
+    "deviceTypes": [
+      "default" ,
+      "2in1"
+    ],
+    "deliveryWithInstall": true,
+    "installationFree": false
+  }
+}

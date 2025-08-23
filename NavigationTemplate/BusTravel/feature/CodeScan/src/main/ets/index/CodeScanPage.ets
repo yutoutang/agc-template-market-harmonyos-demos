@@ -1,11 +1,12 @@
-import { CardInfoList, RouteEntryVM, RouterModule,Common } from 'common'
+import { AppStorageV2 } from '@kit.ArkUI'
+import { CardInfoList, UserInfoModel } from 'common'
 
 @Builder
 export function CodeScanPageBuilder() {
   CodeScanPage()
 }
 
-@Component
+@ComponentV2
 export struct CodeScanPage{
   build() {
     NavDestination(){
@@ -14,18 +15,14 @@ export struct CodeScanPage{
     .title('乘车码')
   }
 }
-@Component
+@ComponentV2
 export struct CodeScanComp {
-  @State cardInfo: CardInfoList = new CardInfoList()
-  @State message: string = ''
-  @State inputText: string = '请输入网址'
-  @State isSecondLevel: boolean = false
-  @State private refreshInterval: number = 30000; // 30s刷新
-  @StorageLink('isLogin') isLogin: boolean = AppStorage.get('isLogin') ?? false;
-  @StorageLink('cloudCard') cloudCard: boolean = AppStorage.get('cloudCard') ?? false;
-  @StorageLink('nickNameValue') nickNameValue: string = '';
+  @Local cardInfo: CardInfoList = new CardInfoList()
+  @Local inputText: string = '请输入网址'
+  @Local isSecondLevel: boolean = false
+  @Local private refreshInterval: number = 30000; // 30s刷新
+  @Local userInfo: UserInfoModel = AppStorageV2.connect(UserInfoModel, 'UserInfoModel', () => new UserInfoModel())!
   private intervalId: number | undefined;
-  vm: RouteEntryVM = RouteEntryVM.instance;
 
   // 启动定时器
   private startRefreshInterval() {
@@ -111,7 +108,7 @@ export struct CodeScanComp {
         .fontSize('18fp')
       Row() {
         Column() {
-          Text(this.nickNameValue)
+          Text(this.userInfo.nickName)
             .fontColor($r('app.color.font_color_white'))
             .fontSize('12fp')
           Text(this.cardInfo?.cardID.toString())
@@ -154,11 +151,12 @@ export struct CodeScanComp {
         .margin('22vp')
       Stack({ alignContent: Alignment.Center }) {
         Image($r('app.media.green_frame'))
-          .height('195.3lpx')
-          .width('195.3lpx')
-        QRCode(this.inputText).width('160lpx').height('160lpx')
-      }.height('195.3lpx')
-      .width('195.3lpx')
+          .height(195)
+          .width(195)
+        QRCode(this.inputText).width(160).height(160)
+      }
+      .height(195)
+      .width(195)
 
       Text('点击刷新')
         .fontSize(14)
@@ -175,6 +173,6 @@ export struct CodeScanComp {
     // 进入时生成二维码
     this.inputText = this.getNewLink()
     this.startRefreshInterval();
-    this.cardInfo.cardName=this.nickNameValue;
+    this.cardInfo.cardName=this.userInfo.nickName;
   }
 }

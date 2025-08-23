@@ -1,7 +1,10 @@
+import { CommonConstants } from '../constants/CommonContants';
+import { RouterMap } from '../constants/CommonEnum';
+import { AccountUtil } from './AccountUtil';
 import { Logger } from './Logger';
 
 export interface NavRouterInfo {
-  url: string; // 需要跳转的路由名
+  url: RouterMap; // 需要跳转的路由名
   mode?: NavDestinationMode; // NavDestination类型
   param?: Object; // 跳转传参
   page?: Object;
@@ -14,7 +17,11 @@ export class RouterModule {
   // 跳转到指定路由栈的指定路由页面
   public static push(info: NavRouterInfo, animated?: boolean) {
     try {
-      RouterModule.stack.pushPathByName(info.url, info.param, animated);
+      if (!AccountUtil.isLogin && CommonConstants.NEED_LOGIN_PAGE.includes(info.url)) {
+        RouterModule.stack.pushPathByName(RouterMap.MINE_LOGIN, info.param, undefined);
+      } else {
+        RouterModule.stack.pushPathByName(info.url, info.param, animated);
+      }
     } catch (err) {
       Logger.info('navigation stack push failed::' + JSON.stringify(err));
     }

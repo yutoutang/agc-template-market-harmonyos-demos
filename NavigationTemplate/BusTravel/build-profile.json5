@@ -1,11 +1,11 @@
 {
   "app": {
-    "signingConfigs": [
-    ],
+    "signingConfigs": [],
     "products": [
       {
         "name": "default",
         "signingConfig": "default",
+        "targetSdkVersion": "5.0.0(12)",
         "compatibleSdkVersion": "5.0.0(12)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
@@ -18,7 +18,7 @@
     ],
     "buildModeSet": [
       {
-        "name": "debug",
+        "name": "debug"
       },
       {
         "name": "release"
@@ -44,7 +44,7 @@
     },
     {
       "name": "RouteDesign",
-      "srcPath": "./feature/RouteDesign",
+      "srcPath": "./feature/RouteDesign"
     },
     {
       "name": "CodeScan",
@@ -52,19 +52,19 @@
     },
     {
       "name": "PersonalCenter",
-      "srcPath": "./feature/PersonalCenter",
+      "srcPath": "./feature/PersonalCenter"
     },
     {
       "name": "frontpage",
-      "srcPath": "./feature/frontpage",
+      "srcPath": "./feature/frontpage"
     },
     {
       "name": "route_detail",
-      "srcPath": "./components/route_detail",
+      "srcPath": "./components/route_detail"
     },
     {
       "name": "route_search",
-      "srcPath": "./components/route_search",
+      "srcPath": "./components/route_search"
     }
   ]
 }

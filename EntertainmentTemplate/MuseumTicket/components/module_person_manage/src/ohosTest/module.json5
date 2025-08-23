@@ -1,0 +1,12 @@
+{
+  "module": {
+    "name": "module_person_manage_test",
+    "type": "feature",
+    "deviceTypes": [
+      "default",
+      "tablet"
+    ],
+    "deliveryWithInstall": true,
+    "installationFree": true
+  }
+}

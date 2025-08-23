@@ -101,9 +101,9 @@ export struct ExpressList {
                 .width('100%')
                 .margin({ bottom: 12 })
 
-                Flex({ justifyContent: FlexAlign.SpaceBetween }) {
+                Flex() {
                   Column() {
-                    Text(order.sendCity)
+                    Text(order.sendAddress.city)
                       .fontSize(18)
                       .fontWeight(FontWeight.Medium)
                       .fontColor($r('sys.color.font_primary'))
@@ -113,6 +113,8 @@ export struct ExpressList {
                       .fontWeight(FontWeight.Regular)
                       .fontColor($r('sys.color.font_secondary'))
                   }
+                  .width('100%')
+                  .flexGrow(1)
 
                   Column() {
                     Image($r('app.media.send'))
@@ -124,9 +126,10 @@ export struct ExpressList {
                       .fontWeight(FontWeight.Regular)
                       .fontColor('#0A59F7')
                   }
+                  .flexShrink(0)
 
                   Column() {
-                    Text(order.getCity)
+                    Text(order.getAddress.city)
                       .fontSize(18)
                       .fontWeight(FontWeight.Medium)
                       .fontColor($r('sys.color.font_primary'))
@@ -136,8 +139,9 @@ export struct ExpressList {
                       .fontWeight(FontWeight.Regular)
                       .fontColor($r('sys.color.font_secondary'))
                   }
+                  .width('100%')
+                  .flexGrow(1)
                 }
-                .padding({ left: 40, right: 40 })
                 .margin({ bottom: 16 })
                 .onClick(() => {
                   if (order.paymentMethod === PaymentMethod.PAY_NOW && order.status === OrderStatus.DO_ING) {
@@ -372,6 +376,7 @@ export struct ExpressList {
         .backgroundColor('rgba(255,255,255,0.80)')
       }
       .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
     }
   }
 

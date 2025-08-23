@@ -1,13 +1,21 @@
 @ComponentV2
 export struct CommonButton {
   @Param
-  bgColor: ResourceColor = $r('app.color.icon_color_highlight');
+  bgColor: ResourceColor = $r('app.color.theme_color');
+  @Param
+  fontColor: ResourceColor = $r('app.color.font_color_level1_invert')
+  @Param
+  customBorderColor?: ResourceColor = undefined
+  @Param
+  isLoading: boolean = false
   @Param
   title: string = '';
   @Param
-  subTitle: string = '';
+  icon: ResourceStr = ''
   @Param
   fullWidth: boolean = true;
+  @Param
+  containerPadding: Length = $r('app.string.padding_l')
   @Event
   handleClick?: () => void = () => {
   };
@@ -15,32 +23,45 @@ export struct CommonButton {
   build() {
     Row() {
       Button(this.title) {
-        Column() {
-          Text(this.title)
-            .fontSize($r('app.string.font_size_32'))
-            .fontWeight(500);
-          if (this.subTitle) {
-            Text(this.subTitle)
-              .fontSize($r('app.string.font_size_20'))
-              .fontColor($r('app.color.font_color_level2_invert'));
+        Row() {
+          if (this.icon) {
+            Image(this.icon)
+              .width(16)
+              .height(16)
+              .objectFit(ImageFit.Contain)
+              .margin({ right: $r('app.string.margin_s') })
           }
-        };
+          Text(this.title)
+            .fontSize($r('app.string.font_size_16'))
+            .fontWeight(500);
+          if(this.isLoading){
+            LoadingProgress()
+              .width(16)
+              .height(16)
+              .color(this.fontColor)
+              .margin({ left: $r('app.string.margin_s') })
+          }
+        }
       }
       .width(this.fullWidth ? '100%' : 'auto')
       .padding({
         left: $r('app.string.padding_m'),
         right: $r('app.string.padding_m'),
       })
-      .height('88lpx')
+      .enabled(!this.isLoading)
+      .height(40)
+      .borderRadius($r('app.string.border_radius_capsule'))
       .backgroundColor(this.bgColor)
-      .fontColor($r('app.color.icon_color_level1_invert'))
+      .borderWidth(this.customBorderColor ? 1 : 0)
+      .borderColor(this.customBorderColor ? this.customBorderColor : this.bgColor)
+      .fontColor(this.fontColor)
       .onClick(() => {
         this.handleClick?.();
       });
     }
     .padding({
-      left: $r('app.string.padding_s'),
-      right: $r('app.string.padding_s'),
+      left: this.containerPadding,
+      right: this.containerPadding,
     });
   }
 }

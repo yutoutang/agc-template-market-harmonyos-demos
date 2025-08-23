@@ -1,1 +1,1 @@
-export {MyOrdersBuilder} from './src/main/ets/pages/MyOrders'
+export { MyBookBuilder } from './src/main/ets/pages/MyBook';

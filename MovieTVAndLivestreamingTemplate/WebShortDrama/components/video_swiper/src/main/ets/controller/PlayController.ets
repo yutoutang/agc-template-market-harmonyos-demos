@@ -15,12 +15,24 @@ export class PlayerLayoutSize {
  * 2. 选集播放
  * 3. swipe事件(当前索引变化, 滑动到末尾，滑动到开头)
  */
+@ObservedV2
 export class PlayController {
   playLayout: PlayerLayoutSize = new PlayerLayoutSize();
   private swiperController?: SwiperController
   autoPlay: boolean = false
+  @Trace isLocked: boolean = false
   private avPlayerMap: Map<number, media.AVPlayer> = new Map
   public curentIndex: number = 0;
+  @Trace id: string = ''
+  @Trace isVip: boolean = false
+  static _lockedDrama: Map<string, Array<number>> = new Map
+
+  public static get lockedDrama() {
+    if (!PlayController._lockedDrama) {
+      PlayController._lockedDrama = new Map
+    }
+    return PlayController._lockedDrama;
+  }
 
   setSwiperController(swiperController: SwiperController) {
     this.swiperController = swiperController

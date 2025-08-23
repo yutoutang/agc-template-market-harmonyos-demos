@@ -17,7 +17,9 @@ export struct StateBar {
           this.vm.selectedIndex = 0
           this.vm.type = OrderType.SEND
           this.vm.status = OrderStatus.SUCCESS
-          this.vm.getOrderList()
+          if (this.vm.isLogin) {
+            this.vm.getOrderList()
+          }
         })
       Button(`收件${this.vm.getCount}`)
         .fontSize(14)
@@ -28,7 +30,9 @@ export struct StateBar {
           this.vm.selectedIndex = 1
           this.vm.type = OrderType.RECEIVE
           this.vm.status = OrderStatus.SUCCESS
-          this.vm.getOrderList()
+          if (this.vm.isLogin) {
+            this.vm.getOrderList()
+          }
         })
       Button(`待支付${this.vm.pendingCount}`)
         .fontSize(14)
@@ -39,7 +43,9 @@ export struct StateBar {
           this.vm.selectedIndex = 2
           this.vm.type = OrderType.ALL
           this.vm.status = OrderStatus.DO_ING
-          this.vm.getOrderList()
+          if (this.vm.isLogin) {
+            this.vm.getOrderList()
+          }
         })
       Select(this.vm.selectData)
         .value('筛选')
@@ -52,7 +58,9 @@ export struct StateBar {
         .optionHeight(300)
         .onSelect((index: number, value: string) => {
           this.vm.selectedExpressStatus = value
-          this.vm.getOrderList()
+          if (this.vm.isLogin) {
+            this.vm.getOrderList()
+          }
         })
     }
     .width('100%')

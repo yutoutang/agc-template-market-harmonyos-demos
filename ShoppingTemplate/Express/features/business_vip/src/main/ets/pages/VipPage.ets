@@ -7,7 +7,7 @@ import { CommonCoupon, Coupon, RouterModule } from 'lib_foundation';
 import { RouterMap } from 'module_base';
 
 @Entry
-@Component
+@ComponentV2
 export struct VipPage {
   vm: VipPageVM = VipPageVM.instance
   dialogController: CustomDialogController = new CustomDialogController({
@@ -25,11 +25,11 @@ export struct VipPage {
         role: ButtonRole.ERROR,
         action: () => {
           console.info('Callback when the second button is clicked')
-        }
+        },
       },
       onCheckedChange: () => {
         console.info('Callback when the checkbox is clicked')
-      }
+      },
     }),
   })
 
@@ -95,7 +95,7 @@ export struct VipPage {
                         }
                         this.vm.couponList[index].isAvailable = false
                         this.vm.userInfo?.couponList.push(coupon.id)
-                      }
+                      },
                     })
                   }
                   .margin({ bottom: 14 })
@@ -105,6 +105,7 @@ export struct VipPage {
             .padding({ left: 16, right: 16 })
           }
           .scrollBar(BarState.Off)
+          .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
         }
         .margin({ top: 47 })
 

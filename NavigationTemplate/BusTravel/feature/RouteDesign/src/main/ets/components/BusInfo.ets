@@ -1,23 +1,21 @@
 import { getDataFromJSON } from 'common'
+import { SearchSet } from 'route_detail'
 import { RandomCountdown } from './RandomCountdown'
 import { generateRandomNumber } from './BusStationRandom'
-import { SearchSet } from 'route_detail'
 
-@Component
+@ComponentV2
 @Preview
 export struct RealTimeBusComponent {
-  @Prop busTimer: RandomCountdown
-  @State busInfo: LineSetInfo = new LineSetInfo('', '', '', 116.490437, 39.90536209, 0);
-  @State lineName: string = '';
-  @State busStationRandom: Array<string> = ['北京南站'];
-  @State randomBus: number = 0;
-  @State randomBusStopDistance: number = generateRandomNumber(0, 300);
-  @StorageLink('stationCount') stationCount: number = 2; // 距离站数 // 值统一
-  @StorageLink('countdownMinute') countdownMinute: number = 15;
-  @State countdownSecond: number = 0;
-  @State endDir: string = '';
+  @Param @Require busTimer: RandomCountdown
+  @Param busInfo: LineSetInfo = new LineSetInfo('', '', '', 116.490437, 39.90536209, 0);
+  @Local lineName: string = '';
+  @Local busStationRandom: Array<string> = ['北京南站'];
+  @Local randomBus: number = 0;
+  @Local randomBusStopDistance: number = generateRandomNumber(0, 300);
+  @Local countdownSecond: number = 0;
+  @Local endDir: string = '';
   // 站线名 起点站 终点站 经纬度 站点名 seq
-  @State busSetItems: Array<SearchSet> = [];
+  @Local busSetItems: Array<SearchSet> = [];
 
   aboutToAppear(): void {
     this.endDir = this.busInfo.endStation
@@ -141,7 +139,7 @@ export struct RealTimeBusComponent {
   }
 }
 
-@Observed
+@ObservedV2
 export class LineSetInfo {
   private _lineName: string = ''
 

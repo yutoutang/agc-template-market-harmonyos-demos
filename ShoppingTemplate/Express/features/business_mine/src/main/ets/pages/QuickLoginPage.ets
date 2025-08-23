@@ -20,28 +20,28 @@ export struct QuickLoginPage {
   @Local anonymousPhone: string = ''
   privacyText: loginComponentManager.PrivacyText[] = [{
     text: '已阅读并同意',
-    type: loginComponentManager.TextType.PLAIN_TEXT
+    type: loginComponentManager.TextType.PLAIN_TEXT,
   }, {
     text: '《用户服务协议》 ',
     tag: '用户服务协议',
-    type: loginComponentManager.TextType.RICH_TEXT
+    type: loginComponentManager.TextType.RICH_TEXT,
   }, {
     text: '《隐私协议》',
     tag: '隐私协议',
-    type: loginComponentManager.TextType.RICH_TEXT
+    type: loginComponentManager.TextType.RICH_TEXT,
   }, {
     text: '和',
-    type: loginComponentManager.TextType.PLAIN_TEXT
+    type: loginComponentManager.TextType.PLAIN_TEXT,
   }, {
     text: '《华为账号用户认证协议》',
     tag: '华为账号用户认证协议',
-    type: loginComponentManager.TextType.RICH_TEXT
+    type: loginComponentManager.TextType.RICH_TEXT,
   }];
   controller: loginComponentManager.LoginWithHuaweiIDButtonController =
     new loginComponentManager.LoginWithHuaweiIDButtonController()
-      // Users need to accept relevant agreements before they can sign in wth HUAWEI IDs.
-      // Set the agreement status to NOT_ACCEPTED first. Once the user accepts the agreements,
-      // change the agreement status to ACCEPTED to complete HUAWEI ID sign-in.
+    // Users need to accept relevant agreements before they can sign in wth HUAWEI IDs.
+    // Set the agreement status to NOT_ACCEPTED first. Once the user accepts the agreements,
+    // change the agreement status to ACCEPTED to complete HUAWEI ID sign-in.
       .setAgreementStatus(loginComponentManager.AgreementStatus.NOT_ACCEPTED)
       .onClickLoginWithHuaweiIDButton((error: BusinessError, response: loginComponentManager.HuaweiIDCredential) => {
         // Process the logic of a tap on the one-tap sign-in button.
@@ -92,7 +92,7 @@ export struct QuickLoginPage {
             data: {
               isLogin: true,
               userName: '用户',
-              phone: this.quickLoginAnonymousPhone
+              phone: this.quickLoginAnonymousPhone,
             },
           };
           emitter.emit('isLogin', uerInfo);
@@ -184,10 +184,10 @@ export struct QuickLoginPage {
                   .maxLines(1)
                   .constraintSize({ maxWidth: '100%' })
                   .margin({
-                    top: 8
+                    top: 8,
                   })
               }.margin({
-                top: 64
+                top: 64,
               })
             }
             .width('100%')
@@ -222,6 +222,7 @@ export struct QuickLoginPage {
           .justifyContent(FlexAlign.SpaceBetween)
         }
         .scrollBar(BarState.Off)
+        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
       }
       .height('calc(100% - 56vp)')
 

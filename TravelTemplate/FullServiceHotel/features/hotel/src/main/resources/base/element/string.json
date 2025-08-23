@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "shared_desc",
+      "value": "description"
+    },
+    {
+      "name": "permission_reason_location",
+      "value": "用于获取当前定位"
+    },
+    {
+      "name": "agcit_huawei_full_service_hotel",
+      "value": "1.0.2"
+    }
+  ]
+}

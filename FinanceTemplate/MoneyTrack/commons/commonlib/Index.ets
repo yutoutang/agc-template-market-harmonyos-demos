@@ -3,14 +3,20 @@ export { Logger } from './src/main/ets/utils/logger/Index';
 export { WindowUtil } from './src/main/ets/utils/window/Index';
 
 export {
-  FrameworkUtil,
-  TabIndexMap,
-} from './src/main/ets/utils/framework/Index';
+  FrameworkUtil, TabIndexMap } from './src/main/ets/utils/framework/Index';
 
 export { EventBus, EventKey } from './src/main/ets/utils/eventbus/Index';
 
 // 路由工具
 export * from './src/main/ets/utils/router/Index';
+
+export {
+  BreakpointTypeEnum,
+  BreakpointType,
+  BreakpointModel,
+  BreakpointStorage,
+  BreakpointSystem,
+} from './src/main/ets/utils/BreakpointSystem'
 
 export { CommonConstants } from './src/main/ets/constants/CommonConstants';
 
@@ -19,9 +25,7 @@ export { CommonHeader } from './src/main/ets/components/CommonHeader';
 export { CommonMonthPicker } from './src/main/ets/components/CommonMonthPicker';
 
 export {
-  CommonButton,
-  CustomButtonType,
-} from './src/main/ets/components/CommonButton';
+  CommonButton, CustomButtonType } from './src/main/ets/components/CommonButton';
 
 export { ContainerRow } from './src/main/ets/components/ContainerRow';
 

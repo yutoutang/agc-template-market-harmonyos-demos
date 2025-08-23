@@ -1,0 +1,9 @@
+{
+  "module": {
+    "name": "module_calendar_picker",
+    "type": "har",
+    "deviceTypes": [
+      "phone",
+    ]
+  }
+}

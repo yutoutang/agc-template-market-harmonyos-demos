@@ -65,6 +65,7 @@ export struct SearchTipPanel {
         this.nullBuilder()
       }
     }
+    .backgroundColor('#F1F3F5')
     .width('100%')
     .height(200)
     .alignItems(VerticalAlign.Top)
@@ -73,7 +74,6 @@ export struct SearchTipPanel {
   @Builder
   nullBuilder() {
     Column() {
-
       Image(getMedia('app.media.search_no_result'))
         .width(120)
         .aspectRatio(1)
@@ -85,7 +85,7 @@ export struct SearchTipPanel {
     }
     .padding(12)
     .borderRadius(16)
-    .backgroundColor(Color.White)
+    .backgroundColor('#F1F3F5')
     .width('100%')
   }
 }

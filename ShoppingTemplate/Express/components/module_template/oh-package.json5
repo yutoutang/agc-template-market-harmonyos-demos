@@ -6,8 +6,8 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "lib_foundation": "file:../../commons/lib_foundation",
     'module_base': 'file:../module_base',
-    'module_address': 'file:../module_address',
+    "module_address": "file:../module_address",
+    "module_address_card": "file:../module_address_card"
   }
 }

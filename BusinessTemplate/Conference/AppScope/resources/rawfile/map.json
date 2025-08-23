@@ -1,0 +1,95 @@
+{
+  "mock_data": [
+    {
+      "title": "篮球中心",
+      "image": "map_basketball.png",
+      "imagePreview": "my%2Fmy_agenda_map.png?token=9e8fd66e-d64b-4927-b1e9-b9ca5ebe62eb",
+      "address": "东莞银行篮球中心",
+      "addressDesc": "东莞市东部快速路与松山湖大道交汇处",
+      "longitude": "113.873114599497",
+      "latitude": "22.8927232495791",
+      "traffic": [
+        {
+          "name": "自驾抵达：",
+          "address": [
+            {
+              "copyText": "东莞银行篮球中心(3号门)",
+              "desc": ""
+            }
+          ]
+        },
+        {
+          "name": "网约车抵达：",
+          "address": [
+            {
+              "copyText": "东莞银行篮球中心(5号门)",
+              "desc": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "大广场",
+      "image": "map_san_top.png",
+      "imagePreview": "my%2Fmy_agenda_map.png?token=9e8fd66e-d64b-4927-b1e9-b9ca5ebe62eb",
+      "address": "大广场（鸿蒙生态园区）",
+      "longitude": "113.873114599497",
+      "latitude": "22.8927232495791",
+      "addressDesc": "东莞市大学路10号",
+      "traffic": [
+        {
+          "name": "自驾抵达：",
+          "address": [
+            {
+              "copyText": "松山湖国际创新创业社区停车场",
+              "desc": "（全天接驳巴士往返大广场）"
+            }
+          ]
+        },
+        {
+          "name": "网约车抵达：",
+          "address": [
+            {
+              "copyText": "某员工培训中心大广场A区－北门",
+              "desc": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "小山村",
+      "image": "map_xi_top.png",
+      "imagePreview": "my%2Fmy_agenda_map.png?token=9e8fd66e-d64b-4927-b1e9-b9ca5ebe62eb",
+      "address": "溪流村庄（云生态园区）",
+      "longitude": "113.873114599497",
+      "latitude": "22.8927232495791",
+      "addressDesc": "东莞市松山湖科技产业园区环湖路９号",
+      "traffic": [
+        {
+          "name": "自驾抵达：",
+          "address": [
+            {
+              "copyText": "中以国际科技合作产业园停车场",
+              "desc": "（全天接驳巴士往返溪流村庄）"
+            }
+          ]
+        },
+        {
+          "name": "网约车抵达：",
+          "address": [
+            {
+              "copyText": "某溪流村庄F区６号门",
+              "desc": ""
+            },
+            {
+              "copyText": "某溪流村庄三家巷",
+              "desc": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

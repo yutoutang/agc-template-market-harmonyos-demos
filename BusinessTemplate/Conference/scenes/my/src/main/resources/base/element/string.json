@@ -1,0 +1,20 @@
+{
+  "string": [
+    {
+      "name": "shared_desc",
+      "value": "description"
+    },
+    {
+      "name": "PRIVACY_URL",
+      "value": "https://agreement-drcn.hispace.dbankcloud.cn/index.html?lang=zh&agreementId=1702049409677676416"
+    },
+    {
+      "name": "FILING_NUMBER_URL",
+      "value": "https://beian.miit.gov.cn"
+    },
+    {
+      "name": "copyEmail",
+      "value": "00000000000"
+    }
+  ]
+}

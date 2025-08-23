@@ -20,7 +20,7 @@ export { DramaInfo } from './src/main/ets/bean/common/DramaInfo';
 
 export { EpisodeInfo } from './src/main/ets/bean/common/EpisodeInfo';
 
-export { CommentInfo } from './src/main/ets/bean/common/CommentInfo';
+export { CommentInfo, ReplyInfo, LikeInfo } from './src/main/ets/bean/common/CommentInfo';
 
 container.register(RequestAPI, {
   value: new RequestAPI()

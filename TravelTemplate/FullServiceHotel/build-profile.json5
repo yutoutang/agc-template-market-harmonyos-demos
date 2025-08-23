@@ -1,12 +1,13 @@
 {
   "app": {
-    "signingConfigs": [
-    ],
+/** todo: 手动签名 */
+    "signingConfigs": [],
     "products": [
       {
         "name": "default",
         "signingConfig": "default",
-        "compatibleSdkVersion": "5.0.0(12)",
+        "targetSdkVersion": "5.0.4(16)",
+        "compatibleSdkVersion": "5.0.4(16)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
           "strictMode": {
@@ -18,7 +19,7 @@
     ],
     "buildModeSet": [
       {
-        "name": "debug",
+        "name": "debug"
       },
       {
         "name": "release"
@@ -28,31 +29,7 @@
   "modules": [
     {
       "name": "entry",
-      "srcPath": "./entry",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
-    },
-    {
-      "name": "home",
-      "srcPath": "./features/tab/home",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
-    },
-    {
-      "name": "mine",
-      "srcPath": "./features/tab/mine",
+      "srcPath": "./products/entry",
       "targets": [
         {
           "name": "default",
@@ -64,55 +41,15 @@
     },
     {
       "name": "commonlib",
-      "srcPath": "./commons/commonlib",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
+      "srcPath": "./commons/commonlib"
     },
     {
       "name": "componentlib",
-      "srcPath": "./commons/componentlib",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
-    },
-    {
-      "name": "comments",
-      "srcPath": "./features/service/comments",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
+      "srcPath": "./commons/componentlib"
     },
     {
       "name": "commonservice",
-      "srcPath": "./features/service/commonservice",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
-    },
-    {
-      "name": "vip",
-      "srcPath": "./features/tab/vip",
+      "srcPath": "./features/commonservice",
       "targets": [
         {
           "name": "default",
@@ -124,19 +61,11 @@
     },
     {
       "name": "banquet",
-      "srcPath": "./features/service/banquet",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
+      "srcPath": "./features/banquet"
     },
     {
       "name": "catering",
-      "srcPath": "./features/service/catering",
+      "srcPath": "./features/catering",
       "targets": [
         {
           "name": "default",
@@ -148,7 +77,7 @@
     },
     {
       "name": "hotel",
-      "srcPath": "./features/service/hotel",
+      "srcPath": "./features/hotel",
       "targets": [
         {
           "name": "default",
@@ -160,15 +89,35 @@
     },
     {
       "name": "network",
-      "srcPath": "./commons/network",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
+      "srcPath": "./commons/network"
+    },
+    {
+      "name": "module_store_comments",
+      "srcPath": "./components/module_store_comments"
+    },
+    {
+      "name": "module_ui_base",
+      "srcPath": "./components/module_ui_base"
+    },
+    {
+      "name": "module_date_selector",
+      "srcPath": "./components/module_date_selector"
+    },
+    {
+      "name": "module_call_dialog",
+      "srcPath": "./components/module_call_dialog"
+    },
+    {
+      "name": "module_login",
+      "srcPath": "./components/module_login"
+    },
+    {
+      "name": "settings",
+      "srcPath": "./features/settings"
+    },
+    {
+      "name": "module_privacy_agreement",
+      "srcPath": "./components/module_privacy_agreement"
     }
   ]
 }

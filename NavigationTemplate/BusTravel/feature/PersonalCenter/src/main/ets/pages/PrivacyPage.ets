@@ -5,7 +5,7 @@ export function PrivacyPageBuilder() {
   PrivacyPage()
 }
 
-@Component
+@ComponentV2
 export struct PrivacyPage {
   scroller: Scroller = new Scroller()
   vm: RouteEntryVM = RouteEntryVM.instance;
@@ -22,23 +22,15 @@ export struct PrivacyPage {
         }
         .height('100%')
         .width('100%')
-        .backgroundColor('#F1F3F5')
       }
       .scrollable(ScrollDirection.Vertical) // 滚动方向纵向
       .scrollBar(BarState.Auto) // 滚动条常驻显示
       .scrollBarColor(Color.Gray) // 滚动条颜色
       .scrollBarWidth(0) // 滚动条宽度
       .friction(0.6)
-      .edgeEffect(EdgeEffect.None)
-      .onWillScroll((xOffset: number, yOffset: number, scrollState: ScrollState) => {
-        console.info(xOffset + ' ' + yOffset)
-      })
-      .onScrollEdge((side: Edge) => {
-        console.info('To the edge')
-      })
-      .onScrollStop(() => {
-        console.info('Scroll Stop')
-      })
+      .edgeEffect(EdgeEffect.Spring)
+      .backgroundColor('#F1F3F5')
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
     }
     .hideTitleBar(false)
     .title('隐私管理')

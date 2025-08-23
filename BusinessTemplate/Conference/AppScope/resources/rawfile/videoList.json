@@ -1,0 +1,277 @@
+{
+  "mock_data": [
+    {
+      "id": 2506213262328918,
+      "articleCategoryId": 2504110917764581,
+      "title": "小艺全面进化，智能体验再升级",
+      "summary": "https://1500037660.vod-qcloud.com/43bb98e6vodtranscq1500037660/362646c73560136624242069599/v.f100040.mp4",
+      "extra": [
+
+      ],
+      "tags": [
+
+      ],
+      "isTop": 0,
+      "isRecommend": 0,
+      "isAllowedLike": 1,
+      "isAllowedComment": 0,
+      "fileIds": null,
+      "coverImageUrl": "https://hwyhw.smarket.net.cn/content/index.php?mappingId=e591577d5145a92f8c9850ad07b8ed3f",
+      "coverImageRealPath": "home%2Fhome_tea_party_.png?token=97597c35-eaa9-4e58-8e93-52a8b2563a7b",
+      "showImagesUrl": [
+
+      ],
+      "showImagesRealPath": [
+
+      ],
+      "typeId": 0,
+      "isUseLinkUrl": 0,
+      "pushTime": 1758931200,
+      "createTime": 1750437887,
+      "modifyTime": 1750579231,
+      "statInfo": null,
+      "templateConfigId": 512996,
+      "order": 7,
+      "authUrl": "0",
+      "PCUrl": "",
+      "approvalStatus": 1,
+      "approvalReason": "",
+      "approvalOperator": null,
+      "approvalTime": 0
+    },
+    {
+      "id": 2506212058477268,
+      "articleCategoryId": 2504110917764581,
+      "title": "让精品应用被发现、被看见",
+      "summary": "https://1500037660.vod-qcloud.com/a2af0fadvodtranssh1500037660/eda01e5e3560136624241239880/v.f100040.mp4",
+      "extra": [
+
+      ],
+      "tags": [
+
+      ],
+      "isTop": 0,
+      "isRecommend": 0,
+      "isAllowedLike": 1,
+      "isAllowedComment": 0,
+      "fileIds": "",
+      "coverImageUrl": "https://hwyhw.smarket.net.cn/content/index.php?mappingId=1e10b10b3314f861d3ae64e1cd1996e3",
+      "coverImageRealPath": "home%2Fhome_tea_party1.png?token=3251d191-25f7-413a-adcd-08b8b2d9c76a",
+      "showImagesUrl": [
+
+      ],
+      "showImagesRealPath": [
+
+      ],
+      "typeId": 0,
+      "isUseLinkUrl": 0,
+      "pushTime": 1758931200,
+      "createTime": 1750437833,
+      "modifyTime": 1750579234,
+      "statInfo": null,
+      "templateConfigId": 512994,
+      "order": 6,
+      "authUrl": "0",
+      "PCUrl": "",
+      "approvalStatus": 1,
+      "approvalReason": "",
+      "approvalOperator": null,
+      "approvalTime": 0
+    },
+    {
+      "id": 2504112821831670,
+      "articleCategoryId": 2504110917764581,
+      "title": "在这里，与全球开发者一起积蓄力量，向阳而生！",
+      "summary": "https://1500037660.vod-qcloud.com/43bb98e6vodtranscq1500037660/b35bbbf93560136624019736501/v.f100040.mp4",
+      "extra": [
+
+      ],
+      "tags": [
+
+      ],
+      "isTop": 0,
+      "isRecommend": 0,
+      "isAllowedLike": 1,
+      "isAllowedComment": 0,
+      "fileIds": null,
+      "coverImageUrl": "https://hwyhw.smarket.net.cn/content/index.php?mappingId=8d4dad2c26378452cda97434e7a5c30f",
+      "coverImageRealPath": "home%2Fhome_tea_party_.png?token=97597c35-eaa9-4e58-8e93-52a8b2563a7b",
+      "showImagesUrl": [
+
+      ],
+      "showImagesRealPath": [
+
+      ],
+      "typeId": 0,
+      "isUseLinkUrl": 0,
+      "pushTime": 1744300800,
+      "createTime": 1744354731,
+      "modifyTime": 1750579236,
+      "statInfo": null,
+      "templateConfigId": 511469,
+      "order": 5,
+      "authUrl": "0",
+      "PCUrl": "",
+      "approvalStatus": 1,
+      "approvalReason": "",
+      "approvalOperator": null,
+      "approvalTime": 0
+    },
+    {
+      "id": 2504113848122305,
+      "articleCategoryId": 2504110917764581,
+      "title": "加入鸿蒙生态，共建共享鸿蒙新世界",
+      "summary": "https://1500037660.vod-qcloud.com/a2af0fadvodtranssh1500037660/5560669c3560136624090295019/v.f100040.mp4",
+      "extra": [
+
+      ],
+      "tags": [
+
+      ],
+      "isTop": 0,
+      "isRecommend": 0,
+      "isAllowedLike": 1,
+      "isAllowedComment": 0,
+      "fileIds": null,
+      "coverImageUrl": "https://hwyhw.smarket.net.cn/content/index.php?mappingId=f43d9e1a11b6368332703b6c99862daa",
+      "coverImageRealPath": "home%2Fhome_tea_party1.png?token=3251d191-25f7-413a-adcd-08b8b2d9c76a",
+      "showImagesUrl": [
+
+      ],
+      "showImagesRealPath": [
+
+      ],
+      "typeId": 0,
+      "isUseLinkUrl": 0,
+      "pushTime": 1744300800,
+      "createTime": 1744354971,
+      "modifyTime": 1750579238,
+      "statInfo": null,
+      "templateConfigId": 511475,
+      "order": 4,
+      "authUrl": "0",
+      "PCUrl": "",
+      "approvalStatus": 1,
+      "approvalReason": "",
+      "approvalOperator": null,
+      "approvalTime": 0
+    },
+    {
+      "id": 2506212127672739,
+      "articleCategoryId": 2504110917764581,
+      "title": "鸿蒙新世界，我们一起创造",
+      "summary": "https://1500037660.vod-qcloud.com/a2af0fadvodtranssh1500037660/aec864a73560136624240858379/v.f100040.mp4",
+      "extra": [
+
+      ],
+      "tags": [
+
+      ],
+      "isTop": 0,
+      "isRecommend": 0,
+      "isAllowedLike": 1,
+      "isAllowedComment": 0,
+      "fileIds": "",
+      "coverImageUrl": "https://hwyhw.smarket.net.cn/content/index.php?mappingId=c25416ca77b04b007edf267144549df7",
+      "coverImageRealPath": "home%2Fhome_tea_party_.png?token=97597c35-eaa9-4e58-8e93-52a8b2563a7b",
+      "showImagesUrl": [
+
+      ],
+      "showImagesRealPath": [
+
+      ],
+      "typeId": 0,
+      "isUseLinkUrl": 0,
+      "pushTime": 1758931200,
+      "createTime": 1750437793,
+      "modifyTime": 1750579240,
+      "statInfo": null,
+      "templateConfigId": 512992,
+      "order": 3,
+      "authUrl": "0",
+      "PCUrl": "",
+      "approvalStatus": 1,
+      "approvalReason": "",
+      "approvalOperator": null,
+      "approvalTime": 0
+    },
+    {
+      "id": 2506212237032481,
+      "articleCategoryId": 2504110917764581,
+      "title": "向阳而生，鸿蒙渐长",
+      "summary": "https://1500037660.vod-qcloud.com/43bb98e6vodtranscq1500037660/ae8fe1383560136624240824182/v.f100040.mp4",
+      "extra": [
+
+      ],
+      "tags": [
+
+      ],
+      "isTop": 0,
+      "isRecommend": 0,
+      "isAllowedLike": 1,
+      "isAllowedComment": 0,
+      "fileIds": "",
+      "coverImageUrl": "https://hwyhw.smarket.net.cn/content/index.php?mappingId=21ebd7c2387b6ff71ec19f2e25033bb0",
+      "coverImageRealPath": "home%2Fhome_tea_party1.png?token=3251d191-25f7-413a-adcd-08b8b2d9c76a",
+      "showImagesUrl": [
+
+      ],
+      "showImagesRealPath": [
+
+      ],
+      "typeId": 0,
+      "isUseLinkUrl": 0,
+      "pushTime": 1758931200,
+      "createTime": 1750437747,
+      "modifyTime": 1750579242,
+      "statInfo": null,
+      "templateConfigId": 512990,
+      "order": 2,
+      "authUrl": "0",
+      "PCUrl": "",
+      "approvalStatus": 1,
+      "approvalReason": "",
+      "approvalOperator": null,
+      "approvalTime": 0
+    },
+    {
+      "id": 2506222117122087,
+      "articleCategoryId": 2504110917764581,
+      "title": "主题演讲精彩时刻，昂然向前，奔腾不息",
+      "summary": "https://1500037660.vod-qcloud.com/a2af0fadvodtranssh1500037660/1da053c13560136624411757456/v.f100040.mp4",
+      "extra": [
+
+      ],
+      "tags": [
+
+      ],
+      "isTop": 0,
+      "isRecommend": 0,
+      "isAllowedLike": 1,
+      "isAllowedComment": 0,
+      "fileIds": "",
+      "coverImageUrl": "https://hwyhw.smarket.net.cn/content/index.php?mappingId=3be16ce30d3e0b343c82eea67eaa9318",
+      "coverImageRealPath": "home%2Fhome_tea_party_.png?token=97597c35-eaa9-4e58-8e93-52a8b2563a7b",
+      "showImagesUrl": [
+
+      ],
+      "showImagesRealPath": [
+
+      ],
+      "typeId": 0,
+      "isUseLinkUrl": 0,
+      "pushTime": 1759017600,
+      "createTime": 1750579224,
+      "modifyTime": 1750579244,
+      "statInfo": null,
+      "templateConfigId": 513006,
+      "order": 1,
+      "authUrl": "0",
+      "PCUrl": "",
+      "approvalStatus": 1,
+      "approvalReason": "",
+      "approvalOperator": null,
+      "approvalTime": 0
+    }
+  ]
+}

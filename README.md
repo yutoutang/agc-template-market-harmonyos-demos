@@ -9,7 +9,7 @@
     <th width="150px">文档</th>
   </tr>
   <tr>
-    <td rowspan="7"><a href="#生活服务">生活服务</a></td>
+    <td rowspan="8"><a href="#生活服务">生活服务</a></td>
     <td><a href="#政务应用模板">政务应用模板</a></td>
     <td><a href="./LifestyleAndServiceTemplate/GovernmentService/Application/README.md" target="_blank">快速开始</a></td>
   </tr>
@@ -28,6 +28,10 @@
   <tr>
     <td><a href="#停车缴费元服务模板">停车缴费元服务模板</a></td>
     <td><a href="./LifestyleAndServiceTemplate/Parking/README.md" target="_blank">快速开始</a></td>
+  </tr>
+  <tr>
+    <td><a href="#天气应用模板">天气应用模板</a></td>
+    <td><a href="./LifestyleAndServiceTemplate/Weather/README.md" target="_blank">快速开始</a></td>
   </tr>
   <tr>
     <td><a href="#购物中心元服务模板">购物中心元服务模板</a></td>
@@ -123,13 +127,17 @@
     <td><a href="./SocialTemplate/SocialDating/README.md" target="_blank">快速开始</a></td>
   </tr>
   <tr>
-    <td rowspan="2"><a href="#工具">工具</a></td>
+    <td rowspan="3"><a href="#工具">工具</a></td>
     <td><a href="#智慧家居应用模板">智慧家居应用模板</a></td>
     <td><a href="./ToolsTemplate//SmartHome/README.md" target="_blank">快速开始</a></td>
   </tr>
   <tr>
     <td><a href="#计算器元服务模板">计算器元服务模板</a></td>
     <td><a href="./ToolsTemplate/Calculator/README.md" target="_blank">快速开始</a></td>
+  </tr>
+  <tr>
+    <td><a href="#综合工具应用模板">综合工具应用模板</a></td>
+    <td><a href="./ToolsTemplate/ComprehensiveTool/README.md" target="_blank">快速开始</a></td>
   </tr>
   <tr>
     <td rowspan="2"><a href="#儿童">儿童</a></td>
@@ -141,7 +149,7 @@
     <td><a href="./KidsTemplate/PostpartumCareCenter/README.md" target="_blank">快速开始</a></td>
   </tr>
   <tr>
-    <td rowspan="3"><a href="#商务">商务</a></td>
+    <td rowspan="4"><a href="#商务">商务</a></td>
     <td><a href="#办公考勤应用模板">办公考勤应用模板</a></td>
     <td><a href="./BusinessTemplate/OfficeAttendance/README.md" target="_blank">快速开始</a></td>
   </tr>
@@ -152,6 +160,10 @@
   <tr>
     <td><a href="#笔记应用模板">笔记应用模板</a></td>
     <td><a href="./BusinessTemplate/Notes/README.md" target="_blank">快速开始</a></td>
+  </tr>
+  <tr>
+    <td><a href="#会务元服务模板">会务元服务模板</a></td>
+    <td><a href="./BusinessTemplate/Conference/README.md" target="_blank">快速开始</a></td>
   </tr>
   <tr>
     <td rowspan="2"><a href="#汽车">汽车</a></td>
@@ -334,6 +346,24 @@
 | 首页                                                           | 找车位                                                           | 我的                                                           |
 |--------------------------------------------------------------|---------------------------------------------------------------|--------------------------------------------------------------|
 | <img src="./LifestyleAndServiceTemplate/Parking/screenshots/pic_home.jpeg" alt="首页" width="300"> | <img src="./LifestyleAndServiceTemplate/Parking/screenshots/pic_find.jpeg" alt="找车位" width="300"> | <img src="./LifestyleAndServiceTemplate/Parking/screenshots/pic_mine.jpeg" alt="我的" width="300"> |
+
+### 天气应用模板
+
+**功能介绍**
+
+本模板为天气应用提供了常用功能的开发样例，模板主要分首页和我的两大模块：
+
+- 首页：主要提供定位显示、实时天气预报、24小时天气预报、15天天气预报和生活指数展示等功能。
+
+- 我的：展示个人信息、浏览切换个性主题、查看详细生活指数、下载使用播报语音包和字体设置等功能。
+
+本模板已集成华为账号等服务，只需做少量配置和定制即可快速实现华为账号登录等功能。
+
+<a href="./LifestyleAndServiceTemplate/Weather/README.md" target="_blank">详细说明</a>
+
+| 首页                                                     | 我的                                                     |
+|--------------------------------------------------------|--------------------------------------------------------|
+| <img src="./LifestyleAndServiceTemplate/Weather/screenshots/Home.jpeg" alt="首页" width="300"> | <img src="./LifestyleAndServiceTemplate/Weather/screenshots/Mine.jpeg" alt="我的" width="300"> |
 
 ### 购物中心元服务模板
 
@@ -770,6 +800,23 @@
 |-------------------------------------------------------|------------------------------------------------------|------------------------------ |
 | <img src="./ToolsTemplate/Calculator/screenshot/home.jpg" alt="计算器" width="300"> | <img src="./ToolsTemplate/Calculator/screenshot/tool.jpg" alt="工具" width="300"> | <img src="./ToolsTemplate/Calculator/screenshot/mine.jpg" alt="我的" width="300"> |
 
+### 综合工具应用模板
+
+**功能介绍**
+
+本模板为工具类应用提供了常用功能的开发样例，模板主要分首页、我的两大模块：
+
+* 首页：提供计算器、黄历、汇率计算、热量计算等工具功能。
+* 我的：支持问题反馈、用户协议、隐私政策查看。
+
+本模板只需做少量配置和定制即可快速实现数字计算、日期查询、空调遥控、个税计算等功能。
+
+<a href="./ToolsTemplate/ComprehensiveTool/README.md" target="_blank">详细说明</a>
+
+| 首页                                                      | 我的                                                      |
+|---------------------------------------------------------|---------------------------------------------------------|
+| <img src="./ToolsTemplate/ComprehensiveTool/screenshots/home.png" alt="首页" width="300"> | <img src="./ToolsTemplate/ComprehensiveTool/screenshots/mine.png" alt="我的" width="300"> |
+
 ## 儿童
 
 ### 儿童教育应用模板
@@ -875,6 +922,27 @@
 | 首页                                    | 我的                                |
 |---------------------------------------|-----------------------------------|
 | <img src="./BusinessTemplate/Notes/screenshots/homepage.jpg" alt="首页" width="300"> | <img src="./BusinessTemplate/Notes/screenshots/mine.jpg" alt="我的" width="300"/> |
+
+
+### 会务元服务模板
+
+**功能介绍**
+
+您可以基于此模板直接定制会议类元服务。
+
+本模板为商务会展类元服务提供了常用功能的开发样例，模板主要分首页、议程和我的三大模块：
+
+- 首页：展示大会议程、精彩活动、会议信息等。
+- 议程：展示每日的详细议程，并支持按关键字进行筛选。
+- 我的：管理门票、收藏的议程和兴趣标签。
+
+本模板已集成华为账号、地图等服务，只需做少量配置和定制即可快速实现华为账号的登录、会场位置定位导航等功能
+
+<a href="./BusinessTemplate/Conference/README.md" target="_blank">详细说明</a>
+
+| 首页                                                        | 会议详情                                                      | 个人中心                                                   |
+|-----------------------------------------------------------|-----------------------------------------------------------|--------------------------------------------------------|
+| <img src="./BusinessTemplate/Conference/screenshots/homepage.jpg" alt="首页" width="300"> | <img src="./BusinessTemplate/Conference/screenshots/meeting.jpg" alt="详情" width="300"/> | <img src="./BusinessTemplate/Conference/screenshots/my.jpg" alt="个人中心" width="300"/> |
 
 ## 汽车
 

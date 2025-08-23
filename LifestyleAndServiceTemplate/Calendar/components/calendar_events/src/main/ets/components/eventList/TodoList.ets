@@ -80,7 +80,7 @@ export struct TodoList {
         }
         .width('100%')
         .alignItems(HorizontalAlign.Start)
-      }
+      }.visibility(this.todoList.length ? Visibility.Visible : Visibility.None)
 
       ListItem() {
         Column() {
@@ -113,7 +113,7 @@ export struct TodoList {
         .width('100%')
         .margin({ top: 16 })
         .alignItems(HorizontalAlign.Start)
-      }
+      }.visibility(this.todoList.length ? Visibility.Visible : Visibility.None)
     }
     .layoutWeight(1)
     .scrollBar(BarState.Off)

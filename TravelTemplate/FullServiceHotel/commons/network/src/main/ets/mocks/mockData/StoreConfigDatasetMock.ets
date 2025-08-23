@@ -22,12 +22,12 @@ const bannerMock: StructureDetailItem = {
 
 const twoPicsServiceMock: StructureDetailItem = {
   templateStructureType: 2,
-  info: '[{"link":"orderoom","image":"img_service_hotel.png?token=442d57c5-17c8-4b34-a19c-6079464c9576","title":"酒店预订"},{"link":"orderfood","image":"img_service_catering.png?token=edf184b9-d4a7-4ea1-8021-7464cd6a1005","title":"餐饮预订"}]',
+  info: '[{"link":"orderoom","image":"mockImage://img_service_hotel","title":"酒店预订"},{"link":"orderfood","image":"mockImage://img_service_catering","title":"餐饮预订"}]',
 };
 
 const threePicsServiceMock: StructureDetailItem = {
   templateStructureType: 3,
-  info: '[{"image":"img_service_banquet.png?token=23482143-0002-4d03-b88f-6b960af08fd2","link":"shop","title":"宴会厅查询"},{"image":"img_service_order.png?token=8acc439f-9596-4912-bc28-8c019a8d6f7a","link":"myorder","title":"订单查询"},{"image":"img_service_contact.png?token=f336d17c-446d-4394-b042-9ca58225c5f6","link":"phone","title":"致电客服"}]',
+  info: '[{"image":"mockImage://img_service_banquet","link":"shop","title":"宴会厅查询"},{"image":"mockImage://img_service_order","link":"myorder","title":"订单查询"},{"image":"mockImage://img_service_contact","link":"phone","title":"致电客服"}]',
 };
 
 const otherServiceMock: StructureDetailItem = {
@@ -42,7 +42,7 @@ const productAdMock: StructureDetailItem = {
 
 const productListMock: StructureDetailItem = {
   templateStructureType: 6,
-  info: '[{"image":"img_meal6.png?token=0412a5a8-9022-4d4b-a352-5d21eba4b7aa","link":"","text":"巴西烤肉单人餐","price":"157","oldPrice":"227","id":"1105","bigImageUrl":"","detailImageUrl":"","storeName":"千和大酒店·西餐厅"},{"image":"img_meal2.png?token=4ecb6cb6-f144-42fb-be9d-577c7fd5d0b4","link":"","text":"海鲜意面双人餐","price":"158","oldPrice":"245","id":"1106","bigImageUrl":"","detailImageUrl":"","storeName":"千和大酒店·西餐厅"},{"image":"img_meal3.png?token=13736cc6-3bc4-480d-b0c4-65c0d56284d8","link":"","text":"石锅酸汤鱼套餐2-3人餐","price":"199","oldPrice":"291","id":"1102","bigImageUrl":"","detailImageUrl":"","storeName":"千和大酒店·中餐厅"},{"image":"img_meal1.png?token=a16847c2-0ff9-4d0b-9f09-f5cb20bc3826","link":"","text":"新疆风味双人餐","price":"98","oldPrice":"185","id":"1103","bigImageUrl":"","detailImageUrl":"","storeName":"千和大酒店·中餐厅"}]',
+  info: '[{"image":"mockImage://img_meal1","link":"","text":"巴西烤肉单人餐","price":"157","oldPrice":"227","id":"1105","monthlySales":"83","bigImageUrl":"","detailImageUrl":"","storeName":"千和大酒店·西餐厅"},{"image":"mockImage://img_meal2","link":"","monthlySales":"96","text":"海鲜意面双人餐","price":"158","oldPrice":"245","id":"1106","bigImageUrl":"","detailImageUrl":"","storeName":"千和大酒店·西餐厅"},{"image":"mockImage://img_meal3","link":"","monthlySales":"39","text":"石锅酸汤鱼套餐2-3人餐","price":"199","oldPrice":"291","id":"1102","bigImageUrl":"","detailImageUrl":"","storeName":"千和大酒店·中餐厅"},{"image":"mockImage://img_meal4","link":"","text":"新疆风味双人餐","monthlySales":"7","price":"98","oldPrice":"185","id":"1103","bigImageUrl":"","detailImageUrl":"","storeName":"千和大酒店·中餐厅"}]',
 };
 
 const noticeItemMock: NoticeItem = {

@@ -36,7 +36,7 @@ struct Widget2x2Card {
         .objectFit(ImageFit.Auto)
 
       Row(){
-        Image($r('app.media.atomic_service_icon'))
+        Image($r('app.media.icon'))
           .width(20)
           .height(20)
           .borderRadius(10)
@@ -74,7 +74,7 @@ struct Widget2x2Card {
         .alignItems(HorizontalAlign.Start)
         .justifyContent(FlexAlign.End)
 
-        Image($r('app.media.ic_paused'))
+        Image($r('app.media.paused'))
           .fillColor(Color.Orange)
           .backgroundColor(Color.White)
           .width(20)

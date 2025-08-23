@@ -1,7 +1,8 @@
 import { storageStatistics } from '@kit.CoreFileKit';
 import { AppStorageV2, promptAction } from '@kit.ArkUI';
 import fs from '@ohos.file.fs';
-import { AppStorageBank, RouterModule, UserInfo } from 'lib_foundation';
+import { RouterModule, } from 'lib_foundation';
+import { AppStorageBank, IUserInfo, UserInfo } from 'module_base'
 import { userInfoData } from '../constants';
 
 @ObservedV2
@@ -37,7 +38,7 @@ export class SettingPageVM {
   }
 
   public async logout() {
-    AppStorageBank.updateUserInfo(userInfoData)
+    AppStorageBank.updateUserInfo(userInfoData as IUserInfo)
     RouterModule.pop()
   }
 

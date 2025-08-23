@@ -81,9 +81,7 @@ export class RouterModule {
   // 获取指定栈中指定页面的参数,不支持栈内存在多个同名页面的情况
   public static getNavParam<T = object>(info: NavRouterInfo): T | undefined {
     try {
-      const paramsArr = RouterModule._stack.getParamByName(info.url) as
-        | T[]
-        | undefined[];
+      const paramsArr = RouterModule._stack.getParamByName(info.url) as T[] | undefined[];
       if (paramsArr.length) {
         const lastParam = paramsArr[paramsArr.length - 1];
         if (typeof lastParam !== 'undefined') {

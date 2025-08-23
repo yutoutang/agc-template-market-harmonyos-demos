@@ -3,15 +3,13 @@ import AppConstants from '../constants/AppConstants'
 import { EntryVM } from '../viewmodels/EntryVM'
 
 @Entry
-@Component
+@ComponentV2
 struct Index {
-  @StorageProp('bottomRectHeight')
-  bottomRectHeight: number = 0;
-  @StorageProp('topRectHeight')
-  topRectHeight: number = 0;
   vm: EntryVM = EntryVM.instance
   private tabController: TabsController = new TabsController();
-
+  aboutToAppear(): void {
+    this.vm.redirect()
+  }
   build() {
     RelativeContainer() {
       Navigation(this.vm.pageStack) {
@@ -33,30 +31,17 @@ struct Index {
             this.vm.currentIndex = targetIndex
           })
         }
+        .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
         .width(AppConstants.FULL_PERCENT)
         .height(AppConstants.FULL_PERCENT)
         .backgroundColor($r('app.color.home_content_bgc_color'))
       }
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
+      .mode(NavigationMode.Stack)
       .hideTitleBar(true)
       .hideBackButton(true)
       .hideToolBar(true)
-    }
-    .padding({ top: px2vp(this.topRectHeight), bottom: px2vp(this.bottomRectHeight) })
-  }
-
-  @Builder
-  CodeScanBuilder(params: TabInfo) {
-    Column() {
-      Image(params.defaultIcon)
-        .size({ width: AppConstants.SPECIAL_ICON_SIZE, height: AppConstants.SPECIAL_ICON_SIZE })
-    }
-    .height(AppConstants.CODE_SCAN_HEIGHT)
-    .position({ x: '50%', y: '100%' })
-    .translate({ x: -(AppConstants.SPECIAL_ICON_SIZE / 2), y: -(AppConstants.CODE_SCAN_HEIGHT) })
-    .onClick(() => {
-      this.vm.currentIndex = params.index
-      this.tabController.changeIndex(params.index)
-    })
+    }.expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
   }
 
   @Builder

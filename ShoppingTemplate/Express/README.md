@@ -3,15 +3,24 @@
 ## 目录
 
 - [功能介绍](#功能介绍)
-- [环境要求](#环境要求)
+- [约束与限制](#约束与限制)
 - [快速入门](#快速入门)
 - [示例效果](#示例效果)
-- [权限要求](#权限要求)
 - [开源许可协议](#开源许可协议)
 
 ## 功能介绍
 
-您可以基于此[模板](#模板)直接定制应用/元服务，也可以挑选此模板中提供的多种[组件](#组件)使用，从而降低您的开发难度，提高您的开发效率。
+您可以基于此模板直接定制应用，也可以挑选此模板中提供的多种组件使用，从而降低您的开发难度，提高您的开发效率。
+
+此模板提供如下组件，所有组件存放在工程根目录的components下，如果您仅需要使用组件，可参考对应组件的指导链接；如果您使用此模板，请参考本文档。
+
+| 组件                          | 描述               | 使用指导                                             |
+|:----------------------------|:-----------------|:-------------------------------------------------|
+| 地址管理组件（module_address）      | 提供新增、编辑、删除地址相关功能 | [使用指导](components/module_address/README.md)      |
+| 地址卡片组件（module_address_card） | 提供展示地址、选择地址相关功能  | [使用指导](components/module_address_card/README.md) |
+| 实名认证组件（module_auth）         | 提供实名认证的功能        | [使用指导](components/module_auth/README.md)         |
+| 城市选择组件（module_city）         | 提供按省、市、区选择城市的功能  | [使用指导](components/module_city/README.md)         |
+| 模板管理组件（module_template）     | 提供新增、编辑、删除模板相关功能 | [使用指导](components/module_template/README.md)     |
 
 ### 模板
 本模板为快递物流类应用提供了常用功能的开发样例，模板主要分寄快递、查快递、会员福利和我的四大模块：
@@ -77,10 +86,9 @@
  |    |    └-- 地址列表
  |    └-- 实名认证
  |    └-- 联系客服
- |    └-- 滚动公告
  |    └-- 设置
            └-- 推送通知
-           └-- 清楚缓存
+           └-- 清除缓存
 ```
 
 本模板工程代码结构如下所示：
@@ -116,7 +124,9 @@ ExpressTemplate
   |   |     |    |- pages                           
   |   |     |    |    AddressPage.est               // 地址列表页
   |   |     |    |    EditAddressPage.est           // 地址编辑页
-  |   |     |    └- viewmodel                       // 与页面一一对应的vm层 
+  |   |     |    └- viewmodel                       // 与页面一一对应的vm层
+  |   |     └- module_address_card/src/main/ets     // 地址卡片 
+  |   |     |    |- components                      // 组件页面           
   |   |     └- module_auth/src/main/ets             // 实名认证                      
   |   |     |    |- pages                           
   |   |     |    |    RealNameAuthPage.est          // 实名认证页
@@ -193,29 +203,18 @@ ExpressTemplate
 
 ```
 
-### 组件
+## 约束与限制
 
-本模板中提供了多种组件，您可以按需选择合适的组件进行使用，所有组件存放在工程根目录的components下。
+### 环境
 
-| 组件                            | 描述                             | 使用指导                                         |
-| :------------------------------ | :------------------------------- | :----------------------------------------------- |
-| 组件基础能力（module_base）     | 提供组件最小公共能力集           | [使用指导](components/module_base/README.md)     |
-| 地址管理组件（module_address）  | 提供新增、编辑、删除地址相关功能 | [使用指导](components/module_address/README.md)  |
-| 实名认证组件（module_auth）     | 提供实名认证的功能               | [使用指导](components/module_auth/README.md)     |
-| 城市选择组件（module_city）     | 提供按省、市、区选择城市的功能   | [使用指导](components/module_city/README.md)     |
-| 模板管理组件（module_template） | 提供新增、编辑、删除模板相关功能 | [使用指导](components/module_template/README.md) |
+* DevEco Studio版本：DevEco Studio 5.0.1 Release及以上
+* HarmonyOS SDK版本：HarmonyOS 5.0.1 Release SDK及以上
+* 设备类型：华为手机（包括双折叠和阔折叠）
+* 系统版本：HarmonyOS 5.0.1(13) 及以上
 
-## 环境要求
+### 权限
 
-### 软件
-
-* DevEco Studio版本：DevEco Studio 5.0.2 Release及以上
-* HarmonyOS SDK版本：HarmonyOS 5.0.1(13) Release SDK及以上
-
-### 硬件
-
-* 设备类型：华为手机（直板机）
-* HarmonyOS版本：HarmonyOS 5.0.2 Release及以上
+* 网络权限：ohos.permission.INTERNET
 
 ## 快速入门
 
@@ -223,52 +222,38 @@ ExpressTemplate
 
 在运行此模板前，需要完成以下配置：
 
-1. 在DevEco Studio中打开此模板。
+1. 在AppGallery Connect创建应用，将包名配置到模板中。
 
-2. 在AppGallery Connect创建应用，将包名配置到模板中。
-
-   a. 参考[创建应用](https://developer.huawei.com/consumer/cn/doc/app/agc-help-createharmonyapp-0000001945392297)为应用创建APPID，并进行关联。
+   a. 参考[创建HarmonyOS应用](https://developer.huawei.com/consumer/cn/doc/app/agc-help-create-app-0000002247955506)为应用创建APP ID，并将APP ID与应用进行关联。
 
    b. 返回应用列表页面，查看应用的包名。
 
-   c. 将模板工程根目录下AppScope/app.json5文件中的bundleName替换为创建应用的包名。
+   c. 将AppScope/app.json5文件中的bundleName替换为创建应用的包名。
 
-3. 配置华为账号服务。
+2. 配置华为账号服务。
 
-   a. 将应用的client ID配置到entry模块的module.json5文件，详细参考：[配置Client ID](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-client-id)。
+   a. 将应用的client ID配置到products/entry/src/main路径下的module.json5文件，详细参考：[配置Client ID](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-client-id)。
 
-   b. 添加公钥指纹，详细参考：[配置应用证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-signature-info-0000001628566748#section5181019153511)。
+   b. 申请华为账号一键登录所需的quickLoginMobilePhone权限，详细参考：[配置scope权限](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-config-permissions)。
 
-   c. 如需获取用户真实手机号，需要申请phone权限和quickLoginMobilePhone权限，详细参考：[配置scope权限](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-config-permissions)。
-
-4. 配置支付服务。
+3. 配置支付服务。
 
    华为支付当前仅支持商户接入，在使用服务前，需要完成商户入网、开发服务等相关配置，本模板仅提供了端侧集成的示例。详细参考：[支付服务接入准备](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/payment-preparations)。
+
+4. 对应用进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing#section297715173233)。
+
+5. 添加手工签名所用证书对应的公钥指纹。详细参考：[配置应用签名证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-cert-fingerprint-0000002278002933)
 
 ### 运行调试工程
 
 1. 连接调试手机和PC。
 
-2. 对应用签名：由于模板中集成了华为账号等服务，所以需要采用[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing)。
-
-3. 配置多模块调试：由于本模板存在多个模块，运行时需确保所有模块安装至调试设备。
-
-   a. 运行模块选择“entry”。
-
-   b. 下拉框选择“Edit Configurations”，在“Run/Debug Configurations”界面，选择“Deploy Multi Hap”页签，勾选上模板中所有模块。
-
-   ![调试步骤](./screenshots/调试步骤.png)
-
-   c. 点击"Run"，运行模板工程。
+2. 菜单选择“Run > Run 'entry' ”或者“Run > Debug 'entry' ”，运行或调试模板工程。
 
 ## 示例效果
 
 [功能展示录屏](./screenshots/功能展示录屏.mp4)
 
-## 权限要求
-
-* 网络权限：ohos.permission.INTERNET
-* 相机权限：ohos.permission.CAMERA
 
 ## 开源许可协议
 

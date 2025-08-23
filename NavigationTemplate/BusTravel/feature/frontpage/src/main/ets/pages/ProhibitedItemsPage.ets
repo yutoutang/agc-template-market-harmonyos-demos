@@ -3,7 +3,7 @@ export function ProhibitedItemsPageBuilder() {
   ProhibitedItemsPage()
 }
 
-@Component
+@ComponentV2
 export struct ProhibitedItemsPage {
   scroller: Scroller = new Scroller()
   build() {
@@ -52,7 +52,6 @@ export struct ProhibitedItemsPage {
         .backgroundColor($r('sys.color.white'))
 
       }
-      // .height('100%')
       .width('100%')
       .backgroundColor('#F1F3F5')
       .padding({left:12,right:12,bottom:12})
@@ -63,15 +62,6 @@ export struct ProhibitedItemsPage {
       .scrollBarWidth(0) // 滚动条宽度
       .friction(0.6)
       .edgeEffect(EdgeEffect.Spring)
-      .onWillScroll((xOffset: number, yOffset: number, scrollState: ScrollState) => {
-        console.info(xOffset + ' ' + yOffset)
-      })
-      .onScrollEdge((side: Edge) => {
-        console.info('To the edge')
-      })
-      .onScrollStop(() => {
-        console.info('Scroll Stop')
-      })
     }
     .title('禁携物品')
   }

@@ -124,7 +124,7 @@ struct MerchantDetailPage {
                   .lineHeight(20)
                 Grid() {
                   GridItem() {
-                    Image(`${CommonUrl.CLOUD_STORAGE_URL}${this.storeModel.storeInfo?.dpyyzz}`)
+                    Image(`${CommonUrl.CLOUD_STORAGE_URL}${this.storeModel.storeInfo?.businessLicense}`)
                       .width(100)
                       .height(70)
                       .draggable(false)
@@ -132,7 +132,7 @@ struct MerchantDetailPage {
                   }
 
                   GridItem() {
-                    Image(`${CommonUrl.CLOUD_STORAGE_URL}${this.storeModel.storeInfo?.spjyxkz}`)
+                    Image(`${CommonUrl.CLOUD_STORAGE_URL}${this.storeModel.storeInfo?.foodLicense}`)
                       .width(100)
                       .height(70)
                       .draggable(false)
@@ -270,10 +270,11 @@ struct MerchantDetailPage {
       .bindSheet($$this.callTelSheet, CallTelSheetBuilder(this.storeModel.storeInfo.tel, () => {
         this.closeTelSheet()
       }), {
-        height: 290,
+        detents: [309, 310],
         blurStyle: BlurStyle.Thick,
-        backgroundColor: '#E6FFFFFF',
-        showClose: false,
+        showClose: true,
+        backgroundColor: $r('sys.color.background_fourth'),
+        title: { title: $r('app.string.contact_us') },
       });
     }.hideTitleBar(true)
   }

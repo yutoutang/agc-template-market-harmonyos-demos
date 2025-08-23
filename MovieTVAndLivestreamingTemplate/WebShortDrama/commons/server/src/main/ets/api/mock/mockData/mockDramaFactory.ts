@@ -4,7 +4,9 @@ import { ActorInfo, Drama, Episode } from "./bean";
 class MockDramaFactory {
   uniqueId: number = 0;
   dramaRepo: Map<string, Drama> = new Map;
-  favoriteDramas: Map<string, Drama> = new Map
+  favoriteDramas: Array<Drama> = []
+  likeDramas: Array<Drama> = []
+  tags: Array<string> = ['古装', '家庭', '年代', '穿越', '职场', '重生', '权谋', '情感', '悬疑', '搞笑']
   watchedDramas: Array<Drama> = []
   dramaNames: Array<string> = [
     '这次到你看我爱着别人',
@@ -62,9 +64,17 @@ class MockDramaFactory {
     // 默认初始一些数据用来显示
     for (let i = 0; i < 3; i++) {
       let drama = this.getOneDrama()
-      this.favoriteDramas.set(drama.id, drama)
       drama.isFavorite = true
+      this.favoriteDramas.push(drama)
+    }
+    for (let i = 0; i < 3; i++) {
+      let drama = this.getOneDrama()
       this.watchedDramas.push(drama)
+    }
+    for (let i = 0; i < 3; i++) {
+      let drama = this.getOneDrama()
+      drama.isLike = true
+      this.likeDramas.push(drama)
     }
   }
 
@@ -79,6 +89,18 @@ class MockDramaFactory {
       actors.push(this.actorList[i])
     }
     return actors
+  }
+
+  getTags(): Array<string> {
+    let tagNum = this.random(2, 3)
+    let tags: Array<string> = []
+    let tempTags = [...this.tags]
+    for (let i = 0; i < tagNum; i++) {
+      const randomIndex = this.random(0, tempTags.length - 1);
+      const selected = tempTags.splice(randomIndex, 1)[0];
+      tags.push(selected)
+    }
+    return tags
   }
 
   getDramaInfo(dramaId: string): Drama {
@@ -104,7 +126,7 @@ class MockDramaFactory {
     return searchedDrama
   }
 
-  getOneDrama(): Drama {
+  getOneDrama(vip: boolean = false): Drama {
     let dramaId = 'drama_' + this.uniqueId++
     let randDrama = this.random(0, 5)
     let randIndex = this.random(0, 5)
@@ -117,11 +139,14 @@ class MockDramaFactory {
       totalCount: 80,
       curIndex: randIndex,
       latestUpdate: randIndex,
-      category: '言情',
+      category: this.getTags(),
       popular: '200万',
       actorInfo: this.getActorList(dramaId),
       isFavorite: false,
-      favoriteCount: this.random(100, 200)
+      favoriteCount: this.random(100, 200),
+      isLike: false,
+      likeCount: this.random(100, 200),
+      isVip: vip
     }
     this.dramaRepo.set(dramaId, drama)
     return drama;
@@ -132,16 +157,23 @@ class MockDramaFactory {
       let dramaInfo: Drama = this.dramaRepo.get(dramaId)
       dramaInfo.isFavorite = true
       dramaInfo.favoriteCount++
-      this.favoriteDramas.set(this.dramaRepo.get(dramaId)?.id, dramaInfo)
+      const index = this.favoriteDramas.findIndex(d => d.id === dramaId)
+      if (index !== -1) {
+        this.favoriteDramas.splice(index, 1)
+      }
+      this.favoriteDramas.unshift(dramaInfo)
     }
   }
 
   unsetFavorite(dramaId: string): void {
     if (this.dramaRepo.has(dramaId)) {
-      let dramaInfo: Drama = this.dramaRepo.get(dramaId)
-      dramaInfo.isFavorite = false
-      dramaInfo.favoriteCount--
-      this.favoriteDramas.delete(dramaId)
+      let dramaInfo: Drama = this.dramaRepo.get(dramaId);
+      dramaInfo.isFavorite = false;
+      dramaInfo.favoriteCount--;
+      const index = this.favoriteDramas.findIndex(d => d.id === dramaId);
+      if (index !== -1) {
+        this.favoriteDramas.splice(index, 1);
+      }
     }
   }
 
@@ -149,21 +181,60 @@ class MockDramaFactory {
     return Array.from(this.favoriteDramas.values())
   }
 
-  setWatched(dramaId: string): void {
+  setMyWatchRecord(drama: Drama): void {
+    this.watchedDramas.unshift(drama)
+  }
+
+  getMyWatchRecord(): Array<Drama> {
+    return this.watchedDramas
+  }
+
+  unsetMyWatchRecord(dramaId: string): void {
     if (this.dramaRepo.has(dramaId)) {
-      this.watchedDramas.push(this.dramaRepo.get(dramaId))
+      let index: number = -1
+      this.watchedDramas.forEach((item) => {
+        if (item.id === dramaId) {
+          index = this.watchedDramas.indexOf(item)
+        }
+      })
+      this.watchedDramas.splice(index, 1)
     }
   }
 
-  getWatched(): Array<Drama> {
-    return this.watchedDramas
+  setLike(dramaId: string): void {
+    if (this.dramaRepo.has(dramaId)) {
+      let dramaInfo: Drama = this.dramaRepo.get(dramaId)
+      dramaInfo.isLike = true
+      dramaInfo.likeCount++
+      const index = this.likeDramas.findIndex(d => d.id === dramaId)
+      if (index !== -1) {
+        this.likeDramas.splice(index, 1)
+      }
+      this.likeDramas.unshift(dramaInfo)
+    }
+  }
+
+  unsetLike(dramaId: string): void {
+    if (this.dramaRepo.has(dramaId)) {
+      let dramaInfo: Drama = this.dramaRepo.get(dramaId);
+      dramaInfo.isLike = false;
+      dramaInfo.likeCount--;
+      const index = this.likeDramas.findIndex(d => d.id === dramaId);
+      if (index !== -1) {
+        this.likeDramas.splice(index, 1);
+      }
+    }
+  }
+
+  getLike(): Array<Drama> {
+    return Array.from(this.likeDramas.values())
   }
 }
 
 let dramaFactor: MockDramaFactory = new MockDramaFactory()
 
-export const getOneDrama = (): Drama => {
-  return dramaFactor.getOneDrama()
+export const getOneDrama = (vip: boolean = false): Drama => {
+  return dramaFactor.getOneDrama(vip)
 }
 
 export const getDramas = (): Array<string> => {
@@ -203,12 +274,32 @@ export const unsetFavorite = (dramaId: string): void => {
   dramaFactor.unsetFavorite(dramaId)
 }
 
-// 获取收藏剧集信息
-export const getWatched = (): Array<Drama> => {
-  return dramaFactor.getWatched()
+// 获取观看记录信息
+export const getMyWatchRecord = (): Array<Drama> => {
+  return dramaFactor.getMyWatchRecord()
 }
 
-// 收藏剧集
-export const setWatched = (dramaId: string): void => {
-  dramaFactor.setWatched(dramaId)
+// 设置为观看记录
+export const setMyWatchRecord = (drama: Drama): void => {
+  dramaFactor.setMyWatchRecord(drama)
 }
+
+export const unsetMyWatchRecord = (dramaId: string): void => {
+  dramaFactor.unsetMyWatchRecord(dramaId)
+}
+
+// 获取点赞剧集列表
+export const getLike = (): Array<Drama> => {
+  return dramaFactor.getLike()
+}
+
+// 点赞剧集
+export const setLike = (dramaId: string): void => {
+  dramaFactor.setLike(dramaId)
+}
+
+// 取消点赞剧集
+export const unsetLike = (dramaId: string): void => {
+  dramaFactor.unsetLike(dramaId)
+}
+

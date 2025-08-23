@@ -1,9 +1,9 @@
-import { TemplatePageVM } from '../viewmodel/TemplatePageVM';
-import { emitter } from '@kit.BasicServicesKit';
-import { OrderType, payMethodList, shippingMethodList, timeList } from '../common/Constant';
 import { CustomContentDialog } from '@kit.ArkUI';
-import { IAddrInfo, IGoods } from '../http/Type';
-import { RouterMap, CommonAddress, CommonCounter, ISetting } from 'module_base';
+import { RouterMap, CommonCounter, ISetting, shippingMethodList, payMethodList } from 'module_base';
+import { CommonAddress } from 'module_address_card'
+import { OrderType } from '../common/Constant';
+import { TemplatePageVM } from '../viewmodel/TemplatePageVM';
+import { IGoods } from '../http/Type';
 
 @Builder
 export function TemplatePageBuilder() {
@@ -32,15 +32,7 @@ struct TemplatePage {
   })
 
   aboutToAppear(): void {
-    emitter.on('address', (data) => {
-      if (data.data) {
-        if (this.vm.selectedAddress === OrderType.SEND) {
-          this.vm.sendAddress = data.data as IAddrInfo
-        } else {
-          this.vm.getAddress = data.data as IAddrInfo
-        }
-      }
-    });
+    this.vm.init()
   }
 
   build() {
@@ -74,11 +66,14 @@ struct TemplatePage {
                 stack: this.vm.stack,
                 sendAddress: this.vm.sendAddress,
                 getAddress: this.vm.getAddress,
-                select: (value) => {
-                  this.vm.selectedAddress = value
-                  this.vm.isFresh = false
+                onSelect: (value) => {
+                  if (value.type === OrderType.SEND) {
+                    this.vm.sendAddress = value.address
+                  } else {
+                    this.vm.getAddress = value.address
+                  }
                 },
-                change: () => {
+                onChange: () => {
                   const temp = this.vm.sendAddress
                   this.vm.sendAddress = this.vm.getAddress
                   this.vm.getAddress = temp
@@ -223,6 +218,7 @@ struct TemplatePage {
             }
           }
           .scrollBar(BarState.Off)
+          .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
         }
         .height('calc(100% - 52vp)')
 
@@ -249,9 +245,6 @@ struct TemplatePage {
     .title('自定义模板')
     .onReady((context) => {
       this.vm.setStack(context.pathStack);
-    })
-    .onShown(() => {
-      this.vm.init()
     })
   }
 
@@ -327,6 +320,7 @@ struct TemplatePage {
         .padding({ bottom: 28 })
       }
       .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
     }
   }
 }

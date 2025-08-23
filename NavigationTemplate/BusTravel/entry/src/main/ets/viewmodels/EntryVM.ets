@@ -1,4 +1,4 @@
-import { TabInfo, RouterModule } from 'common'
+import { TabInfo, RouterModule, PreferenceUtils,Common } from 'common'
 import { homeTabInfo } from '../dataModel/HomeTab'
 
 
@@ -15,5 +15,17 @@ export class EntryVM {
       EntryVM._instance = new EntryVM();
     }
     return EntryVM._instance;
+  }
+  // 重定向
+  redirect() {
+    if (!this.isAgreePrivacy()) {
+      RouterModule.push({
+        url:'SafePage'
+      })
+    }
+  }
+
+  isAgreePrivacy() {
+    return PreferenceUtils.getInstance().get(Common.AGREE_PRIVACY_KEY) as boolean;
   }
 }

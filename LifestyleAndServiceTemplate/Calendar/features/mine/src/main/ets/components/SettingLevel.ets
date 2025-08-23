@@ -84,106 +84,108 @@ export struct SettingLevel {
       NavigationTitle({
         title: '设置',
       })
-      Column() {
-        List() {
-          ForEach(this.settingLevelItems, (value: SettingLevelItem) => {
-            ListItem() {
-              Text(value.title)
-                .attributeModifier(new TextStyleModifier('font_secondary/Body_M/Regular'))
-            }
-            .margin({ bottom: 8 })
-
-            ListItem() {
-              List() {
-                ForEach(value.classifieds, (item: SettingItem) => {
-                  ListItem() {
-                    Flex({ justifyContent: FlexAlign.SpaceBetween, alignItems: ItemAlign.Center }) {
-                      Row({ space: 16 }) {
-                        Text(item.name)
-                          .attributeModifier(new TextStyleModifier('font_primary/Subtitle_M/Medium'))
-                      }
-
-                      Row({ space: 5 }) {
-                        Text(item.currentValue)
-                          .attributeModifier(new TextStyleModifier('font_primary/Body_M/Regular'))
-                        Image($r('app.media.chevron_right')).width(7).height(17)
-                      }
-                    }
-                    .padding({
-                      top: 16,
-                      bottom: 16,
-                      left: 12,
-                      right: 12,
-                    })
-                    .onClick(() => {
-                      switch (item.id) {
-                        case 'theme':
-                          baseActionSheet.show({
-                            id: 'ThemeToggle',
-                            detents:[300,301],
-                            title: {
-                              title: '主题切换',
-                            },
-                            customContent: () => {
-                              this.themePickerBuilder(item)
-                            },
-                          })
-                          break;
-                        case 'weekday':
-                          baseActionSheet.show({
-                            id: 'WeekdayToggle',
-                            detents:[300,301],
-                            title: {
-                              title: '周首日',
-                            },
-                            customContent: () => {
-                              this.weekdayPickerBuilder(item)
-                            },
-                          })
-                          break;
-                        case 'privacy':
-                          RouterModule.pushPathByName({url:'PrivacyPolicyPage'})
-                          break;
-                        case 'terms':
-                          RouterModule.pushPathByName({url:'TermsOfServicePage'})
-                          break;
-                      }
-                    })
-                  }
-                },(item: SettingItem) => item.id)
+        Column() {
+          List() {
+            ForEach(this.settingLevelItems, (value: SettingLevelItem) => {
+              ListItem() {
+                Text(value.title)
+                  .attributeModifier(new TextStyleModifier('font_secondary/Body_M/Regular'))
               }
-              .divider(this.egDivider)
-            }
-            .backgroundColor($r('sys.color.background_primary'))
-            .borderRadius(16)
-            .margin({ bottom: 21 })
-          },(value: SettingLevelItem) => value.title)
-        }
-        .margin({ left: 16, right: 16, top: 21 })
+              .margin({ bottom: 8 })
 
-        Button('退出登录')
-          .fontSize($r('sys.float.Body_M'))
-          .fontWeight(FontWeight.Medium)
-          .fontColor(this.theme.themeState.titleColor)
-          .backgroundColor(this.theme.themeState.outColor)
-          .width('80%')
-          .onClick(() => {
-            baseToast.show({
-              type: 'dialog',
-              hasTitle: '退出登录',
-              message: $r('app.string.sure_release'),
-              confirmAction: () => {
-                this.userState.isLogin = false
-                this.userState.userInfo = new UserInfo()
-                baseToast.hide()
-                RouterModule.pop()
-              },
+              ListItem() {
+                List() {
+                  ForEach(value.classifieds, (item: SettingItem) => {
+                    ListItem() {
+                      Flex({ justifyContent: FlexAlign.SpaceBetween, alignItems: ItemAlign.Center }) {
+                        Row({ space: 16 }) {
+                          Text(item.name)
+                            .attributeModifier(new TextStyleModifier('font_primary/Subtitle_M/Medium'))
+                        }
+
+                        Row({ space: 5 }) {
+                          Text(item.currentValue)
+                            .attributeModifier(new TextStyleModifier('font_primary/Body_M/Regular'))
+                          Image($r('app.media.chevron_right')).width(7).height(17)
+                        }
+                      }
+                      .padding({
+                        top: 16,
+                        bottom: 16,
+                        left: 12,
+                        right: 12,
+                      })
+                      .onClick(() => {
+                        switch (item.id) {
+                          case 'theme':
+                            baseActionSheet.show({
+                              id: 'ThemeToggle',
+                              detents:[300,301],
+                              title: {
+                                title: '主题切换',
+                              },
+                              customContent: () => {
+                                this.themePickerBuilder(item)
+                              },
+                            })
+                            break;
+                          case 'weekday':
+                            baseActionSheet.show({
+                              id: 'WeekdayToggle',
+                              detents:[300,301],
+                              title: {
+                                title: '周首日',
+                              },
+                              customContent: () => {
+                                this.weekdayPickerBuilder(item)
+                              },
+                            })
+                            break;
+                          case 'privacy':
+                            RouterModule.pushPathByName({url:'PrivacyPolicyPage'})
+                            break;
+                          case 'terms':
+                            RouterModule.pushPathByName({url:'TermsOfServicePage'})
+                            break;
+                        }
+                      })
+                    }
+                  },(item: SettingItem) => item.id)
+                }
+                .divider(this.egDivider)
+              }
+              .backgroundColor($r('sys.color.background_primary'))
+              .borderRadius(16)
+              .margin({ bottom: 21 })
+            },(value: SettingLevelItem) => value.title)
+          }
+          .layoutWeight(1)
+          .scrollBar(BarState.Off)
+          .margin({ left: 16, right: 16, top: 21 })
+
+          Button('退出登录')
+            .fontSize($r('sys.float.Body_M'))
+            .fontWeight(FontWeight.Medium)
+            .fontColor(this.theme.themeState.titleColor)
+            .backgroundColor(this.theme.themeState.outColor)
+            .width('80%')
+            .onClick(() => {
+              baseToast.show({
+                type: 'dialog',
+                hasTitle: '退出登录',
+                message: $r('app.string.sure_release'),
+                confirmAction: () => {
+                  this.userState.isLogin = false
+                  this.userState.userInfo = new UserInfo()
+                  baseToast.hide()
+                  RouterModule.pop()
+                },
+              })
             })
-          })
-          .margin({ bottom: 20 })
-      }
-      .layoutWeight(1)
-      .justifyContent(FlexAlign.SpaceBetween)
+            .margin({ bottom: 20 })
+        }
+        .layoutWeight(1)
+        .justifyContent(FlexAlign.SpaceBetween)
     }
     .hideTitleBar(true)
     .backgroundColor($r('sys.color.background_secondary'))

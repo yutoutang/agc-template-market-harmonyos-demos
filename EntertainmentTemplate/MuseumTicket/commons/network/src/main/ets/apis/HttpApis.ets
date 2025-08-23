@@ -1,35 +1,42 @@
 import { RequestUrl } from '../constants/NetworkEnums';
 import request from '../models/AxiosRequest';
 import {
-  BaseResponse,
-  GetUserInfoResp,
-  GetRecommendListResp,
-  GetOrderListInfoResp,
-  GetOrderDetailResp,
-  GetPerformanceInfoResp,
-  GetDayTicketResp,
-  GetExplainTextResp,
-  GetIntroduceResp,
-  UpdateUserInfoRequest,
-  ContactsResp,
-  Contacts,
-  GetTimeTicketResp,
-  GetTicketTypeInfoResp,
-  PrepayBuyTicketResp,
-  UserLoginResp,
-  ParkTextResp,
-  GetTrafficDetailResp,
-} from '../types/ResponseTypes';
-
-import {
   BaseSuccessResponse,
-  OrderListRequest,
   CancelOrderRequest,
+  ExplainTicketRequest,
+  GetBannerImgRequest,
   OrderDetailRequest,
   OrderFreeRequest,
+  OrderListRequest,
+  PreActiveOrderBody,
+  PreExplainOrderBody,
   PrepayBuyTicketRequest,
-  GetBannerImgRequest
+  RepayOrderBody
 } from '../types/RequestTypes';
+import {
+  ActiveInfo,
+  ActiveOrder,
+  BaseResponse,
+  CloudUrl,
+  ExplainOrder,
+  GetDayTicketResp,
+  GetExplainResp,
+  GetExplainTicketInfoResp,
+  GetIntroduceResp,
+  GetOrderDetailResp,
+  GetOrderListInfoResp,
+  GetPerformanceInfoResp,
+  GetRecommendListResp,
+  GetTicketTypeInfoResp,
+  GetTimeTicketResp,
+  GetTrafficDetailResp,
+  GetUserInfoResp,
+  ParkTextResp,
+  PrepayBuyTicketResp,
+  TreasureItem,
+  UpdateUserInfoRequest,
+  UserLoginResp,
+} from '../types/ResponseTypes';
 
 class HttpApi {
   public bindPhone(authCode: string): Promise<BaseResponse<undefined>> {
@@ -39,14 +46,11 @@ class HttpApi {
     });
   }
 
-
   public cancelPhone(): Promise<BaseResponse<undefined>> {
     return request.post({
       url: RequestUrl.USER_CANCEL_PHONE,
     });
   }
-
-
 
   public getUserInfo(): Promise<BaseResponse<GetUserInfoResp>> {
     return request.get({ url: RequestUrl.USER_GET_INFO });
@@ -74,7 +78,7 @@ class HttpApi {
     });
   }
 
-  // 取消预定
+  // 取消展览预定
   public cancelOrder(data: CancelOrderRequest): Promise<BaseSuccessResponse> {
     return request.post({
       url: RequestUrl.CANCEL_ORDER, data,
@@ -96,9 +100,9 @@ class HttpApi {
     return request.get({ url: RequestUrl.BUY_TIME_TICKET, data });
   }
 
-  //  讲解服务文本
-  public getExplainText(): Promise<BaseResponse<GetExplainTextResp>> {
-    return request.get({ url: RequestUrl.EXPLAIN_TEXT });
+  //  讲解服务信息
+  public getExplain(): Promise<BaseResponse<GetExplainResp>> {
+    return request.get({ url: RequestUrl.EXPLAIN });
   }
 
   //   省博介绍文本
@@ -124,15 +128,7 @@ class HttpApi {
     });
   }
 
-  // 获取常用联系人
-  public getContacts(): Promise<BaseResponse<ContactsResp>> {
-    return request.get({ url: RequestUrl.CONTACTS_INFO });
-  }
 
-  //  更新常用联系人
-  public upDateContacts(data: Contacts): Promise<BaseSuccessResponse> {
-    return request.post({ url: RequestUrl.UPDATE_CONTACT, data });
-  }
 
   // 免费预定
   public orderFree(data: OrderFreeRequest): Promise<BaseSuccessResponse<GetOrderDetailResp>> {
@@ -150,19 +146,83 @@ class HttpApi {
   }
 
   //   获取banner图
-  public getBannerImg(data: GetBannerImgRequest): Promise<BaseResponse<string|string[]>> {
+  public getBannerImg(data: GetBannerImgRequest): Promise<BaseResponse<string | string[]>> {
     return request.get({ url: RequestUrl.BANNER_IMG, data });
-  }
-
-  //  删除常用联系人
-  public delContacts(data:string): Promise<BaseSuccessResponse<undefined>> {
-    return request.delete({ url: RequestUrl.DEL_VISITOR, data });
   }
 
   // 获取交通信息
   public getTrafficDetail(): Promise<BaseResponse<GetTrafficDetailResp>> {
-   return request.get({url:RequestUrl.TRAFFIC_DETAIL})
+    return request.get({ url: RequestUrl.TRAFFIC_DETAIL });
   }
+
+  // 获取讲解余票列表
+  public getExplainTicketList(data: ExplainTicketRequest): Promise<BaseResponse<GetExplainTicketInfoResp>> {
+    return request.get({
+      url: RequestUrl.EXPLAIN_TICKET, data
+    });
+  }
+
+  // 获取讲解余票列表
+  public getExplainOrders(): Promise<BaseResponse<ExplainOrder[]>> {
+    return request.get({
+      url: RequestUrl.EXPLAIN_ORDERS
+    });
+  }
+
+  // 讲解门票预支付
+  public preOrderExplain(data: PreExplainOrderBody): Promise<BaseResponse<ExplainOrder>> {
+    return request.post({url:RequestUrl.EXPLAIN_PREPAY,data})
+  }
+
+  //  获取云存储资源
+  public getCloudUrl(): Promise<BaseResponse<CloudUrl>> {
+    return request.get({url:RequestUrl.CLOUD_URL})
+  }
+
+  //  获取珍品馆藏信息
+  public getTreasureInfo(): Promise<BaseResponse<TreasureItem[]>> {
+    return request.get({url:RequestUrl.TREASURE_INFO})
+  }
+
+  // 取消讲解预定
+  public cancelExplainOrder(data: CancelOrderRequest): Promise<BaseResponse<null>> {
+    return request.post({
+      url: RequestUrl.CANCEL_EXPLAIN_ORDER, data,
+    });
+  }
+
+  // 取消活动预定
+  public cancelActiveOrder(data: CancelOrderRequest): Promise<BaseResponse<null>> {
+    return request.post({
+      url: RequestUrl.CANCEL_ACTIVE_ORDER, data,
+    });
+  }
+
+  //  获取活动信息
+  public getActiveInfo(): Promise<BaseResponse<ActiveInfo[]>> {
+    return request.get({url:RequestUrl.ACTIVE_INFO})
+  }
+
+  //  获取活动订单
+  public getActiveOrders(): Promise<BaseResponse<ActiveOrder[]>> {
+    return request.get({url:RequestUrl.ACTIVE_ORDERS})
+  }
+
+
+  // 活动门票预支付
+  public preOrderActive(data:PreActiveOrderBody): Promise<BaseResponse<ActiveOrder>> {
+    return request.post({url:RequestUrl.ACTIVE_PREPAY,data})
+  }
+
+  // 重新支付订单
+  public repayOrder(data: RepayOrderBody): Promise<BaseResponse<null | ActiveOrder | ExplainOrder>> {
+    return request.post({
+      url: RequestUrl.REPAY_ORDER,
+      data,
+    });
+  }
+
+
 }
 
 const https = new HttpApi();

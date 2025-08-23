@@ -6,24 +6,29 @@ enum INDEX {
   END
 }
 
-@Component
+@ComponentV2
 export struct RouteSearch {
-  @Prop @Watch('lineInfoChange') lineInfo: LineInfo[] = []
-  @Prop @Watch('startTextChange') defaultStartText: string = ''
-  @Prop @Watch('endTextChange') defaultEndText: string = ''
-  @State startText: string = '' // 起点
-  @State endText: string = '' //终点
+  @Local startText: string = '' // 起点
+  @Local endText: string = '' //终点
+  @Param defaultStartText: string = ''
 
+  @Monitor('defaultStartText')
   startTextChange() {
     this.startText = this.defaultStartText
   }
 
+  @Param defaultEndText: string = ''
+
+  @Monitor('defaultEndText')
   endTextChange() {
     this.endText = this.defaultEndText
   }
 
+  @Param lineInfo: LineInfo[] = []
+
+  @Monitor('lineInfo')
   lineInfoChange() {
-    if (!this.lineInfo.length) {
+    if (!this.lineInfo.length && this.startText.length && this.endText.length) {
       promptAction.showToast({
         message: '暂未查询到线路',
         duration: 1500,
@@ -31,18 +36,13 @@ export struct RouteSearch {
       })
     }
   }
+
   // 点击输入框触发
-  clickInput = (index: number) => {
-
-  }
+  @Event clickInput: (index: number)  => void = ()=>{}
   // 点击推荐卡片触发
-  clickListItem = (item: LineInfo) => {
-
-  }
+  @Event clickListItem: (item: LineInfo) => void = ()=>{}
   // 监听输入变化
-  onInputChange = (value: string, index: number) => {
-
-  }
+  @Event onInputChange:  (value: string, index: number) => void = ()=>{}
 
   @Builder
   buildSearchItem() {
@@ -155,7 +155,6 @@ export struct RouteSearch {
         Image($r('app.media.change_dir'))
           .height('32vp')
           .width('32vp')
-          .margin({ left: '22vp', right: '25vp' })
           .onClick(() => {
             let temp = this.startText
             this.startText = this.endText

@@ -67,9 +67,9 @@ export class AssociateUtil {
           userInfo.isPhoneAssociated = false;
         });
       })
-        .catch((err: BusinessError) => {
-          AssociateUtil._dealAllError(err, '取消关联失败');
-        });
+        // .catch((err: BusinessError) => {
+        //   AssociateUtil._dealAllError(err, '取消关联成功');
+        // });
     } catch (err) {
       AssociateUtil._dealAllError(err, '取消关联失败');
     }

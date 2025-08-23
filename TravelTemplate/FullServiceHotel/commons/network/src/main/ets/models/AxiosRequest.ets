@@ -1,7 +1,6 @@
-/* eslint-disable */
 import { AxiosResponse, InternalAxiosRequestConfig } from '@ohos/axios';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { AccountUtil, CommonConstants } from 'commonlib';
+import { CommonConstants } from 'commonlib';
 import { AxiosHttpModel } from './AxiosHttpModel';
 
 const request = new AxiosHttpModel(
@@ -13,7 +12,6 @@ const request = new AxiosHttpModel(
     },
     interceptorHooks: {
       requestInterceptor: async (config: InternalAxiosRequestConfig) => {
-        config.headers.set('authorization', AccountUtil.getAuthorization());
         return config;
       },
       requestInterceptorCatch: (err: BusinessError) => {

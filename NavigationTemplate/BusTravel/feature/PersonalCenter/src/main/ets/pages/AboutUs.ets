@@ -7,11 +7,11 @@ export function AboutUsBuilder() {
   AboutUs()
 }
 
-@Component
+@ComponentV2
 export struct AboutUs {
   vm: RouteEntryVM = RouteEntryVM.instance;
-  @State version: string = '15.0.10.300'
-  @State newVersion: string = '最新版本号'
+  @Local version: string = '15.0.10.300'
+  @Local newVersion: string = '最新版本号'
   dialogController: CustomDialogController | null = new CustomDialogController({
     builder: VersionUpdate({
       cancel: () => {
@@ -24,7 +24,6 @@ export struct AboutUs {
     cancel: this.existApp,
     autoCancel: true,
     onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
-      Logger.info('reason======' + JSON.stringify(dismissDialogAction.reason))
       if (dismissDialogAction.reason === DismissReason.PRESS_BACK) {
         dismissDialogAction.dismiss()
       }
@@ -84,12 +83,13 @@ export struct AboutUs {
             .layoutWeight(1)
         }
         .width('100%')
-        .backgroundColor('#F1F3F5')
       }
       .scrollable(ScrollDirection.Vertical)
       .scrollBar(BarState.Auto)
       .scrollBarWidth('0vp')
       .edgeEffect(EdgeEffect.Spring)
+      .backgroundColor('#F1F3F5')
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
     }
     .hideTitleBar(false)
     .title('关于我们')

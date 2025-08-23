@@ -7,7 +7,7 @@ import {
   IVipPrepayRequest,
   NormalRequest,
   RemakeRequest,
-  UpdateOrderRequest
+  UpdateOrderRequest,
 } from '../model/IRequest';
 import { IOrder, IOrderInfo, IPrepay, IUserInfo } from '../model/IResponse';
 import { MockData } from './MockData';
@@ -125,20 +125,6 @@ export class MockApi {
     const company = MockData.COMPANY_LIST.find((item) => {
       return item.id === data.expressCompanyId
     })
-
-    let senderAddress = ''
-    if (data.sendAddress.city === '市辖区') {
-      senderAddress = data.sendAddress.province
-    } else {
-      senderAddress = data.sendAddress.city
-    }
-
-    let getAddress = ''
-    if (data.getAddress.city === '市辖区') {
-      getAddress = data.getAddress.province
-    } else {
-      getAddress = data.getAddress.city
-    }
     const timestamp = new Date().getTime();
     const orderNo: string = timestamp.toString();
     const order: IOrder = {
@@ -149,26 +135,24 @@ export class MockApi {
       companyName: company?.name ?? '',
       orderNo: Date.now() + '',
       remark: '',
-      deliveryTime: '2025-04-10 09:24',
+      deliveryTime: CommonUtil.formatFullDate(new Date()),
       receiptTime: '',
       price: 0,
       sendAddress: data.sendAddress,
       getAddress: data.getAddress,
-      sendCity: senderAddress,
-      getCity: getAddress,
       goods: {
         id: data.goodsInfo.id,
         name: data.goodsInfo.name,
         weight: data.goodsInfo.weight,
-        volume: data.goodsInfo.volume
+        volume: data.goodsInfo.volume,
       },
       day: data.day ?? '',
       time: data.time ?? '',
       paymentMethod: data.payMethod ?? PaymentMethod.PAY_NOW,
       shippingMethod: data.shippingMethod,
-      mailCode: CommonUtil.rand(1000, 9999)
+      mailCode: CommonUtil.rand(1000, 9999),
     }
-    MockData.ORDER_LIST.push(order)
+    MockData.ORDER_LIST.unshift(order)
     const resp: IPrepay = {
       id: timestamp,
       orderNo: orderNo,
@@ -278,6 +262,7 @@ export class MockApi {
     const order = MockData.ORDER_LIST.find((item) => {
       return item.id === Number(data.id)
     })
+    console.log('hello', JSON.stringify(order))
     if (order) {
       orderInfo.id = order.id
       orderInfo.type = order.type
@@ -299,12 +284,13 @@ export class MockApi {
       orderInfo.mailCode = order.mailCode
       if (order.sendAddress) {
         orderInfo.sendPosition = order.sendAddress.name
-        const address = order.sendAddress.province + order.sendAddress.city + order.sendAddress.area +
-        order.sendAddress.detailAddress
+        const address =
+          order.sendAddress.province + order.sendAddress.city + order.sendAddress.district + order.sendAddress.street +
+          order.sendAddress.detail
         const res = await CommonUtil.getAddressesFromLocationName(address)
         orderInfo.origins = {
           'latitude': res[0].latitude ?? 0,
-          'longitude': res[0].longitude ?? 0
+          'longitude': res[0].longitude ?? 0,
         }
       }
       if (order.getAddress) {
@@ -318,12 +304,18 @@ export class MockApi {
             orderInfo.destination = servicePoint.position
           }
         } else {
-          const address = order.getAddress.province + order.getAddress.city + order.getAddress.area +
-          order.getAddress.detailAddress
-          const res = await CommonUtil.getAddressesFromLocationName(address)
+          let address =
+            order.getAddress.province + order.getAddress.city + order.getAddress.district + order.getAddress.street +
+            order.getAddress.detail
+          let res = await CommonUtil.getAddressesFromLocationName(address)
+          if (res.length === 0) {
+            address =
+              order.getAddress.province + order.getAddress.city + order.getAddress.district + order.getAddress.street
+            res = await CommonUtil.getAddressesFromLocationName(address)
+          }
           orderInfo.destination = {
             'latitude': res[0].latitude ?? 0,
-            'longitude': res[0].longitude ?? 0
+            'longitude': res[0].longitude ?? 0,
           }
         }
       }
@@ -345,6 +337,7 @@ export class MockApi {
           break
       }
     }
+    console.log('hello', JSON.stringify(orderInfo))
     return orderInfo
   }
 }

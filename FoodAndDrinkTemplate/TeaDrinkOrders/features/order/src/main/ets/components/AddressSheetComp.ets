@@ -1,17 +1,9 @@
-import {
-  AddressComp,
-  AddressInfo,
-  Constants,
-  HttpCode,
-  HttpRequestApi,
-  PermissionUtil,
-  SheetHeaderComp,
-  WindowModel,
-} from 'common';
-import { AppStorageV2 } from '@kit.ArkUI';
+import { AddressInfo, BaseResponse, Constants, HttpCode, HttpRequestApi, PermissionUtil, WindowModel } from 'common';
+import { AppStorageV2, promptAction } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { map, mapCommon } from '@kit.MapKit';
-import { AddAddressSheetBuilder } from './AddAddressSheetComp';
+import { AddAddress, AddressCard } from 'add_address';
+import { geoLocationManager } from '@kit.LocationKit';
 
 @Builder
 export function AddressSheetBuilder(selectAddress: AddressInfo, close: (selectAddress?: AddressInfo) => void) {
@@ -31,11 +23,15 @@ struct AddressSheet {
   @Local addressList: Array<AddressInfo> = [];
   @Local addressOverList: Array<AddressInfo> = [];
   @Local addAddressSheetShow: boolean = false
+  @Local myLocation?: geoLocationManager.Location
   @Event close: (selectAddress?: AddressInfo) => void = () => {
   }
 
   aboutToAppear(): void {
     this.getUserAddressList()
+    PermissionUtil.getLocation().then(res => {
+      this.myLocation = res
+    })
   }
 
   @Styles
@@ -54,109 +50,88 @@ struct AddressSheet {
   build() {
     Stack() {
       Column() {
-        Column() {
-          SheetHeaderComp({
-            title: $r('app.string.select_address'),
-            close: () => {
-              this.close()
-            },
-          })
-          Column() {
-            List({ space: 8 }) {
-              ForEach(this.addressList, (address: AddressInfo) => {
-                ListItem() {
-                  Row() {
-                    Row() {
-                      Radio({ value: address.id.toString(), group: 'addressGroup' })
-                        .checked(this.selectAddress.id === address.id)
-                        .radioStyle({
-                          checkedBackgroundColor: '#486602',
-                        })
-                        .height(20)
-                        .width(20)
-                        .onClick(() => {
-                          this.close(address)
-                        })
-                      AddressComp({ address })
-                    }.layoutWeight(1)
-
-                    Image($r('app.media.ic_modify')).width(32).margin({ left: 8 }).onClick(() => {
-                      this.modifyAddress = address
-                      this.addAddressSheetShow = true
-                    })
-                  }
-                  .cardStyle()
-                  .justifyContent(FlexAlign.SpaceBetween)
-                }
-              }, (address: AddressInfo) => JSON.stringify(address))
-            }.width(Constants.FULL_SIZE).scrollBar(BarState.Off)
-
-            Row() {
-              Image($r('app.media.ic_add_address')).width(24)
-              Text($r('app.string.add_address'))
-                .fontSize($r('sys.float.Body_L'))
-                .fontWeight(FontWeight.Medium)
-                .fontColor($r('app.color.fontMainColor'))
-                .margin({ left: 8 })
-            }
-            .cardStyle()
-            .height(56)
-            .margin({ top: 24 })
-            .justifyContent(FlexAlign.Center)
-            .onClick(() => {
-              this.modifyAddress = new AddressInfo()
-              this.addAddressSheetShow = true
-            })
-            .bindSheet($$this.addAddressSheetShow,
-              AddAddressSheetBuilder(this.modifyAddress, () => {
-                this.closeAddAddressSheet()
-              }), {
-                height: 736,
-                blurStyle: BlurStyle.Thick,
-                showClose: false,
+        List({ space: 8 }) {
+          ForEach(this.addressList, (address: AddressInfo) => {
+            ListItem() {
+              AddressCard({
+                address,
+                selectId: this.selectAddress.id,
+                showSelect: true,
+                selectAddress: () => {
+                  this.close(address)
+                },
+                modifyAddress: (address: AddressInfo) => {
+                  this.modifyAddress = address
+                  this.addAddressSheetShow = true
+                },
               })
-
-            // 超出配送范围
-            Column() {
-              Text($r('app.string.over_distance_address'))
-                .fontSize($r('sys.float.Body_L'))
-                .fontWeight(FontWeight.Medium)
-                .fontColor($r('sys.color.font_secondary'))
-                .margin({ bottom: 12 })
-              List({ space: 8 }) {
-                ForEach(this.addressOverList, (address: AddressInfo) => {
-                  ListItem() {
-                    Row() {
-                      AddressComp({ address })
-                      Image($r('app.media.ic_modify')).width(32).margin({ left: 8 })
-                    }.layoutWeight(1)
-                    .cardStyle()
-                    .justifyContent(FlexAlign.SpaceBetween)
-                  }
-                }, (address: AddressInfo) => JSON.stringify(address))
-              }.width(Constants.FULL_SIZE).scrollBar(BarState.Off).margin({ bottom: 16 }).opacity(0.4)
             }
-            .margin({ top: 39 })
-            .alignItems(HorizontalAlign.Start)
-            .visibility(this.addressOverList.length ? Visibility.Visible : Visibility.None)
+          }, (address: AddressInfo) => JSON.stringify(address))
+        }.width(Constants.FULL_SIZE).scrollBar(BarState.Off)
 
-          }
-          .layoutWeight(1)
-          .margin({ top: 8 })
+        Row() {
+          Image($r('app.media.ic_add_address')).width(24)
+          Text($r('app.string.add_address'))
+            .fontSize($r('sys.float.Body_L'))
+            .fontWeight(FontWeight.Medium)
+            .fontColor($r('app.color.fontMainColor'))
+            .margin({ left: 8 })
         }
-        .width(Constants.FULL_SIZE)
-        .padding({
-          left: Constants.BORDER_WIDTH,
-          right: Constants.BORDER_WIDTH,
-          top: 8,
-          bottom: this.windowModel.getWindowBottomHeight(),
+        .cardStyle()
+        .height(56)
+        .margin({ top: 24 })
+        .justifyContent(FlexAlign.Center)
+        .onClick(() => {
+          this.modifyAddress = new AddressInfo()
+          this.addAddressSheetShow = true
         })
-        .backgroundColor($r('sys.color.background_secondary'))
+        .bindSheet($$this.addAddressSheetShow, this.addAddressSheet(this.modifyAddress), {
+          detents: [736, 737],
+          blurStyle: BlurStyle.Thick,
+          showClose: true,
+          backgroundColor: $r('sys.color.background_fourth'),
+          title: { title: $r('app.string.add_address') },
+        })
+
+        // 超出配送范围
+        Column() {
+          Text($r('app.string.over_distance_address'))
+            .fontSize($r('sys.float.Body_L'))
+            .fontWeight(FontWeight.Medium)
+            .fontColor($r('sys.color.font_secondary'))
+            .margin({ bottom: 12 })
+          List({ space: 8 }) {
+            ForEach(this.addressOverList, (address: AddressInfo) => {
+              ListItem() {
+                AddressCard({ address, showSelect: true, disable: true })
+              }
+              .opacity(0.4)
+            }, (address: AddressInfo) => JSON.stringify(address))
+          }.width(Constants.FULL_SIZE).scrollBar(BarState.Off).margin({ bottom: 16 }).opacity(0.4)
+        }
+        .margin({ top: 39 })
+        .alignItems(HorizontalAlign.Start)
+        .visibility(this.addressOverList.length ? Visibility.Visible : Visibility.None)
       }
+      .width(Constants.FULL_SIZE)
+      .padding({
+        left: Constants.BORDER_WIDTH,
+        right: Constants.BORDER_WIDTH,
+        bottom: this.windowModel.getWindowBottomHeight(),
+      })
     }.width(Constants.FULL_SIZE)
-    .height(736)
-    .borderRadius({ topLeft: 32, topRight: 32 })
     .alignContent(Alignment.Bottom)
+  }
+
+  @Builder
+  addAddressSheet(selectAddress: AddressInfo) {
+    AddAddress({
+      addressInfo: selectAddress,
+      myLocation: this.myLocation,
+      modifyAddressInfo: (addressInfo: AddressInfo) => {
+        this.modifyAddressInfo(addressInfo)
+      },
+    })
   }
 
   closeAddAddressSheet() {
@@ -188,6 +163,29 @@ struct AddressSheet {
       }
     }).catch((e: BusinessError) => {
       console.error(`getUserAddressList error: ${JSON.stringify(e)}.`);
+    })
+  }
+
+  modifyAddressInfo(addressInfo: AddressInfo) {
+    let address = new AddressInfo()
+    address.addressPre = addressInfo.addressPre
+    address.addressNum = addressInfo.addressNum
+    address.name = addressInfo.name
+    address.sex = addressInfo.sex
+    address.tel = addressInfo.tel
+    address.tag = addressInfo.tag
+    address.latitude = addressInfo.latitude
+    address.longitude = addressInfo.longitude
+    if (addressInfo.id) {
+      address.id = addressInfo.id
+    }
+    HttpRequestApi.modifyUserAddress(address).then((resp: BaseResponse) => {
+      if (resp.code === HttpCode.SUCCESS) {
+        this.addAddressSheetShow = false
+      } else {
+        console.info(`modifyUserAddress failed. Error:${resp.msg}`);
+        promptAction.showToast({ message: $r('app.string.save_address_failed') })
+      }
     })
   }
 }

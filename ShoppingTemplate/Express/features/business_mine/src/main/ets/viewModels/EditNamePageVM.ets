@@ -1,5 +1,6 @@
 import { AppStorageV2, promptAction } from '@kit.ArkUI';
-import { RouterModule, UserInfo } from 'lib_foundation';
+import { RouterModule } from 'lib_foundation';
+import { UserInfo } from 'module_base'
 
 const TAG = '[EditNamePageVM]';
 

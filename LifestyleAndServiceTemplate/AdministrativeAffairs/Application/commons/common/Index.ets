@@ -2,7 +2,6 @@ export { getDataFromJSON } from './src/main/ets/utils/RawFileDealUtils'
 
 export { GridBanner,
   TabsInfo,
-  UserInfo,
   Notification,
   PushParams,
   ParamsObj,
@@ -70,8 +69,8 @@ export { BrightnessUtil } from './src/main/ets/utils/BrightnessUtil'
 
 export { BaseStyleData } from './src/main/ets/olderModel/OlderModel'
 
-export { getQuickLoginAnonymousPhone, cancelRelative } from './src/main/ets/quickLogin/QuickLogin'
-
 export { UserState, SearchHistory, SuggestionList, Suggestion } from './src/main/ets/loginModel/LoginModel'
 
 export { DividerTmp } from './src/main/ets/dividerTmp/DividerTmp'
+
+export { AutomaticQuickLogin } from './src/main/ets/utils/AutomaticLogin'

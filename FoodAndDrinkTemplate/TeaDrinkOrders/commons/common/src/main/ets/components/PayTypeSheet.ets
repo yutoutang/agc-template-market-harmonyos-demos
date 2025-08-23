@@ -1,15 +1,8 @@
 import { Constants } from '../constants/Common'
-import { SheetHeaderComp } from './SheetHeaderComp'
 
 @Builder
 export function PayTypeSheetBuilder(totalMoney: number, close: (flag: boolean) => void) {
   Column() {
-    SheetHeaderComp({
-      title: $r('app.string.select_pay_type'), close: () => {
-        close(false)
-      },
-    })
-
     Column() {
       Row() {
         Text($r('app.string.wait_pay'))
@@ -32,7 +25,12 @@ export function PayTypeSheetBuilder(totalMoney: number, close: (flag: boolean) =
             Text($r('app.string.huawei_pay'))
               .fontSize(8)
               .fontColor($r('sys.color.multi_color_08'))
-              .padding({left:8,right:8,top:3,bottom:3})
+              .padding({
+                left: 8,
+                right: 8,
+                top: 3,
+                bottom: 3,
+              })
               .margin({ left: 4 })
               .backgroundColor('#1AED6F21')
               .borderRadius(14)
@@ -76,11 +74,7 @@ export function PayTypeSheetBuilder(totalMoney: number, close: (flag: boolean) =
     .layoutWeight(1)
     .backgroundColor($r('sys.color.background_primary'))
     .borderRadius({ topLeft: 12, topRight: 12 })
-    .margin({ top: 8 })
   }
   .width(Constants.FULL_SIZE)
-  .padding({ left: Constants.BORDER_WIDTH, right: Constants.BORDER_WIDTH, top: 8 })
-  .backgroundColor($r('sys.color.background_secondary'))
-  .borderRadius({ topLeft: 32, topRight: 32 })
-  .constraintSize({ maxWidth: Constants.FULL_SIZE })
+  .padding({ left: Constants.BORDER_WIDTH, right: Constants.BORDER_WIDTH })
 }

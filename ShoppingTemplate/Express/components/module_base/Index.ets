@@ -1,4 +1,4 @@
-export { RouterMap, goodsList, sendAddressData, getAddressData } from './src/main/ets/common/Constant'
+export * from './src/main/ets/common/Constant'
 
 export * from './src/main/ets/types'
 
@@ -20,6 +20,6 @@ export { PreferenceUtil } from './src/main/ets/common/PreferenceUtil'
 
 export { CommonDivider } from './src/main/ets/component/CommonDivider'
 
-export { CommonAddress } from './src/main/ets/component/CommonAddress'
-
 export { CommonCounter } from './src/main/ets/component/CommonCounter'
+
+export { CommonLoading } from './src/main/ets/component/CommonLoading'

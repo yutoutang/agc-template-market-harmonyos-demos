@@ -60,7 +60,7 @@ export struct HomePage {
                   .linearGradient({
                     direction: GradientDirection.Right,
                     repeating: true,
-                    colors: [[0x0A59F7, 0], [0x3B7AF9, 1]]
+                    colors: [[0x0A59F7, 0], [0x3B7AF9, 1]],
                   })
                   .onClick(() => {
                     if (!this.vm.isLogin) {
@@ -76,7 +76,7 @@ export struct HomePage {
                 top: 22,
                 bottom: 12,
                 left: 16,
-                right: 16
+                right: 16,
               })
 
               EventCard()
@@ -86,6 +86,7 @@ export struct HomePage {
             }
           }
           .scrollBar(BarState.Off)
+          .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
           .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
         }
         .padding({ left: 16, right: 16 })

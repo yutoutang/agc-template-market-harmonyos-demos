@@ -52,9 +52,6 @@ export interface UpdateUserInfoRequest {
   id: number;
   name: string;
   nickname: string;
-  sex: string;
-  cellphone: string;
-  birthday: string;
   avatar: string;
 }
 
@@ -115,4 +112,9 @@ export interface GetRestaurantListRequest {
 
 export interface GetMealDetailRequest {
   packageId: number;
+}
+
+export interface CancelPaymentRequest {
+  orderType: number;
+  orderNo: string;
 }

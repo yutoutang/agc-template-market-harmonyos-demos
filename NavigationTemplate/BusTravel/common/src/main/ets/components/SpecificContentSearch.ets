@@ -1,4 +1,5 @@
 import { promptAction, SymbolGlyphModifier } from '@kit.ArkUI'
+import { Logger } from '../logger'
 import { RouteEntryVM } from '../utils/RouteEntryVM';
 
 @Builder
@@ -6,11 +7,11 @@ export function SpecificContentSearchBuilder() {
   SpecificContentSearch()
 }
 
-@Component
+@ComponentV2
 export struct SpecificContentSearch {
-  @State changeValue: string = ''
-  @State searchNewListData: Array<string> = []
-  @State searchContentList: Array<string> = []
+  @Local changeValue: string = ''
+  @Local searchNewListData: Array<string> = []
+  @Local searchContentList: Array<string> = []
   controller: SearchController = new SearchController()
   scroller: Scroller = new Scroller()
   private scrollerForList: Scroller = new Scroller()
@@ -145,8 +146,6 @@ export struct SpecificContentSearch {
         }
         .edgeEffect(EdgeEffect.Spring)
       }
-
-
     }
     .width('100%')
     .height('100%')
@@ -158,7 +157,7 @@ export struct SpecificContentSearch {
       Column() {
         this.SearchContentInfo()
       }
-      // .height('100%')
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
       .backgroundColor('#F1F3F5')
     }
     .hideTitleBar(true)
@@ -167,7 +166,7 @@ export struct SpecificContentSearch {
       try {
         this.searchContentList = JSON.parse(JSON.stringify(ctx?.pathInfo.param))
       } catch (e) {
-        console.log(`testTag onReady catch exception: ${JSON.stringify(e)}`)
+        Logger.info(`testTag onReady catch exception: ${JSON.stringify(e)}`)
       }
     })
   }

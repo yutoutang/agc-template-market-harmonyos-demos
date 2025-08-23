@@ -1,14 +1,19 @@
 import { MockAdapter } from '@agctemplate/utils';
-import { getCommentList } from './mockData/mockCommentList'
 import { getEpisodeList } from './mockData/mockEpisodeList';
 import {
   getDramaInfo,
   getFavorite,
   getFeedDramaList,
-  getWatched,
+  getLike,
+  getMyWatchRecord,
   setFavorite,
-  unsetFavorite
+  setLike,
+  setMyWatchRecord,
+  unsetFavorite,
+  unsetLike,
+  unsetMyWatchRecord
 } from './mockData/mockDramaFactory';
+import { addComment, addReply, getCommentList, onCommentLike, onReplyLike } from './mockData/mockCommentList';
 
 // 设置模拟规则
 MockAdapter
@@ -20,7 +25,7 @@ MockAdapter
       code: '0'
     },
     total: 3,
-    myWatchRecord: getWatched()
+    myWatchRecord: getMyWatchRecord()
   })
   .onPost({
     url: 'https://agc.template.com/myfollowdrama/list'
@@ -31,6 +36,17 @@ MockAdapter
       },
       total: 3,
       myFollowDramas: getFavorite()
+    }
+  })
+  .onPost({
+    url: 'https://agc.template.com/mylikedrama/list'
+  }, () => {
+    return {
+      ret: {
+        code: '0'
+      },
+      total: 3,
+      myLikeDramas: getLike()
     }
   })
   .onPost({
@@ -108,6 +124,50 @@ MockAdapter
     }
   })
   .onPost({
+    url: 'https://agc.template.com/setlike'
+  }, (data) => {
+    let dramaId = JSON.parse(data.data)
+    setLike(dramaId)
+    return {
+      ret: {
+        code: '0'
+      }
+    }
+  })
+  .onPost({
+    url: 'https://agc.template.com/unsetlike'
+  }, (data) => {
+    let dramaId = JSON.parse(data.data)
+    unsetLike(dramaId)
+    return {
+      ret: {
+        code: '0'
+      }
+    }
+  })
+  .onPost({
+    url: 'https://agc.template.com/setmyWatchrecord'
+  }, (data) => {
+    let dramaId = JSON.parse(data.data)
+    setMyWatchRecord(dramaId)
+    return {
+      ret: {
+        code: '0'
+      }
+    }
+  })
+  .onPost({
+    url: 'https://agc.template.com/unsetsetmyWatchrecord'
+  }, (data) => {
+    let dramaId = JSON.parse(data.data)
+    unsetMyWatchRecord(dramaId)
+    return {
+      ret: {
+        code: '0'
+      }
+    }
+  })
+  .onPost({
     url: 'https://agc.template.com/api/user/associate'
   }, {
     ret: {
@@ -136,5 +196,45 @@ MockAdapter
       cellphone: '133****7890',
       isPhoneAssociated: false,
       isMock: false
+    }
+  })
+  .onPost({
+    url: 'https://agc.template.com/addcomment'
+  }, (data) => {
+    addComment(JSON.parse(data.data))
+    return {
+      ret: {
+        code: '0'
+      }
+    }
+  })
+  .onPost({
+    url: 'https://agc.template.com/addreply'
+  }, (data) => {
+    addReply(JSON.parse(data.data))
+    return {
+      ret: {
+        code: '0'
+      }
+    }
+  })
+  .onPost({
+    url: 'https://agc.template.com/oncommentlike'
+  }, (data) => {
+    onCommentLike(JSON.parse(data.data))
+    return {
+      ret: {
+        code: '0'
+      }
+    }
+  })
+  .onPost({
+    url: 'https://agc.template.com/onreplylike'
+  }, (data) => {
+    onReplyLike(JSON.parse(data.data))
+    return {
+      ret: {
+        code: '0'
+      }
     }
   })

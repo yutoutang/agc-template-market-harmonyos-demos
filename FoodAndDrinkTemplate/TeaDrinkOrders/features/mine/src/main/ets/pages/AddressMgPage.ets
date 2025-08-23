@@ -1,7 +1,5 @@
 import {
   AddressInfo,
-  AddressTagEnum,
-  addressTagMap,
   BaseResponse,
   Constants,
   EmptyComp,
@@ -13,6 +11,7 @@ import {
 } from 'common/Index';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { promptAction } from '@kit.ArkUI';
+import { ADDRESS_TAG_MAP, AddressTagEnum } from 'add_address';
 
 @Builder
 export function AddressMgPageBuilder() {
@@ -46,7 +45,7 @@ struct AddressMgPage {
                   Column() {
                     Row() {
                       if (address.tag) {
-                        Text(addressTagMap[address.tag])
+                        Text(ADDRESS_TAG_MAP[address.tag])
                           .fontSize(10)
                           .fontColor(this.getTagFontColor(address.tag))
                           .borderRadius(4)

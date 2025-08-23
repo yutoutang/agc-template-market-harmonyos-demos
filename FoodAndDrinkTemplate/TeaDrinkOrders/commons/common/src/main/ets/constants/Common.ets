@@ -43,9 +43,9 @@ export class RequestUrl {
   // 13、删除已经添加到购物车的饮品数量
   static readonly GET_UPD_CAR_URL = 'updateMyCar'
   // 14、点击选规格，获取商品规格信息并弹窗选择
-  static readonly GET_GOOD_INFO_URL = 'getGoodInfo'
+  static readonly GET_GOODS_INFO_URL = 'getGoodsInfo'
   // 获取单个商品规格信息
-  static readonly GET_GOOD_SPEC_URL = 'getGoodSpec'
+  static readonly GET_GOODS_SPEC_URL = 'getGoodsSpec'
   // 16、规格饮品到购物车
   static readonly GET_ADD_CAR_URL = 'addCar'
   // 查询我的优惠券列表
@@ -90,18 +90,12 @@ export class Constants {
   static readonly COUPON_TYPE_ALL = '3'
   // 优惠券领取状态 2 未领取
   static readonly COUPON_STATE_NOT_COLLECT = 2
-  // 订单支付超时时间
-  static readonly COUNTDOWN_TIME = 30
-  // 时间转换
-  static readonly SECOND_TO_MIN = 60
-  // 延迟时间1000ms
-  static readonly DELAY_TIME_1000 = 1000
+
   static readonly DRINK_PROCESS_MAX = 6
   static readonly STORE_MAKING_PROCESS_MAX = 15
   static readonly AM_PM = 12
   static readonly MAP_HEIGHT_DEFAULT = 216
   static readonly MID_DAY_TIME = '12:00'
-  static readonly TELEPHONE_LENGTH = 11
   // 配送范围：10公里
   static readonly ADDRESS_OVER = 10000
   static readonly RICH_TEXT_URI = 'resource://rawfile/richtext.html'
@@ -123,36 +117,8 @@ export enum OrderListEnum {
   CANCELED,
 }
 
-// 订单状态
-export enum OrderStateEnum {
-  // 待支付
-  TO_BE_PAID = 0,
-  // 制作中
-  MAKING,
-  // 配送中
-  DELIVERING,
-  // 已完成
-  COMPLETED,
-  // 已取消
-  CANCELED,
-}
-
-// 订单状态
-export const orderStateMap: Record<number, ResourceStr> = {
-  // 待支付
-  0: $r('app.string.to_be_paid'),
-  // 制作中
-  1: $r('app.string.making'),
-  // 配送中
-  2: $r('app.string.delivering'),
-  // 已完成
-  3: $r('app.string.completed'),
-  // 已取消
-  4: $r('app.string.canceled'),
-}
-
 // 商品类别
-export enum GoodSpecEnum {
+export enum GoodsSpecEnum {
   // 正常
   NORMAL = '1',
   // 选规格
@@ -167,15 +133,6 @@ export enum OrderTypeEnum {
   PICK_SELF = 0,
   // 外卖配送
   TAKEAWAY_DELIVERY = 1,
-}
-
-
-// 订单类型
-export const orderTypeMap: Record<number, ResourceStr> = {
-  // 到店自取
-  0: $r('app.string.pick_self_tag'),
-  // 外卖配送
-  1: $r('app.string.takeaway_tag'),
 }
 
 // 订单列表枚举
@@ -197,22 +154,3 @@ export enum UserSexEnum {
   female,
 }
 
-// 地址标签
-export enum AddressTagEnum {
-  DEFAULT = 1,
-  HOME,
-  COMPANY,
-  SCHOOL,
-}
-
-// 地址标签
-export const addressTagMap: Record<number, ResourceStr> = {
-  // 常用
-  1: $r('app.string.address_default'),
-  // 家
-  2: $r('app.string.address_home'),
-  // 公司
-  3: $r('app.string.address_company'),
-  // 学校
-  4: $r('app.string.address_school'),
-}

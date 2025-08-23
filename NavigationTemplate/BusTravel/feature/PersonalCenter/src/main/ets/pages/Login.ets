@@ -1,16 +1,16 @@
-import { promptAction, router } from '@kit.ArkUI';
+import { AppStorageV2, promptAction, router } from '@kit.ArkUI';
 import { util } from '@kit.ArkTS';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { authentication, loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit';
-import { RouteEntryVM, UserInfo } from 'common'
+import { RouteEntryVM, UserInfoModel } from 'common'
 
 @Builder
 export function LoginBuilder() {
   Login()
 }
 
-@Component
+@ComponentV2
 export struct Login {
   build() {
     NavDestination() {
@@ -28,21 +28,18 @@ export struct Login {
   }
 }
 
-@Component
+@ComponentV2
 struct QuickLoginButtonComponent {
-  @StorageLink('isLogin') isLogin: boolean = AppStorage.get('isLogin') ?? false;
+  @Local userInfo: UserInfoModel = AppStorageV2.connect(UserInfoModel, 'UserInfoModel', () => new UserInfoModel())!
   vm: RouteEntryVM = RouteEntryVM.instance;
   logTag: string = 'QuickLoginButtonComponent';
   domainId: number = 0x0000;
   // 匿名化手机号
-  @State quickLoginAnonymousPhone: string = '123****1234';
+  @Local quickLoginAnonymousPhone: string = '123****1234';
   // 是否勾选协议
-  @State isSelected: boolean = false;
+  @Local isSelected: boolean = false;
   private static USER_AUTHENTICATION_PROTOCOL: string =''
-  private static USER_SERVICE_TAG = '用户服务协议';
   private static PRIVACY_TAG = '隐私协议';
-  private static USER_AUTHENTICATION_TAG = '华为账号用户认证协议';
-  // 定义LoginWithHuaweiIDButton展示的隐私文本，展示应用的用户服务协议、隐私协议和华为账号用户认证协议
   privacyText: loginComponentManager.PrivacyText[] = [{
     text: '已阅读并同意',
     type: loginComponentManager.TextType.PLAIN_TEXT
@@ -71,7 +68,6 @@ struct QuickLoginButtonComponent {
         }
         if (response) {
           // 获取到Authorization Code
-          const authorizationCode = response.authorizationCode;
           hilog.info(0x0000, 'testTag', 'Succeeded in getting response.');
           this.loginWithHuawei()
           return;
@@ -178,8 +174,10 @@ struct QuickLoginButtonComponent {
 
         let loginWithHuaweiIDCredential = loginWithHuaweiIDResponse.data!;
         // 登录成功
-        AppStorage.setOrCreate('userInfo', loginWithHuaweiIDCredential)
-        this.isLogin = true
+        this.userInfo.idToken = loginWithHuaweiIDCredential.idToken?? ''
+        this.userInfo.openID = loginWithHuaweiIDCredential.openID
+        this.userInfo.unionID = loginWithHuaweiIDCredential.unionID
+        this.userInfo.isLogin = true
         this.vm.pop();
       });
     } catch (error) {
@@ -190,16 +188,10 @@ struct QuickLoginButtonComponent {
     /*
      * mock登录数据
      * */
-    let mockUserInfo: UserInfo = {
-      'idToken': '',
-      'nickName': '华为用户',
-      'avatarUri': $r('app.media.hd_un_login'),
-      'openID' : '',
-      'unionID' : '',
-      'phoneNumber': '123****1234',
-    }
-    AppStorage.setOrCreate('userInfo', mockUserInfo)
-    AppStorage.setOrCreate('isLogin', true)
+    this.userInfo.nickName = '华为用户'
+    this.userInfo.avatarUri = $r('app.media.hd_un_login')
+    this.userInfo.phoneNumber = '123****1234'
+    this.userInfo.isLogin = true
     this.vm.pop();
   }
 
@@ -222,11 +214,6 @@ struct QuickLoginButtonComponent {
       if (this.isSelected) {
         if (response) {
           hilog.info(this.domainId, this.logTag, 'Succeed in clicking LoginWithHuaweiIDButton.');
-          // 开发者根据实际业务情况使用以下信息
-          const authCode = response.authorizationCode;
-          const openID = response.openID;
-          const unionID = response.unionID;
-          const idToken = response.idToken;
         }
       } else {
         this.agreementDialog.open();
@@ -274,8 +261,6 @@ struct QuickLoginButtonComponent {
     try {
       controller.executeRequest(authRequest).then((response: authentication.AuthorizationWithHuaweiIDResponse) => {
         // 获取到UnionID、OpenID、匿名手机号
-        const unionID = response.data?.unionID;
-        const openID = response.data?.openID;
         const anonymousPhone = response.data?.extraInfo?.quickLoginAnonymousPhone as string;
         if (anonymousPhone) {
           hilog.info(this.domainId, this.logTag, 'Succeeded in authentication.');

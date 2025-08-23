@@ -10,12 +10,16 @@ export class DramaInfo {
   totalCount: number; //总集数
   curIndex: number; // 当前播放集(剧集推荐流使用作为详情页接续播放, 从0开始递增)
   latestUpdate: number; //最新更新集数
-  category: string; //分类
+  category: string[]; //分类
   popular: string; //热度
   actorInfo: ActorInfo[]; //演员表
   episodeList: EpisodeInfo[]; //剧集列表
-  isFavorite:boolean; // 是否追剧
-  favoriteCount:number; // 追剧人数
+  isFavorite: boolean; // 是否追剧
+  favoriteCount: number; // 追剧人数
+  isLike: boolean; // 是否点赞
+  likeCount: number; // 点赞人数
+  isSelect: boolean; // 是否被选中
+  isVip?: boolean; //是否是VIP专属
 
   constructor(dramaInfo: any) {
     this.id = dramaInfo?.id;
@@ -32,5 +36,9 @@ export class DramaInfo {
     this.curIndex = dramaInfo?.curIndex;
     this.favoriteCount = dramaInfo?.favoriteCount;
     this.isFavorite = dramaInfo?.isFavorite;
+    this.likeCount = dramaInfo?.likeCount;
+    this.isLike = dramaInfo?.isLike;
+    this.isSelect = dramaInfo?.isSelect;
+    this.isVip = dramaInfo?.isVip;
   }
 }

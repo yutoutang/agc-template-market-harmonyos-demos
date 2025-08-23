@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { baseActionSheet, DividerTmp, BaseDatePicker, BaseTextStyleModifier} from 'base_apis';
+import { baseActionSheet, DividerTmp, BaseDatePicker, BaseTextStyleModifier } from 'base_apis';
 import { LunarInfo } from '../../model/model';
 import { gregorianToLunar } from '../../utils/Utils';
 
@@ -37,7 +37,8 @@ export struct YinYangConversion {
   /**
    * 查询事件
    */
-  @Event onSearch: (lunarDateInfo: LunarInfo) => void = () => {}
+  @Event onSearch: (lunarDateInfo: LunarInfo) => void = () => {
+  }
 
   aboutToAppear(): void {
     this.localStartDate = dayjs(this.startDate).format('YYYY-MM-DD')
@@ -70,82 +71,89 @@ export struct YinYangConversion {
 
       List({ space: 20 }) {
         ListItem() {
-          Row() {
-            Text('选择日期')
-              .attributeModifier(new BaseTextStyleModifier(`font_primary/Subtitle_M/Medium`))
-            Row({ space: 5 }) {
-              Text(dayjs(this.localStartDate).format('YYYY年MM月DD日'))
-                .attributeModifier(new BaseTextStyleModifier(`font_primary/Body_M/Regular`))
-              Image($r('app.media.chevron_right')).width(7).height(17)
+          Column() {
+            Row() {
+              Text('选择日期')
+                .attributeModifier(new BaseTextStyleModifier(`font_primary/Subtitle_M/Medium`))
+              Row({ space: 5 }) {
+                Text(dayjs(this.localStartDate).format('YYYY年MM月DD日'))
+                  .attributeModifier(new BaseTextStyleModifier(`font_primary/Body_M/Regular`))
+                Image($r('app.media.chevron_right')).width(7).height(17)
+              }
             }
+            .width('100%')
+            .justifyContent(FlexAlign.SpaceBetween)
+            .onClick(() => {
+              this.datePicker = new Date(this.startDate)
+              baseActionSheet.show({
+                id: 'datePickerBuilder',
+                detents: [300, 301],
+                showClose: false,
+                customContent: () => {
+                  this.datePickerBuilder('start')
+                },
+              })
+            });
+
+            Divider()
+              .margin({ top: 16, bottom: 16 })
+            Row({ space: 18 }) {
+              Row({ space: 5 }) {
+                Radio({ value: 'Radio3', group: 'radioGroup2' })
+                  .checked(true)
+                  .radioStyle({
+                    checkedBackgroundColor: $r('sys.color.comp_background_emphasize'),
+                  })
+
+                Text('公历转阴历')
+                  .attributeModifier(new BaseTextStyleModifier(`font_primary/Body_M/Regular`))
+              }
+            }
+            .width('100%')
+            .justifyContent(FlexAlign.End)
           }
-          .width('100%')
-          .justifyContent(FlexAlign.SpaceBetween)
-          .onClick(() => {
-            this.datePicker = new Date(this.startDate)
-            baseActionSheet.show({
-              id: 'datePickerBuilder',
-              detents:[300,301],
-              showClose: false,
-              customContent: () => {
-                this.datePickerBuilder('start')
-              },
-            })
-          });
         }
 
         ListItem() {
-          Row({ space: 18 }) {
-            Row({ space: 5 }) {
-              Radio({ value: 'Radio3', group: 'radioGroup2' })
-                .checked(true)
-                .radioStyle({
-                  checkedBackgroundColor: this.themeColor,
-                })
+          Button('查询')
+            .backgroundColor(this.themeColor)
+            .fontColor(this.textColor)
+            .fontSize($r('sys.float.Body_L'))
+            .fontWeight(FontWeight.Medium)
+            .padding({ top: 12, bottom: 12 })
+            .width('100%')
+            .margin({ top: 25 })
+            .onClick(() => {
+              this.onSearch(this.lunarDateInfo)
+              this.getLunarDateInfo()
+            })
+        }
 
-              Text('公历转阴历')
-                .attributeModifier(new BaseTextStyleModifier(`font_primary/Body_M/Regular`))
+        ListItem() {
+          Column() {
+            Column({ space: 3 }) {
+              Text() {
+                Span('农历：')
+                Span(`${this.lunarDateInfo.year}年${this.lunarDateInfo.month}月${this.lunarDateInfo.day}`)
+              }
+              .attributeModifier(new BaseTextStyleModifier(`font_primary/Body_M/Medium`))
+
+              Text(this.lunarDateInfo.weekday)
+                .attributeModifier(new BaseTextStyleModifier(`font_secondary/Body_S/Regular`))
             }
+            .padding(12)
+            .width('100%')
+            .alignItems(HorizontalAlign.Start)
+            .borderRadius(16)
+            .backgroundColor('#FDF7EE')
           }
-          .width('100%')
-          .justifyContent(FlexAlign.End)
+          .margin({ top: 12 })
         }
       }
-      .divider(this.egDivider)
+      .layoutWeight(1)
+      .scrollBar(BarState.Off)
       .margin({ bottom: 16, top: 16 })
-
-      Button('查询')
-        .backgroundColor(this.themeColor)
-        .fontColor(this.textColor)
-        .fontSize($r('sys.float.Body_L'))
-        .fontWeight(FontWeight.Medium)
-        .padding({ top: 12, bottom: 12 })
-        .width('100%')
-        .margin({ top: 25 })
-        .onClick(() => {
-          this.onSearch(this.lunarDateInfo)
-          this.getLunarDateInfo()
-        })
-      Column() {
-        Column({ space: 3 }) {
-          Text() {
-            Span('农历：')
-            Span(`${this.lunarDateInfo.year}年${this.lunarDateInfo.month}月${this.lunarDateInfo.day}`)
-          }
-          .attributeModifier(new BaseTextStyleModifier(`font_primary/Body_M/Medium`))
-
-          Text(this.lunarDateInfo.weekday)
-            .attributeModifier(new BaseTextStyleModifier(`font_secondary/Body_S/Regular`))
-        }
-        .padding(12)
-        .width('100%')
-        .alignItems(HorizontalAlign.Start)
-        .borderRadius(16)
-        .backgroundColor('#FDF7EE')
-      }
-      .margin({ top: 12 })
     }
-    .height('100%')
     .margin({ top: 18 })
     .justifyContent(FlexAlign.Start)
     .padding({ left: 16, right: 16 })

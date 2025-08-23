@@ -8,7 +8,7 @@ import {
   BreakPointValue,
   StatusBarHeight,
 } from '@agctemplate/widgets';
-import { appRouter } from '@agctemplate/utils';
+import { appRouter, WindowManager } from '@agctemplate/utils';
 import { AppStorageV2 } from '@kit.ArkUI';
 
 export interface TabInfo {
@@ -25,11 +25,13 @@ export struct MainTabPage {
   @Local statusBarHeight: StatusBarHeight = AppStorageV2.connect(StatusBarHeight, AppStorageKeys.STATUS_BAR_HEIGHT,
     () => new StatusBarHeight())!;
   @Provider('curTabIndex') currentIndex: number = 0;
+  @Provider('tabState') tabState: boolean = true;
   @Local isDarkEnable: boolean = true; // 默认主页为深色tab
   private controller: TabsController = new TabsController();
   private isFirstTimeIn: boolean = true; // 优化首次进入无弹跳效果
 
   aboutToAppear(): void {
+    WindowManager.setWindowSystemBarProperties({ statusBarContentColor: '#e6ffffff' })
   }
 
   @Builder
@@ -50,7 +52,8 @@ export struct MainTabPage {
           md: BarPosition.End,
           lg: BarPosition.Start
         }).getValue(this.currentBreakpoint.value),
-        controller: this.controller
+        controller: this.controller,
+        index: this.currentIndex!!
       }) {
         ForEach(TabInfoRegister.tabInfos, (tabInfo: TabInfo, index: number) => {
           TabContent() {
@@ -70,14 +73,17 @@ export struct MainTabPage {
         md: '100%',
         lg: 96
       }).getValue(this.currentBreakpoint.value))
-      .barHeight(new BreakPointType<number | string>({
+      .barHeight(this.tabState ? new BreakPointType<number | string>({
         sm: 48,
         md: 48,
         lg: 400
-      }).getValue(this.currentBreakpoint.value))
+      }).getValue(this.currentBreakpoint.value) : 0)
       .onTabBarClick((index: number) => {
         this.isFirstTimeIn = false;
         this.currentIndex = index;
+        WindowManager.setWindowSystemBarProperties({
+          statusBarContentColor: this.currentIndex === 0 ? '#e6ffffff' : '#e6000000'
+        })
         this.isDarkEnable = this.currentIndex === 0 ? true : false
       })
       .scrollable(false)

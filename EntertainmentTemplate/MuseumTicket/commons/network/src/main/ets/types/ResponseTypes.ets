@@ -173,8 +173,13 @@ export type GetExplainTextResp = ExplainTextItem[];
 
 // 省博介绍
 export interface GetIntroduceResp {
-  total: string,
-  content: string[]
+  museumName: string,
+  address: string,
+  tel: string,
+  openTime: string,
+  bus: string,
+  subway: string,
+  introduction:string
 }
 
 
@@ -232,3 +237,102 @@ export interface GetTrafficDetailResp {
   name: string;
   coordinate: string;
 }
+
+
+
+// 讲解服务信息
+export interface ExplainItem{
+  img:string,
+  title:string,
+  label:string,
+}
+
+export type GetExplainResp = ExplainItem[]
+
+
+// 讲解服务票务信息
+export interface ExplainTicketInfo{
+  timeSegment:string,
+  price:number,
+  headsetPrice:number,
+  name:string,
+  language:string,
+  remaining:number,
+  device:string
+}
+
+export type GetExplainTicketInfoResp = ExplainTicketInfo[]
+
+
+// 讲解服务订单
+export interface ExplainOrder {
+  orderNo: string,
+  orderStr: string;
+  status: string,
+  title: string,
+  time: number,
+  timeSegment: string,
+  orderTime:string,
+  totalPrice: number,
+  visitors: Contacts[],
+  img:string,
+  explainType:string,
+  price:number,
+  language:string
+}
+
+
+export interface TreasureItem {
+  treasureId: number
+  cover: string,
+  bg: string,
+  name: string,
+  title: string,
+  age: string,
+  introduction: string
+}
+
+@ObservedV2
+export class CloudUrl {
+  @Trace activeCover: string = '';
+  @Trace sheetBg: string = '';
+  @Trace introductionBg:string = ''
+}
+
+
+// 活动信息
+export interface ActiveInfo {
+  activeId: string,
+  title: string,
+  subtitle: string,
+  type: string,
+  resume: string,
+  time: string,
+  compere: string,
+  fitAge: string,
+  remain: number,
+  price: number,
+  cover: string,
+  detail: string,
+  deposit: number,
+  address:string
+}
+
+
+// 讲解服务订单
+export interface ActiveOrder {
+  orderNo: string,
+  orderStr: string;
+  activeId: string,
+  status: string,
+  title: string,
+  activeTime: string,
+  orderTime: number,
+  totalPrice: number,
+  visitors: Contacts[],
+  contactName: string,
+  contactPhone: string,
+}
+
+
+

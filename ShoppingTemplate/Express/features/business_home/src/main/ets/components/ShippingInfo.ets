@@ -1,8 +1,7 @@
-import { gridList, payMethodList } from '../constants'
 import { ExpressPageVM } from '../viewModels/ExpressPageVM'
 import { CustomContentDialog } from '@kit.ArkUI'
 import { StoreCard } from './StoreCard'
-import { RouterMap, CommonDivider, IBuilderType } from 'module_base'
+import { RouterMap, CommonDivider, IBuilderType, payMethodList, gridList } from 'module_base'
 import { CommonButton, CommonCoupon, CommonTitle, Coupon, RouterModule } from 'lib_foundation'
 
 
@@ -21,7 +20,7 @@ export struct ShippingInfo {
       topLeft: 32,
       topRight: 32,
       bottomLeft: 0,
-      bottomRight: 0
+      bottomRight: 0,
     },
     alignment: DialogAlignment.Bottom,
   })
@@ -37,7 +36,7 @@ export struct ShippingInfo {
       topLeft: 32,
       topRight: 32,
       bottomLeft: 0,
-      bottomRight: 0
+      bottomRight: 0,
     },
     alignment: DialogAlignment.Bottom,
   })
@@ -53,7 +52,7 @@ export struct ShippingInfo {
       topLeft: 32,
       topRight: 32,
       bottomLeft: 0,
-      bottomRight: 0
+      bottomRight: 0,
     },
     alignment: DialogAlignment.Bottom,
   })
@@ -96,7 +95,7 @@ export struct ShippingInfo {
             }
             this.vm.isFresh = false
             RouterModule.push({ url: RouterMap.GOODS_PAGE, param: true })
-          }
+          },
         })
         this.contentBuilder({
           label: '付款方式',
@@ -113,7 +112,7 @@ export struct ShippingInfo {
             const value = payMethodList[0].text
             this.vm.tempPayMethod = value
             this.payDialogController.open()
-          }
+          },
         })
         this.contentBuilder({
           label: '格口类型',
@@ -130,7 +129,7 @@ export struct ShippingInfo {
             const value = gridList[0].text
             this.vm.tempGrid = value
             this.gridDialogController.open()
-          }
+          },
         })
       }
       .backgroundColor(Color.White)
@@ -152,7 +151,7 @@ export struct ShippingInfo {
               return
             }
             this.couponDialogController.open()
-          }
+          },
         })
       }
       .padding({ top: 12, left: 12, right: 12 })
@@ -204,25 +203,35 @@ export struct ShippingInfo {
       this.titleBuilder('优惠券', () => {
         this.couponDialogController.close()
       })
-
-      List() {
-        ForEach(this.vm.couponList, (coupon: Coupon) => {
-          ListItem() {
-            CommonCoupon({
-              isVip: false,
-              coupon: coupon,
-              couponDialogController: this.couponDialogController,
-              onChange: (coupon) => {
-                this.vm.selectedCoupon = coupon
-                this.vm.couponName = coupon?.name!!
-              }
-            })
-          }
-          .margin({ bottom: 14 })
-        }, (item: Coupon[]) => JSON.stringify(item))
+      if (this.vm.couponList.length === 0) {
+        Column() {
+          Text('暂无优惠券')
+            .fontSize(16)
+            .fontWeight(FontWeight.Regular)
+            .fontColor($r('sys.color.font_tertiary'))
+        }
+        .layoutWeight(1)
+      } else {
+        List() {
+          ForEach(this.vm.couponList, (coupon: Coupon) => {
+            ListItem() {
+              CommonCoupon({
+                isVip: false,
+                coupon: coupon,
+                couponDialogController: this.couponDialogController,
+                onChange: (coupon) => {
+                  this.vm.selectedCoupon = coupon
+                  this.vm.couponName = coupon?.name!!
+                },
+              })
+            }
+            .margin({ bottom: 14 })
+          }, (item: Coupon[]) => JSON.stringify(item))
+        }
+        .layoutWeight(1)
+        .scrollBar(BarState.Off)
+        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
       }
-      .layoutWeight(1)
-      .scrollBar(BarState.Off)
     }
     .width('100%')
     .padding({ bottom: 28 })
@@ -250,25 +259,25 @@ export struct ShippingInfo {
             this.vm.selectedGridIndex = this.vm.getSelectedSettingIndex(this.vm.tempGrid, gridList)
             this.vm.getEstimatedPrice()
             this.gridDialogController.close()
-          }
+          },
           )
         }
         .width('100%')
         .padding({ bottom: 28 })
       }
       .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
     }
   }
 
   @Builder
   priceBuilder(): void {
     Column() {
-      this.titleBuilder('付款方式', () => {
-        this.payDialogController.close()
-      })
-
       Scroll() {
         Column() {
+          this.titleBuilder('付款方式', () => {
+            this.payDialogController.close()
+          })
           TextPicker({ range: payMethodList, selected: this.vm.selectedPayMethodIndex })
             .onChange((value) => {
               this.vm.tempPayMethod = value as string
@@ -281,13 +290,14 @@ export struct ShippingInfo {
             this.vm.selectedPayMethodIndex = this.vm.getSelectedSettingIndex(this.vm.tempPayMethod, payMethodList)
             this.vm.getEstimatedPrice()
             this.payDialogController.close()
-          }
+          },
           )
         }
         .width('100%')
         .padding({ bottom: 28 })
       }
       .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
     }
   }
 

@@ -1,19 +1,20 @@
-export class RouterMap {
-  static readonly INDEX_PAGE = 'IndexPage'
-  static readonly HW_MAP = 'HwMap'
-  static readonly PREVIEW_IMAGE_PAGE = 'PreviewImagePage'
-  static readonly MERCHANT_DETAIL_PAGE = 'MerchantDetailPage'
-  static readonly GOOD_DETAIL_PAGE = 'GoodDetailPage'
-  static readonly CONFIRM_ORDER_PAGE = 'ConfirmOrderPage'
-  static readonly SELECT_COUPON_PAGE = 'SelectCouponPage'
-  static readonly ORDER_DETAIL_PAGE = 'OrderDetailPage'
-  static readonly MY_COUPONS_PAGE = 'MyCouponsPage'
-  static readonly USER_INFO_PAGE = 'UserInfoPage'
-  static readonly ADDRESS_MG_PAGE = 'AddressMgPage'
-  static readonly ADD_ADDRESS_PAGE = 'AddAddressPage'
-  static readonly SELECT_ADDRESS_PAGE = 'SelectAddressPage'
-  static readonly SELECT_STORE_PAGE = 'SelectStorePage'
-  static readonly MEMBER_CODE_PAGE = 'MemberCodePage'
-  static readonly SETTING_PAGE = 'SettingPage'
-  static readonly PRIVACY_PAGE = 'PrivacyPage'
+export enum RouterMap {
+  INDEX_PAGE = 'IndexPage',
+  HW_MAP = 'HwMap',
+  PREVIEW_IMAGE_PAGE = 'PreviewImagePage',
+  MERCHANT_DETAIL_PAGE = 'MerchantDetailPage',
+  GOODS_DETAIL_PAGE = 'GoodsDetailPage',
+  CONFIRM_ORDER_PAGE = 'ConfirmOrderPage',
+  SELECT_COUPON_PAGE = 'SelectCouponPage',
+  ORDER_DETAIL_PAGE = 'OrderDetailPage',
+  MY_COUPONS_PAGE = 'MyCouponsPage',
+  USER_INFO_PAGE = 'UserInfoPage',
+  ADDRESS_MG_PAGE = 'AddressMgPage',
+  ADD_ADDRESS_PAGE = 'AddAddressPage',
+  SELECT_ADDRESS_PAGE = 'SelectAddressPage',
+  SELECT_STORE_PAGE = 'SelectStorePage',
+  MEMBER_CODE_PAGE = 'MemberCodePage',
+  SETTING_PAGE = 'SettingPage',
+  PRIVACY_PAGE = 'PrivacyPage',
+  CONFIRM_DIALOG = 'CommonConfirmDialog',
 }

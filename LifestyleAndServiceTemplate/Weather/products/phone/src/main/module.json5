@@ -1,0 +1,76 @@
+{
+  "module": {
+    "name": "phone",
+    "type": "entry",
+    "description": "$string:module_desc",
+    "mainElement": "PhoneAbility",
+    "deviceTypes": [
+      "phone"
+    ],
+    "deliveryWithInstall": true,
+    "installationFree": false,
+    "pages": "$profile:main_pages",
+    "routerMap": "$profile:route_map",
+    "requestPermissions": [
+      {
+        "name": "ohos.permission.INTERNET"
+      }
+    ],
+    "abilities": [
+      {
+        "name": "PhoneAbility",
+        "srcEntry": "./ets/phoneability/PhoneAbility.ets",
+        "description": "$string:PhoneAbility_desc",
+        "icon": "$media:layered_image",
+        "label": "$string:PhoneAbility_label",
+        "startWindowIcon": "$media:startIcon",
+        "startWindowBackground": "$color:start_window_background",
+        "exported": true,
+        "skills": [
+          {
+            "entities": [
+              "entity.system.home"
+            ],
+            "actions": [
+              "action.system.home"
+            ]
+          }
+        ]
+      }
+    ],
+    "metadata": [
+      {
+        "name": "client_id",
+// todo
+        "value": "******"
+      }
+    ],
+    "extensionAbilities": [
+      {
+        "name": "PhoneBackupAbility",
+        "srcEntry": "./ets/phonebackupability/PhoneBackupAbility.ets",
+        "type": "backup",
+        "exported": false,
+        "metadata": [
+          {
+            "name": "ohos.extension.backup",
+            "resource": "$profile:backup_config"
+          }
+        ]
+      },
+      {
+        "name": "PhoneFormAbility",
+        "srcEntry": "./ets/phoneformability/PhoneFormAbility.ets",
+        "label": "$string:PhoneFormAbility_label",
+        "description": "$string:PhoneFormAbility_desc",
+        "type": "form",
+        "metadata": [
+          {
+            "name": "ohos.extension.form",
+            "resource": "$profile:form_config"
+          }
+        ]
+      }
+    ]
+  }
+}

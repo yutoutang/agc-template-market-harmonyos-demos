@@ -6,11 +6,13 @@ import { appRouter, deepEqual, NavRouterActionType, navStackActionOptions } from
 import '@agctemplate/resources';
 import '@agctemplate/login';
 import { getMedia, getString, NAV_PAGE_NAME } from '@agctemplate/resources';
+import { AwardMainPageBuilder } from '@agctemplate/award';
+import { FavorMainPageBuilder } from '@agctemplate/favor';
 
 @Entry
 @ComponentV2
 struct Index {
-  navPathStack: NavPathStack = new NavPathStack();
+  @Provider('navStack') navPathStack: NavPathStack = new NavPathStack();
   navStackAction: (actionType: NavRouterActionType, options: navStackActionOptions) => boolean =
     (actionType: NavRouterActionType, options: navStackActionOptions) => {
       switch (actionType) {
@@ -49,7 +51,7 @@ struct Index {
     appRouter.setNavPathStack(this.navPathStack);
     this.initMainPageContent();
     appRouter.push({
-      builderName: NAV_PAGE_NAME.MainTabPage.name
+      builderName: NAV_PAGE_NAME.LaunchPage.name
     })
   }
 
@@ -73,6 +75,16 @@ struct Index {
         getMedia('app.media.theater_select'), getMedia('app.media.theater_unselect'),
         getMedia('app.media.theater_unselect_dark')),
       tabContentBuilder: wrapBuilder(TheaterMainPageBuilder)
+    }, {
+      tabHeaderInfo: new TabHeaderInfo(getString('app.string.award'), false,
+        getMedia('app.media.award_select'), getMedia('app.media.award_unselect'),
+        getMedia('app.media.award_unselect_dark')),
+      tabContentBuilder: wrapBuilder(AwardMainPageBuilder)
+    }, {
+      tabHeaderInfo: new TabHeaderInfo(getString('app.string.favor'), false,
+        getMedia('app.media.favor_select'), getMedia('app.media.favor_unselect'),
+        getMedia('app.media.favor_unselect_dark')),
+      tabContentBuilder: wrapBuilder(FavorMainPageBuilder)
     }, {
       tabHeaderInfo: new TabHeaderInfo(getString('app.string.mine'), false,
         getMedia('app.media.mine_select'), getMedia('app.media.mine_unselect'),

@@ -17,8 +17,6 @@ export interface UserInfo {
   avatar: string;
   name: string;
   nickname: string;
-  sex: string;
   cellphone: string;
-  birthday: string;
-  memberInfo: MemberInfo;
+  memberInfo?: MemberInfo;
 }

@@ -1,8 +1,7 @@
 import { AppStorageV2, promptAction } from '@kit.ArkUI';
-import { dayList, getTimeList, gridList, payMethodList, timeList } from '../constants';
+import { paymentService } from '@kit.PaymentKit';
 import { BusinessError, emitter } from '@kit.BasicServicesKit';
 import { common } from '@kit.AbilityKit';
-import { ITime } from '../types';
 import {
   Coupon,
   getCompanyList,
@@ -10,7 +9,6 @@ import {
   getEstimatedPrice,
   getOrderInfo,
   getServicePointList,
-  IAddrInfo,
   ICompany,
   IGoods,
   IOrderInfo,
@@ -24,12 +22,24 @@ import {
   ShippingMethod,
   updateOrder,
   UpdateOrderRequest,
-  UserInfo
 } from 'lib_foundation';
-import { RouterMap, getAddressData, sendAddressData, IParam, ISetting, Logger } from 'module_base';
-import { AddrList } from 'module_address';
+import {
+  RouterMap,
+  getAddressData,
+  sendAddressData,
+  IParam,
+  ISetting,
+  Logger,
+  UserInfo,
+  IAddrInfo,
+  payMethodList,
+  gridList,
+  timeList,
+} from 'module_base';
 import { TemplateList } from 'module_template';
-import { paymentService } from '@kit.PaymentKit';
+import { getDefaultAddress } from 'module_address'
+import { dayList, getTimeList } from '../constants';
+import { ITime } from '../types';
 
 @ObservedV2
 export class ExpressPageVM {
@@ -37,13 +47,6 @@ export class ExpressPageVM {
   context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
   @Trace isLogin: boolean = false
   @Trace userInfo: UserInfo = AppStorageV2.connect(UserInfo, () => new UserInfo())!;
-  @Trace addrList: AddrList = AppStorageV2.connect(AddrList, () => new AddrList())!;
-
-  @Monitor('addrList.list')
-  onAddrChange(monitor: IMonitor) {
-    const list = monitor.value()?.now as IAddrInfo[];
-  }
-
   @Trace tempList: TemplateList = AppStorageV2.connect(TemplateList, () => new TemplateList())!;
 
   @Monitor('tempList.list')
@@ -181,13 +184,12 @@ export class ExpressPageVM {
     this.selectedTimeIndex = this.getSelectedIndex(this.tempTime, this.timePickerList)
     this.selectedDayIndex = this.getSelectedSettingIndex(this.tempDay, dayList)
     this.price = this.orderInfo.price.toString()
-    const sender = await this.getAddressInfo(this.orderInfo.sendAddress.id)
-    if (sender) {
-      this.sendAddress = sender as IAddrInfo
-    }
-    const recipient = await this.getAddressInfo(this.orderInfo.getAddress.id)
-    if (recipient) {
-      this.getAddress = recipient as IAddrInfo
+  }
+
+  public async getDefaultAddress() {
+    const res = await getDefaultAddress()
+    if (res) {
+      this.sendAddress = res as IAddrInfo
     }
   }
 
@@ -211,16 +213,6 @@ export class ExpressPageVM {
     return 0
   }
 
-  public async getAddressInfo(id: number) {
-    const people = this.addrList.list.find((item) => {
-      return item.id === id
-    })
-    if (people) {
-      return people
-    }
-    return undefined
-  }
-
   public async getCompanyList() {
     const res = await getCompanyList()
     this.companyList = res;
@@ -231,23 +223,13 @@ export class ExpressPageVM {
 
   public async getCouponList() {
     const res = await getCouponList()
-    this.couponList = res
-  }
-
-  public async getDefaultAddress() {
-    const address = this.addrList.list.find((item) => {
-      return item.isDefault === true
-    })
-    if (address) {
-      this.sendAddress = {
-        id: address.id,
-        name: address.name,
-        cellphone: address.cellphone,
-        province: address.province,
-        city: address.city,
-        area: address.area,
-        detailAddress: address.detailAddress,
-        isDefault: address.isDefault,
+    if (this.userInfo.couponList.length !== 0) {
+      for (let id of this.userInfo.couponList) {
+        for (let coupon of res) {
+          if (coupon.id === id) {
+            this.couponList.push(coupon)
+          }
+        }
       }
     }
   }
@@ -265,7 +247,7 @@ export class ExpressPageVM {
       goods: {} as IGoods,
       shippingMethod: 1,
       paymentMethod: 1,
-      weight: 1
+      weight: 1,
     }
     this.templateList.unshift(temp)
     this.selectedTemplateId = 0
@@ -281,20 +263,26 @@ export class ExpressPageVM {
     this.selectedTemplateId = template.id
     if (this.selectedTemplateId === 0) {
       this.getAddress = {
-        id: 0,
-        name: '请填写收件人信息',
-        cellphone: '',
-        province: '支持智能识别文字与图片中的地址',
+        id: '',
+        name: '',
+        phone: '',
+        countryCode: '',
+        country: '',
+        province: '',
         city: '',
-        area: '',
-        detailAddress: '',
+        district: '',
+        street: '',
+        detail: '',
         isDefault: false,
+        createdAt: 0,
+        updatedAt: 0,
       }
       this.selectedGoods = undefined
       this.goodsName = ''
       this.selectedPayMethod = ''
       this.tempPayMethod = ''
       this.price = '--'
+      this.getDefaultAddress()
     } else {
       this.sendAddress = template.sendAddress
       this.getAddress = template.getAddress
@@ -322,7 +310,7 @@ export class ExpressPageVM {
   }
 
   checkAddress(): boolean {
-    if (!this.sendAddress.cellphone || !this.getAddress.cellphone) {
+    if (!this.sendAddress.phone || !this.getAddress.phone) {
       promptAction.showToast({ message: '请先填写地址！', alignment: Alignment.Center, duration: 2000 });
       return false
     }
@@ -340,7 +328,7 @@ export class ExpressPageVM {
   }
 
   public checkParam(): boolean {
-    if (!this.sendAddress.cellphone || !this.getAddress.cellphone) {
+    if (!this.sendAddress.phone || !this.getAddress.phone) {
       return false;
     }
     if (!this.selectedGoods) {
@@ -385,7 +373,7 @@ export class ExpressPageVM {
       couponId: this.selectedCoupon?.id,
       servicePointId: this.selectedServicePoint?.id,
       grid: this.selectedGrid,
-      shippingMethod: ShippingMethod.SELF_SENDING
+      shippingMethod: ShippingMethod.SELF_SENDING,
     }
     if (this.selectedMethod === 1) {
       data.shippingMethod = ShippingMethod.PICK_UP_AT_HOME
@@ -424,7 +412,7 @@ export class ExpressPageVM {
         const timer = setTimeout(() => {
           RouterModule.push({
             url: RouterMap.EDIT_ORDER_PAGE,
-            param: res.timestamp
+            param: res.timestamp,
           });
           this.clear()
           RouterModule.stack.removeByName(RouterMap.EXPRESS_PAGE)
@@ -432,8 +420,8 @@ export class ExpressPageVM {
         });
         let order: emitter.EventData = {
           data: {
-            isFresh: true
-          }
+            isFresh: true,
+          },
         };
         emitter.emit('order', order);
       });
@@ -446,10 +434,10 @@ export class ExpressPageVM {
     const data: UpdateOrderRequest = {
       id: this.orderInfo.id,
     }
-    if (this.sendAddress.id !== 0) {
+    if (this.sendAddress.id) {
       data.sendAddress = this.sendAddress
     }
-    if (this.getAddress.id !== 0) {
+    if (this.getAddress.id) {
       data.getAddress = this.getAddress
     }
     if (this.selectedGoods) {

@@ -7,14 +7,13 @@ export function MyOrderBuilder() {
   MyOrder()
 }
 
-@Component
+@ComponentV2
 export struct MyOrder {
   vm: RouteEntryVM = RouteEntryVM.instance;
-  @State orderSetItems: Array<OrderSet> = []
+  @Local orderSetItems: Array<OrderSet> = []
 
   aboutToAppear(): void {
     this.initDataSource()
-    console.log('============' + JSON.stringify(this.orderSetItems))
   }
 
   initDataSource() {
@@ -31,12 +30,13 @@ export struct MyOrder {
             .layoutWeight(1)
         }
         .width('100%')
-        .backgroundImageSize(ImageSize.Auto)
-        .backgroundColor('#F1F3F5')
       }
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
       .scrollable(ScrollDirection.Vertical)
+      .edgeEffect(EdgeEffect.Spring)
       .scrollBar(BarState.Auto)
       .scrollBarWidth('0vp')
+      .backgroundColor('#F1F3F5')
     }
     .hideTitleBar(false)
     .title('我的订单')

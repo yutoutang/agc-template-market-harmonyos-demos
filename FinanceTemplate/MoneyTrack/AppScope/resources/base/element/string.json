@@ -6,7 +6,7 @@
     },
     {
       "name": "agcit_huawei_money_track",
-      "value": "1.0.0"
+      "value": "1.0.1"
     },
     {
       "name": "agcittype_huawei_money_track",
@@ -14,7 +14,7 @@
     },
     {
       "name": "agcitkid_huawei_money_track",
-      "value": "agcit_huawei_money_track_asset_card/1.0.0,agcit_huawei_money_track_asset_manage/1.0.0,agcit_huawei_money_track_bill_card/1.0.0,agcit_huawei_money_track_bill_chart/1.0.0,agcit_huawei_money_track_bill_manage/1.0.0"
+      "value": "agcit_huawei_money_track_asset_card/1.0.1,agcit_huawei_money_track_asset_manage/1.0.1,agcit_huawei_money_track_bill_card/1.0.0,agcit_huawei_money_track_bill_chart/1.0.0,agcit_huawei_money_track_bill_manage/1.0.1"
     }
   ]
 }

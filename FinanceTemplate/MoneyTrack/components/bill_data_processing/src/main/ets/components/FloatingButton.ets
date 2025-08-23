@@ -14,6 +14,10 @@ export struct FloatingButton {
   @Local curLeft: number = 0;
   //当前悬浮按钮距离窗口顶部距离
   @Local curTop: number = 0;
+  // 按钮距离屏幕左边的最大距离
+  @Local maxLeft: number = 0;
+  // 按钮距离屏幕顶部的最大距离
+  @Local maxTop: number = 0;
   // 窗口
   @Local
   windowClass: window.Window | undefined = undefined;
@@ -93,8 +97,12 @@ export struct FloatingButton {
     this._winHeight = px2vp(windowProperties.windowRect.height);
 
     //设置初始位置位于屏幕右下角，演示设置可根据实际调整
-    this.curLeft = this._winWidth * 0.75;
-    this.curTop = this._winHeight * 0.75;
+    const minRight = Math.max(24, this._winWidth * 0.20);
+    const minBottom = Math.max(100, this._winHeight * 0.30);
+    this.maxLeft = this._winWidth - minRight;
+    this.maxTop = this._winHeight - minBottom;
+    this.curLeft = this.maxLeft;
+    this.curTop = this.maxTop;
 
   }
 
@@ -111,10 +119,10 @@ export struct FloatingButton {
       let curLeft = this._startLeft + (touch.windowX - this._startX);
       //限制悬浮球移动范围
       curLeft = Math.max(0, curLeft);
-      this.curLeft = Math.min(this._winWidth * 0.75, curLeft);
+      this.curLeft = Math.min(this.maxLeft, curLeft);
       let curTop = this._startTop + (touch.windowY - this._startY);
       curTop = Math.max(0, curTop);
-      this.curTop = Math.min(this._winHeight * 0.75, curTop);
+      this.curTop = Math.min(this.maxTop, curTop);
     }
   }
 }

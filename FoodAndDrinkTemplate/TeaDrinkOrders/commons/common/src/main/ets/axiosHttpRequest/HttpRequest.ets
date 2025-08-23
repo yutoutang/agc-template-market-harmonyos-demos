@@ -2,13 +2,13 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import {
   AddressInfo,
   BaseResponse,
-  CarGoodInfo,
+  CarGoodsInfo,
   CouponResp,
   DishesType,
-  Good,
-  GoodSpec,
-  GoodSpecInfo,
-  GoodSpecVal,
+  Goods,
+  GoodsSpec,
+  GoodsSpecInfo,
+  GoodsSpecVal,
   MyCar,
   MyCoupon,
   MyOrderInfo,
@@ -17,11 +17,11 @@ import {
   UserInfo,
 } from '../models/ResponseModel';
 import * as HttpRequestApi from '../axiosHttpRequest/HttpRequestApi';
-import { AddDnOrderReq, GoodReq } from '../models/RequestModel';
+import { AddDnOrderReq, GoodsReq } from '../models/RequestModel';
 import { AppStorageV2, promptAction } from '@kit.ArkUI';
 import { paymentService } from '@kit.PaymentKit';
 import { common } from '@kit.AbilityKit';
-import { HttpCode, OrderTypeEnum } from '../constants/Common';
+import { HttpCode } from '../constants/Common';
 import { MyCarModel, StoreInfoModel, UserInfoModel } from '../models/StorageModel';
 
 export function getCancelLogin(): Promise<UserInfo> {
@@ -122,29 +122,29 @@ export function getMyCoupons(): Promise<Array<MyCoupon>> {
   })
 }
 
-export function getGoodInfo(goodId: string = ''): Promise<Good> {
+export function getGoodsInfo(goodsId: string = ''): Promise<Goods> {
   return new Promise((resolve, reject) => {
-    if (!goodId) {
-      console.error(`getGoodInfo error. GoodId is empty: ${JSON.stringify(goodId)}.`);
-      reject(`getGoodInfo error. GoodId is empty: ${JSON.stringify(goodId)}.`)
+    if (!goodsId) {
+      console.error(`getGoodsInfo error. GoodsId is empty: ${JSON.stringify(goodsId)}.`);
+      reject(`getGoodsInfo error. GoodsId is empty: ${JSON.stringify(goodsId)}.`)
       return
     }
-    HttpRequestApi.getGoodInfo(goodId).then((resp: Good) => {
+    HttpRequestApi.getGoodsInfo(goodsId).then((resp: Goods) => {
       if (resp) {
-        let good: Good = resp
-        good.id = resp.id
-        good.name = resp.name
-        good.logo = resp.logo
-        good.bigImg = resp.bigImg
-        good.money = resp.money
-        good.content = resp.content
-        good.sales = resp.sales
-        good.specType = resp.specType
-        good.details = resp.details
-        good.num = resp.num
-        good.spec = resp.spec?.map((item: GoodSpec) => {
-          let specVal = item.specVal.map((specInfo: GoodSpecVal) => {
-            let temp = new GoodSpecVal()
+        let goods: Goods = resp
+        goods.id = resp.id
+        goods.name = resp.name
+        goods.logo = resp.logo
+        goods.bigImg = resp.bigImg
+        goods.money = resp.money
+        goods.content = resp.content
+        goods.sales = resp.sales
+        goods.specType = resp.specType
+        goods.details = resp.details
+        goods.num = resp.num
+        goods.spec = resp.spec?.map((item: GoodsSpec) => {
+          let specVal = item.specVal.map((specInfo: GoodsSpecVal) => {
+            let temp = new GoodsSpecVal()
             temp.specValId = specInfo.specValId
             temp.specValName = specInfo.specValName
             temp.specValLogo = specInfo.specValLogo
@@ -154,18 +154,18 @@ export function getGoodInfo(goodId: string = ''): Promise<Good> {
             temp.logo = specInfo.logo
             return temp
           })
-          return new GoodSpec(item.specId, item.specName, item.specValId, specVal)
+          return new GoodsSpec(item.specId, item.specName, item.specValId, specVal)
         }) ?? []
-        good.boxMoney = resp.boxMoney
+        goods.boxMoney = resp.boxMoney
         resolve(resp)
-        console.info(`getGoodInfo resp:${JSON.stringify(resp)}.`);
+        console.info(`getGoodsInfo resp:${JSON.stringify(resp)}.`);
       } else {
-        console.error(`getGoodInfo error: ${JSON.stringify(resp)}.`);
+        console.error(`getGoodsInfo error: ${JSON.stringify(resp)}.`);
         reject(resp)
       }
     })
       .catch((e: BusinessError) => {
-        console.error(`getGoodSpec error: ${JSON.stringify(e)}.`);
+        console.error(`getGoodsInfo error: ${JSON.stringify(e)}.`);
         reject(e)
       })
   })
@@ -178,7 +178,7 @@ export function getMyCar(): Promise<MyCar> {
         console.info(`getMyCar resp:${JSON.stringify(resp)}.`);
         let myCar: MyCarModel = AppStorageV2.connect(MyCarModel, () => new MyCarModel())!
         myCar.myCar = resp
-        myCar.carCheck = myCar.carCheck.filter(item => myCar.myCar.carGoods.some(carGood => carGood.id === item))
+        myCar.carCheck = myCar.carCheck.filter(item => myCar.myCar.carGoods.some(carGoods => carGoods.id === item))
         resolve(resp)
       } else {
         console.error(`getMyCar error: ${JSON.stringify(resp)}.`);
@@ -192,14 +192,15 @@ export function getMyCar(): Promise<MyCar> {
   })
 }
 
-export function addCarSpec(selectSpecInfo: GoodSpecInfo, goodId: string | undefined, num: number = 1): Promise<string> {
+export function addCarSpec(selectSpecInfo: GoodsSpecInfo, goodsId: string | undefined,
+  num: number = 1): Promise<string> {
   return new Promise((resolve, reject) => {
-    if (!goodId) {
-      console.error(`addCarSpecUtil error.goodId is empty.`);
-      reject(`addCarSpecUtil error.goodId is empty.`)
+    if (!goodsId) {
+      console.error(`addCarSpecUtil error.goodsId is empty.`);
+      reject(`addCarSpecUtil error.goodsId is empty.`)
       return
     }
-    HttpRequestApi.addCarBySpec(goodId, selectSpecInfo, num).then((resp: BaseResponse<string | undefined>) => {
+    HttpRequestApi.addCarBySpec(goodsId, selectSpecInfo, num).then((resp: BaseResponse<string | undefined>) => {
       if (resp.code === HttpCode.SUCCESS && resp.data) {
         console.info(`addCarSpecUtil resp:${JSON.stringify(resp)}.`);
         getMyCar()
@@ -235,24 +236,24 @@ export function updateMyCar(carId: string, num: number): Promise<number> {
   })
 }
 
-export function addDnOrder(list: Array<CarGoodInfo>, params: AddDnOrderReq, storeInfo: StoreInfo,
+export function addDnOrder(list: Array<CarGoodsInfo>, params: AddDnOrderReq, storeInfo: StoreInfo,
   selectAddress: AddressInfo): Promise<number> {
   return new Promise((resolve, reject) => {
     let userInfo: UserInfoModel = AppStorageV2.connect(UserInfoModel, () => new UserInfoModel())!;
     let storeStorage: StoreInfoModel = AppStorageV2.connect(StoreInfoModel, () => new StoreInfoModel())!;
-    let sz = list?.map((carGood: CarGoodInfo) => {
+    let sz = list?.map((carGoods: CarGoodsInfo) => {
       return {
-        id: carGood.id,
-        goodId: carGood.goodId,
-        img: carGood.logo,
-        money: carGood.money,
-        name: carGood.name,
-        num: carGood.num,
-        spec: carGood.spec,
-        specType: carGood.specType,
-        combination: carGood.combination,
-      } as GoodReq
-    }) as Array<GoodReq>
+        id: carGoods.id,
+        goodsId: carGoods.goodsId,
+        img: carGoods.logo,
+        money: carGoods.money,
+        name: carGoods.name,
+        num: carGoods.num,
+        spec: carGoods.spec,
+        specType: carGoods.specType,
+        combination: carGoods.combination,
+      } as GoodsReq
+    }) as Array<GoodsReq>
     let req = {
       userId: userInfo.userInfo.id,
       storeId: storeStorage.storeId,
@@ -269,7 +270,7 @@ export function addDnOrder(list: Array<CarGoodInfo>, params: AddDnOrderReq, stor
       yhqMoney: params.yhqMoney ?? '0',
       couponId: params.couponId,
       orderType: params.orderType,
-      boxMoney: params.orderType === OrderTypeEnum.TAKEAWAY_DELIVERY ? 0 : params.boxMoney,
+      boxMoney: params.orderType === 1 ? 0 : params.boxMoney,
       bagMoney: params.bagMoney,
       storeName: storeInfo.name,
       address: storeInfo.address,
@@ -343,24 +344,24 @@ export function getDishesList(): Promise<Array<DishesType>> {
   })
 }
 
-export function getGoodSpec(goodId: string = '', selectSpecArr: PackageSpec[]): Promise<GoodSpecInfo> {
+export function getGoodsSpec(goodsId: string = '', selectSpecArr: PackageSpec[]): Promise<GoodsSpecInfo> {
   return new Promise((resolve, reject) => {
-    if (!goodId || !selectSpecArr) {
-      console.error(' GoodId or selectSpecArr is empty!');
-      reject(' GoodId or selectSpecArr is empty!')
+    if (!goodsId || !selectSpecArr) {
+      console.error(' GoodsId or selectSpecArr is empty!');
+      reject(' GoodsId or selectSpecArr is empty!')
       return
     }
-    HttpRequestApi.getGoodSpec(goodId, selectSpecArr).then((resp: BaseResponse<GoodSpecInfo>) => {
+    HttpRequestApi.getGoodsSpec(goodsId, selectSpecArr).then((resp: BaseResponse<GoodsSpecInfo>) => {
       if (resp.code === HttpCode.SUCCESS) {
-        console.info(`getGoodSpec resp:${JSON.stringify(resp)}.`);
+        console.info(`getGoodsSpec resp:${JSON.stringify(resp)}.`);
         resolve(resp.data)
       } else {
-        console.error(`getGoodSpec error: ${JSON.stringify(resp)}.`);
+        console.error(`getGoodsSpec error: ${JSON.stringify(resp)}.`);
         reject(resp)
       }
     })
       .catch((e: BusinessError) => {
-        console.error(`getGoodSpec error: ${JSON.stringify(e)}.`);
+        console.error(`getGoodsSpec error: ${JSON.stringify(e)}.`);
         reject(e)
       })
   })

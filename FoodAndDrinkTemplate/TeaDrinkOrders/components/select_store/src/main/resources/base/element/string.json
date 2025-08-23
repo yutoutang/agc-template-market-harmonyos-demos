@@ -1,0 +1,48 @@
+{
+  "string": [
+    {
+      "name": "search",
+      "value": "搜索"
+    },
+    {
+      "name": "collapse_map",
+      "value": "收起地图"
+    },
+    {
+      "name": "expand_map",
+      "value": "展开地图"
+    },
+    {
+      "name": "can_takeaways",
+      "value": "可外带"
+    },
+    {
+      "name": "wait_num_pre",
+      "value": "预计等待 "
+    },
+    {
+      "name": "wait_num_post",
+      "value": "杯"
+    },
+    {
+      "name": "make_now",
+      "value": "现在下单，立即制作"
+    },
+    {
+      "name": "store_open_time",
+      "value": "营业时间："
+    },
+    {
+      "name": "store_address_error",
+      "value": "商户地址错误！"
+    },
+    {
+      "name": "agcit_huawei_tea_drink_orders_select_store",
+      "value": "1.0.0"
+    },
+    {
+      "name": "agcittype_huawei_tea_drink_orders_select_store",
+      "value": "serviceComponent"
+    }
+  ]
+}

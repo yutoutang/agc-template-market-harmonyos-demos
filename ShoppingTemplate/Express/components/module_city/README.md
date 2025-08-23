@@ -3,8 +3,8 @@
 ## 目录
 
 - [简介](#简介)
-- [前提](#前提)
-- [使用](#使用)
+- [约束与限制](#约束与限制)
+- [快速入门](#快速入门)
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
@@ -14,48 +14,139 @@
 
 <img src="screenshots/city.png" width="300">
 
-## 前提
+## 约束与限制
 
-## 使用
+### 环境
+
+* DevEco Studio版本：DevEco Studio 5.0.0 Release及以上
+* HarmonyOS SDK版本：HarmonyOS 5.0.0 Release SDK及以上
+* 设备类型：华为手机（包括双折叠和阔折叠）
+* 系统版本：HarmonyOS 5.0.0(12) 及以上
+
+### 权限
+
+无
+
+## 快速入门
 
 1. 安装组件。
 
-   由于城市选择组件依赖module_city组件，所以需要将模板根目录的components下
-   [module_city](../module_city)目录拷贝至您的工程相应目录，并添加依赖。
+   如果是在DevEvo Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
 
-```
-"dependencies": {
-  "module_city": "file:../module_city"
-}
-```
+   如果是从生态市场下载组件，请参考以下步骤安装组件。
+
+   a. 解压下载的组件包，将包中所有文件夹拷贝至您工程根目录的XXX目录下。
+
+   b. 在项目根目录build-profile.json5添加module_city和module_base模块。
+
+    ```
+    // 在项目根目录build-profile.json5填写module_city路径。其中XXX为组件存放的目录名
+    "modules": [
+        {
+        "name": "module_city",
+        "srcPath": "./XXX/module_city",
+        }
+    ]
+    ```
+   c. 在项目根目录oh-package.json5中添加依赖。
+    ```
+    // XXX为组件存放的目录名称
+    "dependencies": {
+      "module_city": "file:./XXX/module_city"
+    }
+    ```
+
+2. 调用组件，详细参数配置说明参见[API参考](#API参考)。
+   ```
+   // 使用时请将src/main/resources/rawfile/regioin.json文件放在项目的rawfile文件夹
+   import { CommonCascade } from 'module_city'
+   @Entry
+   @ComponentV2
+   struct Sample {
+     stack = new NavPathStack()
+     build() {
+       Navigation(this.stack) {
+         Row() {
+           Text('地址')
+             .fontSize(16)
+             .width('20%')
+           CommonCascade({
+             province: '江苏省',
+             city: '南京市',
+             area: '雨花台区',
+           })
+         }
+         .width('100%')
+         .height(40)
+         .backgroundColor(Color.White)
+         .padding({ left: 16, right: 16 })
+         .borderRadius(16)
+       }
+       .hideTitleBar(true)
+       .backgroundColor('#F1F3F5')
+     }
+   }
+   ```
 
 ## API参考
 
-| <div style="width:200px" align="left">参数</div> | <div style="width:200px" align="left">类型</div> | <div style="width:80px" align="left">必填</div> | <div style="width:200px" align="left">说明</div> |
-|:-----------------------------------------------|:-----------------------------------------------|:----------------------------------------------|:-----------------------------------------------|
-| province                                       | string                                         | 否                                             | 省                                              |
-| city                                           | string                                         | 否                                             | 市                                              |
-| area                                           | string                                         | 否                                             | 区                                              |
+### 子组件
+无
+### 接口
 
-| <div style="width:200px" align="left">事件</div> | <div style="width:200px" align="left">类型</div> | <div style="width:200px" align="left">说明</div> |
+CommonCascade(option: CommonCascadeOptions)
+
+城市选择组件。
+
+**参数：**
+
+| 参数名  | 类型                                              | 是否必填 | 说明                 |
+| ------- |-------------------------------------------------|------| -------------------- |
+| options | [CommonCascadeOptions](#CommonCascadeOptions对象说明) | 否    | 配置城市选组件的参数。 |
+
+### CommonCascadeOptions对象说明
+
+| 参数 | 类型 | 是否必填 | 说明 |
+|:-----------------------------------------------|:-----------------------------------------------|:------------------------------------------------|:-----------------------------------------------|
+| province                                       | string                                         | 否                                               | 省                                              |
+| city                                           | string                                         | 否                                               | 市                                              |
+| area                                           | string                                         | 否                                               | 区                                              |
+
+### onChange事件说明
+
+| 事件 | 类型 | 说明 |
 |:-----------------------------------------------|:-----------------------------------------------|:-----------------------------------------------|
 | onChange                                       | (data: string[]) => void                       | 获取更改后的数据                                       |
 
 ## 示例代码
 
 ```
+// 使用时请将src/main/resources/rawfile/regioin.json文件放在项目的rawfile文件夹
+import { CommonCascade } from 'module_city'
 @Entry
 @ComponentV2
 struct Sample {
+  stack = new NavPathStack()
   build() {
     Navigation(this.stack) {
-      CommonCascade({
-        province: '江苏',
-        city: '南京',
-        area: '雨花台区',
-      })
+      Row() {
+        Text('地址')
+          .fontSize(16)
+          .width('20%')
+        CommonCascade({
+          province: '江苏省',
+          city: '南京市',
+          area: '雨花台区',
+        })
+      }
+      .width('100%')
+      .height(40)
+      .backgroundColor(Color.White)
+      .padding({ left: 16, right: 16 })
+      .borderRadius(16)
     }
     .hideTitleBar(true)
+    .backgroundColor('#F1F3F5')
   }
 }
 ```

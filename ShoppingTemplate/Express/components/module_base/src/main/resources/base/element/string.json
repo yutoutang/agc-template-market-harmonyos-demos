@@ -5,12 +5,12 @@
       "value": "page from package"
     },
     {
-      "name": "agcit_huawei_express_template_module_base",
+      "name": "agcit_huawei_express_template",
       "value": "1.0.0"
     },
     {
-      "name": "agcittype_huawei_express_template_module_base",
-      "value": "serviceComponent"
+      "name": "agcit_huawei_express",
+      "value": "1.0.1"
     }
   ]
 }

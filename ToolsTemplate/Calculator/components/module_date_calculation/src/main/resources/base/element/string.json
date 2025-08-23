@@ -11,6 +11,14 @@
     {
       "name": "agcittype_huawei_calculator_module_date_calculation",
       "value": "serviceComponent"
+    },
+    {
+      "name": "agcit_huawei_calculator_date_calculation",
+      "value": "1.0.1"
+    },
+    {
+      "name": "agcittype_huawei_calculator_date_calculation",
+      "value": "serviceComponent"
     }
   ]
 }

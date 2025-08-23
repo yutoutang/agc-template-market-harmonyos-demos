@@ -4,8 +4,7 @@
     "type": "har",
     "installationFree": true,
     "deviceTypes": [
-      "default",
-      "tablet"
+      "default"
     ],
     "requestPermissions": [
       {

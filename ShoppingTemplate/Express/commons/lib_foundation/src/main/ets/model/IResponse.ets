@@ -1,3 +1,4 @@
+import { IAddrInfo } from 'module_base';
 import { ExpressStatus, OrderStatus, OrderType, PaymentMethod, ShippingMethod } from '../common/Constant';
 
 /**
@@ -52,8 +53,6 @@ export interface IOrder {
   price: number,
   sendAddress: IAddrInfo,
   getAddress: IAddrInfo,
-  sendCity: string,
-  getCity: string,
   shippingMethod: ShippingMethod,
   goods: IGoods,
   day: string,
@@ -137,26 +136,15 @@ export interface IPrepay {
   timestamp: string;
 }
 
-// 寄件/收件人地址信息
-export interface IAddrInfo {
-  id: number,
-  name: string,
-  cellphone: string,
-  province: string,
-  city: string,
-  area: string,
-  detailAddress: string,
-  isDefault: boolean
-}
-
 export interface IAddrInfoDetail {
-  id: number,
+  id: string,
   name: string,
   cellphone: string,
   province: string,
   city: string,
-  area: string,
-  detailAddress: string,
+  district: string,
+  street: string,
+  detail: string,
   isDefault: boolean,
   orderType: OrderType
 }
@@ -172,4 +160,9 @@ export interface ITemplate {
   paymentMethod: number,
   weight: number,
   time?: string,
+}
+
+export interface IAddressParam {
+  type: OrderType,
+  address: IAddrInfo,
 }

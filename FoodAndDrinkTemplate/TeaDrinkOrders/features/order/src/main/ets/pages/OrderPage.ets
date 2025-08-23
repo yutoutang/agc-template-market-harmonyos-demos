@@ -1,5 +1,6 @@
 import {
   BusinessTimeDialog,
+  ConfirmOrderRouter,
   Constants,
   DishesType,
   HttpRequest,
@@ -15,8 +16,7 @@ import { CouponComp } from '../components/CouponComp';
 import { GoodsListComp } from '../components/GoodsListComp';
 import { TitleComp } from '../components/TitleComp';
 import { AppStorageV2 } from '@kit.ArkUI';
-import { MyCarListComp } from '../components/MyCarListComp';
-import { MyCarComp } from '../components/MyCarComp';
+import { CarGoodsInfo, ShoppingCart } from 'shopping_cart';
 
 @Builder
 export function OrderPageBuilder() {
@@ -85,7 +85,78 @@ struct OrderPage {
         }
       }
     }
+  }
 
+  build() {
+    NavDestination() {
+      Stack() {
+        Column() {
+          TitleComp()
+          CouponComp()
+          GoodsListComp().layoutWeight(1)
+        }
+        .height(Constants.FULL_SIZE)
+        .width(Constants.FULL_SIZE);
+
+        // 购物车
+        ShoppingCart({
+          myCar: this.myCarModel.myCar,
+          carCheck: this.myCarModel.carCheck,
+          isRest: this.storeModel.storeInfo.isRest || this.isRest,
+          clearCarCb: () => {
+            this.clearCarCb()
+          },
+          updateCarCb: (id: string, num: number) => {
+            this.updateCarCb(id, num)
+          },
+          goConfirmOrderCb: (carGoodsSelect: Array<CarGoodsInfo>) => {
+            this.goConfirmOrderCb(carGoodsSelect)
+          },
+          changeCarCheck: (id: string, isDelete?: boolean) => {
+            this.changeCarCheck(id, isDelete)
+          },
+        })
+      }.alignContent(Alignment.Bottom);
+    }
+    .hideTitleBar(true);
+  }
+
+  changeCarCheck(id: string, isDelete: boolean = false) {
+    if (isDelete) {
+      this.myCarModel.carCheck = this.myCarModel.carCheck.filter(item => item !== id)
+    } else {
+      this.myCarModel.carCheck.push(id)
+    }
+  }
+
+  updateCarCb(id: string, num: number) {
+    HttpRequest.updateMyCar(id, num)
+  }
+
+  clearCarCb() {
+    HttpRequest.clearCar().then(() => {
+      this.myCarModel.carCheck = []
+    })
+  }
+
+  goConfirmOrderCb(carGoodsSelect: Array<CarGoodsInfo>) {
+    this.pageStack?.pushPathByName(RouterMap.CONFIRM_ORDER_PAGE,
+      { carGoods: carGoodsSelect } as ConfirmOrderRouter)
+  }
+
+  isShowRest() {
+    if (this.storeModel.storeInfo.isRest === Constants.STORE_REST ||
+      new Date().getTime() < this.getTimeByHour(this.storeModel.storeInfo.time1) ||
+      new Date().getTime() > this.getTimeByHour(this.storeModel.storeInfo.time2)) {
+      this.businessHoursAM = `AM ${this.storeModel.storeInfo?.time1}-${Constants.MID_DAY_TIME}`
+      this.businessHoursPM = `PM ${Constants.MID_DAY_TIME}-${this.storeModel.storeInfo?.time2}`
+      if (!this.isRest) {
+        this.businessController?.open();
+      }
+      this.isRest = true
+    } else {
+      this.isRest = false
+    }
   }
 
   changeCarPanel(value = false): void {
@@ -108,47 +179,6 @@ struct OrderPage {
       this.dishesList = res
       this.dishesListOri = JSON.parse(JSON.stringify(res))
     })
-  }
-
-  build() {
-    NavDestination() {
-      Stack() {
-        Column() {
-          TitleComp()
-          CouponComp()
-          GoodsListComp().layoutWeight(1)
-        }
-        .height(Constants.FULL_SIZE)
-        .width(Constants.FULL_SIZE);
-
-        MyCarListComp({
-          changeCarPanel: () => this.changeCarPanel(),
-        }).visibility(this.showCarList ? Visibility.Visible : Visibility.Hidden)
-        // 购物车
-        MyCarComp({
-          isRest: this.storeModel.storeInfo.isRest || this.isRest,
-          showCarList: this.showCarList,
-          changeCarPanel: (value: boolean) => this.changeCarPanel(value),
-        }).visibility(this.myCarModel.myCar.carGoods?.length ? Visibility.Visible : Visibility.Hidden)
-
-      }.alignContent(Alignment.Bottom);
-    }
-    .hideTitleBar(true);
-  }
-
-  isShowRest() {
-    if (this.storeModel.storeInfo.isRest === Constants.STORE_REST ||
-      new Date().getTime() < this.getTimeByHour(this.storeModel.storeInfo.time1) ||
-      new Date().getTime() > this.getTimeByHour(this.storeModel.storeInfo.time2)) {
-      this.businessHoursAM = `AM ${this.storeModel.storeInfo?.time1}-${Constants.MID_DAY_TIME}`
-      this.businessHoursPM = `PM ${Constants.MID_DAY_TIME}-${this.storeModel.storeInfo?.time2}`
-      if (!this.isRest) {
-        this.businessController?.open();
-      }
-      this.isRest = true
-    } else {
-      this.isRest = false
-    }
   }
 
   getTimeByHour(time: string = '') {

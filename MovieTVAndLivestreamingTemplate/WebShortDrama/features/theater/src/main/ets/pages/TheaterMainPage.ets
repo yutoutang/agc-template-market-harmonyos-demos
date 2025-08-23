@@ -1,121 +1,201 @@
-import { getColor, NAV_PAGE_NAME } from '@agctemplate/resources'
-import { appRouter } from '@agctemplate/utils'
+import { getColor } from '@agctemplate/resources'
 import { AppStorageV2, window } from '@kit.ArkUI'
 import { AppStorageKeys, StatusBarHeight } from '@agctemplate/widgets'
 import { DramaCoverVM } from '../viewmodels/DramaCoverVM'
-import { CategoryButtonVM } from '../viewmodels/CategoryButtonVM'
-import { getRankList, getRecommendList } from '../mapper/DramaCoverMapper'
-import { getCategoryButtonList } from '../mapper/CategoryButtonMapper'
-import { getBannerList } from '../mapper/BannerMapper'
-import { DramaInfo } from '@agctemplate/server'
-import { SearchPanel } from '../components/SearchPanel'
-import { BannerPanel } from '../components/BannerPanel'
-import { BillboardPanel } from '../components/BillboardPanel'
-import { RecommendPanel } from '../components/RecommendPanel'
+import { getRecommendList, getVipRecommendList } from '../mapper/DramaCoverMapper'
+import { getBannerList, getVipBannerList } from '../mapper/BannerMapper'
 import { Context } from '@kit.AbilityKit'
+import { UIStickyScroll } from '../components/UIStickyScroll'
+import { NewDrama } from '../views/NewDrama'
+import { VIP } from '../views/VIP'
+import { BillboardPageBuilder } from './BillboardPage'
+import { RecommendPanel } from '../components/RecommendPanel'
+
+const reTabs = ['精选', '古装', '家庭', '年代', '穿越', '职场', '重生', '权谋', '其他']
+const chaTabs = ['热播榜', '飙升榜', '新剧榜', '热搜榜']
 
 @ComponentV2
 struct TheaterMainPage {
   @Local statusBarHeight: StatusBarHeight = AppStorageV2.connect(StatusBarHeight, AppStorageKeys.STATUS_BAR_HEIGHT,
     () => new StatusBarHeight())!;
-  @Local recommendList: Array<DramaCoverVM> = []
+  @Local gutter: number = 10
+  @Local bannerList: Array<DramaCoverVM> = []
+  @Local vipBannerList: Array<DramaCoverVM> = []
   @Local currentRecommendPageNum: number = 1
-  @Local bannerList: Array<string> = []
-  @Local gutter: number = 21
-  @Provider('categoryButtonList') categoryButtonList: Array<CategoryButtonVM> = []
-  @Provider('billboardDramaList') billboardDramaList: Array<DramaCoverVM> = []
-  @Provider('categoryButtonChanged') categoryButtonChanged: Function = async (selectedBtn: CategoryButtonVM) => {
-    this.categoryButtonList.forEach(btn => {
-      btn.isSelected = btn.text === selectedBtn.text
-    })
-    this.billboardDramaList = await getRankList(selectedBtn.text)
+  @Local currentVipPageNum: number = 1
+  @Local headerHeight: number = 56
+  @Local mainHeight: number = 60
+  @Local recommendList: Array<DramaCoverVM> = []
+  @Local vipRecommendList: Array<DramaCoverVM> = []
+  @Local recommendTagList: Array<DramaCoverVM> = []
+  @Provider('fTabs') selectedIndex: number = 0
+  @Provider('sTabs') selIndex: number = 0
+  @Provider('rank') rankTab: string = reTabs[this.selIndex]
+  @Provider('scroll') scroller: Scroller = new Scroller()
+  @Computed
+  get _rankTab(): string {
+    if (this.selectedIndex === 0) {
+      return reTabs[this.selIndex]
+    }
+    if (this.selectedIndex === 1) {
+      return chaTabs[this.selIndex]
+    }
+   return ''
+  }
+
+  @Monitor('_rankTab')
+  change() {
+    this.rankTab = this._rankTab
+    if (this.selectedIndex === 0) {
+      if (this.rankTab === '精选' || this.rankTab === '其他') {
+        this.recommendTagList = this.recommendList
+      } else {
+        this.recommendTagList = this.recommendList.filter(drama => {
+          return drama.tags.includes(this.rankTab);
+        });
+      }
+    }
+  }
+
+  @Monitor('selectedIndex', 'selIndex')
+  idxChange() {
+    this.scroller.scrollToIndex(0)
   }
 
   async initViewData(): Promise<void> {
-    // 分类按钮的显示
-    this.categoryButtonList = await getCategoryButtonList()
-    const selected = this.categoryButtonList.find(btn => btn.isSelected)
-    if (selected) {
-      // 根据选中的分类按钮请求服务端榜单数据
-      this.billboardDramaList = await getRankList(selected.text)
-    }
     // 刷新短剧推荐数据
     this.recommendList = await getRecommendList(1)
+    this.recommendTagList = await getRecommendList(1)
     // 刷新轮播图图片信息
     this.bannerList = await getBannerList()
-  }
-
-  @Builder
-  titleBuilder() {
-    Text(getColor('app.string.theater'))
-      .height('100%')
-      .margin({
-        left: 16
-      })
-      .fontSize(24)
-      .fontWeight(FontWeight.Bold)
-      .fontColor(getColor('app.color.bold_font_color'))
+    this.vipBannerList = await getVipBannerList()
+    this.vipRecommendList = await getVipRecommendList(1)
   }
 
   async aboutToAppear() {
-    // 初始化界面数据
-    this.initViewData()
+    await this.initViewData()
     // 计算优选短剧的间距
     this.gutter = await this.calcRecommendGutter(getContext(this))
   }
 
   async calcRecommendGutter(context: Context): Promise<number> {
-    const padding = 32, coverWidth = 104
+    const padding = 48, coverWidth = 104
     let windowClass = await window.getLastWindow(context)
     let properties = windowClass.getWindowProperties()
     let width = px2vp(properties.windowRect.width)
     let num = Math.floor((width - padding) / coverWidth)
-    return (width - padding - num * coverWidth) / (num - 1)
+    return (width - padding - num * coverWidth) / (num-1)
   }
 
-  onDramaClick(option: DramaCoverVM) {
-    appRouter.push({
-      builderName: NAV_PAGE_NAME.ShortDramaDetailPage.name,
-      params: {
-        dramaInfo: new DramaInfo({ id: option.dramaId }),
-      },
+  @Builder
+  contentBuilder() {
+    List({ scroller: this.scroller }) {
+      if (this.selectedIndex === 0) {
+        RecommendPanel({ recommendList: this.recommendTagList, gutter: this.gutter })
+      } else if (this.selectedIndex === 1) {
+        BillboardPageBuilder(1)
+      } else if (this.selectedIndex === 2) {
+        NewDrama({ bannerList: this.bannerList, recommendList: this.recommendList, gutter: this.gutter })
+      } else {
+        VIP({ bannerList: this.vipBannerList, recommendList: this.vipRecommendList, gutter: this.gutter })
+      }
+    }
+    .borderColor(Color.Red)
+    .padding({ left: 8, right: 8 })
+    .edgeEffect(EdgeEffect.Spring)
+    .scrollBar(BarState.Off)
+    .nestedScroll({
+      scrollForward: NestedScrollMode.PARENT_FIRST,
+      scrollBackward: NestedScrollMode.SELF_FIRST
+    })
+    .onReachEnd(async () => {
+      if (this.selectedIndex === 3) {
+        const list = await getVipRecommendList(++this.currentVipPageNum)
+        this.vipRecommendList = this.vipRecommendList.concat(list)
+      } else if (this.selectedIndex !== 1) {
+        const list = await getRecommendList(++this.currentRecommendPageNum)
+          this.recommendList = this.recommendList.concat(list)
+          if (this.selectedIndex === 0) {
+            if (this.rankTab === '精选' || this.rankTab === '其他') {
+              this.recommendTagList = this.recommendTagList.concat(list)
+            } else {
+              this.recommendTagList = this.recommendList.filter(drama => {
+                return drama.tags.includes(this.rankTab);
+              });
+            }
+        }
+      }
     })
   }
 
-  build() {
-    NavDestination() {
-      Scroll() {
-        Column() {
-          SearchPanel({
-            textController: undefined,
-            searchText: '',
-            searchResult: undefined,
-            isEdit: false,
-            isInput: false
-          })
-          BannerPanel({
-            bannerList: this.bannerList
-          })
-          BillboardPanel({ onDramaClick: this.onDramaClick })
-          RecommendPanel({
-            recommendList: this.recommendList, onDramaClick: this.onDramaClick, gutter: this.gutter
-          })
+  @Builder
+  mainBuilder() {
+    Column() {
+      Row() {
+        Text('剧场')
+          .fontSize(26)
+          .fontWeight(700)
+          .fontColor('#e6000000')
+      }
+      .padding({ left: 16 })
+      .width('100%')
+      .height(56)
+      .justifyContent(FlexAlign.Start)
+      .alignItems(VerticalAlign.Center)
+
+      Flex() {
+        List({ space: 8 }) {
+          ForEach(['推荐','排行榜','新剧','VIP专区'],(title: string, index: number) => {
+            ListItem() {
+              Text(title)
+                .width(76)
+                .height(28)
+                .borderRadius(14)
+                .fontColor(this.selectedIndex === index ? '#fff' : '#e6000000')
+                .backgroundColor(this.selectedIndex === index ? '#EC6E45' : '#0d000000')
+                .fontSize(14)
+                .fontWeight(500)
+                .textAlign(TextAlign.Center)
+                .onClick(() => {
+                  this.selectedIndex = index
+                  this.selIndex = 0
+                })
+            }
+          }, (title: string) => title)
         }
         .width('100%')
+        .height(104)
+        .listDirection(Axis.Horizontal)
+        .scrollBar(BarState.Off)
+        .padding({ top: 10, left: 16 })
       }
-      .width('100%')
-      .height('100%')
-      .padding({
-        left: 16, right: 16
-      })
-      .scrollBar(BarState.Off)
-      .align(Alignment.TopStart)
-      .onReachEnd(async () => {
-        const list = await getRecommendList(++this.currentRecommendPageNum)
-        this.recommendList = this.recommendList.concat(list)
-      })
     }
-    .title(this.titleBuilder())
+    .padding({ top: 9 })
+  }
+
+
+  build() {
+    NavDestination() {
+      Column() {
+        UIStickyScroll({
+          tabList: this.selectedIndex === 0 ? reTabs : this.selectedIndex === 1 ? chaTabs : [],
+          mainHeight: this.mainHeight,
+          headerHeight: this.headerHeight,
+          contentBuilderParam: (): void => {
+            this.contentBuilder()
+          },
+          mainBuilderParam: (): void => {
+            this.mainBuilder()
+          },
+          //main滚动过程触发，ratio为y轴的偏移程度，取为0-1，0为未向上滚动，1为滚动到顶部
+          onProcess: (ratio: number) => {
+          },
+          //滚动到达顶部
+          onReachTop: () => {
+          }
+        })
+      }.backgroundColor('#F1F3F5')
+    }
     .backgroundColor(getColor('app.color.common_background_color'))
     .padding({ top: `${px2vp(this.statusBarHeight.value)}vp` })
   }

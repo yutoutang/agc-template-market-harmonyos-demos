@@ -13,7 +13,7 @@ export default class EntryAbility extends UIAbility {
     windowStage.getMainWindow((err: BusinessError, data) => {
       AppStorage.setOrCreate('windowClass', data);
     });
-    windowStage.loadContent('pages/MainEntry', (err) => {
+    windowStage.loadContent('pages/Index', (err) => {
       if (err.code) {
         Logger.error(TAG, 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');
         return;

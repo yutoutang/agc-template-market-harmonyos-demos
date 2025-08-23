@@ -8,7 +8,7 @@ export function NewsHotspotBuilder() {
   NewsHotspot()
 }
 
-@Component
+@ComponentV2
 export struct NewsHotspot{
   vm: RouteEntryVM = RouteEntryVM.instance;
 

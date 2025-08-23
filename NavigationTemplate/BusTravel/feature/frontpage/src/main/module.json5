@@ -3,7 +3,7 @@
     "name": "frontpage",
     "type": "har",
     "deviceTypes": [
-      "default"
+      "phone"
     ],
     "routerMap": "$profile:route_map"
   }

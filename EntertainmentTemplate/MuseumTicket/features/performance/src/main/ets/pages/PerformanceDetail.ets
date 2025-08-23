@@ -1,6 +1,6 @@
-import { DialogMap, RouterModule, CommonConstants, RouterMap } from 'commonlib';
-import { PerformanceVM } from '../viewModels/PerformanceVM';
+import { CommonConstants, RouterMap, RouterModule } from 'commonlib';
 import { PerformanceNotice } from '../types/Index';
+import { PerformanceVM } from '../viewModels/PerformanceVM';
 
 @Builder
 export function PerformanceDetailBuilder() {
@@ -101,11 +101,11 @@ struct PerformanceDetail {
               }.padding(10);
             };
 
-          }.width('100%').height('calc(100% - 75vp)').scrollBar(BarState.Off);
+          }.width('100%').height('calc(100% - 75vp)').scrollBar(BarState.Off).edgeEffect(EdgeEffect.Spring);
 
           Row() {
             Button('立即购买')
-              .backgroundColor(CommonConstants.FONT_COLOR_GREEN)
+              .backgroundColor('#D1B380')
               .fontWeight(500)
               .fontSize(CommonConstants.FONT_SIZE_L)
               .width('100%')

@@ -10,7 +10,7 @@ export function PurchasePageBuilder() {
 }
 
 @Entry
-@Component
+@ComponentV2
 struct PurchasePage {
   vm: PurchasePageVM = PurchasePageVM.instance
 
@@ -77,7 +77,7 @@ struct PurchasePage {
               top: 14,
               bottom: 16,
               left: 17,
-              right: 17
+              right: 17,
             })
             .margin({ bottom: 28 })
 
@@ -193,8 +193,11 @@ struct PurchasePage {
               .fontSize(10)
               .fontWeight(FontWeight.Regular)
             }
+            .margin({ bottom: 12 })
           }
         }
+        .scrollBar(BarState.Off)
+        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
       }
       .padding({ left: 16, right: 16 })
     }

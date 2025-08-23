@@ -31,6 +31,10 @@
     {
       "name": "widget_display_name",
       "value": "widget"
+    },
+    {
+      "name": "agcit_huawei_express_template",
+      "value": "1.0.0"
     }
   ]
 }

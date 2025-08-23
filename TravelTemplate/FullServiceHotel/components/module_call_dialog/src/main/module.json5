@@ -1,0 +1,9 @@
+{
+  "module": {
+    "name": "module_call_dialog",
+    "type": "har",
+    "deviceTypes": [
+      "default"
+    ]
+  }
+}

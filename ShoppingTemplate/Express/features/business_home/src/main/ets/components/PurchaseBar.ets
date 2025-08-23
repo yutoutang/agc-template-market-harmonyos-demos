@@ -15,8 +15,8 @@ export struct PurchaseBar {
         top: 0,
         left: 0,
         right: 0,
-        bottom: 0
-      }
+        bottom: 0,
+      },
     }),
   })
 
@@ -82,10 +82,10 @@ export struct PurchaseBar {
       })
     }
     .width('100%')
-    .height(84)
-    .padding({ left: 16, right: 16 })
+    .padding({ left: 16, right: 16, top: 16 })
     .backgroundColor(Color.White)
     .borderRadius({ topLeft: 16, topRight: 16 })
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
   }
 
   // 自定义弹出框的内容区
@@ -120,7 +120,7 @@ export struct PurchaseBar {
             }, saveButton: () => {
               this.vm.prepay()
               this.payDialogController.close()
-            }
+            },
           })
         }
         .width('100%')
@@ -128,11 +128,12 @@ export struct PurchaseBar {
           top: 24,
           bottom: 16,
           left: 24,
-          right: 24
+          right: 24,
         })
         .backgroundColor('rgba(255,255,255,0.80)')
       }
       .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
     }
   }
 }

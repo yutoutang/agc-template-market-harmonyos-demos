@@ -6,7 +6,7 @@
     },
     {
       "name": "agcit_huawei_bus_travel",
-      "value": "1.0.1"
+      "value": "1.0.2"
     },
     {
       "name": "agcittype_huawei_bus_travel",
@@ -14,7 +14,7 @@
     },
     {
       "name": "agcitkid_huawei_bus_travel",
-      "value": "agcit_huawei_bus_route_detail/1.0.0,agcit_huawei_bus_route_search/1.0.0"
+      "value": "agcit_huawei_bus_route_detail/1.0.1,agcit_huawei_bus_route_search/1.0.1"
     }
   ]
 }

@@ -164,7 +164,7 @@ export struct SuggestionPage {
           }.padding($r('app.float.about_padding'))
 
           Button($r('app.string.suggestions_submit'))
-            .fontColor(Color.White)
+            .fontColor($r('sys.color.font_on_primary'))
             .backgroundColor('#4EA5FF')
             .padding($r('app.float.about_padding'))
             .width(Constants.HALF_PERCENT_WIDTH)

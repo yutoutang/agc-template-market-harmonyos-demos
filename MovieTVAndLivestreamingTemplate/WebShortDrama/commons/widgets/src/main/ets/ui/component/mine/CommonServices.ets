@@ -23,6 +23,19 @@ function contentTextDescStyles() {
   })
 }
 
+@Extend(Text)
+function redDotStyles() {
+  .fontSize(10)
+  .lineHeight(13)
+  .width(16)
+  .aspectRatio(1)
+  .borderRadius(8)
+  .textAlign(TextAlign.Center)
+  .backgroundColor($r('sys.color.warning'))
+  .fontColor($r('sys.color.font_on_primary'))
+
+}
+
 @ComponentV2
 export struct CommonServices {
   @Param @Once title?: ResourceStr = ''
@@ -58,11 +71,12 @@ export struct CommonServices {
               if (item.icon && item.symbol) {
                 SymbolGlyph(item.icon as Resource)
                   .fontSize(24)
+                  .width(24)
                   .renderingStrategy(SymbolRenderingStrategy.SINGLE)
                   .fontColor([$r('sys.color.icon_secondary')])
               } else if (item.icon) {
                 Image(item.icon)
-                  .iconSizeStyles()
+                  .width(24)
                   .fillColor($r('sys.color.icon_secondary'))
                   .draggable(false)
                   .autoResize(false)
@@ -83,6 +97,9 @@ export struct CommonServices {
                   } else if (item.contentText) {
                     Text(item.contentText)
                       .contentTextDescStyles()
+                  } else if (item.redDot) {
+                    Text(item.redDot)
+                      .redDotStyles()
                   }
                   SymbolGlyph($r('sys.symbol.chevron_right'))
                     .fontSize(24)
@@ -109,7 +126,8 @@ export struct CommonServices {
                 item.handler()
               }
             })
-          }.margin({ left: 4, right: 4 })
+          }
+          .margin({ left: 4, right: 4 })
           .height(56)
         }, (item: ListItemModel, index: number) => item.mainText + '_' + index)
       }

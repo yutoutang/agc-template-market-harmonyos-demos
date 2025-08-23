@@ -47,6 +47,14 @@
     {
       "name": "tab_font_style",
       "value": "HarmonyOS_Sans_SC"
+    },
+    {
+      "name": "medium_img_width",
+      "value": "16vp"
+    },
+    {
+      "name": "agcit_huawei_bus_travel",
+      "value": "1.0.2"
     }
   ]
 }

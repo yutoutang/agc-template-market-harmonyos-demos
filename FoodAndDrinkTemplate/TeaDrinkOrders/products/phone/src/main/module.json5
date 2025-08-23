@@ -30,7 +30,9 @@
             ]
           }
         ],
-        supportWindowMode: ['fullscreen']
+        "supportWindowMode": [
+          "fullscreen"
+        ]
       }
     ],
     "requestPermissions": [
@@ -44,9 +46,9 @@
           "when": "inuse"
         }
       },
+//申请获取地理位置权限
       {
         "name": "ohos.permission.LOCATION",
-        //申请获取地理位置权限
         "reason": "$string:location_permission",
         "usedScene": {
           "abilities": [
@@ -55,9 +57,9 @@
           "when": "inuse"
         }
       },
+//申请获取模糊地理位置权限
       {
         "name": "ohos.permission.APPROXIMATELY_LOCATION",
-        //申请获取模糊地理位置权限
         "reason": "$string:location_permission",
         "usedScene": {
           "abilities": [
@@ -68,10 +70,10 @@
       }
     ],
     "metadata": [
+// todo 替换client_id值,
       {
         "name": "client_id",
-        // todo 替换client_id值,
-        "value": "xxxx"
+        "value": "******"
       }
     ],
     "routerMap": "$profile:route_map",

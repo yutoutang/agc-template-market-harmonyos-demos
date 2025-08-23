@@ -1,11 +1,10 @@
 {
   "module": {
     "name": "video_swiper",
-    "type": "shared",
+    "type": "har",
     "deviceTypes": [
       "phone"
     ],
-    "installationFree":true,
-    'deliveryWithInstall': true
+    "installationFree":true
   }
 }

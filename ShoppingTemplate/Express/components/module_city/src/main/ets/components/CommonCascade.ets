@@ -98,6 +98,7 @@ export struct CommonCascade {
           .listDirection(Axis.Horizontal)
           .height(26)
           .scrollBar(BarState.Off)
+          .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
         }
         .width('100%')
         .margin({ bottom: 1 })
@@ -139,7 +140,9 @@ export struct CommonCascade {
             }
           }, (item: IRegion[]) => JSON.stringify(item))
         }
+        .padding({ bottom: 40 })
         .scrollBar(BarState.Off)
+        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
       }
       .width('100%')
       .height('100%')

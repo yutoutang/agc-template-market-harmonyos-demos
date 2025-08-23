@@ -3,8 +3,8 @@
     "name": "RouteDesign",
     "type": "har",
     "deviceTypes": [
-      "default"
-    ],
+      "phone",
+     ],
     "routerMap": "$profile:route_map"
   }
 }

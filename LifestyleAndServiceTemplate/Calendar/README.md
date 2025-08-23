@@ -3,8 +3,7 @@
 ## 目录
 
 - [功能介绍](#功能介绍)
-- [环境要求](#环境要求)
-- [组件](#组件)
+- [约束与限制](#约束与限制)
 - [快速入门](#快速入门)
 - [示例效果](#示例效果)
 - [权限要求](#权限要求)
@@ -12,7 +11,22 @@
 
 ## 功能介绍
 
-您可以基于此[模板](#模板)直接定制应用/元服务，也可以挑选此模板中提供的多种[组件](#组件)使用，从而降低您的开发难度，提高您的开发效率。
+您可以基于此模板直接定制应用，也可以挑选此模板中提供的多种组件使用，从而降低您的开发难度，提高您的开发效率。
+
+本模板提供如下组件，所有组件存放在工程根目录的components下，如果您仅需使用组件，可参考对应组件的指导链接；如果您使用此模板，请参考本文档。
+
+| 组件                         | 描述                                          | 使用指导                                             |
+|----------------------------|---------------------------------------------|--------------------------------------------------|
+| 日历组件（base_calendar）         | 展示当前日期日历、自定义头部项插槽、节日、节气展示颜色等相关的能力           | [使用指导](components/base_calendar/README.md)       |
+| 黄历组件（calendar_almanac）      | 日历黄历组件，支持日期动态选择，阴历阳历，五行等信息展示                | [使用指导](components/calendar_almanac/README.md)    |
+| 日程提醒（calendar_events）    | 日历重要提醒，支持新增以及编辑日历，生日，纪念日，待办。支持日程添加到系统日历提醒中  | [使用指导](components/calendar_events/README.md)     |
+| 日期计算（date_calculation）   | 本组件日期计算的相关能力，包括日期间隔，日期计算，阴阳转换等功能            | [使用指导](components/date_calculation/README.md)    |
+| 节日节气（festival_solar）        | 本组件提供了节日节气展示的相关功能                           | [使用指导](components/festival_solar/README.md)      |
+| 登录（login_info）              | 本组件提供了用户信息展示，登录，个人信息编辑，华为账号一键登录，开通会员入口的相关功能 | [使用指导](components/login_info/README.md)          |
+| 会员中心（vip_center）            | 本组件提供了用户会员开通功能                              | [使用指导](components/vip_center/README.md)          |
+| 宜忌查询组件（yiji_query）          | 查询开始日期到结束日期内的吉日以及忌日的相关功能                    | [使用指导](components/yiji_query/README.md)          |
+| 城市限行组件（traffic_restriction） | 查询定位城市限行信息                                  | [使用指导](components/traffic_restriction/README.md) |
+| 历史上的今天（today_history）       | 查询历史上的今天                                 | [使用指导](components/today_history/README.md)       |
 
 ### 模板
 本模板为日历应用提供了常用功能的开发样例，模板主要分为万年历、黄历、和我的三大模块：
@@ -117,34 +131,24 @@ Application
 * 本模版登录中获取验证码场景为模拟场景，真实场景以业务实际场景为准。
 * 本模版在未配置华为账号一键登录的情况下为保证正常使用本模版，均采用模拟用户信息登录，实际开发中请以具体业务为准。
 
-## 组件
+## 约束与限制
 
-本模板中提供了多种组件，您可以按需选择合适的组件进行使用，所有组件存放在工程根目录的components下。
+### 环境
 
-| 组件                         | 描述                                          | 使用指导                                             |
-|----------------------------|---------------------------------------------|--------------------------------------------------|
-| 日历组件（BaseCalendar）         | 展示当前日期日历、自定义头部项插槽、节日、节气展示颜色等相关的能力           | [使用指导](components/base_calendar/README.md)       |
-| 黄历组件（CalendarAlmanac）      | 日历黄历组件，支持日期动态选择，阴历阳历，五行等信息展示                | [使用指导](components/calendar_almanac/README.md)    |
-| 日程提醒（CalendarEventMain）    | 日历重要提醒，支持新增以及编辑日历，生日，纪念日，待办。支持日程添加到系统日历提醒中  | [使用指导](components/calendar_events/README.md)     |
-| 日期计算（DateToolsCalculate）   | 本组件日期计算的相关能力，包括日期间隔，日期计算，阴阳转换等功能            | [使用指导](components/date_calculation/README.md)    |
-| 节日节气（FestivalSolar）        | 本组件提供了节日节气展示的相关功能                           | [使用指导](components/festival_solar/README.md)      |
-| 登录（LoginInfo）              | 本组件提供了用户信息展示，登录，个人信息编辑，华为账号一键登录，开通会员入口的相关功能 | [使用指导](components/login_info/README.md)          |
-| 会员中心（VipCenter）            | 本组件提供了用户会员开通功能                              | [使用指导](components/vip_center/README.md)          |
-| 宜忌查询组件（YiJiQuery）          | 查询开始日期到结束日期内的吉日以及忌日的相关功能                    | [使用指导](components/yiji_query/README.md)          |
-| 城市限行组件（TrafficRestriction） | 查询定位城市限行信息                                  | [使用指导](components/traffic_restriction/README.md) |
-| 历史上的今天（TodayHistory）       | 查询历史上的今天                                 | [使用指导](components/today_history/README.md)       |
+- DevEco Studio版本：DevEco Studio 5.0.4 Release及以上
+- HarmonyOS SDK版本：HarmonyOS 5.0.4 Release SDK及以上
+- 设备类型：华为手机（包括双折叠和阔折叠）
+- 系统版本：HarmonyOS 5.0.4(16)及以上
 
-## 环境要求
+### 权限要求
 
-### 软件
+* 网络权限：ohos.permission.INTERNET
+* 获取位置权限：ohos.permission.APPROXIMATELY_LOCATION、ohos.permission.LOCATION
+* 日历权限：ohos.permission.WRITE_CALENDAR、ohos.permission.READ_CALENDAR
 
-* DevEco Studio版本：DevEco Studio 5.0.4 Release及以上
-* HarmonyOS SDK版本：HarmonyOS 5.0.4 Release SDK及以上
+### 调试
 
-### 硬件
-
-* 设备类型：华为手机（直板机）
-* HarmonyOS版本：HarmonyOS 5.0.4 Release及以上
+本模板不支持使用模拟器调试，请使用真机进行调试
 
 ## 快速入门
 
@@ -154,15 +158,13 @@ Application
 
 1. 在AppGallery Connect创建应用，将包名配置到模板中。
 
-   a. 参考[创建HarmonyOS应用](https://developer.huawei.com/consumer/cn/doc/app/agc-help-createharmonyapp-0000001945392297)为应用创建APP ID，并将APP ID与应用进行关联。
+   a. 参考[创建HarmonyOS应用](https://developer.huawei.com/consumer/cn/doc/app/agc-help-create-app-0000002247955506)为应用创建APP ID，并将APP ID与应用进行关联。
 
    b. 返回应用列表页面，查看应用的包名。
 
    c. 将模板工程根目录下AppScope/app.json5文件中的bundleName替换为创建应用的包名。
 
-2. 依次在“API管理”处开通位置服务、定位服务。
-
-   <img src="screenshot/img.png" alt="开通位置定位服务" width="300">  
+2. [开通地图服务](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/map-config-agc)。
 
 3. 配置华为账号服务。
 
@@ -172,7 +174,7 @@ Application
 
 4. 对应用进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing#section297715173233)。
 
-5. 添加手工签名所用证书对应的公钥指纹。详细参考：[配置应用签名证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-signature-info-0000001628566748#section5181019153511)
+5. 添加手工签名所用证书对应的公钥指纹。详细参考：[配置应用签名证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-cert-fingerprint-0000002278002933)
 ### 运行调试工程
 
 1. 连接调试手机和PC。
@@ -187,11 +189,6 @@ Application
 
 3. [我的]([mine.mp4](screenshot%2Fmine.mp4))
 
-## 权限要求
-
-* 网络权限：ohos.permission.INTERNET
-* 获取位置权限：ohos.permission.APPROXIMATELY_LOCATION、ohos.permission.LOCATION
-* 日历权限：ohos.permission.WRITE_CALENDAR、ohos.permission.READ_CALENDAR
 ## 开源许可协议
 
 该代码经过[Apache 2.0 授权许可](http://www.apache.org/licenses/LICENSE-2.0)。

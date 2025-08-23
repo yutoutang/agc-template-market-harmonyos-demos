@@ -138,7 +138,6 @@ export class HWMap {
         // 定义标题描边宽度
         strokeWidth: 2,
         // 定义标题字体样式
-        // fontStyle: mapCommon.FontStyle.ITALIC
       }],
       icon: requestIcon,
       showIcon: true,

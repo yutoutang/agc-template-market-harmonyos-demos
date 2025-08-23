@@ -1,7 +1,8 @@
-import { CommonConstants, cancelAuthorization } from 'commonlib';
-import { MinePageVM } from '../viewModels/MinePageVM';
 import { FunctionalButton, functionalButtonComponentManager } from '@kit.ScenarioFusionKit';
 import { promptAction, AlertDialog } from '@kit.ArkUI';
+import { CommonConstants, cancelAuthorization, Logger } from 'commonlib';
+import { MinePageVM } from '../viewModels/MinePageVM';
+
 
 @ComponentV2
 export struct Header {
@@ -45,7 +46,7 @@ export struct Header {
           if (this.vm.isBindPhone()) {
             Text('取消关联')
               .fontSize(12)
-              .fontColor(CommonConstants.FONT_COLOR_GREEN)
+              .fontColor('#603C00')
               .fontWeight(FontWeight.Medium)
               .height(20)
               .onClick(() => {
@@ -65,20 +66,22 @@ export struct Header {
                     .borderRadius(0)
                     .padding(0)
                     .fontSize(12)
-                    .fontColor(CommonConstants.FONT_COLOR_GREEN)
+                    .fontColor('#603C00')
                     .fontWeight(FontWeight.Medium)
                     .backgroundColor(Color.Transparent)
                 },
               },
               controller: new functionalButtonComponentManager.FunctionalButtonController()
                 .onGetPhoneNumber((err, data) => {
-                  if (err) {
-                    if (err.code !== 1001502012) {
-                      promptAction.showToast({ message: `获取手机号失败: ${err.message}` });
-                    }
+                  if (err && err.code === 1001502012) {
+                    Logger.error('get phone failed,err' + err.message);
                     return;
                   }
-                  this.vm.bindPone(data.code);
+                  if (data && data.code) {
+                    this.vm.bindPone(data.code);
+                  } else {
+                    this.vm.mockBindPhone();
+                  }
                   cancelAuthorization();
                 }),
             }).id('phoneFunctionalButtonId1');

@@ -153,7 +153,7 @@ export struct CustomKeyboard {
     .columnsTemplate('1fr 1fr 1fr 1fr')
     .rowsGap(4)
     .columnsGap(4)
-    .margin({ bottom: 24 });
+    .margin({ bottom: 16 });
   }
 
   @Builder

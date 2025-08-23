@@ -1,14 +1,14 @@
-import { AddCarReq, AddDnOrderReq, AddressReq, CommonReq, GoodReq, MyOrderReq } from '../models/RequestModel';
+import { AddCarReq, AddDnOrderReq, AddressReq, CommonReq, GoodsReq, MyOrderReq } from '../models/RequestModel';
 import {
   AddressInfo,
   BaseResponse,
-  CarGoodInfo,
+  CarGoodsInfo,
   CouponResp,
   DishesType,
-  Good,
+  Goods,
   GoodsOfOrder,
-  GoodSpec,
-  GoodSpecInfo,
+  GoodsSpec,
+  GoodsSpecInfo,
   HmSystem,
   MyCar,
   MyCoupon as MyCoupon,
@@ -20,7 +20,7 @@ import {
 } from '../models/ResponseModel';
 import { Decimal } from '@kit.ArkTS';
 import { map } from '@kit.MapKit';
-import { CouponStateEnum, GoodSpecEnum, OrderListTypeEnum, OrderStateEnum, OrderTypeEnum } from '../constants/Common';
+import { CouponStateEnum, GoodsSpecEnum, OrderListTypeEnum } from '../constants/Common';
 import { getFullDate } from '../utils/Utils';
 
 export class MockData {
@@ -28,10 +28,10 @@ export class MockData {
   static resultSuccess: BaseResponse = new BaseResponse(0, 'success', undefined)
   static resultFailed: BaseResponse = new BaseResponse(1, 'failed', undefined)
   static specJson1 =
-    `[{"specId":"1","specName":"奶油","specValId":"11","specVal":[{"specValId":"11","specValName":"动物奶油","specValLogo":"","specValNum":"1"},{"specValId":"12","specValName":"植物奶油","specValLogo":"","specValNum":"1"}]},{"specId":"2","specName":"糖类选择","specValId":"22","specVal":[{"specValId":"21","specValName":"蔗糖","specValLogo":"","specValNum":"1"},{"specValId":"22","specValName":"赤鲜糖醇（0糖）","specValLogo":"","specValNum":"1"}]},{"specId":"3","specName":"尺寸","specValId":"31","specVal":[{"specValId":"31","specValName":"6寸","specValLogo":"","specValNum":"1"},{"specValId":"32","specValName":"9寸","specValLogo":"","specValNum":"1"},{"specValId":"33","specValName":"12寸","specValLogo":"","specValNum":"1"}]}]`
+    `[{"specId":"1","specName":"温度","specValId":"11","specVal":[{"specValId":"11","specValName":"常温","specValLogo":"","specValNum":"1"},{"specValId":"12","specValName":"热饮","specValLogo":"","specValNum":"1"},{"specValId":"13","specValName":"加冰","specValLogo":"","specValNum":"1"}]},{"specId":"2","specName":"糖类选择","specValId":"22","specVal":[{"specValId":"21","specValName":"蔗糖","specValLogo":"","specValNum":"1"},{"specValId":"22","specValName":"赤鲜糖醇（0糖）","specValLogo":"","specValNum":"1"},{"specValId":"23","specValName":"无糖","specValLogo":"","specValNum":"1"}]},{"specId":"3","specName":"尺寸","specValId":"31","specVal":[{"specValId":"31","specValName":"小杯","specValLogo":"","specValNum":"1"},{"specValId":"32","specValName":"中杯","specValLogo":"","specValNum":"1"},{"specValId":"33","specValName":"大杯","specValLogo":"","specValNum":"1"}]}]`
   static specJson2 =
     `[{"specId":"1","specName":"A（选择1个）","specVal":[{"specValId":"11","id":"1","name":"甜橙咖啡","logo":"TeaDrinkOrders/good_logo1.png"},{"specValId":"12","id":"2","name":"甜橙美式咖啡","logo":"TeaDrinkOrders/good_logo1.png"},{"specValId":"13","id":"3","name":"柠檬咖啡","logo":"TeaDrinkOrders/good_logo2.png"}]},{"specId":"2","specName":"B（选择1个）","specValId":"23","specVal":[{"specValId":"21","id":"4","name":"奶昔美式","logo":"TeaDrinkOrders/good_logo3.png"}]}]`
-  static good1: Good = {
+  static goods1: Goods = {
     id: '1',
     name: '甜橙美式咖啡',
     logo: 'TeaDrinkOrders/good_logo1.png',
@@ -46,7 +46,7 @@ export class MockData {
     spec: [],
     boxMoney: '1',
   }
-  static good2: Good = {
+  static goods2: Goods = {
     id: '2',
     name: '柠檬咖啡',
     logo: 'TeaDrinkOrders/good_logo2.png',
@@ -60,7 +60,7 @@ export class MockData {
     spec: [],
     boxMoney: '1',
   }
-  static good3: Good = {
+  static goods3: Goods = {
     id: '3',
     name: '奶昔美式',
     logo: 'TeaDrinkOrders/good_logo3.png',
@@ -74,7 +74,7 @@ export class MockData {
     spec: [],
     boxMoney: '1',
   }
-  static good4: Good = {
+  static goods4: Goods = {
     id: '4',
     name: '草莓抹茶奶冻',
     logo: 'TeaDrinkOrders/good_logo4.png',
@@ -88,7 +88,7 @@ export class MockData {
     spec: [],
     boxMoney: '1',
   }
-  static goodPkg1: Good = {
+  static goodsPkg1: Goods = {
     id: '5',
     name: '水果美式套餐',
     logo: 'TeaDrinkOrders/good_pkg_logo.png',
@@ -102,7 +102,7 @@ export class MockData {
     spec: [],
     boxMoney: '1',
   }
-  static goodPkg2: Good = {
+  static goodsPkg2: Goods = {
     id: '6',
     name: '招牌美式套餐',
     logo: 'TeaDrinkOrders/good_pkg_logo.png',
@@ -116,7 +116,7 @@ export class MockData {
     spec: [],
     boxMoney: '1',
   }
-  static goodPkg3: Good = {
+  static goodsPkg3: Goods = {
     id: '7',
     name: '大吉大利，今晚吃鸡双人吃鸡套餐',
     logo: 'TeaDrinkOrders/good_pkg_logo.png',
@@ -200,8 +200,8 @@ export class MockData {
     return new BaseResponse(0, 'success', this.myCoupons)
   }
 
-  static get getAllGoodList(): Array<Good> {
-    return [this.good1, this.good2, this.good3, this.good4, this.goodPkg1, this.goodPkg2, this.goodPkg3]
+  static get getAllGoodsList(): Array<Goods> {
+    return [this.goods1, this.goods2, this.goods3, this.goods4, this.goodsPkg1, this.goodsPkg2, this.goodsPkg3]
   }
 
   static get getHmSystemResp(): BaseResponse<HmSystem> {
@@ -304,8 +304,8 @@ export class MockData {
     storeInfo.announcement = '周年店庆全场优惠促销，优惠力度空前，进店享受下单立减5元！！！'
     storeInfo.logo = store.logo
     storeInfo.coordinates = store.coordinates
-    storeInfo.dpyyzz = 'TeaDrinkOrders/store_yyzz.png'
-    storeInfo.spjyxkz = 'TeaDrinkOrders/store_yyzz.png'
+    storeInfo.businessLicense = 'TeaDrinkOrders/store_yyzz.png'
+    storeInfo.foodLicense = 'TeaDrinkOrders/store_yyzz.png'
     storeInfo.environment = [
       'TeaDrinkOrders/store_environment1.png',
       'TeaDrinkOrders/store_environment2.png',
@@ -321,44 +321,44 @@ export class MockData {
     return storeInfo
   }
 
-  static get getGoodSpec(): Array<GoodSpec> {
-    let goodSpecList: GoodSpec[] = JSON.parse(MockData.specJson1) as GoodSpec[]
-    return goodSpecList
+  static get getGoodsSpec(): Array<GoodsSpec> {
+    let goodsSpecList: GoodsSpec[] = JSON.parse(MockData.specJson1) as GoodsSpec[]
+    return goodsSpecList
   }
 
-  static get getGoodList(): Array<Good> {
-    const goodList: Array<Good> = [this.good1, this.good2, this.good3, this.good4]
-    return goodList
+  static get getGoodsList(): Array<Goods> {
+    const goodsList: Array<Goods> = [this.goods1, this.goods2, this.goods3, this.goods4]
+    return goodsList
   }
 
-  static get getGoodPkgList(): Array<Good> {
-    const goodList: Array<Good> = [this.goodPkg1, this.goodPkg2, this.goodPkg3]
-    return goodList
+  static get getGoodsPkgList(): Array<Goods> {
+    const goodsList: Array<Goods> = [this.goodsPkg1, this.goodsPkg2, this.goodsPkg3]
+    return goodsList
   }
 
   static get getDishesList(): Array<DishesType> {
     const dishesList: Array<DishesType> =
       [
-        new DishesType('1', '热销', this.getGoodList), new DishesType('2', '新品推荐', this.getGoodList),
-        new DishesType('3', '经典套餐', this.getGoodPkgList), new DishesType('4', '风味套餐集结号', this.getGoodList),
-        new DishesType('5', '精品奶茶', this.getGoodList), new DishesType('6', '酸奶罐罐', this.getGoodList),
-        new DishesType('7', '饮品名称1', this.getGoodList), new DishesType('8', '饮品名称2', this.getGoodList),
-        new DishesType('9', '饮品名称3', this.getGoodList), new DishesType('10', '饮品名称4', this.getGoodList),
-        new DishesType('11', '饮品名称5', this.getGoodList), new DishesType('12', '饮品名称6', this.getGoodList),
+        new DishesType('1', '热销', this.getGoodsList), new DishesType('2', '新品推荐', this.getGoodsList),
+        new DishesType('3', '经典套餐', this.getGoodsPkgList), new DishesType('4', '风味套餐集结号', this.getGoodsList),
+        new DishesType('5', '精品奶茶', this.getGoodsList), new DishesType('6', '酸奶罐罐', this.getGoodsList),
+        new DishesType('7', '饮品名称1', this.getGoodsList), new DishesType('8', '饮品名称2', this.getGoodsList),
+        new DishesType('9', '饮品名称3', this.getGoodsList), new DishesType('10', '饮品名称4', this.getGoodsList),
+        new DishesType('11', '饮品名称5', this.getGoodsList), new DishesType('12', '饮品名称6', this.getGoodsList),
       ]
     return dishesList
   }
 
-  static getGoodInfoResp = (params: CommonReq): Good | undefined => {
-    let good = this.getAllGoodList.find(item => item.id === params.goodId)
-    if (good?.specType === GoodSpecEnum.SPEC_TYPE) {
-      let spec = JSON.parse(this.specJson1) as GoodSpec[]
-      good.spec = spec
-    } else if (good?.specType === GoodSpecEnum.PACKAGE_TYPE) {
-      let spec = JSON.parse(this.specJson2) as GoodSpec[]
-      good.spec = spec
+  static getGoodInfoResp = (params: CommonReq): Goods | undefined => {
+    let goods = this.getAllGoodsList.find(item => item.id === params.goodsId)
+    if (goods?.specType === GoodsSpecEnum.SPEC_TYPE) {
+      let spec = JSON.parse(this.specJson1) as GoodsSpec[]
+      goods.spec = spec
+    } else if (goods?.specType === GoodsSpecEnum.PACKAGE_TYPE) {
+      let spec = JSON.parse(this.specJson2) as GoodsSpec[]
+      goods.spec = spec
     }
-    return good
+    return goods
   }
   static myCar: MyCar = new MyCar(0, [], 0, 0)
   static myCarId: number = 0
@@ -378,11 +378,11 @@ export class MockData {
   }
 
   static addCar = (params: AddCarReq) => {
-    let good = this.getAllGoodList.find(item => item.id === params.goodId)
-    if (!good) {
+    let goods = this.getAllGoodsList.find(item => item.id === params.goodsId)
+    if (!goods) {
       return this.resultFailed
     }
-    let carGoodTemp = this.myCar.carGoods?.find(item => item.goodId === params.goodId && item.spec === params.spec)
+    let carGoodTemp = this.myCar.carGoods?.find(item => item.goodsId === params.goodsId && item.spec === params.spec)
     let carGoodId = `${this.myCarId}`
     if (carGoodTemp) {
       carGoodId = carGoodTemp.id
@@ -393,17 +393,17 @@ export class MockData {
       })
       this.myCar.money = money
     } else {
-      let carGood: CarGoodInfo = new CarGoodInfo()
+      let carGood: CarGoodsInfo = new CarGoodsInfo()
       carGood.id = `${this.myCarId}`
-      carGood.goodId = params.goodId
+      carGood.goodsId = params.goodsId
       carGood.num = params.num
       carGood.specType = params.specType
       carGood.spec = params.spec
       carGood.combination = params.combination
       carGood.money = params.money
       carGood.boxMoney = params.boxMoney
-      carGood.logo = good?.logo
-      carGood.name = good?.name
+      carGood.logo = goods?.logo
+      carGood.name = goods?.name
       if (!this.myCar.carGoods) {
         this.myCar.carGoods = []
       }
@@ -450,26 +450,26 @@ export class MockData {
       return 0
     }
   }
-  static getGoodSpecInfo = (params: CommonReq): BaseResponse<GoodSpecInfo | undefined> => {
-    let good = this.getAllGoodList.find(item => item.id === params.goodId)
-    if (good) {
+  static getGoodsSpecInfo = (params: CommonReq): BaseResponse<GoodsSpecInfo | undefined> => {
+    let goods = this.getAllGoodsList.find(item => item.id === params.goodsId)
+    if (goods) {
       let money = '0'
       if (params.spec.indexOf('12寸') >= 0) {
-        money = new Decimal(good.money).mul(2).toFixed(1).toString()
+        money = new Decimal(goods.money).mul(2).toFixed(1).toString()
       } else if (params.spec.indexOf('9寸') >= 0) {
-        money = new Decimal(good.money).mul(1.5).toFixed(1).toString()
+        money = new Decimal(goods.money).mul(1.5).toFixed(1).toString()
       } else {
-        money = good.money
+        money = goods.money
       }
-      let result: GoodSpecInfo = new GoodSpecInfo()
+      let result: GoodsSpecInfo = new GoodsSpecInfo()
       result.money = money
       result.spec = params.spec
       result.combination = params.combination
-      result.goodId = params.goodId
-      result.goodName = good.name || ''
-      result.goodLogo = good.logo || ''
-      result.specType = good.specType
-      result.boxMoney = good.boxMoney
+      result.goodsId = params.goodsId
+      result.goodsName = goods.name || ''
+      result.goodsLogo = goods.logo || ''
+      result.specType = goods.specType
+      result.boxMoney = goods.boxMoney
       return new BaseResponse(0, 'success', result)
     }
     return this.resultFailed
@@ -490,27 +490,27 @@ export class MockData {
     orderModel.cutlery = '1';
     orderModel.yhqMoney = '5';
     orderModel.couponId = '1';
-    orderModel.state = OrderStateEnum.COMPLETED;
+    orderModel.state = 3;
     orderModel.oid = `80001`;
     orderModel.storeName = 'AGC奶茶(雨花客厅店)';
     orderModel.address = '南京市雨花台区华为路华为云楼';
     orderModel.tel = '10000000003';
     orderModel.coordinates = '31.97831,118.76362';
 
-    let good: GoodsOfOrder = new GoodsOfOrder()
-    good.id = this.good1.id || '';
-    good.logo = this.good1.logo || '';
-    good.money = this.good1.money || '';
-    good.name = this.good1.name || '';
-    good.num = 1;
-    good.specType = '1';
-    good.spec = '';
-    good.combination = [];
-    let goodList = [good]
+    let goods: GoodsOfOrder = new GoodsOfOrder()
+    goods.id = this.goods1.id || '';
+    goods.logo = this.goods1.logo || '';
+    goods.money = this.goods1.money || '';
+    goods.name = this.goods1.name || '';
+    goods.num = 1;
+    goods.specType = '1';
+    goods.spec = '';
+    goods.combination = [];
+    let goodsList = [goods]
     let order: MyOrderInfo = new MyOrderInfo()
     order.order = orderModel;
-    order.num = goodList.length;
-    order.good = goodList;
+    order.num = goodsList.length;
+    order.goods = goodsList;
     return order
   }
   // 订单
@@ -531,8 +531,8 @@ export class MockData {
   };
   static cancelOrder = (params: CommonReq) => {
     let order = this.orderList.find(item => item.order?.id === params.orderId)
-    if (order?.order?.state === OrderStateEnum.TO_BE_PAID) {
-      order.order.state = OrderStateEnum.CANCELED
+    if (order?.order?.state === 0) {
+      order.order.state = 4
       // 还原优惠券
       let coupon = this.myCoupons.find(item => item.id === order?.order.couponId)
       if (coupon) {
@@ -559,31 +559,31 @@ export class MockData {
     orderModel.cutlery = params.cutlery;
     orderModel.yhqMoney = params.yhqMoney;
     orderModel.couponId = params.couponId;
-    orderModel.state = OrderStateEnum.TO_BE_PAID;
+    orderModel.state = 0;
     orderModel.oid = `${80000 + this.orderId}`;
     orderModel.storeName = params.storeName;
     orderModel.address = params.address;
     orderModel.tel = params.tel;
     orderModel.coordinates = params.coordinates;
-    let sz: Array<GoodReq> = JSON.parse(params.sz)
-    let goodList = sz.map(item => {
-      let temp = this.getAllGoodList.find(i => i.id === item.goodId)
-      let good: GoodsOfOrder = new GoodsOfOrder()
-      good.id = item.goodId;
-      good.logo = item.img;
-      good.money = item.money;
-      good.name = item.name;
-      good.num = item.num;
-      good.specType = temp?.specType ?? '';
-      good.spec = item.spec;
-      good.combination = item.combination;
-      return good
+    let sz: Array<GoodsReq> = JSON.parse(params.sz)
+    let goodsList = sz.map(item => {
+      let temp = this.getAllGoodsList.find(i => i.id === item.goodsId)
+      let goods: GoodsOfOrder = new GoodsOfOrder()
+      goods.id = item.goodsId;
+      goods.logo = item.img;
+      goods.money = item.money;
+      goods.name = item.name;
+      goods.num = item.num;
+      goods.specType = temp?.specType ?? '';
+      goods.spec = item.spec;
+      goods.combination = item.combination;
+      return goods
     })
     let order: MyOrderInfo = new MyOrderInfo()
     order.order = orderModel;
-    order.num = goodList.length;
-    order.good = goodList;
-    if (params.orderType === OrderTypeEnum.TAKEAWAY_DELIVERY) {
+    order.num = goodsList.length;
+    order.goods = goodsList;
+    if (params.orderType === 1) {
       order.address.addressPre = params.addressPre
       order.address.addressNum = params.addressNum
       order.address.latitude = params.latitude
@@ -596,7 +596,7 @@ export class MockData {
     // 更新购物车
     let boxMoney = 0
     let money = 0
-    this.myCar.carGoods = this.myCar.carGoods?.filter(item => sz.every(good => good.id !== item.id)) ?? []
+    this.myCar.carGoods = this.myCar.carGoods?.filter(item => sz.every(goods => goods.id !== item.id)) ?? []
     this.myCar.carGoods.forEach(item => {
       boxMoney = new Decimal(boxMoney).add(item.boxMoney || 0).toNumber()
       money = new Decimal(money).add(new Decimal(item.money || 0).mul(item.num || 0)).toNumber()
@@ -621,10 +621,10 @@ export class MockData {
   }
   static getHuaweiPayInfo = (params: CommonReq) => {
     let order = this.orderList.find(item => item.order?.id === params.orderId)
-    if (order?.order?.state === OrderStateEnum.TO_BE_PAID) {
-      order.order.state = OrderStateEnum.MAKING
+    if (order?.order?.state === 0) {
+      order.order.state = 1
       order.order.payTime = new Date().getTime()
-      if (Number(order.order.orderType) === OrderTypeEnum.PICK_SELF) {
+      if (Number(order.order.orderType) === 0) {
         MockData.startFinishTimer(params.orderId)
       } else {
         MockData.startDeliveringTimer(params.orderId)
@@ -724,8 +724,9 @@ export class MockData {
       return this.resultFailed
     }
   }
+
   static get getPrivacyInfo(): BaseResponse<string> {
-    let json:string = `<h2 class="text-2xl font-bold mb-5">茶饮 元服务 隐私声明</h1>
+    let json: string = `<h2 class="text-2xl font-bold mb-5">茶饮 元服务 隐私声明</h1>
     <p>茶饮模板是用于茶饮的元服务模板。本隐私声明由我们为处理您的个人信息而制定。</p>
     <p>我们非常重视您的个人信息和隐私保护，将会按照法律要求和业界成熟的安全标准，为您的个人信息提供相应的安全保护措施。</p>
 
@@ -737,18 +738,18 @@ export class MockData {
 
     <h3 class="text-xl font-bold mt-8 mb-3">2. 设备权限调用</h2>
     <p>位置 （获取设备位置信息、获取设备模糊位置信息）</p>`
-    return new BaseResponse(0,'success',json)
+    return new BaseResponse(0, 'success', json)
   }
 
   private static startFinishTimer(orderId: string) {
     setTimeout(() => {
-      MockData.changeOrderState(orderId, OrderStateEnum.COMPLETED)
+      MockData.changeOrderState(orderId, 3)
     }, 300000)
   }
 
   private static startDeliveringTimer(orderId: string) {
     setTimeout(() => {
-      MockData.changeOrderState(orderId, OrderStateEnum.DELIVERING)
+      MockData.changeOrderState(orderId, 2)
       MockData.startFinishTimer(orderId)
     }, 10000)
   }

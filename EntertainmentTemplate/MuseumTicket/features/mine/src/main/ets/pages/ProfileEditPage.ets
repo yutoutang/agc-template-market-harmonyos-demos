@@ -1,8 +1,8 @@
 import { FunctionalButton, functionalButtonComponentManager } from '@kit.ScenarioFusionKit';
-import { promptAction } from '@kit.ArkUI';
-import { AccountUtil, RouterModule, UserInfoModel, CommonConstants, Logger } from 'commonlib';
+import { promptAction, LengthMetrics } from '@kit.ArkUI';
 import fs from '@ohos.file.fs';
 import { util } from '@kit.ArkTS';
+import { AccountUtil, RouterModule, UserInfoModel, CommonConstants, Logger, TitleBuilder } from 'commonlib';
 import { BaseSuccessResponse, https, UpdateUserInfoRequest } from 'network';
 import { Gender } from '../types/Index';
 
@@ -97,12 +97,13 @@ struct ProfileEditPage {
         }
         .align(Alignment.Top)
         .height('calc(100% - 75vp)')
-        .scrollBar(BarState.Off);
+        .scrollBar(BarState.Off)
+        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false });
 
         Column() {
           Button('保存')
             .width('100%')
-            .backgroundColor(CommonConstants.FONT_COLOR_GREEN)
+            .backgroundColor('#D1B380')
             .fontWeight(500)
             .fontSize(CommonConstants.FONT_SIZE_L)
             .borderRadius(20)
@@ -117,7 +118,7 @@ struct ProfileEditPage {
     }
     .width('100%')
     .height('100%')
-    .title('编辑资料');
+    .title(TitleBuilder('编辑资料'), { paddingStart: LengthMetrics.vp(16) });
 
   }
 
@@ -142,6 +143,7 @@ struct ProfileEditPage {
         },
         controller: new functionalButtonComponentManager.FunctionalButtonController().onChooseAvatar((error, data) => {
           if (error) {
+            promptAction.showToast({ message: error.message });
             return;
           }
           let avatarFile: fs.File | null = null;
@@ -211,11 +213,11 @@ struct ProfileEditPage {
             .borderWidth(1)
             .borderRadius(24)
             .height(24)
-            .borderColor(this.gender === Gender.MALE ? CommonConstants.FONT_COLOR_GREEN : '#FFCCCCCC')
+            .borderColor(this.gender === Gender.MALE ? '#D1B380' : '#FFCCCCCC')
             .textAlign(TextAlign.Center)
             .fontSize(CommonConstants.FONT_SIZE_M)
             .fontColor(this.gender === Gender.MALE ? '#FFFFFF' : CommonConstants.FONT_COLOR_BLACK)
-            .backgroundColor(this.gender === Gender.MALE ? CommonConstants.FONT_COLOR_GREEN : '');
+            .backgroundColor(this.gender === Gender.MALE ? '#D1B380' : '');
         }
         .margin({ right: 20 })
         .height('100%')
@@ -227,11 +229,11 @@ struct ProfileEditPage {
             .borderWidth(1)
             .borderRadius(24)
             .height(24)
-            .borderColor(this.gender === Gender.FEMALE ? CommonConstants.FONT_COLOR_GREEN : '#FFCCCCCC')
+            .borderColor(this.gender === Gender.FEMALE ? '#D1B380' : '#FFCCCCCC')
             .textAlign(TextAlign.Center)
             .fontSize(CommonConstants.FONT_SIZE_M)
             .fontColor(this.gender === Gender.FEMALE ? '#FFFFFF' : CommonConstants.FONT_COLOR_BLACK)
-            .backgroundColor(this.gender === Gender.FEMALE ? CommonConstants.FONT_COLOR_GREEN : '');
+            .backgroundColor(this.gender === Gender.FEMALE ? '#D1B380' : '');
         }
         .height('100%')
         .onClick(() => this.gender = Gender.FEMALE);
@@ -281,7 +283,7 @@ struct ProfileEditPage {
             role: ButtonRole.NORMAL,
             fontColor: '#FFFFFFFF',
             fontSize: 14,
-            backgroundColor: CommonConstants.FONT_COLOR_GREEN,
+            backgroundColor: '#D1B380',
             borderRadius: 10,
           },
           cancelButtonStyle: {

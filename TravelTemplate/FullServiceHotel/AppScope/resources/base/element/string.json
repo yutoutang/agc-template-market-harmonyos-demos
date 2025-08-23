@@ -6,11 +6,15 @@
     },
     {
       "name": "agcit_huawei_full_service_hotel",
-      "value": "1.0.0"
+      "value": "1.0.2"
     },
     {
       "name": "agcittype_huawei_full_service_hotel",
       "value": "industryTemplate"
+    },
+    {
+      "name": "agcitkid_huawei_full_service_hotel",
+      "value": "agcit_huawei_common_call_dialog/1.0.0,agcit_huawei_full_service_hotel_module_comments/1.0.0,agcit_huawei_full_service_hotel_module_date_selector/1.0.0,agcit_huawei_common_privacy_agreement/1.0.0"
     }
   ]
 }

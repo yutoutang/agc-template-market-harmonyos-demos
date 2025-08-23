@@ -49,8 +49,6 @@ export struct ServiceItems {
       .rowsGap(15)
       .layoutDirection(GridDirection.Row)
       .padding({ bottom: $r('app.float.service_card_padding_bottom') })
-
-      Divider().strokeWidth(10).color($r('sys.color.background_primary'))
     }
   }
 }

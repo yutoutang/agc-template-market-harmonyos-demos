@@ -1,6 +1,6 @@
 import { AccountUtil, HUAWEIAccountModel, RouterModule, UserInfoModel } from 'commonlib';
-import { https, UserLoginResp, GetUserInfoResp } from 'network';
 import { UserInfo } from 'commonlib/src/main/ets/types/Types';
+import { GetUserInfoResp, https, UserLoginResp } from 'network';
 
 const TAG: string = 'MainEntryVM';
 
@@ -11,7 +11,6 @@ export class MainEntryVM {
   // 当前页签
   @Trace curIndex: number = 0;
   @Trace userInfo: UserInfoModel = AccountUtil.getUserInfo();
-
   private static _instance: MainEntryVM;
 
   public static get instance() {

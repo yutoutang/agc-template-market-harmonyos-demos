@@ -1,8 +1,9 @@
-import { RouterMap, RouterModule, CommonConstants, FormatUtil } from 'commonlib';
+import { AlertDialog, promptAction } from '@kit.ArkUI';
+import { CommonConstants, FormatUtil, RouterModule } from 'commonlib';
+import { Contact, PersonManage, SelectMode } from 'module_person_manage';
 import { Contacts } from 'network';
 import { OrderTicketVM } from '../viewModels/OrderTicketVM';
-import { promptAction } from '@kit.ArkUI';
-import { AlertDialog } from '@kit.ArkUI';
+
 
 @Builder
 export function OrderInfoBuilder() {
@@ -70,21 +71,28 @@ struct OrderInfo {
                 }
               }.width('100%');
 
-              Row({ space: 3 }) {
-                Image($r('app.media.icon_public_plus_1')).width(13);
-                Text('常用参观人')
-                  .fontSize(CommonConstants.FONT_SIZE_M)
-                  .fontColor(CommonConstants.FONT_COLOR_GREEN)
-                  .onClick(() => {
-                    RouterModule.push({ url: RouterMap.CONTACTS_PAGE });
-                  });
-              }
-              .width(112)
-              .margin({ top: 12, bottom: 16 })
-              .backgroundColor(CommonConstants.BG_COLOR_GREEN)
-              .height(32)
-              .borderRadius(32)
-              .justifyContent(FlexAlign.Center);
+
+              PersonManage({
+                navPathStack: RouterModule.getStack(),
+                selectMode: SelectMode.MORE_SELECT,
+                disableId:this.vm.disableId,
+                onSelect: (data) => {
+                    this.vm.handleContacts(data as Contacts[])
+                },
+              }) {
+                Row({ space: 3 }) {
+                  Image($r('app.media.contact_add')).width(13);
+                  Text('常用参观人')
+                    .fontSize(CommonConstants.FONT_SIZE_M)
+                    .fontColor('#FFFFFF');
+                }
+                .width(112)
+                .margin({ top: 12, bottom: 16 })
+                .backgroundColor('#D1B380')
+                .height(32)
+                .borderRadius(32)
+                .justifyContent(FlexAlign.Center);
+              };
 
               if (this.vm.confirmContacts.length > 0) {
                 Divider().margin({ bottom: 16 });
@@ -152,7 +160,7 @@ struct OrderInfo {
             .type(ButtonType.Normal)
             .borderRadius(20)
             .backgroundColor(this.isContactInfoValid() ?
-            $r('app.color.font_color_green') : CommonConstants.BG_COLOR_GREEN)
+              '#D1B380' : '#99D1B380')
             .width('calc(100% - 32vp)')
             .enabled(this.isContactInfoValid())
             .onClick(() => {
@@ -176,7 +184,7 @@ function commonCardStyle() {
   .height(93)
   .padding(10)
   .borderRadius(8)
-  .backgroundColor('#3392D6CC');
+  .backgroundColor('#99D1B380');
 }
 
 @Extend(Text)

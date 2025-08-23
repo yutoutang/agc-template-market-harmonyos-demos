@@ -1,9 +1,6 @@
-import {
-  commonToast,
+import { AutomaticQuickLogin, commonToast,
   Constants,
-  getQuickLoginAnonymousPhone,
   HomeServiceEnum,
-  UserInfo,
   UserState,
 } from 'common'
 import { PersistenceV2 } from '@kit.ArkUI';
@@ -18,7 +15,7 @@ export struct MedicalPersonCardInfo {
   @Local userState: UserState = PersistenceV2.connect(UserState, () => new UserState())!;
   @Param isOlder: boolean = false
   @Local modelShow: boolean = false
-
+  @Local automaticQuickLogin: AutomaticQuickLogin = new AutomaticQuickLogin()
   build() {
     Column() {
       Column() {
@@ -69,10 +66,8 @@ export struct MedicalPersonCardInfo {
                 hasTitle: '关联账号',
                 message: $r('app.string.associated_account'),
                 confirmAction: () => {
-                  getQuickLoginAnonymousPhone(getContext(this), (isLogin: boolean, userInfo: UserInfo) => {
-                    this.userState.isLogin = isLogin
-                    this.userState.userInfo = userInfo
-                  })
+                  commonToast.hide()
+                  this.automaticQuickLogin.quickLogin()
                 },
               })
             })
@@ -105,10 +100,7 @@ export struct MedicalPersonCardInfo {
           .borderRadius(Constants.RADIUS_TWELVE)
           .padding($r('app.float.medical_link_padding'))
           .onClick(() => {
-            getQuickLoginAnonymousPhone(getContext(this), (isLogin: boolean, userInfo: UserInfo) => {
-              this.userState.isLogin = isLogin
-              this.userState.userInfo = userInfo
-            })
+            this.automaticQuickLogin.quickLogin()
           })
         }
       }
@@ -176,10 +168,8 @@ export struct MedicalPersonCardInfo {
               hasTitle: '关联账号',
               message: $r('app.string.associated_account'),
               confirmAction: () => {
-                getQuickLoginAnonymousPhone(getContext(this), (isLogin: boolean, userInfo: UserInfo) => {
-                  this.userState.isLogin = isLogin
-                  this.userState.userInfo = userInfo
-                })
+                commonToast.hide()
+                this.automaticQuickLogin.quickLogin()
               },
             })
           })

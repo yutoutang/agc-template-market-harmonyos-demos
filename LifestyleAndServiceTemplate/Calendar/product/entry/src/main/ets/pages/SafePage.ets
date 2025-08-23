@@ -6,9 +6,10 @@ import { UserState } from 'common';
 @ComponentV2
 struct SafePage {
   @Local userState: UserState = PersistenceV2.connect(UserState, () => new UserState())!;
+
   build() {
     Column() {
-      Image($r('app.media.app_icon'))
+      Image($r('app.media.foreground'))
         .width(72).height(72)
         .margin({ top: 136, bottom: 24 })
       Text($r('app.string.EntryAbility_label'))
@@ -75,7 +76,7 @@ struct SafePage {
       Row({ space: 12 }) {
         Button($r('app.string.button_cancel'))
           .backgroundColor($r('app.color.safe_cancel_button_bg'))
-          .fontColor($r('app.color.theme_blue_color'))
+          .fontColor($r('sys.color.font_primary'))
           .layoutWeight(1)
           .onClick(() => {
             let context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
@@ -83,10 +84,10 @@ struct SafePage {
           })
         Button($r('app.string.button_agree'))
           .backgroundColor($r('app.color.theme_blue_color'))
-          .fontColor(Color.White)
+          .fontColor($r('sys.color.font_on_primary'))
           .layoutWeight(1)
           .onClick(() => {
-          this.userState.isAgreedPrivacy = true
+            this.userState.isAgreedPrivacy = true
             PersistenceV2.save(UserState)
             router.replaceUrl({ url: 'pages/SplashPage' })
           })

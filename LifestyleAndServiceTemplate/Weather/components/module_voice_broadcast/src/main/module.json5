@@ -1,0 +1,9 @@
+{
+  "module": {
+    "name": "module_voice_broadcast",
+    "type": "har",
+    "deviceTypes": [
+      "default"
+    ]
+  }
+}

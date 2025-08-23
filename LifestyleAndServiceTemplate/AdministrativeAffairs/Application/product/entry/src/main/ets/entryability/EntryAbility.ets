@@ -46,22 +46,27 @@ export default class EntryAbility extends UIAbility {
 
   functionPreload() {
     // 获取安装预加载数据
-    cloudResPrefetch.getPrefetchResult(cloudResPrefetch.PrefetchMode.INSTALL_PREFETCH)
-      .then((data: cloudResPrefetch.PrefetchResult) => {
-        let result: HomeServiceList = (data.result as CloudHomeListResult).result as HomeServiceList
-        emitter.emit(this.event, {
-          data: {
-            homeServiceList: result,
-          },
-        });
-        AppStorage.setOrCreate('homeServiceList', result)
-        hilog.info(0x0000, 'testTag',
-          `Succeeded in getting install prefetch data, result: ${JSON.stringify(data.result)}`);
-      }).catch((err: BusinessError) => {
-      hilog.error(0x0000, 'testTag', `Failed to get install prefetch data, code: ${err.code}, message: ${err.message}`);
-      // 使用原有方式获取应用数据
+    try {
+      cloudResPrefetch.getPrefetchResult(cloudResPrefetch.PrefetchMode.INSTALL_PREFETCH)
+        .then((data: cloudResPrefetch.PrefetchResult) => {
+          let result: HomeServiceList = (data.result as CloudHomeListResult).result as HomeServiceList
+          emitter.emit(this.event, {
+            data: {
+              homeServiceList: result,
+            },
+          });
+          AppStorage.setOrCreate('homeServiceList', result)
+          hilog.info(0x0000, 'testTag',
+            `Succeeded in getting install prefetch data, result: ${JSON.stringify(data.result)}`);
+        }).catch((err: BusinessError) => {
+        hilog.error(0x0000, 'testTag', `Failed to get install prefetch data, code: ${err.code}, message: ${err.message}`);
+        // 使用原有方式获取应用数据
+        this.functionNormal()
+      })
+    }
+    catch (e) {
       this.functionNormal()
-    })
+    }
   }
 
   functionNormal() {

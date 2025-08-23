@@ -7,6 +7,9 @@
   "license": "Apache-2.0",
   "packageType": "InterfaceHar",
   "dependencies": {
-    "common": "file:../../commons/common"
+    "common": "file:../../commons/common",
+    "base_ui": "file:../../components/base_ui",
+    "add_address": "file:../../components/add_address",
+    "shopping_cart": "file:../../components/shopping_cart"
   }
 }

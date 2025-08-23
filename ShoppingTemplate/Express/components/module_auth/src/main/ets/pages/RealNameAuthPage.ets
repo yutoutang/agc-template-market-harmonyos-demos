@@ -22,14 +22,24 @@ export struct RealNameAuthPage {
   build() {
     NavDestination() {
       Column() {
-        this.buildTipInfo()
-        this.buildIdCardPic1();
-        this.buildIdCardPic2();
-        this.buildIdCardPic3();
-        Blank().height(4)
-      }.width('92%').backgroundColor(Color.White).borderRadius(16)
+        Column() {
+          Scroll() {
+            Column() {
+              this.buildTipInfo()
+              this.buildIdCardPic1();
+              this.buildIdCardPic2();
+              this.buildIdCardPic3();
+              Blank().height(4)
+            }.width('92%').backgroundColor(Color.White).borderRadius(16)
+          }
+          .scrollBar(BarState.Off)
+          .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
+        }
+        .layoutWeight(1)
 
-      this.buildButtonRow()
+        this.buildButtonRow()
+      }
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM]);
     }
     .backgroundColor('#f1f3f5')
     .title('实名认证')
@@ -47,6 +57,9 @@ export struct RealNameAuthPage {
         Image(`${this.vm.idCardPic1}`.startsWith('app.media') ? $r(`${this.vm.idCardPic1}`) : `${this.vm.idCardPic1}`)
           .width(220)
           .height(136)
+          .onError(()=>{
+            this.vm.idCardPic1 = 'app.media.id_card_pic_1'
+          })
           .onClick(() => {
             this.vm.isShowIdCard1Sheet = !this.vm.isShowIdCard1Sheet;
             this.vm.currentIdx = 0;
@@ -71,6 +84,9 @@ export struct RealNameAuthPage {
         Image(`${this.vm.idCardPic2}`.startsWith('app.media') ? $r(`${this.vm.idCardPic2}`) : `${this.vm.idCardPic2}`)
           .width(220)
           .height(136)
+          .onError(()=>{
+            this.vm.idCardPic2 = 'app.media.id_card_pic_2'
+          })
           .onClick(() => {
             this.vm.isShowIdCard2Sheet = !this.vm.isShowIdCard2Sheet;
             this.vm.currentIdx = 1
@@ -95,6 +111,9 @@ export struct RealNameAuthPage {
         Image(`${this.vm.idCardPic3}`.startsWith('app.media') ? $r(`${this.vm.idCardPic3}`) : `${this.vm.idCardPic3}`)
           .width(220)
           .height(136)
+          .onError(()=>{
+            this.vm.idCardPic3 = 'app.media.id_card_pic_3'
+          })
           .onClick(() => {
             this.vm.isShowIdCard3Sheet = !this.vm.isShowIdCard3Sheet;
             this.vm.currentIdx = 2
@@ -189,9 +208,12 @@ export struct RealNameAuthPage {
               if (result.resultCode === 0) {
                 if (result.mediaType === picker.PickerMediaType.PHOTO) {
                   this.setResult(result.resultUri)
+                  this.vm.isShowIdCard1Sheet = false
+                  this.vm.isShowIdCard2Sheet = false
+                  this.vm.isShowIdCard3Sheet = false
                 }
               }
-            }
+            },
           )
       }.margin({ top: 10, bottom: 10 })
     }
@@ -228,7 +250,7 @@ export struct RealNameAuthPage {
             this.vm.stack.pop()
           }
         })
-    }.width('92%').margin({ top: 39 })
+    }.width('92%').margin({ top: 39 }).expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM]);
   }
 
   allPicChosen(): boolean {

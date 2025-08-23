@@ -9,6 +9,7 @@ export struct Mine {
   scroller: Scroller = new Scroller();
   modifier: MainTitleModifier = new MainTitleModifier();
   @Param @Require commonServicesContents: ListItemModel[]
+  @Param @Require commonServicesContents_2: ListItemModel[]
   @Param userInfoHandler?: Function = undefined
 
   build() {
@@ -29,6 +30,12 @@ export struct Mine {
           CommonServices({
             title: getString('app.string.mine_common_service'),
             commonServicesContents: this.commonServicesContents
+          });
+        }
+
+        ListItem() {
+          CommonServices({
+            commonServicesContents: this.commonServicesContents_2
           });
         }
       }

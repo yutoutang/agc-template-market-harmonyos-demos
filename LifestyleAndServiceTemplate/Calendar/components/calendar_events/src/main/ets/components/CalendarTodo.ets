@@ -55,7 +55,7 @@ export struct CalendarTodo {
       Row({ space: 18 }) {
         Checkbox({ name: 'checkbox2', group: 'checkboxGroup' })
           .select(this.userEventInfo.isDone)
-          .selectedColor('#BD2529')
+          .selectedColor($r('sys.color.comp_background_emphasize'))
           .enabled(!this.readonly)
           .shape(CheckBoxShape.ROUNDED_SQUARE)
           .onChange((value: boolean) => {

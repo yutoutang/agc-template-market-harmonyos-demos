@@ -1,0 +1,22 @@
+{
+  "routerMap": [
+    {
+      "name": "MyVideoPlayer",
+      "pageSourceFile": "src/main/ets/pages/MyVideoPlayer.ets",
+      "buildFunction": "MyVideoPlayerBuilder",
+      "data": {
+        "description": "this is PageOne"
+      }
+    },
+    {
+      "name": "Partner",
+      "pageSourceFile": "src/main/ets/pages/Partner.ets",
+      "buildFunction": "PartnerBuilder"
+    },
+    {
+      "name": "ActivitiesPage",
+      "pageSourceFile": "src/main/ets/pages/ActivitiesPage.ets",
+      "buildFunction": "ActivitiesPageBuilder"
+    }
+  ]
+}

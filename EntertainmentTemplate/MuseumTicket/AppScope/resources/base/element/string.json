@@ -6,11 +6,15 @@
     },
     {
       "name": "agcit_huawei_museum_ticket",
-      "value": "1.0.0"
+      "value": "1.0.1"
     },
     {
       "name": "agcittype_huawei_museum_ticket",
       "value": "industryTemplate"
+    },
+    {
+      "name": "agcitkid_huawei_museum_ticket",
+      "value": "agcit_huawei_museum_ticket_module_calendar_picker/1.0.0,agcit_huawei_museum_ticket_module_card_swiper/1.0.0,agcit_huawei_museum_ticket_module_page_swiper/1.0.0,agcit_huawei_museum_ticket_module_person_manage/1.0.0"
     }
   ]
 }

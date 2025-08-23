@@ -79,11 +79,11 @@ export struct BaseDatePicker {
         selected: this.datePickerLocal,
       })
         .lunar(this.isLunarDate)
-        .disappearTextStyle({ color: Color.Gray, font: { size: $r('sys.float.Body_M'), weight: FontWeight.Bold } })
-        .textStyle({ color: '#ff182431', font: { size: $r('sys.float.Body_M'), weight: FontWeight.Normal } })
+        .disappearTextStyle({ color: $r('sys.color.font_primary'), font: { size: $r('sys.float.Subtitle_S'), weight: FontWeight.Bold } })
+        .textStyle({ color: $r('sys.color.font_primary'), font: { size: $r('sys.float.Subtitle_M'), weight: FontWeight.Normal } })
         .selectedTextStyle({
-          color: '#C4272B',
-          font: { size: 20, weight: FontWeight.Medium },
+          color: $r('sys.color.font_emphasize'),
+          font: { size: $r('sys.float.Title_S'), weight: FontWeight.Medium },
         })
         .onDateChange((value: Date) => {
           this.datePickerLocal = value
@@ -97,7 +97,7 @@ export struct BaseDatePicker {
       Row() {
         Toggle({ type: ToggleType.Checkbox, isOn: this.isLunarDate })
           .size({ width: 16, height: 16 })
-          .selectedColor('#C4272B')
+          .selectedColor($r('sys.color.comp_background_emphasize'))
           .onChange((isOn: boolean) => {
             this.onLunarChange(isOn)
           })

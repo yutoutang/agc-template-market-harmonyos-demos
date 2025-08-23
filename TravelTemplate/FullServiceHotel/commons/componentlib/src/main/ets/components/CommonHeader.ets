@@ -1,6 +1,5 @@
 import { RouterModule } from 'commonlib';
 
-
 export enum BackButtonType {
   COMMON,
   INVERT,
@@ -11,12 +10,14 @@ export struct CommonHeader {
   @Param
   backButtonType: BackButtonType = BackButtonType.COMMON;
   @Param
+  isSubTitle: boolean = true
+  @Param
   title: string = '';
   private topBannerHeight: number = 56;
 
   @Computed
   get showBackButton() {
-    return Boolean(RouterModule.size() > 0);
+    return Boolean(RouterModule.size() > 0) && this.isSubTitle;
   }
 
   build() {
@@ -33,14 +34,15 @@ export struct CommonHeader {
           });
       }
       Text(this.title)
-        .fontSize($r('app.string.font_size_36'))
+        .fontSize(this.showBackButton ? $r('app.string.font_size_20') : $r('app.string.font_size_24'))
+        .fontWeight(this.showBackButton ? FontWeight.Medium : FontWeight.Bold)
         .fontColor($r('app.color.font_color_level1'));
     }
     .width('100%')
     .padding({
-      left: $r('app.string.padding_s'),
+      left: $r('app.string.padding_l'),
     })
-    .backgroundColor($r('app.color.system_color_background_white'))
+    .backgroundColor($r('app.color.background_color_transparent'))
     .justifyContent(FlexAlign.Start)
     .height(this.topBannerHeight);
   }

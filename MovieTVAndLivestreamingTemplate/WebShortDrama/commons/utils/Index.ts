@@ -1,7 +1,8 @@
 import { Logger, LogLevelType } from "./src/main/ets/logger/AppLogger";
 import { ToastUtil } from "./src/main/ets/utils/ToastUtil";
 import { EventHubUtil } from "./src/main/ets/utils/EventHubUtil";
-import { PreferenceUtil } from "./src/main/ets/storage/preference/PreferenceUtil";
+import { PreferConstant, PreferenceUtil } from "./src/main/ets/storage/preference/PreferenceUtil";
+
 import { CryptoUtil } from "./src/main/ets/utils/CryptoUtil"
 import { GlobalContext } from './src/main/ets/utils/GlobalContext';
 import { ExternalAbilityUtil } from './src/main/ets/utils/ExternalAbilityUtil';
@@ -39,6 +40,7 @@ export { Logger,
   ToastUtil,
   EventHubUtil,
   PreferenceUtil,
+  PreferConstant,
   GlobalContext,
   ExternalAbilityUtil,
   CryptoUtil,

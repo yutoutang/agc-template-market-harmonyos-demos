@@ -188,6 +188,7 @@ export struct CalendarSchedule {
           .enabled(!this.readonly)
       }, (item: string) => item)
     }
+    .width(224)
   }
 
   @Builder

@@ -40,10 +40,10 @@ export function getMockResponse<T>(config: HttpRequestConfig): T {
       return MockData.getMyCar as T;
     case RequestUrl.GET_UPD_CAR_URL:
       return MockData.getUpdCar(params) as T;
-    case RequestUrl.GET_GOOD_INFO_URL:
+    case RequestUrl.GET_GOODS_INFO_URL:
       return MockData.getGoodInfoResp(params) as T;
-    case RequestUrl.GET_GOOD_SPEC_URL:
-      return MockData.getGoodSpecInfo(params) as T;
+    case RequestUrl.GET_GOODS_SPEC_URL:
+      return MockData.getGoodsSpecInfo(params) as T;
     case RequestUrl.GET_ADD_CAR_URL:
       return MockData.addCar(params) as T;
     case RequestUrl.GET_MY_COUPONS_URL:

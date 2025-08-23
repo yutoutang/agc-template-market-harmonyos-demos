@@ -6,7 +6,7 @@ export function RouteDesignBuilder() {
   RouteDesign()
 }
 
-@Component
+@ComponentV2
 export struct RouteDesign {
   vm: RouteEntryVM = RouteEntryVM.instance
 

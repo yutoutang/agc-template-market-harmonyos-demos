@@ -1,9 +1,6 @@
 import { shippingAddress } from '@kit.AccountKit';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { Logger } from 'module_base';
-import { IAddrInfo } from '../http/Type';
-
-const TAG = 'module_address_manage'
+import { IAddrInfo, Logger } from 'module_base';
 
 /**
  * 通用Utils
@@ -23,14 +20,19 @@ export class CommonUtils {
       const data: shippingAddress.AddressInfo = await shippingAddress.chooseAddress(getContext())
       if (data) {
         const address: IAddrInfo = {
-          id: 0,
+          id: '0',
           name: data.userName,
-          cellphone: data.mobileNumber,
+          phone: data.mobileNumber,
+          countryCode: data.countryCode,
+          country: '',
           province: data.provinceName,
           city: data.cityName,
-          area: data.districtName,
-          detailAddress: data.streetName + data.detailedAddress,
-          isDefault: false
+          district: data.districtName,
+          street: data.streetName,
+          detail: data.detailedAddress,
+          isDefault: false,
+          updatedAt: 0,
+          createdAt: 0,
         }
         return address
       }
@@ -42,6 +44,6 @@ export class CommonUtils {
   }
 
   private static _dealAllError(error: BusinessError): void {
-    Logger.error(TAG, `Failed to login, errorCode: ${error.code}, errorMsg: ${error.message}`);
+    Logger.error(`Failed to login, errorCode: ${error.code}, errorMsg: ${error.message}`);
   }
 }

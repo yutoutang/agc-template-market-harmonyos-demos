@@ -1,0 +1,9 @@
+{
+  "module": {
+    "name": "module_page_swiper",
+    "type": "har",
+    "deviceTypes": [
+      "phone"
+    ]
+  }
+}

@@ -2,25 +2,25 @@ import { SymbolGlyphModifier } from '@kit.ArkUI'
 import { getDataFromJSON, RouteEntryVM } from 'common'
 import { LineSet, SearchSet } from 'route_detail'
 import { LineSetInfo, RealTimeBusComponent } from '../components/BusInfo'
-import { RandomCountdown } from '../components/RandomCountdown';
-import { RouterDetailParam } from '../viewmodels/RouterParams';
+import { RandomCountdown } from '../components/RandomCountdown'
+import { RouterDetailParam } from '../viewmodels/RouterParams'
 
 @Builder
 export function RealTimeBusBuilder() {
   RealTimeBus()
 }
 
-@Component
+@ComponentV2
 export struct RealTimeBus {
-  vm: RouteEntryVM = RouteEntryVM.instance;
+  vm: RouteEntryVM = RouteEntryVM.instance
   // 站线名 起点站 终点站 经纬度 站点名 seq
-  @State busSetItems: Array<SearchSet> = []
+  @Local busSetItems: Array<SearchSet> = []
   // 线路名 起点站 终点站 经纬度 orders
-  @State busInfoList: Array<LineSet> = []
-  @State busInfoListAll: Array<LineSet> = []
-  @Consume('busLineTimeList') busLineTimeList: Map<string, RandomCountdown>
-  @State busInfoListName: Array<string> = []
-  @State busInfoListNameOri: Array<string> = []
+  @Local busInfoList: Array<LineSet> = []
+  @Local busInfoListAll: Array<LineSet> = []
+  @Consumer('busLineTimeList') busLineTimeList: Map<string, RandomCountdown> = new Map()
+  @Local busInfoListName: Array<string> = []
+  @Local busInfoListNameOri: Array<string> = []
   scroller: Scroller = new Scroller()
 
   aboutToAppear(): void {
@@ -28,9 +28,9 @@ export struct RealTimeBus {
   }
 
   initDataSource() {
-    this.busSetItems = getDataFromJSON<SearchSet>('Bus_Station.json', this);
-    this.busInfoListAll = getDataFromJSON<LineSet>('Bus_LineName.json', this);
-    this.busInfoList = getDataFromJSON<LineSet>('Bus_Linetop3.json', this);
+    this.busSetItems = getDataFromJSON<SearchSet>('Bus_Station.json', this)
+    this.busInfoListAll = getDataFromJSON<LineSet>('Bus_LineName.json', this)
+    this.busInfoList = getDataFromJSON<LineSet>('Bus_Linetop3.json', this)
     for (let i = 0; i < this.busInfoListAll.length; i++) {
       this.busInfoListName.push(this.busInfoListAll[i].lineName)
     }
@@ -45,8 +45,8 @@ export struct RealTimeBus {
     })
   }
 
-  @State changeValueLine: string = ''
-  @State lineValueInfo: Array<LineSet> = []
+  @Local changeValueLine: string = ''
+  @Local lineValueInfo: Array<LineSet> = []
 
   getLineValueToLineInfo(str: string) {
     this.lineValueInfo = []
@@ -104,53 +104,54 @@ export struct RealTimeBus {
         }
         .alignContent(Alignment.TopEnd)
 
-          Column() {
-            Text('附近站点')
-              .width('90%')
-              .fontSize(16)
-              .fontWeight(FontWeight.Medium)
-              .align(Alignment.TopStart)
-              .margin({bottom:16})
-            // 根据changeValue的值判断
-            if (this.lineValueInfo.length) {
-              List({ space: 8 }) {
-                ForEach(this.lineValueInfo, (item: LineSetInfo) => {
-                  RealTimeBusComponent({ busInfo: item, busTimer: this.busLineTimeList.get(item.lineName) })
-                    .onClick(() => {
-                      // 跳转到对应路线
-                      this.vm.pushByParams('RouteDetailPage',
-                        {
-                          lineName: item.lineName,
-                          busTimer: this.busLineTimeList.get(item.lineName)
-                        } as RouterDetailParam)
-                    })
-                }, (item: LineSetInfo) => item.lineName)
-              }
-              .layoutWeight(1)
-              .alignListItem(ListItemAlign.Center)
-            } else {
-              List({ space: '8lpx' }) {
-                ForEach(this.busInfoList, (item: LineSetInfo) => {
-                  RealTimeBusComponent({ busInfo: item, busTimer: this.busLineTimeList.get(item.lineName) })
-                    .onClick(() => {
-                      this.vm.pushByParams('RouteDetailPage',
-                        {
-                          lineName: item.lineName,
-                          busTimer: this.busLineTimeList.get(item.lineName)
-                        } as RouterDetailParam)
-                    })
-                }, (item: LineSetInfo) => item.lineName)
-              }
-              .layoutWeight(1)
-              .alignListItem(ListItemAlign.Center)
+        Column() {
+          Text('附近站点')
+            .width('90%')
+            .fontSize(16)
+            .fontWeight(FontWeight.Medium)
+            .align(Alignment.TopStart)
+            .margin({ bottom: 16 })
+          // 根据changeValue的值判断
+          if (this.lineValueInfo.length) {
+            List({ space: 8 }) {
+              ForEach(this.lineValueInfo, (item: LineSetInfo) => {
+                RealTimeBusComponent({ busInfo: item, busTimer: this.busLineTimeList.get(item.lineName) })
+                  .onClick(() => {
+                    // 跳转到对应路线
+                    this.vm.pushByParams('RouteDetailPage',
+                      {
+                        lineName: item.lineName,
+                        busTimer: this.busLineTimeList.get(item.lineName)
+                      } as RouterDetailParam)
+                  })
+              }, (item: LineSetInfo) => item.lineName)
             }
+            .padding({
+              bottom: '175lpx'
+            })
+            .alignListItem(ListItemAlign.Center)
+          } else {
+            List({ space: '8lpx' }) {
+              ForEach(this.busInfoList, (item: LineSetInfo) => {
+                RealTimeBusComponent({ busInfo: item, busTimer: this.busLineTimeList.get(item.lineName) })
+                  .onClick(() => {
+                    this.vm.pushByParams('RouteDetailPage',
+                      {
+                        lineName: item.lineName,
+                        busTimer: this.busLineTimeList.get(item.lineName)
+                      } as RouterDetailParam)
+                  })
+              }, (item: LineSetInfo) => item.lineName)
+            }
+            .padding({
+              bottom: '175lpx'
+            })
+            .alignListItem(ListItemAlign.Center)
           }
-          .layoutWeight(1)
-
-          // .padding({bottom:20})
-
+        }
       }
       .backgroundColor('#F1F3F5')
+      .layoutWeight(1)
     }
     .hideTitleBar(true)
   }

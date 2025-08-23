@@ -1,0 +1,12 @@
+{
+  "string": [
+    {
+      "name": "delete_message_prompt",
+      "value": "是否删除%s消息 ？"
+    },
+    {
+      "name": "agcit_huawei_web_short_drama",
+      "value": "2.0.0"
+    }
+  ]
+}

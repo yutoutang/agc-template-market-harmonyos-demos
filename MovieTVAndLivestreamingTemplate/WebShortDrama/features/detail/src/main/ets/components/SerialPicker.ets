@@ -1,5 +1,7 @@
-import { getColor } from '@agctemplate/resources'
+import { getMedia, NAV_PAGE_NAME } from '@agctemplate/resources'
 import { DramaInfo } from '@agctemplate/server'
+import { appRouter, WindowManager } from '@agctemplate/utils'
+import { PlayController } from 'video_swiper'
 import { util } from '@kit.ArkTS'
 
 export class ActorInfo {
@@ -16,6 +18,8 @@ export class ActorInfo {
 @ComponentV2
 export struct DramaDesc {
   @Param @Require @Once dramaInfo: DramaInfo
+  @Param @Require playController: PlayController
+  @Event closeSheet: () => void
 
   build() {
     Column() {
@@ -40,6 +44,20 @@ export struct DramaDesc {
             }.height(21)
             .width(16)
             .margin({ left: 2 })
+            .onClick(() => {
+              this.closeSheet()
+              WindowManager.setWindowSystemBarProperties({ statusBarContentColor: '#e6000000' })
+              this.playController.pause()
+              appRouter.push({
+                builderName: NAV_PAGE_NAME.DramaDetailInfoPage.name, params: {
+                  dramaInfo: this.dramaInfo,
+                  currentIndex: this.playController.curentIndex,
+                  changeIndex: (index: number) => {
+                    this.playController.changeIndex(index)
+                  }
+                }
+              })
+            })
           }
           .align(Alignment.Start)
 
@@ -81,9 +99,11 @@ export struct DramaDesc {
 @ComponentV2
 export struct SerialPicker {
   @Param @Require dramaInfo: DramaInfo
+  @Param @Require playController: PlayController
   @Param @Once spliceNum: number = 30
   @Param @Once currentIndex: number = 5
   @Local currentTabIndex: number = 0
+  @Event closeSheet: () => void
   @Event onIndexSelect: (index: number) => void = (index: number) => {
   };
   pageStack: NavPathStack = new NavPathStack();
@@ -117,7 +137,9 @@ export struct SerialPicker {
     Stack() {
       Column() {
         DramaDesc({
-          dramaInfo: this.dramaInfo
+          dramaInfo: this.dramaInfo,
+          playController: this.playController,
+          closeSheet: () => this.closeSheet()
         })
 
         List({ space: 24 }) {
@@ -144,36 +166,66 @@ export struct SerialPicker {
                 if (index === this.totalTabIndex - 1) {
                   ForEach(this.tailIndexArray, (item: number, indexIndex: number) => {
                     GridItem() {
-                      Text(`${(index) * this.spliceNum + indexIndex + 1}`)
-                        .textAlign(TextAlign.Center)
-                        .width(48)
-                        .height(48)
-                        .onClick(() => {
-                          this.onIndexSelect(index * this.spliceNum + indexIndex)
-                        })
-                        .fontColor($r('sys.color.font_primary'))
-                        .fontSize($r('sys.float.Body_M'))
-                        .backgroundColor(this.currentIndex === (index * this.spliceNum + indexIndex) ?
-                        getColor('app.color.orange') :
-                        $r('sys.color.background_secondary'))
+                      Stack({ alignContent: Alignment.BottomEnd }) {
+                        Text(`${(index) * this.spliceNum + indexIndex + 1}`)
+                          .textAlign(TextAlign.Center)
+                          .width(48)
+                          .height(48)
+                          .onClick(() => {
+                            this.onIndexSelect(index * this.spliceNum + indexIndex)
+                          })
+                          .fontColor(this.currentIndex === (index * this.spliceNum + indexIndex) ? '#EC6E45' :
+                          $r('sys.color.font_primary'))
+                          .fontSize($r('sys.float.Body_M'))
+                          .backgroundColor(this.currentIndex === (index * this.spliceNum + indexIndex) ?
+                            'rgba(236, 110, 69, 0.05)' : $r('sys.color.background_secondary'))
+                        if(this.currentIndex === (index * this.spliceNum + indexIndex)) {
+                          Image(getMedia('app.media.playing'))
+                            .width(10)
+                            .height(8)
+                            .margin({ bottom: 3, right: 3 })
+                        }
+                        if((index * this.spliceNum + indexIndex) > 10 && !PlayController.lockedDrama.get(
+                          this.playController.id)?.includes((index * this.spliceNum + indexIndex)) &&
+                          !this.playController.isVip) {
+                          Image(getMedia('app.media.icon_Lock'))
+                            .width(16)
+                            .height(16)
+                        }
+                      }
                     }
                   }, (item: number) => item.toString())
                 } else {
                   ForEach(this.fullIndexArray, (item: number, indexIndex: number) => {
                     GridItem() {
-                      Text(`${(index) * this.spliceNum + indexIndex + 1}`)
-                        .textAlign(TextAlign.Center)
-                        .width(48)
-                        .height(48)
-                        .onClick(() => {
-                          this.currentIndex = (index * this.spliceNum + indexIndex)
-                          this.onIndexSelect(index * this.spliceNum + indexIndex)
-                        })
-                        .fontColor($r('sys.color.font_primary'))
-                        .fontSize($r('sys.float.Body_M'))
-                        .backgroundColor(this.currentIndex === (index * this.spliceNum + indexIndex) ?
-                        getColor('app.color.orange') :
-                        $r('sys.color.background_secondary'))
+                      Stack({ alignContent: Alignment.BottomEnd }) {
+                        Text(`${(index) * this.spliceNum + indexIndex + 1}`)
+                          .textAlign(TextAlign.Center)
+                          .width(48)
+                          .height(48)
+                          .onClick(() => {
+                            this.currentIndex = (index * this.spliceNum + indexIndex)
+                            this.onIndexSelect(index * this.spliceNum + indexIndex)
+                          })
+                          .fontColor(this.currentIndex === (index * this.spliceNum + indexIndex) ? '#EC6E45' :
+                          $r('sys.color.font_primary'))
+                          .fontSize($r('sys.float.Body_M'))
+                          .backgroundColor(this.currentIndex === (index * this.spliceNum + indexIndex) ?
+                            'rgba(236, 110, 69, 0.05)' : $r('sys.color.background_secondary'))
+                        if(this.currentIndex === (index * this.spliceNum + indexIndex)) {
+                          Image(getMedia('app.media.playing'))
+                            .width(10)
+                            .height(8)
+                            .margin({ bottom: 3, right: 3 })
+                        }
+                        if((index * this.spliceNum + indexIndex) > 10 && !PlayController.lockedDrama.get(
+                          this.playController.id)?.includes((index * this.spliceNum + indexIndex)) &&
+                          !this.playController.isVip) {
+                          Image(getMedia('app.media.icon_Lock'))
+                            .width(16)
+                            .height(16)
+                        }
+                      }
                     }
                   }, (item: number) => item.toString())
                 }

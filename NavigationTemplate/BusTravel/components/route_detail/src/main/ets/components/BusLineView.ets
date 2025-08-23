@@ -9,16 +9,16 @@ export const busIcon: Resource = $r('app.media.bus_icon_normal')
 /*
  * 公交示意图封装
  * */
-@Component
+@ComponentV2
 export struct BusLineView {
   scroller: Scroller = new Scroller()
-  @Prop busStationName: string[] = []
+  @Param busStationName: string[] = []
   // 此处使用下标的形式来计算位置信息，需要在传入时自动转换成下标，提供了getIndex函数用来使用
   // 规则：这辆车在a 到 a+1站之间，则整数部分为a，小数部分使用车距离站点的位置比上两个车站之间的直线距离获得
-  @Prop busIndex: number[] = []
+  @Param busIndex: number[] = []
   // 线路上有多个公交，最近的公交做不同的标记
   //这里使用距离最近的公交在busIndex中的下标，需要调用方提供
-  @Prop nearToMe: number = -1
+  @Param nearToMe: number = -1
 
 
   build() {

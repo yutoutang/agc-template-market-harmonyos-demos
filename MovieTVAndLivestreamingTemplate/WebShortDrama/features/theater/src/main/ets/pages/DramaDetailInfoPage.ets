@@ -1,11 +1,19 @@
-import { getColor, getMedia, getString } from '@agctemplate/resources';
-import { AiBarHeight, AppStorageKeys, StatusBarHeight } from '@agctemplate/widgets';
-import { AppStorageV2 } from '@kit.ArkUI';
-import { NavParams } from '@agctemplate/utils';
-import { DramaInfo } from '@agctemplate/server';
+import { getColor, getMedia, NAV_PAGE_NAME } from '@agctemplate/resources';
+import { AiBarHeight, AppStorageKeys, StatusBarHeight, UserInfoModel } from '@agctemplate/widgets';
+import { AppStorageV2, promptAction } from '@kit.ArkUI';
+import { appRouter, container, NavParams, WindowManager } from '@agctemplate/utils';
 import { DramaCoverVM } from '../viewmodels/DramaCoverVM';
 import { ActorInfo, DramaDetailVM } from '../viewmodels/DramaDetailVM';
 import { DramaRecommendInfo } from '../components/DramaRecommendInfo';
+import { util } from '@kit.ArkTS';
+import { RequestAPI } from '@agctemplate/server';
+import {
+  getDramaInfo,
+  setFavorite,
+  unsetFavorite
+} from '@agctemplate/server/src/main/ets/api/mock/mockData/mockDramaFactory';
+import { Drama } from '@agctemplate/server/src/main/ets/api/mock/mockData/bean';
+import { emitter } from '@kit.BasicServicesKit';
 
 @ComponentV2
 export struct DramaDetailInfoPage {
@@ -14,34 +22,534 @@ export struct DramaDetailInfoPage {
   @Local statusBarHeight: StatusBarHeight = AppStorageV2.connect(StatusBarHeight, AppStorageKeys.STATUS_BAR_HEIGHT,
     () => new StatusBarHeight())!;
   @Param @Require vm: DramaDetailVM;
+  @Param @Once currentIndex: number = 5
+  @Event changeIndex: Function = () => {
+  }
+  @Local spliceNum: number = 30
+  @Local currentTabIndex: number = 0
+  @Local isFavorite: boolean = false
+  @Local isShowSerialPickerSheet: boolean = false
+  @Local recommendList: Array<DramaCoverVM> = []
+  @Local pageNum: number = 1
+  @Local dramaInfo: Drama | null = null
+  @Local userInfo: UserInfoModel = AppStorageV2.connect(UserInfoModel, 'userInfo', () => new UserInfoModel())!;
+  totalTabIndex: number = 0
+  leftIndex: number = 0
+  tabArray: Array<string> = []
+  fullIndexArray: Array<number> = []
+  tailIndexArray: Array<number> = []
+  private controller: TabsController = new TabsController()
 
-  async aboutToAppear(): Promise<void> {
+  aboutToAppear(): void {
+    this.dramaInfo = getDramaInfo(this.vm.detailInfo.id)
+    this.isFavorite = this.dramaInfo.isFavorite
+    this.currentTabIndex = Math.floor(this.currentIndex / this.spliceNum)
+    this.totalTabIndex = Math.floor(this.vm.detailInfo.totalCount / this.spliceNum) + 1
+    for (let i = 0; i < this.totalTabIndex; i++) {
+      if (i === this.totalTabIndex - 1) {
+        this.tabArray.push(`${i * this.spliceNum + 1}-${this.vm.detailInfo.totalCount}`)
+      } else {
+        this.tabArray.push(`${i * this.spliceNum + 1}-${i * this.spliceNum + this.spliceNum}`)
+      }
+    }
+    this.leftIndex = this.vm.detailInfo.totalCount % this.spliceNum
+    for (let i = 0; i < this.spliceNum; i++) {
+      this.fullIndexArray.push(i)
+    }
+    for (let i = 0; i < this.leftIndex; i++) {
+      this.tailIndexArray.push(i)
+    }
+
+    this.getRecommendList(this.pageNum).then((data) => {
+      this.recommendList = data;
+    })
+  }
+
+  async getRecommendList(pageNum: number): Promise<Array<DramaCoverVM>> {
+    let list = await container.resolve(RequestAPI).getRecommendDramaList({
+      pageSize: 5,
+      pageNum: pageNum
+    })
+    const result = list.getBody().data
+      .map(cover => {
+        const item = new DramaCoverVM()
+        item.dramaId = cover.id
+        item.imagePath = cover.coverUrl
+        item.title = cover.name
+        item.content = cover.description
+        item.episodes = cover.totalCount
+        item.latestUpdate = cover.latestUpdate
+        item.rankId = parseInt(cover.id)
+        item.tags = cover.category
+        return item
+      })
+    return Promise.resolve(result)
+  }
+
+  @Builder
+  serialPickerBuilder() {
+    Column() {
+      Column() {
+        Row() {
+          Text('剧集观看')
+            .height(27)
+            .fontSize(20)
+            .fontWeight(700)
+            .fontColor('#000')
+          Image(getMedia('app.media.close_btn'))
+            .width(40)
+            .height(40)
+            .borderRadius(20)
+            .onClick(() => {
+              this.isShowSerialPickerSheet = !this.isShowSerialPickerSheet
+            })
+        }
+        .width('100%')
+        .height(56)
+        .margin({ top: 8 })
+        .justifyContent(FlexAlign.SpaceBetween)
+
+        Column() {
+          List({ space: 24 }) {
+            ForEach(this.tabArray, (item: string, index: number) => {
+              ListItem() {
+                Text(item)
+                  .fontColor(this.currentTabIndex === index ? 'rgba(0, 0, 0, 0.9)' :
+                    'rgba(0, 0, 0, 0.4)')
+                  .fontSize(14)
+                  .height(19)
+              }.onClick(() => {
+                this.currentTabIndex = index
+              })
+            }, (item: string, index: number) => item + index)
+          }.width('100%')
+          .listDirection(Axis.Horizontal)
+          .height(19)
+          .margin({ bottom: 16 })
+
+          Tabs({ index: this.currentTabIndex, controller: this.controller }) {
+            ForEach(this.tabArray, (item: string, index: number) => {
+              TabContent() {
+                Grid() {
+                  if (index === this.totalTabIndex - 1) {
+                    ForEach(this.tailIndexArray, (item: number, indexIndex: number) => {
+                      GridItem() {
+                        Stack({ alignContent: Alignment.BottomEnd }) {
+                          Text(`${(index) * this.spliceNum + indexIndex + 1}`)
+                            .textAlign(TextAlign.Center)
+                            .width(48)
+                            .height(48)
+                            .fontColor(this.currentIndex === (index * this.spliceNum + indexIndex) ? '#EC6E45' :
+                              $r('sys.color.font_primary'))
+                            .fontSize($r('sys.float.Body_M'))
+                            .backgroundColor(this.currentIndex === (index * this.spliceNum + indexIndex) ?
+                              'rgba(236, 110, 69, 0.05)' : 'rgba(0, 0, 0, 0.05)')
+                          if (this.currentIndex === (index * this.spliceNum + indexIndex)) {
+                            Image(getMedia('app.media.playing'))
+                              .width(10)
+                              .height(8)
+                              .margin({ bottom: 3, right: 3 })
+                          }
+                        }
+                      }
+                      .onClick(() => {
+                        this.isShowSerialPickerSheet = false
+                        WindowManager.setWindowSystemBarProperties({ statusBarContentColor: '#e6ffffff' })
+                        appRouter.back(true)
+                        this.changeIndex(index * this.spliceNum + indexIndex)
+                      })
+                    }, (item: number) => item.toString())
+                  } else {
+                    ForEach(this.fullIndexArray, (item: number, indexIndex: number) => {
+                      GridItem() {
+                        Stack({ alignContent: Alignment.BottomEnd }) {
+                          Text(`${(index) * this.spliceNum + indexIndex + 1}`)
+                            .textAlign(TextAlign.Center)
+                            .width(48)
+                            .height(48)
+                            .fontColor(this.currentIndex === (index * this.spliceNum + indexIndex) ? '#EC6E45' :
+                              $r('sys.color.font_primary'))
+                            .fontSize($r('sys.float.Body_M'))
+                            .backgroundColor(this.currentIndex === (index * this.spliceNum + indexIndex) ?
+                              'rgba(236, 110, 69, 0.05)' : 'rgba(0, 0, 0, 0.05)')
+                          if (this.currentIndex === (index * this.spliceNum + indexIndex)) {
+                            Image(getMedia('app.media.playing'))
+                              .width(10)
+                              .height(8)
+                              .margin({ bottom: 3, right: 3 })
+                          }
+                        }
+                      }
+                      .onClick(() => {
+                        this.isShowSerialPickerSheet = false
+                        WindowManager.setWindowSystemBarProperties({ statusBarContentColor: '#e6ffffff' })
+                        appRouter.back(true)
+                        this.changeIndex(index * this.spliceNum + indexIndex)
+                      })
+                    }, (item: number) => item.toString())
+                  }
+
+                }
+                .maxCount(6)
+                .columnsGap(8)
+                .rowsGap(8)
+              }
+              .align(Alignment.Top)
+
+            }, (item: string) => item + util.generateRandomUUID())
+          }
+          .onChange((index: number) => {
+            this.currentTabIndex = index
+          })
+          .barHeight(0)
+        }
+        .width('100%')
+        .margin({ top: 8 })
+      }
+      .width('100%')
+    }
+    .height('100%')
+    .padding({ left: 16, right: 16 })
+  }
+
+  detailInfoSendFavoriteEmitter() {
+    let event: emitter.InnerEvent = {
+      eventId: 5
+    };
+    let eventData: emitter.EventData = {
+      data: {
+        id: 5
+      }
+    };
+    emitter.emit(event, eventData);
   }
 
   build() {
     NavDestination() {
-      Scroll() {
-        Column() {
-          InfoView({
-            detailInfo: this.vm.detailInfo,
-            onPlayClick: () => {
-              this.vm.playDrama()
+      Stack({ alignContent: Alignment.Bottom }) {
+        Scroll() {
+          Column() {
+            Column() {
+              Row({ space: 16 }) {
+                Image(this.vm.detailInfo.coverUrl)
+                  .width(48)
+                  .height(64)
+                  .borderRadius(4)
+                Column() {
+                  Text(this.vm.detailInfo.name)
+                    .fontSize(16)
+                    .fontWeight(500)
+                    .fontColor($r('sys.color.font_primary'))
+                    .maxLines(1)
+                    .width('100%')
+                    .height(21)
+                    .textAlign(TextAlign.Start)
+                    .textOverflow({
+                      overflow: TextOverflow.Ellipsis
+                    })
+
+                  Text(`${this.vm.detailInfo.category} · 热度${this.vm.detailInfo.popular}`)
+                    .height(16)
+                    .fontSize(12)
+                    .fontColor($r('sys.color.font_secondary'))
+                    .fontWeight(400)
+                    .margin({ top: 2 })
+                    .width('100%')
+
+                  List({ space: 16 }) {
+                    ForEach(this.vm.detailInfo.actorInfo, (item: ActorInfo) => {
+                      ListItem() {
+                        Row() {
+                          Image(item.avatar)
+                            .width(16)
+                            .height(16)
+                            .borderRadius(8)
+                          Text(item.name)
+                            .fontSize(12)
+                            .fontWeight(FontWeight.Regular)
+                            .opacity(0.6)
+                            .height(16)
+                            .margin({ left: 8 })
+                        }
+                        .height(24)
+                        .alignItems(VerticalAlign.Bottom)
+                      }
+                      .height(24)
+                    }, (item: ActorInfo, index: number) => item.name + '_' + index.toString())
+                  }
+                  .width('100%')
+                  .height(24)
+                  .listDirection(Axis.Horizontal)
+                }
+              }
+              .width('100%')
+              .height(80)
+
+              Column() {
+                Row() {
+                  Text('剧情简介')
+                    .height(24)
+                    .fontSize(18)
+                    .fontWeight(700)
+                    .fontColor('#000')
+                  ForEach(
+                    this.vm.detailInfo.category,
+                    (item: string) => {
+                      Text(item)
+                        .height(16)
+                        .fontSize(10)
+                        .lineHeight(13)
+                        .fontWeight(400)
+                        .fontColor('#000')
+                        .padding({ left: 4, right: 4 })
+                        .backgroundColor('rgba(0, 0, 0, 0.05)')
+                        .margin({ left: 12 })
+                    }
+                  )
+                }
+                .height(24)
+
+                Text(this.vm.detailInfo.description)
+                  .width('100%')
+                  .margin({ top: 12 })
+                  .fontSize(14)
+                  .fontWeight(400)
+                  .lineHeight(19)
+                  .fontColor($r('sys.color.font_primary'))
+                  .align(Alignment.TopStart)
+              }
+              .width('100%')
+              .alignItems(HorizontalAlign.Start)
+              .margin({ top: 24 })
+
+              Row() {
+                Text('剧集')
+                  .height(24)
+                  .fontSize(18)
+                  .fontWeight(700)
+                  .fontColor('#000')
+                Row() {
+                  Text(this.vm.detailInfo.latestUpdate === this.vm.detailInfo.totalCount ? '已完结' : '连载中')
+                    .lineHeight(16)
+                    .fontSize(12)
+                    .fontColor('rgba(0, 0, 0, 0.6)')
+                  Text('·')
+                    .lineHeight(16)
+                    .fontSize(12)
+                    .fontColor('rgba(0, 0, 0, 0.6)')
+                  Text(`共${this.vm.detailInfo.totalCount}集`)
+                    .lineHeight(16)
+                    .fontSize(12)
+                    .fontColor('rgba(0, 0, 0, 0.6)')
+                  Column() {
+                    Image(getMedia('app.media.arrow_right'))
+                      .width(9)
+                      .height(9)
+                  }
+                  .width(16)
+                  .height(16)
+                  .justifyContent(FlexAlign.Center)
+                  .margin({ left: 2 })
+                }
+                .height(16)
+                .onClick(() => {
+                  this.isShowSerialPickerSheet = !this.isShowSerialPickerSheet
+                })
+                .bindSheet($$this.isShowSerialPickerSheet, this.serialPickerBuilder(), {
+                  height: 736,
+                  showClose: false,
+                  preferType: SheetType.BOTTOM
+                })
+              }
+              .width('100%')
+              .height(56)
+              .margin({ top: 24 })
+              .justifyContent(FlexAlign.SpaceBetween)
+
+              Column() {
+                List({ space: 24 }) {
+                  ForEach(this.tabArray, (item: string, index: number) => {
+                    ListItem() {
+                      Text(item)
+                        .fontColor(this.currentTabIndex === index ? 'rgba(0, 0, 0, 0.9)' :
+                          'rgba(0, 0, 0, 0.4)')
+                        .fontSize(14)
+                        .height(19)
+                    }.onClick(() => {
+                      this.currentTabIndex = index
+                    })
+                  }, (item: string, index: number) => item + index)
+                }.width('100%')
+                .listDirection(Axis.Horizontal)
+                .height(19)
+                .margin({ bottom: 16 })
+
+                Tabs({ index: this.currentTabIndex, controller: this.controller }) {
+                  ForEach(this.tabArray, (item: string, index: number) => {
+                    TabContent() {
+                      Row({ space: 8 }) {
+                        if (index === this.totalTabIndex - 1) {
+                          ForEach(this.tailIndexArray.slice(0, 6), (item: number, indexIndex: number) => {
+                            Stack({ alignContent: Alignment.BottomEnd }) {
+                              Text(`${(index) * this.spliceNum + indexIndex + 1}`)
+                                .textAlign(TextAlign.Center)
+                                .width(48)
+                                .height(48)
+                                .fontColor(this.currentIndex === (index * this.spliceNum + indexIndex) ? '#EC6E45' :
+                                  $r('sys.color.font_primary'))
+                                .fontSize($r('sys.float.Body_M'))
+                                .backgroundColor(this.currentIndex === (index * this.spliceNum + indexIndex) ?
+                                  'rgba(236, 110, 69, 0.05)' : $r('sys.color.background_secondary'))
+                              if (this.currentIndex === (index * this.spliceNum + indexIndex)) {
+                                Image(getMedia('app.media.playing'))
+                                  .width(10)
+                                  .height(8)
+                                  .margin({ bottom: 3, right: 3 })
+                              }
+                            }
+                            .onClick(() => {
+                              this.isShowSerialPickerSheet = false
+                              WindowManager.setWindowSystemBarProperties({ statusBarContentColor: '#e6ffffff' })
+                              appRouter.back(true)
+                              this.changeIndex(index * this.spliceNum + indexIndex)
+                            })
+                          }, (item: number) => item.toString())
+                        } else {
+                          ForEach(this.fullIndexArray.slice(0, 6), (item: number, indexIndex: number) => {
+                            Stack({ alignContent: Alignment.BottomEnd }) {
+                              Text(`${(index) * this.spliceNum + indexIndex + 1}`)
+                                .textAlign(TextAlign.Center)
+                                .width(48)
+                                .height(48)
+                                .fontColor(this.currentIndex === (index * this.spliceNum + indexIndex) ? '#EC6E45' :
+                                  $r('sys.color.font_primary'))
+                                .fontSize($r('sys.float.Body_M'))
+                                .backgroundColor(this.currentIndex === (index * this.spliceNum + indexIndex) ?
+                                  'rgba(236, 110, 69, 0.05)' : $r('sys.color.background_secondary'))
+                              if (this.currentIndex === (index * this.spliceNum + indexIndex)) {
+                                Image(getMedia('app.media.playing'))
+                                  .width(10)
+                                  .height(8)
+                                  .margin({ bottom: 3, right: 3 })
+                              }
+                            }
+                            .onClick(() => {
+                              this.isShowSerialPickerSheet = false
+                              WindowManager.setWindowSystemBarProperties({ statusBarContentColor: '#e6ffffff' })
+                              appRouter.back(true)
+                              this.changeIndex(index * this.spliceNum + indexIndex)
+                            })
+                          }, (item: number) => item.toString())
+                        }
+                      }
+                      .width('100%')
+                      .height(48)
+                    }
+                    .align(Alignment.Top)
+                  }, (item: string) => item + util.generateRandomUUID())
+                }
+                .onChange((index: number) => {
+                  this.currentTabIndex = index
+                })
+                .barHeight(0)
+              }
+              .height(85)
+
+              RecommendView({
+                recommendList: this.recommendList, gutter: 21, onItemClick: (options: DramaCoverVM) => {
+                  this.vm.jumpDetailPage(options)
+                },
+                changeRecommendList: () => {
+                  if(this.pageNum < 10) {
+                    this.pageNum++
+                  }else {
+                    this.pageNum = 1
+                  }
+                  this.getRecommendList(this.pageNum).then((data) => {
+                    this.recommendList = data;
+                  })
+                }
+              })
+                .margin({ top: 24 })
+
+              Column()
+                .width('100%')
+                .height(156)
             }
-          })
-          ActorsView({ actorInfo: this.vm.detailInfo.actorInfo })
-          RecommendView({
-            recommendList: this.vm.recommendList, gutter: 21, onItemClick: (options: DramaCoverVM) => {
-              this.vm.jumpDetailPage(options)
-            }
-          })
+            .width('100%')
+          }
+          .width('100%')
+          .padding({ left: 16, right: 16 })
         }
-        .margin({ top: 12 })
-        .padding({ left: 16, right: 16 })
+        .edgeEffect(EdgeEffect.Spring)
         .width('100%')
-        .height(651)
+        .height('100%')
+        .scrollBar(BarState.Off)
+
+        Row() {
+          Row() {
+            Column() {
+              Image(this.isFavorite ? getMedia('app.media.favorite_select') :
+                getMedia('app.media.favorite_black'))
+                .width(21)
+                .height(21)
+              Text('收藏')
+                .fontSize(10)
+                .lineHeight(13)
+                .margin({ top: 4 })
+            }
+            .width(48)
+            .margin({ right: 12 })
+            .onClick(() => {
+              if (this.userInfo.isPhoneAssociated) {
+                if (this.isFavorite) {
+                  unsetFavorite(this.dramaInfo!.id)
+                  promptAction.showToast({ message: '取消收藏成功' })
+                } else {
+                  setFavorite(this.dramaInfo!.id)
+                  promptAction.showToast({ message: '收藏成功' })
+                }
+                this.isFavorite = this.dramaInfo!.isFavorite
+                this.detailInfoSendFavoriteEmitter()
+              }else {
+                appRouter.push({ builderName: NAV_PAGE_NAME.LoginPage.name })
+              }
+            })
+
+            Row() {
+              Row({ space: 16 }) {
+                Image(getMedia('app.media.continue_play'))
+                  .width(12)
+                  .height(14)
+                Text('继续播放')
+                  .lineHeight(21)
+                  .fontSize(16)
+                  .fontWeight(500)
+              }
+            }
+            .borderRadius(20)
+            .backgroundColor('rgba(0, 0, 0, 0.05)')
+            .justifyContent(FlexAlign.Center)
+            .layoutWeight(1)
+            .height(40)
+            .onClick(() => {
+              WindowManager.setWindowSystemBarProperties({ statusBarContentColor: '#e6ffffff' })
+              appRouter.back(true)
+            })
+          }
+          .width('100%')
+          .height(56)
+          .padding({ left: 16, right: 16 })
+        }
+        .width('100%')
+        .backgroundColor(getColor('app.color.normal_background_color'))
       }
-      .scrollBar(BarState.Off)
     }
+    .onBackPressed(() => {
+      WindowManager.setWindowSystemBarProperties({ statusBarContentColor: '#e6ffffff' })
+      appRouter.back(true)
+      return true
+    })
     .backgroundColor(getColor('app.color.normal_background_color'))
     .padding({
       top: `${px2vp(this.statusBarHeight.value)}vp`,
@@ -50,149 +558,47 @@ export struct DramaDetailInfoPage {
   }
 }
 
-@ComponentV2
-struct InfoView {
-  @Param @Require detailInfo: DramaInfo;
-  @Event onPlayClick: Function
-
-  build() {
-    Column() {
-      Row({ space: 16 }) {
-        Image(this.detailInfo.coverUrl)
-          .width(68)
-          .height(90)
-          .borderRadius(8)
-          .margin({ top: 1 })
-          .border({ width: 1, color: '#0d000000', style: BorderStyle.Solid })
-
-        Column() {
-          Text(this.detailInfo.name)
-            .fontSize($r('sys.float.Subtitle_M'))
-            .fontWeight(FontWeight.Medium)
-            .fontColor($r('sys.color.font_primary'))
-            .maxLines(1)
-            .width('100%')
-            .height(21)
-            .textAlign(TextAlign.Start)
-            .textOverflow({
-              overflow: TextOverflow.Ellipsis
-            })
-            .margin({ top: 5, left: 5 })
-
-          Text(`${this.detailInfo.category} · ${this.detailInfo.popular}`)
-            .height(19)
-            .fontSize($r('sys.float.Body_M'))
-            .fontColor($r('sys.color.font_secondary'))
-            .fontWeight(FontWeight.Regular)
-            .margin({ top: 2 })
-            .width('100%')
-
-          Row() {
-            Button() {
-              Row() {
-                Image(getMedia('app.media.info_play'))
-                  .width(16)
-                  .height(16)
-                  .margin({ right: 4 })
-                Text(getString('app.string.play'))
-                  .textAlign(TextAlign.Start)
-                  .fontSize($r('sys.float.Subtitle_M'))
-                  .fontWeight(FontWeight.Medium)
-                  .fontColor($r('sys.color.font_primary'))
-              }
-            }
-            .width(96)
-            .height(36)
-            .borderRadius(21)
-            .margin({ top: 13 })
-            .backgroundColor($r('sys.color.comp_background_tertiary'))
-            .onClick(() => this.onPlayClick())
-          }
-          .width('100%')
-        }
-      }
-      .width('100%')
-
-      Text(getString('app.string.synopsis_desc'))
-        .width('100%')
-        .height(24)
-        .fontSize($r('sys.float.Subtitle_L'))
-        .fontWeight(FontWeight.Bold)
-        .fontColor($r('sys.color.font_primary'))
-        .margin({ top: 36 })
-
-      Text(this.detailInfo.description)
-        .width('100%')
-        .height(114)
-        .maxLines(6)
-        .margin({ top: 12 })
-        .fontSize(14)
-        .fontWeight(FontWeight.Regular)
-        .fontColor($r('sys.color.font_primary'))
-        .align(Alignment.TopStart)
-        .textOverflow({ overflow: TextOverflow.Ellipsis })
-    }
-  }
-}
-
-@ComponentV2
-struct ActorsView {
-  @Param @Require actorInfo: ActorInfo[];
-
-  build() {
-    Column() {
-      Text(getString('app.string.actor'))
-        .width('100%')
-        .height(24)
-        .fontSize($r('sys.float.Subtitle_L'))
-        .fontWeight(FontWeight.Bold)
-        .fontColor($r('sys.color.font_primary'))
-        .margin({ top: 24, bottom: 12 })
-
-      List() {
-        ForEach(this.actorInfo, (item: ActorInfo) => {
-          ListItem() {
-            Column() {
-              Image(item.avatar)
-                .borderRadius(24)
-                .width(48)
-                .height(48)
-                .margin({ bottom: 8 })
-
-              Text(item.name)
-                .height(19)
-                .fontSize($r('sys.float.Body_M'))
-                .fontColor($r('sys.color.font_primary'))
-                .fontWeight(FontWeight.Regular)
-            }
-            .margin({ right: 16 })
-          }
-        }, (item: ActorInfo) => JSON.stringify(item))
-      }
-      .listDirection(Axis.Horizontal)
-      .width('100%')
-      .height(75)
-    }
-    .width('100%')
-    .margin({ bottom: 24 })
-  }
-}
 
 @ComponentV2
 struct RecommendView {
   @Param @Require recommendList: Array<DramaCoverVM>
   @Param @Require gutter: number
   @Event onItemClick: Function
+  @Local rotating: number = 0
+  @Event changeRecommendList: () => void
 
   build() {
     Column() {
-      Text(getString('app.string.related_recommned'))
-        .width('100%')
-        .height(24)
-        .fontSize($r('sys.float.Subtitle_L'))
-        .fontWeight(FontWeight.Bold)
-        .fontColor($r('sys.color.font_primary'))
-        .margin({ bottom: 12 })
+      Row() {
+        Text('猜你喜欢')
+          .height(24)
+          .fontSize($r('sys.float.Subtitle_L'))
+          .fontWeight(FontWeight.Bold)
+          .fontColor($r('sys.color.font_primary'))
+          .margin({ bottom: 12 })
+        Row() {
+          Image(getMedia('app.media.ic_public_refresh'))
+            .width(14)
+            .height(14)
+            .margin({ right: 4 })
+            .rotate({ angle: this.rotating })
+            .animation({ duration: 300, curve: Curve.Linear })
+          Text('换一批')
+            .fontSize(12)
+            .lineHeight(16)
+            .fontColor('rgba(0, 0, 0, 0.6)')
+        }
+        .height(16)
+        .onClick(() => {
+          this.rotating += 360
+          setTimeout(() => {
+            this.changeRecommendList()
+          }, 300)
+        })
+      }
+      .width('100%')
+      .height(56)
+      .justifyContent(FlexAlign.SpaceBetween)
 
       List() {
         ForEach(this.recommendList, (recommend: DramaCoverVM) => {
@@ -202,7 +608,6 @@ struct RecommendView {
           .margin({ right: 9.5 })
         }, (item: DramaCoverVM) => item.dramaId + item.title)
       }
-      .height('100%')
       .width('100%')
       .listDirection(Axis.Horizontal)
       .scrollBar(BarState.Off)
@@ -213,5 +618,9 @@ struct RecommendView {
 
 @Builder
 export function dramaInfoPageBuilder() {
-  DramaDetailInfoPage({ vm: new DramaDetailVM(NavParams.getParams()?.dramaInfo) });
+  DramaDetailInfoPage({
+    vm: new DramaDetailVM(NavParams.getParams()?.dramaInfo),
+    currentIndex: NavParams.getParams()?.currentIndex,
+    changeIndex: NavParams.getParams()?.changeIndex
+  });
 }

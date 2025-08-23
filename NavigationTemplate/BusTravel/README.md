@@ -1,11 +1,11 @@
 # 出行导航（公交）应用模板快速入门
 
 ## 目录
+
 - [功能介绍](#功能介绍)
-- [环境要求](#环境要求)
+- [约束与限制](#约束与限制)
 - [快速入门](#快速入门)
 - [示例效果](#示例效果)
-- [权限要求](#权限要求)
 - [开源许可协议](#开源许可协议)
 
 ## 功能介绍
@@ -102,8 +102,11 @@ BusTravel
 │  │  │  └─EntryBackupAbility.ets                      // 主入口生命周期（包含预加载）
 │  │  ├─pages
 │  │  │  └─Index.ets                                   // 主页
+│  │  │  └─AgreeDialogPage.ets                         // 确认取消隐私协议弹框
+│  │  │  └─SafePage.ets                                // 隐私协议声明页
 │  │  └─viewmodels
-│        └─EntryVM.ets                                 // 路由管理
+│  │  │  └─EntryVM.ets                                 // 路由管理
+│        └─SafePageVm.ets                              // 隐私协议管理VM
 ├─feature
 │  ├─CodeScan/src/main/ets
 │  │  └─index
@@ -156,24 +159,28 @@ BusTravel
 │        └─RouterParams.ets                            // 路由参数
 ```
 
-## 环境要求
-### 软件
-* DevEco Studio版本：DevEco Studio 5.0.0 Release及以上
-* HarmonyOS SDK版本：HarmonyOS 5.0.0 Release SDK及以上
-### 硬件
-* 设备类型：华为手机（直板机）
-* HarmonyOS版本：HarmonyOS 5.0.0 Release及以上
+## 约束与限制
+### 环境
+* DevEco Studio版本：DevEco Studio 5.1.0 Release及以上
+* HarmonyOS SDK版本：HarmonyOS 5.1.0 Release SDK及以上
+* 设备类型：华为手机（直板机、双折叠）
+* HarmonyOS版本：HarmonyOS 5.0.0(12)及以上
+
+### 权限
+* 网络权限：ohos.permission.INTERNET
+* 获取位置权限：ohos.permission.LOCATION
+* 模糊位置信息：ohos.permission.APPROXIMATELY_LOCATION
+
 
 ## 快速入门
 
 ### 配置工程
+
 在运行此模板前，需要完成以下配置：
 
 1. 在AppGallery Connect创建应用，将包名配置到模板中。
 
-   a.
-   参考[创建HarmonyOS应用](https://developer.huawei.com/consumer/cn/doc/app/agc-help-createharmonyapp-0000001945392297)
-   为应用创建APP ID，并将APP ID与应用进行关联。
+   a. 参考[创建HarmonyOS应用](https://developer.huawei.com/consumer/cn/doc/app/agc-help-create-app-0000002247955506)为应用创建APP ID，并将APP ID与应用进行关联。
 
    b. 返回应用列表页面，查看应用的包名。
 
@@ -181,21 +188,20 @@ BusTravel
 
 2. 配置华为账号服务。
 
-   a. 将应用的client ID配置到entry模块的[module.json5](entry/src/main/module.json5)
-   文件，详细参考：[配置Client ID](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-client-id)。
+   a. 将应用的client ID配置到entry模块的[module.json5](entry/src/main/module.json5)文件，详细参考：[配置Client ID](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-client-id)。
 
-   b.
-   申请华为账号一键登录所需的quickLoginMobilePhone权限，详细参考：[配置scope权限](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-config-permissions)
-   。在端侧使用快速验证手机号码Button进行[验证获取手机号码](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-get-phonenumber)。
+   b. 申请华为账号一键登录所需的quickLoginMobilePhone权限，详细参考：[配置scope权限](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-config-permissions)。在端侧使用快速验证手机号码Button进行[验证获取手机号码](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-get-phonenumber)。
 
 3. 配置地图服务。
 
    a. 将应用的client ID配置到entry模块的[module.json5](entry/src/main/module.json5)文件，如果华为账号服务已配置，可跳过此步骤。
 
    b. [开通地图服务](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/map-config-agc)。
+
 4. 对应用进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing#section297715173233)。
-5. 添加手工签名所用证书对应的公钥指纹。详细参考：[配置应用签名证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-signature-info-0000001628566748#section5181019153511)
-   
+
+5. 添加手工签名所用证书对应的公钥指纹。详细参考：[配置应用签名证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-cert-fingerprint-0000002278002933)
+
 ### 运行调试工程
 
 1. 连接调试手机和PC。
@@ -205,12 +211,6 @@ BusTravel
 
 ## 示例效果
 [应用示例效果](./screenshots/应用使用示例效果.mp4)
-
-## 权限要求
-需要向系统申请的权限列表
-* 网络权限：ohos.permission.INTERNET
-* 获取位置权限：ohos.permission.LOCATION
-* 模糊位置信息：ohos.permission.APPROXIMATELY_LOCATION
 
 ## 开源许可协议
 该代码经过[Apache 2.0 授权许可](http://www.apache.org/licenses/LICENSE-2.0)。

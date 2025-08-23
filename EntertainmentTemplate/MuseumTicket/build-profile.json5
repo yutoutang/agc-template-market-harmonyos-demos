@@ -6,6 +6,7 @@
         "name": "default",
         "signingConfig": "default",
         "compatibleSdkVersion": "5.0.0(12)",
+        "targetSdkVersion": "5.0.0(12)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
           "strictMode": {
@@ -17,7 +18,7 @@
     ],
     "buildModeSet": [
       {
-        "name": "debug",
+        "name": "debug"
       },
       {
         "name": "release"
@@ -39,11 +40,11 @@
     },
     {
       "name": "network",
-      "srcPath": "./commons/network",
+      "srcPath": "./commons/network"
     },
     {
-      "name": "uicalendarpicker",
-      "srcPath": "./commons/uicalendarpicker"
+      "name": "module_calendar_picker",
+      "srcPath": "./components/module_calendar_picker"
     },
     {
       "name": "commonlib",
@@ -96,6 +97,54 @@
           ]
         }
       ]
+    },
+    {
+      "name": "explain",
+      "srcPath": "./features/explain",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "module_card_swiper",
+      "srcPath": "./components/module_card_swiper"
+    },
+    {
+      "name": "treasure",
+      "srcPath": "./features/treasure",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "active",
+      "srcPath": "./features/active",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "module_page_swiper",
+      "srcPath": "./components/module_page_swiper"
+    },
+    {
+      "name": "module_person_manage",
+      "srcPath": "./components/module_person_manage"
     }
   ]
 }

@@ -9,37 +9,42 @@ import { BusLineView } from './BusLineView'
 
 const context = getContext(this) as common.UIAbilityContext
 
-@Component
+@ComponentV2
 export struct RouteDetail {
   hwMap = new HWMap(context)
   // 站点
-  @Prop stationLocation: SearchSet[] = []
+  @Param stationLocation: SearchSet[] = []
   /*
    * 公交路线信息
    * 车次、行车方向、首班时间、末班时间、票价、当前站点、具体路线、最近的三辆车
    * */
-  @Prop busLineInfo: BusLineInfo = new BusLineInfo()
+  @Param busLineInfo: BusLineInfo = new BusLineInfo()
   /*
    * 当前该路线的公交车
-   * 在外部动态修改参数,数组修改需要用slice或push等方法才可以监听到变化
+   * 在外部动态修改参数,监听整体变化和增删变化
    * */
-  @Prop @Watch('refreshBus') busLocation: mapCommon.LatLng[]
+  @Param busLocation: mapCommon.LatLng[] = []
+  @Monitor('busLocation','busLocation.length')
+  refreshBus() {
+    // 公交位置发生变化，地图上重新绘制公交
+    this.hwMap.refreshBus(this.busLocation)
+  }
   // 横向图形，当前路线上的公交车索引数组
-  @Prop busIndex: number[] = []
+  @Param busIndex: number[] = []
   // 距离最近的公交的下标
-  @Prop nearToMe: number = -1
+  @Param nearToMe: number = -1
   // 控制手势滑动高度
-  @State columnMaxHeight: number = 0
-  @State tempColumnHeight: number = CommonConstants.HEIGHT_MIDDLE
+  @Local columnMaxHeight: number = 0
+  @Local tempColumnHeight: number = CommonConstants.HEIGHT_MIDDLE
   // 线路，经纬度数组，从站点信息中拿到
-  @State lineDots: mapCommon.LatLng[] = []
-  @State mapController?: map.MapComponentController | undefined = undefined
-  @State currentBreakpoint: string = BreakpointConstants.BREAKPOINT_MD
-  @State isShowBack: boolean = false
-  @State isShow: boolean = true
-  @State columnHeight: number = CommonConstants.HEIGHT_MIDDLE
-  @State left: number = CommonConstants.LEFT_MD
-  @State tempLeft: number = CommonConstants.LEFT_MD
+  @Local lineDots: mapCommon.LatLng[] = []
+  @Local mapController?: map.MapComponentController | undefined = undefined
+  @Local currentBreakpoint: string = BreakpointConstants.BREAKPOINT_MD
+  @Local isShowBack: boolean = false
+  @Local isShow: boolean = true
+  @Local columnHeight: number = CommonConstants.HEIGHT_MIDDLE
+  @Local left: number = CommonConstants.LEFT_MD
+  @Local tempLeft: number = CommonConstants.LEFT_MD
   private smMaxHeight: number =
     DeviceScreen.getDeviceHeight() - 8 - (px2vp(AppStorage.get('topRectHeight') as number)) ?? 0
   private panOptionHeight: PanGestureOptions = new PanGestureOptions({
@@ -62,10 +67,6 @@ export struct RouteDetail {
     }
   }
 
-  // 公交位置发生变化，地图上重新绘制公交
-  refreshBus() {
-    this.hwMap.refreshBus(this.busLocation)
-  }
 
   drawAll() {
     this.stationLocation.forEach((item: SearchSet) => {

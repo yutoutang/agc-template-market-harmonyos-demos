@@ -1,6 +1,6 @@
-import { ReservationRecord, UserInfo } from '../model/CommonInterface';
+import { ReservationRecord } from '../model/CommonInterface';
 import { Type } from '@kit.ArkUI';
-
+import { UserInfo } from 'automatic_association_count';
 // 用户数据
 @ObservedV2
 export class UserState {

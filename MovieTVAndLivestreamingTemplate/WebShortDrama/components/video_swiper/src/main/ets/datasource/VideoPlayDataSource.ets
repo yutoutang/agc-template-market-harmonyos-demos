@@ -70,7 +70,7 @@ export abstract class BasicDataSource implements IDataSource {
 export class VideoPlayDataSource extends BasicDataSource {
   @Trace videoList: Array<VideoPlayData> = [];
 
-  // // 获取数组长度
+  // 获取数组长度
   public totalCount(): number {
     return this.videoList.length;
   }
@@ -90,5 +90,24 @@ export class VideoPlayDataSource extends BasicDataSource {
   public pushData(data: VideoPlayData): void {
     this.videoList.push(data);
     this.notifyDataAdd(this.videoList.length - 1);
+  }
+
+  // 替换所有数据
+  public replaceData(data: Array<VideoPlayData>): void {
+    this.videoList = data.slice();
+    this.notifyDataReload();
+  }
+
+  public deleteData(index: number): void {
+    if (index >= 0 && index < this.videoList.length) {
+      this.videoList.splice(index, 1);
+      this.notifyDataDelete(index);
+    }
+  }
+
+  // 清空所有数据
+  public clearData(): void {
+    this.videoList.splice(0, this.videoList.length);
+    this.notifyDataReload();
   }
 }

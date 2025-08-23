@@ -7,25 +7,29 @@ function random(min: number, max: number): number {
 }
 
 // 初始化数据
-const generateDramaList = (length: number): Array<DramaInfo> => {
+const generateDramaList = (length: number, vip: boolean = false): Array<DramaInfo> => {
   const result = []
   for (let i = 0; i < length; i++) {
     let totalCount = random(40, 120)
-    let drama = getOneDrama();
+    let drama = getOneDrama(vip);
     result.push({
       id: drama.id,
       coverUrl: drama.coverUrl,
       name: drama.name,
       description: drama.description,
       totalCount: totalCount,
-      latestUpdate: i % 3 === 0 ? totalCount : random(1, totalCount)
+      category: drama.category,
+      latestUpdate: i % 3 === 0 ? totalCount : random(1, totalCount),
+      isVip: vip
     })
   }
   return result
 }
 
-
-const recommendList: Array<DramaInfo> = generateDramaList(25)
+const bannerList: Array<DramaInfo> = generateDramaList(5)
+const vipBannerList: Array<DramaInfo> = generateDramaList(5, true)
+const recommendList: Array<DramaInfo> = generateDramaList(50)
+const vipRecommendList: Array<DramaInfo> = generateDramaList(50, true)
 const thumbUpList: Array<DramaInfo> = generateDramaList(50)
 const hotList: Array<DramaInfo> = generateDramaList(60)
 const newList: Array<DramaInfo> = generateDramaList(40)
@@ -58,7 +62,8 @@ function getDramaList(param: any): Array<DramaInfo> {
   let category: string = param.category
   let pageNum: number = param.pageNum
   let pageSize: number = param.pageSize
-  const resultList = category === '必看榜' ? thumbUpList : (category === '热播榜' ? hotList : newList)
+  const resultList = category === '飙升榜' ? thumbUpList : category === '热播榜' ?
+    hotList : category === '新剧榜' ? newList : searchList
   if ((pageNum - 1) * pageSize > resultList.length) {
     // 超过范围了
     return []
@@ -90,7 +95,8 @@ MockAdapter
     url: 'https://agc.template.com/theater/billboard/preview'
   }, (config) => {
     let category = JSON.parse(config.data)
-    let resultList = category === '必看榜' ? thumbUpList : (category === '热播榜' ? hotList : newList)
+    let resultList = category === '飙升榜' ? thumbUpList : category === '热播榜' ?
+      hotList : category === '新剧榜' ? newList : searchList
     resultList = resultList.slice(0, Math.min(6, resultList.length))
     return {
       ret: {
@@ -115,6 +121,30 @@ MockAdapter
       // 超过范围了
     } else {
       resultList = recommendList.slice((pageNum - 1) * pageSize, Math.min(pageNum * pageSize, recommendList.length))
+    }
+    return {
+      ret: {
+        code: '0'
+      },
+      total: resultList.length,
+      data: resultList
+    }
+  })
+  .withDelay(100);
+
+MockAdapter
+  .onGet({
+    url: 'https://agc.template.com/theater/viprecommend'
+  }, (config) => {
+    let param = JSON.parse(config.data)
+    let pageNum: number = param.pageNum
+    let pageSize: number = param.pageSize
+    let resultList = []
+    if ((pageNum - 1) * pageSize > vipRecommendList.length) {
+      // 超过范围了
+    } else {
+      resultList = vipRecommendList.slice((pageNum - 1) * pageSize,
+        Math.min(pageNum * pageSize, vipRecommendList.length))
     }
     return {
       ret: {
@@ -193,11 +223,19 @@ MockAdapter
     ret: {
       code: '0'
     },
-    total: 6,
-    data: [
-      'https://agc-storage-drcn.platform.dbankcloud.cn/v0/app-d45y3/banner.png',
-      'https://agc-storage-drcn.platform.dbankcloud.cn/v0/app-d45y3/banner.png',
-      'https://agc-storage-drcn.platform.dbankcloud.cn/v0/app-d45y3/banner.png'
-    ]
+    total: 5,
+    data: bannerList
+  })
+  .withDelay(100);
+
+MockAdapter
+  .onGet({
+    url: 'https://agc.template.com/theater/vipbanner'
+  }, {
+    ret: {
+      code: '0'
+    },
+    total: 5,
+    data: vipBannerList
   })
   .withDelay(100);

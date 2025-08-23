@@ -17,9 +17,9 @@
       }
     },
     {
-      "name": "GoodDetailPage",
-      "pageSourceFile": "src/main/ets/pages/GoodDetailPage.ets",
-      "buildFunction": "GoodDetailPageBuilder",
+      "name": "GoodsDetailPage",
+      "pageSourceFile": "src/main/ets/pages/GoodsDetailPage.ets",
+      "buildFunction": "GoodsDetailPageBuilder",
       "data": {
         "description": ""
       }

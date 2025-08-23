@@ -1,8 +1,8 @@
-import { CommonUrl, Constants, GoodSpecInfo } from 'common'
+import { CommonUrl, Constants, GoodsSpecInfo } from 'common'
 
 @ComponentV2
 export struct PackageCarListComp {
-  @Param @Require packageCarList: Array<GoodSpecInfo>
+  @Param @Require packageCarList: Array<GoodsSpecInfo>
   @Event changeCarPanel: (showPkgCar: boolean) => void = () => {
   }
   @Event clearCar: (specId?: string) => void = () => {
@@ -46,19 +46,19 @@ export struct PackageCarListComp {
         .justifyContent(FlexAlign.End)
 
         List({ space: 12 }) {
-          ForEach(this.packageCarList, (goodSpec: GoodSpecInfo) => {
+          ForEach(this.packageCarList, (goodsSpec: GoodsSpecInfo) => {
             ListItem() {
               Row() {
                 Row() {
-                  Image(`${CommonUrl.CLOUD_STORAGE_URL}${goodSpec.goodLogo}`).width(60).height(60)
+                  Image(`${CommonUrl.CLOUD_STORAGE_URL}${goodsSpec.goodsLogo}`).width(60).height(60)
                   Column() {
-                    Text(goodSpec.goodName)
+                    Text(goodsSpec.goodsName)
                       .fontSize($r('sys.float.Body_M'))
                       .fontWeight(FontWeight.Medium)
                       .fontColor($r('sys.color.font_primary'))
                     Text() {
                       Span($r('app.string.selected'))
-                      Span(goodSpec.specStr).margin({ left: 2 })
+                      Span(goodsSpec.specStr).margin({ left: 2 })
                     }
                     .fontSize($r('sys.float.Caption_M'))
                     .fontColor($r('sys.color.font_secondary'))
@@ -70,9 +70,9 @@ export struct PackageCarListComp {
 
                 Row() {
                   Image($r('app.media.ic_subtract_car')).width(24).onClick(() => {
-                    this.clearCar(goodSpec.specId)
+                    this.clearCar(goodsSpec.specId)
                   })
-                  Text(goodSpec.number)
+                  Text(goodsSpec.number)
                     .margin({ left: 12, right: 12 })
                     .fontSize($r('sys.float.Body_L'))
                     .fontColor($r('sys.color.font_primary'))
@@ -81,7 +81,7 @@ export struct PackageCarListComp {
                 }.height(60).justifyContent(FlexAlign.End).alignItems(VerticalAlign.Bottom)
               }.width(Constants.FULL_SIZE).justifyContent(FlexAlign.SpaceBetween)
             }
-          }, (goodSpec: GoodSpecInfo) => `${goodSpec.specId}${goodSpec.goodId}${goodSpec.specStr}`)
+          }, (goodsSpec: GoodsSpecInfo) => `${goodsSpec.specId}${goodsSpec.goodsId}${goodsSpec.specStr}`)
           // 购物车占位
           ListItem() {
             Row().width(Constants.FULL_SIZE).height(100)

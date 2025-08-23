@@ -1,0 +1,9 @@
+{
+  "routerMap": [
+    {
+      "name": "PrepareIndex",
+      "pageSourceFile": "src/main/ets/pages/PrepareIndex.ets",
+      "buildFunction": "PrepareIndexBuilder"
+    }
+  ]
+}

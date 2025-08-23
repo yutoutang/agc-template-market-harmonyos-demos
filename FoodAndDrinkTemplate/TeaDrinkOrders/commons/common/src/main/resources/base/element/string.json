@@ -33,18 +33,6 @@
       "value": "重复请求"
     },
     {
-      "name": "copy_success",
-      "value": "复制成功"
-    },
-    {
-      "name": "insulation_bag",
-      "value": "保温袋"
-    },
-    {
-      "name": "insulation_bag_desc",
-      "value": "保持低温，口感更好~"
-    },
-    {
       "name": "call_phone",
       "value": "拨打电话"
     },
@@ -59,22 +47,6 @@
     {
       "name": "tab_order_list",
       "value": "我的订单"
-    },
-    {
-      "name": "show_pick_num",
-      "value": "请出示取餐码"
-    },
-    {
-      "name": "process_ordered",
-      "value": "已下单"
-    },
-    {
-      "name": "process_making",
-      "value": "制作中"
-    },
-    {
-      "name": "process_finished",
-      "value": "已完成"
     },
     {
       "name": "memberCode",
@@ -97,10 +69,6 @@
       "value": "加载中"
     },
     {
-      "name": "select_pay_type",
-      "value": "选择支付方式"
-    },
-    {
       "name": "wait_pay",
       "value": "支付金额："
     },
@@ -111,10 +79,6 @@
     {
       "name": "empty_data",
       "value": "暂无数据"
-    },
-    {
-      "name": "delivery_info",
-      "value": "配送信息"
     },
     {
       "name": "agcit_huawei_tea_drink_orders",

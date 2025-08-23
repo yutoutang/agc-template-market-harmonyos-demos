@@ -1,0 +1,29 @@
+{
+  "string": [
+    {
+      "name": "confirm",
+      "value": "پۈتتى",
+      "attr": {
+        "priority": "translate"
+      }
+    },
+    {
+      "name": "select_placeholder",
+      "value": "تاللاش",
+      "attr": {
+        "priority": "translate"
+      }
+    },
+    {
+      "name": "cancel",
+      "value": "بىكار قىلىش",
+      "attr": {
+        "priority": "translate"
+      }
+    },
+    {
+      "name": "agcit_huawei_museum_ticket",
+      "value": "1.0.1"
+    }
+  ]
+}

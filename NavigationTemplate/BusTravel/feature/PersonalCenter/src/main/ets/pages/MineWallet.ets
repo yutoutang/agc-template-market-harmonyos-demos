@@ -1,4 +1,4 @@
-import { CardInfoList, getDataFromJSON, RouteEntryVM } from 'common'
+import { CardInfoList, getDataFromJSON, Logger, RouteEntryVM } from 'common'
 import { ExpendSet } from '../model/ExpendSet'
 
 
@@ -7,18 +7,18 @@ export function MineWalletBuilder() {
   MineWallet()
 }
 
-@Component
+@ComponentV2
 export struct MineWallet {
   vm: RouteEntryVM = RouteEntryVM.instance;
-  @State cardInfo: CardInfoList = new CardInfoList()
-  @State cardNum: number | undefined = undefined
-  @State cardBalance: number | undefined = undefined
-  @State userBalance: number | undefined = undefined
-  @State userTotalConsumption: Array<ExpendSet> = []
-  @State userBusConsumption: Array<ExpendSet> = []
-  @State userRechargeConsumption: Array<ExpendSet> = []
-  @State userShowConsumption: Array<ExpendSet> = []
-  @State assetVisible: boolean = false
+  @Local cardInfo: CardInfoList = new CardInfoList()
+  @Local cardNum: number | undefined = undefined
+  @Local cardBalance: number | undefined = undefined
+  @Local userBalance: number | undefined = undefined
+  @Local userTotalConsumption: Array<ExpendSet> = []
+  @Local userBusConsumption: Array<ExpendSet> = []
+  @Local userRechargeConsumption: Array<ExpendSet> = []
+  @Local userShowConsumption: Array<ExpendSet> = []
+  @Local assetVisible: boolean = false
 
   aboutToAppear(): void {
     this.initDataSource()
@@ -43,16 +43,15 @@ export struct MineWallet {
           this.buildNanjingBus()
           this.buildCardId()
           this.buildExpendDetail()
-          Blank()
-            .layoutWeight(1)
         }
+        .height('100%')
         .width('100%')
-        .backgroundImageSize(ImageSize.Auto)
-        .backgroundColor('#F1F3F5')
       }
-      .layoutWeight(1)
+      .backgroundColor('#F1F3F5')
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
       .scrollable(ScrollDirection.Vertical)
       .scrollBar(BarState.Auto)
+      .edgeEffect(EdgeEffect.Spring)
       .scrollBarWidth('0vp')
     }
     .hideTitleBar(false)
@@ -66,9 +65,9 @@ export struct MineWallet {
       Span('NO: ')
       Span(this.cardInfo.cardID.toString())
     }
+    .width('336vp')
     .margin({ top: '23vp', bottom: '12vp' })
-    .padding({ left: '20vp' })
-    .width('100%')
+    .padding({ left: '5vp' })
     .align(Alignment.Start)
     .fontSize('14vp')
   }
@@ -180,21 +179,21 @@ export struct MineWallet {
             {
               value: '支出',
               action: () => {
-                console.info('handle Menu1 select')
+                Logger.info('handle Menu1 select')
                 this.userShowConsumption = this.userBusConsumption
               }
             },
             {
               value: '充值',
               action: () => {
-                console.info('handle Menu2 select')
+                Logger.info('handle Menu2 select')
                 this.userShowConsumption = this.userRechargeConsumption
               }
             },
             {
               value: '全部',
               action: () => {
-                console.info('handle Menu2 select')
+                Logger.info('handle Menu2 select')
                 this.userShowConsumption = this.userTotalConsumption
               }
             },

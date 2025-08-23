@@ -3,6 +3,10 @@
     {
       "name": "shared_desc",
       "value": "description"
+    },
+    {
+      "name": "agcit_huawei_express_template",
+      "value": "1.0.0"
     }
   ]
 }

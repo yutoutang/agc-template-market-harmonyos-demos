@@ -1,5 +1,5 @@
 import { DramaInfo } from '@agctemplate/server'
-import { VideoPlayData } from '@agctemplate/video_swiper'
+import { VideoPlayData } from 'video_swiper'
 
 export class DramaItemVM implements VideoPlayData {
   dramaInfo: DramaInfo

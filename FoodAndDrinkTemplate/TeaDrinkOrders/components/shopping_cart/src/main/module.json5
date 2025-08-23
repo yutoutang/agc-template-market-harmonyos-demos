@@ -1,0 +1,10 @@
+{
+  "module": {
+    "name": "shopping_cart",
+    "type": "har",
+    "deviceTypes": [
+      "default",
+      "tablet"
+    ]
+  }
+}

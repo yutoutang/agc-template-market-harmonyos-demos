@@ -1,0 +1,20 @@
+{
+  "string": [
+    {
+      "name": "shared_desc",
+      "value": "description"
+    },
+    {
+      "name": "WEBSITE_URL_HDC2025",
+      "value": "https://developer.huawei.com/home/hdc/hdc2025.html"
+    },
+    {
+      "name": "WEBSITE_URL_HDC2024",
+      "value": "https://developer.huawei.com/home/hdc/hdc2024.html"
+    },
+    {
+      "name": "WEBSITE_URL_HDC2023",
+      "value": "https://developer.huawei.com/consumer/cn/hdc/hdc2023/index.html"
+    }
+  ]
+}

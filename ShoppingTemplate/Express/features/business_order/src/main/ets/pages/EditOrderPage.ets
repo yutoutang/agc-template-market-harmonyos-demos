@@ -1,9 +1,13 @@
 import { EditOrderPageVM } from '../viewModels/EditOrderPageVM'
 import { map, MapComponent } from '@kit.MapKit'
-import { CustomContentDialog, promptAction, TipsDialog } from '@kit.ArkUI'
+import { CustomContentDialog, promptAction, TipsDialog, window } from '@kit.ArkUI'
 import { emitter } from '@kit.BasicServicesKit'
-import { CommonButton, IAddrInfo, OrderType, RouterModule, ShippingMethod } from 'lib_foundation'
-import { TelUtil, CommonAddress } from 'module_base'
+import { CommonButton, OrderType, RouterModule, ShippingMethod } from 'lib_foundation'
+import { CommonLoading, TelUtil } from 'module_base'
+import { CommonAddress } from 'module_address_card'
+import { common } from '@kit.AbilityKit'
+
+const context: Context = getContext(this);
 
 @Builder
 export function EditOrderPageBuilder() {
@@ -13,7 +17,9 @@ export function EditOrderPageBuilder() {
 @Entry
 @ComponentV2
 struct EditOrderPage {
+  @Local isShow: boolean = true
   vm: EditOrderPageVM = EditOrderPageVM.instance
+  windowClass: window.Window = (context as common.UIAbilityContext).windowStage.getMainWindowSync();
   payDialogController: CustomDialogController = new CustomDialogController({
     builder: CustomContentDialog({
       contentBuilder: () => {
@@ -23,8 +29,8 @@ struct EditOrderPage {
         top: 0,
         left: 0,
         right: 0,
-        bottom: 0
-      }
+        bottom: 0,
+      },
     }),
   })
   cancelDialogController: CustomDialogController = new CustomDialogController({
@@ -41,23 +47,23 @@ struct EditOrderPage {
         role: ButtonRole.ERROR,
         action: () => {
           this.vm.cancelOrder()
-        }
+        },
       },
     }),
   })
+  public onStatusTypeChange: (statusType: window.WindowStatusType) => void = (statusType: window.WindowStatusType) => {
+    if (statusType === window.WindowStatusType.FULL_SCREEN) {
+      this.isShow = true
+    }
+    if (statusType === window.WindowStatusType.SPLIT_SCREEN) {
+      this.isShow = false
+    }
+  }
 
-  aboutToAppear(): void {
+  aboutToAppear() {
     this.vm.init()
     this.vm.initMap()
-    emitter.on('address', (data) => {
-      if (data.data) {
-        if (this.vm.selectedAddress === OrderType.SEND) {
-          this.vm.sendAddress = data.data as IAddrInfo
-        } else {
-          this.vm.getAddress = data.data as IAddrInfo
-        }
-      }
-    });
+    this.windowClass.on('windowStatusChange', this.onStatusTypeChange);
   }
 
   onPageShow(): void {
@@ -80,154 +86,162 @@ struct EditOrderPage {
 
   build() {
     NavDestination() {
-      Column() {
-        Flex() {
-          Column() {
-            Row() {
-              Text(this.vm.orderInfo?.shippingMethod === ShippingMethod.PICK_UP_AT_HOME ? '待上门取件' : '待服务点自寄')
-                .fontSize(18)
-                .fontWeight(FontWeight.Medium)
-                .fontColor($r('sys.color.font_primary'))
-            }
-            .width('100%')
-            .margin({ bottom: 12 })
-
-            if (this.vm.orderInfo?.shippingMethod === ShippingMethod.PICK_UP_AT_HOME) {
-              Row() {
-                Text(`预计${this.vm.orderInfo?.day}${this.vm.orderInfo?.time}上门取件`)
-                  .fontSize(12)
-                  .fontWeight(FontWeight.Regular)
-                  .fontColor($r('sys.color.font_tertiary'))
-              }
-              .width('100%')
-            }
-          }
-          .flexGrow(1)
-
-          Row() {
-            Text() {
-              Span('寄件码')
-                .fontColor($r('sys.color.font_primary'))
-              Span(this.vm.orderInfo?.mailCode.toString())
-                .fontColor('#0A59F7')
-            }
-            .fontSize(14)
-            .fontWeight(FontWeight.Medium)
-          }
-          .width(128)
-          .height(32)
-          .justifyContent(FlexAlign.Center)
-          .borderRadius(16)
-          .borderWidth(1)
-          .borderColor('#0A59F7')
-        }
-        .padding({ left: 16, right: 16 })
-        .margin({ bottom: 16 })
-
-        Stack({
-          alignContent: Alignment.TopStart,
-        }) {
-          MapComponent({
-            mapOptions: this.vm.mapOptions,
-            mapCallback: this.vm.callback,
-            customInfoWindow: this.customInfoWindow
-          })
-            .width('100%')
-            .height('100%')
-
-          if (this.vm.showTip) {
-            Stack() {
-              Row()
-                .width('100%')
-                .height(30)
-                .backgroundColor('#0A59F7')
-                .opacity(0.27)
-                .borderRadius(16)
-
-              Row() {
-                Row() {
-                  Image($r('app.media.ic_warning'))
-                    .width(12)
-                    .height(12)
-                  Text('部分快递公司需要当面实名认证，请配合快递员出示证件。')
-                    .fontSize(10)
-                    .fontWeight(FontWeight.Regular)
-                    .fontColor(Color.White)
-                    .margin({ left: 4 })
-                }
-
-                Image($r('app.media.ic_close'))
-                  .width(12)
-                  .height(12)
-                  .onClick(() => {
-                    this.vm.showTip = false
-                  })
-              }
-              .width('100%')
-              .height(30)
-              .justifyContent(FlexAlign.SpaceBetween)
-              .padding({ left: 12, right: 12 })
-            }
-            .padding({ left: 16, right: 16 })
-            .position({ top: 16 })
-          }
-
-
-          Column() {
+      if (this.vm.showLoadingMask) {
+        CommonLoading({ showLoadingProgress: this.vm.showLoadingMask })
+      } else {
+        Column() {
+          Flex() {
             Column() {
               Row() {
-                this.buttonBuilder('修改信息', $r('app.media.ic_edit'), () => {
-                  this.vm.isEdit = true
-                  promptAction.showToast({ message: '可修改地址！', alignment: Alignment.Center });
-                })
-                this.buttonBuilder('取消寄件', $r('app.media.ic_cancel'), () => {
-                  this.cancelDialogController.open()
-                })
-                this.buttonBuilder('支付运费', $r('app.media.ic_money'), () => {
-                  this.payDialogController.open()
-                })
-                this.buttonBuilder('联系客服', $r('app.media.svg'), () => {
-                  TelUtil.makeCall('联系客服', '10000000000');
-                })
+                Text(this.vm.getTitle(this.vm.orderInfo?.shippingMethod))
+                  .fontSize(18)
+                  .fontWeight(FontWeight.Medium)
+                  .fontColor($r('sys.color.font_primary'))
               }
               .width('100%')
-              .justifyContent(FlexAlign.SpaceBetween)
-              .backgroundColor(Color.White)
-              .borderRadius(16)
-              .padding(12)
               .margin({ bottom: 12 })
 
-              CommonAddress({
-                stack: RouterModule.stack,
-                isEdit: this.vm.isEdit,
-                sendAddress: this.vm.sendAddress,
-                getAddress: this.vm.getAddress,
-                select: (value) => {
-                  this.vm.isFresh = false
-                  this.vm.selectedAddress = value
-                  this.vm.updateOrder()
-                },
-                change: () => {
-                  const temp = this.vm.sendAddress
-                  this.vm.sendAddress = this.vm.getAddress
-                  this.vm.getAddress = temp
-                  this.vm.updateOrder()
-                  let info: emitter.EventData = {
-                    data: {
-                      index: 1
-                    }
-                  };
-                  emitter.emit('index', info);
+              if (this.vm.orderInfo?.shippingMethod === ShippingMethod.PICK_UP_AT_HOME) {
+                Row() {
+                  Text(`预计${this.vm.orderInfo?.day}${this.vm.orderInfo?.time}上门取件`)
+                    .fontSize(12)
+                    .fontWeight(FontWeight.Regular)
+                    .fontColor($r('sys.color.font_tertiary'))
                 }
-              })
+                .width('100%')
+              }
             }
-            .translate({ y: -34 })
+            .flexGrow(1)
+
+            Row() {
+              Text() {
+                Span('寄件码')
+                  .fontColor($r('sys.color.font_primary'))
+                Span(this.vm.orderInfo?.mailCode.toString())
+                  .fontColor('#0A59F7')
+              }
+              .fontSize(14)
+              .fontWeight(FontWeight.Medium)
+            }
+            .width(128)
+            .height(32)
+            .justifyContent(FlexAlign.Center)
+            .borderRadius(16)
+            .borderWidth(1)
+            .borderColor('#0A59F7')
           }
           .padding({ left: 16, right: 16 })
-          .position({ bottom: -14 })
-          .backgroundColor('#F1F3F5')
+          .margin({ bottom: 16 })
+
+          Stack({
+            alignContent: Alignment.TopStart,
+          }) {
+            MapComponent({
+              mapOptions: this.vm.mapOptions,
+              mapCallback: this.vm.callback,
+              customInfoWindow: this.customInfoWindow,
+            })
+              .width('100%')
+              .height('100%')
+
+            if (this.vm.showTip) {
+              Stack() {
+                Row()
+                  .width('100%')
+                  .height(30)
+                  .backgroundColor('#0A59F7')
+                  .opacity(0.27)
+                  .borderRadius(16)
+
+                Row() {
+                  Row() {
+                    Image($r('app.media.ic_warning'))
+                      .width(12)
+                      .height(12)
+                    Text('部分快递公司需要当面实名认证，请配合快递员出示证件。')
+                      .fontSize(10)
+                      .fontWeight(FontWeight.Regular)
+                      .fontColor(Color.White)
+                      .margin({ left: 4 })
+                  }
+
+                  Image($r('app.media.ic_close'))
+                    .width(12)
+                    .height(12)
+                    .onClick(() => {
+                      this.vm.showTip = false
+                    })
+                }
+                .width('100%')
+                .height(30)
+                .justifyContent(FlexAlign.SpaceBetween)
+                .padding({ left: 12, right: 12 })
+              }
+              .padding({ left: 16, right: 16 })
+              .position({ top: 16 })
+            }
+
+            if (this.isShow) {
+              Column() {
+                Column() {
+                  Row() {
+                    this.buttonBuilder('修改信息', $r('app.media.ic_edit'), () => {
+                      this.vm.isEdit = true
+                      promptAction.showToast({ message: '可修改地址！', alignment: Alignment.Center });
+                    })
+                    this.buttonBuilder('取消寄件', $r('app.media.ic_cancel'), () => {
+                      this.cancelDialogController.open()
+                    })
+                    this.buttonBuilder('支付运费', $r('app.media.ic_money'), () => {
+                      this.payDialogController.open()
+                    })
+                    this.buttonBuilder('联系客服', $r('app.media.svg'), () => {
+                      TelUtil.makeCall('联系客服', '10000000000');
+                    })
+                  }
+                  .width('100%')
+                  .justifyContent(FlexAlign.SpaceBetween)
+                  .backgroundColor(Color.White)
+                  .borderRadius(16)
+                  .padding(12)
+                  .margin({ bottom: 12 })
+
+                  CommonAddress({
+                    stack: RouterModule.stack,
+                    isEdit: this.vm.isEdit,
+                    sendAddress: this.vm.sendAddress,
+                    getAddress: this.vm.getAddress,
+                    onSelect: (value) => {
+                      if (value.type === OrderType.SEND) {
+                        this.vm.sendAddress = value.address
+                      } else {
+                        this.vm.getAddress = value.address
+                      }
+                      this.vm.updateOrder()
+                    },
+                    onChange: () => {
+                      const temp = this.vm.sendAddress
+                      this.vm.sendAddress = this.vm.getAddress
+                      this.vm.getAddress = temp
+                      this.vm.updateOrder()
+                      let info: emitter.EventData = {
+                        data: {
+                          index: 1,
+                        },
+                      };
+                      emitter.emit('index', info);
+                    },
+                  })
+                }
+                .translate({ y: -34 })
+              }
+              .padding({ left: 16, right: 16 })
+              .position({ bottom: -14 })
+              .backgroundColor('#F1F3F5')
+            }
+          }
+          .layoutWeight(1)
         }
-        .layoutWeight(1)
       }
     }
     .backgroundColor('#F1F3F5')
@@ -282,7 +296,7 @@ struct EditOrderPage {
             }, saveButton: () => {
               this.vm.prepay()
               this.payDialogController.close()
-            }
+            },
           })
         }
         .width('100%')
@@ -290,11 +304,12 @@ struct EditOrderPage {
           top: 24,
           bottom: 16,
           left: 24,
-          right: 24
+          right: 24,
         })
         .backgroundColor('rgba(255,255,255,0.80)')
       }
       .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
     }
   }
 

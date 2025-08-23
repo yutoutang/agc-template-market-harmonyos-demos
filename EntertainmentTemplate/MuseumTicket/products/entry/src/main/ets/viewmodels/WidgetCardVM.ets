@@ -17,7 +17,7 @@ class FormData {
 @ObservedV2
 export class WidgetCardVM {
   eventType: string = 'createCard';
-  private formDataInfo: FormData | undefined = undefined;
+  private formDataInfo: FormData = new FormData()
   private static _instance: WidgetCardVM;
 
   public static get instance() {
@@ -52,14 +52,10 @@ export class WidgetCardVM {
   }
 
   public async updateFormInfo() {
-    try {
       if (!this.formDataInfo) {
         return;
       }
       this.updateFormData(this.formDataInfo);
-    } catch (e) {
-      Logger.error(`updateFormInfo failed. Cause: ${JSON.stringify(e)}`);
-    }
   }
 
   public getFormIdArray() {

@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { IAddrInfo, ISetting, ITemplate } from '../http/Type';
+import { ITemplate } from '../http/Type';
 
 
 export enum TypeAddressPage {
@@ -44,74 +44,3 @@ export enum OrderType {
   SEND = '寄快递',
   RECEIVE = '收快递',
 }
-
-export const methodList: ISetting[] = [
-  {
-    text: '上门取件',
-    value: 1,
-  },
-  {
-    text: '服务点自寄',
-    value: 2,
-  }
-]
-
-export const payMethodList: ISetting[] = [
-  {
-    text: '寄付现结',
-    value: 1
-  },
-  {
-    text: '到付',
-    value: 2
-  }
-]
-
-export const gridList: ISetting[] = [
-  {
-    text: '小格口',
-    value: 1
-  },
-  {
-    text: '中格口',
-    value: 2
-  },
-  {
-    text: '大格口',
-    value: 3
-  }
-]
-
-export const dayList: ISetting[] = [
-  {
-    text: '今天',
-    value: 1
-  },
-  {
-    text: '明天',
-    value: 2
-  },
-  {
-    text: '后天',
-    value: 3
-  }
-]
-
-export const shippingMethodList: ISetting[] = [
-  {
-    text: '网点自寄',
-    value: 1
-  },
-  {
-    text: '自行联系快递员',
-    value: 2
-  },
-  {
-    text: '每天固定时间',
-    value: 3
-  }
-]
-
-export const timeList: string[] =
-  ['8:00 - 9:00', '9:00 - 10:00', '10:00 - 11:00', '11:00 - 12:00', '14:00 - 15:00', '15:00 - 16:00', '16:00 - 17:00',
-    '17:00 - 18:00']

@@ -15,15 +15,13 @@
 <img src="./screenshot/Login_1.png" width="300" />
 
 ## 约束与限制
-### 软件
 
-* DevEco Studio版本：DevEco Studio 5.0.4 Release及以上
-* HarmonyOS SDK版本：HarmonyOS 5.0.4 Release及以上
+### 环境
 
-### 硬件
-
-* 设备类型：华为手机（直板机）
-* HarmonyOS版本：HarmonyOS 5.0.4 Release及以上
+- DevEco Studio版本：DevEco Studio 5.0.4 Release及以上
+- HarmonyOS SDK版本：HarmonyOS 5.0.4 Release SDK及以上
+- 设备类型：华为手机（包括双折叠和阔折叠）
+- 系统版本：HarmonyOS 5.0.4(16)及以上
 
 ## 快速入门
 
@@ -57,14 +55,30 @@
       "login_info": "file:./XXX/login_info"
     }
    ```
-   
-2. 引入组件。
+2. 配置华为账号服务。  
+   a. 将应用的client ID配置到项目入口模块（例如：entry）的module.json5文件，详细参考：[配置Client ID](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-client-id)。
+   ```typescript
+   "requestPermissions": [],
+   "metadata": [
+      {
+        "name": "client_id",
+        // 配置为获取的Client ID
+        "value": "*****"
+      },
+    ],
+    "extensionAbilities": [],
+   ```
+   b. [配置签名和指纹](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-sign-fingerprints)。
+
+   c. [申请scope权限](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-config-permissions) 。   
+
+3. 引入组件。
 
    ```typescript
      import { LoginInfo} from 'login_info';
    ```
 
-3. 调用组件，详细参数配置说明参见[API参考](#API参考)
+4. 调用组件，详细参数配置说明参见[API参考](#API参考)
 
    ```typescript
    import { LoginInfo, LoginParams, UserInfo } from 'login_info';

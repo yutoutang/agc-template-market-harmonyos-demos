@@ -1,0 +1,9 @@
+{
+  "routerMap": [
+    {
+      "name": "TreasurePage",
+      "pageSourceFile": "src/main/ets/pages/TreasurePage.ets",
+      "buildFunction": "TreasurePageBuilder"
+    }
+  ]
+}

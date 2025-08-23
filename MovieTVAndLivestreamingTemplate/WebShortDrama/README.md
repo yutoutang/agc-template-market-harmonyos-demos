@@ -1,38 +1,43 @@
-# 网络短剧行业模板快速入门
+# 影视与直播（微短剧）应用模板快速入门
 
 ## 目录
 
-- [网络短剧行业模板快速入门](#网络短剧行业模板快速入门)
-  - [目录](#目录)
-  - [功能介绍](#功能介绍)
-  - [组件](#组件)
-  - [环境要求](#环境要求)
-    - [软件](#软件)
-    - [硬件](#硬件)
-  - [快速入门](#快速入门)
-    - [配置工程](#配置工程)
-    - [运行调试工程](#运行调试工程)
-  - [示例效果](#示例效果)
-  - [权限要求](#权限要求)
-  - [开源许可协议](#开源许可协议)
+- [功能介绍](#功能介绍)
+- [约束和限制](#约束和限制)
+- [快速入门](#快速入门)
+- [示例效果](#示例效果)
+- [开源许可协议](#开源许可协议)
 
 ## 功能介绍
 
-本模板为短剧类元服务提供了常用功能的开发样例，模板主要分首页、剧场、我的及详情播放页三大模块：
+您可以基于此模板直接定制应用，也可以挑选此模板中提供的多种组件使用，从而降低您的开发难度，提高您的开发效率。
+
+此模板提供如下组件，所有组件存放在工程根目录的components下，如果您仅需使用组件，可参考对应组件的指导链接；如果您使用此模板，请参考本文档。
+
+| 组件                   | 描述              | 使用指导                                      |
+|----------------------|-----------------|-------------------------------------------|
+| 滑动视频组件(video_swiper) | 包括滑动视频，视频播放的控制等 | [使用指导](components/video_swiper/README.md) |
+
+
+本模板为短剧类应用提供了常用功能的开发样例，模板主要分首页、剧场、我的及详情播放页六大模块：
 
 * 首页：提供短剧推荐流功能，按照剧目播放。
 
 * 剧场：提供榜单和优选短剧浏览，支持输入剧名搜索。
 
-* 我的：支持账号的管理和常用服务(追剧/观看记录)。
+* 福利：提供任务，完成任务来获取看点。
 
-* 详情: 沉浸式观看短剧，支持剧集播放常用功能(上下滑切换剧集，选集，社交交互等)
+* 追剧：用于管理用户收藏的剧集。
+
+* 我的：支持账号的管理和常用服务(设置/观看记录)。
+
+* 详情：沉浸式观看短剧，支持剧集播放常用功能(上下滑切换剧集，选集，社交交互等)
 
 本模板已集成华为账号等服务，只需做少量配置和定制即可快速实现华为账号的登录功能。
 
-| 首页                         | 剧场                         | 我的                         | 详情                         |
-|----------------------------|----------------------------|----------------------------|----------------------------|
-| ![首页](screenshots/首页.jpeg) | ![剧场](screenshots/剧场.jpeg) | ![我的](screenshots/我的.jpeg) | ![详情](screenshots/详情.jpeg) |
+| 首页                         | 剧场                         | 福利                         | 追剧                         | 我的                         | 详情                         |
+|----------------------------|----------------------------|----------------------------|----------------------------|----------------------------|----------------------------|
+| ![首页](screenshots/首页.jpeg) | ![剧场](screenshots/剧场.jpeg) | ![福利](screenshots/福利.jpeg) | ![追剧](screenshots/追剧.jpeg) | ![我的](screenshots/我的.jpeg) | ![详情](screenshots/详情.jpeg) |
 
 本模板主要页面及核心功能如下所示：
 
@@ -43,31 +48,38 @@
  |    |-- 看全集
  |    └-- 自动播放全集
  |-- 剧场
- |    └-- 榜单
- |    |-- 优选短剧
+ |    |-- 榜单
+ |    |-- 标签分类
  |    └-- 搜索
  |         └-- 历史记录
- └-- 我的
+ |-- 福利
+ |    |-- 任务
+ |    |-- 抽奖
+ |    └-- 签到
+ |-- 追剧
+ |    |-- 查看收藏
+ |    └-- 管理删除
+ |-- 我的
  |    |-- 用户信息
  |    |-- 我的追剧
  |    └-- 观看记录
  └-- 详情
- |    |-- 简介
- |    |-- 社交信息
- |    |    |-- 点赞
- |    |    |-- 分享(示意)
- |    |    |-- 收藏
- |    |    └-- 评论
- |    |-- 选集
- |    |-- 播放设置
- |    └-- 剧集详情介绍
+      |-- 简介
+      |-- 社交信息
+      |    |-- 点赞
+      |    |-- 分享
+      |    |-- 收藏
+      |    └-- 评论
+      |-- 选集
+      |-- 播放设置
+      └-- 剧集详情介绍
 ```
 
 本模板工程代码结构如下所示：
 
 ```ts
 WebShortDrama
-  └- commons                                       // 公共层
+  |- commons                                       // 公共层
   |   |- common                                    // 资源统一管理层
   |   |- server/src/main/ets                       // 无法层
   |   |    |- api                                  // 接口层 
@@ -81,12 +93,28 @@ WebShortDrama
   |   |- utils                                     // 工具类层
   |   └- widgets                                   // 基础控件类层
   |
-  |- components                                    // 组件       
-  |   └- video_swiper                              // 滑动视频组件  
+  |- components                                    // 组件   
+  |   |- base_apis                                 // 集成能力组件   
+  |   |- feed_back                                 // 意见反馈组件   
+  |   |- module_share                              // 分享组件   
+  |   |- open_ads                                  // 广告组件   
+  |   |- video_swiper                              // 滑动视频组件     
+  |   └- vip_center                                // 会员中心组件  
   |
   |- EntryCard                                     // 卡片资源     
   |                      
   |- features    
+  |   |- award/src/main/ets                         // 福利功能(hsp)
+  |   |        |- common                            // 公共组件 
+  |   |        |- components                        // 抽离组件   
+  |   |        |- constants                         // 常量
+  |   |        |- customdialog                      // dialog组件
+  |   |        |- model                             // class类型定义     
+  |   |        |- pages                                
+  |   |        |    AwardMainPage.ets               // 福利页面
+  |   |        |- utils                             // 工具组件   
+  |   |        └- viewmodel                         // 与页面一一对应的vm层 
+  |   | 
   |   |- home/src/main/ets                          // home主页组合(hsp)
   |   |        |- components                        // 抽离组件   
   |   |        |- mapper                            // 接口数据到页面数据类型映射 
@@ -108,19 +136,34 @@ WebShortDrama
   |   |        └- pages                               
   |   |             ChangePage.ets                  // 信息修改播放页面
   |   |             MineMainPage.ets                // 我的主页页面
-  |   |             MyFavoritesPage.ets             // 我的收藏页面
+  |   |             VIPCenterPage.ets               // 会员中心页面
   |   |             PersonalInfoPage.ets            // 个人信息页面
   |   |             WatchRecordsPage.ets            // 观看记录页面
+  |   |             AboutPage.ets                   // 关于我的页面
+  |   |             FeedbackPage.ets                // 反馈页面
+  |   |             FeedbackRecordPage.ets          // 反馈记录页面
+  |   |             LaunchPage.ets                  // 启动页面
+  |   |             LaunchAdPage.ets                // 广告页面
+  |   |             LikesPage.ets                   // 点赞记录页面
+  |   |             MyPreferencesPage.ets           // 首选项页面
+  |   |             PrivacyAgreementPage.ets        // 隐私协议页面
+  |   |             PrivacyStatementPage.ets        // 隐私声明页面
+  |   |             SetupPage.ets                   // 设置页面
   |   | 
   |   |- theater/src/main/ets                       // 剧场组合(hsp)
   |   |        |- components                        // 抽离组件   
   |   |        |- mapper                            // 接口数据到页面数据类型映射 
   |   |        |- pages                               
-  |   |        |    BillboardPage.ets                // 排行榜页面
-  |   |        |    DramaDetailInfoPage.ets          // 剧集详情信息页面
-  |   |        |    SearchPage.ets                   // 搜索页面
-  |   |        |    TheaterMainPage.ets              // 剧场入口页面  
-  |   |        └- viewmodels                         // 与页面一一对应的vm层 
+  |   |        |    BillboardPage.ets               // 排行榜页面
+  |   |        |    DramaDetailInfoPage.ets         // 剧集详情信息页面
+  |   |        |    SearchPage.ets                  // 搜索页面
+  |   |        |    TheaterMainPage.ets             // 剧场入口页面  
+  |   |        |- views                             // 视图组件
+  |   |        └- viewmodels                        // 与页面一一对应的vm层 
+  |   | 
+  |   |- favor/src/main/ets                         // 追剧组合(hsp)
+  |   |        └- pages                               
+  |   |             FavorMainPage.ets               // 追剧页面
   |   | 
   |   |- frame/src/main/ets/view                    // 通用Frame框架(hsp)
   |   |        |- components                        // 抽离组件   
@@ -138,65 +181,54 @@ WebShortDrama
            └- widget2x2                             // 卡片页面 
 ```
 
-## 组件
+## 约束和限制
 
-本模板中提供了滑动视频组件，该存放在工程根目录的components下。
+### 环境
 
-| 组件                 | 描述              | 使用指导                                      |
-|--------------------|-----------------|-------------------------------------------|
-| 滑动视频(video_swiper) | 包括滑动视频，视频播放的控制等 | [使用指导](components/video_swiper/README.md) |
+- DevEco Studio版本：DevEco Studio 5.0.1 Release及以上
+- HarmonyOS SDK版本：HarmonyOS 5.0.1 Release SDK及以上
+- 设备类型：华为手机（直板机、双折叠）
+- HarmonyOS版本：HarmonyOS 5.0.1 Release及以上
 
-## 环境要求
+### 权限
 
-### 软件
+- 网络权限：ohos.permission.INTERNET
 
-* DevEco Studio版本：DevEco Studio 5.0.0 Release及以上
-* HarmonyOS SDK版本：HarmonyOS 5.0.0 Release SDK及以上
+### 调试
 
-### 硬件
-
-* 设备类型：华为手机（直板机）
-* HarmonyOS版本：HarmonyOS 5.0.0 Release及以上
+本模板不支持模拟器调试，请使用真机调试
 
 ## 快速入门
 
 ### 配置工程
 
-在运行此模板前，需要完成以下配置：
+1. 在AppGallery Connect创建应用，将包名配置到模板中。
 
-1. 在DevEco Studio中打开此模板。
+   a. 参考[创建HarmonyOS应用](https://developer.huawei.com/consumer/cn/doc/app/agc-help-create-app-0000002247955506)为应用创建APP ID，并将APP ID与应用进行关联。
 
-2. 在AppGallery Connect创建元服务，将包名配置到模板中。
+   b. 返回应用列表页面，查看应用的包名。
 
-   a. 参考[创建元服务](https://developer.huawei.com/consumer/cn/doc/app/agc-help-createharmonyapp-0000001945392297) 为元服务创建APPID，并进行关联。
+   c. 将模板工程根目录下AppScope/app.json5文件中的bundleName替换为创建应用的包名。
 
-   b. 返回应用列表页面，查看元服务的包名。
+2. 配置华为账号服务。
 
-   c. 将模板工程根目录下AppScope/app.json5文件中的bundleName替换为创建元服务的包名。
+   a. 将应用的client ID配置到products/entry/src/main路径下的module.json5文件中，详细参考：[配置Client ID](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-client-id)。
 
-3. 配置服务侧。
+   b. 申请华为账号一键登录所需的quickLoginMobilePhone权限，详细参考：[配置scope权限](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-config-permissions)。
 
-   本模板接口均采用mock数据，由于元服务包体大小有限制，资源将从云端拉取，所以需为模板构造数据
+3. 配置支付服务。
 
-   a. commons/server/src/main/ets/api/RequestAPI.ts 约定了请求的api和返回的数据格式，开发者参考此api开发后端或者将自己云侧数据做数据转换
+   华为支付当前仅支持商户接入，在使用服务前，需要完成商户入网、开发服务等相关配置，本模板仅提供了端侧集成的示例。详细参考：[支付服务接入准备](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/payment-preparations)。
 
-   b. commons/server/src/main/ets/api/mock 实现了一份mock数据
+4. 对应用进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing#section297715173233)。
 
-4. 配置华为账号服务。
-
-   a. 将元服务的client ID配置到entry模块的module.json5文件，详细参考：[配置Client ID](https://developer.huawei.com/consumer/cn/doc/atomic-guides-V5/account-atomic-client-id-V5)。
-
-   b. 添加公钥指纹，详细参考：[配置应用证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-signature-info-0000001628566748#section5181019153511)。
-
-   c. 如需获取用户真实手机号，需要申请phone权限，详细参考：[配置scope权限](https://developer.huawei.com/consumer/cn/doc/atomic-guides-V5/account-guide-atomic-permissions-V5)，并在端侧使用快速验证手机号码Button进行[验证获取手机号码](https://developer.huawei.com/consumer/cn/doc/atomic-guides-V5/account-guide-atomic-get-phonenumber-V5)。
+5. 添加手工签名所用证书对应的公钥指纹。详细参考：[配置应用签名证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-cert-fingerprint-0000002278002933)
 
 ### 运行调试工程
 
 1. 连接调试手机和PC。
 
-2. 对元服务签名：由于模板中集成了华为账号服务，所以需要采用[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides-V5/ide-signing-V5#section297715173233)。
-
-3. 配置多模块调试：由于本模板存在多个模块，运行时需确保所有模块安装至调试设备。
+2. 配置多模块调试：由于本模板存在多个模块，运行时需确保所有模块安装至调试设备。
 
    a. 运行模块选择“entry”。
 
@@ -209,10 +241,6 @@ WebShortDrama
 ## 示例效果
 
 [功能展示录屏](./screenshots/功能展示录屏.mp4)
-
-## 权限要求
-
-* 网络权限：ohos.permission.INTERNET
 
 ## 开源许可协议
 

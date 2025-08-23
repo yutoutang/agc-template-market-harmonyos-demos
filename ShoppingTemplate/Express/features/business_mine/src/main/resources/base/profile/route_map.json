@@ -11,6 +11,11 @@
       "buildFunction": "EditNamePageBuilder"
     },
     {
+      "name": "EditPhonePage",
+      "pageSourceFile": "src/main/ets/pages/EditPhonePage.ets",
+      "buildFunction": "EditPhonePageBuilder"
+    },
+    {
       "name": "PersonalInformationPage",
       "pageSourceFile": "src/main/ets/pages/PersonalInformationPage.ets",
       "buildFunction": "PersonalInformationPageBuilder"

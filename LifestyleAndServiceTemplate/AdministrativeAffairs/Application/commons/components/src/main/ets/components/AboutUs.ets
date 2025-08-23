@@ -10,7 +10,7 @@ export struct AboutUsPage {
 
   getAppBundleInfo() {
     bundleManager.getBundleInfoForSelf(bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_APPLICATION).then((bundleInfo) => {
-      this.versionNo = bundleInfo.versionCode; //应用版本号
+      this.versionNo = bundleInfo.versionCode; //元服务版本号
     }).catch((error: BusinessError) => {
       console.error('get bundleInfo failed,error is ' + error)
     })

@@ -138,8 +138,8 @@ export struct YiJiDayQuery {
             Text('只看周末')
               .attributeModifier(new BaseTextStyleModifier('#000000/Body_M/Regular'))
             Toggle({ type: ToggleType.Switch, isOn: false })
-              .switchPointColor('#FFFFFF')
-              .selectedColor(this.selectColor)
+              .switchPointColor($r('sys.color.comp_background_primary_contrary'))
+              .selectedColor($r('sys.color.comp_background_emphasize'))
               .onChange((isOn: boolean) => {
                 this.getJiDayInWeek(isOn)
               })

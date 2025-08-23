@@ -6,7 +6,7 @@ import { AppInfoModel, FormCard, FormCardJump, WindowModel } from 'common';
 export default class EntryAbility extends UIAbility {
   async onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): Promise<void> {
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onCreate');
-    // 获取APP ID
+    // 获取packageName
     let bundleInfo = await bundleManager.getBundleInfoForSelf(bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_HAP_MODULE |
     bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_ABILITY |
     bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_REQUESTED_PERMISSION);

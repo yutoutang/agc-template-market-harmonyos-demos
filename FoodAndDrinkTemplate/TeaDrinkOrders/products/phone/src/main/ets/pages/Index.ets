@@ -8,6 +8,7 @@ import {
   HttpCode,
   HttpRequestApi,
   RouterMap,
+  RouterModule,
   StoreInfoModel,
   UserInfo,
   UserInfoModel,
@@ -19,7 +20,7 @@ import { AppInfoModel } from 'common/src/main/ets/models/StorageModel';
 @Entry
 @ComponentV2
 struct Index {
-  @Provider('pageStack') pageStack: NavPathStack = new NavPathStack();
+  @Provider('pageStack') pageStack: NavPathStack = RouterModule.getStack();
   @Local appInfo: AppInfoModel = AppStorageV2.connect(AppInfoModel)!;
   @Local storeInfo: StoreInfoModel = AppStorageV2.connect(StoreInfoModel, () => new StoreInfoModel())!;
   @Local userInfo: UserInfoModel = AppStorageV2.connect(UserInfoModel, () => new UserInfoModel())!;

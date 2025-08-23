@@ -18,12 +18,10 @@ const mockMap: MockMap = {
   [RequestUrl.ORDER_TICKET_DETAIL]:httpsMock.getOrderDetail,
   [RequestUrl.PERFORMANCE_INFO]:httpsMock.getPerformanceInfo,
   [RequestUrl.ORDER_DAY_TICKET]:httpsMock.getDayTicket,
-  [RequestUrl.EXPLAIN_TEXT]:httpsMock.getExplainText,
+  [RequestUrl.EXPLAIN]:httpsMock.getExplain,
   [RequestUrl.INTRODUCE_TEXT]:httpsMock.getIntroduceText,
   [RequestUrl.PARKING_TEXT]:httpsMock.getParkingText,
   [RequestUrl.PRIVACY_TEXT]:httpsMock.getPrivacyText,
-  [RequestUrl.CONTACTS_INFO]:httpsMock.getContacts,
-  [RequestUrl.UPDATE_CONTACT]:httpsMock.upDateContacts,
   [RequestUrl.CANCEL_ORDER]:httpsMock.cancelOrder,
   [RequestUrl.ORDER_FREE]:httpsMock.orderFree,
   [RequestUrl.BUY_TIME_TICKET]:httpsMock.getTimeTicket,
@@ -33,9 +31,19 @@ const mockMap: MockMap = {
   [RequestUrl.USER_LOGIN]:httpsMock.userLogin,
   [RequestUrl.UPDATE_USERINFO]:httpsMock.updateUserInfo,
   [RequestUrl.BANNER_IMG]:httpsMock.getBannerImg,
-  [RequestUrl.DEL_VISITOR]:httpsMock.delContacts,
   [RequestUrl.USER_CANCEL_PHONE]:httpsMock.cancelPhone,
-  [RequestUrl.TRAFFIC_DETAIL]:httpsMock.getTrafficDetail
+  [RequestUrl.TRAFFIC_DETAIL]:httpsMock.getTrafficDetail,
+  [RequestUrl.EXPLAIN_TICKET]:httpsMock.getExplainTicketList,
+  [RequestUrl.EXPLAIN_ORDERS]:httpsMock.getExplainOrders,
+  [RequestUrl.EXPLAIN_PREPAY]:httpsMock.preOrderExplain,
+  [RequestUrl.CLOUD_URL]:httpsMock.getCloudUrl,
+  [RequestUrl.TREASURE_INFO]:httpsMock.getTreasureInfo,
+  [RequestUrl.ACTIVE_INFO]:httpsMock.getActiveInfo,
+  [RequestUrl.ACTIVE_ORDERS]:httpsMock.getActiveOrders,
+  [RequestUrl.CANCEL_ACTIVE_ORDER]:httpsMock.cancelActiveOrder,
+  [RequestUrl.CANCEL_EXPLAIN_ORDER]:httpsMock.cancelExplainOrder,
+  [RequestUrl.ACTIVE_PREPAY]:httpsMock.preOrderActive,
+  [RequestUrl.REPAY_ORDER]:httpsMock.repayOrder
 };
 
 // 模拟一个延时的 mock 方法，延迟时间为 `delay` 毫秒
@@ -60,7 +68,7 @@ export async function replaceMockData(url: string | undefined, ...args: ESObject
     const func = arr.find((item) => url === item[0]);
     if (func) {
       const response: BaseResponse = await func[1](...args);
-      const delayResponse: BaseResponse = await simulateDelay(response, 500);
+      const delayResponse: BaseResponse = await simulateDelay(response, 200);
       return Promise.resolve(delayResponse);
     }
     return mockErrorHandler('cannot find mock function.');

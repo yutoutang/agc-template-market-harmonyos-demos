@@ -2,9 +2,9 @@ import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from '@o
 import { AppStorageMap, CurAppInfo } from '../common/Constant';
 import { getMockResponse } from './HttpMockMap';
 
-/**
- * 是否使用mock数据
- */
+/*
+:todo 是否使用mock数据
+*/
 const useMock: boolean = true;
 
 const instance = axios.create({

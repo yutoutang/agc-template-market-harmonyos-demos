@@ -22,14 +22,14 @@ export class DramaDetailVM {
     appRouter.back(true)
   }
 
-  jumpDetailPage(options: DramaCoverVM) {
+  jumpDetailPage(options: DramaCoverVM, callback?: (popInfo: PopInfo) => void) {
     appRouter.push({
       builderName: NAV_PAGE_NAME.ShortDramaDetailPage.name,
       params: {
         dramaInfo: {
           id: options.dramaId
         } as DramaInfo,
-      },
+      }, popCallback: callback
     })
   }
 }

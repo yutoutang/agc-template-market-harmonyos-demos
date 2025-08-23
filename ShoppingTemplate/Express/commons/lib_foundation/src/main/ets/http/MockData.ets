@@ -1,7 +1,6 @@
-import { goodsList } from 'module_base'
+import { address1, address2, goodsList, IAddrInfo } from 'module_base'
 import { ExpressStatus, OrderStatus, OrderType, PaymentMethod, ShippingMethod } from '../common/Constant'
 import {
-  IAddrInfo,
   ICompany,
   IGoods,
   ILogisticsInfo,
@@ -12,26 +11,8 @@ import {
 } from '../model/IResponse'
 import { CheckIn, Coupon } from '../model/ObserveModel'
 
-const sendAddress: IAddrInfo = {
-  id: 1,
-  name: '用户1',
-  cellphone: '12345678901',
-  province: '江苏省',
-  city: '南京市',
-  area: '雨花台区',
-  detailAddress: 'xx街道xxx小区',
-  isDefault: true
-}
-const getAddress: IAddrInfo = {
-  id: 2,
-  name: '用户2',
-  cellphone: '12345678901',
-  province: '江苏省',
-  city: '南京市',
-  area: '雨花台区',
-  detailAddress: 'xx街道xxx小区',
-  isDefault: false
-}
+const sendAddress: IAddrInfo = address1
+const getAddress: IAddrInfo = address2
 const order1: IOrder = {
   id: 1,
   type: OrderType.SEND,
@@ -45,8 +26,6 @@ const order1: IOrder = {
   price: 0,
   sendAddress: sendAddress,
   getAddress: getAddress,
-  sendCity: '南京市',
-  getCity: '南京市',
   goods: {
     id: 1,
     name: '文件',
@@ -72,8 +51,6 @@ const order2: IOrder = {
   price: 0,
   sendAddress: sendAddress,
   getAddress: getAddress,
-  sendCity: '南京市',
-  getCity: '南京市',
   goods: {
     id: 1,
     name: '文件',
@@ -99,8 +76,6 @@ const order3: IOrder = {
   price: 0,
   sendAddress: sendAddress,
   getAddress: getAddress,
-  sendCity: '南京市',
-  getCity: '南京市',
   goods: {
     id: 1,
     name: '文件',
@@ -126,8 +101,6 @@ const order4: IOrder = {
   price: 35,
   sendAddress: sendAddress,
   getAddress: getAddress,
-  sendCity: '南京市',
-  getCity: '南京市',
   goods: {
     id: 1,
     name: '文件',
@@ -153,8 +126,6 @@ const order6: IOrder = {
   price: 0,
   sendAddress: sendAddress,
   getAddress: getAddress,
-  sendCity: '南京市',
-  getCity: '南京市',
   goods: {
     id: 1,
     name: '文件',
@@ -180,8 +151,6 @@ const order7: IOrder = {
   price: 20,
   sendAddress: sendAddress,
   getAddress: getAddress,
-  sendCity: '南京市',
-  getCity: '南京市',
   goods: {
     id: 1,
     name: '文件',
@@ -207,8 +176,6 @@ const order8: IOrder = {
   price: 30,
   sendAddress: sendAddress,
   getAddress: getAddress,
-  sendCity: '南京市',
-  getCity: '南京市',
   goods: {
     id: 1,
     name: '文件',
@@ -234,8 +201,6 @@ const order9: IOrder = {
   price: 30,
   sendAddress: sendAddress,
   getAddress: getAddress,
-  sendCity: '南京市',
-  getCity: '南京市',
   goods: {
     id: 1,
     name: '文件',
@@ -261,8 +226,6 @@ const order13: IOrder = {
   price: 50,
   sendAddress: sendAddress,
   getAddress: getAddress,
-  sendCity: '南京市',
-  getCity: '南京市',
   goods: {
     id: 1,
     name: '文件',
@@ -371,7 +334,7 @@ export class MockData {
     },
     {
       time: '2025-04-10  11:39',
-      content: '快件正在发往无锡'
+      content: '快件正在发往北京'
     },
     {
       time: '2025-04-10  11:39',
@@ -397,26 +360,8 @@ export class MockData {
     day: '',
     time: '',
     paymentMethod: PaymentMethod.PAY_NOW,
-    sendAddress: {
-      id: 1,
-      name: '用户1',
-      cellphone: '12345678901',
-      province: '江苏省',
-      city: '南京市',
-      area: '雨花台区',
-      detailAddress: 'xx街道xxx小区',
-      isDefault: true
-    },
-    getAddress: {
-      id: 2,
-      name: '用户2',
-      cellphone: '12345678901',
-      province: '江苏省',
-      city: '南京市',
-      area: '雨花台区',
-      detailAddress: 'xx街道xxx小区',
-      isDefault: false
-    },
+    sendAddress: address1,
+    getAddress: address2,
     sendPosition: '',
     getPosition: '',
     orderNo: '',

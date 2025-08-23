@@ -6,9 +6,9 @@ export interface IJumpCategoryParam {
   listInitialIndex: number;
 }
 
-/**
- * 和元服务本身相关的信息
- */
+/*
+:todo 网络请求base url，真实网络请求可以替换请求地址
+*/
 export enum CurAppInfo {
   BASE_URL = '', // 服务端请求基础url
 }

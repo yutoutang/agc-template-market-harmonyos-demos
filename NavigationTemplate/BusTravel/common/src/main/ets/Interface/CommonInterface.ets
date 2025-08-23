@@ -11,12 +11,3 @@ export class Notification {
   'clickAction': Record<string, number>
   'notifyId': number = 0
 }
-
-export class UserInfo {
-  avatarUri: Resource = $r('app.media.ic_empty')
-  idToken: string = ''
-  nickName: string = ''
-  openID: string = ''
-  unionID: string = ''
-  phoneNumber:string='';
-}

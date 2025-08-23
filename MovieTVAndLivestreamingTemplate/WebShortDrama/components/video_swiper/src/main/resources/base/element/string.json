@@ -6,11 +6,23 @@
     },
     {
       "name": "agcit_huawei_video_swiper",
-      "value": "1.0.0"
+      "value": "1.0.1"
     },
     {
       "name": "agcittype_huawei_video_swiper",
       "value": "serviceComponent"
+    },
+    {
+      "name": "refresh",
+      "value": "继续下拉刷新"
+    },
+    {
+      "name": "load",
+      "value": "松手加载"
+    },
+    {
+      "name": "loading",
+      "value": "加载中"
     }
   ]
 }

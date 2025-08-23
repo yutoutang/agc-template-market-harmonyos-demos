@@ -59,15 +59,15 @@ export struct MinePage {
             Divider()
             Row() {
               Text(this.userState.userInfo.vipInfo.isVip ? '请查看您的会员权益' : '开通VIP后享受更多服务')
-                .fontSize(14)
+                .fontSize($r('sys.float.Body_M'))
                 .fontWeight(FontWeight.Regular)
                 .fontColor('#000000')
               Button(this.userState.userInfo.vipInfo.isVip ? '会员中心' : '开通会员')
                 .backgroundColor('#F8E6CF')
                 .height(28)
-                .fontSize(14)
+                .fontSize($r('sys.float.Body_M'))
                 .fontWeight(FontWeight.Medium)
-                .fontColor('#000000')
+                .fontColor($r('sys.color.font_primary'))
                 .onClick(() => {
                   RouterModule.getStack().pushPathByName('VipOpenCenter', null)
                 })

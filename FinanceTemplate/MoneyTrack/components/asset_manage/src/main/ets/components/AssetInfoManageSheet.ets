@@ -56,49 +56,52 @@ export struct AssetInfoManageSheet {
     Column() {
       this.assetFormBuilder();
       Blank();
-      Button('保存')
-        .width('100%')
-        .backgroundColor(Constants.THEME_COLOR)
-        .enabled(typeof this.formData.amount === 'number')
-        .onClick(() => {
-          const num = Number(this.amount);
-          if (typeof num !== 'number') {
-            promptAction.showToast({ message: '请检查输入金额' });
-            return;
-          }
-          this.formData.amount = num;
-          this.handleConfirm?.(this.formData);
-        });
-      if (this.initAsset?.assetId) {
-        Button('删除')
-          .width('100%')
-          .backgroundColor(Constants.BUTTON_BACKGROUND_COLOR_GREY)
-          .fontColor(Constants.WARNING_COLOR)
-          .enabled(this.formData.amount !== 0)
-          .margin({ top: 16 })
-          .onClick(() => {
-            promptAction.showDialog({
-              message: '删除资产账户会取消所有该账户名下的记账数据关联，并且无法恢复关联。请确认是否删除？',
-              buttons: [
-                {
-                  text: '取消',
-                  color: Constants.FONT_COLOR_LEVEL1,
-                },
-                {
-                  text: '删除',
-                  color: Constants.WARNING_COLOR,
-                },
-              ],
-              alignment: DialogAlignment.Bottom,
-            })
-              .then(data => {
-                if (data.index === 1) {
-                  this.handleDelete?.(this.initAsset!.assetId);
-                }
-              });
-          });
-      }
 
+      Column() {
+        Button('保存')
+          .width('100%')
+          .backgroundColor(Constants.THEME_COLOR)
+          .enabled(typeof this.formData.amount === 'number')
+          .onClick(() => {
+            const num = Number(this.amount);
+            if (typeof num !== 'number') {
+              promptAction.showToast({ message: '请检查输入金额' });
+              return;
+            }
+            this.formData.amount = num;
+            this.handleConfirm?.(this.formData);
+          });
+        if (this.initAsset?.assetId) {
+          Button('删除')
+            .width('100%')
+            .backgroundColor(Constants.BUTTON_BACKGROUND_COLOR_GREY)
+            .fontColor(Constants.WARNING_COLOR)
+            .enabled(this.formData.amount !== 0)
+            .margin({ top: 16 })
+            .onClick(() => {
+              promptAction.showDialog({
+                message: '删除资产账户会取消所有该账户名下的记账数据关联，并且无法恢复关联。请确认是否删除？',
+                buttons: [
+                  {
+                    text: '取消',
+                    color: Constants.FONT_COLOR_LEVEL1,
+                  },
+                  {
+                    text: '删除',
+                    color: Constants.WARNING_COLOR,
+                  },
+                ],
+                alignment: DialogAlignment.Bottom,
+              })
+                .then(data => {
+                  if (data.index === 1) {
+                    this.handleDelete?.(this.initAsset!.assetId);
+                  }
+                });
+            });
+        }
+      }
+      .margin({ bottom: 16 })
     }
     .width('100%')
     .height('100%')

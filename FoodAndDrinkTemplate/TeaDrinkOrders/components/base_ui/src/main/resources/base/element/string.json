@@ -1,0 +1,20 @@
+{
+  "string": [
+    {
+      "name": "currency_symbol",
+      "value": "￥"
+    },
+    {
+      "name": "insulation_bag",
+      "value": "保温袋"
+    },
+    {
+      "name": "insulation_bag_desc",
+      "value": "保持低温，口感更好~"
+    },
+    {
+      "name": "agcit_huawei_tea_drink_orders",
+      "value": "1.0.1"
+    }
+  ]
+}

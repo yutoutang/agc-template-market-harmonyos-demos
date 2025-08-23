@@ -1,12 +1,16 @@
 {
   "color": [
     {
-      "name": "system_color_focus",
-      "value": "#007dff"
+      "name": "theme_color",
+      "value": "#0A59F7"
     },
     {
-      "name": "system_color_highlight",
-      "value": "#ff5121"
+      "name": "highlight_color",
+      "value": "#E84026"
+    },
+    {
+      "name": "tag_color",
+      "value": "#ED6F21"
     },
     {
       "name": "system_color_grey_level1",
@@ -17,36 +21,44 @@
       "value": "#f7f7f7"
     },
     {
-      "name": "system_color_background_auxiliary",
-      "value": "#f7f7f7"
+      "name": "background_color_grey",
+      "value": "#f1f3f5"
     },
     {
-      "name": "system_color_background_white",
+      "name": "background_color_white",
       "value": "#ffffff"
     },
     {
-      "name": "system_color_background_colored",
+      "name": "background_color_theme",
       "value": "#f0f6fd"
     },
     {
-      "name": "system_color_background_transparent_black",
-      "value": "#80000000"
+      "name": "background_color_transparent",
+      "value": "#00000000"
+    },
+    {
+      "name": "background_color_transparent_black",
+      "value": "#4D000000"
+    },
+    {
+      "name": "background_color_grey_light",
+      "value": "#0D000000"
+    },
+    {
+      "name": "divider_color",
+      "value": "#33000000"
     },
     {
       "name": "font_color_level1",
-      "value": "#191919"
+      "value": "#E6000000"
     },
     {
       "name": "font_color_level2",
-      "value": "#666666"
+      "value": "#99000000"
     },
     {
       "name": "font_color_level3",
-      "value": "#e0e0e0"
-    },
-    {
-      "name": "font_color_link",
-      "value": "#007dff"
+      "value": "#66000000"
     },
     {
       "name": "font_color_level1_invert",

@@ -33,7 +33,7 @@ export struct HotSearchPanel {
 
         Row() {
           Column({ space: 16 }) {
-            RankList({dramaList: this.rankList, onDramaClick: this.onDramaClick, scroller: undefined,
+            RankList({dramaList: this.rankList, scroller: undefined,
               isVertical: true})
           }
           .width('100%')

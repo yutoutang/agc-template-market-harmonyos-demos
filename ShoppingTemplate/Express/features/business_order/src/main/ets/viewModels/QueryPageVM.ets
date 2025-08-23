@@ -10,13 +10,11 @@ import {
   getOrderCount,
   getOrderList,
   GetOrderListRequest,
-  IAddrInfo,
   IOrder,
   OrderStatus,
   OrderType,
-  UserInfo
 } from 'lib_foundation';
-import { Logger } from 'module_base';
+import { IAddrInfo, Logger,UserInfo } from 'module_base';
 
 
 @ObservedV2

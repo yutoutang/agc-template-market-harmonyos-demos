@@ -7,6 +7,18 @@
     {
       "name": "permission_reason_location",
       "value": "用于获取当前定位"
+    },
+    {
+      "name": "color_brown",
+      "value": "#603C00"
+    },
+    {
+      "name": "bg_brown",
+      "value": "#D1B380"
+    },
+    {
+      "name": "agcit_huawei_museum_ticket",
+      "value": "1.0.1"
     }
   ]
 }

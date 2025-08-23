@@ -1,5 +1,5 @@
 import { relationalStore } from '@kit.ArkData';
-import { Logger } from '../Logger';
+import { Logger } from 'bill_base';
 import { DBOperationErrorCode, DBOperator } from './Constants';
 import {
   TableOrderByParams,

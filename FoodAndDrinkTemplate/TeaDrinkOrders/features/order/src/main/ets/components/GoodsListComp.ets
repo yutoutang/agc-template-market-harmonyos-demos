@@ -1,5 +1,5 @@
-import { Constants, DishesType, Good } from 'common/Index';
-import { GoodInfoComp } from './GoodInfoComp';
+import { Constants, DishesType, Goods } from 'common/Index';
+import { GoodsInfoComp } from './GoodsInfoComp';
 
 @ComponentV2
 export struct GoodsListComp {
@@ -63,7 +63,7 @@ export struct GoodsListComp {
           .onChange((value: string) => {
             if (value) {
               this.dishesList = this.dishesList.map((item) => {
-                item.good = item.good.filter(i => i.name?.includes(value))
+                item.goods = item.goods.filter(i => i.name?.includes(value))
                 return item
               })
             } else {
@@ -105,14 +105,14 @@ export struct GoodsListComp {
         List({ scroller: this.scroller }) {
           ForEach(this.dishesList, (item: DishesType) => {
             ListItemGroup({
-              header: this.titleHeader(item.typeName, item.good.length),
+              header: this.titleHeader(item.typeName, item.goods.length),
               space: 10,
             }) {
-              ForEach(item.good, (listItem: Good) => {
+              ForEach(item.goods, (listItem: Goods) => {
                 ListItem() {
-                  GoodInfoComp({ good: listItem })
+                  GoodsInfoComp({ goods: listItem })
                 }
-              }, (listItem: Good) => JSON.stringify(listItem))
+              }, (listItem: Goods) => JSON.stringify(listItem))
 
             }
           }, (item: DishesType) => JSON.stringify(item))

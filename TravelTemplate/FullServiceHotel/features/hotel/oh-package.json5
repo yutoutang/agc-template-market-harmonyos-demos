@@ -1,0 +1,15 @@
+{
+  "name": "hotel",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "commonlib": "file:../../commons/commonlib",
+    "network": "file:../../commons/network",
+    "componentlib": "file:../../commons/componentlib",
+    "module_date_selector": "file:../../components/module_date_selector",
+    "module_call_dialog": "file:../../components/module_call_dialog"
+  }
+}

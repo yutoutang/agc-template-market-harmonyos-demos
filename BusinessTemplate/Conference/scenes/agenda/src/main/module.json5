@@ -1,0 +1,25 @@
+{
+  "module": {
+    "name": "agenda",
+    "type": "har",
+    "description": "$string:shared_desc",
+    "deviceTypes": [
+      "phone",
+    ],
+    "installationFree": true,
+    "routerMap": '$profile:route_map',
+
+    "requestPermissions": [
+      {
+        "name": "ohos.permission.READ_CALENDAR",
+        "reason": "$string:READ_CALENDAR",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "inuse"
+        }
+      }
+    ]
+  }
+}

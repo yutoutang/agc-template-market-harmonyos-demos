@@ -1,7 +1,7 @@
 import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { window } from '@kit.ArkUI';
 import { Logger } from 'commonlib';
-import { UIBase } from 'uicalendarpicker';
+import { UIBase } from 'module_calendar_picker';
 import { formInfo } from '@kit.FormKit';
 import { RouterModule, RouterMap } from 'commonlib';
 
@@ -23,7 +23,7 @@ export default class EntryAbility extends UIAbility {
 
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     Logger.info(TAG, 'Ability onCreate');
-    this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
+    this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT);
     this.processWantData(want);
   }
 
@@ -34,7 +34,7 @@ export default class EntryAbility extends UIAbility {
 
   processWantData(want: Want) {
     let data = want.parameters;
-    if (data?.[formInfo.FormParam.IDENTITY_KEY] !== undefined) {
+    if (data?.[formInfo.FormParam.IDENTITY_KEY]) {
       let hasData: boolean = (JSON.parse(data.params as string))?.hasData;
       let orderNo: string = (JSON.parse(data.params as string))?.orderNo;
       if (hasData) {

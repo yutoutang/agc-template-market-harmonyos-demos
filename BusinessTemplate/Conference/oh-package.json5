@@ -1,0 +1,15 @@
+{
+  "modelVersion": "5.0.3",
+  "name": "conference",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "",
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "@ohos/axios": "2.2.4",
+    "dayjs": "1.11.13"
+  },
+  "devDependencies": {},
+  "dynamicDependencies": {}
+}

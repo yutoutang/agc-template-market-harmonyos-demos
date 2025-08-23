@@ -41,6 +41,7 @@ export struct AssetCreateSheet {
       };
     }
     .align(Alignment.TopStart)
+    .edgeEffect(EdgeEffect.Spring)
     .padding(16)
     .backgroundColor(this.bgColor)
     .width('100%')

@@ -16,15 +16,12 @@
 
 ## 约束与限制
 
-### 软件
+### 环境
 
-* DevEco Studio版本：DevEco Studio 5.0.4 Release及以上
-* HarmonyOS SDK版本：HarmonyOS 5.0.4 Release及以上
-
-### 硬件
-
-* 设备类型：华为手机（直板机）
-* HarmonyOS版本：HarmonyOS 5.0.4 Release及以上
+- DevEco Studio版本：DevEco Studio 5.0.4 Release及以上
+- HarmonyOS SDK版本：HarmonyOS 5.0.4 Release SDK及以上
+- 设备类型：华为手机（包括双折叠和阔折叠）
+- 系统版本：HarmonyOS 5.0.4(16)及以上
 
 
 ## 快速入门

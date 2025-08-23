@@ -3,7 +3,6 @@ import {
   OrderTypeEnum,
   Reduction,
   RouterMap,
-  SheetHeaderComp,
   StoreInfoModel,
   WindowModel,
 } from 'common/Index';
@@ -144,12 +143,12 @@ export struct TitleComp {
       .onClick(() => {
         this.showShopDiscount = true
       })
-      .bindSheet($$this.showShopDiscount, this.myBuilder(() => {
-        this.showShopDiscount = false
-      }), {
-        height: 421,
+      .bindSheet($$this.showShopDiscount, this.myBuilder(), {
+        detents: [421, 422],
         blurStyle: BlurStyle.Thick,
-        showClose: false,
+        showClose: true,
+        backgroundColor: $r('sys.color.background_fourth'),
+        title: { title: $r('app.string.store_announce') },
       })
       .margin({ top: 12, left: Constants.BORDER_WIDTH, right: Constants.BORDER_WIDTH });
     }
@@ -163,20 +162,14 @@ export struct TitleComp {
   }
 
   @Builder
-  myBuilder(close: () => void) {
+  myBuilder() {
     Column() {
-      SheetHeaderComp({
-        title: $r('app.string.store_announce'),
-        close: () => {
-          close()
-        },
-      })
-      List({ space: 18 }) {
+      List({ space: 14 }) {
         ForEach(this.storeModel.storeInfo?.reduction, (reduction: Reduction) => {
           ListItem() {
             Row() {
               Row() {
-                Image($r('app.media.ic_news')).width(16)
+                Image($r('app.media.ic_news1')).width(16)
                 Text(reduction.name)
                   .fontSize(12)
                   .fontColor($r('sys.color.font_secondary'))
@@ -204,25 +197,13 @@ export struct TitleComp {
         }, (reduction: Reduction) => JSON.stringify(reduction))
       }
       .width(Constants.FULL_SIZE)
-      .constraintSize({ maxWidth: Constants.FULL_SIZE })
-      .padding({
-        top: 13,
-        bottom: 13,
-        left: 16,
-        right: 16,
-      })
       .scrollBar(BarState.Off)
       .layoutWeight(1)
       .backgroundColor($r('sys.color.background_primary'))
-      .borderRadius({ topLeft: 12, topRight: 12 })
-      .padding({ top: 16, left: 12, right: 12 })
-      .margin({ top: 8 })
+      .borderRadius(12)
+      .padding(12)
     }
     .width(Constants.FULL_SIZE)
-    .height(421)
-    .padding({ left: Constants.BORDER_WIDTH, right: Constants.BORDER_WIDTH, top: 8 })
-    .backgroundColor($r('sys.color.background_secondary'))
-    .borderRadius({ topLeft: 32, topRight: 32 })
-    .constraintSize({ maxWidth: Constants.FULL_SIZE })
+    .padding({ left: Constants.BORDER_WIDTH, right: Constants.BORDER_WIDTH })
   }
 }

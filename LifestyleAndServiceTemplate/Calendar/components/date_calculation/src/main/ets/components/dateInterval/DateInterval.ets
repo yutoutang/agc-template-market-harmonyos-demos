@@ -8,47 +8,39 @@ export struct DateInterval {
    * 按钮颜色
    */
   @Param buttonColor: ResourceStr = '#c4272b'
-
   /**
    * 文本颜色
    */
   @Param textColor: ResourceStr = '#ffffff'
-
   /**
    * 分割线
    */
   @Local egDivider: DividerTmp = new DividerTmp(1, 10, 10, '#ffe9f0f0')
-
   /**
    * 当前选择日期
    */
   @Local datePicker: Date = new Date()
-
   /**
    * 传入的初始时间
    */
   @Param startDate: Date = new Date()
-
   /**
    * 开始时间
    */
   @Local localEndDate: string = ''
-
   /**
    * 结束时间
    */
   @Local localStartDate: string = ''
-
   /**
    * 计算值
    */
   @Local betweenDates: number = 0
-
   /**
    * 查询事件
    */
-  @Event onSearch: (betweenDates: number) => void = () => {}
-
+  @Event onSearch: (betweenDates: number) => void = () => {
+  }
 
   aboutToAppear(): void {
     this.localStartDate = dayjs(this.startDate).format('YYYY-MM-DD')
@@ -85,82 +77,88 @@ export struct DateInterval {
 
       List({ space: 16 }) {
         ListItem() {
-          Row() {
-            Text('日期1')
-              .attributeModifier(new BaseTextStyleModifier(`font_primary/Subtitle_M/Medium`))
-            Row({ space: 5 }) {
-              Text(dayjs(this.localStartDate).format('YYYY年MM月DD日'))
-                .attributeModifier(new BaseTextStyleModifier(`font_primary/Body_M/Regular`))
-              Image($r('app.media.chevron_right')).width(7).height(17)
+          Column() {
+            Row() {
+              Text('日期2')
+                .attributeModifier(new BaseTextStyleModifier(`font_primary/Subtitle_M/Medium`))
+              Row({ space: 5 }) {
+                Text(dayjs(this.localEndDate).format('YYYY年MM月DD日'))
+                  .attributeModifier(new BaseTextStyleModifier(`font_primary/Body_M/Regular`))
+                Image($r('app.media.chevron_right')).width(7).height(17)
+              }
             }
+            .width('100%')
+            .justifyContent(FlexAlign.SpaceBetween)
+            .onClick(() => {
+              this.datePicker = new Date(this.localEndDate)
+              baseActionSheet.show({
+                id: 'datePickerBuilder',
+                detents: [300, 301],
+                showClose: false,
+                customContent: () => {
+                  this.datePickerBuilder('end')
+                },
+              })
+            });
+
+            Divider()
+              .margin({ top: 16, bottom: 16 })
+            Row() {
+              Text('日期1')
+                .attributeModifier(new BaseTextStyleModifier(`font_primary/Subtitle_M/Medium`))
+              Row({ space: 5 }) {
+                Text(dayjs(this.localStartDate).format('YYYY年MM月DD日'))
+                  .attributeModifier(new BaseTextStyleModifier(`font_primary/Body_M/Regular`))
+                Image($r('app.media.chevron_right')).width(7).height(17)
+              }
+            }
+            .width('100%')
+            .justifyContent(FlexAlign.SpaceBetween)
+            .onClick(() => {
+              this.datePicker = new Date(this.localStartDate)
+              baseActionSheet.show({
+                id: 'datePickerBuilder',
+                detents: [300, 301],
+                showClose: false,
+                customContent: () => {
+                  this.datePickerBuilder('start')
+                },
+              })
+            });
           }
-          .width('100%')
-          .justifyContent(FlexAlign.SpaceBetween)
-          .onClick(() => {
-            this.datePicker = new Date(this.localStartDate)
-            baseActionSheet.show({
-              id: 'datePickerBuilder',
-              detents:[300,301],
-              showClose: false,
-              customContent: () => {
-                this.datePickerBuilder('start')
-              },
+        }
+
+
+        ListItem() {
+          Button('查询')
+            .backgroundColor(this.buttonColor)
+            .fontColor(this.textColor)
+            .fontSize($r('sys.float.Body_L'))
+            .fontWeight(FontWeight.Medium)
+            .padding({ top: 12, bottom: 12 })
+            .width('100%')
+            .margin({ top: 48 })
+            .onClick(() => {
+              this.calculateDaysBetweenDates()
+              this.onSearch(this.betweenDates)
             })
-          });
         }
 
         ListItem() {
-          Row() {
-            Text('日期2')
-              .attributeModifier(new BaseTextStyleModifier(`font_primary/Subtitle_M/Medium`))
-            Row({ space: 5 }) {
-              Text(dayjs(this.localEndDate).format('YYYY年MM月DD日'))
-                .attributeModifier(new BaseTextStyleModifier(`font_primary/Body_M/Regular`))
-              Image($r('app.media.chevron_right')).width(7).height(17)
-            }
+          Column() {
+            Text(`间隔${this.betweenDates.toString()}天`)
+              .attributeModifier(new BaseTextStyleModifier(`font_primary/Body_M/Medium`))
           }
           .width('100%')
-          .justifyContent(FlexAlign.SpaceBetween)
-          .onClick(() => {
-            this.datePicker = new Date(this.localEndDate)
-            baseActionSheet.show({
-              id: 'datePickerBuilder',
-              detents:[300,301],
-              showClose: false,
-              customContent: () => {
-                this.datePickerBuilder('end')
-              },
-            })
-          });
+          .padding({ top: 12, bottom: 12 })
+          .borderRadius(16)
+          .backgroundColor('#FDF7EE')
         }
-
       }
-      .divider(this.egDivider)
       .margin({ bottom: 16, top: 16 })
       .scrollBar(BarState.Off)
-      Button('查询')
-        .backgroundColor(this.buttonColor)
-        .fontColor(this.textColor)
-        .fontSize($r('sys.float.Body_L'))
-        .fontWeight(FontWeight.Medium)
-        .padding({ top: 12, bottom: 12 })
-        .width('100%')
-        .margin({ top: 48 })
-        .onClick(() => {
-          this.calculateDaysBetweenDates()
-          this.onSearch(this.betweenDates)
-        })
-      Column() {
-        Text(`间隔${this.betweenDates.toString()}天`)
-          .attributeModifier(new BaseTextStyleModifier(`font_primary/Body_M/Medium`))
-      }
-      .width('100%')
-      .margin({ top: 24 })
-      .padding({ top: 12, bottom: 12 })
-      .borderRadius(16)
-      .backgroundColor('#FDF7EE')
+      .layoutWeight(1)
     }
-    .height('100%')
     .margin({ top: 18 })
     .justifyContent(FlexAlign.Start)
     .padding({ left: 16, right: 16 })

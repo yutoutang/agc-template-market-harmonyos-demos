@@ -1,0 +1,11 @@
+{
+  "module": {
+    "name": "module_person_manage",
+    "type": "har",
+    "routerMap": "$profile:route_map",
+    "deviceTypes": [
+      "phone",
+    ]
+
+  }
+}

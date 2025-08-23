@@ -8,6 +8,12 @@ import { ControllerModule } from 'module_base';
 import { WidgetCardVM } from '../viewmodels/WidgetCardVM';
 import { emitter } from '@kit.BasicServicesKit';
 
+
+@Builder
+export function MainEntryBuilder() {
+  MainEntry()
+}
+
 @Entry
 @ComponentV2
 struct MainEntry {
@@ -36,7 +42,7 @@ struct MainEntry {
   }
 
   build() {
-    Navigation(this.vm.navStack) {
+    NavDestination() {
       Column() {
         Tabs({ barPosition: BarPosition.End, index: this.vm.curIndex, controller: this.controller }) {
           TabContent() {
@@ -99,8 +105,6 @@ struct MainEntry {
     }
     .hideTitleBar(true)
     .hideToolBar(true)
-    .hideBackButton(true)
-    .mode(NavigationMode.Stack);
   }
 
   @Builder

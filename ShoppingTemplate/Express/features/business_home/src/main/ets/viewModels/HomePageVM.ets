@@ -1,5 +1,5 @@
-import { UserInfo } from 'lib_foundation';
 import { AppStorageV2 } from '@kit.ArkUI';
+import { UserInfo } from 'module_base';
 
 const TAG = '[HomePageVM]';
 

@@ -82,6 +82,28 @@ export class WindowUtil {
     }
   }
 
+  public static setWindowSystemBar() {
+    if (WindowUtil._currentWindow) {
+      let systemBarProperties: window.SystemBarProperties = {
+        statusBarContentColor: '#FFFFFF',
+        navigationBarColor:'#66000000'
+      };
+      WindowUtil.currentWindow.setWindowSystemBarProperties(systemBarProperties);
+    }
+  }
+
+
+  public static cancelWindowSystemBar() {
+    if (WindowUtil._currentWindow) {
+      let systemBarProperties: window.SystemBarProperties = {
+        statusBarContentColor: '#000000',
+        navigationBarColor:'#66000000'
+      };
+      WindowUtil.currentWindow.setWindowSystemBarProperties(systemBarProperties);
+    }
+  }
+
+
   private static async getCurrentWindow() {
     await window
       .getLastWindow(getContext())

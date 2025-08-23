@@ -41,8 +41,8 @@ export struct ServiceSearch {
       Column() {
         Search({ value: this.searchValue, placeholder: $r('app.string.enter_service'), controller: this.controller })
           .backgroundColor($r('app.color.service_search'))
-          .placeholderColor(Color.Grey)
-          .placeholderFont({ size: Constants.FONT_SIZE_SMALL })
+          .placeholderColor($r('sys.color.font_secondary'))
+          .placeholderFont({ size: $r('sys.float.Body_L') })
           .onChange((value: string) => {
             this.searchValue = value
             this.serviceSearch(value)

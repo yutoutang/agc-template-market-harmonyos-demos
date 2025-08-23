@@ -1,12 +1,11 @@
 {
   "module": {
     "name": "mine",
-    "type": "shared",
+    "type": "har",
     "deviceTypes": [
       "phone"
     ],
     "installationFree":true,
-    'deliveryWithInstall': true,
     "routerMap": "$profile:router_map"
   }
 }

@@ -1,0 +1,41 @@
+<svg width="24.000000" height="24.000000" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<desc>
+			Created with Pixso.
+	</desc>
+	<defs>
+		<clipPath id="clip118_3661">
+			<rect id="ic_weather_rain.svg" width="24.000000" height="24.000000" fill="white" fill-opacity="0"/>
+		</clipPath>
+		<linearGradient x1="9.212734" y1="20.599476" x2="7.914601" y2="19.847912" id="paint_linear_118_3923_0" gradientUnits="userSpaceOnUse">
+			<stop stop-color="#D8E5EA"/>
+			<stop offset="1.000000" stop-color="#D8E5EA" stop-opacity="0.000000"/>
+		</linearGradient>
+		<linearGradient x1="12.712714" y1="20.599478" x2="11.414577" y2="19.847919" id="paint_linear_118_3922_0" gradientUnits="userSpaceOnUse">
+			<stop stop-color="#D8E5EA"/>
+			<stop offset="1.000000" stop-color="#D8E5EA" stop-opacity="0.000000"/>
+		</linearGradient>
+		<linearGradient x1="16.212746" y1="20.599478" x2="14.914607" y2="19.847919" id="paint_linear_118_3921_0" gradientUnits="userSpaceOnUse">
+			<stop stop-color="#D8E5EA"/>
+			<stop offset="1.000000" stop-color="#D8E5EA" stop-opacity="0.000000"/>
+		</linearGradient>
+		<linearGradient x1="7.204909" y1="7.463238" x2="14.651701" y2="13.057639" id="paint_linear_118_3655_0" gradientUnits="userSpaceOnUse">
+			<stop stop-color="#FFFFFF"/>
+			<stop offset="1.000000" stop-color="#D8E5EA"/>
+		</linearGradient>
+		<linearGradient x1="18.427704" y1="7.971373" x2="15.017318" y2="15.355787" id="paint_linear_118_3656_0" gradientUnits="userSpaceOnUse">
+			<stop stop-color="#FFFFFF" stop-opacity="0.737255"/>
+			<stop offset="1.000000" stop-color="#FFFFFF" stop-opacity="0.000000"/>
+		</linearGradient>
+	</defs>
+	<g clip-path="url(#clip118_3661)">
+		<path id="直线-16 (边框)" d="M9.77 19.62L8.64 21.57C8.43 21.93 7.98 22.05 7.62 21.84C7.26 21.63 7.14 21.18 7.35 20.82L8.47 18.87C8.68 18.51 9.13 18.39 9.5 18.6C9.86 18.81 9.98 19.26 9.77 19.62Z" fill="url(#paint_linear_118_3923_0)" fill-opacity="1.000000" fill-rule="evenodd"/>
+		<path id="直线-16-copy (边框)" d="M13.27 19.62L12.14 21.57C11.93 21.93 11.48 22.05 11.12 21.84C10.76 21.63 10.64 21.18 10.85 20.82L11.97 18.87C12.18 18.51 12.63 18.39 13 18.6C13.36 18.81 13.48 19.26 13.27 19.62Z" fill="url(#paint_linear_118_3922_0)" fill-opacity="1.000000" fill-rule="evenodd"/>
+		<path id="直线-16-copy-2 (边框)" d="M16.77 19.62L15.64 21.57C15.43 21.93 14.98 22.05 14.62 21.84C14.26 21.63 14.14 21.18 14.35 20.82L15.47 18.87C15.68 18.51 16.13 18.39 16.5 18.6C16.86 18.81 16.98 19.26 16.77 19.62Z" fill="url(#paint_linear_118_3921_0)" fill-opacity="1.000000" fill-rule="evenodd"/>
+		<path id="合并形状" d="M8.83 17C5.32 16.93 2.5 14.1 2.5 10.62C2.5 7.1 5.39 4.25 8.96 4.25C11.53 4.25 13.75 5.73 14.79 7.88C15.37 7.63 16.01 7.5 16.68 7.5C19.34 7.5 21.5 9.62 21.5 12.25C21.5 14.87 19.34 17 16.68 17L8.83 17Z" fill="url(#paint_linear_118_3655_0)" fill-opacity="1.000000" fill-rule="evenodd"/>
+		<path id="合并形状" d="M2.5 10.62C2.5 7.1 5.39 4.25 8.96 4.25C11.53 4.25 13.75 5.73 14.79 7.88C15.37 7.63 16.01 7.5 16.68 7.5C19.34 7.5 21.5 9.62 21.5 12.25C21.5 14.87 19.34 17 16.68 17L8.83 17C5.32 16.93 2.5 14.1 2.5 10.62Z" stroke="#000000" stroke-opacity="0" stroke-width="1.000000"/>
+		<ellipse id="椭圆形-copy" cx="16.686691" cy="12.250000" rx="4.813334" ry="4.750000" fill="url(#paint_linear_118_3656_0)" fill-opacity="1.000000"/>
+		<ellipse id="椭圆形-copy" cx="16.686691" cy="12.250000" rx="4.813334" ry="4.750000" stroke="#000000" stroke-opacity="0" stroke-width="1.000000"/>
+		<rect id="矩形" width="24.000000" height="24.000000" fill="#000000" fill-opacity="0"/>
+		<rect id="矩形" width="24.000000" height="24.000000" stroke="#000000" stroke-opacity="0" stroke-width="1.000000"/>
+	</g>
+</svg>

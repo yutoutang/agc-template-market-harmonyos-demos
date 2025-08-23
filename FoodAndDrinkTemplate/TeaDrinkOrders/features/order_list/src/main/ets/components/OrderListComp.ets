@@ -14,10 +14,6 @@ import {
   MyOrderInfo,
   OrderDetailRouter,
   OrderListTypeEnum,
-  OrderStateEnum,
-  orderStateMap,
-  OrderTypeEnum,
-  orderTypeMap,
   PayTypeSheetBuilder,
   RouterMap,
   StoreInfoModel,
@@ -27,6 +23,7 @@ import {
 import { common } from '@kit.AbilityKit';
 import { AppStorageV2, promptAction } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { OrderStateEnum, orderStateMap, OrderTypeEnum, orderTypeMap } from 'order_detail';
 
 @ComponentV2
 export struct OrderListComp {
@@ -128,11 +125,11 @@ export struct OrderListComp {
         }
         this.paySheetFlag = false
       }), {
-        height: 290,
-        blurStyle:
-        BlurStyle.Thick,
-        showClose:
-        false,
+        detents: [290, 291],
+        blurStyle: BlurStyle.Thick,
+        showClose: true,
+        backgroundColor: $r('sys.color.background_fourth'),
+        title: { title: $r('app.string.select_pay_type') },
       })
       .visibility(this.orderList.length ? Visibility.Visible : Visibility.None)
 
@@ -147,9 +144,11 @@ export struct OrderListComp {
     .bindSheet($$this.callTelSheet, CallTelSheetBuilder(this.bindTel, () => {
       this.callTelSheet = false
     }), {
-      height: 290,
+      detents: [309, 310],
       blurStyle: BlurStyle.Thick,
-      showClose: false,
+      showClose: true,
+      backgroundColor: $r('sys.color.background_fourth'),
+      title: { title: $r('app.string.contact_us') },
     })
     .height(Constants.FULL_SIZE)
     .width(Constants.FULL_SIZE)
@@ -188,14 +187,14 @@ export struct OrderListComp {
 
       Row() {
         List({ space: 6 }) {
-          ForEach(orderInfo.good, (item: GoodsOfOrder) => {
+          ForEach(orderInfo.goods, (item: GoodsOfOrder) => {
             ListItem() {
               Row() {
                 Image(`${CommonUrl.CLOUD_STORAGE_URL}${item.logo}`)
                   .width(60)
                   .height(60)
                   .borderRadius(8)
-                if (orderInfo.good?.length === 1) {
+                if (orderInfo.goods?.length === 1) {
                   Column() {
                     Text(item.name).fontSize(14).fontColor($r('sys.color.font_primary')).maxLines(1)
                       .textOverflow({ overflow: TextOverflow.Ellipsis });

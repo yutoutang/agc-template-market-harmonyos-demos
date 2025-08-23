@@ -1,4 +1,5 @@
-import { CommonConstants } from 'commonlib';
+import { LengthMetrics } from '@kit.ArkUI';
+import { CommonConstants, TitleBuilder } from 'commonlib';
 import { MinePageVM } from '../viewModels/MinePageVM';
 
 @Builder
@@ -37,9 +38,12 @@ struct PrivacyPage {
             }.width('100%').padding(20).backgroundColor(CommonConstants.BG_COLOR_WHITE);
 
           }.width('100%');
-        }.height(CommonConstants.FULL_HEIGHT).scrollBar(BarState.Off);
+        }
+        .height(CommonConstants.FULL_HEIGHT)
+        .scrollBar(BarState.Off)
+        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false });
       }.padding({ top: 10 }).backgroundColor(CommonConstants.BG_COLOR_GRAY);
-    }.title('隐私政策');
+    }.title(TitleBuilder('隐私政策'), { paddingStart: LengthMetrics.vp(16) });
 
   }
 }

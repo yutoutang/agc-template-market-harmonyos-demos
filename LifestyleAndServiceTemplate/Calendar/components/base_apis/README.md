@@ -29,7 +29,16 @@
 
 ## 快速入门
 
-1. 安装组件。 将模板根目录的components下**base_apis**目录拷贝至您的工程相应目录。如果是在DevEvo Studio使用插件集成组件，则无需安装组件，请忽略此步骤
+1. 安装组件。
+
+   如果是在DevEvo Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
+
+   如果是从生态市场下载组件，请参考以下步骤安装组件。
+
+   a. 解压下载的组件包，将包中所有文件夹拷贝至您工程根目录的XXX目录下。
+
+   b. 在项目根目录build-profile.json5添加base_apis模块。
+
    ```typescript
    // 在项目根目录build-profile.json5填写base_apis路径。其中XXX为组件存放的目录名
     "modules": [

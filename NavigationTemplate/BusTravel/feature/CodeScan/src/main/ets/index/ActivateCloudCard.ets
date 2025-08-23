@@ -1,5 +1,5 @@
-import { promptAction } from '@kit.ArkUI';
-import { RouteEntryVM } from 'common'
+import { AppStorageV2, promptAction } from '@kit.ArkUI'
+import { GlobalState, Logger, RouteEntryVM, UserInfoModel } from 'common'
 
 
 @Builder
@@ -7,18 +7,16 @@ export function ActivateCloudCardBuilder() {
   ActivateCloudCard()
 }
 
-@Component
+@ComponentV2
 export struct ActivateCloudCard {
-  @StorageLink('cloudCard') cloudCard: boolean = AppStorage.get('cloudCard') ?? false;
-  @StorageLink('trueName') trueName: string = '';
-  @StorageLink('phoneNumber') phoneNumber: string = '';
-  @StorageLink('certificateNumber') certificateNumber: string = '';
-  @State certificateType: string = '请选择证件类型';
+  @Local globalState: GlobalState = AppStorageV2.connect(GlobalState, 'GlobalState', () => new GlobalState())!
+  @Local userInfo: UserInfoModel = AppStorageV2.connect(UserInfoModel, 'UserInfoModel', () => new UserInfoModel())!
+  @Local certificateType: string = '请选择证件类型'
   private select: number | number[] = 0
   private selectCertificateType: string[] =
     ['居民身份证', '港澳居民来往内地通行证', '台湾居民来往大陆通行证', '外国人永久居留身份证']
-  @State isTreatyAgree: boolean = false
-  vm: RouteEntryVM = RouteEntryVM.instance;
+  @Local isTreatyAgree: boolean = false
+  vm: RouteEntryVM = RouteEntryVM.instance
 
   clickLogInButton(): void {
     // 先勾选协议
@@ -27,8 +25,8 @@ export struct ActivateCloudCard {
         message: '请阅读并勾选协议',
         duration: 1500,
         bottom: '80vp',
-      });
-      return;
+      })
+      return
     }
   }
 
@@ -49,7 +47,7 @@ export struct ActivateCloudCard {
                   .width(20)
                   .height(20)
                   .select(this.isTreatyAgree)
-                  .onChange((value) => this.isTreatyAgree = value);
+                  .onChange((value) => this.isTreatyAgree = value)
                 Text() {
                   Span('查看')
                     .fontSize(12)
@@ -75,7 +73,7 @@ export struct ActivateCloudCard {
               Row() {
                 Text('姓名')
                   .width(70)
-                TextInput({ text: $$this.trueName, placeholder: '请填写姓名' })
+                TextInput({ text: $$this.userInfo.trueName, placeholder: '请填写姓名' })
                   .caretColor($r('app.color.system_color_green'))
                   .backgroundColor($r('sys.color.comp_background_list_card'))
                   .margin({ left: '8vp' })
@@ -91,7 +89,7 @@ export struct ActivateCloudCard {
               Row() {
                 Text('手机号码')
                   .width(70)
-                TextInput({ text: $$this.phoneNumber, placeholder: '请填写手机号' })
+                TextInput({ text: $$this.userInfo.phoneToCard, placeholder: '请填写手机号' })
                   .caretColor($r('app.color.system_color_green'))
                   .backgroundColor($r('sys.color.comp_background_list_card'))
                   .margin({ left: '8vp' })
@@ -120,10 +118,10 @@ export struct ActivateCloudCard {
                       onAccept: (value: TextPickerResult) => {
                         // 设置select为按下确定按钮时候的选中项index，这样当弹窗再次弹出时显示选中的是上一次确定的选项
                         this.select = value.index
-                        console.log(this.select + '')
+                        Logger.info(this.select + '')
                         // 点击确定后，被选到的文本数据展示到页面
                         this.certificateType = value.value as string
-                        console.info('TextPickerDialog:onAccept()' + JSON.stringify(value))
+                        Logger.info('TextPickerDialog:onAccept()' + JSON.stringify(value))
                       }
                     })
                   })
@@ -138,13 +136,13 @@ export struct ActivateCloudCard {
               Row() {
                 Text('证件号')
                   .width(70)
-                TextInput({ text: $$this.certificateNumber, placeholder: '请填写证件号' })
+                TextInput({ text: $$this.userInfo.certificateNumber, placeholder: '请填写证件号' })
+                  .type(InputType.Number)
                   .caretColor($r('app.color.system_color_green'))
                   .backgroundColor($r('sys.color.comp_background_list_card'))
                   .margin({ left: '8vp' })
                   .maxLength(18)
                   .width(200)
-                  .type(InputType.Normal)
               }
 
               Divider()
@@ -156,7 +154,7 @@ export struct ActivateCloudCard {
                   .selectedColor($r('app.color.system_color_green'))
                   .shape(CheckBoxShape.CIRCLE)
                   .onChange((value: boolean) => {
-                    console.info('Checkbox1 change is' + value)
+                    Logger.info('Checkbox1 change is' + value)
                   })
                   .unselectedColor($r('app.color.system_color_green'))
                   .width(20)
@@ -177,15 +175,16 @@ export struct ActivateCloudCard {
                 .onClick(() => {
                   if (this.isTreatyAgree === false) {
                     this.clickLogInButton()
-                  } else if (this.trueName && this.phoneNumber.length === 11 && this.certificateNumber.length === 18) {
-                    this.cloudCard = true;
+                  } else if (this.userInfo.trueName && this.userInfo.phoneNumber.length === 11 &&
+                    this.userInfo.certificateNumber.length === 18) {
+                    this.globalState.cloudCard = true
                     this.vm.pop()
                   } else {
                     promptAction.showToast({
                       message: '请完善信息',
                       duration: 1500,
                       bottom: '80vp',
-                    });
+                    })
                   }
                 })
             }

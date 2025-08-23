@@ -1,6 +1,7 @@
-import { BaseResponse } from '../types/BaseResponse';
+import { AppStorageMap, Logger } from 'commonlib';
 import axiosClient from '../models/AxiosRequest';
 import {
+  CancelPaymentRequest,
   GetOrderDetailRequest,
   HotelListRequest,
   PrepayMealRequest,
@@ -10,6 +11,7 @@ import {
   SubmitCommentRequest,
   UpdateUserInfoRequest,
 } from '../types/AxiosRequestParam';
+import { BaseResponse } from '../types/BaseResponse';
 import {
   GetBanquetHotelListResp,
   GetBanquetRoomDetailResp,
@@ -37,7 +39,6 @@ import {
   PrepayResp,
 } from '../types/responseTypes';
 import { RequestUrlMap } from './RequestUrlMap';
-import { AccountUtil, AppStorageMap, HUAWEIAccountModel, Logger } from 'commonlib';
 
 export function getTenantId() {
   const tenantId: number | undefined = AppStorage.get(AppStorageMap.TENANT_ID);
@@ -46,16 +47,6 @@ export function getTenantId() {
     return undefined;
   }
   return tenantId;
-}
-
-export function resetLoginToken() {
-  const accountInfo: HUAWEIAccountModel = AccountUtil.getAccountInfo();
-  accountInfo.loginToken = undefined;
-  https.hotelUserLogin().then((res) => {
-    if (res.code === 0) {
-      accountInfo.loginToken = res.data.loginToken;
-    }
-  });
 }
 
 class HttpsApi {
@@ -326,6 +317,14 @@ class HttpsApi {
     return axiosClient.post({
       showLoading: true,
       url: RequestUrlMap.PREPAY_MEAL,
+      data,
+    });
+  }
+
+  // 取消订单
+  public cancelPayment(data: CancelPaymentRequest): Promise<BaseResponse> {
+    return axiosClient.post({
+      url: RequestUrlMap.ORDER_CANCEL,
       data,
     });
   }

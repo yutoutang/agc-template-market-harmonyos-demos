@@ -1,10 +1,12 @@
+import { AppStorageV2, promptAction } from '@kit.ArkUI'
+import { common, Want } from '@kit.AbilityKit'
 import {
+  AppInfoModel,
+  CallTelSheetBuilder,
   Constants,
   HttpCode,
   HttpRequestApi,
-  HwMapComp,
   IndexPageRouter,
-  MapLocation,
   NavHeaderBar,
   PermissionUtil,
   RouterMap,
@@ -13,9 +15,8 @@ import {
   Utils,
   WindowModel,
 } from 'common'
-import { site } from '@kit.MapKit'
-import { SelectStoreComp } from '../components/SelectStoreComp'
-import { AppStorageV2 } from '@kit.ArkUI'
+
+import { SelectStore } from 'select_store'
 
 @Builder
 export function SelectStorePageBuilder() {
@@ -26,102 +27,39 @@ export function SelectStorePageBuilder() {
 struct SelectStorePage {
   @Consumer('pageStack') pageStack?: NavPathStack
   @Local windowModel: WindowModel = AppStorageV2.connect(WindowModel, () => new WindowModel())!
-  @Local searchText: string = ''
-  @Local selectIndex: number = 0
-  @Local mapHeight: number = Constants.MAP_HEIGHT_DEFAULT
-  @Local isExpandMap: boolean = true
+  @Local appInfo: AppInfoModel = AppStorageV2.connect(AppInfoModel, () => new AppInfoModel())!
   @Local storeInfoList: Array<StoreInfo> = []
-  @Local collectStoreList: Array<StoreInfo> = []
-  @Local selectStore: MapLocation = new MapLocation()
-  @Local searchAddressList: Array<site.Site> = []
-
-  @Computed
-  get locations() {
-    return this.searchList.map(item => {
-      let location = new MapLocation()
-      let locationArr = item.coordinates.split(',')
-      if (locationArr?.length === 2) {
-        location.id = item.id
-        location.title = item.name
-        location.latitude = Number(locationArr[0])
-        location.longitude = Number(locationArr[1])
-      }
-      return location
-    })
-  }
-
-  @Computed
-  get searchList() {
-    return this.storeInfoList.filter(item => !this.searchText || item.name.includes(this.searchText))
-  }
+  @Local callTelSheet: boolean = false
+  @Local callTel: string = ''
 
   build() {
     NavDestination() {
       NavHeaderBar({ title: $r('app.string.store_list') })
-      Column() {
-        Row() {
-          Search({ value: $$this.searchText, placeholder: $r('app.string.search') })
-            .textFont({ size: $r('sys.float.Body_L') })
-            .width(Constants.FULL_SIZE)
-            .placeholderFont({ size: $r('sys.float.Body_L') })
-            .maxLength(20)
-        }
-        .height(28)
-        .margin({ top: 12, bottom: 12 })
-        .padding({ left: Constants.BORDER_WIDTH, right: Constants.BORDER_WIDTH })
-
-        Column() {
-          HwMapComp({
-            mapHeight: this.mapHeight,
-            locations: this.locations,
-            showMyLocation: false,
-            selectStore: this.selectStore,
-          }).margin({ top: 4 })
-          Row() {
-            Text(this.isExpandMap ? $r('app.string.collapse_map') : $r('app.string.expand_map'))
-              .fontSize(8)
-              .fontColor($r('sys.color.font_primary'))
-            Image(this.isExpandMap ? $r('app.media.ic_up') : $r('app.media.ic_down')).width(16).margin({ left: 8 })
-          }.width(Constants.FULL_SIZE).height(24).justifyContent(FlexAlign.Center).onClick(() => {
-            if (this.isExpandMap) {
-              this.isExpandMap = false
-              this.mapHeight = 0
-            } else {
-              this.isExpandMap = true
-              this.mapHeight = Constants.MAP_HEIGHT_DEFAULT
-            }
-
-
-          })
-        }
-
-        Column() {
-          List({ space: 12 }) {
-            ForEach(this.searchList, (item: StoreInfo, index: number) => {
-              ListItem() {
-                SelectStoreComp({ storeInfo: item, isSelect: this.selectIndex === index })
-                  .onClick(() => {
-                    if (this.selectIndex === index) {
-                      this.pageStack?.popToName(RouterMap.INDEX_PAGE,
-                        { index: TabBarType.ORDER, storeId: item.id } as IndexPageRouter)
-                    } else {
-                      this.selectIndex = index
-                      this.selectStore = this.locations.find(location => location.id === item.id)!
-                    }
-                  })
-              }
-            }, (item: StoreInfo) => item.id)
-          }.layoutWeight(1).scrollBar(BarState.Off)
-        }.layoutWeight(1)
-        .padding({
-          top: 12,
-          left: Constants.BORDER_WIDTH,
-          right: Constants.BORDER_WIDTH,
-          bottom: this.windowModel.getWindowBottomHeight(),
-        })
-        .backgroundColor($r('sys.color.background_secondary'))
-      }.width(Constants.FULL_SIZE).layoutWeight(1)
-    }.hideTitleBar(true).onShown(() => {
+      SelectStore({
+        storeInfoList: this.storeInfoList,
+        navigateStoreCb: (coordinates: string = '', address: string = '') => {
+          this.goNavigationStore(coordinates, address)
+        },
+        selectStoreCb: (storeId: string) => {
+          this.selectStore(storeId)
+        },
+        callTelCb: (callTelSheet: boolean, tel: string) => {
+          this.callTelCb(callTelSheet, tel)
+        },
+      }).layoutWeight(1).bindSheet($$this.callTelSheet, CallTelSheetBuilder(this.callTel, () => {
+        this.callTelSheet = false
+      }), {
+        detents: [309, 310],
+        blurStyle: BlurStyle.Thick,
+        showClose: true,
+        backgroundColor: $r('sys.color.background_fourth'),
+        title: { title: $r('app.string.contact_us') },
+      });
+    }
+    .margin({ bottom: this.windowModel.getWindowBottomHeight() })
+    .constraintSize({ maxHeight: Constants.FULL_SIZE })
+    .hideTitleBar(true)
+    .onShown(() => {
       Promise.all([PermissionUtil.getLocation(), HttpRequestApi.getStoreList()]).then(res => {
         let myLocation = res[0]
         if (res[1].code === HttpCode.SUCCESS && res[1].data) {
@@ -131,9 +69,40 @@ struct SelectStorePage {
             item.distanceStr = Utils.getFmtDistWithLocation(myLocation, item.coordinates);
           })
           this.storeInfoList.sort((a, b) => a.distance - b.distance)
-          this.selectStore = this.locations.find(item => item.id === this.storeInfoList[0].id)!
         }
       })
     })
+  }
+
+  selectStore(storeId: string) {
+    this.pageStack?.popToName(RouterMap.INDEX_PAGE, { index: TabBarType.ORDER, storeId } as IndexPageRouter)
+  }
+
+  async goNavigationStore(coordinates: string = '', address: string = '') {
+    let coordinateArr = coordinates.split(',')
+    if (coordinateArr?.length === 2) {
+      let latitude: number = Number(coordinateArr[0])
+      let longitude: number = Number(coordinateArr[1])
+      let petalMapWant: Want = {
+        bundleName: 'com.huawei.hmos.maps.app',
+        uri: 'maps://routes',
+        parameters: {
+          linkSource: this.appInfo.packageName,
+          destinationLatitude: latitude,
+          destinationLongitude: longitude,
+          destinationPoiId: '',
+          destinationName: address ?? '',
+        },
+      }
+      let context = getContext(this) as common.UIAbilityContext;
+      context.startAbility(petalMapWant);
+    } else {
+      promptAction.showToast({ message: $r('app.string.store_address_error') })
+    }
+  }
+
+  callTelCb(callTelSheet: boolean, tel: string) {
+    this.callTelSheet = callTelSheet
+    this.callTel = tel
   }
 }

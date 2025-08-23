@@ -30,6 +30,7 @@ export enum RequestUrlMap {
   ORDER_LIST = '/order/list',
   ORDER_DETAIL_HOTEL = '/order/detail/hotel',
   ORDER_DETAIL_MEAL = '/order/detail/meal',
+  ORDER_CANCEL = 'order/cancel',
   /**
    * 酒店预订
    */

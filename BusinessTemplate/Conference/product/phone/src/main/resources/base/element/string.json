@@ -1,0 +1,112 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "module description"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "EntryAbility_label"
+    },
+    {
+      "name": "hwid_no_internet_connect",
+      "value": "No Internet connection. Check your network settings. "
+    },
+    {
+      "name": "hwid_text_button_known",
+      "value": "OK"
+    },
+    {
+      "name": "EntryFormAbility_desc",
+      "value": "form_description"
+    },
+    {
+      "name": "EntryFormAbility_label",
+      "value": "form_label"
+    },
+    {
+      "name": "widget_desc",
+      "value": "Countdown together, the excitement is worth anticipating."
+    },
+    {
+      "name": "widget_display_name",
+      "value": "Countdown to the Conference"
+    },
+    {
+      "name": "reason",
+      "value": "Copy Email"
+    },
+    {
+      "name": "permission_start_abilities",
+      "value": "Open the browser"
+    },
+    {
+      "name": "card_title",
+      "value": "Title"
+    },
+    {
+      "name": "introduction",
+      "value": "Introduction"
+    },
+    {
+      "name": "ticketWidget_desc",
+      "value": "Convenient ticket presentation for a faster entry into the park"
+    },
+    {
+      "name": "ticketWidget_display_name",
+      "value": "My ticket"
+    },
+    {
+      "name": "bigAgendaWidget_desc",
+      "value": "Collect, add to calendar, and recommended topics, all at your fingertips"
+    },
+    {
+      "name": "bigAgendaWidget_display_name",
+      "value": "Agenda of the General Assembly"
+    },
+    {
+      "name": "mediumAgendaWidget_desc",
+      "value": "Collect, add to calendar, and recommended topics, all at your fingertips"
+    },
+    {
+      "name": "mediumAgendaWidget_display_name",
+      "value": "Agenda of the General Assembly"
+    },
+    {
+      "name": "smallAgendaWidget_desc",
+      "value": "Collect, add to calendar, and recommended topics, all at your fingertips"
+    },
+    {
+      "name": "smallAgendaWidget_display_name",
+      "value": "Agenda of the General Assembly"
+    },
+    {
+      "name": "read_calendar",
+      "value": "Used to add agendas of interest to your calendar"
+    },
+    {
+      "name": "write_calendar",
+      "value": "Used to add agendas of interest to your calendar"
+    },
+    {
+      "name": "get_location",
+      "value": "Used for obtaining location information"
+    },
+    {
+      "name": "entranceWidget_desc",
+      "value": "Common Entry Quick Access"
+    },
+    {
+      "name": "entranceWidget_display_name",
+      "value": "Swimming Conference"
+    },
+    {
+      "name": "app_tracking_consent",
+      "value": "Unique ID of anonymized users"
+    }
+  ]
+}

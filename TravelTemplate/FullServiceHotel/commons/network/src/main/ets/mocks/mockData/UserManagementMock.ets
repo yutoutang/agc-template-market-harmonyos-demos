@@ -1,6 +1,6 @@
-import { MockStorageMap } from '../Constants';
-import { GetHotelUserInfoResp, HotelUserLoginResp } from '../../types/responseTypes';
 import { UpdateUserInfoRequest } from '../../types/AxiosRequestParam';
+import { GetHotelUserInfoResp, HotelUserLoginResp } from '../../types/responseTypes';
+import { MockStorageMap } from '../Constants';
 import { getFormattedResp } from '../Utils';
 
 const userInfoMock: HotelUserLoginResp = {
@@ -40,9 +40,6 @@ export class UserManagementMock {
     if (userInfoMock) {
       userInfoMock.name = data.name;
       userInfoMock.nickname = data.nickname;
-      userInfoMock.sex = data.sex;
-      userInfoMock.cellphone = data.cellphone;
-      userInfoMock.birthday = data.birthday;
       userInfoMock.avatar = data.avatar;
       AppStorage.set<GetHotelUserInfoResp>(MockStorageMap.USER_INFO, userInfoMock);
     }

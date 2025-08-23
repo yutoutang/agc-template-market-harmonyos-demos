@@ -62,10 +62,11 @@ export struct MenuComp {
     .bindSheet($$this.callTelSheet, CallTelSheetBuilder(this.storeModel.tel, () => {
       this.closeTelSheet()
     }), {
-      height: 290,
+      detents: [309, 310],
       blurStyle: BlurStyle.Thick,
-      backgroundColor: '#E6FFFFFF',
-      showClose: false,
+      showClose: true,
+      backgroundColor: $r('sys.color.background_fourth'),
+      title: { title: $r('app.string.contact_us') },
     });
   }
 

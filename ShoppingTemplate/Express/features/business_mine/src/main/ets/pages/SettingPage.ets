@@ -80,15 +80,15 @@ export struct SettingPage {
 
             this.contentBuilder('用户协议')
           }
-          .height('100%')
           .margin({
             left: 16,
             right: 16,
           });
         }
         .scrollBar(BarState.Off)
+        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
       }
-      .height('calc(100% - 40vp)')
+      .layoutWeight(1)
 
       if (this.vm.isLogin) {
         Row() {
@@ -105,6 +105,7 @@ export struct SettingPage {
         }
         .width('100%')
         .padding({ left: 16, right: 16 })
+        .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM]);
       }
     }
     .title('设置')

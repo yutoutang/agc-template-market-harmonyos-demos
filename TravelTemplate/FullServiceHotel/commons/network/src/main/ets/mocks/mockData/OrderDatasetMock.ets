@@ -1,8 +1,20 @@
 import { FormatUtil } from 'commonlib';
-import { PrepayMealRequest, PrepayRoomRequest } from '../../types/AxiosRequestParam';
+import { CancelPaymentRequest, PrepayMealRequest, PrepayRoomRequest } from '../../types/AxiosRequestParam';
 import { GetHotelOrderDetailResp, GetMealOrderDetailResp, OrderItem, PrepayResp } from '../../types/responseTypes';
 import { MockImageMap } from '../Constants';
 import { getFormattedResp } from '../Utils';
+
+enum OrderStatus {
+  PENDING_PAYMENT = '1',
+  PENDING_USAGE = '2',
+  COMPLETE = '3',
+  CANCEL = '4',
+}
+
+enum OrderType {
+  HOTEL = 1,
+  MEAL = 2,
+}
 
 const hotelOrder1: OrderItem = {
   id: 1,
@@ -160,6 +172,26 @@ export class OrderDatasetMock {
     }
   }
 
+  public static cancelPayment(data: CancelPaymentRequest) {
+    if (data.orderType === OrderType.HOTEL) {
+      let detail = OrderDatasetMock._hotelOrderDetailList.find((item) => data.orderNo === item.orderNo);
+      if (detail) {
+        detail.orderStatus = OrderStatus.CANCEL
+      }
+    } else {
+      let detail = OrderDatasetMock._mealOrderDetailList.find((item) => data.orderNo === item.orderNo);
+      if (detail) {
+        detail.status = OrderStatus.CANCEL
+      }
+    }
+    let summary = OrderDatasetMock._orderList.find((item) => data.orderNo === item.orderNo)
+    if (summary) {
+      summary.orderStatus = OrderStatus.CANCEL
+    }
+
+    return getFormattedResp(true);
+  }
+
   public static getHotelOrderDetail(orderNo: string) {
     let detail = OrderDatasetMock._hotelOrderDetailList.find((item) => orderNo === item.orderNo);
     if (!detail) {
@@ -294,5 +326,4 @@ export class OrderDatasetMock {
     };
     return getFormattedResp(resp);
   }
-
 }

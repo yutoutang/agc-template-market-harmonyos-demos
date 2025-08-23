@@ -3,7 +3,7 @@
     "name": "route_detail_test",
     "type": "feature",
     "deviceTypes": [
-      "default"
+      "phone"
     ],
     "deliveryWithInstall": true,
     "installationFree": false

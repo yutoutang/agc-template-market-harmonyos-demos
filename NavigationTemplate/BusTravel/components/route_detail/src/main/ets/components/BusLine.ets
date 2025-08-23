@@ -1,10 +1,10 @@
-@Component
+@ComponentV2
 @Preview
 export struct busLine {
-  @Prop busLineInfo: BusLineInfo = new BusLineInfo()
-  @State messageHeight: number = 48
-  @State messageBottom: number = 12
-  @State messageView: Visibility = Visibility.Visible
+  @Param busLineInfo: BusLineInfo = new BusLineInfo()
+  @Local messageHeight: number = 48
+  @Local messageBottom: number = 12
+  @Local messageView: Visibility = Visibility.Visible
 
   aboutToAppear(): void {
   }
@@ -152,7 +152,7 @@ export struct busLine {
   }
 }
 
-@Observed
+@ObservedV2
 export class BusLineInfo {
   private _busNumber: string = ''
 
@@ -257,7 +257,7 @@ export class BusLineInfo {
     this._price = price // 票价
     this._currentStation = currentStation // 当前站点
     this._line = line // 具体路线
-    this._lastThreeBuses = nearestThreeBuses // 距离最近的三辆车
+    this._lastThreeBuses = nearestThreeBuses.slice(0,3) // 距离最近的三辆车
     this._lineEndStop = line[line.length - 1]
     this._lineStartStop = line[0]
   }

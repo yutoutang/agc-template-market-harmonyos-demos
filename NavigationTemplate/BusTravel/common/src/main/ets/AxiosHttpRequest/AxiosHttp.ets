@@ -6,6 +6,7 @@ import axios, {
   InternalAxiosRequestConfig
 } from '@ohos/axios';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { Logger } from '../logger'
 
 
 /**
@@ -81,7 +82,7 @@ export class AxiosHttpRequest {
           resolve(res);
         })
         .catch((err: BusinessError) => {
-          console.error('网络请求Request异常：', err.message)
+          Logger.error('网络请求Request异常：', err.message)
           errorHandler(err)
           if (err) {
             reject(err);

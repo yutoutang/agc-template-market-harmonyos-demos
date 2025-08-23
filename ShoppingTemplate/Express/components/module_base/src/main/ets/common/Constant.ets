@@ -1,4 +1,5 @@
-import { IAddrInfo } from '../types'
+import { IAddrInfo, ISetting } from '../types'
+import { util } from '@kit.ArkTS'
 
 export interface IGoods {
   id: number,
@@ -26,6 +27,11 @@ export enum RouterMap {
   SERVICE_POINT_PAGE = 'ServicePointPage',
   PRIVACY_PAGE = 'PrivacyPage',
   REAL_NAME_AUTH_PAGE = 'RealNameAuthPage',
+  ADDRESS_MANAGE_PAGE = 'AddressManagePage',
+  ADDRESS_EDIT_PAGE = 'AddressEditPage',
+  AGREE_PRIVACY_PAGE = 'AgreePrivacyPage',
+  SAFE_PAGE = 'SafePage',
+  MAIN_ENTRY = 'MainEntry',
 }
 
 /**
@@ -91,23 +97,138 @@ export const goodsList: IGoods[] =
   ]
 
 export const sendAddressData: IAddrInfo = {
-  id: 0,
-  name: '请填写寄件人信息',
-  cellphone: '',
-  province: '支持智能识别文字与图片中的地址',
+  id: '',
+  name: '',
+  phone: '',
+  countryCode: '',
+  country: '',
+  province: '',
   city: '',
-  area: '',
-  detailAddress: '',
+  district: '',
+  street: '',
+  detail: '',
   isDefault: false,
+  createdAt: 0,
+  updatedAt: 0,
 }
 
 export const getAddressData: IAddrInfo = {
-  id: 0,
-  name: '请填写收件人信息',
-  cellphone: '',
-  province: '支持智能识别文字与图片中的地址',
+  id: '',
+  name: '',
+  phone: '',
+  countryCode: '',
+  country: '',
+  province: '',
   city: '',
-  area: '',
-  detailAddress: '',
+  district: '',
+  street: '',
+  detail: '',
   isDefault: false,
+  createdAt: 0,
+  updatedAt: 0,
+}
+
+export const methodList: ISetting[] = [
+  {
+    text: '上门取件',
+    value: 1,
+  },
+  {
+    text: '服务点自寄',
+    value: 2,
+  }
+]
+
+export const payMethodList: ISetting[] = [
+  {
+    text: '寄付现结',
+    value: 1
+  },
+  {
+    text: '到付',
+    value: 2
+  }
+]
+
+
+export const gridList: ISetting[] = [
+  {
+    text: '小格口',
+    value: 1
+  },
+  {
+    text: '中格口',
+    value: 2
+  },
+  {
+    text: '大格口',
+    value: 3
+  }
+]
+
+export const dayList: ISetting[] = [
+  {
+    text: '今天',
+    value: 1
+  },
+  {
+    text: '明天',
+    value: 2
+  },
+  {
+    text: '后天',
+    value: 3
+  }
+]
+
+export const shippingMethodList: ISetting[] = [
+  {
+    text: '网点自寄',
+    value: 1
+  },
+  {
+    text: '自行联系快递员',
+    value: 2
+  },
+  {
+    text: '每天固定时间',
+    value: 3
+  }
+]
+
+export const timeList: string[] =
+  ['8:00 - 9:00', '9:00 - 10:00', '10:00 - 11:00', '11:00 - 12:00', '12:00 - 13:00', '13:00 - 14:00', '14:00 - 15:00',
+    '15:00 - 16:00', '16:00 - 17:00',
+    '17:00 - 18:00']
+
+export const address1: IAddrInfo = {
+  id: util.generateRandomUUID(false),
+  name: '张三',
+  phone: '12345678901',
+  countryCode: 'CN',
+  country: '中国',
+  province: '江苏省',
+  city: '南京市',
+  district: '雨花台区',
+  street: '铁心桥街道',
+  detail: '软件大道101号',
+  isDefault: true,
+  createdAt: new Date().getTime(),
+  updatedAt: new Date().getTime(),
+}
+
+export const address2: IAddrInfo = {
+  id: util.generateRandomUUID(false),
+  name: '李四',
+  phone: '12345678901',
+  countryCode: 'CN',
+  country: '中国',
+  province: '',
+  city: '北京市',
+  district: '东城区',
+  street: '景山前街',
+  detail: '景山前街4号',
+  isDefault: false,
+  createdAt: new Date().getTime(),
+  updatedAt: new Date().getTime(),
 }

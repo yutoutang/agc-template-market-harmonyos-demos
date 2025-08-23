@@ -1,8 +1,9 @@
-import { TemplateListPageVM } from '../viewmodel/TemplateListPageVM';
 import { CustomContentDialog, TipsDialog } from '@kit.ArkUI';
+import { RouterMap, CommonDivider, IParam } from 'module_base';
+import { TemplateListPageVM } from '../viewmodel/TemplateListPageVM';
 import { ITemplate } from '../http/Type';
 import { CommonUtils } from '../common/Utils';
-import { RouterMap, CommonDivider, IParam } from 'module_base';
+import { Context, ctx } from '../common/Context';
 
 @Builder
 export function TemplateListPageBuilder() {
@@ -13,6 +14,8 @@ export function TemplateListPageBuilder() {
 @ComponentV2
 struct TemplateListPage {
   vm: TemplateListPageVM = TemplateListPageVM.instance
+  @Local
+  public ctx: Context = ctx
   dialogControllerDelete: CustomDialogController = new CustomDialogController({
     builder: TipsDialog({
       content: '是否删除当前模板?',
@@ -29,7 +32,7 @@ struct TemplateListPage {
           if (this.vm.selectedTemplate) {
             this.vm.deleteTemplate(this.vm.selectedTemplate.id)
           }
-        }
+        },
       },
     }),
   })
@@ -42,8 +45,8 @@ struct TemplateListPage {
         top: 0,
         left: 0,
         right: 0,
-        bottom: 0
-      }
+        bottom: 0,
+      },
     }),
     cancel: () => {
       this.vm.editName = ''
@@ -84,9 +87,14 @@ struct TemplateListPage {
                       .fontColor(Color.White)
                       .backgroundColor('#0A59F7')
                       .onClick(() => {
-                        const param: IParam = {
-                          templateId: template.id
+                        if (typeof this.ctx.onPushPath === 'function') {
+                          this.ctx.onPushPath(template.id)
+                          return
                         }
+                        const param: IParam = {
+                          templateId: template.id,
+                        }
+
                         this.vm.stack.removeByName(RouterMap.EXPRESS_PAGE)
                         this.vm.stack.pushPath({ name: RouterMap.EXPRESS_PAGE, param })
                         this.vm.stack.removeByName(RouterMap.TEMPLATE_LIST_PAGE)
@@ -158,7 +166,7 @@ struct TemplateListPage {
                     offsetX: 0,
                     offsetY: 4,
                     radius: 4,
-                    color: 'rgba(0,0,0,0.25)'
+                    color: 'rgba(0,0,0,0.25)',
                   })
                   .borderRadius(8)
                   .zIndex(99)
@@ -166,9 +174,10 @@ struct TemplateListPage {
               }
             }
             .margin({ bottom: 12 })
-          }, (item: ITemplate[]) => JSON.stringify(item))
+          }, (item: ITemplate) => JSON.stringify(item))
         }
         .scrollBar(BarState.Off)
+        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
       }
       .padding({ left: 16, right: 16 })
       .onClick(() => {
@@ -267,11 +276,12 @@ struct TemplateListPage {
           top: 24,
           bottom: 16,
           left: 24,
-          right: 24
+          right: 24,
         })
         .backgroundColor('rgba(255,255,255,0.80)')
       }
       .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
     }
   }
 }

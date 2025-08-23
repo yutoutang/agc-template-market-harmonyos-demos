@@ -1,0 +1,36 @@
+{
+  "string": [
+    {
+      "name": "PRIVACY_URL",
+      "value": "https://agreement-drcn.hispace.dbankcloud.cn/index.html?lang=zh&agreementId=1702049409677676416"
+    },
+    {
+      "name": "FILING_NUMBER_URL",
+      "value": "https://beian.miit.gov.cn"
+    },
+    {
+      "name": "WEBSITE_URL_HDC2025",
+      "value": "https://developer.huawei.com/home/hdc/hdc2025.html"
+    },
+    {
+      "name": "WEBSITE_URL_DongGuan",
+      "value": "https://4qdsju.epub360.com.cn/v2/manage/book/3xe1vs/?from=singlemessage"
+    },
+    {
+      "name": "WEBSITE_URL_HDC2024",
+      "value": "https://developer.huawei.com/home/hdc/hdc2024.html"
+    },
+    {
+      "name": "WEBSITE_URL_HDC2023",
+      "value": "https://developer.huawei.com/consumer/cn/hdc/hdc2023/index.html"
+    },
+    {
+      "name": "develop_privacy",
+      "value": "https://term.developer.huaweicloud.com/rest/developer/agreementservice/v1/developer/agreement/agreement-template?agr_type=90108&language=zh_cn&version=2024012204&region=cn#toolbar=0"
+    },
+    {
+      "name": "develop_ecology_privacy",
+      "value": "https://term.developer.huaweicloud.com/rest/developer/agreementservice/v1/developer/agreement/agreement-template?agr_type=90109&language=zh_cn&version=2025041112&region=cn#toolbar=0"
+    }
+  ]
+}

@@ -1,10 +1,8 @@
-import { getColor, getMedia, getString } from '@agctemplate/resources'
-import { Logger } from '@agctemplate/utils'
+import { getColor, getMedia, getString, NAV_PAGE_NAME } from '@agctemplate/resources'
+import { appRouter, Logger } from '@agctemplate/utils'
 import { RowModifier } from '../../AttributeModifiers'
-import { promptAction } from '@kit.ArkUI'
 import { AssociateUtil } from '../../../util/Utils'
 import { MinePageVM } from '../../viewmodel/MinePageVM'
-import { UserInfoModel } from '../../../util/AccountUtil'
 import { FunctionalButton, functionalButtonComponentManager } from '@kit.ScenarioFusionKit'
 
 
@@ -37,32 +35,57 @@ export struct UserLogin {
   @Local vm: MinePageVM = MinePageVM.instance;
   @Param userInfoHandler?: Function = undefined
   rowModifier: RowModifier = new RowModifier();
-
+  @Local isVip: boolean = false
 
   build() {
-    Row({ space: 16 }) {
+    Column() {
       Row({ space: 16 }) {
-        this.profileImage()
-        this.userName()
-      }
-      .height(64)
-      .padding(8)
-      .layoutWeight(1)
-      .borderRadius(12)
-      .attributeModifier(this.rowModifier)
-      .onClick(() => {
-        if (this.userInfoHandler && this.vm.userInfo.isPhoneAssociated) {
-          this.userInfoHandler();
-        } else {
-          promptAction.showToast({ message: getString('app.string.login_tip'), alignment: Alignment.Center });
+        Row({ space: 16 }) {
+          this.profileImage()
+          this.userName()
         }
-      })
+        .height(64)
+        .padding(8)
+        .layoutWeight(1)
+        .borderRadius(12)
+        .attributeModifier(this.rowModifier)
+        .onClick(() => {
+          if (this.userInfoHandler && this.vm.userInfo.isPhoneAssociated) {
+            this.userInfoHandler();
+          } else {
+            appRouter.push({builderName:NAV_PAGE_NAME.LoginPage.name})
+          }
+        })
+      }
 
-      this.accountLink()
+      if (this.vm.userInfo.isPhoneAssociated) {
+        Divider().height(0.5).padding({ left: 12, right: 12 })
+        Row() {
+          Text(this.vm.userInfo.isVip ? getString('app.string.VIP_information') : getString('app.string.Non_VIP_information'))
+            .fontSize(14)
+            .lineHeight(19)
+            .fontColor($r('sys.color.font_primary'))
+
+          Blank()
+          Button(this.vm.userInfo.isVip ? getString('app.string.VIP_button') : getString('app.string.Non_VIP_button'))
+            .fontSize(14)
+            .fontWeight(500)
+            .fontColor($r('sys.color.font_primary'))
+            .height(28)
+            .backgroundColor('#F1D1A5')
+            .onClick(()=>{
+              appRouter.push({builderName:NAV_PAGE_NAME.VIPCenterPage.name})
+            })
+        }
+        .width('100%')
+        .padding({ left: 12, right: 12 })
+        .height(56)
+      }
     }
     .backgroundColor($r('sys.color.background_primary'))
     .borderRadius(16)
     .padding(4)
+
   }
 
   // 头像
@@ -84,16 +107,8 @@ export struct UserLogin {
       if (this.vm.userInfo.isPhoneAssociated) {
         Text(this.vm.localInfo.nickname ? this.vm.localInfo.nickname : this.vm.userInfo.nickname)
           .userNameStyles()
-        Text(getString('app.string.userId', this.vm.userInfo.id ?? ''))
-          .fontColor($r('sys.color.font_secondary'))
-          .fontWeight(FontWeight.Regular)
-          .fontSize($r('sys.float.Body_M'))
-          .textOverflow({
-            overflow: TextOverflow.Ellipsis
-          })
-          .maxLines(1)
       } else {
-        Text(getString('app.string.mine_not_login'))
+        Text('点击登录')
           .userNameStyles()
       }
     }
@@ -105,7 +120,7 @@ export struct UserLogin {
 
   @Builder
   accountLink() {
-    if (this.vm.userInfo.isPhoneAssociated){
+    if (this.vm.userInfo.isPhoneAssociated) {
       Row({ space: 4 }) {
         Image(getMedia('app.media.linked'))
           .height(16)
@@ -116,14 +131,19 @@ export struct UserLogin {
           .fontColor($r('sys.color.font_primary'))
       }
       .backgroundColor($r('sys.color.comp_background_tertiary'))
-      .padding({ left: 8, right: 8, top: 4, bottom: 4 })
+      .padding({
+        left: 8,
+        right: 8,
+        top: 4,
+        bottom: 4
+      })
       .margin({ right: 8 })
       .height(28)
       .borderRadius(14)
       .onClick(async () => {
-        await AssociateUtil.disassociateAccount(getContext(this));   //  container.resolve(LoginAPI).logout();
+        await AssociateUtil.disassociateAccount(getContext(this)); //  container.resolve(LoginAPI).logout();
       })
-    }else {
+    } else {
       Stack() {
         FunctionalButton({
           params: {
@@ -140,12 +160,11 @@ export struct UserLogin {
           },
           controller: new functionalButtonComponentManager.FunctionalButtonController()
             .onGetPhoneNumber((err, data) => {
-              AssociateUtil.associateAccount(err, data?.code);
             }),
         })
           .zIndex(1)
 
-        Row({ space: 4 }){
+        Row({ space: 4 }) {
           Image(getMedia('app.media.to_link'))
             .height(16)
             .width(16)
@@ -155,7 +174,12 @@ export struct UserLogin {
             .fontColor(getColor('app.color.orange'))
         }
       }
-      .padding({ left: 8, right: 8, top: 4, bottom: 4 })
+      .padding({
+        left: 8,
+        right: 8,
+        top: 4,
+        bottom: 4
+      })
       .borderRadius(14)
     }
   }

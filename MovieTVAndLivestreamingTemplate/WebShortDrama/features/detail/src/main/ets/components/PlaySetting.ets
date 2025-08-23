@@ -1,24 +1,20 @@
 import { SpeedSegmentButton } from './SpeedSegmentButton'
-import { promptAction } from '@kit.ArkUI';
 import { getString } from '@agctemplate/resources';
+import { BulletVM } from '../viewmodels/BulletVM';
 
 @Preview
 @ComponentV2
 export struct PlaySetting {
-  @Event speedSet: Function = (speed: number) => {};
-  speedArr: Array<number> = [5, 1, 2, 6, 4]; //['0.5x', '1.0x', '1.25x', '1.5x', '2.0x']对应的数字
 
-  onIndexSelect: (index: number) => void = (index: number) => {
-    if (index > this.speedArr.length) {
-      return;
-    }
-    let speed: number = this.speedArr[index]
-    this.speedSet(speed)
-  };
+  @Param @Require bulletVM: BulletVM
+  @Param isShowBullet: boolean = true
+  @Event onSpeedSet: Function = (speed: number) => {}
+  @Event onBulletSet: Function = (isOn: boolean) => {}
+  @Event onClear: Function = (isOn: boolean) => {}
+  @Event openBulletSetting: () => void
 
   build() {
     Column({ space: 12 }) {
-      // speed
       Row() {
         Row() {
           Text(getString('app.string.play_speed_setting'))
@@ -26,7 +22,7 @@ export struct PlaySetting {
             .width(56)
             .height(19)
           Column() {
-            SpeedSegmentButton({ onIndexSelect: this.onIndexSelect })
+            SpeedSegmentButton({ onSpeedSet: this.onSpeedSet })
               .width(270)
           }
           .margin({ left:12 })
@@ -47,8 +43,7 @@ export struct PlaySetting {
           .height(20)
           .selectedColor('#F17F31')
           .onChange((isOn: boolean) => {
-            // 调用Toast显示提示：此样式仅为案例演示
-            promptAction.showToast({ message: getString('app.string.demo_toast_tips') });
+            this.onClear(isOn)
           })
       }
       .justifyContent(FlexAlign.SpaceBetween)
@@ -59,13 +54,17 @@ export struct PlaySetting {
       Row() {
         Text(getString('app.string.danmaku_switch'))
           .textStyle()
-        Toggle({ type: ToggleType.Switch, isOn: true })
+        Toggle({ type: ToggleType.Switch, isOn: this.isShowBullet })
           .width(36)
           .height(20)
           .selectedColor('#F17F31')
           .onChange((isOn: boolean) => {
-            // 调用Toast显示提示：此样式仅为案例演示
-            promptAction.showToast({ message: getString('app.string.demo_toast_tips') });
+            this.onBulletSet(isOn)
+            if(isOn) {
+              this.bulletVM.startBullet()
+            }else {
+              this.bulletVM.closeBullet()
+            }
           })
       }
       .justifyContent(FlexAlign.SpaceBetween)
@@ -81,8 +80,7 @@ export struct PlaySetting {
           .scale({ x:2, y:2 })
           .fontColor(['#3000'])
           .onClick(() => {
-            // 调用Toast显示提示：此样式仅为案例演示
-            promptAction.showToast({ message: getString('app.string.demo_toast_tips') });
+            this.openBulletSetting()
           })
       }
       .justifyContent(FlexAlign.SpaceBetween)
@@ -91,7 +89,6 @@ export struct PlaySetting {
     }
     .width('100%')
     .height(252)
-    .padding('16px 18px 12px 16px')
   }
 }
 

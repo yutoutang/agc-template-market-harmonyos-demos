@@ -14,6 +14,8 @@ struct MainEntry {
     await this.cardVm.updateFormInfo();
   };
 
+
+
   build() {
     Navigation(this.vm.navStack) {
       Column() {
@@ -30,14 +32,12 @@ struct MainEntry {
         .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
         .scrollable(false)
         .height('100%')
+        .barHeight(48)
         .animationDuration(0)
         .barMode(BarMode.Fixed)
         .onChange((index: number) => {
           this.vm.curIndex = index;
           // 刷新订单列表
-          if (index === 1) {
-            emitter.emit('refreshTable');
-          }
         });
       }
       .backgroundColor(Color.White)
@@ -47,7 +47,8 @@ struct MainEntry {
     .hideToolBar(true)
     .hideBackButton(true)
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
-    .mode(NavigationMode.Stack);
+    .mode(NavigationMode.Stack)
+    .backgroundColor($r('sys.color.background_secondary'))
   }
 
   async aboutToAppear() {
@@ -72,11 +73,13 @@ struct MainEntry {
         .width(24)
         .height(24);
       Text(item.label)
-        .fontColor(this.vm.curIndex === index ? $r('app.color.font_color_green') :
-        $r('sys.color.ohos_id_color_text_tertiary'))
-        .fontSize($r('sys.float.ohos_id_text_size_caption'))
-        .margin({ top: $r('app.string.margin_xs') });
+        .height(14)
+        .fontColor(this.vm.curIndex === index ? '#603C00' :
+        $r('sys.color.font_secondary'))
+        .fontSize($r('sys.float.Caption_M'))
+        .fontWeight(FontWeight.Medium)
+        .margin({ top: 2 });
 
-    }.width('100%');
+    }.width('100%').height('100%').padding({top:4})
   }
 }

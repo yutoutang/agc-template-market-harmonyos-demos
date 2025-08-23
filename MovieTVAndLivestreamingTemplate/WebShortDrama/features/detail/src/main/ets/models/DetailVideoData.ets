@@ -1,4 +1,4 @@
-import { VideoPlayData } from '@agctemplate/video_swiper';
+import { VideoPlayData } from 'video_swiper';
 import { ShortDramaDetailItemVM } from '../viewmodels/ShortDramaDetailItemVM';
 
 // 详情数据结构

@@ -11,10 +11,11 @@ export class ListItemModel {
   @Trace disabled?: boolean = false
   @Trace contentImage: string | PixelMap | Resource = ''
   @Trace contentText: ResourceStr = ''
+  @Trace redDot: ResourceStr = ''
   // 原事件柄
   handler?: Function = undefined
 
-  public constructor(mainText: ResourceStr, icon?: string | PixelMap | Resource, id?: string) {
+  public constructor(mainText: ResourceStr, icon?: string | PixelMap | Resource, id?: string, redDot?: ResourceStr) {
     if (mainText) {
       this.mainText = mainText
     }
@@ -23,6 +24,9 @@ export class ListItemModel {
     }
     if (id) {
       this.id = id
+    }
+    if (redDot) {
+      this.redDot = redDot
     }
   }
 
@@ -75,4 +79,5 @@ export class ListItemModel {
     this.contentText = contentText
     return this;
   }
+
 }

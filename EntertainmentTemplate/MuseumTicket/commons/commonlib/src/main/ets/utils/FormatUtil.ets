@@ -1,4 +1,3 @@
-import { CommonConstants } from '../constants/CommonContants';
 import { Logger } from './Logger';
 
 const TAG = '[FormatUtil]';
@@ -20,19 +19,20 @@ export class FormatUtil {
     return `${distanceInKilometers}km`;
   }
 
-  public static commentCountDisplay(commentCount: number, limit: number = 9999): string {
-    if (commentCount <= limit) {
-      return commentCount.toString();
-    } else {
-      return `${limit}+`;
-    }
-  }
 
   public static dateAsISO(date: Date): string {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
+  }
+
+
+  public static dateAsISOCN(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}年${month}月${day}日`;
   }
 
   // 返回月日信息
@@ -48,7 +48,14 @@ export class FormatUtil {
     return `${month}月${day}日`;
   }
 
-  public static formatFullDate(date: Date): string {
+  public static dateAsDay(date: Date): string {
+    const month = String(date.getMonth() + 1);
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${month}.${day}`;
+  }
+
+
+  public static formatFullDate(date: Date, isCN: boolean = false): string {
     const pad = (n: number) => n < 10 ? '0' + n : n.toString();
 
     const year = date.getFullYear();
@@ -57,8 +64,11 @@ export class FormatUtil {
     const hours = pad(date.getHours());
     const minutes = pad(date.getMinutes());
     const seconds = pad(date.getSeconds());
-
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    if (isCN) {
+      return `${year}年${month}月${day}日 ${hours}:${minutes}:${seconds}`;
+    } else {
+      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    }
   }
 
   public static getImgResource(str: string): string {

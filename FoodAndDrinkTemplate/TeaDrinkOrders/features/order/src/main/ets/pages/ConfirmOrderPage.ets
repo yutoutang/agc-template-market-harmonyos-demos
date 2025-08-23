@@ -1,15 +1,13 @@
 import {
   AddDnOrderReq,
-  AddressComp,
   AddressInfo,
   calculatorUtils,
-  CarGoodInfo,
+  CarGoodsInfo,
   ConfirmOrderRouter,
   Constants,
   CouponCard,
   CouponStateEnum,
   FuncType,
-  GoodsComp,
   HttpRequest,
   MyCoupon,
   NavHeaderBar,
@@ -17,7 +15,6 @@ import {
   OrderTypeEnum,
   Reduction,
   RouterMap,
-  SheetHeaderComp,
   StoreInfoModel,
   StoreMakeInfo,
   Utils,
@@ -28,6 +25,8 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { common } from '@kit.AbilityKit';
 import { Decimal } from '@kit.ArkTS';
 import { AddressSheetBuilder } from '../components/AddressSheetComp';
+import { GoodsComp } from 'base_ui';
+import { AddressComp } from 'add_address';
 
 @Builder
 export function ConfirmOrderPageBuilder() {
@@ -40,7 +39,7 @@ struct ConfirmOrderPage {
   @Consumer('reductionList') reductionList?: Array<Reduction>
   @Local storeModel: StoreInfoModel = AppStorageV2.connect(StoreInfoModel) as StoreInfoModel;
   @Local windowModel: WindowModel = AppStorageV2.connect(WindowModel, () => new WindowModel())!
-  @Local carGoods: Array<CarGoodInfo> = []
+  @Local carGoods: Array<CarGoodsInfo> = []
   @Local cutlery: ResourceStr = ''
   @Local remarks: string = ''
   @Local remarksTemp: string = ''
@@ -307,7 +306,7 @@ struct ConfirmOrderPage {
                 .visibility(this.selectAddress.id ? Visibility.None : Visibility.Visible)
 
                 Row() {
-                  AddressComp({ address: this.selectAddress })
+                  AddressComp({ address: this.selectAddress }).layoutWeight(1)
                   Image($r('app.media.ic_right2')).width(14).margin({ left: 10 })
                 }.width(Constants.FULL_SIZE).justifyContent(FlexAlign.SpaceBetween).onClick(() => {
                   this.addressSheetShow = true
@@ -319,16 +318,18 @@ struct ConfirmOrderPage {
                 AddressSheetBuilder(this.selectAddress, (selectAddress?: AddressInfo) => {
                   this.closeAddressSheet(selectAddress)
                 }), {
-                  height: 736,
+                  detents: [736, 737],
                   blurStyle: BlurStyle.Thick,
-                  showClose: false,
+                  showClose: true,
+                  backgroundColor: $r('sys.color.background_fourth'),
+                  title: { title: $r('app.string.select_address') },
                 })
             }.cardStyle()
           }
 
           ListItem() {
             GoodsComp({
-              goodList: this.carGoods,
+              goodsList: this.carGoods,
               readonly: false,
               bagMoney: this.storeModel.storeInfo.bagMoney,
               changeSelectBag: (value) => {
@@ -401,9 +402,11 @@ struct ConfirmOrderPage {
                 .padding({ top: 10, bottom: 10 })
                 .justifyContent(FlexAlign.SpaceBetween)
                 .bindSheet($$this.couponSheetShow, this.couponSheetBuilder(), {
-                  height: 600,
+                  detents: [600, 601],
                   blurStyle: BlurStyle.Thick,
-                  showClose: false,
+                  showClose: true,
+                  backgroundColor: $r('sys.color.background_fourth'),
+                  title: { title: $r('app.string.select_coupon_title') },
                 });
 
                 if (this.storeModel.orderType === OrderTypeEnum.TAKEAWAY_DELIVERY) {
@@ -570,237 +573,199 @@ struct ConfirmOrderPage {
         .justifyContent(FlexAlign.SpaceBetween)
       }.height(Constants.FULL_SIZE)
       .bindSheet($$this.remarkSheet, this.remarkSheetBuilder(), {
-        height: 480,
+        detents: [480, 481],
         blurStyle: BlurStyle.Thick,
-        showClose: false,
+        showClose: true,
+        backgroundColor: $r('sys.color.background_fourth'),
+        title: { title: $r('app.string.remark') },
       })
     }
     .hideTitleBar(true)
     .padding({ bottom: this.windowModel.getWindowBottomHeight() })
     .bindSheet($$this.cutlerySheetShow, this.cutlerySheetBuilder(), {
-      height: 480,
+      detents: [480, 481],
       blurStyle: BlurStyle.Thick,
-      showClose: false,
+      showClose: true,
+      backgroundColor: $r('sys.color.background_fourth'),
+      title: { title: $r('app.string.dinner_num_label') },
     });
   }
 
   @Builder
   remarkSheetBuilder() {
     Column() {
-      SheetHeaderComp({
-        title: $r('app.string.remark'), close: () => {
-          this.remarkSheet = false
-        },
-      })
-
       Column() {
-        Column() {
-          TextArea({ text: $$this.remarksTemp })
-            .height(144)
-            .borderRadius(8)
-            .width(Constants.FULL_SIZE)
-            .showCounter(true)
-            .maxLength(100)
-            .backgroundColor($r('sys.color.background_secondary'))
-          if (this.storeModel.storeInfo.taste.length) {
-            Text($r('app.string.quick_input'))
-              .fontSize(14)
-              .fontColor($r('sys.color.font_primary'))
-              .margin({ top: 16 })
-            Flex({ wrap: FlexWrap.Wrap }) {
-              ForEach(this.storeModel.storeInfo.taste, (item: string) => {
-                Row() {
-                  Text(item)
-                    .fontSize(10)
-                    .fontColor($r('sys.color.font_primary'))
-                }
-                .padding({
-                  left: 12,
-                  right: 12,
-                  top: 8,
-                  bottom: 8,
-                })
-                .margin({ right: 8, top: 8 })
-                .borderRadius(16)
-                .backgroundColor('#0D000000')
-                .onClick(() => {
-                  this.remarksTemp = `${this.remarksTemp} ${item}`
-                })
-              }, (item: string) => item)
-            }.margin({ top: 2 })
-          }
-        }.alignItems(HorizontalAlign.Start).layoutWeight(1)
-
-        Row() {
-          Text($r('app.string.confirm')).fontSize(14).fontColor(Color.White).fontWeight(FontWeight.Medium)
+        TextArea({ text: $$this.remarksTemp })
+          .height(144)
+          .borderRadius(8)
+          .width(Constants.FULL_SIZE)
+          .showCounter(true)
+          .maxLength(100)
+          .backgroundColor($r('sys.color.background_secondary'))
+        if (this.storeModel.storeInfo.taste.length) {
+          Text($r('app.string.quick_input'))
+            .fontSize(14)
+            .fontColor($r('sys.color.font_primary'))
+            .margin({ top: 16 })
+          Flex({ wrap: FlexWrap.Wrap }) {
+            ForEach(this.storeModel.storeInfo.taste, (item: string) => {
+              Row() {
+                Text(item)
+                  .fontSize(10)
+                  .fontColor($r('sys.color.font_primary'))
+              }
+              .padding({
+                left: 12,
+                right: 12,
+                top: 8,
+                bottom: 8,
+              })
+              .margin({ right: 8, top: 8 })
+              .borderRadius(16)
+              .backgroundColor('#0D000000')
+              .onClick(() => {
+                this.remarksTemp = `${this.remarksTemp} ${item}`
+              })
+            }, (item: string) => item)
+          }.margin({ top: 2 })
         }
-        .width(Constants.FULL_SIZE)
-        .height(40)
-        .padding({ top: 6, bottom: 6 })
-        .backgroundColor($r('app.color.mainColor'))
-        .margin({ left: 16, right: 16 })
-        .borderRadius(16)
-        .justifyContent(FlexAlign.Center)
-        .constraintSize({ maxWidth: Constants.FULL_SIZE })
-        .onClick(() => {
-          this.remarks = this.remarksTemp
-          this.remarkSheet = false
-        })
+      }.alignItems(HorizontalAlign.Start).layoutWeight(1)
+
+      Row() {
+        Text($r('app.string.confirm')).fontSize(14).fontColor(Color.White).fontWeight(FontWeight.Medium)
       }
-      .layoutWeight(1)
-      .backgroundColor($r('sys.color.background_primary'))
-      .borderRadius({ topLeft: 12, topRight: 12 })
-      .margin({ top: 8 })
-      .padding({
-        left: 8,
-        right: 8,
-        top: 19,
-        bottom: this.windowModel.getWindowBottomHeight(),
+      .width(Constants.FULL_SIZE)
+      .height(40)
+      .padding({ top: 6, bottom: 6 })
+      .backgroundColor($r('app.color.mainColor'))
+      .margin({ left: 16, right: 16 })
+      .borderRadius(16)
+      .justifyContent(FlexAlign.Center)
+      .constraintSize({ maxWidth: Constants.FULL_SIZE })
+      .onClick(() => {
+        this.remarks = this.remarksTemp
+        this.remarkSheet = false
       })
     }
     .width(Constants.FULL_SIZE)
+    .backgroundColor($r('sys.color.background_primary'))
+    .borderRadius({ topLeft: 12, topRight: 12 })
     .padding({
-      left: Constants.BORDER_WIDTH,
-      right: Constants.BORDER_WIDTH,
-      top: 8,
+      left: 8,
+      right: 8,
+      top: 19,
       bottom: this.windowModel.getWindowBottomHeight(),
     })
-    .backgroundColor($r('sys.color.background_secondary'))
-    .borderRadius({ topLeft: 32, topRight: 32 })
+    .margin({ left: Constants.BORDER_WIDTH, right: Constants.BORDER_WIDTH })
+    .constraintSize({ maxWidth: Constants.FULL_SIZE })
   }
 
   @Builder
   cutlerySheetBuilder() {
     Column() {
-      SheetHeaderComp({
-        title: $r('app.string.dinner_num_label'), close: () => {
-          this.cutlerySheetShow = false
-        },
-      })
-
       Column() {
-        Column() {
-          Row() {
-            Text($r('app.string.cutlery_tips')).fontSize(12).fontColor($r('sys.color.font_secondary'))
-          }.width(Constants.FULL_SIZE).justifyContent(FlexAlign.Center)
-
-          TextPicker({ range: $r('app.strarray.cutlery_num'), value: $$this.cutlery })
-            .width(Constants.FULL_SIZE)
-            .disappearTextStyle({
-              color: $r('sys.color.font_primary'),
-              font: { size: 14 },
-            })// 设置所有选项中除了最上、最下及选中项以外的文本颜色、字号、字体粗细。
-            .textStyle({
-              color: $r('sys.color.font_primary'),
-              font: {
-                size: 16,
-              },
-            })// 设置选中项的文本颜色、字号、字体粗细。
-            .selectedTextStyle({
-              color: $r('app.color.mainColor'),
-              font: {
-                size: 20,
-                weight: FontWeight.Medium,
-              },
-            })
-            .canLoop(false)
-            .divider(null)
-            .margin({ top: 50 })
-            .onChange((value: string | string[], index: number | number[]) => {
-              console.info('Picker item changed, value: ' + value + ', index: ' + index)
-            })
-        }.margin({ top: 24 })
-
         Row() {
-          Text($r('app.string.confirm')).fontSize(14).fontColor(Color.White).fontWeight(FontWeight.Medium)
-        }
-        .width(Constants.FULL_SIZE)
-        .height(40)
-        .padding({ top: 6, bottom: 6 })
-        .backgroundColor($r('app.color.mainColor'))
-        .margin({ left: 16, right: 16 })
-        .borderRadius(16)
-        .justifyContent(FlexAlign.Center)
-        .constraintSize({ maxWidth: Constants.FULL_SIZE })
-        .onClick(() => {
-          if (!this.cutlery) {
-            this.cutlery = $r('app.string.cutlery_none')
-          }
-          this.cutlerySheetShow = false
-        })
+          Text($r('app.string.cutlery_tips')).fontSize(12).fontColor($r('sys.color.font_secondary'))
+        }.width(Constants.FULL_SIZE).justifyContent(FlexAlign.Center)
+
+        TextPicker({ range: $r('app.strarray.cutlery_num'), value: $$this.cutlery })
+          .width(Constants.FULL_SIZE)
+          .disappearTextStyle({
+            color: $r('sys.color.font_primary'),
+            font: { size: 14 },
+          })// 设置所有选项中除了最上、最下及选中项以外的文本颜色、字号、字体粗细。
+          .textStyle({
+            color: $r('sys.color.font_primary'),
+            font: {
+              size: 16,
+            },
+          })// 设置选中项的文本颜色、字号、字体粗细。
+          .selectedTextStyle({
+            color: $r('app.color.mainColor'),
+            font: {
+              size: 20,
+              weight: FontWeight.Medium,
+            },
+          })
+          .canLoop(false)
+          .divider(null)
+          .margin({ top: 50 })
+          .onChange((value: string | string[], index: number | number[]) => {
+            console.info('Picker item changed, value: ' + value + ', index: ' + index)
+          })
+      }.margin({ top: 24 })
+
+      Row() {
+        Text($r('app.string.confirm')).fontSize(14).fontColor(Color.White).fontWeight(FontWeight.Medium)
       }
-      .layoutWeight(1)
-      .justifyContent(FlexAlign.SpaceBetween)
-      .backgroundColor($r('sys.color.background_primary'))
-      .borderRadius({ topLeft: 12, topRight: 12 })
-      .margin({ top: 8 })
+      .width(Constants.FULL_SIZE)
+      .height(40)
+      .padding({ top: 6, bottom: 6 })
+      .backgroundColor($r('app.color.mainColor'))
+      .margin({ top: 65, left: 16, right: 16 })
+      .borderRadius(16)
+      .justifyContent(FlexAlign.Center)
+      .constraintSize({ maxWidth: Constants.FULL_SIZE })
+      .onClick(() => {
+        if (!this.cutlery) {
+          this.cutlery = $r('app.string.cutlery_none')
+        }
+        this.cutlerySheetShow = false
+      })
     }
+    .justifyContent(FlexAlign.SpaceBetween)
+    .backgroundColor($r('sys.color.background_primary'))
+    .borderRadius({ topLeft: 12, topRight: 12 })
     .width(Constants.FULL_SIZE)
-    .padding({
-      left: Constants.BORDER_WIDTH,
-      right: Constants.BORDER_WIDTH,
-      top: 8,
-      bottom: this.windowModel.getWindowBottomHeight(),
-    })
-    .backgroundColor($r('sys.color.background_secondary'))
-    .borderRadius({ topLeft: 32, topRight: 32 })
+    .padding({ bottom: this.windowModel.getWindowBottomHeight() })
+    .margin({ left: Constants.BORDER_WIDTH, right: Constants.BORDER_WIDTH })
+    .constraintSize({ maxWidth: Constants.FULL_SIZE })
+
   }
 
   @Builder
   couponSheetBuilder() {
     Column() {
-      SheetHeaderComp({
-        title: $r('app.string.select_coupon_title'), close: () => {
-          this.couponSheetShow = false
-        },
-      })
+      List({ space: 8 }) {
+        ForEach(this.myCouponsUsable, (item: MyCoupon) => {
+          ListItem() {
+            CouponCard({
+              coupon: item,
+              totalMoney: this.totalMoney,
+              showUseNowBtn: false,
+              showUseCheck: true,
+              selectCouponId: this.selectCouponIdTemp,
+              changeCoupon: (item: MyCoupon, isCheck: boolean) => {
+                this.changeCoupon(item, isCheck)
+              },
+            })
+          }
+        }, (item: MyCoupon, index: number) => JSON.stringify(item))
+      }.align(Alignment.Top).height(Constants.FULL_SIZE).scrollBar(BarState.Off).layoutWeight(1)
 
-      Column() {
-        List({ space: 8 }) {
-          ForEach(this.myCouponsUsable, (item: MyCoupon) => {
-            ListItem() {
-              CouponCard({
-                coupon: item,
-                totalMoney: this.totalMoney,
-                showUseNowBtn: false,
-                showUseCheck: true,
-                selectCouponId: this.selectCouponIdTemp,
-                changeCoupon: (item: MyCoupon, isCheck: boolean) => {
-                  this.changeCoupon(item, isCheck)
-                },
-              })
-            }
-          }, (item: MyCoupon, index: number) => JSON.stringify(item))
-        }.align(Alignment.Top).height(Constants.FULL_SIZE).scrollBar(BarState.Off).layoutWeight(1)
-
-        Row() {
-          Text($r('app.string.confirm')).fontSize(14).fontColor(Color.White).fontWeight(FontWeight.Medium)
-        }
-        .width(Constants.FULL_SIZE)
-        .height(40)
-        .padding({ top: 6, bottom: 6 })
-        .backgroundColor($r('app.color.mainColor'))
-        .margin({ left: 16, right: 16 })
-        .borderRadius(16)
-        .justifyContent(FlexAlign.Center)
-        .constraintSize({ maxWidth: Constants.FULL_SIZE })
-        .onClick(() => {
-          this.selectCouponId = this.selectCouponIdTemp
-          this.selectCouponMoney = this.selectCouponMoneyTemp
-          this.couponSheetShow = false
-        })
+      Row() {
+        Text($r('app.string.confirm')).fontSize(14).fontColor(Color.White).fontWeight(FontWeight.Medium)
       }
-      .layoutWeight(1)
-      .margin({ top: 8 })
+      .width(Constants.FULL_SIZE)
+      .height(40)
+      .padding({ top: 6, bottom: 6 })
+      .backgroundColor($r('app.color.mainColor'))
+      .margin({ left: 16, right: 16 })
+      .borderRadius(16)
+      .justifyContent(FlexAlign.Center)
+      .constraintSize({ maxWidth: Constants.FULL_SIZE })
+      .onClick(() => {
+        this.selectCouponId = this.selectCouponIdTemp
+        this.selectCouponMoney = this.selectCouponMoneyTemp
+        this.couponSheetShow = false
+      })
     }
     .width(Constants.FULL_SIZE)
     .padding({
       left: Constants.BORDER_WIDTH,
       right: Constants.BORDER_WIDTH,
-      top: 8,
       bottom: this.windowModel.getWindowBottomHeight(),
     })
-    .borderRadius({ topLeft: 32, topRight: 32 })
   }
 
   showTimePicker() {

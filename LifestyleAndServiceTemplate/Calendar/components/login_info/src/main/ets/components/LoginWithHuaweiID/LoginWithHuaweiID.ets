@@ -5,6 +5,7 @@ import {  promptAction } from '@kit.ArkUI';
 import { util } from '@kit.ArkTS';
 import { LoginParams, ThemeState } from '../../model/Model';
 import { LoginEventDispatcher } from '../../utils/Utils';
+import { BaseNavTitle } from 'base_apis';
 
 @Builder
 export function LoginWithHuaweiIDBuilder() {
@@ -213,6 +214,10 @@ export struct LoginWithHuaweiID {
 
   build() {
     NavDestination() {
+      BaseNavTitle({
+        title: '华为账号一键登录',
+        routerModule:this.routerModule
+      })
       Scroll() {
         Column() {
           Column() {
@@ -242,7 +247,7 @@ export struct LoginWithHuaweiID {
                   top: 12,
                 })
             }.margin({
-              top: 100,
+              top: 80,
             })
 
             Column() {
@@ -269,7 +274,7 @@ export struct LoginWithHuaweiID {
                   top: 8,
                 })
             }.margin({
-              top: 64,
+              top: 40,
             })
 
             Column() {
@@ -297,7 +302,7 @@ export struct LoginWithHuaweiID {
             }
             .height(40)
             .margin({
-              top: 56,
+              top: 30,
             })
 
             Column() {
@@ -393,17 +398,13 @@ export struct LoginWithHuaweiID {
         })
       }
       .width('100%')
-      .height('100%')
+      .layoutWeight(1)
       .edgeEffect(EdgeEffect.Spring)
-      .padding({
-        top: Number(AppStorage.get('topRectHeight')),
-      })
     }
     .hideTitleBar(true)
     .onReady((ctx) => {
       this.routerModule = ctx.pathStack
     })
-    .padding({ top: Number(AppStorage.get('topRectHeight')) })
   }
 }
 

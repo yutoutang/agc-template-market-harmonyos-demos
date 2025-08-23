@@ -1,7 +1,7 @@
 import { ComponentContent, promptAction } from '@kit.ArkUI';
 
-import { WindowUtil } from './WindowUtil';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { WindowUtil } from './WindowUtil';
 
 export class PopViewUtils {
   private static ctx: UIContext;

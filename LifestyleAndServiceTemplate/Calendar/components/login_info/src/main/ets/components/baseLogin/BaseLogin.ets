@@ -34,6 +34,7 @@ export struct BaseLogin {
     NavDestination() {
       BaseNavTitle({
         title: '登录',
+        routerModule:this.routerModule
       })
       Column() {
         Column() {

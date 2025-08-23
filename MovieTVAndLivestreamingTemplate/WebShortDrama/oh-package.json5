@@ -1,5 +1,5 @@
 {
-  "modelVersion": "5.0.0",
+  "modelVersion": "5.0.1",
   "description": "Please describe the basic information.",
   "dependencies": {
   },
@@ -18,6 +18,14 @@
     "@agctemplate/detail": "file:./features/detail",
     "@agctemplate/theater": "file:./features/theater",
     "@agctemplate/login": "file:./features/login",
-    "@agctemplate/video_swiper": "file:./components/video_swiper"
+    "video_swiper": "file:./components/video_swiper",
+    "@agctemplate/award": "file:./features/award",
+    "@agctemplate/vip_center": "file:./components/vip_center",
+    "@agctemplate/base_apis": "file:./components/base_apis",
+    "@agctemplate/aggregated_payment": "file:./sdk/aggregated_payment",
+    "@agctemplate/favor": "file:./features/favor",
+    "@agctemplate/open_ads": "file:./components/open_ads",
+    "@agctemplate/module_share": "file:./components/module_share",
+    "@agctemplate/module_login": "file:./components/module_login"
   }
 }

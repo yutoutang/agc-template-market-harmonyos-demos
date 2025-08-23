@@ -26,6 +26,7 @@ export struct ChangePage {
           this.vm.localInfo.nickname : this.vm.userInfo.nickname, text: this.name })
             .height(60)
             .width('90%')
+            .maxLength(10)
             .onChange((value: string) => {
               this.name = value;
             })

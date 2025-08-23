@@ -1,20 +1,24 @@
 {
   "string": [
     {
+      "name": "border_radius_4",
+      "value": "4vp"
+    },
+    {
       "name": "border_radius_8",
       "value": "8vp"
     },
     {
       "name": "border_radius_16",
-      "value": "16lpx"
+      "value": "16vp"
     },
     {
       "name": "border_radius_32",
-      "value": "32lpx"
+      "value": "32vp"
     },
     {
       "name": "border_radius_capsule",
-      "value": "999lpx"
+      "value": "999vp"
     }
   ]
 }

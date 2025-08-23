@@ -10,15 +10,6 @@
     },
     {
 
-      "name": "ExplainPage",
-      "pageSourceFile": "src/main/ets/pages/ExplainPage.ets",
-      "buildFunction": "ExplainPageBuilder",
-      "data": {
-        "description": "this is ExplainPageBuilder"
-      }
-    },
-    {
-
       "name": "MapPage",
       "pageSourceFile": "src/main/ets/pages/MapPage.ets",
       "buildFunction": "MapPageBuilder",

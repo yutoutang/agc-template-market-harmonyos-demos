@@ -1,10 +1,14 @@
 {
   "app": {
+/*
+        :todo 补充手动签名
+        */
     "signingConfigs": [],
     "products": [
       {
         "name": "default",
         "signingConfig": "default",
+        "targetSdkVersion": "5.0.1(13)",
         "compatibleSdkVersion": "5.0.1(13)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
@@ -17,7 +21,7 @@
     ],
     "buildModeSet": [
       {
-        "name": "debug",
+        "name": "debug"
       },
       {
         "name": "release"
@@ -43,39 +47,43 @@
     },
     {
       "name": "module_base",
-      "srcPath": "./components/module_base",
+      "srcPath": "./components/module_base"
     },
     {
       "name": "lib_foundation",
-      "srcPath": "./commons/lib_foundation",
+      "srcPath": "./commons/lib_foundation"
     },
     {
       "name": "business_home",
-      "srcPath": "./features/business_home",
+      "srcPath": "./features/business_home"
     },
     {
       "name": "business_order",
-      "srcPath": "./features/business_order",
+      "srcPath": "./features/business_order"
     },
     {
       "name": "business_vip",
-      "srcPath": "./features/business_vip",
+      "srcPath": "./features/business_vip"
     },
     {
       "name": "business_mine",
-      "srcPath": "./features/business_mine",
+      "srcPath": "./features/business_mine"
     },
     {
       "name": "module_template",
-      "srcPath": "./components/module_template",
+      "srcPath": "./components/module_template"
     },
     {
       "name": "module_city",
-      "srcPath": "./components/module_city",
+      "srcPath": "./components/module_city"
     },
     {
       "name": "module_auth",
-      "srcPath": "./components/module_auth",
+      "srcPath": "./components/module_auth"
+    },
+    {
+      "name": "module_address_card",
+      "srcPath": "./components/module_address_card"
     }
   ]
 }

@@ -1,3 +1,6 @@
+import { RouterMap } from 'commonlib';
+
+// 门票订单状态
 export enum OrderClass {
   PENDING_USE = '1',
   PENDING_PAYMENT = '2',
@@ -9,7 +12,8 @@ export enum OrderClass {
 export interface OrderTabListItem {
   label: string,
   type: OrderClass,
-  icon: ResourceStr
+  icon: ResourceStr,
+  flag:ResourceStr
 }
 
 export interface OrderInfo {
@@ -70,5 +74,25 @@ export interface Contacts {
   phone: string,
   cardID: string
 }
+
+
+
+// 我的预订菜单
+export interface MenuItem {
+  routerUrl:RouterMap,
+  label:string
+}
+
+
+
+
+// 活动、讲解订单状态
+export enum OrderStatus{
+  PENDING_PAY = '1',
+  PENDING_USE='2',
+  OFF='3',
+  CANCEL='4'
+}
+
 
 

@@ -5,6 +5,7 @@ import {
   HttpRequestApi,
   LoadingDialogUtil,
   RouterMap,
+  RouterModule,
   UserIconModel,
   UserInfoModel,
 } from 'common/Index';
@@ -14,6 +15,7 @@ import { authentication } from '@kit.AccountKit';
 import { util } from '@kit.ArkTS';
 import { AppStorageV2, PersistenceV2, promptAction } from '@kit.ArkUI';
 import { MembershipComp } from './MembershipComp';
+import { FunctionalButton, functionalButtonComponentManager } from '@kit.ScenarioFusionKit';
 
 @ComponentV2
 export struct UserInfoComp {
@@ -74,29 +76,64 @@ export struct UserInfoComp {
           }
         })
 
-        Row() {
-          Image($r('app.media.ic_connect')).width(10).height(10).margin({ right: 5 })
-          Text(this.userInfo.isRelative ? $r('app.string.disassociate') : $r('app.string.associate_account'))
-            .fontSize(10)
-            .fontColor(this.userInfo.isRelative ? '#B9DC4B' : '#486602')
-            .margin({ left: 4 })
-        }
-        .padding({
-          top: 5,
-          bottom: 5,
-          right: 8,
-          left: 8,
-        })
-        .borderRadius(11)
-        .backgroundColor(this.userInfo.isRelative ? '#182200' : '#0D000000')
-        .onClick(() => {
-          if (this.userInfo.isRelative) {
-            this.cancelRelative()
-          } else {
-            LoadingDialogUtil.openLoadingDialog()
-            this.getQuickLoginAnonymousPhone()
+        if (this.userInfo.isRelative) {
+          Row() {
+            Image($r('app.media.ic_connect')).width(10).height(10).margin({ right: 5 })
+            Text($r('app.string.disassociate'))
+              .fontSize(10)
+              .fontColor('#B9DC4B')
+              .margin({ left: 4 })
           }
-        })
+          .padding({
+            top: 5,
+            bottom: 5,
+            right: 8,
+            left: 8,
+          })
+          .borderRadius(11)
+          .backgroundColor('#182200')
+          .onClick(() => {
+            RouterModule.push<Record<string, string>>(RouterMap.CONFIRM_DIALOG,
+              { 'title': '账号解除关联', 'message': '请确认是否解除关联？' }, async (value) => {
+                const result = value.result as Record<string, boolean>;
+                if (result.param) {
+                  this.cancelRelative()
+                }
+              });
+          })
+        } else {
+          FunctionalButton({
+            params: {
+              // OpenType.GET_PHONE_NUMBER表示该按钮用于快速验证手机号码。
+              openType: functionalButtonComponentManager.OpenType.GET_PHONE_NUMBER,
+              label: $r('app.string.associate_account'),
+              // 调整按钮样式。
+              styleOption: {
+                styleConfig: new functionalButtonComponentManager.ButtonConfig()
+                  .fontSize(10)
+                  .fontColor('#486602')
+                  .height(24)
+                  .backgroundColor('#0D000000'),
+              },
+            },
+            // 当OpenType为GET_PHONE_NUMBER时，回调必须为onGetPhoneNumber。
+            controller: new functionalButtonComponentManager.FunctionalButtonController()
+              .onGetPhoneNumber((err, data) => {
+                if (err) {
+                  // 错误日志处理。
+                  hilog.error(0x0000, 'testTag', 'error: %{public}d %{public}s', err.code, err.message);
+                  this.bindPhoneMock()
+                  return;
+                }
+                // 成功日志处理。
+                hilog.info(0x0000, 'testTag', 'succeeded in authenticating');
+                // 授权码处理。
+                let authorizationCode = data.code;
+                LoadingDialogUtil.openLoadingDialog()
+                this.getQuickLoginAnonymousPhone()
+              }),
+          })
+        }
       }
       .width(Constants.FULL_SIZE)
       .justifyContent(FlexAlign.SpaceBetween)
@@ -136,19 +173,7 @@ export struct UserInfoComp {
         this.authCode = code ?? ''
         // 开发者处理code
         if (code) {
-          HttpRequestApi.getOpenLoginHm(encodeURIComponent(code)).then((res) => {
-            if (res.code === HttpCode.SUCCESS) {
-              let tel = res.data.userTel ?? ''
-              this.userInfo.userInfo.userTel = `${tel.substring(0, tel.length - 8)}****${tel.substring(tel.length - 4)}`
-              this.userInfo.isRelative = true
-            } else {
-              promptAction.showToast({ message: $r('app.string.relate_account_msg1') })
-            }
-          }).catch(() => {
-            promptAction.showToast({ message: $r('app.string.relate_account_msg2') })
-          }).finally(() => {
-            LoadingDialogUtil.close()
-          })
+          this.login(code)
         } else {
           promptAction.showToast({ message: $r('app.string.relate_account_msg2') })
           LoadingDialogUtil.close()
@@ -172,16 +197,7 @@ export struct UserInfoComp {
     try {
       const controller = new authentication.AuthenticationController(getContext(this));
       controller.executeRequest(cancelRequest, (error: BusinessError<Object>, data) => {
-        if (error) {
-          this.dealAllError(error);
-          return;
-        }
-        const cancelAuthorizationResponse = data as authentication.CancelAuthorizationResponse;
-        const state = cancelAuthorizationResponse.state;
-        if (state && cancelRequest.state !== state) {
-          hilog.error(0x0000, 'testTag', `Failed to cancel. The state is different, response state: ${state}`);
-          return;
-        }
+        // todo 这里可以补充关联失败异常场景，模板为了体验流程暂未处理
         hilog.info(0x0000, 'testTag', 'Succeeded in canceling.');
         HttpRequest.getCancelLogin().then(() => {
           this.userInfo.isRelative = false
@@ -198,5 +214,35 @@ export struct UserInfoComp {
     hilog.error(0x0000, 'testTag',
       `Failed to login, errorCode is ${error.code}, errorMessage is ${error.message}`);
     promptAction.showToast({ message: '账号关联失败' })
+  }
+
+  login(code: string) {
+    HttpRequestApi.getOpenLoginHm(encodeURIComponent(code)).then((res) => {
+      if (res.code === HttpCode.SUCCESS) {
+        let tel = res.data.userTel ?? ''
+        this.userInfo.userInfo.userTel = `${tel.substring(0, tel.length - 8)}****${tel.substring(tel.length - 4)}`
+        this.userInfo.isRelative = true
+        if (!code) {
+          promptAction.showToast({ message: '手机号绑定成功！当前手机号为mock数据，非华为账号真实手机号' });
+        }
+      } else {
+        promptAction.showToast({ message: $r('app.string.relate_account_msg1') })
+      }
+    }).catch(() => {
+      promptAction.showToast({ message: $r('app.string.relate_account_msg2') })
+    }).finally(() => {
+      LoadingDialogUtil.close()
+    })
+  }
+
+  async bindPhoneMock() {
+    RouterModule.push<Record<string, string>>(RouterMap.CONFIRM_DIALOG,
+      { 'title': '提示', 'message': '元服务未获取phone权限或用户授权，点击确定将根据openId创建一个mock账号。' },
+      async (value) => {
+        const result = value.result as Record<string, boolean>;
+        if (result.param) {
+          this.login('')
+        }
+      });
   }
 }

@@ -7,9 +7,10 @@
   "license": "Apache-2.0",
   "packageType": "InterfaceHar",
   "dependencies": {
-    "uicalendarpicker": "file:../../commons/uicalendarpicker",
+    "module_calendar_picker": "file:../../components/module_calendar_picker",
     "commonlib": "file:../../commons/commonlib",
-    "network": "file:../../commons/network"
+    "network": "file:../../commons/network",
+    "module_person_manage": "file:../../components/module_person_manage"
 
   }
 }

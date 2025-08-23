@@ -39,6 +39,10 @@
     {
       "name": "widget1_display_name",
       "value": "widget1"
+    },
+    {
+      "name": "agcit_huawei_museum_ticket",
+      "value": "1.0.1"
     }
   ]
 }

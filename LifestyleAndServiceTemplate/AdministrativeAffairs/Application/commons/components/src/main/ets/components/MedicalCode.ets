@@ -1,9 +1,10 @@
-import { BrightnessUtil, Constants, UserInfo } from 'common';
+import { BrightnessUtil, Constants, UserState } from 'common';
 import { ServiceTitle } from './ServiceTitle';
+import { PersistenceV2 } from '@kit.ArkUI';
 
 @ComponentV2
 export struct MedicalCode {
-  @Local userInfo: UserInfo = AppStorage.get('userInfo') ?? new UserInfo();
+  @Local userState: UserState = PersistenceV2.connect(UserState, () => new UserState())!;
   @Param title: string = ''
 
   aboutToAppear(): void {
@@ -47,7 +48,7 @@ export struct MedicalCode {
           .borderRadius(Constants.RADIUS_TEN)
 
           Stack() {
-            QRCode(JSON.stringify(this.userInfo))
+            QRCode(JSON.stringify(this.userState.userInfo))
               .width($r('app.float.code_qr_width'))
               .height($r('app.float.code_qr_height'))
             Image($r('app.media.logo_about'))

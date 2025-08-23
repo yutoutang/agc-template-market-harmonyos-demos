@@ -6,11 +6,6 @@
       "buildFunction": "MineMainPageBuilder"
     },
     {
-      "name": "MyFavoritesPage",
-      "pageSourceFile": "src/main/ets/pages/MyFavoritesPage.ets",
-      "buildFunction": "MyFavoritesPageBuilder"
-    },
-    {
       "name": "WatchRecordsPage",
       "pageSourceFile": "src/main/ets/pages/WatchRecordsPage.ets",
       "buildFunction": "WatchRecordsPageBuilder"
@@ -24,6 +19,64 @@
       "name": "ChangePage",
       "pageSourceFile": "src/main/ets/pages/ChangePage.ets",
       "buildFunction": "ChangePageBuilder"
+    },
+    {
+      "name": "FeedbackPage",
+      "pageSourceFile": "src/main/ets/pages/FeedbackPage.ets",
+      "buildFunction": "FeedbackPageBuilder"
+    },
+    {
+      "name": "FeedbackRecordPage",
+      "pageSourceFile": "src/main/ets/pages/FeedbackRecordPage.ets",
+      "buildFunction": "FeedbackRecordPageBuilder"
+    },
+    {
+      "name": "SetUpPage",
+      "pageSourceFile": "src/main/ets/pages/SetupPage.ets",
+      "buildFunction": "SetUpPageBuilder"
+    },{
+      "name": "PrivacyAgreementPage",
+      "pageSourceFile": "src/main/ets/pages/PrivacyAgreementPage.ets",
+      "buildFunction": "PrivacyAgreementBuilder"
+    },
+    {
+      "name": "PrivacyStatementPage",
+      "pageSourceFile": "src/main/ets/pages/PrivacyStatementPage.ets",
+      "buildFunction": "PrivacyStatementPageBuilder"
+    },
+    {
+      "name": "AboutPage",
+      "pageSourceFile": "src/main/ets/pages/AboutPage.ets",
+      "buildFunction": "AboutPageBuilder"
+    },
+    {
+      "name": "MyPreferencesPage",
+      "pageSourceFile": "src/main/ets/pages/MyPreferencesPage.ets",
+      "buildFunction": "MyPreferencesPageBuilder"
+    },
+    {
+      "name": "VIPCenterPage",
+      "pageSourceFile": "src/main/ets/pages/VIPCenterPage.ets",
+      "buildFunction": "VIPCenterPageBuilder"
+    },{
+      "name": "LaunchPage",
+      "pageSourceFile": "src/main/ets/pages/LaunchPage.ets",
+      "buildFunction": "LaunchPageBuilder"
+    },
+    {
+      "name": "LaunchAdPage",
+      "pageSourceFile": "src/main/ets/pages/LaunchAdPage.ets",
+      "buildFunction": "LaunchAdPageBuilder"
+    },
+    {
+      "name": "LikesPage",
+      "pageSourceFile": "src/main/ets/pages/LikesPage.ets",
+      "buildFunction": "LikesPageBuilder"
+    },
+    {
+      "name": "LoginPage",
+      "pageSourceFile": "src/main/ets/pages/LoginPage.ets",
+      "buildFunction": "LoginPageBuilder"
     }
   ]
 }

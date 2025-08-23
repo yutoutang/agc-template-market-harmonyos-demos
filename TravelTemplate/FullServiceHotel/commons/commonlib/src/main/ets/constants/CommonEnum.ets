@@ -8,9 +8,13 @@ export enum AppStorageMap {
 }
 
 export enum RouterMap {
+  // 首开统一隐私政策
+  SAFE_PAGE = 'SafePage',
+  // 主入口
+  MAIN_ENTRY = 'MainEntry',
+
   // 公告
   HOME_PUBLIC_NOTICE = 'PublicNotice',
-
   // 酒店列表
   HOTEL_LIST = 'HotelListPage',
   // 房间列表
@@ -45,16 +49,27 @@ export enum RouterMap {
   COMMON_LOCATION = 'Location',
   // 酒店介绍
   COMMON_INTRODUCTION = 'Introduction',
-  //二维码展示页
-  COMMON_QR_CODE = 'QRCodePage',
-
   // 评价列表
-  COMMENT_LIST = 'Comments',
+  COMMENT_LIST = 'CommentListPage',
   // 提交评价
   COMMENT_SUBMISSION = 'SubmitComment',
 
+  // 我的-登录
+  MINE_LOGIN = 'LoginPage',
   // 我的-修改个人信息
   MINE_PROFILE_EDIT = 'ProfileEditPage',
+  // 我的-设置
+  MINE_SETTING = 'SettingPage',
   // 我的-隐私政策
-  MINE_PRIVACY_POLICY = 'PrivacyPolicyPage',
+  MINE_AGREEMENT = 'AgreementPage',
+  // 我的-隐私政策预览
+  MINE_AGREEMENT_PREVIEW = 'AgreementPreviewPage',
+}
+
+export enum AgreementType {
+  PRIVACY = '隐私协议',
+  HUAWEI_USER = '华为账号用户认证协议',
+  USER_AGREEMENT = '用户协议',
+  THIRD_PARTY = '第三方信息共享清单',
+  PERSONAL_INFO = '个人信息收集清单',
 }

@@ -1,5 +1,5 @@
 import { AppStorageV2, promptAction } from '@kit.ArkUI';
-import { AppStorageBank, IUserInfo, UserInfo } from 'lib_foundation';
+import { AppStorageBank, IUserInfo, UserInfo } from 'module_base';
 
 @ObservedV2
 export class RealNameAuthPageVM {

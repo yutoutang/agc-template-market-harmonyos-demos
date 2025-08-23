@@ -10,7 +10,7 @@ export function ParkingPageBuilder() {
 
 @ComponentV2
 struct ParkingPage {
-  @Local vm: HomePageVM = HomePageVM.instance;
+   vm: HomePageVM = HomePageVM.instance;
 
   aboutToAppear(): void {
     this.vm.getParkingText();

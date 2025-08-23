@@ -6,3 +6,8 @@ export class MapLocation {
   @Trace latitude: number = 0
   @Trace longitude: number = 0
 }
+
+export interface ConfirmDialogOption {
+  title: string;
+  message: string;
+}

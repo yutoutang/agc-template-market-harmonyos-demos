@@ -1,0 +1,12 @@
+{
+  "module": {
+    "name": "banquet",
+    "type": "har",
+    "description": "$string:shared_desc",
+    "deviceTypes": [
+      "phone"
+    ],
+    "installationFree": true,
+    "routerMap": "$profile:route_map"
+  }
+}

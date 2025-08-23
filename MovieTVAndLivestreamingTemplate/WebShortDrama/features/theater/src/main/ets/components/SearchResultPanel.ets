@@ -27,7 +27,6 @@ export struct SearchResultPanel {
             Column({ space: 16 }) {
               RankList({
                 dramaList: this.resultList,
-                onDramaClick: this.onDramaClick,
                 scroller: undefined,
                 loadNextPage: this.loadNextPage,
                 isVertical: true
@@ -48,7 +47,6 @@ export struct SearchResultPanel {
   @Builder
   nullBuilder() {
     Column() {
-
       Image(getMedia('app.media.search_no_result'))
         .width(120)
         .aspectRatio(1)
@@ -58,9 +56,9 @@ export struct SearchResultPanel {
         .fontColor($r('sys.color.font_tertiary'))
         .margin({ top: 4, bottom: 10 })
     }
+    .backgroundColor('#F1F3F5')
     .padding(12)
     .borderRadius(16)
-    .backgroundColor(Color.White)
     .width('100%')
   }
 }

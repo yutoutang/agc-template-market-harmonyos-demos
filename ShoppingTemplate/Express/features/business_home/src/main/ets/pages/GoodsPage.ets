@@ -39,7 +39,7 @@ struct GoodsPage {
                 .fontWeight(FontWeight.Bold)
                 .fontColor($r('sys.color.font_primary'))
                 .margin({ bottom: 8 })
-              Flex({ justifyContent: FlexAlign.SpaceBetween, wrap: FlexWrap.Wrap }) {
+              Flex({ wrap: FlexWrap.Wrap }) {
                 ForEach(this.vm.goodsList, (goods: IGoods, index: number) => {
                   Row() {
                     Text(goods.name)
@@ -71,7 +71,7 @@ struct GoodsPage {
                 unit: 'kg',
                 onChange: (value) => {
                   this.vm.weight = value
-                }
+                },
               })
             }
             .width('100%')
@@ -103,7 +103,7 @@ struct GoodsPage {
                     unit: 'm³',
                     onChange: (value) => {
                       this.vm.volume = value
-                    }
+                    },
                   })
                 }
                 .width('100%')
@@ -172,7 +172,7 @@ struct GoodsPage {
                 unit: '件',
                 onChange: (value) => {
                   this.vm.count = value
-                }
+                },
               })
             }
             .width('100%')
@@ -182,8 +182,9 @@ struct GoodsPage {
           .padding({ left: 16, right: 16 })
         }
         .scrollBar(BarState.Off)
+        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
       }
-      .height('calc(100% - 46vp)')
+      .layoutWeight(1)
 
       Row() {
         Button('保存')
@@ -193,8 +194,8 @@ struct GoodsPage {
           })
       }
       .width('100%')
-      .height(76)
       .padding({ left: 28, right: 28 })
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM]);
     }
     .backgroundColor('#F1F3F5')
     .title('物品信息')

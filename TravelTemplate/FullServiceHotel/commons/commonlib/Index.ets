@@ -1,8 +1,5 @@
-// 通信工具
-export { TelUtil } from './src/main/ets/utils/TelUtil';
-
 // 账号工具
-export { AccountUtil, HUAWEIAccountModel, UserInfoModel, MemberInfoModel } from './src/main/ets/utils/AccountUtil';
+export { AccountUtil, UserInfoModel, MemberInfoModel } from './src/main/ets/utils/AccountUtil';
 
 // 窗口工具
 export { WindowUtil } from './src/main/ets/utils/WindowUtil';

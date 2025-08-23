@@ -1,1 +1,3 @@
-export { AddrList } from './src/main/ets/common/Global';
+export { AddressManage } from './src/main/ets/AddressManage';
+
+export { getDefaultAddress } from './src/main/ets/common/AddressManageUtil';

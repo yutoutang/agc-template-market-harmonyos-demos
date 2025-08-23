@@ -1,0 +1,9 @@
+{
+  "module": {
+    "name": "module_weather_core",
+    "type": "har",
+    "deviceTypes": [
+      "default"
+    ]
+  }
+}

@@ -93,61 +93,61 @@ export struct DateCalculation {
 
       List({ space: 16 }) {
         ListItem() {
-          Row() {
-            Text('起始日')
-              .attributeModifier(new BaseTextStyleModifier(`font_primary/Subtitle_M/Medium`))
-            Row({ space: 5 }) {
-              Text(dayjs(this.localStartDate).format('YYYY年MM月DD日'))
-                .attributeModifier(new BaseTextStyleModifier(`font_primary/Body_M/Regular`))
-              Image($r('app.media.chevron_right')).width(7).height(17)
+          Column(){
+            Row() {
+              Text('起始日')
+                .attributeModifier(new BaseTextStyleModifier(`font_primary/Subtitle_M/Medium`))
+              Row({ space: 5 }) {
+                Text(dayjs(this.localStartDate).format('YYYY年MM月DD日'))
+                  .attributeModifier(new BaseTextStyleModifier(`font_primary/Body_M/Regular`))
+                Image($r('app.media.chevron_right')).width(7).height(17)
+              }
             }
-          }
-          .width('100%')
-          .justifyContent(FlexAlign.SpaceBetween)
-          .onClick(() => {
-            this.datePicker = new Date(this.startDate)
-            baseActionSheet.show({
-              id: 'datePickerBuilder',
-              detents:[300,301],
-              showClose: false,
-              customContent: () => {
-                this.datePickerBuilder('start')
-              },
-            })
-          });
-        }
-
-        ListItem() {
-          Row() {
-            Text('天数')
-              .attributeModifier(new BaseTextStyleModifier(`font_primary/Subtitle_M/Medium`))
-            Row({ space: 5 }) {
-              Text(this.dayCount.toString())
-                .attributeModifier(new BaseTextStyleModifier(`font_primary/Body_M/Regular`))
-              Image($r('app.media.chevron_right')).width(7).height(17)
+            .width('100%')
+            .justifyContent(FlexAlign.SpaceBetween)
+            .onClick(() => {
+              this.datePicker = new Date(this.startDate)
+              baseActionSheet.show({
+                id: 'datePickerBuilder',
+                detents:[300,301],
+                showClose: false,
+                customContent: () => {
+                  this.datePickerBuilder('start')
+                },
+              })
+            });
+            Divider()
+              .margin({ top: 16, bottom: 16 })
+            Row() {
+              Text('天数')
+                .attributeModifier(new BaseTextStyleModifier(`font_primary/Subtitle_M/Medium`))
+              Row({ space: 5 }) {
+                Text(this.dayCount.toString())
+                  .attributeModifier(new BaseTextStyleModifier(`font_primary/Body_M/Regular`))
+                Image($r('app.media.chevron_right')).width(7).height(17)
+              }
             }
+            .width('100%')
+            .justifyContent(FlexAlign.SpaceBetween)
+            .onClick(() => {
+              baseActionSheet.show({
+                id: 'datePickerBuilder',
+                detents:[300,301],
+                showClose: false,
+                customContent: () => {
+                  this.textPickerBuilder()
+                },
+              })
+            });
           }
-          .width('100%')
-          .justifyContent(FlexAlign.SpaceBetween)
-          .onClick(() => {
-            baseActionSheet.show({
-              id: 'datePickerBuilder',
-              detents:[300,301],
-              showClose: false,
-              customContent: () => {
-                this.textPickerBuilder()
-              },
-            })
-          });
         }
-
         ListItem() {
           Row({ space: 18 }) {
             Row({ space: 5 }) {
               Radio({ value: 'Radio1', group: 'radioGroup1' })
                 .checked(this.forwardOrBack === CALCULATION_TYPE.FORWARD)
                 .radioStyle({
-                  checkedBackgroundColor: this.buttonColor,
+                  checkedBackgroundColor: $r('sys.color.comp_background_emphasize'),
                 })
                 .onChange((value) => {
                   this.forwardOrBack = CALCULATION_TYPE.FORWARD
@@ -160,7 +160,7 @@ export struct DateCalculation {
               Radio({ value: 'Radio2', group: 'radioGroup1' })
                 .checked(this.forwardOrBack === CALCULATION_TYPE.BACKWARD)
                 .radioStyle({
-                  checkedBackgroundColor: this.buttonColor,
+                  checkedBackgroundColor: $r('sys.color.comp_background_emphasize'),
                 })
                 .onChange((value) => {
                   this.forwardOrBack = CALCULATION_TYPE.BACKWARD
@@ -172,28 +172,32 @@ export struct DateCalculation {
           .width('100%')
           .justifyContent(FlexAlign.End)
         }
-      }
-      .divider(this.egDivider)
-      .margin({ bottom: 16, top: 16 })
 
-      Button('查询')
-        .backgroundColor(this.buttonColor)
-        .fontColor(this.textColor)
-        .fontSize($r('sys.float.Body_L'))
-        .fontWeight(FontWeight.Medium)
-        .padding({ top: 12, bottom: 12 })
-        .width('100%')
-        .margin({ top: 25 })
-        .onClick(() => {
-          this.calculateInfo = calculateDaysLater(this.localStartDate, Number(this.dayCount), this.forwardOrBack)
-          this.onSearch(this.calculateInfo)
-        })
-      Column() {
-        BaseLunarCard({
-          lunarInfo: this.calculateInfo,
-        })
+        ListItem(){
+          Button('查询')
+            .backgroundColor(this.buttonColor)
+            .fontColor(this.textColor)
+            .fontSize($r('sys.float.Body_L'))
+            .fontWeight(FontWeight.Medium)
+            .padding({ top: 12, bottom: 12 })
+            .width('100%')
+            .margin({ top: 25 })
+            .onClick(() => {
+              this.calculateInfo = calculateDaysLater(this.localStartDate, Number(this.dayCount), this.forwardOrBack)
+              this.onSearch(this.calculateInfo)
+            })
+        }
+        ListItem(){
+          Column() {
+            BaseLunarCard({
+              lunarInfo: this.calculateInfo,
+            })
+          }
+          .margin({ top: 12 })
+        }
       }
-      .margin({ top: 12 })
+      .scrollBar(BarState.Off)
+      .margin({ bottom: 16, top: 16 })
     }
     .height('100%')
     .margin({ top: 18 })

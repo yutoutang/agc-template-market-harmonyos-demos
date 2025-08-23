@@ -62,8 +62,8 @@ export struct BillboardPanel {
 
         // 榜单的列表
         Row() {
-          RankList({dramaList: this.dramaList, onDramaClick: this.onDramaClick, scroller: undefined,
-            isVertical: false})
+          RankList({ dramaList: this.dramaList, scroller: undefined,
+            isVertical: false })
         }
         .borderRadius(16)
         .backgroundColor(Color.White)

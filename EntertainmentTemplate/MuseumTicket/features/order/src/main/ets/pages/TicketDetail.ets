@@ -1,8 +1,11 @@
-import { MyOrdersVM } from '../viewModels/MyOrdersVM';
-import { CommonConstants } from 'commonlib';
-import { OrderClass } from '../types/Index';
+import { AlertDialog, LengthMetrics } from '@kit.ArkUI';
 import { TicketOwner } from 'network';
-import { AlertDialog } from '@kit.ArkUI';
+import { CommonConstants, TitleBuilder } from 'commonlib';
+import { NoticeBar } from '../components/NoticeBar';
+import { DetailHeader } from '../components/DetailHeader';
+import { TicketOrdersVM } from '../viewModels/TicketOrdersVM';
+import { OrderClass } from '../types/Index';
+
 
 @Builder
 export function TicketDetailBuilder() {
@@ -12,7 +15,7 @@ export function TicketDetailBuilder() {
 
 @ComponentV2
 struct TicketDetail {
-  vm: MyOrdersVM = MyOrdersVM.instance;
+  vm: TicketOrdersVM = TicketOrdersVM.instance;
   dialogControllerConfirm: CustomDialogController = new CustomDialogController({
     builder: AlertDialog({
       content: '确定要取消订单吗？',
@@ -41,45 +44,43 @@ struct TicketDetail {
         LoadingProgress().width(40);
       } else {
         Scroll() {
-          Column() {
-            this.tagBuilder();
-            Row() {
-              Text(this.vm.orderDetail?.performanceName)
-                .fontColor(CommonConstants.FONT_COLOR_BLACK)
-                .fontSize(CommonConstants.FONT_SIZE_M)
-                .fontWeight(500);
-              Text(this.vm.orderDetail?.visitTime)
-                .fontColor(CommonConstants.FONT_COLOR_BLACK)
-                .fontSize(CommonConstants.FONT_SIZE_M)
-                .fontWeight(500);
-            }
-            .width('100%')
-            .height(40)
-            .backgroundColor('#1A0A554A')
-            .padding({ left: 10, right: 10 })
-            .justifyContent(FlexAlign.SpaceBetween);
+          Column({ space: 12 }) {
+            DetailHeader({
+              icon: this.vm.getIcon(this.vm.orderDetail?.status ?? ''),
+              label: this.vm.getLabel(this.vm.orderDetail?.status ?? ''),
+              visitTime: this.vm.orderDetail?.visitTime,
+              name: this.vm.orderDetail?.performanceName,
+            });
 
-            this.noticeBuilder();
-            Column() {
+            NoticeBar({
+              noticeText: this.vm.orderDetail?.notice,
+            });
+            Column({ space: 12 }) {
               if (!this.vm.orderDetail?.isFree) {
                 this.ticketOwnerBuilder();
               }
               this.orderInfoBuilder();
-            }.padding(10).backgroundColor(CommonConstants.BG_COLOR_WHITE);
+            }.padding(12).backgroundColor('#FFFFFF').borderRadius(16);
 
           }
           .width('100%')
-          .backgroundColor(CommonConstants.BG_COLOR_GRAY)
-          .constraintSize({ minHeight: CommonConstants.FULL_HEIGHT })
-          .padding({ bottom: 10 });
+          .padding({
+            left: 16,
+            right: 16,
+            top: 10,
+            bottom: 10,
+          })
+          .backgroundColor('#F0F0F0')
+          .constraintSize({ minHeight: CommonConstants.FULL_HEIGHT });
         }
         .scrollBar(BarState.Off)
+        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
         .height(this.vm.orderDetail && this.vm.orderDetail.status === OrderClass.PENDING_PAYMENT ? 'calc(100% - 65vp)' :
         CommonConstants.FULL_HEIGHT);
 
         if (this.vm.orderDetail && this.vm.orderDetail.status === OrderClass.PENDING_PAYMENT) {
           Row() {
-            Button('取消订单')
+            Button('取消')
               .fontWeight(500)
               .width(72)
               .height(28)
@@ -91,15 +92,15 @@ struct TicketDetail {
               .onClick(() => {
                 this.dialogControllerConfirm.open();
               });
-            Button('去付款')
+            Button('前往支付')
               .fontWeight(500)
               .width(72)
               .height(28)
-              .backgroundColor(CommonConstants.FONT_COLOR_GREEN)
+              .backgroundColor('#D1B380')
               .fontSize(CommonConstants.FONT_SIZE_M)
               .padding(0)
               .onClick(() => {
-                this.vm.toPay(this.vm.orderDetail?.orderStr as string);
+                 this.vm.toPay(this.vm.orderDetail?.orderNo ?? '', this.vm.orderDetail?.orderStr ?? '');
               });
 
           }
@@ -110,9 +111,7 @@ struct TicketDetail {
           .padding(10);
         }
       }
-
-
-    }.title(this.vm.navTitle);
+    }.title(TitleBuilder(this.vm.navTitle), { paddingStart: LengthMetrics.vp(16) }).backgroundColor('#F3F4F5')
   }
 
   @Builder
@@ -121,28 +120,31 @@ struct TicketDetail {
     Divider();
     Column() {
       Row() {
-        Text('购票人:').commonTextStyle().width(61);
-        Column() {
+        Text('购票人:').ownerTextStyle().width(61);
+        Column({ space: 12 }) {
           ForEach(this.vm.orderDetail?.ticketOwner, (item: TicketOwner) => {
             Row() {
-              Text(item.name + `（${this.vm.ticketTypeMap.get(item.ticketType)}）`).commonTextStyle().width(120);
-              Text(`×${item.ticket}张`).commonTextStyle().width(40);
-              Text('¥' + item.price).commonTextStyle();
+              Text(item.name + `（${this.vm.ticketTypeMap.get(item.ticketType)}）`).ownerTextStyle().width(120);
+              Text(`×${item.ticket}张`).ownerTextStyle().width(40);
+              Text('¥' + item.price).ownerTextStyle().constraintSize({ minWidth: 20 }).textAlign(TextAlign.End);
             }.justifyContent(FlexAlign.SpaceBetween).width('100%');
           }, (item: TicketOwner) => item.personId);
           Divider();
           Row() {
-            Text('合计').commonTextStyle().width(120);
-            Text(`×${this.vm.getTotal(this.vm.orderDetail?.ticketOwner).total}张`).commonTextStyle().width(40);
-            Text('¥' + this.vm.getTotal(this.vm.orderDetail?.ticketOwner).totalPrice).commonTextStyle();
+            Text('合计').ownerTextStyle().width(120);
+            Text(`×${this.vm.getTotal(this.vm.orderDetail?.ticketOwner).total}张`).ownerTextStyle().width(40);
+            Text('¥' + this.vm.getTotal(this.vm.orderDetail?.ticketOwner).totalPrice)
+              .ownerTextStyle()
+              .constraintSize({ minWidth: 20 })
+              .textAlign(TextAlign.End);
           }.justifyContent(FlexAlign.SpaceBetween).width('100%');
         }.width('calc(100% - 61vp)');
       }.alignItems(VerticalAlign.Top);
 
       Row() {
-        Text('联系电话:').commonTextStyle().width(61);
-        Text(this.vm.orderDetail?.contactPhone).commonTextStyle();
-      };
+        Text('联系电话:').ownerTextStyle().width(61);
+        Text(this.vm.orderDetail?.contactPhone).ownerTextStyle();
+      }.margin({ top: 12 });
     }.alignItems(HorizontalAlign.Start).width('100%');
 
     Divider().margin({ bottom: 10 });
@@ -151,20 +153,38 @@ struct TicketDetail {
   @Builder
   orderInfoBuilder() {
     Text('订单信息').commonTitleStyle();
-    Column() {
+    Column({ space: 12 }) {
       if (this.vm.orderDetail?.isFree) {
         this.visitorBuilder();
       } else {
-        Text('下单时间：' + this.vm.orderDetail?.placeTime).commonTextStyle();
+        Row() {
+          Text('下单时间：').commonTextStyle();
+          Text(this.vm.orderDetail?.placeTime).commonTextStyle();
+        }.width('100%').justifyContent(FlexAlign.SpaceBetween);
+
         if (this.vm.orderDetail?.status !== OrderClass.PENDING_PAYMENT && this.vm.orderDetail?.payTime) {
-          Text('付款时间：' + this.vm.orderDetail?.payTime).commonTextStyle();
+          Divider().strokeWidth(0.5);
+          Row() {
+            Text('付款时间：').commonTextStyle();
+            Text(this.vm.orderDetail?.payTime).commonTextStyle();
+          }.width('100%').justifyContent(FlexAlign.SpaceBetween);
+
         }
         if (this.vm.orderDetail?.status !== OrderClass.PENDING_PAYMENT && this.vm.orderDetail?.actualPay) {
-          Text('实付款：' + this.vm.orderDetail?.actualPay).commonTextStyle();
+          Divider().strokeWidth(0.5);
+          Row() {
+            Text('实付款：').commonTextStyle();
+            Text(this.vm.orderDetail?.actualPay.toString()).commonTextStyle();
+          }.width('100%').justifyContent(FlexAlign.SpaceBetween);
+
         }
       }
       if (this.vm.orderDetail?.status === OrderClass.INVALIDATION) {
-        Text('取消时间：' + this.vm.orderDetail?.cancelTime).commonTextStyle();
+        Divider().strokeWidth(0.5);
+        Row() {
+          Text('取消时间：').commonTextStyle();
+          Text(this.vm.orderDetail?.cancelTime).commonTextStyle();
+        }.width('100%').justifyContent(FlexAlign.SpaceBetween);
       }
 
     }.alignItems(HorizontalAlign.Start).width('100%');
@@ -172,57 +192,50 @@ struct TicketDetail {
 
   @Builder
   visitorBuilder() {
-    Text(`参观人：${this.vm.orderDetail?.visitors?.map(item => item.name).join('、')}`).commonTextStyle();
-    Text(`参观人数：${this.vm.orderDetail?.visitors?.length}人`).commonTextStyle();
-    Text(`联系电话：${this.vm.orderDetail?.contactPhone}`).commonTextStyle();
-    Text('预约时间：' + this.vm.orderDetail?.orderTime).commonTextStyle();
-  }
+    Row() {
+      Text('参观人：').commonTextStyle();
+      Text(this.vm.orderDetail?.visitors?.map(item => item.name).join('、')).commonTextStyle();
+    }.width('100%').justifyContent(FlexAlign.SpaceBetween);
 
-  @Builder
-  tagBuilder() {
-    Row({ space: 7.5 }) {
-      Image(this.vm.getIcon(this.vm.orderDetail?.status ?? '')).width(20);
-      Text(this.vm.getLabel(this.vm.orderDetail?.status ?? ''))
-        .fontSize(CommonConstants.FONT_SIZE_L)
-        .fontColor(CommonConstants.FONT_COLOR_BLACK);
-    }.height(48).width('100%').padding({ left: 12 });
-  }
+    Divider().strokeWidth(0.5);
+    Row() {
+      Text('参观人数：').commonTextStyle();
+      Text(`${this.vm.orderDetail?.visitors?.length}人`).commonTextStyle();
+    }.width('100%').justifyContent(FlexAlign.SpaceBetween);
 
-  @Builder
-  noticeBuilder() {
-    Column({ space: 10 }) {
-      Text('温馨提示').fontColor(CommonConstants.FONT_COLOR_BLACK);
-      ForEach(this.vm.orderDetail?.notice, (item: string[]) => {
-        Column() {
-          ForEach(item, (v: string) => {
-            Text(v).fontSize(CommonConstants.FONT_SIZE_S).fontColor(CommonConstants.FONT_COLOR_BLACK);
-          }, (v: string) => v);
-        }.alignItems(HorizontalAlign.Start).width('100%');
-      }, (item: string[], index) => index.toString());
+    Divider().strokeWidth(0.5);
 
-    }
-    .padding({
-      left: 20,
-      right: 20,
-      bottom: 10,
-      top: 20,
-    })
-    .backgroundColor(CommonConstants.BG_COLOR_WHITE)
-    .margin({ bottom: 10 });
+    Row() {
+      Text('联系电话：').commonTextStyle();
+      Text(this.vm.orderDetail?.contactPhone).commonTextStyle();
+    }.width('100%').justifyContent(FlexAlign.SpaceBetween);
+
+    Divider().strokeWidth(0.5);
+
+    Row() {
+      Text('预约时间：').commonTextStyle();
+      Text(this.vm.orderDetail?.orderTime).commonTextStyle();
+    }.width('100%').justifyContent(FlexAlign.SpaceBetween);
+
   }
 }
 
 @Extend(Text)
 function commonTextStyle() {
-  .height(32).fontSize(CommonConstants.FONT_SIZE_S).fontColor(CommonConstants.FONT_COLOR_BLACK);
+  .fontSize($r('sys.float.Body_M')).fontColor($r('sys.color.font_primary'));
+}
+
+
+@Extend(Text)
+function ownerTextStyle() {
+  .fontSize($r('sys.float.Body_S')).fontColor($r('sys.color.font_primary'));
 }
 
 @Extend(Text)
 function commonTitleStyle() {
-  .fontSize(CommonConstants.FONT_SIZE_L)
+  .fontSize($r('sys.float.Subtitle_M'))
   .height(21)
-  .fontWeight(500)
-  .fontColor(CommonConstants.FONT_COLOR_BLACK)
-  .width('100%')
-  .margin({ bottom: 4 });
+  .fontWeight(FontWeight.Medium)
+  .fontColor($r('sys.color.font_primary'))
+  .width('100%');
 }

@@ -26,6 +26,14 @@ export { WindowUtil } from './src/main/ets/utils/WindowUtil';
 
 export * from './src/main/ets/types/Types';
 
-export { PopViewUtils } from './src/main/ets/utils/PopViewUtils'
+export { PopViewUtils } from './src/main/ets/utils/PopViewUtils';
 
 export { PreferenceUtil } from './src/main/ets/utils/PreferenceUtil';
+
+// 二级页面标题
+export { TitleBar } from './src/main/ets/components/TitleBar';
+
+export { TitleBuilder } from './src/main/ets/components/TitleBuilder';
+
+// 一级页面标题
+export { BaseHeader } from './src/main/ets/components/BaseHeader';

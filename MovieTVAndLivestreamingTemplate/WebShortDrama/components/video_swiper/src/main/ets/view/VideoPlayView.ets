@@ -1,7 +1,7 @@
 import { media } from '@kit.MediaKit';
 import { audio } from '@kit.AudioKit';
 import { componentUtils, window } from '@kit.ArkUI';
-import { BusinessError } from '@kit.BasicServicesKit';
+import { BusinessError, emitter } from '@kit.BasicServicesKit';
 import { pauseVideo, playVideo, releaseVideo } from '../utils/CommonUtils';
 import { Constants as Const } from '../constant/Contants'
 import { PlayController, PlayerLayoutSize } from '../controller/PlayController';
@@ -9,6 +9,7 @@ import { VideoPlayData } from '../datasource/VideoPlayDataSource';
 import { util } from '@kit.ArkTS';
 import { PlaySession } from '../controller/PlaySession';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { CoverLayer } from '../components/CoverLayer';
 
 const TAG = '[VideoPlayer]';
 const otherClickHeight = 200
@@ -31,6 +32,8 @@ export struct VideoPlayView {
   @Param firstFlag: boolean = false;
   @Event firstLoaded: () => void = () => {
   };
+  @Event freshLoaded: () => void = () => {
+  };
   // swipe中当前的播放索引
   @Param curIndex: number = -1;
   @Param isPageShow: boolean = false;
@@ -38,12 +41,13 @@ export struct VideoPlayView {
   @Param previewUri: ResourceStr = '';
   @Param @Require videoData: VideoPlayData
   @Param @Require playController: PlayController;
+  @Param @Require inPage: string
   @Local xComponentWidth: number | string = '100%';
   @Local xComponentHeight: number | string = '100%';
   @Local pauseClickHeight: number = 560
-  videoFit: VideoFit = VideoFit.CoverH
+  videoFit: VideoFit = VideoFit.Contain
 
-  @Monitor('curIndex', 'isPageShow', 'onFoldStatusChange')
+  @Monitor('curIndex','isPageShow','onFoldStatusChange')
   onIndexChanged(monitor: IMonitor) {
     monitor.dirty.forEach((path: string) => {
       console.log(`${path} change from ${monitor.value(path)?.before} to ${monitor.value(path)?.now}`);
@@ -62,10 +66,10 @@ export struct VideoPlayView {
   @Param @Once index: number = 0;
   @Local layoutSize: PlayerLayoutSize = new PlayerLayoutSize()
   @Local aspRatio: number = 0.5;
-  @Local isPlaying: boolean = true;
+  @Local isPlaying: boolean = false;
   @Local trackThicknessSize: number = Const.TRACK_SIZE_MIN;
   @Local preparedFlag: boolean = false;
-  @Local isPreview: boolean = false;
+  @Local isLoading: boolean = true;
   private surfaceID: string = '';
   private xComponentController = new XComponentController();
   private avPlayer: media.AVPlayer | undefined = undefined;
@@ -83,9 +87,10 @@ export struct VideoPlayView {
 
   aboutToAppear(): void {
     this.layoutSize = this.playController.playLayout
+    this.backEmitter()
+    this.foreEmitter()
     hilog.info(0x0000, TAG,
       `aboutToAppear playerWidth: ${this.layoutSize.playerWidth}, playerHeight: ${this.layoutSize.playerHeight}.`);
-    this.isPreview = true;
   }
 
   onPageShowWatch() {
@@ -100,95 +105,87 @@ export struct VideoPlayView {
     Stack() {
       Stack({ alignContent: Alignment.Center }) {
         Stack({ alignContent: Alignment.Center }) {
-          if (!this.isPlaying && this.preparedFlag === true) {
-            Image($r('app.media.ic_paused'))
-              .width(60)
-              .height(60)
-              .zIndex(2)
-          }
-          if (this.preparedFlag === false && this.curIndex === this.index) {
-            Column() {
-              LoadingProgress()
-                .width(50)
-                .height(50)
-                .color(Color.White);
-              Text('加载中...')
-                .fontSize(14)
-                .fontColor(Color.White);
-            }
-            .zIndex(3);
-          }
-          if (this.preparedFlag === false && this.isPreview) {
-            Image(this.previewUri)
-              .zIndex(2)
+          CoverLayer({
+            isPlaying: this.isPlaying,
+            preparedFlag: this.preparedFlag,
+            curIndex: this.curIndex,
+            index: this.index,
+            isLoading: this.isLoading,
+            previewUri: this.previewUri,
+            xComponentWidth: this.xComponentWidth,
+            xComponentHeight: this.xComponentHeight
+          })
+
+          Stack() {
+            XComponent({
+              id: this.xComponentId,
+              type: XComponentType.SURFACE,
+              controller: this.xComponentController
+            })
               .width(this.xComponentWidth)
               .height(this.xComponentHeight)
-          }
+              .onLoad(async () => {
+                this.surfaceID = this.xComponentController.getXComponentSurfaceId();
+                hilog.info(0x0000, TAG,
+                  `surfaceID: ${this.surfaceID}, curIndex: ${this.curIndex}, index: ${this.index}.`);
+                this.initAVPlayer();
 
-          XComponent({
-            id: this.xComponentId,
-            type: XComponentType.SURFACE,
-            controller: this.xComponentController
-          })
-            .width(this.xComponentWidth)
-            .height(this.xComponentHeight)
-            .onLoad(async () => {
-              this.surfaceID = this.xComponentController.getXComponentSurfaceId();
-              hilog.info(0x0000, TAG,
-                `surfaceID: ${this.surfaceID}, curIndex: ${this.curIndex}, index: ${this.index}.`);
-              this.initAVPlayer();
-            })
-            .onDestroy(() => {
-              hilog.info(0x0000, TAG,
-                `surfaceID: ${this.surfaceID}, destroy`);
-            })
-            .id('player')
-            .zIndex(1)
-        }
-        .id(this.componentId)
-        .width(this.layoutSize.playerWidth)
-        .height(this.layoutSize.playerHeight)
-        .position({ y: this.layoutSize.playerPositionY })
-        .onSizeChange(() => {
-          hilog.info(0x0000, TAG,
-            `onSizeChange.`);
-          animateTo({ duration: 300, curve: Curve.EaseInOut }, () => {
+              })
+              .onDestroy(() => {
+                hilog.info(0x0000, TAG,
+                  `surfaceID: ${this.surfaceID}, destroy`);
+              })
+              .id('player')
+              .zIndex(1)
+          }
+          .id(this.componentId)
+          .width(this.layoutSize.playerWidth)
+          .height(this.layoutSize.playerHeight)
+          .position({ y: this.layoutSize.playerPositionY })
+          .onSizeChange(() => {
+            hilog.info(0x0000, TAG,
+              `onSizeChange.`);
             this.autoVideoSize()
           })
-        })
 
-        // 图层view, 外部提供
-        if (this.contentBuilder) {
-          Column() {
-            this.contentBuilder?.builder(this.videoData, this.playController, this.playerSession);
-          }.zIndex(2)
-          .width('100%')
-          .height('100%')
+          Column()
+            .width('100%')
+            .height(this.pauseClickHeight)
+            .onClick(() => {
+              hilog.info(0x0000, TAG,
+                `iconOnClick playerWidth: ${this.layoutSize.playerWidth},
+                playerHeight: ${this.layoutSize.playerHeight}.`);
+              hilog.info(0x0000, TAG,
+                `iconOnClick xComponentWidth: ${this.xComponentWidth}, xComponentHeight: ${this.xComponentHeight}.`);
+              if (!this.playController.isLocked) {
+                this.iconOnClick();
+              }
+            })
+            .zIndex(5)
+
+          // 图层view, 外部提供
+          if (this.contentBuilder) {
+            Column() {
+              this.contentBuilder?.builder(this.videoData, this.playController, this.playerSession);
+            }.zIndex(7)
+            .width('100%')
+            .height('100%')
+            .hitTestBehavior(HitTestMode.Transparent)
+          }
         }
+        .width('100%')
+        .height('100%')
+        .backgroundColor(Color.Black)
       }
+      .onAreaChange((oldVal, newVal) => {
+        this.pauseClickHeight = parseInt(newVal.height.toString()) - otherClickHeight
+        if (this.pauseClickHeight <= 30) {
+          this.pauseClickHeight = 30
+        }
+      })
       .width('100%')
       .height('100%')
-      .backgroundColor(Color.Black)
-
-      Column()
-        .width('100%')
-        .height(this.pauseClickHeight)
-        .onClick(() => {
-          hilog.info(0x0000, TAG,
-            `iconOnClick playerWidth: ${this.layoutSize.playerWidth}, playerHeight: ${this.layoutSize.playerHeight}.`);
-          hilog.info(0x0000, TAG,
-            `iconOnClick xComponentWidth: ${this.xComponentWidth}, xComponentHeight: ${this.xComponentHeight}.`);
-          this.iconOnClick();
-        })
     }
-    .onAreaChange((oldVal, newVal) => {
-      this.pauseClickHeight = parseInt(newVal.height.toString()) - otherClickHeight
-      if (this.pauseClickHeight <= 30) {
-        this.pauseClickHeight = 30
-      }
-    })
-    .width('100%')
-    .height('100%')
   }
 
   async iconOnClick() {
@@ -201,13 +198,13 @@ export struct VideoPlayView {
       await windowClass.setWindowKeepScreenOn(false);
       return;
     }
-    if (this.preparedFlag === true) {
+    if (this.preparedFlag) {
       playVideo(this.avPlayer, this.curIndex, this.index);
       this.isPlaying = true;
       this.trackThicknessSize = Const.TRACK_SIZE_MIN;
     } else {
       let intervalFlag = setInterval(async () => {
-        if (this.preparedFlag === true) {
+        if (this.preparedFlag) {
           playVideo(this.avPlayer, this.curIndex, this.index);
           this.isPlaying = true;
           this.trackThicknessSize = Const.TRACK_SIZE_MIN;
@@ -263,6 +260,39 @@ export struct VideoPlayView {
       this.autoVideoSize()
     })
 
+    avPlayer.on('audioInterrupt', async (interruptEvent: audio.InterruptEvent) => {
+      if (interruptEvent.forceType === audio.InterruptForceType.INTERRUPT_FORCE) {
+        // 强制打断类型（INTERRUPT_FORCE）：音频相关处理已由系统执行，应用需更新自身状态，做相应调整
+        switch (interruptEvent.hintType) {
+          case audio.InterruptHint.INTERRUPT_HINT_PAUSE:
+            avPlayer.pause();
+            break;
+          case audio.InterruptHint.INTERRUPT_HINT_STOP:
+            avPlayer.pause();
+            break;
+
+          default:
+            break;
+        }
+      } else if (interruptEvent.forceType === audio.InterruptForceType.INTERRUPT_SHARE) {
+        // 共享打断类型（INTERRUPT_SHARE）：应用可自主选择执行相关操作或忽略音频打断事件
+        switch (interruptEvent.hintType) {
+          case audio.InterruptHint.INTERRUPT_HINT_RESUME:
+            avPlayer.play();
+            break;
+          default:
+            break;
+        }
+      }
+    })
+
+    avPlayer.on('audioOutputDeviceChangeWithInfo', (data: audio.AudioStreamDeviceChangeInfo) => {
+      if (data.changeReason === audio.AudioStreamDeviceChangeReason.REASON_OLD_DEVICE_UNAVAILABLE) {
+        hilog.info(0x0001, TAG, `Device connect: ${data.changeReason}`);
+        avPlayer.pause();
+      }
+    });
+
     //error listen, when the avPlayer is error, to load reset interface
     avPlayer.on('error', (err: BusinessError) => {
       hilog.info(0x0000, TAG, `Invoke avPlayer failed, code is ${err.code}, message is ${err.message}.` +
@@ -289,6 +319,7 @@ export struct VideoPlayView {
           hilog.info(0x0000, TAG, `AVPlayer state prepared called. curIndex: ${this.curIndex}, index: ${this.index}.`);
           avPlayer.audioInterruptMode = audio.InterruptMode.INDEPENDENT_MODE;
           this.preparedFlag = true;
+          this.freshLoaded();
           // 起播进度调整
           if (this.videoData.getPlayTime() > 0) {
             hilog.info(0x0000, TAG, `AVPlayer state prepared called. need seekto: ${this.videoData.getPlayTime()}.`);
@@ -299,8 +330,10 @@ export struct VideoPlayView {
           // 首播起播
           if (this.firstFlag && this.index === this.curIndex && this.isPageShow) {
             hilog.info(0x0000, TAG, 'first video prepared go play!');
-            avPlayer.play();
-            this.firstLoaded();
+            if (!this.playController.isLocked) {
+              avPlayer.play();
+              this.firstLoaded();
+            }
           }
           break;
         case 'playing':
@@ -308,6 +341,14 @@ export struct VideoPlayView {
             `AVPlayer state playing called. curIndex: ${this.curIndex}, index: ${this.index},
             source: ${this.videoData.getUrl()}.`);
           this.isPlaying = true;
+          this.isLoading = false;
+          if (this.inPage === 'Detail' && this.playController.curentIndex > 10 && !PlayController.lockedDrama.get(
+            this.playController.id)?.includes(this.playController.curentIndex) && !this.playController.isVip) {
+            this.playController.isLocked = true
+            pauseVideo(this.avPlayer, this.curIndex, this.index)
+          } else {
+            this.playController.isLocked = false
+          }
           break;
         case 'paused':
           this.isPlaying = false;
@@ -354,12 +395,10 @@ export struct VideoPlayView {
     } else {
       hilog.info(0x0000, TAG,
         `enter indexChange play. curIndex: ${this.curIndex}, index: ${this.index}, isPageShow: ${this.isPageShow}.`);
-      this.isPreview = true;
       // 准备好了，直接播放视频，否则等待准备
-      if (this.preparedFlag === true) {
+      if (this.preparedFlag) {
         playVideo(this.avPlayer, this.curIndex, this.index);
         this.isPlaying = true;
-        this.isPreview = false;
         this.trackThicknessSize = Const.TRACK_SIZE_MIN;
       } else {
         let countNum = 0;
@@ -370,11 +409,10 @@ export struct VideoPlayView {
             curIndex: ${this.curIndex}, index: ${this.index}.`);
             clearInterval(intervalFlag);
           }
-          if (this.preparedFlag === true && this.isPageShow) {
+          if (this.preparedFlag && this.isPageShow) {
             countNum = 0;
             playVideo(this.avPlayer, this.curIndex, this.index);
             this.isPlaying = true;
-            this.isPreview = false;
             this.trackThicknessSize = Const.TRACK_SIZE_MIN;
             clearInterval(intervalFlag);
           } else {
@@ -429,6 +467,27 @@ export struct VideoPlayView {
         this.xComponentHeight = px2vp(playerComponentHeight);
       }
     }
+  }
 
+  backEmitter() {
+    let event: emitter.InnerEvent = {
+      eventId: 1
+    };
+    let callback: Callback<emitter.EventData> = (eventData: emitter.EventData) => {
+        this.playController.pause()
+      hilog.info(0x0000, TAG, `eventData: ${JSON.stringify(eventData)}`);
+    }
+    emitter.on(event, callback);
+  }
+
+  foreEmitter() {
+    let event: emitter.InnerEvent = {
+      eventId: 2
+    };
+    let callback: Callback<emitter.EventData> = (eventData: emitter.EventData) => {
+        this.playController.play()
+      hilog.info(0x0000, TAG, `eventData: ${JSON.stringify(eventData)}`);
+    }
+    emitter.on(event, callback);
   }
 }

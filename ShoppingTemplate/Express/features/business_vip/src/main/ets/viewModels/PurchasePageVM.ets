@@ -1,10 +1,10 @@
-import { vipList } from '../constants';
+import { BusinessError } from '@kit.BasicServicesKit';
 import { AppStorageV2, promptAction } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
 import { paymentService } from '@kit.PaymentKit';
-import { Logger } from 'module_base';
-import { BusinessError } from '@kit.BasicServicesKit';
-import { IVipPrepayRequest, UserInfo, vipPrepay } from 'lib_foundation';
+import { Logger, UserInfo } from 'module_base';
+import { IVipPrepayRequest, vipPrepay } from 'lib_foundation';
+import { vipList } from '../constants';
 
 @ObservedV2
 export class PurchasePageVM {

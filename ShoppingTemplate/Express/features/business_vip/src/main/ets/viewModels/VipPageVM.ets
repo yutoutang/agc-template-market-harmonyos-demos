@@ -1,5 +1,6 @@
-import { CheckIn, Coupon, getCheckInList, getCouponList, UserInfo } from 'lib_foundation';
 import { AppStorageV2 } from '@kit.ArkUI';
+import { CheckIn, Coupon, getCheckInList, getCouponList } from 'lib_foundation';
+import { UserInfo } from 'module_base'
 
 @ObservedV2
 export class VipPageVM {

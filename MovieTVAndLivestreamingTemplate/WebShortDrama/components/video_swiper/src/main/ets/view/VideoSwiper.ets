@@ -29,10 +29,19 @@ export struct VideoSwiper {
   // 外部view
   @Param @Require contentBuilder: WrappedBuilder<[VideoPlayData, PlayController, PlaySession]>;
   // 播放控制器
+  @Param inPage: string = 'Home'
   @Param playController: PlayController = new PlayController()
+  @Event refresh: Function = () => {
+  }
+  @Event loadMore: Function = () => {
+  }
   // 首视频标志
   @Local firstFlag: boolean = true;
   @Local isPageShow: boolean = false;
+  @Local isLoadingMore: boolean = false;
+  @Local refreshStatus: RefreshStatus = RefreshStatus.Inactive;
+  @Local refreshing: boolean = false
+  @Local refreshed: boolean = false
   // Swiper组件控制器
   private swiperController: SwiperController = new SwiperController();
 
@@ -47,56 +56,143 @@ export struct VideoSwiper {
     this.isPageShow = true;
   }
 
+  getStatusText() {
+    switch (this.refreshStatus) {
+      case RefreshStatus.Drag:
+        return $r('app.string.refresh');
+      case RefreshStatus.OverDrag:
+        return $r('app.string.load')
+      case RefreshStatus.Refresh:
+        return $r('app.string.loading')
+      default:
+        return ''
+    }
+  }
+
+  @Builder
+  getRefreshDisplay() {
+    Row() {
+      LoadingProgress()
+        .width(40)
+        .aspectRatio(1)
+        .color(Color.White)
+      Text(this.getStatusText())
+        .fontSize(14)
+        .fontColor(Color.White)
+    }
+    .width('100%')
+    .height(50)
+    .justifyContent(FlexAlign.Center)
+  }
+
+  @Builder
+  getLoadMoreDisplay() {
+    Row() {
+      LoadingProgress()
+        .width(40)
+        .height(60)
+        .aspectRatio(1)
+        .color(Color.White)
+      Text($r('app.string.loading'))
+        .fontSize(14)
+        .fontColor(Color.White)
+    }
+    .width('100%')
+    .height(50)
+    .justifyContent(FlexAlign.Center)
+  }
+
   build() {
     Stack() {
-      Swiper(this.swiperController) { // 使用Swiper组件实现滑动轮播显示的能力
-        LazyForEach(this.videoPlayDataSource, (item: VideoPlayData, index: number) => {
-          VideoPlayView({
-            playController: this.playController,
-            curIndex: this.currentVideoIndex,
-            index: index,
-            firstFlag: this.firstFlag,
-            isPageShow: true,
-            firstLoaded: () => {
-              this.firstFlag = false;
-            },
-            videoData: item,
-            contentBuilder: this.contentBuilder,
-            previewUri: item.getPic(),
-          })
-        },
-          (item: string, index: number) => JSON.stringify(item) + index
-        )
+      Refresh({ refreshing: $$this.refreshing, builder: this.getRefreshDisplay }) {
+        Swiper(this.swiperController) { // 使用Swiper组件实现滑动轮播显示的能力
+          LazyForEach(this.videoPlayDataSource, (item: VideoPlayData, index: number) => {
+            VideoPlayView({
+              playController: this.playController,
+              curIndex: this.currentVideoIndex,
+              index: index,
+              firstFlag: this.firstFlag,
+              isPageShow: true,
+              firstLoaded: () => {
+                this.firstFlag = false;
+              },
+              videoData: item,
+              contentBuilder: this.contentBuilder,
+              previewUri: item.getPic(),
+              freshLoaded: () => {
+                if (this.refreshed) {
+                  this.playController.play();
+                  this.refreshed = false
+                }
+              },
+              inPage: this.inPage
+            })
+          },
+            (item: VideoPlayData, index:number) => index + '__' + JSON.stringify(item)
+          )
+        }
+        .cachedCount(this.firstFlag ? 0 : 2)
+        .width('100%')
+        .height('100%')
+        .vertical(true)
+        .loop(false)
+        .curve(Curve.Ease)
+        .duration(300)
+        .indicator(false)
+        .backgroundColor(Color.Black)
+        .index($$this.currentVideoIndex)
+        .onGestureSwipe((index: number, extraInfo: SwiperAnimationEvent) => {
+          hilog.debug(0x0000, TAG, `onGestureSwipe index: ${index}, extraInfo: ${extraInfo}.`);
+        })
+        .onAnimationStart((index: number, targetIndex: number, extraInfo: SwiperAnimationEvent) => {
+          hilog.debug(0x0000, TAG,
+            `onAnimationStart index: ${index}, targetIndex: ${targetIndex}, extraInfo: ${extraInfo}.`);
+          this.currentVideoIndex = targetIndex;
+        })
+        .onAnimationEnd((index: number, extraInfo: SwiperAnimationEvent) => {
+          hilog.debug(0x0000, TAG, `onAnimationEnd index: ${index}, extraInfo: ${extraInfo}.`);
+          if (index === this.videoPlayDataSource.totalCount() - 1) {
+            this.loadMoreData();
+          }
+        })
+        .onChange((index: number) => {
+          hilog.debug(0x0000, TAG, `onChange index: ${index}.`);
+          this.currentVideoIndex = index;
+          this.playController.curentIndex = index
+        })
       }
-      .cachedCount(this.firstFlag ? 0 : 2)
-      .width('100%')
-      .height('100%')
-      .vertical(true)
-      .loop(false)
-      .curve(Curve.Ease)
-      .duration(300)
-      .indicator(false)
-      .backgroundColor(Color.Black)
-      .index($$this.currentVideoIndex)
-      .onGestureSwipe((index: number, extraInfo: SwiperAnimationEvent) => {
-        hilog.debug(0x0000, TAG, `onGestureSwipe index: ${index}, extraInfo: ${extraInfo}.`);
-      })
-      .onAnimationStart((index: number, targetIndex: number, extraInfo: SwiperAnimationEvent) => {
-        hilog.debug(0x0000, TAG,
-          `onAnimationStart index: ${index}, targetIndex: ${targetIndex}, extraInfo: ${extraInfo}.`);
-        this.currentVideoIndex = targetIndex;
-      })
-      .onAnimationEnd((index: number, extraInfo: SwiperAnimationEvent) => {
-        hilog.debug(0x0000, TAG, `onAnimationEnd index: ${index}, extraInfo: ${extraInfo}.`);
-      })
-      .onChange((index: number) => {
-        hilog.debug(0x0000, TAG, `onChange index: ${index}.`);
-        this.currentVideoIndex = index;
-        this.playController.curentIndex = index
+      .onStateChange(async (value: RefreshStatus) => {
+        this.refreshStatus = value
+        if (value === RefreshStatus.Refresh) {
+          await this.onRefresh();
+        } else if (value === RefreshStatus.Done) {
+          this.refreshing = false
+        }
       })
     }
     .width('100%')
     .height('100%')
+  }
 
+  async onRefresh() {
+    try {
+      this.refresh()
+    } finally {
+      this.refreshing = false
+      this.refreshed = true
+    }
+  }
+
+  async loadMoreData() {
+    if (this.isLoadingMore) {
+      return;
+    } // 防止重复加载
+
+    this.isLoadingMore = true;
+    try {
+      this.loadMore()
+    } finally {
+      this.isLoadingMore = false;
+    }
   }
 }

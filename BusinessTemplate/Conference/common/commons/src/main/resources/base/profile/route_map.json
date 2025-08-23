@@ -1,0 +1,38 @@
+{
+  "routerMap": [
+    {
+      "name": "Login",
+      "pageSourceFile": "src/main/ets/pages/Login.ets",
+      "buildFunction": "LoginBuilder",
+      "data": {
+        "description": "this is PageOne"
+      }
+    },
+    {
+      "name": "MyWebView",
+      "pageSourceFile": "src/main/ets/pages/MyWebView.ets",
+      "buildFunction": "MyWebViewBuilder",
+      "data": {
+        "description": "this is PageOne"
+      }
+    },
+    {
+      "name": "Ticket",
+      "pageSourceFile": "src/main/ets/pages/Ticket.ets",
+      "buildFunction": "TicketBuilder",
+      "data": {
+        "description": "this is PageOne"
+      }
+    },
+    {
+      "name": "PrivacyDialog",
+      "pageSourceFile": "src/main/ets/view/PrivacyDialog.ets",
+      "buildFunction": "PrivacyDialogBuilder"
+    },
+    {
+      "name": "SignupModal2",
+      "pageSourceFile": "src/main/ets/view/SignupModal2.ets",
+      "buildFunction": "SignupModal2Builder"
+    }
+  ]
+}

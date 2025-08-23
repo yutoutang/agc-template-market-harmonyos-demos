@@ -1,5 +1,4 @@
 import { BuyVM } from '../viewModels/BuyVM';
-import { TicketListItem, TicketTypeInfo } from '../types/Index';
 import { CommonConstants } from 'commonlib';
 import { TicketOwner } from 'network';
 
@@ -50,7 +49,7 @@ struct BuySuccess {
               Column() {
                 ForEach(this.vm.orderDetail?.ticketOwner, (item: TicketOwner) => {
                   Row() {
-                    Text(item.name + `（${item.ticketType}）`).commonTextStyle().width(120);
+                    Text(item.name + `（${this.vm.ticketTypeMap.get(item.ticketType)}）`).commonTextStyle().width(120);
                     Text(`×${item.ticket}张`).commonTextStyle().width(40);
                     Text('¥' + item.price).commonTextStyle();
                   }.justifyContent(FlexAlign.SpaceBetween).width('100%');

@@ -15,6 +15,7 @@ export struct SearchPanel {
   @Event inputFocusEvent: Function | undefined
   @Event inputValueChangedEvent: Function | undefined
   @Event searchEvent: Function | undefined
+  @Event clearText: Function
   @Local searchRecords: SearchRecords = AppStorageV2.connect(SearchRecords, () => new SearchRecords())!
 
   build() {
@@ -41,7 +42,7 @@ export struct SearchPanel {
                 })
                 .fontColor(getColor('app.color.normal_font_color'))
             }
-          }else {
+          } else {
             Column() {
               TextInput({
                 controller: this.textController,
@@ -72,6 +73,17 @@ export struct SearchPanel {
                 })
             }
           }
+          if (this.searchText) {
+            Text('󰁖')
+              .textAlign(TextAlign.Center)
+              .fontColor($r('sys.color.mask_secondary'))
+              .width(16)
+              .height(16)
+              .offset({ x: -60 })
+              .onClick(() => {
+                this.clearText()
+              })
+          }
         }
         .margin({
           top: 8,
@@ -90,6 +102,7 @@ export struct SearchPanel {
       }
       .width('100%')
     }
-    .width('100%')
+    .margin({ left: 8 })
+    .width(280)
   }
 }

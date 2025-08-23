@@ -5,7 +5,7 @@ export function PersonalCenterBuilder() {
   PersonalCenter()
 }
 
-@Component
+@ComponentV2
 export struct PersonalCenter {
   build() {
     MinePage()

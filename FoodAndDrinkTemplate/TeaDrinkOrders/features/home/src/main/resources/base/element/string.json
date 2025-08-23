@@ -17,20 +17,12 @@
       "value": "我的收藏"
     },
     {
-      "name": "search",
-      "value": "搜索"
-    },
-    {
       "name": "can_takeaways",
       "value": "可外带"
     },
     {
       "name": "make_now",
       "value": "现在下单，立即制作"
-    },
-    {
-      "name": "store_open_time",
-      "value": "营业时间："
     },
     {
       "name": "wait_num_pre",

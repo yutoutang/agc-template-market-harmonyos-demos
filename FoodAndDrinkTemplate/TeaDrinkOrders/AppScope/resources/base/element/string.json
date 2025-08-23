@@ -165,22 +165,6 @@
       "value": "口味、偏好等要求"
     },
     {
-      "name": "order_time",
-      "value": "下单时间"
-    },
-    {
-      "name": "order_id",
-      "value": "订单号"
-    },
-    {
-      "name": "copy",
-      "value": "复制"
-    },
-    {
-      "name": "order_type",
-      "value": "取餐方式"
-    },
-    {
       "name": "order_pick_self",
       "value": "自提"
     },
@@ -205,40 +189,12 @@
       "value": "已取消"
     },
     {
-      "name": "delivering",
-      "value": "配送中"
-    },
-    {
       "name": "completed",
       "value": "已完成"
     },
     {
-      "name": "pick_self_tag",
-      "value": "自提"
-    },
-    {
-      "name": "takeaway_tag",
-      "value": "外卖"
-    },
-    {
       "name": "tab_mine",
       "value": "我的"
-    },
-    {
-      "name": "address_default",
-      "value": "常用"
-    },
-    {
-      "name": "address_home",
-      "value": "家"
-    },
-    {
-      "name": "address_company",
-      "value": "公司"
-    },
-    {
-      "name": "address_school",
-      "value": "学校"
     },
     {
       "name": "membership_code",
@@ -281,80 +237,16 @@
       "value": "立即支付"
     },
     {
-      "name": "address_tag",
-      "value": "标签"
-    },
-    {
       "name": "add_address",
       "value": "新增收货地址"
-    },
-    {
-      "name": "save_address",
-      "value": "保存地址"
-    },
-    {
-      "name": "address",
-      "value": "地址"
     },
     {
       "name": "select_address",
       "value": "选择收货地址"
     },
     {
-      "name": "man",
-      "value": "先生"
-    },
-    {
-      "name": "house_number",
-      "value": "门牌号"
-    },
-    {
-      "name": "address_num_tip",
-      "value": "填写详细地址，例：1幢1层102室"
-    },
-    {
-      "name": "address_user",
-      "value": "收货人"
-    },
-    {
-      "name": "address_tel",
-      "value": "手机号"
-    },
-    {
       "name": "input_address_pre",
       "value": "请输入您的收货地址"
-    },
-    {
-      "name": "select_address_pre",
-      "value": "请选择收货地址"
-    },
-    {
-      "name": "input_address_num",
-      "value": "请输入门牌号"
-    },
-    {
-      "name": "input_address_user",
-      "value": "请输入收货人"
-    },
-    {
-      "name": "input_address_tel",
-      "value": "请输入手机号"
-    },
-    {
-      "name": "save_address_success",
-      "value": "收货地址保存成功~"
-    },
-    {
-      "name": "save_address_failed",
-      "value": "收货地址保存失败！"
-    },
-    {
-      "name": "address_tel_tip",
-      "value": "请正确填写手机号"
-    },
-    {
-      "name": "woman",
-      "value": "女士"
     },
     {
       "name": "nanjing",
@@ -369,16 +261,24 @@
       "value": "修改收货地址"
     },
     {
-      "name": "address_tel_error",
-      "value": "手机号格式不正确"
-    },
-    {
       "name": "agcit_huawei_tea_drink_orders",
-      "value": "1.0.1"
+      "value": "1.0.2"
     },
     {
       "name": "agcittype_huawei_tea_drink_orders",
       "value": "industryTemplate"
+    },
+    {
+      "name": "save_address_failed",
+      "value": "收货地址保存失败！"
+    },
+    {
+      "name": "select_pay_type",
+      "value": "选择支付方式"
+    },
+    {
+      "name": "agcitkid_huawei_tea_drink_orders",
+      "value": "agcit_huawei_tea_drink_orders_select_store/1.0.0,agcit_huawei_tea_drink_orders_order_detail/1.0.0,agcit_huawei_tea_drink_orders_shopping_cart/1.0.0,agcit_huawei_tea_drink_orders_add_address/1.0.0"
     }
   ]
 }

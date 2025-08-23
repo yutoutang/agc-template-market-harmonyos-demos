@@ -1,5 +1,5 @@
 import { AppStorageV2 } from '@kit.ArkUI';
-import { UserInfo } from 'lib_foundation';
+import { UserInfo } from 'module_base';
 
 const TAG = '[PersonalInformationVM]';
 
@@ -8,7 +8,7 @@ export class PersonalInformationVM {
   private static _instance: PersonalInformationVM;
   @Trace isLogin: boolean = false
   @Trace avatar: string = ''
-  @Trace @Trace userInfo: UserInfo = AppStorageV2.connect(UserInfo, () => new UserInfo())!;
+  @Trace userInfo: UserInfo = AppStorageV2.connect(UserInfo, () => new UserInfo())!;
 
   @Monitor('userInfo.id')
   onChange(monitor: IMonitor) {

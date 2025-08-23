@@ -1,3 +1,3 @@
-import { Restaurant } from '.';
+import { Restaurant } from './GetRestaurantListResp';
 
 export type GetRestaurantInfoResp = Restaurant;

@@ -11,6 +11,7 @@
     "@agctemplate/widgets": "1.0.0",
     "@agctemplate/detail": "1.0.0",
     "@agctemplate/server": "1.0.0",
-    "@agctemplate/video_swiper": "1.0.0"
+    "video_swiper": "1.0.0",
+    "@agctemplate/module_share": "1.0.0"
   }
 }

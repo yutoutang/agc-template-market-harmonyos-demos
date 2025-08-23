@@ -3,6 +3,7 @@
 ## 目录
 
 - [简介](#简介)
+- [约束与限制](#约束与限制)
 - [使用](#使用)
 - [API参考](#API参考)
 - [示例代码](#示例代码)
@@ -13,38 +14,54 @@
 
 <img src="./screenshots/video_swiper.jpeg" height="300">
 
+## 约束与限制
+
+### 环境
+
+- DevEco Studio版本：DevEco Studio 5.0.1 Release及以上
+- HarmonyOS SDK版本：HarmonyOS 5.0.1 Release SDK及以上
+- 设备类型：华为手机（直板机、双折叠）
+- HarmonyOS版本：HarmonyOS 5.0.1 Release及以上
+
+### 权限
+
+- 网络权限：ohos.permission.INTERNET
+
 ## 使用
 
-1. 安装组件。 需要将模板根目录的components下**video_swiper**目录拷贝至您的工程相应目录。
-   ```typescript
-   // 在项目根目录build-profile.json5填写video_swiper路径
-     "modules": [
-       {
-         "name": "video_swiper",
-         "srcPath": "./video_swiper"
-       }
-     ]
-   ```
-   // 在项目根目录oh-package.json5填写video_swiper路径
-   ```typescript
-   "overrides": {
-     "@agctemplate/video_swiper": "file:./video_swiper"
-   }
-   ```
-   // 模块oh-package.json5填写video_swiper依赖
-   ```typescript
-   "dependencies": {
-     "@agctemplate/video_swiper": "1.0.0"
-   }
-   ```
+1. 安装组件。 
+
+    如果是在DevEvo Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
+
+    如果是从生态市场下载组件，请参考以下步骤安装组件。
+
+    a. 解压下载的组件包，将包中所有文件夹拷贝至您工程根目录的XXX目录下。
+
+    b. 在项目根目录build-profile.json5添加video_swiper模块
+
+    ```typescript
+    // 在项目根目录build-profile.json5填写video_swiper路径。其中XXX为组件存放的目录名
+    "modules": [
+      {
+        "name": "video_swiper",
+        "srcPath": "./XXX/video_swiper"
+      }
+    ]
+    ```
+   
+    c. 在项目根目录oh-package.json5中添加依赖。
+
+    ```typescript
+    // XXX为组件存放的目录名称
+    "dependencies": {
+      "video_swiper": "file:./XXX/video_swiper"
+    }
+    ```
 
 2. 引入组件。
 
    ```typescript
-   import {
-    VideoSwiper,
-    PlayController
-    } from '"@agctemplate/video_swiper';
+   import { VideoSwiper, PlayController } from 'video_swiper';
    ```
 
 3. 调用组件，详细参数配置说明参见[API参考](#API参考)。
@@ -56,7 +73,7 @@
       VideoPlayData,
       VideoPlayDataSource,
       VideoSwiper
-   } from '@agctemplate/video_swiper';
+   } from 'video_swiper';
    import { media } from '@kit.MediaKit';
    
    class EpisodeData implements VideoPlayData {
@@ -92,7 +109,7 @@
    }
    
    @Entry
-   @Component
+   @ComponentV2
    struct Index {
       data: VideoPlayDataSource = new VideoPlayDataSource()
    
@@ -275,7 +292,7 @@ onTimeUpdate(key: string, callback: (time: number) => void): void
       VideoPlayData,
       VideoPlayDataSource,
       VideoSwiper
-   } from '@agctemplate/video_swiper';
+   } from 'video_swiper';
    import { media } from '@kit.MediaKit';
    
    class EpisodeData implements VideoPlayData {
@@ -311,7 +328,7 @@ onTimeUpdate(key: string, callback: (time: number) => void): void
    }
    
    @Entry
-   @Component
+   @ComponentV2
    struct Index {
       data: VideoPlayDataSource = new VideoPlayDataSource()
    
@@ -355,7 +372,7 @@ onTimeUpdate(key: string, callback: (time: number) => void): void
       VideoPlayData,
       VideoPlayDataSource,
       VideoSwiper
-   } from '@agctemplate/video_swiper';
+   } from 'video_swiper';
    import { media } from '@kit.MediaKit';
    import { hilog } from '@kit.PerformanceAnalysisKit';
    
@@ -435,7 +452,7 @@ onTimeUpdate(key: string, callback: (time: number) => void): void
    }
    
    @Entry
-   @Component
+   @ComponentV2
    struct Index {
       data: VideoPlayDataSource = new VideoPlayDataSource()
    

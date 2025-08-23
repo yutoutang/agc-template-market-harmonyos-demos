@@ -1,0 +1,54 @@
+{
+  "routerMap": [
+    {
+      "name": "My",
+      "pageSourceFile": "src/main/ets/pages/My.ets",
+      "buildFunction": "MyBuilder"
+    },
+    {
+      "name": "Setting",
+      "pageSourceFile": "src/main/ets/pages/Setting.ets",
+      "buildFunction": "SettingBuilder"
+    },
+    {
+      "name": "InterestTags",
+      "pageSourceFile": "src/main/ets/pages/InterestTags.ets",
+      "buildFunction": "InterestTagsBuilder"
+    },
+    {
+      "name": "AgendaCollectionList",
+      "pageSourceFile": "src/main/ets/pages/AgendaCollectionList.ets",
+      "buildFunction": "AgendaCollectionListBuilder"
+    },
+    {
+      "name": "Catering",
+      "pageSourceFile": "src/main/ets/pages/Catering.ets",
+      "buildFunction": "CateringBuilder"
+    },
+    {
+      "name": "CateringList",
+      "pageSourceFile": "src/main/ets/pages/CateringList.ets",
+      "buildFunction": "CateringListBuilder"
+    },
+    {
+      "name": "Traffic",
+      "pageSourceFile": "src/main/ets/pages/Traffic.ets",
+      "buildFunction": "TrafficBuilder"
+    },
+    {
+      "name": "Qa",
+      "pageSourceFile": "src/main/ets/pages/Qa.ets",
+      "buildFunction": "QaBuilder"
+    },
+    {
+      "name": "Maps",
+      "pageSourceFile": "src/main/ets/pages/Maps.ets",
+      "buildFunction": "MapsBuilder"
+    },
+    {
+      "name": "imagePreviewPage",
+      "pageSourceFile": "src/main/ets/pages/ImagePreview.ets",
+      "buildFunction": "ImagePreviewBuilder"
+    }
+  ]
+}

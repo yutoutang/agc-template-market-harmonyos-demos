@@ -4,6 +4,8 @@ import { INodeItem } from '../components/CommonTimeLine';
 import { nodeListData } from '../constants';
 import { ExpressStatus, getOrderInfo, IOrderInfo, RouterModule } from 'lib_foundation';
 import { RouterMap } from 'module_base';
+import { componentSnapshot } from '@kit.ArkUI';
+import { image } from '@kit.ImageKit';
 
 const DEFAULT_LATITUDE = 31.97;
 const DEFAULT_LONGITUDE = 118.75;
@@ -21,6 +23,7 @@ export class OrderInfoPageVM {
   @Trace public offsetY: number = 240;
   @Trace public positionX: number = 0;
   @Trace public positionY: number = 0;
+  @Trace public showLoadingMask: boolean = true
 
   public static get instance() {
     if (!OrderInfoPageVM._instance) {
@@ -29,12 +32,12 @@ export class OrderInfoPageVM {
     return OrderInfoPageVM._instance;
   }
 
-  public init() {
+  public init(func1: (() => ESObject), func2: (() => ESObject)) {
     const param = RouterModule.getNavParam<number>({
       url: RouterMap.ORDER_INFO_PAGE,
     });
     if (param) {
-      this.getOrderInfo(param)
+      this.getOrderInfo(param, func1, func2)
     }
   }
 
@@ -42,7 +45,7 @@ export class OrderInfoPageVM {
     this.orderInfo = undefined
   }
 
-  public async getOrderInfo(id: number) {
+  public async getOrderInfo(id: number, func1: (() => ESObject), func2: (() => ESObject)) {
     const res = await getOrderInfo({ id })
     this.orderInfo = res
     this.nodeList = nodeListData.slice(0, this.orderInfo.logisticsInfo.length)
@@ -51,18 +54,20 @@ export class OrderInfoPageVM {
       this.nodeList[i].description = this.orderInfo.logisticsInfo[i].content
     }
     this.nodeList.reverse()
+    this.showLoadingMask = false
     this.testDrivingRoutes()
     this.addMarker()
+    this.addMarkerCard(func1, func2)
   }
 
-  public initMap() {
+  public initMap(func1: (() => ESObject), func2: (() => ESObject)) {
     this.mapOptions = {
       position: {
         target: {
           latitude: DEFAULT_LATITUDE,
-          longitude: DEFAULT_LONGITUDE
+          longitude: DEFAULT_LONGITUDE,
         },
-        zoom: 10
+        zoom: 10,
       },
       rotateGesturesEnabled: true,
       scrollGesturesEnabled: true,
@@ -78,6 +83,9 @@ export class OrderInfoPageVM {
           console.info('on-mapLoad');
         }
         this.mapEventManager.on('mapLoad', callback);
+        this.testDrivingRoutes()
+        this.addMarker()
+        this.addMarkerCard(func1, func2)
       }
     };
   }
@@ -93,52 +101,94 @@ export class OrderInfoPageVM {
       destination: this.orderInfo.destination,
       // 路径的途经点
       waypoints: this.orderInfo.waypoints,
-      language: 'zh_CN'
+      language: 'zh_CN',
     };
     const result = await navi.getDrivingRoutes(params);
     this.mapController?.addPolyline({
       points: result.routes[0].overviewPolyline,
       width: 10,
-      color: 0xFFFF2737
+      color: 0xFFFF2737,
     })
     console.info('Succeeded in getting driving routes.');
   }
 
   async addMarker() {
-    const marker1 = await this.mapController?.addMarker({
-      position: this.orderInfo?.origins,
+    let markerOptions1: mapCommon.MarkerOptions = {
+      position: this.orderInfo!.origins,
+      rotation: 0,
+      visible: true,
+      zIndex: 0,
+      alpha: 1,
+      anchorU: 0.5,
+      anchorV: 0,
+      clickable: true,
+      draggable: true,
+      flat: false,
       icon: $r('app.media.ic_send_map'),
-    })
-    if (!marker1) {
-      return
-    }
-    // 设置信息窗的标题
-    marker1.setTitle('始发地');
-    // 设置信息窗的子标题
-    marker1.setSnippet(this.orderInfo?.sendPosition);
-    // 设置标记可点击
-    marker1.setClickable(true);
-    // 设置信息窗的锚点位置
-    marker1.setInfoWindowAnchor(0, 5);
-    // 设置信息窗可见
-    marker1.setInfoWindowVisible(true);
+    };
+    await this.mapController?.addMarker(markerOptions1)
 
-    const marker2 = await this.mapController?.addMarker({
-      position: this.orderInfo?.destination,
+    let markerOptions2: mapCommon.MarkerOptions = {
+      position: this.orderInfo!.destination,
+      rotation: 0,
+      visible: true,
+      zIndex: 0,
+      alpha: 1,
+      anchorU: 0.5,
+      anchorV: 0,
+      clickable: true,
+      draggable: true,
+      flat: false,
       icon: $r('app.media.ic_get_map'),
-    })
-    if (!marker2 || this.orderInfo?.expressStatus !== ExpressStatus.SIGNED_FOR) {
-      return
-    }
-    // 设置信息窗的标题
-    marker2.setTitle('已签收');
-    // 设置信息窗的子标题
-    marker2.setSnippet(this.orderInfo?.getPosition);
-    // 设置标记可点击
-    marker2.setClickable(true);
-    // 设置信息窗的锚点位置
-    marker2.setInfoWindowAnchor(0, 5);
-    // 设置信息窗可见
-    marker2.setInfoWindowVisible(true);
+    };
+    await this.mapController?.addMarker(markerOptions2)
+  }
+
+  addMarkerCard(func1: (() => ESObject) | void, func2: (() => ESObject) | void) {
+    componentSnapshot.createFromBuilder(func1,
+      async (error: Error, pixmap: image.PixelMap) => {
+        if (error) {
+          console.log('error: ' + JSON.stringify(error))
+          return;
+        }
+        // Marker初始化参数
+        let markerOptions: mapCommon.MarkerOptions = {
+          position: this.orderInfo!.origins,
+          rotation: 0,
+          visible: true,
+          zIndex: 0,
+          alpha: 1,
+          anchorU: 0.5,
+          anchorV: 1,
+          clickable: true,
+          draggable: true,
+          flat: false,
+          icon: pixmap,
+        };
+        this.mapController?.addMarker(markerOptions);
+      })
+
+    componentSnapshot.createFromBuilder(func2,
+      async (error: Error, pixmap: image.PixelMap) => {
+        if (error) {
+          console.log('error: ' + JSON.stringify(error))
+          return;
+        }
+        // Marker初始化参数
+        let markerOptions: mapCommon.MarkerOptions = {
+          position: this.orderInfo!.destination,
+          rotation: 0,
+          visible: true,
+          zIndex: 0,
+          alpha: 1,
+          anchorU: 0.5,
+          anchorV: 1,
+          clickable: true,
+          draggable: true,
+          flat: false,
+          icon: pixmap,
+        };
+        this.mapController?.addMarker(markerOptions);
+      })
   }
 }

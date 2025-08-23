@@ -1,20 +1,18 @@
 import {
-  UserInfo,
   getDataFromJSON,
-  commonToast,
   UserState,
   Constants,
   CardInfo,
-  getQuickLoginAnonymousPhone,
   MineGridInfo,
   SettingItem,
   ProgressItem,
   NavigationParams,
   DividerTmp,
-  cancelRelative,
+  AutomaticQuickLogin,
 } from 'common';
 import { PersistenceV2 } from '@kit.ArkUI';
-import { AvatarFunctionButton, CallContentBuilder, ServiceTitle, TitleBuilder } from 'components';
+import { CallContentBuilder, ServiceTitle, TitleBuilder } from 'components';
+import { AutomaticAssociationCount, UserInfo } from 'automatic_association_count'
 
 @ComponentV2
 export struct MinePage {
@@ -22,6 +20,7 @@ export struct MinePage {
   cardItems: CardInfo[] = [];
   settingItems: SettingItem[] = [];
   progressList: ProgressItem[] = []
+  @Local automaticQuickLogin: AutomaticQuickLogin = new AutomaticQuickLogin()
   @Local egDivider: DividerTmp = new DividerTmp(1, 10, 10, '#ffe9f0f0')
   @Consumer('pageInfos') pageInfos: NavPathStack = new NavPathStack();
   @Local userState: UserState = PersistenceV2.connect(UserState, () => new UserState())!;
@@ -81,7 +80,17 @@ export struct MinePage {
           /*
            * 个人信息
            * */
-          this.buildLogInSettingView()
+          AutomaticAssociationCount({
+            userInfo: this.userState.userInfo!!,
+            isLogin: this.userState.isLogin!!,
+            onLogin: (code: string) => {
+              this.automaticQuickLogin.onLogin(code)
+            },
+            onLoginOut:() => {
+              this.userState.isLogin = false
+              this.userState.userInfo = new UserInfo()
+            }
+          })
           /*
            * 办证进度
            * */
@@ -118,97 +127,6 @@ export struct MinePage {
         title: $r('app.string.mine_title'),
       })
     }
-  }
-
-  @Builder
-  buildLogInSettingView() {
-    Row() {
-      Row() {
-        if (!this.userState.isLogin) {
-          Image(
-            $r('app.media.avatar_grey'))
-            .width($r('app.float.mine_avatar_width'))
-            .height($r('app.float.mine_avatar_width'))
-            .borderRadius($r('sys.float.corner_radius_level10'))
-            .margin({ right: $r('app.float.mine_avatar_margin_right') })
-            .syncLoad(false)
-            .objectFit(ImageFit.Fill);
-        } else {
-          Column() {
-            // 声明FunctionalButton
-            AvatarFunctionButton({
-              avatarSize: 60
-            })
-          }
-        }
-        if (this.userState.isLogin) {
-          Column({ space: Constants.CONTAINER_SPACE_TEN }) {
-            Text(this.userState.userInfo.userName || $r('app.string.certification_nickname'))
-              .fontSize($r('sys.float.Subtitle_L'))
-              .fontWeight(FontWeight.Medium)
-              .fontColor($r('sys.color.font_primary'))
-            Row({ space: Constants.CONTAINER_SPACE_FIVE }) {
-              Image($r('app.media.mobile_phone'))
-                .width($r('app.float.mine_phone_width'))
-                .height($r('app.float.mine_phone_height'))
-              Text(this.userState.userInfo.phoneNumber.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2'))
-                .fontSize($r('sys.float.Body_M'))
-                .fontWeight(FontWeight.Regular)
-                .fontColor($r('sys.color.font_secondary'))
-            }
-          }.width(Constants.THIRTY_PERCENT_WIDTH).alignItems(HorizontalAlign.Start)
-        }
-        if (!this.userState.isLogin) {
-          Text($r('app.string.not_associated'))
-            .fontSize($r('sys.float.Subtitle_L'))
-            .fontWeight(FontWeight.Medium)
-            .fontColor($r('sys.color.font_secondary'))
-        }
-      };
-
-      Row({ space: Constants.CONTAINER_SPACE_FIVE }) {
-        Image($r('app.media.link')).width($r('app.float.mine_link_width')).height($r('app.float.mine_link_height'))
-        Text(this.userState.isLogin ? $r('app.string.disassociate') : $r('app.string.associated_account'))
-          .fontColor(this.userState.isLogin ? $r('sys.color.font_on_primary') : $r('sys.color.font_emphasize'))
-          .fontSize($r('sys.float.Caption_M'))
-          .fontWeight(FontWeight.Regular)
-      }
-      .backgroundColor(this.userState.isLogin ? $r('sys.color.comp_background_emphasize') :
-      $r('sys.color.comp_background_tertiary'))
-      .borderRadius(Constants.RADIUS_FIFTEEN)
-      .padding($r('app.float.mine_link_padding'))
-      .onClick(() => {
-        if (this.userState.isLogin) {
-          /*
-           * 解除关联
-           * */
-          commonToast.show({
-            type: 'dialog',
-            hasTitle: '账号解除关联',
-            message: $r('app.string.sure_release'),
-            confirmAction: () => {
-              cancelRelative(getContext(this), (state: string) => {
-                if (state === 'succeeded') {
-                  this.userState.isLogin = false
-                  this.userState.userInfo = new UserInfo()
-                }
-              })
-              commonToast.hide()
-            },
-          })
-          return
-        }
-        getQuickLoginAnonymousPhone(getContext(this), (isLogin: boolean, userInfo: UserInfo) => {
-          this.userState.isLogin = isLogin
-          this.userState.userInfo = userInfo
-        })
-      })
-    }
-    .width(Constants.FULL_PERCENT_WIDTH)
-    .margin({ top: $r('app.float.mine_link_margin_top') })
-    .padding({ left: 8, right: $r('app.float.mine_link_padding_right') })
-    .alignItems(VerticalAlign.Center)
-    .justifyContent(FlexAlign.SpaceBetween)
   }
 
   @Builder

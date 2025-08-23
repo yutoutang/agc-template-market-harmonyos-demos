@@ -1,0 +1,24 @@
+{
+  "routerMap": [
+    {
+      "name": "ActivePage",
+      "pageSourceFile": "src/main/ets/pages/ActivePage.ets",
+      "buildFunction": "ActivePageBuilder"
+    },
+    {
+      "name": "ActiveDetail",
+      "pageSourceFile": "src/main/ets/pages/ActiveDetail.ets",
+      "buildFunction": "ActiveDetailBuilder"
+    },
+    {
+      "name": "JoinActivePage",
+      "pageSourceFile": "src/main/ets/pages/JoinActivePage.ets",
+      "buildFunction": "JoinActivePageBuilder"
+    },
+    {
+      "name": "ActiveSuccess",
+      "pageSourceFile": "src/main/ets/pages/ActiveSuccess.ets",
+      "buildFunction": "ActiveSuccessBuilder"
+    }
+  ]
+}

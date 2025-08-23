@@ -39,14 +39,6 @@
       "data": {
         "description": "this is BuyInfoBuilder"
       }
-    },
-    {
-      "name": "TicketOwner",
-      "pageSourceFile": "src/main/ets/pages/TicketOwner.ets",
-      "buildFunction": "TicketOwnerBuilder",
-      "data": {
-        "description": "this is TicketOwnerBuilder"
-      }
     }
 
 

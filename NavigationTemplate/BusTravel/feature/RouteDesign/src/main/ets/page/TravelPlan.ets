@@ -16,17 +16,17 @@ class LineStartEnd {
   endStation = ''
 }
 
-@Component
+@ComponentV2
 export struct TravelPlan {
-  @Consume('busLineTimeList') busLineTimeList: Map<string, RandomCountdown>
+  @Consumer('busLineTimeList') busLineTimeList: Map<string, RandomCountdown> = new Map()
   vm: RouteEntryVM = RouteEntryVM.instance
-  @State listInfoItem: Array<SearchSet> = []
-  @State startText: string = '' // 起点
-  @State endText: string = '' //终点
-  @State searchListInfoItem: Array<SearchSet> = [] // 传入的查询总数据
-  @State sameLines: Array<LineStartEnd> = []
-  @State stationNameList: Array<string> = [] // 传入搜索页面进行站点查询
-  @State lineInfo: LineInfo[] = []
+  @Local listInfoItem: Array<SearchSet> = []
+  @Local startText: string = '' // 起点
+  @Local endText: string = '' //终点
+  @Local searchListInfoItem: Array<SearchSet> = [] // 传入的查询总数据
+  @Local sameLines: Array<LineStartEnd> = []
+  @Local stationNameList: Array<string> = [] // 传入搜索页面进行站点查询
+  @Local lineInfo: LineInfo[] = []
 
   aboutToAppear(): void {
     this.initDataSource()

@@ -1,8 +1,8 @@
-import { httpsMock } from './HttpRequestApiMock';
 import { promptAction } from '@kit.ArkUI';
 import { Logger } from 'commonlib';
-import { BaseResponse } from '../types/BaseResponse';
 import { RequestUrlMap } from '../apis/RequestUrlMap';
+import { BaseResponse } from '../types/BaseResponse';
+import { httpsMock } from './HttpRequestApiMock';
 
 type MockMap = Record<string, (...args: ESObject[]) => Promise<BaseResponse>>;
 
@@ -39,6 +39,7 @@ const mockMap: MockMap = {
   [RequestUrlMap.ORDER_LIST]: httpsMock.getOrderList,
   [RequestUrlMap.ORDER_DETAIL_HOTEL]: httpsMock.getHotelOrderDetail,
   [RequestUrlMap.ORDER_DETAIL_MEAL]: httpsMock.getMealOrderDetail,
+  [RequestUrlMap.ORDER_CANCEL]: httpsMock.cancelPayment,
   /**
    * 酒店预订
    */

@@ -1,0 +1,332 @@
+{
+  "mock_data": [
+    {
+      "paramId": "290814",
+      "name": "我所在的区域",
+      "isDefault": "0",
+      "createTime": 1747906122,
+      "dicId": "290813",
+      "child": {
+        "283648": [
+          {
+            "paramId": "283649",
+            "name": "大广场",
+            "isDefault": "0",
+            "createTime": 1715219591,
+            "dicId": "283648",
+            "child": []
+          },
+          {
+            "paramId": "283650",
+            "name": "溪流村庄",
+            "isDefault": "0",
+            "createTime": 1715219591,
+            "dicId": "283648",
+            "child": []
+          }
+        ]
+      }
+    },
+    {
+      "paramId": "290815",
+      "name": "会议类型大广场",
+      "isDefault": "0",
+      "createTime": 1747906122,
+      "dicId": "290813",
+      "child": {
+        "283707": [
+          {
+            "paramId": "290823",
+            "name": "鸿蒙生态峰会",
+            "isDefault": "0",
+            "createTime": 1747986379,
+            "dicId": "283707",
+            "child": []
+          },
+          {
+            "paramId": "290824",
+            "name": "开发者主题演讲",
+            "isDefault": "0",
+            "createTime": 1747986379,
+            "dicId": "283707",
+            "child": []
+          },
+          {
+            "paramId": "290825",
+            "name": "HarmonyOS 公开课",
+            "isDefault": "0",
+            "createTime": 1747986379,
+            "dicId": "283707",
+            "child": []
+          },
+          {
+            "paramId": "290826",
+            "name": "专题论坛（大广场）",
+            "isDefault": "0",
+            "createTime": 1747986379,
+            "dicId": "283707",
+            "child": []
+          }
+        ]
+      }
+    },
+    {
+      "paramId": "290816",
+      "name": "技术领域",
+      "isDefault": "0",
+      "createTime": 1747906122,
+      "dicId": "290813",
+      "child": {
+        "290734": [
+          {
+            "paramId": "290997",
+            "name": "HarmonyOS",
+            "isDefault": "0",
+            "createTime": 1749003668,
+            "dicId": "290734",
+            "child": []
+          },
+          {
+            "paramId": "290998",
+            "name": "工程能力",
+            "isDefault": "0",
+            "createTime": 1749003668,
+            "dicId": "290734",
+            "child": []
+          },
+          {
+            "paramId": "290999",
+            "name": "应用开发",
+            "isDefault": "0",
+            "createTime": 1749003668,
+            "dicId": "290734",
+            "child": []
+          },
+          {
+            "paramId": "291000",
+            "name": "开发者工具",
+            "isDefault": "0",
+            "createTime": 1749003668,
+            "dicId": "290734",
+            "child": []
+          },
+          {
+            "paramId": "291001",
+            "name": "AI",
+            "isDefault": "0",
+            "createTime": 1749003668,
+            "dicId": "290734",
+            "child": []
+          },
+          {
+            "paramId": "291002",
+            "name": "人才赋能",
+            "isDefault": "0",
+            "createTime": 1749003668,
+            "dicId": "290734",
+            "child": []
+          },
+          {
+            "paramId": "291003",
+            "name": "CloudMatrix",
+            "isDefault": "0",
+            "createTime": 1749003668,
+            "dicId": "290734",
+            "child": []
+          },
+          {
+            "paramId": "291004",
+            "name": "芯片AI云服务",
+            "isDefault": "0",
+            "createTime": 1749003668,
+            "dicId": "290734",
+            "child": []
+          },
+          {
+            "paramId": "291005",
+            "name": "超级大模型",
+            "isDefault": "0",
+            "createTime": 1749003668,
+            "dicId": "290734",
+            "child": []
+          },
+          {
+            "paramId": "291006",
+            "name": "具身智能",
+            "isDefault": "0",
+            "createTime": 1749003668,
+            "dicId": "290734",
+            "child": []
+          },
+          {
+            "paramId": "291007",
+            "name": "行业AI创新",
+            "isDefault": "0",
+            "createTime": 1749003668,
+            "dicId": "290734",
+            "child": []
+          },
+          {
+            "paramId": "291008",
+            "name": "PaaS",
+            "isDefault": "0",
+            "createTime": 1749003668,
+            "dicId": "290734",
+            "child": []
+          },
+          {
+            "paramId": "291009",
+            "name": "隐私与安全",
+            "isDefault": "0",
+            "createTime": 1749003668,
+            "dicId": "290734",
+            "child": []
+          },
+          {
+            "paramId": "291010",
+            "name": "内容合作",
+            "isDefault": "0",
+            "createTime": 1749003668,
+            "dicId": "290734",
+            "child": []
+          },
+          {
+            "paramId": "291011",
+            "name": "统一生态",
+            "isDefault": "0",
+            "createTime": 1749003668,
+            "dicId": "290734",
+            "child": []
+          },
+          {
+            "paramId": "291012",
+            "name": "aPaaS",
+            "isDefault": "0",
+            "createTime": 1749003668,
+            "dicId": "290734",
+            "child": []
+          },
+          {
+            "paramId": "291013",
+            "name": "计算",
+            "isDefault": "0",
+            "createTime": 1749003668,
+            "dicId": "290734",
+            "child": []
+          },
+          {
+            "paramId": "291014",
+            "name": "存储",
+            "isDefault": "0",
+            "createTime": 1749003668,
+            "dicId": "290734",
+            "child": []
+          }
+        ]
+      }
+    },
+    {
+      "paramId": "290817",
+      "name": "会议类型小山村",
+      "isDefault": "0",
+      "createTime": 1747906122,
+      "dicId": "290813",
+      "child": {
+        "283708": [
+          {
+            "paramId": "290820",
+            "name": "高峰论坛",
+            "isDefault": "0",
+            "createTime": 1747986321,
+            "dicId": "283708",
+            "child": []
+          },
+          {
+            "paramId": "290821",
+            "name": "专题论坛（溪流村庄）",
+            "isDefault": "0",
+            "createTime": 1747986321,
+            "dicId": "283708",
+            "child": []
+          },
+          {
+            "paramId": "290822",
+            "name": "开放演讲",
+            "isDefault": "0",
+            "createTime": 1747986321,
+            "dicId": "283708",
+            "child": []
+          }
+        ]
+      }
+    },
+    {
+      "paramId": "290818",
+      "name": "会议类型全部",
+      "isDefault": "0",
+      "createTime": 1747906122,
+      "dicId": "290813",
+      "child": {
+        "290752": [
+          {
+            "paramId": "290921",
+            "name": "鸿蒙生态峰会",
+            "isDefault": "0",
+            "createTime": 1748595164,
+            "dicId": "290752",
+            "child": []
+          },
+          {
+            "paramId": "290924",
+            "name": "专题论坛（大广场）",
+            "isDefault": "0",
+            "createTime": 1748595164,
+            "dicId": "290752",
+            "child": []
+          },
+          {
+            "paramId": "290927",
+            "name": "开放演讲",
+            "isDefault": "0",
+            "createTime": 1748595164,
+            "dicId": "290752",
+            "child": []
+          },
+          {
+            "paramId": "290929",
+            "name": "高峰论坛",
+            "isDefault": "0",
+            "createTime": 1748595164,
+            "dicId": "290752",
+            "child": []
+          },
+          {
+            "paramId": "290931",
+            "name": "专题论坛（溪流村庄）",
+            "isDefault": "0",
+            "createTime": 1748595164,
+            "dicId": "290752",
+            "child": []
+          },
+          {
+            "paramId": "290934",
+            "name": "开发者主题演讲",
+            "isDefault": "0",
+            "createTime": 1748595164,
+            "dicId": "290752",
+            "child": []
+          },
+          {
+            "paramId": "290996",
+            "name": "HarmonyOS 公开课",
+            "isDefault": "0",
+            "createTime": 1749003175,
+            "dicId": "290752",
+            "child": []
+          }
+        ]
+      }
+    }
+  ]
+
+}

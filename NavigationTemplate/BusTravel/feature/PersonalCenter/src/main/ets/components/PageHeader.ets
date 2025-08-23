@@ -1,9 +1,9 @@
 import { RouteEntryVM } from 'common'
 
-@Component
+@ComponentV2
 export struct PageHeader {
   vm: RouteEntryVM = RouteEntryVM.instance;
-  @State name: string = '';
+  @Local name: string = '';
 
   build() {
     Row() {

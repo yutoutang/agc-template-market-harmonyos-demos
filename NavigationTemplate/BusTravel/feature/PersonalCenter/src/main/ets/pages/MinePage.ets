@@ -2,7 +2,8 @@ import { FunctionalButton, functionalButtonComponentManager } from '@hms.core.at
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { call, observer } from '@kit.TelephonyKit';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { CardInfoList, getDataFromJSON, RouteEntryVM, UserInfo } from 'common'
+import { AppStorageV2 } from '@kit.ArkUI'
+import { CardInfoList, getDataFromJSON, Logger, RouteEntryVM, UserInfoModel,Common } from 'common'
 import { SettingItem } from '../model/SettingItem'
 
 
@@ -11,18 +12,13 @@ export function MinePageBuilder() {
   MinePage()
 }
 
-@Component
+@ComponentV2
 export struct MinePage {
   settingItems: Array<SettingItem> = [];
-  @StorageLink('isLogin') isLogin: boolean = AppStorage.get('isLogin') ?? false;
-  @StorageLink('userInfo') userInfo: UserInfo = AppStorage.get('userInfo') ?? new UserInfo();
-  @StorageLink('nickNameValue') nickNameValue: string = '华为用户';
-  @StorageLink('avatarUri') avatarUri: ResourceStr = $r('app.media.hd_un_login');
-  @State url: ResourceStr = $r('app.media.iconface');
+  @Local userInfo: UserInfoModel = AppStorageV2.connect(UserInfoModel, 'UserInfoModel', () => new UserInfoModel())!
   vm: RouteEntryVM = RouteEntryVM.instance;
-  @State isShow: Boolean = false;
-  @State phoneNumber: number = 12312341234
-  @State cardInfo: CardInfoList = new CardInfoList()
+  @Local isShow: Boolean = false;
+  @Local cardInfo: CardInfoList = new CardInfoList()
 
   initDataSource() {
     this.settingItems = getDataFromJSON<SettingItem>('MinePage-SettingItems.json', this);
@@ -81,7 +77,7 @@ export struct MinePage {
       .justifyContent(FlexAlign.Center)
       .backgroundColor($r('sys.color.comp_background_tertiary'))
       .onClick(() => {
-        if (this.isLogin === false) {
+        if (this.userInfo.isLogin === false) {
           this.vm.toRouteDetail('Login')
         } else {
           this.vm.toRouteDetail('SettingsPage')
@@ -100,7 +96,7 @@ export struct MinePage {
     Row() {
       Row() {
         // 声明FunctionalButton
-        if (this.isLogin === false) {
+        if (this.userInfo.isLogin === false) {
           Image($r('app.media.hd_un_login'))
             .width($r('app.integer.hd_width'))
             .height($r('app.integer.hd_width'))
@@ -118,7 +114,7 @@ export struct MinePage {
               styleOption: {
                 styleConfig: new functionalButtonComponentManager.ButtonConfig()
                   .type(ButtonType.Normal)
-                  .backgroundImage(this.avatarUri)
+                  .backgroundImage(this.userInfo.avatarUri)
                   .backgroundImageSize(ImageSize.Cover)
                   .width($r('app.integer.hd_width'))
                   .height($r('app.integer.hd_width'))
@@ -136,17 +132,17 @@ export struct MinePage {
               }
               // 成功日志处理
               hilog.info(0x0000, 'testTag', 'succeeded in choosing avatar');
-              this.avatarUri = data.avatarUri!;
+              this.userInfo.avatarUri = data.avatarUri!;
             })
           })
             .margin({ right: '8vp' })
         }
 
 
-        if (this.isLogin) {
-          if (this.nickNameValue) {
+        if (this.userInfo.isLogin) {
+          if (this.userInfo.nickName) {
             Column() {
-              Text(this.nickNameValue)
+              Text(this.userInfo.nickName)
                 .fontColor($r('sys.color.black'))
                 .fontSize('16vp')
                 .fontWeight(FontWeight.Bold);
@@ -175,7 +171,7 @@ export struct MinePage {
         .width(24)
         .margin({left:15})
         .onClick(()=>{
-          if (this.isLogin === false) {
+          if (this.userInfo.isLogin === false) {
             this.vm.toRouteDetail('Login')
           }else{
             this.vm.toRouteDetail('PersonalSetting')
@@ -200,7 +196,7 @@ export struct MinePage {
             Text('我的钱包')
               .fontSize('16vp')
               .margin({ bottom: '2vp' })
-            if (this.isLogin) {
+            if (this.userInfo.isLogin) {
               Text() {
                 Span(this.cardInfo.balance.toString())
                 Span('元')
@@ -210,23 +206,23 @@ export struct MinePage {
             } else {
               Text('  ')
                 .fontColor('#ED6F21')
-                .fontSize('12vp')
+                .fontSize('12fp')
             }
           }
           .alignItems(HorizontalAlign.Start)
-          .margin({ left: '12vp' })
+          .margin({ left: '12lpx' })
 
           Image($r('app.media.path'))
             .width('25vp')
             .height('25vp')
             .margin({ left: '32vp' })
         }
-        .width(156)
+        .width('156lpx')
         .height(65)
         .borderRadius(12)
         .backgroundColor($r('app.color.background_color_white'))
         .onClick(() => {
-          if (this.isLogin === false) {
+          if (this.userInfo.isLogin === false) {
             this.vm.toRouteDetail('Login')
           } else {
             this.vm.toRouteDetail('MineWallet')
@@ -237,7 +233,7 @@ export struct MinePage {
           Column() {
             Text('我的订单')
               .fontSize('16vp')
-              .margin({ bottom: '2vp' })
+              .margin({ bottom: '2lpx' })
             Text('查看出行记录')
               .fontColor('#ff454545')
               .fontSize('12vp')
@@ -251,12 +247,12 @@ export struct MinePage {
             .margin({ left: '32vp' })
 
         }
-        .width(156)
+        .width('156lpx')
         .height(65)
         .borderRadius(12)
         .backgroundColor($r('app.color.background_color_white'))
         .onClick(() => {
-          if (this.isLogin === false) {
+          if (this.userInfo.isLogin === false) {
             this.vm.toRouteDetail('Login')
           } else {
             this.vm.toRouteDetail('MyOrder')
@@ -275,7 +271,7 @@ export struct MinePage {
   @Builder
   buildSettingsView() {
     Text('帮助中心')
-      .fontSize('18lpx')
+      .fontSize(18)
       .fontWeight(500)
       .margin({ top: '24lpx', bottom: '8lpx' })
     Column() {
@@ -298,7 +294,7 @@ export struct MinePage {
       .justifyContent(FlexAlign.SpaceBetween)
       .alignItems(VerticalAlign.Center)
       .onClick(() => {
-        if (this.isLogin === false) {
+        if (this.userInfo.isLogin === false) {
           this.vm.toRouteDetail('Login')
         } else {
           this.vm.toRouteDetail('SettingsPage')
@@ -332,7 +328,7 @@ export struct MinePage {
         height: 270,
         blurStyle: BlurStyle.Thick,
         showClose: false,
-        preferType: SheetType.CENTER,
+        preferType: SheetType.BOTTOM,
       })
 
       Divider()
@@ -403,7 +399,7 @@ export struct MinePage {
 
 
       Column(){
-        Text(this.phoneNumber.toString())
+        Text(Common.SERVICE_PHONE)
           .fontSize(18)
           .fontWeight(FontWeight.Medium)
 
@@ -427,11 +423,11 @@ export struct MinePage {
           let isSupport = call.hasVoiceCapability();
           if (isSupport) {
             // 如果设备支持呼叫能力，则继续跳转到拨号界面，并显示拨号的号码
-            call.makeCall(this.phoneNumber.toString(), (err: BusinessError) => {
+            call.makeCall(Common.SERVICE_PHONE, (err: BusinessError) => {
               if (!err) {
-                console.log('make call success.');
+                Logger.info('make call success.');
               } else {
-                console.log('make call fail, err is:' + JSON.stringify(err));
+                Logger.info('make call fail, err is:' + JSON.stringify(err));
               }
             });
 
@@ -447,7 +443,7 @@ export struct MinePage {
 
             let slotId: SlotId = { slotId: 0 }
             observer.on('callStateChange', slotId, (data: CallStateCallback) => {
-              console.log('call state change, data is:' + JSON.stringify(data));
+              Logger.info('call state change, data is:' + JSON.stringify(data));
             });
           }
         })

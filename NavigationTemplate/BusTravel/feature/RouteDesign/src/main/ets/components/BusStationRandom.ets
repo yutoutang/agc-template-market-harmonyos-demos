@@ -1,5 +1,5 @@
-import { getDataFromJSON } from 'common'
 import { cryptoFramework } from '@kit.CryptoArchitectureKit';
+import { getDataFromJSON } from 'common'
 import { SearchSet } from 'route_detail'
 
 export function generateRandomNumber(minNum: number, maxNum: number): number {

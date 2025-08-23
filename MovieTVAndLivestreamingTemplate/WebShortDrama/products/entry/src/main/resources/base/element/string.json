@@ -35,6 +35,10 @@
     {
       "name": "detail_immersive",
       "value": "海量热门短剧随心看"
+    },
+    {
+      "name": "agcit_huawei_web_short_drama",
+      "value": "2.0.0"
     }
   ]
 }

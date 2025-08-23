@@ -1,4 +1,5 @@
 import { BalanceChangeType, BalanceResourceItemModel, BalanceResourceModel } from 'bill_base';
+import { BreakpointStorage, BreakpointSystem, BreakpointTypeEnum } from 'commonlib';
 
 const NO_FILTER_TYPE = -1;
 
@@ -12,10 +13,19 @@ export struct TypeFilterSheet {
   checkedResource: number = NO_FILTER_TYPE;
   @Local
   checkedType: BalanceChangeType = BalanceChangeType.EXPENSE;
+  @Local curBreakpoint: BreakpointStorage = BreakpointSystem.currentBreakpoint
   @Event
   handleCancel: () => void;
   @Event
   handleConfirm: (type: BalanceChangeType, key: number) => void;
+
+  @Computed
+  get typeGridTemplate() {
+    if (this.curBreakpoint.value === BreakpointTypeEnum.SM) {
+      return '1fr 1fr 1fr 1fr'
+    }
+    return '1fr 1fr 1fr 1fr 1fr 1fr'
+  }
 
   aboutToAppear(): void {
     if (this.initResource) {
@@ -72,7 +82,8 @@ export struct TypeFilterSheet {
             this.handleConfirm?.(this.checkedType, this.checkedResource);
           });
       }
-      .width($r('app.string.width_percent_full'));
+      .width($r('app.string.width_percent_full'))
+      .margin({ bottom: $r('app.string.space_l') })
     }
     .padding($r('app.string.space_l'))
     .height($r('app.string.height_percent_full'));
@@ -106,7 +117,7 @@ export struct TypeFilterSheet {
           });
         }, (item: BalanceResourceItemModel) => item.key + '__' + item.name);
       }
-      .columnsTemplate('1fr 1fr 1fr 1fr')
+      .columnsTemplate(this.typeGridTemplate)
       .columnsGap($r('app.string.space_s'))
       .rowsGap($r('app.string.space_s'));
     }

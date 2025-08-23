@@ -1,6 +1,6 @@
 @ComponentV2
 export struct CommonDivider {
-  @Param color: ResourceColor = $r('app.color.system_color_grey_level2');
+  @Param color: ResourceColor = $r('app.color.divider_color');
 
   @Param strokeWidth: string | number = 1;
 

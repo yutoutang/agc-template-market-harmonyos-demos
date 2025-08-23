@@ -1,4 +1,4 @@
-import { AbilityConstant, UIAbility, Want } from '@kit.AbilityKit';
+import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { AppStorageV2, display, window } from '@kit.ArkUI';
 import { GlobalContext, Logger, WindowManager } from '@agctemplate/utils';
 import {
@@ -9,6 +9,7 @@ import {
   DEFAULT_STATUS_BAR_HEIGHT,
   StatusBarHeight
 } from '@agctemplate/widgets';
+import { emitter } from '@kit.BasicServicesKit';
 
 const TAG = 'EntryAbility'
 
@@ -23,6 +24,9 @@ export default class EntryAbility extends UIAbility {
 
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     Logger.info(TAG, 'Ability onCreate');
+    let applicationContext = this.context.getApplicationContext();
+    applicationContext.setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT);
+
     this.contextInit();
   }
 
@@ -56,11 +60,31 @@ export default class EntryAbility extends UIAbility {
 
   onForeground(): void {
     // Ability has brought to foreground
+    let event: emitter.InnerEvent = {
+      eventId: 2
+    };
+    let eventData: emitter.EventData = {
+      data: {
+        content: 'foreground',
+        id: 2
+      }
+    };
+    emitter.emit(event, eventData);
     Logger.info(TAG, 'Ability onForeground');
   }
 
   onBackground(): void {
     // Ability has back to background
+    let event: emitter.InnerEvent = {
+      eventId: 1
+    };
+    let eventData: emitter.EventData = {
+      data: {
+        content: 'background',
+        id: 1
+      }
+    };
+    emitter.emit(event, eventData);
     Logger.info(TAG, 'Ability onBackground');
   }
 

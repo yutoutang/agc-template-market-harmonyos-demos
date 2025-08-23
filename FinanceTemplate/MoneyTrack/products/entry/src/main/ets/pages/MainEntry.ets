@@ -3,7 +3,7 @@ import { TAB_LIST } from '../common/Constants';
 import { HomeView } from 'home';
 import { StatisticsView } from 'statistics';
 import { AssetsView } from 'assets';
-import { TabIndexMap } from 'commonlib';
+import { BreakpointSystem, TabIndexMap } from 'commonlib';
 
 
 @Entry
@@ -63,6 +63,7 @@ struct MainEntry {
 
   async aboutToAppear() {
     await this.vm.initData();
+    BreakpointSystem.register(this.getUIContext())
   }
 
   aboutToDisappear(): void {

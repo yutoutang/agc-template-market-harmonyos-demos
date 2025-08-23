@@ -1,9 +1,8 @@
-import { dayList, payMethodList } from '../constants'
 import { ExpressPageVM } from '../viewModels/ExpressPageVM'
 import { CustomContentDialog } from '@kit.ArkUI'
 import { ITime } from '../types'
 import { CommonButton, CommonCoupon, CommonTitle, Coupon, RouterModule } from 'lib_foundation'
-import { RouterMap, IBuilderType, ISetting } from 'module_base'
+import { RouterMap, IBuilderType, ISetting, payMethodList } from 'module_base'
 
 @ComponentV2
 export struct HomeVisit {
@@ -20,7 +19,7 @@ export struct HomeVisit {
       topLeft: 32,
       topRight: 32,
       bottomLeft: 0,
-      bottomRight: 0
+      bottomRight: 0,
     },
     alignment: DialogAlignment.Bottom,
   })
@@ -36,7 +35,7 @@ export struct HomeVisit {
       topLeft: 32,
       topRight: 32,
       bottomLeft: 0,
-      bottomRight: 0
+      bottomRight: 0,
     },
     alignment: DialogAlignment.Bottom,
   })
@@ -52,7 +51,7 @@ export struct HomeVisit {
       topLeft: 32,
       topRight: 32,
       bottomLeft: 0,
-      bottomRight: 0
+      bottomRight: 0,
     },
     alignment: DialogAlignment.Bottom,
   })
@@ -68,7 +67,7 @@ export struct HomeVisit {
       topLeft: 32,
       topRight: 32,
       bottomLeft: 0,
-      bottomRight: 0
+      bottomRight: 0,
     },
     alignment: DialogAlignment.Bottom,
   })
@@ -90,7 +89,7 @@ export struct HomeVisit {
             }
             this.vm.isFresh = false
             RouterModule.push({ url: RouterMap.GOODS_PAGE, param: true })
-          }
+          },
         })
         this.contentBuilder({
           label: '选择快递',
@@ -107,7 +106,7 @@ export struct HomeVisit {
             const value = this.vm.companyPickerList[0]
             this.vm.tempCompany = value
             this.expressDialogController.open()
-          }
+          },
         })
         this.contentBuilder({
           label: '期望上门时间',
@@ -124,7 +123,7 @@ export struct HomeVisit {
             this.vm.tempDay = this.vm.dayList[0].text
             this.vm.tempTime = this.vm.timePickerList[0]
             this.timeDialogController.open()
-          }
+          },
         })
         this.contentBuilder({
           label: '付款方式',
@@ -141,7 +140,7 @@ export struct HomeVisit {
             const value = payMethodList[0].text
             this.vm.tempPayMethod = value
             this.priceDialogController.open()
-          }
+          },
         })
         this.contentBuilder({
           label: '优惠券',
@@ -156,7 +155,7 @@ export struct HomeVisit {
               return
             }
             this.couponDialogController.open()
-          }
+          },
         })
       }
       .padding({ top: 12, left: 12, right: 12 })
@@ -213,31 +212,35 @@ export struct HomeVisit {
   @Builder
   expressBuilder(): void {
     Column() {
-      Scroll() {
-        Column() {
-          this.titleBuilder('选择快递', () => {
-            this.expressDialogController.close()
-          })
-
-          TextPicker({ range: this.vm.companyPickerList, selected: this.vm.selectedCompanyIndex })
-            .onChange((value) => {
-              this.vm.tempCompany = value as string
-            })
-          this.buttonBuilder(
-            () => {
+      Column() {
+        Scroll() {
+          Column() {
+            this.titleBuilder('选择快递', () => {
               this.expressDialogController.close()
-            }, () => {
-            this.vm.selectedCompany = this.vm.tempCompany
-            this.vm.getEstimatedPrice()
-            this.vm.selectedCompanyIndex = this.vm.getSelectedIndex(this.vm.tempCompany, this.vm.companyPickerList)
-            this.expressDialogController.close()
+            })
+            TextPicker({ range: this.vm.companyPickerList, selected: this.vm.selectedCompanyIndex })
+              .onChange((value) => {
+                this.vm.tempCompany = value as string
+              })
+
+            this.buttonBuilder(
+              () => {
+                this.expressDialogController.close()
+              },
+              () => {
+                this.vm.selectedCompany = this.vm.tempCompany
+                this.vm.getEstimatedPrice()
+                this.vm.selectedCompanyIndex = this.vm.getSelectedIndex(this.vm.tempCompany, this.vm.companyPickerList)
+                this.expressDialogController.close()
+              },
+            )
           }
-          )
+          .width('100%')
+          .padding({ bottom: 28 })
         }
-        .width('100%')
-        .padding({ bottom: 28 })
+        .scrollBar(BarState.Off)
+        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
       }
-      .scrollBar(BarState.Off)
     }
   }
 
@@ -294,24 +297,25 @@ export struct HomeVisit {
             this.vm.selectedDayIndex = this.vm.getSelectedSettingIndex(this.vm.tempDay, this.vm.dayList)
             this.vm.getEstimatedPrice()
             this.timeDialogController.close()
-          }
+          },
           )
         }
         .width('100%')
         .padding({ bottom: 28 })
       }
       .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
     }
   }
 
   @Builder
   priceBuilder(): void {
     Column() {
-      this.titleBuilder('付款方式', () => {
-        this.priceDialogController.close()
-      })
       Scroll() {
         Column() {
+          this.titleBuilder('付款方式', () => {
+            this.priceDialogController.close()
+          })
           TextPicker({ range: payMethodList, selected: this.vm.selectedPayMethodIndex })
             .onChange((value) => {
               this.vm.tempPayMethod = value as string
@@ -324,13 +328,14 @@ export struct HomeVisit {
             this.vm.selectedPayMethodIndex = this.vm.getSelectedSettingIndex(this.vm.tempPayMethod, payMethodList)
             this.priceDialogController.close()
             this.vm.getEstimatedPrice()
-          }
+          },
           )
         }
         .width('100%')
         .padding({ bottom: 28 })
       }
       .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
     }
   }
 
@@ -342,24 +347,35 @@ export struct HomeVisit {
         this.couponDialogController.close()
       })
 
-      List() {
-        ForEach(this.vm.couponList, (coupon: Coupon) => {
-          ListItem() {
-            CommonCoupon({
-              isVip: false,
-              coupon: coupon,
-              couponDialogController: this.couponDialogController,
-              onChange: (coupon) => {
-                this.vm.selectedCoupon = coupon
-                this.vm.couponName = coupon?.name!!
-              }
-            })
-          }
-          .margin({ bottom: 14 })
-        }, (item: Coupon[]) => JSON.stringify(item))
+      if (this.vm.couponList.length === 0) {
+        Column() {
+          Text('暂无优惠券')
+            .fontSize(16)
+            .fontWeight(FontWeight.Regular)
+            .fontColor($r('sys.color.font_tertiary'))
+        }
+        .layoutWeight(1)
+      } else {
+        List() {
+          ForEach(this.vm.couponList, (coupon: Coupon) => {
+            ListItem() {
+              CommonCoupon({
+                isVip: false,
+                coupon: coupon,
+                couponDialogController: this.couponDialogController,
+                onChange: (coupon) => {
+                  this.vm.selectedCoupon = coupon
+                  this.vm.couponName = coupon?.name!!
+                },
+              })
+            }
+            .margin({ bottom: 14 })
+          }, (item: Coupon[]) => JSON.stringify(item))
+        }
+        .layoutWeight(1)
+        .scrollBar(BarState.Off)
+        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
       }
-      .layoutWeight(1)
-      .scrollBar(BarState.Off)
     }
     .width('100%')
     .padding({ bottom: 28 })

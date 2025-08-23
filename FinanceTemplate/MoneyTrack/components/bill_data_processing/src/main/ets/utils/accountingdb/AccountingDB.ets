@@ -10,7 +10,7 @@ import {
   TableQueryWithPaginationRsp,
   TableSchema,
 } from '../basedb/Types';
-import { Logger } from '../Logger';
+import { Logger } from 'bill_base';
 import { AccountingDBConstants } from './Constants';
 import {
   AccountTableFields,

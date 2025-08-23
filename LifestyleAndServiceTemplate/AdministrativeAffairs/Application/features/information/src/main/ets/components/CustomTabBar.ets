@@ -19,7 +19,7 @@ export struct CustomTabBar {
             Divider()
               .height($r('app.float.information_title_divider_height'))
               .width($r('app.float.information_title_divider_width'))
-              .color($r('sys.color.background_emphasize'))
+              .color($r('sys.color.comp_background_emphasize'))
               .visibility(this.currentIndex === index ? Visibility.Visible : Visibility.None)
           }.onClick(() => {
             this.currentIndexChange(index);

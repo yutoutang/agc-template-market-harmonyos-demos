@@ -20,14 +20,18 @@ export class WindowManager {
    * @param isFullScreen
    * @returns
    */
-  public static async setVideoFullScreen(videoFullScreen: boolean): Promise<void> {
+  public static async setVideoFullScreen(videoFullScreen: boolean, videoWidth: number, videoHeight: number): Promise<void> {
     WindowManager.videoFullScreen = videoFullScreen;
     let w = this.windowStage?.getMainWindowSync();
     if (!w) {
       return;
     }
     try {
-      await w.setWindowSystemBarEnable(videoFullScreen ? [] : ['status', 'navigation'])
+      await w.setWindowSystemBarEnable(videoFullScreen ? [] : ['status', 'navigation']);
+
+      const videoAspectRatio = videoWidth / videoHeight;
+      const isLandscapeVideo = videoAspectRatio > 1;
+
       // 折叠屏
       if (display.isFoldable()) {
         if (display.getFoldStatus() === display.FoldStatus.FOLD_STATUS_FOLDED) {
@@ -38,9 +42,17 @@ export class WindowManager {
         }
         return;
       }
-      // 直板机
+      // 直板机：根据视频比例决定是否允许旋转
       if (DeviceUtil.isPhone()) {
-        await w.setPreferredOrientation(videoFullScreen ? window.Orientation.LANDSCAPE : window.Orientation.PORTRAIT);
+        if (videoFullScreen) {
+          if (isLandscapeVideo) { // 长视频（横屏比例）允许自动旋转
+            await w.setPreferredOrientation(window.Orientation.AUTO_ROTATION_LANDSCAPE_RESTRICTED);
+          } else { // 短视频（竖屏比例）锁定竖屏
+            await w.setPreferredOrientation(window.Orientation.PORTRAIT);
+          }
+        } else {
+          await w.setPreferredOrientation(window.Orientation.PORTRAIT); // 非全屏保持竖屏
+        }
         return;
       }
       // 平板

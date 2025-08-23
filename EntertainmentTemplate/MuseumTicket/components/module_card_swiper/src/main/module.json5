@@ -1,0 +1,9 @@
+{
+  "module": {
+    "name": "module_card_swiper",
+    "type": "har",
+    "deviceTypes": [
+      "phone",
+    ]
+  }
+}

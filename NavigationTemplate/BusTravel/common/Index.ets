@@ -6,18 +6,13 @@ export { NavRouterInfo } from './src/main//ets//model/commonInterface'
 
 export { Logger } from './src/main/ets/logger/index'
 
-export { CommonConstants as Common } from './src/main/ets/constants/CommonConstants';
+export { CommonConstants as Common } from './src/main/ets/constants/CommonConstants'
 
-export { BreakpointConstants } from './src/main/ets/constants/BreakpointConstants';
+export { BreakpointConstants } from './src/main/ets/constants/BreakpointConstants'
 
-export { default as LocationUtil } from './src/main/ets/utils/LocationUtil';
+export { default as LocationUtil } from './src/main/ets/utils/LocationUtil'
 
-export { SearchInput } from './src/main/ets/components/SearchInput'
-
-
-export { preferencesUtil } from './src/main/ets/utils/PreferenceUtil'
-
-export { UserInfo } from './src/main/ets/Interface/CommonInterface'
+export { PreferenceUtils } from './src/main/ets/utils/PreferenceUtil'
 
 export { StyleConstants } from './src/main/ets/constants/StyleConstants'
 
@@ -31,4 +26,6 @@ export { getDataFromJSON } from './src/main/ets/utils/RawFileDealUtils'
 
 export { bufferToString } from './src/main/ets/utils/BufferUtil'
 
-export {PrivacyPolicyDetailPage} from './src/main/ets/page/PrivacyPolicyDetailPage'
+export { PrivacyPolicyDetailPage } from './src/main/ets/page/PrivacyPolicyDetailPage'
+
+export { GlobalState,UserInfoModel } from './src/main/ets/model/StorageModel'

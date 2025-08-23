@@ -25,9 +25,9 @@ struct WidgetCard {
         ForEach(this.productList, (item: IOrder) => {
           Row() {
             Text() {
-              Span(item.sendCity)
+              Span(item.sendAddress.city)
               Span('-')
-              Span(item.getCity)
+              Span(item.getAddress.city)
             }
             .fontSize(16)
             .fontWeight(FontWeight.Medium)
@@ -35,7 +35,7 @@ struct WidgetCard {
           }
           .margin({ bottom: 12 })
 
-          Text('正在发往' + item.getCity)
+          Text('正在发往' + item.getAddress.city)
             .fontSize(12)
             .fontWeight(FontWeight.Regular)
             .fontColor($r('sys.color.font_secondary'))
@@ -56,7 +56,7 @@ struct WidgetCard {
                 },
               });
             });
-        })
+        }, (item: IOrder) => JSON.stringify(item))
       }
       .width('100%')
       .height('100%')
@@ -64,7 +64,7 @@ struct WidgetCard {
       .linearGradient({
         direction: GradientDirection.Bottom, // 渐变方向
         repeating: true, // 渐变颜色是否重复
-        colors: [[0xEFF5FF, 0.0], [0xEFF5FF, 0.24], [0x8BAFF0, 1]] // 数组末尾元素占比小于1时满足重复着色效果
+        colors: [[0xEFF5FF, 0.0], [0xEFF5FF, 0.24], [0x8BAFF0, 1]], // 数组末尾元素占比小于1时满足重复着色效果
       })
     }
     .height('100%')

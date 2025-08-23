@@ -13,16 +13,16 @@
     "requestPermissions": [
       {
         "name": "ohos.permission.INTERNET"
-      },
+      }
     ],
     "abilities": [
       {
         "name": "EntryAbility",
         "srcEntry": "./ets/entryability/EntryAbility.ets",
         "description": "$string:EntryAbility_desc",
-        "icon": "$media:atomic_service_icon",
+        "icon": "$media:layered_image",
         "label": "$string:EntryAbility_label",
-        "startWindowIcon": "$media:startIcon",
+        "startWindowIcon": "$media:icon",
         "startWindowBackground": "$color:start_window_background",
         "exported": true,
         "skills": [
@@ -34,6 +34,9 @@
               "action.system.home"
             ]
           }
+        ],
+        "supportWindowMode": [
+          "fullscreen"
         ]
       }
     ],
@@ -55,7 +58,10 @@
     "metadata": [
       {
         "name": "client_id",
-        "value": "xxx"
+/*
+        todo: 配置应用的 client ID
+        */
+        "value": "******"
       }
     ]
   }

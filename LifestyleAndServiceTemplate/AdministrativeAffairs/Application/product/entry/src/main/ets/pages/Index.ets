@@ -1,14 +1,13 @@
 import {
+  AutomaticQuickLogin,
   BaseStyleData,
   BrightnessUtil,
   commonToast,
   Constants,
-  getQuickLoginAnonymousPhone,
   HomeServiceEnum,
   NavigationParams,
   ParamsObj,
   SuggestionList,
-  UserInfo,
   UserState,
   WebCommon,
 } from 'common';
@@ -43,7 +42,7 @@ struct Index {
   tabController: TabsController = new TabsController()
   @Local userState: UserState = PersistenceV2.connect(UserState, () => new UserState())!;
   @Local suggestionList: SuggestionList = PersistenceV2.connect(SuggestionList, () => new SuggestionList())!;
-
+  @Local automaticQuickLogin: AutomaticQuickLogin = new AutomaticQuickLogin()
   interceptCodeChange(code: number) {
     if (code === HomeServiceEnum.Code && !this.userState.isLogin) {
       commonToast.show({
@@ -51,10 +50,8 @@ struct Index {
         hasTitle: '关联账号',
         message: $r('app.string.associated_account'),
         confirmAction: () => {
-          getQuickLoginAnonymousPhone(getContext(this), (isLogin: boolean, userInfo: UserInfo) => {
-            this.userState.isLogin = isLogin
-            this.userState.userInfo = userInfo
-          })
+          commonToast.hide()
+          this.automaticQuickLogin.quickLogin()
         },
       })
       return
@@ -105,10 +102,8 @@ struct Index {
             hasTitle: '关联账号',
             message: $r('app.string.associated_account'),
             confirmAction: () => {
-              getQuickLoginAnonymousPhone(getContext(this), (isLogin: boolean, userInfo: UserInfo) => {
-                this.userState.isLogin = isLogin
-                this.userState.userInfo = userInfo
-              })
+              commonToast.hide()
+              this.automaticQuickLogin.quickLogin()
             },
           })
           target.pathStack.pop();

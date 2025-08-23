@@ -7,9 +7,9 @@ export function LostFindBuilder() {
   LostFind()
 }
 
-@Component
+@ComponentV2
 export struct LostFind {
-  @State searchPlaceholder: string = '搜索公交线路、站点'
+  @Local searchPlaceholder: string = '搜索公交线路、站点'
   vm: RouteEntryVM = RouteEntryVM.instance;
 
   build() {
@@ -108,7 +108,6 @@ export function lostFindItem(item: LostFindSegmentInterface) {
       .width(120)
       .margin({ top: 13 })
   }
-  // .align(Alignment.Start)
   .alignItems(HorizontalAlign.Start)
   .width('90%')
   .padding(12)

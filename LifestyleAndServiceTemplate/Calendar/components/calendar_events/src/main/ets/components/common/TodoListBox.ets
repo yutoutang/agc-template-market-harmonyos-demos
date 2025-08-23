@@ -13,7 +13,7 @@ export struct TodoListBox {
     Row({ space: 18 }) {
       Checkbox({ name: this.todoInfo.id, group: 'checkboxGroup'+ this.todoInfo.id})
         .select(this.isBoxDone)
-        .selectedColor('#D9B3B3')
+        .selectedColor($r('sys.color.comp_background_emphasize'))
         .shape(CheckBoxShape.ROUNDED_SQUARE)
         .onClick(() => {
           this.onChange()

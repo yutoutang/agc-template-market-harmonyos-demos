@@ -1,8 +1,10 @@
-import { TicketStatus, TimeTicketInfo, TimeSegment, BuyStatus, TicketTypeInfo } from '../types/Index';
-import { BuyVM } from '../viewModels/BuyVM';
-import { RouterMap, RouterModule, FormatUtil, CommonConstants } from 'commonlib';
-import { UICalendarPicker, TypePicker, DialogType, SwiperDirection } from 'uicalendarpicker';
+import { LengthMetrics } from '@kit.ArkUI';
+import { RouterMap, RouterModule, FormatUtil, CommonConstants, TitleBuilder } from 'commonlib';
+import { UICalendarPicker, TypePicker, DialogType, SwiperDirection } from 'module_calendar_picker';
 import { NumberBox } from '../component/NumberBox';
+import { BuyVM } from '../viewModels/BuyVM';
+import { TicketStatus, TimeTicketInfo, TimeSegment, BuyStatus, TicketTypeInfo } from '../types/Index';
+
 
 @Builder
 export function BuyTicketBuilder() {
@@ -52,24 +54,24 @@ struct BuyTicket {
             Column() {
               Column() {
                 Text('参观日期').margin({ bottom: 10 });
-                Row({ space: 10 }) {
+                Row({ space: this.vm.isSmallWidth ? 8 : 10 }) {
                   ForEach(this.vm.dayList, (item: TimeTicketInfo) => {
                     Column() {
                       Text(item.day)
-                        .fontColor($r('app.color.font_color_green'))
+                        .fontColor('#603C00')
                         .fontSize($r('sys.float.ohos_id_text_size_body2'));
                       Text(FormatUtil.dateAsMD(item.date))
-                        .fontColor($r('app.color.font_color_green'))
+                        .fontColor('#603C00')
                         .fontSize($r('sys.float.ohos_id_text_size_body3'))
                         .margin(2);
                       Text(item.statusCn)
-                        .fontColor($r('app.color.font_color_green'))
+                        .fontColor('#603C00')
                         .fontSize($r('sys.float.ohos_id_text_size_caption'));
                     }
                     .checkBoxStyle()
                     .justifyContent(FlexAlign.Center)
                     .backgroundColor(this.vm.currentSelected?.date === item.date ?
-                    $r('sys.color.ohos_id_color_palette_aux3') : '')
+                      '#D1B380' : '')
                     .opacity(item.status !== TicketStatus.HAVE ? $r('sys.float.ohos_id_alpha_disabled') : 1)
                     .enabled(item.status === TicketStatus.HAVE ? true : false)
                     .onClick(() => {
@@ -85,7 +87,7 @@ struct BuyTicket {
                       type: TypePicker.SINGLE,
                       dialogType: DialogType.SHEET,
                       enableSelectTime: true,
-                      customColor: $r('app.color.font_color_green'),
+                      customColor: '#D1B380',
                       swiperDirection: SwiperDirection.VERTICAL,
                       selected: this.vm.selected,
                       disabledDates: this.vm.disableData,
@@ -100,24 +102,32 @@ struct BuyTicket {
                     });
                   }.checkBoxStyle();
 
-                }.margin({ bottom: 24 }).height(70);
+                }.margin({ bottom: 24 }).height(70)
+                .onSizeChange((oldVal, newVal: SizeOptions) => {
+                  const newWidth = newVal.width as number;
+                  if (newWidth >= CommonConstants.DESIGN_WIDTH) {
+                    this.vm.isSmallWidth = false;
+                  } else {
+                    this.vm.isSmallWidth = true;
+                  }
+                });
 
                 //  参观时间
                 if (this.vm.currentSelected) {
                   Text('参观时间').margin({ bottom: 10 });
-                  Row({ space: 10 }) {
+                  Row({ space: this.vm.isSmallWidth ? 8 : 10 }) {
                     ForEach(this.vm.currentSelected.timeSegment, (item: TimeSegment) => {
                       Column() {
                         Text(item.label)
-                          .fontColor($r('app.color.font_color_green'))
+                          .fontColor('#603C00')
                           .fontSize($r('sys.float.ohos_id_text_size_body2'));
                         Text(item.buyStatusCn)
-                          .fontColor($r('app.color.font_color_green'))
+                          .fontColor('#603C00')
                           .fontSize($r('sys.float.ohos_id_text_size_caption'));
                       }
                       .TimeBoxStyle()
                       .backgroundColor(this.vm.selectedTime === item.label ?
-                      $r('sys.color.ohos_id_color_palette_aux3') : '')
+                        '#D1B380' : '')
                       .justifyContent(FlexAlign.Center)
                       .opacity(this.vm.currentSelected?.status !== BuyStatus.ABLE ?
                       $r('sys.float.ohos_id_alpha_disabled') : 1)
@@ -140,7 +150,7 @@ struct BuyTicket {
           }.constraintSize({
             minHeight: '100%',
           });
-        }.height('calc(100% - 65vp)').scrollBar(BarState.Off).padding({ bottom: 40 });
+        }.height('calc(100% - 65vp)').scrollBar(BarState.Off).padding({ bottom: 40 }).edgeEffect(EdgeEffect.Spring);
 
         this.buttonBarBuilder();
 
@@ -150,7 +160,7 @@ struct BuyTicket {
       .backgroundColor(CommonConstants.BG_COLOR_GRAY)
       .padding({ top: 10 });
 
-    }.title('购票信息').onReady(() => {
+    }.title(TitleBuilder('购票信息'), { paddingStart: LengthMetrics.vp(16) }).onReady(() => {
       this.vm.getTicketType();
     });
   }
@@ -175,7 +185,7 @@ struct BuyTicket {
               .fontColor(CommonConstants.FONT_COLOR_BLACK)
               .fontWeight(500);
             Text('¥' + item.price)
-              .fontColor(CommonConstants.FONT_COLOR_GREEN)
+              .fontColor('#603C00')
               .fontSize(CommonConstants.FONT_SIZE_M)
               .fontWeight(500);
           }.width('100%').justifyContent(FlexAlign.SpaceBetween);
@@ -192,8 +202,8 @@ struct BuyTicket {
                 Text('购买须知')
                   .fontWeight(500)
                   .fontSize(CommonConstants.FONT_SIZE_S)
-                  .fontColor(CommonConstants.FONT_COLOR_GREEN);
-                Image($r('app.media.icon_public_arrow_right')).width(10);
+                  .fontColor('#603C00');
+                Image($r('app.media.icon_public_arrow_right')).width(10).fillColor('#603C00');
               }.onClick(() => {
                 this.vm.dialogVisible = true;
                 this.vm.notice = item.notice;
@@ -233,7 +243,7 @@ struct BuyTicket {
 
       Button('购票')
         .width(120)
-        .backgroundColor(this.isRequired() ? CommonConstants.FONT_COLOR_GREEN : CommonConstants.BG_COLOR_GREEN)
+        .backgroundColor(this.isRequired() ? '#D1B380' : '#99D1B380')
         .borderRadius(20)
         .onClick(() => {
           if (this.isRequired()) {
@@ -256,7 +266,7 @@ struct BuyTicket {
   @Styles
   checkBoxStyle() {
     .borderRadius(4)
-    .border({ width: 1, color: $r('sys.color.ohos_id_color_palette_aux3') })
+    .border({ width: 1, color: '#D1B380' })
     .height(70)
     .width(60);
   }
@@ -264,7 +274,7 @@ struct BuyTicket {
   @Styles
   TimeBoxStyle() {
     .borderRadius(4)
-    .border({ width: 1, color: $r('sys.color.ohos_id_color_palette_aux3') })
+    .border({ width: 1, color: '#D1B380' })
     .height(70)
     .width(100);
   }
@@ -273,10 +283,10 @@ struct BuyTicket {
   customPanelBuilder() {
     Row() {
       Text('指定日期')
-        .fontColor($r('app.color.font_color_green'))
+        .fontColor('#603C00')
         .width(28)
         .fontSize($r('sys.float.ohos_id_text_size_body2'));
-      Image($r('app.media.icon_public_arrow_right')).width(12);
+      Image($r('app.media.icon_public_arrow_right')).width(12).fillColor('#603C00');
     }.height(70).alignItems(VerticalAlign.Center).justifyContent(FlexAlign.Center).width(60);
   }
 }

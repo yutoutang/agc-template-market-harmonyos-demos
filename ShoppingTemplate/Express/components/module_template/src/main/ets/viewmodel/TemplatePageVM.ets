@@ -1,20 +1,13 @@
-import { AppStorageV2, promptAction } from '@kit.ArkUI';
+import { promptAction } from '@kit.ArkUI';
 import { emitter } from '@kit.BasicServicesKit';
-import { OrderType, PaymentMethod, timeList } from '../common/Constant';
-import { IAddrInfo, IGoods, ITemplate } from '../http/Type';
-import { AddrList } from 'module_address';
+import { OrderType, PaymentMethod } from '../common/Constant';
+import { IGoods, ITemplate } from '../http/Type';
 import { TemplateApi } from '../http/Api';
-import { RouterMap, getAddressData, sendAddressData } from 'module_base';
+import { RouterMap, getAddressData, sendAddressData, IAddrInfo, timeList } from 'module_base';
+import { getDefaultAddress } from 'module_address'
 
 @ObservedV2
 export class TemplatePageVM {
-  @Trace addrList: AddrList = AppStorageV2.connect(AddrList, () => new AddrList())!;
-
-  @Monitor('addrList.list')
-  onChange(monitor: IMonitor) {
-    const list = monitor.value()?.now as IAddrInfo[];
-  }
-
   private static _instance: TemplatePageVM;
   stack: NavPathStack = new NavPathStack();
   @Trace public template: ITemplate | undefined
@@ -60,10 +53,10 @@ export class TemplatePageVM {
           this.selectedTimeIndex = this.getSelectedIndex(this.tempTime, this.timePickerList)
         }
       } else {
-        this.getDefaultPeople()
+        this.getDefaultAddress()
       }
     } else {
-      this.getDefaultPeople()
+      this.getDefaultAddress()
     }
     this.getGoodsList()
   }
@@ -72,7 +65,7 @@ export class TemplatePageVM {
     this.isFresh = true
     this.template = undefined
     this.selectedGoodsId = 0
-    this.selectedShippingMethod = 2
+    this.selectedShippingMethod = 1
     this.selectedPaymentMethod = PaymentMethod.PAY_NOW
     this.weight = 0
     this.sendAddress = sendAddressData as IAddrInfo
@@ -81,6 +74,13 @@ export class TemplatePageVM {
 
   setStack(stack: NavPathStack) {
     this.stack = stack;
+  }
+
+  public async getDefaultAddress() {
+    const res = await getDefaultAddress()
+    if (res) {
+      this.sendAddress = res as IAddrInfo
+    }
   }
 
 
@@ -94,35 +94,17 @@ export class TemplatePageVM {
     return 0
   }
 
-  public async getDefaultPeople() {
-    const people = this.addrList.list.find((item) => {
-      return item.isDefault === true
-    })
-    if (people) {
-      this.sendAddress = {
-        id: people.id,
-        name: people.name,
-        cellphone: people.cellphone,
-        province: people.province,
-        city: people.city,
-        area: people.area,
-        detailAddress: people.detailAddress,
-        isDefault: people.isDefault,
-      }
-    }
-  }
-
   public async getGoodsList() {
     const res = await TemplateApi.getGoodsList()
     this.goodsList = res
   }
 
   public checkTemplate(): boolean {
-    if (this.sendAddress.id === 0) {
+    if (!this.sendAddress.id) {
       promptAction.showToast({ message: '请填写寄件人信息！', alignment: Alignment.Center, duration: 2000 });
       return false
     }
-    if (this.getAddress.id === 0) {
+    if (!this.getAddress.id) {
       promptAction.showToast({ message: '请填写收件人信息！', alignment: Alignment.Center, duration: 2000 });
       return false
     }

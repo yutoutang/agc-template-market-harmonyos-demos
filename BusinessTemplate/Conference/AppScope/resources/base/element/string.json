@@ -1,0 +1,32 @@
+{
+  "string": [
+    {
+      "name": "app_name",
+      "value": "Conference"
+    },
+    {
+      "name": "URL",
+      "value": "https://agc-storage-drcn.platform.dbankcloud.cn/v0/conference-eaytd/"
+    },
+    {
+      "name": "PROJECTURL",
+      "value": "localhost:8080"
+    },
+    {
+      "name": "EVENTSURL",
+      "value": "localhost:8080"
+    },
+    {
+      "name": "map_url",
+      "value": "https://www.petalmaps.com"
+    },
+    {
+      "name": "agcit_huawei_conference",
+      "value": "1.0.0"
+    },
+    {
+      "name": "agcittype_huawei_conference",
+      "value": "industryTemplate"
+    }
+  ]
+}

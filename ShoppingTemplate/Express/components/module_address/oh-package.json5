@@ -6,7 +6,6 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "module_base": "file:../module_base",
-    "module_city": "file:../module_city"
+    'module_base': 'file:../module_base'
   }
 }

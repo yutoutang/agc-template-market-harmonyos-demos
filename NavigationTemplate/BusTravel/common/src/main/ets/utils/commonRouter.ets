@@ -51,7 +51,7 @@ export class RouterModule {
   }
 
   // 清除栈中的所有页面
-  public static clear(stackName: string, animated?: boolean) {
+  public static clear(stackName?: string, animated?: boolean) {
     try {
       RouterModule.stack.clear(animated)
     } catch (err) {

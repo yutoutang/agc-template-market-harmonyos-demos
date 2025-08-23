@@ -1,0 +1,22 @@
+{
+  "name": "entry",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "",
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "@hw-agconnect/ui-base": "^1.0.1",
+    "commonlib": "file:../../commons/commonlib",
+    "componentlib": "file:../../commons/componentlib",
+    "network": "file:../../commons/network",
+    "settings": "file:../../features/settings",
+    "banquet": "file:../../features/banquet",
+    "catering": "file:../../features/catering",
+    "commonservice": "file:../../features/commonservice",
+    "hotel": "file:../../features/hotel",
+    "module_call_dialog": "file:../../components/module_call_dialog",
+    "module_privacy_agreement": "file:../../components/module_privacy_agreement"
+  }
+}
+

@@ -1,5 +1,6 @@
-import { AppStorageBank, UserInfo, userLogin } from 'lib_foundation';
 import { AppStorageV2 } from '@kit.ArkUI';
+import { userLogin } from 'lib_foundation';
+import { AppStorageBank, IUserInfo, UserInfo } from 'module_base'
 
 @ObservedV2
 export class MinePageVM {
@@ -35,6 +36,6 @@ export class MinePageVM {
 
   public async login() {
     const res = await userLogin();
-    AppStorageBank.updateUserInfo(res)
+    AppStorageBank.updateUserInfo(res as IUserInfo)
   }
 }

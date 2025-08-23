@@ -1,7 +1,8 @@
-import { RouterMap, RouterModule, CommonConstants, FormatUtil } from 'commonlib';
+import { LengthMetrics, promptAction } from '@kit.ArkUI';
+import { CommonConstants, FormatUtil, RouterModule, TitleBuilder } from 'commonlib';
+import { Contact, PersonManage } from 'module_person_manage';
 import { TicketListItem, TicketOwner, TicketTypeInfo } from '../types/Index';
 import { BuyVM } from '../viewModels/BuyVM';
-import { promptAction } from '@kit.ArkUI';
 
 
 @Builder
@@ -35,17 +36,63 @@ struct BuyInfo {
   }
 
   aboutToAppear(): void {
-    this.vm.clearOrderInfo()
+    this.vm.clearOrderInfo();
   }
 
   build() {
     NavDestination() {
+
       Column() {
         Scroll() {
           Column() {
             this.ticketInfoBuilder();
-            this.ticketListBuilder();
-            ForEach(this.vm.ticketOwner.sort((a, b) => a.sortId - b.sortId), (item: TicketOwner, index) => {
+            Column({ space: 10 }) {
+
+              ForEach(this.vm.ticketList, (item: TicketListItem, index) => {
+                if (index !== 0) {
+                  Divider();
+                }
+
+                Row() {
+                  Row({ space: 7 }) {
+                    Text(`参观人${item.sortId}`)
+                      .fontSize(CommonConstants.FONT_SIZE_M)
+                      .fontColor(CommonConstants.FONT_COLOR_BLACK)
+                      .fontWeight(500);
+                    Text(item.typeCn)
+                      .backgroundColor('#99D1B380')
+                      .fontSize(CommonConstants.FONT_SIZE_XS)
+                      .fontColor('#603C00')
+                      .padding({ left: 4, right: 4 })
+                      .height(18)
+                      .borderRadius(4);
+                  };
+
+                  PersonManage({
+                    navPathStack: RouterModule.getStack(),
+                    onSelect: (data) => {
+                      this.vm.linkTicketOwner(data as Contact, index, false);
+                    },
+                  }) {
+                    Row({ space: 5.5 }) {
+                      Image($r('app.media.contact_add')).width(9);
+                      Text('常用参观人')
+                        .fontSize(CommonConstants.FONT_SIZE_XS)
+                        .fontColor($r('sys.color.font_on_primary'));
+                    }
+                    .width(82)
+                    .height(24)
+                    .borderRadius(12)
+                    .backgroundColor('#D1B380')
+                    .justifyContent(FlexAlign.Center);
+                  };
+
+                }.width('100%').justifyContent(FlexAlign.SpaceBetween);
+              }, (item: TicketListItem) => item.sortId.toString());
+
+            }.baseContainerStyle().margin({ top: 10 });
+
+            ForEach(this.vm.ticketOwner, (item: TicketOwner, index) => {
               Column() {
                 Row() {
                   Row({ space: 7 }) {
@@ -54,28 +101,32 @@ struct BuyInfo {
                       .fontColor(CommonConstants.FONT_COLOR_BLACK)
                       .fontWeight(500);
                     Text(item.typeCn)
-                      .backgroundColor('#3392D6CC')
+                      .backgroundColor('#99D1B380')
                       .fontSize(CommonConstants.FONT_SIZE_XS)
-                      .fontColor(CommonConstants.FONT_COLOR_GREEN)
+                      .fontColor('#603C00')
                       .padding({ left: 4, right: 4 })
                       .height(18)
                       .borderRadius(4);
                   };
 
-                  Row({ space: 5.5 }) {
-                    Image($r('app.media.icon_public_plus_1')).width(9);
-                    Text('常用参观人')
-                      .fontSize(CommonConstants.FONT_SIZE_XS)
-                      .fontColor(CommonConstants.FONT_COLOR_GREEN);
-                  }
-                  .width(82)
-                  .height(24)
-                  .borderRadius(12)
-                  .backgroundColor(CommonConstants.BG_COLOR_GREEN)
-                  .justifyContent(FlexAlign.Center)
-                  .onClick(() => {
-                    RouterModule.push({ url: RouterMap.TICKET_OWNER, param: { ownerIndex: index } });
-                  });
+                  PersonManage({
+                    navPathStack: RouterModule.getStack(),
+                    onSelect: (data) => {
+                      this.vm.linkTicketOwner(data as Contact, index);
+                    },
+                  }) {
+                    Row({ space: 5.5 }) {
+                      Image($r('app.media.contact_add')).width(9);
+                      Text('常用参观人')
+                        .fontSize(CommonConstants.FONT_SIZE_XS)
+                        .fontColor($r('sys.color.font_on_primary'));
+                    }
+                    .width(82)
+                    .height(24)
+                    .borderRadius(12)
+                    .backgroundColor('#D1B380')
+                    .justifyContent(FlexAlign.Center);
+                  };
 
                 }.width('100%').justifyContent(FlexAlign.SpaceBetween);
 
@@ -143,13 +194,13 @@ struct BuyInfo {
             }.baseContainerStyle().margin({ top: 10, bottom: 20 });
 
           }.constraintSize({ minHeight: '100%' }).padding({ top: 10 });
-        }.scrollBar(BarState.Off).height('calc(100% - 65vp)');
+        }.scrollBar(BarState.Off).height('calc(100% - 65vp)').edgeEffect(EdgeEffect.Spring);
 
         Row() {
           Button('购票')
             .height(40)
             .width('100%')
-            .backgroundColor(this.isBuyInfoValid() ? CommonConstants.FONT_COLOR_GREEN : CommonConstants.BG_COLOR_GREEN)
+            .backgroundColor(this.isBuyInfoValid() ? '#D1B380' : '#99D1B380')
             .enabled(this.isBuyInfoValid())
             .onClick(() => {
               if (this.isPhoneValid()) {
@@ -159,51 +210,10 @@ struct BuyInfo {
         }.width('100%').height(65).padding({ left: 16, right: 16 }).backgroundColor(CommonConstants.BG_COLOR_WHITE);
       }.width('100%').height(CommonConstants.FULL_HEIGHT).backgroundColor(CommonConstants.BG_COLOR_GRAY);
 
-    }.title('购票信息').onReady(() => {
+    }.title(TitleBuilder('购票信息'), { paddingStart: LengthMetrics.vp(16) }).onReady(() => {
       this.vm.createTicketList();
     });
 
-  }
-
-  @Builder
-  ticketListBuilder() {
-    Column({ space: 10 }) {
-      ForEach(this.vm.ticketList, (item: TicketListItem, index) => {
-        if (index !== 0) {
-          Divider();
-        }
-        Row() {
-          Row({ space: 7 }) {
-            Text(`参观人${item.sortId}`)
-              .fontSize(CommonConstants.FONT_SIZE_M)
-              .fontColor(CommonConstants.FONT_COLOR_BLACK)
-              .fontWeight(500);
-            Text(item.typeCn)
-              .backgroundColor('#3392D6CC')
-              .fontSize(CommonConstants.FONT_SIZE_XS)
-              .fontColor(CommonConstants.FONT_COLOR_GREEN)
-              .padding({ left: 4, right: 4 })
-              .height(18)
-              .borderRadius(4);
-          };
-
-          Row({ space: 5.5 }) {
-            Image($r('app.media.icon_public_plus_1')).width(9);
-            Text('常用参观人').fontSize(CommonConstants.FONT_SIZE_XS).fontColor(CommonConstants.FONT_COLOR_GREEN);
-          }
-          .width(82)
-          .height(24)
-          .borderRadius(12)
-          .backgroundColor(CommonConstants.BG_COLOR_GREEN)
-          .justifyContent(FlexAlign.Center)
-          .onClick(() => {
-            RouterModule.push({ url: RouterMap.TICKET_OWNER, param: { ticketIndex: index } });
-          });
-
-        }.width('100%').justifyContent(FlexAlign.SpaceBetween);
-      }, (item: TicketListItem) => item.sortId.toString());
-
-    }.baseContainerStyle().margin({ top: 10 });
   }
 
   @Builder

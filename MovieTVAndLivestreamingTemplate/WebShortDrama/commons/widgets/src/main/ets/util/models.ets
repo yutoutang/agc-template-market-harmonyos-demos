@@ -1,4 +1,3 @@
-
 export interface UserInfo {
   id?: string;
   isPhoneAssociated?: boolean;
@@ -6,6 +5,9 @@ export interface UserInfo {
   nickname?: string;
   cellphone?: string;
   isMock?: boolean;
+  isVip?: boolean;
+  bonus?: number;
+  vipExpiryDate?: Date | null; //  VIP 到期时间
 }
 
 @ObservedV2
@@ -16,6 +18,11 @@ export class UserInfoModel implements UserInfo {
   @Trace avatar: string = '';
   @Trace nickname: string = '';
   @Trace cellphone: string = '';
+  @Trace isVip: boolean = false;
+  @Trace bonus: number = 0
+  @Trace vipExpiryDate: Date  = new Date();
+  @Trace channels: Set<string> = new Set()
+  @Trace category: Set<string> = new Set()
 }
 
 @ObservedV2

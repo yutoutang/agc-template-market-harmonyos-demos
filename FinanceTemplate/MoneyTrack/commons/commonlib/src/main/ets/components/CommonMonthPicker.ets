@@ -97,7 +97,8 @@ export struct CommonMonthPicker {
             this.handleConfirm?.(this.selectedMonth);
           },
         });
-      };
+      }
+      .margin({ bottom: $r('app.string.space_l') })
     }
     .height($r('app.string.height_percent_full'))
     .width($r('app.string.width_percent_full'))

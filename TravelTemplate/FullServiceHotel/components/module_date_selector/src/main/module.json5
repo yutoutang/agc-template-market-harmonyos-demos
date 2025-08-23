@@ -1,0 +1,9 @@
+{
+  "module": {
+    "name": "module_date_selector",
+    "type": "har",
+    "deviceTypes": [
+      "default"
+    ]
+  }
+}

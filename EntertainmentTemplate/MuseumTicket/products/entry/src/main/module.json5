@@ -5,7 +5,7 @@
     "description": "$string:module_desc",
     "mainElement": "EntryAbility",
     "deviceTypes": [
-      "phone",
+      "phone"
     ],
     "deliveryWithInstall": true,
     "installationFree": true,
@@ -13,12 +13,13 @@
     "metadata": [
       {
         "name": "client_id",
-        "value": "xxx"
+// todo: 替换client_id
+        "value": "******"
       }
     ],
     "requestPermissions": [
       {
-        "name": "ohos.permission.INTERNET",
+        "name": "ohos.permission.INTERNET"
       }
     ],
     "abilities": [

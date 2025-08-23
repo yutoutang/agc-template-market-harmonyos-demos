@@ -6,12 +6,16 @@ import { container } from '@agctemplate/utils';
 export class DramaSocialInfo {
   @Trace isFavorite: boolean = false;
   @Trace favoriteCount: number = 315;
+  @Trace isLike: boolean = false;
+  @Trace likeCount: number = 315;
   dramaId: string
 
-  constructor(dramaId: string, isFavorite: boolean, favoriteCount: number) {
+  constructor(dramaId: string, isFavorite: boolean, favoriteCount: number, isLike: boolean, likeCount: number) {
     this.isFavorite = isFavorite
     this.dramaId = dramaId
     this.favoriteCount = favoriteCount
+    this.isLike = isLike
+    this.likeCount = likeCount
   }
 
   setFavor() {
@@ -25,13 +29,25 @@ export class DramaSocialInfo {
     this.isFavorite = false
     container.resolve(RequestAPI).unsetFavorite(this.dramaId)
   }
+
+  setLike() {
+    this.likeCount++;
+    this.isLike = true
+    container.resolve(RequestAPI).setLike(this.dramaId)
+  }
+
+  unsetLike() {
+    this.likeCount--;
+    this.isLike = false
+    container.resolve(RequestAPI).unsetLike(this.dramaId)
+  }
 }
 
 // 视频遮罩层数据
 @ObservedV2
 export class ShortDramaDetailItemVM {
   dramaInfo: DramaInfo = new DramaInfo('');
-  @Trace dramaSocialInfo: DramaSocialInfo = new DramaSocialInfo('', false, 0)
+  @Trace dramaSocialInfo: DramaSocialInfo = new DramaSocialInfo('', false, 0, false, 0)
   url: string = ''
   currentSerial: number = 0; // 当前剧集
   time: string = ''; // 剧集频日期

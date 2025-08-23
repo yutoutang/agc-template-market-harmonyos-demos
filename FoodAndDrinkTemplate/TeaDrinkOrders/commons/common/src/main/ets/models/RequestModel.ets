@@ -31,7 +31,7 @@ export interface CommonReq {
   orderId: string;
 
   // 商品Id
-  goodId: string;
+  goodsId: string;
 
   // 商品规格字符串
   spec: string;
@@ -63,7 +63,7 @@ export interface AddCarReq {
   money: string;
 
   // 商品id
-  goodId?: string;
+  goodsId?: string;
 
   // 商户id
   storeId?: string;
@@ -87,11 +87,11 @@ export interface AddCarReq {
   boxMoney: string;
 }
 
-export interface GoodReq {
+export interface GoodsReq {
   id: string;
 
   // 商品id
-  goodId: string;
+  goodsId: string;
 
   // 商品图片
   img: string;

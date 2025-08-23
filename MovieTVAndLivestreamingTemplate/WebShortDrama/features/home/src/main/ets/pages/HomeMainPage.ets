@@ -1,8 +1,8 @@
-import { getString } from '@agctemplate/resources';
-import { Logger } from '@agctemplate/utils';
-import { VideoSwiper, PlayController } from '@agctemplate/video_swiper';
+import { VideoSwiper, PlayController } from 'video_swiper';
 import { DramaDesComponent } from '../components/DramaDes';
+import { PlayErrorLayer } from '../components/PlayErrorLayer';
 import { DramaListVM } from '../viewmodel/DramaListVM';
+import { emitter } from '@kit.BasicServicesKit';
 
 const TAG = 'HomeMainPage'
 
@@ -10,6 +10,7 @@ const TAG = 'HomeMainPage'
 export struct HomeMainPage {
   @Param @Require index: number;
   @Consumer('curTabIndex') curTabIndex: number = 0;
+  @Local noFlash: boolean = true
 
   @Monitor('curTabIndex')
   onIndexChange(monitor: IMonitor) {
@@ -28,8 +29,44 @@ export struct HomeMainPage {
   playController: PlayController = new PlayController()
 
   aboutToAppear(): void {
+    this.getDeleteEmitter()
+    this.getDetailInfoFavoriteEmitter()
+    this.getSideFavoriteEmitter()
+    setTimeout(() => {
+      this.noFlash = false;
+    }, 1000);
     this.vm.init()
     this.playController.autoPlay = true
+  }
+
+  getDeleteEmitter() {
+    let event: emitter.InnerEvent = {
+      eventId: 6
+    };
+    let callback: Callback<emitter.EventData> = (eventData: emitter.EventData) => {
+      this.vm.refresh()
+    }
+    emitter.on(event, callback);
+  }
+
+  getDetailInfoFavoriteEmitter() {
+    let event: emitter.InnerEvent = {
+      eventId: 5
+    };
+    let callback: Callback<emitter.EventData> = (eventData: emitter.EventData) => {
+      this.vm.refresh()
+    }
+    emitter.on(event, callback);
+  }
+
+  getSideFavoriteEmitter() {
+    let event: emitter.InnerEvent = {
+      eventId: 7
+    };
+    let callback: Callback<emitter.EventData> = (eventData: emitter.EventData) => {
+      this.vm.refresh()
+    }
+    emitter.on(event, callback);
   }
 
   build() {
@@ -40,27 +77,19 @@ export struct HomeMainPage {
           playController: this.playController,
           videoPlayDataSource: this.vm.data,
           contentBuilder: wrapBuilder(DramaDesComponent),
+          refresh: () => { this.vm.refresh() },
+          loadMore: () => { this.vm.init() },
+          inPage: 'Home'
         })
           .width('100%')
           .height('100%')
       }
+      .padding({ top: '56vp' })
       .width('100%')
       .height('100%')
       .backgroundColor(Color.Black)
-    } else {
-      Stack({ alignContent: Alignment.Center }) {
-        Column() {
-          Text(getString('app.string.tips_net_err'))
-            .fontColor($r('sys.color.white'))
-          Button(getString('app.string.refresh'))
-            .onClick(() => {
-              this.vm.init()
-            })
-        }
-      }
-      .width('100%')
-      .height('100%')
-      .backgroundColor(Color.Black)
+    } else if(!this.noFlash) {
+      PlayErrorLayer({ vm: this.vm})
     }
   }
 }

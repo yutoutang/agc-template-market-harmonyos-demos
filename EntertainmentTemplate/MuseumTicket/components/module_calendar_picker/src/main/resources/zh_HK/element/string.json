@@ -1,0 +1,29 @@
+{
+  "string": [
+    {
+      "name": "confirm",
+      "value": "完成",
+      "attr": {
+        "priority": "translate"
+      }
+    },
+    {
+      "name": "select_placeholder",
+      "value": "請選擇",
+      "attr": {
+        "priority": "translate"
+      }
+    },
+    {
+      "name": "cancel",
+      "value": "取消",
+      "attr": {
+        "priority": "translate"
+      }
+    },
+    {
+      "name": "agcit_huawei_museum_ticket",
+      "value": "1.0.1"
+    }
+  ]
+}

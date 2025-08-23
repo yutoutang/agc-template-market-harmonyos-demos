@@ -1,8 +1,9 @@
-import { TicketStatus, DayTicketInfo, DateItem, TimeStatus, Contacts } from '../types/Index';
-import { FormatUtil, RouterModule, RouterMap } from 'commonlib';
-import { GetOrderDetailResp, https, OrderFreeRequest, OrderVisitor } from 'network';
 import { promptAction } from '@kit.ArkUI';
 import { emitter } from '@kit.BasicServicesKit';
+import { FormatUtil, RouterMap, RouterModule } from 'commonlib';
+import { GetOrderDetailResp, https, OrderFreeRequest, OrderVisitor } from 'network';
+import { Contacts, DateItem, DayTicketInfo, TicketStatus, TimeStatus } from '../types/Index';
+
 
 const TAG = '[OrderTicketVM]';
 
@@ -24,8 +25,6 @@ export class OrderTicketVM {
   @Trace currentSelected: DayTicketInfo | undefined = undefined;
   // 当前选择的时间段
   @Trace selectedTime: TimeStatus | undefined = undefined;
-  // 当前选择的参观人
-  @Trace selectContacts: Contacts[] = [];
   // 确认的参观人
   @Trace confirmContacts: Contacts[] = [];
   // 联系电话
@@ -36,6 +35,10 @@ export class OrderTicketVM {
   @Trace isWarning: boolean = false;
   // 当前将要删除参观人的index
   @Trace delIndex: number = 0;
+  // 宽度是否小于设计宽度
+  @Trace isSmallWidth:boolean = false
+  // 禁用参观人的id
+  @Trace disableId:string[]=[]
   // 时间段映射
   timeMap: Map<TimeStatus, string> = new Map([[TimeStatus.MORNING, '上午'], [TimeStatus.AFTERNOON, '下午']]);
   private static _instance: OrderTicketVM;
@@ -55,20 +58,23 @@ export class OrderTicketVM {
   public clearOrderInfo() {
     this.contactPhone = '';
     this.confirmContacts = [];
+    this.disableId=[]
   }
 
-  public addContacts(contact: Contacts) {
-    this.selectContacts.push(contact);
-  }
+
 
   public delContacts() {
     this.confirmContacts.splice(this.delIndex, 1);
+    this.disableId = this.confirmContacts.map((item)=>item.personID)
   }
 
-  public removeContacts(contact: Contacts) {
-    const index: number = this.selectContacts.findIndex((item: Contacts) => item.personID === contact.personID);
-    this.selectContacts.splice(index, 1);
+  public handleContacts(data:Contacts[]){
+    data.map((item)=>{
+      this.confirmContacts.push(item)
+    })
+    this.disableId = this.confirmContacts.map((item)=>item.personID)
   }
+
 
   public async getDayTicketInfo() {
     https.getDayTicket().then(res => {
@@ -105,12 +111,6 @@ export class OrderTicketVM {
     }
   }
 
-  public async getContactsList() {
-    const res = await https.getContacts();
-    if (res.code === 0) {
-      this.contactList = res.data;
-    }
-  }
 
   public async submitOrderInfo() {
     const visitors = this.confirmContacts.map((item) => {
@@ -120,7 +120,6 @@ export class OrderTicketVM {
       };
       return visitor;
     });
-
     const data: OrderFreeRequest = {
       orderTime: FormatUtil.formatFullDate(new Date()),
       visitTime: FormatUtil.dateAsISO(this.currentSelected!.date) + ' ' + this.timeMap.get(this.selectedTime!),
@@ -132,12 +131,11 @@ export class OrderTicketVM {
     if (res.code === 0) {
       promptAction.showToast({ message: '预约成功！' });
       // 刷新卡片
-      emitter.emit('refreshCard')
+      emitter.emit('refreshCard');
       this.orderSuccessDetail = res.data;
       setTimeout(() => {
         RouterModule.push({ url: RouterMap.ORDER_SUCCESS });
       }, 1000);
     }
-
   }
 }

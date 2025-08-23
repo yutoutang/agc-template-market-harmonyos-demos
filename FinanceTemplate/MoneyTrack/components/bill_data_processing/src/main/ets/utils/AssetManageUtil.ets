@@ -16,7 +16,7 @@ import { ASSET_CREATE_EVENT_ID } from '../commons/Constants';
 import { AccountingDB } from './accountingdb/AccountingDB';
 import { AssetTableBasis, UserAsset } from './accountingdb/Types';
 
-import { Logger } from './Logger';
+import { Logger } from 'bill_base';
 import { PopViewUtil } from './PopViewUtil';
 
 const TAG = '[AssetManageUtil]';

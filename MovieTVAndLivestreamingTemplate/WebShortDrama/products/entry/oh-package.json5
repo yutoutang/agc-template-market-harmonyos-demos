@@ -14,7 +14,10 @@
     "@agctemplate/mine": "1.0.0",
     "@agctemplate/detail": "1.0.0",
     "@agctemplate/theater": "1.0.0",
-    "@agctemplate/login": "1.0.0"
+    "@agctemplate/login": "1.0.0",
+    "@agctemplate/award": "1.0.0",
+    "@agctemplate/open_ads": "1.0.0",
+    "@agctemplate/favor": "1.0.0"
   }
 }
 

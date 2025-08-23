@@ -22,6 +22,7 @@ class BillManageUtil {
       {
         detents: [SheetSize.LARGE],
         title: { title: '记一笔' },
+        preferType:SheetType.BOTTOM,
       },
       {
         initBill,
@@ -46,6 +47,7 @@ class BillManageUtil {
         detents: [SheetSize.FIT_CONTENT],
         title: { title: '分类管理' },
         backgroundColor: '#ffffff',
+        preferType:SheetType.BOTTOM,
       },
       {
         handleDeleteSuccess: async (key) => {

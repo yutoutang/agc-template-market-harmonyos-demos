@@ -3,22 +3,23 @@ import { BusinessError } from '@kit.BasicServicesKit'
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
 import { image } from '@kit.ImageKit';
 import { promptAction } from '@kit.ArkUI';
-import { RouteEntryVM } from 'common'
+import { Logger, RouteEntryVM } from 'common'
+import { audio } from '@kit.AudioKit'
 
 @Builder
 export function SuggestionBuilder() {
   Suggestion()
 }
 
-@Component
+@ComponentV2
 export struct Suggestion {
   vm: RouteEntryVM = RouteEntryVM.instance;
-  @State pixelMap: Array<image.PixelMap> = []
-  @State text: string = ''
-  @State contactInfo: string = ''
+  @Local pixelMap: Array<image.PixelMap> = []
+  @Local text: string = ''
+  @Local contactInfo: string = ''
   controller: TextAreaController = new TextAreaController()
 
-  example02() {
+  selectPhoto() {
     try {
       let photoSelectOptions = new photoAccessHelper.PhotoSelectOptions();
       photoSelectOptions.MIMEType = photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE;
@@ -27,10 +28,10 @@ export struct Suggestion {
       photoPicker.select(photoSelectOptions,
         (err: BusinessError, photoSelectResult: photoAccessHelper.PhotoSelectResult) => {
           if (err) {
-            console.error(`PhotoViewPicker.select failed with err: ${err.code}, ${err.message}`);
+            Logger.error(`PhotoViewPicker.select failed with err: ${err.code}, ${err.message}`);
             return;
           }
-          console.info('PhotoViewPicker.select successfully, PhotoSelectResult uri: ' +
+          Logger.info('PhotoViewPicker.select successfully, PhotoSelectResult uri: ' +
           JSON.stringify(photoSelectResult));
           const photoURLs = photoSelectResult.photoUris; // 图片Uris的数组
           photoURLs.forEach((url) => {
@@ -39,7 +40,7 @@ export struct Suggestion {
         });
     } catch (error) {
       let err: BusinessError = error as BusinessError;
-      console.error(`PhotoViewPicker failed with err: ${err.code}, ${err.message}`);
+      Logger.error(`PhotoViewPicker failed with err: ${err.code}, ${err.message}`);
     }
   }
 
@@ -48,7 +49,7 @@ export struct Suggestion {
     try {
       this.pixelMap?.push(await image.createImageSource(file.fd).createPixelMap())
     } catch (error) {
-      console.error('Error:', error);
+      Logger.error('Error:', error);
     } finally {
       if (file) {
         fs.closeSync(await file);
@@ -57,7 +58,7 @@ export struct Suggestion {
   }
 
   testRcpMultiPartUpload() {
-    this.example02();
+    this.selectPhoto();
   }
 
   build() {
@@ -93,7 +94,7 @@ export struct Suggestion {
 
           this.buildDescribe()
           Button('提交')
-            .width('90%')
+            .width('100%')
             .height(35)
             .backgroundColor($r('app.color.system_color_green'))
             .fontSize($r('sys.float.Body_M'))
@@ -114,13 +115,20 @@ export struct Suggestion {
                 });
               }
             })
-            .margin({ top: 200 })
+            .margin({ top: 30 })
         }
-        .backgroundColor('#F1F3F5')
+        .padding({
+          left: 20,
+          right: 20
+        })
+        .width('100%')
+        .height('100%')
       }
       .scrollable(ScrollDirection.Vertical)
       .scrollBar(BarState.Auto)
       .scrollBarWidth('0vp')
+      .backgroundColor('#F1F3F5')
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
     }.hideTitleBar(true)
   }
 
@@ -130,10 +138,10 @@ export struct Suggestion {
       Row() {
         Text('问题描述')
           .fontColor($r('sys.color.ohos_dialog_text_alert'))
-        Text(`${this.text.length}/100`)// 改
+        Text(`${this.text.length}/100`)
           .fontColor('#ff1c1c1c')
       }
-      .width('336vp')
+      .width('100%')
       .justifyContent(FlexAlign.SpaceBetween)
       .margin({ bottom: '12vp' })
 
@@ -159,10 +167,10 @@ export struct Suggestion {
       Row() {
         Text('问题截图（选填）')
           .fontColor($r('sys.color.ohos_dialog_text_alert'))
-        Text(`${this.pixelMap.length}/4`)// 改
+        Text(`${this.pixelMap.length}/4`)
           .fontColor('#ff1c1c1c')
       }
-      .width('336vp')
+      .width('100%')
       .justifyContent(FlexAlign.SpaceBetween)
       .margin({ bottom: '12vp' })
 
@@ -175,7 +183,7 @@ export struct Suggestion {
           ForEach(this.pixelMap, (item: image.PixelMap, index: number) => {
             ListItem() {
               Stack() {
-                Image(this.pixelMap[index]).width(80).height(80)
+                Image(this.pixelMap[index]).width('80lpx').height('80lpx')
                 Row() {
                   Image($r('app.media.ic_public_close')).width(14.6).height(14.6)
                     .margin({ top: 6, right: 6 })
@@ -212,7 +220,7 @@ export struct Suggestion {
         Text(`${this.contactInfo.length}/11`)
           .fontColor('#ff1c1c1c')
       }
-      .width('336vp')
+      .width('100%')
       .justifyContent(FlexAlign.SpaceBetween)
       .margin({ bottom: '12vp' })
 
@@ -220,6 +228,7 @@ export struct Suggestion {
         .caretColor($r('app.color.system_color_green'))
         .width('336lpx')
         .maxLength(11)
+        .type(InputType.PhoneNumber)
         .onChange((value: string) => {
           this.contactInfo = value
         })

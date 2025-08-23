@@ -15,9 +15,9 @@ export class MyWatchRecordRes {
   myWatchRecord: MyWatchRecordData[];
   total: number;
 
-  constructor(myFollowDramaRes?: MyWatchRecordRes) {
-    this.ret = new RetBean(myFollowDramaRes?.ret);
-    this.myWatchRecord = (myFollowDramaRes?.myWatchRecord || []).map((item) => new MyWatchRecordData(item));
-    this.total = myFollowDramaRes?.total || 0;
+  constructor(myWatchRecordRes?: MyWatchRecordRes) {
+    this.ret = new RetBean(myWatchRecordRes?.ret);
+    this.myWatchRecord = (myWatchRecordRes?.myWatchRecord || []).map((item) => new MyWatchRecordData(item));
+    this.total = myWatchRecordRes?.total || 0;
   }
 }

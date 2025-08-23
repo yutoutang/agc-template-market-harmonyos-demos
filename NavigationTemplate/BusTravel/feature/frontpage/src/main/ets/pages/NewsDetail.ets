@@ -6,7 +6,7 @@ export function NewsDetailBuilder() {
   NewsDetail()
 }
 
-@Component
+@ComponentV2
 export struct NewsDetail {
   params:NewsDetailSegmentInterface[]=newsDetailPiece
   build() {
@@ -18,7 +18,6 @@ export struct NewsDetail {
               .fontSize(20)
               .fontWeight(FontWeight.Medium)
               .fontColor($r('sys.color.black'))
-              // .margin({ top: 12 })
             Text(this.params[0].time)
               .fontSize(12)
               .fontColor($r('sys.color.black'))

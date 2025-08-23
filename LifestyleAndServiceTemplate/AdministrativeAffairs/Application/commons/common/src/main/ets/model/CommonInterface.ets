@@ -1,3 +1,5 @@
+import { UserInfo } from 'automatic_association_count'
+
 export class PushParams {
   'payload': Record<string, Notification | string>
   'target': Record<string, Array<string>>
@@ -13,22 +15,6 @@ export class Notification {
   'notifyId': number = 0
 }
 
-@ObservedV2
-export class UserInfo {
-  authCode: string = ''
-  @Trace avatar: string = ''
-  idToken: string = ''
-  @Trace phoneNumber: string = ''
-  @Trace userName: string = ''
-
-  constructor(userInfo?: UserInfo) {
-    this.authCode = userInfo?.authCode || ''
-    this.avatar = userInfo?.avatar || ''
-    this.idToken = userInfo?.idToken || ''
-    this.phoneNumber = userInfo?.phoneNumber || ''
-    this.userName = userInfo?.userName || ''
-  }
-}
 
 export class GridBanner {
   serviceId: string = ''

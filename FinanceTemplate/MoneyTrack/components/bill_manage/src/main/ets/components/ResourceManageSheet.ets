@@ -1,5 +1,13 @@
 import { promptAction } from '@kit.ArkUI';
-import { BalanceChangeType, BalanceResourceItem, BillConstants, ResourceUtil } from 'bill_base';
+import {
+  BalanceChangeType,
+  BalanceResourceItem,
+  BillConstants,
+  BreakpointStorage,
+  BreakpointSystem,
+  BreakpointTypeEnum,
+  ResourceUtil,
+} from 'bill_base';
 import { ResourceManageVM } from '../viewmodels/ResourceManageVM';
 
 export class ResourceManageSheetOptions {
@@ -25,7 +33,16 @@ export struct ResourceManageSheet {
   handleAddSuccess: () => void;
   @Event
   handleDeleteSuccess: (key: number) => void;
+  @Local curBreakpoint: BreakpointStorage = BreakpointSystem.currentBreakpoint
   vm: ResourceManageVM = new ResourceManageVM();
+
+  @Computed
+  get typeGridTemplate() {
+    if (this.curBreakpoint.value === BreakpointTypeEnum.SM) {
+      return '1fr 1fr 1fr 1fr 1fr'
+    }
+    return '1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr'
+  }
 
   aboutToAppear(): void {
     this.vm.resource = ResourceUtil.getResourceList();
@@ -126,7 +143,7 @@ export struct ResourceManageSheet {
     }
     .layoutWeight(1)
     .edgeEffect(EdgeEffect.Spring)
-    .columnsTemplate('1fr 1fr 1fr 1fr 1fr')
+    .columnsTemplate(this.typeGridTemplate)
     .rowsGap(36)
     .editMode(true)
     .onItemDragStart((event: ItemDragInfo, itemIndex: number) => {

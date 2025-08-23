@@ -3,7 +3,7 @@
     "name": "route_search",
     "type": "har",
     "deviceTypes": [
-      "default"
+      "phone"
     ]
   }
 }

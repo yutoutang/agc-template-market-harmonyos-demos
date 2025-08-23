@@ -1,3 +1,4 @@
+import { BusinessError } from '@kit.BasicServicesKit';
 import axios, {
   AxiosError,
   AxiosInstance,
@@ -5,7 +6,6 @@ import axios, {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from '@ohos/axios';
-import { BusinessError } from '@kit.BasicServicesKit';
 import { Logger } from 'commonlib';
 import { replaceMockData } from '../mocks/MockRequestMap';
 

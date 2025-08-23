@@ -1,0 +1,112 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "module description"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "会务模板"
+    },
+    {
+      "name": "hwid_no_internet_connect",
+      "value": "No Internet connection. Check your network settings. "
+    },
+    {
+      "name": "hwid_text_button_known",
+      "value": "OK"
+    },
+    {
+      "name": "EntryFormAbility_desc",
+      "value": "form_description"
+    },
+    {
+      "name": "EntryFormAbility_label",
+      "value": "form_label"
+    },
+    {
+      "name": "widget_desc",
+      "value": "一起倒数，精彩值得期待"
+    },
+    {
+      "name": "widget_display_name",
+      "value": "大会倒数日"
+    },
+    {
+      "name": "reason",
+      "value": "复制邮箱"
+    },
+    {
+      "name": "permission_start_abilities",
+      "value": "打开浏览器"
+    },
+    {
+      "name": "card_title",
+      "value": "Title"
+    },
+    {
+      "name": "introduction",
+      "value": "Introduction"
+    },
+    {
+      "name": "ticketWidget_desc",
+      "value": "便捷出示门票，入园快人一步"
+    },
+    {
+      "name": "ticketWidget_display_name",
+      "value": "我的门票"
+    },
+    {
+      "name": "bigAgendaWidget_desc",
+      "value": "收藏、添加日历和推荐的议题，尽在掌握"
+    },
+    {
+      "name": "bigAgendaWidget_display_name",
+      "value": "大会议程"
+    },
+    {
+      "name": "mediumAgendaWidget_desc",
+      "value": "收藏、添加日历和推荐的议题，尽在掌握"
+    },
+    {
+      "name": "mediumAgendaWidget_display_name",
+      "value": "大会议程"
+    },
+    {
+      "name": "smallAgendaWidget_desc",
+      "value": "收藏、添加日历和推荐的议题，尽在掌握"
+    },
+    {
+      "name": "smallAgendaWidget_display_name",
+      "value": "大会议程"
+    },
+    {
+      "name": "read_calendar",
+      "value": "用于添加您感兴趣的议程到日历"
+    },
+    {
+      "name": "write_calendar",
+      "value": "用于添加您感兴趣的议程到日历"
+    },
+    {
+      "name": "get_location",
+      "value": "用于获取位置信息"
+    },
+    {
+      "name": "entranceWidget_desc",
+      "value": "常用入口快捷访问"
+    },
+    {
+      "name": "entranceWidget_display_name",
+      "value": "畅游 大会"
+    },
+    {
+      "name": "app_tracking_consent",
+      "value": "用于生成脱敏的用户唯一标识"
+    }
+  ]
+}

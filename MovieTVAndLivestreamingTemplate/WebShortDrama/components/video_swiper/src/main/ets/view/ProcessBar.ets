@@ -121,7 +121,7 @@ export struct ProcessBar {
           .trackColor('#3fff')
           .showSteps(false)
           .showTips(false)
-          .animation({ duration:100, curve:Curve.Smooth })
+          .animation({ duration: 100, curve: Curve.Smooth })
           .trackThickness(this.trackThicknessSize)
           .trackBorderRadius(2)
           .onChange((value: number, mode: SliderChangeMode) => {

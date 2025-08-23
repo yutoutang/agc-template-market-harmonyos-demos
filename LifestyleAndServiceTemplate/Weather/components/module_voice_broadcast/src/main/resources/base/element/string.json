@@ -1,0 +1,12 @@
+{
+  "string": [
+    {
+      "name": "agcit_huawei_weather_module_voice_broadcast",
+      "value": "1.0.0"
+    },
+    {
+      "name": "agcittype_huawei_weather_module_voice_broadcast",
+      "value": "serviceComponent"
+    }
+  ]
+}

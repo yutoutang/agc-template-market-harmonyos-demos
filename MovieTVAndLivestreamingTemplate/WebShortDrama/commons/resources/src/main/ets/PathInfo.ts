@@ -13,9 +13,6 @@
   "MineMainPage": {
     "name": "MineMainPage"
   },
-  "MyFavoritesPage": {
-    "name": "MyFavoritesPage"
-  },
   "WatchRecordsPage": {
     "name": "WatchRecordsPage"
   },
@@ -24,6 +21,42 @@
   },
   "ChangePage": {
     "name": "ChangePage"
+  },
+  "FeedbackPage": {
+    "name": "FeedbackPage"
+  },
+  "FeedbackRecordPage": {
+    "name": "FeedbackRecordPage"
+  },
+  "SetUpPage": {
+    "name": "SetUpPage"
+  },
+  "PrivacyAgreementPage": {
+    "name": "PrivacyAgreementPage"
+  },
+  "PrivacyStatementPage": {
+    "name": "PrivacyStatementPage"
+  },
+  "AboutPage": {
+    "name": "AboutPage"
+  },
+  "MyPreferencesPage": {
+    "name": "MyPreferencesPage"
+  },
+  "VIPCenterPage": {
+    "name": "VIPCenterPage"
+  },
+  "LaunchPage": {
+    "name": "LaunchPage"
+  },
+  "LaunchAdPage": {
+    "name": "LaunchAdPage"
+  },
+  "LikesPage": {
+    "name": "LikesPage"
+  },
+  "LoginPage": {
+    "name": "LoginPage"
   },
   "SearchPage": {
     "name": "SearchPage"

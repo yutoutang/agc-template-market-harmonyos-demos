@@ -10,31 +10,31 @@ export function RouteDetailPageBuilder() {
   RouteDetailPage()
 }
 
-@Component
+@ComponentV2
 export struct RouteDetailPage {
   vm: RouteEntryVM = RouteEntryVM.instance
   // 站线名 起点站 终点站 经纬度 站点名 seq
-  @State busSetItems: Array<SearchSet> = []
+  @Local busSetItems: Array<SearchSet> = []
   // 线路名 起点站 终点站 经纬度 orders
-  @State lineSetItems: Array<LineSet> = []
-  @State currentEveryStation: Array<SearchSet> = [] // 当前站点
-  @State currentEveryLine: Array<LineSet> = [] // 当前路线
-  @State busTimer: RandomCountdown = new RandomCountdown()
-  @State line: Array<string> = []
+  @Local lineSetItems: Array<LineSet> = []
+  @Local currentEveryStation: Array<SearchSet> = [] // 当前站点
+  @Local currentEveryLine: Array<LineSet> = [] // 当前路线
+  @Local busTimer: RandomCountdown = new RandomCountdown()
+  @Local line: Array<string> = []
   // 线路，经纬度数组，用于在地图上绘制线路
-  @State lineDots: mapCommon.LatLng[] = []
+  @Local lineDots: mapCommon.LatLng[] = []
   // 站点列表信息，用于地图站点绘制
-  @State stationLocation: SearchSet[] = []
+  @Local stationLocation: SearchSet[] = []
   // 站线名
-  @State longLineName: string = ''
+  @Local longLineName: string = ''
   // 公交信息，用于公交信息卡片展示
-  @State busLineInfo: BusLineInfo = new BusLineInfo(this.longLineName, '下行', '6：00', '22：00', 2, 3, this.line, [])
-  @State currentBreakpoint: string = BreakpointConstants.BREAKPOINT_MD
+  @Local busLineInfo: BusLineInfo = new BusLineInfo(this.longLineName, '下行', '6：00', '22：00', 2, 3, this.line, [])
+  @Local currentBreakpoint: string = BreakpointConstants.BREAKPOINT_MD
   // 地图上当前公交具体位置
-  @State busLocation: mapCommon.LatLng[] =
+  @Local busLocation: mapCommon.LatLng[] =
     [{ longitude: 116.4585837, latitude: 39.9072769 }, { longitude: 116.4397, latitude: 39.90719247 }]
-  @State nearToMe: number = 0
-  @State busIndex: number[] = [1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8, 9.9]
+  @Local nearToMe: number = 0
+  @Local busIndex: number[] = [1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8, 9.9]
 
   initDataSource() {
     this.busSetItems = getDataFromJSON<SearchSet>('Bus_Station.json', this)

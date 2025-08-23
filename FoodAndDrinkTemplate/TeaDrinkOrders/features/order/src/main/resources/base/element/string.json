@@ -37,18 +37,6 @@
       "value": "添加成功！"
     },
     {
-      "name": "place_order",
-      "value": "去结算"
-    },
-    {
-      "name": "total_price",
-      "value": "共计"
-    },
-    {
-      "name": "need_goods",
-      "value": "请选择商品后下单"
-    },
-    {
       "name": "clear_car",
       "value": "清空购物车"
     },
@@ -83,10 +71,6 @@
     {
       "name": "search_goods",
       "value": "金桔柠檬"
-    },
-    {
-      "name": "car_empty_toast",
-      "value": "购物车商品为空，请选择商品后结算"
     },
     {
       "name": "place_order_failed_msg",
@@ -245,10 +229,6 @@
       "value": "添加失败！"
     },
     {
-      "name": "check_all",
-      "value": "全选"
-    },
-    {
       "name": "total_num",
       "value": "共%d件"
     },
@@ -355,6 +335,10 @@
     {
       "name": "select_address_err",
       "value": "请选择配送地址"
+    },
+    {
+      "name": "takeaway_tag",
+      "value": "外卖"
     },
     {
       "name": "agcit_huawei_tea_drink_orders",

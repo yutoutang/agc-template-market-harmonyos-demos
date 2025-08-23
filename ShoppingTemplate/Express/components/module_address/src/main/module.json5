@@ -2,9 +2,9 @@
   "module": {
     "name": "module_address",
     "type": "har",
-    "routerMap": "$profile:route_map",
     "deviceTypes": [
       "default"
-    ]
+    ],
+    "routerMap": "$profile:route_map"
   }
 }

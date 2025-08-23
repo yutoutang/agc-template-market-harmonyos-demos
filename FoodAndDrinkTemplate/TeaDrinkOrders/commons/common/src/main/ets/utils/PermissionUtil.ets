@@ -40,12 +40,23 @@ class PermissionUtil {
         reject()
         return
       }
-      geoLocationManager.getCurrentLocation().then((location: geoLocationManager.Location) => {
-        resolve(location);
-      }).catch((error: Error) => {
-        console.error('getCurrentLocation failed', 'getCurrentLocation error: ' + JSON.stringify(error));
-        reject(error)
-      });
+      let locationChange = (err: BusinessError, location: geoLocationManager.Location) => {
+        if (err) {
+          console.error('getCurrentLocation failed', 'getCurrentLocation error: ' + JSON.stringify(err));
+          reject(err)
+        }
+        if (location) {
+          resolve(location);
+        }
+      };
+      try {
+        geoLocationManager.getCurrentLocation(locationChange);
+      } catch (err) {
+        if (err.code === '3301100') {
+          promptAction.showToast({ message: '检测到您尚未打开位置开关，请到设置里打开“访问我的位置”。', duration: 3000 })
+        }
+        console.error('errCode:' + err.code + ', message:' + err.message);
+      }
     })
   }
 }

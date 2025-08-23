@@ -2,7 +2,6 @@ import { RouterMap } from 'commonlib';
 
 
 
-
 export interface LocationGuideItem {
   icon?: string;
   title: string;
@@ -41,21 +40,13 @@ export interface RecommendListItem {
 }
 
 
-// 讲解服务文本
-export interface ExplainTextItem {
-  title: string,
-  content: string[]
-}
-
-export interface IntroduceText {
-  total: string,
-  content: string[]
-}
-
 
 export interface MuseumLocation {
   latitude: number,
   longitude: number
 }
+
+
+
 
 

@@ -4,7 +4,7 @@
 
 - [简介](#简介)
 - [约束与限制](#约束与限制)
-- [快速入门](#快速入门)
+- [使用](#使用)
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
@@ -18,12 +18,12 @@
 
 ## 环境
 
-* DevEco Studio版本：DevEco Studio 5.0.0 Release及以上
-* HarmonyOS SDK版本：HarmonyOS 5.0.0 Release SDK及以上
-* 设备类型：华为手机（直板机）
-* HarmonyOS版本：HarmonyOS 5.0.0 Release及以上
+* DevEco Studio版本：DevEco Studio 5.1.0 Release及以上
+* HarmonyOS SDK版本：HarmonyOS 5.1.0 Release SDK及以上
+* 设备类型：华为手机（直板机、双折叠）
+* HarmonyOS版本：HarmonyOS 5.0.0(12)及以上
 
-# 快速入门
+# 使用
 
 1. 安装组件。
 
@@ -44,13 +44,14 @@
     }
    ]
    ```
+
    c. 在项目根目录oh-package.json5中添加依赖。
 
    ```typescript
    // XXX为组件存放的目录名称
    "dependencies":
    {
-      "route_detail": "file:../xxx/route_detail"
+      "route_detail": "file:./xxx/route_detail"
    }
    ```
 
@@ -86,92 +87,94 @@ RouteDetail(options?: RouteDetailOptions)
 
 **参数：**
 
-| 参数名     | 类型                                            | 必填 | 说明          |
-|---------|-----------------------------------------------|----|-------------|
-| options | [RouteDetailOptions](#RouteDetailOptions对象说明) | 否  | 展示公交路线详情的参数 |
+| 参数名  | 类型                                              | 是否必填 | 说明                   |
+| ------- | ------------------------------------------------- | -------- | ---------------------- |
+| options | [RouteDetailOptions](#RouteDetailOptions对象说明) | 否       | 展示公交路线详情的参数 |
 
 ### RouteDetailOptions对象说明
 
-| 名称              | 类型                              | 必填 | 说明                   |
-|-----------------|---------------------------------|----|----------------------|
-| stationLocation | [SearchSet[]](#SearchSet接口说明)   | 否  | 站点信息列表，用于在地图上绘制信息    |
-| busLocation     | mapCommon.LatLng[]              | 否  | 公交位置列表，用于在地图上绘制公交车位置 |
-| busLineInfo     | [BusLineInfo](#BusLineInfo对象说明) | 否  | 公交路线具体信息，用于卡片展示      |
-| nearToMe        | number                          | 否  | 距离最近的公交车的下标，默认值为-1   |
-| busIndex        | number[]                        | 否  | 当前线路上公交车索引数数组，默认值[]  |
+| 名称            | 类型                                | 是否必填 | 说明                                     |
+| --------------- | ----------------------------------- | -------- | ---------------------------------------- |
+| stationLocation | [SearchSet[]](#SearchSet接口说明)   | 否       | 站点信息列表，用于在地图上绘制信息       |
+| busLocation     | mapCommon.LatLng[]                  | 否       | 公交位置列表，用于在地图上绘制公交车位置 |
+| busLineInfo     | [BusLineInfo](#BusLineInfo对象说明) | 否       | 公交路线具体信息，用于卡片展示           |
+| nearToMe        | number                              | 否       | 距离最近的公交车的下标，默认值为-1       |
+| busIndex        | number[]                            | 否       | 当前线路上公交车索引数数组，默认值[]     |
 
 ### SearchSet接口说明
 
-| 名称           | 类型     | 必填 | 说明        |
-|--------------|--------|----|-----------|
-| lineName     | string | 是  | 线路名称，比如1路 |
-| startStation | string | 是  | 起始站点名称    |
-| endStation   | string | 是  | 终点站名称     |
-| coordX       | number | 是  | 经度        |
-| coordY       | number | 是  | 纬度        |
-| stationName  | string | 是  | 当前站点名称    |
-| sequence     | number | 是  | 站点顺序      |
+| 名称         | 类型   | 是否必填 | 说明              |
+| ------------ | ------ | -------- | ----------------- |
+| lineName     | string | 是       | 线路名称，比如1路 |
+| startStation | string | 是       | 起始站点名称      |
+| endStation   | string | 是       | 终点站名称        |
+| coordX       | number | 是       | 经度              |
+| coordY       | number | 是       | 纬度              |
+| stationName  | string | 是       | 当前站点名称      |
+| sequence     | number | 是       | 站点顺序          |
 
 ### BusLineInfo对象说明
 
-| 名称                | 类型                                      | 必填 | 说明         |
-|-------------------|-----------------------------------------|----|------------|
-| busNumber         | string                                  | 否  | 车次名称       |
-| direction         | string                                  | 否  | 行车方向       |
-| lineFirstTime     | string                                  | 否  | 首班车时间      |
-| lineEndTime       | string                                  | 否  | 末班车时间      |
-| price             | number                                  | 否  | 票价         |
-| currentStation    | number                                  | 否  | 当前站点索引     |
-| line              | string[]                                | 否  | 站点名称列表     |
-| nearestThreeBuses | [BusFromCurrent[]](#BusFromCurrent对象说明) | 否  | 距离最近的三辆车信息 |
+| 名称              | 类型                                        | 是否必填 | 说明                 |
+| ----------------- | ------------------------------------------- | -------- | -------------------- |
+| busNumber         | string                                      | 否       | 车次名称             |
+| direction         | string                                      | 否       | 行车方向             |
+| lineFirstTime     | string                                      | 否       | 首班车时间           |
+| lineEndTime       | string                                      | 否       | 末班车时间           |
+| price             | number                                      | 否       | 票价                 |
+| currentStation    | number                                      | 否       | 当前站点索引         |
+| line              | string[]                                    | 否       | 站点名称列表         |
+| nearestThreeBuses | [BusFromCurrent[]](#BusFromCurrent对象说明) | 否       | 距离最近的三辆车信息 |
 
 ### BusFromCurrent对象说明
 
-| 名称             | 类型     | 必填 | 说明         |
-|----------------|--------|----|------------|
-| remainStop     | number | 否  | 剩余站点数，默认值0 |
-| remainDistance | number | 否  | 剩余距离，默认值0  |
-| remainMinute   | number | 否  | 剩余时间，默认值0  |
+| 名称           | 类型   | 是否必填 | 说明                |
+| -------------- | ------ | -------- | ------------------- |
+| remainStop     | number | 否       | 剩余站点数，默认值0 |
+| remainDistance | number | 否       | 剩余距离，默认值0   |
+| remainMinute   | number | 否       | 剩余时间，默认值0   |
 
 # 示例代码
 
 ```
+import { mapCommon } from '@kit.MapKit'
 import { BusFromCurrent, BusLineInfo, RouteDetail, SearchSet } from 'route_detail'
 
 @Entry
-@Component
+@ComponentV2
 struct Index {
-   @State line: string[] = ['四惠枢纽站', '八王坟西']
-   @State nearInfos: BusFromCurrent[] = [new BusFromCurrent(2, 2, 3)]
-   @State stationLocation: SearchSet[] = [{
-      'lineName': '1路',
-      'startStation': '四惠枢纽站',
-      'endStation': '老山公交场站',
-      'coordX': 116.490437,
-      'coordY': 39.90536209,
-      'stationName': '四惠枢纽站',
-      'sequence': 1
-   }, {
-      'lineName': '1路',
-      'startStation': '四惠枢纽站',
-      'endStation': '老山公交场站',
-      'coordX': 116.469076,
-      'coordY': 39.90718736,
-      'stationName': '八王坟西',
-      'sequence': 2
-   }]
+  @Local line: string[] = ['四惠枢纽站', '八王坟西']
+  @Local nearInfos: BusFromCurrent[] = [new BusFromCurrent(2, 2, 3)]
+  @Local stationLocation: SearchSet[] = [{
+    'lineName': '1路',
+    'startStation': '四惠枢纽站',
+    'endStation': '老山公交场站',
+    'coordX': 116.490437,
+    'coordY': 39.90536209,
+    'stationName': '四惠枢纽站',
+    'sequence': 1
+  }, {
+    'lineName': '1路',
+    'startStation': '四惠枢纽站',
+    'endStation': '老山公交场站',
+    'coordX': 116.469076,
+    'coordY': 39.90718736,
+    'stationName': '八王坟西',
+    'sequence': 2
+  }]
+  @Local busLocation: mapCommon.LatLng[] = [{ longitude: 116.490437, latitude: 39.90536209 }]
 
-   build() {
-      Column() {
-         RouteDetail({
-            stationLocation: this.stationLocation,
-            busLocation: [{ longitude: 116.490437, latitude: 39.90536209 }],
-            busLineInfo: new BusLineInfo('1路', '老山公交场站方向', '6：00', '22：00', 2, 3, this.line, this.nearInfos),
-            nearToMe: 0,
-            busIndex: [0.1, 1.1]
-         })
-      }
-   }
+  build() {
+    Column() {
+      RouteDetail({
+        stationLocation: this.stationLocation,
+        busLocation: this.busLocation,
+        busLineInfo: new BusLineInfo('1路', '老山公交场站方向', '6：00', '22：00', 2, 3, this.line, this.nearInfos),
+        nearToMe: 0,
+        busIndex: [0.1, 1.1]
+      })
+    }
+  }
 }
 ```
 

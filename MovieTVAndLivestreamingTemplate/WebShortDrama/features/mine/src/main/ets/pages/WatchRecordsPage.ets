@@ -1,16 +1,140 @@
-import { jumpDetailPage } from '@agctemplate/detail';
-import { getString } from '@agctemplate/resources';
+import { jumpDetailPage, ParamsModel } from '@agctemplate/detail';
+import { getMedia, getString } from '@agctemplate/resources';
 import { MyWatchRecordData, MyWatchRecordRes, RequestAPI } from '@agctemplate/server';
-import { appRouter, container } from '@agctemplate/utils';
+import { appRouter, container, WindowManager } from '@agctemplate/utils';
 import { NavDestinationModifier } from '@agctemplate/widgets'
 import { VideoSeries } from '../component/VideoSeries';
+import { AlertDialog } from '@kit.ArkUI'
+import {
+  getDramaInfo,
+  setMyWatchRecord,
+  unsetMyWatchRecord
+} from '@agctemplate/server/src/main/ets/api/mock/mockData/mockDramaFactory';
 
 @ComponentV2
 export struct WatchRecordsPage {
   @Local myWatchRecordRes: MyWatchRecordRes = new MyWatchRecordRes();
   navDestinationModifier: NavDestinationModifier = new NavDestinationModifier();
+  @Local isDeleting: boolean = false
+  @Local selectCount: number = 0
+  @Local selectedIds: string[] = []
+  @Local deletePromptMsg: string | Resource = '此条'
+  deleteDialogController: CustomDialogController = new CustomDialogController({
+    builder: AlertDialog({
+      content: getString('app.string.delete_watched_prompt', this.deletePromptMsg.toString()),
+      primaryButton: {
+        value: '取消',
+        action: () => {
+          this.deleteDialogController.close()
+        }
+      },
+      secondaryButton: {
+        value: '删除',
+        fontColor: $r('sys.color.ohos_id_color_warning'),
+        action: () => {
+          if (this.selectCount > 0) {
+            // 删除选中
+            this.selectedIds.map(item => {
+              unsetMyWatchRecord(item)
+            })
+            this.updateWatchedRecords()
+            this.deleteDialogController.close()
+            this.isDeleting = !this.isDeleting
+            this.selectedIds = []
+            this.selectCount = 0
+          }
+        },
+      },
+    }),
+  })
 
   aboutToAppear(): void {
+    this.updateWatchedRecords()
+  }
+
+  build() {
+    NavDestination() {
+      Column() {
+        this.title()
+        Column() {
+          if (this.myWatchRecordRes.myWatchRecord.length > 0) {
+            this.WatchRecordItemsBuilder()
+          } else {
+            Text('暂无观看记录')
+              .height('100%')
+              .fontSize($r('sys.float.Body_S'))
+              .fontColor($r('sys.color.icon_secondary'))
+          }
+        }
+        .width('100%')
+
+        Blank()
+        this.footItemBuilder()
+      }
+      .height('100%')
+      .width('100%')
+      .padding({ left: 16, right: 16 })
+    }
+    .onBackPressed(() => {
+      appRouter.back(true)
+      return true
+    })
+    .hideTitleBar(true)
+    .backgroundColor($r('sys.color.comp_background_gray'))
+    .attributeModifier(this.navDestinationModifier)
+
+  }
+
+  @Builder
+  WatchRecordItemsBuilder() {
+    Grid() {
+      Repeat<MyWatchRecordData>(this.myWatchRecordRes.myWatchRecord)
+        .each((ri: RepeatItem<MyWatchRecordData>) => {
+          GridItem() {
+            VideoSeries({
+              title: ri.item.name,
+              currentEpisode: ri.item.currentWatch + 1,
+              totalCount: ri.item.totalCount,
+              isDeleting: this.isDeleting,
+              likeCount: ri.item.likeCount,
+              isLike: false,
+              isSelectBack: (isSelect) => {
+                ri.item.isSelect = isSelect
+                this.getSelectedIds()
+              },
+              cover: ri.item.coverUrl,
+              isVip: ri.item.isVip,
+              onContinueWatch: () => {
+                if (!this.isDeleting) {
+                  jumpDetailPage(ri.item, ri.item.currentWatch, 0, (params) => {
+                    WindowManager.setWindowSystemBarProperties({ statusBarContentColor: '#e6000000' })
+                    const paramsInfo = params.result as ParamsModel
+                    const drama = getDramaInfo(paramsInfo.id)
+                    drama.curIndex = paramsInfo.curIndex
+                    unsetMyWatchRecord(drama.id)
+                    setMyWatchRecord(drama)
+                    this.updateWatchedRecords()
+                  })
+                }
+              }
+            })
+          }
+        })
+        .key((item: MyWatchRecordData, index: number): string => item.id)// 键值生成函数
+        .virtualScroll({
+          totalCount: this.myWatchRecordRes.myWatchRecord.length
+        }) // 打开virtualScroll模式，totalCount为期望加载的数据长度
+    }
+    .edgeEffect(EdgeEffect.Spring)
+    .columnsTemplate('1fr 1fr 1fr')
+    .scrollBar(BarState.Off)
+    .cachedCount(4) // 容器组件的预加载区域大小
+    .margin({ bottom: this.isDeleting ? 0 : 60 })
+    .height(this.isDeleting ? '85%' : 'auto')
+  }
+
+  // 更新观看记录数据
+  updateWatchedRecords(): void {
     container.resolve(RequestAPI).getMyWatchRecord({
       pageSize: 1,
       pageNum: 20
@@ -19,55 +143,115 @@ export struct WatchRecordsPage {
     })
   }
 
-  build() {
-    NavDestination() {
-      Column() {
-        List() {
-          Repeat<MyWatchRecordData>(this.myWatchRecordRes.myWatchRecord)
-            .each((ri: RepeatItem<MyWatchRecordData>) => { // 默认模板
-              ListItem() {
-                VideoSeries({
-                  title: ri.item.name,
-                  currentEpisode: ri.item.currentWatch + 1,
-                  episodesDes: ri.item.name,
-                  cover: ri.item.coverUrl,
-                  onContinueWatch: () => {
-                    jumpDetailPage(ri.item, ri.item.currentWatch)
-                  }
-                })
-              }
-            })
-            .key((item: MyWatchRecordData, index: number): string => item.id)// 键值生成函数
-            .virtualScroll({
-              totalCount: this.myWatchRecordRes.myWatchRecord.length
-            }) // 打开virtualScroll模式，totalCount为期望加载的数据长度
-        }
-        .scrollBar(BarState.Off)
-        .cachedCount(4) // 容器组件的预加载区域大小
-      }.width('100%')
-      .height('100%')
-      .padding({ left: 16, right: 16 })
+  // 获取列表id
+  getSelectedIds() {
+    this.selectedIds = this.myWatchRecordRes.myWatchRecord
+      .filter(item => item.isSelect)
+      .map(item => item.id)
+    this.selectCount = this.selectedIds.length
+    this.getSelectCount()
+  }
+
+  // 获取所有id
+  getAllIds() {
+    this.selectedIds = this.myWatchRecordRes.myWatchRecord
+      .map(item => item.id);
+    this.selectCount = this.selectedIds.length
+    this.getSelectCount()
+  }
+
+  // 获取所有id
+  getSelectCount() {
+    if (this.selectCount < 1) {
+      return
     }
-    .onBackPressed(() => {
-      appRouter.back(true)
-      return true
-    })
-    .hideTitleBar(false)
-    .title(this.title())
-    .backgroundColor($r('sys.color.background_primary'))
-    .attributeModifier(this.navDestinationModifier)
-    .height('100%')
+    if (this.selectCount === 1) {
+      this.deletePromptMsg = '此条'
+    } else if (this.selectCount === this.myWatchRecordRes.myWatchRecord.length) {
+      this.deletePromptMsg = '全部'
+    } else {
+      this.deletePromptMsg = this.selectCount + '条'
+    }
   }
 
   @Builder
   title() {
-    Text(getString('app.string.my_record'))
-      .fontSize(20)
-      .fontWeight(FontWeight.Bold)
-      .height(27)
-      .margin({ top: 15, left: 8 })
+    Row() {
+      Image(getMedia('app.media.black_back'))
+        .width(40)
+        .aspectRatio(1)
+        .margin({ right: 8 })
+        .onClick(() => {
+          appRouter.back()
+        })
+      Text(getString('app.string.my_record'))
+        .fontSize(20)
+        .fontWeight(FontWeight.Bold)
+        .height(27)
+
+      Blank()
+      Button(this.isDeleting ? '取消' : '编辑')
+        .margin({ left: 8 })
+        .height(40)
+        .borderRadius(20)
+        .fontSize(16)
+        .fontColor($r('sys.color.font_primary'))
+        .backgroundColor($r('sys.color.comp_background_tertiary'))
+        .onClick(() => {
+          this.isDeleting = !this.isDeleting
+          this.selectedIds = []
+          this.selectCount = 0
+          this.myWatchRecordRes.myWatchRecord.forEach(item => {
+            item.isSelect = false;
+          })
+        })
+    }
+    .height(56)
+    .width('100%')
   }
 
+  @Builder
+  footItemBuilder() {
+    if (this.isDeleting) {
+      Row() {
+        Column() {
+          Image(getMedia('app.media.ic_public_delete_all'))
+            .width(22)
+            .height(22)
+          Text('一键清空')
+            .height(14)
+            .fontSize(13)
+            .margin({ top: 5.36 })
+        }
+        .width('50%')
+        .onClick(() => {
+          this.getAllIds()
+          this.deleteDialogController.open()
+        })
+
+        Column() {
+          Image(getMedia('app.media.ic_public_delete'))
+            .width(22)
+            .height(22)
+          Text('删除')
+            .height(14)
+            .fontSize(13)
+            .margin({ top: 5.36 })
+        }
+        .width('50%')
+        .opacity(this.selectCount > 0 ? 1 : 0.4)
+        .enabled(this.selectCount > 0)
+        .onClick(() => {
+          this.getSelectedIds()
+          this.deleteDialogController.open()
+        })
+      }
+      .width('100%')
+      .justifyContent(FlexAlign.Center)
+      .backgroundColor($r('sys.color.comp_background_gray'))
+      .padding({ top: 8, bottom: 8 })
+    }
+  }
 }
 
 @Builder

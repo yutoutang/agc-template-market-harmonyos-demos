@@ -1,0 +1,1 @@
+export { FavorMainPageBuilder } from './src/main/ets/pages/FavorMainPage'

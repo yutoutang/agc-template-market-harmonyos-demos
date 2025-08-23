@@ -1,9 +1,10 @@
 import { abilityAccessCtrl, bundleManager, common, PermissionRequestResult, Permissions } from '@kit.AbilityKit';
-import { map, mapCommon } from '@kit.MapKit';
-import { geoLocationManager } from '@kit.LocationKit';
-import { WindowUtil } from './WindowUtil';
-import { Logger } from './Logger';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { geoLocationManager } from '@kit.LocationKit';
+import { map, mapCommon } from '@kit.MapKit';
+import { Logger } from './Logger';
+import { WindowUtil } from './WindowUtil';
+import { promptAction } from '@kit.ArkUI';
 
 export interface LocationResultData {
   result: LocationStatus;
@@ -64,6 +65,10 @@ export class LocationUtil {
       LocationUtil.cache = gcj02LatLng;
       return { result: LocationStatus.SUCCESS, gcj02LatLng: gcj02LatLng };
     } catch (error) {
+      if (!geoLocationManager.isLocationEnabled()) {
+        promptAction.showToast({ message: '系统定位权限未开启' });
+        return { result: LocationStatus.SUCCESS, gcj02LatLng: undefined };
+      }
       return { result: LocationStatus.UNKNOWN_ERROR };
     }
   }

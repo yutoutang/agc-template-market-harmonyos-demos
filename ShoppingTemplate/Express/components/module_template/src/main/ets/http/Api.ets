@@ -1,6 +1,6 @@
 import { IGoods, ITemplate } from './Type';
 import { CommonUtils } from '../common/Utils';
-import { goodsList } from 'module_base';
+import { goodsList, address1, address2 } from 'module_base';
 
 export class TemplateApi {
   static TEMPLATE_LIST: ITemplate[] =
@@ -8,26 +8,8 @@ export class TemplateApi {
       {
         id: 1,
         name: '文件',
-        sendAddress: {
-          id: 1,
-          name: '用户1',
-          cellphone: '12345678901',
-          province: '江苏省',
-          city: '南京市',
-          area: '雨花台区',
-          detailAddress: 'xx街道xxx小区',
-          isDefault: true
-        },
-        getAddress: {
-          id: 2,
-          name: '用户2',
-          cellphone: '12345678901',
-          province: '江苏省',
-          city: '南京市',
-          area: '雨花台区',
-          detailAddress: 'xx街道xxx小区',
-          isDefault: false
-        },
+        sendAddress: address1,
+        getAddress: address2,
         goods: {
           id: 1,
           name: '文件',
@@ -41,26 +23,8 @@ export class TemplateApi {
       {
         id: 2,
         name: '发票',
-        sendAddress: {
-          id: 1,
-          name: '用户1',
-          cellphone: '12345678901',
-          province: '江苏省',
-          city: '南京市',
-          area: '雨花台区',
-          detailAddress: 'xx街道xxx小区',
-          isDefault: true
-        },
-        getAddress: {
-          id: 2,
-          name: '用户2',
-          cellphone: '12345678901',
-          province: '江苏省',
-          city: '南京市',
-          area: '雨花台区',
-          detailAddress: 'xx街道xxx小区',
-          isDefault: false
-        },
+        sendAddress: address1,
+        getAddress: address2,
         goods: {
           id: 3,
           name: '发票',

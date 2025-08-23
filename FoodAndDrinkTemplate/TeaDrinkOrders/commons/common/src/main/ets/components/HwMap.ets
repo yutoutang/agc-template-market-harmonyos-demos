@@ -7,6 +7,7 @@ import { CommonUrl, Constants } from '../constants/Common';
 import { AppStorageV2 } from '@kit.ArkUI';
 import { AppInfoModel, StoreInfoModel, WindowModel } from '../models/StorageModel';
 import { RouterMap } from '../constants/RouterMap';
+import { logger } from '../utils/Logger';
 
 @Builder
 export function HwMapBuilder() {
@@ -257,7 +258,11 @@ export struct HwMap {
       }
     }).onHidden(() => {
       if (this.mapController) {
-        this.mapController.hide();
+        try {
+          this.mapController.hide();
+        } catch (e) {
+          logger.error(`HwMap hide failed. msg:${e}`)
+        }
       }
     })
 

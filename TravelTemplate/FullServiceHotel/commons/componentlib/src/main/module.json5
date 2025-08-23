@@ -3,8 +3,7 @@
     "name": "componentlib",
     "type": "har",
     "deviceTypes": [
-      "default",
-      "tablet"
+      "default"
     ],
     "installationFree": true,
   }

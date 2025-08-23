@@ -1,0 +1,19 @@
+{
+  "routerMap": [
+    {
+      "name": "ExplainPage",
+      "pageSourceFile": "src/main/ets/pages/ExplainPage.ets",
+      "buildFunction": "ExplainPageBuilder"
+    },
+    {
+      "name": "ExplainOrderPage",
+      "pageSourceFile": "src/main/ets/pages/ExplainOrderPage.ets",
+      "buildFunction": "ExplainOrderPageBuilder"
+    },
+    {
+      "name": "ExplainSuccess",
+      "pageSourceFile": "src/main/ets/pages/ExplainSuccess.ets",
+      "buildFunction": "ExplainSuccessBuilder"
+    }
+  ]
+}

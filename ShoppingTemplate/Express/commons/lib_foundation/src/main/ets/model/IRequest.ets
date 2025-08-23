@@ -1,5 +1,6 @@
+import { IAddrInfo } from 'module_base';
 import { ExpressStatus, OrderStatus, OrderType, PaymentMethod, ShippingMethod } from '../common/Constant';
-import { IAddrInfo, IGoods } from './IResponse';
+import { IGoods } from './IResponse';
 
 export interface NormalRequest {
   id: number

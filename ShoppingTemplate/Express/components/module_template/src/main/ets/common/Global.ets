@@ -13,32 +13,16 @@
  * limitations under the License.
  */
 import { AppStorageV2 } from '@kit.ArkUI';
+import { address1, address2, IAddrInfo } from 'module_base';
 import { TemplateApi } from '../http/Api';
-import { IAddrInfo, IGoods, ITemplate } from '../http/Type';
+import { IGoods, ITemplate } from '../http/Type';
+
 @ObservedV2
 export class TemplateInfo {
   @Trace id: number = 0
   @Trace name: string = ''
-  @Trace sendAddress: IAddrInfo = {
-    id: 1,
-    name: '用户1',
-    cellphone: '12345678901',
-    province: '江苏省',
-    city: '南京市',
-    area: '雨花台区',
-    detailAddress: 'xx街道xxx小区',
-    isDefault: true
-  }
-  @Trace getAddress: IAddrInfo = {
-    id: 1,
-    name: '用户1',
-    cellphone: '12345678901',
-    province: '江苏省',
-    city: '南京市',
-    area: '雨花台区',
-    detailAddress: 'xx街道xxx小区',
-    isDefault: true
-  }
+  @Trace sendAddress: IAddrInfo = address1
+  @Trace getAddress: IAddrInfo = address2
   @Trace goods: IGoods = {
     id: 1,
     name: '文件',
@@ -57,6 +41,7 @@ export class CurrentAppStorage {
     CurrentAppStorage.templateInfo = new TemplateInfo()
   }
 }
+
 @ObservedV2
 export class TemplateList {
   @Trace list: ITemplate[] = TemplateApi.TEMPLATE_LIST;

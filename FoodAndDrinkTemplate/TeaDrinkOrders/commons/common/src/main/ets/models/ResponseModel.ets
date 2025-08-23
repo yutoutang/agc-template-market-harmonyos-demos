@@ -1,4 +1,4 @@
-import { orderStateMap } from '../constants/Common'
+import { Type } from '@kit.ArkUI'
 
 export class BaseResponse<T = undefined> {
   code: number
@@ -86,9 +86,9 @@ export class StoreInfo {
   // 位置坐标
   coordinates: string = ''
   // 营业执照
-  dpyyzz: string = ''
+  businessLicense: string = ''
   // 食品经营许可证
-  spjyxkz: string = ''
+  foodLicense: string = ''
   // 保温袋金额
   bagMoney: number = 0
   environment: Array<string> = []
@@ -114,7 +114,7 @@ export class StoreInfo {
  * 商品
  */
 @ObservedV2
-export class Good {
+export class Goods {
   id?: string
   name?: string
   logo?: string
@@ -126,20 +126,20 @@ export class Good {
   specType?: string
   details?: string
   num?: number
-  spec?: Array<GoodSpec>
+  spec?: Array<GoodsSpec>
   // 餐盒费
   boxMoney: string = '0'
 }
 
 @ObservedV2
-export class GoodSpec {
+export class GoodsSpec {
   specId: string
   specName: string
   specValId: string
   @Trace selected: boolean = false
-  @Trace specVal: Array<GoodSpecVal>
+  @Trace specVal: Array<GoodsSpecVal>
 
-  constructor(specId: string, specName: string, specValId: string, specVal: Array<GoodSpecVal>) {
+  constructor(specId: string, specName: string, specValId: string, specVal: Array<GoodsSpecVal>) {
     this.specId = specId
     this.specName = specName
     this.specValId = specValId
@@ -148,7 +148,7 @@ export class GoodSpec {
 }
 
 @ObservedV2
-export class GoodSpecVal extends Good {
+export class GoodsSpecVal extends Goods {
   @Trace specValId?: string
   @Trace specValName?: string
   @Trace specValLogo?: string
@@ -163,12 +163,12 @@ export class GoodSpecVal extends Good {
 export class DishesType {
   id: string
   typeName: string
-  good: Array<Good>
+  goods: Array<Goods>
 
-  constructor(id: string, typeName: string, good: Array<Good>) {
+  constructor(id: string, typeName: string, goods: Array<Goods>) {
     this.id = id
     this.typeName = typeName
-    this.good = good
+    this.goods = goods
   }
 }
 
@@ -177,7 +177,7 @@ export class DishesType {
  * 饮品类别
  */
 @ObservedV2
-export class GoodSpecInfo {
+export class GoodsSpecInfo {
   id?: string
   specId: string = ''
   money?: string
@@ -185,37 +185,15 @@ export class GoodSpecInfo {
   @Trace combination?: PackageSpec[]
   number?: string
   num: number = 0
-  @Trace goodId?: string
-  @Trace goodName: string = ''
-  @Trace goodLogo: string = ''
+  @Trace goodsId?: string
+  @Trace goodsName: string = ''
+  @Trace goodsLogo: string = ''
   boxMoney: string = '0'
   specType?: string
 
   @Computed
   get specStr() {
     return this.spec?.split(',').join(' | ')
-  }
-}
-
-@ObservedV2
-export class MyCar {
-  @Trace boxMoney?: number
-  @Trace carGoods: Array<CarGoodInfo> = []
-  @Trace num?: number
-  @Trace money?: number
-
-  constructor(boxMoney?: number, res: Array<CarGoodInfo> = [], num?: number, money?: number) {
-    this.boxMoney = boxMoney
-    this.carGoods = res
-    this.num = num
-    this.money = money
-  }
-
-  update(item: MyCar) {
-    this.boxMoney = item.boxMoney
-    this.carGoods = item.carGoods
-    this.num = item.num
-    this.money = item.money
   }
 }
 
@@ -230,20 +208,44 @@ export class PackageSpec {
 }
 
 @ObservedV2
-export class CarGoodInfo {
+export class CarGoodsInfo {
   id: string = ''
-  goodId?: string = ''
+  goodsId?: string = ''
   logo?: string = ''
   name?: string = ''
   type?: string = ''
   @Trace num: number = 0
   specType?: string = ''
   @Trace spec?: string = ''
+  @Type(PackageSpec)
   @Trace combination?: PackageSpec[] = []
   money: string = ''
   boxMoney?: string = ''
   number?: string = ''
   isCheck?: boolean = true
+}
+
+@ObservedV2
+export class MyCar {
+  @Trace boxMoney?: number
+  @Type(CarGoodsInfo)
+  @Trace carGoods: Array<CarGoodsInfo> = []
+  @Trace num?: number
+  @Trace money?: number
+
+  constructor(boxMoney?: number, res: Array<CarGoodsInfo> = [], num?: number, money?: number) {
+    this.boxMoney = boxMoney
+    this.carGoods = res
+    this.num = num
+    this.money = money
+  }
+
+  update(item: MyCar) {
+    this.boxMoney = item.boxMoney
+    this.carGoods = item.carGoods
+    this.num = item.num
+    this.money = item.money
+  }
 }
 
 @ObservedV2
@@ -269,10 +271,6 @@ export class OrderModel {
   address?: string
   coordinates?: string
   bagMoney?: number
-
-  getState() {
-    return orderStateMap[this.state]
-  }
 }
 
 @ObservedV2
@@ -292,7 +290,7 @@ export class GoodsOfOrder {
 export class MyOrderInfo {
   @Trace order: OrderModel = new OrderModel()
   num?: number
-  @Trace good?: Array<GoodsOfOrder>
+  @Trace goods?: Array<GoodsOfOrder>
   storeInfo: StoreInfo = new StoreInfo()
   address: AddressInfo = new AddressInfo()
   delivery: DeliveryInfo = new DeliveryInfo()

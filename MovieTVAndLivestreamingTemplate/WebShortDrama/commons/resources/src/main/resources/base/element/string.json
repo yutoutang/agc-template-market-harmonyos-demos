@@ -13,6 +13,10 @@
       "value": "福利"
     },
     {
+      "name": "favor",
+      "value": "追剧"
+    },
+    {
       "name": "mine",
       "value": "我的"
     },
@@ -37,6 +41,26 @@
       "value": "个人信息"
     },
     {
+      "name": "privacy_policy",
+      "value": "隐私协议"
+    },
+    {
+      "name": "preferences",
+      "value": "我的偏好"
+    },
+    {
+      "name": "play_speed_settings",
+      "value": "倍速设置"
+    },
+    {
+      "name": "background_mini_window_playback",
+      "value": "后台小窗播放"
+    },
+    {
+      "name": "about",
+      "value": "关于我们"
+    },
+    {
       "name": "avatar",
       "value": "头像"
     },
@@ -58,7 +82,47 @@
     },
     {
       "name": "my_record",
-      "value": "观看记录"
+      "value": "浏览记录"
+    },
+    {
+      "name": "my_message",
+      "value": "我的消息"
+    },
+    {
+      "name": "my_like",
+      "value": "我的点赞"
+    },
+    {
+      "name": "my_award",
+      "value": "福利中心"
+    },
+    {
+      "name": "my_feedback",
+      "value": "意见与反馈"
+    },
+    {
+      "name": "my_customer_service",
+      "value": "在线客服"
+    },
+    {
+      "name": "my_setting",
+      "value": "设置"
+    },
+    {
+      "name": "VIP_button",
+      "value": "会员中心"
+    },
+    {
+      "name": "Non_VIP_button",
+      "value": "开通会员"
+    },
+    {
+      "name": "VIP_information",
+      "value": "请查看您的会员权益"
+    },
+    {
+      "name": "Non_VIP_information",
+      "value": "开通VIP后享受更多服务"
     },
     {
       "name": "my_viewpoint",
@@ -78,7 +142,7 @@
     },
     {
       "name": "have_watch",
-      "value": "看到第%s集"
+      "value": "观看至%s集"
     },
     {
       "name": "continue_watch",
@@ -122,7 +186,7 @@
     },
     {
       "name": "comment_tip",
-      "value": "请先关联账号"
+      "value": "请先登录"
     },
     {
       "name": "search_placeholder",
@@ -162,7 +226,7 @@
     },
     {
       "name": "billboard_category_hot",
-      "value": "热播榜"
+      "value": "热搜榜"
     },
     {
       "name": "billboard_category_new",
@@ -186,7 +250,7 @@
     },
     {
       "name": "cover_update_info",
-      "value": "更新至%s集"
+      "value": "已更%s集"
     },
     {
       "name": "play",
@@ -222,7 +286,7 @@
     },
     {
       "name": "login_tip",
-      "value": "请先关联账号"
+      "value": "请先登录"
     },
     {
       "name": "phone_tip",
@@ -255,6 +319,82 @@
     {
       "name": "modify_info",
       "value": "修改个人信息"
+    },
+    {
+      "name": "daily_point_limit",
+      "value": "每天最多+500看点"
+    },
+    {
+      "name": "watch_reward",
+      "value": "看剧领奖励"
+    },
+    {
+      "name": "daily_check_in_reward",
+      "value": "签到7天 赚看点"
+    },
+    {
+      "name": "watch_drama",
+      "value": "去看剧"
+    },
+    {
+      "name": "receive",
+      "value": "领取"
+    },
+    {
+      "name": "completed",
+      "value": "已完成"
+    },
+    {
+      "name": "earn_points",
+      "value": "领看点"
+    },
+    {
+      "name": "checked_in",
+      "value": "已签到"
+    },
+    {
+      "name": "check_in",
+      "value": "签到"
+    },
+    {
+      "name": "reward_center",
+      "value": "福利"
+    },
+    {
+      "name": "point_balance",
+      "value": "看点余额"
+    },
+    {
+      "name": "daily_points_limit",
+      "value": "今日最多可领11080看点，每100点可免广看剧1次"
+    },
+    {
+      "name": "reward_wheel",
+      "value": "福利转盘"
+    },
+    {
+      "name": "max_points_winnable",
+      "value": "最高可得8888看点"
+    },
+    {
+      "name": "daily_tasks",
+      "value": "日常任务"
+    },
+    {
+      "name": "daily_task_update",
+      "value": "每日凌晨任务更新"
+    },
+    {
+      "name": "delete_watched_prompt",
+      "value": "是否删除%s观看记录 ？"
+    },
+    {
+      "name": "delete_favor_prompt",
+      "value": "是否删除%s收藏 ？"
+    },
+    {
+      "name": "agcit_huawei_web_short_drama",
+      "value": "2.0.0"
     }
   ]
 }

@@ -1,4 +1,3 @@
-import { OrderTypeEnum } from '../constants/Common';
 import { getAnonymousTel } from '../utils/Utils';
 import { MyCar, Reduction, StoreInfo, UserInfo } from './ResponseModel';
 import { window } from '@kit.ArkUI';
@@ -13,7 +12,7 @@ export class AppInfoModel {
 export class StoreInfoModel {
   @Trace storeId: string = '';
   @Trace tel: string = '';
-  @Trace orderType: number = OrderTypeEnum.PICK_SELF
+  @Trace orderType: number = 0
   @Trace distance: number = 0
   @Trace storeInfo: StoreInfo = new StoreInfo()
 }

@@ -8,24 +8,24 @@
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
-## 约束与限制
-### 软件
 
-* DevEco Studio版本：DevEco Studio 5.0.4 Release及以上
-* HarmonyOS SDK版本：HarmonyOS 5.0.4 Release及以上
 
-### 硬件
-
-* 设备类型：华为手机（直板机）
-* HarmonyOS版本：HarmonyOS 5.0.4 Release及以上
-
-## 快速入门
+## 简介
 
 本组件提供了查询开始日期到结束日期内的吉日以及忌日的相关功能。
 
 <img src="./screenshot/YiJiDayQuery_3.png" width="300">
 
-## 使用
+## 约束与限制
+
+### 环境
+
+- DevEco Studio版本：DevEco Studio 5.0.4 Release及以上
+- HarmonyOS SDK版本：HarmonyOS 5.0.4 Release SDK及以上
+- 设备类型：华为手机（包括双折叠和阔折叠）
+- 系统版本：HarmonyOS 5.0.4(16)及以上
+
+## 快速入门
 
 1. 安装组件。
 

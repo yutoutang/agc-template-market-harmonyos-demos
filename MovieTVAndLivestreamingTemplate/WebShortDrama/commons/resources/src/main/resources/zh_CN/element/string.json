@@ -58,7 +58,7 @@
     },
     {
       "name": "my_record",
-      "value": "观看记录"
+      "value": "浏览记录"
     },
     {
       "name": "my_viewpoint",
@@ -122,7 +122,7 @@
     },
     {
       "name": "comment_tip",
-      "value": "请先关联账号"
+      "value": "请先登录"
     },
     {
       "name": "search_placeholder",
@@ -162,7 +162,7 @@
     },
     {
       "name": "billboard_category_hot",
-      "value": "热播榜"
+      "value": "热搜榜"
     },
     {
       "name": "billboard_category_new",
@@ -186,7 +186,7 @@
     },
     {
       "name": "cover_update_info",
-      "value": "更新至%s集"
+      "value": "已更%s集"
     },
     {
       "name": "play",
@@ -222,7 +222,7 @@
     },
     {
       "name": "login_tip",
-      "value": "请先关联账号"
+      "value": "请先登录"
     },
     {
       "name": "phone_tip",
@@ -255,6 +255,10 @@
     {
       "name": "modify_info",
       "value": "修改个人信息"
+    },
+    {
+      "name": "agcit_huawei_web_short_drama",
+      "value": "2.0.0"
     }
   ]
 }

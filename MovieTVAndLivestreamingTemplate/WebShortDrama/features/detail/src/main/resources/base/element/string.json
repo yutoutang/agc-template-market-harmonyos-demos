@@ -111,6 +111,10 @@
     {
       "name": "ohos_global_state_dialog_hundred_percent",
       "value": "100%"
+    },
+    {
+      "name": "agcit_huawei_web_short_drama",
+      "value": "2.0.0"
     }
   ]
 }

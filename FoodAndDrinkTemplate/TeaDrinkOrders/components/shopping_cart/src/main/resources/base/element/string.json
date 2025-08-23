@@ -1,0 +1,48 @@
+{
+  "string": [
+    {
+      "name": "store_rest",
+      "value": "小店休息一下~~"
+    },
+    {
+      "name": "place_order",
+      "value": "去结算"
+    },
+    {
+      "name": "total_price",
+      "value": "共计"
+    },
+    {
+      "name": "currency_symbol",
+      "value": "￥"
+    },
+    {
+      "name": "need_goods",
+      "value": "请选择商品后下单"
+    },
+    {
+      "name": "car_empty_toast",
+      "value": "购物车商品为空，请选择商品后结算"
+    },
+    {
+      "name": "check_all",
+      "value": "全选"
+    },
+    {
+      "name": "clear_car",
+      "value": "清空购物车"
+    },
+    {
+      "name": "selected",
+      "value": "已选："
+    },
+    {
+      "name": "agcit_huawei_tea_drink_orders_shopping_cart",
+      "value": "1.0.0"
+    },
+    {
+      "name": "agcittype_huawei_tea_drink_orders_shopping_cart",
+      "value": "serviceComponent"
+    }
+  ]
+}

@@ -1,7 +1,8 @@
-import { abilityAccessCtrl, bundleManager, common, PermissionRequestResult, Permissions, Want } from '@kit.AbilityKit';
-import { BusinessError } from '@kit.BasicServicesKit';
-import { fileIo, storageStatistics } from '@kit.CoreFileKit';
-import { Logger, RouteEntryVM } from 'common';
+import { abilityAccessCtrl, bundleManager, common, PermissionRequestResult, Permissions, Want } from '@kit.AbilityKit'
+import { BusinessError } from '@kit.BasicServicesKit'
+import { fileIo, storageStatistics } from '@kit.CoreFileKit'
+import { AppStorageV2 } from '@kit.ArkUI'
+import { Logger, RouteEntryVM, UserInfoModel } from 'common'
 
 
 @Builder
@@ -9,19 +10,19 @@ export function SettingsPageBuilder() {
   SettingsPage()
 }
 
-const TAG: string = '[PublishOperation]';
-const DOMAIN_NUMBER: number = 0xFF00;
+const TAG: string = '[PublishOperation]'
+const DOMAIN_NUMBER: number = 0xFF00
 
-@Component
+@ComponentV2
 export struct SettingsPage {
-  @State notifyToggle: boolean = false;
-  @State appCache: number = 100.3
-  @State isShow: Boolean = false;
-  @StorageLink('isLogin') isLogin: boolean = AppStorage.get('isLogin') ?? false;
-  @State localToggle: boolean = false;
-  private context = getContext(this) as common.UIAbilityContext;
-  localPermissions: Array<Permissions> = ['ohos.permission.LOCATION', 'ohos.permission.APPROXIMATELY_LOCATION'];
-  vm: RouteEntryVM = RouteEntryVM.instance;
+  @Local userInfo: UserInfoModel = AppStorageV2.connect(UserInfoModel, 'UserInfoModel', () => new UserInfoModel())!
+  @Local notifyToggle: boolean = false
+  @Local appCache: number = 100.3
+  @Local isShow: Boolean = false
+  @Local localToggle: boolean = false
+  private context = getContext(this) as common.UIAbilityContext
+  localPermissions: Array<Permissions> = ['ohos.permission.LOCATION', 'ohos.permission.APPROXIMATELY_LOCATION']
+  vm: RouteEntryVM = RouteEntryVM.instance
 
   async aboutToAppear(): Promise<void> {
     this.localToggle = await this.checkPermissions(this.localPermissions)
@@ -30,13 +31,13 @@ export struct SettingsPage {
 
   // 请求权限
   async reqPermissionsFromUser(permissions: Array<Permissions>): Promise<boolean> {
-    let context: Context = getContext(this) as common.UIAbilityContext;
-    let atManager: abilityAccessCtrl.AtManager = abilityAccessCtrl.createAtManager();
+    let context: Context = getContext(this) as common.UIAbilityContext
+    let atManager: abilityAccessCtrl.AtManager = abilityAccessCtrl.createAtManager()
     // requestPermissionsFromUser会判断权限的授权状态来决定是否唤起弹窗
     let data: PermissionRequestResult = await atManager.requestPermissionsFromUser(context, permissions)
 
-    let grantStatus: Array<number> = data.authResults;
-    let length: number = grantStatus.length;
+    let grantStatus: Array<number> = data.authResults
+    let length: number = grantStatus.length
     for (let i = 0; i < length; i++) {
       if (grantStatus[i] === 0) {
         // 用户授权，可以继续访问目标操作
@@ -46,10 +47,10 @@ export struct SettingsPage {
           await atManager.requestPermissionOnSetting(context, permissions)
         for (let i = 0; i < secondData.length; i++) {
           if (secondData[i] === abilityAccessCtrl.GrantStatus.PERMISSION_DENIED) {
-            return false;
+            return false
           }
         }
-        return true;
+        return true
       }
     }
     return true
@@ -58,30 +59,30 @@ export struct SettingsPage {
   // 校验应用是否被授予定位权限，可以通过调用checkAccessToken()方法来校验当前是否已经授权。
   async checkPermissions(permissions: Array<Permissions>): Promise<boolean> {
     for (let permission of permissions) {
-      let grantStatus: abilityAccessCtrl.GrantStatus = await this.checkAccessToken(permission);
+      let grantStatus: abilityAccessCtrl.GrantStatus = await this.checkAccessToken(permission)
       if (grantStatus === abilityAccessCtrl.GrantStatus.PERMISSION_DENIED) {
-        return false;
+        return false
       }
     }
-    return true;
+    return true
   }
 
   async checkAccessToken(permission: Permissions): Promise<abilityAccessCtrl.GrantStatus> {
-    let atManager: abilityAccessCtrl.AtManager = abilityAccessCtrl.createAtManager();
-    let grantStatus: abilityAccessCtrl.GrantStatus = abilityAccessCtrl.GrantStatus.PERMISSION_DENIED;
+    let atManager: abilityAccessCtrl.AtManager = abilityAccessCtrl.createAtManager()
+    let grantStatus: abilityAccessCtrl.GrantStatus = abilityAccessCtrl.GrantStatus.PERMISSION_DENIED
 
     // 获取应用程序的accessTokenID
-    let tokenId: number = 0;
+    let tokenId: number = 0
     let bundleInfo: bundleManager.BundleInfo =
-      await bundleManager.getBundleInfoForSelf(bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_APPLICATION);
+      await bundleManager.getBundleInfoForSelf(bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_APPLICATION)
     Logger.info('Succeeded in getting Bundle.')
-    let appInfo: bundleManager.ApplicationInfo = bundleInfo.appInfo;
-    tokenId = appInfo.accessTokenId;
+    let appInfo: bundleManager.ApplicationInfo = bundleInfo.appInfo
+    tokenId = appInfo.accessTokenId
 
     // 校验应用是否被授予权限
-    grantStatus = await atManager.checkAccessToken(tokenId, permission);
+    grantStatus = await atManager.checkAccessToken(tokenId, permission)
     Logger.info('Succeeded in checking access token.')
-    return grantStatus;
+    return grantStatus
   }
 
   byteToM(num: number) {
@@ -98,34 +99,33 @@ export struct SettingsPage {
         Logger.info('getCurrentBundleStats successfully:' + JSON.stringify(bundleStats))
         this.appCache = this.byteToM(bundleStats.cacheSize)
       }
-    });
+    })
   }
 
   // 清理缓存
   clearCache() {
-    let cacheDir = getContext(this).cacheDir;
-    console.info(cacheDir);
+    let cacheDir = getContext(this).cacheDir
 
     fileIo.listFile(cacheDir).then((filenames) => {
       for (let i = 0; i < filenames.length; i++) {
-        let dirPath = cacheDir + '/' + filenames[i];
+        let dirPath = cacheDir + '/' + filenames[i]
         Logger.info(dirPath)
         // 判断是否为文件夹
-        let isDirectory: boolean = false;
+        let isDirectory: boolean = false
         try {
-          isDirectory = fileIo.statSync(dirPath).isDirectory();
+          isDirectory = fileIo.statSync(dirPath).isDirectory()
         } catch (e) {
-          Logger.error('==========aaaa' + JSON.stringify(e))
+          Logger.error('not a Directory' + JSON.stringify(e))
         }
 
         if (isDirectory) {
-          fileIo.rmdirSync(dirPath);
+          fileIo.rmdirSync(dirPath)
         } else {
           fileIo.unlink(dirPath).then(() => {
             Logger.info('remove file succeed')
           }).catch((err: Error) => {
             Logger.error('remove file failed with error message: ' + err.message)
-          });
+          })
         }
       }
     })
@@ -144,7 +144,7 @@ export struct SettingsPage {
           Blank()
             .layoutWeight(1)
 
-          if (this.isLogin) {
+          if (this.userInfo.isLogin) {
             Button('退出登录')
               .width('90%')
               .height('40vp')
@@ -153,21 +153,23 @@ export struct SettingsPage {
               .fontSize($r('sys.float.Body_L'))
               .margin({ bottom: '40vp' })
               .onClick(() => {
-                AppStorage.setOrCreate('isLogin', false)
-                AppStorage.setOrCreate('userInfo', '')
+                this.userInfo.isLogin = false
+                AppStorageV2.remove('UserInfo')
                 this.vm.pop()
-              });
+              })
           }
 
         }
         .height('100%')
         .width('100%')
-        .backgroundColor('#F1F3F5')
         .justifyContent(FlexAlign.SpaceBetween)
       }
+      .backgroundColor('#F1F3F5')
       .scrollable(ScrollDirection.Vertical)
       .scrollBar(BarState.Auto)
       .scrollBarWidth('0vp')
+      .edgeEffect(EdgeEffect.Spring)
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
     }
     .title('设置')
   }
@@ -192,7 +194,7 @@ export struct SettingsPage {
     .justifyContent(FlexAlign.SpaceBetween)
     .margin({ top: 12, bottom: 12 })
     .onClick(() => {
-      if (this.isLogin === false) {
+      if (this.userInfo.isLogin === false) {
         this.vm.toRouteDetail('Login')
       } else {
         this.vm.toRouteDetail('PersonalSetting')
@@ -224,7 +226,7 @@ export struct SettingsPage {
               parameters: {
                 pushParams: this.context.abilityInfo.bundleName // 应用包名
               }
-            };
+            }
             await this.context.startAbility(want)
             this.localToggle = await this.checkPermissions(this.localPermissions)
           }
@@ -299,29 +301,29 @@ export struct SettingsPage {
         .fontSize(12)
         .fontColor('#757575')
         .height('40lpx')
-        .width('312lpx')
       Row() {
         Button('取消')
           .height('32lpx')
-          .width('156lpx')
+          .width('40%')
           .fontColor($r('sys.color.font_tertiary'))
           .backgroundColor('#F3F3F3')
           .margin({ left: '12lpx', right: '24lpx' })
           .onClick(() => {
-            this.isShow = false;
+            this.isShow = false
           })
         Button('确认')
           .height('32lpx')
-          .width('156lpx')
+          .width('40%')
           .backgroundColor($r('app.color.system_color_green'))
           .onClick(() => {
-            this.isShow = false;
-            this.appCache = 0;
+            this.isShow = false
+            this.appCache = 0
             this.clearCache()
             this.getCache()
           })
       }
       .margin({ top: '32lpx' })
     }
+    .padding(15)
   }
 }

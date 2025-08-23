@@ -1,53 +1,49 @@
 {
   "routerMap": [
     {
-      "name": "MyOrders",
-      "pageSourceFile": "src/main/ets/pages/MyOrders.ets",
-      "buildFunction": "MyOrdersBuilder",
-      "data": {
-        "description": "this is MyOrdersBuilder"
-      }
+      "name": "TicketOrders",
+      "pageSourceFile": "src/main/ets/pages/TicketOrders.ets",
+      "buildFunction": "TicketOrdersBuilder"
     },
     {
       "name": "TicketDetail",
       "pageSourceFile": "src/main/ets/pages/TicketDetail.ets",
-      "buildFunction": "TicketDetailBuilder",
-      "data": {
-        "description": "this is TicketDetailBuilder"
-      }
+      "buildFunction": "TicketDetailBuilder"
     },
     {
       "name": "OrderTicket",
       "pageSourceFile": "src/main/ets/pages/OrderTicket.ets",
-      "buildFunction": "OrderTicketBuilder",
-      "data": {
-        "description": "this is OrderTicketBuilder"
-      }
+      "buildFunction": "OrderTicketBuilder"
     },
     {
       "name": "OrderInfo",
       "pageSourceFile": "src/main/ets/pages/OrderInfo.ets",
-      "buildFunction": "OrderInfoBuilder",
-      "data": {
-        "description": "this is OrderInfoBuilder"
-      }
+      "buildFunction": "OrderInfoBuilder"
     },
     {
       "name": "OrderSuccess",
       "pageSourceFile": "src/main/ets/pages/OrderSuccess.ets",
-      "buildFunction": "OrderSuccessBuilder",
-      "data": {
-        "description": "this is OrderSuccessBuilder"
-      }
+      "buildFunction": "OrderSuccessBuilder"
     },
-
     {
-      "name": "ContactsPage",
-      "pageSourceFile": "src/main/ets/pages/ContactsPage.ets",
-      "buildFunction": "ContactsPageBuilder",
-      "data": {
-        "description": "this is ContactsPageBuilder"
-      }
+      "name": "ExplainOrders",
+      "pageSourceFile": "src/main/ets/pages/ExplainOrders.ets",
+      "buildFunction": "ExplainOrdersBuilder"
+    },
+    {
+      "name": "ActiveOrders",
+      "pageSourceFile": "src/main/ets/pages/ActiveOrders.ets",
+      "buildFunction": "ActiveOrdersBuilder"
+    },
+    {
+      "name": "ExplainOrderDetail",
+      "pageSourceFile": "src/main/ets/pages/ExplainOrderDetail.ets",
+      "buildFunction": "ExplainOrderDetailBuilder"
+    },
+    {
+      "name": "ActiveOrderDetail",
+      "pageSourceFile": "src/main/ets/pages/ActiveOrderDetail.ets",
+      "buildFunction": "ActiveOrderDetailBuilder"
     }
   ]
 }

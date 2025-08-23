@@ -1,11 +1,11 @@
 {
   "app": {
-    "bundleName": "com.atomicservice.xxx",
-    "bundleType": "atomicService",
+/** todo: 配置包名 */
+    "bundleName": "zhjd.1.xxxxxx",
     "vendor": "example",
     "versionCode": 1000000,
     "versionName": "1.0.0",
-    "icon": "$media:startIcon",
+    "icon": "$media:layered_image",
     "label": "$string:app_name"
   }
 }

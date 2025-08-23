@@ -665,16 +665,17 @@ export class OrderDatasetMock {
       visitTime: data.visitTime,
       orderTime,
       visitor: data.ticketOwner.length,
-      status: '2',
+      status: '1',
       orderAmount: data.orderAmount,
       performanceName: data.performanceName,
+      actualPay:data.orderAmount,
     };
     OrderDatasetMock._orderList.push(order);
     const orderDetail: GetOrderDetailResp = {
       orderNo,
       orderTime,
       visitTime: data.visitTime,
-      status: '2',
+      status: '1',
       orderAmount: data.orderAmount,
       ticketOwner: data.ticketOwner,
       contactPhone: data.contactPhone,
@@ -683,6 +684,8 @@ export class OrderDatasetMock {
       notice: notice,
       visitor: data.ticketOwner.length,
       placeTime: orderTime,
+      payTime:orderTime,
+      actualPay:data.orderAmount
     };
 
     OrderDatasetMock._orderDetailList.push(orderDetail);
@@ -690,8 +693,26 @@ export class OrderDatasetMock {
       orderNo,
       orderStr: '',
     };
-
     return getFormattedResp(res);
+  }
 
+  // 重新支付
+  public static repayOrder(orderNo:string){
+    const payTime:string= FormatUtil.formatFullDate(new Date())
+    OrderDatasetMock._orderList.map((item)=>{
+      if (item.orderNo === orderNo){
+        item.actualPay = item.orderAmount
+        item.status = '1'
+        item.payTime = payTime
+      }
+    })
+    OrderDatasetMock._orderDetailList.map((item)=>{
+      if (item.orderNo === orderNo){
+        item.actualPay = item.orderAmount
+        item.status = '1'
+        item.payTime = payTime
+      }
+    })
+    return getFormattedResp<null>(null)
   }
 }

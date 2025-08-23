@@ -1,6 +1,6 @@
 {
   "src": [
-    "pages/MainEntry"
+    "pages/Index"
   ],
   "window": {
     "designWidth": 720,

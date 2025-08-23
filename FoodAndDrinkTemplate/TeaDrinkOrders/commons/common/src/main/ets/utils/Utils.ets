@@ -1,25 +1,6 @@
-import { BusinessError, pasteboard } from '@kit.BasicServicesKit';
-import { promptAction } from '@kit.ArkUI';
 import Decimal from '@arkts.math.Decimal';
 import { geoLocationManager } from '@kit.LocationKit';
 import { map, mapCommon } from '@kit.MapKit';
-
-export function copyString(param: string = '') {
-  let pasteData: pasteboard.PasteData =
-    pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, param)
-  let systemPasteboard: pasteboard.SystemPasteboard = pasteboard.getSystemPasteboard();
-  systemPasteboard.setData(pasteData)
-    .then(() => {
-      console.info('succeeded in setting PasteData. ')
-      promptAction.showToast({
-        message: $r('app.string.copy_success'),
-        duration: 2000,
-      });
-    })
-    .catch((err: BusinessError) => {
-      console.error(`faild to set PasteData, ${JSON.stringify(err)}`)
-    })
-}
 
 export function getAnonymousTel(userTel: string = '') {
   if (userTel.length >= 8) {

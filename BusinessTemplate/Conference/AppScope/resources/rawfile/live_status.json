@@ -1,0 +1,36 @@
+{
+  "mock_data": [
+    {
+      "liveId": "15537",
+      "status": "0"
+    },
+    {
+      "liveId": "15539",
+      "status": "1"
+    },
+    {
+      "liveId": "15558",
+      "status": "2"
+    },
+    {
+      "liveId": "15533",
+      "status": "3"
+    },
+    {
+      "liveId": "15534",
+      "status": "0"
+    },
+    {
+      "liveId": "15540",
+      "status": "1"
+    },
+    {
+      "liveId": "15569",
+      "status": "2"
+    },
+    {
+      "liveId": "15566",
+      "status": "3"
+    }
+  ]
+}

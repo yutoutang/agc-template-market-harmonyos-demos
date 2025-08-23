@@ -3,7 +3,7 @@
     "name": "PersonalCenter",
     "type": "har",
     "deviceTypes": [
-      "default"
+      "phone"
     ],
     "routerMap": "$profile:route_map"
   }

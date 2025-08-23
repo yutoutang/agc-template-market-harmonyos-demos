@@ -13,7 +13,7 @@ import { Domain } from './Domain'
 import './mock/ApiMock'
 import './mock/TheaterApiMock'
 import { BannerRes } from '../bean/response/BannerRes'
-import { MyWatchRecordRes } from '../bean/response/MyWatchRecordRes'
+import { MyWatchRecordData, MyWatchRecordRes } from '../bean/response/MyWatchRecordRes'
 import { TokenReq } from '../bean/request/TokenReq'
 import { TokenRes } from '../bean/response/TokenRes'
 import { UserInfoRes } from '../bean/response/UserInfoRes'
@@ -22,6 +22,8 @@ import { UserLoginRes } from '../bean/response/UserLoginRes'
 import { GetUserInfoRes } from '../bean/response/GetUserInfoRes'
 import { AssociateAccountRes, AssociateAccountRequest } from '../bean/response/AssociateAccountRes'
 import { DisassociateAccountRes } from '../bean/response/DiassociateAccountRes'
+import { MyLikeDramaRes } from '../bean/response/MyLikeDramaRes'
+import { CommentItem, Drama, Replying, ReplyLike } from './mock/mockData/bean'
 
 export class RequestAPI implements Domain {
   getDomain(): string {
@@ -34,6 +36,11 @@ export class RequestAPI implements Domain {
     return Promise.resolve(new BaseResponse())
   }
 
+  @POST({ path: '/mylikedrama/list', needLogin: true })
+  getMyLikeDrama(@Body pageReq: PageReq): Promise<BaseResponse<MyLikeDramaRes>> {
+    return Promise.resolve(new BaseResponse())
+  }
+
   @POST({ path: '/mywatchrecord/list' })
   getMyWatchRecord(@Body pageReq: PageReq): Promise<BaseResponse<MyWatchRecordRes>> {
     return Promise.resolve(new BaseResponse())
@@ -43,6 +50,7 @@ export class RequestAPI implements Domain {
   getFeedDramaList(@Body pageReq: PageReq): Promise<BaseResponse<FeedDramaListRes>> {
     return Promise.resolve(new BaseResponse())
   }
+
   @POST({ path: '/episode/list' })
   getEpisodeList(@Body dramaId: string): Promise<BaseResponse<EpisodeListRes>> {
     return Promise.resolve(new BaseResponse())
@@ -73,6 +81,11 @@ export class RequestAPI implements Domain {
     return Promise.resolve(new BaseResponse())
   }
 
+  @GET({ path: '/theater/viprecommend' })
+  getVipRecommendDramaList(@Body pageReq: PageReq): Promise<BaseResponse<TheaterDramaRes>> {
+    return Promise.resolve(new BaseResponse())
+  }
+
   @GET({ path: '/theater/search' })
   getSearchDramaList(@Body pageReq: SearchPageReq): Promise<BaseResponse<TheaterDramaRes>> {
     return Promise.resolve(new BaseResponse())
@@ -84,7 +97,12 @@ export class RequestAPI implements Domain {
   }
 
   @GET({ path: '/theater/banner' })
-  getBannerList(): Promise<BaseResponse<BannerRes>> {
+  getBannerList(): Promise<BaseResponse<TheaterDramaRes>> {
+    return Promise.resolve(new BaseResponse())
+  }
+
+  @GET({ path: '/theater/vipbanner' })
+  getVipBannerList(): Promise<BaseResponse<TheaterDramaRes>> {
     return Promise.resolve(new BaseResponse())
   }
 
@@ -117,12 +135,52 @@ export class RequestAPI implements Domain {
   }
 
   @POST({ path: '/setfavorite', needLogin: true })
-  setFavorite(@Body dramaId:string): Promise<BaseResponse<UserInfoRes>> {
+  setFavorite(@Body dramaId:string): Promise<BaseResponse<MyFollowDramaRes>> {
     return Promise.resolve(new BaseResponse())
   }
 
   @POST({ path: '/unsetfavorite', needLogin: true })
-  unsetFavorite(@Body dramaId:string): Promise<BaseResponse<UserInfoRes>> {
+  unsetFavorite(@Body dramaId:string): Promise<BaseResponse<MyFollowDramaRes>> {
+    return Promise.resolve(new BaseResponse())
+  }
+
+  @POST({ path: '/setmyWatchrecord', needLogin: true })
+  setMyWatchRecord(@Body drama: Drama): Promise<BaseResponse<MyWatchRecordRes>> {
+    return Promise.resolve(new BaseResponse())
+  }
+
+  @POST({ path: '/unsetsetmyWatchrecord', needLogin: true })
+  unsetMyWatchRecord(@Body dramaId:string): Promise<BaseResponse<MyWatchRecordRes>> {
+    return Promise.resolve(new BaseResponse())
+  }
+
+  @POST({ path: '/setlike', needLogin: true })
+  setLike(@Body dramaId:string): Promise<BaseResponse<MyLikeDramaRes>> {
+    return Promise.resolve(new BaseResponse())
+  }
+
+  @POST({ path: '/unsetlike', needLogin: true })
+  unsetLike(@Body dramaId:string): Promise<BaseResponse<MyLikeDramaRes>> {
+    return Promise.resolve(new BaseResponse())
+  }
+
+  @POST({ path: '/addcomment', needLogin: true })
+  addComment(@Body commentItem: CommentItem): Promise<BaseResponse<CommentItem>> {
+    return Promise.resolve(new BaseResponse())
+  }
+
+  @POST({ path: '/addreply', needLogin: true })
+  addReply(@Body replying: Replying): Promise<BaseResponse<Replying>> {
+    return Promise.resolve(new BaseResponse())
+  }
+
+  @POST({ path: '/oncommentlike', needLogin: true })
+  onCommentLike(@Body id: number): Promise<BaseResponse<number>> {
+    return Promise.resolve(new BaseResponse())
+  }
+
+  @POST({ path: '/onreplylike', needLogin: true })
+  onReplyLike(@Body replyLike: ReplyLike): Promise<BaseResponse<ReplyLike>> {
     return Promise.resolve(new BaseResponse())
   }
 }

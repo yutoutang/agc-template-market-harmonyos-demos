@@ -4,9 +4,12 @@ export class DramaCoverVM {
   imagePath: ResourceStr = ''
   title: string = ''
   content: string = ''
+  description: string = ''
   // 总集数
   episodes: number = 0
   // 最后一次更新的集数
   latestUpdate: number = 0
+  tags: string[] = []
   rankId?: number
+  isVip?: boolean = false
 }

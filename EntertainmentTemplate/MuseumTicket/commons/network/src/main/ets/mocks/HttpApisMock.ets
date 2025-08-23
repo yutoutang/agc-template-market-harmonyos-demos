@@ -1,3 +1,14 @@
+import { AccountUtil, UserInfo } from 'commonlib';
+import { MockStorageMap } from './Constants';
+import { UserDatasetMock } from './MockData/UserMockData';
+import { BannerDatasetMock } from './MockData/BannerMockData';
+import { ExplainDatasetMock } from './MockData/ExplainMockData';
+import { recommendListResp, introduceTextResp, parkingTextResp } from './MockData/HomeMockData';
+import { privacyTextResp } from './MockData/MineMockData';
+import { OrderDatasetMock } from './MockData/OrderMockData';
+import { PerformanceDatasetMock } from './MockData/PerformanceMockData';
+import { ActiveDataSetMock } from '../mocks/MockData/ActiveMockData';
+import { treasureInfoResp } from '../mocks/MockData/TreasureMockData';
 import {
   BaseResponse,
   GetUserInfoResp,
@@ -6,10 +17,8 @@ import {
   GetOrderDetailResp,
   GetPerformanceInfoResp,
   GetDayTicketResp,
-  GetExplainTextResp,
+  GetExplainResp,
   GetIntroduceResp,
-  ContactsResp,
-  Contacts,
   GetTimeTicketResp,
   GetTicketTypeInfoResp,
   PrepayBuyTicketResp,
@@ -17,13 +26,13 @@ import {
   UserLoginResp,
   ParkTextResp,
   GetTrafficDetailResp,
+  GetExplainTicketInfoResp,
+  ExplainOrder,
+  CloudUrl,
+  TreasureItem,
+  ActiveInfo,
+  ActiveOrder,
 } from '../types/ResponseTypes';
-import { recommendListResp, explainTextResp, introduceTextResp, parkingTextResp } from './MockData/HomeMockData';
-import { privacyTextResp } from './MockData/MineMockData';
-import { OrderDatasetMock } from './MockData/OrderMockData';
-import { PerformanceDatasetMock } from './MockData/PerformanceMockData';
-import { ContactsDatasetMock } from './MockData/ContactsMockData';
-import { AccountUtil } from 'commonlib';
 import {
   BaseSuccessResponse,
   OrderListRequest,
@@ -32,11 +41,13 @@ import {
   OrderFreeRequest,
   PrepayBuyTicketRequest,
   GetBannerImgRequest,
+  ExplainTicketRequest,
+  PreExplainOrderBody,
+  PreActiveOrderBody,
+  RepayOrderBody,
+  OrderType,
 } from '../types/RequestTypes';
-import { UserInfo } from 'commonlib/src/main/ets/types/Types';
-import { MockStorageMap } from './Constants';
-import { UserDatasetMock } from './MockData/UserMockData';
-import { BannerDatasetMock } from './MockData/BannerMockData';
+
 
 class HttpApiMock {
   public bindPhone(): Promise<BaseResponse<undefined>> {
@@ -113,9 +124,9 @@ class HttpApiMock {
     return Promise.resolve(resp);
   }
 
-  //   讲解服务文本
-  public getExplainText(): Promise<BaseResponse<GetExplainTextResp>> {
-    const resp: BaseResponse<GetExplainTextResp> = explainTextResp;
+  //   讲解服务
+  public getExplain(): Promise<BaseResponse<GetExplainResp>> {
+    const resp: BaseResponse<GetExplainResp> = ExplainDatasetMock.getExplain();
     return Promise.resolve(resp);
   }
 
@@ -137,12 +148,6 @@ class HttpApiMock {
     return Promise.resolve(resp);
   }
 
-  //   获取常用联系人
-  public getContacts(): Promise<BaseResponse<ContactsResp>> {
-    const resp: BaseResponse<ContactsResp> = ContactsDatasetMock.getContacts();
-    return Promise.resolve(resp);
-  }
-
   // 更新用户信息
   public updateUserInfo(data: UpdateUserInfoRequest): Promise<BaseSuccessResponse> {
     const userInfoMock = AppStorage.get<UpdateUserInfoRequest>(MockStorageMap.USER_INFO);
@@ -156,16 +161,6 @@ class HttpApiMock {
       AppStorage.set<UpdateUserInfoRequest>(MockStorageMap.USER_INFO, userInfoMock);
       AccountUtil.updateUserInfo(data as UserInfo);
     }
-    const resp: BaseSuccessResponse<undefined> = {
-      code: 0,
-      data: undefined,
-    };
-    return Promise.resolve(resp);
-  }
-
-  //   更新常用联系人
-  public upDateContacts(data: Contacts): Promise<BaseSuccessResponse> {
-    ContactsDatasetMock.updateContacts(data);
     const resp: BaseSuccessResponse<undefined> = {
       code: 0,
       data: undefined,
@@ -197,16 +192,6 @@ class HttpApiMock {
     return Promise.resolve(resp);
   }
 
-  //  删除常用联系人
-  public delContacts(data: string): Promise<BaseSuccessResponse<undefined>> {
-    ContactsDatasetMock.delContacts(data);
-    const resp: BaseSuccessResponse<undefined> = {
-      code: 0,
-      data: undefined,
-    };
-    return Promise.resolve(resp);
-  }
-
   // 获取交通信息
   public getTrafficDetail(): Promise<BaseResponse<GetTrafficDetailResp>> {
     const data: GetTrafficDetailResp = {
@@ -218,6 +203,70 @@ class HttpApiMock {
       data: data,
     };
     return Promise.resolve(resp);
+  }
+
+  // 获取讲解门票信息
+  public getExplainTicketList(data: ExplainTicketRequest): Promise<BaseResponse<GetExplainTicketInfoResp>> {
+    const resp: BaseSuccessResponse<GetExplainTicketInfoResp> = ExplainDatasetMock.getExplainTicket(data);
+    return Promise.resolve(resp);
+  }
+
+  // 获取讲解门票订单
+  public getExplainOrders(): Promise<BaseResponse<ExplainOrder[]>> {
+    const resp: BaseSuccessResponse<ExplainOrder[]> = ExplainDatasetMock.getExplainOrders();
+    return Promise.resolve(resp);
+  }
+
+  // 讲解门票预支付
+  public preOrderExplain(data: PreExplainOrderBody): Promise<BaseResponse<ExplainOrder>> {
+    const resp: BaseSuccessResponse<ExplainOrder> = ExplainDatasetMock.preExplainOrder(data);
+    return Promise.resolve(resp);
+  }
+
+  // 获取云存储资源
+  public getCloudUrl(): Promise<BaseResponse<CloudUrl>> {
+    return Promise.resolve(BannerDatasetMock.getCloudUrl());
+  }
+
+  //  获取珍品馆藏信息
+  public getTreasureInfo(): Promise<BaseResponse<TreasureItem[]>> {
+    return Promise.resolve(treasureInfoResp);
+  }
+
+  // 取消讲解预定
+  public cancelExplainOrder(data: CancelOrderRequest): Promise<BaseResponse<null>> {
+    return Promise.resolve(ExplainDatasetMock.cancelExplainOrder(data));
+  }
+
+  // 取消活动预定
+  public cancelActiveOrder(data: CancelOrderRequest): Promise<BaseResponse<null>> {
+    return Promise.resolve(ActiveDataSetMock.cancelActiveOrder(data));
+  }
+
+  //  获取活动信息
+  public getActiveInfo(): Promise<BaseResponse<ActiveInfo[]>> {
+    return Promise.resolve(ActiveDataSetMock.getActiveInfo());
+  }
+
+  //  获取活动订单
+  public getActiveOrders(): Promise<BaseResponse<ActiveOrder[]>> {
+    return Promise.resolve(ActiveDataSetMock.getActiveInOrders());
+  }
+
+  // 活动门票预支付
+  public preOrderActive(data: PreActiveOrderBody): Promise<BaseResponse<ActiveOrder>> {
+    return Promise.resolve(ActiveDataSetMock.preActiveOrder(data));
+  }
+
+  // 重新支付订单
+  public repayOrder(data: RepayOrderBody): Promise<BaseResponse<null | ActiveOrder | ExplainOrder>> {
+    if (data.orderType === OrderType.ACTIVE_ORDER) {
+      return Promise.resolve(ActiveDataSetMock.repayOrder(data.orderNo));
+    } else if (data.orderType === OrderType.EXPLAIN_ORDER) {
+      return Promise.resolve(ExplainDatasetMock.repayOrder(data.orderNo));
+    } else {
+      return Promise.resolve(OrderDatasetMock.repayOrder(data.orderNo));
+    }
   }
 }
 

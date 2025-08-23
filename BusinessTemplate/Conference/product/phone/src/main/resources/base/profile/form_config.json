@@ -1,0 +1,92 @@
+{
+  "forms": [
+    {
+      "name": "ticketWidget",
+      "displayName": "$string:ticketWidget_display_name",
+      "description": "$string:ticketWidget_desc",
+      "src": "./ets/widget/pages/TicketCard2x2.ets",
+      "uiSyntax": "arkts",
+      "window": {
+        "designWidth": 720,
+        "autoDesignWidth": true
+      },
+      "colorMode": "light",
+      "isDynamic": true,
+      "isDefault": false,
+      "updateEnabled": false,
+      "scheduledUpdateTime": "10:30",
+      "updateDuration": 1,
+      "fontScaleFollowSystem": false,
+      "defaultDimension": "2*2",
+      "supportDimensions": [
+        "2*2"
+      ]
+    },
+    {
+      "name": "bigAgendaWidget",
+      "displayName": "$string:bigAgendaWidget_display_name",
+      "description": "$string:bigAgendaWidget_desc",
+      "src": "./ets/widget/pages/AgendaWidget4x4.ets",
+      "uiSyntax": "arkts",
+      "window": {
+        "designWidth": 720,
+        "autoDesignWidth": true
+      },
+      "colorMode": "light",
+      "isDynamic": true,
+      "isDefault": false,
+      "updateEnabled": true,
+      "scheduledUpdateTime": "10:30",
+      "updateDuration": 1,
+      "defaultDimension": "4*4",
+      "fontScaleFollowSystem": false,
+      "supportDimensions": [
+        "4*4"
+      ]
+    },
+    {
+      "name": "mediumAgendaWidget",
+      "displayName": "$string:mediumAgendaWidget_display_name",
+      "description": "$string:mediumAgendaWidget_desc",
+      "src": "./ets/widget/pages/AgendaWidget2x4.ets",
+      "uiSyntax": "arkts",
+      "window": {
+        "designWidth": 720,
+        "autoDesignWidth": true
+      },
+      "colorMode": "light",
+      "isDynamic": true,
+      "isDefault": true,
+      "updateEnabled": true,
+      "scheduledUpdateTime": "10:30",
+      "updateDuration": 1,
+      "defaultDimension": "2*4",
+      "fontScaleFollowSystem": false,
+      "supportDimensions": [
+        "2*4"
+      ]
+    },
+    {
+      "name": "smallAgendaWidget",
+      "displayName": "$string:smallAgendaWidget_display_name",
+      "description": "$string:smallAgendaWidget_desc",
+      "src": "./ets/widget/pages/AgendaWidget2x2.ets",
+      "uiSyntax": "arkts",
+      "window": {
+        "designWidth": 720,
+        "autoDesignWidth": true
+      },
+      "colorMode": "light",
+      "isDynamic": true,
+      "isDefault": false,
+      "updateEnabled": true,
+      "scheduledUpdateTime": "10:30",
+      "updateDuration": 1,
+      "defaultDimension": "2*2",
+      "fontScaleFollowSystem": false,
+      "supportDimensions": [
+        "2*2"
+      ]
+    }
+  ]
+}

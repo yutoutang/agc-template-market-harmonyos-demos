@@ -48,6 +48,7 @@ struct BillManageSheetExample1 {
       }), {
         title: { title: '选择资产类型' },
         detents: [SheetSize.FIT_CONTENT],
+        preferType:SheetType.BOTTOM,
       });
   }
 }

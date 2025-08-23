@@ -10,7 +10,7 @@ export struct VipOpen {
       Row() {
         Checkbox({ name: 'checkbox1', group: 'checkboxGroup' })
           .select(this.isAgreed)
-          .selectedColor('#F1D1A5')
+          .selectedColor($r('sys.color.comp_background_emphasize'))
           .onChange((value) => {
             this.isAgreed = value
           })
@@ -33,7 +33,7 @@ export struct VipOpen {
         .backgroundColor('#F1D1A5')
         .fontColor($r('sys.color.font_primary'))
         .fontWeight(FontWeight.Medium)
-        .fontSize(16)
+        .fontSize($r('sys.float.Body_L'))
         .width('100%')
         .onClick(() => {
           if(!this.isAgreed) {
@@ -44,5 +44,6 @@ export struct VipOpen {
         })
     }
     .padding({ left: 16, right: 16 })
+    .margin({ top: '30%' })
   }
 }

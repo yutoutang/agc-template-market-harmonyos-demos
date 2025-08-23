@@ -75,14 +75,14 @@ export struct ReservationSheet {
         Button($r('app.string.common_cancel'))
           .width(Constants.FORTY_PERCENT_WIDTH)
           .backgroundColor($r('app.color.record_sheet_cancel'))
-          .fontColor($r('app.color.record_sheet_cancel_color'))
+          .fontColor($r('sys.color.font_primary'))
           .onClick(() => {
             this.closeSheet()
           })
         Button($r('app.string.common_submit'))
           .width(Constants.FORTY_PERCENT_WIDTH)
           .backgroundColor($r('app.color.record_sheet_submit_color'))
-          .fontColor(Color.White)
+          .fontColor($r('sys.color.font_on_primary'))
           .onClick(() => {
             /*
             * 转化成时间戳之后添加到日历

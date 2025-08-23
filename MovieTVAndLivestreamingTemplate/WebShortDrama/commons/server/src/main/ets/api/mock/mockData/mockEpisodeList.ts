@@ -18,7 +18,7 @@ export const getEpisodeList = (): Array<Episode> => {
         likeCount: '123',
         favoriteCount: '456',
         shareCount: '789',
-        commentCount: '1234'
+        commentCount: '3'
       }
     },)
   }
