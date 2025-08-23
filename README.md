@@ -180,7 +180,7 @@
     <td><a href="./NewsTemplate/News/README.md" target="_blank">快速开始</a></td>
   </tr>
    <tr>
-    <td><a href="#综合新闻元服务模板">综合新闻元服务模板</a></td>
+    <td><a href="#综合新闻应用模板">综合新闻应用模板</a></td>
     <td><a href="./NewsTemplate/ComprehensiveNews/README.md" target="_blank">快速开始</a></td>
   </tr>
   <tr>
