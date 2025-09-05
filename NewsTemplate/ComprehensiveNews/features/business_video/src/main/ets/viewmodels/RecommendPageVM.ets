@@ -1,4 +1,4 @@
-import { BaseViewModel, CommonDataSource } from 'lib_common';
+import { BaseViewModel, BreakpointNameEnum, CommonDataSource } from 'lib_common';
 import { MineServiceApi } from 'lib_news_api';
 import { AVPlayerManager } from 'module_swipeplayer';
 import { VideoNewsData } from '../models/VideoModel';
@@ -10,8 +10,6 @@ export class RecommendPageVM extends BaseViewModel {
   @Trace startIndex: number = 0;
   // List显示区域内中间子组件索引值
   @Trace centerIndex: number = 0;
-  // List显示区域内最后子组件索引值
-  @Trace endIndex: number = 0;
   // 当前播放的index
   @Trace currentIndex: number = 0;
   // 下拉刷新
@@ -34,10 +32,15 @@ export class RecommendPageVM extends BaseViewModel {
   @Trace isListScrollByUserClick: boolean = false;
   // 手动点击播放的index
   @Trace playIndex: number = 0
+  // 是否手动触发滑动事件
+  @Trace isUserActionScroll: boolean = false;
+  // 是否展示网络异常页
+  @Trace showExceptionPage: boolean = false;
+  @Trace loading: boolean = false;
   // 懒加载数据
   videoListDataSource = new CommonDataSource<VideoNewsData>();
   // 视频播放控制
-  listScroller: ListScroller = new ListScroller();
+  listScroller: Scroller = new Scroller();
   // 播放管理
   avPlayerManager: AVPlayerManager = AVPlayerManager.getInstance()
 
@@ -47,7 +50,7 @@ export class RecommendPageVM extends BaseViewModel {
   }
 
   refreshList() {
-    this.avPlayerManager.clear()
+    this.avPlayerManager.clear();
     // 模拟下拉刷新
     setTimeout(() => {
       this.initVideoListDataSource();
@@ -73,11 +76,14 @@ export class RecommendPageVM extends BaseViewModel {
   }
 
   // 处理滚动事件
-  handleScrollIndex(start: number, end: number, center: number) {
-    this.startIndex = start;
-    this.endIndex = end;
-    this.centerIndex = center
-    if (start > 0 && end < this.videoListDataSource.totalCount()) {
+  handleScrollIndex(first: number, last: number) {
+    this.startIndex = first;
+    if (this.isUserActionScroll) {
+      this.centerIndex = this.breakPointModel.currentBreakpoint === BreakpointNameEnum.SM ? first + 1 : first + 2;
+    } else {
+      this.centerIndex = this.breakPointModel.currentBreakpoint === BreakpointNameEnum.SM ? first : first + 1;
+    }
+    if (first > 0 && last < this.videoListDataSource.totalCount()) {
       this.isScrollStart = false;
       this.isScrollEnd = false
     }
@@ -96,7 +102,7 @@ export class RecommendPageVM extends BaseViewModel {
         if (this.isScrollStart) {
           this.currentIndex = this.yOffset > 120 ? this.centerIndex : 0
         } else if (this.isScrollEnd) {
-          this.currentIndex = this.endIndex - 1;
+          this.currentIndex = this.centerIndex
         } else {
           this.currentIndex = this.centerIndex;
         }
@@ -114,6 +120,7 @@ export class RecommendPageVM extends BaseViewModel {
     this.isListScrollByUserClick = true;
     this.playIndex = index;
     this.listScroller.scrollToIndex(index, true);
+    this.currentIndex = index;
   }
 
   // 监听播放状态
@@ -127,5 +134,46 @@ export class RecommendPageVM extends BaseViewModel {
 
   addHistoryList(id: string) {
     MineServiceApi.addToHistory(id)
+  }
+
+  // 一多适配
+  getListLanes(): number {
+    let lanesValue = 1
+    switch (this.breakPointModel.currentBreakpoint) {
+      case BreakpointNameEnum.SM:
+        lanesValue = 1;
+        break;
+      case BreakpointNameEnum.MD:
+        lanesValue = 2;
+        break;
+      case BreakpointNameEnum.LG:
+      case BreakpointNameEnum.XL:
+        lanesValue = 3;
+        break;
+    }
+
+    return lanesValue
+  }
+
+  getListPadding(): number {
+    let paddingNum = 0
+    switch (this.breakPointModel.currentBreakpoint) {
+      case BreakpointNameEnum.SM:
+        paddingNum = 0;
+        break;
+      case BreakpointNameEnum.MD:
+      case BreakpointNameEnum.LG:
+      case BreakpointNameEnum.XL:
+        paddingNum = 24;
+        break;
+    }
+    return paddingNum;
+  }
+
+  @Computed get pagePaddingBottom() {
+    if (this.tabModel.isTabVertical) {
+      return this.windowModel.windowBottomPadding;
+    }
+    return 48;
   }
 }

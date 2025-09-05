@@ -1,4 +1,5 @@
 import { intl } from '@kit.LocalizationKit';
+import { Constants } from './Constants';
 
 export class CommonUtils {
   static weekFormat = new intl.DateTimeFormat('zh-CN', { weekday: 'short' });
@@ -26,5 +27,14 @@ export class CommonUtils {
    */
   public static padStart(value: number): string {
     return value.toString().padStart(2, '0');
+  }
+
+  /**
+   * 获取页面margin
+   * @param bp
+   * @returns
+   */
+  public static getPageMargin(bp: string): number {
+    return Reflect.get(Constants.GRID_MARGIN, bp);
   }
 }

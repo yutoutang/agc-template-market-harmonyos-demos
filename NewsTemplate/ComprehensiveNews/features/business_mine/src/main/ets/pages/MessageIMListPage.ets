@@ -49,8 +49,8 @@ struct MsgIMPage {
           .scrollBar(BarState.Off)
           .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
           .padding({
-            left: CommonConstants.PADDING_PAGE,
-            right: CommonConstants.PADDING_PAGE,
+            left: this.vm.breakPointModel.pagePadding,
+            right: this.vm.breakPointModel.pagePadding,
             top: CommonConstants.SPACE_S,
           })
         }
@@ -63,6 +63,9 @@ struct MsgIMPage {
     .onBackPressed(() => {
       RouterUtils.pop('1');
       return true;
+    })
+    .onShown(() => {
+      this.vm.loadBlank();
     })
   }
 

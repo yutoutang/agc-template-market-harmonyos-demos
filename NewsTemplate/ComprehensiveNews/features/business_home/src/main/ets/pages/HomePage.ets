@@ -1,19 +1,9 @@
 import { common } from '@kit.AbilityKit';
-import { notificationManager } from '@kit.NotificationKit';
-import {
-  CommonConstants,
-  LinearColumnModifier,
-  NewsEnum,
-  NewsScan,
-  PushActionParams,
-  PushUtils,
-  RouterMap,
-  RouterToNews,
-  RouterUtils,
-} from 'lib_common'
+import { CircleButtonModifier, CommonConstants, LinearColumnModifier, NewsScan } from 'lib_common'
 import { FlexLayout } from 'lib_flex_layout';
+import { NewsSearchTransition } from 'lib_widget';
 import { NavHeaderBar } from 'lib_widget';
-import { BaseNewsServiceApi } from 'lib_news_api';
+import { FloatingPublishBtn } from '../components/FloatingPublishBtn';
 import { HomeViewModel } from '../viewmodels/HomeViewModel';
 
 @Builder
@@ -25,9 +15,10 @@ export function HomePageBuilder() {
 struct HomePage {
   @Local homeViewModel: HomeViewModel = new HomeViewModel();
   @Local modifier: LinearColumnModifier = new LinearColumnModifier($r('app.color.home_linear'));
+  @Local buttonModifier: CircleButtonModifier = new CircleButtonModifier();
 
   aboutToAppear(): void {
-   this.homeViewModel.sendPushNotice(getContext(this) as common.UIAbilityContext)
+    this.homeViewModel.sendPushNotice(getContext(this) as common.UIAbilityContext)
   }
 
   build() {
@@ -44,37 +35,43 @@ struct HomePage {
           FlexLayout()
         }
         .layoutWeight(1)
+
+        this.publishNewsBtn()
       }
       .width(CommonConstants.FULL_PERCENT)
       .height(CommonConstants.FULL_PERCENT)
       .backgroundColor($r('sys.color.background_primary'))
       .attributeModifier(this.modifier)
+      .padding({
+        bottom: this.homeViewModel.pagePaddingBottom,
+      })
     }
     .hideTitleBar(true)
   }
 
   @Builder
+  publishNewsBtn() {
+    FloatingPublishBtn()
+  }
+
+  @Builder
   rightHeadPartBuilder() {
     Row({ space: CommonConstants.SPACE_S }) {
-      Row() {
-        Image($r('app.media.ic_search')).width($r('app.float.nav_icon_width')).fillColor($r('sys.color.font_primary'))
-          .onClick(() => {
-            RouterUtils.pushPathByName(RouterMap.NEWS_SEARCH)
-          })
-      }
-      .padding(10)
-      .backgroundColor($r('sys.color.comp_background_tertiary'))
-      .borderRadius('50%')
+      NewsSearchTransition({
+        componentId: 'homePage',
+      })
 
-      Row() {
-        Image($r('app.media.ic_scan')).width($r('app.float.nav_icon_width')).fillColor($r('sys.color.font_primary'))
-          .onClick(() => {
-            new NewsScan().scan()
-          })
+      Button() {
+        SymbolGlyph($r('sys.symbol.line_viewfinder'))
+          .fontColor([$r('sys.color.font_primary')])
+          .fontWeight(FontWeight.Normal)
+          .fontSize(24)
       }
-      .padding(10)
-      .borderRadius('50%')
-      .backgroundColor($r('sys.color.comp_background_tertiary'))
+      .attributeModifier(this.buttonModifier)
+      .accessibilityText('扫码')
+      .onClick(() => {
+        new NewsScan().scan()
+      })
     }
     .layoutWeight(1)
     .justifyContent(FlexAlign.End)

@@ -2,11 +2,12 @@ import { PersistenceV2 } from '@kit.ArkUI'
 import dayjs from 'dayjs'
 import { webview } from '@kit.ArkWeb'
 import { BusinessError } from '@kit.BasicServicesKit'
-import { FormatCount, RouterMap, RouterUtils, SettingModel } from 'lib_common'
+import { FormatCount, RouterMap, RouterUtils, SettingModel, UserInfoModel } from 'lib_common'
 import { ImagePreview, PreviewVerticalAlign } from 'module_imagepreview'
 import { Share } from 'module_share'
 import { handlerCoverImage } from '../utils/Utils'
-import NewsFeedVM from '../viewModel/NewsFeedVM'
+import NewsFeedVM from '../viewmodel/NewsFeedVM'
+import { FeedBreakPointVM } from '../viewmodel/FeedBreakPointVM'
 
 class Native {
   preview = (srcList: string[], index: number) => {
@@ -21,11 +22,20 @@ export struct NewsContent {
   webViewController: webview.WebviewController = new webview.WebviewController();
   @Local nativeObj: Native = new Native();
   @Local isExpand: boolean = false
-  @Event onAddLike: () => void = () => {}
-  @Event onAddWatch: () => void = () => {}
-  @Event onComment: () => void = () => {}
+  @Event onAddLike: () => void = () => {
+  }
+  @Event onAddWatch: () => void = () => {
+  }
+  @Event onComment: () => void = () => {
+  }
   @Local timer: number = 0
   @Local richTextHeight: number = 300
+  @Local newsBreakPoint: FeedBreakPointVM = new FeedBreakPointVM()
+
+  @Monitor('settingInfo.darkSwitch')
+  darkSwitch() {
+    this.webViewController.runJavaScript(`setWebFontColor(${this.settingInfo.darkSwitch})`);
+  }
 
   expandAnimation() {
     if (this.timer) {
@@ -46,9 +56,10 @@ export struct NewsContent {
   @Builder
   authorBuilder() {
     Flex({ alignItems: ItemAlign.Center }) {
-      Row({ space: 5 }) {
+      Row({ space: 4 }) {
         Image(this.newsFeedVM.articleDetails.author.authorIcon).width(24).height(24).borderRadius(12).clip(true)
-        Text(this.newsFeedVM.articleDetails.author.authorNickName).fontColor($r('sys.color.font_on_primary'))
+        Text(this.newsFeedVM.articleDetails.author.authorNickName)
+          .fontColor($r('sys.color.font_on_primary'))
           .fontSize(16 * this.fontSizeRatio)
       }
 
@@ -57,10 +68,11 @@ export struct NewsContent {
           Span(this.newsFeedVM.isWatch() ? '已关注' : '关注')
         }
         .fontSize(14 * this.fontSizeRatio)
-        .fontColor(this.newsFeedVM.isWatch() ? $r('app.color.app_theme') : $r('sys.color.background_primary'))
+        .fontColor(this.newsFeedVM.isWatch() ? $r('app.color.app_theme') : $r('sys.color.font_on_primary'))
         .onClick(() => {
           this.onAddWatch()
         })
+        .visibility(!this.newsFeedVM.isFeedSelf ? Visibility.Visible : Visibility.None)
       }
       .width(72)
       .height(28)
@@ -189,20 +201,24 @@ export struct NewsContent {
   @Builder
   authorInfoBuilder() {
     Flex({ alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
-      Row({ space: 5 }) {
+      Row({ space: 4 }) {
         Image(this.newsFeedVM.articleDetails.author.authorIcon)
           .width(40)
           .height(40)
           .borderRadius(20)
           .clip(true)
+          .accessibilityText(this.newsFeedVM.articleDetails.author.authorNickName + '头像')
           .onClick(() => {
             RouterUtils.pushPathByName(RouterMap.PROFILE_HOME, this.newsFeedVM.articleDetails.author.authorId)
           })
-        Column({ space: 5 }) {
+        Column({ space: 4 }) {
           Text(this.newsFeedVM.articleDetails.author.authorNickName)
             .fontSize(14 * this.fontSizeRatio)
             .fontWeight(FontWeight.Medium)
             .fontColor($r('sys.color.font_primary'))
+            .maxLines(1)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+            .constraintSize({ maxWidth: 'calc(100% - 44vp)' })
           Text(dayjs(this.newsFeedVM.articleDetails.createTime).format('YYYY-MM-DD hh:mm'))
             .fontSize(12 * this.fontSizeRatio)
             .fontWeight(FontWeight.Regular)
@@ -216,7 +232,7 @@ export struct NewsContent {
           Span(this.newsFeedVM.isWatch() ? '已关注' : '关注')
         }
         .fontSize(14 * this.fontSizeRatio)
-        .fontColor(this.newsFeedVM.isWatch() ? $r('app.color.app_theme') : $r('sys.color.background_primary'))
+        .fontColor(this.newsFeedVM.isWatch() ? $r('app.color.app_theme') : $r('sys.color.font_on_primary'))
         .onClick(() => {
           this.newsFeedVM.watchOperation()
         })
@@ -224,6 +240,7 @@ export struct NewsContent {
       .width(72)
       .height(28)
       .margin({ left: 16 })
+      .visibility(!this.newsFeedVM.isFeedSelf ? Visibility.Visible : Visibility.None)
       .backgroundColor(this.newsFeedVM.isWatch() ? $r('sys.color.comp_background_tertiary') : $r('app.color.app_theme'))
       .borderRadius(14)
       .justifyContent(FlexAlign.Center)
@@ -256,15 +273,17 @@ export struct NewsContent {
         Web({
           src: '',
           controller: this.webViewController,
+          renderMode: RenderMode.SYNC_RENDER,
         })
           .fileAccess(false)
-          .height(this.richTextHeight)
+          .layoutMode(WebLayoutMode.FIT_CONTENT)
           .geolocationAccess(false)
-          .defaultFontSize(16 * this.setWebFontSize)
+          .defaultFontSize(14 * this.setWebFontSize)
           .backgroundColor($r('sys.color.background_primary'))
+          .accessibilityGroup(true)
           .onControllerAttached(() => {
             this.webViewController.loadData(
-              this.newsFeedVM.setRichToHtml(this.settingInfo.darkSwitch),
+              this.newsFeedVM.setRichToHtml(),
               'text/html',
               'UTF-8',
             );
@@ -274,6 +293,7 @@ export struct NewsContent {
             } catch (error) {
               console.error(`ErrorCode: ${(error as BusinessError).code},  Message: ${(error as BusinessError).message}`);
             }
+
           })
           .onPageEnd(() => {
             this.webViewController.runJavaScript(`getSize()`)
@@ -281,6 +301,7 @@ export struct NewsContent {
                 let res: Record<string, number> = JSON.parse(result)
                 this.richTextHeight = px2vp(res.height) * 1.2
               })
+            this.webViewController.runJavaScript(`setWebFontColor(${this.settingInfo.darkSwitch})`);
           })
       }
       .padding({ left: 16, right: 16 })

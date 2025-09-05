@@ -1,18 +1,28 @@
 import { BuilderNode, FrameNode, NodeController, typeNode } from '@kit.ArkUI';
 import { LayoutSetting, NewsResponse } from 'lib_news_api';
 import { transformLayout } from 'lib_native_components';
-import { IButtonItem } from 'lib_widget';
 import { FrameNodeParams } from '../model/Model';
 import { ScrollNodeBuilder } from '../builder/scrollNodeBuild/ScrollNodeBuilder';
 import { ListNodeBuilder } from '../builder/listNodeBuilder/ListNodeBuilder';
 
-import { getNativeNodeController } from './NativeNodeFactory';
+import { getNativeNodeController, NodeControllerFactory } from './NativeNodeFactory';
 
-export const nodeMap: Map<string, FrameController | undefined> = new Map();
+export const nodeMap: Map<string | number, BuilderNode<[FrameNodeParams]> | undefined> = new Map();
+
+const nodeControllerFactory: NodeControllerFactory = new NodeControllerFactory()
+
+export function setNodeMap(extraInfo: Record<string, number | string | boolean | Record<string, string | boolean>[]>,
+  nativeNode: BuilderNode<[FrameNodeParams]>) {
+  let flowIndex = extraInfo.flowIndex as number
+  if (!nodeMap.get(flowIndex)) {
+    nodeMap.set(flowIndex, nativeNode)
+  }
+}
 
 export function FrameNodeFactory(vm: LayoutSetting, articles: NewsResponse[],
-  extraInfo: Record<string, string | boolean | Record<string, string | boolean>[]>,
+  extraInfo: Record<string, number | string | boolean | Record<string, string | boolean>[]>,
   context: UIContext): FrameNode | null {
+
   if (vm.type === 'view') {
     let node = typeNode.createNode(context, 'Column');
     setColumnNodeAttr(node, vm.style);
@@ -35,7 +45,7 @@ export function FrameNodeFactory(vm: LayoutSetting, articles: NewsResponse[],
     setColumnNodeAttr(node, vm.style);
     let nativeNode: BuilderNode<[FrameNodeParams]> = new BuilderNode(context);
     nativeNode.build(wrapBuilder<[FrameNodeParams]>(ScrollNodeBuilder),
-      new FrameNodeParams(vm, articles, vm.style, extraInfo));
+      new FrameNodeParams(vm, articles, vm.style, extraInfo, nodeControllerFactory));
     return nativeNode.getFrameNode()
   }
   if (vm.type === 'List') {
@@ -43,8 +53,9 @@ export function FrameNodeFactory(vm: LayoutSetting, articles: NewsResponse[],
     setColumnNodeAttr(node, vm.style);
     let nativeNode: BuilderNode<[FrameNodeParams]> = new BuilderNode(context);
     nativeNode.build(wrapBuilder<[FrameNodeParams]>(ListNodeBuilder),
-      new FrameNodeParams(vm, articles, vm.style, extraInfo));
+      new FrameNodeParams(vm, articles, vm.style, extraInfo, nodeControllerFactory));
     node.appendChild(nativeNode.getFrameNode())
+    setNodeMap(extraInfo, nativeNode)
     return node
   }
   if (vm.type === 'native') {
@@ -54,7 +65,7 @@ export function FrameNodeFactory(vm: LayoutSetting, articles: NewsResponse[],
       type: vm.showType,
       extraInfo: extraInfo,
       layout: vm,
-    })?.makeNode());
+    }, nodeControllerFactory)?.makeNode());
     return node;
   }
   return null;
@@ -82,19 +93,35 @@ function setColumnNodeAttr(node: typeNode.Column, style: Record<string, string |
 }
 
 export class FrameController extends NodeController {
-  setting: LayoutSetting
-  articles: NewsResponse[]
-  extraInfo: Record<string, string | boolean | Record<string, string | boolean>[]>
+  setting: LayoutSetting = new LayoutSetting()
+  articles: NewsResponse[] = []
+  extraInfo: Record<string, number | string | boolean | Record<string, string | boolean>[]> = {}
+  private rootNode: FrameNode | null = null;
 
-  constructor(setting: LayoutSetting, articles: NewsResponse[],
-    extraInfo: Record<string, string | boolean | Record<string, string | boolean>[]>) {
-    super()
+  /*
+   * 初始化值
+   * */
+  initFrameNode(setting: LayoutSetting, articles: NewsResponse[],
+    extraInfo: Record<string, number | string | boolean | Record<string, string | boolean>[]>): void {
     this.setting = setting
     this.articles = articles
     this.extraInfo = extraInfo
   }
 
+  /*
+   * 解除引用关系，释放节点
+   * */
+  disposeFrameNode(): void {
+    let flowIndex = this.extraInfo.flowIndex as number
+    if (this.rootNode !== null && nodeMap.get(flowIndex)) {
+      this.rootNode.dispose();
+      nodeMap.get(flowIndex)?.dispose()
+      nodeControllerFactory.disposeFrameNode()
+    }
+  }
+
   makeNode(uiContext: UIContext): FrameNode | null {
-    return FrameNodeFactory(this.setting, this.articles, this.extraInfo, uiContext);
+    this.rootNode = FrameNodeFactory(this.setting, this.articles, this.extraInfo, uiContext);
+    return this.rootNode
   }
 }

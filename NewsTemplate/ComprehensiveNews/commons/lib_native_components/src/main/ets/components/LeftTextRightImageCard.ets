@@ -1,9 +1,10 @@
+import { PersistenceV2, UIUtils } from '@kit.ArkUI'
 import { CommonConstants, SettingModel, TimeUtils } from 'lib_common'
 import { LayoutParams, PostImgList } from 'lib_news_api'
-import { PersistenceV2, UIUtils } from '@kit.ArkUI'
+import { BaseImage } from 'lib_widget'
 import { Highlight } from 'module_highlight'
 import { AuthorCard } from '../builder/AuthorBuilder'
-import { CardViewModel } from '../viewModel/CardViewModel'
+import { CardViewModel } from '../viewmodel/CardViewModel'
 
 @Builder
 export function LeftTextRightImageCard(cardData: LayoutParams) {
@@ -17,7 +18,7 @@ struct NativeComponent {
   @Param @Require cardData: LayoutParams
   @Local settingInfo: SettingModel = PersistenceV2.connect(SettingModel, () => new SettingModel())!
   @Param showAuthor: boolean = true;
-  @Local cardViewModel: CardViewModel = new CardViewModel()
+  @Local cardViewModel: CardViewModel = new CardViewModel(this.getUIContext())
 
   aboutToAppear(): void {
     this.cardData.nativeCardData = UIUtils.makeObserved(this.cardData.nativeCardData)
@@ -60,35 +61,41 @@ struct NativeComponent {
         }
         .width('65%')
         .alignItems(HorizontalAlign.Start)
+        .accessibilityGroup(true)
+        .accessibilityLevel('yes')
 
-        Column() {
-          if (this.cardData.nativeCardData?.postImgList?.length) {
+        if (this.cardData.nativeCardData?.postImgList?.length) {
+          Column() {
             ForEach(this.cardData.nativeCardData?.postImgList, (item: PostImgList) => {
               ListItem() {
                 Column() {
                   if (item.surfaceUrl) {
                     Stack() {
-                      Image(item.surfaceUrl)
+                      BaseImage({
+                        url: item.surfaceUrl,
+                        downloadWithoutWlan: this.settingInfo.network.downloadWithoutWlan
+                      })
                         .size({ width: 96, height: 72 })
-                        .borderRadius(8)
                         .clip(true)
                       Image($r('app.media.play')).width(43).height(43)
                     }
                   } else {
-                    Image(item.picVideoUrl)
+                    BaseImage({
+                      url: item.picVideoUrl,
+                      downloadWithoutWlan: this.settingInfo.network.downloadWithoutWlan
+                    })
                       .size({ width: 96, height: 72 })
-                      .borderRadius(8)
                       .clip(true)
                   }
                 }
               }
-            })
+            },(item: PostImgList) => JSON.stringify(item))
           }
         }
       }
-      .onClick(() => {
-        this.cardViewModel.pushToNewsDetails(this.cardData)
-      })
     }
+    .onClick(() => {
+      this.cardViewModel.pushToNewsDetails(this.cardData)
+    })
   }
 }

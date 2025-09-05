@@ -34,6 +34,10 @@ export class MineService extends AuthorService {
     if (index !== -1) {
       mineUserInfo.myLikes.splice(index, 1);
     }
+    const news = BaseNewsServiceApi.queryRawNews(newsId);
+    if (news) {
+      news.isLiked = false;
+    }
   }
 
   /**
@@ -96,6 +100,12 @@ export class MineService extends AuthorService {
     const index = mineUserInfo?.myMarks.findIndex(id => id === newsId);
     if (index !== -1) {
       mineUserInfo?.myMarks.splice(index, 1);
+    }
+
+    const news = BaseNewsServiceApi.queryRawNews(newsId);
+    if (news) {
+      news.isMarked = false;
+      news.markCount -= 1
     }
   }
 
@@ -165,19 +175,6 @@ export class MineService extends AuthorService {
       mineUserInfo.myComments.splice(index, 1);
     }
     CommentServiceApi.deleteComment(commentId);
-  }
-
-  /**
-   * 查询我的评论
-   * @returns
-   */
-  public queryMyComments(): CommentResponse[] {
-    const mineUserInfo = this.queryAuthorRaw() as MyAuthor;
-    return mineUserInfo.myComments
-      .map((commentId: string) => {
-        return CommentServiceApi.queryComment(commentId);
-      })
-      .filter(v => Boolean(v)) as CommentResponse[];
   }
 
   /**

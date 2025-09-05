@@ -10,12 +10,14 @@ function loginSheetBuilder() {
 @ComponentV2
 struct loginSheet {
   @Local sheetParams: LoginSheetParams = LoginSheetUtils.sheetParams;
+  @Local sheetStack: NavPathStack = new NavPathStack();
 
   aboutToAppear(): void {
-    RouterUtils.createStack(Constants.LOGIN_SHEET_STACK_NAME, true);
+    this.sheetStack = RouterUtils.createStack(Constants.LOGIN_SHEET_STACK_NAME, true);
     RouterUtils.pushPathByName(RouterMap.HUAWEI_LOGIN_PAGE, {
       isSheet: true,
       keepVM: false,
+      sheetParams: this.sheetParams,
     } as LoginRouterParams,
       undefined,
       true,
@@ -24,7 +26,7 @@ struct loginSheet {
   }
 
   build() {
-    Navigation(RouterUtils.getStack(Constants.LOGIN_SHEET_STACK_NAME)) {
+    Navigation(this.sheetStack) {
     }
     .hideNavBar(true)
     .hideTitleBar(true)
@@ -44,10 +46,13 @@ export class LoginSheetUtils {
       height: Constants.DEFAULT_LOGIN_SHEET_HEIGHT,
       detents: [Constants.DEFAULT_LOGIN_SHEET_HEIGHT, SheetSize.LARGE],
       dragBar: true,
+      scrollSizeMode: ScrollSizeMode.CONTINUOUS,
       onHeightDidChange: (height: number) => {
         LoginSheetUtils.sheetParams.height = px2vp(height);
       },
-      scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+      onTypeDidChange: (type: SheetType) => {
+        LoginSheetUtils.sheetParams.sheetType = type;
+      },
     });
   }
 }

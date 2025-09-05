@@ -3,10 +3,8 @@
     "name": "lib_news_feed_details_test",
     "type": "feature",
     "deviceTypes": [
-      "default",
-      "tablet",
-      "2in1",
-      "wearable"
+      "phone",
+      "tablet"
     ],
     "deliveryWithInstall": true,
     "installationFree": false

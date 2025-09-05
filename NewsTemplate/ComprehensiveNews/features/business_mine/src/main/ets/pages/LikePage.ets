@@ -27,5 +27,8 @@ struct LikePage {
       .height(CommonConstants.FULL_PERCENT)
     }
     .hideTitleBar(true)
+    .onShown(() => {
+      this.vm.queryList();
+    })
   }
 }

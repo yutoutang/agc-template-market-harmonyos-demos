@@ -629,7 +629,7 @@ export struct ChannelsSortEdit {
           .fontColor($r('sys.color.font_primary'))
           .fontSize(14)
 
-        Image($r('app.media.delete'))
+        Image($r('app.media.ic_delete'))
           .width(10)
           .height(10)
           .draggable(false)
@@ -717,10 +717,11 @@ export struct ChannelsSortEdit {
           .fontColor($r('sys.color.font_primary'))
           .fontSize(14 * this.fontSizeRatio)
 
-        Image($r('app.media.delete'))
+        Image($r('app.media.ic_delete'))
           .width(10)
           .height(10)
           .draggable(false)
+          .fillColor($r('sys.color.font_primary'))
           .transition({ type: TransitionType.All, scale: { x: 0, y: 0, centerX: '50%' } })
           .scale(select.id === this.content.id ? { x: this.scaleIcon, y: this.scaleIcon } : {})
           .visibility(this.gridComState && !select.disabled ? Visibility.Visible : Visibility.None)
@@ -731,6 +732,8 @@ export struct ChannelsSortEdit {
           .margin({ left: 5 })
       }
       .onClick(() => this.handleDeleteClick(select))
+      .accessibilityGroup(true)
+      .accessibilityText(this.gridComState ? select.text + '删除' : select.text + '跳转')
       .borderRadius(16)
       .backgroundColor($r('sys.color.ohos_id_color_button_normal'))
       .translate(this.gridComState ? this.clickRemoveBtn && select.id === this.content.id ?
@@ -761,6 +764,7 @@ export struct ChannelsSortEdit {
           .width(13)
           .height(13)
           .draggable(false)
+          .fillColor($r('sys.color.font_primary'))
           .visibility(this.addIconShow && select.id === this.content.id ? Visibility.None : Visibility.Visible)
           .transition({ type: TransitionType.All, scale: { x: 0, y: 0 } })
           .margin({ right: 5 })
@@ -774,6 +778,8 @@ export struct ChannelsSortEdit {
           .fontSize(14 * this.fontSizeRatio)
       }
       .onClick(() => this.handleAddIconClick(select))
+      .accessibilityGroup(true)
+      .accessibilityText(select.text as string + '添加')
       .padding({ top: 8, bottom: 8 })
       .backgroundColor($r('sys.color.ohos_id_color_button_normal'))
       .borderRadius(16)
@@ -809,6 +815,7 @@ export struct ChannelsSortEdit {
           Stack() {
             this.TextBlockAddItemBuilder(item);
           }
+          .accessibilityLevel('no')
           .onHover((isHover: boolean) => {
             if (isHover) {
               this.hoverId = item.id;
@@ -862,6 +869,7 @@ export struct ChannelsSortEdit {
         })
       }, (item: TabInfo) => item.id.toString())
     }
+    .accessibilityLevel('no')
     .translate(this.clickRemoveBtn && this.selected.length % this.colNum === 1 ? { y: -this.blockHeight } : {})
     .animation({
       duration: ChannelConstants.ENTER_EXIT_ICON_DURATION,
@@ -1048,6 +1056,7 @@ export struct ChannelsSortEdit {
           .visibility(select.visibility)
         }, (item: TabInfo) => item.id.toString())
       }
+      .accessibilityLevel('no')
       .scrollBar(BarState.Off)
       .parallelGesture(
         LongPressGesture({ repeat: true })
@@ -1119,6 +1128,7 @@ export struct ChannelsSortEdit {
         this.onDragMoveEvent(event, itemIndex, insertIndex),
       )
     }
+    .accessibilityLevel('no')
     .parallelGesture(
       LongPressGesture({ repeat: true })
         .onAction(() => {
@@ -1179,6 +1189,7 @@ export struct ChannelsSortEdit {
               Text('点击进入频道')
                 .fontSize(12 * this.fontSizeRatio)
                 .fontColor($r('sys.color.font_tertiary'))
+                .accessibilityLevel('no')
             }
 
             Row() {
@@ -1208,6 +1219,7 @@ export struct ChannelsSortEdit {
             Text('点击添加')
               .fontSize(12 * this.fontSizeRatio)
               .fontColor($r('sys.color.font_tertiary'))
+              .accessibilityLevel('no')
           }
           .width('100%')
           .justifyContent(FlexAlign.Start)

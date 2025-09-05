@@ -49,7 +49,8 @@ export struct CustomTabBar {
                 .visibility(this.currentIndex === index ? Visibility.Visible : Visibility.None)
             }
             .justifyContent(FlexAlign.SpaceBetween)
-          }.onClick(() => {
+          }
+          .onClick(() => {
             this.listScroller.scrollToIndex(index, true, ScrollAlign.CENTER)
             this.onIndexChange(index, item)
           })

@@ -8,6 +8,8 @@ export class RecordListVM {
   @Trace feedbackModel: FeedbackModel = AppStorageV2.connect(FeedbackModel, () => new FeedbackModel())!;
   @Trace list: FeedbackResponseParams[] = [];
   @Trace loading: boolean = false;
+  @Trace gridCount: number = 3;
+  @Trace breakpoint: string = 'sm';
 
   constructor() {
     this.queryListInfo();
@@ -20,5 +22,16 @@ export class RecordListVM {
     }).finally(() => {
       this.loading = false;
     });
+  }
+
+  onBreakpointChange(bp: string) {
+    this.breakpoint = bp;
+    if (bp === 'sm') {
+      this.gridCount = 3;
+    } else if (bp === 'md') {
+      this.gridCount = 6;
+    } else {
+      this.gridCount = 8;
+    }
   }
 }

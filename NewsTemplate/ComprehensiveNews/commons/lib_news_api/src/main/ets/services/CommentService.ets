@@ -34,7 +34,7 @@ export class CommentService {
    * @returns
    */
   private handleCommentRaw(item: BaseComment, ignoreParent: boolean = false,
-    ignoreReply: boolean = false): CommentResponse {
+    ignoreReplyOuter: boolean = false, ignoreReplyInner: boolean = true): CommentResponse {
     const copyItem = JSON.parse(JSON.stringify(item)) as CommentResponse;
     const authorInfo = AuthorServiceApi.queryAuthorInfo(item.authorId);
     if (authorInfo) {
@@ -44,16 +44,16 @@ export class CommentService {
     if (item.parentCommentId && !ignoreParent) {
       const parentComment = this.queryRawComment(item.parentCommentId);
       if (parentComment) {
-        copyItem.parentComment = this.handleCommentRaw(parentComment, true, true);
+        copyItem.parentComment = this.handleCommentRaw(parentComment, true, ignoreReplyInner);
       }
     }
 
-    if (copyItem.replyComments.length && !ignoreReply) {
+    if (copyItem.replyComments.length && !ignoreReplyOuter) {
       copyItem.replyComments = item.replyComments
         .map((id: string) => {
           const comment = this.queryRawComment(id);
           if (comment) {
-            return this.handleCommentRaw(comment, false, true);
+            return this.handleCommentRaw(comment, false, ignoreReplyInner);
           }
           return undefined;
         })
@@ -69,12 +69,44 @@ export class CommentService {
    * @param commentId
    * @returns
    */
-  public queryComment(commentId: string): CommentResponse | undefined {
+  public queryComment(commentId: string, ignoreReplyInner: boolean = false): CommentResponse | undefined {
     const item = this.queryRawComment(commentId);
     if (item) {
-      return this.handleCommentRaw(item);
+      return this.handleCommentRaw(item, false, false, ignoreReplyInner);
     }
     return undefined;
+  }
+
+  /**
+   * 扁平化评论数组
+   * @param arr
+   * @returns
+   */
+  public flattenWithReduce(arr: CommentResponse[]): CommentResponse[] {
+    return arr.reduce((acc, current) => {
+      // 若当前元素是数组，递归扁平化后合并到累加器
+      if (Array.isArray(current.replyComments)) {
+        return acc.concat(this.flattenWithReduce(current.replyComments));
+      }
+      // 否则直接添加到累加器
+      acc.push(current);
+      return acc;
+    }, arr);
+  }
+
+  /**
+   * 查询根评论下所有相关评论
+   * @param commentId
+   * @returns
+   */
+  public queryAllReplyComment(commentId: string): CommentResponse[] {
+    const item = this.queryRawComment(commentId);
+    let list: CommentResponse[] = [];
+    if (item) {
+      const resp = this.handleCommentRaw(item, false, false, false);
+      list = this.flattenWithReduce(resp.replyComments)
+    }
+    return list;
   }
 
   /**
@@ -82,11 +114,11 @@ export class CommentService {
    * @param commentId
    * @returns
    */
-  public queryCommentList(newsId: string): CommentResponse[] | undefined {
+  public queryCommentList(newsId: string,ignoreReplyInner:boolean = false): CommentResponse[] | undefined {
     const item = this.queryRawCommentList(newsId);
     if (item?.length) {
       let res = item.map(comment => {
-        return this.handleCommentRaw(comment);
+        return this.handleCommentRaw(comment, false, false, ignoreReplyInner);
       })
       return res
     }
@@ -136,11 +168,6 @@ export class CommentService {
       let parent = MockComment.list.find(item => item.commentId === newItem.parentCommentId)
       if (parent) {
         parent.replyComments.unshift(newItem.commentId)
-      }
-      const rootId = this.queryRootComment(newItem.parentCommentId);
-      if (rootId !== parent?.commentId) {
-        const root = MockComment.list.find(item => item.commentId === rootId);
-        root?.replyComments.unshift(newItem.commentId);
       }
     }
     MockComment.list.splice(0, 0, newItem);

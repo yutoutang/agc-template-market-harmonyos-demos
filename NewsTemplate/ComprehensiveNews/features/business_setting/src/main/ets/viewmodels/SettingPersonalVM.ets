@@ -1,11 +1,22 @@
-import { promptAction, window } from '@kit.ArkUI';
-import { BaseViewModel, FileUtils, Logger, PhoneNumberUtils, RouterUtils, BreakpointNameEnum } from 'lib_common';
+import { promptAction } from '@kit.ArkUI';
+import { BusinessError } from '@kit.BasicServicesKit';
+import {
+  BaseViewModel,
+  FileUtils,
+  Logger,
+  PhoneNumberUtils,
+  RouterUtils,
+  CommonConstants,
+  CommonTipDialog,
+} from 'lib_common';
 import { MineServiceApi } from 'lib_news_api';
+import { getAccountErrorMsg, ErrorCode } from 'lib_account';
 
 const TAG = '[SettingPersonalVM]';
 
 @ObservedV2
 export class SettingPersonalVM extends BaseViewModel {
+  readonly defaultSheetH: SheetSize | Length = SheetSize.LARGE;
   @Trace nickName: string = this.userInfoModel.authorNickName;
   @Trace contactPhone: string = this.userInfoModel.authorPhone;
   @Trace personalDesc: string = this.userInfoModel.authorDesc;
@@ -13,8 +24,21 @@ export class SettingPersonalVM extends BaseViewModel {
   @Trace showPersonDescSheet: boolean = false;
   @Trace showPhoneSheet: boolean = false;
   @Trace hasModify: boolean = false;
-  @Trace keyHeight: number = 0;
-  readonly defaultSheetH: SheetSize | Length = SheetSize.LARGE;
+  @Trace sheetType: SheetType = SheetType.BOTTOM;
+
+  getSheetOptions(title: string) {
+    return {
+      title: { title },
+      height: this.defaultSheetH,
+      detents: [this.defaultSheetH, SheetSize.MEDIUM],
+      showClose: true,
+      keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
+      preferType: SheetType.CENTER,
+      onTypeDidChange: (type: SheetType) => {
+        this.setSheetType(type);
+      },
+    } as SheetOptions
+  }
 
   modifyNickName() {
     if (!this.nickName) {
@@ -60,30 +84,32 @@ export class SettingPersonalVM extends BaseViewModel {
     this.hasModify = true;
   }
 
+  handleAvatarError(error: BusinessError) {
+    Logger.error(TAG, 'onChooseAvatar failed, error: ' + JSON.stringify(error));
+    if (error.code === ErrorCode.ERROR_CODE_CANCEL) {
+      return;
+    }
+    let errorMsg: string = getAccountErrorMsg(error.code);
+
+    CommonTipDialog.show({
+      primaryTitle: '温馨提示',
+      content: errorMsg,
+      priBtnV: '确定',
+    })
+  }
+
   customBack() {
     RouterUtils.pop(this.hasModify ? 'modify-flag' : undefined);
   }
 
-  registerKeyboard() {
-    window.getLastWindow(getContext()).then(currentWindow => {
-      currentWindow.on('avoidAreaChange', this.cb);
-    })
+  setSheetType(sheetType: SheetType) {
+    this.sheetType = sheetType;
   }
 
-  unRegisterKeyboard() {
-    window.getLastWindow(getContext()).then(currentWindow => {
-      currentWindow.off('avoidAreaChange', this.cb);
-    })
-  }
-
-  cb: (data: window.AvoidAreaOptions) => void = (data) => {
-    if (data.type === window.AvoidAreaType.TYPE_KEYBOARD) {
-      this.keyHeight = px2vp(data.area.bottomRect.height);
-      if (this.keyHeight > 0 &&
-      [BreakpointNameEnum.MD, BreakpointNameEnum.LG].includes(this.breakPointModel.currentBreakpoint)) {
-        // 减去居中弹窗底部高度
-        this.keyHeight -= 100;
-      }
+  getSheetPaddingBottom() {
+    if (this.sheetType === SheetType.BOTTOM) {
+      return Math.max(this.windowModel.windowBottomPadding, CommonConstants.PADDING_L);
     }
+    return CommonConstants.PADDING_L;
   }
 }

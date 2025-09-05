@@ -128,9 +128,9 @@ export class MockUser {
     watchers: ['author_1', 'author_2', 'author_6', 'author_7'],
     followers: ['author_1', 'author_2', 'author_3', 'author_4', 'author_5'],
     likeNum: 12,
-    myLikes: ['author_1', 'author_3', 'video1', 'post_1'],
-    myMarks: ['author_2', 'author_4', 'video2', 'post_1'],
+    myLikes: ['video1', 'post_1'],
+    myMarks: ['video2', 'post_1'],
     myComments: [],
-    myHistory: ['author_1', 'video1', 'post_1'],
+    myHistory: ['video1', 'post_1'],
   };
 }

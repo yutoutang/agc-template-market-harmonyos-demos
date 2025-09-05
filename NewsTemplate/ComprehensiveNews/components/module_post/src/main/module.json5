@@ -3,7 +3,8 @@
     "name": "module_post",
     "type": "har",
     "deviceTypes": [
-      "default"
+      "phone",
+      "tablet"
     ]
   }
 }

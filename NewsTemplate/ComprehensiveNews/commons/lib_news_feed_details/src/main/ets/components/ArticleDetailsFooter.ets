@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import { SettingModel } from 'lib_common'
 import { WxShareViewModel } from 'module_share'
 import { handlerCoverImage } from '../utils/Utils'
-import NewsFeedVM from '../viewModel/NewsFeedVM'
+import NewsFeedVM from '../viewmodel/NewsFeedVM'
 
 @ComponentV2
 export struct ArticleDetailsFooter {
@@ -50,15 +50,16 @@ export struct ArticleDetailsFooter {
             .fontWeight(FontWeight.Regular)
             .fontColor($r('sys.color.font_primary'))
         }
-        .onClick(() => {
-          this.newsFeedVM.newsLike()
-        })
         .backgroundColor($r('sys.color.comp_background_tertiary'))
         .padding({ top: 8, bottom: 8 })
         .justifyContent(FlexAlign.Center)
         .borderRadius(21)
         .flexGrow(1)
         .margin({ right: 5 })
+        .accessibilityText('点赞' + this.newsFeedVM.articleDetails.likeCount.toString())
+        .onClick(() => {
+          this.newsFeedVM.newsLike()
+        })
 
         Row() {
           Image($r('app.media.wechat'))
@@ -77,6 +78,7 @@ export struct ArticleDetailsFooter {
         .padding({ top: 8, bottom: 8 })
         .width('48%')
         .margin({ left: 5 })
+        .accessibilityText('分享到微信')
         .onClick(() => {
           WxShareViewModel.instance.newsWebShare({
             id: this.newsFeedVM.articleDetails.id,

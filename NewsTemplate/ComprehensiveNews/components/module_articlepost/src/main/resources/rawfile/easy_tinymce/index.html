@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0,user-scalable=no, viewport-fit=contain"
+    />
+    <script src="./tinymce.min.js"></script>
+    <script src="./config.js"></script>
+    <style>
+      /* 保持原有样式不变 */
+      .tinymce-editor {
+        width: 100%;
+        height: 100%;
+      }
+      .mce-content-body {
+        margin: 0 !important;
+      }
+      html,
+      body {
+        margin: 0 !important;
+        padding: 0;
+        height: 100%;
+        background-color: transparent;
+      }
+
+      #editor-container {
+        width: 100%;
+        height: 100vh;
+      }
+
+      .tox-tinymce {
+        border: unset !important;
+      }
+
+      /* 工具栏隐藏的样式类 */
+      .toolbar-hidden .tox-editor-header {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        overflow: hidden !important;
+      }
+
+      /* Emoji面板样式 */
+      .emoji-panel {
+        position: absolute;
+        z-index: 9998;
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        padding: 12px;
+        display: none;
+      }
+
+      .emoji-panel.visible {
+        display: block;
+      }
+
+      .emoji-grid {
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        gap: 8px;
+      }
+
+      .emoji-item {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+      }
+
+      .emoji-item:hover {
+        background-color: #f0f0f0;
+      }
+
+      .emoji-category {
+        margin-bottom: 12px;
+      }
+
+      .tox-toolbar-overlord > .tox-toolbar:first-child {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .emoji-category-title {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 8px;
+        padding-left: 4px;
+      }
+      /* 分割线样式 */
+      hr {
+        border: none;
+        border-top: 1px solid #e5e7eb;
+        margin: 1.5em 0;
+      }
+
+      .tox .tox-toolbar__group {
+        padding: 0 !important;
+      }
+    </style>
+    <title>EasyTinyMCE</title>
+  </head>
+  <body>
+    <div id="editor-container" class="tinymce-editor"></div>
+    <!-- Emoji面板 -->
+    <div class="emoji-panel" id="emojiPanel">
+      <div class="emoji-category">
+        <div class="emoji-category-title">常用表情</div>
+        <div class="emoji-grid" id="commonEmojis">
+          <!-- 常用表情将通过JS填充 -->
+        </div>
+      </div>
+      <div class="emoji-category">
+        <div class="emoji-category-title">手势与情感</div>
+        <div class="emoji-grid" id="gestureEmojis">
+          <!-- 手势表情将通过JS填充 -->
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+      let currentEditor;
+      let lastContent;
+      let emojiPanelVisible = false;
+      const emojiPanel = document.getElementById("emojiPanel");
+      const emojiButtonSelector = '.tox-tbtn[aria-label="插入表情"]';
+
+      // 图片压缩和上传处理函数保持不变
+      const compressImage = (blob) => {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          const reader = new FileReader();
+
+          reader.onload = (e) => {
+            img.src = e.target.result;
+            img.crossOrigin = "anonymous";
+          };
+
+          reader.onerror = () => reject(new Error("图片读取失败"));
+          reader.readAsDataURL(blob);
+
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+
+            const originalWidth = img.width;
+            const originalHeight = img.height;
+
+            let targetWidth, targetHeight;
+            if (originalWidth > 500) {
+              targetWidth = 500;
+              targetHeight = (originalHeight * targetWidth) / originalWidth;
+            } else {
+              targetWidth = originalWidth;
+              targetHeight = originalHeight;
+            }
+
+            canvas.width = targetWidth;
+            canvas.height = targetHeight;
+            ctx.clearRect(0, 0, targetWidth, targetHeight);
+            ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+
+            canvas.toBlob(
+              (compressedBlob) => {
+                if (!compressedBlob) {
+                  reject(new Error("图片压缩失败"));
+                  return;
+                }
+                resolve(compressedBlob);
+              },
+              blob.type || "image/jpeg",
+              0.9
+            );
+          };
+
+          img.onerror = () => reject(new Error("图片加载失败"));
+        });
+      };
+
+      const example_image_upload_handler = (blobInfo, progress) => {
+        return new Promise(async (resolve, reject) => {
+          try {
+            if (!blobInfo || !blobInfo.blob()) {
+              reject("无法获取图片数据");
+              return;
+            }
+
+            const compressedBlob = await compressImage(blobInfo.blob());
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+              const base64Url = e.target.result;
+              if (
+                typeof base64Url !== "string" ||
+                !base64Url.startsWith("data:image/")
+              ) {
+                reject("图片格式无效");
+                return;
+              }
+              resolve(base64Url);
+            };
+
+            reader.onerror = function () {
+              reject("图片读取失败: " + (reader.error?.message || "未知错误"));
+            };
+
+            reader.readAsDataURL(compressedBlob);
+          } catch (err) {
+            reject("图片处理失败: " + err.message);
+          }
+        });
+      };
+
+      // Emoji相关配置保持不变
+      const emojis = {
+        common: [
+          "😀",
+          "😁",
+          "😂",
+          "🤣",
+          "😃",
+          "😄",
+          "😅",
+          "😆",
+          "😉",
+          "😊",
+          "🙂",
+          "🙃",
+          "😋",
+          "😎",
+          "😍",
+          "😘",
+        ],
+        gesture: [
+          "👍",
+          "👎",
+          "👌",
+          "✌️",
+          "🤞",
+          "🤟",
+          "🤘",
+          "👊",
+          "👏",
+          "🙌",
+          "💪",
+          "✊",
+          "👋",
+          "🤚",
+          "🖐️",
+          "🖖",
+        ],
+      };
+
+      function insertEmoji(emoji) {
+        if (currentEditor) {
+          currentEditor.insertContent(emoji);
+          hideEmojiPanel();
+        }
+      }
+
+      function showEmojiPanel() {
+        const emojiButton = document.querySelector(emojiButtonSelector);
+        if (!emojiButton || !emojiPanel) {
+          return;
+        }
+
+        const btnRect = emojiButton.getBoundingClientRect();
+        emojiPanel.classList.add("visible");
+        const panelRect = emojiPanel.getBoundingClientRect();
+
+        const topPos = Math.max(
+          0,
+          btnRect.top + window.scrollY - panelRect.height - 2
+        );
+        const leftPos = Math.max(
+          0,
+          btnRect.left +
+            window.scrollX +
+            btnRect.width / 2 -
+            panelRect.width / 2
+        );
+
+        emojiPanel.style.top = `${topPos}px`;
+        emojiPanel.style.left = `${leftPos}px`;
+        emojiPanelVisible = true;
+      }
+
+      function hideEmojiPanel() {
+        if (emojiPanel) {
+          emojiPanel.classList.remove("visible");
+          emojiPanelVisible = false;
+        }
+      }
+
+      function initEmojiPanel() {
+        const commonContainer = document.getElementById("commonEmojis");
+        const gestureContainer = document.getElementById("gestureEmojis");
+
+        emojis.common.forEach((emoji) => {
+          const emojiEl = document.createElement("div");
+          emojiEl.className = "emoji-item";
+          emojiEl.textContent = emoji;
+          emojiEl.addEventListener("click", (e) => {
+            e.stopPropagation();
+            insertEmoji(emoji);
+          });
+          commonContainer.appendChild(emojiEl);
+        });
+
+        emojis.gesture.forEach((emoji) => {
+          const emojiEl = document.createElement("div");
+          emojiEl.className = "emoji-item";
+          emojiEl.textContent = emoji;
+          emojiEl.addEventListener("click", (e) => {
+            e.stopPropagation();
+            insertEmoji(emoji);
+          });
+          gestureContainer.appendChild(emojiEl);
+        });
+      }
+
+      function initEmojiHideListeners(editor) {
+        function handleGlobalClick(e) {
+          const excludeAreas = [
+            e.target.closest(".emoji-panel"),
+            e.target.closest(emojiButtonSelector),
+          ];
+          const isClickExcludeArea = excludeAreas.some((area) => area !== null);
+          if (!isClickExcludeArea && emojiPanelVisible) {
+            hideEmojiPanel();
+          }
+        }
+
+        document.addEventListener("click", handleGlobalClick);
+        editor.on("click", handleGlobalClick);
+
+        // 工具栏按钮点击监听
+        editor.on("toolbarclick", (e) => {
+          if (e.toolbarButton?.name !== "emoji" && emojiPanelVisible) {
+            hideEmojiPanel();
+          }
+        });
+
+        // 命令执行监听 - 重点针对颜色和图片命令
+        editor.on("ExecCommand", (e) => {
+          const commandsToHide = [
+            "mceShowColorPicker",
+            "mceImage",
+            "mceForeColor",
+            "mceBackColor",
+            "mceLink",
+          ];
+
+          if (
+            emojiPanelVisible &&
+            (commandsToHide.includes(e.command) ||
+              !e.command.startsWith("mceEmoji"))
+          ) {
+            hideEmojiPanel();
+          }
+        });
+
+        // 【解决方案1：使用更通用的事件替代DialogOpen】
+        // 监听所有模态窗口相关事件
+        editor.on("OpenWindow", () => {
+          if (emojiPanelVisible) {
+            hideEmojiPanel();
+          }
+        });
+
+        // 颜色选择器特殊处理
+        editor.on("ColorPickerShow", () => {
+          if (emojiPanelVisible) {
+            hideEmojiPanel();
+          }
+        });
+
+        // 上下文菜单和面板事件
+        editor.on("ContextMenu", () => {
+          if (emojiPanelVisible) {
+            hideEmojiPanel();
+          }
+        });
+
+        editor.on("PanelShow", () => {
+          if (emojiPanelVisible) {
+            hideEmojiPanel();
+          }
+        });
+
+        // 窗口和滚动事件
+        window.addEventListener("scroll", () => {
+          if (emojiPanelVisible) {
+            hideEmojiPanel();
+          }
+        });
+
+        window.addEventListener("resize", () => {
+          if (emojiPanelVisible) {
+            hideEmojiPanel();
+          }
+        });
+
+        editor.on("blur", () => {
+          if (emojiPanelVisible) {
+            hideEmojiPanel();
+          }
+        });
+
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            if (mutation.addedNodes.length) {
+              for (let node of mutation.addedNodes) {
+                if (node.nodeType === 1) {
+                  // 检测所有可能的TinyMCE弹窗类
+                  const isTinyMCEPopup =
+                    node.classList.contains("tox-dialog") ||
+                    node.classList.contains("tox-colorpicker") ||
+                    node.classList.contains("tox-menu") ||
+                    node.classList.contains("tox-pop") ||
+                    node.classList.contains("tox-swatch") ||
+                    node.classList.contains("tox-modal");
+
+                  if (isTinyMCEPopup && emojiPanelVisible) {
+                    hideEmojiPanel();
+                    break;
+                  }
+                }
+              }
+            }
+          });
+        });
+
+        // 监测整个文档的变化
+        observer.observe(document.body, {
+          childList: true,
+          subtree: true,
+          attributes: false,
+          characterData: false,
+        });
+
+        // 清理监听
+        editor.on("Remove", () => {
+          document.removeEventListener("click", handleGlobalClick);
+          window.removeEventListener("scroll", () => {
+            if (emojiPanelVisible) {
+              hideEmojiPanel();
+            }
+          });
+          window.removeEventListener("resize", () => {
+            if (emojiPanelVisible) {
+              hideEmojiPanel();
+            }
+          });
+          observer.disconnect();
+        });
+      }
+
+      function initEmojiButton(editor) {
+        editor.ui.registry.addButton("emoji", {
+          icon: "emoji",
+          tooltip: "插入表情",
+          onAction: function () {
+            if (emojiPanelVisible) {
+              hideEmojiPanel();
+            } else {
+              hideEmojiPanel();
+              showEmojiPanel();
+            }
+          },
+        });
+      }
+
+      function insertHorizontalLine() {
+        if (currentEditor) {
+          currentEditor.insertContent("<p></p><hr><p></p>");
+          currentEditor.selection.select(
+            currentEditor.getBody().lastElementChild
+          );
+          currentEditor.selection.collapse(false);
+        }
+      }
+
+      // 保留原有Bridge配置和初始化逻辑
+      window.EasyEditorBridge = window.EasyEditorBridge || {
+        fetchConfig() {
+          return `{}`;
+        },
+        fetchContent() {
+          return "";
+        },
+        onContentChanged(content) {},
+      };
+
+      let configText = window.EasyEditorBridge.fetchConfig();
+      let config;
+      try {
+        config = Function(`return ${configText}`)();
+      } catch (e) {
+        config = {};
+      }
+
+      let initConfig = {
+        language: "zh_CN",
+        statusbar: false,
+        promotion: false,
+        license_key: "gpl",
+        min_height: 1,
+        plugins: "link image lists",
+        menubar: false,
+        toolbar: [
+          "emoji image | removeformat undo redo ",
+          "bold italic underline strikethrough fontsize forecolor backcolor",
+          "alignleft aligncenter alignright | bullist numlist | horizontalline ",
+        ],
+        font_size_formats: "14px 16px 18px 20px",
+        images_upload_handler: example_image_upload_handler,
+        content_style:
+          "img {max-width: 50%; /* 设置图片最大宽度为100% */height: auto; /* 确保图片保持横纵比 */}",
+        toolbar_sticky: false,
+        toolbar_location: "bottom",
+        mobile: {
+          toolbar_sticky: false,
+          toolbar_location: "bottom",
+        },
+        placeholder: "请输入正文",
+        setup: function (editor) {
+          currentEditor = editor;
+
+          initEmojiButton(editor);
+          initEmojiHideListeners(editor);
+
+          // 字体大小按钮配置
+          editor.ui.registry.addIcon(
+            "custom-font-size",
+            `<svg width="19" height="16" viewBox="0 0 21.3826 16.5801" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+               <desc>Created with Pixso.</desc>
+             <defs/>
+               <path id="path" d="M13.6 15.55C13.7 15.79 13.7 15.98 13.61 16.12C13.52 16.25 13.34 16.34 13.07 16.38C12.75 16.43 12.5 16.4 12.34 16.31C12.17 16.2 12.05 16.04 11.97 15.82L10.34 11.59L3.11 11.59L1.51 15.82C1.37 16.2 1.08 16.38 0.64 16.38C0.36 16.38 0.18 16.31 0.08 16.15C-0.03 16.01 -0.03 15.81 0.07 15.55L5.8 0.66C5.88 0.44 5.98 0.28 6.11 0.16C6.24 0.05 6.42 0 6.64 0C7.12 0 7.44 0.21 7.6 0.64L13.6 15.55ZM3.59 10.22L9.81 10.22L6.71 1.91L3.59 10.22ZM17.92 7.25C18.92 7.25 19.75 7.55 20.41 8.16C21.05 8.79 21.38 9.66 21.38 10.8L21.38 15.84C21.38 16.06 21.32 16.24 21.21 16.37C21.09 16.49 20.93 16.56 20.73 16.56C20.52 16.56 20.36 16.51 20.25 16.41C20.13 16.32 20.07 16.17 20.06 15.98C20.04 15.74 20.02 15.5 20.01 15.26C19.72 15.69 19.35 16.02 18.89 16.25C18.43 16.46 17.91 16.58 17.32 16.58C16.4 16.58 15.63 16.33 15.01 15.85C14.37 15.36 14.06 14.68 14.06 13.82C14.06 13.08 14.31 12.48 14.81 12.01C15.31 11.53 16.01 11.23 16.9 11.09C17.78 10.94 18.79 10.98 19.91 11.21L19.91 11.02C19.89 10.18 19.71 9.57 19.37 9.17C19.03 8.78 18.52 8.59 17.85 8.59C17.43 8.59 17.07 8.65 16.76 8.8C16.44 8.93 16.17 9.12 15.93 9.37C15.78 9.52 15.57 9.7 15.44 9.72C15.3 9.75 15.15 9.71 14.99 9.62C14.8 9.51 14.68 9.38 14.63 9.23C14.58 9.09 14.61 8.93 14.73 8.78C15.06 8.3 15.51 7.92 16.07 7.65C16.63 7.38 17.24 7.25 17.92 7.25ZM17.44 15.34C18.11 15.34 18.69 15.14 19.18 14.75C19.66 14.35 19.91 13.8 19.91 13.1L19.91 12.42C19.03 12.21 18.26 12.12 17.61 12.16C16.95 12.21 16.45 12.38 16.11 12.66C15.76 12.95 15.59 13.33 15.59 13.8C15.59 14.28 15.76 14.65 16.11 14.92C16.45 15.2 16.9 15.34 17.44 15.34Z" fill="#000000" fill-opacity="0.898039" fill-rule="nonzero"/>
+            </svg>
+            `
+          );
+          editor.ui.registry.addMenuButton("fontsize", {
+            icon: "custom-font-size",
+            tooltip: "字体大小",
+            fetch: function (callback) {
+              let items = [
+                {
+                  type: "menuitem",
+                  text: "14px",
+                  onAction: function () {
+                    editor.execCommand("FontSize", false, "14pt");
+                  },
+                },
+                {
+                  type: "menuitem",
+                  text: "16px",
+                  onAction: function () {
+                    editor.execCommand("FontSize", false, "16pt");
+                  },
+                },
+                {
+                  type: "menuitem",
+                  text: "18px",
+                  onAction: function () {
+                    editor.execCommand("FontSize", false, "18pt");
+                  },
+                },
+                {
+                  type: "menuitem",
+                  text: "24px",
+                  onAction: function () {
+                    editor.execCommand("FontSize", false, "24pt");
+                  },
+                },
+              ];
+              callback(items);
+            },
+          });
+
+          // Emoji图标注册
+          editor.ui.registry.addIcon(
+            "emoji",
+            `<svg width="19" height="19" viewBox="0 0 21.98 21.98" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+               <desc>Created with Pixso.</desc>
+             <defs/>
+               <path id="path" d="M10.99 0C8.98 0 7.14 0.48 5.46 1.46C3.79 2.45 2.45 3.79 1.46 5.46C0.48 7.14 0 8.98 0 10.99C0 12.99 0.48 14.83 1.46 16.51C2.45 18.18 3.79 19.52 5.46 20.51C7.14 21.49 8.98 21.98 10.99 21.98C12.97 21.98 14.81 21.49 16.5 20.51C18.18 19.52 19.52 18.18 20.51 16.5C21.49 14.81 21.98 12.97 21.98 10.99C21.98 9 21.49 7.16 20.51 5.47C19.52 3.79 18.18 2.45 16.5 1.46C14.81 0.48 12.97 0 10.99 0ZM10.99 20.49C9.27 20.49 7.69 20.06 6.23 19.2C4.78 18.35 3.62 17.2 2.77 15.74C1.91 14.28 1.48 12.7 1.48 10.99C1.48 9.27 1.91 7.69 2.77 6.23C3.62 4.78 4.78 3.62 6.23 2.77C7.69 1.91 9.27 1.48 10.99 1.48C12.7 1.48 14.28 1.91 15.74 2.77C17.2 3.62 18.35 4.78 19.2 6.23C20.06 7.69 20.49 9.27 20.49 10.99C20.49 12.7 20.06 14.28 19.2 15.74C18.35 17.2 17.2 18.35 15.74 19.2C14.28 20.06 12.7 20.49 10.99 20.49ZM7.4 8.22C7.4 7.89 7.29 7.61 7.07 7.37C6.83 7.14 6.54 7.03 6.18 7.03C5.85 7.03 5.57 7.14 5.34 7.37C5.1 7.61 4.98 7.89 4.98 8.22C4.98 8.56 5.1 8.85 5.34 9.09C5.57 9.33 5.85 9.44 6.18 9.44C6.54 9.44 6.83 9.33 7.07 9.09C7.29 8.85 7.4 8.56 7.4 8.22ZM15.72 7.05C15.37 7.05 15.09 7.16 14.87 7.4C14.63 7.64 14.52 7.93 14.52 8.28C14.52 8.61 14.63 8.89 14.87 9.13C15.09 9.37 15.37 9.5 15.72 9.5C16.07 9.5 16.36 9.37 16.59 9.13C16.82 8.89 16.93 8.61 16.93 8.28C16.93 7.93 16.82 7.64 16.59 7.4C16.36 7.16 16.07 7.05 15.72 7.05ZM16.03 13.32C15.85 13.24 15.66 13.23 15.47 13.31C15.27 13.37 15.12 13.5 15.05 13.7C14.69 14.5 14.15 15.12 13.42 15.59C12.69 16.04 11.88 16.27 10.99 16.27C10.07 16.27 9.26 16.04 8.54 15.59C7.82 15.12 7.27 14.49 6.9 13.67C6.83 13.48 6.68 13.35 6.48 13.28C6.29 13.2 6.09 13.21 5.89 13.29C5.7 13.37 5.58 13.51 5.52 13.71C5.45 13.9 5.45 14.1 5.54 14.3C6.04 15.37 6.77 16.22 7.75 16.85C8.72 17.46 9.8 17.78 10.99 17.78C12.17 17.78 13.25 17.47 14.22 16.86C15.18 16.24 15.91 15.39 16.4 14.33C16.49 14.13 16.49 13.93 16.42 13.74C16.35 13.54 16.22 13.39 16.03 13.32Z" fill="#000000" fill-opacity="0.898039" fill-rule="nonzero"/>
+            </svg>`
+          );
+
+          // 分割线按钮配置
+          editor.ui.registry.addButton("horizontalline", {
+            icon: "horizontal-line",
+            tooltip: "插入分割线",
+            onAction: function () {
+              insertHorizontalLine();
+            },
+          });
+
+          editor.ui.registry.addIcon(
+            "horizontal-line",
+            `
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <line x1="4" y1="6" x2="20" y2="6" stroke="currentColor" stroke-width="1" stroke-dasharray="2 2"/>
+              <line x1="4" y1="18" x2="20" y2="18" stroke="currentColor" stroke-width="1" stroke-dasharray="2 2"/>
+            </svg>
+          `
+          );
+        },
+      };
+      Object.keys(initConfig).forEach((key) => {
+        if (config[key] === undefined || config[key] === null) {
+          config[key] = initConfig[key];
+        }
+      });
+
+      config = reduceConfig(config);
+
+      let oldCallback = config.init_instance_callback;
+      config.init_instance_callback = (editor) => {
+        currentEditor = editor;
+        currentEditor.on(
+          "change Change Undo Redo ExecCommand deactivate keyup mouseup touchend focus",
+          () => {
+            let content = currentEditor.getContent();
+            if (lastContent !== content) {
+              lastContent = content;
+            } else {
+              return;
+            }
+            window.EasyEditorBridge.onContentChanged(content);
+            hideEmojiPanel();
+          }
+        );
+        try {
+          oldCallback && oldCallback(currentEditor);
+        } catch (e) {}
+        injectContent();
+      };
+
+      function injectContent() {
+        currentEditor.setContent(window.EasyEditorBridge.fetchContent());
+      }
+
+      function toggleToolbar(isToolbarHidden) {
+        const editorElement = document.querySelector(".tox-tinymce");
+        if (!editorElement) {
+          return;
+        }
+        if (isToolbarHidden) {
+          editorElement.classList.add("toolbar-hidden");
+        } else {
+          editorElement.classList.remove("toolbar-hidden");
+        }
+      }
+
+      function setDarkMode() {
+        let darkMode = window.EasyEditorBridge.darkMode();
+        if (darkMode) {
+          config.selector = "textarea";
+          config.skin = "oxide-dark";
+          config.content_css = "dark";
+        }
+      }
+
+      initEmojiPanel();
+      setDarkMode();
+      config.before_init && config.before_init(config);
+
+      config.selector = "#editor-container";
+      if (config.target) {
+        delete config.target;
+      }
+      config.height = "100%";
+      config.highlight_on_focus = false;
+      window.tinymce.init(config);
+    </script>
+  </body>
+</html>

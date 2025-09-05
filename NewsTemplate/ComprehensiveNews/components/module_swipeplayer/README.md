@@ -10,7 +10,7 @@
 
 ## 简介
 
-本组件实现短视频切换场景，提供了短视频上下滑动、横竖屏切换、长按倍速、播放进度条拖动等能力。
+本组件实现短视频切换场景，提供了短视频上下滑动、横竖屏切换、长按倍速、播放进度条拖动、音量和亮度调节等能力。
 
 | 竖屏                                                         | 横屏                                                         |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -22,40 +22,45 @@
 
 - DevEco Studio版本：DevEco Studio 5.0.3 Release及以上
 - HarmonyOS SDK版本：HarmonyOS 5.0.3 Release SDK及以上
-- 设备类型：华为手机（包括双折叠和阔折叠）
+- 设备类型：华为手机（包括双折叠和阔折叠）、平板
 - 系统版本：HarmonyOS 5.0.1(13)及以上
 
 ### 权限
 
-- 网络权限：ohos.permission.INTERNET、ohos.permission.GET_NETWORK_INFO、ohos.permission.GET_WIFI_INFO
+- 网络权限：ohos.permission.INTERNET、ohos.permission.GET_NETWORK_INFO
 
 ## 快速入门
 
 1. 安装组件。
 
-   如果是在DevEvo Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
+   如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
 
    如果是从生态市场下载组件，请参考以下步骤安装组件。
 
    a. 解压下载的组件包，将包中所有文件夹拷贝至您工程根目录的XXX目录下。
 
-   b. 在项目根目录build-profile.json5添加module_swipeplayer模块。
+   b. 在项目根目录build-profile.json5添加module_swipeplayer、module_transition模块。
 
    ```
-   // 项目根目录下build-profile.json5填写module_swipeplayer路径。其中XXX为组件存放的目录名
+   // 项目根目录下build-profile.json5填写module_swipeplayer、module_transition路径。其中XXX为组件存放的目录名
    "modules": [
      {
        "name": "module_swipeplayer",
        "srcPath": "./XXX/module_swipeplayer"
      },
+     {
+       "name": "module_transition",
+       "srcPath": "./XXX/module_transition"
+     },
    ]
    ```
-
+   
    c. 在项目根目录oh-package.json5添加依赖。
    ```
    // XXX为组件存放的目录名称
    "dependencies": {
-      "module_swipeplayer": "file:./XXX/module_swipeplayer"
+      "module_swipeplayer": "file:./XXX/module_swipeplayer",
+      "module_transition": "file:./XXX/module_transition",
    }
    ```
    
@@ -71,23 +76,27 @@
 
 #### VideoSwipePlayerOptions对象说明
 
-| 参数名                | 类型                                                         | 是否必填 | 说明                                                       |
-| :-------------------- | :----------------------------------------------------------- | :------- | :--------------------------------------------------------- |
-| datasource            | IDataSource                                                  | 是       | 视频列表的懒加载数据源                                     |
-| swipePlayerController | [SwipePlayerController](#SwipePlayerController对象说明)      | 是       | 视频滑动播放控制器                                         |
-| options               | [SwipePlayerOptions](#SwipePlayerOptions对象说明)            | 是       | 配置的信息                                                 |
-| videoLayerBuilder     | WrappedBuilder<[ESObject, [AVPlayerSession](#AVPlayerSession对象说明), [SwipePlayerController](#SwipePlayerController对象说明), [PlayerLayoutSize](#PlayerLayoutSize对象说明)]> | 否       | 视频外层的操作层，可自定义，如果不传，则只显示进度条       |
-| fullBtnBuilder        | () => CustomBuilder                                          | 否       | 全屏播放按钮，可以自定义，如果不传，使用默认样式           |
-| pathStack             | NavPathStack                                                 | 是       | 全局Navigation的路由栈                                     |
-| playerStateCallback   | (state: string, id: string) => void                          | 否       | 播放状态回调。state：视频的播放状态，id： 当前播放视频的id |
+| 参数名                | 类型                                                         | 是否必填 | 说明                                                         |
+| :-------------------- | :----------------------------------------------------------- | :------- | :----------------------------------------------------------- |
+| datasource            | IDataSource                                                  | 是       | 视频列表的懒加载数据源                                       |
+| swipePlayerController | [SwipePlayerController](#SwipePlayerController对象说明)      | 是       | 视频滑动播放控制器                                           |
+| options               | [SwipePlayerOptions](#SwipePlayerOptions对象说明)            | 是       | 配置的信息                                                   |
+| videoLayerBuilder     | WrappedBuilder<[ESObject, [AVPlayerSession](#AVPlayerSession对象说明), [SwipePlayerController](#SwipePlayerController对象说明), [PlayerLayoutSize](#PlayerLayoutSize对象说明)]> | 否       | 视频外层的操作层，可自定义，如果不传，则只显示进度条         |
+| fullBtnBuilder        | () => CustomBuilder                                          | 否       | 全屏播放按钮，可以自定义，如果不传，使用默认样式             |
+| pathStack             | NavPathStack                                                 | 是       | 全局Navigation的路由栈                                       |
+| playerStateCallback   | (state: string, id: string) => void                          | 否       | 播放状态回调。state：视频播放中playing是、时的状态，id： 当前播放视频的id |
+| isLandscape           | boolean                                                      | 否       | 是否横屏                                                     |
+| videoNetwork          | [VideoNetworkModel](#VideoNetworkModel对象说明)              | 否       | 网络状态                                                     |
+| videoNetworkSetting   | [VideoNetworkSetting](#VideoNetworkSetting对象说明)          | 否       | 网络播放设置                                                 |
+| isShown               | boolean                                                      | 是       | 当前组件所在的页面是否显示                                   |
 
 #### SwipePlayerController对象说明
 
-| 参数名           | 类型                                        | 是否必填 | 说明                 |
-| :--------------- | :------------------------------------------ | :------- | :------------------- |
-| avPlayerMgr      | [AVPlayerManager](#AVPlayerManager对象说明) | 是       | 播放器管理           |
-| curentIndex      | number                                      | 是       | 当前播放视频的索引   |
-| swiperController | SwiperController                            | 是       | 限制资源选择最大大小 |
+| 参数名           | 类型                                        | 是否必填 | 说明               |
+| :--------------- | :------------------------------------------ | :------- | :----------------- |
+| avPlayerMgr      | [AVPlayerManager](#AVPlayerManager对象说明) | 是       | 播放器管理         |
+| curentIndex      | number                                      | 是       | 当前播放视频的索引 |
+| swiperController | SwiperController                            | 是       | Swiper组件的控制器 |
 
 #### SwipePlayerOptions对象说明
 
@@ -139,6 +148,26 @@
 | play             | () => Promise<void>         | 播放AVplayer               |
 | pause            | () => Promise<void>         | 暂停AVPlayer               |
 
+#### VideoNetworkModel对象说明
+
+| 参数名              | 类型    | 说明                         |
+| :------------------ | :------ | :--------------------------- |
+| hasNet              | boolean | 是否有网络                   |
+| isCellular          | boolean | 是否是移动蜂窝网络           |
+| isWiFi              | boolean | 是否是WiFi网络               |
+| hasOfflineTip       | boolean | 无网络时，是否已经提示       |
+| canUseMobileData    | boolean | 是否可以使用移动流量         |
+| hasUseMobileDataTip | boolean | 使用流量播放时，是否已经提示 |
+| isNetworkAvailable  | boolean | 当前网络是否可用             |
+
+#### VideoNetworkSetting对象说明
+
+| 参数名              | 类型    | 说明               |
+| :------------------ | :------ | :----------------- |
+| downloadWithoutWlan | boolean | 是否下载大图       |
+| remindWithoutWlan   | boolean | 非WLAN网络播放提醒 |
+| autoPlayNext        | boolean | 视频自动下滑       |
+
 
 
 ## 示例代码
@@ -149,6 +178,9 @@
 
 示例代码使用Navigation，运行示例代码之前需要进行系统路由表的配置，具体操作如下：
 在entry/src/main目录下的工程配置文件[module.json5](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/module-configuration-file)中的module字段里配置 "routerMap": "$profile:route_map"，
+
+<img src="./screenshots/router_map.png" width="300">
+
 
 在entry/src/main/resources/base/profile目录下新增route_map.json文件，文件内容如下：
 
@@ -164,68 +196,34 @@
 }
 ```
 
+由于使用了一镜到底效果，需要在entry/src/main/ets/entryability/EntryAbility.ets文件的onWindowStageCreate方法里初始化一镜到底动画：
+
+```typescript
+import { window } from '@kit.ArkUI';
+import { LoneTakeAnimationsTransition } from 'module_transition';
+
+export default class EntryAbility extends UIAbility {
+     onWindowStageCreate(windowStage: window.WindowStage): void {
+        ...
+        LoneTakeAnimationsTransition.init(windowStage);
+        ...
+     }
+}
+```
+
+入口页：
 ```typescript
 // Index.ets
-import { AnimateCallback, CustomTransition } from 'module_swipeplayer';
+import { LoneTakeAnimationsTransition } from 'module_transition';
 
 @Entry
-@Component
+@ComponentV2
 struct Index {
   // 全局navigation的路由栈
   pageStack: NavPathStack = new NavPathStack();
-  // 运行自定义转场动画的路由页面 From、To，主要是针对滑动页跳转到横屏页时，实现一镜到底的效果
-  allowedCustomTransitionFromPageNames: string[] = ['SwipeVideoPage'];
-  allowedCustomTransitionToPageNames: string[] = ['LandscapeVideo'];
-
+  @Local isEnabled: boolean = true;
   aboutToAppear(): void {
     this.pageStack.pushPathByName('SwipeVideoPage', '')
-  }
-
-  // 通过from和to的name对自定义转场路由进行管控，判断页面是否需要进行自定义转场动画
-  isCustomTransitionEnabled(fromName: string, toName: string): boolean {
-    if ((this.allowedCustomTransitionFromPageNames.includes(fromName) &&
-    this.allowedCustomTransitionToPageNames.includes(toName)) ||
-      (this.allowedCustomTransitionFromPageNames.includes(toName) &&
-      this.allowedCustomTransitionToPageNames.includes(fromName))) {
-      return true;
-    }
-    return false;
-  }
-
-  // 注册自定义转场动画
-  customNavContentTransitionCallback(
-    from: NavContentInfo,
-    to: NavContentInfo,
-    operation: NavigationOperation
-  ): NavigationAnimatedTransition | undefined {
-    if ((!from || !to) || (!from.name || !to.name)) {
-      return undefined;
-    }
-    // 通过from和to的name对自定义转场路由进行管控
-    if (!this.isCustomTransitionEnabled(from.name, to.name)) {
-      return undefined;
-    }
-    // 需要对转场页面是否注册了animation进行判断，来决定是否进行自定义转场
-    let fromParam: AnimateCallback = CustomTransition.getInstance().getAnimateParam(from.index);
-    let toParam: AnimateCallback = CustomTransition.getInstance().getAnimateParam(to.index);
-    if (!fromParam.animation || !toParam.animation) {
-      return undefined;
-    }
-    // 构造customAnimation给系统侧调用，执行自定义转场动画
-    let customAnimation: NavigationAnimatedTransition = {
-      onTransitionEnd: (isSuccess: boolean) => {
-      },
-      timeout: 2000,
-      transition: (transitionProxy: NavigationTransitionProxy) => {
-        if (fromParam.animation) {
-          fromParam.animation(operation === NavigationOperation.PUSH, true, transitionProxy);
-        }
-        if (toParam.animation) {
-          toParam.animation(operation === NavigationOperation.PUSH, false, transitionProxy);
-        }
-      }
-    };
-    return customAnimation;
   }
 
   build() {
@@ -233,14 +231,24 @@ struct Index {
     }
     .hideNavBar(true)
     .hideTitleBar(true)
+    .enabled(this.isEnabled)
     .customNavContentTransition((from: NavContentInfo, to: NavContentInfo, operation: NavigationOperation) => {
-      return this.customNavContentTransitionCallback(from, to, operation)
+        // 自定义转场动画
+      return LoneTakeAnimationsTransition.customNavContentTransition(from, to, operation, {
+        // 自定义转场过程中禁用手势，避免出现体验问题
+        onTransitionStart: () => {
+          this.isEnabled = false;
+        },
+        onTransitionEnd: () => {
+          this.isEnabled = true;
+        }
+      });
     })
   }
 }
 ```
 
-
+滑动视频页：
 
 ```ts
 // SwipeVideoPage.ets
@@ -252,8 +260,8 @@ import {
   SwipePlayerController,
   PlayerLayoutSize,
   VideoPlayerData,
-  CustomTransition,
 } from 'module_swipeplayer';
+import { LongTakeAnimationProperties } from 'module_transition';
 
 interface VideoInfo {
   // 视频id
@@ -376,8 +384,7 @@ export struct SwipeVideoPage {
   avPlayerManager: AVPlayerManager = new AVPlayerManager();
   // 路由栈
   pathStack = new NavPathStack()
-  // 自定义转场动画 页面id
-  private pageId: number = -1;
+  @Local longTakeSession: LongTakeAnimationProperties = new LongTakeAnimationProperties();
 
   aboutToAppear() {
     // 设置播放管理
@@ -407,12 +414,6 @@ export struct SwipeVideoPage {
     this.videoDataSources.setData(list)
   }
 
-  // 注册自定义动画协议
-  private registerCustomTransition(): void {
-    CustomTransition.getInstance().registerNavParam(this.pageId,
-      (isPush: boolean, isExit: boolean, transitionProxy: NavigationTransitionProxy) => {}, 500);
-  }
-
   build() {
     NavDestination() {
       Stack() {
@@ -425,6 +426,7 @@ export struct SwipeVideoPage {
             // 视频外层控制层，需要实现一个WrappedBuilder组件
             videoLayerBuilder: wrapBuilder(VideoLayerViewBuilder),
             pathStack: this.pathStack,
+            isShown: true,
             options: {
               autoPlay: true,
               bottomTabHeight: 56,
@@ -447,15 +449,7 @@ export struct SwipeVideoPage {
     }
     .hideTitleBar(true)
     .onReady((context: NavDestinationContext) => {
-      this.pathStack = context.pathStack
-      // 自定义动画所需的pageId
-      if (context.pathStack.getAllPathName()?.length) {
-        this.pageId = context.pathStack.getAllPathName().length - 1;
-      }
-      this.registerCustomTransition();
-    })
-    .onDisAppear(() => {
-      CustomTransition.getInstance().unRegisterNavParam(this.pageId);
+      this.pathStack = context.pathStack;
     })
   }
 }

@@ -1,5 +1,7 @@
 import { AppStorageV2, PersistenceV2 } from '@kit.ArkUI';
-import { CommonConstants, Logger, SettingModel, TabModel, TimeUtils, UserInfoModel, WindowModel } from 'lib_common';
+import {
+  BreakpointModel,
+  CommonConstants, Logger, SettingModel, TabModel, TimeUtils, UserInfoModel, WindowModel } from 'lib_common';
 import { LoginSheetUtils } from 'lib_account';
 import { AVPlayerSession, PlayerLayoutSize, SwipePlayerController, VideoProgressBar } from 'module_swipeplayer';
 import { Sidebar } from './Sidebar';
@@ -18,13 +20,12 @@ export struct VideoLayerView {
   // 评论页面出现时，改变播放页面的尺寸
   @Param @Require playerLayoutSize: PlayerLayoutSize
   @Local isSliderMoving: boolean = false;
-
   private commentController: CommentController = new CommentController();
-
   windowModel: WindowModel = AppStorageV2.connect(WindowModel, () => new WindowModel())!;
   tabModel: TabModel = AppStorageV2.connect(TabModel, () => new TabModel())!;
   settingInfo: SettingModel = PersistenceV2.connect(SettingModel, () => new SettingModel())!;
   userInfoModel: UserInfoModel = PersistenceV2.connect(UserInfoModel, () => new UserInfoModel())!;
+  breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
 
   @Monitor('commentController.showComment')
   onVisibleCommentChange(monitor: IMonitor) {
@@ -60,27 +61,28 @@ export struct VideoLayerView {
       Sidebar({
         videoInfo: this.videoData,
         commentController: this.commentController,
-        playerLayoutSize: this.playerLayoutSize
+        playerLayoutSize: this.playerLayoutSize,
       })
         .visibility(this.isSliderMoving ? Visibility.Hidden : Visibility.Visible)
         .alignRules({
           bottom: { anchor: '__container__', align: VerticalAlign.Bottom },
-          right: { anchor: '__container__', align: HorizontalAlign.End }
+          right: { anchor: '__container__', align: HorizontalAlign.End },
         })
         .offset({ x: -20, y: -100 - (this.tabModel.tabHeight as number) });
 
       // 底部信息
-      Stack({alignContent: Alignment.Bottom}) {
+      Stack({ alignContent: Alignment.Bottom }) {
         // 视频信息
         this.videoInfoView()
 
-        Column() {
+        Column({ space: CommonConstants.SPACE_M }) {
           // 视频的进度控制器
           VideoProgressBar({
             playerSession: this.playerSession,
             onSlideChange: (flag) => {
-              this.isSliderMoving = flag
-            }
+              this.isSliderMoving = flag;
+              this.playerLayoutSize.updateSlideMovingFlag(flag)
+            },
           })
           // 评论
           this.commentView()
@@ -89,7 +91,7 @@ export struct VideoLayerView {
       .width('100%')
       .alignRules({
         bottom: { anchor: '__container__', align: VerticalAlign.Bottom },
-        left: { anchor: '__container__', align: HorizontalAlign.Start }
+        left: { anchor: '__container__', align: HorizontalAlign.Start },
       })
     }
     .id('videoLayerView')
@@ -103,7 +105,7 @@ export struct VideoLayerView {
 
   @Builder
   videoInfoView() {
-    Column({space: 4}) {
+    Column({ space: 4 }) {
       Text('@' + this.videoData.author?.authorNickName)
         .fontSize(14)
         .fontColor(Color.White)
@@ -112,7 +114,7 @@ export struct VideoLayerView {
         .fontSize(14)
         .fontColor(Color.White)
         .maxLines(2)
-        .textOverflow({overflow: TextOverflow.Ellipsis})
+        .textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Text(TimeUtils.formatDate(this.videoData.createTime))
         .fontColor('#99ffffff')
@@ -120,9 +122,14 @@ export struct VideoLayerView {
     }
     .width(CommonConstants.FULL_PERCENT)
     .alignItems(HorizontalAlign.Start)
-    .padding({left: CommonConstants.PADDING_PAGE, right: CommonConstants.PADDING_PAGE})
-    .offset({bottom: 24 + (this.tabModel.tabHeight as number)})
+    .padding({
+      left: this.breakPointModel.pagePadding,
+      right: this.breakPointModel.pagePadding,
+    })
+    .offset({ bottom: 84 })
     .visibility(this.isSliderMoving ? Visibility.Hidden : Visibility.Visible)
+    .accessibilityGroup(true)
+    .accessibilityLevel('yes')
   }
 
   @Builder
@@ -151,10 +158,8 @@ export struct VideoLayerView {
     }
     .width(CommonConstants.FULL_PERCENT)
     .padding({
-      top: CommonConstants.PADDING_S,
-      left: CommonConstants.PADDING_PAGE,
-      right: CommonConstants.PADDING_PAGE,
-      bottom: this.windowModel.windowBottomPadding
+      left: this.breakPointModel.pagePadding,
+      right: this.breakPointModel.pagePadding,
     })
     .backgroundColor(Color.Transparent)
     .visibility(this.isSliderMoving ? Visibility.Hidden : Visibility.Visible)
@@ -166,7 +171,7 @@ export function VideoLayerViewBuilder(
   videoData: ESObject,
   playerSession: AVPlayerSession,
   swipePlayerController: SwipePlayerController,
-  playerLayoutSize: PlayerLayoutSize
+  playerLayoutSize: PlayerLayoutSize,
 ) {
   VideoLayerView({
     videoData,

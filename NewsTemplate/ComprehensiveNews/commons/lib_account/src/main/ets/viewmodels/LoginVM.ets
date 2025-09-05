@@ -1,7 +1,8 @@
-import { promptAction } from '@kit.ArkUI';
+import { promptAction, window } from '@kit.ArkUI';
 import { loginComponentManager } from '@kit.AccountKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { common } from '@kit.AbilityKit';
+import { deviceInfo } from '@kit.BasicServicesKit';
 import * as wxopensdk from '@tencent/wechat_open_sdk';
 import { BaseViewModel, CommonConfirmDialog, CommonConstants, Logger, PopViewUtils, RouterMap } from 'lib_common';
 import { AccountApi } from '../services/AccountApi';
@@ -9,7 +10,8 @@ import { HuaweiAuthUtils } from '../utils/HuaweiAuthUtils';
 import { ErrorCode } from '../constants/ErrorCode';
 import { OnWXResp, wxApi, wxEventHandler } from '../utils/WXApiUtils';
 import { Constants } from '../constants/Constants';
-import { LoginRouterParams } from '../constants/Types';
+import { LoginRouterParams, LoginSheetParams } from '../constants/Types';
+import { getAccountErrorMsg } from '../utils/ErrorCodeHelper';
 
 const TAG = '[LoginVM]';
 
@@ -21,24 +23,18 @@ export class LoginVM extends BaseViewModel {
   @Trace privacyInfo: string = '';
   @Trace huaweiUserProtocolInfo: string = '';
   @Trace isSheet: boolean = false;
+  @Trace sheetParams: LoginSheetParams = new LoginSheetParams();
   @Trace stack: NavPathStack = new NavPathStack();
+  @Trace accountInput: string = '';
+  @Trace passwordInput: string = '';
+  private accountInstance: AccountApi = new AccountApi();
+  static instance: LoginVM | null;
   controller: loginComponentManager.LoginWithHuaweiIDButtonController =
     new loginComponentManager.LoginWithHuaweiIDButtonController()
       .setAgreementStatus(loginComponentManager.AgreementStatus.NOT_ACCEPTED)
       .onClickLoginWithHuaweiIDButton((error: BusinessError, response: loginComponentManager.HuaweiIDCredential) => {
-        if (response) {
-          Logger.info(TAG, 'onClickLoginWithHuaweiIDButton success, response: ' + JSON.stringify(response));
-        }
-        if (error) {
-          this.handleHuaweiLoginFail(error);
-          return;
-        }
-        this.huaweiLogin();
+        this.handleClickLoginWithHuaweiIDButton(error, response);
       })
-  static instance: LoginVM | null;
-  @Trace accountInput: string = '';
-  @Trace passwordInput: string = '';
-  private accountInstance: AccountApi = new AccountApi();
 
   public static getInstance(reCreate: boolean = false) {
     if (!LoginVM.instance || reCreate) {
@@ -63,31 +59,32 @@ export class LoginVM extends BaseViewModel {
     this.agreePrivacyChange(false);
   }
 
+  private handleClickLoginWithHuaweiIDButton(error: BusinessError, response: loginComponentManager.HuaweiIDCredential) {
+    if (response) {
+      Logger.info(TAG, 'onClickLoginWithHuaweiIDButton success, response: ' + JSON.stringify(response));
+    }
+    if (error) {
+      this.handleHuaweiLoginFail(error);
+      return;
+    }
+    this.huaweiLogin();
+  }
+
   private handleHuaweiLoginFail(error: BusinessError) {
     Logger.error(TAG, 'onClickLoginWithHuaweiIDButton fail, error: ' + JSON.stringify(error));
 
     if (error.code === ErrorCode.ERROR_CODE_AGREEMENT_STATUS_NOT_ACCEPTED) {
       promptAction.showToast({ message: '请先勾选同意协议' });
-    } else {
-      let errorMsg: string = '';
-      if (error.code === ErrorCode.ERROR_CODE_LOGIN_OUT) {
-        errorMsg = '用户未登录华为账号';
-      } else if (error.code === ErrorCode.ERROR_CODE_INVALID_PARAM) {
-        errorMsg = '应用未正确配置client_id';
-      } else if (error.code === ErrorCode.ERROR_CODE_NOT_SCOPE) {
-        errorMsg = '应用未申请scopes或permissions权限';
-      } else {
-        errorMsg = '其他错误'
-      }
-
-      CommonConfirmDialog.show({
-        primaryTitle: '温馨提示',
-        content: errorMsg + '，是否先模拟登录成功？',
-        confirm: () => {
-          this.huaweiLogin();
-        },
-      })
+      return;
     }
+    let errorMsg: string = getAccountErrorMsg(error.code);
+    CommonConfirmDialog.show({
+      primaryTitle: '温馨提示',
+      content: errorMsg + '是否先模拟登录成功？',
+      confirm: () => {
+        this.huaweiLogin();
+      },
+    })
   }
 
   private OnWXRespCallback: OnWXResp = (resp) => {
@@ -110,6 +107,24 @@ export class LoginVM extends BaseViewModel {
 
   unregisterOnWXRespCallback() {
     wxEventHandler.unregisterOnWXRespCallback(this.OnWXRespCallback);
+  }
+
+  setPrivacyMode(context?: Context) {
+    if (!context) {
+      return;
+    }
+    window.getLastWindow(context).then((window) => {
+      window.setWindowPrivacyMode(true);
+    });
+  }
+
+  cancelPrivacyMode(context?: Context) {
+    if (!context) {
+      return;
+    }
+    window.getLastWindow(context).then((window) => {
+      window.setWindowPrivacyMode(false);
+    });
   }
 
 
@@ -137,7 +152,7 @@ export class LoginVM extends BaseViewModel {
   }
 
   huaweiLogin() {
-    this.accountInstance.huaweiLogin();
+    this.accountInstance.huaweiLogin(this.anonymousPhone);
     this.handleClose();
   }
 
@@ -164,13 +179,13 @@ export class LoginVM extends BaseViewModel {
   }
 
   jumpOtherLogin() {
-    this.stack.replacePathByName(RouterMap.OTHER_LOGIN_PAGE, null, true);
+    this.stack.replacePathByName(RouterMap.OTHER_LOGIN_PAGE, null, false);
   }
 
   jumpHuaweiLogin() {
     this.stack.replacePathByName(RouterMap.HUAWEI_LOGIN_PAGE, {
       keepVM: true,
-    } as LoginRouterParams, true);
+    } as LoginRouterParams, false);
   }
 
   async jumpWX() {
@@ -200,13 +215,6 @@ export class LoginVM extends BaseViewModel {
     }
   }
 
-  iconMarginTop() {
-    if (this.isSheet) {
-      return 56;
-    }
-    return 118 + this.windowModel.windowTopPadding;
-  }
-
   otherWayMarginTop() {
     if (this.isSheet) {
       return CommonConstants.PADDING_XXL;
@@ -219,5 +227,16 @@ export class LoginVM extends BaseViewModel {
       return Color.Transparent;
     }
     return $r('sys.color.background_secondary');
+  }
+
+  getPagePaddingBottom() {
+    if (this.isSheet && this.sheetParams.sheetType === SheetType.CENTER) {
+      return 0;
+    }
+    // 兼容api17以下
+    if (deviceInfo.sdkApiVersion < 17) {
+      return this.windowModel.windowBottomPadding + CommonConstants.PADDING_L;
+    }
+    return this.windowModel.windowBottomPadding;
   }
 }

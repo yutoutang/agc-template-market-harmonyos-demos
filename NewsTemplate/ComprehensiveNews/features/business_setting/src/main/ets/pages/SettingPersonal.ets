@@ -1,5 +1,5 @@
 import { FunctionalButton, functionalButtonComponentManager } from '@kit.ScenarioFusionKit';
-import { CommonConstants } from 'lib_common';
+import { CommonConstants, GridRowColSetting } from 'lib_common';
 import { NavHeaderBar } from 'lib_widget'
 import { SettingPersonalVM } from '../viewmodels/SettingPersonalVM';
 
@@ -12,14 +12,6 @@ export function SettingPersonalBuilder() {
 struct SettingPersonal {
   @Local vm: SettingPersonalVM = new SettingPersonalVM();
 
-  aboutToAppear(): void {
-    this.vm.registerKeyboard();
-  }
-
-  aboutToDisappear(): void {
-    this.vm.unRegisterKeyboard();
-  }
-
   build() {
     NavDestination() {
       NavHeaderBar({
@@ -28,41 +20,41 @@ struct SettingPersonal {
           this.vm.customBack();
         },
       })
-      Scroll() {
-        Column({ space: CommonConstants.SPACE_M }) {
-          this.userIconBuilder()
-          List() {
-            ListItem() {
-              this.nickNameBuilder()
-            }
+      GridRow(GridRowColSetting.DEFAULT_GRID_ROW_OPTIONS) {
+        GridCol({
+          span: GridRowColSetting.DEFAULT_CENTER_COL_SPAN,
+          offset: GridRowColSetting.DEFAULT_CENTER_COL_OFFSET,
+        }) {
+          Scroll() {
+            Column({ space: CommonConstants.SPACE_M }) {
+              this.userIconBuilder()
+              List() {
+                ListItem() {
+                  this.nickNameBuilder()
+                }
 
-            ListItem() {
-              this.phoneBuilder()
+                ListItem() {
+                  this.phoneBuilder()
+                }
+              }
+              .listStyle()
+
+              this.personalDescBuilder()
             }
+            .padding({
+              top: CommonConstants.PADDING_M,
+              left: this.vm.breakPointModel.pagePadding,
+              right: this.vm.breakPointModel.pagePadding,
+              bottom: this.vm.windowModel.windowBottomPadding,
+            })
           }
-          .width(CommonConstants.FULL_PERCENT)
-          .borderRadius($r('app.float.large_radius'))
-          .padding(CommonConstants.PADDING_XS)
-          .backgroundColor($r('sys.color.comp_background_primary'))
-          .divider({
-            strokeWidth: 0.5,
-            color: $r('sys.color.comp_divider'),
-            startMargin: CommonConstants.PADDING_M,
-            endMargin: CommonConstants.PADDING_M,
-          })
-
-          this.personalDescBuilder()
+          .layoutWeight(1)
+          .scrollBar(BarState.Off)
+          .align(Alignment.Top)
+          .edgeEffect(EdgeEffect.Spring)
         }
-        .padding({
-          top: CommonConstants.PADDING_M,
-          left: CommonConstants.PADDING_PAGE,
-          right: CommonConstants.PADDING_PAGE
-        })
       }
       .layoutWeight(1)
-      .scrollBar(BarState.Off)
-      .align(Alignment.Top)
-      .edgeEffect(EdgeEffect.Spring)
     }
     .hideTitleBar(true)
     .backgroundColor($r('sys.color.background_secondary'))
@@ -109,6 +101,10 @@ struct SettingPersonal {
             },
             controller: new functionalButtonComponentManager.FunctionalButtonController().onChooseAvatar((err,
               data) => {
+              if (err) {
+                this.vm.handleAvatarError(err);
+                return;
+              }
               if (data) {
                 this.vm.saveUserIcon(data.avatarUri!);
               }
@@ -118,6 +114,8 @@ struct SettingPersonal {
             .width($r('app.float.arrow_right_w'))
             .draggable(false)
         }
+        .accessibilityLevel('yes')
+        .accessibilityText('切换头像')
       }
       .innerCard()
       .stateStyles({
@@ -154,13 +152,7 @@ struct SettingPersonal {
       this.vm.nickName = this.vm.userInfoModel.authorNickName;
       this.vm.showNickNameSheet = true;
     })
-    .bindSheet($$this.vm.showNickNameSheet, this.modifyNameSheet(), {
-      title: { title: '设置昵称' },
-      height: this.vm.defaultSheetH,
-      detents: [this.vm.defaultSheetH, SheetSize.MEDIUM],
-      showClose: true,
-      keyboardAvoidMode: SheetKeyboardAvoidMode.NONE,
-    })
+    .bindSheet($$this.vm.showNickNameSheet, this.modifyNameSheet(), this.vm.getSheetOptions('设置昵称'))
   }
 
   @Builder
@@ -188,13 +180,7 @@ struct SettingPersonal {
       this.vm.contactPhone = this.vm.userInfoModel.authorPhone;
       this.vm.showPhoneSheet = true;
     })
-    .bindSheet($$this.vm.showPhoneSheet, this.modifyPhoneSheet(), {
-      title: { title: '设置手机号' },
-      height: this.vm.defaultSheetH,
-      detents: [this.vm.defaultSheetH, SheetSize.MEDIUM],
-      showClose: true,
-      keyboardAvoidMode: SheetKeyboardAvoidMode.NONE,
-    })
+    .bindSheet($$this.vm.showPhoneSheet, this.modifyPhoneSheet(), this.vm.getSheetOptions('设置手机号'))
   }
 
   @Builder
@@ -220,13 +206,7 @@ struct SettingPersonal {
       this.vm.personalDesc = this.vm.userInfoModel.authorDesc;
       this.vm.showPersonDescSheet = true;
     })
-    .bindSheet($$this.vm.showPersonDescSheet, this.modifyPersonalDescSheet(), {
-      title: { title: '个人简介' },
-      height: this.vm.defaultSheetH,
-      detents: [this.vm.defaultSheetH, SheetSize.MEDIUM],
-      showClose: true,
-      keyboardAvoidMode: SheetKeyboardAvoidMode.NONE,
-    })
+    .bindSheet($$this.vm.showPersonDescSheet, this.modifyPersonalDescSheet(), this.vm.getSheetOptions('个人简介'))
   }
 
   @Builder
@@ -234,37 +214,21 @@ struct SettingPersonal {
     Column() {
       Column() {
         TextInput({ text: $$this.vm.nickName })
-          .fontSize(16 * this.vm.settingInfo.fontSizeRatio)
-          .fontColor($r('sys.color.font_primary'))
-          .backgroundColor($r('sys.color.comp_background_tertiary'))
-          .cancelButton({ style: CancelButtonStyle.INPUT, icon: { size: 16 } })
-          .maxLength(20)
-          .showCounter(true)
-          .height(40)
-          .margin({ top: 12 })
+          .textInputStyle(16 * this.vm.settingInfo.fontSizeRatio, 20)
+
         Column() {
           Button('确定')
-            .fontSize(16)
-            .fontWeight(FontWeight.Medium)
-            .fontColor($r('sys.color.font_on_primary'))
-            .backgroundColor($r('app.color.app_theme'))
-            .width('100%')
+            .confirmButton()
             .onClick(() => {
               this.vm.modifyNickName();
             })
         }
-        .padding({ bottom: this.vm.keyHeight })
       }
+      .padding({ top: 12 })
       .layoutWeight(1)
       .justifyContent(FlexAlign.SpaceBetween)
     }
-    .width(CommonConstants.FULL_PERCENT)
-    .height(CommonConstants.FULL_PERCENT)
-    .padding({
-      left: CommonConstants.PADDING_PAGE,
-      right: CommonConstants.PADDING_PAGE,
-      bottom: this.vm.windowModel.windowBottomPadding
-    })
+    .sheetColumnStyle(this.vm.getSheetPaddingBottom())
   }
 
   @Builder
@@ -273,37 +237,21 @@ struct SettingPersonal {
       Column() {
         TextInput({ text: $$this.vm.contactPhone })
           .type(InputType.PhoneNumber)
-          .fontSize(16 * this.vm.settingInfo.fontSizeRatio)
-          .fontColor($r('sys.color.font_primary'))
-          .backgroundColor($r('sys.color.comp_background_tertiary'))
-          .cancelButton({ style: CancelButtonStyle.INPUT, icon: { size: 16 } })
-          .maxLength(20)
-          .showCounter(true)
-          .height(40)
-          .margin({ top: 12 })
+          .textInputStyle(16 * this.vm.settingInfo.fontSizeRatio, 11)
+
         Column() {
           Button('确定')
-            .fontSize(16)
-            .fontWeight(FontWeight.Medium)
-            .fontColor($r('sys.color.font_on_primary'))
-            .backgroundColor($r('app.color.app_theme'))
-            .width('100%')
+            .confirmButton()
             .onClick(() => {
               this.vm.modifyContactPhone();
             })
         }
-        .padding({ bottom: this.vm.keyHeight })
       }
+      .padding({ top: 12 })
       .layoutWeight(1)
       .justifyContent(FlexAlign.SpaceBetween)
     }
-    .width(CommonConstants.FULL_PERCENT)
-    .height(CommonConstants.FULL_PERCENT)
-    .padding({
-      left: CommonConstants.PADDING_PAGE,
-      right: CommonConstants.PADDING_PAGE,
-      bottom: this.vm.windowModel.windowBottomPadding
-    })
+    .sheetColumnStyle(this.vm.getSheetPaddingBottom())
   }
 
   @Builder
@@ -322,28 +270,62 @@ struct SettingPersonal {
           .margin({ top: 12 })
         Column() {
           Button('确定')
-            .fontSize(16)
-            .fontWeight(FontWeight.Medium)
-            .fontColor($r('sys.color.font_on_primary'))
-            .backgroundColor($r('app.color.app_theme'))
-            .width('100%')
+            .confirmButton()
             .onClick(() => {
               this.vm.modifyPersonalDesc();
             })
         }
-        .padding({ bottom: this.vm.keyHeight })
       }
       .layoutWeight(1)
       .justifyContent(FlexAlign.SpaceBetween)
     }
-    .width(CommonConstants.FULL_PERCENT)
-    .height(CommonConstants.FULL_PERCENT)
-    .padding({
-      left: CommonConstants.PADDING_PAGE,
-      right: CommonConstants.PADDING_PAGE,
-      bottom: this.vm.windowModel.windowBottomPadding
-    })
+    .sheetColumnStyle(this.vm.getSheetPaddingBottom())
   }
+}
+
+@Extend(Column)
+function sheetColumnStyle(paddingBottom: number = 0) {
+  .width(CommonConstants.FULL_PERCENT)
+  .height(CommonConstants.FULL_PERCENT)
+  .padding({
+    left: CommonConstants.PADDING_L,
+    right: CommonConstants.PADDING_L,
+    bottom: paddingBottom,
+  })
+}
+
+@Extend(List)
+function listStyle() {
+  .width(CommonConstants.FULL_PERCENT)
+  .borderRadius($r('app.float.large_radius'))
+  .padding(CommonConstants.PADDING_XS)
+  .backgroundColor($r('sys.color.comp_background_primary'))
+  .divider({
+    strokeWidth: 0.5,
+    color: $r('sys.color.comp_divider'),
+    startMargin: CommonConstants.PADDING_M,
+    endMargin: CommonConstants.PADDING_M,
+  })
+}
+
+@Extend(TextInput)
+function textInputStyle(fontSize: Length = 16, maxLength: number = 10) {
+  .fontSize(fontSize)
+  .fontColor($r('sys.color.font_primary'))
+  .backgroundColor($r('sys.color.comp_background_tertiary'))
+  .cancelButton({ style: CancelButtonStyle.INPUT, icon: { size: 16 } })
+  .maxLength(maxLength)
+  .showCounter(true)
+  .height(40)
+}
+
+@Extend(Button)
+function confirmButton() {
+  .fontSize($r('sys.float.Body_L'))
+  .fontWeight(FontWeight.Medium)
+  .fontColor($r('sys.color.font_on_primary'))
+  .backgroundColor($r('app.color.app_theme'))
+  .width(CommonConstants.FULL_PERCENT)
 }
 
 @Extend(Row)

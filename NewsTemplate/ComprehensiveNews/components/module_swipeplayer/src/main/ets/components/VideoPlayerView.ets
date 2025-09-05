@@ -1,7 +1,9 @@
 import { media } from '@kit.MediaKit';
 import { emitter } from '@kit.BasicServicesKit';
-import { uiObserver, window } from '@kit.ArkUI';
-import { AVPlayerState, VideoPlayerData } from '../type/Index';
+import { display, uiObserver, window } from '@kit.ArkUI';
+import { LongTakeTransitionParam } from 'module_transition';
+import { LoneTakeAnimationsTransition } from 'module_transition';
+import { AVPlayerState, BreakpointNameEnum, PageNameEnum, VideoPlayerData } from '../type/Index';
 import { AVPlayerSession } from '../controller/AVPlayerManager';
 import { SwipePlayerController } from '../controller/SwipePlayerController';
 import { PlayerLayoutSize } from '../controller/PlayerLayoutSize';
@@ -9,9 +11,9 @@ import { VideoProgressBar } from './VideoProgressBar';
 import { Constants } from '../constants/Constants';
 import { SwipePlayerModel } from '../viewmodel/SwipePlayerModel';
 import { PlayerSpeedRateView } from './PlayerSpeedRateView';
-import { VideoNetworkModel, VideoNetworkSetting } from '../models/VideoNetworkModel';
+import { DownloadWithoutWlanEnum, VideoNetworkModel, VideoNetworkSetting } from '../models/VideoNetworkModel';
 import { handleSandboxVideoUrl, setOrientation, toast } from '../utils/Util';
-import { ComponentAttrUtils, RectInfoInPx } from '../customtransition/ComponentAttrUtils';
+import { BreakpointModel } from '../models/BreakpointModel';
 
 @ComponentV2
 export struct VideoPlayerView {
@@ -39,15 +41,24 @@ export struct VideoPlayerView {
   @Param videoNetworkSetting: VideoNetworkSetting | undefined = undefined
   // 底部tab高度
   @Consumer() bottomTabHeight: Length | undefined;
+  // 播放状态回调
+  @Event playerStateCallback: (state: string, id: string) => void = (state: string, id: string) => {
+  }
   // 路由变化的监听事件
   @Consumer() navDestinationUpdateListeners: Map<string, (info: uiObserver.NavDestinationInfo) => void> = new Map();
   // 路由栈
   @Param @Require pathStack: NavPathStack
-
+  // 当前组件所在的页面是否显示
+  @Param isShown: boolean = false;
+  // 是否横屏
+  @Param isLandscape: boolean = false;
+  // 一多适配的断点
+  @Param breakpointModel: BreakpointModel = new BreakpointModel();
+  // 播放进度变化的回调
+  @Event playerTimeUpdateCallback: (id: string, timeMs: number) => void = (id: string, timeMs: number) => {
+  }
   private xComponentController = new XComponentController();
-
   vm: SwipePlayerModel = new SwipePlayerModel(this.getUIContext(), this.index)
-
   // 准备状态监听事件
   private preparedListener = () => {
     if (this.index === this.currentIndex && this.autoPlay) {
@@ -69,17 +80,20 @@ export struct VideoPlayerView {
   }
   // 播放时监听
   private playingListeners = () => {
-    emitter.emit('swipeVideoPlayerState', {
-      data: {
-        state: AVPlayerState.PLAYING,
-        id: this.videoData.getVideoId(),
-      }
-    } as emitter.EventData)
+    if (this.index === this.currentIndex) {
+      this.playerStateCallback && this.playerStateCallback(AVPlayerState.PLAYING, this.videoData.getVideoId())
+      emitter.emit('swipeVideoPlayerState', {
+        data: {
+          state: AVPlayerState.PLAYING,
+          index: this.currentIndex,
+        },
+      } as emitter.EventData)
+    }
   }
   // 播放完成状态监听事件
   private completedListeners = () => {
     // 横屏时，播放完成后，重头开始播放
-    if (this.vm.isLandscape) {
+    if (this.isLandscape) {
       this.vm.playerSession.play();
       return
     }
@@ -101,7 +115,7 @@ export struct VideoPlayerView {
       toast(this.vm.uiContext!, {
         message: '网络连接不可用',
         alignment: Alignment.Center,
-        textColor: Color.Red
+        textColor: Color.Red,
       })
       this.vm.isBuffering = false;
       this.vm.isPause = true;
@@ -124,8 +138,8 @@ export struct VideoPlayerView {
   onIndexChanged() {
     this.onChangeSwiperIndex();
   }
-  
-  @Monitor('videoNetwork.hasNet')
+
+  @Monitor('videoNetwork.isNetworkAvailable')
   onListenNetwork(monitor: IMonitor) {
     let hasNet = monitor.value()?.now as boolean
     let playerState = this.vm.playerSession?.avPlayer?.state
@@ -138,7 +152,27 @@ export struct VideoPlayerView {
     }
   }
 
+  @Monitor('isLandscape')
+  onChangeOrientation(monitor: IMonitor) {
+    let isLandscape = (monitor.value()?.now) as boolean;
+    if (!isLandscape) {
+      this.vm.isClickFullScreenBtn = false;
+      return
+    }
+    // 自动横屏：组件处于显示状态、横屏、当前索引视频、不是通过点击全屏按钮的横屏、直板机状态下
+    if (this.index === this.currentIndex && isLandscape && this.isShown && !this.vm.isClickFullScreenBtn &&
+      this.breakpointModel.currentBreakpoint === BreakpointNameEnum.SM
+    ) {
+      this.handleFullScreen(false)
+    }
+  }
+
   aboutToAppear(): void {
+    let isDisabled = this.videoNetworkSetting?.downloadWithoutWlan === DownloadWithoutWlanEnum.downloadDisable;
+    let isCellular = this.videoNetwork?.isNetworkAvailable && this.videoNetwork?.isCellular;
+    // 移动网络下，设置不下载图
+    let imageUrl = isCellular && isDisabled ? $r('app.media.ic_default_bg') : this.videoData.getCoverUrl();
+    this.vm.imageUrl = imageUrl || $r('app.media.ic_default_bg');
     // 初始化
     this.vm.avPlayerManager = this.swipePlayerController.getAVPlayerMgr()!
     this.vm.initPlayerManager(this.videoData, this.videoItemPlayerSession)
@@ -166,11 +200,17 @@ export struct VideoPlayerView {
     this.vm.onVideoSizeChangedListener(() => {
       this.vm.adaptiveVideoSize()
     })
+    // 视频进度监听
+    this.vm.onTimeUpdateListener((timeMs: number) => {
+      if (this.index === this.currentIndex) {
+        this.playerTimeUpdateCallback && this.playerTimeUpdateCallback(this.videoData.getVideoId(), timeMs)
+      }
+    })
   }
 
   aboutToDisappear(): void {
     // 从列表页跳转过来的，不需要销毁播放对象
-    if (!this.vm.isFromList) {
+    if (this.index !== this.currentIndex && !this.vm.isFromList) {
       this.vm.handlerDisappear()
     }
   }
@@ -183,7 +223,7 @@ export struct VideoPlayerView {
       return;
     }
     this.vm.isPause = false;
-    if (this.vm.playerSession.avPlayer?.state! === 'idle') {
+    if (this.vm.playerSession.avPlayer?.state! === AVPlayerState.IDLE) {
       if (this.videoData.getVideoUrl().startsWith('http')) {
         this.vm.playerSession.avPlayer!.url = this.videoData.getVideoUrl()
       } else {
@@ -198,26 +238,56 @@ export struct VideoPlayerView {
     }
   }
 
+  // 跳转到横屏页
+  pushToLandscapePage(
+    param: Record<string, Object | AVPlayerSession | BreakpointModel | LongTakeTransitionParam | undefined>
+  ) {
+    let longTakeTransitionParam: LongTakeTransitionParam | undefined =
+      LoneTakeAnimationsTransition.generateLongTakeParam(this.getUIContext(), 'player', 9);
+    if (longTakeTransitionParam) {
+      param.longTakeTransitionParam = longTakeTransitionParam;
+    }
+    this.pathStack.pushPathByName(PageNameEnum.VIDEO_LANDSCAPE_PAGE, param);
+  }
+
   // 处理横屏按钮事件
-  handleFullScreen(uiContext: UIContext, param: Record<string, Object | AVPlayerSession>) {
-    let cardItemInfo: RectInfoInPx = ComponentAttrUtils.getRectInfoById(uiContext, 'player');
-    param.cardItemInfo = cardItemInfo;
+  async handleFullScreen(isSetOrientation: boolean = true) {
+    let param: Record<string, Object | AVPlayerSession | BreakpointModel> = {};
+    param.playerSession = this.vm.playerSession;
+    param.surfaceId = this.vm.surfaceId;
+    param.videoWidth = this.vm.videoWidth;
+    param.videoHeight = this.vm.videoHeight;
+    param.videoTitle = this.videoData.getVideoTitle();
+    param.breakpointModel = this.breakpointModel
     // 视频播放，跨页面流转
     this.navDestinationUpdateListeners.delete('fullScreenListener');
     this.navDestinationUpdateListeners.set('fullScreenListener', (info) => {
-      if (info.name === 'LandscapeVideo' && info.state === 3) {
+      if (info.name === PageNameEnum.VIDEO_LANDSCAPE_PAGE && info.state === 3) {
         let avPlayer = (param.playerSession as AVPlayerSession).getAVPlayer() as media.AVPlayer;
         if (avPlayer) {
           avPlayer.surfaceId = param.surfaceId as string;
-          this.vm.isLandscape = false
         }
       }
     })
-    this.vm.isLandscape = true
-    // 窗口旋转
-    setOrientation(window.Orientation.USER_ROTATION_LANDSCAPE).then(() => {
-      this.pathStack.pushPathByName('LandscapeVideo', param);
-    })
+
+    if (isSetOrientation) {
+      // 窗口旋转
+      let displayClass = display.getDefaultDisplaySync();
+      let orientation = displayClass.orientation;
+      if (orientation === display.Orientation.LANDSCAPE) {
+        await setOrientation(window.Orientation.USER_ROTATION_LANDSCAPE_INVERTED)
+      } else if (orientation === display.Orientation.LANDSCAPE_INVERTED) {
+        await setOrientation(window.Orientation.USER_ROTATION_LANDSCAPE)
+      } else if (orientation === display.Orientation.PORTRAIT) {
+        await setOrientation(window.Orientation.USER_ROTATION_LANDSCAPE)
+      } else if (orientation === display.Orientation.PORTRAIT_INVERTED) {
+        await setOrientation(window.Orientation.USER_ROTATION_LANDSCAPE_INVERTED)
+      }
+      this.vm.isClickFullScreenBtn = true;
+      this.pushToLandscapePage(param)
+    } else {
+      this.pushToLandscapePage(param)
+    }
   }
 
   build() {
@@ -225,12 +295,12 @@ export struct VideoPlayerView {
       // 倍速
       PlayerSpeedRateView({
         leftRateOpacity: this.vm.leftRateOpacity,
-        rightRateOpacity: this.vm.rightRateOpacity
+        rightRateOpacity: this.vm.rightRateOpacity,
       })
         .visibility(this.vm.isAccelerate ? Visibility.Visible : Visibility.None)
 
       Stack() {
-        Stack({alignContent: Alignment.Bottom}) {
+        Stack({ alignContent: Alignment.Bottom }) {
           Column() {
             Stack() {
               if (this.vm.isPause) {
@@ -238,6 +308,8 @@ export struct VideoPlayerView {
                   .width(60)
                   .height(60)
                   .zIndex(2)
+                  .accessibilityLevel('yes')
+                  .accessibilityText('继续播放')
                   .onClick(() => {
                     this.vm.playOrPause()
                   });
@@ -246,10 +318,9 @@ export struct VideoPlayerView {
               XComponent({
                 id: this.vm.xComponentId,
                 type: XComponentType.SURFACE,
-                controller: this.xComponentController
+                controller: this.xComponentController,
               })
-                .width(this.vm.playerLayoutSize.getXComponentWidth())
-                .height(this.vm.playerLayoutSize.getXComponentHeight())
+                .aspectRatio(Number(this.vm.videoWidth) / Number(this.vm.videoHeight))
                 .onLoad(() => {
                   let surfaceId = this.xComponentController.getXComponentSurfaceId();
                   // 设置视频窗口ID
@@ -260,21 +331,20 @@ export struct VideoPlayerView {
 
               Column() {
                 LoadingProgress()
-                  .width(50)
-                  .height(50)
-                  .color(Color.White);
+                  .width(40)
+                  .height(40)
+                  .color($r('sys.color.icon_on_primary'))
                 Text('缓冲中...')
                   .fontSize(12)
-                  .fontColor(Color.White)
+                  .fontColor($r('sys.color.icon_on_primary'))
               }
+              .accessibilityLevel('no-hide-descendants')
               .zIndex(2)
               .visibility(this.vm.isBuffering ? Visibility.Visible : Visibility.Hidden)
 
-              if (this.vm.showCover) {
-                if (this.videoData.getCoverUrl()) {
-                  Image(this.videoData.getCoverUrl())
-                    .width(this.vm.playerLayoutSize.getXComponentWidth())
-                }
+              // 封面
+              if (this.vm.showCover && this.videoData.getCoverUrl()) {
+                this.coverImgView()
               }
             }
             .id(this.vm.componentId)
@@ -287,7 +357,7 @@ export struct VideoPlayerView {
           }
           .width('100%')
           .height('100%')
-          .padding({bottom: this.bottomTabHeight})
+          .padding({ bottom: this.bottomTabHeight })
 
           // 自定义外层操作交互层
           if (this.videoLayerBuilder && !this.vm.isAccelerate) {
@@ -296,7 +366,7 @@ export struct VideoPlayerView {
                 this.videoData,
                 this.vm.playerSession,
                 this.swipePlayerController,
-                this.vm.playerLayoutSize
+                this.vm.playerLayoutSize,
               )
             }
             .zIndex(2)
@@ -308,17 +378,22 @@ export struct VideoPlayerView {
             this.defaultVideoProgressBar()
           }
         }
-
         // 全屏播放按钮
-        if (this.vm.showFullScreenBtn() && !this.vm.isAccelerate) {
+        if (this.vm.showFullScreenBtn() && !this.vm.isAccelerate &&
+          !this.vm.playerLayoutSize.getSlideMovingFlag()
+        ) {
           this.fullScreenBtnView()
         }
       }
     }
+    .accessibilityLevel('no')
     .gesture(
       LongPressGesture({ repeat: true, duration: 300 })
         .onAction((event: GestureEvent) => {
           this.vm.onLongPress(event)
+        })
+        .onActionCancel(() => {
+          this.vm.offLongPress()
         })
         .onActionEnd(() => {
           this.vm.offLongPress()
@@ -327,22 +402,23 @@ export struct VideoPlayerView {
   }
 
   @Builder
+  coverImgView() {
+    Image(this.vm.imageUrl).width(this.vm.playerLayoutSize.getXComponentWidth())
+  }
+
+  @Builder
   fullScreenBtnView() {
     Column() {
       this.fullBtnBuilder()
     }
     .zIndex(4)
-    .offset({top: Number(this.vm.playerLayoutSize.getXComponentHeight()) / 2})
+    .offset({ top: Number(this.vm.playerLayoutSize.getXComponentHeight()) / 2 })
     .visibility(this.vm.playerLayoutSize.getLayoutSizeChangeFlag() ? Visibility.Hidden : Visibility.Visible)
     .onClick(() => {
-      let uiContext = this.getUIContext()
-      let param: Record<string, Object | AVPlayerSession> = {};
-      param.playerSession = this.vm.playerSession;
-      param.surfaceId = this.vm.surfaceId;
-      param.videoWidth = this.vm.videoWidth;
-      param.videoHeight = this.vm.videoHeight;
-      param.videoTitle = this.videoData.getVideoTitle();
-      this.handleFullScreen(uiContext, param)
+      if (this.vm.isBuffering) {
+        return;
+      }
+      this.handleFullScreen()
     })
   }
 
@@ -357,6 +433,6 @@ export struct VideoPlayerView {
     .width('100%')
     .height('100%')
     .justifyContent(FlexAlign.End)
-    .padding({bottom: Constants.BOTTOM_TAB_NAV_HEIGHT})
+    .padding({ bottom: Constants.BOTTOM_TAB_NAV_HEIGHT })
   }
 }

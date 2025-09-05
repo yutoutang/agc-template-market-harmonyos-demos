@@ -1,5 +1,5 @@
-import { CircleShape } from '@kit.ArkUI';
-import { CommonConstants, RouterMap, RouterUtils, TimeUtils } from 'lib_common'
+import { AppStorageV2, CircleShape } from '@kit.ArkUI';
+import { BreakpointModel, CommonConstants, RouterMap, RouterUtils, TimeUtils } from 'lib_common'
 import { AggregateNewsCommentModel } from '../common/ObservedModel'
 import { UniformNewsCard } from './UniformNewsCard'
 
@@ -7,8 +7,8 @@ import { UniformNewsCard } from './UniformNewsCard'
 export struct CommentRoot {
   @Require @Param data: AggregateNewsCommentModel;
   @Param fontSizeRatio: number = 1;
-  @Event onReply: () => void = () => {
-  };
+  @Event onReply: () => void = () => {};
+  @Local breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
 
   build() {
     Column({ space: CommonConstants.PADDING_S }) {
@@ -78,8 +78,8 @@ export struct CommentRoot {
     .width(CommonConstants.FULL_PERCENT)
     .alignItems(HorizontalAlign.Start)
     .padding({
-      left: CommonConstants.PADDING_PAGE,
-      right: CommonConstants.PADDING_PAGE,
+      left: this.breakPointModel.pagePadding,
+      right: this.breakPointModel.pagePadding,
       top: CommonConstants.PADDING_M,
       bottom: CommonConstants.PADDING_M,
     })

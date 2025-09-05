@@ -1,0 +1,16 @@
+{
+  "name": "lib_preview_page",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "dayjs": "^1.11.13",
+    'module_share': 'file:../../components/module_share',
+    'module_newsfeed': 'file:../../components/module_newsfeed',
+    'lib_news_api': 'file:../lib_news_api',
+    'lib_common': 'file:../lib_common',
+    "module_transition": "file:../../components/module_transition"
+  }
+}

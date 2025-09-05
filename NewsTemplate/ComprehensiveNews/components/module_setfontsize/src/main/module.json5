@@ -3,7 +3,8 @@
     "name": "module_setfontsize",
     "type": "har",
     "deviceTypes": [
-      "default"
+      "phone",
+      "tablet"
     ]
   }
 }

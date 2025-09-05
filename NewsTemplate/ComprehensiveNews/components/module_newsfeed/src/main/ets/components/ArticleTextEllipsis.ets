@@ -8,7 +8,8 @@ export struct ArticleTextEllipsis {
   @Param text: string = ''
   @Param omitContent: string = '…'
   @Param fontSizeRatio: number = 1
-  @Param searchKey:string = ''
+  @Param searchKey: string = ''
+
   @Monitor('rows', 'text')
   onStrChange(monitor: IMonitor) {
     monitor.dirty.forEach((path: string) => {
@@ -109,10 +110,10 @@ export struct ArticleTextEllipsis {
           keywords: [this.searchKey as string],
           sourceString: this.isExpand ? this.text : this.showText,
           highLightColor: '#E84026',
-          textColor:$r('sys.color.font_primary')
+          textColor: $r('sys.color.font_primary'),
         })
       } else {
-        Text(){
+        Text() {
           Span(this.isExpand ? this.text : this.showText)
             .fontColor($r('sys.color.font_primary'))
             .fontWeight(FontWeight.Medium)

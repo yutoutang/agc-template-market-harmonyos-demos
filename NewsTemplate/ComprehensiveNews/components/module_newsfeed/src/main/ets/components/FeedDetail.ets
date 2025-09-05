@@ -1,10 +1,9 @@
-import { display, PersistenceV2 } from '@kit.ArkUI';
+import { PersistenceV2 } from '@kit.ArkUI';
+import { CommonConstants, RouterMap, RouterUtils, UserInfoModel } from 'lib_common';
 import { ArticleTextEllipsis } from './ArticleTextEllipsis';
 import { FeedSingleImageSize } from './FeedSingleImageSize';
 import { PostImgList, FeedCardInfoModel } from '../model/RecommendModel';
-import { calculateDimensions, getDateDiff, twoImagesSize } from '../utils/Index';
-import { UserInfoModel } from 'lib_common';
-
+import { getColumnsTemplate, getDateDiff } from '../utils/Index';
 
 /*
  * 动态中心内容
@@ -22,6 +21,7 @@ export struct FeedDetail {
   @Param searchKey: string = ''
   @Param showUserBar: boolean = true;
   @Param showTimeBottom: boolean = false;
+  @Param showImagePreviewLayer: boolean = true;
   @Param isWatch: boolean = false
   @Param isFeedSelf: boolean = false
   @BuilderParam followBuilderParam: () => void = this.followBuilder;
@@ -32,10 +32,10 @@ export struct FeedDetail {
   @Event onAddComment: () => void = () => {}
   @Event onVideo: () => void = () => {}
   @Local currentTextCount: number | undefined = undefined
-  @Local imageList: ResourceStr [] = []
-  @Local imageWidth: number = 0
-  @Local imageHeight: number = 0
   @Local userInfoModel: UserInfoModel = PersistenceV2.connect(UserInfoModel, () => new UserInfoModel())!;
+  @Local clickedIndex: number = 0;
+  @Local isFirstPageShow: boolean = true;
+  @Local truncatedCount: number = 0
 
   @Computed
   get getAuthorIcon() {
@@ -47,16 +47,6 @@ export struct FeedDetail {
     return this.isFeedSelf ? this.userInfoModel.authorNickName : this.curFeedCardInfo.author.authorNickName
   }
 
-  aboutToAppear(): void {
-    // 收集图片信息
-    this.imageList = this.curFeedCardInfo.postImgList?.map((item: PostImgList) => {
-      if (!item.surfaceUrl) {
-        return item.picVideoUrl
-      }
-      return ''
-    }) as []
-  }
-
   @Builder
   followBuilder() {
   };
@@ -65,10 +55,10 @@ export struct FeedDetail {
   publishTimeBuilder() {
     if (this.isDynamicsSingleDetail) {
       Column() {
-        Text(getDateDiff(this.curFeedCardInfo?.createTime))
+        Text(this.curFeedCardInfo.relativeTime)
           .fontSize($r('sys.float.Body_S'))
           .fontColor($r('sys.color.font_tertiary'))
-      }.width('100%').alignItems(HorizontalAlign.Start)
+      }.width(CommonConstants.FULL_PERCENT).alignItems(HorizontalAlign.Start)
     }
 
   };
@@ -86,6 +76,31 @@ export struct FeedDetail {
     });
   }
 
+  onIndexChange(index: number): void {
+    this.clickedIndex = index;
+  }
+
+  onBack(): void {
+    this.isFirstPageShow = true;
+  }
+
+  computeImageCount() {
+    if (!this.curFeedCardInfo.postImgList) {
+      return []
+    }
+    const rules = new Map([
+      [5, 4], // 5张时保留4张
+      [6, 6], // 6张时保留6张
+      [7, 6], // 7张时保留6张
+      [8, 6], // 8张时保留6张
+      [9, 9],// 9张时保留9张
+    ]);
+    const count = this.curFeedCardInfo.postImgList.length;
+    const keepCount = rules.get(count) ?? count;
+    this.truncatedCount = count - keepCount;
+    return this.curFeedCardInfo.postImgList.slice(0, keepCount);
+  }
+
   build() {
     Column() {
       Flex({ justifyContent: FlexAlign.SpaceBetween, alignItems: ItemAlign.Center }) {
@@ -97,6 +112,7 @@ export struct FeedDetail {
               .height(40)
               .borderRadius('50%')
               .clip(true)
+              .accessibilityText(this.getAuthorName + '头像')
               .onClick(() => {
                 this.onGoUserInfo(this.curFeedCardInfo.author.authorId)
               })
@@ -128,58 +144,71 @@ export struct FeedDetail {
             searchKey: this.searchKey,
           })
         }.width('100%')
-
       }
       .width('100%')
       .alignItems(HorizontalAlign.Start)
+      .accessibilityLevel('yes')
+      .accessibilityText(this.curFeedCardInfo.title)
 
       Column() {
-        Flex({ justifyContent: FlexAlign.SpaceBetween, wrap: FlexWrap.Wrap }) {
-          ForEach(this.curFeedCardInfo.postImgList,
+        Grid() {
+          ForEach(this.computeImageCount(),
             (item: PostImgList, index: number) => {
-              FeedSingleImageSize({
-                fontSizeRatio: this.fontSizeRatio,
-                componentId: this.componentId,
-                isWatch: this.isWatch,
-                isFeedSelf: this.isFeedSelf,
-                imageWidth: this.imageWidth,
-                imageHeight: this.imageHeight,
-                curFeedCardInfo: this.curFeedCardInfo,
-                postImgListItem: item,
-                imageList: this.getImageList(this.curFeedCardInfo.postImgList ?? []),
-                index: index,
-                onAddWatch: () => {
-                  this.onAddWatch()
-                },
-                onAddLike: () => {
-                  this.onAddLike()
-                },
-                onAddComment: () => {
-                  this.onAddComment()
-                },
-                onVideo: () => {
-                  this.onVideo()
-                },
-              })
-            }, (item: PostImgList) => item.id)
+              GridItem() {
+                Column() {
+                  if (this.clickedIndex !== index || (this.isFirstPageShow)) {
+                    FeedSingleImageSize({
+                      curFeedCardInfo: this.curFeedCardInfo,
+                      componentId: this.componentId,
+                      isLast: this.computeImageCount().length - 1 === index,
+                      truncatedCount: this.truncatedCount,
+                      postImgListItem: item,
+                      onImageClick: () => {
+                        let param: Record<string, Object> = {};
+                        this.clickedIndex = index;
+                        param.selectedIndex = this.clickedIndex;
+                        param.onIndexChange = (index: number) => {
+                          this.onIndexChange(index);
+                        };
+                        param.componentId = this.componentId
+                        param.onBackToFirstPage = () => {
+                          this.onBack();
+                        }
+                        param.curFeedCardInfo = this.curFeedCardInfo
+                        param.watchOperation = () => {
+                          this.onAddWatch();
+                        };
+                        param.newsLike = () => {
+                          this.onAddLike();
+                        };
+                        param.onAddComment = () => {
+                          this.onAddComment();
+                        };
+                        param.showImagePreviewLayer = this.showImagePreviewLayer;
+                        this.getUIContext().animateTo({
+                          duration: 150,
+                          curve: Curve.EaseIn,
+                        }, () => {
+                          RouterUtils.pushPathByName(RouterMap.IMAGE_PREVIEW, param, () => {
+                          }, false)
+                          this.isFirstPageShow = false;
+                        })
+                      },
+                      onVideo: () => {
+                        this.onVideo()
+                      },
+                    })
+                  }
+                }
+                .width('100%')
+                .alignItems(HorizontalAlign.Start)
+              }
+
+            }, (item: PostImgList) => JSON.stringify(item))
         }
-        .width('100%')
+        .columnsTemplate('1fr '.repeat(getColumnsTemplate(this.computeImageCount().length ?? 0)))
+        .columnsGap(8)
       }
-      .onAreaChange(() => {
-        if (this.imageList.length === 1) {
-          this.imageWidth = calculateDimensions(this.curFeedCardInfo.postImgList?.[0].surfaceUrl ?
-          this.curFeedCardInfo.postImgList?.[0].surfaceUrl :
-          this.curFeedCardInfo.postImgList?.[0].picVideoUrl).width
-          this.imageHeight = calculateDimensions(this.curFeedCardInfo.postImgList?.[0].surfaceUrl ?
-          this.curFeedCardInfo.postImgList?.[0].surfaceUrl :
-          this.curFeedCardInfo.postImgList?.[0].picVideoUrl).height
-        } else {
-          this.imageWidth =
-            twoImagesSize(this.curFeedCardInfo.postImgList?.length ?? 0, this.getUIContext(), this.componentId)
-          this.imageHeight =
-            twoImagesSize(this.curFeedCardInfo.postImgList?.length ?? 0, this.getUIContext(), this.componentId)
-        }
-      })
 
       if (this.showTimeBottom) {
         Column() {

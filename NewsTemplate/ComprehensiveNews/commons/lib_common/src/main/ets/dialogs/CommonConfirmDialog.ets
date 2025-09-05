@@ -92,8 +92,8 @@ function confirmDialogView(params: ConfirmDialogParams) {
   }
   .width(CommonConstants.FULL_PERCENT)
   .padding({
-    left: CommonConstants.PADDING_PAGE,
-    right: CommonConstants.PADDING_PAGE,
+    left: CommonConstants.PADDING_L,
+    right: CommonConstants.PADDING_L,
   })
 }
 

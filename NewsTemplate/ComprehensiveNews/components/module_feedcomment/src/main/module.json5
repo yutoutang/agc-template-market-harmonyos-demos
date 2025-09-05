@@ -4,10 +4,8 @@
     "type": "har",
     "routerMap": "$profile:route_map",
     "deviceTypes": [
-      "default",
-      "tablet",
-      "2in1",
-      "wearable"
+      "phone",
+      "tablet"
     ]
   }
 }

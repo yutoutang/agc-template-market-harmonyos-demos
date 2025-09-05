@@ -1,0 +1,9 @@
+{
+  "routerMap": [
+    {
+      "name": "ImagePreview",
+      "pageSourceFile": "src/main/ets/components/ImagePreviewPage.ets",
+      "buildFunction": "ImagePreviewPageBuilder"
+    }
+  ]
+}

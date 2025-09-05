@@ -14,9 +14,11 @@ export class SubmitVM {
   @Trace maxSelectNumber: number = Constants.MAX_IMG_COUNT;
   @Trace stack: NavPathStack = new NavPathStack();
   @Trace loading: boolean = false;
+  @Trace gridCount: number = 3;
+  @Trace breakpoint: string = 'sm';
 
   async selectPhoto() {
-    const uriList = await MediaUtils.selectMedia(this.maxSelectNumber);
+    const uriList = await MediaUtils.selectMedia(this.maxSelectNumber - this.imgArr.length);
     this.imgArr.push(...uriList);
   }
 
@@ -55,5 +57,21 @@ export class SubmitVM {
       return false;
     }
     return true;
+  }
+
+  onBreakpointChange(bp: string) {
+    this.breakpoint = bp;
+    if (bp === 'sm') {
+      this.gridCount = 3;
+    } else if (bp === 'md') {
+      this.gridCount = 6;
+    } else {
+      this.gridCount = 8;
+    }
+  }
+
+  @Computed
+  get getColumnsTemplate() {
+    return Array(this.gridCount).fill('1fr').join(' ');
   }
 }

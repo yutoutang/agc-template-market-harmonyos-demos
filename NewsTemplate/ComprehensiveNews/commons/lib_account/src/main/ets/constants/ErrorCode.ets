@@ -1,32 +1,24 @@
 export enum ErrorCode {
-  // The agreements are not accepted.
+  // 使用华为账号登录组件时，未设置协议状态为ACCEPTED。
   ERROR_CODE_AGREEMENT_STATUS_NOT_ACCEPTED = 1005300001,
-  // Invalid input parameter value.
-  ERROR_CODE_INVALID_PARAM = 1001502003,
-  // The app does not have the required scopes or permissions.
-  ERROR_CODE_NOT_SCOPE = 1001502014,
-  // No HUAWEI ID has been signed in.
-  ERROR_CODE_LOGIN_OUT = 1001502001,
-  // This HUAWEI ID does not support one-tap sign-in as it is a child account or not registered in the Chinese mainland.
-  ERROR_CODE_NOT_SUPPORTED = 1001500003,
-  // The operation for obtaining the shipping address is canceled.
-  SHIPPING_ADDRESS_USER_CANCELED = 1008100006,
-  // Authorization revoking is performed.
-  AUTHENTICATION_USER_CANCELED = 1001502012,
-  // The operation for obtaining the invoice title is canceled.
-  INVOICE_ASSISTANT_USER_CANCELED = 1010060001,
-  // A network exception occurred in the API for obtaining the shipping address.
-  SHIPPING_ADDRESS_NETWORK_ERROR = 1008100002,
-  // A network exception occurs in the authorization API.
-  AUTHENTICATION_NETWORK_ERROR = 1001502005,
-  // A network exception occurred in the API for obtaining the invoice title.
-  INVOICE_ASSISTANT_NETWORK_ERROR = 1010060005,
-  // Internal error.
-  ERROR_CODE_INTERNAL_ERROR = 1001502009,
-  // Authorization revoking is performed.
-  ERROR_CODE_USER_CANCEL = 1001502012,
-  // System service exception.
-  ERROR_CODE_SYSTEM_SERVICE = 12300001,
-  // Repeated request.
-  ERROR_CODE_REQUEST_REFUSE = 1001500002
+  // 用户未登录华为账号
+  ERROR_CODE_UN_LOGIN1 = 1001502001,
+  // 账号未登录
+  ERROR_CODE_UN_LOGIN2 = 1001600002,
+  // 用户取消当前操作。
+  ERROR_CODE_CANCEL = 1001600005,
 }
+
+export const ERROR_MSG_MAP: Record<number, string> = {
+  1001502001: '用户未登录华为账号，请前往设置-登录华为账号。',
+  1001600002: '用户未登录华为账号，请前往设置-登录华为账号。',
+  1001500001: '应用指纹证书校验失败，请检查client_id、应用指纹证书配置。',
+  1001600003: '应用指纹证书校验失败，请检查client_id、应用指纹证书配置。',
+  1001502003: '输入参数值无效，请检查client_id。',
+  1001502014: '应用未申请scopes或permissions权限。',
+  1008100002: '网络不可用，检查网络是否连接好。',
+  1001502005: '网络错误，检查网络连接。',
+  1010060005: '网络连接错误，检查网络是否连接好。',
+  1005300001: '用户未同意协议。',
+  1001502012: '用户取消授权。',
+};

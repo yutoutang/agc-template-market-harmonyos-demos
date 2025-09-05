@@ -43,13 +43,13 @@ export const channelList: TabInfo[] = [
   {
     text: '民生',
     id: 'people',
-    selected: false,
+    selected: true,
     order: 6,
   },
   {
     text: '科普',
     id: 'science',
-    selected: false,
+    selected: true,
     order: 6,
   },
   {

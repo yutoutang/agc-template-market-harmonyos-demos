@@ -1,7 +1,7 @@
 import fs from '@ohos.file.fs';
 import { util } from '@kit.ArkTS';
-import { Logger } from './Logger';
 import { storageStatistics } from '@kit.CoreFileKit';
+import { Logger } from './Logger';
 
 const TAG = '[FileUtils]';
 
@@ -27,6 +27,28 @@ export class FileUtils {
     } catch (error) {
       Logger.error(TAG, 'fs.copyFileSync error: ' + JSON.stringify(error));
       return '';
+    } finally {
+      if (file) {
+        fs.closeSync(file);
+      }
+    }
+  }
+
+  /**
+   * 沙箱图片转换成base64
+   * @param imgUri
+   * @returns
+   */
+  static sandboxToBase64(imgUri: string): string {
+    let file: fs.File | null = null;
+    try {
+      file = fs.openSync(imgUri);
+      let buffer: ArrayBuffer = new ArrayBuffer(fs.statSync(file.fd).size);
+      fs.readSync(file.fd, buffer);
+      let unit = new Uint8Array(buffer);
+      let base64 = new util.Base64Helper();
+      let base64string = base64.encodeToStringSync(unit, util.Type.MIME);
+      return `data:image/jpeg;base64,${base64string}`;
     } finally {
       if (file) {
         fs.closeSync(file);

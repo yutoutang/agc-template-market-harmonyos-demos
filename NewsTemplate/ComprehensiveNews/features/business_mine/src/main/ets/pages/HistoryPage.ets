@@ -1,6 +1,7 @@
 import { CommonConstants } from 'lib_common';
 import { NewsModel } from 'lib_news_api';
 import { emptyBuilder, NavHeaderBar } from 'lib_widget';
+import { EditCheckbox, HeaderRightPart, ToolBarBottom } from '../components/BaseHistoryComment';
 import { UniformNewsCard } from '../components/UniformNewsCard';
 import { HistoryViewModel } from '../viewmodels/HistoryVM';
 
@@ -27,20 +28,12 @@ struct HistoryPage {
             ForEach(this.vm.list, (v: NewsModel) => {
               ListItem() {
                 Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center }) {
-                  Row() {
-                    Checkbox()
-                      .width($r('app.float.normal_img_size'))
-                      .select(false)
-                      .shape(CheckBoxShape.CIRCLE)
-                      .selectedColor($r('sys.color.warning'))
-                      .onChange((value: boolean) => {
-                        this.vm.onChange(value, v);
-                      })
-                  }
-                  .padding({
-                    right: CommonConstants.PADDING_L,
+                  EditCheckbox({
+                    isEditMode: this.vm.isEditMode,
+                    onChange: (value) => {
+                      this.vm.onChange(value, v);
+                    }
                   })
-                  .visibility(this.vm.isEditMode ? Visibility.Visible : Visibility.None)
 
                   this.contentItemBuilder(v)
                 }
@@ -52,8 +45,8 @@ struct HistoryPage {
           .scrollBar(BarState.Off)
           .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
           .padding({
-            left: CommonConstants.PADDING_PAGE,
-            right: CommonConstants.PADDING_PAGE,
+            left: this.vm.breakPointModel.pagePadding,
+            right: this.vm.breakPointModel.pagePadding,
             top: CommonConstants.SPACE_M,
             bottom: CommonConstants.SPACE_M,
           })
@@ -106,61 +99,11 @@ struct HistoryPage {
 
   @Builder
   rightPartBuilder() {
-    Row() {
-      Image(this.vm.isEditMode ? $r('app.media.ic_close') : $r('app.media.ic_public_trash'))
-        .width($r('app.float.large_img_size'))
-        .aspectRatio(1)
-        .draggable(false)
-        .enabled(this.vm.allowEnterEdit)
-        .fillColor(this.vm.allowEnterEdit ? $r('sys.color.font_primary') : $r('sys.color.font_secondary'))
-        .onClick(() => {
-          if (this.vm.isEditMode) {
-            this.vm.quitEdit();
-          } else {
-            this.vm.enterEdit();
-          }
-        })
-    }
-    .layoutWeight(1)
-    .justifyContent(FlexAlign.End)
+    HeaderRightPart({ vm: this.vm })
   }
 
   @Builder
   toolBarBuilder() {
-    Row() {
-      Column({ space: CommonConstants.SPACE_XS }) {
-        Image($r('app.media.ic_public_eraser'))
-          .width($r('app.float.normal_img_size'))
-          .aspectRatio(1)
-          .draggable(false)
-          .fillColor($r('sys.color.font_primary'))
-        Text('一键清空')
-          .fontSize(10 * this.vm.settingInfo.fontSizeRatio)
-          .fontColor($r('sys.color.font_primary'))
-      }
-      .width(CommonConstants.HALF_PERCENT)
-      .padding(CommonConstants.PADDING_XS)
-      .onClick(() => {
-        this.vm.deleteAllConfirm();
-      })
-
-      Column({ space: CommonConstants.SPACE_XS }) {
-        Image($r('app.media.ic_public_delete'))
-          .width($r('app.float.normal_img_size'))
-          .aspectRatio(1)
-          .draggable(false)
-          .fillColor(this.vm.allowDelete ? $r('sys.color.font_primary') : $r('sys.color.font_secondary'))
-        Text('删除')
-          .fontSize(10 * this.vm.settingInfo.fontSizeRatio)
-          .fontColor(this.vm.allowDelete ? $r('sys.color.font_primary') : $r('sys.color.font_secondary'))
-      }
-      .width(CommonConstants.HALF_PERCENT)
-      .padding(CommonConstants.PADDING_XS)
-      .enabled(this.vm.allowDelete)
-      .onClick(() => {
-        this.vm.deleteConfirm();
-      })
-    }
-    .width(CommonConstants.FULL_PERCENT)
+    ToolBarBottom({ vm: this.vm })
   }
 }

@@ -54,6 +54,7 @@ export class PopViewUtils {
         onHeightDidChange: options?.onHeightDidChange,
         onDetentsDidChange: options?.onDetentsDidChange,
         scrollSizeMode: options?.scrollSizeMode,
+        onWillDisappear:options?.onWillDisappear
       };
       PopViewUtils.uiContext.openBindSheet(componentContent, sheetOptions);
       let sheetList = PopViewUtils.shareInstance().sheetList;

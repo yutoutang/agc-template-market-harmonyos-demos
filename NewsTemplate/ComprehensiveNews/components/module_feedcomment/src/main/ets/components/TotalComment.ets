@@ -1,7 +1,7 @@
 import { NavHeaderBar } from 'lib_widget';
 import { CommentInfo } from '../model/Model';
-import { commentSheetOpen } from '../utils/Utils';
-import { FeedCommentVM } from '../viewModel/FeedCommentVM';
+import { CommentUtils } from '../utils/CommentUtils';
+import { FeedCommentVM } from '../viewmodel/FeedCommentVM';
 import { CommentCard } from './CommentCard';
 
 @Builder
@@ -14,7 +14,6 @@ export struct TotalComment {
   @Local commentInfo: CommentInfo = new CommentInfo()
   @Local feedCommentVM: FeedCommentVM = FeedCommentVM.instance;
   @Local navPathStack: NavPathStack = new NavPathStack()
-
 
   @Builder
   commentBuilder(item: CommentInfo, needPadding = true) {
@@ -104,7 +103,7 @@ export struct TotalComment {
         .width('100%')
       }
       .onClick(() => {
-        commentSheetOpen(this.commentInfo.author.authorNickName, (replyContent: string) => {
+        CommentUtils.commentSheetOpen(this.commentInfo.author.authorNickName, (replyContent: string) => {
           this.feedCommentVM.addComment(this.commentInfo, replyContent)
         })
       })

@@ -105,7 +105,8 @@ export class MessageService {
     if (rootId !== commentId) {
       current = CommentServiceApi.queryComment(commentId);
     }
-    const list = (root?.replyComments || [])
+    const replyList = CommentServiceApi.queryAllReplyComment(rootId);
+    const list = replyList
       .filter(v => ![root.commentId, current?.commentId].includes(v.commentId))
 
     return {

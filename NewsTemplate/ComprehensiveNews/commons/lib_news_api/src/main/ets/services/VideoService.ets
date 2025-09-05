@@ -3,7 +3,6 @@ import { NewsResponse } from '../params/response/NewsResponse';
 import { MockVideo } from './mockdata/MockVideo';
 import { BaseNews } from '../database/NewsType';
 import { Utils } from '../utils/Utils';
-import { MockArticle } from './mockdata/MockArticle';
 import { MockPost } from './mockdata/MockPost';
 import { NewsEnum } from '../constants/Constants';
 import { PostImgList } from '../params/base/BaseModel';

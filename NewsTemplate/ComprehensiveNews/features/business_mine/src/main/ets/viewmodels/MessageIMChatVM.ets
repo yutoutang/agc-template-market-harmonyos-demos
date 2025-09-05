@@ -1,7 +1,7 @@
 import { webview } from '@kit.ArkWeb';
-import { controllerMap, preLoadUrl, updateWeb, webOptionMap } from '@hw-agconnect/fast-web';
+import { controllerMap, updateWeb, webOptionMap } from '@hw-agconnect/fast-web';
 import { ImagePreview, PreviewVerticalAlign } from 'module_imagepreview';
-import { BaseViewModel, Logger, RouterMap, RouterUtils } from 'lib_common';
+import { BaseViewModel, FileUtils, Logger, RouterMap, RouterUtils } from 'lib_common';
 import { AuthorModel, ChatInfoDetailResponse, MessageServiceApi, SendMessageRequest } from 'lib_news_api';
 import { ChatInfoDetailModel } from '../common/ObservedModel';
 import { WebIdMap } from '../constants/Constants';
@@ -20,10 +20,11 @@ export class MsgIMChatViewModel extends BaseViewModel {
   @Trace public webController: webview.WebviewController = new webview.WebviewController();
   @Trace public chatAuthor: AuthorModel | null = null;
   @Trace public chatList: ChatInfoDetailModel[] = [];
-  @Trace public useOfflineWeb: boolean = false;
+  // 自行选择是否使用离线Web
+  @Trace public useOfflineWeb: boolean = true;
   public readonly JAVASCRIPT_PROXY_NAME: string = 'msgIMChatViewModel';
   public readonly METHOD_LIST: string[] = [
-    'queryList', 'sendMessage', 'enterPreview', 'jumpTAProfile', 'jumpMyProfile'
+    'queryList', 'sendMessage', 'enterPreview', 'jumpTAProfile', 'jumpMyProfile',
   ];
 
   constructor() {
@@ -35,7 +36,7 @@ export class MsgIMChatViewModel extends BaseViewModel {
   queryList(): Promise<ChatModel> {
     return MessageServiceApi.queryChatRecordByAuthorId(this.chatAuthorId).then((resp) => {
       const dataInject: ChatModel = {
-        myAvatar: this.userInfoModel.authorIcon,
+        myAvatar: this.getMyAvatar,
         otherAvatar: this.chatAuthor?.authorIcon || '',
         messages: resp,
       };
@@ -97,16 +98,20 @@ export class MsgIMChatViewModel extends BaseViewModel {
     }
   }
 
-  loadBlank() {
-    preLoadUrl(WebIdMap.ChatWebId, 'about:blank');
-  }
-
   deleteJavaScriptRegister() {
     try {
       this.controller?.deleteJavaScriptRegister(this.JAVASCRIPT_PROXY_NAME);
     } catch (e) {
       Logger.error(TAG, 'deleteJavaScriptRegister fail, error: ' + JSON.stringify(e));
     }
+  }
+
+  @Computed
+  get getMyAvatar() {
+    if (this.userInfoModel.authorIcon.startsWith('file://')) {
+      return FileUtils.sandboxToBase64(this.userInfoModel.authorIcon);
+    }
+    return this.userInfoModel.authorIcon;
   }
 
   @Computed

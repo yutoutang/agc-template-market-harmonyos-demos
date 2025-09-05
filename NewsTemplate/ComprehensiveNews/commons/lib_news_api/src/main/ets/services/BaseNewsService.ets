@@ -6,6 +6,7 @@ import { CommentServiceApi } from './CommentService';
 import { AuthorServiceApi } from './AuthorService';
 import { NewsResponse } from '../params/response/NewsResponse';
 import { RequestListData } from '../params/response/LayoutResponse';
+import { Utils } from '../utils/Utils';
 
 /**
  * 新闻base类
@@ -36,7 +37,7 @@ export class BaseNewsService {
 
     copyItem.commentCount = CommentServiceApi.queryTotalCommentCount(item.id);
     copyItem.comments = [];
-
+    copyItem.relativeTime = Utils.getDateDiff(copyItem.createTime)
     if (copyItem.recommends?.length && !ignoreRec) {
       copyItem.recommends = (item?.recommends || [])
         .map((news: SimpleNews) => {

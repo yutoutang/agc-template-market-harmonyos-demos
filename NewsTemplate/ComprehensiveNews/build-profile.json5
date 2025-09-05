@@ -17,7 +17,7 @@
     ],
     "buildModeSet": [
       {
-        "name": "debug",
+        "name": "debug"
       },
       {
         "name": "release"
@@ -39,11 +39,11 @@
     },
     {
       "name": "business_home",
-      "srcPath": "./features/business_home",
+      "srcPath": "./features/business_home"
     },
     {
       "name": "business_video",
-      "srcPath": "./features/business_video",
+      "srcPath": "./features/business_video"
     },
     {
       "name": "business_interaction",
@@ -51,15 +51,15 @@
     },
     {
       "name": "business_mine",
-      "srcPath": "./features/business_mine",
+      "srcPath": "./features/business_mine"
     },
     {
       "name": "business_profile",
-      "srcPath": "./features/business_profile",
+      "srcPath": "./features/business_profile"
     },
     {
       "name": "business_setting",
-      "srcPath": "./features/business_setting",
+      "srcPath": "./features/business_setting"
     },
     {
       "name": "lib_common",
@@ -67,7 +67,7 @@
     },
     {
       "name": "lib_widget",
-      "srcPath": "./commons/lib_widget",
+      "srcPath": "./commons/lib_widget"
     },
     {
       "name": "lib_account",
@@ -75,19 +75,23 @@
     },
     {
       "name": "lib_news_api",
-      "srcPath": "./commons/lib_news_api",
+      "srcPath": "./commons/lib_news_api"
     },
     {
       "name": "lib_flex_layout",
-      "srcPath": "./commons/lib_flex_layout",
+      "srcPath": "./commons/lib_flex_layout"
     },
     {
       "name": "lib_native_components",
-      "srcPath": "./commons/lib_native_components",
+      "srcPath": "./commons/lib_native_components"
     },
     {
       "name": "lib_news_feed_details",
-      "srcPath": "./commons/lib_news_feed_details",
+      "srcPath": "./commons/lib_news_feed_details"
+    },
+    {
+      "name": "lib_preview_page",
+      "srcPath": "./commons/lib_preview_page"
     },
     {
       "name": "module_channeledit",
@@ -135,7 +139,15 @@
     },
     {
       "name": "module_highlight",
-      "srcPath": "./components/module_highlight",
+      "srcPath": "./components/module_highlight"
+    },
+    {
+      "name": "module_transition",
+      "srcPath": "./components/module_transition"
+    },
+    {
+      "name": "module_articlepost",
+      "srcPath": "./components/module_articlepost"
     }
   ]
 }

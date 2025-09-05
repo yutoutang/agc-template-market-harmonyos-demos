@@ -2,6 +2,7 @@ import { ImagePreview, PreviewVerticalAlign } from 'module_imagepreview';
 import { NavHeaderBar } from '../components/NavHeaderBar';
 import { Constants } from '../common/Constants';
 import { SubmitVM } from '../viewmodels/SubmitVM';
+import { CommonUtils } from '../common/CommonUtils';
 
 @Builder
 export function SubmitPageBuilder() {
@@ -16,12 +17,25 @@ export struct SubmitPage {
   build() {
     NavDestination() {
       Column() {
-        NavHeaderBar({ title: '反馈问题' })
+        NavHeaderBar({
+          title: '反馈问题',
+          breakpoint: this.vm.breakpoint,
+        })
         this.customDivider()
         Scroll() {
           Column() {
             this.textInfo()
-            this.imageInfo()
+            GridRow(Constants.GRID_ROW_OPTIONS) {
+              GridCol({
+                span: Constants.FULL_COL_SPAN,
+              }) {
+                this.imageInfo()
+              }
+            }
+            .onBreakpointChange((bp: string) => {
+              this.vm.onBreakpointChange(bp);
+            })
+
             this.customDivider()
             this.contactInfo()
           }
@@ -69,8 +83,8 @@ export struct SubmitPage {
         })
     }
     .padding({
-      left: Constants.PADDING_PAGE,
-      right: Constants.PADDING_PAGE,
+      left: CommonUtils.getPageMargin(this.vm.breakpoint),
+      right: CommonUtils.getPageMargin(this.vm.breakpoint),
       top: Constants.PADDING_L,
     })
   }
@@ -91,7 +105,7 @@ export struct SubmitPage {
           }
         }, (v: string) => v)
       }
-      .columnsTemplate('1fr 1fr 1fr')
+      .columnsTemplate(this.vm.getColumnsTemplate)
       .columnsGap(12)
       .rowsGap(8)
       .maxCount(Constants.MAX_IMG_COUNT)
@@ -106,8 +120,8 @@ export struct SubmitPage {
         .margin({ top: Constants.PADDING_M })
     }
     .padding({
-      left: Constants.PADDING_PAGE,
-      right: Constants.PADDING_PAGE,
+      left: CommonUtils.getPageMargin(this.vm.breakpoint),
+      right: CommonUtils.getPageMargin(this.vm.breakpoint),
       bottom: Constants.PADDING_L,
     })
     .margin({
@@ -132,7 +146,7 @@ export struct SubmitPage {
           .padding(0)
           .fontSize(16 * this.vm.feedbackModel.fontSizeRatio)
           .fontColor($r('sys.color.font_primary'))
-          .placeholderColor($r('sys.color.font_tertiary'))
+          .placeholderColor($r('sys.color.font_secondary'))
           .placeholderFont({ size: 12 * this.vm.feedbackModel.fontSizeRatio })
           .backgroundColor(Color.Transparent)
           .borderRadius(0)
@@ -151,8 +165,8 @@ export struct SubmitPage {
     }
     .alignItems(HorizontalAlign.Start)
     .padding({
-      left: Constants.PADDING_PAGE,
-      right: Constants.PADDING_PAGE,
+      left: CommonUtils.getPageMargin(this.vm.breakpoint),
+      right: CommonUtils.getPageMargin(this.vm.breakpoint),
       top: Constants.PADDING_L,
     })
   }
@@ -165,7 +179,7 @@ export struct SubmitPage {
           LoadingProgress()
             .width(16)
             .aspectRatio(1)
-            .color($r('sys.color.font_on_primary'))
+            .color($r('sys.color.icon_on_primary'))
             .visibility(this.vm.loading ? Visibility.Visible : Visibility.None)
           Text(this.vm.loading ? '正在提交反馈...' : '提交反馈')
             .fontSize($r('sys.float.Body_L'))
@@ -183,8 +197,8 @@ export struct SubmitPage {
     .padding({
       top: Constants.PADDING_S,
       bottom: Constants.PADDING_S,
-      left: Constants.PADDING_PAGE,
-      right: Constants.PADDING_PAGE,
+      left: CommonUtils.getPageMargin(this.vm.breakpoint),
+      right: CommonUtils.getPageMargin(this.vm.breakpoint),
     })
   }
 
@@ -202,6 +216,7 @@ export struct SubmitPage {
     .justifyContent(FlexAlign.Center)
     .borderRadius(16)
     .backgroundColor($r('sys.color.comp_background_tertiary'))
+    .accessibilityText('添加图片或视频')
     .onClick(async () => {
       this.vm.selectPhoto();
     })

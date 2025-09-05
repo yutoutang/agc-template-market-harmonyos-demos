@@ -40,6 +40,8 @@ export struct FeedOperate {
               .fontSize(12 * this.fontSizeRatio)
               .fontColor($r('sys.color.font_secondary'))
           }
+          .accessibilityGroup(true)
+          .accessibilityText('分享按钮' + formatToK(this.curFeedCardInfo.shareCount))
         }
         Row({ space: 5 }) {
           Image($r('app.media.op_comment')).width(17 * this.fontSizeRatio).height(16 * this.fontSizeRatio)
@@ -48,6 +50,7 @@ export struct FeedOperate {
             .fontSize(12 * this.fontSizeRatio)
             .fontColor($r('sys.color.font_secondary'))
         }
+        .accessibilityText('评论按钮' + formatToK(this.curFeedCardInfo.commentCount))
         .onClick(() => {
           this.onArticle()
         })
@@ -60,6 +63,8 @@ export struct FeedOperate {
             .fontSize(12 * this.fontSizeRatio)
             .fontColor($r('sys.color.font_secondary'))
         }
+        .accessibilityText(this.curFeedCardInfo.isLiked ? '取消点赞按钮' + formatToK(this.curFeedCardInfo.likeCount) :
+          '点赞按钮' + formatToK(this.curFeedCardInfo.likeCount))
         .onClick(() => {
           this.onLike()
         }).justifyContent(FlexAlign.End)

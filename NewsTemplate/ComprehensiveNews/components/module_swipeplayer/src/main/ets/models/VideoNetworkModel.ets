@@ -24,12 +24,19 @@ export class VideoNetworkSetting {
   @Trace downloadWithoutWlan: number = 0;
   // 非WLAN网络播放提醒
   @Trace remindWithoutWlan: number = 0;
-  // 非WLAN网络下自动播放直播
-  @Trace liveAutoplayWithoutWlan: boolean = true;
   // 使用移动网络改善内容浏览体验
   @Trace optimizeWith4G: boolean = true;
   // 视频自动下滑
   @Trace autoPlayNext: boolean = true;
   // 推荐频道自动播放视频
   @Trace autoPlayTabRecommend: boolean = true;
+}
+
+/**
+ * 非WLAN网络流量枚举
+ */
+export enum DownloadWithoutWlanEnum {
+  downloadBigPic = 0,
+  downloadSmart,
+  downloadDisable,
 }

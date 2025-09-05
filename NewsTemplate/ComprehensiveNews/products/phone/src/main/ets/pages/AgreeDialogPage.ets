@@ -16,6 +16,7 @@ struct AgreePrivacyPage {
         Column() {
           Text('您需要同意协议才能体验新闻模板')
             .fontSize($r('sys.float.Title_S'))
+            .fontColor($r('sys.color.font_primary'))
             .fontWeight(FontWeight.Bold)
           Text() {
             Span('本应用需联网，调用XX、XX权限，获取XX信息，以为您提供XX服务。我们仅在您使用具体功能业务时，才会触发上述行为收集使用相关的个人信息。详情请参阅')
@@ -52,7 +53,7 @@ struct AgreePrivacyPage {
           }
           .margin({ top: 24 })
         }
-        .backgroundColor(Color.White)
+        .backgroundColor($r('sys.color.comp_background_primary'))
         .width(CommonConstants.FULL_PERCENT)
         .borderRadius($r('app.float.xxl_radius'))
         .padding(CommonConstants.PADDING_L)

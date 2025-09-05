@@ -1,6 +1,6 @@
+import { PersistenceV2 } from '@kit.ArkUI'
 import { CommonConstants, RouterMap, RouterUtils, SettingModel, TimeUtils } from 'lib_common'
 import { LayoutParams } from 'lib_news_api'
-import { PersistenceV2 } from '@kit.ArkUI'
 
 @ComponentV2
 export struct AuthorCard {
@@ -19,10 +19,8 @@ export struct AuthorCard {
             .height(40)
             .borderRadius('50%')
             .clip(true)
+            .accessibilityText(this.cardData.nativeCardData.author.authorNickName + '头像')
             .onClick(() => {
-              /**
-               * 跳转用户动态
-               */
               RouterUtils.pushPathByName(RouterMap.PROFILE_HOME, this.cardData.nativeCardData.author.authorId)
             })
         }
@@ -41,7 +39,6 @@ export struct AuthorCard {
       if (this.watchBuilder) {
         this.watchBuilder()
       }
-
     }
     .visibility(this.isNeedAuthor ? Visibility.Visible : Visibility.None)
   }

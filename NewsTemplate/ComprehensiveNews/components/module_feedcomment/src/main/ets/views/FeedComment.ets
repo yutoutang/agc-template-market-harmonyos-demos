@@ -1,9 +1,9 @@
 import { CommentInfo, Tmp } from '../model/Model';
 import { CommentCard } from '../components/CommentCard';
-import { FeedCommentVM } from '../viewModel/FeedCommentVM';
+import { FeedCommentVM } from '../viewmodel/FeedCommentVM';
 import { CommentEventDispatcher } from '../utils/EventDispatcher';
 import { UserInfoModel } from 'lib_common';
-import { commentSheetOpen } from '../utils/Utils';
+import { CommentUtils } from '../utils/CommentUtils';
 
 @ComponentV2
 export struct FeedComment {
@@ -12,15 +12,14 @@ export struct FeedComment {
   @Param fontSizeRatio: number = 1
   @Param isDark: boolean = false
   @Param userInfo: UserInfoModel = new UserInfoModel()
+  @Param feedCommentScroller:Scroller = new Scroller()
   @Local feedCommentVM: FeedCommentVM = FeedCommentVM.instance;
   @Event addComment: (commentInfo: CommentInfo, parentCommentId: string) => void = () => {};
   @Event giveLike: (commentInfo: CommentInfo, isLike: boolean) => void = () => {};
   @Event onGoAuthorInfo: (authorId: string) => void = () => {};
-  @Event onInterceptLogin: (cb: (isLogin: boolean) => void) => void = () => {};
   @Event onDeleteComment: (commentId: string) => void = () => {};
   @Event onFirstComment:(commentContent: string) => void = () => {}
   @BuilderParam commentTopViewBuilder: () => void = this.commentTopView;
-  scroller: Scroller = new Scroller()
 
   @Monitor('fontSizeRatio')
   fontSizeRatioChange() {
@@ -49,9 +48,6 @@ export struct FeedComment {
     CommentEventDispatcher.goUserHome = (authorId: string) => {
       this.onGoAuthorInfo(authorId)
     }
-    CommentEventDispatcher.interceptLogin = (cb: (isLogin: boolean) => void) => {
-      this.onInterceptLogin(cb)
-    }
     CommentEventDispatcher.deleteComment = (commentId: string) => {
       this.onDeleteComment(commentId)
     }
@@ -63,18 +59,6 @@ export struct FeedComment {
 
   setDarkMode() {
     this.feedCommentVM.setIsDark(this.isDark)
-  }
-
-  @Builder
-  commentReplyRefreshComponent(params: Tmp) {
-    Column() {
-      List({ scroller: this.scroller }) {
-        this.commentComponent(params)
-      }
-      .scrollBar(BarState.Off)
-      .edgeEffect(EdgeEffect.None)
-      .width('100%')
-    }
   }
 
   @Builder
@@ -153,7 +137,7 @@ export struct FeedComment {
   build() {
     Column() {
       this.commentTopViewBuilder()
-      List({ scroller: this.scroller }) {
+      List({ scroller: this.feedCommentScroller }) {
         if (!this.commentList.length) {
           ListItem() {
             Column({ space: 16 }) {
@@ -172,7 +156,7 @@ export struct FeedComment {
                 })
                 .fontSize(16*this.fontSizeRatio)
                 .onClick(() => {
-                  commentSheetOpen(null, (commentContent: string) => {
+                  CommentUtils.commentSheetOpen(null, (commentContent: string) => {
                     this.onFirstComment(commentContent)
                   })
                 })

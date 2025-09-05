@@ -1,12 +1,10 @@
 import { NewsEnum } from '../constants/Constants';
 import { BaseNews } from '../database/NewsType';
 import { PostRequest } from '../params/request/CommonRequest';
-import { FlexLayoutModel } from '../params/response/LayoutResponse';
 import { NewsResponse } from '../params/response/NewsResponse';
 import { Utils } from '../utils/Utils';
 import { BaseNewsService, BaseNewsServiceApi } from './BaseNewsService';
 import { MineServiceApi } from './MineService';
-import { MockFlexLayout } from './mockdata/MockFlexLayout';
 import { MockPost } from './mockdata/MockPost';
 
 /**
@@ -17,24 +15,24 @@ export class PostService extends BaseNewsService {
    * 查询推荐
    * @returns
    */
-  public queryPostRecommendList(): NewsResponse[] {
+  public queryPostRecommendList(currentIndex: number = 10, currentPage = 0): NewsResponse[] {
     const posts = MockPost.list
       .map((post: BaseNews) => BaseNewsServiceApi.queryNews(post.id))
       .filter(v => Boolean(v)) as NewsResponse[];
-    return Utils.shuffleArray([...posts]);
+    return [...posts].slice(currentPage, currentIndex);
   }
 
   /**
    * 查询关注
    * @returns
    */
-  public queryPostFollowList(): NewsResponse[] {
+  public queryPostFollowList(currentIndex: number = 10, currentPage = 0): NewsResponse[] {
     const myUserInfo = MineServiceApi.queryAuthorRaw();
     const posts = MockPost.list
       .filter(v => myUserInfo?.watchers.includes(v.authorId))
       .map((post: BaseNews) => BaseNewsServiceApi.queryNews(post.id))
       .filter(v => Boolean(v)) as NewsResponse[];
-    return Utils.shuffleArray([...posts]);
+    return [...posts].slice(currentPage, currentIndex);
   }
 
   /**

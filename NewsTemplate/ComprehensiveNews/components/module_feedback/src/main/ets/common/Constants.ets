@@ -16,6 +16,51 @@ export class Constants {
   static readonly TEXT_INPUT_HEIGHT: number = 48;
   static readonly MAX_IMG_COUNT: number = 5;
   static readonly PHONE_REG = /^[1][3,4,5,6,7,8,9][0-9]{9}$/;
+  static readonly GRID_ROW_OPTIONS: GridRowOptions = {
+    columns: {
+      sm: 4,
+      md: 8,
+      lg: 12,
+      xl: 12,
+    },
+    gutter: {
+      x: {
+        sm: 8,
+        md: 12,
+        lg: 16,
+        xl: 20,
+      },
+    },
+    breakpoints: {
+      value: ['0', '600vp', '840vp', '1440vp'],
+      reference: BreakpointsReference.WindowSize,
+    },
+    direction: GridRowDirection.Row,
+  };
+  static readonly FULL_COL_SPAN: GridColColumnOption = {
+    sm: 4,
+    md: 8,
+    lg: 12,
+    xl: 12,
+  };
+  static readonly CENTER_COL_SPAN: GridColColumnOption = {
+    sm: 4,
+    md: 8,
+    lg: 8,
+    xl: 8,
+  };
+  static readonly CENTER_COL_OFFSET: GridColColumnOption = {
+    sm: 0,
+    md: 0,
+    lg: 2,
+    xl: 2,
+  };
+  public static readonly GRID_MARGIN: GridRowColumnOption = {
+    sm: 16,
+    md: 24,
+    lg: 32,
+    xl: 32,
+  };
 }
 
 export enum RouterMap {
@@ -37,5 +82,5 @@ export const LIST_INFO: ISettingItem[] = [
   {
     label: '反馈记录',
     routerName: RouterMap.FEEDBACK_RECORD_LIST_PAGE,
-  }
+  },
 ];

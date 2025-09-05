@@ -5,6 +5,8 @@ export enum TabPageType {
   FEATURED,
   // 推荐
   RECOMMEND,
+  // 直播
+  LIVESTREAM,
 }
 
 export type BaseParamType = string | number | undefined

@@ -3,16 +3,18 @@ import { SettingItem } from '../types/Types';
 
 @ObservedV2
 export class SettingPrivacyVM extends BaseViewModel {
+  @Trace personalizedPushItem = new SettingItem({
+    label: '个性化推荐',
+    subLabel: '推荐符合我的个性化内容',
+    typeSwitch: true,
+    switchV: this.settingInfo.personalizedPush,
+    onClick: (isOn) => {
+      this.personalizedPushItem.switchV = isOn as boolean;
+      this.settingInfo.personalizedPush = isOn as boolean;
+    },
+  })
   @Trace list1: SettingItem[] = [
-    new SettingItem({
-      label: '个性化推荐',
-      subLabel: '推荐符合我的个性化内容',
-      typeSwitch: true,
-      switchV: this.settingInfo.personalizedPush,
-      onClick: (isOn) => {
-        this.settingInfo.personalizedPush = isOn as boolean;
-      },
-    }),
+    this.personalizedPushItem,
   ];
   @Trace list2: SettingItem[] = [
     new SettingItem({

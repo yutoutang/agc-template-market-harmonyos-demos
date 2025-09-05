@@ -1,4 +1,4 @@
-import { CommonConstants } from 'lib_common';
+import { CommonConstants, GridRowColSetting } from 'lib_common';
 import { NavHeaderBar } from 'lib_widget';
 import { SettingCard } from '../components/SettingCard';
 import { SettingNetworkVM } from '../viewmodels/SettingNetworkVM';
@@ -18,30 +18,39 @@ struct SettingNetwork {
         NavHeaderBar({
           title: '播放与网络设置',
         })
-        Scroll() {
-          Column({ space: CommonConstants.SPACE_M }) {
-            Text('网络设置')
-              .fontSize(16 * this.vm.settingInfo.fontSizeRatio)
-              .fontColor($r('sys.color.font_primary'))
-              .fontWeight(FontWeight.Medium)
-            SettingCard({ list: this.vm.list1 })
-            Text('视频播放设置')
-              .fontSize(16 * this.vm.settingInfo.fontSizeRatio)
-              .fontColor($r('sys.color.font_primary'))
-              .fontWeight(FontWeight.Medium)
-            SettingCard({ list: this.vm.list2 })
+        GridRow(GridRowColSetting.DEFAULT_GRID_ROW_OPTIONS) {
+          GridCol({
+            span: GridRowColSetting.DEFAULT_CENTER_COL_SPAN,
+            offset: GridRowColSetting.DEFAULT_CENTER_COL_OFFSET,
+          }) {
+            Scroll() {
+              Column({ space: CommonConstants.SPACE_M }) {
+                Text('网络设置')
+                  .fontSize(16 * this.vm.settingInfo.fontSizeRatio)
+                  .fontColor($r('sys.color.font_primary'))
+                  .fontWeight(FontWeight.Medium)
+                SettingCard({ list: this.vm.list1 })
+                Text('视频播放设置')
+                  .fontSize(16 * this.vm.settingInfo.fontSizeRatio)
+                  .fontColor($r('sys.color.font_primary'))
+                  .fontWeight(FontWeight.Medium)
+                SettingCard({ list: this.vm.list2 })
+              }
+              .alignItems(HorizontalAlign.Start)
+              .padding({
+                left: this.vm.breakPointModel.pagePadding,
+                right: this.vm.breakPointModel.pagePadding,
+                top: CommonConstants.PADDING_M,
+                bottom: this.vm.windowModel.windowBottomPadding,
+              })
+            }
+            .layoutWeight(1)
+            .scrollBar(BarState.Off)
+            .align(Alignment.Top)
+            .edgeEffect(EdgeEffect.Spring)
           }
-          .alignItems(HorizontalAlign.Start)
-          .padding({
-            left: CommonConstants.PADDING_PAGE,
-            right: CommonConstants.PADDING_PAGE,
-            top: CommonConstants.PADDING_M,
-          })
         }
         .layoutWeight(1)
-        .scrollBar(BarState.Off)
-        .align(Alignment.Top)
-        .edgeEffect(EdgeEffect.Spring)
       }
       .width(CommonConstants.FULL_PERCENT)
       .height(CommonConstants.FULL_PERCENT)

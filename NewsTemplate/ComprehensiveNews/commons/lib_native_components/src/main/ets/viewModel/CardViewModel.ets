@@ -1,10 +1,16 @@
 import { LoginSheetUtils } from 'lib_account';
-import { BaseViewModel, CommonConfirmDialog, NewsEnum, RouterMap, RouterToNews, RouterUtils } from 'lib_common';
+import { BaseViewModel, CommonConfirmDialog, RouterParams, RouterToNews } from 'lib_common';
 import { CommentServiceApi, LayoutParams, MineServiceApi, NewsResponse } from 'lib_news_api';
-import { AVPlayerSession } from 'module_swipeplayer';
+import { LoneTakeAnimationsTransition, LongTakeTransitionParam } from 'module_transition';
 
 export class CardViewModel extends BaseViewModel {
   private authorId: string = ''
+  private uiContext: UIContext
+
+  constructor(uiContext: UIContext) {
+    super()
+    this.uiContext = uiContext
+  }
 
   setAuthorId(authorId: string) {
     this.authorId = authorId
@@ -60,18 +66,31 @@ export class CardViewModel extends BaseViewModel {
     })
   }
 
-  public pushToNewsDetails(cardData: LayoutParams, type?: string) {
-    if (cardData.nativeCardData.type === NewsEnum.Video || cardData.nativeCardData.postImgList?.[0]?.surfaceUrl) {
-      let param: Record<string, string | number> = {
-        'id': cardData.nativeCardData.id,
-        'type': cardData.nativeCardData.type as number
-      }
-      if(cardData.extraInfo.authorId) {
-        param.authorId = cardData.nativeCardData.author.authorId
-      }
-      RouterUtils.pushPathByName(RouterMap.VIDEO_DETAIL_PAGE, param)
-      return
+  /*
+   * cardData 数据源
+   * formType 跳转来源，判断是否是从首页点击评论进入
+   * componentId  一镜到底id
+   * isQueryCardData 是否携带新闻详情跳转到详情页
+   * */
+
+  public pushToNewsDetails(cardData: LayoutParams, formType?: string, componentId?: string,
+    isQueryCardData: boolean = false) {
+    let params: RouterParams<NewsResponse> = {
+      newsId: cardData.nativeCardData.id,
+      type: cardData.nativeCardData.type,
+      surfaceUrl: cardData.nativeCardData.postImgList?.[0]?.surfaceUrl,
+      cardData: cardData.nativeCardData,
+      isQueryCardData: isQueryCardData,
+      formType: formType ?? '',
     }
-    RouterToNews.routerToNewsByDetails(cardData.nativeCardData, type)
+    let longTakeTransitionParam: LongTakeTransitionParam | undefined =
+      LoneTakeAnimationsTransition.generateLongTakeParam(this.uiContext,
+        componentId ? componentId :
+          'news_flow_' + cardData.extraInfo.channelId + '_' + cardData.extraInfo.flowIndex + '_' +
+          cardData.extraInfo.flexId, 9);
+    if (longTakeTransitionParam) {
+      params.longTakeTransitionParam = longTakeTransitionParam;
+    }
+    RouterToNews.pushToNewsDetails<NewsResponse>(params)
   }
 }

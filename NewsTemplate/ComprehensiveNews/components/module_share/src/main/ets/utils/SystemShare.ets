@@ -7,7 +7,6 @@ import { image } from '@kit.ImageKit';
 import { promptAction } from '@kit.ArkUI';
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
 import { buffer } from '@kit.ArkTS';
-import { ShareEventDispatcher } from './EventDispatcher';
 import { ShareOptions } from '../model/Model';
 
 
@@ -44,9 +43,6 @@ export class PosterShare {
     }).catch((error: BusinessError) => {
       console.error(`ShareController show error. code: ${error.code}, message: ${error.message}`);
     });
-    controller.on('dismiss',() => {
-      ShareEventDispatcher.dispatchToClose()
-    })
   }
 
   public copy() {
@@ -54,13 +50,7 @@ export class PosterShare {
       pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, 'www.vmall.com/index.html?cid=128688')
     const systemPasteboard = pasteboard.getSystemPasteboard()
     systemPasteboard.setData(pasteboardData)
-    systemPasteboard.getData().then((data) => {
-      if (data) {
-        promptAction.showToast({ message: '复制成功' })
-      } else {
-        promptAction.showToast({ message: '复制失败' })
-      }
-    })
+    promptAction.showToast({ message: '复制成功' })
   }
 
   public async saveImage(cover:PixelMap,popClose:(isClose:boolean) => void) {

@@ -17,3 +17,17 @@ export interface VideoPlayerData {
   getVideoTitle: () => string;
   getVideoDuration: () => number;
 }
+
+/**
+ * 断点名称
+ */
+export enum BreakpointNameEnum {
+  SM = 'sm',
+  MD = 'md',
+  LG = 'lg',
+  XL = 'xl',
+}
+
+export enum PageNameEnum {
+  VIDEO_LANDSCAPE_PAGE = 'LandscapeVideo',
+}

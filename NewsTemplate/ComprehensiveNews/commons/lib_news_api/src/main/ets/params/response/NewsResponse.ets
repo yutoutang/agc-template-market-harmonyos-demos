@@ -17,6 +17,8 @@ export interface NewsResponse {
   author: AuthorResponse
   // 创建时间
   createTime: number
+  // 相对时间
+  relativeTime?: string
   // 评论列表
   comments: CommentResponse[]
   // 评论数

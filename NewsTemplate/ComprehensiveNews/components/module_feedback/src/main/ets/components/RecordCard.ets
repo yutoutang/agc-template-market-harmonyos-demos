@@ -7,6 +7,7 @@ import { FeedbackResponseParams } from '../services/ResponseModel'
 export struct RecordCard {
   @Require @Param record: FeedbackResponseParams;
   @Param fontSizeRatio: number = 1;
+  @Param gridCount: number = 3;
 
   build() {
     Column() {
@@ -72,7 +73,7 @@ export struct RecordCard {
           }
         }
       }
-      .columnsTemplate('1fr 1fr 1fr')
+      .columnsTemplate(this.getColumnsTemplate)
       .columnsGap(12)
       .rowsGap(8)
       .maxCount(Constants.MAX_IMG_COUNT)
@@ -83,5 +84,10 @@ export struct RecordCard {
     .borderRadius(Constants.RADIUS_16)
     .padding(Constants.PADDING_M)
     .alignItems(HorizontalAlign.Start)
+  }
+
+  @Computed
+  get getColumnsTemplate() {
+    return Array(this.gridCount).fill('1fr').join(' ');
   }
 }

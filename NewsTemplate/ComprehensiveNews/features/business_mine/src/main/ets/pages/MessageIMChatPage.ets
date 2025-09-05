@@ -21,7 +21,6 @@ struct MsgIMChatPage {
 
   aboutToDisappear(): void {
     this.vm.deleteJavaScriptRegister();
-    this.vm.loadBlank();
   }
 
   build() {

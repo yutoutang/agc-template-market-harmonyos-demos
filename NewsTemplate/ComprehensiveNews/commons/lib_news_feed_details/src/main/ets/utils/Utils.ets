@@ -14,6 +14,7 @@ export class MakeObCommentServed extends CommentInfo {
   @Trace likeCount: number = 0
   @Trace replyComments: CommentInfo[] = []
   isExpand: boolean = false
+  parentComment?: CommentInfo
 
   constructor(value: CommentInfo) {
     super()
@@ -27,6 +28,9 @@ export class MakeObCommentServed extends CommentInfo {
     this.isLiked = value.isLiked
     this.likeCount = value.likeCount
     this.replyComments = value.replyComments.map((item) => new MakeObCommentServed(item))
+    if(value.parentComment) {
+      this.parentComment = new MakeObCommentServed(value.parentComment)
+    }
   }
 }
 

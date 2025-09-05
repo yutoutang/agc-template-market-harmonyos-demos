@@ -115,11 +115,17 @@ export struct ChannelEdit {
         },
       })
         .flexGrow(1)
-      Image($r('app.media.tab_more')).width(24).height(24)
-        .fillColor($r('sys.color.font_primary'))
-        .onClick(() => {
-          this.isShowSheet = !this.isShowSheet
-        })
+      Row() {
+        Image($r('app.media.tab_more'))
+          .width(24)
+          .height(24)
+          .fillColor($r('sys.color.font_primary'))
+      }
+      .accessibilityText('频道编辑按钮')
+      .onClick(() => {
+        this.isShowSheet = !this.isShowSheet
+      })
+
     }
     .backgroundColor($r('sys.color.background_primary'))
     .bindSheet($$this.isShowSheet, this.gridEditSheetBuilder(), {
@@ -128,6 +134,7 @@ export struct ChannelEdit {
       showClose: true,
       title: this.sheetTitleBuilder,
     })
+    .padding({ left: 16, right: 16 })
     .height(56)
   }
 }

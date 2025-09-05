@@ -1,6 +1,7 @@
 import { uiObserver, window } from '@kit.ArkUI';
 import { AVPlayerSession, VideoCard, VideoNetworkModel, VideoNetworkSetting } from 'module_swipeplayer';
-import { CommonConstants, Logger, RouterMap, RouterUtils, TimeUtils } from 'lib_common';
+import { CommonConstants, Logger, NetworkUtil, RouterMap, RouterUtils, TimeUtils } from 'lib_common';
+import { NetworkExceptionView } from 'lib_widget';
 import { VideoNewsData } from '../models/VideoModel';
 import { RecommendPageVM } from '../viewmodels/RecommendPageVM';
 import { TabPageType } from '../types/Index';
@@ -57,6 +58,8 @@ export struct RecommendPage {
   }
 
   aboutToAppear(): void {
+    // 模拟首次进入页面时，判断是否展示网络异常页面
+    this.vm.showExceptionPage = !this.vm.networkModel.isNetworkAvailable
     // 获取数据
     this.vm.initVideoListDataSource();
     // 监听 windowStageEvent
@@ -84,99 +87,139 @@ export struct RecommendPage {
 
   build() {
     Column() {
-      Refresh({ refreshing: $$this.vm.isRefreshing, builder: this.customRefreshComponent }) {
-        List({ scroller: this.vm.listScroller, space: 8 }) {
-          LazyForEach(this.vm.videoListDataSource, (item: VideoNewsData, index: number) => {
-            ListItem() {
-              VideoCard({
-                currentIndex: this.vm.currentIndex,
-                index: index,
-                videoData: item,
-                isShown: this.currentTabIndex === this.index && this.vm.tabModel.selectedIndex === 1,
-                videoNetwork: this.vm.networkModel as VideoNetworkModel,
-                videoNetworkSetting: this.vm.settingInfo.network as VideoNetworkSetting,
-                playerStateCallback: (state: string, id: string) => {
-                  this.vm.onPlayerStateListen(state, id)
-                },
-                setUseMobileData: () => {
-                  this.vm.networkModel.canUseMobileData = true
-                },
-                videoInfoViewBuilder: () => {
-                  this.videoCardInfoView(item)
-                },
-                onClickEvent: (playerSession: AVPlayerSession | undefined, callback: Function) => {
-                  let param: Record<string, string | AVPlayerSession | undefined> = {
-                    'id': item.getVideoId(),
-                    'playerSession': playerSession,
-                  }
-                  playerSession!.avPlayer?.pause();
-                  // 监听页面跳转
-                  this.vm.navRouteModel.navDestinationUpdateListeners.delete('clickVideoCardListener');
-                  this.vm.navRouteModel.navDestinationUpdateListeners.set('clickVideoCardListener', (info) => {
-                    // 离开推荐列表时，处理视频是否播放
-                    if (info.name === 'IndexPage' && this.currentTabIndex === TabPageType.RECOMMEND &&
-                      info.state === uiObserver.NavDestinationState.ON_WILL_SHOW &&
-                      this.vm.tabModel.selectedIndex === 1
-                    ) {
-                      this.vm.tabModel.showTabBar = true
-                      callback()
+      if (this.vm.showExceptionPage) {
+        if (!this.vm.loading) {
+          NetworkExceptionView({
+            textFontColor: $r('sys.color.font_primary'),
+            btnFontColor: $r('sys.color.font_primary'),
+            btnBorderColor: $r('sys.color.font_primary'),
+            refreshNetwork: () => {
+              this.vm.loading = true;
+              // 模拟请求判断网络能否使用
+              let networkUtil = NetworkUtil.getInstance()
+              networkUtil.handleNetworkAvailable();
+              setTimeout(() => {
+                // 模拟
+                if (this.vm.networkModel.isNetworkAvailable) {
+                  this.vm.initVideoListDataSource()
+                  this.vm.showExceptionPage = false;
+                } else {
+                  this.vm.loading = false
+                }
+              }, 100)
+            }
+          })
+        }
+      } else {
+        Refresh({ refreshing: $$this.vm.isRefreshing, builder: this.customRefreshComponent }) {
+          WaterFlow({scroller: this.vm.listScroller }) {
+            LazyForEach(this.vm.videoListDataSource, (item: VideoNewsData, index: number) => {
+              FlowItem() {
+                VideoCard({
+                  currentIndex: this.vm.currentIndex,
+                  index: index,
+                  videoData: item,
+                  isShown: this.currentTabIndex === this.index && this.vm.tabModel.selectedIndex === 1,
+                  videoNetwork: this.vm.networkModel as VideoNetworkModel,
+                  videoNetworkSetting: this.vm.settingInfo.network as VideoNetworkSetting,
+                  currentBreakpoint: this.vm.breakPointModel.currentBreakpoint,
+                  playerStateCallback: (state: string, id: string) => {
+                    this.vm.onPlayerStateListen(state, id)
+                  },
+                  setUseMobileData: () => {
+                    this.vm.networkModel.canUseMobileData = true
+                  },
+                  videoInfoViewBuilder: () => {
+                    this.videoCardInfoView(item)
+                  },
+                  onClickEvent: (playerSession: AVPlayerSession | undefined, callback: Function) => {
+                    let param: Record<string, string | AVPlayerSession | undefined> = {
+                      'newsId': item.getVideoId(),
+                      'playerSession': playerSession,
                     }
-                  })
-                  // 跳转到详情页
-                  RouterUtils.pushPathByName(RouterMap.VIDEO_DETAIL_PAGE, param);
-                },
-                onPlayItem: (playIndex: number) => {
-                  Logger.info(TAG, 'onPlayItem play video index is ' + playIndex)
-                  this.vm.handleListScrollByUserClick(playIndex)
+                    playerSession!.avPlayer?.pause();
+                    // 监听页面跳转
+                    this.vm.navRouteModel.navDestinationUpdateListeners.delete('clickVideoCardListener');
+                    this.vm.navRouteModel.navDestinationUpdateListeners.set('clickVideoCardListener', (info) => {
+                      // 离开推荐列表时，处理视频是否播放
+                      if (info.name === 'IndexPage' && this.currentTabIndex === TabPageType.RECOMMEND &&
+                        info.state === uiObserver.NavDestinationState.ON_WILL_SHOW &&
+                        this.vm.tabModel.selectedIndex === 1
+                      ) {
+                        this.vm.tabModel.showTabBar = true
+                        callback()
+                      }
+                    })
+                    // 跳转到详情页
+                    RouterUtils.pushPathByName(RouterMap.VIDEO_DETAIL_PAGE, param);
+                  },
+                  onPlayItem: (playIndex: number) => {
+                    Logger.info(TAG, 'onPlayItem play video index is ' + playIndex)
+                    this.vm.handleListScrollByUserClick(playIndex)
+                  }
+                })
+              }
+              .width(CommonConstants.FULL_PERCENT)
+              .onAppear(() => {
+                // 即将触底时提前增加数据，即执行数据预加载
+                if (index + 5 === this.vm.videoListDataSource.totalCount()) {
+                  this.vm.loadMore()
                 }
               })
-            }
-          }, (item: VideoNewsData, index: number) => JSON.stringify(item) + index)
-          // 加载更多
-          this.loadingBuilder()
+            }, (item: VideoNewsData, index: number) => JSON.stringify(item) + index)
+            // 加载更多
+            this.loadingBuilder()
+          }
+          .columnsTemplate(`repeat(${this.vm.getListLanes()}, 1fr)`)
+          .columnsGap(12)
+          .rowsGap(8)
+          .width(CommonConstants.FULL_PERCENT)
+          .height(CommonConstants.FULL_PERCENT)
+          .cachedCount(1)
+          .scrollBar(BarState.Off)
+          .friction(0.6)
+          .edgeEffect(EdgeEffect.None)
+          .padding({left: this.vm.getListPadding(), right: this.vm.getListPadding()})
+          .onWillScroll((scrollOffset: number, scrollState: ScrollState, scrollSource: ScrollSource) => {
+            this.vm.yOffset += scrollOffset
+          })
+          .onScrollFrameBegin((offset: number, state: ScrollState) => {
+            this.vm.isUserActionScroll = true;
+            return { offsetRemain: offset };
+          })
+          .onScrollIndex((first: number, last: number) => {
+            this.vm.handleScrollIndex(first, last)
+          })
+          .onScrollStop(() => {
+            this.vm.handleScrollStop()
+            this.vm.isUserActionScroll = false;
+          })
+          .onReachStart(() => {
+            this.vm.isScrollStart = true;
+          })
         }
-        .width(CommonConstants.FULL_PERCENT)
-        .height(CommonConstants.FULL_PERCENT)
-        .cachedCount(1)
-        .scrollBar(BarState.Off)
-        .friction(0.6)
-        .edgeEffect(EdgeEffect.None)
-        .onWillScroll((scrollOffset: number, scrollState: ScrollState, scrollSource: ScrollSource) => {
-          this.vm.yOffset += scrollOffset
+        .layoutWeight(1)
+        .pullToRefresh(true)
+        .pullDownRatio(this.vm.ratio)
+        .refreshOffset(64)
+        .accessibilityLevel('no')
+        .onRefreshing(() => {
+          this.vm.refreshList()
         })
-        .onScrollIndex((start: number, end: number, center: number) => {
-          this.vm.handleScrollIndex(start, end, center)
+        .onStateChange((state: RefreshStatus) => {
+          this.vm.refreshStatus = state;
         })
-        .onScrollStop(() => {
-          this.vm.handleScrollStop()
-        })
-        .onReachStart(() => {
-          this.vm.isScrollStart = true;
-        })
-        .onReachEnd(() => {
-          this.vm.loadMore()
+        .onOffsetChange((offset: number) => {
+          this.vm.offsetChanged(offset)
         })
       }
-      .layoutWeight(1)
-      .onRefreshing(() => {
-        this.vm.refreshList()
-      })
-      .pullToRefresh(true)
-      .pullDownRatio(this.vm.ratio)
-      .refreshOffset(64)
-      .onStateChange((state: RefreshStatus) => {
-        this.vm.refreshStatus = state;
-      })
-      .onOffsetChange((offset: number) => {
-        this.vm.offsetChanged(offset)
-      })
     }
     .width(CommonConstants.FULL_PERCENT)
     .height(CommonConstants.FULL_PERCENT)
     .backgroundColor($r('sys.color.background_secondary'))
     .padding({
       top: this.vm.windowModel.windowTopPadding + 56,
-      bottom: this.vm.tabModel.tabHeight
+      bottom: this.vm.pagePaddingBottom,
     })
   }
 
@@ -188,12 +231,12 @@ export struct RecommendPage {
           .height(32)
       } else if (this.vm.refreshStatus === RefreshStatus.OverDrag) {
         Text('释放可刷新页面')
-          .fontColor($r('sys.color.font_primary'))
-          .fontSize(14)
+          .fontColor($r('sys.color.font_secondary'))
+          .fontSize($r('sys.float.Body_M'))
       } else if (this.vm.refreshStatus === RefreshStatus.Drag) {
         Text('下拉刷新')
-          .fontColor($r('sys.color.font_primary'))
-          .fontSize(14)
+          .fontColor($r('sys.color.font_secondary'))
+          .fontSize($r('sys.float.Body_M'))
       }
     }
     .align(Alignment.Bottom)
@@ -209,7 +252,7 @@ export struct RecommendPage {
       LoadingProgress()
         .width(24)
         .height(24)
-        .color($r('sys.color.font_primary'))
+        .color($r('sys.color.icon_secondary'))
       Text('正在获取更多内容')
         .fontColor($r('sys.color.font_primary'))
         .fontSize(12)

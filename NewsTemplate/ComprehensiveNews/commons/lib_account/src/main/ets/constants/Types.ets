@@ -6,6 +6,7 @@ import { Constants } from './Constants';
 export interface LoginRouterParams {
   isSheet?: boolean
   keepVM?: boolean
+  sheetParams?: LoginSheetParams
 }
 
 /**
@@ -14,4 +15,13 @@ export interface LoginRouterParams {
 @ObservedV2
 export class LoginSheetParams {
   @Trace height: number = Constants.DEFAULT_LOGIN_SHEET_HEIGHT;
+  @Trace sheetType: SheetType = SheetType.BOTTOM;
+}
+
+/**
+ * 跳转协议页面路由参数
+ */
+export interface ProtocolRouterParams {
+  content: string
+  isSheet?: boolean
 }

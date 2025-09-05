@@ -1,6 +1,5 @@
 import { UIUtils } from '@kit.ArkUI';
-import { commentSheetOpen, FeedComment } from 'module_feedcomment';
-import { LoginSheetUtils } from 'lib_account';
+import { CommentUtils, FeedComment } from 'module_feedcomment';
 import { CommonConstants, RouterMap, RouterUtils } from 'lib_common';
 import { CommentResponse, CommentServiceApi, NewsResponse } from 'lib_news_api';
 import { MakeObCommentServed, CommentInfo } from 'lib_news_feed_details';
@@ -15,7 +14,6 @@ export function CommentViewPageBuilder() {
 export struct CommentViewPage {
   @Consumer() navPathStack: NavPathStack = new NavPathStack()
   @Consumer() showKeyboard: boolean = false;
-
   vm: CommentViewPageVM = new CommentViewPageVM()
 
   build() {
@@ -26,7 +24,7 @@ export struct CommentViewPage {
             commentList: this.vm.commentList,
             userInfo: this.vm.getUserInfo(),
             fontSizeRatio: this.vm.settingInfo.fontSizeRatio,
-            isDark:this.vm.settingInfo.darkSwitch,
+            isDark: this.vm.settingInfo.darkSwitch,
             navPathStack: this.navPathStack,
             commentTopViewBuilder: () => {
               this.commentTopView()
@@ -37,18 +35,11 @@ export struct CommentViewPage {
             onFirstComment: (commentContent: string) => {
               this.vm.addNewsComment(commentContent)
             },
-            giveLike: (comment: CommentResponse, isLike:boolean) => {
+            giveLike: (comment: CommentResponse, isLike: boolean) => {
               this.vm.addLike(comment, isLike)
             },
             onGoAuthorInfo: (authorId: string) => {
               RouterUtils.pushPathByName(RouterMap.PROFILE_HOME, authorId)
-            },
-            onInterceptLogin: (loginInterceptCb: (isLogin: boolean) => void) => {
-              if (!this.vm.userInfoModel.isLogin) {
-                LoginSheetUtils.open()
-                return
-              }
-              loginInterceptCb(this.vm.userInfoModel.isLogin)
             },
           })
         }
@@ -74,7 +65,7 @@ export struct CommentViewPage {
             })
             .backgroundColor($r('app.color.comment_input_bg'))
             .onClick(() => {
-              commentSheetOpen(null, (commentContent: string) => {
+              CommentUtils.commentSheetOpen(null, (commentContent: string) => {
                 this.vm.addNewsComment(commentContent)
               })
             })
@@ -82,12 +73,15 @@ export struct CommentViewPage {
         .width(CommonConstants.FULL_PERCENT)
         .padding({
           top: CommonConstants.PADDING_S,
-          left: CommonConstants.PADDING_PAGE,
-          right: CommonConstants.PADDING_PAGE,
+          left: this.vm.breakPointModel.pagePadding,
+          right: this.vm.breakPointModel.pagePadding,
         })
       }
       .width(CommonConstants.FULL_PERCENT)
-      .padding({ top: CommonConstants.PADDING_PAGE, bottom: this.vm.windowModel.windowBottomPadding })
+      .padding({
+        top: CommonConstants.PADDING_L,
+        bottom: this.vm.windowModel.windowBottomPadding,
+      })
       .alignItems(HorizontalAlign.Start)
     }
     .hideTitleBar(true)
@@ -103,7 +97,7 @@ export struct CommentViewPage {
     .onShown(() => {
       if (this.showKeyboard) {
         setTimeout(() => {
-          commentSheetOpen(null, (commentContent: string) => {
+          CommentUtils.commentSheetOpen(null, (commentContent: string) => {
             this.vm.addNewsComment(commentContent)
           })
         }, 100)

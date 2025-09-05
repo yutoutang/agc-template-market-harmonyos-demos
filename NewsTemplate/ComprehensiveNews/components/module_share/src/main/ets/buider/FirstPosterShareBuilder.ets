@@ -3,12 +3,12 @@ import { firstShareList } from '../constants/Constants'
 import { componentSnapshot } from '@kit.ArkUI'
 import { image } from '@kit.ImageKit'
 import { PosterShare } from '../utils/SystemShare'
-import { WxShareViewModel } from '../viewModel/WxShareViewModel'
-import { QqShareViewModel } from '../viewModel/QqShareViewModel'
+import { WxShareViewModel } from '../viewmodel/WxShareViewModel'
+import { QqShareViewModel } from '../viewmodel/QqShareViewModel'
 import { PopViewUtils } from '../utils/PopViewUtils'
 
 @Builder
-export function FirstPosterShareBuilder(params:ShareSheetParams) {
+export function FirstPosterShareBuilder(params: ShareSheetParams) {
   FirstPosterShare({
     params: params,
   })
@@ -18,7 +18,7 @@ export function FirstPosterShareBuilder(params:ShareSheetParams) {
 export struct FirstPosterShare {
   @Local shareList: ShareKinds[][] = firstShareList
   @Param posterShare: PosterShare = new PosterShare()
-  @Require @Param params:ShareSheetParams
+  @Require @Param params: ShareSheetParams
   @Local wxShareViewModel: WxShareViewModel = WxShareViewModel.instance
   @Local qqShareViewModel: QqShareViewModel = QqShareViewModel.instance
 
@@ -41,7 +41,7 @@ export struct FirstPosterShare {
                       if (err) {
                         return
                       }
-                      this.params.onPost(true,pixmap)
+                      this.params.onPost(true, pixmap)
                     }))
                     break
                   case 'wechat':
@@ -62,13 +62,13 @@ export struct FirstPosterShare {
                 }
                 PopViewUtils.closeSheet()
               })
-            })
+            },(value: ShareKinds) => value.id)
           }
           .width('100%')
           .justifyContent(FlexAlign.Start)
           .margin({ top: 30 })
         }
-      })
+      },(item: ShareKinds[],index:number) => index.toString())
       ListItem() {
         Button('取消')
           .backgroundColor($r('sys.color.comp_background_tertiary'))

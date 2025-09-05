@@ -1,7 +1,7 @@
 import { promptAction } from '@kit.ArkUI';
 import { BaseViewModel, RouterMap, RouterUtils } from 'lib_common';
 import { MessageServiceApi, MineServiceApi, PublishCommentRequest } from 'lib_news_api';
-import { commentSheetOpen } from 'module_feedcomment';
+import { CommentUtils } from 'module_feedcomment';
 import { AggregateNewsCommentModel } from '../common/ObservedModel';
 
 @ObservedV2
@@ -23,9 +23,9 @@ export class MsgCommentViewModel extends BaseViewModel {
   }
 
   replyComment(v: AggregateNewsCommentModel) {
-    commentSheetOpen(v.author.authorNickName, (content: string) => {
+    CommentUtils.commentSheetOpen(v.author.authorNickName, (content: string) => {
       this.publishReply(v, content);
-    },false)
+    })
   }
 
   jumpProfile(v: AggregateNewsCommentModel) {

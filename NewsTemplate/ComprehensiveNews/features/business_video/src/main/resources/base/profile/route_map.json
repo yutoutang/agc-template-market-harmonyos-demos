@@ -14,6 +14,11 @@
       "name": "CommentViewPage",
       "pageSourceFile": "src/main/ets/pages/CommentViewPage.ets",
       "buildFunction": "CommentViewPageBuilder"
+    },
+    {
+      "name": "LivestreamDetailPage",
+      "pageSourceFile": "src/main/ets/pages/LivestreamDetailPage.ets",
+      "buildFunction": "LivestreamDetailPageBuilder"
     }
   ]
 }

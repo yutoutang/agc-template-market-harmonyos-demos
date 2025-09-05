@@ -4,32 +4,37 @@ import { RouterParams } from '../models/RouterParams';
 import { RouterUtils } from './RouterUtils';
 
 export class RouterToNews {
+  /**
+   * 根据id跳转新闻详情页
+   * @param {id} 组件id
+   * @param {formType} 跳转来源
+   * @param {scrollOffset}
+   * */
   static routerToNewsById(id: string, formType?: string) {
     let routerParams = {
-      'id': id,
+      'newsId': id,
       'formType': formType,
-    } as Record<string, string>
+    } as Record<string, string | number>;
     RouterUtils.pushPathByName(RouterMap.ARTICLE_FEED_DETAILS, routerParams);
   }
-
-  static routerToNewsByDetails<T>(cardData: T, type?: string) {
-    const params: RouterParams<T> = {
-      cardData: cardData,
-      formType: type,
-    }
-    RouterUtils.pushPathByName(RouterMap.ARTICLE_FEED_DETAILS, params);
-  }
-
-  static pushToNewsDetails(routerParams: Record<string, string | NewsEnum>) {
+  /**
+   * 跳转新闻详情页
+   * @param {routerParams} 跳转参数，携带一镜到底参数longTakeTransitionParam
+   * */
+  static pushToNewsDetails<T>(routerParams: RouterParams<T>) {
+    /**
+     * routerParams携带cardInfo需要携带整个数据跳转到详情页
+     * routerParams携带id需要通过id跳转到详情页
+     * routerParams.type或者routerParams.surfaceUrl存在则需要跳转到视频详情页
+     * */
     if (routerParams.type === NewsEnum.Video || routerParams.surfaceUrl) {
-      let param: Record<string, string | number> = {
-        'id': routerParams.newsId as string,
-        'authorId': routerParams.authorId as string ?? '',
-        'type': routerParams.type as number,
-      }
-      RouterUtils.pushPathByName(RouterMap.VIDEO_DETAIL_PAGE, param)
+      RouterUtils.pushPathByName(RouterMap.VIDEO_DETAIL_PAGE, routerParams)
       return
     }
-    RouterToNews.routerToNewsById(routerParams.newsId as string)
+    if (routerParams.cardData) {
+      RouterUtils.pushPathByName(RouterMap.ARTICLE_FEED_DETAILS, routerParams)
+      return
+    }
+    RouterToNews.routerToNewsById(routerParams.newsId as string, '');
   }
 }

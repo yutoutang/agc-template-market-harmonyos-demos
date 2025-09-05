@@ -80,9 +80,9 @@ export class MockVideo {
       createTime: new Date().getTime(),
       commentCount: 10,
       markCount: 0,
-      likeCount: 0,
+      likeCount: 1,
       shareCount: 0,
-      isLiked: false,
+      isLiked: true,
       isMarked: false,
       recommends: [{
         newsId: 'article_10',
@@ -112,11 +112,11 @@ export class MockVideo {
       authorId: 'author_2',
       createTime: new Date().getTime(),
       commentCount: 10,
-      markCount: 0,
+      markCount: 1,
       likeCount: 0,
       shareCount: 0,
       isLiked: false,
-      isMarked: false,
+      isMarked: true,
       recommends: [{
         newsId: 'article_10',
         newsType: 1,
@@ -327,11 +327,11 @@ export class MockVideo {
       postImgList: [
         {
           picVideoUrl: 'https://e-file.huawei.com/mediares/MarketingMaterial_MCD/EBG/PUBLIC/zh/2025/04/5feb8457-d5e9-4949-a181-795e4d873af9.mp4',
-          surfaceUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/%E7%9F%A9%E5%BD%A2%203416%403x-2.png',
+          surfaceUrl: 'https://e-file.huawei.com/mediares/Video_MCD/EBG/PUBLIC/zh/2025/04/3c04b872-197d-4551-a353-0eb99def6ca2.png',
         },
       ],
       videoUrl: 'https://e-file.huawei.com/mediares/MarketingMaterial_MCD/EBG/PUBLIC/zh/2025/04/5feb8457-d5e9-4949-a181-795e4d873af9.mp4',
-      coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/%E7%9F%A9%E5%BD%A2%203416%403x-2.png',
+      coverUrl: 'https://e-file.huawei.com/mediares/Video_MCD/EBG/PUBLIC/zh/2025/04/3c04b872-197d-4551-a353-0eb99def6ca2.png',
       articleFrom: '4号选手',
       videoDuration: 48234,
       navInfo: {

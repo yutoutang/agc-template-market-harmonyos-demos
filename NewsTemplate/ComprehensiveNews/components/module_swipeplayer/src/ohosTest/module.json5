@@ -3,9 +3,8 @@
     "name": "module_swipeplayer_test",
     "type": "feature",
     "deviceTypes": [
-      "default",
-      "tablet",
-      "2in1"
+      "phone",
+      "tablet"
     ],
     "deliveryWithInstall": true,
     "installationFree": false

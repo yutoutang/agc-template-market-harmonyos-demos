@@ -1,4 +1,4 @@
-import { updateManager } from '@kit.StoreKit';
+import { updateManager } from '@kit.AppGalleryKit';
 import { common } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { Logger } from './Logger';

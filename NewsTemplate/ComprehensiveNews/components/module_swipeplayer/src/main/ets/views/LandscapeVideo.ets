@@ -1,14 +1,17 @@
 import { media } from '@kit.MediaKit';
+import { AVVolumePanel } from '@kit.AudioKit';
+import { emitter } from '@kit.BasicServicesKit';
+import { LongTakeAnimationProperties } from 'module_transition';
 import { Battery } from '../components/Battery';
 import { VideoProgressBar } from '../components/VideoProgressBar';
 import { AVPlayerSession } from '../controller/AVPlayerManager';
 import { Constants } from '../constants/Constants';
-import { AnimationProperties } from '../customtransition/AnimationProperties';
-import { RectInfoInPx } from '../customtransition/ComponentAttrUtils';
-import { AVPlayerState } from '../type/Index';
-import { CustomTransition } from '../customtransition/CustomNavigationUtils';
+import { AVPlayerState, BreakpointNameEnum } from '../type/Index';
 import { LandscapeVideoVM } from '../viewmodel/LandscapeVideoVM';
 import { PlayerSpeedRateView } from '../components/PlayerSpeedRateView';
+import { PlayerSlider } from '../components/PlayerSlider';
+import { PlayerSliderModel, SliderType } from '../models/PlayerSliderModel';
+import { BreakpointModel } from '../models/BreakpointModel';
 
 @Builder
 export function LandscapeVideoBuilder() {
@@ -18,16 +21,12 @@ export function LandscapeVideoBuilder() {
 @ComponentV2
 export struct LandscapeVideo {
   xComponentController: XComponentController = new XComponentController();
-
-  @Local animationProperties: AnimationProperties = new AnimationProperties(this.getUIContext());
-  private pageId: number = -1;
-  private prePageDoFinishTransition: () => void = () => {};
-  private cardItemInfo: RectInfoInPx = new RectInfoInPx();
-
   vm: LandscapeVideoVM = new LandscapeVideoVM(this.getUIContext())
+  @Provider() playerSliderModel: PlayerSliderModel = this.vm.volumeUtil.playerSliderModel;
+  @Local longTakeSession: LongTakeAnimationProperties = new LongTakeAnimationProperties();
 
   aboutToAppear(): void {
-    this.vm.init()
+    this.vm.init();
   }
 
   aboutToDisappear(): void {
@@ -39,42 +38,32 @@ export struct LandscapeVideo {
     return true;
   }
 
-  handleXComponentSize() {
-    // 横屏页面，需要使用原来竖屏时的宽度当做高度
-    let screenHeight = this.animationProperties.windowWidth
-    const uiContext = this.getUIContext()
-    this.vm.xComponentWidth = uiContext.px2vp(this.vm.videoWidth * screenHeight / this.vm.videoHeight);
-    this.vm.xComponentHeight = uiContext.px2vp(screenHeight);
-  }
-
   build() {
     NavDestination() {
-      Stack({ alignContent: Alignment.TopStart }) {
-        // 倍速
-        PlayerSpeedRateView({
-          leftRateOpacity: this.vm.leftRateOpacity,
-          rightRateOpacity: this.vm.rightRateOpacity,
-          offsetTop: 56
-        })
-          .visibility(this.vm.isAccelerate ? Visibility.Visible : Visibility.None)
-          .zIndex(2)
-
-        Stack({ alignContent: Alignment.Center }) {
+      FolderStack({ upperItems: ['upperVideoPlayer'] }) {
+        Column() {
           XComponent({
             id: 'xmComponent',
             type: XComponentType.SURFACE,
-            controller: this.xComponentController
+            controller: this.xComponentController,
           })
-          .width(this.vm.xComponentWidth)
-          .height(this.vm.xComponentHeight)
-          .onLoad(() => {
-            const surfaceId = this.xComponentController.getXComponentSurfaceId();
-            if (this.vm.player) {
-              this.vm.player.surfaceId = surfaceId;
-            }
-            this.vm.player?.play()
-          })
+            .aspectRatio(this.vm.videoWidth / this.vm.videoHeight)
+            .onLoad(() => {
+              const surfaceId = this.xComponentController.getXComponentSurfaceId();
+              if (this.vm.player) {
+                this.vm.player.surfaceId = surfaceId;
+              }
+              this.vm.player?.play()
+            })
+        }
+        .height('100%')
+        .width('100%')
+        .justifyContent(FlexAlign.Center)
+        .id('upperVideoPlayer')
 
+        Stack({ alignContent: Alignment.TopStart }) {
+          // 音量、亮度、倍速
+          this.videoExtraView()
           // 视频外层
           RelativeContainer() {
             // 头部
@@ -86,7 +75,7 @@ export struct LandscapeVideo {
               middle: { anchor: '__container__', align: HorizontalAlign.Center },
             })
             .visibility(this.vm.showBar ? Visibility.Visible : Visibility.Hidden)
-            .animation({duration: 200})
+            .animation({ duration: 200 })
 
             // 中心区域
             Column() {
@@ -96,19 +85,25 @@ export struct LandscapeVideo {
             .height('calc(100% - 64vp - 82vp)')
             .alignRules({
               middle: { anchor: '__container__', align: HorizontalAlign.Center },
-              center: { anchor: '__container__', align: VerticalAlign.Center }
+              center: { anchor: '__container__', align: VerticalAlign.Center },
             })
 
             // 底部进度条
-            Column() {
+            Row() {
               VideoProgressBar({
                 playerSession: this.vm.playerSession,
                 showProgressBarLeft: true,
                 showProgressBarRight: true,
                 selectedColor: Color.White,
                 trackColor: $r('app.color.landscape_slide_track_color'),
-                progressBarBuilder: () => {
-                  this.bottomRegionView()
+                isFullScreen: true,
+                progressController: this.vm.progressController,
+                onSwitchPlayCallback: () => {
+                  this.vm.switchPlayOrPause()
+                  this.vm.handleVideoLayerVisible()
+                },
+                onSwitchFullScreenCallback: () => {
+                  this.vm.onBack()
                 },
                 onSlideChange: (flag) => {
                   if (flag) {
@@ -117,17 +112,18 @@ export struct LandscapeVideo {
                   } else {
                     this.vm.showOrHiddenBar()
                   }
-                }
+                },
               })
             }
             .width(Constants.FULL_PERCENT)
-            .position({bottom: Constants.BOTTOM_PADDING_HEIGHT - 10})
+            .padding({ bottom: Constants.BOTTOM_PADDING_HEIGHT })
+            .justifyContent(FlexAlign.SpaceBetween)
             .alignRules({
               bottom: { anchor: '__container__', align: VerticalAlign.Bottom },
-              left: { anchor: '__container__', align: HorizontalAlign.Start }
+              left: { anchor: '__container__', align: HorizontalAlign.Start },
             })
             .visibility(this.vm.showBar && !this.vm.isLockScreen ? Visibility.Visible : Visibility.Hidden)
-            .animation({duration: 200})
+            .animation({ duration: 200 })
 
             // 页面锁住时，底部展示控制器
             Column() {
@@ -138,15 +134,15 @@ export struct LandscapeVideo {
                 isProgressFullWidth: true,
                 showSlideBlock: false,
                 selectedColor: Color.White,
-                slideHeight: 14
+                slideHeight: 14,
               })
             }
             .visibility(this.vm.isLockScreen ? Visibility.Visible : Visibility.Hidden)
             .width(Constants.FULL_PERCENT)
-            .padding({left:Constants.PADDING_L, right: Constants.PADDING_L})
+            .padding({ left: Constants.PADDING_L, right: Constants.PADDING_L })
             .alignRules({
               bottom: { anchor: '__container__', align: VerticalAlign.Bottom },
-              left: { anchor: '__container__', align: HorizontalAlign.Start }
+              left: { anchor: '__container__', align: HorizontalAlign.Start },
             })
           }
           .width(Constants.FULL_PERCENT)
@@ -155,41 +151,96 @@ export struct LandscapeVideo {
         .width(Constants.FULL_PERCENT)
         .height(Constants.FULL_PERCENT)
         .gesture(
-          LongPressGesture({ repeat: true, duration: 300 })
-            .onAction((event: GestureEvent) => {
-              // 页面锁住时，不能进行操作
-              if (!this.vm.isLockScreen) {
-                this.vm.onLongPress(event)
-              }
-            })
-            .onActionEnd(() => {
-              // 页面锁住时，不能进行操作
-              if (!this.vm.isLockScreen) {
-                this.vm.offLongPress()
-              }
-            })
+          // 组合手势，互斥识别
+          GestureGroup(GestureMode.Exclusive,
+            // 长按加速
+            LongPressGesture({ repeat: true, duration: 300 })
+              .onAction((event: GestureEvent) => {
+                // 页面锁住时，不能进行操作
+                if (!this.vm.isLockScreen) {
+                  this.vm.onLongPress(event)
+                }
+              })
+              .onActionCancel(() => {
+                // 页面锁住时，不能进行操作
+                if (!this.vm.isLockScreen) {
+                  this.vm.offLongPress()
+                }
+              })
+              .onActionEnd(() => {
+                // 页面锁住时，不能进行操作
+                if (!this.vm.isLockScreen) {
+                  this.vm.offLongPress()
+                }
+              }),
+            // 双击暂停或播放
+            TapGesture({count: 2})
+              .onAction((event: GestureEvent) => {
+                if (!event) {
+                  return
+                }
+                if (!this.vm.isBuffering) {
+                  this.vm.switchPlayOrPause()
+                }
+              }),
+            // 单击显隐外层视图
+            TapGesture({count: 1})
+              .onAction((event: GestureEvent) => {
+                if (event) {
+                  this.vm.handleClickScreen()
+                }
+              }),
+            // 竖直滑动修改音量或亮度
+            PanGesture({ direction: PanDirection.Vertical })
+              .onActionStart((event?: GestureEvent) => {
+                this.vm.handleBrightAndVolumePanStart(event)
+              })
+              .onActionUpdate((event?: GestureEvent) => {
+                this.vm.handleBrightAndVolumePanUpdate(event)
+              })
+              .onActionCancel(() => {
+                this.vm.onActionEnd();
+              })
+              .onActionEnd(() => {
+                this.vm.onActionEnd();
+              }),
+            // 横向滑动更新进度条
+            PanGesture({ direction: PanDirection.Horizontal })
+              .onActionStart((event?: GestureEvent) => {
+                this.vm.handleProgressStart(event)
+              })
+              .onActionUpdate((event?: GestureEvent) => {
+                this.vm.handleProgressUpdate(event)
+              })
+              .onActionCancel(() => {
+                this.vm.handleProgressEnd();
+              })
+              .onActionEnd(() => {
+                this.vm.handleProgressEnd()
+              })
+          )
         )
       }
-      .backgroundColor(Color.Black)
-      .onClick(() => {
-        this.vm.handleClickScreen()
-      })
+      .enableAnimation(false)
+      .alignContent(Alignment.Center)
     }
+    .backgroundColor(Color.Black)
     .hideTitleBar(true)
     .onReady((context: NavDestinationContext) => {
       this.vm.pathStack = context.pathStack
-      this.pageId = context.pathStack.getAllPathName().length - 1;
-      let param = context.pathInfo?.param as Record<string, Object | AVPlayerSession>;
+      let param = context.pathInfo?.param as Record<string, Object | AVPlayerSession | BreakpointNameEnum>;
       this.vm.playerSession = (param.playerSession as AVPlayerSession)
       this.vm.player = (param.playerSession as AVPlayerSession).getAVPlayer() as media.AVPlayer;
       this.vm.videoWidth = param.videoWidth as number
       this.vm.videoHeight = param.videoHeight as number
-      this.prePageDoFinishTransition = () => {}
-      this.cardItemInfo = param.cardItemInfo as RectInfoInPx;
       this.vm.videoTitle = param.videoTitle as string
+      this.vm.breakpointModel = param.breakpointModel as BreakpointModel
 
-      this.handleXComponentSize()
-
+      // 音量初始化
+      this.vm.volumeUtil.init()
+      // 设置亮度
+      this.vm.volumeUtil.updateBrightness(this.getUIContext().getHostContext() as Context)
+      // 状态监听
       this.vm.playerSession?.onEvent('stateChange', (state: string) => {
         // 横屏时，播放完之后会重头播放，需要保持播放状态
         this.vm.isPlaying = state === AVPlayerState.PLAYING || state === AVPlayerState.COMPLETED
@@ -202,13 +253,7 @@ export struct LandscapeVideo {
           this.vm.isBuffering = false
         }
       });
-
-      CustomTransition.getInstance().registerNavParam(this.pageId,
-        (isPush: boolean, isExit: boolean, transitionProxy: NavigationTransitionProxy) => {
-          this.animationProperties.doAnimation(
-            this.cardItemInfo, isPush, isExit, transitionProxy,
-            this.prePageDoFinishTransition, undefined)
-        }, 500);
+      this.vm.registerCustomTransition(context, this.longTakeSession)
     })
     // 返回后继续播放
     .onBackPressed(() => {
@@ -216,22 +261,39 @@ export struct LandscapeVideo {
     })
     .onAppear(() => {
       this.vm.windowClass!.setSpecificSystemBarEnabled('navigationIndicator', false);
+      this.vm.windowClass!.setSpecificSystemBarEnabled('status', false);
     })
     .onDisAppear(() => {
-      CustomTransition.getInstance().unRegisterNavParam(this.pageId);
       this.vm.windowClass!.setSpecificSystemBarEnabled('navigationIndicator', true);
+      this.vm.windowClass!.setSpecificSystemBarEnabled('status', true);
     })
   }
 
   @Builder
+  videoExtraView() {
+    // 系统音量控制面板
+    VolumePanelView()
+    // 倍速
+    PlayerSpeedRateView({
+      leftRateOpacity: this.vm.leftRateOpacity,
+      rightRateOpacity: this.vm.rightRateOpacity,
+      offsetTop: 56,
+    })
+      .visibility(this.vm.isAccelerate ? Visibility.Visible : Visibility.None)
+
+    // 亮度或音量进度
+    this.volumeAndBrightView()
+  }
+
+  @Builder
   topRegionView() {
-    Stack({alignContent: Alignment.Center}) {
+    Stack({ alignContent: Alignment.Center }) {
       Row()
         .width(Constants.FULL_PERCENT)
-        .height(64)
+        .height(this.vm.isFullMode ? 104 : 64)
         .linearGradient({
           angle: 180,
-          colors: [[Color.Black, 0], [Color.Transparent, 1]]
+          colors: [[Color.Black, 0], [Color.Transparent, 1]],
         })
 
       Row() {
@@ -242,22 +304,26 @@ export struct LandscapeVideo {
           .width(40)
           .height(40)
           .justifyContent(FlexAlign.Center)
+          .accessibilityText('退出全屏')
           .onClick(() => {
             this.vm.onBack()
           })
+
           // 标题
           Text(this.vm.videoTitle ?? '').fontSize(14)
             .fontColor(Color.White)
+            .accessibilityLevel('yes')
         }
+
         // 电池
         Battery()
       }
       .width(Constants.FULL_PERCENT)
-      .padding({left: 16, right: 16})
+      .padding({ left: 16, right: 16 })
       .justifyContent(FlexAlign.SpaceBetween)
     }
     .width(Constants.FULL_PERCENT)
-    .height(64)
+    .height(this.vm.isFullMode ? 104 : 64)
   }
 
   @Builder
@@ -271,22 +337,24 @@ export struct LandscapeVideo {
           .width(50)
           .height(50)
           .visibility(this.vm.showBar && !this.vm.isBuffering ? Visibility.Visible : Visibility.Hidden)
-          .animation({duration: 200})
+          .animation({ duration: 200 })
+          .accessibilityText(this.vm.isPlaying && !this.vm.isBuffering ? '点击暂停' : '点击播放')
           .onClick(() => {
             if (!this.vm.isBuffering) {
               this.vm.switchPlayOrPause()
+              this.vm.handleVideoLayerVisible()
             }
           })
 
         if (this.vm.isBuffering) {
           Column() {
             LoadingProgress()
-              .width(50)
-              .height(50)
-              .color(Color.White);
+              .width(40)
+              .height(40)
+              .color($r('sys.color.icon_on_primary'))
             Text('缓冲中...')
               .fontSize(12)
-              .fontColor(Color.White)
+              .fontColor($r('sys.color.icon_on_primary'))
           }
         }
       }
@@ -294,38 +362,11 @@ export struct LandscapeVideo {
       .height(60)
       .alignRules({
         middle: { anchor: '__container__', align: HorizontalAlign.Center },
-        center: { anchor: '__container__', align: VerticalAlign.Center }
+        center: { anchor: '__container__', align: VerticalAlign.Center },
       })
     }
     .width(Constants.FULL_PERCENT)
     .height(Constants.FULL_PERCENT)
-  }
-
-  @Builder
-  bottomRegionView() {
-    Column() {
-      Row() {
-        Image(this.vm.isPlaying ? $r('app.media.ic_pause') : $r('app.media.ic_play'))
-          .width(24)
-          .height(24)
-          .objectFit(ImageFit.Contain)
-          .onClick(() => {
-            this.vm.switchPlayOrPause()
-          })
-
-        Image($r('app.media.ic_exit_full_screen'))
-          .width(18)
-          .height(18)
-          .objectFit(ImageFit.Contain)
-          .onClick(() => {
-            this.vm.onBack()
-          })
-      }
-      .width(Constants.FULL_PERCENT)
-      .padding({left: Constants.PADDING_PAGE, right: Constants.PADDING_PAGE})
-      .justifyContent(FlexAlign.SpaceBetween)
-    }
-    .padding({bottom: Constants.BOTTOM_PADDING_HEIGHT})
   }
 
   @Builder
@@ -341,16 +382,57 @@ export struct LandscapeVideo {
         .width(30)
         .height(30)
         .objectFit(ImageFit.Contain)
+        .accessibilityText(this.vm.isLockScreen ? '点击解锁' : '点击锁屏')
         .onClick(() => {
           this.vm.lockScreen()
         })
     }
-    .offset({left: 56})
+    .offset({ left: 56 })
     .alignRules({
       left: { anchor: '__container__', align: HorizontalAlign.Start },
-      center: { anchor: '__container__', align: VerticalAlign.Center }
+      center: { anchor: '__container__', align: VerticalAlign.Center },
     })
     .visibility(this.vm.showLock ? Visibility.Visible : Visibility.Hidden)
-    .animation({duration: 200})
+    .animation({ duration: 200 })
+  }
+
+  @Builder
+  volumeAndBrightView() {
+    Row() {
+      if (this.vm.volumeUtil.playerSliderModel.showVolumeProgress) {
+        PlayerSlider({ type: SliderType.VOLUME })
+      } else if (this.vm.volumeUtil.playerSliderModel.showBrightProgress) {
+        PlayerSlider({ type: SliderType.BRIGHT })
+      }
+    }
+    .width('100%')
+    .justifyContent(FlexAlign.Center)
+    .offset({top: 80})
+    .zIndex(2)
+  }
+}
+
+// 用来设置音量同步系统音量
+@Component
+struct VolumePanelView {
+  @State volume: number = 0
+
+  aboutToAppear(): void {
+    emitter.on('systemVolumeChange',  (eventData: emitter.EventData) => {
+      this.volume = eventData.data!.volume * 15
+    })
+  }
+
+  build() {
+    AVVolumePanel({
+      volumeLevel: this.volume,
+      volumeParameter: {
+        position: {
+          x: -50,
+          y: 150
+        }
+      }
+    })
+      .width(100)
   }
 }

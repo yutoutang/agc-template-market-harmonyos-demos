@@ -11,6 +11,6 @@
     "lib_common": "file:../lib_common",
     "lib_account": "file:../lib_account",
     "lib_news_api": "file:../lib_news_api",
-    "module_channeledit": "file:../../components/module_channeledit"
+    "module_channeledit": "file:../../components/module_channeledit",
   }
 }

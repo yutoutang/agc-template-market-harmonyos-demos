@@ -1,5 +1,5 @@
-import { AccountApi } from 'lib_account'
 import { RouterMap, RouterUtils } from 'lib_common';
+import { AccountApi, ProtocolRouterParams } from 'lib_account'
 
 @Builder
 export function SettingH5Builder() {
@@ -20,24 +20,23 @@ struct SettingH5 {
     switch (param) {
       case 1:
         this.content = this.accountInstance.getUserAgreeInfo();
-        RouterUtils.replacePathByName(RouterMap.PROTOCOL_WEBVIEW, this.content);
         break;
       case 2:
         this.content = this.accountInstance.getPrivacyInfo();
-        RouterUtils.replacePathByName(RouterMap.PROTOCOL_WEBVIEW, this.content);
         break;
       case 3:
         this.content = this.accountInstance.getThirdPartyInfo();
-        RouterUtils.replacePathByName(RouterMap.PROTOCOL_WEBVIEW, this.content);
         break;
       case 4:
         this.content = this.accountInstance.getPersonalInfoCollection();
-        RouterUtils.replacePathByName(RouterMap.PROTOCOL_WEBVIEW, this.content);
         break;
       default:
         this.content = '';
-        RouterUtils.replacePathByName(RouterMap.PROTOCOL_WEBVIEW, this.content);
     }
+    RouterUtils.replacePathByName(RouterMap.PROTOCOL_WEBVIEW, {
+      content: this.content,
+      isSheet: false,
+    } as ProtocolRouterParams);
   }
 
   build() {

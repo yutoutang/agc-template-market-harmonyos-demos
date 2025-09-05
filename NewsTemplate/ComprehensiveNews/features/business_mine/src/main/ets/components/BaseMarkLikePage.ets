@@ -24,8 +24,8 @@ export struct BaseMarkLikePage {
         .scrollBar(BarState.Off)
         .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
         .padding({
-          left: CommonConstants.PADDING_PAGE,
-          right: CommonConstants.PADDING_PAGE,
+          left: this.vm.breakPointModel.pagePadding,
+          right: this.vm.breakPointModel.pagePadding,
           top: CommonConstants.SPACE_M,
         })
       }
@@ -67,13 +67,16 @@ export struct BaseMarkLikePage {
 
   @Builder
   operateBuilder(v: NewsModel) {
-    Image($r('app.media.ic_public_ellipsis_circle'))
-      .width($r('app.float.medium_img_width'))
-      .aspectRatio(1)
-      .draggable(false)
-      .fillColor($r('sys.color.icon_secondary'))
-      .onClick(() => {
-        this.vm.popDialog(v);
-      })
+    Row() {
+      Image($r('app.media.ic_public_ellipsis_circle'))
+        .width($r('app.float.medium_img_width'))
+        .aspectRatio(1)
+        .draggable(false)
+        .fillColor($r('sys.color.icon_secondary'))
+    }
+    .accessibilityText('取消按钮')
+    .onClick(() => {
+      this.vm.popDialog(v);
+    })
   }
 }

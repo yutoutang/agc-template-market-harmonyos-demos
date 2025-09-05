@@ -6,5 +6,6 @@ export class Constants {
   public static readonly WAY_WIDTH: number = 100;
   public static readonly INPUT_HEIGHT: number = 56;
   public static readonly DEFAULT_LOGIN_SHEET_HEIGHT: number = 620
+  public static readonly SHEET_TITLE_H: number = 56;
   public static readonly LOGIN_SHEET_STACK_NAME: string = 'loginSheetStackName';
 }

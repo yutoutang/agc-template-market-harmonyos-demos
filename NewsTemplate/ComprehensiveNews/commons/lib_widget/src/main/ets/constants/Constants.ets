@@ -10,7 +10,6 @@ export class Constants {
   static readonly FULL_PERCENT: string = '100%';
   static readonly PADDING_S: number = 8;
   static readonly PADDING_L: number = 16;
-  static readonly PADDING_PAGE: number = 16;
   // 空白图标宽度
   public static readonly EMPTY_IMG_W: number = 120;
 }

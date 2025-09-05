@@ -1,11 +1,14 @@
 import { ButtonGroup } from '../components/ButtonGroup'
 import { FontSizeSlider } from '../components/FontSizeSlider';
 import { BUTTON_LIST, Constants } from '../common/Constants'
+import { getPageMargin } from '../common/Utils';
 
 @ComponentV2
 export struct SettingFontCore {
   // 字体比例初始值
   @Once @Param currentRatio: number = 1;
+  // 当前断点
+  @Param breakpoint: string = 'sm';
   // 确认调整的回调
   @Event confirm: (ratio: number) => void = () => {
   };
@@ -14,6 +17,11 @@ export struct SettingFontCore {
   @Computed
   get showListSample() {
     return this.selectId === '1';
+  }
+
+  @Computed
+  get needBarShadow() {
+    return ['sm', 'md'].includes(this.breakpoint);
   }
 
   build() {
@@ -37,8 +45,8 @@ export struct SettingFontCore {
       }
       .layoutWeight(1)
       .padding({
-        left: Constants.PADDING_PAGE,
-        right: Constants.PADDING_PAGE,
+        left: getPageMargin(this.breakpoint),
+        right: getPageMargin(this.breakpoint),
       })
 
       this.bottomCard()
@@ -62,11 +70,11 @@ export struct SettingFontCore {
     .shadow({
       offsetY: -4,
       radius: 8,
-      color: '#E5E5E5',
+      color: this.needBarShadow ? '#E5E5E5' : Color.Transparent,
     })
     .padding({
-      left: Constants.PADDING_PAGE,
-      right: Constants.PADDING_PAGE,
+      left: getPageMargin(this.breakpoint),
+      right: getPageMargin(this.breakpoint),
     })
   }
 
@@ -123,7 +131,7 @@ export struct SettingFontCore {
         Blank()
         Button('关注')
           .height(28)
-          .fontSize(14)
+          .fontSize($r('sys.float.Body_M'))
       }
       .width('100%')
       .padding({ top: 12, bottom: 12 })

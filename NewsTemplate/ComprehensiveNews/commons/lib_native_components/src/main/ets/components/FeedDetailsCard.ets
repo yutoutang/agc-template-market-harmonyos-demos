@@ -1,11 +1,17 @@
 import { PersistenceV2, UIUtils } from '@kit.ArkUI'
 import {
   CommonConstants,
-  FormatCount, RouterMap, RouterToNews, RouterUtils, SettingModel, TimeUtils, UserInfoModel } from 'lib_common'
+  FormatCount,
+  RouterMap,
+  RouterUtils,
+  SettingModel,
+  TimeUtils,
+  UserInfoModel,
+} from 'lib_common'
 import { LayoutParams } from 'lib_news_api'
 import { Share } from 'module_share'
 import { FeedCard } from 'module_newsfeed'
-import { CardViewModel } from '../viewModel/CardViewModel'
+import { CardViewModel } from '../viewmodel/CardViewModel'
 
 @Builder
 export function FeedDetailsCard(cardData: LayoutParams) {
@@ -19,13 +25,14 @@ export struct NativeComponent {
   @Param @Require cardData: LayoutParams
   @Local currentIndex: number = 0
   @Local selectedId: string = '1'
-  @Local cardViewModel: CardViewModel = new CardViewModel()
+  @Local cardViewModel: CardViewModel = new CardViewModel(this.getUIContext())
   @Local settingInfo: SettingModel = PersistenceV2.connect(SettingModel, () => new SettingModel())!
   @Local userInfoModel: UserInfoModel = PersistenceV2.connect(UserInfoModel, () => new UserInfoModel())!;
 
   aboutToAppear(): void {
     this.cardViewModel.setAuthorId(this.cardData.nativeCardData.author.authorId)
     this.cardData.nativeCardData = UIUtils.makeObserved(this.cardData.nativeCardData)
+    this.currentIndex = this.cardData.currentIndex
   }
 
   @Builder
@@ -52,9 +59,9 @@ export struct NativeComponent {
       qrCodeInfo: {
         id: this.cardData.nativeCardData.id,
         type: this.cardData.nativeCardData.type,
-        title:this.cardData.nativeCardData.title,
+        title: this.cardData.nativeCardData.title,
         createTime: TimeUtils.formatDate(this.cardData.nativeCardData.createTime, 'YYYY-MM-DD HH:MM'),
-        coverUrl:  this.handlerCoverImage(),
+        coverUrl: this.handlerCoverImage(),
         isVideo: !!this.cardData.nativeCardData.postImgList?.[0]?.surfaceUrl,
         articleFrom: this.cardData.nativeCardData.articleFrom,
       },
@@ -69,17 +76,21 @@ export struct NativeComponent {
       FeedCard({
         componentId: 'home_news',
         feedCardInfo: this.cardData.nativeCardData,
-        isAll: true,
+        isAll: this.cardData.extraInfo?.showTitleTextAll as boolean ?? true,
         isNeedOperation: false,
         isNeedFollow: !!this.cardData.extraInfo?.isFollow,
         showUserBar: this.cardData.extraInfo?.showUserBar as boolean ?? true,
         showTimeBottom: this.cardData.extraInfo?.showTimeBottom as boolean ?? false,
+        showImagePreviewLayer: this.cardData.extraInfo?.showImagePreviewLayer as boolean ?? true,
         fontSizeRatio: this.settingInfo.fontSizeRatio,
         searchKey: this.cardData?.extraInfo?.searchKey as string,
-        onArticle: (type?: string) => {
-          this.cardViewModel.pushToNewsDetails(this.cardData,type)
+        onArticle: (formType?: string) => {
+          let disabledClickEvent = this.cardData.extraInfo?.disabledClickEvent as boolean ?? false;
+          if (!disabledClickEvent) {
+            this.cardViewModel.pushToNewsDetails(this.cardData, formType, '', true)
+          }
         },
-        onVideo:() => {
+        onVideo: () => {
           this.cardViewModel.pushToNewsDetails(this.cardData)
         },
         shareBuilder: () => this.shareBuilder,
@@ -93,7 +104,7 @@ export struct NativeComponent {
           this.cardViewModel.likeOperation(this.cardData.nativeCardData)
         },
         onComment: () => {
-          RouterToNews.routerToNewsByDetails(this.cardData.nativeCardData, 'comment')
+          this.cardViewModel.pushToNewsDetails(this.cardData, 'comment')
         },
       })
     }

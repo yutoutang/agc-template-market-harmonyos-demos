@@ -1,7 +1,7 @@
 import { PopViewUtils } from 'lib_common'
-import { CommentParams } from '../utils/Utils'
 import { promptAction } from '@kit.ArkUI'
-import { FeedCommentVM } from '../viewModel/FeedCommentVM'
+import { FeedCommentVM } from '../viewmodel/FeedCommentVM'
+import { CommentParams } from '../model/Model'
 
 @Builder
 export function publishCommentBuilder(commentParams: CommentParams) {
@@ -51,6 +51,7 @@ export struct PublishComment {
         }
         .height(40)
         .width(40)
+        .accessibilityText('发送按钮')
         .onClick(() => {
           if (this.commendText.trim() === '') {
             promptAction.showToast({ message: '发表内容不能为空' })

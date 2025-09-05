@@ -53,3 +53,9 @@ export const agreePrivacyKey: string = 'isAgreePrivacy';
 export const SOURCE_FORM_CARD: string = 'FormCard';
 
 export const NEWS_DETAIL_PAGE: string = 'NewsDetailPage';
+
+export class PhoneConstants {
+  static readonly LEFT_TAB_BAR_WIDTH: number = 96;
+  static readonly LEFT_TAB_BAR_ITEM_HEIGHT: number = 100;
+  static readonly BOTTOM_TAB_BAR_HEIGHT: number = 48;
+}

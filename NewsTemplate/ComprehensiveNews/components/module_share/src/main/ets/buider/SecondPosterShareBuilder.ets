@@ -1,18 +1,20 @@
 import { ShareKinds, ShareOptions } from '../model/Model'
 import { secondShareList } from '../constants/Constants'
 import { PosterShare } from '../utils/SystemShare'
-import { WxShareViewModel } from '../viewModel/WxShareViewModel'
-import { QqShareViewModel } from '../viewModel/QqShareViewModel'
+import { WxShareViewModel } from '../viewmodel/WxShareViewModel'
+import { QqShareViewModel } from '../viewmodel/QqShareViewModel'
 
 @ComponentV2
 export struct SecondPosterShare {
   @Local shareList: ShareKinds[] = secondShareList
   @Param posterShare: PosterShare = new PosterShare()
   @Param qrCodeInfo: ShareOptions = new ShareOptions()
-  @Require @Param coverUrl:string
-  @Require @Param pixmap:PixelMap
-  @Event onCancel:() => void = () => {}
-  @Event popClose:(isClose:boolean) => void = () => {}
+  @Require @Param coverUrl: string
+  @Require @Param pixmap: PixelMap
+  @Event onCancel: () => void = () => {
+  }
+  @Event popClose: (isClose: boolean) => void = () => {
+  }
   @Local qqShareViewModel: QqShareViewModel = QqShareViewModel.instance
   @Local wxShareViewModel: WxShareViewModel = WxShareViewModel.instance
 
@@ -33,15 +35,15 @@ export struct SecondPosterShare {
           .onClick(() => {
             switch (value.id) {
               case 'save':
-                this.posterShare.saveImage(this.pixmap,(isClose:boolean) => {
+                this.posterShare.saveImage(this.pixmap, (isClose: boolean) => {
                   this.popClose(isClose)
                 })
                 break;
               case 'wechat':
-                this.wxShareViewModel.newsPosterShare('WXSceneSession',this.pixmap)
+                this.wxShareViewModel.newsPosterShare('WXSceneSession', this.pixmap)
                 break;
               case 'wechat_feed':
-                this.wxShareViewModel.newsPosterShare('WXSceneTimeline',this.pixmap)
+                this.wxShareViewModel.newsPosterShare('WXSceneTimeline', this.pixmap)
                 break;
               case 'qq':
                 this.qqShareViewModel.share(this.qrCodeInfo)
@@ -49,7 +51,7 @@ export struct SecondPosterShare {
             }
             this.onCancel()
           })
-        })
+        },(value: ShareKinds) => value.id)
       }
       .width('100%')
       .justifyContent(FlexAlign.Start)

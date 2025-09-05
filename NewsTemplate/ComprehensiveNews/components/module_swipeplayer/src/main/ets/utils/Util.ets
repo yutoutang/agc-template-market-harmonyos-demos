@@ -1,6 +1,6 @@
 import { media } from '@kit.MediaKit';
 import { common } from '@kit.AbilityKit';
-import { promptAction } from '@kit.ArkUI';
+import { display, promptAction } from '@kit.ArkUI';
 import fs from '@ohos.file.fs';
 import { Logger } from './Logger';
 import { AVPlayerState } from '../type/Index';
@@ -106,4 +106,16 @@ export function handleSandboxVideoUrl(videoUrlPath: string): string {
   let file = fs.openSync(videoUrlPath);
   let fdPath = 'fd://' + file.fd;
   return fdPath
+}
+
+// 判断是否是大折叠、阔折叠外屏、小折叠内屏
+export const isDisplayModeFull = (): boolean => {
+  // 是否可折叠
+  let isFoldable = display.isFoldable();
+  // 当前设备的显示模式
+  let foldDisplayMode: display.FoldDisplayMode | undefined = undefined
+  if (isFoldable) {
+    foldDisplayMode = display.getFoldDisplayMode();
+  }
+  return foldDisplayMode === display.FoldDisplayMode.FOLD_DISPLAY_MODE_FULL;
 }

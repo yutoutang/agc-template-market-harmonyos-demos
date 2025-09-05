@@ -1,21 +1,35 @@
-import { PersistenceV2 } from '@kit.ArkUI';
-import { UserInfoModel } from 'lib_common';
+import { SettingModel } from 'lib_common';
 import { LayoutSetting, NewsResponse } from 'lib_news_api';
 import { FrameController } from './factory/FrameNodeFactory';
+import { RendNewsInfo } from './model/Model';
+import { PersistenceV2 } from '@kit.ArkUI';
 
 @ComponentV2
 export struct FlexLayoutPage {
+  @Param channelItem:RendNewsInfo | undefined = undefined
   @Param setting: LayoutSetting = new LayoutSetting()
   @Param articles: NewsResponse[] = []
-  @Param extraInfo: Record<string, string | boolean | Record<string, string | boolean>[]> = {}
+  @Param flowIndex: number = 0
+  @Param extraInfo: Record<string, number | string | boolean | Record<string, string | boolean>[]> = {}
+  @Local settingInfo: SettingModel = PersistenceV2.connect(SettingModel, () => new SettingModel())!
   @Local firstLevelClassificationData: LayoutSetting = new LayoutSetting()
   @Local count: number = 0
   @Local isSwiperDisabled: boolean = false
-  @Param resource:string = ''
-  @Local userInfoModel: UserInfoModel = PersistenceV2.connect(UserInfoModel, () => new UserInfoModel())!;
+  @Local frameController:FrameController = new FrameController()
+
+  @Monitor('settingInfo.darkSwitch')
+  darkSwitch() {
+    this.frameController.rebuild();
+  }
 
   aboutToAppear(): void {
     this.settingDataHandler()
+    this.extraInfo.flowIndex = this.flowIndex
+    this.extraInfo.channelId = this.channelItem?.id ?? ''
+  }
+
+  aboutToDisappear(): void {
+    this.frameController.disposeFrameNode()
   }
 
   getAreaQueryVos(children: LayoutSetting[]) {
@@ -44,6 +58,7 @@ export struct FlexLayoutPage {
     result.children = this.getAreaQueryVos(this.setting.children as LayoutSetting[])
     result.style = this.setting.style
     this.firstLevelClassificationData = result
+    this.frameController.initFrameNode(this.firstLevelClassificationData, this.articles, this.extraInfo)
   }
 
   getNativeCount(children: LayoutSetting []) {
@@ -60,7 +75,7 @@ export struct FlexLayoutPage {
   @Builder
   buildVNode() {
     if (this.firstLevelClassificationData.type === 'view') {
-      NodeContainer(new FrameController(this.firstLevelClassificationData, this.articles, this.extraInfo))
+      NodeContainer(this.frameController)
     }
   }
 

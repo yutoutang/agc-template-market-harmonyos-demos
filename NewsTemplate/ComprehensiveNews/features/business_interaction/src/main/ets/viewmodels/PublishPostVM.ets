@@ -33,7 +33,7 @@ export class PublishPostViewModel extends BaseViewModel {
     /*
      * 事件分发，通知首页刷新
      * */
-    emitter.emit('followRefresh')
+    emitter.emit('recommendRefresh')
     RouterUtils.pop();
   }
 

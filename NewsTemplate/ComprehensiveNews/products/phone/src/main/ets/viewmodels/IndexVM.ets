@@ -1,19 +1,27 @@
-import { uiObserver, window } from '@kit.ArkUI';
+import { display, uiObserver, window } from '@kit.ArkUI';
 import { BaseViewModel, BreakpointUtils, Logger, PreferenceUtils, RouterMap, RouterUtils } from 'lib_common';
 import { LoginSheetUtils } from 'lib_account';
-import { AnimateCallback, CustomTransition } from 'module_swipeplayer';
 import { agreePrivacyKey, REQUIRE_LOGIN_PAGE_LIST } from '../common/Constants';
 
 const TAG = 'IndexVM';
 
 @ObservedV2
 export class IndexVM extends BaseViewModel {
-  allowedCustomTransitionFromPageNames: string[] = ['IndexPage', 'VideoDetailPage'];
-  allowedCustomTransitionToPageNames: string[] = ['LandscapeVideo'];
+  // todo: 自行调整是否支持开屏广告
+  @Trace isShowAd: boolean = false;
   breakpoint: BreakpointUtils | null = null;
 
   redirect() {
-    RouterUtils.pushPathByName(RouterMap.START_PAGE);
+    if (this.isAgreePrivacy()) {
+      const targetPage = this.isShowAd ? RouterMap.SPLASH_PAGE : RouterMap.INDEX_PAGE;
+      RouterUtils.replacePathByName(targetPage);
+    } else {
+      RouterUtils.replacePathByName(RouterMap.SAFE_PAGE);
+    }
+  }
+
+  isAgreePrivacy() {
+    return PreferenceUtils.getInstance().get(agreePrivacyKey) as boolean;
   }
 
   setInterception() {
@@ -31,7 +39,7 @@ export class IndexVM extends BaseViewModel {
           target.pathStack.pop();
           LoginSheetUtils.open();
         }
-      }
+      },
     })
   }
 
@@ -42,53 +50,6 @@ export class IndexVM extends BaseViewModel {
 
   unregisterBreakpointListener() {
     this.breakpoint?.unRegister();
-  }
-
-
-  isCustomTransitionEnabled(fromName: string, toName: string): boolean {
-    if ((this.allowedCustomTransitionFromPageNames.includes(fromName) &&
-    this.allowedCustomTransitionToPageNames.includes(toName)) ||
-      (this.allowedCustomTransitionFromPageNames.includes(toName) &&
-      this.allowedCustomTransitionToPageNames.includes(fromName))) {
-      return true;
-    }
-    return false;
-  }
-
-  // 自定义转场动画
-  customNavContentTransitionCallback(
-    from: NavContentInfo,
-    to: NavContentInfo,
-    operation: NavigationOperation
-  ): NavigationAnimatedTransition | undefined {
-    if ((!from || !to) || (!from.name || !to.name)) {
-      return undefined;
-    }
-    // 通过from和to的name对自定义转场路由进行管控
-    if (!this.isCustomTransitionEnabled(from.name, to.name)) {
-      return undefined;
-    }
-    // 需要对转场页面是否注册了animation进行判断，来决定是否进行自定义转场
-    let fromParam: AnimateCallback = CustomTransition.getInstance().getAnimateParam(from.index);
-    let toParam: AnimateCallback = CustomTransition.getInstance().getAnimateParam(to.index);
-    if (!fromParam.animation || !toParam.animation) {
-      return undefined;
-    }
-    // 构造customAnimation给系统侧调用，执行自定义转场动画
-    let customAnimation: NavigationAnimatedTransition = {
-      onTransitionEnd: (isSuccess: boolean) => {
-      },
-      timeout: 2000,
-      transition: (transitionProxy: NavigationTransitionProxy) => {
-        if (fromParam.animation) {
-          fromParam.animation(operation === NavigationOperation.PUSH, true, transitionProxy);
-        }
-        if (toParam.animation) {
-          toParam.animation(operation === NavigationOperation.PUSH, false, transitionProxy);
-        }
-      }
-    };
-    return customAnimation;
   }
 
   // 监听NavDestination组件的状态变化
@@ -109,5 +70,16 @@ export class IndexVM extends BaseViewModel {
         callback(type)
       })
     });
+  }
+
+  // 监听设备屏幕方向改变
+  displayOrientationListener() {
+    this.displayModel.isFoldable = display.isFoldable();
+    display.on('change', (type: number) => {
+      let displayClass = display.getDisplayByIdSync(type);
+      // 横屏
+      let landscapeType = [display.Orientation.LANDSCAPE, display.Orientation.LANDSCAPE_INVERTED]
+      this.displayModel.isLandscape = landscapeType.includes(displayClass.orientation);
+    })
   }
 }

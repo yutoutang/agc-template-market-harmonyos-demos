@@ -33,10 +33,29 @@ export class FeedCommentVM {
       createTime: new Date().getTime(),
       likeCount: 0,
       isLiked: false,
+      parentComment: this.handleCommentInfo(commentInfo),
       replyComments: [],
     }
     commentInfo.replyComments.unshift(new MakeObCommentServed(currentComment))
     CommentEventDispatcher.dispatchToAddComment(currentComment, commentInfo.commentId)
+  }
+
+  /*
+   * 协同查询数据，parentComment父评论不需要replyComments
+   * */
+  public handleCommentInfo(commentInfo: CommentInfo) {
+    let newItem: CommentInfo = {
+      commentId: commentInfo.commentId,
+      newsId: commentInfo.newsId,
+      author: commentInfo.author,
+      commentBody: commentInfo.commentBody,
+      commentLikeNum: commentInfo.commentLikeNum,
+      createTime: commentInfo.createTime,
+      likeCount: commentInfo.likeCount,
+      isLiked: commentInfo.isLiked,
+      replyComments: [],
+    }
+    return newItem
   }
 
   public deleteComment(commentId:string) {

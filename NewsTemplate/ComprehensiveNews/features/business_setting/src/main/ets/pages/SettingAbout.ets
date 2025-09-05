@@ -1,4 +1,4 @@
-import { CommonConstants } from 'lib_common'
+import { CommonConstants, GridRowColSetting } from 'lib_common'
 import { NavHeaderBar } from 'lib_widget'
 import { SettingAboutVM } from '../viewmodels/SettingAboutVM';
 
@@ -14,22 +14,30 @@ struct SettingAbout {
   build() {
     NavDestination() {
       NavHeaderBar({ title: '关于' })
-      Scroll() {
-        Column() {
-          this.appInfo()
-          this.cardInfo()
-          this.otherInfo()
+      GridRow(GridRowColSetting.DEFAULT_GRID_ROW_OPTIONS) {
+        GridCol({
+          span: GridRowColSetting.DEFAULT_CENTER_COL_SPAN,
+          offset: GridRowColSetting.DEFAULT_CENTER_COL_OFFSET,
+        }) {
+          Scroll() {
+            Column() {
+              this.appInfo()
+              this.cardInfo()
+              this.otherInfo()
+            }
+            .width(CommonConstants.FULL_PERCENT)
+          }
+          .layoutWeight(1)
+          .scrollBar(BarState.Off)
+          .align(Alignment.Top)
+          .padding({
+            left: this.vm.breakPointModel.pagePadding,
+            right: this.vm.breakPointModel.pagePadding,
+            bottom: this.vm.windowModel.windowBottomPadding,
+          })
         }
-        .width(CommonConstants.FULL_PERCENT)
       }
       .layoutWeight(1)
-      .scrollBar(BarState.Off)
-      .align(Alignment.Top)
-      .padding({
-        left: CommonConstants.PADDING_PAGE,
-        right: CommonConstants.PADDING_PAGE,
-        bottom: this.vm.windowModel.windowBottomPadding,
-      })
     }
     .hideTitleBar(true)
     .backgroundColor($r('sys.color.background_secondary'))
@@ -78,7 +86,7 @@ struct SettingAbout {
         .alignItems(HorizontalAlign.Start)
         .padding({
           top: 10,
-          bottom: 10
+          bottom: 10,
         })
 
         Row({ space: CommonConstants.SPACE_XS }) {
@@ -86,7 +94,7 @@ struct SettingAbout {
             LoadingProgress()
               .width(24)
               .aspectRatio(1)
-              .color($r('sys.color.font_secondary'))
+              .color($r('sys.color.icon_secondary'))
           } else {
             Text(this.vm.updateLabel)
               .fontSize(14 * this.vm.settingInfo.fontSizeRatio)
@@ -102,7 +110,7 @@ struct SettingAbout {
         this.vm.checkUpdate();
       })
 
-      Divider().strokeWidth(0.5)
+      Divider()
 
       Row() {
         Column({ space: CommonConstants.SPACE_XXS }) {
@@ -118,7 +126,7 @@ struct SettingAbout {
         .alignItems(HorizontalAlign.Start)
         .padding({
           top: 10,
-          bottom: 10
+          bottom: 10,
         })
         .onClick(() => {
           this.vm.callHotline();

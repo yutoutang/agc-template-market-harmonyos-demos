@@ -56,8 +56,7 @@ export struct PosterSharePopContent {
       Image(this.pixmap)
         .width(270)
         .height(this.coverUrl ? 370 : 270)
-        .margin({ top: '30%' })
-      Blank()
+        .margin({ bottom: '40%' })
       Row() {
         Column() {
           SecondPosterShare({
@@ -77,21 +76,18 @@ export struct PosterSharePopContent {
         .backgroundColor($r('sys.color.background_primary'))
         .alignItems(HorizontalAlign.Start)
         .borderRadius(24)
-        .translate({
-          y: this.transY,
-        })
         .animation({ duration: popupDuration, curve: Curve.EaseInOut })
         .onAppear(() => {
           setTimeout(() => {
             this.trans()
           }, 100)
         })
-
       }
+      .position({bottom:0,left:0})
     }
     .justifyContent(FlexAlign.Center)
     .height('100%')
-    .offset({ x: 0, y: 0 })
+    .width('100%')
     .clip(true)
   }
 }

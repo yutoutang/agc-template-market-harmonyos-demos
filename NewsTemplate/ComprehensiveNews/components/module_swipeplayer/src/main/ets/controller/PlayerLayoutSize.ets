@@ -4,7 +4,8 @@ export class PlayerLayoutSize {
   @Trace private playerHeight: Length = '100%';
   @Trace private xComponentWidth: Length = '100%';
   @Trace private xComponentHeight: Length = '100%';
-  @Trace private layoutSizeChangeFlag: boolean = false
+  @Trace private layoutSizeChangeFlag: boolean = false;
+  @Trace private slideMovingFlag: boolean = false;
 
   updatePlayerWidth(playerWidth: Length): void {
     this.playerWidth = playerWidth;
@@ -44,5 +45,13 @@ export class PlayerLayoutSize {
 
   getLayoutSizeChangeFlag(): boolean {
     return this.layoutSizeChangeFlag
+  }
+
+  updateSlideMovingFlag(flag: boolean) {
+    this.slideMovingFlag = flag
+  }
+
+  getSlideMovingFlag(): boolean {
+    return this.slideMovingFlag
   }
 }

@@ -1,4 +1,4 @@
-import { CommonConstants, RouterToNews, TimeUtils } from 'lib_common';
+import { CommonConstants, RouterParams, RouterToNews, TimeUtils } from 'lib_common';
 import { NewsEnum, NewsModel } from 'lib_news_api';
 import { Constants } from '../constants/Constants';
 
@@ -41,6 +41,7 @@ export struct UniformNewsCard {
         if (this.videoUrl) {
           RelativeContainer() {
             Image(this.videoUrl)
+              .width(CommonConstants.FULL_PERCENT)
               .height(CommonConstants.FULL_PERCENT)
               .borderRadius($r('app.float.small_radius'))
             Image($r('app.media.ic_public_video_play'))
@@ -49,7 +50,7 @@ export struct UniformNewsCard {
               .draggable(false)
               .alignRules({
                 center: { anchor: '__container__', align: VerticalAlign.Center },
-                middle: { anchor: '__container__', align: HorizontalAlign.Center }
+                middle: { anchor: '__container__', align: HorizontalAlign.Center },
               })
             Row() {
               Text(TimeUtils.handleDuration(this.newsInfo.videoDuration))
@@ -66,12 +67,14 @@ export struct UniformNewsCard {
             })
             .alignRules({
               bottom: { anchor: '__container__', align: VerticalAlign.Bottom },
-              right: { anchor: '__container__', align: HorizontalAlign.End }
+              right: { anchor: '__container__', align: HorizontalAlign.End },
             })
             .offset({ x: -4, y: -4 });
           }
           .width(Constants.NEWS_IMAGE_WIDTH / (this.customStyle.imgRatio ?? 1))
           .height(Constants.NEWS_IMAGE_HEIGHT / (this.customStyle.imgRatio ?? 1))
+          .accessibilityGroup(true)
+          .accessibilityLevel('no')
         } else if (this.imgUrl) {
           Image(this.imgUrl)
             .width(Constants.NEWS_IMAGE_WIDTH / (this.customStyle.imgRatio ?? 1))
@@ -81,9 +84,21 @@ export struct UniformNewsCard {
       }
       .width(CommonConstants.FULL_PERCENT)
       .alignItems(VerticalAlign.Top)
+      .onClick(() => {
+        let routerParams: RouterParams<null> = {
+          'type': this.newsInfo.type,
+          'newsId': this.newsInfo.id,
+          'surfaceUrl': this.videoUrl,
+        }
+        RouterToNews.pushToNewsDetails(routerParams)
+      })
 
-      Row({ space: CommonConstants.SPACE_S }) {
-        this.authorInfo()
+      Row() {
+        Row({ space: CommonConstants.SPACE_S }) {
+          this.authorInfo()
+        }
+        .accessibilityGroup(true)
+
         Blank()
         if (this.operateBuilder) {
           this.operateBuilder()
@@ -92,14 +107,6 @@ export struct UniformNewsCard {
       .width(CommonConstants.FULL_PERCENT)
       .visibility(this.showAuthorInfoBottom ? Visibility.Visible : Visibility.None)
     }
-    .onClick(() => {
-      let routerParams: Record<string, string | NewsEnum> = {
-        'type': this.newsInfo.type,
-        'newsId': this.newsInfo.id,
-        'surfaceUrl': this.videoUrl,
-      }
-      RouterToNews.pushToNewsDetails(routerParams)
-    })
   }
 
   @Builder

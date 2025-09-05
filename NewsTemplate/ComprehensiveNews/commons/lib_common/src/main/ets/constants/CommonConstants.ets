@@ -13,6 +13,7 @@ export class CommonConstants {
   // Percent
   static readonly FULL_PERCENT: string = '100%';
   static readonly HALF_PERCENT: string = '50%';
+  static readonly QUARTER_PERCENT: string = '25%';
   // Padding
   static readonly PADDING_XXS: number = 2;
   static readonly PADDING_XS: number = 4;

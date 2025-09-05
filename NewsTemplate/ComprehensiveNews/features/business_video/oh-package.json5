@@ -11,8 +11,10 @@
     "lib_news_api": "file:../../commons/lib_news_api",
     "lib_account": "file:../../commons/lib_account",
     "lib_news_feed_details": "file:../../commons/lib_news_feed_details",
+    "lib_flex_layout": "file:../../commons/lib_flex_layout",
     "module_feedcomment": "file:../../components/module_feedcomment",
     "module_swipeplayer": "file:../../components/module_swipeplayer",
-    "module_share": "file:../../components/module_share"
+    "module_share": "file:../../components/module_share",
+    "module_transition": "file:../../components/module_transition"
   }
 }

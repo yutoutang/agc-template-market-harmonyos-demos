@@ -1,9 +1,14 @@
 import { media } from '@kit.MediaKit';
-import { window } from '@kit.ArkUI';
+import { display, window } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
 import { Constants } from '../constants/Constants'
 import { AVPlayerSession } from '../controller/AVPlayerManager';
-import { pauseVideo, playVideo, setOrientation } from '../utils/Util';
+import { isDisplayModeFull, pauseVideo, playVideo } from '../utils/Util';
+import { VolumeAndBright } from '../utils/VolumeAndBright';
+import { AVPlayerState, PageNameEnum } from '../type/Index';
+import { ProgressController } from '../components/VideoProgressBar';
+import { BreakpointModel } from '../models/BreakpointModel';
+import { LongTakeAnimationProperties, LongTakeTransitionParam } from 'module_transition';
 
 @ObservedV2
 export class LandscapeVideoVM {
@@ -35,6 +40,16 @@ export class LandscapeVideoVM {
   @Trace isAccelerate: boolean = false;
   @Trace leftRateOpacity: number = 0;
   @Trace rightRateOpacity: number = 1;
+  @Trace volumeUtil: VolumeAndBright = new VolumeAndBright()
+  // 进度条跟随手势滑动
+  @Trace panStartTime: number = 0
+  @Trace panEndTime: number = 0
+  // 一多适配的断点
+  @Trace breakpointModel: BreakpointModel = new BreakpointModel();
+  @Trace isFullMode: boolean = false;
+  positionX: number = 0;
+  positionY: number = 0;
+  progressController: ProgressController = new ProgressController();
 
   uiContext?: UIContext
   windowClass?: window.Window
@@ -42,15 +57,20 @@ export class LandscapeVideoVM {
     this.uiContext = uiContext
     const context: common.UIAbilityContext = uiContext.getHostContext() as common.UIAbilityContext
     this.windowClass = context.windowStage!.getMainWindowSync();
+
+    AppStorage.setAndRef('windowClass', this.windowClass)
   }
 
   init() {
     this.windowClass?.on('windowSizeChange', (size) => {
+      this.xComponentWidth = this.uiContext!.px2vp(size.width);
+      this.xComponentHeight = this.uiContext!.px2vp(size.height);
+      // 判断是否是大折叠、阔折叠外屏、小折叠内屏
+      this.isFullMode = isDisplayModeFull();
       if (!this.isBackFlag && size.width < size.height &&
-        this.pathStack.getAllPathName().includes('LandscapeVideo')
+        this.pathStack.getAllPathName().includes(PageNameEnum.VIDEO_LANDSCAPE_PAGE)
       ) {
         this.pathStack.pop();
-        setOrientation(window.Orientation.PORTRAIT)
       }
     })
     this.showOrHiddenBar()
@@ -60,12 +80,11 @@ export class LandscapeVideoVM {
     this.windowClass!.off('windowSizeChange')
   }
 
-  onBack() {
+  async onBack() {
     this.isBackFlag = true;
     // 设置横竖屏
-    setOrientation(window.Orientation.PORTRAIT).then(() => {
-      this.pathStack.pop();
-    })
+    let displayClass = display.getDefaultDisplaySync();
+    this.pathStack.pop();
   }
 
   showOrHiddenBar() {
@@ -106,7 +125,10 @@ export class LandscapeVideoVM {
       this.trackThicknessSize = Constants.TRACK_SIZE_MIN;
     }
     this.windowClass?.setWindowKeepScreenOn(true);
-    // 处理视频外层的显示和隐藏
+  }
+
+  // 处理视频外层的显示和隐藏
+  handleVideoLayerVisible() {
     if (this.isPlaying) {
       this.showOrHiddenBar()
     } else {
@@ -142,6 +164,145 @@ export class LandscapeVideoVM {
     if (this.playerSession?.avPlayer?.state === 'playing') {
       this.isAccelerate = false;
       this.playerSession.avPlayer.setSpeed(media.PlaybackSpeed.SPEED_FORWARD_1_00_X)
+    }
+  }
+
+  // 处理音量和亮度的滑动开始事件回调
+  handleBrightAndVolumePanStart(event?: GestureEvent) {
+    // 页面锁住时，不能进行操作
+    if (this.isLockScreen) {
+      return
+    }
+    if (!event) {
+      return;
+    }
+    if (!event.fingerList[0]) {
+      return
+    }
+    if (event.fingerList[0].localX >= (this.xComponentWidth as number) / 2) {
+      this.volumeUtil.playerSliderModel.showVolumeProgress = true
+    } else {
+      this.volumeUtil.playerSliderModel.showBrightProgress = true
+    }
+
+    this.positionY = event.offsetY;
+  }
+
+  // 处理音量和亮度的滑动更新事件回调
+  handleBrightAndVolumePanUpdate(event?: GestureEvent) {
+    if (this.isLockScreen) {
+      return
+    }
+    if (!event) {
+      return;
+    }
+    if (!event.fingerList[0]) {
+      return
+    }
+    
+    if (event.fingerList[0].displayX >= (this.xComponentWidth as number) / 2) {
+      this.onVolumeActionUpdate(event)
+    } else {
+      this.onBrightActionUpdate(event)
+    }
+  }
+
+  // 音量
+  onVolumeActionUpdate(event: GestureEvent) {
+    if (!this.player) {
+      return;
+    }
+    const canOperateState: string[] = [
+      AVPlayerState.PREPARED, AVPlayerState.PLAYING, AVPlayerState.PAUSED, AVPlayerState.COMPLETED
+    ];
+    if (canOperateState.indexOf(this.player.state) === -1) {
+      return;
+    }
+    let changeVolume = (this.positionY - event.offsetY) / (this.xComponentHeight as number)
+    let currentVolume = this.volumeUtil.playerSliderModel.volume + changeVolume;
+    let endVolume = Math.min(Math.max(0, currentVolume), 1);
+    // 处理音量进度的显隐变化
+    this.volumeUtil.handleVolumeProgressChange()
+    this.volumeUtil.offVolumeChangeListen();
+    this.volumeUtil.playerSliderModel.onSliderChange(0, endVolume, SliderChangeMode.Moving);
+    this.positionY = event.offsetY;
+  }
+
+  // 亮度更新
+  onBrightActionUpdate(event: GestureEvent) {
+    if (this.volumeUtil.playerSliderModel.bright !== -1 && this.volumeUtil.playerSliderModel.bright < 0) {
+      this.volumeUtil.playerSliderModel.bright = 0
+    }
+    if (this.volumeUtil.playerSliderModel.bright > 1) {
+      this.volumeUtil.playerSliderModel.bright = 1
+    }
+    this.volumeUtil.playerSliderModel.showBrightProgress = true
+    this.volumeUtil.playerSliderModel.showVolumeProgress = false;
+    this.volumeUtil.offVolumeChangeListen();
+    let changeBright = (this.positionY - event.offsetY) / (this.xComponentHeight as number)
+    let currentBright = this.volumeUtil.playerSliderModel.bright + changeBright;
+    let endBright = Math.min(Math.max(0, currentBright), 1);
+    this.volumeUtil.playerSliderModel.onSliderChange(1, endBright, SliderChangeMode.Moving);
+    this.positionY = event.offsetY;
+  }
+
+  onActionEnd() {
+    if (this.isLockScreen) {
+      return
+    }
+    this.volumeUtil.playerSliderModel.showVolumeProgress = false
+    this.volumeUtil.playerSliderModel.showBrightProgress = false
+    this.volumeUtil.onVolumeChangeListen()
+  }
+
+  // 进度条
+  handleProgressStart(event: GestureEvent) {
+    if (this.isLockScreen) {
+      return
+    }
+    if (!event) {
+      return;
+    }
+    this.positionX = event.offsetX;
+    this.panStartTime = this.progressController.currentTime;
+  }
+
+  // 更新进度条
+  handleProgressUpdate(event: GestureEvent) {
+    if (this.isLockScreen) {
+      return
+    }
+    if (!event) {
+      return;
+    }
+    let tempTime = this.positionX + event.offsetX
+    let changeTime = tempTime / this.progressController.progressWidth * this.progressController.durationTime;
+    let panTime = this.panStartTime + changeTime
+    this.panEndTime = Math.min(Math.max(0, panTime), this.progressController.durationTime);
+    this.progressController.sliderOnChange(this.panEndTime, SliderChangeMode.Moving);
+  }
+
+  // 进度条滑动结束
+  handleProgressEnd() {
+    if (this.isLockScreen) {
+      return
+    }
+    this.progressController.sliderOnChange(this.panEndTime, SliderChangeMode.End);
+  }
+
+  // 自定义动画注册
+  public registerCustomTransition(
+    navDestContext: NavDestinationContext,
+    longTakeSession: LongTakeAnimationProperties
+  ) {
+    let param = navDestContext.pathInfo?.param as Record<string, Object>;
+    let longTakeTransitionParam = param.longTakeTransitionParam as LongTakeTransitionParam;
+    if (longTakeTransitionParam) {
+      longTakeSession.init(navDestContext, longTakeTransitionParam, {
+        pop: () => {
+          navDestContext.pathStack.pop()
+        },
+      });
     }
   }
 }

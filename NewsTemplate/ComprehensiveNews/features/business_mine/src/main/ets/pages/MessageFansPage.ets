@@ -40,8 +40,8 @@ struct MsgFansPage {
           .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
           .cachedCount(1)
           .padding({
-            left: CommonConstants.PADDING_PAGE,
-            right: CommonConstants.PADDING_PAGE,
+            left: this.vm.breakPointModel.pagePadding,
+            right: this.vm.breakPointModel.pagePadding,
             top: CommonConstants.SPACE_M,
           })
         }

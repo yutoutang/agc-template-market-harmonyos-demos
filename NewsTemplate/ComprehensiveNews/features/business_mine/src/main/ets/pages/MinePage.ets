@@ -34,13 +34,16 @@ struct MinePage {
         .scrollBar(BarState.Off)
         .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
         .padding({
-          left: CommonConstants.PADDING_PAGE,
-          right: CommonConstants.PADDING_PAGE,
+          left: this.vm.breakPointModel.pagePadding,
+          right: this.vm.breakPointModel.pagePadding,
           top: CommonConstants.SPACE_M,
         })
       }
       .width(CommonConstants.FULL_PERCENT)
       .height(CommonConstants.FULL_PERCENT)
+      .padding({
+        bottom: this.vm.pagePaddingBottom,
+      })
     }
     .hideTitleBar(true)
     .backgroundColor($r('sys.color.background_secondary'))
@@ -181,6 +184,7 @@ struct MinePage {
         .fontWeight(FontWeight.Medium)
       SettingCard({
         list: this.vm.serviceList,
+        enableLaneSetting: true,
       })
     }
     .margin({ top: CommonConstants.PADDING_XS })

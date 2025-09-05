@@ -21,8 +21,11 @@ export class NodeControllerFactory extends NodeController {
     return null;
   }
 
-  remove() {
-    this.isRemove = true;
+  disposeFrameNode() {
+    if (this.rootNode !== null && this.nativeNode !== null) {
+      this.nativeNode.dispose()
+      this.rootNode.dispose();
+    }
   }
 
   initData(uiContext: UIContext, nodeParams: NodeParams) {
@@ -41,8 +44,7 @@ export class NodeControllerFactory extends NodeController {
 }
 
 export const getNativeNodeController =
-  (uiContext: UIContext, nodeParams: NodeParams): NodeControllerFactory | undefined => {
-    let baseNode = new NodeControllerFactory();
+  (uiContext: UIContext, nodeParams: NodeParams,baseNode:NodeControllerFactory): NodeControllerFactory | undefined => {
     nodeMap.set(nodeParams.type, baseNode);
     baseNode.initData(uiContext, nodeParams);
     return nodeMap.get(nodeParams.type);

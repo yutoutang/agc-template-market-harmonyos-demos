@@ -27,5 +27,6 @@ struct Sample1 {
       })
     }
     .hideTitleBar(true)
+    .mode(NavigationMode.Stack)
   }
 }

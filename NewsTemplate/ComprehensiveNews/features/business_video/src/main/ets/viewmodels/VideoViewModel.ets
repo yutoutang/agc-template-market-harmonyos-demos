@@ -16,6 +16,7 @@ export class VideoViewModel extends BaseViewModel {
     new TabNav('follow', '关注'),
     new TabNav('featured', '精选'),
     new TabNav('recommend', '推荐', $r('app.color.color_tab_blue')),
+    new TabNav('livestream', '直播', $r('app.color.color_tab_blue')),
   ]
 
   tabController: TabsController = new TabsController();
@@ -62,5 +63,12 @@ export class VideoViewModel extends BaseViewModel {
     SystemBarOperation.setWindowSystemBarProp({
       statusBarContentColor: color,
     })
+  }
+
+  @Computed get pagePaddingBottom() {
+    if (this.tabModel.isTabVertical) {
+      return this.windowModel.windowBottomPadding;
+    }
+    return 0;
   }
 }

@@ -11,7 +11,6 @@ import { TopTextBottomVideoCard } from './src/main/ets/components/TopTextBottomV
 import { AdvertisementCard } from './src/main/ets/components/AdvertisementCard'
 export { transformLayout } from './src/main/ets/utils/Utils'
 
-export { ChildrenData } from './src/main/ets/interface'
 
 
 let nodeBuilderConfigVm = NodeBuilderConfig.instance

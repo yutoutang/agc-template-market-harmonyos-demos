@@ -1,4 +1,4 @@
-import { CommonConstants, RouterMap, RouterToNews, TimeUtils } from 'lib_common';
+import { CommonConstants, RouterMap, RouterParams, RouterToNews, TimeUtils } from 'lib_common';
 import { NewsEnum, NewsResponse } from 'lib_news_api';
 
 @ComponentV2
@@ -57,6 +57,8 @@ export struct UniformNews {
         }
         .width(96)
         .height(72)
+        .accessibilityGroup(true)
+        .accessibilityLevel('no')
       } else if (this.imgUrl) {
         Image(this.imgUrl)
           .width(96)
@@ -71,7 +73,7 @@ export struct UniformNews {
       bottom: CommonConstants.PADDING_M,
     })
     .onClick(() => {
-      let routerParams: Record<string, string | NewsEnum> = {
+      let routerParams: RouterParams<null> = {
         'type': this.newsInfo.type,
         'newsId': this.newsInfo.id,
         'authorId': this.newsInfo.author.authorId,

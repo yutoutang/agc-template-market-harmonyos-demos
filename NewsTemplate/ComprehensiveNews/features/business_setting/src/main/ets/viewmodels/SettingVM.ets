@@ -1,12 +1,14 @@
 import { promptAction } from '@kit.ArkUI';
 import { common, ConfigurationConstant } from '@kit.AbilityKit';
-import { AppGalleryUtils, BaseViewModel, FileUtils, RouterMap, RouterUtils, SystemBarOperation } from 'lib_common';
+import { notificationManager } from '@kit.NotificationKit';
+import { AppGalleryUtils, BaseViewModel, FileUtils, RouterMap, RouterUtils } from 'lib_common';
 import { AccountApi } from 'lib_account';
-import { SettingItem } from '../types/Types';
+import { ISelectOption, SettingItem } from '../types/Types';
 
 @ObservedV2
 export class SettingViewModel extends BaseViewModel {
   private accountInstance: AccountApi = new AccountApi();
+  @Trace isFocusOnPage: boolean = true;
   @Trace isLoading: boolean = false;
   @Trace cacheSize: string = '0';
   @Trace cacheSettingItem = new SettingItem({
@@ -21,12 +23,30 @@ export class SettingViewModel extends BaseViewModel {
   })
   @Trace colorSettingItem = new SettingItem({
     label: '夜间模式',
-    typeSwitch: true,
-    switchV: this.settingInfo.darkSwitch,
-    onClick: (isOn) => {
-      this.settingInfo.darkSwitch = isOn as boolean;
-      this.colorSettingItem.switchV = isOn as boolean
-      this.setColorMode(this.settingInfo.darkSwitch);
+    typeSelect: true,
+    selectTitle: '夜间模式',
+    selectOptions: [
+      {
+        id: 0,
+        label: '跟随系统',
+        value: -1,
+      },
+      {
+        id: 1,
+        label: '普通模式',
+        value: 1,
+      },
+      {
+        id: 2,
+        label: '夜间模式',
+        value: 0,
+      },
+    ],
+    selectV: this.getColorIndex(),
+    onSelect: (option) => {
+      this.settingInfo.colorMode = (option as ISelectOption).value as ConfigurationConstant.ColorMode;
+      this.colorSettingItem.selectV = this.getColorIndex();
+      getContext().getApplicationContext().setColorMode(this.settingInfo.colorMode);
     },
   });
   @Trace pushSettingItem = new SettingItem({
@@ -34,8 +54,7 @@ export class SettingViewModel extends BaseViewModel {
     typeSwitch: true,
     switchV: this.settingInfo.pushSwitch,
     onClick: (isOn) => {
-      this.settingInfo.pushSwitch = isOn as boolean;
-      this.pushSettingItem.switchV = isOn as boolean;
+      this.requestPushPermission(isOn as boolean);
     },
   });
   @Trace list1: SettingItem[] = [
@@ -68,7 +87,7 @@ export class SettingViewModel extends BaseViewModel {
     new SettingItem({
       label: '字体大小',
       routerName: RouterMap.SETTING_FONT,
-    })
+    }),
   ];
   @Trace list4: SettingItem[] = [
     new SettingItem({
@@ -87,16 +106,23 @@ export class SettingViewModel extends BaseViewModel {
     new SettingItem({
       label: '关于我们',
       routerName: RouterMap.SETTING_ABOUT,
-    })
+    }),
   ];
 
-  setColorMode(isDark: boolean) {
-    const mode =
-      isDark ? ConfigurationConstant.ColorMode.COLOR_MODE_DARK : ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT;
-    getContext().getApplicationContext().setColorMode(mode);
-    SystemBarOperation.setWindowSystemBarProp({
-      statusBarContentColor:isDark?'#ffffff':'#ff090909'
-    })
+  requestPushPermission(isOn: boolean) {
+    notificationManager.openNotificationSettings(getContext(this) as common.UIAbilityContext)
+      .then(() => {
+        this.isFocusOnPage = false;
+      })
+  }
+
+  getLatestPushStatus() {
+    if (!this.isFocusOnPage) {
+      const isOn = notificationManager.isNotificationEnabledSync();
+      this.settingInfo.pushSwitch = isOn;
+      this.pushSettingItem.switchV = isOn;
+      this.isFocusOnPage = true;
+    }
   }
 
   getCache() {
@@ -110,6 +136,16 @@ export class SettingViewModel extends BaseViewModel {
     return `${this.cacheSize}M`;
   }
 
+  getColorIndex() {
+    if (this.settingInfo.colorMode === 0) {
+      return 2;
+    }
+    if (this.settingInfo.colorMode === 1) {
+      return 1;
+    }
+    return 0;
+  }
+
   onSignOutBtnClick() {
     this.isLoading = true;
     this.accountInstance.signOut()
@@ -121,11 +157,11 @@ export class SettingViewModel extends BaseViewModel {
       });
   }
 
-  @Computed get signOutBtnLabel() {
-    if(this.isLoading) {
+  @Computed
+  get signOutBtnLabel() {
+    if (this.isLoading) {
       return '正在退出登录...'
     }
     return '退出登录'
   }
-
 }

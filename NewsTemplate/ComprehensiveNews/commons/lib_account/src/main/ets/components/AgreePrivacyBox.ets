@@ -1,4 +1,5 @@
-import { CommonConstants } from 'lib_common';
+import { CommonConstants, RouterMap } from 'lib_common';
+import { ProtocolRouterParams } from '../constants/Types';
 import { LoginVM } from '../viewmodels/LoginVM';
 
 @ComponentV2
@@ -22,14 +23,20 @@ export struct AgreePrivacyBox {
           .fontColor($r('app.color.app_theme'))
           .fontWeight(FontWeight.Medium)
           .onClick(() => {
-            this.vm.stack.pushPathByName('ProtocolWebView', this.vm.userProtocolInfo, true);
+            this.vm.stack.pushPathByName(RouterMap.PROTOCOL_WEBVIEW, {
+              content: this.vm.userProtocolInfo,
+              isSheet: this.vm.isSheet,
+            } as ProtocolRouterParams, true);
           })
         Span('《xxxx隐私政策》')
           .fontSize($r('sys.float.Caption_L'))
           .fontColor($r('app.color.app_theme'))
           .fontWeight(FontWeight.Medium)
           .onClick(() => {
-            this.vm.stack.pushPathByName('ProtocolWebView', this.vm.privacyInfo, true);
+            this.vm.stack.pushPathByName(RouterMap.PROTOCOL_WEBVIEW, {
+              content: this.vm.privacyInfo,
+              isSheet: this.vm.isSheet,
+            } as ProtocolRouterParams, true);
           })
         Span('和')
           .fontSize($r('sys.float.Caption_L'))
@@ -39,7 +46,10 @@ export struct AgreePrivacyBox {
           .fontColor($r('app.color.app_theme'))
           .fontWeight(FontWeight.Medium)
           .onClick(() => {
-            this.vm.stack.pushPathByName('ProtocolWebView', this.vm.huaweiUserProtocolInfo, true);
+            this.vm.stack.pushPathByName(RouterMap.PROTOCOL_WEBVIEW, {
+              content: this.vm.huaweiUserProtocolInfo,
+              isSheet: this.vm.isSheet,
+            } as ProtocolRouterParams, true);
           })
       }
       .layoutWeight(1)

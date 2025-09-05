@@ -3,7 +3,8 @@
     "name": "module_post_test",
     "type": "feature",
     "deviceTypes": [
-      "default"
+      "phone",
+      "tablet"
     ],
     "deliveryWithInstall": true,
     "installationFree": false

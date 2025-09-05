@@ -32,5 +32,8 @@ export struct Battery {
         .height(6)
         .backgroundColor(Color.White)
     }
+    .accessibilityGroup(true)
+    .accessibilityLevel('yes')
+    .accessibilityText('电量百分之' + this.percent)
   }
 }

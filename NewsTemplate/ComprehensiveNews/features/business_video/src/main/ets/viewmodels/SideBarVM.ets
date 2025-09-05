@@ -1,14 +1,24 @@
+import { UIUtils } from '@kit.ArkUI';
 import { LoginSheetUtils } from 'lib_account';
 import { BaseViewModel, FormatCount } from 'lib_common';
 import { BaseNewsServiceApi, CommentServiceApi, MineServiceApi, NewsResponse } from 'lib_news_api';
+import { VideoService } from '../services/VideoService';
 
 @ObservedV2
 export class SideBarVM extends BaseViewModel {
   @Trace videoInfo: NewsResponse = {} as NewsResponse
 
+  getVideoInfo(videoId: string) {
+    const videoDetailInfo = VideoService.queryVideoDataById(videoId);
+    if (videoDetailInfo) {
+      this.videoInfo = UIUtils.makeObserved(videoDetailInfo);
+    }
+  }
+
   isFollow() {
     return this.userInfoModel.watchers.includes(this.videoInfo.author.authorId)
   }
+
   // 关注操作
   followOperation() {
     if (!this.userInfoModel.isLogin) {
@@ -41,9 +51,13 @@ export class SideBarVM extends BaseViewModel {
   // 点赞数
   getLikeCount(): string {
     if (!this.videoInfo.likeCount) {
-      return '点赞'
+      return '点赞';
     }
-    return FormatCount.formatNumberToW(this.videoInfo.likeCount)
+    return this.getLikeNum();
+  }
+
+  getLikeNum() {
+    return FormatCount.formatNumberToW(this.videoInfo.likeCount);
   }
 
   // 点赞操作
@@ -63,9 +77,13 @@ export class SideBarVM extends BaseViewModel {
   // 收藏数
   getMarkCount(): string {
     if (!this.videoInfo.markCount) {
-      return '收藏'
+      return '收藏';
     }
-    return FormatCount.formatNumberToW(this.videoInfo.markCount)
+    return this.getMarkNum();
+  }
+
+  getMarkNum() {
+    return FormatCount.formatNumberToW(this.videoInfo.markCount);
   }
 
   // 收藏操作

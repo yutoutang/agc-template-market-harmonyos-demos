@@ -1,5 +1,6 @@
 import { media } from '@kit.MediaKit';
 import { util } from '@kit.ArkTS';
+import { display } from '@kit.ArkUI';
 import { PlayerLayoutSize } from '../controller/PlayerLayoutSize';
 import { VideoPlayerModel } from './VideoPlayerModel';
 import { AVPlayerManager, AVPlayerSession } from '../controller/AVPlayerManager';
@@ -19,8 +20,8 @@ export class SwipePlayerModel extends VideoPlayerModel {
   isFromList: boolean = false;
   // 点击列表卡片的播放器实例
   itemAVPlayer: media.AVPlayer | undefined
-  // 是否横屏
-  @Trace isLandscape: boolean = false
+  // 封面图
+  @Trace imageUrl: ResourceStr = ''
   // 倍速
   @Trace isAccelerate: boolean = false;
   @Trace leftRateOpacity: number = 0;
@@ -84,8 +85,16 @@ export class SwipePlayerModel extends VideoPlayerModel {
 
   // 是否显示全屏按钮
   showFullScreenBtn(): boolean {
-    let height = Number(this.playerLayoutSize.getXComponentHeight())
-    let width = Number(this.playerLayoutSize.getXComponentWidth())
+    let height = Number(this.playerLayoutSize.getXComponentHeight());
+    let width = Number(this.playerLayoutSize.getXComponentWidth());
+
+    let displayClass = display.getDefaultDisplaySync();
+    let orientation = displayClass.orientation;
+    let landscapes = [display.Orientation.LANDSCAPE, display.Orientation.LANDSCAPE_INVERTED];
+    // 设备横向时不展示全屏播放按钮
+    if (landscapes.includes(orientation)) {
+      return false;
+    }
     return height / width < 1
   }
 
@@ -110,7 +119,7 @@ export class SwipePlayerModel extends VideoPlayerModel {
 
   // 长按加速
   onLongPress(event: GestureEvent) {
-    if (this.playerSession?.avPlayer?.state === 'playing') {
+    if (this.playerSession?.avPlayer?.state === 'playing' && !this.isBuffering) {
       // 快进图标显隐变化
       this.leftRateOpacity = 1;
       this.rightRateOpacity = 0;
@@ -122,9 +131,7 @@ export class SwipePlayerModel extends VideoPlayerModel {
   }
   // 取消长按
   offLongPress() {
-    if (this.playerSession?.avPlayer?.state === 'playing') {
-      this.isAccelerate = false;
-      this.playerSession.avPlayer.setSpeed(media.PlaybackSpeed.SPEED_FORWARD_1_00_X)
-    }
+    this.isAccelerate = false;
+    this.playerSession?.avPlayer?.setSpeed(media.PlaybackSpeed.SPEED_FORWARD_1_00_X)
   }
 }

@@ -1,7 +1,7 @@
 import { FeedComment } from 'module_feedcomment'
 import { RouterMap, RouterUtils } from 'lib_common';
 import { CommentResponse } from 'lib_news_api';
-import NewsFeedVM from '../viewModel/NewsFeedVM';
+import NewsFeedVM from '../viewmodel/NewsFeedVM';
 import { LoginSheetUtils } from 'lib_account';
 
 @Builder
@@ -18,13 +18,6 @@ export function CommentBuilder(newsFeedVM: NewsFeedVM) {
     },
     onGoAuthorInfo: (authorId: string) => {
       RouterUtils.pushPathByName(RouterMap.PROFILE_HOME, authorId)
-    },
-    onInterceptLogin: (loginInterceptCb: (isLogin: boolean) => void) => {
-      if (!newsFeedVM.userInfoModel.isLogin) {
-        LoginSheetUtils.open()
-        return
-      }
-      loginInterceptCb(newsFeedVM.userInfoModel.isLogin)
     },
     onDeleteComment: (commentId: string) => {
       newsFeedVM.deleteComment(commentId)

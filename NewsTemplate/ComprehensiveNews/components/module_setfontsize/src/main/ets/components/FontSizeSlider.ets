@@ -17,7 +17,10 @@ export struct FontSizeSlider {
   build() {
     Column({ space: 2 }) {
       Row({ space: 20 }) {
-        Text('A').fontSize(14 * FontSizeEnum.SMALL).fontColor($r('sys.color.font_secondary'))
+        Text('A')
+          .fontSize(14 * FontSizeEnum.SMALL)
+          .fontColor($r('sys.color.font_secondary'))
+          .accessibilityLevel('no')
         Slider({
           min: 0,
           max: 3,
@@ -30,7 +33,10 @@ export struct FontSizeSlider {
           .onChange((value: number) => {
             this.$currentRatio(FONT_SIZE_LIST[value].value);
           })
-        Text('A').fontSize(14 * FontSizeEnum.XL).fontColor($r('sys.color.font_secondary'))
+        Text('A')
+          .fontSize(14 * FontSizeEnum.XL)
+          .fontColor($r('sys.color.font_secondary'))
+          .accessibilityLevel('no')
       }
       .width(Constants.FULL_PERCENT)
       .height(40)

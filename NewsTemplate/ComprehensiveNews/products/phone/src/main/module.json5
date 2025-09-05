@@ -5,7 +5,8 @@
     "description": "$string:module_desc",
     "mainElement": "PhoneAbility",
     "deviceTypes": [
-      "phone"
+      "phone",
+      "tablet"
     ],
     "querySchemes": [
       "weixin",
@@ -22,10 +23,15 @@
         "label": "$string:PhoneAbility_label",
         "srcEntry": "./ets/phoneability/PhoneAbility.ets",
         "description": "$string:PhoneAbility_desc",
-        "startWindowIcon": "$media:startIcon",
+        "startWindowIcon": "$media:new_start_icon",
         "startWindowBackground": "$color:start_window_background",
-        "supportWindowMode": ["fullscreen", "floating"],
+        "orientation": "follow_desktop",
+        "supportWindowMode": [
+          "fullscreen",
+          "floating"
+        ],
         "exported": true,
+        "continuable": true,
         "skills": [
           {
             "entities": [
@@ -68,22 +74,19 @@
     ],
     "requestPermissions": [
       {
-        "name": "ohos.permission.INTERNET",
+        "name": "ohos.permission.INTERNET"
       },
       {
-        "name": "ohos.permission.GET_NETWORK_INFO",
-      },
-      {
-        "name": "ohos.permission.GET_WIFI_INFO",
+        "name": "ohos.permission.GET_NETWORK_INFO"
       }
     ],
     "metadata": [
       {
-        /*
-        * todo: 替换应用的Client ID
-        */
+/**
+         * todo: 替换应用的Client ID
+         */
         "name": "client_id",
-        "value": "xxx"
+        "value": "******"
       }
     ]
   }

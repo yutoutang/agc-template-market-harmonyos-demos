@@ -1,15 +1,17 @@
 import { CommonConstants } from 'lib_common'
 import { LayoutSetting, NewsResponse } from 'lib_news_api'
-import { getNativeNodeController } from '../../factory/NativeNodeFactory'
+import { FlexLayoutBreakPointVM } from '../../../viewmodel/FlexLayoutBreakPointVM'
+import { getNativeNodeController, NodeControllerFactory } from '../../factory/NativeNodeFactory'
 import { FrameNodeParams } from '../../model/Model'
 
 @Builder
-export function ListNodeBuilder(frameNodeParams:FrameNodeParams) {
+export function ListNodeBuilder(frameNodeParams: FrameNodeParams) {
   ListBuilder({
     articles: frameNodeParams.articles,
     viewLayout: frameNodeParams.viewLayout,
     style: frameNodeParams.style,
-    extraInfo:frameNodeParams.extraInfo
+    extraInfo: frameNodeParams.extraInfo,
+    nodeControllerFactory:frameNodeParams.nodeControllerFactory
   })
 }
 
@@ -18,8 +20,8 @@ export struct ListBuilder {
   @Param articles: NewsResponse[] = []
   @Param viewLayout: LayoutSetting = new LayoutSetting()
   @Param style: Record<string, string | number> = {}
-  @Param extraInfo: Record<string, string | boolean | Record<string, string | boolean>[]> = {}
-  @Local nativeLeft: number = 0
+  @Param extraInfo: Record<string, number | string | boolean | Record<string, string | boolean>[]> = {}
+  @Param nodeControllerFactory:NodeControllerFactory = new NodeControllerFactory()
 
   @Builder
   viewVNodeBuilder(children: LayoutSetting [], nativeCardData: NewsResponse, scrollIndex: number) {
@@ -34,8 +36,8 @@ export struct ListBuilder {
             nativeCardData: nativeCardData,
             scrollIndex: scrollIndex,
             layout: item,
-            extraInfo:this.extraInfo
-          }))
+            extraInfo: this.extraInfo,
+          },this.nodeControllerFactory))
         }
       }, (item: LayoutSetting) => JSON.stringify(item))
     }
@@ -50,6 +52,7 @@ export struct ListBuilder {
         }
       }, (item: NewsResponse) => JSON.stringify(item.id))
     }
+    .lanes(new FlexLayoutBreakPointVM(this.extraInfo).getLanes, 16)
   }
 
   build() {

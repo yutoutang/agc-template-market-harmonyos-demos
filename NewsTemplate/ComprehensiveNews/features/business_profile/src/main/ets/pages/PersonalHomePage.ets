@@ -2,11 +2,13 @@ import { CommonConstants } from 'lib_common';
 import { FlexLayoutPage } from 'lib_flex_layout';
 import { NewsEnum, RequestListData } from 'lib_news_api';
 import { emptyBuilder, NavHeaderBar } from 'lib_widget';
-import { LayoutNewsDataSource } from '../common/NewsDataSource';
+import { LayoutNewsDataSource } from '../common/DataSource';
 import { TabBar } from '../components/TabBar';
 import { UserIntro } from '../components/UserIntro';
 import { UniformNews } from '../components/UniformNews';
 import { PersonalPageViewModel } from '../viewmodels/PersonalHomeVM';
+import { WatchButton } from '../components/WatchButton';
+import { Constants } from '../common/Constants';
 
 @Builder
 export function PersonalHomePageBuilder() {
@@ -25,7 +27,6 @@ struct PersonalHomePage {
     NavDestination() {
       Column() {
         NavHeaderBar({
-          title: this.vm.titleText,
           rightPartBuilder: () => {
             this.rightPartBuilder()
           },
@@ -49,13 +50,14 @@ struct PersonalHomePage {
           .align(Alignment.Top)
           .edgeEffect(EdgeEffect.None)
           .onReachEnd(() => {
-            this.vm.titleText = this.vm.userInfo?.authorNickName || '';
+            this.vm.showInfoTop = true;
           })
           .onReachStart(() => {
-            this.vm.titleText = '';
+            this.vm.showInfoTop = false;
           })
         }
         .layoutWeight(1)
+        .accessibilityLevel('no')
         .onRefreshing(() => {
           this.vm.onRefreshing();
         })
@@ -116,17 +118,17 @@ struct PersonalHomePage {
     .backgroundColor($r('sys.color.comp_background_primary'))
     .borderRadius({ topLeft: $r('app.float.xxl_radius'), topRight: $r('app.float.xxl_radius') })
     .padding({
-      left: CommonConstants.PADDING_PAGE,
-      right: CommonConstants.PADDING_PAGE,
+      left: this.vm.breakPointModel.pagePadding,
+      right: this.vm.breakPointModel.pagePadding,
       bottom: this.vm.windowModel.windowBottomPadding,
     })
   }
 
   @Builder
   listBuilder(v: LayoutNewsDataSource, index: number) {
-    List() {
+    WaterFlow() {
       LazyForEach(v, (item: RequestListData) => {
-        ListItem() {
+        FlowItem() {
           if ([NewsEnum.Article, NewsEnum.Video].includes(index)) {
             UniformNews({
               newsInfo: item.articles[0],
@@ -140,11 +142,14 @@ struct PersonalHomePage {
             })
           }
         }
+        .width(CommonConstants.FULL_PERCENT)
       }, (item: RequestListData) => JSON.stringify(item))
     }
     .width(CommonConstants.FULL_PERCENT)
     .height(CommonConstants.FULL_PERCENT)
     .cachedCount(1)
+    .columnsTemplate(this.vm.getColumnsTemplate())
+    .columnsGap(CommonConstants.SPACE_XXL)
     .align(Alignment.Top)
     .scrollBar(BarState.Off)
     .edgeEffect(EdgeEffect.None)
@@ -156,15 +161,51 @@ struct PersonalHomePage {
 
   @Builder
   rightPartBuilder() {
-    Row() {
-      Image($r('app.media.ic_email'))
-        .width($r('app.float.large_img_size'))
-        .aspectRatio(1)
-        .draggable(false)
-        .visibility(this.vm.isMyself ? Visibility.None : Visibility.Visible)
-        .onClick(() => {
-          this.vm.jumpChatPage();
+    Row({ space: CommonConstants.SPACE_XS }) {
+      Row() {
+        Image(this.vm.userInfo?.authorIcon)
+          .width(Constants.SMALL_USER_ICON_W)
+          .aspectRatio(1)
+          .borderRadius(CommonConstants.HALF_PERCENT)
+          .clip(true)
+          .margin({
+            left: CommonConstants.PADDING_S,
+          })
+        Text(this.vm.userInfo?.authorNickName)
+          .fontSize($r('sys.float.Subtitle_L'))
+          .fontColor($r('sys.color.font_primary'))
+          .fontWeight(FontWeight.Medium)
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .constraintSize({ maxWidth: `calc(100% - ${this.vm.authorNameMaxWidth}vp)` })
+          .margin({
+            left: CommonConstants.PADDING_M,
+          })
+        Row() {
+          WatchButton({
+            author: this.vm.userInfo!,
+          })
+        }
+        .margin({
+          left: CommonConstants.PADDING_L,
         })
+        .visibility(this.vm.isMyself ? Visibility.Hidden : Visibility.Visible)
+      }
+      .layoutWeight(1)
+      .visibility(this.vm.showInfoTop ? Visibility.Visible : Visibility.Hidden)
+
+      Button() {
+        SymbolGlyph($r('sys.symbol.envelope'))
+          .fontColor([$r('sys.color.font_primary')])
+          .fontWeight(FontWeight.Normal)
+          .fontSize(24)
+      }
+      .attributeModifier(this.vm.buttonModifier)
+      .accessibilityText('私信')
+      .visibility(this.vm.isMyself ? Visibility.None : Visibility.Visible)
+      .onClick(() => {
+        this.vm.jumpChatPage();
+      })
     }
     .layoutWeight(1)
     .justifyContent(FlexAlign.End)

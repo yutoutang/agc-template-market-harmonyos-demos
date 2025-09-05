@@ -40,8 +40,8 @@ struct MessagePage {
           .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
           .align(Alignment.Top)
           .padding({
-            left: CommonConstants.PADDING_PAGE,
-            right: CommonConstants.PADDING_PAGE,
+            left: this.vm.breakPointModel.pagePadding,
+            right: this.vm.breakPointModel.pagePadding,
           })
         }
         .layoutWeight(1)

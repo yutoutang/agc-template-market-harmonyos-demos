@@ -3,6 +3,7 @@ import { FeedbackModel } from '../common/FeedbackModel';
 import { NavHeaderBar } from '../components/NavHeaderBar';
 import { Constants, LIST_INFO } from '../common/Constants';
 import { SettingList } from '../components/SettingList';
+import { CommonUtils } from '../common/CommonUtils';
 
 @Builder
 export function FeedbackManagePageBuilder() {
@@ -13,27 +14,41 @@ export function FeedbackManagePageBuilder() {
 export struct FeedbackManagePage {
   @Provider() stack: NavPathStack = new NavPathStack();
   @Local feedbackModel: FeedbackModel = AppStorageV2.connect(FeedbackModel, () => new FeedbackModel())!;
+  @Local breakpoint: string = 'sm';
 
   build() {
     NavDestination() {
       Column({ space: Constants.SPACE_12 }) {
-        NavHeaderBar({ title: '意见反馈' })
-        Scroll() {
-          Column() {
-            SettingList({
-              list: LIST_INFO,
-              fontSizeRatio: this.feedbackModel.fontSizeRatio,
-            })
+        NavHeaderBar({
+          title: '意见反馈',
+          breakpoint: this.breakpoint,
+        })
+        GridRow(Constants.GRID_ROW_OPTIONS) {
+          GridCol({
+            span: Constants.CENTER_COL_SPAN,
+            offset: Constants.CENTER_COL_OFFSET,
+          }) {
+            Scroll() {
+              Column() {
+                SettingList({
+                  list: LIST_INFO,
+                  fontSizeRatio: this.feedbackModel.fontSizeRatio,
+                })
+              }
+              .padding({
+                left: CommonUtils.getPageMargin(this.breakpoint),
+                right: CommonUtils.getPageMargin(this.breakpoint),
+              })
+            }
+            .layoutWeight(1)
+            .scrollBar(BarState.Off)
+            .align(Alignment.Top)
+            .edgeEffect(EdgeEffect.Spring)
           }
-          .padding({
-            left: Constants.PADDING_PAGE,
-            right: Constants.PADDING_PAGE,
-          })
         }
-        .layoutWeight(1)
-        .scrollBar(BarState.Off)
-        .align(Alignment.Top)
-        .edgeEffect(EdgeEffect.Spring)
+        .onBreakpointChange((bp: string) => {
+          this.breakpoint = bp;
+        })
       }
     }
     .hideTitleBar(true)

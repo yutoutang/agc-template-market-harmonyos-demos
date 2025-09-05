@@ -7,6 +7,8 @@ import { NavRouteModel } from '../models/NavRouteModel';
 import { WindowStageModel } from '../models/WindowStageModel';
 import { BreakpointModel } from '../models/BreakpointModel';
 import { NetworkModel } from '../models/NetworkModel';
+import { VideoExtraInfoModel } from '../models/VideoExtraInfoModel';
+import { DisplayModel } from '../models/DisplayModel';
 
 /**
  * 所有ViewModel的基类，支持UI动态观测
@@ -21,4 +23,7 @@ export abstract class BaseViewModel {
   @Trace windowStageModel: WindowStageModel = AppStorageV2.connect(WindowStageModel, () => new WindowStageModel())!;
   @Trace breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
   @Trace networkModel: NetworkModel = AppStorageV2.connect(NetworkModel, () => NetworkModel.getInstance())!;
+  @Trace videoExtraInfoModel: VideoExtraInfoModel =
+    AppStorageV2.connect(VideoExtraInfoModel, () => VideoExtraInfoModel.getInstance())!;
+  @Trace displayModel: DisplayModel = AppStorageV2.connect(DisplayModel, () => new DisplayModel())!;
 }

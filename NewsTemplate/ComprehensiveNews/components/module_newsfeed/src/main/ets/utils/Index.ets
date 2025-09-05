@@ -191,6 +191,25 @@ export function formatToK(number: number) {
   return valueInK.replace(/\.0$/, '') + 'k';
 }
 
-export function handlerCoverImage(articleDetails: FeedCardInfoModel): string | undefined {
-  return articleDetails.postImgList?.[0]?.surfaceUrl || articleDetails.postImgList?.[0]?.picVideoUrl
+
+/*
+ * 获取ColumnsTemplate
+ * */
+export function getColumnsTemplate(imageCount: number) {
+  const count = Number(imageCount);
+  if (isNaN(count)) {
+    return 0;
+  }
+  if (count === 1) {
+    return 1;
+  } else if (count === 2) {
+    return 2;
+  } else if (count === 3) {
+    return 3;
+  } else if (count === 4) {
+    return 2;
+  } else if (count > 4) {
+    return 3;
+  }
+  return 0;
 }

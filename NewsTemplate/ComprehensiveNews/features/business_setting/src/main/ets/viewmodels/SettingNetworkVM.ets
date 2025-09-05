@@ -47,20 +47,13 @@ export class SettingNetworkVM extends BaseViewModel {
       this.item2.selectV = this.settingInfo.network.remindWithoutWlan;
     },
   });
-  @Trace item3: SettingItem = new SettingItem({
-    typeSwitch: true,
-    label: '非WLAN网络下自动播放直播',
-    switchV: this.settingInfo.network.liveAutoplayWithoutWlan,
-    onClick: (isOn) => {
-      this.settingInfo.network.liveAutoplayWithoutWlan = isOn as boolean;
-    },
-  });
   @Trace item4: SettingItem = new SettingItem({
     typeSwitch: true,
     label: '使用移动网络改善内容浏览体验',
     subLabel: '如Wi-Fi网络质量差，将使用移动网络改善',
     switchV: this.settingInfo.network.optimizeWith4G,
     onClick: (isOn) => {
+      this.item4.switchV = isOn as boolean;
       this.settingInfo.network.optimizeWith4G = isOn as boolean;
     },
   });
@@ -70,6 +63,7 @@ export class SettingNetworkVM extends BaseViewModel {
     subLabel: '视频观看结束将自动下滑至下一个视频',
     switchV: this.settingInfo.network.autoPlayNext,
     onClick: (isOn) => {
+      this.item5.switchV = isOn as boolean;
       this.settingInfo.network.autoPlayNext = isOn as boolean;
     },
   });
@@ -78,6 +72,7 @@ export class SettingNetworkVM extends BaseViewModel {
     label: '推荐频道自动播放视频',
     switchV: this.settingInfo.network.autoPlayTabRecommend,
     onClick: (isOn) => {
+      this.item6.switchV = isOn as boolean;
       this.settingInfo.network.autoPlayTabRecommend = isOn as boolean;
     },
   });

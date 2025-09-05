@@ -1,4 +1,4 @@
-import { BaseViewModel, Logger } from 'lib_common';
+import { BaseViewModel, BreakpointNameEnum, Logger } from 'lib_common';
 import { MineServiceApi } from 'lib_news_api';
 import { AVPlayerManager, PlayerDataSource, SwipePlayerController } from 'module_swipeplayer';
 import { VideoNewsData } from '../models/VideoModel';
@@ -21,6 +21,12 @@ export class VideoSwipePageVM extends BaseViewModel {
   @Trace ratio: number = 1
   // 下拉刷新组件的状态
   @Trace refreshStatus: RefreshStatus = RefreshStatus.Inactive;
+  // 是否显示侧边评论
+  @Trace isShowSideComment: boolean = false
+  // 是否展示网络异常页
+  @Trace showExceptionPage: boolean = false;
+  @Trace loading: boolean = false;
+  @Trace pageType: TabPageType = TabPageType.FEATURED
   // 下拉最到高度
   maxRefreshingHeight: number = 100
   // 展示刷新动画的状态
@@ -30,10 +36,24 @@ export class VideoSwipePageVM extends BaseViewModel {
   // 播放管理
   avPlayerManager: AVPlayerManager = new AVPlayerManager();
 
-  initVideoDataSource(type: TabPageType) {
+  @Monitor('videoExtraInfoModel.isDisplayChange', 'breakPointModel.currentBreakpoint')
+  onShowSideCommentChange() {
+    this.isShowSideComment = this.videoExtraInfoModel.isDisplayChange &&
+      ((this.breakPointModel.currentBreakpoint === BreakpointNameEnum.MD &&
+      this.displayModel.isFoldable) || this.breakPointModel.currentBreakpoint === BreakpointNameEnum.LG)
+  }
+
+  @Computed get pagePaddingBottom() {
+    if (this.tabModel.isTabVertical) {
+      return this.windowModel.windowBottomPadding;
+    }
+    return 0;
+  }
+
+  initVideoDataSource() {
     let videoList: VideoNewsData[] = []
     // 关注 tab
-    if (type === TabPageType.FOLLOW) {
+    if (this.pageType === TabPageType.FOLLOW) {
       videoList = VideoService.queryFollowedUserVideoList(this.userInfoModel.authorId)
     } else {
       videoList = VideoService.queryVideoList();
@@ -47,7 +67,12 @@ export class VideoSwipePageVM extends BaseViewModel {
     // 加载更多，无限上滑
     let totalNum = this.videoDataSources.totalCount();
     if (totalNum - targetIndex <= 5) {
-      let videoList = VideoService.queryVideoList();
+      let videoList: VideoNewsData[] = []
+      if (this.pageType === TabPageType.FOLLOW) {
+        videoList = VideoService.queryFollowedUserVideoList(this.userInfoModel.authorId)
+      } else {
+        videoList = VideoService.queryVideoList();
+      }
       this.videoDataSources.pushDataArray(...videoList);
     }
   }
@@ -58,10 +83,11 @@ export class VideoSwipePageVM extends BaseViewModel {
     Logger.debug(TAG, 'get tab bar is visible: ' + this.tabModel.showTabBar)
   }
 
-  refreshList(pageType: TabPageType) {
+  refreshList() {
     // 模拟数据拉下刷新
     setTimeout(() => {
-      this.initVideoDataSource(pageType);
+      this.swipePlayerController.getAVPlayerMgr()?.clear()
+      this.initVideoDataSource();
       this.isRefreshing = false;
     }, 500);
   }
@@ -84,5 +110,20 @@ export class VideoSwipePageVM extends BaseViewModel {
 
   addHistoryList(id: string) {
     MineServiceApi.addToHistory(id)
+  }
+
+  // 是否使用侧边评论
+  checkUseSideComment(): boolean {
+    if (this.videoExtraInfoModel.isDisplayChange) {
+      return false;
+    }
+    // 折叠屏使用侧边评论
+    if (this.breakPointModel.currentBreakpoint === BreakpointNameEnum.MD) {
+      return this.displayModel.isFoldable;
+    }
+    if (this.breakPointModel.currentBreakpoint === BreakpointNameEnum.LG) {
+      return true;
+    }
+    return false;
   }
 }

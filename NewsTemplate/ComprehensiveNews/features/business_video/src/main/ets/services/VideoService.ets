@@ -32,4 +32,20 @@ export class VideoService {
     let data = VideoServiceApi.queryVideoById(id);
     return data ? new VideoNewsData(data) : undefined
   }
+
+  // 查询直播banner
+  public static queryLiveBannerList(): VideoNewsData[] {
+    let list = VideoServiceApi.queryVideoList('', 1);
+    let videoList: VideoNewsData[] = VideoService.createVideoList(list);
+    let liveMockList = [...videoList].slice(0, 3)
+    return liveMockList.sort(() => Number(Decimal.random()) - 0.5);
+  }
+
+  // 查询精彩回放数据
+  public static queryLiveHighlights(): VideoNewsData[] {
+    let list = VideoServiceApi.queryVideoList('', 1);
+    let videoList: VideoNewsData[] = VideoService.createVideoList(list);
+    let liveMockList = [...videoList].slice(0, 8)
+    return liveMockList.sort(() => Number(Decimal.random()) - 0.5);
+  }
 }

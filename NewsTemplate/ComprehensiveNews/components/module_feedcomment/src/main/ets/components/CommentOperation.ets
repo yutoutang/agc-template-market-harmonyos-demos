@@ -1,6 +1,5 @@
-import { CommentEventDispatcher } from '../utils/EventDispatcher'
-import { commentSheetOpen, formatToK } from '../utils/Utils'
-import { FeedCommentVM } from '../viewModel/FeedCommentVM'
+import { CommentUtils } from '../utils/CommentUtils'
+import { FeedCommentVM } from '../viewmodel/FeedCommentVM'
 
 @ComponentV2
 export struct CommentOperation {
@@ -11,14 +10,18 @@ export struct CommentOperation {
   @Param fontSizeRatio: number = 1
   @Param isDark: boolean = false
   @Local isShowComment: boolean = false
-  @Event onInterceptLogin: (cb: (isLogin: boolean) => void) => void = () => {};
-  @Event $isMarked: (value: boolean) => void = () => {};
-  @Event $markCount: (count: number) => void = () => {};
-  @Event onComment: (commentContent: string) => void = () => {}
-  @Event onShare: () => void = () => {}
-  @Event onMarked: (value: boolean) => void = () => {}
-  @Event onScrollToComment: () => void = () => {}
-
+  @Event $isMarked: (value: boolean) => void = () => {
+  };
+  @Event $markCount: (count: number) => void = () => {
+  };
+  @Event onComment: (commentContent: string) => void = () => {
+  }
+  @Event onShare: () => void = () => {
+  }
+  @Event onMarked: (value: boolean) => void = () => {
+  }
+  @Event onScrollToComment: () => void = () => {
+  }
   @BuilderParam shareBuilder: () => void
   @Local feedCommentVM: FeedCommentVM = FeedCommentVM.instance;
 
@@ -34,9 +37,6 @@ export struct CommentOperation {
 
   aboutToAppear(): void {
     this.fontSizeRatioChange()
-    CommentEventDispatcher.interceptLogin = (cb: (isLogin: boolean) => void) => {
-      this.onInterceptLogin(cb)
-    }
   }
 
   build() {
@@ -49,7 +49,7 @@ export struct CommentOperation {
       .borderRadius(24)
       .backgroundColor($r('sys.color.comp_background_tertiary'))
       .onClick(() => {
-        commentSheetOpen(null, (commentContent: string) => {
+        CommentUtils.commentSheetOpen(null, (commentContent: string) => {
           this.onComment(commentContent)
         })
       })
@@ -59,20 +59,29 @@ export struct CommentOperation {
       Row() {
         Column({ space: 5 }) {
           Image($r('app.media.message_active')).width(22).height(21).fillColor($r('sys.color.font_primary'))
-          Text(formatToK(this.commentCount)).fontSize(10 * this.fontSizeRatio).fontColor($r('sys.color.font_primary'))
-        }.onClick(() => {
+          Text(CommentUtils.formatToK(this.commentCount))
+            .fontSize(10 * this.fontSizeRatio)
+            .fontColor($r('sys.color.font_primary'))
+        }
+        .accessibilityText('评论' + CommentUtils.formatToK(this.commentCount))
+        .onClick(() => {
           this.onScrollToComment()
         })
+        .margin({ right: 24 })
 
         Column({ space: 5 }) {
           Image(this.isMarked ? $r('app.media.comment_like') : this.getDarkLike)
             .width(22)
             .height(21)
-          Text(formatToK(this.markCount)).fontSize(10 * this.fontSizeRatio).fontColor($r('sys.color.font_primary'))
+          Text(CommentUtils.formatToK(this.markCount))
+            .fontSize(10 * this.fontSizeRatio)
+            .fontColor($r('sys.color.font_primary'))
         }
+        .accessibilityText('收藏' + CommentUtils.formatToK(this.markCount))
         .onClick(() => {
           this.onMarked(!this.isMarked)
         })
+        .margin({ right: 24 })
 
         if (this.shareBuilder) {
           this.shareBuilder()
@@ -82,15 +91,17 @@ export struct CommentOperation {
               .width(21)
               .height(21)
               .fillColor($r('sys.color.font_primary'))
-            Text(formatToK(this.shareCount)).fontSize(10 * this.fontSizeRatio).fontColor($r('sys.color.font_primary'))
+            Text(CommentUtils.formatToK(this.shareCount))
+              .fontSize(10 * this.fontSizeRatio)
+              .fontColor($r('sys.color.font_primary'))
           }
+          .accessibilityText('分享' + CommentUtils.formatToK(this.shareCount))
           .onClick(() => {
             this.onShare()
           })
         }
       }
       .justifyContent(FlexAlign.SpaceBetween)
-      .flexGrow(1)
       .margin({ left: 16 })
     }
     .backgroundColor($r('sys.color.background_primary'))

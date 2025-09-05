@@ -5,15 +5,19 @@ export enum RouterMap {
   SPLASH_PAGE = 'SplashPage',
   PRIVACY_PAGE = 'PrivacyPage',
   AGREE_PRIVACY_PAGE = 'AgreePrivacyPage',
-  START_PAGE = 'StartPage',
 
   // 首页模块
   HOME_PAGE = 'HomePage',
   NEWS_SEARCH = 'NewsSearch',
+  NEWS_POST = 'NewsPost',
+  NEWS_PUBLISH_SELECT = 'NewsPublishSelect',
+  // 图片预览
+  IMAGE_PREVIEW = 'ImagePreview',
   // 视频模块
   VIDEO_PAGE = 'VideoPage',
   VIDEO_DETAIL_PAGE = 'VideoDetailPage',
   VIDEO_LANDSCAPE_PAGE = 'LandscapeVideo',
+  LIVESTREAM_DETAIL_PAGE = 'LivestreamDetailPage',
   // 账号模块
   HUAWEI_LOGIN_PAGE = 'HuaweiLoginPage',
   OTHER_LOGIN_PAGE = 'OtherLoginPage',

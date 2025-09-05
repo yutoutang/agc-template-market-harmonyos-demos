@@ -36,8 +36,8 @@ export class AccountApi {
   /**
    * 华为账号登录
    */
-  public huaweiLogin() {
-    const user = MineServiceApi.signIn();
+  public huaweiLogin(nickPhone: string) {
+    const user = MineServiceApi.signIn('hw', nickPhone);
     if (user) {
       this.userInfoModel.loginChannel = 'hw';
       this.handleUserInfo(user);

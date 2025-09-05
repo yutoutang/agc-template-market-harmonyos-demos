@@ -7,6 +7,7 @@
 - [快速入门](#快速入门)
 - [示例效果](#示例效果)
 - [开源许可协议](#开源许可协议)
+- [附录](#附录)
 
 ## 功能介绍
 
@@ -26,18 +27,23 @@
 | 分享组件（module_share）           | 支持微信、qq、系统分享                    | [使用指导](components/module_share/README.md)         |
 | 短视频滑动组件（module_swipeplayer）  | 支持短视频上下滑动、横竖屏切换、长按倍速、播放进度条拖动等能力 | [使用指导](components/module_swipeplayer/README.md)   |
 | 朗读组件（module_text_reader）     | 支持文本朗读                          | [使用指导](components/module_text_reader/README.md)   |
+| 一镜到底组件（module_transition）    | 支持路由跳转一镜到底                      | [使用指导](components/module_transition/README.md)    |
+| 新闻发表组件（module_articlepost）   | 支持富文本发表新闻                       | [使用指导](components/module_transition/README.md)    |
 
 本模板为新闻类应用提供了常用功能的开发样例，模板主要分首页、视频、互动和我的四大模块：
 
 * 首页：提供推荐新闻信息流、搜索、扫码、热榜、本地等功能。
 
-* 视频：提供关注、精选、推荐短视频等功能。
+* 视频：提供关注、精选、推荐短视频以及直播等功能。
 
 * 互动：支持查看关注、推荐、附近博主发文、支持一键发帖。
 
 * 我的：提供个人主页查看、评论、消息、管理收藏/点赞/浏览历史、意见反馈、设置等功能。
 
-本模板已集成华为账号、推送、预加载、广告、朗读、微信登录等服务，只需做少量配置和定制即可快速实现华为账号的登录、新闻阅读等功能。
+本模板已集成华为账号、推送、预加载、广告、朗读、无障碍屏幕朗读、适老化、深色模式、微信登录分享等服务，
+适配平板一多布局、视频悬停态播放，支持不同设备间同步新闻浏览进度，
+提供首页新闻动态布局能力，
+只需做少量配置和定制即可快速实现华为账号的登录、新闻阅读等功能。
 
 | 首页                                             | 视频                                              | 互动                                                    | 我的                                             |
 |------------------------------------------------|-------------------------------------------------|-------------------------------------------------------|------------------------------------------------|
@@ -75,13 +81,14 @@
   │   ├──顶部栏  
   │   │   ├── 关注 
   │   │   ├── 精选
-  │   │   ├── 推荐                         
+  │   │   ├── 推荐 
+  │   │   ├── 直播                        
   │   │   └── 搜索                      
   │   │         
   │   └──视频详情页         
   │       ├── 竖屏播放
   │       ├── 横屏播放
-  │       ├── 暂停、播放、进度调节、倍速
+  │       ├── 播放、暂停、音量/亮度/进度调节、倍速
   │       └── 关注、点赞、收藏、评论、分享                            
   │                        
   ├──互动                           
@@ -149,6 +156,7 @@ ComprehensiveNews
 │  │    │   ├──OtherLoginPage.ets                         // 其他方式登录页面
 │  │    │   └──ProtocolWebView.ets                        // 协议H5                  
 │  │    └──utils  
+│  │        ├──ErrorCodeHelper.ets                        // 错误码处理工具类
 │  │        ├──HuaweiAuthUtils.ets                        // 华为认证工具类
 │  │        ├──LoginSheetUtils.ets                        // 统一登录半模态弹窗
 │  │        └──WXApiUtils.ets                             // 微信登录事件处理类 
@@ -159,12 +167,14 @@ ComprehensiveNews
 │  │    ├──dialogs                                        // 通用弹窗 
 │  │    ├──models                                         // 状态观测模型
 │  │    ├──push                                           // 推送
+│  │    ├──styles                                         // 样式
 │  │    └──utils                                          // 通用方法     
 │  │
 │  ├──lib_flex_layout/src/main/ets                        // 动态布局模块             
 │  │    ├──components
-│  │    │   ├──AddPlateComp.ets                           // 添加车牌组件
-│  │    │   └──GuideListComp.ets                          // 指南列表组件                  
+│  │    │   ├──LoadMoreFooter.ets                         // 加载更多
+│  │    │   ├──NewsTabContent.ets                         // Tab视图
+│  │    │   └──NoLoginPage.ets                            // 未登录视图                  
 │  │    ├──sdk                                            // 动态布局核心sdk        
 │  │    └──views
 │  │        └──FlexLayout.ets                             // 动态布局列表页 
@@ -200,13 +210,18 @@ ComprehensiveNews
 │  │    │   └──RecommendArea.ets                          // 相关推荐                  
 │  │    └──views  
 │  │        └──ArticleFeedDetails.ets                     // 新闻详情页      
+│  │
+│  ├──lib_preview_page/src/main/ets                       // 预览模块             
+│  │    └───components
+│  │        └──ImagePreviewPage.ets                       // 图片预览视图                  
 │  │ 
 │  └──lib_widget/src/main/ets                             // 通用UI模块             
 │       └──components
 │           ├──ButtonGroup.ets                            // 组合按钮
 │           ├──CustomBadge.ets                            // 自定义信息标记组件
 │           ├──EmptyBuilder.ets                           // 空白组件
-│           └──NavHeaderBar.ets                           // 自定义标题栏
+│           ├──NavHeaderBar.ets                           // 自定义标题栏
+│           └──NewsSearchTransition.ets                   // 搜索动画
 │
 ├──components
 │  ├──module_advertisement                                // 广告组件                     
@@ -220,7 +235,8 @@ ComprehensiveNews
 │  ├──module_setfontsize                                  // 字体大小调节组件
 │  ├──module_share                                        // 分享组件
 │  ├──module_swipeplayer                                  // 视频组件
-│  └──module_text_reader                                  // 朗读组件            
+│  ├──module_text_reader                                  // 朗读组件
+│  └──module_transition                                   // 动画组件            
 │      
 ├──features
 │  ├──business_home/src/main/ets                          // 首页模块             
@@ -241,7 +257,8 @@ ComprehensiveNews
 │  │
 │  ├──business_mine/src/main/ets                          // 我的模块             
 │  │    ├──components
-│  │    │   ├──BaseMarkLikePage.ets                       // 收藏点赞基础页面
+│  │    │   ├──BaseHistoryComment.ets                     // 历史、评论基础页面
+│  │    │   ├──BaseMarkLikePage.ets                       // 收藏、点赞基础页面
 │  │    │   ├──CancelDialogBuilder.ets                    // 取消收藏点赞弹窗
 │  │    │   ├──CommentRoot.ets                            // 主评论
 │  │    │   ├──CommentSub.ets                             // 从属评论
@@ -294,16 +311,24 @@ ComprehensiveNews
 │  └──business_video/src/main/ets                         // 视频模块             
 │       ├──components
 │       │   ├──CommentView.ets                            // 评论视图
+│       │   ├──LiveHighlightsView.ets                     // 直播回放视图
+│       │   ├──LiveNoticePreview.ets                      // 直播公告视图
+│       │   ├──LivestreamCard.ets                         // 直播卡片视图
+│       │   ├──LivestreamFooterView.ets                   // 直播底部视图
 │       │   ├──Sidebar.ets                                // 侧边栏视图
 │       │   ├──TabHeaderView.ets                          // 顶部Tab视图
 │       │   └──VideoLayerView.ets                         // 视频外层操作层视图
 │       ├──pages
 │       │   ├──CommentViewPage.ets                        // 评论页面
+│       │   ├──LivestreamDetailPage.ets                   // 直播详情页面
 │       │   ├──VideoDetailPage.ets                        // 视频详情页
 │       │   └──VideoPage.ets                              // 视频首页
 │       └──views
 │           ├──FeaturedPage.ets                           // 精选页面               
 │           ├──FollowPage.ets                             // 关注页面
+│           ├──IntroductionView.ets                       // 直播介绍视图
+│           ├──LiveCommentView.ets                        // 直播评论视图
+│           ├──LivestreamPage.ets                         // 直播列表页面
 │           ├──RecommendPage.ets                          // 推荐页面
 │           └──VideoSwiperPage.ets                        // 短视频轮播页面
 │
@@ -311,9 +336,15 @@ ComprehensiveNews
    └──phone/src/main/ets                                  // phone模块
         ├──common                        
         │   ├──AppTheme.ets                               // 应用主题色
+        │   ├──AppUtils.ets                               // 应用设置工具类
+        │   ├──CloudPrefetchUtils.ets                     // 预加载工具类
         │   ├──Constants.ets                              // 业务常量
-        │   ├──FormUtils.ets                              // 卡片Utils
-        │   └──Types.ets                                  // 数据模型
+        │   ├──ContinueUtils.ets                          // 自由流转应用接续工具类
+        │   ├──FormUtils.ets                              // 卡片工具类
+        │   ├──NetworkUtils.ets                           // 网络工具类
+        │   ├──Types.ets                                  // 数据模型
+        │   ├──WantUtils.ets                              // want工具类
+        │   └──WindowUtils.ets                            // 窗口工具类
         ├──components                    
         │   └──CustomTabBar.ets                           // 应用底部Tab
         ├──pages   
@@ -322,8 +353,7 @@ ComprehensiveNews
         │   ├──IndexPage.ets                              // 应用主页面
         │   ├──PrivacyPage.ets                            // 查看隐私协议页面
         │   ├──SafePage.ets                               // 隐私同意页面
-        │   ├──SplashPage.ets                             // 开屏广告页面
-        │   └──StartPage.ets                              // 应用启动页面
+        │   └──SplashPage.ets                             // 开屏广告页面
         └──widget                                         // 服务卡片
  
 ```
@@ -334,13 +364,25 @@ ComprehensiveNews
 
 - DevEco Studio版本：DevEco Studio 5.0.3 Release及以上
 - HarmonyOS SDK版本：HarmonyOS 5.0.3 Release SDK及以上
-- 设备类型：华为手机（包括双折叠和阔折叠）
+- 设备类型：华为手机（包括双折叠和阔折叠）、平板
 - 系统版本：HarmonyOS 5.0.1(13)及以上
 
 ### 权限
 
-- 网络权限: ohos.permission.INTERNET, ohos.permission.GET_NETWORK_INFO, ohos.permission.GET_WIFI_INFO
+- 网络权限: ohos.permission.INTERNET, ohos.permission.GET_NETWORK_INFO
 - 跨应用关联权限: ohos.permission.APP_TRACKING_CONSENT
+
+### 使用约束
+1. 跨设备同步新闻浏览进度，使用约束如下，详细参考：[应用接续开发指导](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/app-continuation-guide#section17575828642)
+   - 支持的手机系统：HarmonyOS NEXT Developer Preview0及以上版本的设备
+   - 双端设备需要登录同一华为账号
+   - 双端设备需要打开 WLAN 和蓝牙开关，或者在设置中的“多设备协同 > 高级”中启用“多设备协同增强服务”功能
+   - 双端设备需要在“设置”应用中开启“多设备协同 > 接续”功能
+   - 双端设备都需要安装该应用
+
+2. 碰一碰分享，使用约束如下，详细参考：[手机与手机碰一碰分享](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/knock-share-phone-to-phone#section15384182281511)
+   - 支持的手机系统：HarmonyOS NEXT Release及以上版本
+   - 任意一端设备不支持碰一碰能力时，轻碰无任何响应
 
 ## 快速入门
 
@@ -431,3 +473,18 @@ ComprehensiveNews
 ## 开源许可协议
 
 该代码经过[Apache 2.0 授权许可](http://www.apache.org/licenses/LICENSE-2.0)。
+
+## 附录
+
+### 常用三方SDK
+
+| 分类   | 三方库名称                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | 功能描述          |
+|------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
+| 登录认证 | [阿里云号码认证SDK](https://help.aliyun.com/zh/pnvs/developer-reference/harmony-client-access?spm=5176.21213303.J_ZGek9Blx07Hclc3Ddt9dg.1.382e2f3da3ZL7I&scm=20140722.S_help@@%E6%96%87%E6%A1%A3@@2853932._.ID_help@@%E6%96%87%E6%A1%A3@@2853932-RL_%E9%B8%BF%E8%92%99-LOC_2024SPHelpResult-OR_ser-PAR1_2150446a17564540220258611e6859-V_4-PAR3_o-RE_new9-P0_0-P1_0) / [中国电信一键登录SDK](https://developer.huawei.com/consumer/cn/market/prod-detail/f5770bbdb7d84c47a0887d9b99d3a5d9/1) /  [极光安全认证 (JVerification)](https://developer.huawei.com/consumer/cn/market/prod-detail/589f0f55d91d47419edd8156b7c2d35f/88795a04fdac4c0a903c893bde1c9b4a) / [极光安全认证 (JVerification)](https://developer.huawei.com/consumer/cn/market/prod-detail/589f0f55d91d47419edd8156b7c2d35f/88795a04fdac4c0a903c893bde1c9b4a) / [创蓝闪验](https://developer.huawei.com/consumer/cn/market/prod-detail/3bf7d42b9e074362b866f2c3cf0a3592/202ad06fc59c4a19adbce1248af9d8d2) | 登录认证          |
+| 分享   | [MobLink ](https://developer.huawei.com/consumer/cn/market/prod-detail/c88909dd0c9146dc87d675038773ccd2/f897ac2dbdde447180e9bb61dc4eb0d1)/ [微信分享](https://developers.weixin.qq.com/doc/oplatform/Mobile_App/Share_and_Favorites/ohos.html) / [QQ分享](https://wiki.connect.qq.com/harmonyos_sdk%e7%8e%af%e5%a2%83%e6%90%ad%e5%bb%ba) / [新浪微博SDK](https://developer.huawei.com/consumer/cn/market/prod-detail/7afe7ff8e74e4585941f738c09e7c06f/PLATFORM)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | 推送/分享         |
+| 支付   | [支付宝支付](https://opendocs.alipay.com/open/02e7gu) / [微信支付 ](https://developers.weixin.qq.com/doc/oplatform/Mobile_App/WeChat_Pay/Android.html)/ [银联支付 (云闪付)](https://open.unionpay.com/tjweb/doc/mchnt/list?id=2981)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | 支付            |
+| 数据分析 | [神策分析](https://developer.huawei.com/consumer/cn/market/prod-detail/a629e0eeab9c44f9a6f15e0727bc92ca/PLATFORM) / [友盟common SDK ](https://developer.huawei.com/consumer/cn/market/prod-detail/14d21b00a4d34ff3be00dec7597ab5d7/0277100bd59f45e38d8a0de52e1119b2)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | 数据收集、处理、分析、运用 |
+| 性能监控 | [腾讯Bugly ](https://developer.huawei.com/consumer/cn/market/prod-detail/eea993bb84ec4627aefac94c86d37601/PLATFORM)/ [听云SDK](https://developer.huawei.com/consumer/cn/market/prod-detail/2acb6ccef6a04820a230627ab1ee87b9/03d0f883f0c54f1aa97cb895ac68fb3a)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | 异常上报和运营统计     |
+| 推送   | [阿里推送SDK](https://developer.huawei.com/consumer/cn/market/prod-detail/bacc457d60bf4daf9def11e1e5ddc1c6/PLATFORM) / [极光推送](https://developer.huawei.com/consumer/cn/market/prod-detail/eb15c8034a7540c7a62ea765c4baae2b/88795a04fdac4c0a903c893bde1c9b4a) / [个推 (每日互动)](https://developer.huawei.com/consumer/cn/market/prod-detail/5e5944b551ca462993d58dad106c5700/f3c76ca47db845f0b8cdf53af50aa74c)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | 消息推送          |
+| 媒体   | [阿里云视频播放器SDK](https://help.aliyun.com/zh/apsaravideo-for-vod/use-cases/harmonyos-next-sdk-integration)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | 音视频           |
+| 地图   | [高德地图SDK](https://lbs.amap.com/api/harmonyos-sdk/summary)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | 地图            |

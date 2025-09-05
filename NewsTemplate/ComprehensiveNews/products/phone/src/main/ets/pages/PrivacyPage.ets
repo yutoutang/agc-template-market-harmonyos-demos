@@ -17,7 +17,12 @@ struct PrivacyPage {
   build() {
     NavDestination() {
       Column() {
-        NavHeaderBar()
+        NavHeaderBar({
+          customPadding: {
+            left: 0,
+            right: 0,
+          },
+        })
         Web({
           src: $rawfile('privacy-statement.htm'),
           controller: this.webViewController,

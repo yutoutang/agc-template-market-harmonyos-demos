@@ -1,5 +1,8 @@
 import { authentication } from '@kit.AccountKit';
+import { BusinessError } from '@kit.BasicServicesKit';
+import { util } from '@kit.ArkTS';
 import { Logger } from 'lib_common';
+import { ErrorCode } from '../constants/ErrorCode';
 
 const TAG = '[HuaweiAuthUtils]';
 
@@ -29,5 +32,26 @@ export class HuaweiAuthUtils {
         `Failed to authorize. errCode is ${error.code}, message is ${error.message}`);
       return quickLoginAnonymousPhone;
     }
+  }
+
+  /**
+   * 登录华为账号
+   * @returns
+   */
+  static loginHuaweiID(): Promise<void> {
+    const loginRequest = new authentication.HuaweiIDProvider().createLoginWithHuaweiIDRequest();
+    // 默认值为true，若账号未登录则强制拉起账号登录页
+    loginRequest.forceLogin = true;
+    loginRequest.state = util.generateRandomUUID();
+    const controller = new authentication.AuthenticationController(getContext());
+    return new Promise((resolve, reject) => {
+      controller.executeRequest(loginRequest).then((resp: authentication.AuthorizationWithHuaweiIDResponse) => {
+        Logger.info(TAG, 'login huawei success, response: ' + JSON.stringify(resp));
+        resolve();
+      }).catch((err: BusinessError) => {
+        Logger.error(TAG, 'login huawei failed, error: ' + JSON.stringify(err));
+        reject();
+      });
+    })
   }
 }

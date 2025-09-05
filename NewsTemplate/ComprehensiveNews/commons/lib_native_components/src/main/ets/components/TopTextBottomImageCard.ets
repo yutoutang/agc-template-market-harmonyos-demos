@@ -1,9 +1,11 @@
-import { CommonConstants, RouterToNews, SettingModel } from 'lib_common'
-import { LayoutParams, PostImgList } from 'lib_news_api'
 import { PersistenceV2, UIUtils } from '@kit.ArkUI'
+import { CommonConstants, SettingModel } from 'lib_common'
+import { LayoutParams, PostImgList } from 'lib_news_api'
+import { BaseImage } from 'lib_widget'
 import { Highlight } from 'module_highlight'
 import { AuthorCard } from '../builder/AuthorBuilder'
 import { ArticleSourceBuilder } from '../builder/ArticleSourceBuilder'
+import { CardViewModel } from '../viewmodel/CardViewModel'
 
 @Builder
 export function TopTextBottomImageCard(cardData: LayoutParams) {
@@ -17,6 +19,7 @@ struct NativeComponent {
   @Param @Require cardData: LayoutParams
   @Local currentIndex: number = 0
   @Local settingInfo: SettingModel = PersistenceV2.connect(SettingModel, () => new SettingModel())!
+  @Local cardViewModel: CardViewModel = new CardViewModel(this.getUIContext())
 
   aboutToAppear(): void {
     this.cardData.nativeCardData = UIUtils.makeObserved(this.cardData.nativeCardData)
@@ -41,21 +44,27 @@ struct NativeComponent {
           .fontColor($r('sys.color.font_primary'))
           .fontSize(16 * this.settingInfo.fontSizeRatio)
       }
-      List({ space: CommonConstants.SPACE_M }) {
+      Grid() {
         ForEach(this.cardData.nativeCardData?.postImgList, (item: PostImgList) => {
-          ListItem() {
-            Image(item.picVideoUrl).width(104).height(78).borderRadius(8).clip(true)
+          GridItem() {
+            BaseImage({
+              url: item.picVideoUrl,
+              downloadWithoutWlan: this.settingInfo.network.downloadWithoutWlan
+            })
+              .aspectRatio(1).clip(true)
+              .width('100%')
           }
-        })
+        },(item: PostImgList) => JSON.stringify(item))
       }
-      .listDirection(Axis.Horizontal)
+      .columnsTemplate('1fr '.repeat(this.cardData.nativeCardData?.postImgList?.length ?? 0))
+      .columnsGap(8)
 
       ArticleSourceBuilder({
         cardData: this.cardData,
       })
     }
     .onClick(() => {
-      RouterToNews.routerToNewsByDetails(this.cardData.nativeCardData)
+      this.cardViewModel.pushToNewsDetails(this.cardData)
     })
     .width(CommonConstants.FULL_PERCENT)
     .alignItems(HorizontalAlign.Start)

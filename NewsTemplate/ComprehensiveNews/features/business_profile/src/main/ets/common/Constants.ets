@@ -1,5 +1,6 @@
 export class Constants {
   public static readonly USER_ICON_W: number = 48;
+  public static readonly SMALL_USER_ICON_W: number = 24;
   public static readonly MEDIUM_ICON_W: number = 48;
   public static readonly SMALL_BTN_W: number = 72;
   public static readonly SMALL_BTN_H: number = 28;

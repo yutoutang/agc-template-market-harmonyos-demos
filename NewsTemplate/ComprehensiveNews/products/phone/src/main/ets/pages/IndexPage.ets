@@ -5,6 +5,7 @@ import { VideoPageBuilder } from 'business_video';
 import { InteractionPageBuilder } from 'business_interaction';
 import { CustomTabBar } from '../components/CustomTabBar';
 import { IndexPageViewModel } from '../viewmodels/IndexPageVM';
+import { TabBarItem, TABS_INFO } from '../common/Constants';
 
 @Builder
 export function IndexPageBuilder() {
@@ -19,6 +20,7 @@ struct IndexPage {
   aboutToAppear(): void {
     this.vm.refreshUserInfo();
     this.vm.checkJumpNewsDetail();
+    this.vm.checkContinueScene();
   }
 
   @Monitor('selectedIndex')
@@ -28,63 +30,63 @@ struct IndexPage {
 
   build() {
     NavDestination() {
-      Stack({ alignContent: Alignment.Bottom }) {
+      Column() {
         Tabs({ index: $$this.selectedIndex }) {
           TabContent() {
             HomePageBuilder()
           }
-          .padding({
-            bottom: this.vm.tabPaddingBottom
-          })
+          .tabBar(this.tabBuilder(TABS_INFO[0]))
 
           TabContent() {
             VideoPageBuilder()
           }
+          .tabBar(this.tabBuilder(TABS_INFO[1]))
 
           TabContent() {
             InteractionPageBuilder()
           }
-          .padding({
-            bottom: this.vm.tabPaddingBottom
-          })
+          .tabBar(this.tabBuilder(TABS_INFO[2]))
 
           TabContent() {
             MinePageBuilder()
           }
-          .padding({
-            bottom: this.vm.tabPaddingBottom
-          })
+          .tabBar(this.tabBuilder(TABS_INFO[3]))
         }
-        .width(CommonConstants.FULL_PERCENT)
-        .layoutWeight(1)
-        .barHeight(0)
+        .barWidth(this.vm.tabWidth)
+        .barHeight(this.vm.tabBarHeight)
+        .animation({ duration: 200, curve: Curve.EaseInOut })
+        .vertical(this.vm.tabModel.isTabVertical)
+        .barPosition(this.vm.barPosition)
         .scrollable(false)
+        .divider(this.vm.showDivider)
+        .barOverlap(!this.vm.tabModel.isTabVertical)
+        .barBackgroundColor(this.vm.barBgColor)
+        .barBackgroundBlurStyle(BlurStyle.NONE)
+        .animationDuration(0)
         .onChange((index) => {
           this.selectedIndex = index;
         })
-
-        CustomTabBar({
-          fontSizeRatio: this.vm.settingInfo.fontSizeRatio,
-        })
-          .translate({ x: 0, y: this.vm.translateY })
-          .animation({ duration: 200, curve: Curve.EaseInOut })
-          .onAreaChange((ov: Area, nv: Area) => {
-            this.vm.tabPaddingBottom = nv.height;
-            this.vm.tabModel.tabHeight = nv.height
-          })
       }
       .height(CommonConstants.FULL_PERCENT)
       .width(CommonConstants.FULL_PERCENT)
+      .backgroundColor(this.vm.pageBgColor)
+      .padding({
+        bottom: this.vm.paddingBottom,
+      })
     }
     .hideTitleBar(true)
-    .onReady((context: NavDestinationContext) => {
-      this.vm.onReady(context);
-    })
-    .onDisAppear(() => {
-      this.vm.onDisAppear();
-    })
     .onBackPressed(() => {
       return this.vm.onBackPressed();
     })
+  }
+
+  @Builder
+  tabBuilder(item: TabBarItem) {
+    CustomTabBar({ item: item })
+      .translate({ x: 0, y: this.vm.translateY })
+      .animation({ duration: 200, curve: Curve.EaseInOut })
+      .onAreaChange((ov: Area, nv: Area) => {
+        this.vm.tabModel.tabHeight = nv.height
+      })
   }
 }

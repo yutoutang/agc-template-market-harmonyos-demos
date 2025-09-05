@@ -42,9 +42,9 @@ export struct FollowPage {
         .fontColor('#bfbfbf')
 
       Button('登录', { type: ButtonType.Normal, stateEffect: true })
-        .fontSize(14)
-        .fontColor('#fff')
-        .borderRadius(8)
+        .fontSize($r('sys.float.Body_M'))
+        .fontColor($r('sys.color.font_on_primary'))
+        .borderRadius($r('sys.float.corner_radius_level4'))
         .backgroundColor('#505050')
         .width('33%')
         .onClick(() => {

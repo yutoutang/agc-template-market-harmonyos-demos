@@ -1,7 +1,8 @@
 import { AppStorageV2 } from '@kit.ArkUI';
-import { CommonConstants, RouterMap, RouterUtils, WindowModel } from 'lib_common';
+import { CommonConstants, WindowModel } from 'lib_common';
 import { TabModel } from 'lib_common/src/main/ets/models/TabModel';
 import { TabNav } from '../models/VideoModel';
+import { NewsSearchTransition } from 'lib_widget';
 
 @ComponentV2
 export struct TabHeaderView {
@@ -21,11 +22,22 @@ export struct TabHeaderView {
 
   @Monitor('tabModel.showTabBar')
   onChangeShowTabBar(monitor: IMonitor) {
+    if (this.tabModel.isTabVertical) {
+      return;
+    }
     let isShowCustomTabBar = monitor.value()?.now as boolean
     if (isShowCustomTabBar) {
       this.translateX = -40
     } else {
       this.translateX = 0
+    }
+  }
+
+  @Monitor('tabModel.isTabVertical')
+  onShowChangeTabBar(monitor: IMonitor) {
+    let isShowCustomTabBar = monitor.value()?.now as boolean
+    if (isShowCustomTabBar) {
+      this.translateX = -40
     }
   }
 
@@ -58,9 +70,10 @@ export struct TabHeaderView {
             ListItem() {
               this.tabBuilder(item, index)
             }
-          })
+          }, (item: TabNav, index: number) => item.id + index)
         }
         .height(56)
+        .width('100%')
         .listDirection(Axis.Horizontal)
         .padding({ left: CommonConstants.PADDING_L, right: CommonConstants.PADDING_L })
         .alignListItem(ListItemAlign.Center)
@@ -69,16 +82,10 @@ export struct TabHeaderView {
       .animation({ duration: 200, curve: Curve.EaseInOut })
       .layoutWeight(1)
 
-      Row() {
-        Image($r('app.media.ic_search'))
-          .width($r('app.float.nav_icon_width'))
-          .fillColor(this.indicatorIndex > 1 ? $r('sys.color.font_primary') : Color.White)
-      }
-      .padding(10)
-      .backgroundColor($r('sys.color.comp_background_tertiary'))
-      .borderRadius('50%')
-      .onClick(() => {
-        RouterUtils.pushPathByName(RouterMap.NEWS_SEARCH)
+      NewsSearchTransition({
+        isVideo:true,
+        componentId:'videoPage',
+        indicatorIndex:this.indicatorIndex
       })
     }
     .width('100%')

@@ -22,6 +22,7 @@ export struct FeedCard {
   @Param isNeedOperation: boolean = true
   @Param showUserBar: boolean = true;
   @Param showTimeBottom: boolean = false;
+  @Param showImagePreviewLayer: boolean = true;
   @Param searchKey: string = ''
   @Param isNeedFollow: boolean = false
   @BuilderParam shareBuilder: () => void
@@ -47,7 +48,7 @@ export struct FeedCard {
   @Builder
   publishTimeBuilder() {
     Column() {
-      Text(getDateDiff(this.feedCardInfo?.createTime))
+      Text(this.feedCardInfo?.relativeTime)
         .fontSize(12 * this.fontSizeRatio).fontColor('#8C8C8E')
     }.alignItems(HorizontalAlign.Start)
   }
@@ -59,7 +60,7 @@ export struct FeedCard {
         Span(this.getWatch ? '已关注' : '关注')
       }
       .fontSize(14 * this.fontSizeRatio)
-      .fontColor(this.getWatch ? $r('app.color.app_theme') : $r('sys.color.background_primary'))
+      .fontColor(this.getWatch ? $r('app.color.app_theme') : $r('sys.color.font_on_primary'))
       .onClick(() => {
         this.onWatch()
       })
@@ -93,6 +94,7 @@ export struct FeedCard {
         searchKey: this.searchKey,
         showUserBar: this.showUserBar,
         showTimeBottom: this.showTimeBottom,
+        showImagePreviewLayer: this.showImagePreviewLayer,
         followBuilderParam: () => {
           this.followBuilder()
         },

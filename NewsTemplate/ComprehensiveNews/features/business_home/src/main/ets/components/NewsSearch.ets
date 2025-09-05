@@ -1,7 +1,9 @@
-import { FlexLayoutPage } from 'lib_flex_layout';
+import { AppStorageV2, curves, PersistenceV2 } from '@kit.ArkUI';
+import { FlexLayoutBreakPointVM, FlexLayoutPage } from 'lib_flex_layout';
 import { HomeServiceApi, NewsResponse, RequestListData } from 'lib_news_api';
-import { NavHeaderBar } from 'lib_widget'
 import { Highlight } from 'module_highlight';
+import { BreakpointModel, CircleButtonModifier, CommonConstants, SettingModel, WindowModel } from 'lib_common';
+import { LongTakeAnimationProperties } from 'module_transition';
 import { HomeViewModel } from '../viewmodels/HomeViewModel';
 
 @Builder
@@ -15,7 +17,14 @@ export struct NewsSearch {
   @Local hotDataList: RequestListData[] = []
   @Local isSearchCommit: boolean = false;
   @Local homeViewVM: HomeViewModel = new HomeViewModel()
+  @Local longTakeSession: LongTakeAnimationProperties = new LongTakeAnimationProperties();
+  @Local homeViewModel: HomeViewModel = new HomeViewModel();
   controller: SearchController = new SearchController();
+  @Local windowModel: WindowModel = AppStorageV2.connect(WindowModel, () => new WindowModel())!;
+  @Local breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
+  @Local componentId: string = ''
+  @Local settingInfo: SettingModel = PersistenceV2.connect(SettingModel, () => new SettingModel())!
+  buttonModifier: CircleButtonModifier = new CircleButtonModifier();
 
   async aboutToAppear() {
     this.hotDataList = await HomeServiceApi.queryHomeRecommendList('hotTopChart');
@@ -26,10 +35,9 @@ export struct NewsSearch {
     Search({ value: this.searchValue, controller: this.controller })
       .cancelButton({
         style: CancelButtonStyle.CONSTANT,
-        icon: {
-          src: $r('sys.media.ohos_ic_public_cancel_filled'),
-        },
       })
+      .geometryTransition('news_search_transition_' + this.componentId)
+      .transition(TransitionEffect.opacity(0.99))
       .onFocus(() => {
         this.isSearchCommit = false
       })
@@ -44,8 +52,8 @@ export struct NewsSearch {
       })
       .defaultFocus(true)
       .backgroundColor($r('sys.color.comp_background_tertiary'))
-      .textFont({ size: 16, weight: FontWeight.Medium })
-      .width('85%')
+      .textFont({ size: $r('sys.float.Body_L'), weight: FontWeight.Medium })
+      .flexGrow(1)
   }
 
   @Builder
@@ -53,12 +61,12 @@ export struct NewsSearch {
     Column() {
       Flex({ justifyContent: FlexAlign.SpaceBetween }) {
         Text('历史搜索')
-          .fontSize(14)
+          .fontSize(14 * this.settingInfo.fontSizeRatio)
           .fontColor($r('sys.color.font_secondary'))
-        Row({ space: 5 }) {
+        Row({ space: 4 }) {
           Image($r('app.media.clear')).width(16).height(16)
           Text('清空')
-            .fontSize(14)
+            .fontSize(14 * this.settingInfo.fontSizeRatio)
             .fontColor($r('sys.color.font_secondary'))
         }
         .onClick(() => {
@@ -69,7 +77,7 @@ export struct NewsSearch {
       Flex({ justifyContent: FlexAlign.Start, wrap: FlexWrap.Wrap }) {
         Row() {
           Text('暂无历史搜索')
-            .fontSize(12)
+            .fontSize(12 * this.settingInfo.fontSizeRatio)
             .fontColor($r('sys.color.font_secondary'))
         }
         .visibility(this.homeViewVM.searchHistory.historyList.length <= 0 ? Visibility.Visible : Visibility.None)
@@ -79,7 +87,7 @@ export struct NewsSearch {
         ForEach(this.homeViewVM.searchHistory.historyList, (item: string) => {
           Row() {
             Text(item)
-              .fontSize(14)
+              .fontSize(14 * this.settingInfo.fontSizeRatio)
               .fontColor($r('sys.color.font_primary'))
               .fontWeight(FontWeight.Medium)
           }
@@ -99,11 +107,14 @@ export struct NewsSearch {
           .borderRadius(14)
           .backgroundColor($r('sys.color.comp_background_tertiary'))
           .visibility(this.homeViewVM.searchHistory.historyList.length <= 0 ? Visibility.None : Visibility.Visible)
-        })
+        }, (item: string) => item)
       }
       .margin({ top: 12, bottom: 12 })
     }
-    .padding({ left: 16, right: 16 })
+    .padding({
+      left: this.breakPointModel.pagePadding,
+      right: this.breakPointModel.pagePadding,
+    })
     .margin({ top: 16 })
   }
 
@@ -115,7 +126,7 @@ export struct NewsSearch {
           Column() {
             Image($r('app.media.search_no_result')).width(120).height(120)
             Text('暂无搜索结果')
-              .fontSize(14)
+              .fontSize(14 * this.settingInfo.fontSizeRatio)
               .fontColor($r('sys.color.font_secondary'))
           }
         }
@@ -133,9 +144,14 @@ export struct NewsSearch {
         }, (item: RequestListData) => JSON.stringify(item))
       }
     }
+    .lanes(new FlexLayoutBreakPointVM().lanesCount.getLanes(), 16)
+    .padding({
+      left: this.breakPointModel.pagePadding,
+      right: this.breakPointModel.pagePadding,
+    })
     .scrollBar(BarState.Off)
     .layoutWeight(1)
-    .padding({ left: 16, right: 16 })
+    .padding({ left: CommonConstants.PADDING_L, right: CommonConstants.PADDING_L })
     .visibility(this.isSearchCommit ? Visibility.Visible : Visibility.None)
   }
 
@@ -146,7 +162,7 @@ export struct NewsSearch {
         Column() {
           Image($r('app.media.search_no_result')).width(120).height(120)
           Text('暂无搜索结果')
-            .fontSize(14)
+            .fontSize(14 * this.settingInfo.fontSizeRatio)
             .fontColor($r('sys.color.font_secondary'))
         }
       }
@@ -158,9 +174,15 @@ export struct NewsSearch {
         ForEach(item.articles, (value: NewsResponse) => {
           ListItem() {
             Flex() {
-              Image($r('app.media.search')).width(14).height(14)
-                .margin({ right: 16 })
-                .fillColor($r('sys.color.font_primary'))
+              Row() {
+                Image($r('app.media.search')).width(14).height(14)
+                  .fillColor($r('sys.color.font_primary'))
+              }
+              .width(30)
+              .height(18)
+              .justifyContent(FlexAlign.Start)
+              .alignItems(VerticalAlign.Center)
+
               Highlight({
                 keywords: [this.searchValue],
                 sourceString: value.title,
@@ -178,11 +200,14 @@ export struct NewsSearch {
             this.isSearchCommit = true
           })
           .visibility(this.homeViewVM.searchResultList.length <= 0 ? Visibility.None : Visibility.Visible)
-        })
+        }, (value: NewsResponse) => JSON.stringify(value))
       }, (item: NewsResponse) => JSON.stringify(item))
     }
+    .padding({
+      left: this.breakPointModel.pagePadding,
+      right: this.breakPointModel.pagePadding,
+    })
     .visibility(this.isSearchCommit ? Visibility.None : Visibility.Visible)
-    .padding({ left: 16, right: 16 })
     .scrollBar(BarState.Off)
     .layoutWeight(1)
     .cachedCount(1)
@@ -193,13 +218,13 @@ export struct NewsSearch {
     List() {
       ListItem() {
         Row({ space: 5 }) {
-          Image($r('app.media.hot_chart')).width(24).height(24)
+          Image($r('app.media.hot_chart')).width(16).height(20)
           Text('热搜榜')
             .fontWeight(FontWeight.Bold)
             .fontColor($r('sys.color.font_primary'))
-            .fontSize(18)
+            .fontSize(18 * this.settingInfo.fontSizeRatio)
         }
-      }.padding({ left: 16 })
+      }.padding({ left: this.breakPointModel.pagePadding })
 
       ForEach(this.hotDataList, (item: RequestListData) => {
         ListItem() {
@@ -209,6 +234,10 @@ export struct NewsSearch {
             extraInfo: item.extraInfo,
           })
         }
+        .padding({
+          left: CommonConstants.PADDING_L,
+          right: CommonConstants.PADDING_L,
+        })
       }, (item: RequestListData) => JSON.stringify(item))
     }
     .scrollBar(BarState.Off)
@@ -218,19 +247,60 @@ export struct NewsSearch {
 
   build() {
     NavDestination() {
-      NavHeaderBar({
-        rightPartBuilder: () => {
+      Column() {
+        Flex({ justifyContent: FlexAlign.Start, alignItems: ItemAlign.Center }) {
+          Column() {
+            Button() {
+              SymbolGlyph($r('sys.symbol.chevron_backward'))
+                .fontColor([$r('sys.color.font_primary')])
+                .fontWeight(FontWeight.Normal)
+                .fontSize($r('app.float.normal_img_size'))
+            }
+            .attributeModifier(this.buttonModifier)
+            .accessibilityText('返回')
+          }
+          .justifyContent(FlexAlign.Center)
+          .onClick(() => {
+            this.homeViewModel.onLongTakeSearchBack(this.getUIContext());
+          })
+          .transition(TransitionEffect.asymmetric(
+            TransitionEffect.OPACITY
+              .animation({ duration: 200, delay: 150, curve: curves.cubicBezierCurve(0.33, 0, 0.67, 1) }),
+            TransitionEffect.OPACITY
+              .animation({ duration: 200, curve: curves.cubicBezierCurve(0.33, 0, 0.67, 1) }),
+          ))
+          .margin({ right: 16 })
+
           this.searchBuilder()
-        },
-      })
-      if (this.searchValue.trim() !== '') {
-        this.searchListBuilder()
-        this.searchResultListBuilder()
-      } else {
-        this.historySearch()
-        this.hotTopChartList()
+        }
+        .padding({
+          left: this.breakPointModel.pagePadding,
+          right: this.breakPointModel.pagePadding,
+        })
+        .width('100%')
+        .height(50)
+
+        if (this.searchValue.trim() !== '') {
+          this.searchListBuilder()
+          this.searchResultListBuilder()
+        } else {
+          this.historySearch()
+          this.hotTopChartList()
+        }
       }
+      .backgroundColor($r('sys.color.background_primary'))
     }
+    .padding({
+      top: this.windowModel.windowTopPadding,
+    })
+    .transition(TransitionEffect.OPACITY)
     .hideTitleBar(true)
+    .onReady((context: NavDestinationContext) => {
+      this.componentId = context.pathInfo?.param as string
+    })
+    .onBackPressed(() => {
+      this.homeViewModel.onLongTakeSearchBack(this.getUIContext())
+      return true;
+    })
   }
 }

@@ -31,7 +31,7 @@
 
 1. 安装组件。
 
-   如果是在DevEvo Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
+   如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
 
    如果是从生态市场下载组件，请参考以下步骤安装组件。
 
@@ -91,8 +91,7 @@
       }
     ]
    ```
-   <img src="./screenshots/share_1.png" width="300" height="100">   
-   <img src="./screenshots/share_2.png" width="300" height="100"> 
+   <img src="./screenshots/share_1.png" width="300"> <img src="./screenshots/share_2.png" width="400"> 
 4. 接入微信SDK。
    前往微信开放平台申请AppID并配置鸿蒙应用信息，详情参考：[鸿蒙接入指南](https://developers.weixin.qq.com/doc/oplatform/Mobile_App/Access_Guide/ohos.html)。
 5. 接入QQ。

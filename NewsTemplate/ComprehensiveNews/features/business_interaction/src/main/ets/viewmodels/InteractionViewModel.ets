@@ -1,7 +1,9 @@
 import { UIUtils } from '@kit.ArkUI';
+import { emitter } from '@kit.BasicServicesKit';
 import { LoginSheetUtils } from 'lib_account';
-import { BaseViewModel, NewsEnum, RouterToNews } from 'lib_common';
-import { MineServiceApi, NewsResponse, PostServiceApi } from 'lib_news_api';
+import { BaseViewModel, RouterParams, RouterToNews } from 'lib_common';
+import { CommentServiceApi, MineServiceApi, NewsResponse, PostServiceApi } from 'lib_news_api';
+import { LoneTakeAnimationsTransition, LongTakeTransitionParam } from 'module_transition';
 import { TabEnum } from '../common/Constants';
 
 @ObservedV2
@@ -10,6 +12,15 @@ export class InteractionViewModel extends BaseViewModel {
   @Trace isRefreshing: boolean = false
   @Trace interactionList: NewsResponse[] = []
   @Trace resourceId: TabEnum = TabEnum.Watch
+  @Trace isLoading: boolean = false
+  @Trace currentIndex: number = 10
+  @Trace currentPage: number = 0
+  private uiContext: UIContext
+
+  constructor(uiContext: UIContext) {
+    super()
+    this.uiContext = uiContext
+  }
 
   @Monitor('resourceId')
   tabChange() {
@@ -28,6 +39,16 @@ export class InteractionViewModel extends BaseViewModel {
     this.isRefreshing = true
     this.resourceId = resourceId
     this.setActionData(PostServiceApi.queryPostFollowList)
+    if (this.resourceId === TabEnum.Recommend) {
+      emitter.on('recommendRefresh', () => {
+        this.refresh()
+      })
+    }
+  }
+
+
+  public emitterOff() {
+    emitter.off('recommendRefresh')
   }
 
   public async setActionData(actionAPi: () => NewsResponse[]) {
@@ -77,12 +98,42 @@ export class InteractionViewModel extends BaseViewModel {
     MineServiceApi.cancelWatch(this.authorId)
   }
 
-  public actionToNewsDetails(cardInfo: NewsResponse) {
-    let routerParams: Record<string, string | NewsEnum> = {
-      'type': cardInfo.type,
-      'newsId': cardInfo.id,
-      'surfaceUrl': cardInfo.postImgList?.[0].surfaceUrl ?? '',
+  public actionToNewsDetails(cardData: NewsResponse, index: number, resourceId: number, formType?: string) {
+    let params: RouterParams<NewsResponse> = {
+      newsId: cardData.id,
+      authorId: cardData.author.authorId,
+      type: cardData.type,
+      surfaceUrl: cardData.postImgList?.[0]?.surfaceUrl,
+      cardData: cardData,
+      formType: formType ?? '',
     }
-    RouterToNews.pushToNewsDetails(routerParams)
+    let longTakeTransitionParam: LongTakeTransitionParam | undefined =
+      LoneTakeAnimationsTransition.generateLongTakeParam(this.uiContext, 'action_flow' + resourceId + index, 9);
+    if (longTakeTransitionParam) {
+      params.longTakeTransitionParam = longTakeTransitionParam;
+    }
+    RouterToNews.pushToNewsDetails<NewsResponse>(params)
+  }
+
+  public addLike(cardInfo: NewsResponse) {
+    if (!this.userInfoModel.isLogin) {
+      LoginSheetUtils.open()
+      return
+    }
+    cardInfo.isLiked = !cardInfo.isLiked
+    if (cardInfo.isLiked) {
+      CommentServiceApi.addPosterLike(cardInfo.id)
+      cardInfo.likeCount += 1
+      return
+    }
+    CommentServiceApi.cancelPosterLike(cardInfo.id)
+    cardInfo.likeCount -= 1
+  }
+
+  public loadMore() {
+    this.currentIndex += this.currentPage
+    this.currentPage += 5
+    let followList = PostServiceApi.queryPostFollowList(this.currentIndex, this.currentPage)
+    followList.forEach(item => this.interactionList.push(UIUtils.makeObserved(item)))
   }
 }

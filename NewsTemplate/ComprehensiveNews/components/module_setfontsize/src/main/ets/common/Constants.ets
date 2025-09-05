@@ -50,3 +50,10 @@ export const FONT_SIZE_LIST: FontSizeItem[] = [
     label: '特大'
   },
 ];
+
+export const GRID_MARGIN: GridRowColumnOption = {
+  sm: 16,
+  md: 24,
+  lg: 32,
+  xl: 32,
+};

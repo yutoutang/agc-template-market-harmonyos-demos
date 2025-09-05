@@ -1,4 +1,4 @@
-import { BreakpointNameEnum, CommonConstants, RouterUtils } from 'lib_common'
+import { CommonConstants, RouterUtils } from 'lib_common'
 import { NavHeaderBar } from 'lib_widget'
 import { PostImgVideoItem, PublishPostComp } from 'module_post'
 import { PublishPostViewModel } from '../viewmodels/PublishPostVM'
@@ -37,7 +37,6 @@ export struct PublishPostPage {
       Column() {
         PublishPostComp({
           fontRatio: this.vm.settingInfo.fontSizeRatio,
-          columnsNum: this.columnsNum,
           onChange: (body: string, mediaList: PostImgVideoItem[]) => {
             this.vm.body = body;
             this.vm.mediaList = mediaList;
@@ -46,8 +45,6 @@ export struct PublishPostPage {
       }
       .layoutWeight(1)
       .padding({
-        left: CommonConstants.PADDING_PAGE,
-        right: CommonConstants.PADDING_PAGE,
         top: CommonConstants.PADDING_M,
         bottom: this.vm.paddingBottom,
       })
@@ -56,14 +53,6 @@ export struct PublishPostPage {
     .onBackPressed(() => {
       return this.vm.onBackPressed();
     })
-  }
-
-  @Computed
-  get columnsNum() {
-    if ([BreakpointNameEnum.MD, BreakpointNameEnum.LG].includes(this.vm.breakPointModel.currentBreakpoint)) {
-      return 6;
-    }
-    return 3;
   }
 
   @Builder

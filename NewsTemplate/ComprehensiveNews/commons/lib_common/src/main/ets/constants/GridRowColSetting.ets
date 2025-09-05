@@ -1,4 +1,29 @@
 /**
+ * 业务options模型
+ */
+export interface BreakpointTypeOptions<T> {
+  [BreakpointNameEnum.SM]?: T,
+  [BreakpointNameEnum.MD]?: T,
+  [BreakpointNameEnum.LG]?: T,
+  [BreakpointNameEnum.XL]?: T,
+}
+
+/**
+ * 业务options类
+ */
+export class BreakpointType<T> {
+  private options: BreakpointTypeOptions<T>;
+
+  constructor(options: BreakpointTypeOptions<T>) {
+    this.options = options;
+  }
+
+  public getValue(bp: BreakpointNameEnum) {
+    return Reflect.get(this.options, bp) as T;
+  }
+}
+
+/**
  * 断点名称
  */
 export enum BreakpointNameEnum {
@@ -68,7 +93,61 @@ export class GridRowColSetting {
     direction: GridRowDirection.Row,
   };
   /**
+   * 居中8栅格列span
+   */
+  public static readonly DEFAULT_CENTER_COL_SPAN: GridColColumnOption = {
+    sm: 4,
+    md: 8,
+    lg: 8,
+    xl: 8,
+  };
+  /**
+   * 居中8栅格列offset
+   */
+  public static readonly DEFAULT_CENTER_COL_OFFSET: GridColColumnOption = {
+    sm: 0,
+    md: 0,
+    lg: 2,
+    xl: 2,
+  };
+  /**
+   * 居中6栅格列span
+   */
+  public static readonly SMALL_CENTER_COL_SPAN: GridColColumnOption = {
+    sm: 4,
+    md: 8,
+    lg: 6,
+    xl: 6,
+  };
+  /**
+   * 居中6栅格列offset
+   */
+  public static readonly SMALL_CENTER_COL_OFFSET: GridColColumnOption = {
+    sm: 0,
+    md: 0,
+    lg: 3,
+    xl: 3,
+  };
+  /**
    * 弹窗最大宽度
    */
   public static readonly DIALOG_MAX_WIDTH: number = 400;
+
+  /**
+   * 获取窗口断点栅格数
+   * @param bp
+   * @returns
+   */
+  public static getWindowColumn(bp: BreakpointNameEnum | string): number {
+    return Reflect.get(GridRowColSetting.GRID_ROW_OPTIONS_COLUMNS, bp);
+  }
+
+  /**
+   * 获取页面margin
+   * @param bp
+   * @returns
+   */
+  public static getPageMargin(bp: BreakpointNameEnum | string): number {
+    return Reflect.get(GridRowColSetting.GRID_ROW_OPTIONS_MARGIN, bp);
+  }
 }

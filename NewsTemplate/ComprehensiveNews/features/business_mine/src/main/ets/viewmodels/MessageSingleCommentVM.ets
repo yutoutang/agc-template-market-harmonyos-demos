@@ -1,7 +1,7 @@
 import { promptAction } from '@kit.ArkUI';
 import { BaseViewModel, RouterMap, RouterUtils } from 'lib_common';
 import { CommentModel, MessageServiceApi, MineServiceApi, PublishCommentRequest } from 'lib_news_api';
-import { commentSheetOpen } from 'module_feedcomment';
+import { CommentUtils } from 'module_feedcomment';
 import { CommentDetailModel } from '../common/ObservedModel';
 
 @ObservedV2
@@ -52,9 +52,9 @@ export class MsgSingleCommentListViewModel extends BaseViewModel {
 
   showCommentSheet(data?: CommentModel) {
     if (data) {
-      commentSheetOpen(data.author.authorNickName, (content: string) => {
+      CommentUtils.commentSheetOpen(data.author.authorNickName, (content: string) => {
         this.publishReply(data, content);
-      },false)
+      })
     }
   }
 

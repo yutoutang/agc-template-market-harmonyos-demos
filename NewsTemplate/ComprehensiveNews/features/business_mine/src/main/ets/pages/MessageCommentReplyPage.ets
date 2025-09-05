@@ -35,13 +35,14 @@ struct MsgCommentReplyPage {
           .height(CommonConstants.FULL_PERCENT)
           .scrollBar(BarState.Off)
           .padding({
-            left: CommonConstants.PADDING_PAGE,
-            right: CommonConstants.PADDING_PAGE,
+            left: this.vm.breakPointModel.pagePadding,
+            right: this.vm.breakPointModel.pagePadding,
             top: CommonConstants.SPACE_S,
             bottom: this.vm.windowModel.windowBottomPadding,
           })
         }
         .layoutWeight(1)
+        .accessibilityLevel('no')
         .onRefreshing(() => {
           this.vm.onRefresh();
         })

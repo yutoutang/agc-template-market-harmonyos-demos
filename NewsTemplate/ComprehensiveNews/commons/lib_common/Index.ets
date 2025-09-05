@@ -7,13 +7,19 @@ export { GlobalKey } from './src/main/ets/constants/GlobalKey';
 
 export { RouterMap } from './src/main/ets/constants/RouterMap';
 
-export { WX_APPID } from './src/main/ets/constants/WeChatConstants'
+export { WX_APPID } from './src/main/ets/constants/WeChatConstants';
 
-export { DownloadWithoutWlanEnum, RemindWithoutWlanEnum, } from './src/main/ets/constants/NetworkSettingEnum';
+export { DownloadWithoutWlanEnum, RemindWithoutWlanEnum } from './src/main/ets/constants/NetworkSettingEnum';
 
-export { NewsEnum } from './src/main/ets/constants/NewsEnum'
+export { NewsEnum } from './src/main/ets/constants/NewsEnum';
 
-export { BreakpointNameEnum, BreakpointValueEnum, GridRowColSetting } from './src/main/ets/constants/GridRowColSetting'
+export {
+  BreakpointTypeOptions,
+  BreakpointType,
+  BreakpointNameEnum,
+  BreakpointValueEnum,
+  GridRowColSetting,
+} from './src/main/ets/constants/GridRowColSetting';
 
 // models
 export { UserInfoModel } from './src/main/ets/models/UserInfoModel';
@@ -30,12 +36,21 @@ export { NetworkModel } from './src/main/ets/models/NetworkModel';
 
 export { SearchHistory } from './src/main/ets/models/SearchHistoryModel';
 
-export { RouterParams } from './src/main/ets/models/RouterParams'
+export { RouterParams, TransitionParams } from './src/main/ets/models/RouterParams';
 
-export { BundleInfo } from './src/main/ets/models/BundleInfo'
+export { BundleInfo } from './src/main/ets/models/BundleInfo';
 
 export { CloudRecommendListResult } from './src/main/ets/models/PreloadModel'
 
+export { ContinueModel } from './src/main/ets/models/ContinueModel';
+
+export { VideoExtraInfoModel } from './src/main/ets/models/VideoExtraInfoModel'
+
+export { DisplayModel } from './src/main/ets/models/DisplayModel'
+
+export { BreakpointModel } from './src/main/ets/models/BreakpointModel'
+
+export { CoverUri } from './src/main/ets/models/MediaModel'
 // utils
 export { BaseViewModel } from './src/main/ets/utils/BaseViewModel';
 
@@ -55,7 +70,7 @@ export { FileUtils } from './src/main/ets/utils/FileUtils';
 
 export { TimeUtils } from './src/main/ets/utils/TimeUtils';
 
-export { getDataFromJSON } from './src/main/ets/utils/ReadRawfile'
+export { getDataFromJSON } from './src/main/ets/utils/ReadRawfile';
 
 export { AppGalleryUtils } from './src/main/ets/utils/AppGalleryUtils';
 
@@ -65,27 +80,29 @@ export { PhoneNumberUtils } from './src/main/ets/utils/PhoneNumberUtils';
 
 export { logMethod } from './src/main/ets/utils/DecoratorUtils';
 
-export { RouterToNews } from './src/main/ets/utils/NewsPushUtils'
+export { RouterToNews } from './src/main/ets/utils/NewsPushUtils';
 
-export { FormatCount } from './src/main/ets/utils/FormatCount'
+export { FormatCount } from './src/main/ets/utils/FormatCount';
 
-export { PushUtils } from './src/main/ets/push/PushUtils'
+export { PushUtils } from './src/main/ets/push/PushUtils';
 
-export { PushActionParams } from './src/main/ets/push/Model'
+export { PushActionParams } from './src/main/ets/push/Model';
 
-export { LinearColumnModifier } from './src/main/ets/utils/Modifier'
+export { BundleUtils } from './src/main/ets/utils/BundleUtils';
 
-export { BundleUtils } from './src/main/ets/utils/BundleUtils'
+export { SafeRandomGenerate } from './src/main/ets/utils/SafeRandomNumer';
 
-export { SafeRandomGenerate } from './src/main/ets/utils/SafeRandomNumer'
+export { BreakpointUtils } from './src/main/ets/utils/BreakpointUtils';
 
-export { BreakpointUtils } from './src/main/ets/utils/BreakpointUtils'
+export { NetworkUtil } from './src/main/ets/utils/NetworkUtil';
 
-export { NetworkUtil } from './src/main/ets/utils/NetworkUtil'
-
-export { SystemBarOperation } from './src/main/ets/utils/SystemBarOperation'
+export { SystemBarOperation } from './src/main/ets/utils/SystemBarOperation';
 
 export { NewsScan } from './src/main/ets/utils/NewsScan';
+
+export { CommonBreakpoint } from './src/main/ets/utils/CommonBreakpoint'
+
+export { MediaUtils } from './src/main/ets/utils/MediaUtils'
 
 // dialogs
 export { CommonConfirmDialog, IConfirmDialogParams } from './src/main/ets/dialogs/CommonConfirmDialog';
@@ -93,6 +110,11 @@ export { CommonConfirmDialog, IConfirmDialogParams } from './src/main/ets/dialog
 export { CommonLoadingDialog, loadingView } from './src/main/ets/dialogs/CommonLoading';
 
 export { CommonTipDialog, ITipDialogParams } from './src/main/ets/dialogs/CommonTipDialog';
+
+// styles
+export { LinearColumnModifier } from './src/main/ets/styles/LinearColumnModifier';
+
+export { CircleButtonModifier } from './src/main/ets/styles/CircleButtonModifier';
 
 // dataSource
 export { CommonDataSource } from './src/main/ets/datasource/CommonDataSource';

@@ -2,15 +2,17 @@ import { media } from '@kit.MediaKit';
 import { display } from '@kit.ArkUI';
 import { util } from '@kit.ArkTS';
 import { Constants } from '../constants/Constants';
-import { VideoPlayerData } from '../type/Index';
+import { BreakpointNameEnum, VideoPlayerData } from '../type/Index';
 import { VideoPlayerModel } from './VideoPlayerModel';
 import { VideoNetworkModel } from '../models/VideoNetworkModel';
+import { isDisplayModeFull } from '../utils/Util';
 
 @ObservedV2
 export class VideoCardModel extends VideoPlayerModel {
   // 封面图的高度
   @Trace coverImgHeight: Length = Constants.VIDEO_CARD_HEIGHT;
   @Trace isPause: boolean = true;
+  @Trace currentBreakpoint: BreakpointNameEnum = BreakpointNameEnum.SM;
   videoNetwork?: VideoNetworkModel
   xComponentId: string = ''
 
@@ -38,9 +40,16 @@ export class VideoCardModel extends VideoPlayerModel {
 
   // 计算尺寸
   adaptiveVideoSize() {
-    let radio = Number(this.videoWidth) / Number(this.videoHeight);
-    let screenWidth = display.getDefaultDisplaySync().width;
-    this.xComponentHeight = this.uiContext!.px2vp(screenWidth / radio);
+    let videoRatio = Number(this.videoWidth) / Number(this.videoHeight);
+    let displayWidth = display.getDefaultDisplaySync().width;
+    let vpWidth = this.uiContext!.px2vp(displayWidth);
+    let screenWidth = vpWidth;
+    // 大折叠、平板适配
+    let isFullMode = isDisplayModeFull();
+    if (isFullMode || (!isFullMode && this.currentBreakpoint !== BreakpointNameEnum.SM)) {
+      screenWidth = vpWidth / 2 - 48
+    }
+    this.xComponentHeight = screenWidth / videoRatio;
   }
 
   initXComponentId() {

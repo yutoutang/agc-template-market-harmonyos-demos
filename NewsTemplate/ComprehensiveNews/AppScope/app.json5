@@ -1,9 +1,9 @@
 {
   "app": {
-    /**
-    * todo: 替换包名
-    */
-    "bundleName": "com.example.xxx",
+/**
+     * todo: 替换包名
+     */
+    "bundleName": "zhxw.1.xxxxxx",
     "vendor": "example",
     "versionCode": 1000000,
     "versionName": "1.0.0",

@@ -1,4 +1,4 @@
-import { CommonConstants } from 'lib_common';
+import { CommonConstants, GridRowColSetting } from 'lib_common';
 import { NavHeaderBar } from 'lib_widget';
 import { SettingCard } from '../components/SettingCard';
 import { SettingPrivacyVM } from '../viewmodels/SettingPrivacyVM'
@@ -18,22 +18,31 @@ struct SettingPrivacy {
         NavHeaderBar({
           title: '隐私设置',
         })
-        Scroll() {
-          Column({ space: CommonConstants.SPACE_M }) {
-            SettingCard({ list: this.vm.list1 })
-            SettingCard({ list: this.vm.list2 })
-            SettingCard({ list: this.vm.list3 })
+        GridRow(GridRowColSetting.DEFAULT_GRID_ROW_OPTIONS) {
+          GridCol({
+            span: GridRowColSetting.DEFAULT_CENTER_COL_SPAN,
+            offset: GridRowColSetting.DEFAULT_CENTER_COL_OFFSET,
+          }) {
+            Scroll() {
+              Column({ space: CommonConstants.SPACE_M }) {
+                SettingCard({ list: this.vm.list1 })
+                SettingCard({ list: this.vm.list2 })
+                SettingCard({ list: this.vm.list3 })
+              }
+              .padding({
+                left: this.vm.breakPointModel.pagePadding,
+                right: this.vm.breakPointModel.pagePadding,
+                top: CommonConstants.PADDING_M,
+                bottom: this.vm.windowModel.windowBottomPadding,
+              })
+            }
+            .layoutWeight(1)
+            .scrollBar(BarState.Off)
+            .align(Alignment.Top)
+            .edgeEffect(EdgeEffect.Spring)
           }
-          .padding({
-            left: CommonConstants.PADDING_PAGE,
-            right: CommonConstants.PADDING_PAGE,
-            top: CommonConstants.PADDING_M,
-          })
         }
         .layoutWeight(1)
-        .scrollBar(BarState.Off)
-        .align(Alignment.Top)
-        .edgeEffect(EdgeEffect.Spring)
       }
       .width(CommonConstants.FULL_PERCENT)
       .height(CommonConstants.FULL_PERCENT)

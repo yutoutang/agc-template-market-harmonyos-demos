@@ -1,28 +1,30 @@
-import dayjs from 'dayjs'
-import { CommonConfirmDialog, PopViewUtils } from 'lib_common'
-import { BuilderParams, CommentInfo } from '../model/Model'
-import { CommentEventDispatcher } from '../utils/EventDispatcher'
-import { commentSheetOpen } from '../utils/Utils'
-import { FeedCommentVM } from '../viewModel/FeedCommentVM'
-import { confirmDialogView } from './PressAction'
 import { promptAction } from '@kit.ArkUI'
+import dayjs from 'dayjs'
+import { PopViewUtils } from 'lib_common'
+import { BuilderParams, CommentInfo } from '../model/Model'
+import { CommentUtils } from '../utils/CommentUtils'
+import { CommentEventDispatcher } from '../utils/EventDispatcher'
+import { FeedCommentVM } from '../viewmodel/FeedCommentVM'
+import { confirmDialogView } from './PressAction'
+
 
 @ComponentV2
 export struct CommentCard {
   @Require @Param commentInfo: CommentInfo
   @Param articleInfo: CommentInfo = new CommentInfo()
   @Param navPathStack: NavPathStack = new NavPathStack()
-  @Param isDark:boolean = false
+  @Param isDark: boolean = false
   @BuilderParam replyComponentBuilder: () => void;
   @BuilderParam totalCommentBuilder: () => void;
-  @Event onDeleteComment: (commentId: string) => void = () => {}
+  @Event onDeleteComment: (commentId: string) => void = () => {
+  }
   @Local feedCommentVM: FeedCommentVM = FeedCommentVM.instance;
   @Param isNeedReply: boolean = false
   private customDialogComponentId: number = 0
 
   @Computed
   get getDarkLike() {
-    return this.isDark ? $r('app.media.give_like_dark'): $r('app.media.give_like')
+    return this.isDark ? $r('app.media.give_like_dark') : $r('app.media.give_like')
   }
 
   @Builder
@@ -57,7 +59,7 @@ export struct CommentCard {
 
   pressReply = () => {
     PopViewUtils.closePopView()
-    commentSheetOpen(this.commentInfo.author.authorNickName, (replyContent: string) => {
+    CommentUtils.commentSheetOpen(this.commentInfo.author.authorNickName, (replyContent: string) => {
       this.feedCommentVM.addComment(this.commentInfo, replyContent)
     })
   }
@@ -90,6 +92,7 @@ export struct CommentCard {
               .height(32)
               .borderRadius('50%')
               .clip(true)
+              .accessibilityText(this.commentInfo.author.authorNickName + '头像')
               .onClick(() => {
                 CommentEventDispatcher.dispatchToUserHome(this.commentInfo.author.authorId)
               })
@@ -119,18 +122,30 @@ export struct CommentCard {
               Text(this.commentInfo.commentBody).fontColor($r('app.color.common_title_font'))
                 .fontColor($r('sys.color.font_primary')).fontSize(14 * this.feedCommentVM.fontSizeRatio)
             }
+            .accessibilityGroup(true)
           }
           .onClick(() => {
-            commentSheetOpen(this.commentInfo.author.authorNickName, (replyContent: string) => {
+            CommentUtils.commentSheetOpen(this.commentInfo.author.authorNickName, (replyContent: string) => {
               this.feedCommentVM.addComment(this.commentInfo, replyContent)
             })
           })
 
 
           Row() {
-            Text(dayjs(this.commentInfo.createTime).format('YYYY-MM-DD hh:mm'))
-              .fontSize(10 * this.feedCommentVM.fontSizeRatio)
-              .fontColor($r('sys.color.font_secondary'))
+            Row({ space: 16 }) {
+              Text(dayjs(this.commentInfo.createTime).format('YYYY-MM-DD hh:mm'))
+                .fontSize(10 * this.feedCommentVM.fontSizeRatio)
+                .fontColor($r('sys.color.font_secondary'))
+              Text('回复')
+                .fontSize(10 * this.feedCommentVM.fontSizeRatio)
+                .fontColor($r('app.color.app_theme'))
+                .onClick(() => {
+                  CommentUtils.commentSheetOpen(this.commentInfo.author.authorNickName, (replyContent: string) => {
+                    this.feedCommentVM.addComment(this.commentInfo, replyContent)
+                  })
+                })
+            }
+
             Row({ space: 5 }) {
               Image(this.commentInfo.isLiked ? $r('app.media.give_like_active') : this.getDarkLike)
                 .width(16)
@@ -139,8 +154,9 @@ export struct CommentCard {
                 .fontSize(10 * this.feedCommentVM.fontSizeRatio)
                 .fontColor($r('sys.color.font_secondary'))
             }
+            .accessibilityText('点赞' + this.commentInfo.commentLikeNum)
             .onClick(() => {
-              this.feedCommentVM.giveLike(this.commentInfo,!this.commentInfo.isLiked)
+              this.feedCommentVM.giveLike(this.commentInfo, !this.commentInfo.isLiked)
             })
           }
           .width('100%')
@@ -167,7 +183,7 @@ export struct CommentCard {
                 delete: this.pressDelete,
                 cancel: this.pressCancel,
                 isCommentOwner: this.commentInfo.author.authorId === this.feedCommentVM.userInfo.authorId,
-                fontSizeRatio:this.feedCommentVM.fontSizeRatio,
+                fontSizeRatio: this.feedCommentVM.fontSizeRatio,
               }
               PopViewUtils.showPopView<BuilderParams>(wrapBuilder(confirmDialogView), {
                 alignment: DialogAlignment.Bottom,

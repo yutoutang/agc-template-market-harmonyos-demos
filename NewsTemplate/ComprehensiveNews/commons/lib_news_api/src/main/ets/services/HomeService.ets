@@ -22,7 +22,7 @@ export class HomeService {
    * @returns
    */
   @AsyncFunc
-  public queryHomeRecommendList(postType: string): RequestListData[] {
+  public queryHomeRecommendList(postType: string, currentIndex: number = 10, currentPage = 0): RequestListData[] {
     let postList: RequestListData[] = []
     switch (postType) {
       case 'recommend':
@@ -37,6 +37,24 @@ export class HomeService {
       default:
         postList = Utils.shuffleArray(this.getRecommendList(MockFlexLayout.recommendList).slice(1))
         break
+    }
+    return postList.slice(currentPage, currentIndex);
+  }
+
+  @AsyncFunc
+  public queryNextPageData(postType: string, currentIndex: number = 10, currentPage = 0): RequestListData[] {
+    let postList: RequestListData[]
+    if (postType === 'follow') {
+      postList = this.queryHomeFollowList([NewsEnum.Article], currentIndex, currentPage)
+      /*
+       * 处理extraInfo
+       * */
+      postList.forEach(item => {
+        item.extraInfo.isNeedAuthor = true
+        item.extraInfo.isFollow = true
+      })
+    } else {
+      postList = this.queryHomeRecommendList(postType, currentIndex, currentPage)
     }
     return postList;
   }
@@ -64,7 +82,7 @@ export class HomeService {
    * @returns
    */
   @AsyncFunc
-  public queryActionFollowList(): NewsResponse[] {
+  public queryActionFollowList(pageIndex: number): NewsResponse[] {
     const myUserInfo = MineServiceApi.queryAuthorRaw();
     const articles = MockArticle.list
       .filter(v => myUserInfo?.watchers.includes(v.authorId) && v.type === NewsEnum.Post)
@@ -78,7 +96,7 @@ export class HomeService {
       .filter(v => myUserInfo?.watchers.includes(v.authorId) && v.type === NewsEnum.Post)
       .map((news: BaseNews) => BaseNewsServiceApi.queryNews(news.id))
       .filter(v => Boolean(v)) as NewsResponse[]
-    return Utils.shuffleArray([...videos, ...posts, ...articles]);
+    return Utils.shuffleArray([...videos, ...posts, ...articles].slice(0, pageIndex));
   }
 
   /**
@@ -102,7 +120,7 @@ export class HomeService {
    * 查询首页关注流
    * @returns
    */
-  public queryHomeFollowList(newsType: NewsEnum[]): RequestListData[] {
+  public queryHomeFollowList(newsType: NewsEnum[], currentIndex: number = 10, currentPage = 0): RequestListData[] {
     const myUserInfo = MineServiceApi.queryAuthorRaw();
     const articles = MockArticle.list
       .filter(v => myUserInfo?.watchers.includes(v.authorId) && newsType.includes(v.type))
@@ -117,7 +135,7 @@ export class HomeService {
         v.authorId === myUserInfo?.authorId)
       .map(v => BaseNewsServiceApi.handleRawNews(v))
       .map(v => BaseNewsServiceApi.layoutTrans(v));
-    return Utils.shuffleArray([...videos, ...posts, ...articles]);
+    return Utils.shuffleArray([...videos, ...posts, ...articles].slice(currentPage, currentIndex));
   }
 
   /**

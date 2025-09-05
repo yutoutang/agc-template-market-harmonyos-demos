@@ -22,14 +22,14 @@
 
 - DevEco Studio版本：DevEco Studio 5.0.3 Release及以上
 - HarmonyOS SDK版本：HarmonyOS 5.0.3 Release SDK及以上
-- 设备类型：华为手机（包括双折叠和阔折叠）
+- 设备类型：华为手机（包括双折叠和阔折叠）、平板
 - 系统版本：HarmonyOS 5.0.1(13)及以上
 
 ## 快速入门
 
 1. 安装组件。
 
-   如果是在DevEvo Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
+   如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
 
    如果是从生态市场下载组件，请参考以下步骤安装组件。
 
@@ -86,7 +86,6 @@ PublishPostComp(option?: PublishPostCompOptions)
 | fontRatio   | number                                                                         | 否    | 字体大小比例        |
 | imageParams | [MediaParams](#MediaParams对象说明)                                                | 否    | 图片参数          |
 | videoParams | [MediaParams](#MediaParams对象说明)                                                | 否    | 视频参数          |
-| columnsNum  | number                                                                         | 否    | grid列数        |
 | onChange    | (body: string, mediaList: [PostImgVideoItem](#PostImgVideoItem对象说明)[]) => void | 否    | 文字、图片、视频变化的回调 |
 
 ### MediaParams对象说明
@@ -122,7 +121,6 @@ struct Sample1 {
       Column() {
         PublishPostComp({
           fontRatio: 1,
-          columnsNum: 3,
           onChange: (body: string, mediaList: PostImgVideoItem[]) => {
             this.body = body;
             this.mediaList = mediaList;

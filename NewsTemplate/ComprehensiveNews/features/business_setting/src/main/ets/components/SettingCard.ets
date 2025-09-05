@@ -1,5 +1,13 @@
-import { PersistenceV2 } from '@kit.ArkUI';
-import { CommonConstants, Logger, PopViewUtils, RouterUtils, SettingModel } from 'lib_common'
+import { AppStorageV2, PersistenceV2 } from '@kit.ArkUI';
+import {
+  BreakpointModel,
+  BreakpointNameEnum,
+  CommonConstants,
+  Logger,
+  PopViewUtils,
+  RouterUtils,
+  SettingModel,
+} from 'lib_common'
 import { SettingItem } from '../types/Types';
 import { SettingSelectDialog } from './SettingSelectDialog';
 
@@ -9,7 +17,10 @@ const TAG = '[SettingCard]';
 export struct SettingCard {
   @Param list: SettingItem[] = [];
   @Param labelSize: number = 16;
+  @Param enableLaneSetting: boolean = false;
   @Local settingInfo: SettingModel = PersistenceV2.connect(SettingModel, () => new SettingModel())!;
+  @Local breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
+  readonly IMAGE_ICON_WIDTH: number = 24;
 
   build() {
     List() {
@@ -18,7 +29,7 @@ export struct SettingCard {
           Row({ space: CommonConstants.SPACE_M }) {
             if (v.icon) {
               Image(v.icon)
-                .width($r('app.float.normal_img_size'))
+                .width(this.IMAGE_ICON_WIDTH)
                 .fillColor($r('sys.color.font_primary'))
                 .draggable(false)
             }
@@ -35,6 +46,7 @@ export struct SettingCard {
             }
             .layoutWeight(1)
             .alignItems(HorizontalAlign.Start)
+            .accessibilityGroup(true)
 
             if (v.typeSwitch) {
               this.toggleScene(v)
@@ -55,31 +67,45 @@ export struct SettingCard {
             normal: this.normalStyles,
             pressed: this.pressedStyles,
           })
+          .accessibilityLevel(v.typeSwitch ? 'no' : 'auto')
+          .onTouchIntercept(() => {
+            if (v.typeSwitch) {
+              return HitTestMode.None;
+            }
+            return HitTestMode.Default;
+          })
+          .onClick(() => {
+            if (v.typeSelect) {
+              PopViewUtils.showPopView(wrapBuilder(SettingSelectDialog), {}, v);
+              return;
+            }
+            if (v.onClick) {
+              v.onClick();
+              return;
+            }
+            if (v.routerName) {
+              RouterUtils.pushPathByName(v.routerName, v.routerParams);
+            }
+          })
         }
-        .onClick(() => {
-          if (v.onClick) {
-            v.onClick();
-          } else if (v.routerName) {
-            RouterUtils.pushPathByName(v.routerName, v.routerParams);
-          }
-        })
       }, (v: SettingItem) => v.label as string)
     }
     .width(CommonConstants.FULL_PERCENT)
     .height('auto')
-    .padding({
-      left: CommonConstants.PADDING_XS,
-      right: CommonConstants.PADDING_XS,
-      top: CommonConstants.PADDING_XS,
-      bottom: CommonConstants.PADDING_XS,
-    })
+    .lanes(this.listLanes)
     .borderRadius($r('app.float.large_radius'))
     .backgroundColor($r('sys.color.comp_background_primary'))
     .divider({
       strokeWidth: 0.5,
       color: $r('sys.color.comp_divider'),
-      startMargin: CommonConstants.PADDING_M,
+      startMargin: this.dividerStartMargin,
       endMargin: CommonConstants.PADDING_M,
+    })
+    .padding({
+      left: CommonConstants.PADDING_XS,
+      right: CommonConstants.PADDING_XS,
+      top: CommonConstants.PADDING_XS,
+      bottom: CommonConstants.PADDING_XS,
     })
   }
 
@@ -96,12 +122,12 @@ export struct SettingCard {
   @Builder
   toggleScene(v: SettingItem) {
     Toggle({ type: ToggleType.Switch, isOn: v.switchV })
-      .hitTestBehavior(HitTestMode.Block)
-      .onChange((isOn: boolean) => {
-        Logger.info(TAG, 'Toggle status:' + isOn);
+      .onTouchIntercept(() => {
+        Logger.info(TAG, 'Toggle target status:' + !v.switchV);
         if (v.onClick) {
-          v.onClick(isOn);
+          v.onClick(!v.switchV);
         }
+        return HitTestMode.None;
       })
   }
 
@@ -115,9 +141,6 @@ export struct SettingCard {
         .width($r('app.float.arrow_right_w'))
         .draggable(false)
     }
-    .onClick(() => {
-      PopViewUtils.showPopView(wrapBuilder(SettingSelectDialog), {}, v);
-    })
   }
 
   @Builder
@@ -137,5 +160,24 @@ export struct SettingCard {
   getSelectLabel(v: SettingItem) {
     const option = v.selectOptions?.find(option => option.id === v.selectV);
     return option?.label || '';
+  }
+
+  @Computed
+  get listLanes() {
+    if (!this.enableLaneSetting) {
+      return 1;
+    }
+    if ([BreakpointNameEnum.SM, BreakpointNameEnum.MD].includes(this.breakPointModel.currentBreakpoint)) {
+      return 1;
+    }
+    return 2;
+  }
+
+  @Computed
+  get dividerStartMargin() {
+    if (this.enableLaneSetting) {
+      return CommonConstants.PADDING_M + CommonConstants.SPACE_M + this.IMAGE_ICON_WIDTH;
+    }
+    return CommonConstants.PADDING_M
   }
 }

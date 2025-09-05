@@ -6,10 +6,14 @@ import {
   DEFAULT_VIDEO_PARAM,
   PostImgVideoItem,
   UploadType,
-  MediaParams
+  MediaParams,
+  GRID_ROW_OPTIONS,
+  COL_SPAN,
+  COL_OFFSET,
 } from '../constants/Constants';
 import { MediaUtils } from '../utils/MediaUtils';
 import { FileUtils } from '../utils/FileUtils';
+import { getPageMargin } from '../utils/Common';
 
 @ComponentV2
 export struct PublishPostComp {
@@ -19,15 +23,18 @@ export struct PublishPostComp {
   @Param imageParams: MediaParams = DEFAULT_IMAGE_PARAM;
   // 视频参数
   @Param videoParams: MediaParams = DEFAULT_VIDEO_PARAM;
-  // grid列数
-  @Param columnsNum: number = 3;
   // 图文变化的回调
   @Event onChange: (body: string, mediaList: PostImgVideoItem[]) => void = () => {
   };
+  @Event onHideNewsTab: (isHide: boolean) => void = () => {
+  }
+  // 是否是新闻发表页
+  @Param isArticlePost: boolean = false
   @Local body: string = '';
   @Local imgList: PostImgVideoItem[] = [];
   @Local videoList: PostImgVideoItem[] = [];
-  @Local keyboardHeight: number = 0;
+  @Local columnsNum: number = 3;
+  @Local breakpoint: string = 'sm';
 
   @Monitor('body', 'imgList.length', 'videoList.length')
   onContentChange(monitor: IMonitor) {
@@ -35,33 +42,57 @@ export struct PublishPostComp {
   }
 
   aboutToAppear(): void {
-    this.handleKeyBoard();
-  }
-
-  aboutToDisappear(): void {
-    this.cancelHandleKeyBoard()
+    window.getLastWindow(getContext(this)).then(currentWindow => {
+      currentWindow.on('keyboardHeightChange', this.onKeyBoardCB);
+    })
   }
 
   build() {
     Column() {
-      Scroll() {
-        Column() {
-          this.textArea()
-          this.mediaArea()
+      GridRow(GRID_ROW_OPTIONS) {
+        GridCol({
+          span: COL_SPAN,
+          offset: COL_OFFSET,
+        }) {
+          Scroll() {
+            Column() {
+              this.textArea()
+              this.mediaArea()
+            }
+            .width(Constants.FULL_PERCENT)
+            .alignItems(HorizontalAlign.Start)
+          }
+          .width(Constants.FULL_PERCENT)
+          .layoutWeight(1)
+          .align(Alignment.Top)
+          .scrollBar(BarState.Off)
+          .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
         }
-        .width(Constants.FULL_PERCENT)
-        .alignItems(HorizontalAlign.Start)
       }
-      .width(Constants.FULL_PERCENT)
       .layoutWeight(1)
-      .align(Alignment.Top)
-      .scrollBar(BarState.Off)
-      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+      .padding({
+        left: getPageMargin(this.breakpoint),
+        right: getPageMargin(this.breakpoint),
+      })
+      .onBreakpointChange((bp: string) => {
+        this.breakpoint = bp;
+        if (bp === 'sm') {
+          this.columnsNum = 3;
+        } else {
+          this.columnsNum = 6;
+        }
+      })
 
       this.actionBar()
     }
     .width(Constants.FULL_PERCENT)
     .height(Constants.FULL_PERCENT)
+    .onAppear(() => {
+      this.handleKeyBoard();
+    })
+    .onDisAppear(() => {
+      this.cancelHandleKeyBoard()
+    })
   }
 
   @Builder
@@ -84,6 +115,12 @@ export struct PublishPostComp {
   mediaArea() {
     Column({ space: Constants.SPACE_8 }) {
       Grid() {
+        if (this.showUploadBox) {
+          GridItem() {
+            this.uploadBox()
+          }
+        }
+
         ForEach(this.imgList, (v: PostImgVideoItem, index: number) => {
           GridItem() {
             this.imageBox(v.picVideoUrl, index)
@@ -95,12 +132,6 @@ export struct PublishPostComp {
             this.videoBox(v.surfaceUrl, index)
           }
         }, (v: PostImgVideoItem) => v.picVideoUrl)
-
-        if (this.showUploadBox) {
-          GridItem() {
-            this.uploadBox()
-          }
-        }
       }
       .columnsTemplate(this.getColumnsTemplate)
       .columnsGap(12)
@@ -145,7 +176,15 @@ export struct PublishPostComp {
     }
     .width(Constants.FULL_PERCENT)
     .height(Constants.ACTION_BAR_HEIGHT)
-    .margin({ bottom: this.keyboardHeight })
+    .padding({
+      left: getPageMargin(this.breakpoint),
+      right: getPageMargin(this.breakpoint),
+    })
+    .shadow({
+      offsetY: -2,
+      radius: 4,
+      color: '#F2F2F2',
+    })
   }
 
   @Builder
@@ -241,14 +280,14 @@ export struct PublishPostComp {
     if (this.videoList.length) {
       this.getUIContext().getPromptAction().showToast({
         message: '图片与视频一次只可上传一种',
-        bottom: this.keyboardHeight + 40,
+        bottom: this.toastMarginBottom,
       });
       return;
     }
     if (this.imgList.length >= this.imageParams.maxLimit) {
       this.getUIContext().getPromptAction().showToast({
         message: '已添加的图片数量已达上限',
-        bottom: this.keyboardHeight + 40,
+        bottom: this.toastMarginBottom,
       });
       return;
     }
@@ -259,14 +298,14 @@ export struct PublishPostComp {
     if (this.imgList.length) {
       this.getUIContext().getPromptAction().showToast({
         message: '图片与视频一次只可上传一种',
-        bottom: this.keyboardHeight + 40,
+        bottom: this.toastMarginBottom,
       });
       return;
     }
     if (this.videoList.length >= this.videoParams.maxLimit) {
       this.getUIContext().getPromptAction().showToast({
         message: '已添加的视频数量已达上限',
-        bottom: this.keyboardHeight + 40,
+        bottom: this.toastMarginBottom,
       });
       return;
     }
@@ -302,17 +341,8 @@ export struct PublishPostComp {
   }
 
   handleKeyBoard() {
-    this.getUIContext().setKeyboardAvoidMode(KeyboardAvoidMode.NONE);
-    window.getLastWindow(getContext(this)).then(currentWindow => {
-      currentWindow.on('keyboardHeightChange', this.onKeyBoardCB);
-    })
-  }
-
-  cancelHandleKeyBoard() {
-    this.getUIContext().setKeyboardAvoidMode(KeyboardAvoidMode.OFFSET);
-    window.getLastWindow(getContext(this)).then(currentWindow => {
-      currentWindow.off('keyboardHeightChange', this.onKeyBoardCB);
-    })
+    // 键盘避让设置为压缩模式
+    this.getUIContext().setKeyboardAvoidMode(KeyboardAvoidMode.RESIZE);
   }
 
   onKeyBoardCB: (height: number) => void = (height: number) => {
@@ -320,9 +350,23 @@ export struct PublishPostComp {
       duration: 200,
       curve: Curve.EaseInOut,
     }, () => {
-      this.keyboardHeight = px2vp(height);
+      if (!height) {
+        this.onHideNewsTab(false)
+      } else {
+        this.onHideNewsTab(true)
+      }
     });
   };
+
+  cancelHandleKeyBoard() {
+    // 键盘避让还原成上抬模式
+    this.getUIContext().setKeyboardAvoidMode(KeyboardAvoidMode.OFFSET);
+  }
+
+  @Computed
+  get toastMarginBottom() {
+    return 40;
+  }
 
   @Computed
   get getMaxCount() {

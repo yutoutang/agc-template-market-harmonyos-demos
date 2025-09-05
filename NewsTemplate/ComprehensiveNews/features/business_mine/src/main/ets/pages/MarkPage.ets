@@ -26,5 +26,8 @@ struct MarkPage {
       .height(CommonConstants.FULL_PERCENT)
     }
     .hideTitleBar(true)
+    .onShown(() => {
+      this.vm.queryList();
+    })
   }
 }

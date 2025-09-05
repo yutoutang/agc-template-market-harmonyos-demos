@@ -57,6 +57,7 @@ export class MakeObCommentServed extends CommentInfo {
   @Trace likeCount: number = 0
   @Trace replyComments: CommentInfo[] = []
   isExpand: boolean = false
+  parentComment?:CommentInfo
 
   constructor(value: CommentInfo) {
     super()
@@ -70,6 +71,7 @@ export class MakeObCommentServed extends CommentInfo {
     this.likeCount = value.likeCount
     this.replyComments = value.replyComments.map((item) => new MakeObCommentServed(item))
     this.replyAuthor = value?.parentComment?.author ?? new AuthorInfo()
+    this.parentComment = value.parentComment ?? undefined
   }
 }
 
@@ -79,4 +81,14 @@ export interface BuilderParams {
   cancel: () => void
   isCommentOwner: boolean
   fontSizeRatio:number
+}
+
+export class CommentParams {
+  reNickName: string = ''
+  callback: (replyContent: string) => void
+
+  constructor(replyAuthor: string | null, callback: (replyContent: string) => void) {
+    this.reNickName = replyAuthor ?? ''
+    this.callback = callback
+  }
 }

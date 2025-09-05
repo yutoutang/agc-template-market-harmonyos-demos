@@ -24,11 +24,6 @@
       "name": "SplashPage",
       "pageSourceFile": "src/main/ets/pages/SplashPage.ets",
       "buildFunction": "SplashPageBuilder"
-    },
-    {
-      "name": "StartPage",
-      "pageSourceFile": "src/main/ets/pages/StartPage.ets",
-      "buildFunction": "StartPageBuilder"
     }
   ]
 }

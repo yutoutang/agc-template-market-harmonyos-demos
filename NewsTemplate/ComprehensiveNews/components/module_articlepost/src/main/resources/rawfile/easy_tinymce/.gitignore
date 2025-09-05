@@ -1,0 +1,29 @@
+.DS_Store
+node_modules
+/dist
+vue.config.js
+/coverage
+
+# local env files
+.env.local
+.env.*.local
+.env.development
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.iml
+package-lock.json
+tinymce.d.ts
+tinymce.min.js
+

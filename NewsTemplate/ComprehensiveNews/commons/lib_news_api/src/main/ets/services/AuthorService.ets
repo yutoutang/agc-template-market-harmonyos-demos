@@ -51,13 +51,16 @@ export class AuthorService {
    * 登录
    * @param loginChannel 渠道
    */
-  public signIn(loginChannel?: string) {
+  public signIn(loginChannel?: string, nickPhone?: string) {
     const raw = this.queryAuthorRaw();
     if (raw) {
       if (loginChannel === 'wechat') {
         raw.authorNickName = '微信用户';
       } else {
         raw.authorNickName = '华为用户';
+      }
+      if (nickPhone) {
+        raw.authorPhone = nickPhone;
       }
       return this.handleRawInfo(raw);
     }

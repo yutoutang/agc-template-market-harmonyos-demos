@@ -9,6 +9,16 @@
       "name": "NewsSearch",
       "pageSourceFile": "src/main/ets/components/NewsSearch.ets",
       "buildFunction": "NewsSearchBuilder"
+    },
+    {
+      "name": "NewsPost",
+      "pageSourceFile": "src/main/ets/components/NewsPost.ets",
+      "buildFunction": "NewsPostBuilder"
+    },
+    {
+      "name": "NewsPublishSelect",
+      "pageSourceFile": "src/main/ets/components/NewsPublishSelect.ets",
+      "buildFunction": "NewsPublishSelectBuilder"
     }
   ]
 }

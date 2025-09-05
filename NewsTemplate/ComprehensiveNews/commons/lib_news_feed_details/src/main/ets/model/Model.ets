@@ -42,6 +42,8 @@ export class NewsFeedInfo implements NewsResponse {
   author: AuthorInfo = new AuthorInfo()
   // 创建时间
   createTime: number = 0
+  // 相对时间
+  relativeTime: string = ''
   // 评论列表
   @Trace comments: CommentResponse[] = []
   // 收藏数量

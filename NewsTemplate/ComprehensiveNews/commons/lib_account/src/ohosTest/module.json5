@@ -3,7 +3,8 @@
     "name": "lib_account_test",
     "type": "feature",
     "deviceTypes": [
-      "default"
+      "phone",
+      "tablet"
     ],
     "deliveryWithInstall": true,
     "installationFree": false

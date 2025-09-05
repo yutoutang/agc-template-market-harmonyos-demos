@@ -4,9 +4,8 @@
     "type": "har",
     "routerMap": "$profile:route_map",
     "deviceTypes": [
-      "default",
-      "tablet",
-      "2in1"
+      "phone",
+      "tablet"
     ],
     "requestPermissions": [
       {
@@ -14,9 +13,6 @@
       },
       {
         "name": "ohos.permission.GET_NETWORK_INFO",
-      },
-      {
-        "name": "ohos.permission.GET_WIFI_INFO",
       }
     ]
   }

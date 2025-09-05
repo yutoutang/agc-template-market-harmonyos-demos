@@ -1,10 +1,6 @@
-import { connection } from '@kit.NetworkKit';
-
 @ObservedV2
 export class NetworkModel {
   private static instance?: NetworkModel
-  // 数据网络的句柄
-  @Trace netHandle: connection.NetHandle | undefined = undefined
   // 是否有网络
   @Trace hasNet: boolean = true
   // 是否是移动蜂窝网络

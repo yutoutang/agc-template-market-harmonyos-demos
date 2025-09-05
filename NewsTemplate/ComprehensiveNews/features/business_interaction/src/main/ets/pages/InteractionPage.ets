@@ -1,9 +1,20 @@
-import { PersistenceV2 } from '@kit.ArkUI';
-import { CommonConstants, LinearColumnModifier, RouterMap, RouterUtils, SettingModel } from 'lib_common'
+import { AppStorageV2, PersistenceV2 } from '@kit.ArkUI';
+import {
+  BreakpointModel,
+  CircleButtonModifier,
+  CommonConstants,
+  LinearColumnModifier,
+  RouterMap,
+  RouterUtils,
+  SettingModel,
+  TabModel,
+  WindowModel,
+} from 'lib_common'
 import { NavHeaderBar } from 'lib_widget';
 import { TopBar } from '../components/TopBar';
 import { TabItem, TAB_LIST } from '../common/Constants';
 import { InterActionTabContent } from '../components/InterActionTabContent';
+import { NewsSearchTransition } from 'lib_widget';
 
 @Builder
 export function InteractionPageBuilder() {
@@ -13,9 +24,13 @@ export function InteractionPageBuilder() {
 @ComponentV2
 struct InteractionPage {
   @Local settingInfo: SettingModel = PersistenceV2.connect(SettingModel, () => new SettingModel())!
+  @Local windowModel: WindowModel = AppStorageV2.connect(WindowModel, () => new WindowModel())!;
+  @Local tabModel: TabModel = AppStorageV2.connect(TabModel, () => new TabModel())!;
+  @Local breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
   @Local selectedId: number = 0
   @Local targetIndex: number = 0
   @Local modifier: LinearColumnModifier = new LinearColumnModifier($r('app.color.action_linear'));
+  @Local buttonModifier: CircleButtonModifier = new CircleButtonModifier();
 
   build() {
     NavDestination() {
@@ -40,8 +55,8 @@ struct InteractionPage {
         .height(40)
         .alignItems(HorizontalAlign.Start)
         .padding({
-          left: CommonConstants.PADDING_PAGE,
-          right: CommonConstants.PADDING_PAGE,
+          left: this.breakPointModel.pagePadding,
+          right: this.breakPointModel.pagePadding,
         })
 
         Tabs({ index: this.targetIndex }) {
@@ -66,6 +81,9 @@ struct InteractionPage {
       .width(CommonConstants.FULL_PERCENT)
       .height(CommonConstants.FULL_PERCENT)
       .backgroundColor($r('sys.color.background_secondary'))
+      .padding({
+        bottom: this.pagePaddingBottom,
+      })
     }
     .hideTitleBar(true)
   }
@@ -73,30 +91,30 @@ struct InteractionPage {
   @Builder
   rightHeadPartBuilder() {
     Row({ space: CommonConstants.SPACE_S }) {
-      Row() {
-        Image($r('app.media.ic_search')).width($r('app.float.nav_icon_width')).fillColor($r('sys.color.font_primary'))
-          .onClick(() => {
-            RouterUtils.pushPathByName(RouterMap.NEWS_SEARCH)
-          })
+      NewsSearchTransition({
+        componentId: 'interactionPage',
+      })
+      Button() {
+        SymbolGlyph($r('sys.symbol.plus'))
+          .fontColor([$r('sys.color.font_primary')])
+          .fontWeight(FontWeight.Normal)
+          .fontSize(24)
       }
-      .padding(10)
-      .backgroundColor($r('sys.color.comp_background_tertiary'))
-      .borderRadius('50%')
-
-      Row() {
-        Image($r('app.media.ic_plus'))
-          .fillColor($r('sys.color.font_primary'))
-          .width($r('app.float.nav_icon_width'))
-          .draggable(false)
-          .onClick(() => {
-            RouterUtils.pushPathByName(RouterMap.PUBLISH_POST_PAGE);
-          })
-      }
-      .padding(10)
-      .backgroundColor($r('sys.color.comp_background_tertiary'))
-      .borderRadius('50%')
+      .attributeModifier(this.buttonModifier)
+      .accessibilityText('发帖')
+      .onClick(() => {
+        RouterUtils.pushPathByName(RouterMap.PUBLISH_POST_PAGE);
+      })
     }
     .layoutWeight(1)
     .justifyContent(FlexAlign.End)
+  }
+
+  @Computed
+  get pagePaddingBottom() {
+    if (this.tabModel.isTabVertical) {
+      return this.windowModel.windowBottomPadding;
+    }
+    return 48;
   }
 }

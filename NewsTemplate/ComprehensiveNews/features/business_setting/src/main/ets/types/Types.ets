@@ -3,6 +3,7 @@ import { RouterMap } from 'lib_common';
 export interface ISelectOption {
   id: number;
   label: string;
+  value?: number;
 }
 
 export interface ISettingItem {

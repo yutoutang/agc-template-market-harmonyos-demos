@@ -5,6 +5,7 @@ import { FollowPage } from '../views/FollowPage';
 import { FeaturedPage } from '../views/FeaturedPage';
 import { RecommendPage } from '../views/RecommendPage';
 import { TabHeaderView } from '../components/TabHeaderView';
+import { LivestreamPage } from '../views/LivestreamPage';
 
 @Builder
 export function VideoPageBuilder() {
@@ -20,7 +21,6 @@ struct VideoPage {
 
   aboutToAppear(): void {
     this.vm.setWindowSystemBarContentColor('#ffffff')
-    this.vm.tabController.preloadItems([0, 2])
 
     // 视频评论出现时，tab头部隐藏
     emitter.on('showTabHeader', (eventData: emitter.EventData) => {
@@ -42,9 +42,10 @@ struct VideoPage {
           }
         })
       }
-      .animation({duration: 200})
+      .animation({ duration: 200 })
       .visibility(this.vm.showTabHeader ? Visibility.Visible : Visibility.Hidden)
       .zIndex(2)
+
       // 内容
       Column() {
         this.tabContentView()
@@ -59,21 +60,34 @@ struct VideoPage {
   tabContentView() {
     Tabs({ controller: this.vm.tabController, index: this.vm.currentTabIndex }) {
       TabContent() {
+        // 关注
         FollowPage({
           currentTabIndex: this.vm.indicatorIndex,
           index: 0,
         })
       }
+
       TabContent() {
+        // 精选
         FeaturedPage({
           currentTabIndex: this.vm.indicatorIndex,
           index: 1,
         })
       }
+
       TabContent() {
+        // 推荐
         RecommendPage({
           currentTabIndex: this.vm.indicatorIndex,
           index: 2,
+        })
+      }
+
+      TabContent() {
+        // 直播
+        LivestreamPage({
+          currentTabIndex: this.vm.indicatorIndex,
+          index: 3,
         })
       }
     }
@@ -81,6 +95,7 @@ struct VideoPage {
     .height(CommonConstants.FULL_PERCENT)
     .layoutWeight(1)
     .barHeight(0)
+    .scrollable(!this.vm.videoExtraInfoModel.isDisplayChange)
     .animationDuration(100)
     .onAnimationStart((_index: number, targetIndex: number, _event: TabsAnimationEvent) => {
       this.vm.handleTabAnimationStart(_index, targetIndex)

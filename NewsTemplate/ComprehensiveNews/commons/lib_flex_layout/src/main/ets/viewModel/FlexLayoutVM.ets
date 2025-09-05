@@ -15,12 +15,13 @@ export class FlexLayoutVM extends BaseViewModel {
   @Trace bgColor: ResourceStr = $r('sys.color.background_primary')
   @Trace tabIndex: number = 1
   @Trace setting: SettingModel = PersistenceV2.connect(SettingModel, () => new SettingModel())!
+  @Trace pageIndex: number = 10;
 
   @Monitor('setting.personalizedPush')
   async switchRecommend() {
     if (this.setting.personalizedPush) {
       let lazyNewsInfoList: CommonDataSource<RequestListData> = new CommonDataSource()
-      let newsInfoList = await HomeServiceApi.queryHomeRecommendList('recommend');
+      let newsInfoList = await HomeServiceApi.queryHomeRecommendList('recommend',this.pageIndex);
       lazyNewsInfoList.setData(newsInfoList)
       this.channelsList.splice(1, 0, UIUtils.makeObserved({
         text: '推荐',
@@ -68,13 +69,6 @@ export class FlexLayoutVM extends BaseViewModel {
     this.handleLocalTabTitle()
   }
 
-  public async getNewsDynamicData(resource: string) {
-    let newsInfoList = await HomeServiceApi.queryHomeRecommendList(resource);
-    let list = this.rendNewsInfoList.find(item => item.id === resource)
-    if (list) {
-      list.newsList.setData(newsInfoList)
-    }
-  }
 
   public initNewsDynamicData() {
     this.channelsList.filter(item => item.selected).forEach((item: TabInfo, index: number) => {
@@ -139,4 +133,5 @@ export class FlexLayoutVM extends BaseViewModel {
   public currentIndexChange(index: number) {
     this.currentIndex = index
   }
+
 }

@@ -1,0 +1,10 @@
+{
+  "module": {
+    "name": "module_articlepost",
+    "type": "har",
+    "deviceTypes": [
+      "phone",
+      "tablet",
+    ]
+  }
+}

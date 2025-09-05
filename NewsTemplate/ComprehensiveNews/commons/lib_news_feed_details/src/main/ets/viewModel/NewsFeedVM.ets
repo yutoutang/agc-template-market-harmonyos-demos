@@ -1,5 +1,6 @@
-import { UIUtils } from '@kit.ArkUI'
-import { BaseViewModel, BundleInfo, CommonConfirmDialog } from 'lib_common'
+import { AbilityConstant, common } from '@kit.AbilityKit'
+import { AppStorageV2, UIUtils } from '@kit.ArkUI'
+import { BaseViewModel, BundleInfo, CommonConfirmDialog, ContinueModel, GridRowColSetting, Logger } from 'lib_common'
 import {
   BaseNewsServiceApi,
   CommentResponse,
@@ -8,8 +9,12 @@ import {
   PublishCommentRequest,
 } from 'lib_news_api'
 import { LoginSheetUtils } from 'lib_account'
+import { LongTakeAnimationProperties, LongTakeTransitionParam } from 'module_transition'
 import { CommentInfo, NewsFeedInfo } from '../model/Model'
 import { MakeObCommentServed } from '../utils/Utils'
+import { FeedBreakPointVM } from './FeedBreakPointVM'
+
+const TAG = 'NewsFeedVM'
 
 @ObservedV2
 export class NewsFeedVM extends BaseViewModel {
@@ -18,6 +23,14 @@ export class NewsFeedVM extends BaseViewModel {
   @Trace commentInfoList: CommentInfo[] = []
   @Trace scroller: Scroller = new Scroller();
   @Trace bundleInfo: BundleInfo | undefined = undefined
+  @Trace continueModel: ContinueModel = AppStorageV2.connect(ContinueModel, () => new ContinueModel())!;
+  @Trace feedBreakPointVM: FeedBreakPointVM = new FeedBreakPointVM()
+  feedCommentScroller: Scroller = new Scroller()
+
+  @Computed
+  get isFeedSelf() {
+    return this.userInfoModel.authorId === this.articleDetails?.author?.authorId;
+  }
 
   public static get instance() {
     if (!NewsFeedVM._instance) {
@@ -57,7 +70,7 @@ export class NewsFeedVM extends BaseViewModel {
 
 
   public isWatch() {
-    let authorId = this.articleDetails.author.authorId
+    let authorId = this.articleDetails?.author?.authorId ?? ''
     return this.userInfoModel.isLogin && this.userInfoModel.watchers.includes(authorId)
   }
 
@@ -75,7 +88,7 @@ export class NewsFeedVM extends BaseViewModel {
   }
 
   public addWatch() {
-    let authorId = this.articleDetails.author.authorId
+    let authorId = this.articleDetails?.author?.authorId ?? ''
     this.userInfoModel.watchers.push(authorId)
     MineServiceApi.addWatch(authorId)
   }
@@ -84,9 +97,9 @@ export class NewsFeedVM extends BaseViewModel {
     CommonConfirmDialog.show({
       content: '确定不再关注TA？',
       confirm: () => {
-        let watchIndex = this.userInfoModel.watchers.findIndex(v => v === this.articleDetails.author.authorId)
+        let watchIndex = this.userInfoModel.watchers.findIndex(v => v === this.articleDetails?.author?.authorId)
         this.userInfoModel.watchers.splice(watchIndex, 1)
-        MineServiceApi.cancelWatch(this.articleDetails.author.authorId)
+        MineServiceApi.cancelWatch(this.articleDetails?.author?.authorId)
       },
     })
   }
@@ -109,6 +122,7 @@ export class NewsFeedVM extends BaseViewModel {
     if (index !== -1) {
       this.commentInfoList.splice(index, 1);
     }
+    this.articleDetails.commentCount--
     CommentServiceApi.deleteComment(commentId)
   }
 
@@ -183,15 +197,56 @@ export class NewsFeedVM extends BaseViewModel {
     return 'black'
   }
 
-  setRichToHtml(isDark: boolean) {
+  setRichToHtml() {
     return `
+        <!DOCTYPE html>
         <html>
-        <body id="body" style="color: ${this.setWebFontColor(isDark)}">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+        </head>
+        <style>
+            @media (0px<=width<320px) {
+               .image-preview {
+                   width: 100%;
+               }
+           }
+           @media (320px<=width<600px) {
+               .image-preview {
+                   width: 100%;
+               }
+           }
+
+           @media (600px<=width<840px) {
+               .image-preview {
+                   width: 80%;
+               }
+           }
+
+           @media (840px<=width) {
+               .image-preview {
+                   width: 50%;
+               }
+           }
+           .post-image {
+              display: block;
+              margin-left: auto;
+              margin-right: auto;
+              height: auto;
+           }
+        </style>
+        <body id="body">
           ${this.articleDetails.richContent}
           <script>
-           function getSize() { return { width: document.getElementById('body').offsetWidth, height: document.getElementById('body').offsetHeight } }
            function callNativePreview(srcList, index) {
                 native.preview(srcList, index);
+            }
+           function setWebFontColor(isDark) {
+              if(isDark) {
+                document.getElementById('body').style.color = 'white';
+                return
+              }
+              document.getElementById('body').style.color = 'black';
             }
             let imageList = document.querySelectorAll(".image-preview")
             imageList.forEach((element,index) => {
@@ -208,10 +263,80 @@ export class NewsFeedVM extends BaseViewModel {
    `
   }
 
-  public scrollToComment() {
+  public scrollToComment(isSplit?: boolean) {
+    /*
+     *  1、未分屏情况下快速定位到评论区域
+     *  2、分屏情况下评论区可以快速置顶
+     * */
+    if (isSplit) {
+      this.feedCommentScroller.scrollToIndex(0, true)
+      return
+    }
     this.scroller.scrollToIndex(3, true)
   }
 
+  public registerCustomTransition(navDestContext: NavDestinationContext, longTakeSession: LongTakeAnimationProperties) {
+    let param = navDestContext.pathInfo?.param as Record<string, Object>;
+    let longTakeTransitionParam = param.longTakeTransitionParam as LongTakeTransitionParam;
+    if (longTakeTransitionParam) {
+      longTakeSession.init(navDestContext, longTakeTransitionParam, {
+        pop: () => {
+          navDestContext.pathStack.pop()
+        },
+      });
+    }
+  }
+
+  public scrollToRestorePosition() {
+    if (!this.continueModel.isTargetDevice) {
+      return;
+    }
+    if (!this.continueModel.scrollOffset) {
+      this.continueModel.isTargetDevice = false;
+      return;
+    }
+    // 对端还原参数
+    let yOffset = this.continueModel.scrollOffset;
+    if (this.continueModel.breakpoint !== this.breakPointModel.currentBreakpoint) {
+      const continueCount = GridRowColSetting.getWindowColumn(this.continueModel.breakpoint);
+      const curCount = GridRowColSetting.getWindowColumn(this.breakPointModel.currentBreakpoint);
+      yOffset = yOffset * continueCount / curCount;
+    }
+    this.scroller.scrollTo({
+      xOffset: 0,
+      yOffset: yOffset,
+    })
+    this.continueModel.isTargetDevice = false;
+  }
+
+  public enableContinue(context: common.UIAbilityContext) {
+    context.setMissionContinueState(AbilityConstant.ContinueState.ACTIVE).then(() => {
+      Logger.info(TAG, 'setMissionContinueState ACTIVE result: ACTIVE')
+    });
+  }
+
+  public setContinueData() {
+    if (this.continueModel.isTargetDevice) {
+      return;
+    }
+    // 源端保存参数
+    this.continueModel.newsId = this.articleDetails.id;
+    this.continueModel.newsType = this.articleDetails.type;
+    this.continueModel.breakpoint = this.breakPointModel.currentBreakpoint;
+  }
+
+  public setContinueOffset() {
+    if (this.continueModel.isTargetDevice) {
+      return;
+    }
+    try {
+      // 源端保存参数
+      const scrollOffset = this.scroller?.currentOffset()?.yOffset;
+      this.continueModel.scrollOffset = scrollOffset ?? 0;
+    } catch (e) {
+      Logger.error(TAG, 'setContinueOffset fail, error: ' + JSON.stringify(e));
+    }
+  }
 }
 
 export default NewsFeedVM

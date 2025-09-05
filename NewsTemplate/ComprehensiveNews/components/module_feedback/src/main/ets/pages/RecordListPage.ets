@@ -4,6 +4,7 @@ import { RecordListVM } from '../viewmodels/RecordListVM';
 import { FeedbackResponseParams } from '../services/ResponseModel';
 import { RecordCard } from '../components/RecordCard';
 import { Empty } from '../components/Empty';
+import { CommonUtils } from '../common/CommonUtils';
 
 @Builder
 export function RecordListPageBuilder() {
@@ -18,46 +19,60 @@ export struct RecordListPage {
   build() {
     NavDestination() {
       Column() {
-        NavHeaderBar({ title: '反馈记录' })
-        Scroll() {
-          if (this.vm.loading) {
-            Column() {
-              LoadingProgress()
-                .width(72)
-                .height(72)
+        NavHeaderBar({
+          title: '反馈记录',
+          breakpoint: this.vm.breakpoint,
+        })
+        GridRow(Constants.GRID_ROW_OPTIONS) {
+          GridCol({
+            span: Constants.FULL_COL_SPAN,
+          }) {
+            Scroll() {
+              if (this.vm.loading) {
+                Column() {
+                  LoadingProgress()
+                    .width(72)
+                    .height(72)
+                }
+                .height(Constants.FULL_PERCENT)
+                .justifyContent(FlexAlign.Center)
+              } else if (this.vm.list.length) {
+                Column({ space: Constants.SPACE_12 }) {
+                  ForEach(this.vm.list, (v: FeedbackResponseParams) => {
+                    RecordCard({
+                      record: v,
+                      fontSizeRatio: this.vm.feedbackModel.fontSizeRatio,
+                      gridCount: this.vm.gridCount,
+                    })
+                  }, (v: FeedbackResponseParams) => v.id)
+                }
+              } else {
+                Column() {
+                  Empty({
+                    fontSizeRatio: this.vm.feedbackModel.fontSizeRatio,
+                  })
+                }
+                .height(Constants.FULL_PERCENT)
+                .justifyContent(FlexAlign.Center)
+              }
             }
-            .height(Constants.FULL_PERCENT)
-            .justifyContent(FlexAlign.Center)
-          } else if (this.vm.list.length) {
-            Column({ space: Constants.SPACE_12 }) {
-              ForEach(this.vm.list, (v: FeedbackResponseParams) => {
-                RecordCard({
-                  record: v,
-                  fontSizeRatio: this.vm.feedbackModel.fontSizeRatio,
-                })
-              }, (v: FeedbackResponseParams) => v.id)
-            }
-          } else {
-            Column() {
-              Empty({
-                fontSizeRatio: this.vm.feedbackModel.fontSizeRatio,
-              })
-            }
-            .height(Constants.FULL_PERCENT)
-            .justifyContent(FlexAlign.Center)
+            .width(Constants.FULL_PERCENT)
+            .layoutWeight(1)
+            .align(Alignment.Top)
+            .scrollBar(BarState.Off)
+            .edgeEffect(EdgeEffect.Spring)
+            .backgroundColor($r('sys.color.background_secondary'))
+            .padding({
+              left: CommonUtils.getPageMargin(this.vm.breakpoint),
+              right: CommonUtils.getPageMargin(this.vm.breakpoint),
+              top: Constants.PADDING_M,
+              bottom: this.vm.feedbackModel.windowBottomPadding,
+            })
           }
         }
-        .width(Constants.FULL_PERCENT)
         .layoutWeight(1)
-        .align(Alignment.Top)
-        .scrollBar(BarState.Off)
-        .edgeEffect(EdgeEffect.Spring)
-        .backgroundColor($r('sys.color.background_secondary'))
-        .padding({
-          left: Constants.PADDING_PAGE,
-          right: Constants.PADDING_PAGE,
-          top: Constants.PADDING_M,
-          bottom: this.vm.feedbackModel.windowBottomPadding,
+        .onBreakpointChange((bp: string) => {
+          this.vm.onBreakpointChange(bp);
         })
       }
     }

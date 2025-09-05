@@ -3,7 +3,7 @@ export { VideoSwipePlayer } from './src/main/ets/views/VideoSwipePlayer'
 
 export { VideoProgressBar } from './src/main/ets/components/VideoProgressBar'
 
-export { VideoCard } from './src/main/ets/components/VideoCard'
+export { VideoCard, VideoCardPlayerController } from './src/main/ets/components/VideoCard'
 
 export { PlayerDataSource } from './src/main/ets/datasource/PlayerDataSource'
 
@@ -16,10 +16,6 @@ export { AVPlayerManager, AVPlayerSession, registerAVPlayerCallback } from './sr
 export { PlayerLayoutSize } from './src/main/ets/controller/PlayerLayoutSize'
 // 横屏页面
 export { LandscapeVideoBuilder } from './src/main/ets/views/LandscapeVideo';
-// CustomTransition
-export { AnimationProperties } from './src/main/ets/customtransition/AnimationProperties'
-export { ComponentAttrUtils, RectInfoInPx } from './src/main/ets/customtransition/ComponentAttrUtils'
-export { AnimateCallback, CustomTransition } from './src/main/ets/customtransition/CustomNavigationUtils'
 
 // 网络
 export { VideoNetworkModel, VideoNetworkSetting } from './src/main/ets/models/VideoNetworkModel'

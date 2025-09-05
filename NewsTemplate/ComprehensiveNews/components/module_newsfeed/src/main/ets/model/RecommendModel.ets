@@ -78,6 +78,7 @@ export class FeedCardInfoModel {
   @Trace shareCount: number = 0
   @Trace isLiked: boolean = false
   @Trace isMarked: boolean = false
+  @Trace relativeTime?:string = ''
   richContent?: string
   videoUrl?: string
   coverUrl?: string
@@ -102,6 +103,7 @@ export class FeedCardInfoModel {
     this.isMarked = value?.isMarked ?? false
     this.postImgList = value?.postImgList ?? []
     this.isWatch = value?.isWatch ?? false
+    this.relativeTime = value?.relativeTime ?? ''
   }
 }
 

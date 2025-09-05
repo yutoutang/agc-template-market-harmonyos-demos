@@ -1,13 +1,14 @@
-import { emitter } from '@kit.BasicServicesKit';
+import { deviceInfo, emitter } from '@kit.BasicServicesKit';
+import { display, uiObserver, window } from '@kit.ArkUI';
 import { SwipePlayerController } from '../controller/SwipePlayerController';
 import { PlayerDataSource } from '../datasource/PlayerDataSource';
 import { AVPlayerSession } from '../controller/AVPlayerManager';
 import { VideoPlayerView } from '../components/VideoPlayerView';
-import { AVPlayerState, VideoPlayerData } from '../type/Index';
-import { toast } from '../utils/Util';
+import { AVPlayerState, BreakpointNameEnum, PageNameEnum, VideoPlayerData } from '../type/Index';
+import { isDisplayModeFull, setOrientation, toast } from '../utils/Util';
 import { PlayerLayoutSize } from '../controller/PlayerLayoutSize';
 import { VideoNetworkModel, VideoNetworkSetting } from '../models/VideoNetworkModel';
-import { uiObserver } from '@kit.ArkUI';
+import { BreakpointModel } from '../models/BreakpointModel';
 
 @ComponentV2({ freezeWhenInactive: true })
 export struct VideoSwipePlayer {
@@ -33,43 +34,78 @@ export struct VideoSwipePlayer {
   @Param videoNetworkSetting: VideoNetworkSetting | undefined = undefined
   // 路由栈
   @Param @Require pathStack: NavPathStack
+  // 当前组件所在的页面是否显示
+  @Param isShown: boolean = false;
+  // 是否横屏
+  @Param isLandscape: boolean = false;
+  // 一多适配的断点
+  @Param currentBreakpoint: BreakpointNameEnum = BreakpointNameEnum.SM;
   // 播放状态回调
-  @Event playerStateCallback: (state: string, id: string) => void = (state: string, id: string) => {}
+  @Event playerStateCallback: (state: string, id: string) => void = (state: string, id: string) => {
+  }
+  // 播放进度变化的回调
+  @Event playerTimeUpdateCallback: (id: string, timeMs: number) => void = (id: string, timeMs: number) => {
+  }
   // 滑动控制器
   swiperController: SwiperController = new SwiperController();
   @Local videoState: AVPlayerState = AVPlayerState.IDLE;
-
+  @Local videoStateIndex: number = 0
   @Provider() navDestinationUpdateListeners: Map<string, (info: uiObserver.NavDestinationInfo) => void> = new Map();
+  @Local breakpointModel: BreakpointModel = new BreakpointModel();
+
+  private displayFoldStatusChangeCallback = (data: display.FoldStatus) => {
+    if (data === display.FoldStatus.FOLD_STATUS_FOLDED) {
+      let isFullMode = isDisplayModeFull();
+      if (isFullMode) {
+        setOrientation(window.Orientation.FOLLOW_DESKTOP)
+      } else {
+        setOrientation(window.Orientation.USER_ROTATION_PORTRAIT)
+      }
+    }
+  }
 
   @Computed
   get avPlayerManager() {
     return this.swipePlayerController.getAVPlayerMgr()!
   }
 
-  @Monitor('videoNetwork.isCellular', 'videoState')
+  @Monitor('videoNetwork.isCellular', 'videoState', 'videoStateIndex')
   onNetworkChange() {
     let videoState = this.avPlayerManager.getAVPlayer(this.currentIndex)?.state
+    if (this.videoNetworkSetting?.remindWithoutWlan === 1) {
+      this.videoNetwork!.hasUseMobileDataTip = false
+    }
     if (videoState === AVPlayerState.PLAYING) {
       if (this.videoNetwork?.isCellular && !this.videoNetwork?.hasUseMobileDataTip) {
         toast(this.getUIContext(), {
           message: '正在使用流量播放',
           alignment: Alignment.Center,
         })
-        this.videoNetwork.hasUseMobileDataTip = true
+        if (this.videoNetwork && this.videoNetworkSetting?.remindWithoutWlan === 0) {
+          this.videoNetwork.hasUseMobileDataTip = true
+        }
       }
     }
   }
 
+  @Monitor('currentBreakpoint')
+  onCurrentBreakpointChange() {
+    // 设置断点
+    this.breakpointModel.currentBreakpoint = this.currentBreakpoint;
+  }
+
   aboutToAppear(): void {
+    // 设置断点
+    this.breakpointModel.currentBreakpoint = this.currentBreakpoint;
     this.swipePlayerController?.setSwiperController(this.swiperController);
     // 网络
     this.handleNetwork()
     // 当前视频的状态
     emitter.on('swipeVideoPlayerState', (eventData: emitter.EventData) => {
       let state = eventData.data!.state as AVPlayerState;
-      let id = eventData.data!.id as string;
-      this.videoState = state
-      this.playerStateCallback && this.playerStateCallback(this.videoState, id)
+      let index = eventData.data!.index as number;
+      this.videoState = state;
+      this.videoStateIndex = index
     })
 
     // 无感监听路由变化
@@ -87,7 +123,7 @@ export struct VideoSwipePlayer {
       toast(this.getUIContext(), {
         message: '网络连接不可用',
         alignment: Alignment.Center,
-        textColor: Color.Red
+        textColor: Color.Red,
       })
     }
   }
@@ -109,8 +145,13 @@ export struct VideoSwipePlayer {
             videoLayerBuilder: this.videoLayerBuilder,
             fullBtnBuilder: this.fullBtnBuilder,
             pathStack: this.pathStack,
+            isLandscape: this.isLandscape,
+            isShown: this.isShown,
+            breakpointModel: this.breakpointModel,
+            playerStateCallback: this.playerStateCallback,
+            playerTimeUpdateCallback: this.playerTimeUpdateCallback,
           })
-        }, (item: VideoPlayerData, index: number) => item.getVideoId() + index);
+        }, (item: VideoPlayerData, index: number) => JSON.stringify(item) + index);
       }
       .cachedCount(this.options?.cachedCount ?? 2)
       .width('100%')
@@ -138,12 +179,31 @@ export struct VideoSwipePlayer {
     .width('100%')
     .height('100%')
     .id('player')
+    .onVisibleAreaChange([0.0, 1.0], (isExpanding: boolean, currentRatio: number) => {
+      if (isExpanding && currentRatio >= 1.0) {
+        let isFullMode = isDisplayModeFull();
+        if (isFullMode || deviceInfo.deviceType === 'tablet') {
+          setOrientation(window.Orientation.FOLLOW_DESKTOP)
+        } else {
+          setOrientation(window.Orientation.USER_ROTATION_PORTRAIT)
+        }
+        display.on('foldStatusChange', this.displayFoldStatusChangeCallback);
+      }
+      if (!isExpanding && currentRatio <= 0.0) {
+        let allPathNames = this.pathStack.getAllPathName();
+        let lastName = allPathNames[allPathNames.length - 1]
+        if (lastName !== PageNameEnum.VIDEO_LANDSCAPE_PAGE) {
+          setOrientation(window.Orientation.FOLLOW_DESKTOP)
+        }
+        display.off('foldStatusChange', this.displayFoldStatusChangeCallback);
+      }
+    })
   }
 
   // 默认全屏播放按钮
   @Builder
   defaultFullBtnBuilder() {
-    Row({space: 4}) {
+    Row({ space: 4 }) {
       Image($r('app.media.ic_expand_full')).width(13).height(13)
       Text('全屏播放')
         .fontColor(Color.White)
@@ -153,7 +213,7 @@ export struct VideoSwipePlayer {
       left: 10,
       top: 8,
       bottom: 8,
-      right: 10
+      right: 10,
     })
     .border({
       width: 1,

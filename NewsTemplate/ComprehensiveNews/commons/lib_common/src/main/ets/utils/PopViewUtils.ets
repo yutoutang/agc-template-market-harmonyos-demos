@@ -102,27 +102,14 @@ export class PopViewUtils {
       } else {
         componentContent = new ComponentContent(PopViewUtils.uiContext, contentView as WrappedBuilder<[]>);
       }
-
-      let sheetOptions: SheetOptions = {
-        height: options?.height,
-        dragBar: options?.dragBar,
-        maskColor: options?.maskColor,
-        detents: options?.detents,
-        showClose: options?.showClose,
-        title: options?.title,
-        backgroundColor: options?.backgroundColor,
-        onHeightDidChange: options?.onHeightDidChange,
-        onDetentsDidChange: options?.onDetentsDidChange,
-        scrollSizeMode: options?.scrollSizeMode,
-      };
-      PopViewUtils.uiContext.openBindSheet(componentContent, sheetOptions);
+      PopViewUtils.uiContext.openBindSheet(componentContent, options);
       let sheetList = PopViewUtils.shareInstance().sheetList;
       let info: PopViewModel = {
         com: componentContent,
         popType: type,
       };
       sheetList[0] = info;
-      Logger.info(TAG, 'sheet open, options: ' + JSON.stringify(sheetOptions));
+      Logger.info(TAG, 'sheet open, options: ' + JSON.stringify(options));
     }
   }
 

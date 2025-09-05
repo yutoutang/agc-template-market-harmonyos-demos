@@ -1,4 +1,5 @@
 import { BaseViewModel, RouterMap, RouterUtils } from 'lib_common';
+import { FeedbackModel } from 'module_feedback';
 import { SettingItem } from 'business_setting';
 import { MineGridItem } from '../types/Types';
 
@@ -12,7 +13,7 @@ export class MineViewModel extends BaseViewModel {
       windowTopPadding: this.windowModel.windowTopPadding,
       windowBottomPadding: this.windowModel.windowBottomPadding,
       fontSizeRatio: this.settingInfo.fontSizeRatio,
-    } as ESObject,
+    } as FeedbackModel,
   });
   serviceList: SettingItem[] = [
     new SettingItem({
@@ -34,7 +35,7 @@ export class MineViewModel extends BaseViewModel {
       windowTopPadding: this.windowModel.windowTopPadding,
       windowBottomPadding: this.windowModel.windowBottomPadding,
       fontSizeRatio: this.settingInfo.fontSizeRatio,
-    } as ESObject
+    } as FeedbackModel
   }
 
   jumpLogin() {
@@ -52,5 +53,13 @@ export class MineViewModel extends BaseViewModel {
   @Computed
   get userIcon() {
     return this.userInfoModel.authorIcon || $r('app.media.ic_user_default');
+  }
+
+  @Computed
+  get pagePaddingBottom() {
+    if (this.tabModel.isTabVertical) {
+      return this.windowModel.windowBottomPadding;
+    }
+    return 48;
   }
 }

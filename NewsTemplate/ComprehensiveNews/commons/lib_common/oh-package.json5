@@ -8,10 +8,8 @@
   "dependencies": {
     "dayjs": "^1.11.13",
     "@ohos/axios": "2.2.4",
-    "@hw-agconnect/petal-aegis": "^1.4.11-300"
+    "@hw-agconnect/petal-aegis": "^1.4.11-300",
   },
-  "devDependencies": {
-
-  },
+  "devDependencies": {},
   "dynamicDependencies": {}
 }

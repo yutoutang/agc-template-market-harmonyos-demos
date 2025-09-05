@@ -1,5 +1,4 @@
 import { common } from '@kit.AbilityKit';
-import { window } from '@kit.ArkUI';
 
 export function secondToTime(seconds: number): string {
   let hourUnit = 60 * 60;

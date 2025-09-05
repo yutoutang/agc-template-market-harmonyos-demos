@@ -1,14 +1,16 @@
-import { PersistenceV2 } from '@kit.ArkUI';
-import { CommonConstants, SettingModel } from 'lib_common';
+import { AppStorageV2, PersistenceV2 } from '@kit.ArkUI';
+import { BreakpointModel, SettingModel } from 'lib_common';
 import { ChannelEdit, TabInfo } from 'module_channeledit';
-import { FlexLayoutVM } from '../viewModel/FlexLayoutVM';
+import { FlexLayoutVM } from '../viewmodel/FlexLayoutVM';
 import { RendNewsInfo } from '../sdk/model/Model';
 import { NewsTabContent } from '../components/NewsTabContent';
 
 @ComponentV2
 export struct FlexLayout {
   @Local flexLayoutVm: FlexLayoutVM = new FlexLayoutVM()
+  @Local pageIndex: number = 10;
   @Local settingInfo: SettingModel = PersistenceV2.connect(SettingModel, () => new SettingModel())!
+  @Local breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
 
   aboutToAppear(): void {
     this.flexLayoutVm.init()
@@ -30,22 +32,18 @@ export struct FlexLayout {
           }
         })
       }
-      .padding({
-        left: CommonConstants.PADDING_PAGE,
-        right: CommonConstants.PADDING_PAGE,
-      })
 
       Tabs({
         barPosition: BarPosition.Start,
         controller: this.flexLayoutVm.tabsController,
         index: this.flexLayoutVm.currentIndex,
       }) {
-        ForEach(this.flexLayoutVm.rendNewsInfoList, (channelItem: RendNewsInfo) => {
+        ForEach(this.flexLayoutVm.rendNewsInfoList, (channelItem: RendNewsInfo,index:number) => {
           TabContent() {
             NewsTabContent({
               channelItem: channelItem,
               rendNewsInfoList: this.flexLayoutVm.rendNewsInfoList,
-              bgColor: this.flexLayoutVm.bgColor
+              bgColor: this.flexLayoutVm.bgColor,
             })
           }
         }, (item: RendNewsInfo, index: number) => index + JSON.stringify(item))

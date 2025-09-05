@@ -23,6 +23,10 @@ export class VideoPlayerModel {
   @Trace showCover: boolean = true;
   @Trace isBuffering: boolean = false;
   @Trace isPause: boolean = false;
+  @Trace isCompleted: boolean = false;
+
+  // 是否是通过点击全屏播放按钮跳转到横屏页面
+  @Trace isClickFullScreenBtn: boolean = false;
   // AVPlayer管理器
   avPlayerManager: AVPlayerManager = AVPlayerManager.getInstance()
   // 播放器id
@@ -45,6 +49,7 @@ export class VideoPlayerModel {
   private bufferingUpdateListeners: Array<(infoType: media.BufferingInfoType) => void> = []
   private videoSizeChangedListeners: Array<() => void> = []
   private startRendFrameListeners: Array<() => void> = []
+  private timeUpdateListeners: Array<(timeMs: number) => void> = []
 
   constructor(uiContext: UIContext, index: number = 0) {
     this.uiContext = uiContext;
@@ -111,6 +116,9 @@ export class VideoPlayerModel {
   onStartRenderFrameListener(listener: () => void) {
     this.startRendFrameListeners.push(listener)
   }
+  onTimeUpdateListener(listener: (timeMs: number) => void) {
+    this.timeUpdateListeners.push(listener)
+  }
 
   onStateChangeListener(avPlayer: media.AVPlayer) {
     this.playerSession.avPlayer!.on('stateChange', (state: string, reason: media.StateChangeReason) => {
@@ -131,6 +139,7 @@ export class VideoPlayerModel {
         case 'prepared':
           Logger.debug(TAG, 'player state is prepared index: ' + this.index);
           this.showCover = true;
+          this.isCompleted = false;
           this.playerSession.avPlayer!.loop = false;
           this.playerSession.avPlayer!.audioInterruptMode = audio.InterruptMode.INDEPENDENT_MODE;
           this.preparedListeners.forEach((callback) => {
@@ -143,6 +152,7 @@ export class VideoPlayerModel {
           this.isPause = false;
           this.showCover = false;
           this.isBuffering = false;
+          this.isCompleted = false;
           this.playingListeners.forEach((callback)=> {
             callback()
           })
@@ -152,16 +162,19 @@ export class VideoPlayerModel {
           Logger.debug(TAG, 'player state is paused');
           this.isPause = true;
           this.showCover = false;
+          this.isCompleted = false;
           this.windowClass?.setWindowKeepScreenOn(false);
           break;
         case 'stopped':
           Logger.debug(TAG, 'player state is stopped');
           this.showCover = false;
+          this.isCompleted = false;
           this.windowClass?.setWindowKeepScreenOn(false);
           break;
         case 'completed':
           Logger.debug(TAG, 'player state is completed');
           this.showCover = false;
+          this.isCompleted = true;
           this.completedListeners.forEach((callback) => {
             callback()
           })
@@ -169,10 +182,12 @@ export class VideoPlayerModel {
         case 'released':
           Logger.debug(TAG, 'player state is released');
           this.showCover = false;
+          this.isCompleted = false;
           break;
         case 'error':
           Logger.debug(TAG, 'player state is error');
           this.showCover = false;
+          this.isCompleted = false;
           this.errorListeners.forEach((callback) => {
             callback()
           })
@@ -216,6 +231,12 @@ export class VideoPlayerModel {
         callback()
       })
     });
+    // 时间进度回调
+    this.playerSession.onEvent('timeUpdate', (time: number) => {
+      this.timeUpdateListeners.forEach((callback) => {
+        callback(time)
+      })
+    })
   }
 
   setAVPlayerInterruptCallback(avPlayer: media.AVPlayer) {

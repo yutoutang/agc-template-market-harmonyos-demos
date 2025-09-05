@@ -12,9 +12,9 @@ export struct BaseFollowWatchPage {
   build() {
     Column() {
       if (this.vm.dataSource.totalCount() > 0) {
-        List({ space: CommonConstants.SPACE_M }) {
+        WaterFlow() {
           LazyForEach(this.vm.dataSource, (v: AuthorModel) => {
-            ListItem() {
+            FlowItem() {
               AuthorItem({
                 author: v,
                 fontSizeRatio: this.vm.settingInfo.fontSizeRatio,
@@ -25,21 +25,17 @@ export struct BaseFollowWatchPage {
               bottom: CommonConstants.PADDING_M,
             })
           }, (v: AuthorModel) => v.authorId)
-          ListItem() {
-            Text('--到底啦--')
-              .fontSize($r('sys.float.Body_S'))
-              .fontColor($r('sys.color.font_secondary'))
-              .width(CommonConstants.FULL_PERCENT)
-              .textAlign(TextAlign.Center)
-          }
         }
         .width(CommonConstants.FULL_PERCENT)
         .height(CommonConstants.FULL_PERCENT)
         .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+        .columnsTemplate(this.vm.getColumnsTemplate())
+        .columnsGap(CommonConstants.SPACE_XXL)
+        .rowsGap(CommonConstants.SPACE_M)
         .cachedCount(1)
         .padding({
-          left: CommonConstants.PADDING_PAGE,
-          right: CommonConstants.PADDING_PAGE,
+          left: this.vm.breakPointModel.pagePadding,
+          right: this.vm.breakPointModel.pagePadding,
           top: CommonConstants.SPACE_M,
           bottom: this.vm.windowModel.windowBottomPadding,
         })

@@ -1,5 +1,5 @@
 import { LayoutSetting, NewsResponse } from 'lib_news_api'
-import { getNativeNodeController } from '../../factory/NativeNodeFactory'
+import { getNativeNodeController, NodeControllerFactory } from '../../factory/NativeNodeFactory'
 import { FrameNodeParams } from '../../model/Model'
 
 
@@ -19,7 +19,8 @@ export struct ScrollBuilder {
   @Param scrollLayout: LayoutSetting = new LayoutSetting()
   @Local nativeLeft: number = 0
   @Param style: Record<string, string | number> = {}
-  @Param extraInfo: Record<string, string | boolean | Record<string, string | boolean>[]> = {}
+  @Param extraInfo: Record<string, number | string | boolean | Record<string, string | boolean>[]> = {}
+  @Local nodeControllerFactory: NodeControllerFactory = new NodeControllerFactory()
   @Builder
   scrollVNodeBuilder(children: LayoutSetting [], nativeCardData: NewsResponse, scrollIndex: number) {
     if (children) {
@@ -36,7 +37,7 @@ export struct ScrollBuilder {
             scrollIndex: scrollIndex,
             layout: item,
             extraInfo:this.extraInfo
-          }))
+          },this.nodeControllerFactory))
         }
       }, (item: LayoutSetting) => JSON.stringify(item))
     }

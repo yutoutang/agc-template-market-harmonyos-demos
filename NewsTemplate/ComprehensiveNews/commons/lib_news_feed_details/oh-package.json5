@@ -15,6 +15,8 @@
     "module_newsfeed": "file:../../components/module_newsfeed",
     "module_imagepreview": "file:../../components/module_imagepreview",
     "module_share": "file:../../components/module_share",
-    "module_text_reader": "file:../../components/module_text_reader"
+    "module_text_reader": "file:../../components/module_text_reader",
+    'lib_preview_page': "file:../../commons/lib_preview_page",
+    "module_transition": "file:../../components/module_transition"
   }
 }

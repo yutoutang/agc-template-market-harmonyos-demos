@@ -171,7 +171,6 @@ struct ReadIcon {
     }
     .justifyContent(FlexAlign.Center)
     .height('100%')
-    .width('70%')
     .alignItems(HorizontalAlign.End)
   }
 }
