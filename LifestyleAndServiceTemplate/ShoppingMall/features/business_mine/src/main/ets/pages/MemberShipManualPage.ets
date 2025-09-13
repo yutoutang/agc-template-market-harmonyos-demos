@@ -14,7 +14,7 @@ struct MemberShipManualPage {
         Text('会员章程').fontSize($r('sys.float.Title_M')).fontWeight(FontWeight.Medium)
         Column({ space: 8 }) {
           Text('会员开通').fontSize($r('sys.float.Subtitle_M')).fontWeight(FontWeight.Medium)
-          Text('打开元服务，点击关联账号，进行手机号授权后将自动注册成为会员。').fontSize($r('sys.float.Body_S'))
+          Text('打开元服务，会自动静默登录华为账号。').fontSize($r('sys.float.Body_S'))
         }
         .width('100%')
         .alignItems(HorizontalAlign.Start)

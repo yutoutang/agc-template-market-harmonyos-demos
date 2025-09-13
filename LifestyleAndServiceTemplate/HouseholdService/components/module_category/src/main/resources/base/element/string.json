@@ -6,7 +6,7 @@
     },
     {
       "name": "agcit_huawei_household_module_category",
-      "value": "1.0.0"
+      "value": "1.0.1"
     },
     {
       "name": "agcittype_huawei_household_module_category",
@@ -14,7 +14,7 @@
     },
     {
       "name": "agcitkid_huawei_household_module_category",
-      "value": "agcit_huawei_household_module_base/1.0.0"
+      "value": "agcit_huawei_household_module_base/1.0.1"
     }
   ]
 }

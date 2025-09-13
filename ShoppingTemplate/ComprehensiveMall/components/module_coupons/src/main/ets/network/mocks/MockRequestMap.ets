@@ -1,13 +1,16 @@
-import { httpsMock } from './HttpRequestApiMock';
 import { promptAction } from '@kit.ArkUI';
-import { BaseSuccessResponse } from '../types/BaseSuccessResponse';
+import { CommonConstants } from '../../constants/Contants';
 import { FullLoading } from '../../utils/FullLoading';
 import { Logger } from '../../utils/Logger';
-import { RequestUrl } from '../types/RequestUrl';
 import { GetCouponsRequest } from '../types/AxiosRequestParam';
-import { CommonConstants } from '../../constants/Contants';
+import { BaseSuccessResponse } from '../types/BaseSuccessResponse';
+import { RequestUrl } from '../types/RequestUrl';
+import { httpsMock } from './HttpRequestApiMock';
 
-export async function replaceMockData(url: string | undefined, args: Object): Promise<Object | string> {
+export async function replaceMockData(
+  url: string | undefined,
+  args: Object,
+): Promise<Object | string> {
   let response: BaseSuccessResponse | undefined;
   switch (url) {
     case RequestUrl.URL_COUPONS_GET:
@@ -17,7 +20,10 @@ export async function replaceMockData(url: string | undefined, args: Object): Pr
       return mockErrorHandler('cannot find url.');
   }
   if (response) {
-    const delayResponse: BaseSuccessResponse = await simulateDelay(response, CommonConstants.SIMULATE_DELAY);
+    const delayResponse: BaseSuccessResponse = await simulateDelay(
+      response,
+      CommonConstants.SIMULATE_DELAY,
+    );
     FullLoading.close();
     return Promise.resolve(delayResponse);
   }

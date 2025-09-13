@@ -1,9 +1,9 @@
 let pathStack: NavPathStack;
 
-export const setPathStack = (navPathStack: NavPathStack) => {
-  pathStack = navPathStack;
+export const getInstance = () => {
+  return pathStack;
 }
 
-export const getInstance = (): NavPathStack => {
-  return pathStack;
+export const setPathStack = (navPathStack: NavPathStack) => {
+  pathStack = navPathStack;
 }

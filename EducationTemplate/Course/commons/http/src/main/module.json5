@@ -1,0 +1,9 @@
+{
+  "module": {
+    "name": "http",
+    "type": "har",
+    "deviceTypes": [
+      "phone"
+    ]
+  }
+}

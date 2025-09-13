@@ -2,7 +2,7 @@ import { PersistenceV2, UIUtils } from '@kit.ArkUI';
 import { TabInfo } from 'module_channeledit';
 import { BaseViewModel, CommonDataSource, SettingModel } from 'lib_common';
 import { HomeServiceApi, RequestListData } from 'lib_news_api';
-import { RendNewsInfo } from '../sdk/model/Model';
+import { RendNewsInfo } from '../model/Model';
 import { channelList } from '../constants/ChannelList';
 
 

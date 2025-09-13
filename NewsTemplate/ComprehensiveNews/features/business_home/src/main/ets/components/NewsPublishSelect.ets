@@ -45,7 +45,7 @@ export struct NewsPublishSelect {
           .fontWeight(FontWeight.Regular)
           .fontColor($r('sys.color.font_tertiary'))
       }
-      .flexGrow(1)
+      .width('40%')
       .alignItems(HorizontalAlign.Start)
 
       ForEach(this.newsPostViewModel.coverSingleList, (item: CoverUri) => {
@@ -60,7 +60,7 @@ export struct NewsPublishSelect {
             },
           })
         }
-      })
+      }, (item: CoverUri, index: number) => index + item.id)
     }
   }
 
@@ -79,9 +79,12 @@ export struct NewsPublishSelect {
               onSelected: (uri: string) => {
                 item.uri = uri
               },
+              onDeleteUri: (uri: string) => {
+                item.uri = ''
+              },
             })
           }
-        })
+        }, (item: CoverUri, index: number) => index + item.id)
       }
 
       Text(this.userInfoModel.authorNickName)

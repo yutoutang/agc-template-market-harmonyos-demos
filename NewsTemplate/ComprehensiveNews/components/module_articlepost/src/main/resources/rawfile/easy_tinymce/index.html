@@ -536,7 +536,6 @@
 
           initEmojiButton(editor);
           initEmojiHideListeners(editor);
-
           // 字体大小按钮配置
           editor.ui.registry.addIcon(
             "custom-font-size",
@@ -547,6 +546,31 @@
             </svg>
             `
           );
+
+          editor.on("init", () => {
+            setTimeout(() => {
+              const toolbar = document.querySelector(".tox-toolbar");
+              if (toolbar) {
+                toolbar.addEventListener(
+                  "touchend",
+                  (e) => {
+                    const isRemoveBtn = e.target.closest(
+                      '[aria-label="清除格式"]'
+                    );
+                    if (isRemoveBtn) {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      window.EasyEditorBridge.removeFormat(() => {
+                        editor.execCommand("removeformat");
+                      });
+                    }
+                  },
+                  { passive: false }
+                );
+              }
+            }, 500);
+          });
+
           editor.ui.registry.addMenuButton("fontsize", {
             icon: "custom-font-size",
             tooltip: "字体大小",
@@ -662,17 +686,7 @@
         }
       }
 
-      function setDarkMode() {
-        let darkMode = window.EasyEditorBridge.darkMode();
-        if (darkMode) {
-          config.selector = "textarea";
-          config.skin = "oxide-dark";
-          config.content_css = "dark";
-        }
-      }
-
       initEmojiPanel();
-      setDarkMode();
       config.before_init && config.before_init(config);
 
       config.selector = "#editor-container";

@@ -15,6 +15,8 @@
 
 import { Logger } from 'module_base';
 
+const TAG = '[RouterModule]';
+
 export interface NavRouterInfo {
   url: string, // 需要跳转的路由名
   mode?: NavDestinationMode, // NavDestination类型
@@ -36,7 +38,7 @@ export class RouterModule {
     try {
       RouterModule.stack.pushPathByName(info.url, info.param, info.onPop, info.animated);
     } catch (err) {
-      Logger.info('navigation stack push failed::' + JSON.stringify(err));
+      Logger.info(TAG, 'navigation stack push failed::' + JSON.stringify(err));
     }
   }
 
@@ -45,7 +47,7 @@ export class RouterModule {
     try {
       RouterModule.stack.replacePathByName(info.url, info.param);
     } catch (err) {
-      Logger.info('navigation stack replace failed::' + JSON.stringify(err));
+      Logger.info(TAG, 'navigation stack replace failed::' + JSON.stringify(err));
     }
   }
 
@@ -54,7 +56,7 @@ export class RouterModule {
     try {
       RouterModule.stack.pop(result, animated);
     } catch (err) {
-      Logger.info('navigation stack pop failed::' + JSON.stringify(err));
+      Logger.info(TAG, 'navigation stack pop failed::' + JSON.stringify(err));
     }
   }
 
@@ -63,7 +65,7 @@ export class RouterModule {
     try {
       RouterModule.stack.popToName(name, animated);
     } catch (err) {
-      Logger.info('navigation stack pop to name failed::' + JSON.stringify(err));
+      Logger.info(TAG, 'navigation stack pop to name failed::' + JSON.stringify(err));
     }
   }
 
@@ -72,7 +74,7 @@ export class RouterModule {
     try {
       RouterModule.stack.clear(animated)
     } catch (err) {
-      Logger.info('navigation stack clear failed::' + JSON.stringify(err))
+      Logger.info(TAG, 'navigation stack clear failed::' + JSON.stringify(err))
     }
   }
 
@@ -82,7 +84,7 @@ export class RouterModule {
     try {
       params = RouterModule.stack.getParamByName(info.url) as T[];
     } catch (err) {
-      Logger.info('navigation stack get params failed::' + JSON.stringify(err));
+      Logger.info(TAG, 'navigation stack get params failed::' + JSON.stringify(err));
     }
     return params;
   }

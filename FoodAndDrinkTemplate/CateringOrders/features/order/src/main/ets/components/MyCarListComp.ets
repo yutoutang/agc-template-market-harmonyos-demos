@@ -1,19 +1,14 @@
-import {
-  CarGoodInfo,
-  clearCarUtil,
-  CommonUrl,
-  Constants,
-  DishesType,
-  GetMyCarResp,
-  updateMyCarUtil,
-} from 'common/Index'
-import { MustGoodsController } from '../models/MustGoodsController'
+import { CommonUrl, Constants, MyCarModel } from 'common/Index';
+import { MustGoodsController } from '../models/MustGoodsController';
+import { AppStorageV2 } from '@kit.ArkUI';
+import * as API from '../api/Index';
+import { CarGoodsInfoResp, DishesTypeResp } from 'network';
 
-@Component
+@ComponentV2
 export struct MyCarListComp {
-  @StorageProp('myCar') myCar: GetMyCarResp = new GetMyCarResp()
-  @Consume('mustGoodsCtrl') mustGoodsCtrl: MustGoodsController
-  close: () => void = () => {
+  @Local myCarModel: MyCarModel = AppStorageV2.connect(MyCarModel) as MyCarModel
+  @Consumer('mustGoodsCtrl') mustGoodsCtrl: MustGoodsController = new MustGoodsController()
+  @Event close: () => void = () => {
   }
 
   build() {
@@ -40,7 +35,7 @@ export struct MyCarListComp {
                 .fontColor($r('sys.color.font_secondary'))
                 .margin({ left: 4 })
             }.onClick(() => {
-              clearCarUtil().then(() => {
+              API.clearCar().then(() => {
                 this.mustGoodsCtrl.cleanCar()
               })
             })
@@ -53,11 +48,11 @@ export struct MyCarListComp {
         .margin({ left: 16, right: 16 })
 
         List({ space: 8 }) {
-          ForEach(this.myCar.res, (carGoodInfo: CarGoodInfo) => {
+          ForEach(this.myCarModel.myCar.goodsList, (carGoodsInfo: CarGoodsInfoResp) => {
             ListItem() {
-              CarCard({ carGoodInfo: carGoodInfo })
+              CarCard({ carGoodsInfo: carGoodsInfo })
             }
-          }, (carGoodInfo: CarGoodInfo, index: number) => `${carGoodInfo.id}+${carGoodInfo.num}`)
+          }, (carGoodsInfo: CarGoodsInfoResp) => `${carGoodsInfo.id}-${carGoodsInfo.num}`)
           // 购物车占位
           ListItem() {
             Row().width(Constants.FULL_SIZE).height(60)
@@ -82,20 +77,20 @@ export struct MyCarListComp {
   }
 }
 
-@Component
+@ComponentV2
 struct CarCard {
-  @StorageProp('myCar') myCar: GetMyCarResp = new GetMyCarResp()
-  @Consume('mustGoodsCtrl') mustGoodsCtrl: MustGoodsController
-  @Consume('dishesList') dishesList: Array<DishesType>
-  @ObjectLink carGoodInfo: CarGoodInfo
+  @Local myCarModel: MyCarModel = AppStorageV2.connect(MyCarModel) as MyCarModel
+  @Consumer('mustGoodsCtrl') mustGoodsCtrl: MustGoodsController = new MustGoodsController()
+  @Consumer('dishesList') dishesList: Array<DishesTypeResp> = []
+  @Param @Require carGoodsInfo: CarGoodsInfoResp
 
   build() {
     Row() {
       Row() {
-        Image(`${CommonUrl.CLOUD_STORAGE_URL}${this.carGoodInfo.logo}`).width(60).height(60)
+        Image(`${CommonUrl.CLOUD_STORAGE_URL}${this.carGoodsInfo.logo}`).width(60).height(60)
         Column() {
           Column() {
-            Text(this.carGoodInfo.name)
+            Text(this.carGoodsInfo.name)
               .fontSize($r('sys.float.Body_M'))
               .fontWeight(FontWeight.Medium)
               .fontColor($r('sys.color.font_primary'))
@@ -104,7 +99,7 @@ struct CarCard {
               .layoutWeight(1)
             Text() {
               Span($r('app.string.selected'))
-              Span(this.carGoodInfo.spec?.split(',').join(' | ')).margin({ left: 2 })
+              Span(this.carGoodsInfo.spec?.split(',').join(' | ')).margin({ left: 2 })
             }
             .fontSize($r('sys.float.Caption_M'))
             .fontColor($r('sys.color.font_secondary'))
@@ -118,7 +113,7 @@ struct CarCard {
               .fontSize($r('sys.float.Caption_M'))
               .fontWeight(FontWeight.Medium)
               .fontColor($r('sys.color.font_primary'))
-            Span(`${Number(this.carGoodInfo.money)}`)
+            Span(`${Number(this.carGoodsInfo.money)}`)
               .fontSize($r('sys.float.Body_M'))
               .fontWeight(FontWeight.Medium)
               .fontColor($r('sys.color.font_primary'))
@@ -133,20 +128,20 @@ struct CarCard {
 
       Row() {
         Image($r('app.media.ic_subtract')).width(24).onClick(() => {
-          if (this.carGoodInfo?.id && this.carGoodInfo?.num) {
-            updateMyCarUtil(this.carGoodInfo?.id, Number(this.carGoodInfo?.num) - 1)
+          if (this.carGoodsInfo?.id && this.carGoodsInfo?.num) {
+            API.updateMyCar(this.carGoodsInfo?.id, Number(this.carGoodsInfo?.num) - 1)
           }
         })
-        Text(this.carGoodInfo.num)
+        Text(this.carGoodsInfo.num.toString())
           .margin({ left: 12, right: 12 })
           .fontSize($r('sys.float.Body_L'))
           .fontColor($r('sys.color.font_primary'))
           .fontWeight(FontWeight.Medium)
         Image($r('app.media.add_car')).width(24).onClick(() => {
-          if (this.carGoodInfo?.id && this.carGoodInfo?.num) {
-            updateMyCarUtil(this.carGoodInfo?.id, Number(this.carGoodInfo?.num) + 1)
+          if (this.carGoodsInfo?.id && this.carGoodsInfo?.num) {
+            API.updateMyCar(this.carGoodsInfo?.id, Number(this.carGoodsInfo?.num) + 1)
           } else {
-            console.error(`GoodInfo not in disheList: ${JSON.stringify(this.carGoodInfo.goodId)}.`);
+            console.error(`GoodInfo not in disheList: ${JSON.stringify(this.carGoodsInfo.goodsId)}.`);
             return
           }
         })

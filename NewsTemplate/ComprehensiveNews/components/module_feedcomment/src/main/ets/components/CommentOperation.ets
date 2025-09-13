@@ -104,6 +104,5 @@ export struct CommentOperation {
       .justifyContent(FlexAlign.SpaceBetween)
       .margin({ left: 16 })
     }
-    .backgroundColor($r('sys.color.background_primary'))
   }
 }

@@ -25,6 +25,7 @@ export struct CalculationForm {
   @Param loanAmount: string = ''
   @Param loanYear: string = '';
   @Param loanRate: string = '';
+  @Param isSmallHeight:boolean = false
   @Event handleAmountChange: (value: string) => void;
   @Event handleYearChange: (value: string) => void;
   @Event handleRateChange: (value: string) => void;
@@ -45,6 +46,7 @@ export struct CalculationForm {
           value: this.loanAmount,
           max: 10000,
           isInteger: false,
+          isSmallHeight:this.isSmallHeight,
           handleChange: (value: string) => {
             this.handleAmountChange(value);
           }
@@ -59,6 +61,7 @@ export struct CalculationForm {
           value: this.loanYear,
           max: 30,
           isInteger: true,
+          isSmallHeight:this.isSmallHeight,
           handleChange: (value: string) => {
             this.handleYearChange(value);
           }
@@ -73,6 +76,7 @@ export struct CalculationForm {
           value: this.loanRate,
           max: 100,
           isInteger: false,
+          isSmallHeight:this.isSmallHeight,
           handleChange: (value: string) => {
             this.handleRateChange(value);
           }

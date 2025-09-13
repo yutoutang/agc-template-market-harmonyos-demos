@@ -55,6 +55,10 @@
     {
       "name": "footer_line",
       "value": "我是有底线的"
+    },
+    {
+      "name": "agcit_huawei_shopping_mall",
+      "value": "1.0.0"
     }
   ]
 }

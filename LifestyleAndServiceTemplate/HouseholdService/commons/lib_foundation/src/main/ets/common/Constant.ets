@@ -26,7 +26,6 @@ export enum CurAppInfo {
  */
 export enum AppStorageMap {
   TOKEN = 'Token',
-  UI_CONTEXT = 'uiContext',
 }
 
 /**

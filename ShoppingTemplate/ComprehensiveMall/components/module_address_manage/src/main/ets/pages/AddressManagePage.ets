@@ -1,14 +1,12 @@
 import { Context } from '../common/Context';
-import { TitleBar } from '../common/TitleBar';
 import { buildLoadingMask } from '../common/CommonBuilders';
-import { IColor, IFontSize, IStyle, Operation, RouteMap, ViewModelState } from '../common/CommonConst';
+import { IColor, IStyle, Operation, RouteMap, ViewModelState } from '../common/CommonConst';
 import { AddressDTO } from '../model/AddressDTO';
 import { AddressVM } from '../viewmodel/AddressVM';
 import { ComponentContent } from '@kit.ArkUI';
 
 @ComponentV2
 struct AddressManagePage {
-
   @Param
   public ctx: Context = new Context();
 
@@ -19,15 +17,6 @@ struct AddressManagePage {
   public build(): void {
     NavDestination() {
       Column() {
-        TitleBar({
-          onBackButtonClick: () => this.ctx.navPathStack.pop(),
-          barColor: IColor.WHITE,
-        }) {
-          Text('收货地址')
-            .fontSize(IFontSize.TITLE)
-            .fontColor(IColor.BLACK_TRANSPARENT_90)
-            .fontWeight(500)
-        }
         Stack() {
           if (this.ctx.addressMgr.state === ViewModelState.READY) {
             this.buildMainContent();
@@ -45,7 +34,7 @@ struct AddressManagePage {
       .backgroundColor(IColor.BACKGROUND)
       .expandSafeArea([SafeAreaType.SYSTEM, SafeAreaType.CUTOUT], [SafeAreaEdge.BOTTOM, SafeAreaEdge.TOP])
     }
-    .hideTitleBar(true)
+    .title('收货地址')
   }
 
   @Builder
@@ -77,6 +66,7 @@ struct AddressManagePage {
       .layoutWeight(1)
       .alignItems(HorizontalAlign.Center)
       .justifyContent(FlexAlign.Center)
+
       this.buildCreateAddressButton();
     }
     .height('100%')
@@ -101,6 +91,7 @@ struct AddressManagePage {
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .margin({ top: 5 })
       }
+
       Row() {
         Row() {
           Checkbox()
@@ -117,54 +108,59 @@ struct AddressManagePage {
             .margin({ left: 8 })
         }
         .responseRegion([
-          { x: 0, y: '-50%', width: '100%', height: '200%' },
-          { x: -16, y: '-50%', width: 16, height: '200%' },
+          {
+            x: 0,
+            y: '-50%',
+            width: '100%',
+            height: '200%',
+          },
+          {
+            x: -16,
+            y: '-50%',
+            width: 16,
+            height: '200%',
+          },
         ])
         .onClick(() => {
           const dto: AddressDTO = address.toDTO();
           dto.isDefault = !dto.isDefault;
           this.ctx.addressMgr.update(dto);
         })
+
         Row() {
-          Button() {
+          Button(){
             Text('删除')
               .fontColor(IColor.BLACK_TRANSPARENT_60)
               .fontSize(10)
           }
-          .width(36)
-          .height(18)
-          .type(ButtonType.Normal)
-          .backgroundColor(IColor.WHITE)
-          .borderWidth(1)
-          .borderColor(IColor.BLACK_TRANSPARENT_60)
-          .borderRadius(8)
-          .onClick(() => {
-            const uiContext = this.getUIContext();
-            const promptAction = uiContext.getPromptAction();
-            const params: ParamsForDeleteDialog = new ParamsForDeleteDialog();
-            const contentNode = new ComponentContent(uiContext, wrapBuilder(buildDeleteDialog), params);
-            params.onClose = () => promptAction.closeCustomDialog(contentNode);
-            params.onDelete = () => this.ctx.addressMgr.delete(address.id);
-            promptAction.openCustomDialog(contentNode);
-          })
-          Button() {
+            .width(36)
+            .backgroundColor(IColor.WHITE)
+            .borderWidth(1)
+            .borderColor('#99000000')
+            .onClick(() => {
+              const uiContext = this.getUIContext();
+              const promptAction = uiContext.getPromptAction();
+              const params: ParamsForDeleteDialog = new ParamsForDeleteDialog();
+              const contentNode = new ComponentContent(uiContext, wrapBuilder(buildDeleteDialog), params);
+              params.onClose = () => promptAction.closeCustomDialog(contentNode);
+              params.onDelete = () => this.ctx.addressMgr.delete(address.id);
+              promptAction.openCustomDialog(contentNode);
+            })
+          Button(){
             Text('修改')
               .fontColor(IColor.BLACK_TRANSPARENT_60)
               .fontSize(10)
           }
-          .width(36)
-          .height(18)
-          .type(ButtonType.Normal)
-          .backgroundColor(IColor.WHITE)
-          .borderWidth(1)
-          .borderColor(IColor.BLACK_TRANSPARENT_60)
-          .borderRadius(8)
-          .margin({ left: 8 })
-          .onClick(() => {
-            this.ctx.editingAddressDTO = address.toDTO();
-            this.ctx.operation = Operation.EDIT;
-            this.ctx.navPathStack.pushPathByName(RouteMap.ADDRESS_EDIT_PAGE, this.ctx);
-          })
+            .width(36)
+            .backgroundColor(IColor.WHITE)
+            .borderWidth(1)
+            .borderColor(IColor.BLACK_TRANSPARENT_60)
+            .margin({ left: 8 })
+            .onClick(() => {
+              this.ctx.editingAddressDTO = address.toDTO();
+              this.ctx.operation = Operation.EDIT;
+              this.ctx.navPathStack.pushPathByName(RouteMap.ADDRESS_EDIT_PAGE, this.ctx);
+            })
         }
       }
       .width('100%')
@@ -190,22 +186,16 @@ struct AddressManagePage {
   private buildCreateAddressButton(): void {
     Column() {
       Row() {
-        Button() {
-          Text('添加新地址')
-            .fontSize(IFontSize.BODY)
-            .fontColor(IColor.WHITE)
-        }
-        .width('80%')
-        .height(40)
-        .borderRadius(21)
-        .fontWeight(500)
-        .type(ButtonType.Normal)
-        .backgroundColor(IColor.THEME_PRIMARY)
-        .onClick(() => {
-          this.ctx.editingAddressDTO = null;
-          this.ctx.operation = Operation.CREATE;
-          this.ctx.navPathStack.pushPathByName(RouteMap.ADDRESS_EDIT_PAGE, this.ctx);
-        })
+        Button('添加新地址')
+          .width('80%')
+          .height(40)
+          .fontWeight(500)
+          .backgroundColor(IColor.THEME_PRIMARY)
+          .onClick(() => {
+            this.ctx.editingAddressDTO = null;
+            this.ctx.operation = Operation.CREATE;
+            this.ctx.navPathStack.pushPathByName(RouteMap.ADDRESS_EDIT_PAGE, this.ctx);
+          })
       }
       .width('100%')
       .height(52)
@@ -223,11 +213,10 @@ export function buildAddressManagePage(_: string, context: Context) {
 }
 
 class ParamsForDeleteDialog {
-
-  public onClose = () => {};
-
-  public onDelete = () => {};
-
+  public onClose = () => {
+  };
+  public onDelete = () => {
+  };
 }
 
 @Builder
@@ -249,6 +238,7 @@ function buildDeleteDialog(params: ParamsForDeleteDialog): void {
       .type(ButtonType.Normal)
       .backgroundColor(Color.Transparent)
       .onClick(() => params.onClose())
+
       Button() {
         Text('删除')
           .fontColor(IColor.THEME_PRIMARY)

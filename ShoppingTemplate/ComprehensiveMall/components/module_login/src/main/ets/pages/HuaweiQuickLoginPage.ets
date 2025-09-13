@@ -2,8 +2,7 @@ import { authentication, loginComponentManager, LoginWithHuaweiIDButton } from '
 import { BusinessError } from '@kit.BasicServicesKit';
 import { util } from '@kit.ArkTS';
 import { promptAction } from '@kit.ArkUI';
-
-import { iData, RouterMap, routerStack, TitleBar } from 'lib_foundation';
+import { iData, RouterMap, routerStack } from 'lib_foundation';
 import { LoginParams } from '../models/LoginParams';
 import { IPrivacyText } from '../models/IPrivacyText';
 import { IColor } from '../commons/CommonConst';
@@ -13,19 +12,15 @@ const IS_DEV_MODE: boolean = true;
 
 @ComponentV2
 export struct HuaweiQuickLoginPage {
-
   @Event
-  public onFinish: () => void = () => {};
-
+  public onFinish: () => void = () => {
+  };
   @Local
   private isAccepted: boolean = false;
-
   @Local
   private anonymousPhone: string = '';
-
   @Local
   private isFinish: boolean = false;
-
   private privacyTexts: IPrivacyText[] = [
     {
       text: '已阅读并同意',
@@ -60,7 +55,6 @@ export struct HuaweiQuickLoginPage {
       },
     },
   ];
-
   private handleHuaweiQuickLogin = (error: BusinessError<void> | undefined,
     credential: loginComponentManager.HuaweiIDCredential) => {
     if (error) {
@@ -75,7 +69,6 @@ export struct HuaweiQuickLoginPage {
       this.onLogin(credential);
     }
   };
-
   private loginButtonController: loginComponentManager.LoginWithHuaweiIDButtonController =
     new loginComponentManager.LoginWithHuaweiIDButtonController()
       .setAgreementStatus(loginComponentManager.AgreementStatus.NOT_ACCEPTED)
@@ -94,7 +87,6 @@ export struct HuaweiQuickLoginPage {
   public build(): void {
     NavDestination() {
       Column() {
-        TitleBar({ onBackButtonClick: () => routerStack.pop() })
         Scroll() {
           Column() {
             if (this.anonymousPhone) {
@@ -120,6 +112,7 @@ export struct HuaweiQuickLoginPage {
                 }
                 .margin({ top: 48 })
                 .alignItems(HorizontalAlign.Center)
+
                 LoginWithHuaweiIDButton({
                   params: {
                     style: loginComponentManager.Style.BUTTON_CUSTOM,
@@ -146,26 +139,21 @@ export struct HuaweiQuickLoginPage {
                   controller: this.loginButtonController,
                 })
                   .margin({ top: 48 })
-                Button() {
-                  Text('其他方式登录')
-                    .fontColor(IColor.BLACK_TRANSPARENT_90)
-                    .fontSize(16)
-                    .fontWeight(500)
-                }
-                .width('100%')
-                .height(40)
-                .type(ButtonType.Normal)
-                .backgroundColor(IColor.BLACK_TRANSPARENT_5)
-                .borderRadius(20)
-                .margin({ top: 12 })
-                .onClick(() => {
-                  this.isFinish = true;
-                  routerStack.replacePathByName(RouterMap.USER_OTHER_LOGIN, this.onFinish);
-                })
+                Button('其他方式登录')
+                  .fontColor($r('sys.color.font_primary'))
+                  .width('100%')
+                  .height(40)
+                  .backgroundColor(IColor.BLACK_TRANSPARENT_5)
+                  .margin({ top: 12 })
+                  .onClick(() => {
+                    this.isFinish = true;
+                    routerStack.replacePathByName(RouterMap.USER_OTHER_LOGIN, this.onFinish);
+                  })
               }
               .width('100%')
               .alignItems(HorizontalAlign.Center)
               .justifyContent(FlexAlign.Start)
+
               Row() {
                 Checkbox()
                   .width(20)
@@ -173,7 +161,12 @@ export struct HuaweiQuickLoginPage {
                   .shape(CheckBoxShape.CIRCLE)
                   .select(this.isAccepted)
                   .selectedColor(IColor.THEME_PRIMARY)
-                  .margin({ left: 0, right: 14, top: 0, bottom: 0 })
+                  .margin({
+                    left: 0,
+                    right: 14,
+                    top: 0,
+                    bottom: 0,
+                  })
                   .onChange((value: boolean) => {
                     if (value) {
                       this.isAccepted = true;
@@ -218,7 +211,6 @@ export struct HuaweiQuickLoginPage {
       .width('100%')
       .height('100%')
     }
-    .hideTitleBar(true)
     .onReady((ctx: NavDestinationContext) => {
       if (ctx.pathInfo.param) {
         this.onFinish = ctx.pathInfo.param as () => void;

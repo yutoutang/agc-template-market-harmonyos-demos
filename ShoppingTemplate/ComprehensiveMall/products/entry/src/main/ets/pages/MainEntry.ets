@@ -1,0 +1,62 @@
+import { TAB_LIST } from '../commons/Constants';
+import { TabListItem } from '../commons/Types';
+import { MainEntryVM } from '../viewmodels/MainEntryVM';
+
+@Builder
+export function MainEntryBuilder() {
+  MainEntry()
+}
+
+@ComponentV2
+struct MainEntry {
+  vm: MainEntryVM = new MainEntryVM();
+  private controller: TabsController = new TabsController();
+
+  aboutToAppear(): void {
+    this.vm.initData();
+  }
+
+  build() {
+    NavDestination() {
+      Tabs({ barPosition: BarPosition.End, index: this.vm.curIndex, controller: this.controller }) {
+        ForEach(TAB_LIST, (item: TabListItem, index: number) => {
+          TabContent() {
+            item.component.builder();
+          }
+          .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
+          .tabBar(this.tabBarBuilder(item, index))
+          .clip(false)
+        }, (item: TabListItem, index: number) => index + '__' + item.label);
+      }
+      .scrollable(false)
+      .height($r('app.string.size_percent_full'))
+      .animationDuration(0)
+      .barMode(BarMode.Fixed)
+      .onChange((index: number) => {
+        this.vm.curIndex = index;
+      })
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM, SafeAreaEdge.TOP])
+      .barBackgroundColor($r('app.color.background_color_white'))
+    }
+    .hideTitleBar(true)
+    .onBackPressed(() => {
+      return this.vm.handleBackPressed()
+    })
+  }
+
+  @Builder
+  tabBarBuilder(item: TabListItem, index: number) {
+    Column() {
+      Image(this.vm.curIndex === index ? item.iconChecked : item.icon)
+        .fillColor(this.vm.curIndex === index ? $r('app.color.theme_color') : $r('app.color.font_color_level3'))
+        .width(24)
+        .height(24);
+      Text(item.label)
+        .fontColor(this.vm.curIndex === index ? $r('app.color.theme_color') :
+        $r('app.color.font_color_level3'))
+        .fontSize($r('app.string.font_size_10'))
+        .margin({ top: $r('app.string.space_xs') });
+    }
+    .width($r('app.string.size_percent_full'))
+  }
+}

@@ -13,6 +13,8 @@ export class CalculationViewModel {
   @Trace commercialAmount: string = '100';
   @Trace commercialYear: string = '30';
   @Trace commercialRate: string = '3.5';
+  @Trace isSmallHeight:boolean = false
+  DEFAULT_HEIGHT:number = 800
 
   async queryLPRList(): Promise<void> {
     const rateList = await queryLPRList();

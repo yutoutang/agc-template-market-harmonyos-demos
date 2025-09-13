@@ -1,32 +1,32 @@
-import { CallTelDialogBuilder, CommonUrl, Constants, HwMapModel, StoreInfo } from 'common/Index'
-import { promptAction } from '@kit.ArkUI'
+import { CommonUrl, Constants, HwMapModel, RouterMap, RouterModule, StoreInfoModel } from 'common/Index';
+import { AppStorageV2, promptAction } from '@kit.ArkUI';
+import { callTelSheetBuilder } from 'base_ui';
 
 /*
  * 购买商品列表
  * */
-@Component
+@ComponentV2
 export struct StoreInfoCard {
-  @Consume('storeInfo') storeInfo: StoreInfo
-  @Consume('pageStack') pageStack: NavPathStack
-  @State tel: string = ''
-  @State callTelSheet: boolean = false
+  @Local storeModel: StoreInfoModel = AppStorageV2.connect(StoreInfoModel, () => new StoreInfoModel())!;
+  @Local tel: string = ''
+  @Local callTelSheet: boolean = false
 
   aboutToAppear(): void {
-    this.tel = this.storeInfo?.tel ?? ''
+    this.tel = this.storeModel.storeInfo?.tel ?? ''
   }
 
   build() {
     Row() {
       Row() {
-        Image(`${CommonUrl.CLOUD_STORAGE_URL}${this.storeInfo.logo}`).width(40).height(40)
+        Image(`${CommonUrl.CLOUD_STORAGE_URL}${this.storeModel.storeInfo.logo}`).width(40).height(40)
         Column() {
-          Text(`${this.storeInfo.name}`)
+          Text(`${this.storeModel.storeInfo.name}`)
             .fontSize(18)
             .fontColor($r('sys.color.font_primary'))
             .fontWeight(FontWeight.Medium)
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
-          Text(`${this.storeInfo.address}`)
+          Text(`${this.storeModel.storeInfo.address}`)
             .fontSize($r('sys.float.Body_S'))
             .fontColor($r('sys.color.font_secondary'))
             .fontWeight(400)
@@ -42,20 +42,17 @@ export struct StoreInfoCard {
           this.callTelSheet = true
         })
         ImageSpan($r('app.media.position_icon')).width(24).height(24).onClick(() => {
-          let coordinates = this.storeInfo?.coordinates?.split(',')
+          let coordinates = this.storeModel.storeInfo?.coordinates?.split(',')
           if (coordinates?.length === 2) {
             let latitude: number = Number(coordinates[0])
             let longitude: number = Number(coordinates[1])
-            this.pageStack.pushPath({
-              name: 'HwMap',
-              param: { latitude, longitude, storeInfo: this.storeInfo } as HwMapModel,
-            })
+            RouterModule.push(RouterMap.HW_MAP_PAGE, { latitude, longitude } as HwMapModel)
           } else {
             promptAction.showToast({ message: $r('app.string.store_address_error') })
           }
         })
       }.margin({ left: 8 })
-      .bindSheet($$this.callTelSheet, CallTelDialogBuilder(this.tel, () => {
+      .bindSheet($$this.callTelSheet, callTelSheetBuilder(this.tel, () => {
         this.callTelSheet = false
       }), {
         height: 309,

@@ -1,6 +1,6 @@
 import { PersistenceV2 } from '@kit.ArkUI'
 import { CommonConstants, RouterMap, RouterUtils, SettingModel, TimeUtils } from 'lib_common'
-import { LayoutParams } from 'lib_news_api'
+import { LayoutParams } from 'module_flexlayout'
 
 @ComponentV2
 export struct AuthorCard {
@@ -30,7 +30,7 @@ export struct AuthorCard {
             .fontSize(16 * this.settingInfo.fontSizeRatio)
             .fontColor($r('sys.color.font_primary'))
             .fontWeight(FontWeight.Medium)
-          Text(TimeUtils.formatDate(this.cardData.nativeCardData?.createTime, 'YYYY-MM-DD HH:MM'))
+          Text(TimeUtils.formatDate(this.cardData.nativeCardData?.createTime, 'YYYY-MM-DD HH:mm'))
             .fontSize(12 * this.settingInfo.fontSizeRatio)
             .fontColor($r('sys.color.font_secondary'))
         }.alignItems(HorizontalAlign.Start)

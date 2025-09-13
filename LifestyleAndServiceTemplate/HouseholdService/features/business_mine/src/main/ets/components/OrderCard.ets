@@ -30,13 +30,13 @@ import { CommonUtils, RouterMap } from 'module_base';
 @ComponentV2
 struct OperateBtn {
   @Param label: string = '';
-  @Param fgColor: ResourceColor = Color.Black;
+  @Param fgColor: ResourceColor = $r('sys.color.font_primary');
   @Param bgColor: ResourceColor = $r('app.color.grey_5');
 
   build() {
     Button() {
       Text(this.label)
-        .fontSize(14)
+        .fontSize($r('sys.float.Body_M'))
         .fontWeight(500)
         .fontColor(this.fgColor)
         .width(56)

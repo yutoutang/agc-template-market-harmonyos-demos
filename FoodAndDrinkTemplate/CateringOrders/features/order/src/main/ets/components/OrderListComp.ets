@@ -1,16 +1,20 @@
-import { Constants, DishesType, Good } from 'common/Index';
+import { Constants } from 'common/Index';
+import { DishesTypeResp } from 'network';
+import { Goods } from '../models/Index';
 import { MustGoodsController } from '../models/MustGoodsController';
 import { GoodInfoComp } from './GoodInfoComp';
 
-@Component
+@ComponentV2
 export struct OrderListComp {
-  @Consume('dishesList') @Watch('dishesListChange') dishesList: Array<DishesType>
-  @Consume('pageStack') pageStack: NavPathStack
-  @Consume('mustGoodsCtrl') mustGoodsCtrl: MustGoodsController
-  @State windowBottomHeight: number = AppStorage.get('windowBottomHeight') as number || 28
-  @State currentIndex: number = 0;
-  @State buyCarMoney: number = 0; //购物车金额
-  @State index: number = 0
+  // 展示的商品列表
+  @Consumer('dishesList') dishesList: Array<DishesTypeResp> = []
+  // 原始商品列表
+  @Consumer('dishesListOri') dishesListOri: Array<DishesTypeResp> = []
+  @Consumer('mustGoodsCtrl') mustGoodsCtrl: MustGoodsController = new MustGoodsController()
+  @Local currentIndex: number = 0;
+  @Local index: number = 0
+  // 当前搜索关键字
+  @Local searchText: string = '';
   private titleItemScroller: Scroller = new Scroller();
   private scroller: Scroller = new Scroller();
 
@@ -18,16 +22,19 @@ export struct OrderListComp {
     if (this.mustGoodsCtrl) {
       this.mustGoodsCtrl.goMustGoods = this.goMustGoods
     }
-    this.dishesListChange()
   }
 
-  dishesListChange() {
-    this.index = this.dishesList.findIndex(item => item.good?.some(i => i.isMust === Constants.GOODS_MUST))
+  @Monitor('dishesList')
+  dishesListChange(monitor: IMonitor) {
+    if (monitor.value()?.now) {
+      this.index = this.dishesList.findIndex(item => item.goods?.some(i => i.isMust === Constants.GOODS_MUST))
+    }
   }
 
   goMustGoods = () => {
     if (this.mustGoodsCtrl.isNeedMustGoods && this.index >= 0) {
-      this.scroller.scrollToIndex(this.index);
+      // 搜索占据第一个索引，这里需要给index+1
+      this.scroller.scrollToIndex(this.index + 1);
     }
   }
 
@@ -58,22 +65,15 @@ export struct OrderListComp {
           .padding({ left: 4 })
       }
     }
-    .height(20)
-    .width(Constants.FULL_SIZE)
-    .margin({
-      bottom: 8,
-      top: 8,
-      left: 16,
-      right: 16,
-    })
+    .margin({ bottom: 8, top: 8 })
   }
 
   build() {
     Column() {
       // 列表页
-      Row() {
+      Row({ space: 8 }) {
         List({ scroller: this.titleItemScroller }) {
-          ForEach(this.dishesList, (item: DishesType, index: number) => {
+          ForEach(this.dishesList, (item: DishesTypeResp, index: number) => {
             ListItem() {
               TitleItem({
                 typeName: item.typeName,
@@ -81,17 +81,17 @@ export struct OrderListComp {
                 isSelected: this.currentIndex === index,
                 onClickAction: () => {
                   if (index !== undefined) {
-                    this.currentIndexChangeAction(index, true);
+                    this.currentIndexChangeAction(index + 1, true);
                   }
                 },
               })
             }
-          }, (item: DishesType, index: number) => item.typeName + this.currentIndex)
+          }, (item: DishesTypeResp) => item.typeName + this.currentIndex)
           ListItem() {
             Column().width(Constants.FULL_SIZE).height(78)
           }
         }
-        .width(80)
+        .width(92)
         .height(Constants.FULL_SIZE)
         .listDirection(Axis.Vertical) // 排列方向
         .backgroundColor(Color.White)
@@ -99,19 +99,38 @@ export struct OrderListComp {
         .divider({ strokeWidth: 1 })
 
         List({ scroller: this.scroller }) {
-          ForEach(this.dishesList, (item: DishesType) => {
+          ListItem() {
+            Search({ value: $$this.searchText, placeholder: $r('app.string.search_goods') })
+              .textFont({ size: $r('sys.float.Body_L') })
+              .width(Constants.FULL_SIZE)
+              .placeholderFont({ size: $r('sys.float.Body_L') })
+              .maxLength(20)
+              .margin(0)
+              .onChange((value: string) => {
+                if (value) {
+                  this.dishesList = this.dishesList.map((item) => {
+                    item.goods = item.goods.filter(i => i.name?.includes(value))
+                    return item
+                  })
+                } else {
+                  this.dishesList = JSON.parse(JSON.stringify(this.dishesListOri))
+                }
+              })
+          }
+
+          ForEach(this.dishesList, (item: DishesTypeResp) => {
             ListItemGroup({
-              header: this.titleHeader(item.typeName, item.good.length),
+              header: this.titleHeader(item.typeName, item.goods.length),
               space: 10,
             }) {
-              ForEach(item.good, (listItem: Good) => {
+              ForEach(item.goods, (listItem: Goods) => {
                 ListItem() {
                   GoodInfoComp({ item: listItem })
                 }
-              }, (listItem: Good) => JSON.stringify(listItem))
+              }, (listItem: Goods) => JSON.stringify(listItem))
 
             }
-          }, (item: DishesType) => JSON.stringify(item))
+          }, (item: DishesTypeResp) => JSON.stringify(item))
           ListItem() {
             Column() {
               Divider().margin({ top: 12 })
@@ -127,20 +146,19 @@ export struct OrderListComp {
         .height(Constants.FULL_SIZE)
         .scrollBar(BarState.Off)
         .sticky(StickyStyle.None)
-        .onScrollIndex((start: number) => this.currentIndexChangeAction(start, false))
-      }.layoutWeight(1)
-
+        .onScrollIndex((start: number) => this.currentIndexChangeAction(start - 1, false))
+      }.layoutWeight(1).margin({ right: 16 })
     }.width(Constants.FULL_SIZE).height(Constants.FULL_SIZE).constraintSize({ maxHeight: Constants.FULL_SIZE })
   }
 }
 
 // 标题
-@Component
+@ComponentV2
 export struct TitleItem {
-  @Prop typeName?: string;
-  @Prop hasIcon: boolean = false
-  @Prop isSelected: boolean = false;
-  onClickAction = (): void => {
+  @Param @Require typeName: string;
+  @Param hasIcon: boolean = false
+  @Param isSelected: boolean = false;
+  @Event onClickAction: () => void = () => {
   }
 
   build() {

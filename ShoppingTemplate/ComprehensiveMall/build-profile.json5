@@ -1,11 +1,13 @@
 {
   "app": {
+/**todo: 配置手动签名 */
     "signingConfigs": [],
     "products": [
       {
         "name": "default",
         "signingConfig": "default",
         "compatibleSdkVersion": "5.0.4(16)",
+        "targetSdkVersion": "5.0.4(16)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
           "strictMode": {
@@ -17,7 +19,7 @@
     ],
     "buildModeSet": [
       {
-        "name": "debug",
+        "name": "debug"
       },
       {
         "name": "release"
@@ -38,16 +40,12 @@
       ]
     },
     {
-      "name": "lib_network",
-      "srcPath": "./commons/lib_network"
-    },
-    {
       "name": "shopping",
-      "srcPath": "./scenes/shopping"
+      "srcPath": "./features/shopping"
     },
     {
       "name": "order",
-      "srcPath": "./scenes/order"
+      "srcPath": "./features/order"
     },
     {
       "name": "module_product_detail",
@@ -71,19 +69,47 @@
     },
     {
       "name": "module_login",
-      "srcPath": "./components/module_login",
+      "srcPath": "./components/module_login"
     },
     {
       "name": "module_coupons",
-      "srcPath": "./components/module_coupons",
+      "srcPath": "./components/module_coupons"
     },
     {
       "name": "module_product_share",
-      "srcPath": "./components/module_product_share",
+      "srcPath": "./components/module_product_share"
     },
     {
       "name": "module_product_search",
-      "srcPath": "./components/module_product_search",
+      "srcPath": "./components/module_product_search"
+    },
+    {
+      "name": "module_privacy_agreement",
+      "srcPath": "./components/module_privacy_agreement"
+    },
+    {
+      "name": "module_ui_base",
+      "srcPath": "./components/module_ui_base"
+    },
+    {
+      "name": "setting",
+      "srcPath": "./features/setting"
+    },
+    {
+      "name": "lib_network",
+      "srcPath": "./commons/lib_network"
+    },
+    {
+      "name": "lib_widget",
+      "srcPath": "./commons/lib_widget"
+    },
+    {
+      "name": "module_product_review",
+      "srcPath": "./components/module_product_review"
+    },
+    {
+      "name": "module_product_category",
+      "srcPath": "./components/module_product_category"
     }
   ]
 }

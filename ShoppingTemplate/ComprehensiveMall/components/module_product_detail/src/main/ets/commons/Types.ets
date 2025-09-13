@@ -1,3 +1,5 @@
+import { ReviewMediaType } from './Enums';
+
 export interface ProductInfo {
   id: string;
   banners: ResourceStr[];
@@ -46,4 +48,28 @@ export interface SpecValue {
 export interface SpecOption {
   key: string;
   values: SpecValue[];
+}
+
+export interface ProductReviewItem {
+  productId: string;
+  userAvatar: ResourceStr;
+  userName: string;
+  skuCode: string;
+  skuDesc: string[];
+  rating: number;
+  date: number; //时间戳
+  content: string;
+  mediaList: ReviewMediaItem[];
+}
+
+export interface ReviewMediaItem {
+  uri: ResourceStr;
+  type: ReviewMediaType;
+}
+
+export interface ProductReviewResp {
+  reviewList: ProductReviewItem[];
+  curPage: number;
+  total: number;
+  isFinal: boolean;
 }

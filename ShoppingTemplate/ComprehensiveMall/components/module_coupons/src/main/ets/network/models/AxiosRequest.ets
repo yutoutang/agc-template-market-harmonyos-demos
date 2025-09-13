@@ -1,8 +1,8 @@
-import { AxiosHttpRequest } from './AxiosHttp';
-import { AxiosRequestHeaders, AxiosResponse } from '@ohos/axios';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { FullLoading } from '../../utils/FullLoading';
+import { AxiosRequestHeaders, AxiosResponse } from '@ohos/axios';
 import { CommonConstants } from '../../constants/Contants';
+import { FullLoading } from '../../utils/FullLoading';
+import { AxiosHttpRequest } from './AxiosHttp';
 
 const axiosClient = new AxiosHttpRequest(
   {

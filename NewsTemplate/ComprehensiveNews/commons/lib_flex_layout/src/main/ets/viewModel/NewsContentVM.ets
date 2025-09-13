@@ -2,7 +2,8 @@ import { emitter } from '@kit.BasicServicesKit';
 import { promptAction } from '@kit.ArkUI';
 import { BaseViewModel, CommonBreakpoint, CommonDataSource, NetworkUtil } from 'lib_common';
 import { HomeServiceApi, NewsEnum, RequestListData } from 'lib_news_api';
-import { RendNewsInfo } from '../sdk/model/Model';
+import { RendNewsInfo } from '../model/Model';
+
 
 @ObservedV2
 export class NewsContentVM extends BaseViewModel {
@@ -31,13 +32,13 @@ export class NewsContentVM extends BaseViewModel {
     this.rendNewsInfoList = rendNewsInfoList
     this.resource = resource
     this.isRefreshing = true
-    emitter.on('home_recommend_fresh',() => {
+    emitter.on('follow_recommend_fresh',() => {
       this.refresh()
     })
   }
 
   public emitterOff() {
-    emitter.off('home_recommend_fresh')
+    emitter.off('follow_recommend_fresh')
   }
 
   public async getNewsDynamicData(resource: string) {
@@ -57,7 +58,6 @@ export class NewsContentVM extends BaseViewModel {
        * 处理extraInfo
        * */
       newsInfoList.forEach(item => {
-        item.extraInfo.isNeedAuthor = true
         item.extraInfo.isFollow = true
       })
     }

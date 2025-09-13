@@ -13,6 +13,7 @@ export function ProtocolWebViewBuilder() {
 struct ProtocolWebView {
   @Local content: string = '';
   @Local isSheet: boolean = false;
+  @Local sheetType: SheetType = SheetType.BOTTOM;
   windowModel: WindowModel = AppStorageV2.connect(WindowModel, () => new WindowModel())!;
   breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
   webViewController: webview.WebviewController = new webview.WebviewController();
@@ -22,10 +23,11 @@ struct ProtocolWebView {
     NavDestination() {
       Column() {
         NavHeaderBar({
+          headerBarHeight: this.headerHeight,
           customPadding: {
             left: 0,
             right: 0,
-            top: this.isSheet ? CommonConstants.PADDING_S : undefined,
+            top: this.headerPaddingTop,
           },
           onBack: () => {
             this.stack.pop(true);
@@ -61,6 +63,7 @@ struct ProtocolWebView {
       if (params) {
         this.content = params.content;
         this.isSheet = params.isSheet ?? false;
+        this.sheetType = params.sheetType ?? SheetType.BOTTOM;
       }
     })
   }
@@ -78,6 +81,10 @@ struct ProtocolWebView {
       .verticalScrollBarAccess(false)
       .backgroundColor($r('sys.color.background_secondary'))
       .layoutWeight(1)
+      .nestedScroll({
+        scrollForward: NestedScrollMode.SELF_ONLY,
+        scrollBackward: NestedScrollMode.SELF_ONLY,
+      })
       .onControllerAttached(() => {
         setTimeout(() => {
           this.webViewController.loadData(
@@ -89,5 +96,27 @@ struct ProtocolWebView {
           );
         }, 100)
       })
+  }
+
+  @Computed
+  get headerHeight() {
+    if (!this.isSheet) {
+      return 56;
+    }
+    return 40;
+  }
+
+  @Computed
+  get headerPaddingTop() {
+    if (!this.isSheet) {
+      return undefined;
+    }
+    if (this.sheetType === SheetType.CENTER) {
+      return 16;
+    }
+    if (this.sheetType === SheetType.BOTTOM) {
+      return 0;
+    }
+    return 0;
   }
 }

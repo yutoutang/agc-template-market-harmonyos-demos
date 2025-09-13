@@ -1,3 +1,4 @@
+import { AppStorageV2 } from '@kit.ArkUI';
 import {
   CommonUtils,
   getGroupList,
@@ -8,8 +9,7 @@ import {
   RouterMap,
   RouterModule,
   SimpleGoodInfo,
-} from 'utils'
-import { AppStorageV2 } from '@kit.ArkUI';
+} from 'foundation'
 
 @ComponentV2
 export struct GroupBuy {
@@ -60,11 +60,11 @@ export struct GroupBuy {
           if (this.userInfo.mobile) {
             Button() {
               Text('抢购')
-                .fontSize(14)
+                .fontSize($r('sys.float.Body_M'))
                 .fontWeight(500)
                 .width(56)
                 .height(20)
-                .fontColor(Color.White)
+                .fontColor($r('sys.color.font_on_primary'))
                 .textAlign(TextAlign.Center)
             }
             .padding({

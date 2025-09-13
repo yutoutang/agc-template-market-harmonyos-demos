@@ -19,6 +19,11 @@
       "name": "BookGroupDetail",
       "pageSourceFile": "src/main/ets/pages/BookGroupDetail.ets",
       "buildFunction": "BookGroupDetailBuilder"
+    },
+    {
+      "name": "EditPersonalInfo",
+      "pageSourceFile": "src/main/ets/pages/EditPersonalInfo.ets",
+      "buildFunction": "EditPersonalInfoBuilder"
     }
   ]
 }

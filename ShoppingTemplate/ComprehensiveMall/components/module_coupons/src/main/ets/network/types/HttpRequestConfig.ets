@@ -1,5 +1,9 @@
-import { AxiosRequestHeaders, AxiosResponse, InternalAxiosRequestConfig } from '@ohos/axios';
 import { BusinessError } from '@kit.BasicServicesKit';
+import {
+  AxiosRequestHeaders,
+  AxiosResponse,
+  InternalAxiosRequestConfig,
+} from '@ohos/axios';
 
 export interface HttpRequestConfig extends InternalAxiosRequestConfig {
   showLoading?: boolean;
@@ -9,8 +13,12 @@ export interface HttpRequestConfig extends InternalAxiosRequestConfig {
 }
 
 export interface InterceptorHooks {
-  requestInterceptor?: (config: HttpRequestConfig) => Promise<HttpRequestConfig>;
+  requestInterceptor?: (
+    config: HttpRequestConfig,
+  ) => Promise<HttpRequestConfig>;
   requestInterceptorCatch?: (error: BusinessError) => BusinessError;
-  responseInterceptor?: (response: AxiosResponse) => AxiosResponse | Promise<AxiosResponse>;
+  responseInterceptor?: (
+    response: AxiosResponse,
+  ) => AxiosResponse | Promise<AxiosResponse>;
   responseInterceptorCatch?: (error: BusinessError) => Promise<BusinessError>;
 }

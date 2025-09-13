@@ -1,13 +1,16 @@
 import window from '@ohos.window';
-import { CommonUrl, Constants, ImageRouter } from 'common/Index';
+import { CommonUrl, Constants, ImageRouter, RouterMap, RouterModule } from 'common/Index';
 
+@Builder
+export function PreviewImagePageBuilder() {
+  PreviewImagePage()
+}
 
-@Component
-export struct PreviewImagePage {
-  @Consume('pageStack') pageStack: NavPathStack
-  @State imageSrc: string = ''
-  @State screenWidth: number = 0;
-  @State op: number = 0
+@ComponentV2
+struct PreviewImagePage {
+  @Local imageSrc: string = ''
+  @Local screenWidth: number = 0;
+  @Local op: number = 0
 
   aboutToAppear() {
     this.getParams()
@@ -18,15 +21,14 @@ export struct PreviewImagePage {
   }
 
   getParams() {
-    let paramsArr: ImageRouter[] = this.pageStack.getParamByName('PreviewImagePage') as ImageRouter[]
-    if (paramsArr.length) {
-      let routerParam = paramsArr[paramsArr.length-1]
-      this.imageSrc = routerParam?.imageSrc ?? ''
+    let params = RouterModule.getNavParam<ImageRouter>(RouterMap.PREVIEW_IMAGE_PAGE)
+    if (params) {
+      this.imageSrc = params.imageSrc ?? ''
     }
   }
 
   closeDialog() {
-    this.pageStack.pop()
+    RouterModule.pop()
   }
 
   build() {
@@ -37,7 +39,7 @@ export struct PreviewImagePage {
           viewWidth: this.screenWidth,
           closeDialog: () => {
             this.closeDialog()
-          }
+          },
         })
       }
       .width(Constants.FULL_SIZE)
@@ -45,23 +47,24 @@ export struct PreviewImagePage {
       .justifyContent(FlexAlign.Center)
       .backgroundColor(`#66000000`)
     }.hideTitleBar(true)
+    .systemTransition(NavigationSystemTransitionType.EXPLODE)
     .mode(NavDestinationMode.DIALOG)
 
   }
 }
 
 // 进场过程中会逐帧触发onEnter回调，入参为动效的归一化进度(0% -- 100
-@Component
+@ComponentV2
 struct ImageComponent {
-  private image: string = ''
+  @Param image: string = ''
+  @Param viewWidth: number = 0
+  @Local geometryScale: number = 1
+  @Local geometryOffsetX: number = 0
+  @Local geometryOffsetY: number = 0
+  @Local imageWidth: number = 0
+  @Local imageHeight: number = 0
   private preGeometryScale: number = 1
-  @State geometryScale: number = 1
-  @State geometryOffsetX: number = 0
-  @State geometryOffsetY: number = 0
-  @State imageWidth: number = 0
-  @State imageHeight: number = 0
-  @Prop viewWidth: number = 0
-  private closeDialog = () => {
+  @Event closeDialog: () => void = () => {
   }
 
   reset(): Promise<void> {
@@ -90,11 +93,11 @@ struct ImageComponent {
         .height(this.imageHeight + 'px')
         .scale({
           x: this.geometryScale,
-          y: this.geometryScale
+          y: this.geometryScale,
         })
         .offset({
           x: this.geometryOffsetX,
-          y: this.geometryOffsetY
+          y: this.geometryOffsetY,
         })
         .focusable(true)
         .objectFit(ImageFit.Cover)
@@ -129,8 +132,8 @@ struct ImageComponent {
             if (event) {
               this.closeDialog()
             }
-          })
-      )
+          }),
+      ),
     )
   }
 }

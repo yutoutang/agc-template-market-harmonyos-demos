@@ -1,33 +1,36 @@
-import { Constants, CouponCard, CouponStateEnum, getMyCouponsUtil, MyCouponResp, NavHeaderBar } from 'common/Index';
+import { CouponCard, CouponItem } from 'base_ui';
+import { Constants, HomePageRouter, NavHeaderBar, RouterModule, TabBarType, WindowModel } from 'common/Index';
+import * as API from '../api/Index';
+import { AppStorageV2 } from '@kit.ArkUI';
 
-@Component
-export struct MyCouponsPage {
-  @Consume('pageStack') pageStack: NavPathStack
-  @State windowBottomHeight: number = AppStorage.get('windowBottomHeight') as number || 28
-  @State currentIndex: number = 0
-  @State myCouponsAll: Array<MyCouponResp> = []
-  @State myCouponsUsable: Array<MyCouponResp> = []
-  @State myCouponsExpired: Array<MyCouponResp> = []
-  @State myCouponsUsed: Array<MyCouponResp> = []
+@Builder
+export function MyCouponsPageBuilder() {
+  MyCouponsPage()
+}
+
+@ComponentV2
+struct MyCouponsPage {
+  @Local windowModel: WindowModel = AppStorageV2.connect(WindowModel, () => new WindowModel())!
+  @Local currentIndex: number = 0
+  @Local myCouponsAll: CouponItem[] = []
+  @Local myCouponsUsable: CouponItem[] = []
+  @Local myCouponsExpired: CouponItem[] = []
+  @Local myCouponsUsed: CouponItem[] = []
 
   aboutToAppear() {
     this.getMyCoupon()
   }
 
   getMyCoupon() {
-    getMyCouponsUtil().then((res) => {
-      res.forEach(item => {
-        // 过滤可使用的优惠券 1.类型为优惠券 2.适用范围店内、外卖和店内  3.满减金额小于订单金额 4.日期在有效期内
-        if (item.type === Constants.COUPON &&
-        [Constants.COUPON_TYPE_STORE, Constants.COUPON_TYPE_ALL].includes(item.couponType)) {
-          this.myCouponsAll.push(item)
-          if (item.state === CouponStateEnum.USED) {
-            this.myCouponsUsed.push(item)
-          } else if (new Date(`${item.endTime} 23:59:59`).getTime() > new Date().getTime()) {
-            this.myCouponsUsable.push(item)
-          } else {
-            this.myCouponsExpired.push(item)
-          }
+    API.getMyCoupons().then((res) => {
+      res.forEach((item: CouponItem) => {
+        this.myCouponsAll.push(item)
+        if (item.offsetInfo) {
+          this.myCouponsUsed.push(item)
+        } else if (new Date(`${item.endTime} 23:59:59`).getTime() > new Date().getTime()) {
+          this.myCouponsUsable.push(item)
+        } else {
+          this.myCouponsExpired.push(item)
         }
       })
     })
@@ -74,41 +77,49 @@ export struct MyCouponsPage {
         Tabs({ index: this.currentIndex }) {
           TabContent() {
             List({ space: 8 }) {
-              ForEach(this.myCouponsAll, (item: MyCouponResp) => {
+              ForEach(this.myCouponsAll, (item: CouponItem) => {
                 ListItem() {
-                  CouponCard({ coupon: item })
+                  CouponCard({
+                    coupon: item, useNow: () => {
+                      RouterModule.pop({ index: TabBarType.HOMEPAGE } as HomePageRouter)
+                    },
+                  })
                 }
-              }, (item: MyCouponResp) => JSON.stringify(item))
+              }, (item: CouponItem) => JSON.stringify(item))
             }.listStyle().scrollBar(BarState.Off)
           }.tabBar(this.tabBuilder(0, $r('app.string.all')))
 
           TabContent() {
             List({ space: 8 }) {
-              ForEach(this.myCouponsUsable, (item: MyCouponResp) => {
+              ForEach(this.myCouponsUsable, (item: CouponItem) => {
                 ListItem() {
-                  CouponCard({ coupon: item })
+                  CouponCard({
+                    coupon: item, useNow: () => {
+                      RouterModule.pop({ index: TabBarType.HOMEPAGE } as HomePageRouter)
+                    },
+                  })
                 }
-              }, (item: MyCouponResp) => JSON.stringify(item))
+              }, (item: CouponItem) => JSON.stringify(item))
             }.listStyle().scrollBar(BarState.Off)
           }.tabBar(this.tabBuilder(1, $r('app.string.available')))
 
           TabContent() {
             List({ space: 8 }) {
-              ForEach(this.myCouponsExpired, (item: MyCouponResp) => {
+              ForEach(this.myCouponsExpired, (item: CouponItem) => {
                 ListItem() {
                   CouponCard({ coupon: item })
                 }
-              }, (item: MyCouponResp) => JSON.stringify(item))
+              }, (item: CouponItem) => JSON.stringify(item))
             }.listStyle().scrollBar(BarState.Off)
           }.tabBar(this.tabBuilder(2, $r('app.string.expired')))
 
           TabContent() {
             List({ space: 8 }) {
-              ForEach(this.myCouponsUsed, (item: MyCouponResp) => {
+              ForEach(this.myCouponsUsed, (item: CouponItem) => {
                 ListItem() {
                   CouponCard({ coupon: item })
                 }
-              }, (item: MyCouponResp) => JSON.stringify(item))
+              }, (item: CouponItem) => JSON.stringify(item))
             }.listStyle().scrollBar(BarState.Off)
           }.tabBar(this.tabBuilder(3, $r('app.string.coupon_used')))
         }
@@ -126,7 +137,7 @@ export struct MyCouponsPage {
       .scrollBar(BarState.Off)
       .align(Alignment.Top)
       .backgroundColor('#F2F1F3F5')
-      .margin({ bottom: this.windowBottomHeight })
+      .margin({ bottom: this.windowModel.getWindowBottomHeight() })
     }.hideTitleBar(true)
   }
 }

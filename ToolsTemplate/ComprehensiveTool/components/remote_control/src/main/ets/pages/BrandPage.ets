@@ -36,9 +36,9 @@ export struct BrandPage {
       Row() {
         Row({ space: 8 }) {
           Image($r('app.media.ic_white_left'))
-            .size({ height: 40, width: 40 }).onClick(()=> {
-              getInstance().pop()
-          })
+            .size({ height: 40, width: 40 }).onClick(() => {
+            getInstance().pop();
+          });
 
           Text('选择品牌')
             .fontSize(20)
@@ -57,6 +57,7 @@ export struct BrandPage {
         left: 12,
         right: 12,
       });
+
       Column() {
         Row() {
           Search({
@@ -144,8 +145,11 @@ export struct BrandPage {
               this.scroller.scrollToIndex(this.vm.brandList.findIndex((item) => this.vm.alphabetArr[index] ===
               item.firstName));
             });
-        }.backgroundColor($r('sys.color.background_primary'))
-      }.height('100%').backgroundColor($r('sys.color.background_emphasize'))
-    }.hideTitleBar(true).backgroundColor($r('sys.color.background_emphasize'))
+        }
+        .backgroundColor($r('sys.color.background_primary'))
+        .layoutWeight(1)
+        .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM]);
+      }.layoutWeight(1).expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM]);
+    }.hideTitleBar(true).backgroundColor($r('sys.color.background_emphasize'));
   }
 }

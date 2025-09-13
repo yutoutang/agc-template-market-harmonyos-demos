@@ -1,3 +1,4 @@
+import { AppStorageV2 } from '@kit.ArkUI';
 import {
   CommonUtils,
   UIEmpty,
@@ -6,9 +7,8 @@ import {
   IMySingleCardInfo,
   IUseRecord,
   PopViewUtils,
-} from 'utils';
+} from 'foundation';
 import { DialogQRCodeBuilder, QRCodeParams } from '../components/DialogQRCode';
-import { AppStorageV2 } from '@kit.ArkUI';
 
 @Builder
 export function SingleCardVisitListBuilder() {

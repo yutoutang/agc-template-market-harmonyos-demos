@@ -21,17 +21,21 @@
 
 - DevEco Studio版本：DevEco Studio 5.0.4 Release及以上
 - HarmonyOS SDK版本：HarmonyOS 5.0.4 Release SDK及以上
-- 设备类型：华为手机（直板机）
-- HarmonyOS版本：HarmonyOS 5.0.4 Release及以上
+- 设备类型：华为手机（包括双折叠和阔折叠）
+- 系统版本：HarmonyOS 5.0.4(16)及以上
 
 ### 权限
 
 - 网络权限：ohos.permission.INTERNET
 
+### 调试
+
+本组件不支持使用模拟器调试，请使用真机进行调试
+
 ## 快速入门
 
 1. 安装组件。  
-   如果是在DevEvo Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
+   如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
    如果是从生态市场下载组件，请参考以下步骤安装组件。  
    a. 解压下载的组件包，将包中所有文件夹拷贝至您工程根目录的xxx目录下。  
    b. 在项目根目录build-profile.json5并添加aggregated_payment模块。
@@ -48,20 +52,20 @@
    ```typescript
    // xxx为组件存放的目录名称
    "dependencies": {
-     "aggregated_payment": "file:../xxx/aggregated_payment"
+     "aggregated_payment": "file:./xxx/aggregated_payment"
    }
    ```
    
 2. [配置签名和指纹](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-sign-fingerprints)。
 
-3. 完成华为支付服务器侧预下单开发，配置[ChannelInfo](#ChannelInfo对象说明)中华为支付的preOrderInfo字段为预下单orderStr，详情参考[商户基础支付场景](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/payment-payment-process#section126982401468)
+3. 完成华为支付服务器侧预下单开发，配置ChannelInfo中华为支付的preOrderInfo字段为预下单orderStr，详情参考[商户基础支付场景](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/payment-payment-process#section126982401468)
 
    ```typescript
    // 预下单orderStr示例
    hwOrderStr: string = '{"app_id":"***","merc_no":"***","prepay_id":"xxx","timestamp":"1680259863114","noncestr":"1487b8a60ed9f9ecc0ba759fbec23f4f","sign":"****","auth_id":"***"}';
    ```
    
-4. 完成微信支付相关的商户权限申请及微信权限开通，并完成App下单相关服务器开发，配置[WxExtraInfo](#WxExtraInfo对象说明)中的相关字段为支付参数，详情请参考[微信App支付](https://pay.weixin.qq.com/doc/v3/merchant/4013070158)
+4. 完成微信支付相关的商户权限申请及微信权限开通，并完成App下单相关服务器开发，配置WxExtraInfo中的相关字段为支付参数，详情请参考[微信App支付](https://pay.weixin.qq.com/doc/v3/merchant/4013070158)
    ```typescript
    // WxExtraInfo对象示例
     {
@@ -191,7 +195,7 @@ struct Index {
                center: { anchor: '__container__', align: VerticalAlign.Center },
                middle: { anchor: '__container__', align: HorizontalAlign.Center },
             })
-            .bindSheet($$this.isShow, this.paymentChannelSheet(), { showClose: false, height: '30%' })
+            .bindSheet($$this.isShow, this.paymentChannelSheet(), { showClose: false, height: 250 })
             .onClick(() => {
                this.isShow = true;
             })

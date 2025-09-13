@@ -51,9 +51,7 @@ export { CommentResponse } from './src/main/ets/params/response/CommentResponse'
 // 动态布局响应模型
 export {
   RequestListData,
-  LayoutSetting,
   LayoutStyle,
-  LayoutParams,
 } from './src/main/ets/params/response/LayoutResponse'
 
 // 编排新闻评论

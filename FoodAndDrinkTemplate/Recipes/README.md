@@ -3,13 +3,29 @@
 ## 目录
 
 - [功能介绍](#功能介绍)
-- [组件](#组件)
 - [约束与限制](#约束与限制)
 - [快速入门](#快速入门)
 - [示例效果](#示例效果)
 - [开源许可协议](#开源许可协议)
 
 ## 功能介绍
+
+您可以基于此模板直接定制应用，也可以挑选此模板中提供的多种组件使用，从而降低您的开发难度，提高您的开发效率。
+
+此模板提供如下组件，所有组件存放在工程根目录的components下，如果您仅需使用组件，可参考对应组件的指导链接；如果您使用此模板，请参考本文档。
+
+| 组件                          | 描述                | 使用指导                                             |
+|-----------------------------|-------------------|--------------------------------------------------|
+| 广告组件（aggregated_ads）        | 展示开屏广告            | [使用指导](components/aggregated_ads/README.md)      |
+| 登录组件（aggregated_login）      | 支持华为一键登录和微信登录     | [使用指导](components/aggregated_login/README.md)    |
+| 支付组件（aggregated_payment）    | 支持华为支付，微信支付，支付宝支付 | [使用指导](components/aggregated_payment/README.md)  |
+| 热量计算组件（calorie_calculation） | 提供了统计饮食计划的卡路里     | [使用指导](components/calorie_calculation/README.md) |
+| 菜谱瀑布流组件（featured_recipes）   | 提供了展示菜谱列表瀑布流      | [使用指导](components/featured_recipes/README.md)    |
+| 搜索组件（home_search）           | 本组件提供了菜谱搜索的相关功能   | [使用指导](components/home_search/README.md)         |
+| 分类列表组件（link_category）       | 提供了按分类展示菜谱列表      | [使用指导](components/link_category/README.md)       |
+| 个人中心组件（personal_homepage）   | 提供了个人中心页面展示       | [使用指导](components/personal_homepage/README.md)   |
+| 菜篮子组件（shopping_basket）      | 本组件提供了菜篮子相关功能     | [使用指导](components/shopping_basket/README.md)     |
+| 上传菜谱组件（upload_recipe）       | 提供了上传菜谱的功能        | [使用指导](components/upload_recipe/README.md)       |
 
 本模板为美食菜谱类应用提供了常用功能的开发样例，模板主要分首页、分类、热量计算和我的四大模块：
 
@@ -21,7 +37,7 @@
 本模板已集成华为账号服务，只需做少量配置和定制即可快速实现华为账号的登录等功能。
 
 | 首页                                                                | 分类                                                                    | 热量计算                                                                   | 我的                                                                |
-|-------------------------------------------------------------------|-----------------------------------------------------------------------|----------------------------------------------------------------------|-------------------------------------------------------------------|
+|-------------------------------------------------------------------|-----------------------------------------------------------------------|------------------------------------------------------------------------|-------------------------------------------------------------------|
 | <img src="screenshots/Screenshot_home.jpeg" alt="首页" width="300"> | <img src="screenshots/Screenshot_category.jpeg" alt="分类" width="300"> | <img src="screenshots/Screenshot_calorie.jpeg" alt="热量计算" width="300"> | <img src="screenshots/Screenshot_mine.jpeg" alt="我的" width="300"> |
 
 本模板主要页面及核心功能清单如下所示：
@@ -336,31 +352,14 @@ Recipes
      └─resources
 ```
 
-## 组件
-
-本模板中提供了多种组件，您可以按需选择合适的组件进行使用，所有组件存放在工程根目录的components下。
-
-| 组件                          | 描述                | 使用指导                                             |
-|-----------------------------|-------------------|--------------------------------------------------|
-| 广告组件（aggregated_ads）        | 展示开屏广告            | [使用指导](components/aggregated_ads/README.md)      |
-| 登录组件（aggregated_login）      | 支持华为一键登录和微信登录     | [使用指导](components/aggregated_login/README.md)    |
-| 支付组件（aggregated_payment）    | 支持华为支付，微信支付，支付宝支付 | [使用指导](components/aggregated_payment/README.md)  |
-| 热量计算组件（calorie_calculation） | 提供了统计饮食计划的卡路里     | [使用指导](components/calorie_calculation/README.md) |
-| 菜谱瀑布流组件（featured_recipes）   | 提供了展示菜谱列表瀑布流      | [使用指导](components/featured_recipes/README.md)    |
-| 搜索组件（home_search）           | 本组件提供了菜谱搜索的相关功能   | [使用指导](components/home_search/README.md)         |
-| 分类列表组件（link_category）       | 提供了按分类展示菜谱列表      | [使用指导](components/link_category/README.md)       |
-| 个人中心组件（personal_homepage）   | 提供了个人中心页面展示       | [使用指导](components/personal_homepage/README.md)   |
-| 菜篮子组件（shopping_basket）      | 本组件提供了菜篮子相关功能     | [使用指导](components/shopping_basket/README.md)     |
-| 上传菜谱组件（upload_recipe）       | 提供了上传菜谱的功能        | [使用指导](components/upload_recipe/README.md)       |
-
 ## 约束与限制
 
 ### 环境
 
 * DevEco Studio版本：DevEco Studio 5.0.4 Release及以上
 * HarmonyOS SDK版本：HarmonyOS 5.0.4 Release SDK及以上
-* 设备类型：华为手机（直板机）
-* HarmonyOS版本：HarmonyOS 5.0.4 Release及以上
+* 设备类型：华为手机（包括双折叠和阔折叠）
+* 系统版本：HarmonyOS 5.0.4(16)及以上
 
 ### 权限要求
 

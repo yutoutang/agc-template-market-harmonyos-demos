@@ -13,6 +13,18 @@
 
 <img src="./screenshot/exchange.png" width="300" >
 
+本组件工程代码结构如下所示：
+```ts
+exchange_calculator/src/main/ets                  // 汇率计算器(har)
+  |- apis                                         // 公共路由
+  |- common                                       // 公共路由
+  |- constants                                    // 模块常量     
+  |- mocks                                        // mock数据 
+  |- model                                        // 模型定义  
+  |- pages                                        // 页面
+  |- viewmodel                                    // 与页面一一对应的vm层 
+```
+
 ## 约束与限制
 
 ### 环境
@@ -29,7 +41,7 @@
 ## 快速入门
 1. 安装组件。
 
-   如果是在DevEvo Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
+   如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
 
    如果是从生态市场下载组件，请参考以下步骤安装组件。
 

@@ -39,24 +39,31 @@ export class PopViewUtil {
     }
 
     if (PopViewUtil._dialogNodes.length) {
-      const latest = PopViewUtil._dialogNodes[PopViewUtil._dialogNodes.length - 1];
+      const latest =
+        PopViewUtil._dialogNodes[PopViewUtil._dialogNodes.length - 1];
       try {
         if (!options.onWillDismiss) {
           options.onWillDismiss = () => {
             PopViewUtil.closeDialog();
           };
         }
-        await PopViewUtil._ctx.getPromptAction().openCustomDialog(latest, options);
+        await PopViewUtil._ctx
+          .getPromptAction()
+          .openCustomDialog(latest, options);
         Logger.info(TAG, 'open custom dialog complete.');
       } catch (err) {
-        Logger.error(TAG, `open custom dialog failed. error: ${JSON.stringify(err)}`);
+        Logger.error(
+          TAG,
+          `open custom dialog failed. error: ${JSON.stringify(err)}`,
+        );
       }
     }
   }
 
   public static closeDialog() {
     if (PopViewUtil._dialogNodes.length) {
-      const latest = PopViewUtil._dialogNodes[PopViewUtil._dialogNodes.length - 1];
+      const latest =
+        PopViewUtil._dialogNodes[PopViewUtil._dialogNodes.length - 1];
       PopViewUtil._ctx
         .getPromptAction()
         .closeCustomDialog(latest)
@@ -65,7 +72,10 @@ export class PopViewUtil {
           PopViewUtil._dialogNodes.pop();
         })
         .catch((error: BusinessError) => {
-          Logger.error(TAG, `close custom dialog failed. error: ${JSON.stringify(error)}`);
+          Logger.error(
+            TAG,
+            `close custom dialog failed. error: ${JSON.stringify(error)}`,
+          );
         });
     }
   }
@@ -77,7 +87,10 @@ export class PopViewUtil {
           await PopViewUtil._ctx.getPromptAction().closeCustomDialog(item);
           Logger.info(TAG, 'close sheet complete.');
         } catch (err) {
-          Logger.error(TAG, `close sheet failed. error: ${JSON.stringify(err)}`);
+          Logger.error(
+            TAG,
+            `close sheet failed. error: ${JSON.stringify(err)}`,
+          );
         }
       });
       PopViewUtil._dialogNodes = [];

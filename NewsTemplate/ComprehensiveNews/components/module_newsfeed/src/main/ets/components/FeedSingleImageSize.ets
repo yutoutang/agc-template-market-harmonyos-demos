@@ -46,7 +46,7 @@ export struct FeedSingleImageSize {
             Text(`+ ${this.truncatedCount}`)
               .fontSize(18)
               .fontWeight(FontWeight.Bold)
-              .fontColor($r('sys.color.font_primary'))
+              .fontColor($r('sys.color.font_on_primary'))
           }
           .margin({ right: 8, bottom: 8 })
           .visibility(this.getImageRestPosition ? Visibility.Visible : Visibility.None)

@@ -9,7 +9,8 @@ export interface AttractionListItem {
   latitude: number,
   longitude: number,
   audio: string,
-  location: string
+  location: string,
+  introduction: string
 }
 
 export interface AttractionList extends Array<AttractionListItem> {}

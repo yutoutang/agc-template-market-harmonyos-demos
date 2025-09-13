@@ -1,0 +1,324 @@
+{
+  "string": [
+    {
+      "name": "page_show",
+      "value": "page from package"
+    },
+    {
+      "name": "common_services",
+      "value": "常用服务"
+    },
+    {
+      "name": "mine",
+      "value": "我的"
+    },
+    {
+      "name": "click_login",
+      "value": "点击登录"
+    },
+    {
+      "name": "personal_info",
+      "value": "个人信息"
+    },
+    {
+      "name": "avatar",
+      "value": "头像"
+    },
+    {
+      "name": "nick_name",
+      "value": "昵称"
+    },
+    {
+      "name": "set_nick_name",
+      "value": "设置昵称"
+    },
+    {
+      "name": "phone_number",
+      "value": "手机号"
+    },
+    {
+      "name": "use_Huawei_account_profile_picture",
+      "value": "使用华为账号头像"
+    },
+    {
+      "name": "select_from_gallery",
+      "value": "从图库选择"
+    },
+    {
+      "name": "photograph",
+      "value": "拍照"
+    },
+    {
+      "name": "avatar_modified_successfully",
+      "value": "头像修改成功"
+    },
+    {
+      "name": "nick_name_modified_successfully",
+      "value": "昵称修改成功"
+    },
+    {
+      "name": "you_have_not_filled_in",
+      "value": "您还未填写"
+    },
+    {
+      "name": "nick_name_cannot_exceed_12_characters",
+      "value": "昵称禁止超过12位"
+    },
+    {
+      "name": "order_empty",
+      "value": "订单空空如也~~去精品课程逛逛吧！"
+    },
+    {
+      "name": "copy_fail",
+      "value": "复制失败"
+    },
+    {
+      "name": "copy_success",
+      "value": "复制成功"
+    },
+    {
+      "name": "wait_pay",
+      "value": "待支付"
+    },
+    {
+      "name": "pay_success",
+      "value": "已支付"
+    },
+    {
+      "name": "cancelled",
+      "value": "已取消"
+    },
+    {
+      "name": "cancel_order",
+      "value": "取消订单"
+    },
+    {
+      "name": "delete_order",
+      "value": "删除订单"
+    },
+    {
+      "name": "immediate_payment",
+      "value": "立即支付"
+    },
+    {
+      "name": "learn_now",
+      "value": "立即学习"
+    },
+    {
+      "name": "reorder_again",
+      "value": "重新下单"
+    },
+    {
+      "name": "my_course",
+      "value": "我的课程"
+    },
+    {
+      "name": "my_collection",
+      "value": "我的收藏"
+    },
+    {
+      "name": "my_course_history",
+      "value": "观看记录"
+    },
+    {
+      "name": "my_course_comments",
+      "value": "我的评论"
+    },
+    {
+      "name": "course",
+      "value": "课程"
+    },
+    {
+      "name": "topic",
+      "value": "题目"
+    },
+    {
+      "name": "topic_source",
+      "value": "题目来源："
+    },
+    {
+      "name": "collection_no_data",
+      "value": "当前暂无收藏记录。"
+    },
+    {
+      "name": "my_download",
+      "value": "我的下载"
+    },
+    {
+      "name": "material_source",
+      "value": "资料来源："
+    },
+    {
+      "name": "download_no_data",
+      "value": "当前暂无下载记录。"
+    },
+    {
+      "name": "my_wrong_question",
+      "value": "我的错题"
+    },
+    {
+      "name": "wrong_question_no_data",
+      "value": "当前暂无错题记录。"
+    },
+    {
+      "name": "my_order",
+      "value": "我的订单"
+    },
+    {
+      "name": "message_notice",
+      "value": "消息通知"
+    },
+    {
+      "name": "no_unreadMessageCount",
+      "value": "暂无未读消息"
+    },
+    {
+      "name": "operation_successful",
+      "value": "操作成功"
+    },
+    {
+      "name": "system_message",
+      "value": "系统消息"
+    },
+    {
+      "name": "course_update",
+      "value": "课程动态"
+    },
+    {
+      "name": "text_expand",
+      "value": "...全文"
+    },
+    {
+      "name": "text_retract",
+      "value": "...收起"
+    },
+    {
+      "name": "watch_history",
+      "value": "观看记录"
+    },
+    {
+      "name": "my_comment",
+      "value": "我的评论"
+    },
+    {
+      "name": "opinion_and_feedback",
+      "value": "意见与反馈"
+    },
+    {
+      "name": "feedback_records",
+      "value": "反馈记录"
+    },
+    {
+      "name": "problem_desc",
+      "value": "问题描述"
+    },
+    {
+      "name": "feedback_no_data",
+      "value": "当前暂无反馈记录。"
+    },
+    {
+      "name": "setting",
+      "value": "设置"
+    },
+    {
+      "name": "privacy_setting",
+      "value": "隐私设置"
+    },
+    {
+      "name": "video_backend",
+      "value": "切后台自动小窗播放"
+    },
+    {
+      "name": "video_play_Speed",
+      "value": "视频播放速度"
+    },
+    {
+      "name": "video_clarity",
+      "value": "视频默认清晰度"
+    },
+    {
+      "name": "clear_cache",
+      "value": "清除缓存"
+    },
+    {
+      "name": "version_detection",
+      "value": "版本检测"
+    },
+    {
+      "name": "about_us",
+      "value": "关于我们"
+    },
+    {
+      "name": "log_out",
+      "value": "退出登录"
+    },
+    {
+      "name": "privacy_set",
+      "value": "隐私设置"
+    },
+    {
+      "name": "personalized_recommendations",
+      "value": "个性化推荐"
+    },
+    {
+      "name": "personalized_content",
+      "value": "向我推荐审核我的个性化内容"
+    },
+    {
+      "name": "user_agreement",
+      "value": "用户协议"
+    },
+    {
+      "name": "privacy_policy",
+      "value": "隐私政策"
+    },
+    {
+      "name": "third_party_information_sharing",
+      "value": "第三方信息共享清单"
+    },
+    {
+      "name": "personal_information_collection_checklist",
+      "value": "个人信息收集清单"
+    },
+    {
+      "name": "later_update",
+      "value": "以后再说"
+    },
+    {
+      "name": "immediate_update",
+      "value": "立即更新"
+    },
+    {
+      "name": "already_latest_version",
+      "value": "已是最新版本"
+    },
+    {
+      "name": "new_version",
+      "value": "发现新版本"
+    },
+    {
+      "name": "about",
+      "value": "关于"
+    },
+    {
+      "name": "cancel",
+      "value": "取消"
+    },
+    {
+      "name": "play_call",
+      "value": "呼叫"
+    },
+    {
+      "name": "edit",
+      "value": "编辑"
+    },
+    {
+      "name": "course_no_data",
+      "value": "当前暂无课程。"
+    },
+    {
+      "name": "order_detail",
+      "value": "订单详情"
+    }
+  ]
+}

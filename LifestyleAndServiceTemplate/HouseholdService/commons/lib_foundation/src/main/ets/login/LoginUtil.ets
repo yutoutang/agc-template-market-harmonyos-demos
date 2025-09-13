@@ -17,12 +17,11 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { util } from '@kit.ArkTS';
 import { promptAction } from '@kit.ArkUI';
 import { Logger } from 'module_base';
-import {
-  getUserInfo,
-  loginWithHuaweiID,
-} from '../http/ApiManage';
+import { getUserInfo, loginWithHuaweiID, } from '../http/ApiManage';
 import { AppStorageMap } from '../common/Constant';
 import { AppStorageBank } from '../model/ObserveModel';
+
+const TAG = '[LoginUtil]';
 
 /**
  * 登录工具类
@@ -39,7 +38,7 @@ export class LoginUtil {
       return controller.executeRequest(loginRequest).then(async (data) => {
         const loginWithHuaweiIDResponse = data as authentication.LoginWithHuaweiIDResponse;
         const loginWithHuaweiIDCredential = loginWithHuaweiIDResponse.data;
-        Logger.info(`loginResponse=${JSON.stringify(loginWithHuaweiIDCredential)}`);
+        Logger.info(TAG, `loginResponse=${JSON.stringify(loginWithHuaweiIDCredential)}`);
 
         const resp = await loginWithHuaweiID({
           clientId: 'xxx',
@@ -48,18 +47,15 @@ export class LoginUtil {
           openId: loginWithHuaweiIDCredential?.openID || '',
           unionId: loginWithHuaweiIDCredential?.unionID || '',
         });
-        Logger.info('loginWithHuaweiID success, token:' + resp.token);
+        Logger.info(TAG, 'loginWithHuaweiID success, token:' + resp.token);
         AppStorage.setOrCreate(AppStorageMap.TOKEN, resp.token);
         await LoginUtil.queryUserInfo();
         return true;
-      }).catch((error: BusinessError) => {
-        Logger.error('LoginWithHuaweiID executeRequest error: ' + JSON.stringify(error));
-        if (error?.code === authentication.AuthenticationErrorCode.ACCOUNT_NOT_LOGGED_IN) {
-          promptAction.showToast({ message: $r('app.string.need_login_in_setting') });
-        } else {
-          promptAction.showToast({ message: $r('app.string.login_in_error') });
-        }
-        return false;
+      }).catch(async (error: BusinessError) => {
+        Logger.error(TAG, 'LoginWithHuaweiID executeRequest error: ' + JSON.stringify(error));
+        // 为了不阻塞模板体验，不做失败拦截
+        await LoginUtil.queryUserInfo();
+        return true;
       });
     } catch (e) {
       promptAction.showToast({ message: $r('app.string.login_in_error') });
@@ -80,14 +76,14 @@ export class LoginUtil {
         const cancelAuthorizationResponse = data as authentication.CancelAuthorizationResponse;
         const state: string = cancelAuthorizationResponse.state!;
         if (cancelRequest.state !== state) {
-          Logger.error('Failed to cancel. The state is different');
+          Logger.error(TAG, 'Failed to cancel. The state is different');
           return;
         }
       }).catch((err: BusinessError) => {
-        Logger.error(`Failed to cancel. errCode is ${err.code}, errMessage is ${err.message}`);
+        Logger.error(TAG, `Failed to cancel. errCode is ${err.code}, errMessage is ${err.message}`);
       })
     } catch (err) {
-      Logger.error(`Failed to cancel. errCode is ${err.code}, errMessage is ${err.message}`);
+      Logger.error(TAG, `Failed to cancel. errCode is ${err.code}, errMessage is ${err.message}`);
     }
   }
 
@@ -99,7 +95,7 @@ export class LoginUtil {
       const userInfo = await getUserInfo();
       AppStorageBank.updateUserInfo(userInfo);
     } catch (e) {
-      Logger.error('queryUserInfo error:' + JSON.stringify(e));
+      Logger.error(TAG, 'queryUserInfo error:' + JSON.stringify(e));
     }
   }
 }

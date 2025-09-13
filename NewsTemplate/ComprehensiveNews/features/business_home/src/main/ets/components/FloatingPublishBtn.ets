@@ -44,6 +44,12 @@ export struct FloatingPublishBtn {
         let windowProperties = windowClass.getWindowProperties()
         this.winWidth = px2vp(windowProperties.windowRect.width)
         this.winHeight = px2vp(windowProperties.windowRect.height)
+        if ([BreakpointNameEnum.LG, BreakpointNameEnum.XL].includes(this.breakpointModel.currentBreakpoint)) {
+          // 要减去左边tab栏的宽度
+          this.positionX = this.winWidth - this.imageSize - this.breakpointModel.pagePadding - 120
+          this.positionY = this.winHeight * 0.8
+          return
+        }
         this.positionX = this.winWidth - this.imageSize - this.breakpointModel.pagePadding
         this.positionY = this.winHeight * 0.8
       }
@@ -100,6 +106,10 @@ export struct FloatingPublishBtn {
             duration: 200,
             curve: Curve.EaseOut,
           }, () => {
+            if ([BreakpointNameEnum.LG, BreakpointNameEnum.XL].includes(this.breakpointModel.currentBreakpoint)) {
+              this.positionX = this.winWidth - this.imageSize - this.breakpointModel.pagePadding- 120
+              return
+            }
             this.positionX = this.winWidth - this.imageSize - this.breakpointModel.pagePadding
           })
         }

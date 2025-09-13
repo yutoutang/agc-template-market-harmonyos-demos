@@ -1,12 +1,12 @@
 {
   "app": {
-    "signingConfigs": [
-    ],
+    "signingConfigs": [],
     "products": [
       {
         "name": "default",
         "signingConfig": "default",
-        "compatibleSdkVersion": "5.0.0(12)",
+        "targetSdkVersion": "5.0.3(15)",
+        "compatibleSdkVersion": "5.0.3(15)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
           "strictMode": {
@@ -18,7 +18,7 @@
     ],
     "buildModeSet": [
       {
-        "name": "debug",
+        "name": "debug"
       },
       {
         "name": "release"
@@ -39,52 +39,12 @@
       ]
     },
     {
-      "name": "home",
-      "srcPath": "./features/tabs/home",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
-    },
-    {
-      "name": "mall",
-      "srcPath": "./features/functions/mall",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
-    },
-    {
       "name": "guide",
-      "srcPath": "./features/tabs/guide",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
+      "srcPath": "./features/guide"
     },
     {
       "name": "mine",
-      "srcPath": "./features/tabs/mine",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
+      "srcPath": "./features/mine"
     },
     {
       "name": "types",
@@ -99,20 +59,8 @@
       ]
     },
     {
-      "name": "components",
-      "srcPath": "./commons/components",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
-    },
-    {
-      "name": "audio",
-      "srcPath": "./commons/kits/audio",
+      "name": "uicomponents",
+      "srcPath": "./commons/uicomponents",
       "targets": [
         {
           "name": "default",
@@ -124,51 +72,7 @@
     },
     {
       "name": "order",
-      "srcPath": "./features/tabs/order",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
-    },
-    {
-      "name": "note",
-      "srcPath": "./features/functions/note",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
-    },
-    {
-      "name": "catering",
-      "srcPath": "./features/functions/catering",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
-    },
-    {
-      "name": "route",
-      "srcPath": "./features/functions/route",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
+      "srcPath": "./features/order"
     },
     {
       "name": "network",
@@ -184,27 +88,7 @@
     },
     {
       "name": "ticket",
-      "srcPath": "./features/tabs/ticket",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
-    },
-    {
-      "name": "account",
-      "srcPath": "./commons/kits/account",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
+      "srcPath": "./features/ticket"
     },
     {
       "name": "common",
@@ -219,28 +103,40 @@
       ]
     },
     {
-      "name": "tourist",
-      "srcPath": "./features/functions/tourist",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
+      "name": "home",
+      "srcPath": "./features/home"
     },
     {
-      "name": "address",
-      "srcPath": "./features/functions/address",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
+      "name": "attraction_live",
+      "srcPath": "./components/attraction_live"
+    },
+    {
+      "name": "service_hotline",
+      "srcPath": "./components/service_hotline"
+    },
+    {
+      "name": "catering_accommodation",
+      "srcPath": "./components/catering_accommodation"
+    },
+    {
+      "name": "module_base",
+      "srcPath": "./components/module_base"
+    },
+    {
+      "name": "tourist_management",
+      "srcPath": "./components/tourist_management"
+    },
+    {
+      "name": "attraction_announcement",
+      "srcPath": "./components/attraction_announcement"
+    },
+    {
+      "name": "attraction_guide",
+      "srcPath": "./components/attraction_guide"
+    },
+    {
+      "name": "attraction_note",
+      "srcPath": "./components/attraction_note"
     }
   ]
 }

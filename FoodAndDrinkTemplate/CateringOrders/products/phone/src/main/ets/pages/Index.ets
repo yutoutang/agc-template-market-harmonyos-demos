@@ -2,67 +2,33 @@ import { authentication } from '@kit.AccountKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import {
-  BusinessTimeDialog,
   CardManager,
   Constants,
-  CouponResp,
   FormDataClass,
-  GetTableInfoResp,
-  getTableInfoUtil,
-  GetUserInfoResp,
-  HttpRequestApi,
   HuaweiIDResp,
-  HwMap,
-  Reduction,
-  StoreInfo,
-  StoreSet,
+  MyCarModel,
+  RouterMap,
+  RouterModule,
+  StoreInfoModel,
   StoreType,
-  TableTitle,
+  UserInfoModel,
 } from 'common/Index';
-import 'order/src/main/ets/pages/OrderPage';
-import { OrderPage } from 'order/src/main/ets/pages/OrderPage';
-import {
-  ConfirmOrderPage,
-  GoodDetailPage,
-  MerchantDetailPage,
-  PreviewImagePage,
-  RemarksPage,
-  SelectCouponPage,
-} from 'order';
-import { clearCarUtil, getCouponListUtil, getMyCarUtil, getStoreInfoUtil } from 'common/src/main/ets/utils/Utils';
-import { HomePage } from './HomePage';
-import { AnswerPage, FrequentQuestionPage, MyCouponsPage } from 'personal_center';
-import { OrderDetailPage } from 'order_list';
-import { MustGoodsController } from 'order/src/main/ets/models/MustGoodsController';
 import dataPreferences from '@ohos.data.preferences';
-import { promptAction } from '@kit.ArkUI';
+import { AppStorageV2, promptAction } from '@kit.ArkUI';
+import { BusinessTimeDialog } from 'base_ui';
+import * as API from '../api/Index';
+import { MustGoodsController } from 'order';
 
 @Entry
-@Component
+@ComponentV2
 struct Index {
-  @State windowTopHeight: number = AppStorage.get('windowTopHeight') as number || 38.77;
-  @StorageProp('storeId') @Watch('initQuery') storeId: string = '';
-  @StorageProp('storeType') storeType: number = 1;
-  @StorageLink('userId') userId: string = '';
-  @StorageLink('authCode') authCode: string = '';
-  @StorageLink('tableId') tableId: string = '';
-  @StorageLink('userTel') userTel: string = '';
-  @StorageLink('userName') userName: string = '';
-  @StorageLink('totalScore') totalScore: string = '';
-  @StorageLink('wallet') wallet: string = '';
-  @StorageProp('qrCodeFlag') qrCodeFlag: boolean = false;
-  @StorageLink('isRest') isRest: boolean = false;
-  @StorageProp('tableList') @Watch('initTableTitle') tableList: Array<TableTitle> = [];
-  @Provide('storeInfo') storeInfo: StoreInfo = new StoreInfo();
-  @Provide('storeSet') storeSet: StoreSet = new StoreSet();
-  @Provide('reductionList') reductionList: Array<Reduction> = [];
-  @Provide('pageStack') pageStack: NavPathStack = new NavPathStack();
-  @Provide('tableInfo') tableInfo?: GetTableInfoResp = undefined;
-  @Provide('mustGoodsCtrl') mustGoodsCtrl: MustGoodsController = new MustGoodsController();
-  @Provide('orderId') orderId?: string = undefined;
-  @Provide('couponList') couponList?: Array<CouponResp> = [];
-  @State openId: string = '';
-  @State unionId: string = '';
+  @Local storeModel: StoreInfoModel = AppStorageV2.connect(StoreInfoModel, () => new StoreInfoModel())!;
+  @Local userInfoModel: UserInfoModel = AppStorageV2.connect(UserInfoModel, () => new UserInfoModel())!;
+  @Local myCarModel: MyCarModel = AppStorageV2.connect(MyCarModel, () => new MyCarModel())!
+  @Provider('mustGoodsCtrl') mustGoodsCtrl: MustGoodsController = new MustGoodsController();
+  @Provider('orderId') orderId?: string = undefined;
+  @Local openId: string = '';
+  @Local unionId: string = '';
   businessController: CustomDialogController = new CustomDialogController({
     builder: BusinessTimeDialog(),
     width: 296,
@@ -70,78 +36,77 @@ struct Index {
   });
 
   aboutToAppear() {
-    this.loginWithHuaweiID().then(res => {
-      this.openId = res.openId;
-      this.unionId = res.unionId;
-      this.authCode = res.authCode;
-      if (this.storeId) {
-        this.initQuery();
-      } else {
-        console.info(`initQuery is from watch.`);
+    Promise.all([API.getStoreList(), this.loginWithHuaweiID()]).then(res => {
+      this.storeModel.storeList = res[0];
+      this.storeModel.storeId = res[0][0].id;
+      this.openId = res[1].openId;
+      this.unionId = res[1].unionId;
+      this.userInfoModel.authCode = res[1].authCode;
+      if (this.storeModel.preloadFinished) {
+        this.initQuery()
       }
     });
   }
 
-  initQuery() {
-    // 查询用户信息
-    this.getUserInfo(this.openId, this.unionId).then((resp) => {
-      this.userId = resp.id;
-      this.wallet = resp.wallet;
-      this.totalScore = resp.totalScore;
-      this.userTel = resp.userTel ?? '';
-      this.userName = resp.name;
-      if (this.qrCodeFlag) {
-        clearCarUtil();
-      } else {
-        getMyCarUtil().then((res) => {
-          res.res?.forEach(item => {
-            if (item.isMust === Constants.GOODS_MUST) {
-              this.mustGoodsCtrl.addIsMust(Number(item.num));
-            }
+  @Monitor('storeModel.preloadFinished')
+  async initQuery() {
+    if (this.storeModel.preloadFinished) {
+      if (!this.storeModel.storeId) {
+        await this.getPreloadData()
+      }
+      // 查询用户信息
+      Promise.all([API.getUserInfo(this.storeModel.storeId, this.openId, this.unionId),
+        API.getStoreInfo(this.storeModel.storeId)]).then(res => {
+        this.userInfoModel.userInfo.id = res[0].id;
+        this.userInfoModel.userInfo.wallet = res[0].wallet;
+        this.userInfoModel.userInfo.totalScore = res[0].totalScore;
+        this.userInfoModel.userInfo.userTel = res[0].userTel ?? '';
+        this.userInfoModel.isRelative = !!res[0].userTel
+        this.userInfoModel.userInfo.name = res[0].name;
+        if (this.storeModel.qrCodeFlag) {
+          API.clearCar();
+        } else {
+          API.getMyCar().then((res) => {
+            res.goodsList?.forEach(item => {
+              if (item.isMust === Constants.GOODS_MUST) {
+                this.mustGoodsCtrl.addIsMust(Number(item.num));
+              }
+            });
           });
-        });
-      }
-      getCouponListUtil().then((resp: Array<CouponResp>) => {
-        this.couponList = resp;
+        }
+        this.storeModel.storeInfo = res[1];
+        this.updateFormCard();
+        this.storeModel.storeInfo.reductionList = res[1].reductionList;
+        if (this.storeModel.storeType === StoreType.SCAN_TYPE && this.myCarModel.tableId) {
+          this.myCarModel.tableInfo = this.storeModel.tableList.find(item => item.id === this.myCarModel.tableId)!;
+        }
+        RouterModule.replace(RouterMap.HOME_PAGE);
       });
-    });
-    this.initTableTitle();
-    this.pageStack.replacePath({ name: 'HomePage' });
+    }
   }
 
-  initTableTitle() {
-    if (!this.tableList.length) {
-      return;
-    }
-    getStoreInfoUtil(this.storeId).then(res => {
-      this.storeInfo = res.store;
-      AppStorage.setOrCreate('storeInfo', res.store);
-      this.updateFormCard();
-      this.storeSet = res.storeSet;
-      this.reductionList = res.reduction;
-      if (this.storeInfo.isRest === Constants.STORE_REST ||
-        new Date().getTime() < this.getTimeByHour(this.storeInfo.time) ||
-        new Date().getTime() > this.getTimeByHour(this.storeInfo.time4)) {
-        if (!this.isRest) {
-          this.businessController?.open();
+  getPreloadData(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      Promise.all([API.getAppInfo(), API.getTableList()]).then(res => {
+        if (res[0]) {
+          this.storeModel.storeId = res[0].storeId;
+          this.storeModel.storeType = res[0].storeType;
         }
-        this.isRest = true;
-      } else {
-        this.isRest = false;
-      }
-    });
-    if (this.storeType === StoreType.SCAN_TYPE && this.tableId) {
-      getTableInfoUtil(this.tableId).then((res) => {
-        this.tableInfo = res;
+        if (res[1]?.length) {
+          this.storeModel.tableList = res[1];
+        }
+        resolve()
+      }).catch(() => {
+        reject()
       });
-    }
+    })
   }
 
   updateFormCard() {
     dataPreferences.removePreferencesFromCacheSync(getContext(this), { name: CardManager.KEY_CARD_ID })
     let pref = dataPreferences.getPreferencesSync(getContext(this), { name: CardManager.KEY_CARD_INFO });
     let dataClass = new FormDataClass();
-    dataClass.storeName = this.storeInfo.name || '';
+    dataClass.storeName = this.storeModel.storeInfo.name || '';
     pref.putSync(CardManager.KEY_CARD_INFO, dataClass);
     pref.flush();
     CardManager.get().updateCard(getContext(this), '', dataClass);
@@ -152,44 +117,12 @@ struct Index {
     return date.getTime()
   }
 
-  @Builder
-  PageMap(name: string) {
-    if (name === 'HomePage') {
-      HomePage();
-    } else if (name === 'OrderPage') {
-      OrderPage();
-    } else if (name === 'MerchantDetailPage') {
-      MerchantDetailPage();
-    } else if (name === 'GoodDetailPage') {
-      GoodDetailPage();
-    } else if (name === 'ConfirmOrderPage') {
-      ConfirmOrderPage();
-    } else if (name === 'FrequentQuestionPage') {
-      FrequentQuestionPage();
-    } else if (name === 'OrderDetailPage') {
-      OrderDetailPage();
-    } else if (name === 'HwMap') {
-      HwMap();
-    } else if (name === 'AnswerPage') {
-      AnswerPage();
-    } else if (name === 'SelectCouponPage') {
-      SelectCouponPage();
-    } else if (name === 'MyCouponsPage') {
-      MyCouponsPage();
-    } else if (name === 'RemarksPage') {
-      RemarksPage();
-    } else if (name === 'PreviewImagePage') {
-      PreviewImagePage();
-    }
-  }
-
   build() {
     Column() {
-      Navigation(this.pageStack) {
+      Navigation(RouterModule.getStack()) {
       }
       .hideTitleBar(true)
       .hideNavBar(true)
-      .navDestination(this.PageMap)
       .mode(NavigationMode.Stack)
       .height(Constants.FULL_SIZE)
       .width(Constants.FULL_SIZE);
@@ -227,31 +160,11 @@ struct Index {
         hilog.error(0x0000, 'testTag', 'error: %{public}s', JSON.stringify(error));
         if (error.code === authentication.AuthenticationErrorCode.ACCOUNT_NOT_LOGGED_IN) {
           // HUAWEI ID is not logged in, it is recommended to jump to the login guide page
-          promptAction.showToast({ message: $r('app.string.login_account') })
         }
         // todo 模板适配无法登录华为账号场景下可以正常访问，正常开发需要根据实际场景选择  reject(error);
         resolve({ openId: '1', unionId: '1', authCode: '1' } as HuaweiIDResp);
       });
     });
 
-  }
-
-  private getUserInfo(openid: string, unionId: string): Promise<GetUserInfoResp> {
-    return new Promise((resolve, reject) => {
-      HttpRequestApi.getUserInfo(this.storeId, openid, unionId)
-        .then((resp: GetUserInfoResp) => {
-          if (resp.id) {
-            console.info(`getUserInfo resp:${JSON.stringify(resp)}.`);
-            resolve(resp);
-          } else {
-            console.error(`getUserInfo error: ${JSON.stringify(resp)}.`);
-            reject(resp.msg);
-          }
-        })
-        .catch((e: BusinessError) => {
-          console.error(`getUserInfo error: ${JSON.stringify(e)}.`);
-          reject(e);
-        });
-    });
   }
 }

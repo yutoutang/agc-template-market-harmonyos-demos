@@ -10,28 +10,22 @@ import { Config, IColor, IFontSize, IStyle, Operation, ShippingAddressErrorCode 
 import shippingAddress from '@hms.core.account.shippingAddress';
 import pasteboard from '@ohos.pasteboard';
 import i18n from '@ohos.i18n';
-import { PromptAction, KeyboardAvoidMode, MeasureUtils } from '@ohos.arkui.UIContext';
+import { PromptAction, MeasureUtils } from '@ohos.arkui.UIContext';
 import { sceneMap } from '@kit.MapKit';
 import { BusinessError } from '@ohos.base';
 
 @ComponentV2
 struct AddressEditPage {
-
   @Param
   public ctx: Context = new Context();
-
   @Local
   private address: AddressVM = new AddressVM();
-
   @Local
   private clipboardText: string = '';
-
   @Local
   private isSelectingDistrict: boolean = false;
-
   @Local
   private isSelectingAddress: boolean = false;
-
   @Local
   private isResolvingClipboardText: boolean = false;
 
@@ -43,28 +37,20 @@ struct AddressEditPage {
   @Computed
   private get showLoadingMask(): boolean {
     return this.ctx.addressMgr.isLoading ||
-           this.isSelectingDistrict ||
-           this.isSelectingAddress ||
-           this.isResolvingClipboardText;
+    this.isSelectingDistrict ||
+    this.isSelectingAddress ||
+    this.isResolvingClipboardText;
   }
 
   private promptAction: PromptAction = this.getUIContext().getPromptAction();
-
   private systemPasteboard: pasteboard.SystemPasteboard = pasteboard.getSystemPasteboard();
-
   private formatNational: i18n.PhoneNumberFormat = new i18n.PhoneNumberFormat('CN', { type: 'NATIONAL' });
-
   private measure: MeasureUtils = this.getUIContext().getMeasureUtils();
 
   public aboutToAppear(): void {
-    this.getUIContext().setKeyboardAvoidMode(KeyboardAvoidMode.RESIZE);
     if (this.ctx.operation === Operation.EDIT && this.ctx.editingAddressDTO) {
       this.address.assignFromDTO(this.ctx.editingAddressDTO);
     }
-  }
-
-  public aboutToDisappear(): void {
-    this.getUIContext().setKeyboardAvoidMode(KeyboardAvoidMode.OFFSET);
   }
 
   public build(): void {
@@ -79,6 +65,7 @@ struct AddressEditPage {
             .fontColor(IColor.BLACK_TRANSPARENT_90)
             .fontWeight(500)
         }
+
         Stack() {
           this.buildMainContent();
           if (this.showLoadingMask) {
@@ -122,6 +109,7 @@ struct AddressEditPage {
           .padding({ left: 16, right: 16 })
           .margin({ bottom: IStyle.CARD_GAP })
           .onClick(() => this.handleSelectAddress())
+
           // 地址解析
           Column() {
             TextArea({ text: this.clipboardText, placeholder: '在此粘贴复制的地址信息，自动拆分姓名，电话和地址' })
@@ -149,7 +137,7 @@ struct AddressEditPage {
               PasteButton({
                 icon: PasteIconStyle.LINES,
                 text: PasteDescription.PASTE,
-                buttonType: ButtonType.Normal
+                buttonType: ButtonType.Normal,
               })
                 .width(80)
                 .height(28)
@@ -160,30 +148,29 @@ struct AddressEditPage {
                 .onClick((_: ClickEvent, result: PasteButtonOnClickResult) => {
                   this.handlePasteButtonOnClickResult(result);
                 })
-              Button() {
-                Text('识别')
-                  .fontSize(IFontSize.BODY)
-                  .fontColor(IColor.WHITE)
-                  .fontWeight(600)
-              }
-              .width(80)
-              .height(28)
-              .borderRadius(16)
-              .fontWeight(400)
-              .type(ButtonType.Normal)
-              .backgroundColor(IColor.THEME_PRIMARY)
-              .margin({ left: 16 })
-              .onClick(() => {
-                this.handleResolvingClipboardText();
-              })
+              Button('识别')
+                .width(80)
+                .height(28)
+                .fontWeight(400)
+                .backgroundColor(IColor.THEME_PRIMARY)
+                .margin({ left: 16 })
+                .onClick(() => {
+                  this.handleResolvingClipboardText();
+                })
             }
           }
           .width('100%')
           .backgroundColor(IColor.WHITE)
           .alignItems(HorizontalAlign.End)
           .borderRadius(8)
-          .padding({ left: 10, right: 10, top: 12, bottom: 12 })
+          .padding({
+            left: 10,
+            right: 10,
+            top: 12,
+            bottom: 12,
+          })
           .margin({ bottom: IStyle.CARD_GAP })
+
           // 收货人 & 手机号码
           Column() {
             Row() {
@@ -211,6 +198,7 @@ struct AddressEditPage {
             .width('100%')
             .height(48)
             .alignItems(VerticalAlign.Center)
+
             Divider()
               .height(IStyle.DIVIDER_HEIGHT)
               .backgroundColor(IColor.BACKGROUND)
@@ -245,6 +233,7 @@ struct AddressEditPage {
           .backgroundColor(IColor.WHITE)
           .borderRadius(8)
           .padding({ left: 16, right: 16 })
+
           // 所在区域 & 详细地址
           Column() {
             Row() {
@@ -286,6 +275,7 @@ struct AddressEditPage {
             .width('100%')
             .height(48)
             .alignItems(VerticalAlign.Center)
+
             Divider()
               .height(IStyle.DIVIDER_HEIGHT)
               .backgroundColor(IColor.BACKGROUND)
@@ -313,7 +303,7 @@ struct AddressEditPage {
                   top: (48 - this.measureTextHeight('详细地址', 14)) / 2,
                   bottom: 12,
                   left: 0,
-                  right: 0
+                  right: 0,
                 })
                 .backgroundColor(IColor.WHITE)
                 .height(80)
@@ -327,6 +317,7 @@ struct AddressEditPage {
           .borderRadius(8)
           .padding({ left: 16, right: 16 })
           .margin({ top: IStyle.CARD_GAP })
+
           // 设为默认地址
           Row() {
             Text('设为默认地址')
@@ -357,6 +348,7 @@ struct AddressEditPage {
       .layoutWeight(1)
       .scrollBar(BarState.Auto)
       .edgeEffect(EdgeEffect.None)
+
       this.buildSaveButton();
     }
     .height('100%')
@@ -366,25 +358,19 @@ struct AddressEditPage {
   private buildSaveButton(): void {
     Column() {
       Row() {
-        Button() {
-          Text('保存')
-            .fontSize(IFontSize.BODY)
-            .fontColor(IColor.WHITE)
-        }
-        .width('80%')
-        .height(40)
-        .borderRadius(21)
-        .fontWeight(500)
-        .type(ButtonType.Normal)
-        .backgroundColor(IColor.THEME_PRIMARY)
-        .onClick(() => {
-          if (this.verify()) {
-            const address: AddressDTO = this.address.toDTO();
-            this.ctx.operation === Operation.CREATE ?
-            this.ctx.addressMgr.create(address, () => this.ctx.navPathStack.pop()) :
-            this.ctx.addressMgr.update(address, () => this.ctx.navPathStack.pop());
-          }
-        })
+        Button('保存')
+          .width('80%')
+          .height(40)
+          .fontWeight(500)
+          .backgroundColor(IColor.THEME_PRIMARY)
+          .onClick(() => {
+            if (this.verify()) {
+              const address: AddressDTO = this.address.toDTO();
+              this.ctx.operation === Operation.CREATE ?
+                this.ctx.addressMgr.create(address, () => this.ctx.navPathStack.pop()) :
+                this.ctx.addressMgr.update(address, () => this.ctx.navPathStack.pop());
+            }
+          })
       }
       .width('100%')
       .height(52)
@@ -404,7 +390,7 @@ struct AddressEditPage {
     const options: sceneMap.DistrictSelectOptions = {
       countryCode: 'CN',
       language: 'zh',
-      cancelCallback: () => this.isSelectingDistrict = false
+      cancelCallback: () => this.isSelectingDistrict = false,
     };
     sceneMap.selectDistrict(this.getUIContext().getHostContext(), options)
       .then((result: sceneMap.DistrictSelectResult) => {
@@ -532,7 +518,7 @@ struct AddressEditPage {
       message: message,
       backgroundBlurStyle: BlurStyle.NONE,
       backgroundColor: IColor.DEV_TOAST_BG_COLOR,
-      textColor: IColor.BLACK_TRANSPARENT_90
+      textColor: IColor.BLACK_TRANSPARENT_90,
     });
   }
 

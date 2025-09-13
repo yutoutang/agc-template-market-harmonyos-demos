@@ -24,11 +24,27 @@ export class CouponModel implements CouponItem {
   lastUpdateTime: string;
   offsetInfo?: OffsetInfo;
 
-  constructor(couponID: string, couponName: string, validityPeriodMode: string, startTime: string, endTime: string,
-    status: string, amountRule: CouponRule, distributionQuantity: string, repeatedPickup: string, categoryGroup: string,
-    brandGroup: string, catalogGroup: string, productGroup: string, recipientLimits: string,
-    specifiedSubGroup: KeyValue[], specifiedPickupScenario: KeyValue[], createdTime: string, lastUpdateTime: string,
-    offsetInfo?: OffsetInfo) {
+  constructor(
+    couponID: string,
+    couponName: string,
+    validityPeriodMode: string,
+    startTime: string,
+    endTime: string,
+    status: string,
+    amountRule: CouponRule,
+    distributionQuantity: string,
+    repeatedPickup: string,
+    categoryGroup: string,
+    brandGroup: string,
+    catalogGroup: string,
+    productGroup: string,
+    recipientLimits: string,
+    specifiedSubGroup: KeyValue[],
+    specifiedPickupScenario: KeyValue[],
+    createdTime: string,
+    lastUpdateTime: string,
+    offsetInfo?: OffsetInfo,
+  ) {
     this.couponID = couponID;
     this.couponName = couponName;
     this.validityPeriodMode = validityPeriodMode;
@@ -157,4 +173,3 @@ export interface OffsetInfo {
   // 核销状态：0-已核销(活动期间正常使用的优惠券) ; 1-已失效(活动期间商家手动关闭但用户已使用的优惠券)
   couponStatus: string;
 }
-

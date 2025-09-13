@@ -7,34 +7,42 @@ enum Status {
   READY_TO_BACK
 }
 
-@Component
+@ComponentV2
 export struct ImageLongTakeDelegate {
-  private componentId: string = ''
-  private newsId: string = ''
-  @State status: Status = Status.IDLE;
-  @State panDirection: PanDirection = PanDirection.Vertical;
-  @State imageScale: number = 1;
-  @State imagePullingDownScale: number = 1;
-  @State imageTranslateX: number = 0;
-  @State imageTranslateY: number = 0;
-  @State centerX: number = 0;
-  @State centerY: number = 0;
-  @State maxOffsetX: number = 0;
-  @State minOffsetX: number = 0;
-  @State maxOffsetY: number = 0;
-  @State minOffsetY: number = 0;
-  @State gestureDisabled: boolean = false;
-  @State @Watch('onAllGestureFinish') gestureCount: number = 0;
-  @State geometryPositionX: number = 0;
-  @State geometryPositionY: number = 0;
-  @State geometryScale: number = 1;
-  private imageUrl: string = '';
+  @Param componentId: string = ''
+  @Param newsId: string = ''
+  @Local status: Status = Status.IDLE;
+  @Local panDirection: PanDirection = PanDirection.Vertical;
+  @Local imageScale: number = 1;
+  @Local imagePullingDownScale: number = 1;
+  @Local imageTranslateX: number = 0;
+  @Local imageTranslateY: number = 0;
+  @Local centerX: number = 0;
+  @Local centerY: number = 0;
+  @Local maxOffsetX: number = 0;
+  @Local minOffsetX: number = 0;
+  @Local maxOffsetY: number = 0;
+  @Local minOffsetY: number = 0;
+  @Local gestureDisabled: boolean = false;
+  @Local gestureCount: number = 0;
+  @Monitor('gestureCount')
+  onAllGestureFinishFn() {
+    this.onAllGestureFinish()
+  }
+  @Local geometryPositionX: number = 0;
+  @Local geometryPositionY: number = 0;
+  @Local geometryScale: number = 1;
+  @Param imageUrl: string = '';
   private photoId: string = 'myCat';
   private photoListener: inspector.ComponentObserver =
     this.getUIContext().getUIInspector().createComponentObserver(this.photoId);
   private imagePositionX: number = 0;
   private imagePositionY: number = 600;
-  @State @Watch('getImageWidth') imageWidth: number = 1260;
+  @Local  imageWidth: number = 1260;
+  @Monitor('imageWidth')
+  getImageWidthFn() {
+    this.getImageWidth()
+  }
   private imageHeight: number = 1680;
   private lastCenterX: number = 0;
   private lastCenterY: number = 0;
@@ -50,8 +58,7 @@ export struct ImageLongTakeDelegate {
   private realDisplayBoundsRight: number = 0;
   private realDisplayBoundsBottom: number = 0;
   private firstStarted = true;
-  backToFirstPage: () => void = () => {
-  };
+  @Event backToFirstPage: () => void = () => {};
 
   init(): void {
     let photoInfo = this.getUIContext().getComponentUtils().getRectangleById(this.photoId);

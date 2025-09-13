@@ -1,6 +1,7 @@
 import { LoginSheetUtils } from 'lib_account';
 import { BaseViewModel, CommonConfirmDialog, RouterParams, RouterToNews } from 'lib_common';
-import { CommentServiceApi, LayoutParams, MineServiceApi, NewsResponse } from 'lib_news_api';
+import { CommentServiceApi, MineServiceApi, NewsResponse } from 'lib_news_api';
+import { LayoutParams } from 'module_flexlayout';
 import { LoneTakeAnimationsTransition, LongTakeTransitionParam } from 'module_transition';
 
 export class CardViewModel extends BaseViewModel {

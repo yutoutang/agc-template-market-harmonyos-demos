@@ -1,39 +1,52 @@
 import { CustomTabBar } from '../components/CustomTabBar';
-import { OrderPage } from 'order';
-import { OrderListPage } from 'order_list';
-import { PersonalCenterPage } from 'personal_center';
-import { Constants, FormCardJump, HomePageRouter, TabBarType } from 'common';
+import { OrderPageBuilder } from 'order';
+import { OrderListPageBuilder } from 'order_list';
+import { PersonalCenterPageBuilder } from 'personal_center';
+import {
+  Constants,
+  FormCard,
+  HomePageRouter,
+  OrderDetailRouter,
+  RouterMap,
+  RouterModule,
+  TabBarType,
+  WindowModel,
+} from 'common';
+import { AppStorageV2 } from '@kit.ArkUI';
 
-@Component
-export struct HomePage {
-  @StorageProp('formCardJump') @Watch('formCardChange') formCardJump?: FormCardJump = undefined;
-  @Consume('pageStack') pageStack: NavPathStack;
-  @Provide('currentIndex') currentIndex: number = 0;
-  @Provide('refreshData') refreshData: boolean = false;
-  @Provide('showShopDiscount') showShopDiscount: boolean = false
-  @State windowBottomHeight: number = AppStorage.get('windowBottomHeight') as number || 28;
+@Builder
+export function HomePageBuilder() {
+  HomePage()
+}
+
+@ComponentV2
+struct HomePage {
+  @Provider('currentIndex') currentIndex: number = 0;
+  @Provider('refreshData') refreshData: boolean = false;
+  @Local formCard: FormCard = AppStorageV2.connect(FormCard, () => new FormCard())!
+  @Local windowModel: WindowModel = AppStorageV2.connect(WindowModel, () => new WindowModel())!;
 
   aboutToAppear(): void {
     this.getParams();
   }
 
-  formCardChange() {
-    if (this.formCardJump?.url) {
-      let currentName: string[] = this.pageStack.getAllPathName()
+  @Monitor('formCard.id')
+  formCardChange(monitor: IMonitor) {
+    if (monitor.value()?.now) {
+      let currentName: string[] = RouterModule.getStack().getAllPathName()
       if (currentName.length && currentName[currentName.length-1] === 'OrderDetailPage') {
-        this.pageStack.replacePath({ name: this.formCardJump.url, param: this.formCardJump.params });
+        RouterModule.replace(this.formCard.url, { orderId: this.formCard.orderId } as OrderDetailRouter);
       } else {
-        this.pageStack.pushPath({ name: this.formCardJump.url, param: this.formCardJump.params });
+        RouterModule.push(this.formCard.url, { orderId: this.formCard.orderId } as OrderDetailRouter);
       }
-      AppStorage.delete('formCardJump');
+      this.formCard.id = 0
     }
   }
 
   getParams() {
-    let paramsArr: HomePageRouter[] = this.pageStack.getParamByName('HomePage') as HomePageRouter[];
-    if (paramsArr.length) {
-      let routerParam = paramsArr[paramsArr.length-1];
-      this.currentIndex = routerParam?.index ?? 0;
+    let params = RouterModule.getNavParam<HomePageRouter>(RouterMap.HOME_PAGE);
+    if (params) {
+      this.currentIndex = params.index ?? 0;
     }
   }
 
@@ -45,15 +58,15 @@ export struct HomePage {
         }) {
           Tabs({ index: this.currentIndex }) {
             TabContent() {
-              OrderPage();
+              wrapBuilder(OrderPageBuilder).builder();
             };
 
             TabContent() {
-              OrderListPage();
+              wrapBuilder(OrderListPageBuilder).builder();
             };
 
             TabContent() {
-              PersonalCenterPage();
+              wrapBuilder(PersonalCenterPageBuilder).builder();
             };
           }
           .layoutWeight(1)
@@ -63,18 +76,12 @@ export struct HomePage {
             this.currentIndex = index;
           });
 
-          CustomTabBar({ currentIndex: $currentIndex });
+          CustomTabBar();
         }
         .width(Constants.FULL_SIZE)
         .height(Constants.FULL_SIZE);
       };
-    }.hideTitleBar(true).padding({ bottom: this.windowBottomHeight }).onBackPressed(() => {
-      if (this.showShopDiscount) {
-        this.showShopDiscount = false
-        return true
-      }
-      return false
-    })
+    }.hideTitleBar(true).padding({ bottom: this.windowModel.getWindowBottomHeight() })
     .onShown(() => {
       if (this.currentIndex === TabBarType.ORDER) {
         this.refreshData = true

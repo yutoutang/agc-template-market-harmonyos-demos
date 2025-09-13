@@ -1,0 +1,20 @@
+{
+  "string": [
+    {
+      "name": "page_show",
+      "value": "page from package"
+    },
+    {
+      "name": "advertising_description_backgroundColor",
+      "value": "rgba(0,0,0,0.3)"
+    },
+    {
+      "name": "agcit_huawei_common_advertisement",
+      "value": "1.0.0"
+    },
+    {
+      "name": "agcittype_huawei_common_advertisement",
+      "value": "serviceComponent"
+    }
+  ]
+}

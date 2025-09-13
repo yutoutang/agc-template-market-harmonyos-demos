@@ -61,22 +61,23 @@ export function tinymceNpm(str?: string) {
           throw new Error(`在指定目录中未找到package.json: ${projectRoot}`);
         }
 
+        // 定义文件路径
+        const targetDtsPath = path.join(projectRoot, 'tinymce.d.ts');
+        const targetMinJsPath = path.join(projectRoot, 'tinymce.min.js');
+
+        // 检查核心文件是否已存在，如果都存在则退出
+        if (fs.existsSync(targetDtsPath) && fs.existsSync(targetMinJsPath)) {
+          console.log('tinymce核心文件已存在，无需执行操作');
+          return;
+        }
+
         // 定义node_modules目录路径
         const nodeModulesDir = path.join(projectRoot, 'node_modules');
         const nodeModulesTinymceDir = path.join(nodeModulesDir, 'tinymce');
 
-        // 检查node_modules是否存在，存在则退出
-        if (fs.existsSync(nodeModulesDir)) {
-          console.log('node_modules目录已存在，无需执行操作');
-          return;
-        }
-
-        // 定义文件路径
+        // 定义源文件路径
         const sourceDtsPath = path.join(nodeModulesTinymceDir, 'tinymce.d.ts');
         const sourceMinJsPath = path.join(nodeModulesTinymceDir, 'tinymce.min.js');
-
-        const targetDtsPath = path.join(projectRoot, 'tinymce.d.ts');
-        const targetMinJsPath = path.join(projectRoot, 'tinymce.min.js');
 
         // 定义需要复制的文件夹
         const foldersToCopy = ['plugins', 'models', 'themes'];

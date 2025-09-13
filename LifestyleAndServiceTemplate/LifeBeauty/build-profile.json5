@@ -5,7 +5,7 @@
       {
         "name": "default",
         "signingConfig": "default",
-        "compatibleSdkVersion": "5.0.0(12)",
+        "compatibleSdkVersion": "5.0.3(15)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
           "strictMode": {
@@ -17,7 +17,7 @@
     ],
     "buildModeSet": [
       {
-        "name": "debug",
+        "name": "debug"
       },
       {
         "name": "release"
@@ -27,7 +27,7 @@
   "modules": [
     {
       "name": "entry",
-      "srcPath": "./entry",
+      "srcPath": "./products/entry",
       "targets": [
         {
           "name": "default",
@@ -38,8 +38,20 @@
       ]
     },
     {
-      "name": "utils",
-      "srcPath": "./commons/utils",
+      "name": "foundation",
+      "srcPath": "./commons/foundation"
+    },
+    {
+      "name": "profile_edit",
+      "srcPath": "./components/profile_edit"
+    },
+    {
+      "name": "reservation_card",
+      "srcPath": "./components/reservation_card"
+    },
+    {
+      "name": "reservation_form",
+      "srcPath": "./components/reservation_form"
     },
     {
       "name": "home",
@@ -47,7 +59,7 @@
     },
     {
       "name": "mine",
-      "srcPath": "./features/mine",
+      "srcPath": "./features/mine"
     }
   ]
 }

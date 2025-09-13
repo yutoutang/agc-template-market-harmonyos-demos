@@ -5,7 +5,7 @@
     "description": "$string:module_desc",
     "mainElement": "EntryAbility",
     "deviceTypes": [
-      "phone",
+      "phone"
     ],
     "deliveryWithInstall": true,
     "installationFree": true,
@@ -39,14 +39,16 @@
     "requestPermissions": [
       {
         "name": "ohos.permission.INTERNET",
-        "reason": "$string:INTERNET_REASON",
-      },
+        "reason": "$string:INTERNET_REASON"
+      }
     ],
     "metadata": [
       {
-        // 替换应用的clientID
+/**
+         * todo: 替换Client ID
+         */
         "name": "client_id",
-        "value": "xxx"
+        "value": "******"
       }
     ],
     "routerMap": "$profile:route_map",
@@ -64,6 +66,6 @@
           }
         ]
       }
-    ],
+    ]
   }
 }

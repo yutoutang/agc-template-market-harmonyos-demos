@@ -1,0 +1,28 @@
+{
+  "string": [
+    {
+      "name": "page_show",
+      "value": "page from package"
+    },
+    {
+      "name": "edit",
+      "value": "编辑"
+    },
+    {
+      "name": "cancel",
+      "value": "取消"
+    },
+    {
+      "name": "one_click_clear",
+      "value": "一键清空"
+    },
+    {
+      "name": "delete",
+      "value": "删除"
+    },
+    {
+      "name": "single_choice",
+      "value": "单选"
+    }
+  ]
+}

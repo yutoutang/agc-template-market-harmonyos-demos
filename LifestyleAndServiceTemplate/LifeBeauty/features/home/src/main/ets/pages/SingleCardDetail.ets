@@ -11,7 +11,7 @@ import {
   SimpleGoodInfo,
   SingleCardInfo,
   UIBackBtn,
-} from 'utils'
+} from 'foundation'
 import { RuleID, ALIGN_RULE_CATEGORY, ALIGN_RULE_COUNT, ALIGN_RULE_DIVIDER } from '../common/Constant'
 import { StoreList } from '../components/StoreList';
 import { AppStorageV2 } from '@kit.ArkUI';
@@ -114,7 +114,7 @@ export struct SingleCardDetail {
         right: 10,
       })
       .borderRadius(8)
-      .backgroundColor('#F1F3F5')
+      .backgroundColor($r('sys.color.background_secondary'))
       .margin({ top: 5 })
 
       // 门店
@@ -230,8 +230,8 @@ export struct SingleCardDetail {
       if (this.userInfo.mobile) {
         Button() {
           Text('立即抢购')
-            .fontSize(16)
-            .fontColor(Color.White)
+            .fontSize($r('sys.float.Body_L'))
+            .fontColor($r('sys.color.font_on_primary'))
             .fontWeight(500)
             .width(88)
             .height(21)

@@ -2,8 +2,8 @@ import { AppStorageV2, PersistenceV2 } from '@kit.ArkUI';
 import { BreakpointModel, SettingModel } from 'lib_common';
 import { ChannelEdit, TabInfo } from 'module_channeledit';
 import { FlexLayoutVM } from '../viewmodel/FlexLayoutVM';
-import { RendNewsInfo } from '../sdk/model/Model';
 import { NewsTabContent } from '../components/NewsTabContent';
+import { RendNewsInfo } from '../model/Model';
 
 @ComponentV2
 export struct FlexLayout {
@@ -58,5 +58,9 @@ export struct FlexLayout {
         this.flexLayoutVm.currentIndexChange(index)
       })
     }
+    .padding({
+      left: this.breakPointModel.pagePadding,
+      right: this.breakPointModel.pagePadding,
+    })
   }
 }

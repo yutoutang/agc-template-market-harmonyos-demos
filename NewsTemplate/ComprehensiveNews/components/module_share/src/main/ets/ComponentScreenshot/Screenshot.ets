@@ -38,7 +38,7 @@ export struct Screenshot {
             Text(this.qrCodeInfo.articleFrom)
               .fontSize(12)
               .fontColor($r('sys.color.font_secondary'))
-            Text(dayjs(this.qrCodeInfo.createTime).format('YYYY-MM-DD hh:mm'))
+            Text(dayjs(this.qrCodeInfo.createTime).format('YYYY-MM-DD HH:mm'))
               .fontSize(12)
               .fontColor($r('sys.color.font_secondary'))
           }

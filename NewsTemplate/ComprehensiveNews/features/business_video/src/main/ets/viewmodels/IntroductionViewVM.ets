@@ -18,14 +18,14 @@ export class IntroductionViewVM extends BaseViewModel {
   }
 
   queryIntroductionList() {
-    const list = BaseNewsServiceApi.queryAuthorPosts(this.userInfoModel.authorId);
+    const list = BaseNewsServiceApi.queryAuthorPosts('author_5');
     list.forEach((item) => {
       item.extraInfo.showUserBar = false;
       item.extraInfo.showTimeBottom = false;
       item.extraInfo.showTitleTextAll = false;
       item.extraInfo.showImagePreviewLayer = false;
       item.extraInfo.disabledClickEvent = true;
-      item.extraInfo.authorId = this.userInfoModel.authorId;
+      item.extraInfo.authorId = 'author_5';
       item.articles[0].postImgList = item.articles[0].postImgList?.slice(0, 1)
     })
     this.introductionDataSource.setData(list);
@@ -40,7 +40,7 @@ export class IntroductionViewVM extends BaseViewModel {
         '慢下来，整理呼吸，调整步伐，你会发现风景依然在前方等你。坚持，是给自己最好的礼物。',
     ]
     this.timer = setInterval(() => {
-      const list = BaseNewsServiceApi.queryAuthorPosts(this.userInfoModel.authorId);
+      const list = BaseNewsServiceApi.queryAuthorPosts('author_5');
       let item = list[0];
       if (item) {
         item.extraInfo.showUserBar = false;

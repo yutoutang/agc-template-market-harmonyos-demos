@@ -61,11 +61,24 @@
     import { SettingFontCore } from 'module_setfontsize';
     ```
 
+3. 调用组件，详细参数配置说明参见[API参考](#API参考)。
+   ```
+   SettingFontCore({
+     currentRatio: this.currentRatio,
+     confirm: (ratio: number) => {
+       this.currentRatio = ratio;
+       this.getUIContext().getPromptAction().showToast({
+         message: '字号设置已成功'
+       });
+     },
+   })
+   ```
+
 ## API参考
 
 ### 接口
 
-SettingFontCore(option?: SettingFontCoreOptions)
+SettingFontCore(option?: [SettingFontCoreOptions](#SettingFontCoreOptions对象说明))
 
 字体大小调节组件。
 

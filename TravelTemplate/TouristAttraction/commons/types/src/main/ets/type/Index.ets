@@ -32,10 +32,6 @@ export class LocationInfo {
   latitude: number = 0;
 }
 
-export const cardTypeOptions = [
-  '身份证',
-];
-
 export enum DeleteItems {
   Address = 0,
   Tourist = 1
@@ -85,5 +81,10 @@ export class Params {
 
 export class Page {
   index: number = 0;
+}
+
+export class WindowSize {
+  width: number = 0
+  height: number = 0
 }
 

@@ -85,9 +85,9 @@ struct PlateNumberPage {
           })
         } else {
           TextInput({ text: $$this.plate, placeholder: '请输入车牌' })
-            .placeholderFont({ size: 16 })
+            .placeholderFont({ size: $r('sys.float.Body_L') })
             .placeholderColor($r('sys.color.font_secondary'))
-            .fontSize(16)
+            .fontSize($r('sys.float.Body_L'))
             .fontColor($r('sys.color.font_primary'))
             .borderRadius(4)
             .textAlign(TextAlign.Center)
@@ -152,11 +152,10 @@ struct PlateNumberPage {
           }, (v: PlateNumber) => JSON.stringify(v))
         }.margin({ top: 20 })
 
-        Button('查询费用', { type: ButtonType.Normal })
-          .fontColor(Color.White)
+        Button('查询费用')
+          .fontColor($r('sys.color.font_on_primary'))
           .width('100%')
           .height(40)
-          .borderRadius(20)
           .backgroundColor($r('app.color.app_theme'))
           .margin({ top: 32, bottom: 16 })
           .onClick(() => {

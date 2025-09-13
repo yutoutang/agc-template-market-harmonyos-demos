@@ -13,6 +13,8 @@ export enum RouterMap {
   NEWS_PUBLISH_SELECT = 'NewsPublishSelect',
   // 图片预览
   IMAGE_PREVIEW = 'ImagePreview',
+  // 视频预览
+  Video_PREVIEW = 'VideoPreview',
   // 视频模块
   VIDEO_PAGE = 'VideoPage',
   VIDEO_DETAIL_PAGE = 'VideoDetailPage',

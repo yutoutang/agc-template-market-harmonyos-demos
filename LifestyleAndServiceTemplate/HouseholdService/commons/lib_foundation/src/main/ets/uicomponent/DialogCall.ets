@@ -22,6 +22,8 @@ import {
 } from 'module_base';
 import { CommonConstants } from '../common/Constant';
 
+const TAG = '[DialogCall]';
+
 export class PhoneParams {
   phones: string[] = [];
 
@@ -34,9 +36,9 @@ export function callPhone(value: string) {
   try {
     call.makeCall(value, (err: BusinessError) => {
       if (!err) {
-        Logger.info('make call success.');
+        Logger.info(TAG, 'make call success.');
       } else {
-        Logger.error('make call fail, err is:' + JSON.stringify(err));
+        Logger.error(TAG, 'make call fail, err is:' + JSON.stringify(err));
       }
     });
   } catch (e) {

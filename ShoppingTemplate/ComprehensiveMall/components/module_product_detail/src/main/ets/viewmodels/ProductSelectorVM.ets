@@ -47,7 +47,7 @@ export class ProductSelectorVM {
   // 是否可以提交规格
   @Computed
   get enableConfirm() {
-    return !this.curSku || this.curSku && this.curSku.stock > 0;
+    return !this.curSku || (this.curSku && this.curSku.stock > 0);
   }
 
   async initData(id: string) {

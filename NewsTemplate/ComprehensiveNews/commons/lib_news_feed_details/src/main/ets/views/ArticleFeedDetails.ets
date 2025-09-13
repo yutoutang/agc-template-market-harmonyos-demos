@@ -18,14 +18,13 @@ import { NavHeaderBar } from 'lib_widget';
 import { FeedCard } from 'module_newsfeed';
 import { Share } from 'module_share';
 import { ReadNewsComponent } from 'module_text_reader';
-import { LongTakeAnimationProperties, LongTakeTransitionDelegate } from 'module_transition';
+import { CardLongTakeDelegate, LongTakeAnimationProperties } from 'module_transition';
 import { extractText, handlerCoverImage } from '../utils/Utils';
 import { ArticleDetailsFooter } from '../components/ArticleDetailsFooter';
 import { RecommendArea } from '../components/RecommendArea';
 import NewsFeedVM from '../viewmodel/NewsFeedVM';
 import { NewsContent } from '../components/NewsContent';
 import { NewsFeedInfo } from '../model/Model';
-import { LoginSheetUtils } from 'lib_account';
 import { FeedBreakPointVM } from '../viewmodel/FeedBreakPointVM';
 
 @Builder
@@ -59,6 +58,7 @@ export struct ArticleFeedDetails {
       this.newsFeedVM.initArticle(this.articleId)
     }
     this.newsFeedVM.initComment(this.articleId)
+    this.newsFeedVM.setUiContext(this.getUIContext())
     this.bundleInfo = AppStorage.get('appInfo') as BundleInfo
     this.newsFeedVM.addHistory()
     this.newsFeedVM.setContinueData()
@@ -89,7 +89,7 @@ export struct ArticleFeedDetails {
       this.pointSplit()
       ReadNewsComponent({
         author: this.newsFeedVM.articleDetails.author.authorNickName,
-        date: dayjs(this.newsFeedVM.articleDetails.createTime).format('YYYY-MM-DD hh:mm:ss'),
+        date: dayjs(this.newsFeedVM.articleDetails.createTime).format('YYYY-MM-DD HH:mm:ss'),
         title: this.newsFeedVM.articleDetails.title,
         coverImage: handlerCoverImage(this.newsFeedVM.articleDetails),
         bundleName: this.bundleInfo?.appName,
@@ -107,7 +107,7 @@ export struct ArticleFeedDetails {
         type: this.newsFeedVM.articleDetails.type,
         title: this.newsFeedVM.articleDetails.title,
         articleFrom: this.newsFeedVM.articleDetails.articleFrom,
-        createTime: dayjs(this.newsFeedVM.articleDetails.createTime).format('YYYY-MM-DD hh:mm'),
+        createTime: dayjs(this.newsFeedVM.articleDetails.createTime).format('YYYY-MM-DD HH:mm'),
         coverUrl: handlerCoverImage(this.newsFeedVM.articleDetails),
         isVideo: !!this.newsFeedVM.articleDetails.postImgList?.[0]?.surfaceUrl,
       },
@@ -179,13 +179,16 @@ export struct ArticleFeedDetails {
                   },
                 })
               }
-              .padding(16)
+              .padding(this.newsBreakPoint.breakpointModel.pagePadding)
               .backgroundColor($r('sys.color.background_primary'))
             }
             ListItem() {
               ArticleDetailsFooter()
             }
-            .padding({ left: 16, right: 16 })
+            .padding({
+              left: this.newsBreakPoint.breakpointModel.pagePadding,
+              right: this.newsBreakPoint.breakpointModel.pagePadding,
+            })
             .backgroundColor($r('sys.color.background_primary'))
 
             ListItem() {
@@ -221,7 +224,10 @@ export struct ArticleFeedDetails {
               })
             }
             .id('news_feedComment')
-            .padding({ left: 16, right: 16 })
+            .padding({
+              left: this.newsBreakPoint.breakpointModel.pagePadding,
+              right: this.newsBreakPoint.breakpointModel.pagePadding,
+            })
             .backgroundColor($r('sys.color.background_primary'))
             .visibility(!this.newsBreakPoint.isFolderStatus ? Visibility.Visible : Visibility.None)
             .onAppear(() => {
@@ -244,7 +250,7 @@ export struct ArticleFeedDetails {
 
         Column() {
           FeedComment({
-            feedCommentScroller:this.newsFeedVM.feedCommentScroller,
+            feedCommentScroller: this.newsFeedVM.feedCommentScroller,
             userInfo: this.newsFeedVM.getUserInfo(),
             commentList: this.newsFeedVM.commentInfoList,
             fontSizeRatio: this.settingInfo.fontSizeRatio,
@@ -270,7 +276,10 @@ export struct ArticleFeedDetails {
         }
         .width(!this.newsBreakPoint.isFolderStatus ? CommonConstants.FULL_PERCENT : CommonConstants.HALF_PERCENT)
         .id('news_feedComment')
-        .padding({ left: 16, right: 16 })
+        .padding({
+          left: this.newsBreakPoint.breakpointModel.pagePadding,
+          right: this.newsBreakPoint.breakpointModel.pagePadding,
+        })
         .backgroundColor($r('sys.color.background_primary'))
         .visibility(this.newsBreakPoint.isFolderStatus ? Visibility.Visible : Visibility.None)
         .onAppear(() => {
@@ -305,15 +314,18 @@ export struct ArticleFeedDetails {
         })
       }
       .margin({ top: 16, bottom: 32 })
-      .padding({ left: CommonConstants.PADDING_L, right: CommonConstants.PADDING_L })
+      .padding({
+        left: this.newsBreakPoint.breakpointModel.pagePadding,
+        right: this.newsBreakPoint.breakpointModel.pagePadding,
+      })
     }
-    .backgroundColor($r('sys.color.background_primary'))
+    .backgroundColor($r('sys.color.comp_background_primary'))
   }
 
   build() {
     NavDestination() {
       if (this.longTakeSession) {
-        LongTakeTransitionDelegate({
+        CardLongTakeDelegate({
           longTakeSession: this.longTakeSession,
           contentBuilder: (): void => {
             this.ContentBuilder()

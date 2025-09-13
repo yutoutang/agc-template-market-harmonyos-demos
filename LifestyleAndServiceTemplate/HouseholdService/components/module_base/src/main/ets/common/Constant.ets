@@ -39,13 +39,6 @@ export enum TypeGood {
 }
 
 /**
- * AppStorage应用临时缓存映射表
- */
-export enum AppStorageMap {
-  UI_CONTEXT = 'uiContext',
-}
-
-/**
  * 性别常量
  */
 export const GENDER_OPTIONS: string[] = ['男', '女'];

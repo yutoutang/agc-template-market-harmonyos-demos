@@ -3,7 +3,7 @@ import { CommonConstants, RouterMap, RouterUtils, UserInfoModel } from 'lib_comm
 import { ArticleTextEllipsis } from './ArticleTextEllipsis';
 import { FeedSingleImageSize } from './FeedSingleImageSize';
 import { PostImgList, FeedCardInfoModel } from '../model/RecommendModel';
-import { getColumnsTemplate, getDateDiff } from '../utils/Index';
+import { calculateDimensions, getColumnsTemplate, getDateDiff } from '../utils/Index';
 
 /*
  * 动态中心内容
@@ -26,11 +26,16 @@ export struct FeedDetail {
   @Param isFeedSelf: boolean = false
   @BuilderParam followBuilderParam: () => void = this.followBuilder;
   @BuilderParam publishCustomTimeBuilder: () => void = this.publishTimeBuilder;
-  @Event onGoUserInfo: (authorId: string) => void = () => {}
-  @Event onAddWatch: () => void = () => {}
-  @Event onAddLike: () => void = () => {}
-  @Event onAddComment: () => void = () => {}
-  @Event onVideo: () => void = () => {}
+  @Event onGoUserInfo: (authorId: string) => void = () => {
+  }
+  @Event onAddWatch: () => void = () => {
+  }
+  @Event onAddLike: () => void = () => {
+  }
+  @Event onAddComment: () => void = () => {
+  }
+  @Event onVideo: () => void = () => {
+  }
   @Local currentTextCount: number | undefined = undefined
   @Local userInfoModel: UserInfoModel = PersistenceV2.connect(UserInfoModel, () => new UserInfoModel())!;
   @Local clickedIndex: number = 0;
@@ -45,6 +50,17 @@ export struct FeedDetail {
   @Computed
   get getAuthorName() {
     return this.isFeedSelf ? this.userInfoModel.authorNickName : this.curFeedCardInfo.author.authorNickName
+  }
+
+  @Computed
+  get oneImageSize() {
+    /*
+     * 一张图的时候需要固定父容器高度
+     * */
+    return this.computeImageCount().length === 1 ?
+    calculateDimensions(this.curFeedCardInfo.postImgList?.[0].surfaceUrl ?
+    this.curFeedCardInfo.postImgList?.[0].surfaceUrl :
+    this.curFeedCardInfo.postImgList?.[0].picVideoUrl).height : 'auto'
   }
 
   @Builder
@@ -202,8 +218,8 @@ export struct FeedDetail {
                 }
                 .width('100%')
                 .alignItems(HorizontalAlign.Start)
+                .height(this.oneImageSize)
               }
-
             }, (item: PostImgList) => JSON.stringify(item))
         }
         .columnsTemplate('1fr '.repeat(getColumnsTemplate(this.computeImageCount().length ?? 0)))

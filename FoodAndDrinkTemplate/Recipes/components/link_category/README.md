@@ -19,13 +19,13 @@
 
 - DevEco Studio版本：DevEco Studio 5.0.4 Release及以上
 - HarmonyOS SDK版本：HarmonyOS 5.0.4 Release SDK及以上
-- 设备类型：华为手机（直板机）
-- HarmonyOS版本：HarmonyOS 5.0.4 Release及以上
+- 设备类型：华为手机（包括双折叠和阔折叠）
+- 系统版本：HarmonyOS 5.0.4(16)及以上
 
 ## 快速入门
 
 1. 安装组件。  
-   如果是在DevEvo Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
+   如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
    如果是从生态市场下载组件，请参考以下步骤安装组件。  
    a. 解压下载的组件包，将包中所有文件夹拷贝至您工程根目录的xxx目录下。  
    b. 在项目根目录build-profile.json5并添加link_category模块。
@@ -42,7 +42,7 @@
    ```typescript
    // xxx为组件存放的目录名称
    "dependencies": {
-     "link_category": "file:../xxx/link_category"
+     "link_category": "file:./xxx/link_category"
    }
    ```
    
@@ -130,8 +130,7 @@ changeCurrentIndex(callback: (currentIndex: number) => void)
 ## 示例代码
 
 ```typescript
-import { RecipeBriefInfo } from 'featured_recipes';
-import { LinkCategory, RecipeCategory } from 'link_category';
+import { LinkCategory, RecipeBriefInfo, RecipeCategory } from 'link_category';
 
 @Entry
 @ComponentV2
@@ -141,12 +140,14 @@ struct Index {
       id: 1,
       name: '热门菜肴',
       recipeList: [{ id: 1, title: '西红柿炒鸡蛋', thumbnail: 'startIcon' } as RecipeBriefInfo,
-         { id: 2, title: '可乐鸡翅', thumbnail: 'startIcon' } as RecipeBriefInfo],
+         { id: 2, title: '可乐鸡翅', thumbnail: 'startIcon' } as RecipeBriefInfo,
+         { id: 3, title: '宫保鸡丁', thumbnail: 'startIcon' } as RecipeBriefInfo],
    }, {
       id: 2,
       name: '家常菜',
       recipeList: [{ id: 1, title: '红烧肉', thumbnail: 'startIcon' } as RecipeBriefInfo,
-         { id: 2, title: '回锅肉', thumbnail: 'startIcon' } as RecipeBriefInfo],
+         { id: 2, title: '回锅肉', thumbnail: 'startIcon' } as RecipeBriefInfo,
+         { id: 3, title: '清蒸鱼', thumbnail: 'startIcon' } as RecipeBriefInfo],
    }];
 
    build() {
@@ -164,9 +165,7 @@ struct Index {
          })
       }
       .height('100%')
-         .width('100%')
+      .width('100%')
    }
 }
 ```
-
-<img src="./screenshot/LinkCategory1.PNG" width="300">

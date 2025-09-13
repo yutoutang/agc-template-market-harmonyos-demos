@@ -61,7 +61,15 @@ export struct Home {
     }.hideTitleBar(true)
     .onReady((ctx) => {
       setPathStack(ctx.pathStack);
-    });
+    })
+    .onSizeChange((oldSize:SizeOptions,newSize:SizeOptions)=>{
+      const height:number = newSize.height as  number
+      if (height<=this.vm.DEFAULT_HEIGHT){
+        this.vm.isSmallHeight = true
+      }else {
+        this.vm.isSmallHeight = false
+      }
+    })
   }
 }
 

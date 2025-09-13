@@ -1,3 +1,7 @@
+import { AppStorageV2 } from '@kit.ArkUI';
+import { BusinessError } from '@kit.BasicServicesKit';
+import { common, EnvironmentCallback, Configuration } from '@kit.AbilityKit';
+import { i18n } from '@kit.LocalizationKit';
 import {
   AppointmentInfo,
   AppointState,
@@ -8,12 +12,14 @@ import {
   Logger,
   RouterMap,
   RouterModule,
-} from 'utils';
-import { AppStorageV2 } from '@kit.ArkUI';
-import { BusinessError } from '@kit.BasicServicesKit';
-import { common, EnvironmentCallback, Configuration } from '@kit.AbilityKit';
-import { i18n } from '@kit.LocalizationKit';
-import { BookCard } from '../components/BookCard';
+  CurAppInfo,
+  cancelAppointment,
+  IUpdateAppointmentRequest,
+  updateAppointmentInfo,
+} from 'foundation';
+import { ReservationCard } from 'reservation_card';
+
+const TAG = '[AppointmentList]';
 
 @Builder
 export function appointmentListBuilder() {
@@ -38,7 +44,6 @@ export struct AppointmentList {
   private callbackId: number = 0;
 
   aboutToAppear(): void {
-    Logger.info('AppointmentList aboutToAppear');
     const paramList: AppointState[] = RouterModule.getNavParam({ url: RouterMap.MY_APPOINTMENT_LIST });
     if (paramList.length) {
       this.status = paramList[paramList.length - 1];
@@ -51,6 +56,73 @@ export struct AppointmentList {
     this.unsubscribeConfigurationUpdate();
   }
 
+  build() {
+    NavDestination() {
+      Column() {
+        if (!this.isBindPhone || this.appointInfoList.length === 0) {
+          UIEmpty({
+            emptyDesc: this.isBindPhone ? $r('app.string.empty_history') : $r('app.string.empty_history_need_login'),
+          })
+            .margin({ top: 140, bottom: 20 })
+        } else {
+          Refresh({ refreshing: $$this.isRefreshing }) {
+            Scroll() {
+              Column({ space: 10 }) {
+                ForEach(this.appointInfoList, (v: AppointmentInfo) => {
+                  ReservationCard({
+                    appointInfo: v,
+                    themeColor: $r('app.color.common_theme_color'),
+                    entityIds: CurAppInfo.PUSH_TEMPLATE_ID,
+                    systemLanguage: this.systemLanguage,
+                    cancelReservation: () => {
+                      cancelAppointment(v.id).then(() => {
+                        this.getUIContext()
+                          .getPromptAction()
+                          .showToast({ message: $r('app.string.toast_appoint_canceled') });
+                        this.appointInfoList = [];
+                        this.getAppointInfoList();
+                      })
+                    },
+                    updateReservation: (setSchedule: number, setSubscription: number) => {
+                      const data: IUpdateAppointmentRequest = {
+                        reserveId: v.id,
+                        setSchedule: setSchedule,
+                        setSubscription: setSubscription,
+                      };
+                      updateAppointmentInfo(data);
+                    },
+                    refreshReservation: () => {
+                      this.appointInfoList = [];
+                      this.getAppointInfoList();
+                    },
+                  })
+                }, (v: AppointmentInfo) => JSON.stringify(v))
+              }
+            }
+            .width(CommonConstants.FULL_PERCENT)
+            .layoutWeight(1)
+            .align(Alignment.Top)
+            .scrollBar(BarState.Off)
+            .edgeEffect(EdgeEffect.Spring)
+            .padding({
+              left: 10,
+              right: 10,
+              top: 10,
+              bottom: 20,
+            })
+          }
+          .layoutWeight(1)
+          .onRefreshing(() => {
+            this.getAppointInfoList();
+          })
+        }
+      }
+
+    }
+    .title(this.pageTitle, { backgroundColor: Color.White })
+    .backgroundColor($r('app.color.common_page_bg'))
+  }
+
   getAppointInfoList() {
     const param = this.status === AppointState.NEW ? [AppointState.NEW, AppointState.CANCEL, AppointState.OVER_TIME] :
       [AppointState.FINISH];
@@ -61,10 +133,10 @@ export struct AppointmentList {
         }
         return new AppointmentInfo(v);
       });
-      Logger.info('getAppointInfoList success');
+      Logger.info(TAG, 'getAppointInfoList success');
     }).catch((error: BusinessError) => {
       this.appointInfoList = [];
-      Logger.error('getAppointInfoList error:' + JSON.stringify(error));
+      Logger.error(TAG, 'getAppointInfoList error:' + JSON.stringify(error));
     }).finally(() => {
       setTimeout(() => {
         this.isRefreshing = false;
@@ -92,7 +164,7 @@ export struct AppointmentList {
     try {
       this.callbackId = applicationContext.on('environment', environmentCallback);
     } catch (err) {
-      Logger.error('applicationContext.on(environment error: ' + JSON.stringify(err));
+      Logger.error(TAG, 'applicationContext.on(environment error: ' + JSON.stringify(err));
     }
   }
 
@@ -101,7 +173,7 @@ export struct AppointmentList {
     try {
       applicationContext.off('environment', this.callbackId);
     } catch (err) {
-      Logger.error('applicationContext.off(environment error: ' + JSON.stringify(err));
+      Logger.error(TAG, 'applicationContext.off(environment error: ' + JSON.stringify(err));
     }
   }
 
@@ -113,60 +185,5 @@ export struct AppointmentList {
   @Computed
   get pageTitle() {
     return this.status === AppointState.NEW ? '已预约' : '已完成';
-  }
-
-  build() {
-    NavDestination() {
-      Column() {
-        if (!this.isBindPhone || this.appointInfoList.length === 0) {
-          UIEmpty({
-            emptyDesc: this.isBindPhone ? $r('app.string.empty_history') : $r('app.string.empty_history_need_login'),
-          })
-            .margin({ top: 140, bottom: 20 })
-        } else {
-          Refresh({ refreshing: $$this.isRefreshing }) {
-            Scroll() {
-              Column({ space: 10 }) {
-                ForEach(this.appointInfoList, (v: AppointmentInfo) => {
-                  BookCard({
-                    appointInfo: v,
-                    systemLanguage: this.systemLanguage,
-                    updateSchedule: (value) => {
-                      v.setSchedule = value;
-                    },
-                    updateSubscribe: (value) => {
-                      v.setSubscription = value;
-                    },
-                    reQueryList: () => {
-                      this.appointInfoList = [];
-                      this.getAppointInfoList();
-                    },
-                  })
-                }, (v: AppointmentInfo) => JSON.stringify(v))
-              }
-            }
-            .width(CommonConstants.FULL_PERCENT)
-            .layoutWeight(1)
-            .align(Alignment.Top)
-            .scrollBar(BarState.Auto)
-            .edgeEffect(EdgeEffect.Spring)
-            .padding({
-              left: 10,
-              right: 10,
-              top: 10,
-              bottom: 20,
-            })
-          }
-          .layoutWeight(1)
-          .onRefreshing(() => {
-            this.getAppointInfoList();
-          })
-        }
-      }
-
-    }
-    .title(this.pageTitle, { backgroundColor: Color.White })
-    .backgroundColor($r('app.color.common_page_bg'))
-
   }
 }

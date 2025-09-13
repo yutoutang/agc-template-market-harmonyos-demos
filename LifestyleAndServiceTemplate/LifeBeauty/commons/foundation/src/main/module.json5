@@ -1,0 +1,10 @@
+{
+  "module": {
+    "name": "foundation",
+    "type": "har",
+    "deviceTypes": [
+      "default",
+      "tablet"
+    ]
+  }
+}

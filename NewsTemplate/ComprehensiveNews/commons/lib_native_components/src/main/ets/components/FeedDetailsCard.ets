@@ -8,7 +8,7 @@ import {
   TimeUtils,
   UserInfoModel,
 } from 'lib_common'
-import { LayoutParams } from 'lib_news_api'
+import { LayoutParams } from 'module_flexlayout'
 import { Share } from 'module_share'
 import { FeedCard } from 'module_newsfeed'
 import { CardViewModel } from '../viewmodel/CardViewModel'
@@ -48,7 +48,7 @@ export struct NativeComponent {
     }
   }
 
-  handlerCoverImage() {
+  handlerCoverImage(): string {
     return this.cardData.nativeCardData.postImgList?.[0]?.surfaceUrl ||
       this.cardData.nativeCardData.postImgList?.[0]?.picVideoUrl
   }
@@ -60,7 +60,7 @@ export struct NativeComponent {
         id: this.cardData.nativeCardData.id,
         type: this.cardData.nativeCardData.type,
         title: this.cardData.nativeCardData.title,
-        createTime: TimeUtils.formatDate(this.cardData.nativeCardData.createTime, 'YYYY-MM-DD HH:MM'),
+        createTime: TimeUtils.formatDate(this.cardData.nativeCardData.createTime, 'YYYY-MM-DD HH:mm'),
         coverUrl: this.handlerCoverImage(),
         isVideo: !!this.cardData.nativeCardData.postImgList?.[0]?.surfaceUrl,
         articleFrom: this.cardData.nativeCardData.articleFrom,

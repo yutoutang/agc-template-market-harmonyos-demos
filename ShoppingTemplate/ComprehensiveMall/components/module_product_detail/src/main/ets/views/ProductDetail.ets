@@ -1,13 +1,16 @@
 import { Constants } from '../commons/Constants';
-import { ProductOperationType } from '../commons/Enum';
-import { ProductInfo } from '../commons/Types';
+import { ProductOperationType } from '../commons/Enums';
+import { ProductInfo, ProductReviewItem } from '../commons/Types';
 import { ProductInfoCard } from '../components/ProductInfoCard';
+import { ProductReviewCard } from '../components/ProductReviewCard';
 import { ProductSwiper } from '../components/ProductSwiper';
 import { ProductDetailApis } from '../https/Apis';
 import { ProductSelector } from './ProductSelector';
 
 @ComponentV2
 export struct ProductDetail {
+  @Param
+  stack: NavPathStack = new NavPathStack()
   @Param
   productId: string = '';
   @Param
@@ -29,6 +32,10 @@ export struct ProductDetail {
   @Local
   productInfo: ProductInfo | undefined = undefined;
   @Local
+  reviewList: ProductReviewItem[] = []
+  @Local
+  reviewNum: number = 0
+  @Local
   showSelector: boolean = false;
   @Local
   operationType: ProductOperationType = ProductOperationType.ADD_TO_CART;
@@ -37,6 +44,7 @@ export struct ProductDetail {
     this.isLoading = true;
     this.productInfo = await ProductDetailApis.getProductDetail(this.productId);
     this.getProductInfo?.(this.productInfo);
+    this.getReviewList()
     this.isLoading = false;
   }
 
@@ -55,6 +63,8 @@ export struct ProductDetail {
             ProductInfoCard({
               productInfo: this.productInfo,
             }).margin({ bottom: 8 });
+            // 用户评价
+            this.productReviewBuilder()
             // 详情介绍
             this.productDescBuilder();
           };
@@ -93,6 +103,52 @@ export struct ProductDetail {
     .alignItems(HorizontalAlign.Start)
     .backgroundColor(Constants.BACKGROUND_COLOR)
     .padding({ top: 12, bottom: 12 });
+  }
+
+  @Builder
+  productReviewBuilder() {
+    Column({ space: 16 }) {
+      Row() {
+        Text() {
+          Span('商品评价')
+          Span(`(${this.reviewNum})`)
+        }
+        .fontWeight(FontWeight.Bold)
+        .layoutWeight(1)
+
+        Text('更多')
+          .fontSize($r('app.string.font_size_12'))
+          .fontColor(Constants.FONT_COLOR_LEVEL3)
+          .margin({ right: $r('app.string.space_xs') })
+        Image($r('app.media.ic_arrow_right'))
+          .height(16)
+          .fillColor(Constants.FONT_COLOR_LEVEL3)
+      }
+      .width($r('app.string.size_percent_full'))
+      .justifyContent(FlexAlign.SpaceBetween)
+
+      if (this.reviewList.length) {
+        Column({ space: 16 }) {
+          ForEach(this.reviewList, (reviewItem: ProductReviewItem) => {
+            ProductReviewCard({ reviewItem })
+          }, (item: ProductReviewItem, index: number) => index + '_' + item.date)
+        }
+      } else {
+        Text('暂无商品评价')
+          .fontSize($r('app.string.font_size_14'))
+          .fontColor(Constants.FONT_COLOR_LEVEL2)
+          .height(36)
+      }
+    }
+    .padding($r('app.string.space_l'))
+    .margin({ bottom: 8 })
+    .backgroundColor(Constants.BACKGROUND_COLOR)
+    .onClick(() => {
+      if (this.reviewList.length) {
+        this.stack.pushPath({ name: Constants.REVIEW_ROUTER, param: this.productId })
+      }
+    })
+    .hitTestBehavior(HitTestMode.Default)
   }
 
   @Builder
@@ -144,7 +200,6 @@ export struct ProductDetail {
         .bottomButtonStyle()
         .borderColor(Constants.THEME_COLOR)
         .backgroundColor(Constants.THEME_COLOR)
-        .fontColor(Constants.FONT_COLOR_1_INVERT)
         .borderRadius({
           topLeft: 0,
           bottomLeft: 0,
@@ -204,6 +259,12 @@ export struct ProductDetail {
     this.operationType = operationType;
     this.showSelector = true;
   }
+
+  async getReviewList() {
+    const res = await ProductDetailApis.getProductReviewList(this.productId, 1)
+    this.reviewList = res.reviewList.slice(0, 2);
+    this.reviewNum = res.total;
+  }
 }
 
 @Extend(Text)
@@ -217,7 +278,7 @@ function chapterTitleStyle() {
 
 @Extend(Button)
 function bottomButtonStyle() {
-  .fontSize(14)
+  .fontSize($r('sys.float.Body_M'))
   .borderWidth(1)
   .height(40)
   .type(ButtonType.Normal);

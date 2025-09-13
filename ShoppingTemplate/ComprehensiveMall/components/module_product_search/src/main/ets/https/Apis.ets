@@ -1,13 +1,21 @@
+import { AppStorageV2 } from '@kit.ArkUI';
 import { HistoryModel } from '../commons/Models';
 import { HistorySearchItem, HotSearchItem } from '../commons/Types';
-import { AppStorageV2 } from '@kit.ArkUI';
-import { GUESS_LIKE_LIST1, GUESS_LIKE_LIST2, HISTORY_SEARCH_MOCK, HOT_SEARCH_MOCK } from './MockData';
+import {
+  GUESS_LIKE_LIST1,
+  GUESS_LIKE_LIST2,
+  HISTORY_SEARCH_MOCK,
+  HOT_SEARCH_MOCK,
+} from './MockData';
 
 // todo: 商品搜索组件的API定义,当前为纯端数据mock
 @ObservedV2
 export class ProductSearchApis {
   @Trace
-  private static _history: HistoryModel = AppStorageV2.connect(HistoryModel, () => new HistoryModel())!;
+  private static _history: HistoryModel = AppStorageV2.connect(
+    HistoryModel,
+    () => new HistoryModel(),
+  )!;
   private static _isInit: boolean = false;
   private static _refreshTimes: number = 0;
 
@@ -24,7 +32,9 @@ export class ProductSearchApis {
       label,
       latestSearch: new Date().getTime(),
     };
-    const idx = ProductSearchApis._history.list.findIndex((item) => item.label === label);
+    const idx = ProductSearchApis._history.list.findIndex(
+      (item) => item.label === label,
+    );
     if (idx >= 0) {
       ProductSearchApis._history.list.splice(idx, 1);
     }

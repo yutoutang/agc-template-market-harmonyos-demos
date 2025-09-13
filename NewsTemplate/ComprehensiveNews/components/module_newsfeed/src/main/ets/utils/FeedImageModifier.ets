@@ -1,7 +1,7 @@
 import { FeedCardInfoModel } from '../model/RecommendModel'
 import { calculateDimensions } from './Index'
 
-export class FeedImageModifier implements AttributeModifier<ImageAttribute> {
+export class FeedImageModifier implements AttributeModifier<ImageAttribute | ColumnAttribute> {
   curFeedCardInfo: FeedCardInfoModel = new FeedCardInfoModel()
   imageWidth: number = 0
   imageHeight: number = 0
@@ -10,7 +10,7 @@ export class FeedImageModifier implements AttributeModifier<ImageAttribute> {
     this.curFeedCardInfo = curFeedCardInfo
   }
 
-  applyNormalAttribute(instance: ImageAttribute): void {
+  applyNormalAttribute(instance: ImageAttribute | ColumnAttribute): void {
     if (this.curFeedCardInfo.postImgList?.length === 1) {
       this.calculateSize()
       instance.width(this.imageWidth)

@@ -19,6 +19,7 @@ export struct RecommendedCard {
       Stack() {
         Image($r(`app.media.${this.recipe.thumbnail}`))
           .width('100%')
+          .constraintSize({ maxWidth: 160 })
           .objectFit(ImageFit.Cover)
           .height(160)
           .borderRadius(8)
@@ -38,12 +39,14 @@ export struct RecommendedCard {
       }
       .borderRadius(8)
       .width('100%')
+      .constraintSize({ maxWidth: 160 })
       .height(160)
       .clip(true)
       .align(Alignment.Bottom);
 
       Text(this.recipe.title)
         .width('100%')
+        .constraintSize({ maxWidth: 160 })
         .margin({ top: 8, bottom: 4 })
         .fontColor($r('sys.color.font_primary'))
         .fontSize(14);
@@ -64,8 +67,8 @@ export struct RecommendedCard {
             .fontSize(12)
             .fontColor($r('sys.color.font_secondary'));
         };
-      }.width('100%').justifyContent(FlexAlign.SpaceBetween);
-    }.gesture(GestureGroup(GestureMode.Exclusive,
+      }.width('100%').constraintSize({ maxWidth: 160 }).justifyContent(FlexAlign.SpaceBetween);
+    }.width('100%').gesture(GestureGroup(GestureMode.Exclusive,
       LongPressGesture({ repeat: true })
         .onAction(() => {
           this.changeDeleteState(true);

@@ -4,15 +4,15 @@
  * 可作为数据层与 UI (View Model) 层之间的数据交换对象，或持久化、网络通信的通用格式。
  */
 export class ParsedAddressDTO {
-  public name: string = '';         // 姓名
-  public phone: string = '';        // 手机号
-  public countryCode: string = '';  // 国家代码
-  public country: string = '';      // 国家
-  public province: string = '';     // 省
-  public city: string = '';         // 市
-  public district: string = '';     // 区
-  public street: string = '';       // 街道
-  public detail: string = '';       // 地址详述（如楼栋、门牌号等）
+  public name: string = ''; // 姓名
+  public phone: string = ''; // 手机号
+  public countryCode: string = ''; // 国家代码
+  public country: string = ''; // 国家
+  public province: string = ''; // 省
+  public city: string = ''; // 市
+  public district: string = ''; // 区
+  public street: string = ''; // 街道
+  public detail: string = ''; // 地址详述（如楼栋、门牌号等）
 
   // 一个有效的地址至少要到达三级行政区
   public hasCompleteLocation(): boolean {

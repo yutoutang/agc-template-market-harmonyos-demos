@@ -173,6 +173,7 @@ struct HomePage {
           }
           .layoutWeight(1)
           .scrollBar(BarState.Off)
+          .edgeEffect(EdgeEffect.Spring)
           .align(Alignment.Top)
           .padding({ left: Constants.BORDER_WIDTH, right: Constants.BORDER_WIDTH })
         }

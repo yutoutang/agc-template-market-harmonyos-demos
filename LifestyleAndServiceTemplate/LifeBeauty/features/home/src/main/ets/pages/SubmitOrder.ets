@@ -1,6 +1,10 @@
+import { common } from '@kit.AbilityKit';
+import { paymentService } from '@kit.PaymentKit';
+import { BusinessError } from '@kit.BasicServicesKit';
 import {
   CommonUtils,
   ISubmitOrderRequest,
+  Logger,
   PHONE_REG,
   preOrder,
   RouterMap,
@@ -8,11 +12,8 @@ import {
   SimpleGoodInfo,
   SimpleOrderInfo,
   UIOrderPart,
-} from 'utils';
-import { common } from '@kit.AbilityKit';
-import { paymentService } from '@kit.PaymentKit';
-import { BusinessError } from '@kit.BasicServicesKit';
-import { FormItemDivider } from '../common/UIComponent';
+} from 'foundation';
+import { ConstantsHome } from '../common/Constant';
 
 @Builder
 export function SubmitOrderBuilder() {
@@ -32,15 +33,7 @@ function cardContainer() {
   .backgroundColor(Color.White)
 }
 
-@Extend(Button)
-function btnStyle() {
-  .width(16)
-  .height(16)
-  .padding(3)
-  .backgroundColor('#F2F2F2')
-  .type(ButtonType.Circle)
-
-}
+const TAG = '[SubmitOrder]';
 
 @ComponentV2
 export struct SubmitOrder {
@@ -50,7 +43,7 @@ export struct SubmitOrder {
   @Local phone: string = '';
   @Local remark: string = '';
   number: number = 1;
-  // 由于没有商户环境，不能真实调用华为支付api
+  // todo: 实际商户条件具备后，修改为false
   private ignoreRequestPayment: boolean = true;
 
   aboutToAppear(): void {
@@ -81,13 +74,14 @@ export struct SubmitOrder {
     if (this.ignoreRequestPayment) {
       return new Promise((resolve) => resolve());
     }
+    // todo: 补充订购信息
     const orderStr = '{}';
     return paymentService.requestPayment(this.context, orderStr)
       .then(() => {
-        console.info('succeeded in paying');
+        Logger.info(TAG, 'succeeded in paying');
       })
       .catch((error: BusinessError) => {
-        console.error(`failed to pay, error.code: ${error.code}, error.message: ${error.message}`);
+        Logger.error(TAG, `failed to pay, error.code: ${error.code}, error.message: ${error.message}`);
         this.getUIContext().getPromptAction().showToast({ message: '拉起支付失败' });
       });
   }
@@ -157,7 +151,7 @@ export struct SubmitOrder {
           .textAlign(TextAlign.End)
       }.width('100%').height(48)
 
-      FormItemDivider()
+      Divider().margin({ bottom: 8 })
 
       Row() {
         Row({ space: 4 }) {
@@ -211,18 +205,22 @@ export struct SubmitOrder {
         }
       }.width('100%').height(48)
 
-      FormItemDivider()
+      Divider().margin({ bottom: 8 })
 
-      Row() {
+      Column({ space: 10 }) {
         Text('备注').fontSize(16).fontWeight(500)
-        Blank()
-        TextInput({ text: $$this.remark, placeholder: '请填写备注信息' })
+        TextArea({ placeholder: '请填写备注信息', text: $$this.remark })
+          .maxLines(3)
+          .height(70)
+          .placeholderColor('#C7C7C7')
+          .maxLength(ConstantsHome.MAX_REMARK_LENGTH)
+          .showCounter(true, { highlightBorder: false })
           .backgroundColor(Color.Transparent)
-          .padding(0)
           .borderRadius(0)
-          .width('70%')
-          .textAlign(TextAlign.End)
-      }.width('100%').height(48)
+          .padding(0)
+      }
+      .width('100%')
+      .alignItems(HorizontalAlign.Start)
     }.cardContainer()
   }
 
@@ -244,7 +242,7 @@ export struct SubmitOrder {
           right: 16,
         })
         .backgroundColor($r('app.color.common_theme_color'))
-        .fontColor(Color.White)
+        .fontColor($r('sys.color.font_on_primary'))
         .onClick(() => {
           this.submit();
         })

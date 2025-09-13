@@ -39,6 +39,10 @@
     {
       "name": "loading",
       "value": "加载中"
+    },
+    {
+      "name": "agcit_huawei_shopping_mall",
+      "value": "1.0.0"
     }
   ]
 }

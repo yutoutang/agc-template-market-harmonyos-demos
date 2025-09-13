@@ -12,14 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Logger, RouterMap } from 'module_base';
+import { RouterMap } from 'module_base';
 import { RouterModule, LoginUtil } from 'lib_foundation';
 
 @Entry
 @ComponentV2
 struct Index {
   aboutToAppear() {
-    Logger.info('Index Page onCreate');
     LoginUtil.silentLogin().then((isSuccess) => {
       if (isSuccess) {
         RouterModule.replace({ url: RouterMap.MAIN });

@@ -1,5 +1,7 @@
 import { uiObserver, UIUtils, window } from '@kit.ArkUI';
-import { CircleButtonModifier, CommonConstants, CommonDataSource, RouterMap, RouterUtils } from 'lib_common'
+import {
+  BreakpointNameEnum,
+  CircleButtonModifier, CommonConstants, CommonDataSource, RouterMap, RouterUtils } from 'lib_common'
 import { VideoCard, VideoCardPlayerController, VideoNetworkModel, VideoNetworkSetting } from 'module_swipeplayer';
 import { LongTakeAnimationProperties } from 'module_transition';
 import { CommentInfo } from 'module_feedcomment';
@@ -77,21 +79,27 @@ export struct LivestreamDetailPage {
       this.headerBuilderView();
 
       Stack({ alignContent: Alignment.TopStart }) {
-        VideoCard({
-          currentIndex: 0,
-          index: 0,
-          videoData: this.detailData,
-          isShown: true,
-          videoNetwork: this.vm.networkModel as VideoNetworkModel,
-          videoNetworkSetting: this.vm.settingInfo.network as VideoNetworkSetting,
-          currentBreakpoint: this.vm.breakPointModel.currentBreakpoint,
-          videoCardPlayerController: this.videoCardPlayerController,
-          isFromDetailCard: true,
-          canChangeSlide: !this.isLivestream,
-          pathStack: this.pathStack,
-        })
-          .clip(true)
-          .constraintSize({ maxHeight: 400 })
+        Column() {
+          VideoCard({
+            currentIndex: 0,
+            index: 0,
+            videoData: this.detailData,
+            isShown: true,
+            videoNetwork: this.vm.networkModel as VideoNetworkModel,
+            videoNetworkSetting: this.vm.settingInfo.network as VideoNetworkSetting,
+            currentBreakpoint: this.vm.breakPointModel.currentBreakpoint,
+            videoCardPlayerController: this.videoCardPlayerController,
+            isFromDetailCard: true,
+            canChangeSlide: !this.isLivestream,
+            pathStack: this.pathStack,
+          })
+            .clip(true)
+        }
+        .width('100%')
+        .height(this.vm.breakPointModel.currentBreakpoint === BreakpointNameEnum.SM ? 200 : 400)
+        .justifyContent(FlexAlign.Center)
+        .alignItems(HorizontalAlign.Center)
+        .backgroundColor(Color.Black)
 
         Row({ space: CommonConstants.SPACE_S }) {
           Row({ space: 2 }) {

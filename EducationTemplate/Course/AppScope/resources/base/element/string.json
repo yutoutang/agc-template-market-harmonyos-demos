@@ -1,0 +1,20 @@
+{
+  "string": [
+    {
+      "name": "app_name",
+      "value": "课堂应用模板"
+    },
+    {
+      "name": "agcit_huawei_course_service",
+      "value": "1.0.0"
+    },
+    {
+      "name": "agcittype_huawei_course_service",
+      "value": "industryTemplate"
+    },
+    {
+      "name": "agcitkid_huawei_course_service",
+      "value": "agcit_huawei_common_advertisement/1.0.0,agcit_huawei_common_login/1.0.0,agcit_huawei_course_recorded_player/1.0.0,agcit_huawei_common_feedback/1.0.0,agcit_huawei_common_payment/1.0.0,agcit_huawei_common_share/1.0.0,agcit_huawei_course_classification/1.0.0,agcit_huawei_common_search/1.0.0"
+    }
+  ]
+}

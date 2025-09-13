@@ -1,4 +1,11 @@
-import { EasyEditor } from '../components/EasyEditor'
+import { RawEditorOptions } from '../options/tinymce'
+
+class EasyEditor {
+  content:string = ''
+  config:string | RawEditorOptions = ''
+  darkMode:boolean = false
+  removeFormat:(confirm:()=> void) => void = () => {}
+}
 
 export class EasyEditorBridge {
   private editor: EasyEditor
@@ -33,4 +40,11 @@ export class EasyEditorBridge {
     return this.editor.darkMode
   }
 
+  /**
+   * 清除格式回调
+   * @returns 暗黑模式
+   */
+  removeFormat(confirm:() => void) {
+    this.editor.removeFormat(confirm)
+  }
 }

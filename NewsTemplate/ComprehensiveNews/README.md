@@ -27,9 +27,9 @@
 | 分享组件（module_share）           | 支持微信、qq、系统分享                    | [使用指导](components/module_share/README.md)         |
 | 短视频滑动组件（module_swipeplayer）  | 支持短视频上下滑动、横竖屏切换、长按倍速、播放进度条拖动等能力 | [使用指导](components/module_swipeplayer/README.md)   |
 | 朗读组件（module_text_reader）     | 支持文本朗读                          | [使用指导](components/module_text_reader/README.md)   |
-| 一镜到底组件（module_transition）    | 支持路由跳转一镜到底                      | [使用指导](components/module_transition/README.md)    |
-| 新闻发表组件（module_articlepost）   | 支持富文本发表新闻                       | [使用指导](components/module_transition/README.md)    |
-
+| 一镜到底组件（module_transition）    | 支持卡片展开、搜索、查看大图一镜到底              | [使用指导](components/module_transition/README.md)    |
+| 新闻发布组件（module_articlepost）   | 支持富文本发表新闻                       | [使用指导](components/module_articlepost/README.md)   |
+| 动态布局组件（module_flexlayout）   | 支持根据描述文件动态布局                    | [使用指导](components/module_flexlayout/README.md)   |
 本模板为新闻类应用提供了常用功能的开发样例，模板主要分首页、视频、互动和我的四大模块：
 
 * 首页：提供推荐新闻信息流、搜索、扫码、热榜、本地等功能。
@@ -40,10 +40,7 @@
 
 * 我的：提供个人主页查看、评论、消息、管理收藏/点赞/浏览历史、意见反馈、设置等功能。
 
-本模板已集成华为账号、推送、预加载、广告、朗读、无障碍屏幕朗读、适老化、深色模式、微信登录分享等服务，
-适配平板一多布局、视频悬停态播放，支持不同设备间同步新闻浏览进度，
-提供首页新闻动态布局能力，
-只需做少量配置和定制即可快速实现华为账号的登录、新闻阅读等功能。
+本模板已集成华为账号、推送、预加载、广告、朗读、无障碍屏幕朗读、适老化、深色模式、微信登录分享等服务，适配平板一多布局、视频悬停态播放，支持不同设备间同步新闻浏览进度，提供首页新闻动态布局能力，只需做少量配置和定制即可快速实现华为账号的登录、新闻阅读等功能。
 
 | 首页                                             | 视频                                              | 互动                                                    | 我的                                             |
 |------------------------------------------------|-------------------------------------------------|-------------------------------------------------------|------------------------------------------------|
@@ -174,8 +171,8 @@ ComprehensiveNews
 │  │    ├──components
 │  │    │   ├──LoadMoreFooter.ets                         // 加载更多
 │  │    │   ├──NewsTabContent.ets                         // Tab视图
-│  │    │   └──NoLoginPage.ets                            // 未登录视图                  
-│  │    ├──sdk                                            // 动态布局核心sdk        
+│  │    │   ├──NoLoginPage.ets                            // 未登录视图
+│  │    │   └──FlexLayoutPage.ets                         // 动态布局入口    
 │  │    └──views
 │  │        └──FlexLayout.ets                             // 动态布局列表页 
 │  │
@@ -191,9 +188,9 @@ ComprehensiveNews
 │  │    │   ├──TopTextBottomVideoCard.ets                 // 上文下视频卡片
 │  │    │   └──VerticalBigImageCard.ets                   // 上下布局大图
 │  │    └─utils 
-│  │        ├──Modifier.ets                               // 样式modifier
-│  │        ├──NodeBuilderConfig.ets                      // node配置类
-│  │        └──Utils.ets                                  // 工具方法             
+│  │        ├──CardRegisterEngine.ets                     // 样式modifier
+│  │        ├──Modifier.ets                               // 工具方法    
+│  │        └──Utils.ets                                  // 卡片注册类         
 │  │
 │  ├──lib_news_api/src/main/ets                           // 服务端api模块             
 │  │    ├──constants                                      // 常量文件    
@@ -236,7 +233,8 @@ ComprehensiveNews
 │  ├──module_share                                        // 分享组件
 │  ├──module_swipeplayer                                  // 视频组件
 │  ├──module_text_reader                                  // 朗读组件
-│  └──module_transition                                   // 动画组件            
+│  └──module_transition                                   // 动画组件
+│  └──module_flexlayout                                   // 动态布局渲染组件             
 │      
 ├──features
 │  ├──business_home/src/main/ets                          // 首页模块             
@@ -374,14 +372,12 @@ ComprehensiveNews
 
 ### 使用约束
 1. 跨设备同步新闻浏览进度，使用约束如下，详细参考：[应用接续开发指导](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/app-continuation-guide#section17575828642)
-   - 支持的手机系统：HarmonyOS NEXT Developer Preview0及以上版本的设备
    - 双端设备需要登录同一华为账号
    - 双端设备需要打开 WLAN 和蓝牙开关，或者在设置中的“多设备协同 > 高级”中启用“多设备协同增强服务”功能
    - 双端设备需要在“设置”应用中开启“多设备协同 > 接续”功能
    - 双端设备都需要安装该应用
 
 2. 碰一碰分享，使用约束如下，详细参考：[手机与手机碰一碰分享](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/knock-share-phone-to-phone#section15384182281511)
-   - 支持的手机系统：HarmonyOS NEXT Release及以上版本
    - 任意一端设备不支持碰一碰能力时，轻碰无任何响应
 
 ## 快速入门
@@ -465,10 +461,15 @@ ComprehensiveNews
 
 1. [首页](./screenshots/home.mp4)
 2. [视频](./screenshots/video.mp4)
-3. [互动](./screenshots/interaction.mp4)
+3. [发帖](./screenshots/post.jpg)
 4. [我的](./screenshots/mine.mp4)
-5. [深色模式](./screenshots/dark.mp4)
-6. [字体设置](./screenshots/fontsetting.mp4)
+5. [深色模式](./screenshots/darkmode.jpg)
+6. [大字体](./screenshots/fontsetting.jpg)
+7. [折叠屏-首页](./screenshots/homefold.jpg)
+8. [折叠屏-新闻详情页](./screenshots/newsdetailfold.jpg)
+9. [折叠屏-悬停态播放视频](./screenshots/videofold.mp4)
+10. [跨设备同步新闻浏览进度](./screenshots/syncnews.mp4)
+11. [一镜到底动效](./screenshots/longtake.mp4)
 
 ## 开源许可协议
 

@@ -11,15 +11,22 @@ export {
   BreakpointSystem,
   BreakpointType,
   BreakpointModel,
-  BreakpointStorage
-} from './src/main/ets/utils/BreakpointSystem'
+  BreakpointStorage,
+} from './src/main/ets/utils/BreakpointSystem';
+
+export { Logger } from './src/main/ets/utils/Logger';
 
 export * from './src/main/ets/featurecomponents/Index';
 
-export * from './src/main/ets/basecomponents/Index';
-
-export * from './src/main/ets/types/Index';
-
 export * from './src/main/ets/models/Index';
 
-export * from './src/main/ets/constants/Index'
+export * from './src/main/ets/constants/Index';
+
+export { WindowUtil } from './src/main/ets/utils/WindowUtil';
+
+export { PopViewUtil } from './src/main/ets/utils/PopViewUtil';
+
+export {
+  CallButton,
+  buildMakeCallComponent,
+} from './src/main/ets/featurecomponents/callbutton/Index';

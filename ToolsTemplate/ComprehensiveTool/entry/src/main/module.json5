@@ -3,7 +3,6 @@
     "name": "entry",
     "type": "entry",
     "description": "$string:module_desc",
-    "routerMap": "$profile:route_map",
     "mainElement": "EntryAbility",
     "deviceTypes": [
       "phone",
@@ -28,7 +27,8 @@
               "entity.system.home"
             ],
             "actions": [
-              "action.system.home"
+              "action.system.home",
+              "ohos.nfc.tag.action.TAG_FOUND"
             ]
           }
         ]

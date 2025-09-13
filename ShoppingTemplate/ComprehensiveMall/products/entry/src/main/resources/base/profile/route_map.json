@@ -1,29 +1,24 @@
 {
   "routerMap": [
     {
+      "name": "MainEntry",
+      "pageSourceFile": "src/main/ets/pages/MainEntry.ets",
+      "buildFunction": "MainEntryBuilder"
+    },
+    {
+      "name": "SafePage",
+      "pageSourceFile": "src/main/ets/pages/SafePage.ets",
+      "buildFunction": "SafePageBuilder"
+    },
+    {
       "name": "CategoryPage",
-      "pageSourceFile": "src/main/ets/pages/CategoryPage.ets",
+      "pageSourceFile": "src/main/ets/tabviews/CategoryPage.ets",
       "buildFunction": "buildCategoryPage"
     },
     {
-      "name": "SettingPage",
-      "pageSourceFile": "src/main/ets/pages/SettingPage.ets",
-      "buildFunction": "buildSettingPage"
-    },
-    {
-      "name": "AgreementPage",
-      "pageSourceFile": "src/main/ets/pages/AgreementPage.ets",
-      "buildFunction": "buildAgreementPage"
-    },
-    {
-      "name": "EditProfilePage",
-      "pageSourceFile": "src/main/ets/pages/EditProfilePage.ets",
-      "buildFunction": "buildEditProfilePage"
-    },
-    {
-      "name": "CouponPage",
-      "pageSourceFile": "src/main/ets/pages/CouponPage.ets",
-      "buildFunction": "buildCouponPage"
+      "name": "CartPage",
+      "pageSourceFile": "src/main/ets/tabviews/CartPage.ets",
+      "buildFunction": "buildCartPage"
     }
   ]
 }

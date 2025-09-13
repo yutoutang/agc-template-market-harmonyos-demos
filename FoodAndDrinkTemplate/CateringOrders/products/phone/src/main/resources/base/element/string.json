@@ -63,6 +63,10 @@
     {
       "name": "login_account",
       "value": "请先登录华为账号"
+    },
+    {
+      "name": "agcit_huawei_catering_orders",
+      "value": "1.0.1"
     }
   ]
 }

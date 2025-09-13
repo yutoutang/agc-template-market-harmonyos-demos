@@ -22,7 +22,7 @@
 
 - DevEco Studio版本：DevEco Studio 5.0.3 Release及以上
 - HarmonyOS SDK版本：HarmonyOS 5.0.3 Release SDK及以上
-- 设备类型：华为手机（包括双折叠和阔折叠）
+- 设备类型：华为手机（包括双折叠和阔折叠）、平板
 - 系统版本：HarmonyOS 5.0.1(13)及以上
 
 ### 权限
@@ -64,7 +64,7 @@
    ```
    import { AdvertisementComponent } from 'module_advertisement';
    ```
-3. 调用组件，详细参数配置说明参见[API参考](#API参考)。
+3. 调用组件，详细组件调用参见[示例代码](#示例代码)。
 
    ``` 
    import { AdvertisementComponent } from 'module_advertisement';
@@ -83,38 +83,6 @@
            // 备考隐私协议方法
            skipAd: () => {
            },
-         })
-       }
-       .height('100%')
-       .width('100%')
-     }
-   }
-   ```
-   ```
-   import { AdvertisementComponent } from 'module_advertisement';
-
-   @Entry
-   @Component
-   struct Index {
-     @State message: string = 'Hello World';
-   
-     build() {
-       RelativeContainer() {
-         // 横幅广告
-         Row() {
-           AdvertisementComponent({
-             testAd: 'testw6vs28auh3',
-             adType: 8,
-           })
-         }
-         .width('100%')
-         .height(120)
-         .margin({top:48})
-         .padding({
-           left: 16,
-           right: 16,
-           top: 12,
-           bottom: 12
          })
        }
        .height('100%')

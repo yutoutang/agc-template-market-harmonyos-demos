@@ -56,6 +56,3 @@ export enum ReductionTypes {
   // 折扣
   DISCOUNT_REDUCTION = '2',
 }
-
-
-

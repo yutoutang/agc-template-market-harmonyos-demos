@@ -1,7 +1,7 @@
 import { PersistenceV2, UIUtils } from '@kit.ArkUI';
 import { CommonConstants, SettingModel, UserInfoModel } from 'lib_common';
-import { LayoutParams } from 'lib_news_api';
 import { BaseImage } from 'lib_widget';
+import { LayoutParams } from 'module_flexlayout';
 import { Highlight } from 'module_highlight';
 import { AuthorCard } from '../builder/AuthorBuilder';
 import { CardViewModel } from '../viewmodel/CardViewModel';

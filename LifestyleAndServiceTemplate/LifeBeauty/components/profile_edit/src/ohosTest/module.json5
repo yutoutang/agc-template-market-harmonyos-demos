@@ -1,0 +1,11 @@
+{
+  "module": {
+    "name": "profile_edit_test",
+    "type": "feature",
+    "deviceTypes": [
+      "default"
+    ],
+    "deliveryWithInstall": true,
+    "installationFree": true
+  }
+}

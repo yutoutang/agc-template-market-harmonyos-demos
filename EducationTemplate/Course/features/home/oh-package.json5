@@ -1,0 +1,17 @@
+{
+  "name": "home",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "commonlib": "file:../../commons/commonlib",
+    "http": "file:../../commons/http",
+    "recorded_player": "file:../../components/recorded_player",
+    "search": "file:../../components/search",
+    "aggregated_payment": "file:../../components/aggregated_payment",
+    "aggregated_share": "file:../../components/aggregated_share",
+    "classification": "file:../../components/classification"
+  }
+}

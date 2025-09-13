@@ -31,6 +31,7 @@ export class MyOrderDetailVM {
 
   payOrder() {
     CommonUtils.showLoading();
+    // todo: 传入false，不走mock
     SystemSceneUtils.requestPaymentPromise(true, this.uiAbilityContext).then(() => {
       payOrder(this.fullOrderInfo.orderId).then(() => {
         CommonUtils.hideLoading();

@@ -5,19 +5,18 @@ import { HistoryUtils } from '../utils/HistoryUtils';
 import CheckEmptyUtil from '../common/CheckEmptyUtil';
 import CalculateUtil from '../common/CalculateUtil';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { BreakpointModel, BreakpointStorage, BreakpointSystem, BreakpointTypeEnum } from '../utils/BreakpointSystem';
 
 @ComponentV2
 export struct StandardCalcKeyboard {
   @Local firstClickC: boolean = true;
   @Local inputValue: string = '';
   @Local calValue: string = '';
-  private expressions: Array<string> = [];
   @Local arr: string[] = [];
   @Local lastBtnIsEqu: boolean = false;
   @Local isClickEquBtn: boolean = false;
+  @Local curBreakpoint: BreakpointStorage = BreakpointSystem.currentBreakpoint
   context: common.Context = getContext(this) as common.UIAbilityContext;
-  @Event changeResult: (result: string, expression: string) => void = (result: string, expression: string) => {
-  };
   calcButtonItemModel: CalcButtonItemModel[] = [
     new CalcButtonItemModel('del', BUTTON_TYPE.LETTERS, 0, 'C',
       $r('sys.color.background_emphasize')),
@@ -64,6 +63,10 @@ export struct StandardCalcKeyboard {
       }
       return [0, 0, 0, 0];
     },
+  };
+  private expressions: Array<string> = [];
+
+  @Event changeResult: (result: string, expression: string) => void = (result: string, expression: string) => {
   };
 
   @Monitor('inputValue')
@@ -121,8 +124,14 @@ export struct StandardCalcKeyboard {
     .columnsTemplate('1fr 1fr 1fr 1fr')
     .rowsTemplate('1fr 1fr 1fr 1fr 1fr')
     .columnsGap(16)
-    .rowsGap(16)
-    .height(420);
+    .rowsGap(new BreakpointModel<number>({
+      [BreakpointTypeEnum.LG_WIDE]: 8,
+      [BreakpointTypeEnum.LG_NORMAL]: 16,
+    }).getValue(this.curBreakpoint.height))
+    .height(new BreakpointModel<number>({
+      [BreakpointTypeEnum.LG_WIDE]: 388,
+      [BreakpointTypeEnum.LG_NORMAL]: 420,
+    }).getValue(this.curBreakpoint.height));
   }
 
   /**

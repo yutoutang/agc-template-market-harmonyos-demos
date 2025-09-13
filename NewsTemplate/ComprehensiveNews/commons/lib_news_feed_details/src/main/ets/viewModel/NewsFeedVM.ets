@@ -1,15 +1,18 @@
 import { AbilityConstant, common } from '@kit.AbilityKit'
 import { AppStorageV2, UIUtils } from '@kit.ArkUI'
-import { BaseViewModel, BundleInfo, CommonConfirmDialog, ContinueModel, GridRowColSetting, Logger } from 'lib_common'
+import { BaseViewModel, BundleInfo, CommonConfirmDialog, ContinueModel, GridRowColSetting, Logger,
+  RouterParams,
+  RouterToNews} from 'lib_common'
 import {
   BaseNewsServiceApi,
   CommentResponse,
   CommentServiceApi,
   MineServiceApi,
+  NewsResponse,
   PublishCommentRequest,
 } from 'lib_news_api'
 import { LoginSheetUtils } from 'lib_account'
-import { LongTakeAnimationProperties, LongTakeTransitionParam } from 'module_transition'
+import { LoneTakeAnimationsTransition, LongTakeAnimationProperties, LongTakeTransitionParam } from 'module_transition'
 import { CommentInfo, NewsFeedInfo } from '../model/Model'
 import { MakeObCommentServed } from '../utils/Utils'
 import { FeedBreakPointVM } from './FeedBreakPointVM'
@@ -26,7 +29,7 @@ export class NewsFeedVM extends BaseViewModel {
   @Trace continueModel: ContinueModel = AppStorageV2.connect(ContinueModel, () => new ContinueModel())!;
   @Trace feedBreakPointVM: FeedBreakPointVM = new FeedBreakPointVM()
   feedCommentScroller: Scroller = new Scroller()
-
+  uiContext:UIContext | undefined = undefined
   @Computed
   get isFeedSelf() {
     return this.userInfoModel.authorId === this.articleDetails?.author?.authorId;
@@ -37,6 +40,10 @@ export class NewsFeedVM extends BaseViewModel {
       NewsFeedVM._instance = new NewsFeedVM()
     }
     return NewsFeedVM._instance
+  }
+
+  public setUiContext(uiContext:UIContext) {
+    this.uiContext = uiContext
   }
 
   public initArticle(articleId: string) {
@@ -336,6 +343,31 @@ export class NewsFeedVM extends BaseViewModel {
     } catch (e) {
       Logger.error(TAG, 'setContinueOffset fail, error: ' + JSON.stringify(e));
     }
+  }
+
+  /*
+  * cardData 数据源
+  * formType 跳转来源，判断是否是从首页点击评论进入
+  * componentId  一镜到底id
+  * isQueryCardData 是否携带新闻详情跳转到详情页
+  * */
+  public pushToNewsDetails(cardData: NewsFeedInfo,componentId: string, formType?: string,
+    isQueryCardData: boolean = false) {
+    let params: RouterParams<NewsResponse> = {
+      newsId: cardData.id,
+      type: cardData.type,
+      surfaceUrl: cardData.postImgList?.[0]?.surfaceUrl,
+      cardData: cardData,
+      isQueryCardData: isQueryCardData,
+      formType: formType ?? '',
+    }
+    let longTakeTransitionParam: LongTakeTransitionParam | undefined =
+      LoneTakeAnimationsTransition.generateLongTakeParam(this.uiContext as UIContext,
+        componentId, 9);
+    if (longTakeTransitionParam) {
+      params.longTakeTransitionParam = longTakeTransitionParam;
+    }
+    RouterToNews.pushToNewsDetails<NewsResponse>(params)
   }
 }
 

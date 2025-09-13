@@ -1,7 +1,9 @@
 import { call } from '@kit.TelephonyKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { promptAction } from '@kit.ArkUI';
-import { CommonConstants, Logger, PopViewUtils } from 'utils';
+import { CommonConstants, Logger, PopViewUtils } from 'foundation';
+
+const TAG = '[DialogCall]';
 
 export class Params {
   phones: string[] = [];
@@ -20,9 +22,9 @@ function callPhone(value: string) {
     }
     call.makeCall(value, (err: BusinessError) => {
       if (!err) {
-        Logger.info('make call success.');
+        Logger.info(TAG, 'make call success.');
       } else {
-        Logger.error('make call fail, err is:' + JSON.stringify(err));
+        Logger.error(TAG, 'make call fail, err is:' + JSON.stringify(err));
       }
     });
   } catch (e) {

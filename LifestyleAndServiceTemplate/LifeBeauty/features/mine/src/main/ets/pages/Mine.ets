@@ -1,6 +1,7 @@
 import { AppStorageV2, CircleShape } from '@kit.ArkUI';
+import { common, Configuration, EnvironmentCallback } from '@kit.AbilityKit';
+import { i18n } from '@kit.LocalizationKit';
 import {
-  AppointmentInfo,
   AppointState,
   CommonConstants,
   getGoodList,
@@ -15,23 +16,11 @@ import {
   RouterMap,
   RouterModule,
   unbindPhone,
-} from 'utils';
-import { common, Configuration, EnvironmentCallback } from '@kit.AbilityKit';
-import { i18n } from '@kit.LocalizationKit';
+} from 'foundation';
 import { DialogQRCodeBuilder, QRCodeParams } from '../components/DialogQRCode';
+import { MineIconLabel } from '../components/MineIconLabel';
 
-@ComponentV2
-struct MineIconLabel {
-  @Param icon: ResourceStr = '';
-  @Param label: ResourceStr = '';
-
-  build() {
-    Column({ space: 6 }) {
-      Image(this.icon).width(24).height(24)
-      Text(this.label).fontSize(12).height(16)
-    }
-  }
-}
+const TAG = '[Mine]';
 
 @ComponentV2
 export struct Mine {
@@ -66,7 +55,7 @@ export struct Mine {
     try {
       this.callbackId = applicationContext.on('environment', environmentCallback);
     } catch (err) {
-      Logger.error('applicationContext.on(environment error: ' + JSON.stringify(err));
+      Logger.error(TAG, 'applicationContext.on(environment error: ' + JSON.stringify(err));
     }
   }
 
@@ -75,7 +64,7 @@ export struct Mine {
     try {
       applicationContext.off('environment', this.callbackId);
     } catch (err) {
-      Logger.error('applicationContext.off(environment error: ' + JSON.stringify(err));
+      Logger.error(TAG, 'applicationContext.off(environment error: ' + JSON.stringify(err));
     }
   }
 
@@ -101,7 +90,11 @@ export struct Mine {
   @Builder
   titleBuilder() {
     Row() {
-      Text('个人中心').fontSize(16).fontWeight(700).padding({ left: 16 }).height(56)
+      Text('个人中心')
+        .fontSize(26)
+        .fontWeight(700)
+        .padding({ left: 16 })
+        .height(56)
     }
     .width('100%')
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
@@ -112,7 +105,7 @@ export struct Mine {
   @Builder
   titleInside() {
     Text('个人中心')
-      .fontSize(16)
+      .fontSize(26)
       .fontWeight(700)
       .padding({ left: 16 })
       .height(56)
@@ -127,6 +120,11 @@ export struct Mine {
         .width(56)
         .height(56)
         .clipShape(new CircleShape({ width: 56, height: 56 }))
+        .onClick(() => {
+          if (this.isBindPhone()) {
+            RouterModule.push({ url: RouterMap.MY_PERSONAL_INFO });
+          }
+        })
       if (this.isBindPhone()) {
         Column({ space: 10 }) {
           Row({ space: 10 }) {
@@ -136,6 +134,9 @@ export struct Mine {
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
               .constraintSize({ maxWidth: 150 })
+              .onClick(() => {
+                RouterModule.push({ url: RouterMap.MY_PERSONAL_INFO });
+              })
 
             if (this.userInfo.memberId) {
               Row({ space: 4 }) {
@@ -220,15 +221,19 @@ export struct Mine {
         Column() {
           Text('我的订单').fontSize(16).fontWeight(500).alignSelf(ItemAlign.Start).margin({ bottom: 10 })
           Row() {
-            MineIconLabel({ icon: $r('app.media.ic_bar_appointed'), label: '已预约' })
-              .onClick(() => {
-                RouterModule.push({ url: RouterMap.MY_APPOINTMENT_LIST, param: AppointState.NEW });
-              })
+            MineIconLabel({
+              icon: $r('app.media.ic_bar_appointed'),
+              label: '已预约',
+              routeUrl: RouterMap.MY_APPOINTMENT_LIST,
+              routeParam: AppointState.NEW,
+            })
 
-            MineIconLabel({ icon: $r('app.media.ic_bar_appoint_done'), label: '已完成' })
-              .onClick(() => {
-                RouterModule.push({ url: RouterMap.MY_APPOINTMENT_LIST, param: AppointState.FINISH });
-              })
+            MineIconLabel({
+              icon: $r('app.media.ic_bar_appoint_done'),
+              label: '已完成',
+              routeUrl: RouterMap.MY_APPOINTMENT_LIST,
+              routeParam: AppointState.FINISH,
+            })
           }
           .width('100%')
           .justifyContent(FlexAlign.SpaceAround)
@@ -242,15 +247,17 @@ export struct Mine {
         Column() {
           Text('服务与工具').fontSize(16).fontWeight(500).alignSelf(ItemAlign.Start).margin({ bottom: 10 })
           Row() {
-            MineIconLabel({ icon: $r('app.media.ic_bar_single_card'), label: '次卡' })
-              .onClick(() => {
-                RouterModule.push({ url: RouterMap.MY_SINGLE_VISIT_LIST });
-              })
+            MineIconLabel({
+              icon: $r('app.media.ic_bar_single_card'),
+              label: '次卡',
+              routeUrl: RouterMap.MY_SINGLE_VISIT_LIST,
+            })
 
-            MineIconLabel({ icon: $r('app.media.ic_bar_group'), label: '团购' })
-              .onClick(() => {
-                RouterModule.push({ url: RouterMap.MY_GROUP_LIST });
-              })
+            MineIconLabel({
+              icon: $r('app.media.ic_bar_group'),
+              label: '团购',
+              routeUrl: RouterMap.MY_GROUP_LIST,
+            })
           }
           .width('100%')
           .justifyContent(FlexAlign.SpaceAround)
@@ -305,8 +312,8 @@ export struct Mine {
             .padding({
               left: 10,
               right: 10,
-              top: 17,
-              bottom: 17,
+              top: 16,
+              bottom: 16,
             })
           }
         }

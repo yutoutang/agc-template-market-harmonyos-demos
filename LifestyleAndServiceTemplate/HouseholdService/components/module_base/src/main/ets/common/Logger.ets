@@ -16,14 +16,9 @@
 import { hilog } from '@kit.PerformanceAnalysisKit';
 
 export class Logger {
-  private static domain: number;
-  private static prefix: string;
-  private static format: string = '%{public}s';
-
-  constructor(prefix: string = '[HouseholdTemplate]', domain: number = 0xFF00) {
-    Logger.prefix = prefix;
-    Logger.domain = domain;
-  }
+  private static domain: number = 0xFF00;
+  private static prefix: string = '[HouseholdTemplate]';
+  private static format: string = '%{public}s, %{public}s';
 
   static debug(...args: Object[]): void {
     hilog.debug(Logger.domain, Logger.prefix, Logger.format, args);

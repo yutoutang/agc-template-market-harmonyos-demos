@@ -1,31 +1,24 @@
 import { loginComponentManager } from '@kit.AccountKit';
 import { promptAction } from '@kit.ArkUI';
-
-import { iData, RouterMap, routerStack, SimpleDialog, TitleBar } from 'lib_foundation';
+import { iData, RouterMap, routerStack, SimpleDialog } from 'lib_foundation';
 import { IPrivacyText } from '../models/IPrivacyText';
 import { IColor } from '../commons/CommonConst';
 
 @ComponentV2
 export struct OtherLoginPage {
-
   @Event
-  public onFinish: () => void = () => {};
-
+  public onFinish: () => void = () => {
+  };
   @Local
   private isAccepted: boolean = false;
-
   @Local
   private isFinish: boolean = false;
-
   @Local
   private verifyCodeTime: number = 0;
-
   @Local
   private phone: string = '';
-
   @Local
   private smsCode: string = '';
-
   private privacyTexts: IPrivacyText[] = [
     {
       text: '已阅读并同意',
@@ -62,12 +55,6 @@ export struct OtherLoginPage {
   public build(): void {
     NavDestination() {
       Column() {
-        TitleBar() {
-          Text('登录')
-            .fontSize(18)
-            .fontColor('#E6000000')
-            .fontWeight(500)
-        }
         Scroll() {
           Column() {
             Column() {
@@ -85,12 +72,15 @@ export struct OtherLoginPage {
                 .caretColor(IColor.THEME_PRIMARY)
                 .maxLength(11)
                 .fontColor(IColor.BLACK_TRANSPARENT_90)
-                .fontSize(16)
-                .placeholderFont({ size: 16 })
-                .borderRadius(20)
+                .borderRadius($r('sys.float.corner_radius_level10'))
                 .borderWidth(1)
                 .borderColor(IColor.BLACK_TRANSPARENT_20)
-                .padding({ top: 0, bottom: 0, left: 20, right: 20 })
+                .padding({
+                  top: 0,
+                  bottom: 0,
+                  left: 20,
+                  right: 20,
+                })
                 .maxLines(1)
                 .backgroundColor(IColor.WHITE)
                 .onChange((value: string) => this.phone = value)
@@ -129,19 +119,14 @@ export struct OtherLoginPage {
               .borderColor(IColor.BLACK_TRANSPARENT_20)
               .padding({ left: 20, right: 20 })
               .margin({ top: 12 })
-              Button() {
-                Text('点击登录')
-                  .fontColor(IColor.WHITE)
-                  .fontSize(16)
-                  .fontWeight(500)
-              }
+
+              Button('点击登录')
               .width('100%')
               .height(40)
-              .type(ButtonType.Normal)
               .backgroundColor(IColor.THEME_PRIMARY)
-              .borderRadius(20)
               .margin({ top: 36 })
               .onClick(() => this.onMockLogin())
+
               Text('其他方式登录')
                 .fontSize(14)
                 .fontColor(IColor.BLACK_TRANSPARENT_40)
@@ -165,6 +150,7 @@ export struct OtherLoginPage {
             .width('100%')
             .alignItems(HorizontalAlign.Center)
             .justifyContent(FlexAlign.Start)
+
             Row() {
               Checkbox()
                 .width(20)
@@ -172,7 +158,12 @@ export struct OtherLoginPage {
                 .shape(CheckBoxShape.CIRCLE)
                 .select(this.isAccepted)
                 .selectedColor(IColor.THEME_PRIMARY)
-                .margin({ left: 0, right: 14, top: 0, bottom: 0 })
+                .margin({
+                  left: 0,
+                  right: 14,
+                  top: 0,
+                  bottom: 0,
+                })
                 .onChange((value: boolean) => this.isAccepted = value)
               Text() {
                 ForEach(this.privacyTexts, (text: IPrivacyText) => {
@@ -212,7 +203,6 @@ export struct OtherLoginPage {
       .expandSafeArea([SafeAreaType.SYSTEM, SafeAreaType.CUTOUT], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
       .backgroundColor(Color.White)
     }
-    .hideTitleBar(true)
     .onReady((ctx: NavDestinationContext) => {
       if (ctx.pathInfo.param) {
         this.onFinish = ctx.pathInfo.param as () => void;

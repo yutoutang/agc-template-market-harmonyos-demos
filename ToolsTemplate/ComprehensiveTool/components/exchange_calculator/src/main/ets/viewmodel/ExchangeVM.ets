@@ -1,9 +1,14 @@
-import { CALCULATE_DATA } from '../constants/Constants';
 import { window } from '@kit.ArkUI';
+import { queryExchangeList } from '../apis/APIList';
+import { ICurrencyData } from '../model/Types';
+import { Currency } from '../mocks/MockData/Exchange';
 
 @ObservedV2
 export class ExchangeVM {
+  @Trace editFlag: boolean = false;
+  @Trace updateTime: string = '';
   @Trace results: string[] = [];
+  @Trace exchangeData: ICurrencyData[] = [];
   @Trace keyboardShow: boolean = false;
   private _keyboardHeightChangeCallback = (data: number) => {
     this.keyboardShow = data ? true : false;
@@ -28,8 +33,23 @@ export class ExchangeVM {
     return ExchangeVM._instance;
   }
 
+  public getExchangeInfo() {
+    queryExchangeList().then((resp) => {
+      let exchangeInfo = resp.data;
+      this.updateTime = this.getCurrentTimeStr(exchangeInfo.updateTime);
+      this.exchangeData = exchangeInfo.rates.map((item: Currency) => {
+        return {
+          bankConversionPri: item.rate,
+          name: item.name,
+          country: item.country,
+          pic: $r(`app.media.${item.country}`),
+        } as ICurrencyData;
+      });
+    });
+  }
+
   public resetResults() {
-    this.results = Array.from<string>({ length: CALCULATE_DATA.length }).fill('');
+    this.results = Array.from<string>({ length: this.exchangeData.length }).fill('');
   }
 
   public calcBaseValue(newText: string, index: number) {
@@ -37,19 +57,20 @@ export class ExchangeVM {
       this.resetResults();
       return;
     }
-    let rate = Number(CALCULATE_DATA[index].bankConversionPri);
+    let rate = Number(this.exchangeData[index].bankConversionPri);
     const baseValue = rate / 100 * Number(newText);
-    this.results = CALCULATE_DATA.map((item, i) => {
+    this.results = this.exchangeData.map((item, i) => {
       if (i !== index) {
         return (100 / Number(item.bankConversionPri) * baseValue).toFixed(3).toString();
       } else {
         return newText;
       }
-    })
+    });
+    this.editFlag = false;
   }
 
-  public getCurrentTimeStr() {
-    const date = new Date();
+  public getCurrentTimeStr(timeStamp: number) {
+    const date = new Date(timeStamp);
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');

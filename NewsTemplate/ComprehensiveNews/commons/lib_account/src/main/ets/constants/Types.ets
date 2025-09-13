@@ -24,4 +24,5 @@ export class LoginSheetParams {
 export interface ProtocolRouterParams {
   content: string
   isSheet?: boolean
+  sheetType?: SheetType
 }

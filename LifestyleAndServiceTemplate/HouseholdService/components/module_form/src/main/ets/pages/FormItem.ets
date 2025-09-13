@@ -59,7 +59,10 @@ export struct FormItem {
           Text('*')
             .fontColor($r('app.color.common_red'))
             .visibility(Boolean(this.param.required) ? Visibility.Visible : Visibility.None)
-          Text(this.param.label).fontSize(16).fontWeight(500).fontColor(Color.Black)
+          Text(this.param.label)
+            .fontSize($r('sys.float.Body_L'))
+            .fontWeight(500)
+            .fontColor($r('sys.color.font_primary'))
         }
 
         Row() {

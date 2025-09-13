@@ -1,88 +1,93 @@
 import {
   Constants,
-  DishesType,
-  getDishesListUtil,
-  GetMyCarResp,
-  GetTableInfoResp,
-  getTableInfoUtil,
+  getDistanceWithLocation,
+  getFmtDistWithLocation,
+  MyCarModel,
+  PermissionUtil,
+  StoreInfoModel,
   StoreType,
   TabBarType,
-  TableTitle,
+  TableInfo,
 } from 'common/Index';
 import { TitleComp } from '../components/TitleComp';
-import { ContainerComp } from '../components/ContainerComp';
 import { MyCarListComp } from '../components/MyCarListComp';
 import { MyCarComp } from '../components/MyCarComp';
 import { MustGoodsController } from '../models/MustGoodsController';
-import { ShopDiscountComp } from '../components/ShopDiscountComp';
 import { CustomSelectSheetBuilder } from '../components/CustomSelectDialog';
+import { OrderListComp } from '../components/OrderListComp';
+import { AppStorageV2 } from '@kit.ArkUI';
+import { BusinessTimeDialog } from 'base_ui';
+import { DishesTypeResp, HttpRequest } from 'network';
+import * as API from '../api/Index';
 
+@Builder
+export function OrderPageBuilder() {
+  OrderPage()
+}
 
-@Component
-export struct OrderPage {
-  @StorageProp('myCar') myCar: GetMyCarResp = new GetMyCarResp()
-  @StorageProp('tableList') tableList: Array<TableTitle> = [];
-  @StorageLink('tableId') tableId: string = '';
-  @StorageLink('dinerNum') dinerNum: string = '';
-  @StorageProp('storeType') storeType: number = 1;
-  @StorageLink('isRest') isRest: boolean = false;
+@ComponentV2
+struct OrderPage {
   // 原始商品列表
-  @Provide('dishesListOri') dishesListOri: Array<DishesType> = []
+  @Provider('dishesListOri') dishesListOri: Array<DishesTypeResp> = []
   // 展示的商品列表
-  @Provide('dishesList') dishesList: Array<DishesType> = []
-  @Consume('currentIndex') @Watch('currentIndexChange') currentIndex: number
-  @Consume('tableInfo') tableInfo?: GetTableInfoResp
-  @Consume('showShopDiscount') showShopDiscount: boolean
-  @Consume('mustGoodsCtrl') mustGoodsCtrl: MustGoodsController
-  @State showCarList: boolean = false
-  @State tableSheetShow: boolean = false;
-  @State dinerSheetShow: boolean = false;
+  @Provider('dishesList') dishesList: Array<DishesTypeResp> = []
+  @Consumer('currentIndex') currentIndex: number = 0
+  @Consumer('mustGoodsCtrl') mustGoodsCtrl: MustGoodsController = new MustGoodsController()
+  @Local myCarModel: MyCarModel = AppStorageV2.connect(MyCarModel) as MyCarModel
+  @Local storeModel: StoreInfoModel = AppStorageV2.connect(StoreInfoModel, () => new StoreInfoModel())!;
+  @Local showCarList: boolean = false
+  @Local tableSheetShow: boolean = false;
+  @Local dinerSheetShow: boolean = false;
+  businessHoursAM: string = ''
+  businessHoursPM: string = ''
+  businessController: CustomDialogController = new CustomDialogController({
+    builder: BusinessTimeDialog({
+      businessHoursAM: this.businessHoursAM,
+      businessHoursPM: this.businessHoursPM,
+    }),
+    width: 296,
+    height: 348,
+  });
 
-  aboutToAppear() {
-    getDishesListUtil().then(res => {
-      this.dishesList = res
-      this.dishesListOri = JSON.parse(JSON.stringify(res))
-      this.dishesList.forEach(item => {
-        item.good.forEach(i => {
-          if (i.isMust === Constants.GOODS_MUST) {
-            this.mustGoodsCtrl.changeShopIsMustGoods()
-          }
-        })
-
-      })
-    })
-    this.chooseRefresh()
-  }
-
-  chooseRefresh() {
-    if (!this.isRest) {
-      if (this.storeType === StoreType.SCAN_TYPE && !this.tableId) {
-        this.tableInfo = undefined
-        this.tableSheetShow = true
-      } else if (!this.dinerNum) {
-        this.dinerSheetShow = true
-      }
-    }
-  }
-
+  @Monitor('currentIndex')
   currentIndexChange() {
     if (this.currentIndex === TabBarType.HOMEPAGE) {
       this.chooseRefresh()
     }
   }
 
+  @Monitor('storeModel.storeId')
+  getStoreInfo() {
+    API.getStoreInfo(this.storeModel.storeId).then(res => {
+      this.storeModel.storeInfo = res;
+      PermissionUtil.getLocation().then(location => {
+        this.storeModel.storeInfo.distance = getDistanceWithLocation(location, res.coordinates);
+        this.storeModel.storeInfo.distanceStr = getFmtDistWithLocation(location, res.coordinates);
+      })
+      this.isShowRest()
+    });
+  }
+
+  aboutToAppear() {
+    this.getDishesList()
+    this.getStoreInfo()
+    HttpRequest.getMyCar()
+
+    this.chooseRefresh()
+  }
+
   build() {
     NavDestination() {
       Stack() {
-        Column() {
+        Column({ space: 12 }) {
           TitleComp()
-          ContainerComp().layoutWeight(1)
+          OrderListComp().layoutWeight(1)
         }
         .height(Constants.FULL_SIZE)
         .width(Constants.FULL_SIZE)
         .bindSheet($$this.tableSheetShow,
-          CustomSelectSheetBuilder($r('app.string.pick_table'), this.tableList.map((item) => {
-            return item.name ?? '';
+          CustomSelectSheetBuilder($r('app.string.pick_table'), this.storeModel.tableList.map((item) => {
+            return item.typeName ?? '';
           }), (select: ResourceStr) => {
             this.confirmTable(select);
           }), {
@@ -97,15 +102,16 @@ export struct OrderPage {
           },
         }).visibility(this.showCarList ? Visibility.Visible : Visibility.Hidden)
         // 购物车
-        MyCarComp({ showCarList: this.showCarList })
-          .visibility(this.myCar.res?.length ? Visibility.Visible : Visibility.Hidden)
-        // 优惠活动
-        ShopDiscountComp().visibility(this.showShopDiscount ? Visibility.Visible : Visibility.Hidden)
-
+        MyCarComp({
+          showCarList: this.showCarList, changeCarListShow: (flag: boolean) => {
+            this.showCarList = flag
+          },
+        })
+          .visibility(this.myCarModel.myCar.goodsList?.length ? Visibility.Visible : Visibility.Hidden)
       }.alignContent(Alignment.Bottom)
       .bindSheet($$this.dinerSheetShow,
         CustomSelectSheetBuilder($r('app.string.pick_dinner_num'), $r('app.strarray.diner_num'),
-          (select: string) => {
+          (select: ResourceStr) => {
             this.confirmDiner(select);
           }), {
           height: 408,
@@ -116,25 +122,69 @@ export struct OrderPage {
     .hideTitleBar(true)
   }
 
+  getDishesList() {
+    API.getDishesList().then(res => {
+      this.dishesList = res
+      this.dishesListOri = JSON.parse(JSON.stringify(res))
+      this.dishesList.forEach(item => {
+        item.goods.forEach(i => {
+          if (i.isMust === Constants.GOODS_MUST) {
+            this.mustGoodsCtrl.changeShopIsMustGoods()
+          }
+        })
+
+      })
+    })
+  }
+
+  chooseRefresh() {
+    if (!this.storeModel.isRest) {
+      if (this.storeModel.storeType === StoreType.SCAN_TYPE && !this.myCarModel.tableId) {
+        this.myCarModel.tableInfo = new TableInfo()
+        this.tableSheetShow = true
+      } else if (!this.myCarModel.dinerNum && !this.dinerSheetShow) {
+        this.dinerSheetShow = true
+      }
+    }
+  }
+
+  isShowRest() {
+    if (this.storeModel.storeInfo.isRest === Constants.STORE_REST ||
+      new Date().getTime() < this.getTimeByHour(this.storeModel.storeInfo.time1) ||
+      new Date().getTime() > this.getTimeByHour(this.storeModel.storeInfo.time2)) {
+      this.businessHoursAM = `AM ${this.storeModel.storeInfo?.time1}-${Constants.MID_DAY_TIME}`
+      this.businessHoursPM = `PM ${Constants.MID_DAY_TIME}-${this.storeModel.storeInfo?.time2}`
+      if (!this.storeModel.isRest) {
+        this.businessController?.open();
+      }
+      this.storeModel.isRest = true
+    } else {
+      this.storeModel.isRest = false
+    }
+  }
+
+  getTimeByHour(time: string = '') {
+    let date = new Date(`${new Date().toLocaleDateString()} ${time}`)
+    return date.getTime()
+  }
+
   confirmTable(select: ResourceStr) {
     if (select) {
-      let table = this.tableList.find(item => item.name === select)
-      this.tableId = table?.id ?? '';
-      getTableInfoUtil(this.tableId).then((res) => {
-        this.tableInfo = res;
-      });
+      let table = this.storeModel.tableList.find(item => item.tableName === select)
+      this.myCarModel.tableId = table?.id ?? '1';
+      this.myCarModel.tableInfo = this.storeModel.tableList.find(item => item.id === this.myCarModel.tableId)!;
     }
     this.tableSheetShow = false
-    if (!this.dinerNum) {
+    if (!this.myCarModel.dinerNum) {
       this.dinerSheetShow = true
     }
   }
 
-  confirmDiner(select: string) {
+  confirmDiner(select: ResourceStr) {
     if (select) {
-      this.dinerNum = select;
+      this.myCarModel.dinerNum = select;
     } else {
-      this.dinerNum = this.dinerNum || `1人`
+      this.myCarModel.dinerNum = this.myCarModel.dinerNum || `1人`;
     }
     this.dinerSheetShow = false
   }

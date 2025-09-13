@@ -1,4 +1,5 @@
 import { common } from '@kit.AbilityKit';
+import { AppStorageV2 } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import {
   StoreInfo,
@@ -13,15 +14,16 @@ import {
   SystemSceneUtils,
   GetUserInfoResp,
   GoodCard,
-} from 'utils';
+} from 'foundation';
 import { DialogCallBuilder, Params } from '../components/DialogCall';
 import { LIST_RULE, RuleID, STORE_STATUS } from '../common/Constant';
 import { BusinessParams, DialogBusinessBuilder } from '../components/DialogBusiness';
 import { ActiveMember } from '../components/ActiveMemberModule';
 import { SingleVisitList } from '../components/SingleVisitModule';
 import { GroupBuyList } from '../components/GroupModule';
-import { AppStorageV2 } from '@kit.ArkUI';
 import { HomeBaseVM } from '../viewmodel/HomeBaseVM';
+
+const TAG = '[HomePage]';
 
 @Styles
 function subTextContainer() {
@@ -66,9 +68,9 @@ export struct Home {
   getStoreInfo() {
     return getStoreInfo().then((resp) => {
       this.storeInfo = resp as StoreInfo;
-      Logger.info('get store info response = ' + JSON.stringify(resp));
+      Logger.info(TAG, 'get store info response = ' + JSON.stringify(resp));
     }).catch((e: BusinessError) => {
-      Logger.error('get store info error = ' + JSON.stringify(e));
+      Logger.error(TAG, 'get store info error = ' + JSON.stringify(e));
     })
   }
 
@@ -225,7 +227,7 @@ export struct Home {
   @Builder
   titleBuilder() {
     Row() {
-      Text('首页').fontSize(16).fontWeight(700).padding({ left: 16 }).height(56)
+      Text('首页').fontSize(26).fontWeight(700).padding({ left: 16 }).height(56)
     }
     .width('100%')
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])

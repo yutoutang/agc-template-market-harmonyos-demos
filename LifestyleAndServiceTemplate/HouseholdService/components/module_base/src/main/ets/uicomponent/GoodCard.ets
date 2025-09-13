@@ -79,9 +79,9 @@ export struct GoodCard {
           if (this.styleGood.showBtn) {
             Button() {
               Text(this.isTypePay ? $r('app.string.good_card_appoint_btn') : '咨询')
-                .fontSize(14)
+                .fontSize($r('sys.float.Body_M'))
                 .fontWeight(500)
-                .fontColor(Color.White)
+                .fontColor($r('sys.color.font_on_primary'))
                 .width(56)
                 .height(20)
                 .textAlign(TextAlign.Center)

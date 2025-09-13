@@ -1,1 +1,0 @@
-export { Notes, NotesBuilder } from './src/main/ets/pages/Notes'

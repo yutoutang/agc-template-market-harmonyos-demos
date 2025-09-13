@@ -1,22 +1,23 @@
+import { promptAction } from '@kit.ArkUI';
 import { webview } from '@kit.ArkWeb';
-import { bindWith } from '../utils/Index'
 import { Callback } from '@kit.BasicServicesKit';
 import { RawEditorOptions } from '../options/tinymce'
 import { EasyEditorBridge } from '../utils/Bridge';
 import { EasyEditorController } from '../utils/Controller';
+import { bindWith } from '../utils/Index'
 
-@Preview
 @ComponentV2
 export struct EasyEditor {
   @Local _privateController: webview.WebviewController = new webview.WebviewController();
   @Local _privateDisposer?: Callback<void>
-  @Param darkMode:boolean = false
+  @Param darkMode: boolean = false
   @Param @Once config: string | RawEditorOptions = ''
   @Param @Once controller?: EasyEditorController = undefined
   @Param @Once content: string = ''
   @Param @Once javascriptProxies?: Array<JavaScriptProxy> = []
-  @Param hideRichOperation:boolean = false
+  @Param hideRichOperation: boolean = false
   @Event onContentChange?: Callback<string> = undefined
+  private customDialogComponentId: number = 0
 
   @Monitor('content')
   contentChanged(_: IMonitor) {
@@ -28,6 +29,43 @@ export struct EasyEditor {
     this.onHideOperation()
   }
 
+  @Builder
+  customDialogComponent(confirm: () => void) {
+    Column() {
+      Text('温馨提示').fontSize(20).fontColor($r('sys.color.font_primary')).fontWeight(FontWeight.Bold)
+      Text('您确定将重置所有样式？')
+        .fontSize(16).fontColor($r('sys.color.font_primary'))
+      Row({ space: 120 }) {
+        Text('取消')
+          .fontColor($r('sys.color.font_emphasize'))
+          .onClick(() => {
+            promptAction.closeCustomDialog(this.customDialogComponentId)
+          })
+        Text('确认')
+          .fontColor($r('sys.color.font_emphasize'))
+          .onClick(() => {
+            confirm()
+            promptAction.closeCustomDialog(this.customDialogComponentId)
+          })
+      }
+    }.height(160).padding({ top: 16, bottom: 26 }).justifyContent(FlexAlign.SpaceBetween)
+  }
+
+  removeFormat(confirm: () => void) {
+    promptAction.openCustomDialog({
+      builder: () => {
+        this.customDialogComponent(confirm)
+      },
+      onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
+        if (dismissDialogAction.reason !== DismissReason.TOUCH_OUTSIDE) {
+          dismissDialogAction.dismiss()
+        }
+      },
+    }).then((dialogId: number) => {
+      this.customDialogComponentId = dialogId
+    })
+  }
+
   aboutToAppear(): void {
     /*
      * get set方法绑定到controller中
@@ -36,7 +74,7 @@ export struct EasyEditor {
       'setContent': 'setContent',
       'getContent': 'getContent',
       'onHideOperation': 'onHideOperation',
-      'setDarkMode':'setDarkMode'
+      'setDarkMode': 'setDarkMode',
     })
   }
 
@@ -59,7 +97,7 @@ export struct EasyEditor {
       .onControllerAttached(() => {
         this._privateController.registerJavaScriptProxy(new EasyEditorBridge(this),
           'EasyEditorBridge',
-          ['fetchConfig', 'onContentChanged', 'fetchContent','darkMode'], [],
+          ['fetchConfig', 'onContentChanged', 'fetchContent', 'darkMode', 'removeFormat'], [],
           `{"javascriptProxyPermission":{"urlPermissionList":[{"scheme":"resource","host":"rawfile","port":"","path":""}]}}`)
         if (this.javascriptProxies?.length) {
           this.javascriptProxies.forEach(proxy => {

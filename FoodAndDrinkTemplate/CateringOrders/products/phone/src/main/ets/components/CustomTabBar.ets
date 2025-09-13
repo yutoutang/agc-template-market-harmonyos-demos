@@ -1,9 +1,10 @@
-import { Constants, TabBarData, TabBarType, TABS_INFO } from 'common';
+import { Constants, TabBarData, TabBarType, TABS_INFO, WindowModel } from 'common';
+import { AppStorageV2 } from '@kit.ArkUI';
 
-@Component
+@ComponentV2
 export struct CustomTabBar {
-  @Link currentIndex: TabBarType;
-  @StorageProp('naviIndicatorHeight') naviIndicatorHeight: number = 0;
+  @Consumer('currentIndex') currentIndex: TabBarType = TabBarType.HOMEPAGE;
+  @Local windowModel: WindowModel = AppStorageV2.connect(WindowModel, () => new WindowModel())!
 
   onChange(index: TabBarType): void {
     this.currentIndex = index;
@@ -34,7 +35,7 @@ export struct CustomTabBar {
       top: 6,
       bottom: 3,
       left: 28,
-      right: 28,
+      right: this.windowModel.getWindowBottomHeight(),
     })
     .clip(false)
     .height(48)
@@ -42,11 +43,11 @@ export struct CustomTabBar {
   }
 }
 
-@Component
+@ComponentV2
 struct TabItem {
-  @Prop selectedIndex: number;
-  @Prop index: number
-  onChange: (index: number) => void = () => {
+  @Param @Require selectedIndex: number;
+  @Param @Require index: number
+  @Event onChange: (index: number) => void = () => {
   };
 
   build() {

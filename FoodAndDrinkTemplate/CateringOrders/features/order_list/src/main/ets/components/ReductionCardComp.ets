@@ -1,17 +1,9 @@
-import { Constants, OrderModel, OrderStateEnum, OrderTypeEnum } from 'common'
+import { Constants, OrderStateEnum, OrderTypeEnum, PayType } from 'common'
+import { OrderInfo } from '../models/Index'
 
-@Component
+@ComponentV2
 export struct ReductionCard {
-  @Prop @Watch('orderInfoChange') orderInfo: OrderModel
-  @State order: OrderModel = new OrderModel()
-
-  aboutToAppear(): void {
-    this.orderInfoChange()
-  }
-
-  orderInfoChange() {
-    this.order = this.orderInfo
-  }
+  @Param @Require orderInfo: OrderInfo
 
   build() {
     Column({ space: 8 }) {
@@ -26,7 +18,7 @@ export struct ReductionCard {
 
         Text() {
           Span($r('app.string.currency_symbol_pre_params', '-')).fontSize($r('sys.float.Caption_S'))
-          Span(`${Number(this.order.yhqMoney)}`).fontSize($r('sys.float.Body_M'))
+          Span(`${Number(this.orderInfo.yhqMoney)}`).fontSize($r('sys.float.Body_M'))
         }.fontColor($r('sys.color.multi_color_08')).fontWeight(FontWeight.Medium)
       }
       .width(Constants.FULL_SIZE)
@@ -36,7 +28,7 @@ export struct ReductionCard {
       Row() {
         Row() {
           Image($r('app.media.ic_reduction')).width(16)
-          Text(this.order.xyhMoney !== '0' ? $r('app.string.new_user_discount_label') :
+          Text(this.orderInfo.xyhMoney !== 0 ? $r('app.string.new_user_discount_label') :
           $r('app.string.store_discount_label'))
             .fontSize($r('sys.float.Body_M'))
             .fontColor($r('sys.color.font_secondary'))
@@ -47,15 +39,15 @@ export struct ReductionCard {
 
         Text() {
           Span($r('app.string.currency_symbol_pre_params', '-')).fontSize($r('sys.float.Caption_S'))
-          Span(this.order.xyhMoney !== '0' ? `${Number(this.order.xyhMoney)}` :
-            `${Number(this.order.mjMoney)}`).fontSize($r('sys.float.Body_M'))
+          Span(this.orderInfo.xyhMoney !== 0 ? this.orderInfo.xyhMoney.toString() : this.orderInfo.mjMoney.toString())
+            .fontSize($r('sys.float.Body_M'))
         }.fontColor($r('sys.color.multi_color_08')).fontWeight(FontWeight.Medium)
       }
       .width(Constants.FULL_SIZE)
       .justifyContent(FlexAlign.SpaceBetween)
 
 
-      if (Number(this.order.orderType) === OrderTypeEnum.PICKING) {
+      if (Number(this.orderInfo.orderType) === OrderTypeEnum.TAKEAWAY_DELIVERY) {
         Row() {
           Row() {
             Image($r('app.media.ic_takeaway')).width(16)
@@ -67,13 +59,13 @@ export struct ReductionCard {
 
           Text() {
             Span($r('app.string.currency_symbol')).fontSize($r('sys.float.Caption_S'))
-            Span(`${this.order.boxMoney}`).fontSize($r('sys.float.Body_M'))
+            Span(`${this.orderInfo.boxMoney}`).fontSize($r('sys.float.Body_M'))
           }.fontColor($r('sys.color.multi_color_08')).fontWeight(FontWeight.Medium)
         }
         .width(Constants.FULL_SIZE)
         .justifyContent(FlexAlign.SpaceBetween)
       }
-      if (Number(this.order.dnState) === OrderStateEnum.noFinished) {
+      if (Number(this.orderInfo.state) === OrderStateEnum.noFinished) {
         Divider().margin({ top: 8 })
         // 实付金额
         Row() {
@@ -84,7 +76,7 @@ export struct ReductionCard {
               .fontWeight(FontWeight.Medium)
               .lineHeight(14)
               .margin({ left: 4 })
-            Span(this.order.reductionMoney?.toString())
+            Span(this.orderInfo.reductionMoney?.toString())
               .fontSize($r('sys.float.Body_M'))
               .fontWeight(FontWeight.Medium)
               .lineHeight(20)
@@ -97,7 +89,7 @@ export struct ReductionCard {
               .fontWeight(FontWeight.Medium)
               .lineHeight(14)
               .margin({ left: 4 })
-            Span(`${this.order.money}`)
+            Span(`${this.orderInfo.money}`)
               .fontSize($r('sys.float.Body_M'))
               .fontWeight(FontWeight.Medium)
               .lineHeight(20)
@@ -114,7 +106,7 @@ export struct ReductionCard {
             .fontSize($r('sys.float.Body_M'))
             .fontColor($r('sys.color.font_secondary'))
 
-          Text($r('app.string.huawei_pay'))
+          Text(this.orderInfo.payType === PayType.WALLET ? '钱包支付' : '华为支付')
             .fontSize($r('sys.float.Body_M'))
             .fontColor($r('sys.color.font_primary'))
             .fontWeight(FontWeight.Medium)
@@ -130,7 +122,7 @@ export struct ReductionCard {
               .fontSize($r('sys.float.Caption_S'))
               .fontWeight(FontWeight.Medium)
               .fontColor($r('sys.color.font_secondary'))
-            Text(`${Number(this.order.money)}`)
+            Text(`${Number(this.orderInfo.money)}`)
               .fontSize($r('sys.float.Body_M'))
               .fontColor($r('sys.color.font_primary'))
           }

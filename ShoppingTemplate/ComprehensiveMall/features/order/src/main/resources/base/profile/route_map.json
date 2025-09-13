@@ -1,0 +1,34 @@
+{
+  "routerMap": [
+    {
+      "name": "OrderSearchPage",
+      "pageSourceFile": "src/main/ets/pages/OrderSearchPage.ets",
+      "buildFunction": "buildOrderSearchPage"
+    },
+    {
+      "name": "OrderInfoPage",
+      "pageSourceFile": "src/main/ets/pages/OrderInfoPage.ets",
+      "buildFunction": "buildOrderInfoPage"
+    },
+    {
+      "name": "OrderListPage",
+      "pageSourceFile": "src/main/ets/pages/OrderListPage.ets",
+      "buildFunction": "buildOrderListPage"
+    },
+    {
+      "name": "UpdateAddressSheet",
+      "pageSourceFile": "src/main/ets/pages/UpdateAddressSheet.ets",
+      "buildFunction": "buildUpdateAddressSheet"
+    },
+    {
+      "name": "OrderReviewCreatePage",
+      "pageSourceFile": "src/main/ets/pages/OrderReviewCreatePage.ets",
+      "buildFunction": "orderReviewCreatePageBuilder"
+    },
+    {
+      "name": "OrderReviewInfoPage",
+      "pageSourceFile": "src/main/ets/pages/OrderReviewInfoPage.ets",
+      "buildFunction": "orderReviewInfoPageBuilder"
+    }
+  ]
+}

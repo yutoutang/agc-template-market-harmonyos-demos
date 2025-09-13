@@ -68,11 +68,11 @@ export struct ChannelsSortEdit {
   @Local editGridHeight: number = 0;
   @Local addGridHeight: number = 0;
   @Local subTitleHeight: number = 0;
-  private colNum: number = ChannelConstants.COL_IMAGE_TEXT;
+  @Local colNum: number = ChannelConstants.COL_IMAGE_TEXT;
   @Event onSave?: (select: TabInfo[], unselect: TabInfo[]) => void;
   @Event onCancel?: () => void;
-  isFollowingSystemFontScale: boolean = false;
-  maxAppFontScale: number = 1;
+  @Local isFollowingSystemFontScale: boolean = false;
+  @Local maxAppFontScale: number = 1;
   @Local readFlag: boolean = true;
   @Local readIndex4AddArea: number = -1;
   @Local readIndex4EditArea: number = -1;
@@ -454,7 +454,7 @@ export struct ChannelsSortEdit {
     const totalRows: number = Math.ceil(len / col);
     let xNew: number = 0;
     if (removeCol === 0) {
-      (this.fontSizeScale && this.fontSizeScale > 1) ? -this.blockWidth * 2 : -this.blockWidth * 3;
+      xNew = (this.fontSizeScale && this.fontSizeScale > 1) ? -this.blockWidth * 2 : -this.blockWidth * 3;
     } else {
       xNew = -this.blockWidth * (removeCol - 1);
     }
@@ -582,7 +582,6 @@ export struct ChannelsSortEdit {
         y: coveringGridPosition.y,
       };
     }
-
     return { x: 0, y: 0 };
   }
 

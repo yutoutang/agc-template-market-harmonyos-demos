@@ -159,6 +159,10 @@
     {
       "name": "order_completed",
       "value": "订单已完成"
+    },
+    {
+      "name": "agcit_huawei_catering_orders",
+      "value": "1.0.1"
     }
   ]
 }

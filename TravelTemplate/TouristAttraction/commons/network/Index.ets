@@ -46,3 +46,5 @@ export { CreateCommodityOrderRequest,
   AddressRequest } from './src/main/ets/types/AxiosRequestParam';
 
 export { BaseResponse, GetUserInfoResp } from './src/main/ets/types/ResponseTypes';
+
+export { mapperAttractionsInfo } from './src/main/ets/mapper/Index';

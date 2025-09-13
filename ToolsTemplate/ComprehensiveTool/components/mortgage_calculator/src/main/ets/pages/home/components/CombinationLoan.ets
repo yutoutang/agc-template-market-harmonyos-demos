@@ -40,6 +40,7 @@ export default struct CombinationLoan {
         loanAmount: this.vm.commercialAmount,
         loanRate: this.vm.commercialRate,
         loanYear: this.vm.commercialYear,
+        isSmallHeight:this.vm.isSmallHeight,
         loanType: 1,
         handleAmountChange: (value: string) => {
           this.vm.updateCommercialAmount(value);
@@ -56,6 +57,7 @@ export default struct CombinationLoan {
         loanAmount: this.vm.fundAmount,
         loanRate: this.vm.fundRate,
         loanYear: this.vm.fundYear,
+        isSmallHeight:this.vm.isSmallHeight,
         loanType: 2,
         handleAmountChange: (value: string) => {
           this.vm.updateFundAmount(value);

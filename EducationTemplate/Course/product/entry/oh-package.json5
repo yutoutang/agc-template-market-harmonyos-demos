@@ -1,0 +1,20 @@
+{
+  "name": "entry",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "",
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "home": "file:../../features/home",
+    "mine": "file:../../features/mine",
+    "course": "file:../../features/course",
+    "commonlib": "file:../../commons/commonlib",
+    "open_ads": "file:../../components/open_ads",
+    "login_info": "file:../../components/login_info",
+    "recorded_player": "file:../../components/recorded_player",
+    "aggregated_share": "file:../../components/aggregated_share",
+    "http": "file:../../commons/http"
+  }
+}
+

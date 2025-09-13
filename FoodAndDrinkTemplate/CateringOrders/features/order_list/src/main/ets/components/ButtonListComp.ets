@@ -1,11 +1,11 @@
 import { Constants } from 'common/Index';
-import { BtnType } from '../models/Model';
+import { BtnType } from '../models/Index';
 
-@Component
+@ComponentV2
 export struct ButtonListComp {
-  @Prop btnList: Array<BtnType>;
-  @Prop pos: string = 'center';
-  @Prop orderId: string
+  @Param @Require btnList: Array<BtnType>;
+  @Param pos: string = 'center';
+  @Param orderId: string = ''
 
   build() {
     Row({ space: 10 }) {

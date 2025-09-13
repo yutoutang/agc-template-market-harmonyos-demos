@@ -1,25 +1,29 @@
-import { Constants, NavHeaderBar, RemarksRouter, StoreSet } from 'common/Index'
+import { Constants, NavHeaderBar, RemarksRouter, RouterMap, RouterModule, StoreInfoModel } from 'common/Index';
+import { AppStorageV2 } from '@kit.ArkUI';
 
-@Component
-export struct RemarksPage {
-  @Consume('pageStack') pageStack: NavPathStack
-  @Consume('storeSet') storeSet: StoreSet
-  @State tastes: Array<string> = []
-  @State remarks: string = ''
+@Builder
+export function RemarksPageBuilder() {
+  RemarksPage()
+}
+
+@ComponentV2
+struct RemarksPage {
+  @Local storeModel: StoreInfoModel = AppStorageV2.connect(StoreInfoModel, () => new StoreInfoModel())!;
+  @Local tastes: Array<string> = []
+  @Local remarks: string = ''
 
   aboutToAppear(): void {
     this.getParams()
-    let tasteArr = this.storeSet.taste?.split(/[;；]/)
+    let tasteArr = this.storeModel.storeInfo.taste?.split(/[;；]/)
     if (tasteArr?.length) {
       this.tastes = tasteArr
     }
   }
 
   getParams() {
-    let paramsArr: RemarksRouter[] = this.pageStack.getParamByName('RemarksPage') as RemarksRouter[]
-    if (paramsArr.length) {
-      let routerParam = paramsArr[paramsArr.length-1]
-      this.remarks = routerParam?.remarks ?? ''
+    let params = RouterModule.getNavParam<RemarksRouter>(RouterMap.REMARKS_PAGE)
+    if (params) {
+      this.remarks = params.remarks ?? ''
     }
   }
 
@@ -88,7 +92,7 @@ export struct RemarksPage {
           .constraintSize({ maxWidth: Constants.FULL_SIZE })
           .backgroundColor($r('sys.color.multi_color_09'))
           .onClick(() => {
-            this.pageStack.pop({ remarks: this.remarks })
+            RouterModule.pop({ 'remarks': this.remarks } as Record<string, string>)
           })
       }
       .width(Constants.FULL_SIZE)

@@ -1,6 +1,7 @@
 {
   "app": {
-    "bundleName": "com.atomicservice.6917560304091745774",
+// todo 替换为您创建的元服务的包名
+    "bundleName": "com.atomicservice.xxxxxx",
     "bundleType": "atomicService",
     "vendor": "example",
     "versionCode": 1000000,

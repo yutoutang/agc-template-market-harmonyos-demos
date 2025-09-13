@@ -12,7 +12,7 @@ import {
   UIBackBtn,
   AppointState,
   IntroItem,
-} from 'utils';
+} from 'foundation';
 import { TAG_CONSTANT_LIST, ImgDesc } from '../common/Constant';
 
 @Builder
@@ -146,8 +146,8 @@ export struct GoodDetail {
 
       if (this.isBindPhone) {
         Button($r('app.string.book_good_btn'))
-          .fontSize(14)
-          .fontColor($r('app.color.common_fg_white'))
+          .fontSize($r('sys.float.Body_M'))
+          .fontColor($r('sys.color.font_on_primary'))
           .backgroundColor($r('app.color.common_theme_color'))
           .layoutWeight(1)
           .onClick(() => {

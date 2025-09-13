@@ -17,7 +17,7 @@ import {
   VideoNetworkSetting,
   VideoSwipePlayer,
 } from 'module_swipeplayer';
-import { LongTakeAnimationProperties, LongTakeTransitionDelegate } from 'module_transition';
+import { CardLongTakeDelegate, LongTakeAnimationProperties } from 'module_transition';
 import { VideoNewsData } from '../models/VideoModel';
 import { VideoLayerViewBuilder } from '../components/VideoLayerView';
 import { VideoDetailPageModel } from '../models/VideoDetailPageModel';
@@ -264,7 +264,7 @@ export struct VideoDetailPage {
   build() {
     NavDestination() {
       if (this.vm.needLongTake && this.longTakeSession) {
-        LongTakeTransitionDelegate({
+        CardLongTakeDelegate({
           longTakeSession: this.longTakeSession,
           contentBuilder: (): void => {
             this.ContentBuilder()

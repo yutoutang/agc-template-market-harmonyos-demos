@@ -5,7 +5,7 @@
     "description": "$string:module_desc",
     "mainElement": "EntryAbility",
     "deviceTypes": [
-      "phone",
+      "phone"
     ],
     "deliveryWithInstall": true,
     "installationFree": true,
@@ -44,16 +44,6 @@
         }
       },
       {
-        "name": "ohos.permission.GET_NETWORK_INFO",
-        "reason": "$string:app_name",
-        "usedScene": {
-          "abilities": [
-            "EntryAbility"
-          ],
-          "when": "always"
-        }
-      },
-      {
         "name": "ohos.permission.LOCATION",
         "reason": "$string:app_name",
         "usedScene": {
@@ -72,14 +62,14 @@
           ],
           "when": "inuse"
         }
-      },
+      }
     ],
     "metadata": [
       {
         "name": "client_id",
-        "value": "6917560304091745774"
-        // 配置为获取的Client ID
-      },
+// todo: 配置为获取的Client ID
+        "value": "******"
+      }
     ],
     "extensionAbilities": [
       {

@@ -3,7 +3,8 @@
 ## 目录
 
 - [简介](#简介)
-- [使用](#使用)
+- [约束与限制](#约束与限制)
+- [快速入门](#快速入门)
 - [API参考](#API参考)
 
 ## 简介
@@ -17,32 +18,53 @@
 | 公共模型   | 提供组件公共模型 | [使用指导](#公共模型) |
 | 公共基础组件 | 提供公共基础组件 | [使用指导](#公共组件) |
 
-## 使用
+## 约束与限制
+### 环境
+
+* DevEco Studio版本：DevEco Studio 5.0.0 Release及以上
+* HarmonyOS SDK版本：HarmonyOS 5.0.0 Release SDK及以上
+* 设备类型：华为手机（包括双折叠和阔折叠）
+* 系统版本：HarmonyOS 5.0.0(12)及以上
+
+### 权限
+
+* 位置权限：ohos.permission.APPROXIMATELY_LOCATION
+
+## 快速入门
 
 1. 安装组件。
 
-   需要将模板根目录的components下[module_base](../module_base)目录拷贝至您工程根目录components/，并添加依赖和module声明。
+   如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
 
-```
-// entry/oh-package.json5
-"dependencies": {
-  "module_base": "file:../components/module_base"
-}
+   如果是从生态市场下载组件，请参考以下步骤安装组件。
 
-// build-profile.json5
-"modules": [
-  {
-    "name": "module_base",
-    "srcPath": "./components/module_base"
-  }
-]
-```
+   a. 解压下载的组件包，将包中所有文件夹拷贝至您工程根目录的XXX目录下。
+
+   b. 在项目根目录build-profile.json5添加module_base模块。
+
+   ```
+   // 项目根目录下build-profile.json5填写module_base路径。其中XXX为组件存放的目录名
+   "modules": [
+     {
+       "name": "module_base",
+       "srcPath": "./XXX/module_base"
+     }
+   ]
+   ```
+
+   c. 在项目根目录oh-package.json5添加依赖。
+   ```
+   // XXX为组件存放的目录名称
+   "dependencies": {
+     "module_base": "file:./XXX/module_base"
+   }
+   ```
 
 2. 引入组件。
 
-```
-import { CommonUtils, RouterMap, TypeGood, PopViewUtils } from 'module_base';
-```
+    ```
+    import { CommonUtils, RouterMap, TypeGood, PopViewUtils } from 'module_base';
+    ```
 
 ## API参考
 
@@ -166,19 +188,6 @@ requestPaymentPromise(ignoreRequestPayment: boolean, context: common.UIAbilityCo
 
 基础弹窗类
 
-**开发前提**：
-
-```
-import { AppStorageMap } from 'module_base';
-
-onWindowStageCreate(windowStage: window.WindowStage): void {
- window.getLastWindow(this.context).then((data: window.Window) => {
-   let uiContext = data.getUIContext();
-   AppStorage.setOrCreate<UIContext>(AppStorageMap.UI_CONTEXT, uiContext);
- });
-}
-```
-
 ##### shareInstance
 
 shareInstance(): PopViewUtils
@@ -208,6 +217,7 @@ export function DialogCallBuilder(params: PhoneParams) {
     }, (v: string) => v)
     Text('取消')
   }
+  .padding({ left: 10, right: 10, bottom: 30 })
 }
 
 PopViewUtils.showPopView<PhoneParams>(wrapBuilder(DialogCallBuilder), new PhoneParams([]));
@@ -280,12 +290,6 @@ error(...args: Object[])
 |:--------|:-----|
 | PAY     | 付款类型 |
 | CONSULT | 咨询类型 |
-
-#### AppStorageMap枚举说明
-
-| 名称         | 说明    |
-|:-----------|:------|
-| UI_CONTEXT | UI上下文 |
 
 #### GoodCardSize枚举说明
 

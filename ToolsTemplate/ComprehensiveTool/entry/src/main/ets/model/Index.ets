@@ -12,22 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { Category, SettingType, TabBarType, ToolType } from '../constant/Enum';
-
-@ObservedV2
-export class SelectedToolType {
-  @Trace title: string = '全部';
-  @Trace url: string = '';
-  @Trace index: number = 0;
-}
-
-export interface ToolTypeModule {
-  id: ToolType;
-  title: string;
-  icon?: ResourceStr;
-  url: string;
-  category?: Category;
+export enum TabBarType {
+  HOME = 0,
+  MINE = 1
 }
 
 export interface TabBarModule {
@@ -36,19 +23,4 @@ export interface TabBarModule {
   activeIcon: ResourceStr;
   defaultIcon: ResourceStr;
   component: WrappedBuilder<[]>;
-}
-
-export interface SettingModule {
-  id: SettingType;
-  title: ResourceStr;
-  icon: ResourceStr;
-  click: (event: ClickEvent) => void;
-}
-
-export class ToolTypeModules extends Array<ToolTypeModule> {
-}
-
-@ObservedV2
-export class ToolTypeList {
-  @Trace list: string = '[]';
 }

@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit';
-import { IBaseStore, PopViewUtils, SystemSceneUtils } from 'utils';
-import { DialogCallBuilder, Params } from '../components/DialogCall';
+import { IBaseStore, PopViewUtils, SystemSceneUtils } from 'foundation';
+import { DialogCallBuilder, Params } from './DialogCall';
 import { HomeBaseVM } from '../viewmodel/HomeBaseVM';
 
 @ComponentV2

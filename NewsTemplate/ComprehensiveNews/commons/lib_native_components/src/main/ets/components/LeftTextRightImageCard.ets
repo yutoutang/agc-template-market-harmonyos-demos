@@ -1,6 +1,7 @@
 import { PersistenceV2, UIUtils } from '@kit.ArkUI'
 import { CommonConstants, SettingModel, TimeUtils } from 'lib_common'
-import { LayoutParams, PostImgList } from 'lib_news_api'
+import { LayoutParams } from 'module_flexlayout'
+import { PostImgList } from 'lib_news_api'
 import { BaseImage } from 'lib_widget'
 import { Highlight } from 'module_highlight'
 import { AuthorCard } from '../builder/AuthorBuilder'
@@ -53,7 +54,7 @@ struct NativeComponent {
               .fontColor($r('sys.color.font_tertiary'))
               .visibility(this.showAuthor ? Visibility.Visible : Visibility.None)
             Text(
-              TimeUtils.formatDate(this.cardData.nativeCardData?.createTime, 'YYYY-MM-DD HH:MM'))
+              TimeUtils.formatDate(this.cardData.nativeCardData?.createTime, 'YYYY-MM-DD HH:mm'))
               .fontSize(12 * this.settingInfo.fontSizeRatio)
               .fontColor($r('sys.color.font_tertiary'))
           }

@@ -6,8 +6,8 @@ import { harmonyShare, systemShare } from '@kit.ShareKit';
 import { PosterType } from '../commons/Enums';
 import { ProductResource } from '../commons/Types';
 import { posterDialogBuilder } from '../components/PosterDialog';
-import { PopViewUtil } from './PopViewUtil';
 import { Logger } from './Logger';
+import { PopViewUtil } from './PopViewUtil';
 import { WindowUtil } from './WindowUtil';
 
 const TAG: string = '[ShareOperationUtil]';
@@ -27,17 +27,29 @@ class ShareOperationUtil {
 
   public copyUrl(path: string) {
     const uiContext = WindowUtil.uiContext;
-    const pasteData: pasteboard.PasteData = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, path);
-    let systemPasteboard: pasteboard.SystemPasteboard = pasteboard.getSystemPasteboard();
-    systemPasteboard.setData(pasteData).then(() => {
-      uiContext.getPromptAction().showToast({ message: '商品链接复制成功~' });
-    }).catch((err: BusinessError) => {
-      Logger.error(TAG, 'set pasteboard failed.error:' + JSON.stringify(err));
-      uiContext.getPromptAction().showToast({ message: '商品链接复制失败，请稍后重试' });
-    });
+    const pasteData: pasteboard.PasteData = pasteboard.createData(
+      pasteboard.MIMETYPE_TEXT_PLAIN,
+      path,
+    );
+    let systemPasteboard: pasteboard.SystemPasteboard =
+      pasteboard.getSystemPasteboard();
+    systemPasteboard
+      .setData(pasteData)
+      .then(() => {
+        uiContext.getPromptAction().showToast({ message: '商品链接复制成功~' });
+      })
+      .catch((err: BusinessError) => {
+        Logger.error(TAG, 'set pasteboard failed.error:' + JSON.stringify(err));
+        uiContext
+          .getPromptAction()
+          .showToast({ message: '商品链接复制失败，请稍后重试' });
+      });
   }
 
-  public openPosterDialog(posterResource: ProductResource, posterType: PosterType = PosterType.DEFAULT) {
+  public openPosterDialog(
+    posterResource: ProductResource,
+    posterType: PosterType = PosterType.DEFAULT,
+  ) {
     PopViewUtil.openDialog(
       wrapBuilder(posterDialogBuilder),
       {
@@ -69,15 +81,22 @@ class ShareOperationUtil {
         description: '¥' + productResource.price,
         label: productResource.title ?? '',
       });
-      let controller: systemShare.ShareController = new systemShare.ShareController(shareData);
-      controller.show(contextFaker as common.UIAbilityContext, {
-        previewMode: systemShare.SharePreviewMode.DEFAULT,
-        selectionMode: systemShare.SelectionMode.BATCH,
-      }).then(() => {
-        Logger.info(TAG, 'HuaweiShare show');
-      }).catch((error: BusinessError) => {
-        Logger.error(TAG, `HuaweiShare show error. Code: ${error.code}, message: ${error.message}`);
-      });
+      let controller: systemShare.ShareController =
+        new systemShare.ShareController(shareData);
+      controller
+        .show(contextFaker as common.UIAbilityContext, {
+          previewMode: systemShare.SharePreviewMode.DEFAULT,
+          selectionMode: systemShare.SelectionMode.BATCH,
+        })
+        .then(() => {
+          Logger.info(TAG, 'HuaweiShare show');
+        })
+        .catch((error: BusinessError) => {
+          Logger.error(
+            TAG,
+            `HuaweiShare show error. Code: ${error.code}, message: ${error.message}`,
+          );
+        });
     } else {
       Logger.error(TAG, 'HuaweiShare show error. context or fileUri is null');
     }
@@ -93,30 +112,38 @@ class ShareOperationUtil {
       // 下载网络图片存入缓存沙箱
       const fileName = image.split('/').pop() as string;
       const filePath = parentDir + '/' + `${Date.now()}_${fileName}`;
-      request.downloadFile(context, {
-        url: image,
-        filePath: filePath,
-      }).then(async (downloadTask: request.DownloadTask) => {
-        downloadTask.on('fail', () => {
-          Logger.error(TAG, 'file manager download failed.');
+      request
+        .downloadFile(context, {
+          url: image,
+          filePath: filePath,
+        })
+        .then(async (downloadTask: request.DownloadTask) => {
+          downloadTask.on('fail', () => {
+            Logger.error(TAG, 'file manager download failed.');
+          });
+          downloadTask.on('complete', async () => {
+            Logger.info(TAG, 'file manager download success.');
+            this._fileUri = filePath;
+          });
         });
-        downloadTask.on('complete', async () => {
-          Logger.info(TAG, 'file manager download success.');
-          this._fileUri = filePath;
-        });
-      });
     } else {
       // 将资源文件存入缓存沙箱
       const mediaContent = context.resourceManager.getMediaContentSync(image);
       const filePath = parentDir + '/' + `${Date.now()}_local_image.jpg`;
       let file: fs.File | null = null;
       try {
-        file = fs.openSync(filePath, fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE);
+        file = fs.openSync(
+          filePath,
+          fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE,
+        );
         fs.writeSync(file.fd, (mediaContent as Uint8Array).buffer);
         Logger.info('write data to file success.');
         this._fileUri = filePath;
       } catch (err) {
-        Logger.error(TAG, 'write data to file failed. error: ' + JSON.stringify(err));
+        Logger.error(
+          TAG,
+          'write data to file failed. error: ' + JSON.stringify(err),
+        );
       } finally {
         if (file) {
           fs.closeSync(file);
@@ -128,11 +155,14 @@ class ShareOperationUtil {
   public cleanCacheImage() {
     if (this._fileUri) {
       try {
-        fs.unlinkSync(fileUri.getUriFromPath(this._fileUri));
+        fs.unlinkSync(this._fileUri);
         this._fileUri = '';
         Logger.info(TAG, 'delete cache file success');
       } catch (err) {
-        Logger.error(TAG, `delete cache file failed,uri:${this._fileUri},error:` + err);
+        Logger.error(
+          TAG,
+          `delete cache file failed,uri:${this._fileUri},error:` + err,
+        );
       }
     }
   }
@@ -155,7 +185,9 @@ class ShareOperationUtil {
       content: this.productResource?.url ?? '',
       thumbnailUri: fileUri.getUriFromPath(this._fileUri),
       title: this.productResource?.title ?? '',
-      description: this.productResource?.price ? `¥${this.productResource.price}` : '',
+      description: this.productResource?.price
+        ? `¥${this.productResource.price}`
+        : '',
     });
     sharableTarget.share(shareData);
   }

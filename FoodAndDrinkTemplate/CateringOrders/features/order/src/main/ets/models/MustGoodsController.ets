@@ -1,12 +1,13 @@
+@ObservedV2
 export class MustGoodsController {
   // 购物车内必选商品数量
   private isMust: number = 0
   // 商铺必选商品数量
-  shopIsMust: number = 0
+  @Trace shopIsMust: number = 0
   // 是否提交
-  isChecked: boolean = false
-  isNeedMustGoods: boolean = false
-  showMustGoods: boolean = false
+  @Trace isChecked: boolean = false
+  @Trace isNeedMustGoods: boolean = false
+  @Trace showMustGoods: boolean = false
 
   addIsMust(num?: number) {
     if (num) {

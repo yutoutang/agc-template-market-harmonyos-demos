@@ -14,6 +14,8 @@ import {
 } from '../uicomponent/NoticeDialog';
 import { fullLoading, FullLoadingParam } from '../uicomponent/UILoading';
 
+const TAG = '[Utils]';
+
 /**
  * 通用Utils
  */
@@ -81,7 +83,7 @@ export class CommonUtils {
       // 小数保留2位小数
       return cash.toFixed(2);
     } catch (e) {
-      Logger.error('handleCash fail, error: ' + JSON.stringify(e));
+      Logger.error(TAG, 'handleCash fail, error: ' + JSON.stringify(e));
       return '';
     }
   }
@@ -151,7 +153,7 @@ export class CommonUtils {
         const resource = getContext().resourceManager.getMediaBase64ByNameSync(resourceName);
         return resource;
       } catch (err) {
-        Logger.error(`get image resource failed, ${err}, ${resourceName}`);
+        Logger.error(TAG, `get image resource failed, ${err}, ${resourceName}`);
         return '';
       }
     }
@@ -184,7 +186,7 @@ export class SystemSceneUtils {
       tokenId = bundleInfo.appInfo.accessTokenId;
     } catch (error) {
       const err: BusinessError = error as BusinessError;
-      Logger.error(`Failed to get bundle info for self. Code is ${err.code}, message is ${err.message}`);
+      Logger.error(TAG, `Failed to get bundle info for self. Code is ${err.code}, message is ${err.message}`);
     }
 
     // 校验应用是否被授予权限
@@ -192,7 +194,7 @@ export class SystemSceneUtils {
       grantStatus = await atManager.checkAccessToken(tokenId, permission);
     } catch (error) {
       const err: BusinessError = error as BusinessError;
-      Logger.error(`Failed to check access token. Code is ${err.code}, message is ${err.message}`);
+      Logger.error(TAG, `Failed to check access token. Code is ${err.code}, message is ${err.message}`);
     }
 
     return grantStatus === abilityAccessCtrl.GrantStatus.PERMISSION_GRANTED;
@@ -210,7 +212,7 @@ export class SystemSceneUtils {
     const isGrantedAppLo = await SystemSceneUtils.checkPermissionGrant(permissions[0]);
 
     if (isGrantedAppLo) {
-      Logger.info('already granted location and approximate location permissions')
+      Logger.info(TAG, 'already granted location and approximate location permissions')
       return true;
     }
     if (!SystemSceneUtils.context) {
@@ -250,10 +252,10 @@ export class SystemSceneUtils {
         language: 'zh_CN',
       };
       const reverseGeocodeResult = await site.reverseGeocode(reverseGeoCodeReq);
-      Logger.info('reverseGeocodeResult=' + JSON.stringify(reverseGeocodeResult));
+      Logger.info(TAG, 'reverseGeocodeResult=' + JSON.stringify(reverseGeocodeResult));
       return reverseGeocodeResult.addressComponent.city?.cityName ?? '';
     } catch (e) {
-      Logger.error('getCurrentCityInfo fail, error: ' + JSON.stringify(e));
+      Logger.error(TAG, 'getCurrentCityInfo fail, error: ' + JSON.stringify(e));
       return '';
     }
   }
@@ -266,13 +268,14 @@ export class SystemSceneUtils {
     if (ignoreRequestPayment) {
       return new Promise((resolve) => resolve());
     }
+    // todo 补充订购信息
     const orderStr = '{}';
     return paymentService.requestPayment(context, orderStr)
       .then(() => {
-        Logger.info('succeeded in paying');
+        Logger.info(TAG, 'succeeded in paying');
       })
       .catch((error: BusinessError) => {
-        Logger.error(`failed to pay, error.code: ${error.code}, error.message: ${error.message}`);
+        Logger.error(TAG, `failed to pay, error.code: ${error.code}, error.message: ${error.message}`);
         promptAction.showToast({ message: '拉起支付失败' });
       });
   }

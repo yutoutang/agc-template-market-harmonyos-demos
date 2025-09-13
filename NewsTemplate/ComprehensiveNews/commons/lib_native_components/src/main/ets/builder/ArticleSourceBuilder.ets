@@ -1,6 +1,6 @@
-import { SettingModel, TimeUtils } from 'lib_common'
-import { LayoutParams } from 'lib_news_api'
 import { PersistenceV2 } from '@kit.ArkUI'
+import { SettingModel, TimeUtils } from 'lib_common'
+import { LayoutParams } from 'module_flexlayout'
 
 @ComponentV2
 export struct ArticleSourceBuilder {
@@ -13,7 +13,7 @@ export struct ArticleSourceBuilder {
         .fontSize(12 * this.settingInfo.fontSizeRatio)
         .fontColor($r('sys.color.font_tertiary'))
         .textAlign(TextAlign.Start)
-      Text(TimeUtils.formatDate(this.cardData.nativeCardData?.createTime, 'YYYY-MM-DD HH:MM'))
+      Text(TimeUtils.formatDate(this.cardData.nativeCardData?.createTime, 'YYYY-MM-DD HH:mm'))
         .fontSize(12 * this.settingInfo.fontSizeRatio)
         .fontColor($r('sys.color.font_tertiary'))
         .textAlign(TextAlign.Start)

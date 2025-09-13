@@ -1,6 +1,7 @@
-import { CartCardDto, Product, CartDto, MockCart } from '../commons/Model';
-import { PersistenceV2 } from '@kit.ArkUI';
 import { util } from '@kit.ArkTS';
+import { PersistenceV2 } from '@kit.ArkUI';
+import { CartCardDto, Product, CartDto, MockCart, UpdateCartReq } from '../commons/Model';
+import { MockProductData } from './MockProductData';
 
 function handleBannerIcon(banner: string): ResourceStr {
   if (banner.startsWith('app://')) {
@@ -13,6 +14,11 @@ function handleBannerIcon(banner: string): ResourceStr {
 }
 
 export class CartApi {
+  public static getCartData(): Promise<CartDto> {
+    let data = CartApi._getCartData();
+    return Promise.resolve(data);
+  }
+
   // 获取购物车列表数据
   public static getCartList(): Promise<Product[]> {
     let mockCart: MockCart = PersistenceV2.connect(
@@ -43,15 +49,19 @@ export class CartApi {
   }
 
   // 删除购物车商品
-  public static deleteCartProduct(data: string[]): Promise<string> {
+  public static deleteCartProduct(
+    data: string[],
+    isRemain: boolean = true,
+  ): Promise<string> {
     let mockCart: MockCart = PersistenceV2.connect(
       MockCart,
       'MockCart',
       () => new MockCart(),
     )!;
-    const mockCartData = JSON.parse(mockCart.data) as CartDto;
+    const mockCartData = CartApi._getCartData()
     let remainList: CartCardDto[] = mockCartData.cards.filter(
-      (item: CartCardDto) => data.includes(item.skuCode),
+      (item: CartCardDto) =>
+        isRemain ? data.includes(item.skuCode) : !data.includes(item.skuCode),
     );
     let cacheData = {
       version: util.generateRandomUUID(false),
@@ -65,7 +75,7 @@ export class CartApi {
 
   // 更新购物车商品的数量
   public static updateProductCount(
-    data: Record<string, string | number>,
+    data: UpdateCartReq,
   ): Promise<string> {
     let mockCart: MockCart = PersistenceV2.connect(
       MockCart,
@@ -82,5 +92,63 @@ export class CartApi {
     mockCartData.version = util.generateRandomUUID(false);
     mockCart.data = JSON.stringify(mockCartData);
     return Promise.resolve('0');
+  }
+
+  public static addSkuToCart(skuCode: string, count: number): Promise<string> {
+    const cartData = CartApi._getCartData();
+    const card = cartData.cards.find((item) => item.skuCode === skuCode);
+    if (card) {
+      card.count = Math.min(card.stock, card.count + count);
+    } else {
+      const skuItem = MockProductData.PRODUCT_SKU_TABLE.find(
+        (sku) => sku.skuCode === skuCode,
+      );
+      if (skuItem) {
+        const cartItem: CartCardDto = {
+          productId: skuItem.productId,
+          skuCode: skuItem.skuCode,
+          skuDesc: skuItem.skuDesc,
+          stock: skuItem.stock,
+          count: count,
+          banner: skuItem.banner,
+          title: skuItem.title,
+          serviceDesc: skuItem.serviceDesc,
+          price: skuItem.price,
+          dashPrice: skuItem.dashPrice,
+          isSelected: false,
+        };
+        cartData.cards.unshift(cartItem);
+        cartData.version = util.generateRandomUUID(false);
+        cartData.total = cartData.cards.length;
+      }
+    }
+    CartApi._setCartData(cartData);
+    return Promise.resolve('0');
+  }
+
+  private static _getCartData() {
+    let mockCart: MockCart = PersistenceV2.connect(
+      MockCart,
+      'MockCart',
+      () => new MockCart(),
+    )!;
+    if (!mockCart.data) {
+      return {
+        version: 'mock_cart_version_empty',
+        total: 0,
+        cards: [],
+      } as CartDto;
+    } else {
+      return JSON.parse(mockCart.data) as CartDto;
+    }
+  }
+
+  private static _setCartData(data: CartDto) {
+    let mockCart: MockCart = PersistenceV2.connect(
+      MockCart,
+      'MockCart',
+      () => new MockCart(),
+    )!;
+    mockCart.data = JSON.stringify(data);
   }
 }

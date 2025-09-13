@@ -1,0 +1,11 @@
+{
+  "module": {
+    "name": "attraction_note",
+    "type": "har",
+    "deviceTypes": [
+      "default",
+      "tablet"
+    ],
+    "routerMap": "$profile:router_map"
+  }
+}

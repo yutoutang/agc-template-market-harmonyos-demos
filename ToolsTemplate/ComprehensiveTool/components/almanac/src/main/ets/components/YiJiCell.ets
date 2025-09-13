@@ -25,7 +25,8 @@ export struct YiJiCell {
   /**
    * 单元格点击事件
    */
-  @Event onYiJiCellClick: () => void = () => {}
+  @Event onYiJiCellClick: () => void = () => {
+  }
 
   build() {
     Column() {
@@ -36,13 +37,13 @@ export struct YiJiCell {
         Text() {
           ForEach(this.yiText, (value: string) => {
             Span(value + '  ')
-          },(value: string) => value)
+          }, (value: string) => value)
         }
         .lineHeight(24)
+        .layoutWeight(1)
+        .fontColor(FontWeight.Regular)
         .fontColor($r('sys.color.font_primary'))
         .fontSize($r('sys.float.Subtitle_S'))
-        .fontColor(FontWeight.Regular)
-        .layoutWeight(1)
         .attributeModifier(new TextStyleModifier(this.isEllipsis))
 
       }
@@ -56,7 +57,7 @@ export struct YiJiCell {
         Text() {
           ForEach(this.jiText, (value: string) => {
             Span(value + '  ')
-          },(value: string) => value)
+          }, (value: string) => value)
         }
         .lineHeight(24)
         .fontColor($r('sys.color.font_primary'))

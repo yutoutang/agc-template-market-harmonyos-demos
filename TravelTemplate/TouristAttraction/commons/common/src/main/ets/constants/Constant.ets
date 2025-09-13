@@ -12,3 +12,7 @@ export class Constant {
   static readonly CLOUD_STORAGE_URL =
     'https://agc-storage-drcn.platform.dbankcloud.cn/v0/scenic-i0v1l/';
 }
+
+export const CARD_TYPE_OPTIONS = [
+  '身份证',
+];

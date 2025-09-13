@@ -6,6 +6,8 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "utils": "file:../../commons/utils"
+    "foundation": "file:../../commons/foundation",
+    "profile_edit": "file:../../components/profile_edit",
+    "reservation_form": "file:../../components/reservation_form",
   }
 }

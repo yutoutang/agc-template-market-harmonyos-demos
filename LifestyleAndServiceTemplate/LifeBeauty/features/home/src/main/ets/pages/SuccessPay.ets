@@ -1,5 +1,4 @@
-import { RouterMap, RouterModule, SimpleOrderInfo, UIOrderPart } from 'utils';
-import { FormItemDivider } from '../common/UIComponent';
+import { RouterMap, RouterModule, SimpleOrderInfo, UIOrderPart } from 'foundation';
 
 @Builder
 export function SuccessPayBuilder() {
@@ -43,7 +42,7 @@ export struct SuccessPay {
       .height('100%')
       .padding({ left: 10, right: 10 })
       .align(Alignment.Top)
-
+      .scrollBar(BarState.Off)
     }
     .title('支付完成', { backgroundColor: Color.White })
     .backgroundColor($r('app.color.common_page_bg'))
@@ -62,7 +61,7 @@ export struct SuccessPay {
         Text(this.orderInfo.contactName)
       }.width('100%').height(48)
 
-      FormItemDivider()
+      Divider().margin({ top: 0, bottom: 8 })
 
       Row() {
         Text('电话').formLabel()
@@ -103,9 +102,9 @@ export struct SuccessPay {
       Text('备注').formLabel()
       Blank()
       Text(this.orderInfo.remark || '暂无')
-        .maxLines(2)
+        .maxLines(4)
         .textOverflow({ overflow: TextOverflow.Ellipsis })
-        .constraintSize({ maxWidth: '70%' })
+        .constraintSize({ maxWidth: '80%' })
     }
     .width('100%')
     .padding({

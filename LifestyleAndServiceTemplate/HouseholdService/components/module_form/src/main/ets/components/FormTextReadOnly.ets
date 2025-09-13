@@ -19,9 +19,9 @@ export struct FormTextReadOnly {
 
   build() {
     Text(this.value)
-      .fontSize(14)
+      .fontSize($r('sys.float.Body_L'))
       .fontWeight(400)
-      .fontColor(Color.Black)
+      .fontColor($r('sys.color.font_primary'))
       .maxLines(1)
       .textOverflow({ overflow: TextOverflow.Ellipsis })
   }

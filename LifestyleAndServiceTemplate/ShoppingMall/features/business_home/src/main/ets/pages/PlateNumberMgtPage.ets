@@ -79,7 +79,10 @@ struct PlateNumberMgtPage {
           Column() {
             Button({ type: ButtonType.Normal }) {
               Row() {
-                Image($r('app.media.ic_plus')).width(24)
+                SymbolGlyph($r('sys.symbol.plus'))
+                  .fontColor([$r('sys.color.font_on_primary')])
+                  .fontWeight(FontWeight.Normal)
+                  .fontSize(24)
                 Text('新增车牌')
                   .fontSize(18)
                   .fontWeight(FontWeight.Medium)
@@ -89,7 +92,7 @@ struct PlateNumberMgtPage {
             }
             .width(Constants.FULL_SIZE)
             .backgroundColor($r('app.color.app_theme'))
-            .borderRadius(16)
+            .borderRadius($r('sys.float.corner_radius_level7'))
             .padding({
               top: 16,
               bottom: 16,

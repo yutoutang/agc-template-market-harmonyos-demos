@@ -1,11 +1,9 @@
 export class Config {
-
   // 是否为开发模式
   public static readonly IS_DEV: boolean = true;
 
   // 地址解析文本的字符数限制
   public static readonly ADDRESS_PARSE_TEXT_CHAR_LIMIT: number = 150;
-
 }
 
 export class RouteMap {
@@ -59,7 +57,7 @@ export class IStyle {
 
 export class IColor {
   // 纯白色
-  public static readonly WHITE: ResourceStr = '#FFFFFFFF';
+  public static readonly WHITE: ResourceStr = $r('sys.color.font_on_primary');
 
   // 淡灰色 85% 透明
   public static readonly GRAY_LIGHT_TRANSPARENT_85: ResourceStr = '#D9FAFAFA';
@@ -91,7 +89,7 @@ export class IFontSize {
 
   public static readonly SUB_TITLE: Dimension = '16vp';
 
-  public static readonly BODY: Dimension = '14vp';
+  public static readonly BODY: Dimension = $r('sys.float.Body_M');
 
   public static readonly CAPTION: Dimension = '12vp';
 
@@ -122,5 +120,5 @@ export enum ShippingAddressErrorCode {
   PACKAGE_FINGERPRINT_CHECK_ERROR = 1008100004,
   PERMISSION_CHECK_ERROR = 1008100005,
   USER_CANCELED = 1008100006,
-  UNSUPPORTED = 1008100007
+  UNSUPPORTED = 1008100007,
 }

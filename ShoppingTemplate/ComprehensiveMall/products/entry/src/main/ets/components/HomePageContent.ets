@@ -2,13 +2,13 @@ import {
   BreakpointStorage,
   BreakpointSystem,
   BreakpointTypeEnum,
-  Category,
   iResourceMgr,
   RouterMap,
   routerStack,
   Style,
 } from 'lib_foundation';
 import { ProductWaterFlow } from 'module_product_waterflow';
+import { CategoryItem } from 'lib_network';
 
 @ComponentV2
 export struct HomePageContent {
@@ -19,11 +19,11 @@ export struct HomePageContent {
     $r('app.media.mock_homepage_banner3'),
   ];
   @Param
-  categoryList: Category[] = [];
+  categoryList: CategoryItem[] = [];
   @Param
   scroller: Scroller = new Scroller();
   @Local
-  categoryDisplayList: Category[][] = [];
+  categoryDisplayList: CategoryItem[][] = [];
   @Event
   handleClickCategory: (id: string) => void;
   @Local curBreakpoint: BreakpointStorage = BreakpointSystem.currentBreakpoint
@@ -75,7 +75,7 @@ export struct HomePageContent {
     .autoPlay(true)
     .aspectRatio(this.curBreakpoint.value === BreakpointTypeEnum.SM ? 4 / 3 : 16 / 9)
     .clip(true)
-    .borderRadius(8);
+    .borderRadius($r('app.float.border_radius_l'));
   }
 
   @Builder
@@ -83,9 +83,9 @@ export struct HomePageContent {
     Column() {
       Scroll() {
         Row({ space: 16 }) {
-          ForEach(this.categoryDisplayList, (list: Category[]) => {
+          ForEach(this.categoryDisplayList, (list: CategoryItem[]) => {
             Column({ space: 16 }) {
-              ForEach(list, (category: Category) => {
+              ForEach(list, (category: CategoryItem) => {
                 Column() {
                   Image(iResourceMgr.resolveUri(category.iconUrl))
                     .width(48)
@@ -96,9 +96,12 @@ export struct HomePageContent {
                     .fontColor(Style.FONT_COLOR_LEVEL3);
                 }
                 .constraintSize({ minWidth: 70 })
-              })
+                .onClick(() => {
+                  this.handleClickCategory?.(category.id)
+                })
+              }, (item: CategoryItem) => item.id)
             }
-          })
+          }, (_item: CategoryItem[], index: number) => index + '__')
         }
         .constraintSize({ minWidth: '100%' })
         .justifyContent(FlexAlign.SpaceBetween)

@@ -99,6 +99,10 @@
     {
       "name": "clear_cache",
       "value": "清除缓存"
+    },
+    {
+      "name": "agcit_huawei_shopping_mall",
+      "value": "1.0.0"
     }
   ]
 }

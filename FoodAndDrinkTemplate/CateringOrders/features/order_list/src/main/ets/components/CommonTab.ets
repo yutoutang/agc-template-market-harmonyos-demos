@@ -1,24 +1,41 @@
 import { OrderCard } from './OrderCard';
-import { Constants, GetMyOrderResp, getMyOrderUtil, OrderStateEnum, TabBarType } from 'common/Index';
+import { Constants, OrderStateEnum, TabBarType } from 'common/Index';
+import { MyOrderResp } from 'network';
+import * as API from '../api/Index';
+import { orderInfoMapper } from '../mapper/Index';
+import { MyOrderInfo } from '../models/Index';
 
-@Component
+@ComponentV2
 export struct CommonTab {
-  @Consume('currentIndex') @Watch('currentIndexChange') currentIndex: number
-  @Consume('refreshData') @Watch('refreshOrderList') refreshData: boolean
-  @State currentState: OrderStateEnum = OrderStateEnum.All;
-  @State orderList: Array<GetMyOrderResp> = [];
+  @Consumer('currentIndex') currentIndex: number = 0
+  @Consumer('refreshData') refreshData: boolean = false
+  @Local currentState: OrderStateEnum = OrderStateEnum.All;
+  @Local orderList: Array<MyOrderInfo> = [];
   scroller: Scroller = new Scroller()
-  @State pageNum: number = 0
+  @Local pageNum: number = 0
 
-  currentIndexChange() {
-    if (this.currentIndex === 1) {
+  @Monitor('currentIndex')
+  currentIndexChange(monitor: IMonitor) {
+    if (monitor.value()?.now === 1) {
       this.getMyOrder()
     }
   }
 
+  @Monitor('refreshData')
+  refreshOrderList(monitor: IMonitor) {
+    if (monitor.value()?.now && this.currentIndex === TabBarType.ORDER) {
+      this.getMyOrder()
+      this.refreshData = false
+    }
+  }
+
   getMyOrder() {
-    getMyOrderUtil(this.pageNum, this.currentState).then((resp: Array<GetMyOrderResp>) => {
-      this.orderList = resp
+    let tabIndex = [this.currentState]
+    if (this.currentState === OrderStateEnum.All) {
+      tabIndex = [OrderStateEnum.noFinished, OrderStateEnum.finished, OrderStateEnum.AfterSales]
+    }
+    API.getMyOrder(this.pageNum, tabIndex).then((resp: Array<MyOrderResp>) => {
+      this.orderList = resp.map(item => orderInfoMapper(item))
     })
   }
 
@@ -53,15 +70,16 @@ export struct CommonTab {
   @Builder
   tabOrderList() {
     List({ space: 12 }) {
-      ForEach(this.orderList, (item: GetMyOrderResp) => {
+      ForEach(this.orderList, (item: MyOrderInfo) => {
         OrderCard({
           orderItem: item, getMyOrder: () => {
             this.getMyOrder()
           },
         })
-      }, (item: GetMyOrderResp) => JSON.stringify(item))
+      }, (item: MyOrderInfo) => JSON.stringify(item))
     }
     .scrollBar(BarState.Off)
+    .edgeEffect(EdgeEffect.Spring)
     .height(Constants.FULL_SIZE)
     .margin({ top: 12 })
     .constraintSize({ maxHeight: Constants.FULL_SIZE })
@@ -97,12 +115,5 @@ export struct CommonTab {
         this.getMyOrder()
       })
     }.justifyContent(FlexAlign.Start)
-  }
-
-  refreshOrderList() {
-    if (this.refreshData && this.currentIndex === TabBarType.ORDER) {
-      this.getMyOrder()
-      this.refreshData = false
-    }
   }
 }

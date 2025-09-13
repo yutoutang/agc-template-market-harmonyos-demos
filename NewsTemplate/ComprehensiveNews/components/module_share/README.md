@@ -20,7 +20,7 @@
 
 - DevEco Studio版本：DevEco Studio 5.0.3 Release及以上
 - HarmonyOS SDK版本：HarmonyOS 5.0.3 Release SDK及以上
-- 设备类型：华为手机（包括双折叠和阔折叠）
+- 设备类型：华为手机（包括双折叠和阔折叠）、平板
 - 系统版本：HarmonyOS 5.0.1(13)及以上
 
 ### 权限
@@ -69,7 +69,8 @@
       "weixin",
       "wxopensdk"
     ],
-   
+   ```
+   ```
    "skills": [
           {
             "entities": [
@@ -81,6 +82,8 @@
             ]
           }
         ]
+   ```
+   ```
    "metadata": [
       {
         /*
@@ -96,6 +99,24 @@
    前往微信开放平台申请AppID并配置鸿蒙应用信息，详情参考：[鸿蒙接入指南](https://developers.weixin.qq.com/doc/oplatform/Mobile_App/Access_Guide/ohos.html)。
 5. 接入QQ。
    前往QQ开放平台申请AppID并配置鸿蒙应用信息，详情参考：[鸿蒙接入指南](https://wiki.connect.qq.com/sdk%e4%b8%8b%e8%bd%bd)。
+
+6. 调用组件，详细组件调用参见[示例代码](#示例代码)。
+
+```ts
+import { Share } from 'module_share';
+
+@Entry
+@ComponentV2
+export struct Index {
+  build() {
+    Column(){
+      Share({
+        ...
+      })
+    }
+  }
+}
+```
 
 ## API参考
 
@@ -113,12 +134,12 @@ Share(option: [ShareOptions](#ShareOptions对象说明))
 
 #### ShareOptions对象说明
 
-| 参数名                | 类型                                | 是否必填 | 说明                  |
-|:-------------------|:----------------------------------|:-----|:--------------------|
-| qrCodeInfo         | [ShareOptions](#ShareOptions对象说明) | 是    | 生成海报二维码的相关信息        |
-| shareRenderBuilder | () => void                        | 否    | 自定义插槽，可自定义分享入口图片内容等 |
+| 参数名                | 类型                                     | 是否必填 | 说明                  |
+|:-------------------|:---------------------------------------|:-----|:--------------------|
+| qrCodeInfo         | [QrCodeInfoOptions](#QrCodeInfoOptions对象说明) | 是    | 生成海报二维码的相关信息        |
+| shareRenderBuilder | () => void                             | 否    | 自定义插槽，可自定义分享入口图片内容等 |
 
-#### ShareOptions对象说明
+#### QrCodeInfoOptions对象说明
 
 | 参数名         | 类型                  | 是否必填 | 说明        |
 |:------------|:--------------------|:-----|:----------|

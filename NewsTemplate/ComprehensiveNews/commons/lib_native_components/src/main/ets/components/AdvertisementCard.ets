@@ -1,5 +1,6 @@
-import { LayoutParams } from 'lib_news_api'
+
 import { AdvertisementComponent } from 'module_advertisement'
+import { LayoutParams } from 'module_flexlayout'
 
 @Builder
 export function AdvertisementCard(cardData: LayoutParams) {

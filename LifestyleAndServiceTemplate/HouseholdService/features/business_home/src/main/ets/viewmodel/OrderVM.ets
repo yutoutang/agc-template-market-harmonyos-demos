@@ -18,13 +18,15 @@ import { AddrList, AddrViewModel } from 'module_address_manage';
 import { AppStorageV2 } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
 
+const TAG = '[OrderVM]';
+
 @ObservedV2
 export class OrderVM {
   @Trace addrList: AddrList = AppStorageV2.connect(AddrList, () => new AddrList())!;
 
   @Monitor('addrList.list')
   onChange(monitor: IMonitor) {
-    console.log(`inner.num change from ${monitor.value()?.before} to ${monitor.value()?.now}`);
+    Logger.info(TAG, `inner.num change from ${monitor.value()?.before} to ${monitor.value()?.now}`);
     const list = monitor.value()?.now as AddrViewModel[];
     const item = list.find(v => v.id === this.addrSelected.id);
     if (item) {
@@ -152,7 +154,7 @@ export class OrderVM {
       }
       return CommonUtils.handleCash(this.goodInfo.vipPrice);
     } catch (e) {
-      Logger.error('getTotalCash fail, error: ' + JSON.stringify(e));
+      Logger.error(TAG, 'getTotalCash fail, error: ' + JSON.stringify(e));
       return CommonUtils.handleCash(this.goodInfo.vipPrice);
     }
   }
@@ -207,6 +209,7 @@ export class OrderVM {
   payOrder() {
     CommonUtils.showLoading();
     const jumpParam = this.buildJumpParam();
+    // todo: 传入false，不走mock
     SystemSceneUtils.requestPaymentPromise(true, this.uiAbilityContext).then(() => {
       payOrder(this._orderId).then(() => {
         CommonUtils.hideLoading();

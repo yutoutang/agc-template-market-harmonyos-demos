@@ -98,13 +98,15 @@ export class InteractionViewModel extends BaseViewModel {
     MineServiceApi.cancelWatch(this.authorId)
   }
 
-  public actionToNewsDetails(cardData: NewsResponse, index: number, resourceId: number, formType?: string) {
+  public actionToNewsDetails(cardData: NewsResponse, index: number, resourceId: number, formType?: string,
+    isQueryCardData: boolean = false) {
     let params: RouterParams<NewsResponse> = {
       newsId: cardData.id,
       authorId: cardData.author.authorId,
       type: cardData.type,
       surfaceUrl: cardData.postImgList?.[0]?.surfaceUrl,
       cardData: cardData,
+      isQueryCardData: isQueryCardData,
       formType: formType ?? '',
     }
     let longTakeTransitionParam: LongTakeTransitionParam | undefined =

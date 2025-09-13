@@ -101,6 +101,6 @@ export class AddressMgrVM {
         }
         onError && onError();
       })
-      .finally(() => this.isLoading = false);
+      .finally(() => (this.isLoading = false));
   }
 }

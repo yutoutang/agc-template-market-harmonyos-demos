@@ -18,6 +18,7 @@ export struct NavHeaderBar {
           Image(this.backImg)
             .width(40)
             .height(40)
+            .draggable(false)
             .onClick(() => {
               RouterUtil.pop()
             })

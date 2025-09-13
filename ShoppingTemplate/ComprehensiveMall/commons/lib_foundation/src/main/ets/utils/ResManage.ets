@@ -1,17 +1,20 @@
 import util from '@ohos.util';
-import { Config } from '../constants/Config';
 
 class IResourceMgr {
-  public resolveUri(uri: string | undefined | null): ResourceStr {
+  public resolveUri(uri: ResourceStr | undefined | null): ResourceStr {
     try {
-      if (!uri) {
+      if (typeof uri === 'string') {
+        if (uri.startsWith('app://dev')) {
+          return $rawfile(uri.slice(6)) ?? '';
+        } else if (uri.startsWith('app://prod')) {
+          return $rawfile(uri.slice(6));
+        } else if (!uri.startsWith('http://') && !uri.startsWith('https://')) {
+          return uri;
+        } else {
+          return uri;
+        }
+      } else if (!uri) {
         return '';
-      } else if (uri.startsWith('app://dev')) {
-        return Config.IS_DEV ? $rawfile(uri.slice(6)) : '';
-      } else if (uri.startsWith('app://prod')) {
-        return $rawfile(uri.slice(6));
-      } else if (!uri.startsWith('http://') && !uri.startsWith('https://')) {
-        return Config.API_BASE_URL + uri;
       } else {
         return uri;
       }

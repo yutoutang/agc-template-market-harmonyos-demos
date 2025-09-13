@@ -12,8 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { getInstance, setPathStack } from '../common/Route';
+import { getStack, setStack } from '../common/Route';
 import { StandardCalculator } from '../components/StandardCalculator';
+import { BreakpointSystem } from '../utils/BreakpointSystem';
 
 @Builder
 export function HomePageBuilder() {
@@ -22,11 +23,19 @@ export function HomePageBuilder() {
 
 @ComponentV2
 export struct HomePage {
+  aboutToAppear(): void {
+    BreakpointSystem.register(this.getUIContext())
+  }
+
+  aboutToDisappear(): void {
+    BreakpointSystem.unregister()
+  }
+
   build() {
     NavDestination() {
       Scroll() {
         Column() {
-          StandardCalculator({ routerModule: getInstance() });
+          StandardCalculator({ routerModule: getStack() });
           Blank().layoutWeight(1)
         }
       }
@@ -36,7 +45,7 @@ export struct HomePage {
       .scrollBar(BarState.Off)
     }.title('计算器')
     .onReady((ctx) => {
-      setPathStack(ctx.pathStack);
+      setStack(ctx.pathStack);
     });
   }
 }

@@ -113,7 +113,7 @@ export struct UICitySelect {
   @Builder
   TopSearch() {
     Row({ space: 10 }) {
-      Search({ value: $$this.searchKey, placeholder: '请输入名称或首字母查询' }).layoutWeight(1)
+      Search({ value: $$this.searchKey, placeholder: '请输入名称查询' }).layoutWeight(1)
         .onClick(() => {
           this.showSearchRsp = true;
         })
@@ -195,7 +195,7 @@ export struct UICitySelect {
 
         Blank()
         if (this.isLoading) {
-          LoadingProgress().width(24).height(24).color($r('app.color.common_theme_color')).margin({ left: 10 })
+          LoadingProgress().width(24).height(24).color($r('sys.color.icon_secondary')).margin({ left: 10 })
         } else {
           Text('重新定位')
             .fontSize(14)

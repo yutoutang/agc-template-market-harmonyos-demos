@@ -9,12 +9,12 @@
       "value": "This application requires infrared permissions to be enabled."
     },
     {
-      "name": "agcit_huawei_remote_control",
-      "value": "1.0.0"
-    },
-    {
       "name": "agcittype_huawei_remote_control",
       "value": "serviceComponent"
+    },
+    {
+      "name": "agcit_huawei_remote_control",
+      "value": "1.0.1"
     }
   ]
 }

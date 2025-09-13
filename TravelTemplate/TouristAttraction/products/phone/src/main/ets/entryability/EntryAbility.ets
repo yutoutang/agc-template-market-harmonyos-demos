@@ -2,32 +2,35 @@ import { AbilityConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { AppStorageV2, window } from '@kit.ArkUI';
 import { UIBase } from '@hw-agconnect/ui-base';
-import { PlayInfo } from 'audio';
 import { PageUtil } from 'common';
+import { WindowSize } from 'types';
 
 export default class EntryAbility extends UIAbility {
   private pageIndex: number = 0;
   private currentWindowStage: window.WindowStage | null = null;
+  private _windowSize: WindowSize = AppStorageV2.connect(WindowSize, 'WindowSize', () => new WindowSize())!;
 
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     AppStorage.setOrCreate('context', this.context);
-    AppStorageV2.connect(PlayInfo, 'playInfo', () => new PlayInfo())!;
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onCreate');
+    this.setWantParam(want);
+  }
+
+  setWantParam(want: Want) {
     if (want?.parameters?.params) {
       // want.parameters.params 对应 postCardAction() 中 params 内容
-      let params: Record<string, Object> = JSON.parse(want.parameters.params as string);
-      this.pageIndex = params.index as number;
-      PageUtil.setPageInfo(this.pageIndex);
+      try {
+        let params: Record<string, Object> = JSON.parse(want.parameters.params as string);
+        this.pageIndex = params.index as number;
+        PageUtil.setPageInfo(this.pageIndex);
+      } catch (paramError) {
+        hilog.error(0x0000, 'testTag', 'Succeeded in get params.');
+      }
     }
   }
 
   onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): void {
-    if (want?.parameters?.params) {
-      // want.parameters.params 对应 postCardAction() 中 params 内容
-      let params: Record<string, Object> = JSON.parse(want.parameters.params as string);
-      this.pageIndex = params.index as number;
-      PageUtil.setPageInfo(this.pageIndex);
-    }
+    this.setWantParam(want);
     if (this.currentWindowStage !== null) {
       this.onWindowStageCreate(this.currentWindowStage);
     }
@@ -35,6 +38,33 @@ export default class EntryAbility extends UIAbility {
 
   onDestroy(): void {
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onDestroy');
+  }
+
+  monitorWindowSizeChange() {
+    let windowClass: window.Window | undefined = undefined;
+    try {
+      window.getLastWindow(this.context, (err, data) => {
+        const errCode: number = err.code;
+        if (errCode) {
+          hilog.error(0x0000, 'testTag', 'Failed to obtain the top window. Cause: ' + err.message);
+          return;
+        }
+        windowClass = data;
+        this._windowSize.width = px2vp(windowClass.getWindowProperties().windowRect.width)
+        try {
+          windowClass.on('windowSizeChange', (data) => {
+            this._windowSize.width = px2vp(data.width)
+            this._windowSize.height = px2vp(data.height)
+          });
+        } catch (exception) {
+          hilog.error(0x0000, 'testTag',
+            'Failed to enable the listener for window size changes. Cause: ' + exception.message);
+        }
+        hilog.info(0x0000, 'testTag', 'Succeeded in obtaining the top window. Data: ' + data.toString());
+      });
+    } catch (exception) {
+      hilog.error(0x0000, 'testTag', 'Failed to obtain the top window. Cause: ' + exception.message);
+    }
   }
 
   async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
@@ -51,6 +81,8 @@ export default class EntryAbility extends UIAbility {
     avoidArea = windowClass.getWindowAvoidArea(type);
     let windowBottomHeight = px2vp(avoidArea.bottomRect.height);
     AppStorage.setOrCreate('windowBottomHeight', windowBottomHeight);
+
+    this.monitorWindowSizeChange();
 
     windowStage.loadContent('pages/Main', (err) => {
       if (err.code) {

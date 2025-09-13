@@ -1,41 +1,29 @@
 import {
-  cancelOrderUtil,
   Constants,
   copyString,
   DnState,
-  getMyCarUtil,
-  GetMyOrderResp,
-  HttpCode,
-  HttpRequestApi,
-  OrderTable,
-  paySheetBuilder,
+  MyCarModel,
+  RouterMap,
+  RouterModule,
+  StoreInfoModel,
   StoreType,
 } from 'common/Index'
 import { ButtonListComp } from './ButtonListComp'
-import { promptAction } from '@kit.ArkUI'
+import { AppStorageV2, promptAction } from '@kit.ArkUI'
 import { BusinessError } from '@kit.BasicServicesKit'
-import { BtnType } from '../models/Model'
+import { BtnType, MyOrderInfo } from '../models/Index'
+import * as API from '../api/Index'
+import { paySheetBuilder } from 'base_ui'
 
-@Component
+@ComponentV2
 export struct OrderTypeComp {
-  @StorageLink('tableId') tableId: string = ''
-  @StorageLink('dinerNum') dinerNum: string = ''
-  @StorageProp('storeType') storeType: number = 1
-  @Consume('pageStack') pageStack: NavPathStack
-  @Prop @Watch('dealSate') orderDetail: GetMyOrderResp
-  @Prop @Watch('tableInfoChange') tableInfo: OrderTable
-  @State countdownMin: number = 0
-  @State countdownSec: number = 0
-  @State paySheetFlag: boolean = false
-  @State tableWatch: OrderTable = new OrderTable()
+  @Param @Require orderDetail: MyOrderInfo
+  @Local storeModel: StoreInfoModel = AppStorageV2.connect(StoreInfoModel, () => new StoreInfoModel())!;
+  @Local myCarModel: MyCarModel = AppStorageV2.connect(MyCarModel, () => new MyCarModel())!
+  @Local countdownMin: number = 0
+  @Local countdownSec: number = 0
+  @Local paySheetFlag: boolean = false
   timer: number = 0
-  getOrderInfo = () => {
-  }
-
-  tableInfoChange() {
-    this.tableWatch = this.tableInfo
-  }
-
   private waitPayBtnList: Array<BtnType> = [
     {
       text: $r('app.string.pay'),
@@ -50,10 +38,10 @@ export struct OrderTypeComp {
       color: $r('sys.color.font_secondary'),
       backgroundColor: $r('sys.color.background_secondary'),
       callback: () => {
-        if (this.orderDetail.order?.id) {
-          HttpRequestApi.addGoods(this.orderDetail.order.id).then(() => {
-            getMyCarUtil()
-            this.pageStack.popToName('HomePage', 0)
+        if (this.orderDetail.order.id) {
+          API.addGoods(this.orderDetail.order.id).then(() => {
+            API.getMyCar()
+            RouterModule.popToName(RouterMap.HOME_PAGE, 0)
           })
         } else {
           promptAction.showToast({ message: $r('app.string.order_not_exist') })
@@ -66,13 +54,12 @@ export struct OrderTypeComp {
       color: $r('sys.color.font_secondary'),
       backgroundColor: $r('sys.color.background_secondary'),
       callback: (orderId: string) => {
-        cancelOrderUtil(orderId).then((resp: number) => {
-          //   取消 2 失败
-          let msg: Resource =
-            resp === HttpCode.SUCCESS ? $r('app.string.cancel_success') : $r('app.string.cancel_failed')
-          promptAction.showToast({ message: msg })
-          if (resp !== 2) {
+        API.cancelOrder(orderId).then((resp: number) => {
+          if (resp === 1) {
+            promptAction.showToast({ message: $r('app.string.cancel_success') })
             this.getOrderInfo()
+          } else {
+            promptAction.showToast({ message: $r('app.string.cancel_failed') })
           }
         })
       },
@@ -84,14 +71,12 @@ export struct OrderTypeComp {
       color: $r('sys.color.font_secondary'),
       backgroundColor: $r('sys.color.background_secondary'),
       callback: () => {
-        this.pageStack.popToName('HomePage', 0)
+        RouterModule.popToName(RouterMap.HOME_PAGE, 0)
       },
     },
   ]
 
-  aboutToAppear(): void {
-    this.tableInfoChange()
-    this.dealSate()
+  @Event getOrderInfo: () => void = () => {
   }
 
   aboutToDisappear(): void {
@@ -102,7 +87,7 @@ export struct OrderTypeComp {
 
   confirmOrder() {
     // 拉华为支付
-    HttpRequestApi.getHuaweiPayInfo(this.orderDetail.order?.id ?? '').then((resp: number) => {
+    API.getHuaweiPayInfo(this.orderDetail.order.id ?? '').then((resp: number) => {
       if (resp) {
         promptAction.showToast({ message: $r('app.string.pay_success') })
         this.getOrderInfo()
@@ -115,14 +100,15 @@ export struct OrderTypeComp {
     })
   }
 
+  @Monitor('orderDetail.order.state')
   dealSate() {
-    if (this.orderDetail.order?.dnState !== DnState.TO_BE_PAID) {
+    if (this.orderDetail.order.state !== DnState.TO_BE_PAID) {
       return;
     }
     if (this.timer) {
       this.clearTimer()
     }
-    let orderTime = new Date(this.orderDetail.order?.time!)
+    let orderTime = new Date(this.orderDetail.order.time!)
     orderTime.setMinutes(orderTime.getMinutes() + 30)
     let countdownSec = Math.floor((orderTime.getTime() - new Date().getTime()) / 1000)
     this.countdownSec = countdownSec >= 0 ? countdownSec : 0
@@ -130,7 +116,7 @@ export struct OrderTypeComp {
     this.timer = setInterval(() => {
       if (this.countdownSec <= 0) {
         this.clearTimer()
-        cancelOrderUtil(this.orderDetail.order?.id ?? '')
+        API.cancelOrder(this.orderDetail.order.id ?? '')
         this.getOrderInfo()
         return
       }
@@ -173,8 +159,8 @@ export struct OrderTypeComp {
         bottom: 12,
       })
 
-      ButtonListComp({ btnList: this.waitPayBtnList, orderId: this.orderDetail?.order?.id })
-        .bindSheet($$this.paySheetFlag, paySheetBuilder(Number(this.orderDetail.order?.money ?? 0), (flag: boolean) => {
+      ButtonListComp({ btnList: this.waitPayBtnList, orderId: this.orderDetail.order.id })
+        .bindSheet($$this.paySheetFlag, paySheetBuilder(Number(this.orderDetail.order.money ?? 0), (flag: boolean) => {
           if (flag) {
             this.confirmOrder()
           }
@@ -195,25 +181,27 @@ export struct OrderTypeComp {
         .fontSize($r('sys.float.Title_S'))
         .fontWeight(FontWeight.Medium)
         .fontColor($r('sys.color.font_primary'))
-      if (this.storeType === StoreType.SCAN_TYPE) {
+      if (this.storeModel.storeType === StoreType.SCAN_TYPE) {
         Row() {
           Image($r('app.media.table_icon')).width(16)
-          Text(`${this.tableWatch.typeName} ${this.tableWatch.name}`).fontColor($r('sys.color.font_secondary'))
-            .fontSize($r('sys.float.Body_M')).margin({ left: 2 })
+          Text(`${this.orderDetail.table?.typeName} ${this.orderDetail.table?.name}`)
+            .fontColor($r('sys.color.font_secondary'))
+            .fontSize($r('sys.float.Body_M'))
+            .margin({ left: 2 })
         }
       } else {
         Text() {
           ImageSpan($r('app.media.ic_pick_num')).width(16)
           Span($r('app.string.pick_good_id')).fontColor($r('sys.color.font_secondary')).margin({ left: 2 })
-          Span(`${this.orderDetail.order?.oid}`).fontColor($r('sys.color.font_secondary')).margin({ left: 4 })
+          Span(`${this.orderDetail.order.oid}`).fontColor($r('sys.color.font_secondary')).margin({ left: 4 })
         }.fontSize($r('sys.float.Body_M'))
       }
       Text() {
         Span($r('app.string.order_id_prefix'))
-        Span(`${this.orderDetail?.order?.orderNum}  `)
+        Span(`${this.orderDetail.order.orderNum}  `)
         ImageSpan($r('app.media.copy')).width(16).height(16)
           .onClick(() => {
-            copyString(this.orderDetail?.order?.orderNum ?? '')
+            copyString(this.orderDetail.order.orderNum ?? '')
           })
       }
       .fontSize($r('sys.float.Caption_M'))
@@ -243,12 +231,12 @@ export struct OrderTypeComp {
         Text($r('app.string.order_id_prefix'))
           .fontSize($r('sys.float.Caption_M'))
           .fontColor($r('sys.color.font_secondary'))
-        Text(`${this.orderDetail?.order?.orderNum}  `)
+        Text(`${this.orderDetail.order.orderNum}  `)
           .fontSize($r('sys.float.Caption_M'))
           .fontColor($r('sys.color.font_secondary'))
         Image($r('app.media.copy')).width(12).height(12)
           .onClick(() => {
-            copyString(this.orderDetail?.order?.orderNum ?? '')
+            copyString(this.orderDetail.order.orderNum ?? '')
           })
       }
       .align(Alignment.Center)
@@ -272,9 +260,9 @@ export struct OrderTypeComp {
 
   build() {
     Column() {
-      if (this.orderDetail?.order?.dnState === DnState.TO_BE_PAID) {
+      if (this.orderDetail.order.state === DnState.TO_BE_PAID) {
         this.waitPayBuilder()
-      } else if (this.orderDetail?.order?.dnState === DnState.COMPLETED) {
+      } else if (this.orderDetail.order.state === DnState.COMPLETED) {
         this.finishedBuilder()
       } else {
         this.canceledBuilder()

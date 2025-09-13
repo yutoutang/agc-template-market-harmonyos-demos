@@ -1,6 +1,7 @@
 import { PersistenceV2, UIUtils } from '@kit.ArkUI'
 import { CommonConstants, SettingModel } from 'lib_common'
-import { LayoutParams, PostImgList } from 'lib_news_api'
+import { LayoutParams } from 'module_flexlayout'
+import { PostImgList } from 'lib_news_api'
 import { BaseImage } from 'lib_widget'
 import { AuthorCard } from '../builder/AuthorBuilder'
 import { ArticleSourceBuilder } from '../builder/ArticleSourceBuilder'

@@ -1,7 +1,7 @@
 import { BusinessError } from '@kit.BasicServicesKit';
 import { ComponentContent } from '@kit.ArkUI';
 import { UIContext } from '@ohos.arkui.UIContext';
-import { default as Logger } from '../utils/Logger'
+import { Logger } from '../utils/Logger';
 
 export class DialogController {
   static context: UIContext;

@@ -33,7 +33,7 @@ struct MyWalletPage {
           Stack() {
             Image($r('app.media.bg_self_point_title_right')).width(133).height(78)
             Button('充值', { controlSize: ControlSize.SMALL })
-              .fontSize(14)
+              .fontSize($r('sys.float.Body_M'))
               .fontWeight(FontWeight.Medium)
               .fontColor($r('sys.color.font_on_primary'))
               .width(72)
@@ -197,7 +197,7 @@ struct MyWalletPage {
         .padding({ top: 16, bottom: 16 })
       Row({ space: 12 }) {
         Button('取消')
-          .fontSize(16)
+          .fontSize($r('sys.float.Body_L'))
           .fontWeight(FontWeight.Medium)
           .fontColor($r('sys.color.font_primary'))
           .layoutWeight(1)
@@ -207,7 +207,7 @@ struct MyWalletPage {
             this.vm.datePickerSheet = false
           })
         Button('确认')
-          .fontSize(16)
+          .fontSize($r('sys.float.Body_L'))
           .fontWeight(FontWeight.Medium)
           .fontColor($r('sys.color.font_on_primary'))
           .layoutWeight(1)

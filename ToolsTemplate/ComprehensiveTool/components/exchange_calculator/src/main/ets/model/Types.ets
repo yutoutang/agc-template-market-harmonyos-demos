@@ -1,31 +1,21 @@
-export interface ICurrencyData {
+@ObservedV2
+export class ICurrencyData {
   /**
    *  银行中间价
    */
-  bankConversionPri: string;
-
+  bankConversionPri: number = 0;
   /**
    * 币种名称
    */
-  name: string;
-
+  name: string = '';
   /**
    * 国家名
    */
-  country: string
+  country: string = '';
   /**
    * 国家旗帜
    */
-  pic: Resource
-  /**
-   * 日期
-   */
-  date: string;
-
-  /**
-   * 时间
-   */
-  time: string;
+  pic: ResourceStr = '';
 }
 
 @ObservedV2

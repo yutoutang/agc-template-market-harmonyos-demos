@@ -12,9 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import { common } from '@kit.AbilityKit';
 import { ComponentContent, promptAction } from '@kit.ArkUI';
-import { AppStorageMap } from './Constant';
 
 export enum PopViewShowType {
   OPEN
@@ -27,6 +26,7 @@ interface PopViewModel {
 
 export class PopViewUtils {
   private static popShare: PopViewUtils;
+  private static uiContext: UIContext;
   private infoList: PopViewModel[] = [];
 
   static shareInstance(): PopViewUtils {
@@ -36,12 +36,14 @@ export class PopViewUtils {
     return PopViewUtils.popShare;
   }
 
-  static showDialog<T extends object>(type: PopViewShowType, contentView: WrappedBuilder<[T]>, args: T,
-    options?: promptAction.BaseDialogOptions): void {
-    let uiContext = AppStorage.get<UIContext>(AppStorageMap.UI_CONTEXT);
-    if (uiContext) {
-      let prompt = uiContext.getPromptAction();
-      let componentContent = new ComponentContent(uiContext, contentView, args);
+  static async showDialog<T extends object>(type: PopViewShowType, contentView: WrappedBuilder<[T]>, args: T,
+    options?: promptAction.BaseDialogOptions): Promise<void> {
+    if (!PopViewUtils.uiContext) {
+      PopViewUtils.uiContext = await getUIContext();
+    }
+    if (PopViewUtils.uiContext) {
+      let prompt = PopViewUtils.uiContext.getPromptAction();
+      let componentContent = new ComponentContent(PopViewUtils.uiContext, contentView, args);
       let customOptions: promptAction.BaseDialogOptions = {
         alignment: options?.alignment || DialogAlignment.Bottom,
         autoCancel: options?.autoCancel || false,
@@ -61,10 +63,12 @@ export class PopViewUtils {
     }
   }
 
-  static closeDialog(type: PopViewShowType): void {
-    let uiContext = AppStorage.get<UIContext>(AppStorageMap.UI_CONTEXT);
-    if (uiContext) {
-      let prompt = uiContext.getPromptAction();
+  static async closeDialog(type: PopViewShowType): Promise<void> {
+    if (!PopViewUtils.uiContext) {
+      PopViewUtils.uiContext = await getUIContext();
+    }
+    if (PopViewUtils.uiContext) {
+      let prompt = PopViewUtils.uiContext.getPromptAction();
       let sameTypeList = PopViewUtils.shareInstance().infoList.filter((model) => {
         return model.popType === type;
       })
@@ -86,4 +90,8 @@ export class PopViewUtils {
   static closePopView(): void {
     PopViewUtils.closeDialog(PopViewShowType.OPEN);
   }
+}
+
+async function getUIContext() {
+  return (await (getContext() as common.UIAbilityContext).windowStage.getMainWindow()).getUIContext();
 }

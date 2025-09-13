@@ -63,7 +63,7 @@ export class HomeService {
     let handleRes = recommendList.map(item => {
       const copyItem = JSON.parse(JSON.stringify(item)) as RequestListData;
       let flexData1 = item.articles.map(articleId => {
-        let raw = BaseNewsServiceApi.queryRawNews(articleId)
+        let raw = BaseNewsServiceApi.queryRawNews(articleId,false)
         if (raw) {
           return BaseNewsServiceApi.handleRawNews(raw)
         }
@@ -123,19 +123,16 @@ export class HomeService {
   public queryHomeFollowList(newsType: NewsEnum[], currentIndex: number = 10, currentPage = 0): RequestListData[] {
     const myUserInfo = MineServiceApi.queryAuthorRaw();
     const articles = MockArticle.list
-      .filter(v => myUserInfo?.watchers.includes(v.authorId) && newsType.includes(v.type))
+      .filter(v => (myUserInfo?.watchers.includes(v.authorId)||
+        v.authorId === myUserInfo?.authorId) && newsType.includes(v.type))
       .map(v => BaseNewsServiceApi.handleRawNews(v))
       .map(v => BaseNewsServiceApi.layoutTrans(v));
     const videos = MockVideo.list
-      .filter(v => myUserInfo?.watchers.includes(v.authorId) && newsType.includes(v.type))
+      .filter(v => (myUserInfo?.watchers.includes(v.authorId)||
+        v.authorId === myUserInfo?.authorId) && newsType.includes(v.type))
       .map(v => BaseNewsServiceApi.handleRawNews(v))
       .map(v => BaseNewsServiceApi.layoutTrans(v));
-    const posts = MockPost.list
-      .filter(v => myUserInfo?.watchers.includes(v.authorId) && newsType.includes(v.type) ||
-        v.authorId === myUserInfo?.authorId)
-      .map(v => BaseNewsServiceApi.handleRawNews(v))
-      .map(v => BaseNewsServiceApi.layoutTrans(v));
-    return Utils.shuffleArray([...videos, ...posts, ...articles].slice(currentPage, currentIndex));
+    return [...videos, ...articles].slice(currentPage, currentIndex);
   }
 
   /**

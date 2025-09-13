@@ -20,7 +20,7 @@
 
 - DevEco Studio版本：DevEco Studio 5.0.3 Release及以上
 - HarmonyOS SDK版本：HarmonyOS 5.0.3 Release SDK及以上
-- 设备类型：华为手机（包括双折叠和阔折叠）
+- 设备类型：华为手机（包括双折叠和阔折叠）、平板
 - 系统版本：HarmonyOS 5.0.1(13)及以上
 
 ### 权限
@@ -62,6 +62,24 @@
    ```
    import { ImagePreview } from 'module_imagepreview';
    ```
+
+3. 调用组件，详细组件调用参见[示例代码](#示例代码)。
+
+```ts
+import { ImagePreview } from 'module_imagepreview'
+
+@Entry
+@ComponentV2
+export struct Index {
+  build() {
+    Button('打开图片预览').onClick(() => {
+      ImagePreview.show(
+         ...
+      )
+    })
+  }
+}
+```
 
 ## API参考
 

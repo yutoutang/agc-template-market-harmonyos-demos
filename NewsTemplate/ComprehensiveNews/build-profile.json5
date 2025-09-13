@@ -148,6 +148,10 @@
     {
       "name": "module_articlepost",
       "srcPath": "./components/module_articlepost"
+    },
+    {
+      "name": "module_flexlayout",
+      "srcPath": "./components/module_flexlayout"
     }
   ]
 }

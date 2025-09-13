@@ -1,15 +1,17 @@
+import { AppStorageV2 } from '@kit.ArkUI';
 import { Constants } from '../constants/Common';
+import { WindowModel } from '../models/StorageModel';
+import { RouterModule } from '../utils/RouterModule';
 
-@Component
+@ComponentV2
 export struct NavHeaderBar {
-  @Consume('pageStack') pageStack: NavPathStack
-  @Prop title: ResourceStr;
-  @Prop hasBackButton: boolean = true;
-  @Prop hasBgColor: boolean = true;
-  @Prop backImg: ResourceStr = $r('app.media.ic_back');
-  @Prop hasBackgroundImg: boolean = true;
-  @Prop isMainPage: boolean = false;
-  windowTopHeight: number = AppStorage.get('windowTopHeight') as number || 38.77
+  @Param title: ResourceStr = '';
+  @Param hasBackButton: boolean = true;
+  @Param hasBgColor: boolean = true;
+  @Param backImg: ResourceStr = $r('app.media.ic_back');
+  @Param hasBackgroundImg: boolean = true;
+  @Param isMainPage: boolean = false;
+  @Param windowTopHeight: number = AppStorageV2.connect(WindowModel)?.getWindowTopHeight() || 38.77
 
   build() {
     Column() {
@@ -19,13 +21,13 @@ export struct NavHeaderBar {
             .width(24)
             .height(24)
             .onClick(() => {
-              this.pageStack?.pop()
+              RouterModule.pop()
             })
         }
         Text(this.title)
           .fontColor($r('sys.color.font_primary'))
           .fontSize(this.isMainPage ? $r('sys.float.Title_M') : $r('sys.float.Title_S'))
-          .width(Constants.FULL_SIZE)
+          .width($r('app.string.full_size'))
           .fontWeight(FontWeight.Medium)
           .margin({ left: 8 })
       }.height(36).margin({ left: 16, right: 16 })

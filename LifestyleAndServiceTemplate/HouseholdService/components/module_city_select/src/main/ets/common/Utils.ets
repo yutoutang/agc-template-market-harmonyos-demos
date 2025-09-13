@@ -26,18 +26,15 @@ import { site } from '@kit.MapKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { ICityGroup } from './Model';
 
+const TAG = '[Utils]';
+
 /**
  * 日志类
  */
 export class Logger {
-  private static domain: number;
-  private static prefix: string;
-  private static format: string = '%{public}s';
-
-  constructor(prefix: string = '[HouseholdTemplate]', domain: number = 0xFF00) {
-    Logger.prefix = prefix;
-    Logger.domain = domain;
-  }
+  private static domain: number = 0xFF00;
+  private static prefix: string = '[ModuleCitySelect]';
+  private static format: string = '%{public}s, %{public}s';
 
   static debug(...args: Object[]): void {
     hilog.debug(Logger.domain, Logger.prefix, Logger.format, args);
@@ -103,7 +100,7 @@ export class SystemSceneUtils {
       tokenId = bundleInfo.appInfo.accessTokenId;
     } catch (error) {
       const err: BusinessError = error as BusinessError;
-      Logger.error(`Failed to get bundle info for self. Code is ${err.code}, message is ${err.message}`);
+      Logger.error(TAG, `Failed to get bundle info for self. Code is ${err.code}, message is ${err.message}`);
     }
 
     // 校验应用是否被授予权限
@@ -111,7 +108,7 @@ export class SystemSceneUtils {
       grantStatus = await atManager.checkAccessToken(tokenId, permission);
     } catch (error) {
       const err: BusinessError = error as BusinessError;
-      Logger.error(`Failed to check access token. Code is ${err.code}, message is ${err.message}`);
+      Logger.error(TAG, `Failed to check access token. Code is ${err.code}, message is ${err.message}`);
     }
 
     return grantStatus === abilityAccessCtrl.GrantStatus.PERMISSION_GRANTED;
@@ -128,7 +125,7 @@ export class SystemSceneUtils {
     const isGrantedAppLo = await SystemSceneUtils.checkPermissionGrant(permissions[0]);
 
     if (isGrantedAppLo) {
-      Logger.info('already granted location and approximate location permissions')
+      Logger.info(TAG, 'already granted location and approximate location permissions')
       return true;
     }
     if (!SystemSceneUtils.context) {
@@ -168,10 +165,10 @@ export class SystemSceneUtils {
         language: 'zh_CN',
       };
       const reverseGeocodeResult = await site.reverseGeocode(reverseGeoCodeReq);
-      Logger.info('reverseGeocodeResult=' + JSON.stringify(reverseGeocodeResult));
+      Logger.info(TAG, 'reverseGeocodeResult=' + JSON.stringify(reverseGeocodeResult));
       return reverseGeocodeResult.addressComponent.city?.cityName ?? '';
     } catch (e) {
-      Logger.error('getCurrentCityInfo fail, error: ' + JSON.stringify(e));
+      Logger.error(TAG, 'getCurrentCityInfo fail, error: ' + JSON.stringify(e));
       return '';
     }
   }

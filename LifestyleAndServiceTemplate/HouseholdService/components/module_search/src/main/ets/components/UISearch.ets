@@ -12,9 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { CommonUtils, IGoodInfo, UIEmpty, } from 'module_base'
 import { LengthMetrics } from '@kit.ArkUI';
+import { CommonUtils, IGoodInfo, UIEmpty, } from 'module_base'
 import { UISearchController } from '../common/Utils';
 
 @ComponentV2
@@ -114,7 +113,9 @@ export struct UISearch {
       }) {
         ForEach(this.recommendList, (v: string) => {
           Button() {
-            Text(v).fontSize(14).fontWeight(500)
+            Text(v)
+              .fontSize($r('sys.float.Body_M'))
+              .fontWeight(500)
           }
           .backgroundColor($r('app.color.grey_5'))
           .padding({

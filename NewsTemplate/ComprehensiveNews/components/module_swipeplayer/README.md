@@ -70,9 +70,46 @@
     import { VideoSwipePlayer, SwipePlayerController, AVPlayerManager, AVPlayerSession, PlayerDataSource } from 'module_swipeplayer';
     ```
 
+3. 调用组件，详细参数配置说明参见[API参考](#API参考)。
+   ```typescript
+   VideoSwipePlayer({
+     // 数据源
+     datasource: this.videoDataSources,
+     // 滑动播放控制器
+     swipePlayerController: this.swipePlayerController,
+     // 视频外层控制层，需要实现一个WrappedBuilder组件
+     videoLayerBuilder: wrapBuilder(VideoLayerViewBuilder),
+     pathStack: this.pathStack,
+     isShown: true,
+     options: {
+       autoPlay: true,
+       bottomTabHeight: 56,
+       totalCount: 2,
+       swiperCallback: {
+         onAnimationStart: (_index: number, targetIndex: number, extraInfo: SwiperAnimationEvent) => {
+           // TODO 处理切换动画开始的业务逻辑，如：加载更多
+         },
+         onChange: (index: number) => {
+           // TODO 子组件索引变化时的回调
+         }
+       }
+     }
+   })
+   ```
+
 ## API参考
 
-### VideoSwipePlayer(option: [VideoSwipePlayerOptions](#VideoSwipePlayerOptions对象说明))
+### 接口
+
+VideoSwipePlayer(option: [VideoSwipePlayerOptions](#VideoSwipePlayerOptions对象说明))
+
+滑动视频组件
+
+**参数：**
+
+| 参数名  | 类型                                                        | 是否必填 | 说明                 |
+| :------ | :---------------------------------------------------------- | :------- | :------------------- |
+| options | [VideoSwipePlayerOptions](#VideoSwipePlayerOptions对象说明) | 是       | 滑动视频组件的参数。 |
 
 #### VideoSwipePlayerOptions对象说明
 
@@ -84,7 +121,7 @@
 | videoLayerBuilder     | WrappedBuilder<[ESObject, [AVPlayerSession](#AVPlayerSession对象说明), [SwipePlayerController](#SwipePlayerController对象说明), [PlayerLayoutSize](#PlayerLayoutSize对象说明)]> | 否       | 视频外层的操作层，可自定义，如果不传，则只显示进度条         |
 | fullBtnBuilder        | () => CustomBuilder                                          | 否       | 全屏播放按钮，可以自定义，如果不传，使用默认样式             |
 | pathStack             | NavPathStack                                                 | 是       | 全局Navigation的路由栈                                       |
-| playerStateCallback   | (state: string, id: string) => void                          | 否       | 播放状态回调。state：视频播放中playing是、时的状态，id： 当前播放视频的id |
+| playerStateCallback   | (state: string, id: string) => void                          | 否       | 播放状态回调。state：视频播放中"playing"的状态，id： 当前播放视频的id |
 | isLandscape           | boolean                                                      | 否       | 是否横屏                                                     |
 | videoNetwork          | [VideoNetworkModel](#VideoNetworkModel对象说明)              | 否       | 网络状态                                                     |
 | videoNetworkSetting   | [VideoNetworkSetting](#VideoNetworkSetting对象说明)          | 否       | 网络播放设置                                                 |

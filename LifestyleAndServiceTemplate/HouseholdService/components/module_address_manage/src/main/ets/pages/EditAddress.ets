@@ -111,8 +111,8 @@ export struct EditAddressModule {
   BottomBar() {
     Row() {
       Button('保存地址')
-        .fontColor(Color.White)
-        .fontSize(16)
+        .fontColor($r('sys.color.font_on_primary'))
+        .fontSize($r('sys.float.Body_L'))
         .fontWeight(500)
         .width('100%')
         .height(40)

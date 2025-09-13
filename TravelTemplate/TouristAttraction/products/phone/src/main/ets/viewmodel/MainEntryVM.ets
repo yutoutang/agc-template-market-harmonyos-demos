@@ -1,4 +1,4 @@
-import { AccountUtil } from 'account';
+import { AccountUtil } from 'common';
 
 @ObservedV2
 export class MainEntryVM {

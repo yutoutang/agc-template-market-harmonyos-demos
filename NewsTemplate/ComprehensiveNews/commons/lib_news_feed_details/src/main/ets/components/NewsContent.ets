@@ -178,7 +178,7 @@ export struct NewsContent {
         type: this.newsFeedVM.articleDetails.type,
         title: this.newsFeedVM.articleDetails.title,
         articleFrom: this.newsFeedVM.articleDetails.articleFrom,
-        createTime: dayjs(this.newsFeedVM.articleDetails.createTime).format('YYYY-MM-DD hh:mm'),
+        createTime: dayjs(this.newsFeedVM.articleDetails.createTime).format('YYYY-MM-DD HH:mm'),
         coverUrl: handlerCoverImage(this.newsFeedVM.articleDetails),
         isVideo: !!this.newsFeedVM.articleDetails.postImgList?.[0]?.surfaceUrl,
       },
@@ -219,7 +219,7 @@ export struct NewsContent {
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
             .constraintSize({ maxWidth: 'calc(100% - 44vp)' })
-          Text(dayjs(this.newsFeedVM.articleDetails.createTime).format('YYYY-MM-DD hh:mm'))
+          Text(dayjs(this.newsFeedVM.articleDetails.createTime).format('YYYY-MM-DD HH:mm'))
             .fontSize(12 * this.fontSizeRatio)
             .fontWeight(FontWeight.Regular)
             .fontColor($r('sys.color.font_tertiary'))
@@ -266,7 +266,6 @@ export struct NewsContent {
       Column() {
         this.authorInfoBuilder()
       }
-      .padding({ left: 16, right: 16 })
       .backgroundColor($r('sys.color.background_primary'))
 
       Column() {
@@ -304,8 +303,11 @@ export struct NewsContent {
             this.webViewController.runJavaScript(`setWebFontColor(${this.settingInfo.darkSwitch})`);
           })
       }
-      .padding({ left: 16, right: 16 })
-      .backgroundColor($r('sys.color.background_primary'))
     }
+    .padding({
+      left: this.newsBreakPoint.breakpointModel.pagePadding,
+      right: this.newsBreakPoint.breakpointModel.pagePadding,
+    })
+    .backgroundColor($r('sys.color.background_primary'))
   }
 }

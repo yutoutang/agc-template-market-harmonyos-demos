@@ -1,6 +1,6 @@
 import { PersistenceV2, UIUtils } from '@kit.ArkUI'
 import { CommonConstants, SettingModel } from 'lib_common'
-import { LayoutParams } from 'lib_news_api'
+import { LayoutParams } from 'module_flexlayout'
 import { CardViewModel } from '../viewmodel/CardViewModel'
 
 @Builder

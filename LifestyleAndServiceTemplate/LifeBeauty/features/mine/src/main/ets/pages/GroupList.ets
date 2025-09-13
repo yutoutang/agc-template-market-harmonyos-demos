@@ -1,3 +1,4 @@
+import { AppStorageV2 } from '@kit.ArkUI';
 import {
   UIEmpty,
   getMyGroupList,
@@ -10,8 +11,7 @@ import {
   RouterModule,
   UIOrderPart,
   OrderType,
-} from 'utils';
-import { AppStorageV2 } from '@kit.ArkUI';
+} from 'foundation';
 
 @Builder
 export function GroupListBuilder() {
@@ -62,7 +62,7 @@ export struct GroupList {
       Column({ space: 10 }) {
         Text(this.getTitle(item))
           .fontSize(12)
-          .fontColor(this.isAvailable(item) ? '#0A59F7' : $r('app.color.common_grey'))
+          .fontColor(this.isAvailable(item) ? $r('sys.color.brand') : $r('app.color.common_grey'))
           .alignSelf(ItemAlign.End)
 
         UIOrderPart({
@@ -96,7 +96,7 @@ export struct GroupList {
         Row() {
           Button() {
             Text('退款')
-              .fontSize(14)
+              .fontSize($r('sys.float.Body_M'))
               .fontWeight(500)
               .width(56)
               .height(20)
@@ -160,4 +160,3 @@ export struct GroupList {
     .backgroundColor($r('app.color.common_page_bg'))
   }
 }
-

@@ -4,15 +4,13 @@ export { CustomTransition, AnimateCallback } from './src/main/ets/utils/CustomNa
 
 export { LongTakeAnimationProperties } from './src/main/ets/sessions/LongTakeAnimationProperties';
 
-export { LeftRightInteractiveSession } from './src/main/ets/sessions/LeftRightInteractiveSession';
-
-export { LongTakeTransitionDelegate } from './src/main/ets/customtransition/LongTakeTransitionDelegate';
+export { CardLongTakeDelegate } from './src/main/ets/customtransition/CardLongTakeDelegate';
 
 export { RectInfoPx } from './src/main/ets/utils/ComponentAttrUtils';
 
 export { SnapShotImage } from './src/main/ets/utils/SnapShotImage';
 
-export { LoneTakeAnimationsTransition } from './src/main/ets/LoneTakeAnimationsTransition';
+export { LoneTakeAnimationsTransition } from './src/main/ets/utils/LoneTakeAnimationsTransition';
 
 export { LongTakeTransitionParam } from './src/main/ets/utils/LongTakeTransitionParam';
 

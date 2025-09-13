@@ -19,6 +19,11 @@
       "name": "NewsPublishSelect",
       "pageSourceFile": "src/main/ets/components/NewsPublishSelect.ets",
       "buildFunction": "NewsPublishSelectBuilder"
+    },
+    {
+      "name": "VideoPreview",
+      "pageSourceFile": "src/main/ets/components/VideoPreview.ets",
+      "buildFunction": "VideoPreviewBuilder"
     }
   ]
 }

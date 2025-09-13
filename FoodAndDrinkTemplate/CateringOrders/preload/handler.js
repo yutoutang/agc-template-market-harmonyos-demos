@@ -2,10 +2,9 @@ let myHandler = async function (event, context, callback, logger) {
     logger.info(`Input event: ${JSON.stringify(event)}`);
 
     let hmSystem = {
-        status: 1,
-        msg: 'success',
-        storeId: '26',
-        storeType: 1
+        storeId: '1',
+        storeType: 2,
+        status: 1
     }
     logger.info(`hmSystem: ${hmSystem}`);
     let tableTitleArr = [{
@@ -70,7 +69,7 @@ let myHandler = async function (event, context, callback, logger) {
         status: '0'
     }]
     logger.info(`tableTitleArr: ${tableTitleArr}`);
-    let result = {hmSystem,tableTitleArr}
+    let result = { hmSystem, tableTitleArr }
     let res = new context.HTTPResponse(result, {
         "faas-content-type": "json"
     }, "application/json", "200");

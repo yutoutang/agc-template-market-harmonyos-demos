@@ -69,6 +69,42 @@
     {
       "name": "mortgage_calculator",
       "srcPath": "./components/mortgage_calculator"
+    },
+    {
+      "name": "personal_notes",
+      "srcPath": "./components/personal_notes"
+    },
+    {
+      "name": "home",
+      "srcPath": "./feature/home"
+    },
+    {
+      "name": "mine",
+      "srcPath": "./feature/mine"
+    },
+    {
+      "name": "picture_watermark",
+      "srcPath": "./components/picture_watermark"
+    },
+    {
+      "name": "money_track",
+      "srcPath": "./components/money_track"
+    },
+    {
+      "name": "decompression_tool",
+      "srcPath": "./components/decompression_tool"
+    },
+    {
+      "name": "science_calculator",
+      "srcPath": "./components/science_calculator"
+    },
+    {
+      "name": "calendar_events",
+      "srcPath": "./components/calendar_events"
+    },
+    {
+      "name": "mobile_nfc",
+      "srcPath": "./components/mobile_nfc"
     }
   ]
 }

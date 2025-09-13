@@ -39,7 +39,7 @@ struct FindCarPage {
           .width('100%')
           .backgroundColor($r('app.color.app_theme'))
           .fontColor($r('sys.color.font_on_primary'))
-          .fontSize(16)
+          .fontSize($r('sys.float.Body_L'))
           .height(40)
           .margin({ top: 12 })
           .onClick(() => {

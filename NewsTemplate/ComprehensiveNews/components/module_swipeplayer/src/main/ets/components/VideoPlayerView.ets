@@ -63,6 +63,11 @@ export struct VideoPlayerView {
   private preparedListener = () => {
     if (this.index === this.currentIndex && this.autoPlay) {
       this.vm.playerSession.play()
+    } else {
+      // 没有封面图时，取视频的 2ms 的位置帧作为封面
+      if (!this.videoData.getCoverUrl()) {
+        this.vm.playerSession.avPlayer?.seek(2)
+      }
     }
   }
   // 资源初始化状态

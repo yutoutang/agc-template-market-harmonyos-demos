@@ -1,7 +1,7 @@
 import { promptAction } from '@kit.ArkUI';
 import { common, ConfigurationConstant } from '@kit.AbilityKit';
 import { notificationManager } from '@kit.NotificationKit';
-import { AppGalleryUtils, BaseViewModel, FileUtils, RouterMap, RouterUtils } from 'lib_common';
+import { AppGalleryUtils, BaseViewModel, CommonConfirmDialog, FileUtils, RouterMap, RouterUtils } from 'lib_common';
 import { AccountApi } from 'lib_account';
 import { ISelectOption, SettingItem } from '../types/Types';
 
@@ -147,14 +147,19 @@ export class SettingViewModel extends BaseViewModel {
   }
 
   onSignOutBtnClick() {
-    this.isLoading = true;
-    this.accountInstance.signOut()
-      .then(() => {
-        promptAction.showToast({ message: '已退出登录' });
-      })
-      .finally(() => {
-        this.isLoading = false;
-      });
+    CommonConfirmDialog.show({
+      content: '确定退出登录吗？',
+      confirm: () => {
+        this.isLoading = true;
+        this.accountInstance.signOut()
+          .then(() => {
+            promptAction.showToast({ message: '已退出登录' });
+          })
+          .finally(() => {
+            this.isLoading = false;
+          });
+      },
+    })
   }
 
   @Computed

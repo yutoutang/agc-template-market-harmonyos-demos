@@ -104,7 +104,7 @@
     <td><a href="./FinanceTemplate/MoneyTrack/README.md" target="_blank">快速开始</a></td>
   </tr>
   <tr>
-    <td rowspan="3"><a href="#教育">教育</a></td>
+    <td rowspan="4"><a href="#教育">教育</a></td>
     <td><a href="#课程助手元服务模板">课程助手元服务模板</a></td>
     <td><a href="./EducationTemplate/SchoolLife//README.md" target="_blank">快速开始</a></td>
   </tr>
@@ -115,6 +115,10 @@
   <tr>
     <td><a href="#备考应用模板">备考应用模板</a></td>
     <td><a href="./EducationTemplate/Exam/README.md" target="_blank">快速开始</a></td>
+  </tr>
+  <tr>
+    <td><a href="#课堂应用模板">课堂应用模板</a></td>
+    <td><a href="./EducationTemplate/Course/README.md" target="_blank">快速开始</a></td>
   </tr>
   <tr>
     <td><a href="#医疗">医疗</a></td>
@@ -291,9 +295,10 @@
 
 <a href="./LifestyleAndServiceTemplate/LifeBeauty/README.md" target="_blank">详细说明</a>
 
-| 首页                                                                                    | 我的                                                                                    |
-| --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| <img src="./LifestyleAndServiceTemplate/LifeBeauty/screenshots/首页.jpg" width="200px"> | <img src="./LifestyleAndServiceTemplate/LifeBeauty/screenshots/我的.jpg" width="200px"> |
+| 首页                                                    | 我的                                                    |
+|-------------------------------------------------------|-------------------------------------------------------|
+| <img src="./LifestyleAndServiceTemplate/LifeBeauty/screenshots/home.jpg" alt="首页" width="300"> | <img src="./LifestyleAndServiceTemplate/LifeBeauty/screenshots/mine.jpg" alt="我的" width="300"> |
+
 
 ### 家政元服务模板
 
@@ -311,9 +316,10 @@
 
 <a href="./LifestyleAndServiceTemplate/HouseholdService/README.md" target="_blank">详细说明</a>
 
-| 首页                                                                         | 全部服务                                                                             | 我的                                                                         |
-| ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
-| ![首页](./LifestyleAndServiceTemplate/HouseholdService/screenshots/首页.jpg) | ![全部服务](./LifestyleAndServiceTemplate/HouseholdService/screenshots/全部服务.jpg) | ![我的](./LifestyleAndServiceTemplate/HouseholdService/screenshots/我的.jpg) |
+
+| 首页                                                      | 全部服务                                                            | 我的                                                      |
+|---------------------------------------------------------|-----------------------------------------------------------------|---------------------------------------------------------|
+| <img src="./LifestyleAndServiceTemplate/HouseholdService/screenshots/home.jpg" alt="首页" width="300"> | <img src="./LifestyleAndServiceTemplate/HouseholdService/screenshots/allservice.jpg" alt="全部服务" width="300"> | <img src="./LifestyleAndServiceTemplate/HouseholdService/screenshots/mine.jpg" alt="我的" width="300"> |
 
 ### 日历应用模板
 
@@ -381,9 +387,11 @@
 
 <a href="./LifestyleAndServiceTemplate/ShoppingMall/README.md" target="_blank">详细说明</a>
 
-| 首页                                                    | 一码通                                                     | 我的                                                    |
-|-------------------------------------------------------|---------------------------------------------------------|-------------------------------------------------------|
-| <img src="./LifestyleAndServiceTemplate/ShoppingMall/screenshots/首页.jpg" alt="首页" width="300"> | <img src="./LifestyleAndServiceTemplate/ShoppingMall/screenshots/一码通.jpg" alt="一码通" width="300"> | <img src="./LifestyleAndServiceTemplate/ShoppingMall/screenshots/我的.jpg" alt="我的" width="300"> |
+
+| 首页                                                      | 一码通                                                        | 我的                                                      |
+|---------------------------------------------------------|------------------------------------------------------------|---------------------------------------------------------|
+| <img src="./LifestyleAndServiceTemplate/ShoppingMall/screenshots/home.jpg" alt="首页" width="300"> | <img src="./LifestyleAndServiceTemplate/ShoppingMall/screenshots/qrcode.jpg" alt="一码通" width="300"> | <img src="./LifestyleAndServiceTemplate/ShoppingMall/screenshots/mine.jpg" alt="我的" width="300"> |
+
 
 ## 运动健康
 
@@ -425,7 +433,7 @@
 
 | 首页                                                                      | 会员                                                                               | 我的                                                                       |
 | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| ![首页](./EntertainmentTemplate/MuseumTicket/screenshots/首页.jpeg) | ![我的预定](./EntertainmentTemplate/MuseumTicket//screenshots/我的预定.jpeg) | ![我的](./EntertainmentTemplate/MuseumTicket//screenshots/我的.jpeg) |
+| ![首页](./EntertainmentTemplate/MuseumTicket/screenshots/首页.jpeg) | ![我的预定](./EntertainmentTemplate/MuseumTicket//screenshots/我的预订.jpeg) | ![我的](./EntertainmentTemplate/MuseumTicket//screenshots/我的.jpeg) |
 
 ## 旅游
 
@@ -447,7 +455,7 @@
 
 | 首页                                                            | 会员                                                            | 我的                                                            |
 | --------------------------------------------------------------- | --------------------------------------------------------------- | --------------------------------------------------------------- |
-| ![首页](./TravelTemplate/FullServiceHotel/screenshots/首页.png) | ![会员](./TravelTemplate/FullServiceHotel/screenshots/会员.png) | ![我的](./TravelTemplate/FullServiceHotel/screenshots/我的.png) |
+| ![首页](./TravelTemplate/FullServiceHotel/screenshots/home.png) | ![会员](./TravelTemplate/FullServiceHotel/screenshots/vip.png) | ![我的](./TravelTemplate/FullServiceHotel/screenshots/mine.png) |
 
 ### 景区元服务模板
 
@@ -569,9 +577,10 @@
 
 <a href="./FoodAndDrinkTemplate/CateringOrders/README.md" target="_blank">详细说明</a>
 
-| 点餐                                                                            | 订单                                                                           | 我的                                                                           |
-| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
-| ![点餐](./FoodAndDrinkTemplate/CateringOrders/screenshots/Screenshot_order.png) | ![订单](./FoodAndDrinkTemplate/CateringOrders/screenshots/Screenshot_list.png) | ![我的](./FoodAndDrinkTemplate/CateringOrders/screenshots/Screenshot_mine.png) |
+| 点餐                                                                 | 订单                                                               | 我的                                                                |
+|--------------------------------------------------------------------|------------------------------------------------------------------|-------------------------------------------------------------------|
+| <img src="./FoodAndDrinkTemplate/CateringOrders/screenshots/Screenshot_order.jpeg" alt="点餐" width="300"> | <img src="./FoodAndDrinkTemplate/CateringOrders/screenshots/Screenshot_list.jpeg" alt="订单" width="300"> | <img src="./FoodAndDrinkTemplate/CateringOrders/screenshots/Screenshot_mine.jpeg" alt="我的" width="300"> |
+
 
 ### 茶饮元服务模板
 
@@ -720,6 +729,27 @@
 | 练习                                                   | 课程                                                   | 我的                                                   |
 |------------------------------------------------------|------------------------------------------------------|------------------------------------------------------|
 | <img src="./EducationTemplate/Exam//screenshots/001.jpg" alt="首页" width="300"> | <img src="./EducationTemplate/Exam//screenshots/002.jpg" alt="课程" width="300"> | <img src="./EducationTemplate/Exam//screenshots/003.jpg" alt="我的" width="300"> |
+
+### 课堂应用模板
+
+**功能介绍**
+
+本模板为教育类应用提供了常用功能的开发样例，对视频播放器进行了定制化的开发，模板主要分首页、学习、我的三大模块：
+
+* 首页：提供推荐课程信息流、搜索等功能。
+
+* 学习：提供学习记录、视频播放等功能。
+
+* 我的：提供个人信息查看、消息、意见反馈、设置等功能。
+
+本模板已集成华为账号、广告等服务，只需做少量配置和定制即可快速实现华为账号的登录、媒体播放等功能。
+
+<a href="./EducationTemplate/Course/README.md" target="_blank">详细说明</a>
+
+| 首页                                                | 学习                                                | 我的                                                |
+|---------------------------------------------------|---------------------------------------------------|---------------------------------------------------|
+| <img src="./EducationTemplate/Course/screenshot/course03.jpg" width="300"> | <img src="./EducationTemplate/Course/screenshot/course01.jpg" width="300"> | <img src="./EducationTemplate/Course/screenshot/course02.jpg" width="300"> |
+
 
 ## 医疗
 

@@ -34,6 +34,7 @@ export default struct CommercialLoan {
         loanAmount: this.vm.fundAmount,
         loanRate: this.vm.fundRate,
         loanYear: this.vm.fundYear,
+        isSmallHeight:this.vm.isSmallHeight,
         loanType: 2,
         handleAmountChange: (value: string) => {
           this.vm.updateFundAmount(value)

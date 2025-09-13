@@ -1,1 +1,0 @@
-export { MallView, MallBuilder } from './src/main/ets/pages/MallView'

@@ -1,26 +1,15 @@
-import { Constants, copyString, GetMyOrderResp, OrderListEnum, OrderTable, OrderTypeEnum } from 'common/Index';
+import { Constants, copyString, getFullDate, OrderListEnum, OrderTypeEnum } from 'common/Index';
+import { MyOrderInfo } from '../models/Index';
 
-@Component
+@ComponentV2
 export struct PaymentDetailsComp {
-  @StorageProp('storeType') storeType: number = 1
-  @Prop overallFontSize: number = 12
-  @Prop @Watch('orderDetailChange') orderDetail: GetMyOrderResp;
-  @Prop tableInfo: OrderTable = new OrderTable()
-  @State order: GetMyOrderResp = new GetMyOrderResp()
-
-  aboutToAppear(): void {
-    this.orderDetailChange()
-  }
-
-  orderDetailChange() {
-    this.order = this.orderDetail
-  }
+  @Param @Require orderDetail: MyOrderInfo;
 
   build() {
     Column() {
       Row() {
         Text($r('app.string.order_time')).fontSize($r('sys.float.Body_M')).fontColor($r('sys.color.font_secondary'))
-        Text(this.order.order?.time).fontSize($r('sys.float.Body_S')).fontColor($r('sys.color.font_primary'))
+        Text(this.orderDetail.order.time).fontSize($r('sys.float.Body_S')).fontColor($r('sys.color.font_primary'))
       }
       .width(Constants.FULL_SIZE)
       .justifyContent(FlexAlign.SpaceBetween)
@@ -30,12 +19,12 @@ export struct PaymentDetailsComp {
       Row() {
         Text($r('app.string.order_id')).fontSize($r('sys.float.Body_M')).fontColor($r('sys.color.font_secondary'))
         Row() {
-          Text(this.order.order?.orderNum)
+          Text(this.orderDetail.order.orderNum)
             .fontSize($r('sys.float.Body_S'))
             .fontColor($r('sys.color.font_primary'))
           Image($r('app.media.copy')).width(16).margin({ left: 4 })
             .onClick(() => {
-              copyString(this.order.order?.orderNum || '')
+              copyString(this.orderDetail.order.orderNum || '')
             })
         }.justifyContent(FlexAlign.End).layoutWeight(1)
       }
@@ -44,11 +33,11 @@ export struct PaymentDetailsComp {
       .padding({ top: 12, bottom: 12 })
 
 
-      // 取餐方式
+      // 就餐方式
       Row() {
         Text($r('app.string.order_type')).fontSize($r('sys.float.Body_M')).fontColor($r('sys.color.font_secondary'))
         Row() {
-          Text(Number(this.order.order?.orderType) === OrderTypeEnum.STORE_DINING ?
+          Text(Number(this.orderDetail.order.orderType) === OrderTypeEnum.PICK_SELF ?
           $r('app.string.store_dining') :
           $r('app.string.picking')).fontSize($r('sys.float.Body_S')).fontColor($r('sys.color.font_primary'))
         }.justifyContent(FlexAlign.End).layoutWeight(1)
@@ -56,13 +45,33 @@ export struct PaymentDetailsComp {
       .width(Constants.FULL_SIZE)
       .justifyContent(FlexAlign.SpaceBetween)
       .padding({ top: 12, bottom: 12 })
+      // 预约时间
+      Row() {
+        Text('预约时间').fontSize($r('sys.float.Body_M')).fontColor($r('sys.color.font_secondary'))
+        Row() {
+          Text(this.orderDetail.order.preorderTime).fontSize($r('sys.float.Body_S')).fontColor($r('sys.color.font_primary'))
+        }.justifyContent(FlexAlign.End).layoutWeight(1)
+      }
+      .width(Constants.FULL_SIZE)
+      .justifyContent(FlexAlign.SpaceBetween)
+      .padding({ top: 12, bottom: 12 })
+      // 预约号码
+      Row() {
+        Text('预约号码').fontSize($r('sys.float.Body_M')).fontColor($r('sys.color.font_secondary'))
+        Row() {
+          Text(this.orderDetail.order.preorderPhone).fontSize($r('sys.float.Body_S')).fontColor($r('sys.color.font_primary'))
+        }.justifyContent(FlexAlign.End).layoutWeight(1)
+      }
+      .width(Constants.FULL_SIZE)
+      .justifyContent(FlexAlign.SpaceBetween)
+      .padding({ top: 12, bottom: 12 })
 
-      if (Number(this.order.order?.dnState) !== OrderListEnum.CANCELED) {
+      if (Number(this.orderDetail.order.state) !== OrderListEnum.CANCELED) {
         Row() {
           Text($r('app.string.dinner_num_label'))
             .fontSize($r('sys.float.Body_M'))
             .fontColor($r('sys.color.font_secondary'))
-          Text(this.order.order?.tableware)
+          Text(this.orderDetail.order.tableware.toString())
             .fontSize($r('sys.float.Body_S'))
             .fontColor($r('sys.color.font_primary'))
         }
@@ -73,7 +82,7 @@ export struct PaymentDetailsComp {
 
       Row() {
         Text($r('app.string.remark')).fontSize($r('sys.float.Body_M')).fontColor($r('sys.color.font_secondary'))
-        Text(this.order.order?.note || $r('app.string.none'))
+        Text(this.orderDetail.order.note || $r('app.string.none'))
           .fontSize($r('sys.float.Body_S'))
           .fontColor($r('sys.color.font_primary'))
           .width(200)

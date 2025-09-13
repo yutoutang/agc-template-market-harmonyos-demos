@@ -3,7 +3,7 @@
 ## 目录
 
 - [功能介绍](#功能介绍)
-- [环境要求](#环境要求)
+- [约束与限制](#约束与限制)
 - [快速入门](#快速入门)
 - [权限要求](#权限要求)
 - [开源许可协议](#开源许可协议)
@@ -14,15 +14,15 @@
 
 本模板提供如下组件，所有组件存放在工程根目录的components下，如果您仅需使用组件，可参考对应组件的指导链接；如果您使用此模板，请参考本文档。
 
-| 组件                            | 描述                                             | 使用指导                                                 |
-|-------------------------------|------------------------------------------------|------------------------------------------------------|
-| 地址管理组件（module_address_manage） | 提供新增/编辑/删除地址相关的场景化组件                           | [使用指导](./components/module_address_manage/README.md) |
-| 优惠券组件（module_coupons）         | 提供了优惠券的浏览、选择能力                                 | [使用指导](./components/module_coupons/README.md)        |
-| 商品详情组件（module_product_detail） | 提供商品详情组件，支持详情展示和规格选择                           | [使用指导](./components/module_product_detail/README.md) |
-| 商品搜索组件（module_product_search） | 提供了查看并编辑搜索历史，查看并刷新推荐关键词，查看热搜榜的搜索页面组件           | [使用指导](./components/module_product_search/README.md) |
-| 商品分享组件（module_product_share）  | 支持保存商品为海报，复制商品链接，拉起华为系统分享和碰一碰分享功能              | [使用指导](./components/module_product_share/README.md)  |
-| 购物车组件（module_shopping_cart）   | 提供了购物车商品列表展示，商品选择、删除、增减商品数量、查看明细、结算等相关功能的场景化组件 | [使用指导](./components/module_shopping_cart/README.md)  |
-
+| 组件                                   | 描述                                                         | 使用指导                                                 |
+| -------------------------------------- | ------------------------------------------------------------ | -------------------------------------------------------- |
+| 地址管理组件（module_address_manage）  | 提供新增/编辑/删除地址相关的场景化组件                       | [使用指导](./components/module_address_manage/README.md) |
+| 商城优惠券组件（module_coupons）       | 提供了优惠券的浏览、选择能力                                 | [使用指导](./components/module_coupons/README.md)        |
+| 商品详情组件（module_product_detail）  | 提供商品详情组件，支持详情展示和规格选择                     | [使用指导](./components/module_product_detail/README.md) |
+| 商品搜索组件（module_product_search）  | 提供了查看并编辑搜索历史，查看并刷新推荐关键词，查看热搜榜的搜索页面组件 | [使用指导](./components/module_product_search/README.md) |
+| 商品分享组件（module_product_share）   | 支持保存商品为海报，复制商品链接，拉起华为系统分享和碰一碰分享功能 | [使用指导](./components/module_product_share/README.md)  |
+| 商城购物车组件（module_shopping_cart） | 提供了购物车商品列表展示，商品选择、删除、增减商品数量、查看明细、结算等相关功能的场景化组件 | [使用指导](./components/module_shopping_cart/README.md)  |
+| 商品评价组件（module_product_review）  | 提供商品评价功能，支持评定星级、填写评价、上传图片。         | [使用指导](./components/module_product_review/README.md) |
 
 本模板为综合商城应用提供了常用功能的开发样例，模板主要分首页、分类、购物车、和我的四大模块：
 
@@ -36,8 +36,8 @@
 
 本模板已集成华为账号、通话、华为支付等服务，只需做少量配置和定制即可快速实现华为账号的登录、一键拨打服务电话、商品购买等功能。
 
-| 首页                                                   | 分类                                                       | 购物车                                                   | 我的                                                       |
-|------------------------------------------------------|----------------------------------------------------------|-------------------------------------------------------|----------------------------------------------------------|
+| 首页                                                   | 分类                                                       | 购物车                                                   | 我的                                                        |
+| ------------------------------------------------------ | ---------------------------------------------------------- | -------------------------------------------------------- | ----------------------------------------------------------- |
 | <img src="screenshot/home.png" alt="首页" width="300"> | <img src="screenshot/category.png" alt="分类" width="300"> | <img src="screenshot/cart.png" alt="购物车" width="300"> | <img src="screenshot/profile.png" alt="购物车" width="300"> |
 
 本模板主要页面及核心功能如下所示：
@@ -114,7 +114,9 @@
 │   ├── module_address_manage                     // 地址管理组件
 │   ├── module_coupons                            // 优惠券组件
 │   ├── module_login                              // 登录组件
+│   ├── module_privacy_agreement                  // 协议授权组件
 │   ├── module_product_detail                     // 商品详情组件
+│   ├── module_product_review                     // 商品评价组件
 │   ├── module_product_search                     // 商品搜索组件
 │   ├── module_product_share                      // 商品分享组件
 │   ├── module_product_waterflow                  // 商品瀑布流
@@ -138,7 +140,7 @@
     └── entry/src/main/ets
        ├── components
        │   ├──HomePageContent.ets                 // 首页详情
-       │   └──IconTextTab.ets                     
+       │   └──IconTextTab.ets
        ├── pages
        │   ├── AgreementPage.ets                  // 隐私政策&用户协议页
        │   ├── CategoryPage.ets                   // 分类页
@@ -147,22 +149,24 @@
        │   ├── HomePage.ets                       // 首页
        │   ├── Index.ets                          // 入口页
        │   ├── ProfilePage.ets                    // 我的页
-       │   └── SettingPage.ets                    // 设置页     
+       │   └── SettingPage.ets                    // 设置页
        └── widget                                 // 服务卡片
 
 ```
 
-## 环境要求
+## 约束与限制
 
 ### 软件
 
-- DevEco Studio版本：DevEco Studio 5.0.4 Release及以上
-- HarmonyOS SDK版本：HarmonyOS 5.0.4 Release SDK及以上
+* DevEco Studio版本：DevEco Studio5.0.4 Release及以上
+* HarmonyOS SDK版本：HarmonyOS5.0.4 Release SDK及以上
+* 设备类型：华为手机（包括双折叠和阔折叠）
+* 系统版本：HarmonyOS 5.0.4(16)及以上
 
-### 硬件
+### 权限要求
 
-- 设备类型：华为手机（直板机）
-- HarmonyOS版本：HarmonyOS 5.0.4 Release及以上
+* 获取位置权限：ohos.permission.APPROXIMATELY_LOCATION，ohos.permission.LOCATION。
+* 网络权限：ohos.permission.INTERNET
 
 ## 快速入门
 
@@ -172,7 +176,7 @@
 
 1. 在AppGallery Connect创建应用，将包名配置到模板中。
 
-   a. 参考[创建HarmonyOS应用](https://developer.huawei.com/consumer/cn/doc/app/agc-help-createharmonyapp-0000001945392297)为应用创建APP ID，并将APP ID与应用进行关联。
+   a. 参考[创建HarmonyOS应用](https://developer.huawei.com/consumer/cn/doc/app/agc-help-create-app-0000002247955506)为应用创建APP ID，并将APP ID与应用进行关联。
 
    b. 返回应用列表页面，查看应用的包名。
 
@@ -180,7 +184,7 @@
 
 2. 配置华为账号服务。
 
-   a. 将应用的client ID配置到products/entry/src/main路径下的module.json5文件中，详细参考：[配置Client ID](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-client-id)。
+   a. 将应用的client ID配置到entry/src/main路径下的module.json5文件中，详细参考：[配置Client ID](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-client-id)。
 
    b. 申请华为账号一键登录所需的quickLoginMobilePhone权限，详细参考：[配置scope权限](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-config-permissions)。
 
@@ -194,7 +198,7 @@
 
 5. 对应用进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing#section297715173233)。
 
-6. 添加手工签名所用证书对应的公钥指纹。详细参考：[配置应用签名证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-signature-info-0000001628566748#section5181019153511)
+6. 添加手工签名所用证书对应的公钥指纹。详细参考：[配置应用签名证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-cert-fingerprint-0000002278002933)
 
 ### 运行调试工程
 
@@ -202,9 +206,7 @@
 
 2. 菜单选择“Run > Run 'entry' ”或者“Run > Debug 'entry' ”，运行或调试模板工程。
 
-## 权限要求
 
-- 网络权限：ohos.permission.INTERNET
 
 ## 开源许可协议
 

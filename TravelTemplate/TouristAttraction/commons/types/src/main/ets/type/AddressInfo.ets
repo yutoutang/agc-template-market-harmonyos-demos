@@ -10,4 +10,3 @@ export class AddressInfo {
 
 export class AddressList extends Array<AddressInfo> {
 }
-

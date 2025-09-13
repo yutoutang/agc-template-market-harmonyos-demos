@@ -1,4 +1,4 @@
-import { CommonConstants, CommonUtils, PopViewUtils } from 'utils';
+import { CommonConstants, CommonUtils, PopViewUtils } from 'foundation';
 
 export class BusinessParams {
   src: string = '';

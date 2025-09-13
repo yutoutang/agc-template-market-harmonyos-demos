@@ -1,4 +1,4 @@
-import { CommonUtils, getSingleVisitCardList, ISingleVisitCard, RouterMap, RouterModule } from 'utils'
+import { CommonUtils, getSingleVisitCardList, ISingleVisitCard, RouterMap, RouterModule } from 'foundation'
 
 @ComponentV2
 export struct SingleVisit {

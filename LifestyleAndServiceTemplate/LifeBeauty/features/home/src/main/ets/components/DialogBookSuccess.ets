@@ -1,4 +1,4 @@
-import { CommonConstants, PopViewUtils, RouterMap, RouterModule } from 'utils'
+import { CommonConstants, PopViewUtils, RouterMap, RouterModule } from 'foundation'
 
 export class BookSuccessParam {
   title: string = '';

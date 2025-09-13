@@ -14,16 +14,6 @@
     "requestPermissions": [
       {
         "name": "ohos.permission.INTERNET"
-      },
-      {
-        "name": "ohos.permission.APPROXIMATELY_LOCATION",
-        "reason": "$string:apply_location_reason",
-        "usedScene": {
-          "abilities": [
-            "EntryAbility"
-          ],
-          "when": "inuse"
-        }
       }
     ],
     "abilities": [
@@ -50,8 +40,11 @@
     ],
     "metadata": [
       {
+/**
+         * todo: 替换Client ID
+         */
         "name": "client_id",
-        "value": "xxx"
+        "value": "******"
       }
     ],
     "extensionAbilities": [

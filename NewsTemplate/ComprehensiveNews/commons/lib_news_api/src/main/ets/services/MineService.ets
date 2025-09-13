@@ -105,7 +105,6 @@ export class MineService extends AuthorService {
     const news = BaseNewsServiceApi.queryRawNews(newsId);
     if (news) {
       news.isMarked = false;
-      news.markCount -= 1
     }
   }
 

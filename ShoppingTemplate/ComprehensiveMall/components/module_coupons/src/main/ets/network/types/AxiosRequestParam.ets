@@ -14,5 +14,3 @@ export interface GetCouponsRequest {
   // 请求数
   limit?: number;
 }
-
-

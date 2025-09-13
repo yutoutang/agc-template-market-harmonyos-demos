@@ -1,0 +1,140 @@
+{
+  "string": [
+    {
+      "name": "book_good_toast_time",
+      "value": "请选择预约时间"
+    },
+    {
+      "name": "book_good_toast_name",
+      "value": "请填写联系人姓名"
+    },
+    {
+      "name": "book_good_toast_phone",
+      "value": "请填写手机号"
+    },
+    {
+      "name": "book_good_toast_phone_correct",
+      "value": "请填写正确的手机号"
+    },
+    {
+      "name": "book_good_times_empty",
+      "value": "当前日期暂无可预约时间"
+    },
+    {
+      "name": "book_good_appoint_time",
+      "value": "预约时间"
+    },
+    {
+      "name": "book_good_appoint_info",
+      "value": "预约信息"
+    },
+    {
+      "name": "book_good_appoint_project",
+      "value": "预约项目"
+    },
+    {
+      "name": "book_good_appoint_contact_name",
+      "value": "联系人"
+    },
+    {
+      "name": "book_good_appoint_phone",
+      "value": "手机号"
+    },
+    {
+      "name": "book_good_appoint_nums",
+      "value": "人数"
+    },
+    {
+      "name": "book_good_appoint_remark",
+      "value": "备注"
+    },
+    {
+      "name": "common_required",
+      "value": "*"
+    },
+    {
+      "name": "common_minus",
+      "value": "-"
+    },
+    {
+      "name": "common_plus",
+      "value": "+"
+    },
+    {
+      "name": "book_contact_name_place",
+      "value": "请输入称呼"
+    },
+    {
+      "name": "book_phone_place",
+      "value": "请输入号码"
+    },
+    {
+      "name": "book_remark_place",
+      "value": "选填"
+    },
+    {
+      "name": "book_good_tip",
+      "value": "温馨提示：预约无需支付费用，请您到店享受服务后再支付费用"
+    },
+    {
+      "name": "book_error_tip",
+      "value": "出错啦，请稍后再试~"
+    },
+    {
+      "name": "week_weekday",
+      "value": "周日"
+    },
+    {
+      "name": "week_monday",
+      "value": "周一"
+    },
+    {
+      "name": "week_tuesday",
+      "value": "周二"
+    },
+    {
+      "name": "week_wednesday",
+      "value": "周三"
+    },
+    {
+      "name": "week_thursday",
+      "value": "周四"
+    },
+    {
+      "name": "week_friday",
+      "value": "周五"
+    },
+    {
+      "name": "week_saturday",
+      "value": "周六"
+    },
+    {
+      "name": "week_today",
+      "value": "今天"
+    },
+    {
+      "name": "week_tomorrow",
+      "value": "明天"
+    },
+    {
+      "name": "dialog_book_success_title",
+      "value": "预约成功"
+    },
+    {
+      "name": "dialog_book_success_content",
+      "value": "请在预约时间准时到达门店，期待您更美的样子呢~"
+    },
+    {
+      "name": "btn_common_know",
+      "value": "我知道了"
+    },
+    {
+      "name": "agcit_huawei_life_beauty_reservation_form",
+      "value": "1.0.0"
+    },
+    {
+      "name": "agcittype_huawei_life_beauty_reservation_form",
+      "value": "serviceComponent"
+    }
+  ]
+}

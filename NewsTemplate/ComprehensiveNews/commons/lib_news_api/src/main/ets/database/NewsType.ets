@@ -59,4 +59,5 @@ export interface BaseNews {
   totalCount?: number
   publishTime?: string
   playCount?: string
+  isLocalPublish?:boolean
 }

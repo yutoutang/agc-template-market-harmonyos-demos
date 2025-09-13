@@ -1,5 +1,5 @@
 import { photoAccessHelper } from '@kit.MediaLibraryKit'
-import { CommonConstants, MediaUtils } from 'lib_common'
+import { CommonConstants, MediaUtils, RouterMap, RouterUtils } from 'lib_common'
 import { Constants } from '../constants/NewsConstants'
 import { NewsPostViewModel } from '../viewmodels/NewsPostViewModel'
 
@@ -55,6 +55,9 @@ export struct VideoPost {
         .width(32)
         .draggable(false)
     }
+    .onClick(() => {
+      RouterUtils.pushPathByName(RouterMap.Video_PREVIEW,this.videoUri)
+    })
     .width(this.newsPostViewModel.isSmDevice ? Constants.VIDEO_SIZE_SM_W : Constants.VIDEO_SIZE_LG_W)
     .height(this.newsPostViewModel.isSmDevice ? Constants.VIDEO_SIZE_SM_H : Constants.VIDEO_SIZE_LG_H)
     .borderRadius(16)
@@ -96,7 +99,7 @@ export struct VideoPost {
           .borderRadius(8)
         }
       }
-      .backgroundColor('#EEEEEE')
+      .backgroundColor($r('sys.color.comp_background_tertiary'))
       .borderRadius(8)
       .clip(true)
 

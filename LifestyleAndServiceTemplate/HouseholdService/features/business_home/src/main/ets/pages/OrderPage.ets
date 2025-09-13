@@ -135,9 +135,9 @@ export struct OrderPage {
       Blank()
       Button() {
         Text('支付并预约')
-          .fontSize(16)
+          .fontSize($r('sys.float.Body_L'))
           .fontWeight(500)
-          .fontColor(Color.White)
+          .fontColor($r('sys.color.font_on_primary'))
       }
       .backgroundColor($r('app.color.common_theme_color'))
       .padding({

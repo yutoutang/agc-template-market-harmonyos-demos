@@ -10,6 +10,7 @@ export struct NavHeaderBar {
   @Param showBackBtn: boolean = false;
   @Param bgColor: ResourceColor = '#00000000';
   @Param isSubTitle: boolean = true;
+  @Param headerBarHeight: Length = $r('app.float.nav_header_height');
   @Param customPadding: Padding = {};
   @BuilderParam rightPartBuilder: () => void;
   // 自定义返回事件
@@ -53,7 +54,7 @@ export struct NavHeaderBar {
           this.rightPartBuilder()
         }
       }
-      .height($r('app.float.nav_header_height'))
+      .height(this.headerBarHeight)
       .justifyContent(FlexAlign.SpaceBetween)
       .width(CommonConstants.FULL_PERCENT)
     }

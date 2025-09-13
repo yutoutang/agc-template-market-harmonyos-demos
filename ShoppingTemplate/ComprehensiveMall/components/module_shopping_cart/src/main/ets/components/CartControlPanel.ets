@@ -78,7 +78,6 @@ export struct CartControlPanel {
       })
     }
     .backgroundColor(Color.White)
-    .margin({bottom: this.isChildRoute ? 0 : 48})
     .onAreaChange((ov, nv) => {
       if (nv.globalPosition.y) {
         this.popupMaskHeight = nv.globalPosition.y;

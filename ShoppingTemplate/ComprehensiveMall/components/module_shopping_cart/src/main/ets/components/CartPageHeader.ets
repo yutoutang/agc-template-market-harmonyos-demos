@@ -17,8 +17,10 @@ export struct CartPageHeader {
   titleContentView() {
     Row() {
       Text('购物车')
-        .fontSize(16)
-        .fontWeight(500)
+        .fontSize(this.isChildRoute ? $r('sys.float.Title_S') : $r('sys.float.Title_M'))
+        .fontColor($r('sys.color.font_primary'))
+        .fontWeight(FontWeight.Bold)
+
       if (this.showEdit) {
         Column() {
           Text(this.isEdit ? '退出管理' : '管理')

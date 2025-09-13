@@ -118,7 +118,7 @@ export struct NewsPost {
                   this.postBody = body
                   this.mediaList = mediaList
                 },
-                onHideNewsTab: (isTabHide: boolean) => {
+                isFocus: (isTabHide: boolean) => {
                   this.isTabHide = isTabHide
                 },
               })
@@ -168,6 +168,8 @@ export struct NewsPost {
             .fontColor(this.selectedId === item.id ? $r('sys.color.icon_primary') : $r('sys.color.icon_secondary'))
             .fontWeight(FontWeight.Medium)
         }
+        .justifyContent(FlexAlign.Center)
+        .flexGrow(1)
         .onClick(() => {
           this.selectedId = item.id
           this.targetIndex = index

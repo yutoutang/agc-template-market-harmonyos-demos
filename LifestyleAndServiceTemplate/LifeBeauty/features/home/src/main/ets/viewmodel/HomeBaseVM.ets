@@ -1,4 +1,4 @@
-import { getStoreList, IBaseStore } from 'utils';
+import { getStoreList, IBaseStore } from 'foundation';
 import { StoreDataSource } from '../common/StoreDataSource';
 
 @ObservedV2

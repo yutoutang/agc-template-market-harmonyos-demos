@@ -134,7 +134,6 @@ export struct ChannelEdit {
       showClose: true,
       title: this.sheetTitleBuilder,
     })
-    .padding({ left: 16, right: 16 })
     .height(56)
   }
 }

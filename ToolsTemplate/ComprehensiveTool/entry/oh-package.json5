@@ -14,7 +14,16 @@
     "exchange_calculator": "file:../components/exchange_calculator",
     "remote_control": "file:../components/remote_control",
     "mortgage_calculator": "file:../components/mortgage_calculator",
-    "@ohos/axios": "^2.2.4"
+    "personal_notes": "file:../components/personal_notes",
+    "money_track": "file:../components/money_track",
+    "@ohos/axios": "^2.2.4",
+    "mine": "file:../feature/mine",
+    "home": "file:../feature/home",
+    "picture_watermark": "file:../components/picture_watermark",
+    "decompression_tool": "file:../components/decompression_tool",
+    "science_calculator": "file:../components/science_calculator",
+    "calendar_events": "file:../components/calendar_events",
+    "mobile_nfc": "file:../components/mobile_nfc"
   }
 }
 

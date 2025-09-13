@@ -51,7 +51,7 @@ struct PayDetailPage {
 
           Column() {
             Button('立即支付')
-              .fontSize(16)
+              .fontSize($r('sys.float.Body_L'))
               .fontWeight(FontWeight.Medium)
               .fontColor($r('sys.color.font_on_primary'))
               .width(Constants.FULL_SIZE)
@@ -313,7 +313,7 @@ struct PayDetailPage {
 
             Toggle({ type: ToggleType.Switch, isOn: this.vm.useWallet })
               .selectedColor($r('app.color.app_theme'))
-              .switchPointColor('#FFFFFF')
+              .switchPointColor($r('sys.color.comp_background_primary_contrary'))
               .enabled(this.vm.enableWallet)
               .onChange((isOn: boolean) => {
                 this.vm.useWallet = isOn;

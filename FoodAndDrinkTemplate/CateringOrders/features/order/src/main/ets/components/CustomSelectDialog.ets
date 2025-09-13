@@ -1,26 +1,26 @@
-import { Constants, SheetHeaderComp } from 'common/Index'
+import { Constants } from 'common/Index'
+import { SheetHeaderComp } from 'base_ui'
 
 @Builder
 export function CustomSelectSheetBuilder(title: Resource, list: Array<string> | Resource,
-  confirm: (select: string) => void, selected: ResourceStr = '') {
+  confirm: (select: ResourceStr) => void, selected: ResourceStr = '') {
   CustomSelectSheet({
     title,
     list,
-    confirm: (select: string) => {
+    confirm: (select: ResourceStr) => {
       confirm(select)
     },
     selected,
   })
 }
 
-@Component
+@ComponentV2
 struct CustomSelectSheet {
-  @Prop title: Resource
-  @Prop list: Array<string> | Resource = []
-  @Prop selected: ResourceStr
-  @State select: string = ''
-  @State windowBottomHeight: number = AppStorage.get('windowBottomHeight') as number || 28
-  confirm: (select: string) => void = () => {
+  @Param title: ResourceStr = ''
+  @Param list: Array<string> | Resource = []
+  @Param selected: ResourceStr = ''
+  @Local select: ResourceStr = ''
+  @Event confirm: (select: ResourceStr) => void = () => {
   }
 
   aboutToAppear(): void {

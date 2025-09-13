@@ -1,18 +1,21 @@
-import { CommonBreakpoint, RouterMap, RouterUtils, SettingModel } from 'lib_common'
+import { CommonBreakpoint, SettingModel } from 'lib_common'
 import { NewsFeedInfo } from '../model/Model'
+import { FeedBreakPointVM } from '../viewmodel/FeedBreakPointVM'
 import NewsFeedVM from '../viewmodel/NewsFeedVM'
 
 @ComponentV2
 export struct RecommendArea {
-  @Local newsFeedVM:NewsFeedVM = NewsFeedVM.instance
+  @Local newsFeedVM: NewsFeedVM = NewsFeedVM.instance
   @Require @Param settingInfo: SettingModel
-  @Param isFolderStatus:boolean = false
-  @Local lanesCount:CommonBreakpoint<number> = new CommonBreakpoint<number>({
+  @Param isFolderStatus: boolean = false
+  @Local newsBreakPoint: FeedBreakPointVM = new FeedBreakPointVM()
+  @Local lanesCount: CommonBreakpoint<number> = new CommonBreakpoint<number>({
     sm: 1,
     md: 2,
     lg: 3,
     xl: 3,
   });
+
   build() {
     Column() {
       Column() {
@@ -24,9 +27,10 @@ export struct RecommendArea {
       .margin({ top: 16, bottom: 8 })
       .width('100%')
       .alignItems(HorizontalAlign.Start)
-      List(){
-        ForEach(this.newsFeedVM.articleDetails.recommends, (item: NewsFeedInfo) => {
-          ListItem(){
+
+      List() {
+        ForEach(this.newsFeedVM.articleDetails.recommends, (item: NewsFeedInfo, index: number) => {
+          ListItem() {
             Flex({ justifyContent: FlexAlign.SpaceBetween }) {
               Column({ space: 5 }) {
                 Text(item.title)
@@ -64,22 +68,23 @@ export struct RecommendArea {
                 }
               }
             }
+            .id('recommend_' + index + item.id)
             .padding({ top: 12, bottom: 12 })
             .onClick(() => {
-              let routerParams = {
-                'id': item.id,
-                'author': item.author.authorId,
-              } as Record<string, string>
-              RouterUtils.pushPathByName(RouterMap.ARTICLE_FEED_DETAILS, routerParams)
+              this.newsFeedVM.pushToNewsDetails(item, 'recommend_' + index + item.id)
             })
+            .backgroundColor($r('sys.color.background_primary'))
           }
-        },(item: NewsFeedInfo) => item.id)
+        }, (item: NewsFeedInfo, index: number) => index + item.id)
       }
       .scrollBar(BarState.Off)
       .lanes(this.isFolderStatus ? 1 : this.lanesCount.getLanes(), 16)
       .edgeEffect(EdgeEffect.None)
     }
-    .padding({ left: 16, right: 16 })
+    .padding({
+      left: this.newsBreakPoint.breakpointModel.pagePadding,
+      right: this.newsBreakPoint.breakpointModel.pagePadding,
+    })
     .backgroundColor($r('sys.color.background_primary'))
     .margin({ top: 8 })
   }

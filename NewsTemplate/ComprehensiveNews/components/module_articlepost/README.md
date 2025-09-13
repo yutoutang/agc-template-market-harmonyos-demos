@@ -64,6 +64,24 @@
    import { ArticlePost } from 'module_articlepost';
    ```
 
+3. 调用组件，详细组件调用参见[示例代码](#示例代码)。
+
+   ```ts
+   import { ArticlePost } from 'module_articlepost'
+   
+   @Entry
+   @ComponentV2
+   struct Index {
+     build() {
+       Column(){
+         ArticlePost({
+           ...
+         })
+       }
+     }
+   }
+   ```
+
 ## API参考
 
 ### 接口

@@ -62,15 +62,7 @@
     },
     {
       "name": "new_user_discount",
-      "value": "新用户下单立减%s元"
-    },
-    {
-      "name": "claim_now",
-      "value": "立即领取"
-    },
-    {
-      "name": "collected",
-      "value": "已领取"
+      "value": "新用户下单立减%d元"
     },
     {
       "name": "claiming_succeeded",
@@ -205,44 +197,8 @@
       "value": "店铺公告"
     },
     {
-      "name": "validity",
-      "value": "有效期"
-    },
-    {
-      "name": "order_validity_desc",
-      "value": "订单当天有效，随时可退"
-    },
-    {
-      "name": "usage_rules",
-      "value": "使用规则"
-    },
-    {
-      "name": "usage_rules_desc1",
-      "value": "1、仅限堂食，不可使用包间"
-    },
-    {
-      "name": "usage_rules_desc2",
-      "value": "2、套餐菜品不可更换，单次消费不可与其他套餐和优惠券叠加使用"
-    },
-    {
-      "name": "use_time",
-      "value": "使用时间"
-    },
-    {
-      "name": "use_time_desc",
-      "value": "营业时间内可用"
-    },
-    {
       "name": "good_details",
       "value": "商品详情"
-    },
-    {
-      "name": "package_details",
-      "value": "套餐详情"
-    },
-    {
-      "name": "buy_notes",
-      "value": "购买须知"
     },
     {
       "name": "add_failed",
@@ -269,12 +225,64 @@
       "value": "月售100+"
     },
     {
-      "name": "show_more",
-      "value": "查看更多"
-    },
-    {
       "name": "update_order_failed",
       "value": "订单更新失败"
+    },
+    {
+      "name": "order_title_store_dining",
+      "value": "堂食"
+    },
+    {
+      "name": "order_title_packing",
+      "value": "外带"
+    },
+    {
+      "name": "preorder",
+      "value": "预约"
+    },
+    {
+      "name": "distance_me",
+      "value": "距您"
+    },
+    {
+      "name": "preorder_today",
+      "value": "今天（%s） %s"
+    },
+    {
+      "name": "preorder_sheet_title",
+      "value": "用餐时间"
+    },
+    {
+      "name": "store_list",
+      "value": "门店列表"
+    },
+    {
+      "name": "request_failed",
+      "value": "请求失败"
+    },
+    {
+      "name": "cancel_pay",
+      "value": "取消支付"
+    },
+    {
+      "name": "pay_failed",
+      "value": "支付失败"
+    },
+    {
+      "name": "network_error",
+      "value": "网络链接异常"
+    },
+    {
+      "name": "duplicate_request",
+      "value": "重复请求"
+    },
+    {
+      "name": "store_activity",
+      "value": "店铺活动"
+    },
+    {
+      "name": "agcit_huawei_catering_orders",
+      "value": "1.0.1"
     }
   ]
 }

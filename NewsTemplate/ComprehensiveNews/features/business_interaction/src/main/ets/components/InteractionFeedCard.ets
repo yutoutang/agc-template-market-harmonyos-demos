@@ -44,7 +44,7 @@ export struct InteractionFeedCard {
         type: this.cardInfo.type,
         title: this.cardInfo.title,
         articleFrom: this.cardInfo.articleFrom,
-        createTime: TimeUtils.formatDate(this.cardInfo.createTime, 'YYYY-MM-DD HH:MM'),
+        createTime: TimeUtils.formatDate(this.cardInfo.createTime, 'YYYY-MM-DD HH:mm'),
         coverUrl: this.cardInfo.postImgList?.[0]?.picVideoUrl,
         isVideo: !!this.cardInfo.postImgList?.[0]?.surfaceUrl,
       },
@@ -57,7 +57,7 @@ export struct InteractionFeedCard {
   build() {
     Column() {
       FeedCard({
-        componentId: 'interaction_news',
+        componentId: 'interaction_news' + this.resource.label,
         feedCardInfo: this.cardInfo,
         isAll: true,
         isDark: this.settingInfo.darkSwitch,
@@ -68,7 +68,7 @@ export struct InteractionFeedCard {
           RouterUtils.pushPathByName(RouterMap.PROFILE_HOME, authorId)
         },
         onArticle: (formType?: string) => {
-          this.interactionViewModel.actionToNewsDetails(this.cardInfo, this.index, this.resource.id, formType)
+          this.interactionViewModel.actionToNewsDetails(this.cardInfo, this.index, this.resource.id, formType, true)
         },
         onVideo: () => {
           this.interactionViewModel.actionToNewsDetails(this.cardInfo, this.index, this.resource.id)

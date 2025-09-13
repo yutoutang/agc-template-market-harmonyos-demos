@@ -133,7 +133,7 @@ export struct CommentCard {
 
           Row() {
             Row({ space: 16 }) {
-              Text(dayjs(this.commentInfo.createTime).format('YYYY-MM-DD hh:mm'))
+              Text(dayjs(this.commentInfo.createTime).format('YYYY-MM-DD HH:mm'))
                 .fontSize(10 * this.feedCommentVM.fontSizeRatio)
                 .fontColor($r('sys.color.font_secondary'))
               Text('回复')

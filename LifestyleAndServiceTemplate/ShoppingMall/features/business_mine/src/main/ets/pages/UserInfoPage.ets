@@ -148,7 +148,7 @@ struct UserInfoPage {
           .margin({ top: 12 })
         Column() {
           Button('确定')
-            .fontSize(16)
+            .fontSize($r('sys.float.Body_L'))
             .fontWeight(FontWeight.Medium)
             .fontColor($r('sys.color.font_on_primary'))
             .backgroundColor($r('app.color.app_theme'))

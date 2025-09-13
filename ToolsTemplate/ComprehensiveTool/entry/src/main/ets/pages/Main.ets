@@ -12,16 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { TabBarType } from '../constant/Enum';
-import { stack } from '../constant/Index';
-import { Home } from './Home';
-import { Mine } from './Mine';
+import { Home } from 'home';
+import { Mine } from 'mine';
+import { TabBarType } from '../model/Index';
 
 @Entry
 @ComponentV2
 struct Main {
   @Local homeTabIndex: number = 0;
+  @Local stack: NavPathStack = new NavPathStack();
 
   @Builder
   mainTabBar(title: ResourceStr, targetIndex: number, selectedImg: ResourceStr, normalImg: ResourceStr) {
@@ -43,15 +42,15 @@ struct Main {
   }
 
   build() {
-    Navigation(stack) {
+    Navigation(this.stack) {
       Tabs({ index: this.homeTabIndex }) {
         TabContent() {
-          Home();
+          Home({ pathStack: this.stack });
         }
         .tabBar(this.mainTabBar('首页', TabBarType.HOME, $r('app.media.home_active'), $r('app.media.home_inactive')));
 
         TabContent() {
-          Mine();
+          Mine({ pathStack: this.stack });
         }.expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
         .tabBar(this.mainTabBar('我的', TabBarType.MINE, $r('app.media.mine_active'), $r('app.media.mine_inactive')));
       }
@@ -61,10 +60,11 @@ struct Main {
       .animationDuration(0)
       .barPosition(BarPosition.End)
       .barBackgroundColor($r('sys.color.background_secondary'))
-      .height('100%').expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
+      .height('100%')
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
       .onChange((value: number) => {
         this.homeTabIndex = value;
-      })
+      });
     }.hideTitleBar(true).mode(NavigationMode.Stack);
   }
 }

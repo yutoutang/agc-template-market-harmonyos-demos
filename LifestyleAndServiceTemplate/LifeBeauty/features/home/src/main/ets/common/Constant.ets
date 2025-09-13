@@ -55,15 +55,3 @@ export const ALIGN_RULE_CATEGORY: Record<string, Record<string, string | Vertica
   'bottom': { 'anchor': '__container__', 'align': VerticalAlign.Bottom },
   'left': { 'anchor': RuleID.DIVIDER_ID, 'align': HorizontalAlign.Start },
 };
-
-export const WEEK_LABELS: ResourceStr[] = [
-  $r('app.string.week_weekday'),
-  $r('app.string.week_monday'),
-  $r('app.string.week_tuesday'),
-  $r('app.string.week_wednesday'),
-  $r('app.string.week_thursday'),
-  $r('app.string.week_friday'),
-  $r('app.string.week_saturday'),
-  $r('app.string.week_today'),
-  $r('app.string.week_tomorrow'),
-];

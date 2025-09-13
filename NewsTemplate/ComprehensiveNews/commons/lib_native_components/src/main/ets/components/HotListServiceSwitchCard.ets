@@ -1,6 +1,6 @@
 import { UIUtils } from '@kit.ArkUI'
 import { ButtonGroup, IButtonItem } from 'lib_widget'
-import { LayoutParams } from 'lib_news_api'
+import { LayoutParams } from 'module_flexlayout'
 
 @Builder
 export function HotListServiceSwitchCard(cardData: LayoutParams) {

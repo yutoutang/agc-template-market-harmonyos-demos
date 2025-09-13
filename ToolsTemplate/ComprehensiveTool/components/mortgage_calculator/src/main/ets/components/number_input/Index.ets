@@ -7,6 +7,7 @@ export struct NumberInput {
   @Param max: number = 10000;
   @Param maxLen: number = 10;
   @Param isInteger: boolean = true;
+  @Param isSmallHeight:boolean = false
   @Event handleChange: (value: string) => void;
 
   handleInputChange(value: string) {
@@ -50,7 +51,8 @@ export struct NumberInput {
         },
         handleOk: () => {
           this.controller.stopEditing();
-        }
+        },
+        isSmallHeight:this.isSmallHeight
       })).height(36).borderRadius(6)
   }
 }

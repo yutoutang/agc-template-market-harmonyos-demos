@@ -14,17 +14,23 @@
 
 此模板提供如下组件，所有组件存放在工程根目录的components下，如果您仅需使用组件，可参考对应组件的指导链接；如果您使用此模板，请参考本文档。
 
-| 组件                         | 描述                                       | 使用指导                                                  |
-|----------------------------| ------------------------------------------ | --------------------------------------------------------- |
-| 黄历（almanac）                | 提供了查看黄历和白话文的功能。      | [使用指导](./components/almanac/README.md) |
-| 基础计算器（basic_calculator）    | 提供了基础计算的功能。       | [使用指导](./components/basic_calculator/README.md)     |
-| 热量计算（calories_calculate）   | 提供了按日和按周根据摄入计算热量的功能。 | [使用指导](./components/calories_calculate/README.md)     |
-| 日期计算（date_calculate）       | 提供了日起计算和日期间隔计算的功能。         | [使用指导](./components/date_calculate/README.md)   |
-| 汇率计算器（exchange_calculator） | 提供了多种币种之间实时汇率计算的功能。        | [使用指导](./components/exchange_calculator/README.md)   |
-| 个税计算器（income_calculator）   | 提供了工资、劳动报酬等收入个税计算的功能。      | [使用指导](./components/income_calculator/README.md)   |
-| 房贷计算器（mortgage_calculator） | 提供了商业贷款、公积金贷款和组合贷款的还款计划计算功能。   | [使用指导](./components/mortgage_calculator/README.md)   |
-| 万能空调遥控器（remote_control）    | 提供了空调遥控器创建，删除及以发射红外信号控制对应空调等功能。 | [使用指导](./components/remote_control/README.md)   |
-
+| 组件                         | 描述                                       | 使用指导                                               |
+|----------------------------|------------------------------------------|----------------------------------------------------|
+| 黄历（almanac）                | 提供了查看黄历和白话文的功能。                          | [使用指导](./components/almanac/README.md)             |
+| 基础计算器（basic_calculator）    | 提供了基础计算的功能。                              | [使用指导](./components/basic_calculator/README.md)    |
+| 热量计算（calories_calculate）   | 提供了按日和按周根据摄入计算热量的功能。                     | [使用指导](./components/calories_calculate/README.md)  |
+| 日期计算（date_calculate）       | 提供了日期计算和日期间隔计算的功能。                       | [使用指导](./components/date_calculate/README.md)      |
+| 汇率计算器（exchange_calculator） | 提供了多种币种之间实时汇率计算的功能。                      | [使用指导](./components/exchange_calculator/README.md) |
+| 个税计算器（income_calculator）   | 提供了工资、劳动报酬等收入个税计算的功能。                    | [使用指导](./components/income_calculator/README.md)   |
+| 房贷计算器（mortgage_calculator） | 提供了商业贷款、公积金贷款和组合贷款的还款计划计算功能。             | [使用指导](./components/mortgage_calculator/README.md) |
+| 万能空调遥控器（remote_control）    | 提供了空调遥控器创建，删除及以发射红外信号控制对应空调等功能。          | [使用指导](./components/remote_control/README.md)      |
+| 科学计算器（science_calculator）  | 提供了多种科学计算方法的计算的功能。                       | [使用指导](./components/science_calculator/README.md)  |
+| 倒计日（calendar_events）       | 提供了新增以及编辑日历、生日、纪念日、待办，并将日程添加到系统日历提醒中的功能。 | [使用指导](./components/calendar_events/README.md)  |
+| 敲木鱼（decompression_tool）    | 提供了敲木鱼解压的功能。                             | [使用指导](./components/decompression_tool/README.md)  |
+| 记账（money_track）            | 提供了记账、查看账单列表和统计图表的功能。                    | [使用指导](./components/money_track/README.md)  |
+| 隐私笔记（personal_notes）       | 提供了写笔记、编辑笔记、删除笔记、笔记分类，搜索，多选，排序，分享、复制功能。  | [使用指导](./components/personal_notes/README.md)  |
+| 图片水印（picture_watermark）    | 提供了图片添加水印、下载保存相册、历史添加缓存等功能。              | [使用指导](./components/picture_watermark/README.md)  |
+| 手机NFC（mobile_nfc）   | 提供了门禁卡、公交卡和银行卡的读取和克隆功能。                  | [使用指导](./components/mobile_nfc/README.md)  |
 
 本模板为工具类应用提供了常用功能的开发样例，模板主要分首页、我的两大模块：
 
@@ -64,6 +70,23 @@
  |    |    |-- 遥控器列表
  |    |-- 房贷计算器
  |    |    |-- 房贷计算
+ |    |-- 科学计算器
+ |    |    └-- 科学计算
+ |    |-- 倒计日
+ |    |    └-- 倒计日列表
+ |    |-- 记账
+ |    |    └-- 账单统计
+ |    |-- 隐私笔记
+ |    |    └-- 添加笔记
+ |    |-- 图片水印
+ |    |    └-- 编辑水印
+ |    |    └-- 历史记录
+ |    |-- 手机NFC
+ |    |    └-- 读取门禁卡
+ |    |    └-- 读取公交卡
+ |    |    └-- 读取银行卡
+ |    |    └-- 克隆卡片
+ |    |-- 敲木鱼
  └-- 我的
       |-- 问题反馈
       |    └-- 提交反馈
@@ -75,8 +98,14 @@
 
 ```ts
 ComprehensiveTool
-  |- components                                            // 可分可合组件层
-  |   |- almanac/src/main/ets                              // 黄历(har)
+  |- feature                                               // 基础特性层
+  |   |- home/src/main/ets                                 // 我的(har)
+  |   |    |- constant                                     // 模块常量
+  |   |    |- components                                   // 组件
+  |   |    |- model                                        // 模型定义 
+  |   |    └- pages                                        // 页面
+  |   |    └- viewmodel                                    // 与页面一一对应的vm层
+  |   |- mine/src/main/ets                                 // 首页(har)
   |   |    |- apis                                         // 模块接口
   |   |    |- constants                                    // 模块常量     
   |   |    |- components                                   // 公共组件
@@ -86,58 +115,22 @@ ComprehensiveTool
   |   |    |- utils                                        // 模块工具
   |   |    |- viewmodel                                    // 与页面一一对应的vm层           
   |   |    
+  |- components                                            // 可分可合组件层
+  |   |- almanac/src/main/ets                              // 黄历(har)
   |   |- basic_calculator/src/main/ets                     // 计算器(har)
-  |   |    |- common                                       // 模块常量
-  |   |    |- components                                   // 组件
-  |   |    |- model                                        // 模型定义 
-  |   |    └- pages                                        // 页面
-  |   |    └- utils                                        // 模块工具类
-  |   |    └- viewmodel                                    // 与页面一一对应的vm层
-  |   |                               
   |   |- calories_calculate/src/main/ets                   // 热量计算(har)
-  |   |    |- common                                       // 公共路由
-  |   |    |- apis                                         // 模块接口
-  |   |    |- components                                   // 模块组件
-  |   |    |- pages                                        // 页面      
-  |   |    |- mocks                                        // mock数据
-  |   |    |- model                                        // 模型定义
-  |   |    |- viewmodel                                    // 与页面一一对应的vm层
-  |   |    └- utils                                        // 模块工具类
   |   |- date_calculate/src/main/ets                       // 日期计算(har)    
-  |   |    |- apis                                         // 模块接口
-  |   |    |- constants                                    // 模块常量     
-  |   |    |- components                                   // 模块组件
-  |   |    |- model                                        // 模型定义  
-  |   |    |- pages                                        // 页面
-  |   |    |- utils                                        // 模块工具
   |   |- exchange_calculator/src/main/ets                  // 汇率计算器(har)
-  |   |    |- common                                       // 公共路由
-  |   |    |- constants                                    // 模块常量     
-  |   |    |- components                                   // 模块组件
-  |   |    |- model                                        // 模型定义  
-  |   |    |- pages                                        // 页面
-  |   |    |- viewmodel                                    // 与页面一一对应的vm层 
   |   |- income_calculator/src/main/ets                    // 个税计算器(har)
-  |   |    |- common                                       // 模块常量   
-  |   |    |- components                                   // 模块组件
-  |   |    |- model                                        // 模型定义  
-  |   |    |- pages                                        // 页面
-  |   |    |- utils                                        // 模块工具类
-  |   |    |- viewmodel                                    // 与页面一一对应的vm层
   |   |- remote_control/src/main/ets                       // 空调遥控器(har)
-  |   |    |- constant                                     // 模块常量定义   
-  |   |    |- components                                   // 模块组件
-  |   |    |- model                                        // 模型定义  
-  |   |    |- util                                         // 模块工具类 
-  |   |    |- http                                         // 请求定义  
-  |   |    |- pages                                        // 页面
-  |   |    |- viewmodel                                    // 与页面一一对应的vm层  
-  |   |- mortgage_calculator/src/main/ets                  // 房贷计算器(har)
-  |   |    |- common                                       // 模块常量定义   
-  |   |    |- components                                   // 模块组件
-  |   |    |- types                                        // 模型定义  
-  |   |    |- pages                                        // 页面
-  |   |    |- viewmodel                                    // 与页面一一对应的vm层             
+  |   |- mortgage_calculator/src/main/ets                  // 房贷计算器(har)     
+  |   |- science_calculator/src/main/ets                   // 科学计算器(har)
+  |   |- calendar_events/src/main/ets                      // 倒计日(har)
+  |   |- money_track/src/main/ets                          // 记账(har)
+  |   |- decompression_tool/src/main/ets                   // 敲木鱼(har)
+  |   |- personal_notes/src/main/ets                       // 隐私笔记(har)
+  |   |- picture_watermark/src/main/ets                    // 图片水印(har)
+  |   |- mobile_nfc/src/main/ets                           // 手机NFC(har)
   |
   |   |- entry/src/main/ets    
   |   |    |- apis                                         // 模块接口  
@@ -163,6 +156,7 @@ ComprehensiveTool
 ### 权限
 
 * 红外发射权限权限：ohos.permission.MANAGE_INPUT_INFRARED_EMITTER
+* NFC权限：ohos.permission.NFC_TAG
 
 ## 快速入门
 

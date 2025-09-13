@@ -1,0 +1,93 @@
+{
+  "app": {
+    "signingConfigs": [],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+        "compatibleSdkVersion": "5.0.1(13)",
+        "runtimeOS": "HarmonyOS",
+        "buildOption": {
+          "strictMode": {
+            "caseSensitiveCheck": true,
+            "useNormalizedOHMUrl": true
+          }
+        }
+      }
+    ],
+    "buildModeSet": [
+      {
+        "name": "debug",
+      },
+      {
+        "name": "release"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "entry",
+      "srcPath": "./product/entry",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "commonlib",
+      "srcPath": "./commons/commonlib",
+    },
+    {
+      "name": "home",
+      "srcPath": "./features/home",
+    },
+    {
+      "name": "mine",
+      "srcPath": "./features/mine",
+    },
+    {
+      "name": "course",
+      "srcPath": "./features/course",
+    },
+    {
+      "name": "http",
+      "srcPath": "./commons/http",
+    },
+    {
+      "name": "login_info",
+      "srcPath": "./components/login_info",
+    },
+    {
+      "name": "aggregated_payment",
+      "srcPath": "./components/aggregated_payment"
+    },
+    {
+      "name": "aggregated_share",
+      "srcPath": "./components/aggregated_share",
+    },
+    {
+      "name": "feed_back",
+      "srcPath": "./components/feed_back",
+    },
+    {
+      "name": "recorded_player",
+      "srcPath": "./components/recorded_player"
+    },
+    {
+      "name": "search",
+      "srcPath": "./components/search",
+    },
+    {
+      "name": "classification",
+      "srcPath": "./components/classification",
+    },
+    {
+      "name": "open_ads",
+      "srcPath": "./components/open_ads",
+    }
+  ]
+}

@@ -26,10 +26,14 @@ export struct UIBackBtn {
 
   build() {
     Button() {
-      Image($r('app.media.ic_public_arrow_left')).width(16).height(16)
+      SymbolGlyph($r('sys.symbol.chevron_backward'))
+        .fontColor([$r('sys.color.font_primary')])
+        .fontWeight(FontWeight.Normal)
+        .fontSize(24)
     }
     .width(40)
     .height(40)
+    .type(ButtonType.Circle)
     .backgroundColor('#0C000000')
     .margin({ left: 16 })
     .onClick(() => {

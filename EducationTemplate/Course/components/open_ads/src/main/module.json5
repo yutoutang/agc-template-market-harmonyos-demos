@@ -1,0 +1,14 @@
+{
+  "module": {
+    "name": "open_ads",
+    "type": "har",
+    "deviceTypes": [
+      "phone"
+    ],
+    "requestPermissions": [
+      {
+        "name": "ohos.permission.INTERNET",
+      }
+    ]
+  }
+}

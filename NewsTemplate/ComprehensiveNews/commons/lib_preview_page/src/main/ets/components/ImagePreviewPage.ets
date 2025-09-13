@@ -3,7 +3,6 @@ import { BreakpointModel, FormatCount } from 'lib_common';
 import { Share } from 'module_share';
 import { ImageLongTakeDelegate } from 'module_transition';
 import { ImagePreviewVM } from '../viewmodel/ImagePreviewVM';
-import { window } from '@kit.ArkUI';
 
 @Builder
 export function ImagePreviewPageBuilder() {
@@ -14,22 +13,15 @@ export function ImagePreviewPageBuilder() {
 struct ImagePreviewPage {
   @Local imagePreviewVM: ImagePreviewVM = new ImagePreviewVM()
   @Local imagePointModel: BreakpointModel = new BreakpointModel()
-  @Local windowClass: window.Window | undefined = undefined
-  async aboutToAppear() {
-    const windowStage = AppStorage.get('windowStage') as window.WindowStage;
-    this.windowClass = windowStage.getMainWindowSync()
-    this.windowClass.setWindowSystemBarProperties({
-      statusBarContentColor: '#ffffff',
-    })
-  }
 
+  async aboutToAppear() {
+   this.imagePreviewVM.setSystemBarProperty()
+  }
 
   aboutToDisappear(): void {
-    let mainStatusBarContentColor: string = AppStorage.get('statusBarContentColor') ?? '#ffffff'
-    this.windowClass?.setWindowSystemBarProperties({
-      statusBarContentColor: mainStatusBarContentColor,
-    })
+    this.imagePreviewVM.resetSystemBarProperty()
   }
+
   @Builder
   shareBuilder() {
     Share({
@@ -37,7 +29,7 @@ struct ImagePreviewPage {
         id: this.imagePreviewVM.curFeedCardInfo.id,
         type: this.imagePreviewVM.curFeedCardInfo.type,
         title: this.imagePreviewVM.curFeedCardInfo.title,
-        createTime: dayjs(this.imagePreviewVM.curFeedCardInfo.createTime).format('YYYY-MM-DD hh:mm'),
+        createTime: dayjs(this.imagePreviewVM.curFeedCardInfo.createTime).format('YYYY-MM-DD HH:mm'),
         coverUrl: this.imagePreviewVM.handlerCoverImage,
         isVideo: !!this.imagePreviewVM.curFeedCardInfo.postImgList?.[0]?.surfaceUrl,
       },
@@ -96,8 +88,6 @@ struct ImagePreviewPage {
     }
     .visibility(this.imagePreviewVM.isExpand ? Visibility.None : Visibility.Visible)
   }
-
-
 
   @Builder
   operationBuilder() {
@@ -197,7 +187,7 @@ struct ImagePreviewPage {
             .borderRadius(16)
             .padding(4)
           }
-          .padding({ left: 16, right: 16 })
+          .padding({ left: this.imagePointModel.pagePadding, right: this.imagePointModel.pagePadding })
           .margin({ top: 36 })
         }
 
@@ -206,7 +196,7 @@ struct ImagePreviewPage {
             this.operationBuilder()
           }
           .position({ bottom: 28 })
-          .padding({ left: 16, right: 16 })
+          .padding({ left: this.imagePointModel.pagePadding, right: this.imagePointModel.pagePadding })
         }
       }
     }

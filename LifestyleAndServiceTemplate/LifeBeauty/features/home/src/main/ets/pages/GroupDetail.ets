@@ -1,3 +1,4 @@
+import { AppStorageV2 } from '@kit.ArkUI';
 import {
   CommonConstants,
   GetUserInfoResp,
@@ -13,9 +14,8 @@ import {
   SimpleGoodInfo,
   UIEmpty,
   UIBackBtn,
-} from 'utils';
+} from 'foundation';
 import { StoreList } from '../components/StoreList';
-import { AppStorageV2 } from '@kit.ArkUI';
 import { HomeBaseVM } from '../viewmodel/HomeBaseVM';
 
 @Builder
@@ -238,8 +238,8 @@ export struct GroupDetail {
           Text('立即抢购')
             .width(88)
             .height(21)
-            .fontColor(Color.White)
-            .fontSize(16)
+            .fontColor($r('sys.color.font_on_primary'))
+            .fontSize($r('sys.float.Body_L'))
             .fontWeight(500)
             .textAlign(TextAlign.Center)
         }
@@ -344,5 +344,3 @@ export struct GroupDetail {
     .backgroundColor($r('app.color.common_page_bg'))
   }
 }
-
-

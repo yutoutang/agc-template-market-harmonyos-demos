@@ -22,9 +22,9 @@ export struct FormInput {
   build() {
     TextInput({ text: this.value, placeholder: '请填写' })
       .type(this.inputType)
-      .placeholderFont({ size: 14 })
-      .fontSize(14)
-      .fontColor(Color.Black)
+      .placeholderFont({ size: $r('sys.float.Body_L') })
+      .fontSize($r('sys.float.Body_L'))
+      .fontColor($r('sys.color.font_primary'))
       .backgroundColor(Color.Transparent)
       .layoutWeight(1)
       .textAlign(TextAlign.End)

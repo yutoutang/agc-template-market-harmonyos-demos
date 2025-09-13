@@ -1,19 +1,19 @@
 import CalendarVM from '../viewmodel/CalendarVM';
 
 export class LuckyDays {
-  daysFromNow: number = 2
-  solarDate: Date | string = '2025-05-10T00:00:00.000Z'
-  lunarDate: string = '二〇二五年四月十三'
-  ganZhiYear: string = '乙巳'
-  ganZhiMonth: string = '辛巳'
-  ganZhiDay: string = '己卯'
-  weekday: string = '星期六'
-  forwardOrBack?: CALCULATION_TYPE = CALCULATION_TYPE.FORWARD
+  solarDate: Date | string = '2025-05-10T00:00:00.000Z';
+  lunarDate: string = '二〇二五年四月十三';
+  ganZhiYear: string = '乙巳';
+  ganZhiDay: string = '己卯';
+  ganZhiMonth: string = '辛巳';
+  weekday: string = '星期六';
+  daysFromNow: number = 2;
+  forwardOrBack?: CALCULATION_TYPE = CALCULATION_TYPE.FORWARD;
 }
 
-export enum CALCULATION_TYPE  {
+export enum CALCULATION_TYPE {
+  BACKWARD = 'backward',
   FORWARD = 'forward',
-  BACKWARD = 'backward'
 }
 
 @ObservedV2
@@ -51,11 +51,11 @@ export class YiJiSetDate {
 export class CalendarController {
   public static vm: CalendarVM = CalendarVM.instance;
 
-  public setSelectDate(date: Date) {
-    CalendarController.vm.changeDate(date)
+  public getTodayYiJi() {
+    CalendarController.vm.getTodayYiJi();
   }
 
-  public getTodayYiJi() {
-    CalendarController.vm.getTodayYiJi()
+  public setSelectDate(date: Date) {
+    CalendarController.vm.changeDate(date);
   }
 }

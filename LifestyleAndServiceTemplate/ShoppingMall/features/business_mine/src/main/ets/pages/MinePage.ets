@@ -59,6 +59,7 @@ struct MinePage {
       }
       .layoutWeight(1)
       .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring)
       .align(Alignment.Top)
     }
     .width(Constants.FULL_SIZE)

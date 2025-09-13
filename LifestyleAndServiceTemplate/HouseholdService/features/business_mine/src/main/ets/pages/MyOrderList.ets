@@ -71,9 +71,9 @@ export struct MyOrderList {
         .fontSize(14)
         .fontWeight(this.orderVM.selectedIndex === index ? 500 : 400)
         .lineHeight(20)
-      Divider()
-        .strokeWidth(2)
-        .color($r('app.color.common_theme_color'))
+      Row()
+        .height(2)
+        .backgroundColor($r('app.color.common_theme_color'))
         .opacity(this.orderVM.selectedIndex === index ? 1 : 0)
         .width('80%')
     }

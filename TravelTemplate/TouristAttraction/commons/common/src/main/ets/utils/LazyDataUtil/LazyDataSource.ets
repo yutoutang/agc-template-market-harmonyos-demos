@@ -1,4 +1,4 @@
-import Logger from '../Logger';
+import { Logger } from '../Logger';
 import { ObservedArray } from './ObservedArray';
 
 const TAG = '[BasicDataSource]';

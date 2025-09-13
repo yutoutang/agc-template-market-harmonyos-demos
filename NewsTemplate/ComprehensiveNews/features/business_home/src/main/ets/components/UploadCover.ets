@@ -5,8 +5,10 @@ import { MediaUtils } from 'lib_common'
 export struct UploadCover {
   @Param coverUri: string = ''
   @Local maxSelectNumber: number = 1
-  @Event onSelected: (uri: string) => void = () => {}
-  @Event onDeleteUri: (uri: string) => void = () => {}
+  @Event onSelected: (uri: string) => void = () => {
+  }
+  @Event onDeleteUri: (uri: string) => void = () => {
+  }
 
   build() {
     Column() {
@@ -21,6 +23,7 @@ export struct UploadCover {
           Image($r('app.media.ic_public_close_circle'))
             .width(24)
             .height(24)
+            .fillColor($r('sys.color.font_primary'))
             .position({ right: -8, top: -8 })
             .onClick(() => {
               this.onDeleteUri(this.coverUri)
@@ -28,20 +31,23 @@ export struct UploadCover {
         }
       } else {
         Image($r('app.media.cover_plus'))
+          .fillColor($r('sys.color.font_primary'))
           .width(20)
           .height(20)
-          .onClick(async () => {
-            const uriList = await MediaUtils.selectMedia({
-              type: photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE,
-              maxLimit: 1,
-            });
-            this.onSelected(uriList[0])
-          })
       }
     }
+    .onClick(async () => {
+      if (!this.coverUri) {
+        const uriList = await MediaUtils.selectMedia({
+          type: photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE,
+          maxLimit: 1,
+        });
+        this.onSelected(uriList[0])
+      }
+    })
     .justifyContent(FlexAlign.Center)
-    .width(104)
-    .height(78)
+    .width('30%')
+    .aspectRatio(1)
     .borderRadius(8)
     .backgroundColor($r('sys.color.comp_background_tertiary'))
   }

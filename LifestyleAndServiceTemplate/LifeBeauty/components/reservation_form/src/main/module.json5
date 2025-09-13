@@ -1,0 +1,9 @@
+{
+  "module": {
+    "name": "reservation_form",
+    "type": "har",
+    "deviceTypes": [
+      "default"
+    ]
+  }
+}

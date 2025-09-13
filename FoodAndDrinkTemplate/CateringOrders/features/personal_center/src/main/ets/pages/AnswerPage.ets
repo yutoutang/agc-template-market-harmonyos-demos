@@ -1,19 +1,24 @@
 import web_webview from '@ohos.web.webview';
-import { AsWebRichText, Constants, NavHeaderBar } from 'common/Index';
+import { AsWebRichText, Constants, NavHeaderBar, RouterMap, RouterModule, WindowModel } from 'common/Index';
+import { AppStorageV2 } from '@kit.ArkUI';
 
-@Component
-export struct AnswerPage {
-  @Consume('pageStack') pageStack: NavPathStack
-  @State answerDetail: string = ''
-  @State windowBottomHeight: number = AppStorage.get('windowBottomHeight') as number || 28
+@Builder
+export function AnswerPageBuilder() {
+  AnswerPage()
+}
+
+@ComponentV2
+struct AnswerPage {
+  @Local answerDetail: string = ''
+  @Local windowModel: WindowModel = AppStorageV2.connect(WindowModel, () => new WindowModel())!
   controller: web_webview.WebviewController = new web_webview.WebviewController();
   private scroller: Scroller = new Scroller()
 
   getAnswerDetail() {
-    let paramsArr: string[] = this.pageStack.getParamByName('AnswerPage') as string[]
-    if (paramsArr.length) {
+    let params = RouterModule.getNavParam<string>(RouterMap.ANSWER_PAGE)
+    if (params) {
       this.answerDetail =
-        `<meta name="viewport" content="width=device-width, initial-scale=1.0">${paramsArr[paramsArr.length-1]}`
+        `<meta name="viewport" content="width=device-width, initial-scale=1.0">${params}`
     }
   }
 
@@ -34,6 +39,6 @@ export struct AnswerPage {
       .align(Alignment.Top)
     }
     .hideTitleBar(true)
-    .padding({ bottom: this.windowBottomHeight })
+    .padding({ bottom: this.windowModel.getWindowBottomHeight() })
   }
 }

@@ -1,9 +1,8 @@
-import { MediaService } from 'audio';
-import { Constant } from 'common';
+import { TextReader } from '@kit.SpeechKit';
+import { Constant, PageUtil } from 'common';
+import { OrderPageVM } from 'order';
 import { TABS_INFO, TabBarData } from '../model/TabBarInfo';
 import { MainEntryVM } from '../viewmodel/MainEntryVM';
-import { PageUtil } from 'common';
-import { OrderPageVM } from 'order';
 
 @Entry
 @ComponentV2
@@ -59,8 +58,10 @@ struct Main {
         if (this.homeTabIndex === 3) {
           this.orderVm.getOrderList();
         }
-        MediaService.getInstance().releaseAvPlayer();
+        TextReader.stop().then(() => {
+          TextReader.release();
+        });
       });
-    }.hideTitleBar(true);
+    }.hideTitleBar(true).mode(NavigationMode.Stack);
   }
 }

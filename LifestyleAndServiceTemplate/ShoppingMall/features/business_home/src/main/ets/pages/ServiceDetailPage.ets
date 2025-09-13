@@ -111,9 +111,9 @@ struct ServiceDetailPage {
         ForEach(ConstantsHome.SERVICE_LOST_TABS, (v: TabBarData) => {
           Button(v.title)
             .width(96)
-            .height(36)
+            .height(40)
             .backgroundColor(this.vm.lostType === v.id ? '#7BB201' : $r('sys.color.comp_background_tertiary'))
-            .fontSize(14)
+            .fontSize($r('sys.float.Body_M'))
             .fontColor(this.vm.lostType === v.id ? $r('sys.color.font_on_primary') : $r('sys.color.font_primary'))
             .onClick(() => {
               this.vm.lostType = v.id;

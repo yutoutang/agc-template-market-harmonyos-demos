@@ -1,27 +1,25 @@
 import { AbilityConstant, bundleManager, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import { window } from '@kit.ArkUI';
+import { AppStorageV2, window } from '@kit.ArkUI';
 import { cloudFunction, cloudResPrefetch } from '@kit.CloudFoundationKit';
-import { Constants, FormCardJump, PreloadResponse } from 'common';
+import { AppInfoModel, Constants, FormCard, FormCardJump, MyCarModel, StoreInfoModel, WindowModel } from 'common';
 import { pushService } from '@kit.PushKit';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { PreloadResponse } from 'network';
 
 export default class EntryAbility extends UIAbility {
   async onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): Promise<void> {
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onCreate');
     // 在应用启动时调用函数获取应用数据
     this.functionPreload();
-    // 获取APP id
+    // 获取应用包名
     let bundleInfo = await bundleManager.getBundleInfoForSelf(bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_HAP_MODULE |
     bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_ABILITY |
     bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_REQUESTED_PERMISSION);
     let packageName = bundleInfo.name;
-    AppStorage.setOrCreate('packageName', packageName);
+    let appInfo: AppInfoModel = AppStorageV2.connect(AppInfoModel, () => new AppInfoModel())!;
+    appInfo.packageName = bundleInfo.name;
     console.info(`packageName: ${JSON.stringify(packageName)}.`);
-    // 元服务包名最后一段为appid
-    let appId = packageName.substring(packageName.lastIndexOf('.') + 1);
-    AppStorage.setOrCreate('appId', appId);
-    console.info(`appId: ${JSON.stringify(appId)}.`);
     this.resolvePagePath(want);
     // 获取Push Token
     try {
@@ -40,7 +38,7 @@ export default class EntryAbility extends UIAbility {
   onWindowStageCreate(windowStage: window.WindowStage): void {
     // Main window is created, set main page for this ability
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
-
+    let windowModel: WindowModel = AppStorageV2.connect(WindowModel, () => new WindowModel())!;
     windowStage.loadContent('pages/Index', async (err) => {
       if (err.code) {
         hilog.error(0x0000, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');
@@ -52,14 +50,12 @@ export default class EntryAbility extends UIAbility {
       await windowClass.setWindowLayoutFullScreen(true);
       let type = window.AvoidAreaType.TYPE_SYSTEM; // 以状态栏避让为例
       let avoidArea = windowClass.getWindowAvoidArea(type);
-      let windowTopHeight = px2vp(avoidArea.topRect.height);
-      AppStorage.setOrCreate('windowTopHeight', windowTopHeight);
+      windowModel.windowTopHeight = px2vp(avoidArea.topRect.height);
       type = window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR; // 以导航条避让为例
       avoidArea = windowClass.getWindowAvoidArea(type);
-      let windowBottomHeight = px2vp(avoidArea.bottomRect.height);
-      AppStorage.setOrCreate('windowBottomHeight', windowBottomHeight);
-      PersistentStorage.persistProp('userIconPath', 'userImage.jpg');
+      windowModel.windowBottomHeight = px2vp(avoidArea.bottomRect.height);
     });
+    windowModel.windowStage = windowStage
   }
 
   onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): void {
@@ -73,33 +69,42 @@ export default class EntryAbility extends UIAbility {
     console.info(`uri is: ${uri}`);
     if (uri) {
       //解析通过router跳转的页面
-      // 商户id
-      let storeId = want.parameters?.sid as string;
-      console.info(`storeId is: ${storeId}`);
-      AppStorage.setOrCreate('storeId', storeId);
+      let storeInfoModel: StoreInfoModel = AppStorageV2.connect(StoreInfoModel, () => new StoreInfoModel())!
+      storeInfoModel.storeId = want.parameters?.sid as string;
+      console.info(`storeId is: ${storeInfoModel.storeId}`);
       // 桌号
-      let tableId = want.parameters?.tid as string;
-      console.info(`tableId is: ${tableId}`);
-      AppStorage.setOrCreate('tableId', tableId);
+      let myCarModel: MyCarModel = AppStorageV2.connect(MyCarModel, () => new MyCarModel())!
+      myCarModel.tableId = want.parameters?.tid as string;
+      console.info(`tableId is: ${myCarModel.tableId}`);
       // 扫码进入清空购物车
-      AppStorage.setOrCreate('qrCodeFlag', true);
+      storeInfoModel.qrCodeFlag = true
     } else if (parameters?.url) {
       let formCardJump: FormCardJump = JSON.parse(parameters?.params.toString() || '');
-      formCardJump.id = new Date().getTime()
-      AppStorage.setOrCreate('formCardJump', formCardJump);
+      let formCard: FormCard = AppStorageV2.connect(FormCard, () => new FormCard())!
+      if (formCardJump?.params?.orderId) {
+        formCard.id = new Date().getTime()
+        formCard.orderId = formCardJump.params.orderId
+        formCard.url = parameters?.url as string
+      }
     }
   }
 
   functionPreload() {
-    cloudResPrefetch.getPrefetchResult(cloudResPrefetch.PrefetchMode.INSTALL_PREFETCH)
-      .then((data: cloudResPrefetch.PrefetchResult) => {
-        hilog.info(0x0000, 'testTag', `Succeeded in getting install prefetch data, result: ${JSON.stringify(data.result)}`);
-        this.initPreload(data.result as PreloadResponse); // data.result即是缓存的应用数据
-      }).catch((err: BusinessError) => {
-      hilog.error(0x0000, 'testTag', `Failed to get install prefetch data, code: ${err.code}, message: ${err.message}`);
-      // 使用原有方式获取应用数据
-      this.functionNormal();
-    })
+    try {
+      cloudResPrefetch.getPrefetchResult(cloudResPrefetch.PrefetchMode.INSTALL_PREFETCH)
+        .then((data: cloudResPrefetch.PrefetchResult) => {
+          hilog.info(0x0000, 'testTag',
+            `Succeeded in getting install prefetch data, result: ${JSON.stringify(data.result)}`);
+          this.initPreload(data.result as PreloadResponse); // data.result即是缓存的应用数据
+        }).catch((err: BusinessError) => {
+        hilog.error(0x0000, 'testTag',
+          `Failed to get install prefetch data, code: ${err.code}, message: ${err.message}`);
+        // 使用原有方式获取应用数据
+        this.functionNormal();
+      })
+    } catch (e) {
+      this.initPreload()
+    }
   }
 
   functionNormal() {
@@ -114,16 +119,21 @@ export default class EntryAbility extends UIAbility {
       this.initPreload(data.result as PreloadResponse); // data.result即是缓存的应用数据
     }).catch((err: Error) => {
       hilog.info(0x0000, 'testTag', 'fail to call function: %{public}s', err.message);
+      this.initPreload(); // data.result即是缓存的应用数据
     });
   }
 
-  initPreload(result: PreloadResponse) {
-    if (result.hmSystem) {
-      AppStorage.setOrCreate('storeId', result.hmSystem.storeId);
-      AppStorage.setOrCreate('storeType', result.hmSystem.storeType);
-    }
-    if (result.tableTitleArr) {
-      AppStorage.setOrCreate('tableList', result.tableTitleArr);
+  initPreload(result?: PreloadResponse) {
+    let storeInfo: StoreInfoModel = AppStorageV2.connect(StoreInfoModel, () => new StoreInfoModel()) as StoreInfoModel;
+    storeInfo.preloadFinished = true
+    if (result) {
+      if (result.appInfo) {
+        storeInfo.storeId = result.appInfo.storeId;
+        storeInfo.storeType = result.appInfo.storeType;
+      }
+      if (result.tableList?.length) {
+        storeInfo.tableList = result.tableList;
+      }
     }
   }
 };

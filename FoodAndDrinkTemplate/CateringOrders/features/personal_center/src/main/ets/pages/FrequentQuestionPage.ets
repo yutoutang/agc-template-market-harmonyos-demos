@@ -1,15 +1,21 @@
-import { Constants, GetHelpMsgResp, getHelpMsgUtil, NavHeaderBar } from 'common/Index'
+import { Constants, NavHeaderBar, RouterMap, RouterModule, WindowModel } from 'common/Index';
+import { AppStorageV2 } from '@kit.ArkUI';
+import { HelpMsgResp } from 'network';
+import * as API from '../api/Index';
 
-@Component
-export struct FrequentQuestionPage {
-  @State windowTopHeight: number = AppStorage.get('windowTopHeight') as number || 38.77
-  @State windowBottomHeight: number = AppStorage.get('windowBottomHeight') as number || 28
-  @Consume('pageStack') pageStack: NavPathStack
-  @State questionList?: Array<GetHelpMsgResp> = undefined
+@Builder
+export function FrequentQuestionPageBuilder() {
+  FrequentQuestionPage()
+}
+
+@ComponentV2
+struct FrequentQuestionPage {
+  @Local windowModel: WindowModel = AppStorageV2.connect(WindowModel, () => new WindowModel())!
+  @Local questionList?: Array<HelpMsgResp> = undefined
   scroller: Scroller = new Scroller()
 
   aboutToAppear(): void {
-    getHelpMsgUtil().then((resp: Array<GetHelpMsgResp>) => {
+    API.getHelpMsg().then((resp: Array<HelpMsgResp>) => {
       this.questionList = resp
       console.log(JSON.stringify(this.questionList))
     })
@@ -46,7 +52,7 @@ export struct FrequentQuestionPage {
 
         Scroll(this.scroller) {
           Column() {
-            ForEach(this.questionList, (item: GetHelpMsgResp) => {
+            ForEach(this.questionList, (item: HelpMsgResp) => {
               Row() {
                 Text(item.question)
                   .fontSize($r('sys.float.Body_M'))
@@ -68,9 +74,9 @@ export struct FrequentQuestionPage {
                 color: { top: $r('sys.color.comp_divider') },
               })
               .onClick(() => {
-                this.pageStack.pushPath({ name: 'AnswerPage', param: item.answer })
+                RouterModule.push(RouterMap.ANSWER_PAGE, item.answer)
               })
-            }, (item: GetHelpMsgResp) => item.question)
+            }, (item: HelpMsgResp) => item.question)
           }.alignItems(HorizontalAlign.Start)
         }
         .width(Constants.FULL_SIZE)
@@ -79,7 +85,7 @@ export struct FrequentQuestionPage {
       }.backgroundColor($r('sys.color.background_primary'))
     }
     .hideTitleBar(true)
-    .padding({ bottom: this.windowBottomHeight })
+    .padding({ bottom: this.windowModel.getWindowBottomHeight() })
     .backgroundColor($r('sys.color.background_secondary'))
   }
 }

@@ -22,6 +22,10 @@
         "description": "",
         "icon": "$media:layered_image",
         "label": "$string:EntryAbility_label",
+        "supportWindowMode": [
+          "fullscreen",
+          "floating"
+        ],
         "startWindowIcon": "$media:app_icon",
         "startWindowBackground": "$color:start_window_background",
         "exported": true,
@@ -39,7 +43,7 @@
           // todo: 修改client_id
           {
             "name": "client_id",
-            "value": "xxx"
+            "value": "6917579572381969601"
           }
         ]
       }

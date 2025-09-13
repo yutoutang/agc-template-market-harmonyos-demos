@@ -65,11 +65,22 @@
     import { PublishPostComp } from 'module_post';
     ```
 
+3. 调用组件，详细参数配置说明参见[API参考](#API参考)。
+   ```
+   PublishPostComp({
+     fontRatio: 1,
+     onChange: (body: string, mediaList: PostImgVideoItem[]) => {
+       this.body = body;
+       this.mediaList = mediaList;
+     },
+   })
+   ```
+
 ## API参考
 
 ### 接口
 
-PublishPostComp(option?: PublishPostCompOptions)
+PublishPostComp(option?: [PublishPostCompOptions](#PublishPostCompOptions对象说明))
 
 发帖组件
 
@@ -87,6 +98,7 @@ PublishPostComp(option?: PublishPostCompOptions)
 | imageParams | [MediaParams](#MediaParams对象说明)                                                | 否    | 图片参数          |
 | videoParams | [MediaParams](#MediaParams对象说明)                                                | 否    | 视频参数          |
 | onChange    | (body: string, mediaList: [PostImgVideoItem](#PostImgVideoItem对象说明)[]) => void | 否    | 文字、图片、视频变化的回调 |
+| isFocus     | (result: boolean) => void                                                      | 否    | 键盘是否被拉起的回调    |
 
 ### MediaParams对象说明
 

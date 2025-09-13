@@ -1,6 +1,11 @@
 import { Https } from '../network/apis/HttpRequestApi';
 import { CouponItem } from '../network/types/responseTypes/GetCouponsResp';
-import { CouponStatus, ReductionTypes, ScenarioStatus, VerificationStatus } from '../types/Types';
+import {
+  CouponStatus,
+  ReductionTypes,
+  ScenarioStatus,
+  VerificationStatus,
+} from '../types/Types';
 
 /**
  * 获取优惠减免金额
@@ -8,11 +13,15 @@ import { CouponStatus, ReductionTypes, ScenarioStatus, VerificationStatus } from
 export function getReduceAmount(coupon: CouponItem, orderMoney: number) {
   const precision = 1000;
   if (coupon.amountRule.discountType === ReductionTypes.DISCOUNT_REDUCTION) {
-    return (1 * precision - Number(coupon.amountRule.discountCoefficient) * precision) * orderMoney / precision;
+    return (
+      ((1 * precision -
+        Number(coupon.amountRule.discountCoefficient) * precision) *
+        orderMoney) /
+      precision
+    );
   }
   return Number(coupon.amountRule.discountAmount);
 }
-
 
 /**
  * 获取减免方式说明
@@ -58,11 +67,18 @@ export function getReduceDays(coupon: CouponItem) {
  * 2.失效且已被使用/核销
  */
 export async function getCouponList(): Promise<CouponItem[]> {
-  const res1 =
-    await Https.getCoupons({ userId: 'xxx', status: CouponStatus.effective });
-  const res2 =
-    await Https.getCoupons({ userId: 'xxx', status: CouponStatus.lapsed, couponStatus: VerificationStatus.CANCEL });
-  return (res1.code === 0 ? res1.data.couponsList : []).concat(res2.code === 0 ? res2.data.couponsList : []);
+  const res1 = await Https.getCoupons({
+    userId: 'xxx',
+    status: CouponStatus.effective,
+  });
+  const res2 = await Https.getCoupons({
+    userId: 'xxx',
+    status: CouponStatus.lapsed,
+    couponStatus: VerificationStatus.CANCEL,
+  });
+  return (res1.code === 0 ? res1.data.couponsList : []).concat(
+    res2.code === 0 ? res2.data.couponsList : [],
+  );
 }
 
 /**

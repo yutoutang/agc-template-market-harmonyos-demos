@@ -1,20 +1,12 @@
 {
   "string": [
     {
+      "name": "full_size",
+      "value": "100%"
+    },
+    {
       "name": "shared_desc",
       "value": "description"
-    },
-    {
-      "name": "business_time",
-      "value": "营业时间"
-    },
-    {
-      "name": "call",
-      "value": "一键拨号"
-    },
-    {
-      "name": "must_good",
-      "value": "必选品"
     },
     {
       "name": "request_failed",
@@ -39,6 +31,14 @@
     {
       "name": "copy_success",
       "value": "复制成功"
+    },
+    {
+      "name": "permission_failed",
+      "value": "权限获取失败"
+    },
+    {
+      "name": "agcit_huawei_catering_orders",
+      "value": "1.0.1"
     }
   ]
 }

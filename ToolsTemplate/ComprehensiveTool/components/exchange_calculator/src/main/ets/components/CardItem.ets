@@ -1,11 +1,9 @@
-import { CALCULATE_DATA } from '../constants/Constants';
 import { StyleConstants } from '../constants/Styles';
 import { ExchangeVM } from '../viewmodel/ExchangeVM';
 
 @ComponentV2
 export struct CardItem {
   @Require @Param index: number;
-  @Param cardBgColor: ResourceColor = $r('sys.color.background_primary');
   @Local editFlag: boolean = false;
   vm: ExchangeVM = ExchangeVM.instance;
   shadowOption: ShadowOptions =
@@ -15,8 +13,8 @@ export struct CardItem {
     ListItem() {
       Row() {
         Row() {
-          Image(CALCULATE_DATA[this.index].pic).height(StyleConstants.IMAGE_40).width(StyleConstants.IMAGE_64)
-          Text(CALCULATE_DATA[this.index].country)
+          Image(this.vm.exchangeData[this.index].pic).height(StyleConstants.IMAGE_40).width(StyleConstants.IMAGE_64)
+          Text(this.vm.exchangeData[this.index].country)
             .mainStyle()
             .margin({ left: StyleConstants.SPACE_12, right: StyleConstants.SPACE_24 })
         }
@@ -34,7 +32,7 @@ export struct CardItem {
               }
               this.vm.calcBaseValue(newText, this.index);
             })
-          Text(CALCULATE_DATA[this.index].name).subStyle2()
+          Text(this.vm.exchangeData[this.index].name).subStyle2()
         }.alignItems(HorizontalAlign.End).layoutWeight(1)
       }
       .justifyContent(FlexAlign.SpaceBetween)
@@ -44,7 +42,7 @@ export struct CardItem {
     .shadow(this.editFlag ? this.shadowOption : undefined)
     .padding(StyleConstants.SPACE_12)
     .borderRadius(StyleConstants.RADIUS_16)
-    .backgroundColor(this.cardBgColor)
+    .backgroundColor($r('sys.color.background_primary'))
   }
 }
 

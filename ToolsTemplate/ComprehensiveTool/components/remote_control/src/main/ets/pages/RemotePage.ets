@@ -14,7 +14,7 @@
  */
 import { AlertDialog } from '@kit.ArkUI';
 import { RemotePageVM } from '../viewmodel/RemotePageVM';
-import { ControlInfo } from '../model/Index'
+import { ControlInfo } from '../model/Index';
 import { getInstance, setPathStack } from '../components/RouteModule';
 
 @Builder
@@ -38,7 +38,7 @@ export struct RemotePage {
         value: '确认',
         role: ButtonRole.ERROR,
         action: () => {
-            this.vm.myControl.removeControl(this.vm.delId)
+          this.vm.myControl.removeControl(this.vm.delId);
         },
       },
     }),
@@ -62,7 +62,7 @@ export struct RemotePage {
             });
           };
 
-          ForEach(this.vm.myControl.list,(item:ControlInfo)=>{
+          ForEach(this.vm.myControl.list, (item: ControlInfo) => {
             GridItem() {
               Column({ space: 8 }) {
                 Image($r('app.media.ic_air')).width(50).height(38);
@@ -70,27 +70,31 @@ export struct RemotePage {
                   .fontColor($r('sys.color.font_primary'))
                   .fontWeight(FontWeight.Regular)
                   .fontWeight(FontWeight.Medium)
-                  .constraintSize({maxWidth:'100%'})
+                  .constraintSize({ maxWidth: '100%' })
                   .maxLines(1)
-                  .textOverflow({overflow:TextOverflow.Ellipsis})
+                  .textOverflow({ overflow: TextOverflow.Ellipsis });
               }.cardExtend().padding(12);
             }.gesture(
               // 以下组合手势为顺序识别，当长按手势事件未正常触发时则不会触发拖动手势事件
               GestureGroup(GestureMode.Exclusive, LongPressGesture({ repeat: false })
                 .onAction(() => {
-                  this.vm.delId = item.id
+                  this.vm.delId = item.id;
                   this.dialogControllerConfirm.open();
                 }),
                 TapGesture({ count: 1 }).onAction(() => {
-                  getInstance().pushPathByName('ControllerPage',item);
+                  getInstance().pushPathByName('ControllerPage', item);
                 })));
 
-          },(item:ControlInfo)=>item.id+item.name)
+          }, (item: ControlInfo) => item.id + item.name);
 
 
-        }.columnsTemplate('1fr 1fr')
+        }
+        .columnsTemplate('1fr 1fr')
         .columnsGap(12)
-        .rowsGap(12);
+        .rowsGap(12)
+        .layoutWeight(1)
+        .scrollBar(BarState.Off)
+        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false });
 
       }.width('100%').layoutWeight(1).padding({ left: 16, right: 16, top: 24 });
 

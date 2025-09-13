@@ -7,6 +7,7 @@ class KeyboardParams {
   }
   handleOk = () => {
   }
+  isSmallHeight:boolean = true
 }
 
 @Builder
@@ -37,7 +38,7 @@ export function NumberKeyboardBuilder(params: KeyboardParams) {
     .columnsGap(10)
     .rowsGap(10)
     .width('100%')
-    .height(300)
+    .height(params.isSmallHeight ? 180 : 300)
   }.width('100%')
   .padding({
     top: 10,

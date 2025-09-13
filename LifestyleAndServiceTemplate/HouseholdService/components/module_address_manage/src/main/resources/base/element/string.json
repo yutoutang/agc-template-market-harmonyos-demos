@@ -6,7 +6,7 @@
     },
     {
       "name": "agcit_huawei_household_module_address_manage",
-      "value": "1.0.0"
+      "value": "1.0.1"
     },
     {
       "name": "agcittype_huawei_household_module_address_manage",
@@ -14,7 +14,7 @@
     },
     {
       "name": "agcitkid_huawei_household_module_address_manage",
-      "value": "agcit_huawei_household_module_base/1.0.0,agcit_huawei_household_module_form/1.0.0"
+      "value": "agcit_huawei_household_module_base/1.0.1,agcit_huawei_household_module_form/1.0.1"
     }
   ]
 }

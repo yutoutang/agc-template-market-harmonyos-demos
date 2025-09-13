@@ -37,6 +37,7 @@ export class ArticleService extends BaseNewsService {
       shareCount: 0,
       isLiked: false,
       isMarked: false,
+      isLocalPublish: true,
       articleFrom: MineServiceApi.queryAuthorInfo()?.authorNickName,
       navInfo: {
         setting: setting,

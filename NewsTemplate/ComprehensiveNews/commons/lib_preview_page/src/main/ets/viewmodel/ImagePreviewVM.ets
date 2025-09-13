@@ -1,16 +1,21 @@
-import { PersistenceV2 } from '@kit.ArkUI';
-import {  SettingModel, UserInfoModel } from 'lib_common';
+import { PersistenceV2, window } from '@kit.ArkUI';
+import { SettingModel, UserInfoModel } from 'lib_common';
 import { FeedCardInfoModel } from 'module_newsfeed';
 import { LongTakeAnimationProperties } from 'module_transition';
 import { PostImgList } from 'lib_news_api';
 
 @ObservedV2
 export class ImagePreviewVM {
-  public onFirstPageShow: () => void = () => {};
-  public watchOperation: () => void = () => {};
-  public newsLike: () => void = () => {};
-  public onAddComment: () => void = () => {};
-  public onIndexChange: (index: number) => void = (_index: number) => {}
+  public onFirstPageShow: () => void = () => {
+  };
+  public watchOperation: () => void = () => {
+  };
+  public newsLike: () => void = () => {
+  };
+  public onAddComment: () => void = () => {
+  };
+  public onIndexChange: (index: number) => void = (_index: number) => {
+  }
   public backToFirstPage: () => void = () => {
     animateTo({
       duration: 200,
@@ -32,7 +37,10 @@ export class ImagePreviewVM {
   @Trace selectedIndex: number = 0;
   @Trace isDisabledSwiper: boolean = false
   @Trace showImagePreviewLayer: boolean = true;
+  @Trace statusBarContentColor: string = ''
   public pageInfo: NavPathStack = new NavPathStack();
+  private windowClass: window.Window | undefined = undefined
+
   @Computed
   get isFeedSelf() {
     return this.userInfoModel.authorId === this.curFeedCardInfo.author.authorId
@@ -105,5 +113,21 @@ export class ImagePreviewVM {
     this.componentId = param.componentId as string
     this.newsLike = param.newsLike as () => void;
     this.showImagePreviewLayer = param.showImagePreviewLayer as boolean;
+  }
+
+  setSystemBarProperty() {
+    const windowStage = AppStorage.get('windowStage') as window.WindowStage;
+    this.windowClass = windowStage.getMainWindowSync()
+    let systemBarProperty = this.windowClass.getWindowSystemBarProperties()
+    this.statusBarContentColor = systemBarProperty.statusBarContentColor as string
+    this.windowClass.setWindowSystemBarProperties({
+      statusBarContentColor: '#ffffff',
+    })
+  }
+
+  resetSystemBarProperty() {
+    this.windowClass?.setWindowSystemBarProperties({
+      statusBarContentColor: this.statusBarContentColor ?? '#ffffff',
+    })
   }
 }

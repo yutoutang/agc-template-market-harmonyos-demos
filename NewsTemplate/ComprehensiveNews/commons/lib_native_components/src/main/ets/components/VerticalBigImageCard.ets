@@ -1,8 +1,7 @@
 import { PersistenceV2, UIUtils } from '@kit.ArkUI'
-import { LayoutParams, LayoutSetting } from 'lib_news_api'
-import { CommonConstants, FormatCount, SettingModel } from 'lib_common'
+import { CommonConstants, FormatCount, SettingModel, NewsEnum } from 'lib_common'
 import { BaseImage } from 'lib_widget'
-import { NewsEnum } from 'lib_common/src/main/ets/constants/NewsEnum'
+import { LayoutParams, LayoutSetting } from 'module_flexlayout'
 import { CardViewModel } from '../viewmodel/CardViewModel'
 import { ComponentModifier } from '../utils/Modifier'
 
@@ -37,7 +36,7 @@ struct NativeComponent {
       BaseImage({
         url: this.getSurface,
         fit: ImageFit.Fill,
-        downloadWithoutWlan: this.settingInfo.network.downloadWithoutWlan
+        downloadWithoutWlan: this.settingInfo.network.downloadWithoutWlan,
       })
       Column({ space: CommonConstants.SPACE_S }) {
         Flex({ alignItems: ItemAlign.Center }) {

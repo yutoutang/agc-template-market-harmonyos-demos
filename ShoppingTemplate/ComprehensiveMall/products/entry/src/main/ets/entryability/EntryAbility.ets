@@ -11,14 +11,11 @@ export default class EntryAbility extends UIAbility {
   }
 
   onWindowStageCreate(windowStage: window.WindowStage): void {
-    windowStage.loadContent(
-      'pages/Index',
-      (): void => {
-        windowStage
-          .getMainWindowSync()
-          .getUIContext()
-          .setKeyboardAvoidMode(KeyboardAvoidMode.OFFSET);
-      },
-    );
+    windowStage.loadContent('pages/Index', (): void => {
+      windowStage
+        .getMainWindowSync()
+        .getUIContext()
+        .setKeyboardAvoidMode(KeyboardAvoidMode.OFFSET_WITH_CARET);
+    });
   }
 }

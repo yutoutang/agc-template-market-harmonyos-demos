@@ -36,7 +36,7 @@ struct SettingH5 {
     RouterUtils.replacePathByName(RouterMap.PROTOCOL_WEBVIEW, {
       content: this.content,
       isSheet: false,
-    } as ProtocolRouterParams);
+    } as ProtocolRouterParams, false);
   }
 
   build() {

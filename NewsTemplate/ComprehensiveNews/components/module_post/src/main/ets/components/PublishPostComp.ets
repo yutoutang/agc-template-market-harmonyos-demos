@@ -26,10 +26,9 @@ export struct PublishPostComp {
   // 图文变化的回调
   @Event onChange: (body: string, mediaList: PostImgVideoItem[]) => void = () => {
   };
-  @Event onHideNewsTab: (isHide: boolean) => void = () => {
+  // 键盘是否被拉起
+  @Event isFocus: (result: boolean) => void = () => {
   }
-  // 是否是新闻发表页
-  @Param isArticlePost: boolean = false
   @Local body: string = '';
   @Local imgList: PostImgVideoItem[] = [];
   @Local videoList: PostImgVideoItem[] = [];
@@ -351,9 +350,9 @@ export struct PublishPostComp {
       curve: Curve.EaseInOut,
     }, () => {
       if (!height) {
-        this.onHideNewsTab(false)
+        this.isFocus(false)
       } else {
-        this.onHideNewsTab(true)
+        this.isFocus(true)
       }
     });
   };

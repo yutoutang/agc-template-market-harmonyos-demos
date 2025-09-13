@@ -19,7 +19,8 @@ export const attractionListMock: BaseResponse<GetAttractionsInfoResp> =
         latitude: 22.878538,
         longitude: 113.886642,
         audio: Constant.CLOUD_STORAGE_URL + MockResourceEnum.AUDIO,
-        location: '松山湖欧洲小镇L区'
+        location: '松山湖欧洲小镇L区',
+        introduction: 'L区建筑以海德堡建筑风格为主，红褐色古城堡是海德堡城的标志，大多为白墙红瓦的老城建筑。设计参考了在人文科学上闻名、并在德国具有最悠久历史的海德堡大学，以红砂岩外墙和传统街区构成建筑群，布置在小山丘上细致而雄伟的城堡与由网格状道路构成的街区形成了鲜明的对比。',
       },
         {
           labels: ['文化建筑', '欧美浪漫'],
@@ -32,7 +33,8 @@ export const attractionListMock: BaseResponse<GetAttractionsInfoResp> =
           latitude: 22.881063,
           longitude: 113.88549,
           audio: Constant.CLOUD_STORAGE_URL + MockResourceEnum.AUDIO,
-          location: '松山湖欧洲小镇J区'
+          location: '松山湖欧洲小镇J区',
+          introduction: 'J区借鉴了弗里堡的中世纪古城风格，哥特式建筑赋予了这座古城无与伦比的风格与魅力，以白墙红瓦的淡色系建筑为主。根据用地起伏、靠近松山湖水域的地理位置特点，结合瑞士具有历史性的古城和修道院建筑特色，通过棕红色瓦斜坡屋顶和绿色砂岩外墙等特征，打造了面向湖畔的斜面风景。',
         },
         {
           labels: ['意大利', '浪漫古堡'],
@@ -45,8 +47,9 @@ export const attractionListMock: BaseResponse<GetAttractionsInfoResp> =
           latitude: 22.883272,
           longitude: 113.889091,
           audio: Constant.CLOUD_STORAGE_URL + MockResourceEnum.AUDIO,
-          location: '松山湖欧洲小镇K区'
+          location: '松山湖欧洲小镇K区',
+          introduction: 'K区以勃艮第为模板，勃艮第地区位于法国巴黎南部，日照充足，是世界闻名的葡萄酒产区，主要出产酒体从中等到丰满的红葡萄酒，以及干白葡萄酒。借鉴了枫德内修道院、昂诺克西奥街区以及以棕红色屋顶为特征的瑟米尔，利用现代工艺和手法将其进行重塑，形成了特有的建筑风貌。"',
         },
-        ] as AttractionListItem[]
-    }
-  }
+      ] as AttractionListItem[],
+    },
+  };

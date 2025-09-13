@@ -40,7 +40,7 @@ struct SelfServicePointPage {
               }.alignItems(HorizontalAlign.Start)
 
               Button(this.vm.globalPointInfo.isCheckIn ? '已签到' : '签到', { controlSize: ControlSize.SMALL })
-                .fontSize(14)
+                .fontSize($r('sys.float.Body_M'))
                 .fontColor($r('sys.color.font_on_primary'))
                 .width(72)
                 .backgroundColor($r('app.color.app_theme'))

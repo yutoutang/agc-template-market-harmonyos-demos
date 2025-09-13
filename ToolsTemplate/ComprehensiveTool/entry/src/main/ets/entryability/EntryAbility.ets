@@ -1,6 +1,8 @@
 import { AbilityConstant, common, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
+import { appDB, initNFC } from 'mobile_nfc';
+import { BusinessError } from '@kit.BasicServicesKit';
 
 const DOMAIN = 0x0000;
 
@@ -9,6 +11,8 @@ export default class EntryAbility extends UIAbility {
     this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');
     this.setColorMode(this.context);
+    appDB.initDb(this.context)
+    initNFC(want)
   }
 
   private setColorMode(context: common.UIAbilityContext) {
@@ -22,7 +26,28 @@ export default class EntryAbility extends UIAbility {
   async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
     // Main window is created, set main page for this ability
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
+    AppStorage.setOrCreate('windowStage', windowStage);
+    let windowClass: window.Window | undefined = undefined;
 
+    try {
+      window.getLastWindow(this.context, (err: BusinessError, data) => {
+        const errCode: number = err.code;
+        if (errCode) {
+          return;
+        }
+        windowClass = data;
+        try {
+          // 对窗口尺寸大小变化的监听
+          windowClass.on('windowSizeChange', (data) => {
+            AppStorage.setOrCreate('height', px2vp(data.height));
+          });
+        } catch (exception) {
+          hilog.error(DOMAIN, 'testTag', 'Failed to listen windowSizeChange. Cause: %{public}s', JSON.stringify(exception));
+        }
+      });
+    } catch (exception) {
+      hilog.error(DOMAIN, 'testTag', 'Failed to getLastWindow. Cause: %{public}s', JSON.stringify(exception));
+    }
     windowStage.loadContent('pages/Main', (err) => {
       if (err.code) {
         hilog.error(DOMAIN, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err));

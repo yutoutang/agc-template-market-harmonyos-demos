@@ -11,4 +11,6 @@ export class Constants {
   public static readonly BACKGROUND_COLOR_THEME = '#1ae64566';
   public static readonly BORDER_RADIUS_4 = '4vp';
   public static readonly BORDER_RADIUS_CAPSULE = '99vp';
+  public static readonly PAGE_SIZE = 5;
+  public static readonly REVIEW_ROUTER = 'ProductReviewPage';
 }

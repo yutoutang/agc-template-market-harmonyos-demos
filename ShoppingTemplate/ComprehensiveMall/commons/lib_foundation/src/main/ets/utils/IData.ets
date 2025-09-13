@@ -1,35 +1,21 @@
 import { util } from '@kit.ArkTS';
-import { UserInfoVM } from '../models/UserInfoVM';
-import { AppStorageV2, PersistenceV2 } from '@kit.ArkUI';
+import { PersistenceV2 } from '@kit.ArkUI';
+import { UserInfoModel } from '../models/UserInfoModel';
 
 @ObservedV2
 export class GlobalStateMgr {
   @Trace
   public rootPageActiveTabId: string = '';
-
   @Trace
   public isNavPathStackEmpty: boolean = true;
-
   @Trace
   public cartVersion: string = util.generateRandomUUID(false);
-
   @Trace
   public cartTotal: number = 0;
-
   @Trace
   public isLogin: boolean = false;
-
   @Trace
-  public userInfo: UserInfoVM = new UserInfoVM();
-
-  @Trace
-  public nickname: string = '';
-
-  @Trace
-  public phone: string = '';
-
-  @Trace
-  public avatar: string = '';
+  public userInfo: UserInfoModel = new UserInfoModel();
 }
 
 @ObservedV2
@@ -41,15 +27,13 @@ export class Persistence {
 @ObservedV2
 class IData {
   @Trace
-  public readonly global: GlobalStateMgr = AppStorageV2.connect(
+  public readonly global: GlobalStateMgr = PersistenceV2.connect(
     GlobalStateMgr,
-    'GlobalStateMgr',
     () => new GlobalStateMgr(),
   )!;
   @Trace
   public readonly local: Persistence = PersistenceV2.connect(
     Persistence,
-    'Persistence',
     () => new Persistence(),
   )!;
 }

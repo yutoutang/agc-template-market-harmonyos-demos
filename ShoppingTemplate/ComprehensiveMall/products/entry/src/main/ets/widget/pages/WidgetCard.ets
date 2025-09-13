@@ -33,7 +33,7 @@ struct WidgetCard {
           .objectFit(ImageFit.Contain)
           .margin({ left: 16, right: 16 })
         Text('综合商城')
-          .fontSize($r('app.float.font_size'))
+          .fontSize($r('app.float.font_size_16'))
           .fontWeight(FontWeight.Medium)
           .fontColor($r('sys.color.font_primary'))
       }

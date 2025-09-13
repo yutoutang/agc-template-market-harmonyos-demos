@@ -1,17 +1,11 @@
-import { Good, StoreInfo } from './ResponseModel';
-
 export interface HwMapModel {
   latitude: number,
   longitude: number,
-  storeInfo: StoreInfo
-}
-
-export interface GoodRouter {
-  goodInfo: Good,
 }
 
 export interface HomePageRouter {
   index: number,
+  storeId: string,
   orderId: string,
 }
 
@@ -23,7 +17,7 @@ export interface OrderDetailRouter {
 export interface CouponRouter {
   totalMoney: number,
   selectId: string,
-  reduce: string,
+  reduce: number,
 }
 
 export interface RemarksRouter {
@@ -38,4 +32,9 @@ export interface FormCardJump {
   id: number,
   url: string,
   params: OrderDetailRouter,
+}
+
+export interface ConfirmDialogOption {
+  title: string;
+  message: string;
 }

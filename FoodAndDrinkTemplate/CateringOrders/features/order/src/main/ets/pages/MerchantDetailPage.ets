@@ -1,31 +1,27 @@
 import {
-  CallTelDialogBuilder,
   CommonUrl,
   Constants,
   HwMapModel,
   ImageRouter,
   NavHeaderBar,
-  StoreInfo,
+  RouterMap,
+  RouterModule,
+  StoreInfoModel,
 } from 'common/Index';
-import { promptAction } from '@kit.ArkUI';
-import web_webview from '@ohos.web.webview';
+import { AppStorageV2, promptAction } from '@kit.ArkUI';
+import { callTelSheetBuilder } from 'base_ui';
 
-@Component
-export struct MerchantDetailPage {
-  @Consume('pageStack') pageStack: NavPathStack
-  @Consume('storeInfo') storeInfo?: StoreInfo
-  @State windowTopHeight: number = AppStorage.get('windowTopHeight') as number || 38.77
-  @State windowBottomHeight: number = AppStorage.get('windowBottomHeight') as number || 28
-  @State webFilePath: string = ''
-  @State storeDetails: string = ''
-  @State callTelSheet: boolean = false
-  controller: web_webview.WebviewController = new web_webview.WebviewController();
+@Builder
+export function MerchantDetailPageBuilder() {
+  MerchantDetailPage()
+}
+
+@ComponentV2
+struct MerchantDetailPage {
+  @Local storeModel: StoreInfoModel = AppStorageV2.connect(StoreInfoModel, () => new StoreInfoModel())!;
+  @Local webFilePath: string = ''
+  @Local callTelSheet: boolean = false
   private scroller: Scroller = new Scroller()
-
-  aboutToAppear(): void {
-    this.storeDetails =
-      `<meta name="viewport" content="width=device-width, initial-scale=1.0">${this.storeInfo?.details ?? ''}`
-  }
 
   @Styles
   cardStyle(){
@@ -54,15 +50,18 @@ export struct MerchantDetailPage {
             Column() {
               Row() {
                 Row() {
-                  Image(`${CommonUrl.CLOUD_STORAGE_URL}${this.storeInfo?.logo}`).width(40).height(40).borderRadius(8)
+                  Image(`${CommonUrl.CLOUD_STORAGE_URL}${this.storeModel.storeInfo?.logo}`)
+                    .width(40)
+                    .height(40)
+                    .borderRadius(8)
                   Column() {
-                    Text(this.storeInfo?.name)
+                    Text(this.storeModel.storeInfo?.name)
                       .fontSize($r('sys.float.Body_L'))
                       .fontWeight(FontWeight.Medium)
                       .fontColor($r('sys.color.font_primary'))
                       .maxLines(1)
                       .textOverflow({ overflow: TextOverflow.Ellipsis })
-                    Text(this.storeInfo?.address)
+                    Text(this.storeModel.storeInfo?.address)
                       .fontSize($r('sys.float.Body_S'))
                       .fontColor($r('sys.color.font_secondary'))
                       .constraintSize({ maxWidth: 190 })
@@ -77,7 +76,7 @@ export struct MerchantDetailPage {
                     .onClick(() => {
                       this.callTelSheet = true
                     })
-                    .bindSheet($$this.callTelSheet, CallTelDialogBuilder(this.storeInfo?.tel || '', () => {
+                    .bindSheet($$this.callTelSheet, callTelSheetBuilder(this.storeModel.storeInfo?.tel || '', () => {
                       this.callTelSheet = false
                     }), {
                       height: 309,
@@ -86,14 +85,11 @@ export struct MerchantDetailPage {
                     });
                   Image($r('app.media.ic_map')).width(24).margin({ left: 12 })
                     .onClick(() => {
-                      let coordinates = this.storeInfo?.coordinates?.split(',')
+                      let coordinates = this.storeModel.storeInfo?.coordinates?.split(',')
                       if (coordinates?.length === 2) {
                         let latitude: number = Number(coordinates[0])
                         let longitude: number = Number(coordinates[1])
-                        this.pageStack.pushPath({
-                          name: 'HwMap',
-                          param: { latitude, longitude, storeInfo: this.storeInfo } as HwMapModel,
-                        })
+                        RouterModule.push(RouterMap.HW_MAP_PAGE, { latitude, longitude } as HwMapModel)
                       } else {
                         promptAction.showToast({ message: $r('app.string.store_address_error') })
                       }
@@ -110,13 +106,13 @@ export struct MerchantDetailPage {
                 Image($r('app.media.clock')).width(14)
                 Text() {
                   Span($r('app.string.monday_to_sunday'))
-                  Span(this.storeInfo?.time)
+                  Span(this.storeModel.storeInfo.time1)
                   Span('-')
-                  Span(this.storeInfo?.time2)
+                  Span(Constants.MID_DAY_TIME)
                   Span('  ')
-                  Span(this.storeInfo?.time3)
+                  Span(Constants.MID_DAY_TIME)
                   Span('-')
-                  Span(this.storeInfo?.time4)
+                  Span(this.storeModel.storeInfo.time2)
                 }
                 .margin({ left: 9 })
                 .fontSize($r('sys.float.Body_S'))
@@ -135,7 +131,7 @@ export struct MerchantDetailPage {
                   .fontColor($r('sys.color.font_primary'))
                 Grid() {
                   GridItem() {
-                    Image(`${CommonUrl.CLOUD_STORAGE_URL}${this.storeInfo?.dpyyzz}`)
+                    Image(`${CommonUrl.CLOUD_STORAGE_URL}${this.storeModel.storeInfo.businessLicense}`)
                       .width(100)
                       .height(70)
                       .draggable(false)
@@ -143,7 +139,7 @@ export struct MerchantDetailPage {
                   }
 
                   GridItem() {
-                    Image(`${CommonUrl.CLOUD_STORAGE_URL}${this.storeInfo?.spjyxkz}`)
+                    Image(`${CommonUrl.CLOUD_STORAGE_URL}${this.storeModel.storeInfo.foodLicense}`)
                       .width(100)
                       .height(70)
                       .draggable(false)
@@ -155,7 +151,7 @@ export struct MerchantDetailPage {
               .alignItems(HorizontalAlign.Start)
             }.cardStyle()
 
-            if (this.storeInfo?.environment) {
+            if (this.storeModel.storeInfo.environment) {
               // 商家环境
               Column() {
                 Column() {
@@ -164,7 +160,7 @@ export struct MerchantDetailPage {
                     .fontWeight(FontWeight.Medium)
                     .fontColor($r('sys.color.font_primary'))
                   Grid() {
-                    ForEach(this.storeInfo?.environment, (item: string) => {
+                    ForEach(this.storeModel.storeInfo.environment, (item: string) => {
                       GridItem() {
                         Image(`${CommonUrl.CLOUD_STORAGE_URL}${item}`)
                           .width(100)
@@ -172,10 +168,7 @@ export struct MerchantDetailPage {
                           .draggable(false)
                           .borderRadius(8)
                           .onClick(() => {
-                            this.pageStack.pushPath({
-                              name: 'PreviewImagePage',
-                              param: { imageSrc: `${item}` } as ImageRouter,
-                            })
+                            RouterModule.push(RouterMap.PREVIEW_IMAGE_PAGE, { imageSrc: `${item}` } as ImageRouter)
                           })
                       }
                     }, (item: string) => item)
@@ -246,7 +239,7 @@ export struct MerchantDetailPage {
                   .fontColor($r('sys.color.font_primary'))
                 Row() {
                   Image($r('app.media.news')).width(16)
-                  Text(this.storeInfo?.announcement)
+                  Text(this.storeModel.storeInfo.announcement)
                     .fontSize($r('sys.float.Body_S'))
                     .fontColor($r('sys.color.font_secondary'))
                     .layoutWeight(1)

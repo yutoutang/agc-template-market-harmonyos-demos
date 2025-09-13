@@ -1,5 +1,7 @@
-import { CommonConstants, RouterMap, RouterUtils } from 'lib_common'
+import { CommonConstants, RouterMap, RouterUtils, SettingModel } from 'lib_common'
+import { BaseImage } from 'lib_widget';
 import { VideoNewsData } from '../models/VideoModel'
+import { PersistenceV2 } from '@kit.ArkUI';
 
 @ComponentV2
 export struct LivestreamCard {
@@ -8,6 +10,8 @@ export struct LivestreamCard {
   @Param imgBorderRadius: number = 8;
   @Param titleFontSize: number = 14;
   @Local prefixText: string = ''
+
+  settingInfo: SettingModel = PersistenceV2.connect(SettingModel, () => new SettingModel())!;
 
   aboutToAppear(): void {
     if (this.showLiveTag) {
@@ -18,11 +22,13 @@ export struct LivestreamCard {
   build() {
     Column({ space: CommonConstants.SPACE_S }) {
       Stack({alignContent: Alignment.TopEnd}) {
-        Image(this.cardData.coverUrl)
+        BaseImage({
+          url: this.cardData.coverUrl,
+          imgRadius: this.imgBorderRadius,
+          downloadWithoutWlan: this.settingInfo.network.downloadWithoutWlan
+        })
           .width(CommonConstants.FULL_PERCENT)
-          .borderRadius(this.imgBorderRadius)
           .aspectRatio(16/9)
-          .draggable(false)
 
         if (this.showLiveTag) {
           Row({space:2 }) {

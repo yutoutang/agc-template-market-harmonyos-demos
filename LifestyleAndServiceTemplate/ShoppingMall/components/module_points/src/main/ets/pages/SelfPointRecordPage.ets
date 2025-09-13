@@ -300,7 +300,7 @@ struct SelfPointRecordPage {
               if (point.status === PointStatus.UN_APPROVED) {
                 Row({ space: 8 }) {
                   Button('重新提交', { controlSize: ControlSize.SMALL })
-                    .fontSize(14)
+                    .fontSize($r('sys.float.Body_M'))
                     .fontColor($r('sys.color.font_primary'))
                     .backgroundColor($r('sys.color.comp_background_tertiary'))
                     .padding({
@@ -313,7 +313,7 @@ struct SelfPointRecordPage {
                       this.vm.reSubmit(point.id);
                     })
                   Button('联系客服', { controlSize: ControlSize.SMALL })
-                    .fontSize(14)
+                    .fontSize($r('sys.float.Body_M'))
                     .fontColor($r('sys.color.font_on_primary'))
                     .backgroundColor($r('app.color.app_theme'))
                     .padding({
@@ -376,7 +376,7 @@ struct SelfPointRecordPage {
         .divider(null)
       Row({ space: 12 }) {
         Button('取消')
-          .fontSize(16)
+          .fontSize($r('sys.float.Body_L'))
           .fontWeight(FontWeight.Medium)
           .fontColor($r('sys.color.font_primary'))
           .backgroundColor($r('sys.color.comp_background_tertiary'))
@@ -386,7 +386,7 @@ struct SelfPointRecordPage {
             this.vm.datePickerSheet = false
           })
         Button('确认')
-          .fontSize(16)
+          .fontSize($r('sys.float.Body_L'))
           .fontWeight(FontWeight.Medium)
           .fontColor($r('sys.color.font_on_primary'))
           .layoutWeight(1)

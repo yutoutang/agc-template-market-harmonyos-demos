@@ -1,5 +1,3 @@
-
-
 @ObservedV2
 export class DialogContentVM {
   @Trace

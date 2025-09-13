@@ -30,7 +30,7 @@ struct PaySuccessPage {
           this.carInfoCard(this.vm.payRecord)
           Column() {
             Button('返回首页')
-              .fontSize(16)
+              .fontSize($r('sys.float.Body_L'))
               .fontWeight(FontWeight.Medium)
               .fontColor($r('sys.color.font_on_primary'))
               .width('100%')

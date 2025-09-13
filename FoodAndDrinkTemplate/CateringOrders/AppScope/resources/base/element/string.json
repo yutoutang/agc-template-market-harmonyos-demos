@@ -21,10 +21,6 @@
       "value": "确定"
     },
     {
-      "name": "cancel",
-      "value": "取消"
-    },
-    {
       "name": "currency_symbol",
       "value": "￥"
     },
@@ -34,7 +30,7 @@
     },
     {
       "name": "currency_symbol_post_params",
-      "value": "￥%s"
+      "value": "￥%d"
     },
     {
       "name": "yuan",
@@ -61,16 +57,8 @@
       "value": "%s折"
     },
     {
-      "name": "store_rest",
-      "value": "小店休息一下~~"
-    },
-    {
       "name": "add_good",
       "value": "加菜"
-    },
-    {
-      "name": "contact_us",
-      "value": "联系客服"
     },
     {
       "name": "store_dining",
@@ -105,14 +93,6 @@
       "value": "备注"
     },
     {
-      "name": "full_available",
-      "value": "满%s可用"
-    },
-    {
-      "name": "valid_until",
-      "value": "有效期至%s"
-    },
-    {
       "name": "expired",
       "value": "已过期"
     },
@@ -145,34 +125,6 @@
       "value": "保存"
     },
     {
-      "name": "instruction",
-      "value": "使用说明"
-    },
-    {
-      "name": "use_now",
-      "value": "立即使用"
-    },
-    {
-      "name": "instruction_label",
-      "value": "使用说明："
-    },
-    {
-      "name": "select_pay_type",
-      "value": "选择支付方式"
-    },
-    {
-      "name": "pay_now",
-      "value": "立即支付"
-    },
-    {
-      "name": "coupon_type",
-      "value": "全品类可用"
-    },
-    {
-      "name": "below_threshold",
-      "value": "距离使用门槛还差%d元"
-    },
-    {
       "name": "tab_order",
       "value": "点餐"
     },
@@ -194,11 +146,23 @@
     },
     {
       "name": "agcit_huawei_catering_orders",
-      "value": "1.0.1"
+      "value": "1.0.2"
     },
     {
       "name": "agcittype_huawei_catering_orders",
       "value": "industryTemplate"
+    },
+    {
+      "name": "no_relate",
+      "value": "未关联"
+    },
+    {
+      "name": "dine_now",
+      "value": "立即就餐"
+    },
+    {
+      "name": "agcitkid_huawei_catering_orders",
+      "value": "agcit_huawei_catering_orders_goods_detail/1.0.0,agcit_huawei_catering_orders_my_wallet/1.0.0,agcit_huawei_tea_drink_orders_select_store/1.0.0,agcit_huawei_catering_orders_snack_sized_deal/1.0.0"
     }
   ]
 }

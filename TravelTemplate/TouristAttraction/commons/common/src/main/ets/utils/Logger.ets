@@ -1,30 +1,23 @@
 import { hilog } from '@kit.PerformanceAnalysisKit';
 
 export class Logger {
-  private domain: number;
-  private prefix: string;
-  private format: string = '%{public}s, %{public}s';
+  private static domain: number = 0xff00;
+  private static prefix: string = 'Template';
+  private static format: string = '%{public}s, %{public}s';
 
-  constructor(prefix: string) {
-    this.prefix = prefix;
-    this.domain = 0xFF00;
+  public static debug(...args: string[]): void {
+    hilog.debug(Logger.domain, Logger.prefix, Logger.format, args);
   }
 
-  debug(...args: Object[]): void {
-    hilog.debug(this.domain, this.prefix, this.format, args);
+  public static info(...args: string[]): void {
+    hilog.info(Logger.domain, Logger.prefix, Logger.format, args);
   }
 
-  info(...args: Object[]): void {
-    hilog.info(this.domain, this.prefix, this.format, args);
+  public static warn(...args: string[]): void {
+    hilog.warn(Logger.domain, Logger.prefix, Logger.format, args);
   }
 
-  warn(...args: Object[]): void {
-    hilog.warn(this.domain, this.prefix, this.format, args);
-  }
-
-  error(...args: Object[]): void {
-    hilog.error(this.domain, this.prefix, this.format, args);
+  public static error(...args: string[]): void {
+    hilog.error(Logger.domain, Logger.prefix, Logger.format, args);
   }
 }
-
-export default new Logger('[lOG]');

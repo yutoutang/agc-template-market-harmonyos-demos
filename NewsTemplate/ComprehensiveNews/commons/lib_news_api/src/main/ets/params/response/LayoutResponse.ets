@@ -1,4 +1,4 @@
-import { IButtonItem, NavInfo, PostImgList } from '../base/BaseModel'
+import { NavInfo } from '../base/BaseModel'
 import { AuthorResponse } from './AuthorResponse'
 import { NewsResponse } from './NewsResponse'
 
@@ -34,13 +34,6 @@ export class RequestListData {
   extraInfo: Record<string, string | boolean | Record<string, string | boolean>[]> = {}
 }
 
-export class LayoutSetting {
-  type: string = ''
-  style: Record<string, string | number> = {}
-  showType: string = ''
-  children: LayoutSetting[] = []
-}
-
 export class LayoutStyle {
   backgroundColor: string = ''
   borderRadius: number = 0
@@ -49,19 +42,4 @@ export class LayoutStyle {
   paddingRight: number | string = 0
   paddingBottom: number | string = 0
   paddingTop: number | string = 0
-}
-
-export class LayoutParams {
-  nativeCardData: NewsResponse
-  currentIndex: number = 0
-  extraInfo: Record<string, string | boolean | Record<string, string | boolean>[] | IButtonItem[]> = {}
-  layout: LayoutSetting = new LayoutSetting()
-
-  constructor(nativeCardData: NewsResponse, currentIndex: number,
-    extraInfo: Record<string, string | boolean | Record<string, string | boolean>[]>, layout: LayoutSetting) {
-    this.nativeCardData = nativeCardData
-    this.currentIndex = currentIndex
-    this.extraInfo = extraInfo
-    this.layout = layout
-  }
 }

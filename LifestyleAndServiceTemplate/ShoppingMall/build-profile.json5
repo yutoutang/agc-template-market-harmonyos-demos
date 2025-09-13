@@ -1,7 +1,6 @@
 {
   "app": {
-    "signingConfigs": [
-    ],
+    "signingConfigs": [],
     "products": [
       {
         "name": "default",
@@ -17,7 +16,7 @@
     ],
     "buildModeSet": [
       {
-        "name": "debug",
+        "name": "debug"
       },
       {
         "name": "release"
@@ -63,7 +62,7 @@
     },
     {
       "name": "lib_common",
-      "srcPath": "./commons/lib_common",
+      "srcPath": "./commons/lib_common"
     },
     {
       "name": "module_keyboard",
@@ -75,7 +74,7 @@
     },
     {
       "name": "module_coupon",
-      "srcPath": "./components/module_coupon",
+      "srcPath": "./components/module_coupon"
     }
   ]
 }

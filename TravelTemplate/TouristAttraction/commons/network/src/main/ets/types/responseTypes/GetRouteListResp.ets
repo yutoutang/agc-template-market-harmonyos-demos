@@ -5,6 +5,7 @@ export interface RouteLineListItem {
   duration: number
   routeBanner: ResourceStr,
   attractionIds: number[],
+  brief?: string
 }
 
 export interface GetRouteLineListResp extends Array<RouteLineListItem> {}

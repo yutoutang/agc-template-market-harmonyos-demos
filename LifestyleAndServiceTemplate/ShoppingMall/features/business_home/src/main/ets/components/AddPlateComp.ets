@@ -108,9 +108,9 @@ export struct AddPlateComp {
           }.width(Constants.FULL_SIZE).justifyContent(FlexAlign.End)
         } else {
           TextInput({ text: $$this.plate, placeholder: '请输入车牌' })
-            .placeholderFont({ size: 16 })
+            .placeholderFont({ size: $r('sys.float.Body_L') })
             .placeholderColor($r('sys.color.font_secondary'))
-            .fontSize(16)
+            .fontSize($r('sys.float.Body_L'))
             .fontColor($r('sys.color.font_primary'))
             .borderRadius(4)
             .textAlign(TextAlign.Center)

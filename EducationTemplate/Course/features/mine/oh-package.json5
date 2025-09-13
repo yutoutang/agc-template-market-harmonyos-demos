@@ -1,0 +1,14 @@
+{
+  "name": "mine",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "commonlib": "file:../../commons/commonlib",
+    "feed_back": "file:../../components/feed_back",
+    "recorded_player": "file:../../components/recorded_player",
+    "http": "file:../../commons/http"
+  }
+}

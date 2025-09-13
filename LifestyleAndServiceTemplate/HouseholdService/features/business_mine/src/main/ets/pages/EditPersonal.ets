@@ -167,8 +167,8 @@ export struct EditPersonal {
   BottomBar() {
     Row() {
       Button('保存')
-        .fontColor(Color.White)
-        .fontSize(16)
+        .fontColor($r('sys.color.font_on_primary'))
+        .fontSize($r('sys.float.Body_L'))
         .fontWeight(500)
         .width(CommonConstants.FULL_PERCENT)
         .height(40)

@@ -1,11 +1,13 @@
 import { PersistenceV2, UIUtils } from '@kit.ArkUI'
 import { CommonConstants, SettingModel } from 'lib_common'
-import { LayoutParams, PostImgList } from 'lib_news_api'
+import { LayoutParams } from 'module_flexlayout'
+import { PostImgList } from 'lib_news_api'
 import { BaseImage } from 'lib_widget'
 import { Highlight } from 'module_highlight'
 import { AuthorCard } from '../builder/AuthorBuilder'
 import { ArticleSourceBuilder } from '../builder/ArticleSourceBuilder'
 import { CardViewModel } from '../viewmodel/CardViewModel'
+
 
 @Builder
 export function TopTextBottomImageCard(cardData: LayoutParams) {
@@ -49,12 +51,12 @@ struct NativeComponent {
           GridItem() {
             BaseImage({
               url: item.picVideoUrl,
-              downloadWithoutWlan: this.settingInfo.network.downloadWithoutWlan
+              downloadWithoutWlan: this.settingInfo.network.downloadWithoutWlan,
             })
               .aspectRatio(1).clip(true)
               .width('100%')
           }
-        },(item: PostImgList) => JSON.stringify(item))
+        }, (item: PostImgList, index: number) => index + JSON.stringify(item))
       }
       .columnsTemplate('1fr '.repeat(this.cardData.nativeCardData?.postImgList?.length ?? 0))
       .columnsGap(8)

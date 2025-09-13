@@ -17,6 +17,7 @@
     "module_highlight": "file:../../components/module_highlight",
     "module_advertisement": "file:../../components/module_advertisement",
     "module_transition": "file:../../components/module_transition",
-    'lib_preview_page': "file:../../commons/lib_preview_page"
+    'lib_preview_page': "file:../../commons/lib_preview_page",
+    "module_flexlayout": "file:../../components/module_flexlayout"
   }
 }

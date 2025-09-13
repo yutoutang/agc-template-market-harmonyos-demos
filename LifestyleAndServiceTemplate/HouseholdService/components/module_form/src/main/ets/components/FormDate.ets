@@ -35,7 +35,7 @@ export struct FormDate {
     if (!this.date) {
       return $r('app.color.common_grey');
     }
-    return Color.Black;
+    return $r('sys.color.font_primary');
   }
 
   @Builder
@@ -67,7 +67,7 @@ export struct FormDate {
   build() {
     Row({ space: 6 }) {
       Text(this.dateText)
-        .fontSize(14)
+        .fontSize($r('sys.float.Body_L'))
         .fontColor(this.dateColor)
       Image($r('app.media.ic_public_arrow_right')).width(12).fillColor($r('app.color.common_grey'))
     }

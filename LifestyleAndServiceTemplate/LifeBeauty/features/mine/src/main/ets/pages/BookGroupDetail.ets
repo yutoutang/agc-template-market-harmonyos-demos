@@ -1,4 +1,4 @@
-import { CommonUtils, GroupOrderStatus, MyGroupInfo, RouterMap, RouterModule } from 'utils'
+import { CommonUtils, GroupOrderStatus, MyGroupInfo, RouterMap, RouterModule } from 'foundation'
 
 @Builder
 export function BookGroupDetailBuilder() {
@@ -38,6 +38,7 @@ export struct BookGroupDetail {
         .align(Alignment.Top)
         .padding(10)
         .edgeEffect(EdgeEffect.Spring)
+        .scrollBar(BarState.Off)
       }
       .width('100%')
     }

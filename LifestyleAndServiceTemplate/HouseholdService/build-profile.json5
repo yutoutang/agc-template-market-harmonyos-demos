@@ -1,7 +1,6 @@
 {
   "app": {
-    "signingConfigs": [
-    ],
+    "signingConfigs": [],
     "products": [
       {
         "name": "default",
@@ -18,7 +17,7 @@
     ],
     "buildModeSet": [
       {
-        "name": "debug",
+        "name": "debug"
       },
       {
         "name": "release"
@@ -48,19 +47,19 @@
     },
     {
       "name": "module_time_select",
-      "srcPath": "./components/module_time_select",
+      "srcPath": "./components/module_time_select"
     },
     {
       "name": "module_search",
-      "srcPath": "./components/module_search",
+      "srcPath": "./components/module_search"
     },
     {
       "name": "module_category",
-      "srcPath": "./components/module_category",
+      "srcPath": "./components/module_category"
     },
     {
       "name": "module_form",
-      "srcPath": "./components/module_form",
+      "srcPath": "./components/module_form"
     },
     {
       "name": "module_city_select",
@@ -77,6 +76,6 @@
     {
       "name": "business_mine",
       "srcPath": "./features/business_mine"
-    },
+    }
   ]
 }

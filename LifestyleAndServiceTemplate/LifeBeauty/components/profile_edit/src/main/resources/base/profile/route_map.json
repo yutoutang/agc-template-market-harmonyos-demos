@@ -1,0 +1,14 @@
+{
+  "routerMap": [
+    {
+      "name": "EditPersonalInfoCore",
+      "pageSourceFile": "src/main/ets/components/EditPersonalCore.ets",
+      "buildFunction": "EditPersonalInfoCoreBuilder"
+    },
+    {
+      "name": "PrivacyH5",
+      "pageSourceFile": "src/main/ets/components/PrivacyH5.ets",
+      "buildFunction": "PrivacyH5Builder"
+    }
+  ]
+}

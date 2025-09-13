@@ -85,8 +85,8 @@ export struct CouponCard {
           Button($r('app.string.use_now'))
             .height(28)
             .position({ top: 0, right: 12 })
-            .fontSize($r('app.string.font_size_14'))
-            .fontColor($r('app.color.sys_background_white'))
+            .fontSize($r('sys.float.Body_M'))
+            .fontColor($r('sys.color.font_on_primary'))
             .backgroundColor($r('app.color.sys_brand_fuchsia'))
             .padding({
               left: 8,

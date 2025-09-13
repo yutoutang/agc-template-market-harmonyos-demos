@@ -2,11 +2,11 @@ import { PersistenceV2 } from '@kit.ArkUI';
 import { CommonConstants, UserInfoModel } from 'lib_common'
 import { RequestListData } from 'lib_news_api';
 import { NetworkExceptionView } from 'lib_widget';
-import { RendNewsInfo } from '../sdk/model/Model'
-import { FlexLayoutPage } from '../sdk/FlexLayoutPage';
 import { NewsContentVM } from '../viewmodel/NewsContentVM';
 import { NoLoginPage } from './NoLoginPage';
 import { LoadMoreFooter } from './LoadMoreFooter';
+import { FlexLayoutPage } from './FlexLayoutPage';
+import { RendNewsInfo } from '../model/Model';
 
 @ComponentV2
 export struct NewsTabContent {
@@ -70,10 +70,6 @@ export struct NewsTabContent {
               }
               .backgroundColor($r('sys.color.background_primary'))
               .id('news_flow_' + this.channelItem.id +'_'+ index + '_'+ value.extraInfo.flexId)
-              .padding({
-                left: CommonConstants.PADDING_PAGE,
-                right: CommonConstants.PADDING_PAGE,
-              })
             }, (value: RequestListData, index: number) => index + JSON.stringify(value.articles[0]))
           }
           .onReachEnd(
@@ -88,8 +84,7 @@ export struct NewsTabContent {
           .columnsGap(16)
           .rowsGap(12)
           .scrollBar(BarState.Off)
-          .cachedCount(3)
-          .backgroundColor(this.bgColor)
+          .cachedCount(1)
         }
       }
       .pullToRefresh(true)

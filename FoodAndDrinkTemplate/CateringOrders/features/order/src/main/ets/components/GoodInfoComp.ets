@@ -1,53 +1,50 @@
 import {
-  addCarSpecUtil,
-  addCarUtil,
-  CarGoodInfo,
+  CarGoodsInfo,
   CommonUrl,
   Constants,
-  getGoodInfoUtil,
-  GetGoodSpecResp,
-  getGoodSpecUtil,
-  GetMyCarResp,
-  Good,
-  GoodRouter,
-  GoodSpec,
-  GoodSpecEnum,
-  GoodSpecInfo,
+  GoodsSpecEnum,
+  MyCarModel,
   PackageSpec,
-  SheetHeaderComp,
-  updateMyCarUtil,
+  RouterMap,
+  RouterModule,
 } from 'common/Index';
-import { MeasureText, promptAction } from '@kit.ArkUI';
+import { AppStorageV2, MeasureText, promptAction } from '@kit.ArkUI';
 import { MustGoodsController } from '../models/MustGoodsController';
 import { Decimal } from '@kit.ArkTS';
+import { SheetHeaderComp } from 'base_ui';
+import * as API from '../api/Index';
+import { Goods } from '../models/Index';
+import { GoodsSpecResp, SpecCatalogResp, SpecItemResp } from 'network';
 
 // 子列表
-@Component
+@ComponentV2
 export struct GoodInfoComp {
-  @StorageProp('myCar') @Watch('myCarChange') myCar: GetMyCarResp = new GetMyCarResp();
-  @Consume('pageStack') pageStack: NavPathStack;
-  @Consume('mustGoodsCtrl') mustGoodsCtrl: MustGoodsController;
-  @Prop item: Good;
-  @State carGoodInfo?: CarGoodInfo = undefined;
-  @State goodNum: string = '1';
-  @State windowBottomHeight: number = AppStorage.get('windowBottomHeight') as number || 28;
-  @State goodSpecList: Array<GoodSpec> = [];
-  @State sumPrice: string = this.item?.money ?? '0';
-  @State selectSpecArr: Array<PackageSpec> = [];
-  @State selectSpecInfo?: GetGoodSpecResp = undefined;
-  @State goodSinglePrice: number = 0;
-  @State specSheetFlag: boolean = false;
-  @State showGoodContent: boolean = true;
-  @State goodTextWidth: number = 0;
+  @Local myCarModel: MyCarModel = AppStorageV2.connect(MyCarModel) as MyCarModel
+  @Consumer('mustGoodsCtrl') mustGoodsCtrl: MustGoodsController = new MustGoodsController();
+  @Param @Require item: Goods = new Goods();
+  @Local carGoodsInfo: CarGoodsInfo = new CarGoodsInfo();
+  @Local goodNum: string = '1';
+  @Local goodSpecList: Array<SpecCatalogResp> = [];
+  @Local sumPrice: number = this.item.money ?? 0;
+  @Local selectSpecArr: Array<PackageSpec> = [];
+  @Local selectSpecInfo?: GoodsSpecResp = undefined;
+  @Local goodSinglePrice: number = 0;
+  @Local specSheetFlag: boolean = false;
+  @Local showGoodContent: boolean = true;
+  @Local goodTextWidth: number = 0;
   private scroller: Scroller = new Scroller();
 
-  aboutToAppear(): void {
-    this.myCarChange();
-  }
-
-  myCarChange() {
-    this.carGoodInfo = this.myCar.res?.find((item: CarGoodInfo) => item.goodId === this.item.id);
-    console.info(`carGoodInfo: ${JSON.stringify(this.carGoodInfo)}.`);
+  @Monitor('myCarModel.myCar')
+  myCarChange(monitor: IMonitor) {
+    if (monitor.value()?.now) {
+      let carGoodsInfo = this.myCarModel.myCar.goodsList?.find((item: CarGoodsInfo) => item.goodsId === this.item.id)!;
+      console.info(`CarGoodsInfo: ${JSON.stringify(this.carGoodsInfo)}.`);
+      if (carGoodsInfo) {
+        this.carGoodsInfo = carGoodsInfo
+      } else {
+        this.carGoodsInfo.num = 0
+      }
+    }
   }
 
   goodChange() {
@@ -63,7 +60,7 @@ export struct GoodInfoComp {
   }
 
   goGoodDetail() {
-    this.pageStack.pushPath({ name: 'GoodDetailPage', param: { goodInfo: this.item } as GoodRouter });
+    RouterModule.push(RouterMap.GOODS_DETAIL_PAGE, { 'goodsId': this.item.id } as Record<string, string>);
   }
 
   build() {
@@ -112,7 +109,7 @@ export struct GoodInfoComp {
                 .fontColor($r('sys.color.font_primary'))
             };
 
-            if (this.item.specType === GoodSpecEnum.PACKAGE_TYPE) {
+            if (this.item.specType === GoodsSpecEnum.PACKAGE_TYPE) {
               Text($r('app.string.discount', this.item.discount))
                 .fontSize($r('sys.float.Caption_L'))
                 .fontColor($r('sys.color.multi_color_09'))
@@ -140,34 +137,35 @@ export struct GoodInfoComp {
           };
 
 
-          if (this.item?.specType === GoodSpecEnum.NORMAL) {
+          if (this.item?.specType === GoodsSpecEnum.NORMAL) {
             Row() {
               Image($r('app.media.ic_subtract'))
                 .width(24)
                 .height(24)
                 .onClick(() => {
-                  if (this.carGoodInfo?.id && this.carGoodInfo?.num && this.carGoodInfo?.num !== '0') {
-                    updateMyCarUtil(this.carGoodInfo?.id, Number(this.carGoodInfo?.num) - 1)
+                  if (this.carGoodsInfo?.id && this.carGoodsInfo?.num && this.carGoodsInfo?.num !== 0) {
+                    this.carGoodsInfo.num--
+                    API.updateMyCar(this.carGoodsInfo?.id, this.carGoodsInfo?.num)
                   }
                 })
-                .visibility(this.carGoodInfo?.num && this.carGoodInfo?.num !== '0' ? Visibility.Visible :
+                .visibility(this.carGoodsInfo?.num && this.carGoodsInfo?.num !== 0 ? Visibility.Visible :
                 Visibility.Hidden);
-              Text(this.carGoodInfo?.num)
+              Text(this.carGoodsInfo.num.toString())
                 .margin({ left: 8, right: 8 })
                 .fontSize($r('sys.float.Body_M'))
                 .fontColor($r('sys.color.font_secondary'))
                 .fontWeight(FontWeight.Medium)
-                .visibility(this.carGoodInfo?.num && this.carGoodInfo?.num !== '0' ? Visibility.Visible :
+                .visibility(this.carGoodsInfo?.num && this.carGoodsInfo?.num !== 0 ? Visibility.Visible :
                 Visibility.Hidden);
               Image($r('app.media.add_car')).width(24).height(24).onClick(() => {
-                addCarUtil(this.item)
+                this.carGoodsInfo.num++
+                API.addCar(this.item)
               });
-              // .visibility(this.carGoodInfo?.num && this.carGoodInfo?.num !== '0' ? Visibility.Visible :
             }.padding({ right: 1 });
 
           } else {
             Row() {
-              Text(this.item?.specType === GoodSpecEnum.PACKAGE_TYPE ? $r('app.string.select_package') :
+              Text(this.item?.specType === GoodsSpecEnum.PACKAGE_TYPE ? $r('app.string.select_package') :
               $r('app.string.select_spec'))
                 .fontSize($r('sys.float.Caption_M'))
                 .fontColor($r('sys.color.background_primary'))
@@ -181,24 +179,24 @@ export struct GoodInfoComp {
             .borderRadius(14)
             .backgroundColor($r('sys.color.multi_color_09'))
             .onClick(() => {
-              if (this.item?.specType === GoodSpecEnum.PACKAGE_TYPE) {
+              if (this.item?.specType === GoodsSpecEnum.PACKAGE_TYPE) {
                 this.goGoodDetail();
                 return;
               }
-              getGoodInfoUtil(this.item.id).then((resp: Good) => {
+              API.getGoodInfo(this.item.id).then((resp: Goods) => {
                 this.goodSpecList = resp.spec ?? [];
-                this.selectSpecArr = this.goodSpecList.map((item: GoodSpec) => {
-                  let goodSpec = item.specVal.find((spec: GoodSpecInfo) => item.specValId === spec.specValNum);
+                this.selectSpecArr = this.goodSpecList.map((item: SpecCatalogResp) => {
+                  let goodSpec = item.specVal.find((spec: SpecItemResp) => item.specValId === spec.specValId);
                   let result: PackageSpec = {
                     specName: goodSpec?.specValName ?? item.specVal[0].specValName,
                     specNum: Number(goodSpec?.specValNum ?? 0),
                   };
                   return result;
                 });
-                getGoodSpecUtil(this.item.id, this.selectSpecArr).then((resp) => {
+                API.getGoodSpec(this.item.id, this.selectSpecArr).then((resp) => {
                   this.selectSpecInfo = resp;
                   this.goodSinglePrice = Number(resp.money);
-                  this.sumPrice = new Decimal(this.goodSinglePrice).mul(this.goodNum).toString();
+                  this.sumPrice = new Decimal(this.goodSinglePrice).mul(this.goodNum).toNumber();
                 });
                 this.goodNum = '1'
                 this.specSheetFlag = true;
@@ -224,7 +222,6 @@ export struct GoodInfoComp {
     .alignItems(VerticalAlign.Top)
     .width(Constants.FULL_SIZE)
     .height(80)
-    .padding({ left: 16, right: 16 })
     .backgroundColor(this.item.isMust === Constants.GOODS_MUST && this.mustGoodsCtrl.showMustGoods ? '#0FF9A01E' :
       '#FFFFFF')
     .justifyContent(FlexAlign.SpaceBetween)
@@ -280,14 +277,14 @@ export struct GoodInfoComp {
 
         Scroll(this.scroller) {
           Column() {
-            ForEach(this.goodSpecList, (goodSpec: GoodSpec, index: number) => {
+            ForEach(this.goodSpecList, (goodSpec: SpecCatalogResp, index: number) => {
               Column() {
                 Text(goodSpec.specName)
                   .fontSize($r('sys.float.Body_M'))
                   .fontWeight(FontWeight.Medium)
                   .fontColor($r('sys.color.font_primary'))
                 Flex({ wrap: FlexWrap.Wrap }) {
-                  ForEach(goodSpec.specVal, (item: GoodSpecInfo) => {
+                  ForEach(goodSpec.specVal, (item: SpecItemResp) => {
                     Row() {
                       Text(item.specValName)
                         .fontSize($r('sys.float.Caption_M'))
@@ -312,17 +309,17 @@ export struct GoodInfoComp {
                         specNum: Number(item.specValNum),
                       };
                       this.selectSpecArr[index] = pkgSpec;
-                      getGoodSpecUtil(this.item.id, this.selectSpecArr).then((resp) => {
+                      API.getGoodSpec(this.item.id, this.selectSpecArr).then((resp) => {
                         this.selectSpecInfo = resp;
                         this.goodSinglePrice = Number(resp.money);
-                        this.sumPrice = new Decimal(this.goodSinglePrice).mul(this.goodNum).toString();
+                        this.sumPrice = new Decimal(this.goodSinglePrice).mul(this.goodNum).toNumber();
                       });
                     });
-                  }, (item: GoodSpecInfo) => item.specValId);
+                  }, (item: SpecItemResp) => item.specValId);
                 }.margin({ top: 12 })
 
               }.alignItems(HorizontalAlign.Start).margin({ top: 20 });
-            }, (goodSpec: GoodSpec, index: number) => goodSpec.specId);
+            }, (goodSpec: SpecCatalogResp) => goodSpec.specId);
             Row() {
               Text($r('app.string.good_number'))
                 .fontSize($r('sys.float.Body_S'))
@@ -333,7 +330,7 @@ export struct GoodInfoComp {
                 Image($r('app.media.ic_subtract')).width(24).onClick(() => {
                   if (Number(this.goodNum) > 1) {
                     this.goodNum = `${Number(this.goodNum) - 1}`;
-                    this.sumPrice = new Decimal(this.goodSinglePrice).mul(this.goodNum).toString();
+                    this.sumPrice = new Decimal(this.goodSinglePrice).mul(this.goodNum).toNumber();
                   }
                 });
                 Text(this.goodNum)
@@ -343,7 +340,7 @@ export struct GoodInfoComp {
                   .margin({ left: 8, right: 8 })
                 Image($r('app.media.add_car')).width(24).onClick(() => {
                   this.goodNum = `${Number(this.goodNum) + 1}`;
-                  this.sumPrice = new Decimal(this.goodSinglePrice).mul(this.goodNum).toString();
+                  this.sumPrice = new Decimal(this.goodSinglePrice).mul(this.goodNum).toNumber();
                 });
               }
             }.width(Constants.FULL_SIZE).margin({ top: 20 }).justifyContent(FlexAlign.SpaceBetween).height(43)
@@ -367,7 +364,7 @@ export struct GoodInfoComp {
                 console.info(`add car empty.`);
                 return;
               }
-              addCarSpecUtil(this.selectSpecInfo, this.item.id, Number(this.goodNum)).then(() => {
+              API.addCarSpec(this.selectSpecInfo, this.item.id, Number(this.goodNum)).then(() => {
                 promptAction.showToast({ message: $r('app.string.add_success') });
                 if (this.selectSpecInfo?.isMust === Constants.GOODS_MUST) {
                   this.mustGoodsCtrl.addIsMust();

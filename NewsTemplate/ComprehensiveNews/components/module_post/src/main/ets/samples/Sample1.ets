@@ -14,7 +14,6 @@ struct Sample1 {
       Column() {
         PublishPostComp({
           fontRatio: 1,
-          columnsNum: 3,
           onChange: (body: string, mediaList: PostImgVideoItem[]) => {
             this.body = body;
             this.mediaList = mediaList;

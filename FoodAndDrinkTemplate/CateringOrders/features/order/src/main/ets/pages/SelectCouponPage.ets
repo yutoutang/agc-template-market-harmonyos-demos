@@ -1,26 +1,24 @@
-import {
-  Constants,
-  CouponCard,
-  CouponRouter,
-  CouponStateEnum,
-  getMyCouponsUtil,
-  MyCouponResp,
-  NavHeaderBar,
-} from 'common/Index';
+import { Constants, CouponRouter, NavHeaderBar, RouterMap, RouterModule, TabBarType, WindowModel } from 'common/Index';
+import { AppStorageV2 } from '@kit.ArkUI';
+import { CouponCard, CouponItem } from 'base_ui';
+import * as API from '../api/Index';
 
-@Component
-export struct SelectCouponPage {
-  @Consume('pageStack') pageStack: NavPathStack
-  @State windowTopHeight: number = AppStorage.get('windowTopHeight') as number || 38.77
-  @State windowBottomHeight: number = AppStorage.get('windowBottomHeight') as number || 28
+@Builder
+export function SelectCouponPageBuilder() {
+  SelectCouponPage()
+}
+
+@ComponentV2
+struct SelectCouponPage {
+  @Local windowModel: WindowModel = AppStorageV2.connect(WindowModel, () => new WindowModel())!
   // 订单总金额
-  @State totalMoney: number = 0
+  @Local totalMoney: number = 0
   // 已选择优惠券id
-  @State selectId: string = ''
-  @State selectCouponMoney: string = '0'
-  @State currentIndex: number = 0
-  @State myCouponsUsable: Array<MyCouponResp> = []
-  @State myCouponsUnUsable: Array<MyCouponResp> = []
+  @Local selectId: string = ''
+  @Local selectCouponMoney: number = 0
+  @Local currentIndex: number = 0
+  @Local myCouponsUsable: Array<CouponItem> = []
+  @Local myCouponsUnUsable: Array<CouponItem> = []
 
   aboutToAppear() {
     this.getParams()
@@ -28,27 +26,23 @@ export struct SelectCouponPage {
   }
 
   getParams() {
-    let paramsArr: CouponRouter[] = this.pageStack.getParamByName('SelectCouponPage') as CouponRouter[]
-    if (paramsArr.length) {
-      let routerParam = paramsArr[paramsArr.length-1]
-      this.totalMoney = routerParam?.totalMoney ?? 0
-      this.selectId = routerParam?.selectId ?? ''
+    let params = RouterModule.getNavParam<CouponRouter>(RouterMap.SELECT_COUPON_PAGE)
+    if (params) {
+      this.totalMoney = params.totalMoney ?? 0
+      this.selectId = params.selectId ?? ''
     }
   }
 
   getMyCoupon() {
-    getMyCouponsUtil().then((res) => {
-      res.forEach(item => {
+    API.getMyCoupons().then((res) => {
+      res.forEach((item: CouponItem) => {
         // 初始化优惠券金额
-        if (item.id === this.selectId) {
-          this.selectCouponMoney = item.reduce
+        if (item.couponID === this.selectId) {
+          this.selectCouponMoney = Number(item.amountRule.discountAmount)
         }
-        // 优惠券过期时间精确到23：59：59
-        let date = new Date(`${item.endTime} 23:59:59`)
-        // 过滤可使用的优惠券 1.类型为优惠券 2.适用范围店内、外卖和店内  3.满减金额小于等于订单金额 4.日期在有效期内
-        if (item.type === Constants.COUPON &&
-        [Constants.COUPON_TYPE_STORE, Constants.COUPON_TYPE_ALL].includes(item.couponType) &&
-          Number(item.full) <= this.totalMoney && date.getTime() > new Date().getTime()) {
+        // 过滤可使用的优惠券 1.满减金额小于等于订单金额 2.日期在有效期内 3.未使用
+        if (Number(item.amountRule.fullAmount) <= this.totalMoney &&
+          new Date(`${item.endTime} 23:59:59`).getTime() > new Date().getTime() && !item.offsetInfo) {
           this.myCouponsUsable.push(item)
         } else {
           this.myCouponsUnUsable.push(item)
@@ -98,29 +92,32 @@ export struct SelectCouponPage {
       Tabs({ index: this.currentIndex }) {
         TabContent() {
           List({ space: 8 }) {
-            ForEach(this.myCouponsUsable, (item: MyCouponResp) => {
+            ForEach(this.myCouponsUsable, (item: CouponItem) => {
               ListItem() {
                 CouponCard({
                   coupon: item,
                   isOrder: true,
                   selectId: this.selectId,
                   totalMoney: this.totalMoney,
-                  selectCoupon: (coupon: MyCouponResp) => {
+                  clickCoupon: (coupon: CouponItem) => {
                     this.selectCoupon(coupon)
+                  },
+                  useNow: () => {
+                    RouterModule.popToName<number>(RouterMap.HOME_PAGE, TabBarType.HOMEPAGE)
                   },
                 })
               }
-            }, (item: MyCouponResp) => JSON.stringify(item))
+            }, (item: CouponItem) => JSON.stringify(item))
           }.listStyle().scrollBar(BarState.Off)
         }.tabBar(this.tabBuilder(0, $r('app.string.can_use')))
 
         TabContent() {
           List({ space: 8 }) {
-            ForEach(this.myCouponsUnUsable, (item: MyCouponResp) => {
+            ForEach(this.myCouponsUnUsable, (item: CouponItem) => {
               ListItem() {
                 CouponCard({ coupon: item, isOrder: true, totalMoney: this.totalMoney })
               }
-            }, (item: MyCouponResp) => JSON.stringify(item))
+            }, (item: CouponItem) => JSON.stringify(item))
           }.listStyle().scrollBar(BarState.Off)
         }.tabBar(this.tabBuilder(1, $r('app.string.can_not_use')))
       }
@@ -168,7 +165,10 @@ export struct SelectCouponPage {
             })
             .margin({ left: 12 })
             .onClick(() => {
-              this.pageStack.pop({ selectId: this.selectId, reduce: this.selectCouponMoney })
+              RouterModule.pop({
+                'selectId': this.selectId,
+                'reduce': this.selectCouponMoney,
+              } as Record<string, string | number>)
             })
         }
         .width(Constants.FULL_SIZE)
@@ -176,12 +176,11 @@ export struct SelectCouponPage {
         .padding({ top: 12, bottom: 12, right: 14 })
         .justifyContent(FlexAlign.End)
       }
-    }.hideTitleBar(true).padding({ bottom: this.windowBottomHeight })
+    }.hideTitleBar(true).padding({ bottom: this.windowModel.getWindowBottomHeight() })
   }
 
-  canUseCoupon(item: MyCouponResp) {
-    if (new Date(`${item.endTime} 23:59:59`).getTime() > new Date().getTime() &&
-      item.state === CouponStateEnum.USABLE) {
+  canUseCoupon(item: CouponItem) {
+    if (new Date(`${item.endTime} 23:59:59`).getTime() > new Date().getTime() && item.offsetInfo) {
       return true
     } else {
       return false
@@ -189,8 +188,8 @@ export struct SelectCouponPage {
 
   }
 
-  selectCoupon(coupon: MyCouponResp) {
-    this.selectId = coupon.couponId
-    this.selectCouponMoney = coupon.reduce
+  selectCoupon(coupon: CouponItem) {
+    this.selectId = coupon.couponID
+    this.selectCouponMoney = Number(coupon.amountRule.discountAmount)
   }
 }

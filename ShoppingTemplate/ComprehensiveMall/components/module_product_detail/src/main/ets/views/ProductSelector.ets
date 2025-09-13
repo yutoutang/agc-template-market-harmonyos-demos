@@ -2,7 +2,7 @@ import { LengthMetrics, promptAction } from '@kit.ArkUI';
 import { Constants } from '../commons/Constants';
 import { ProductSelectorVM } from '../viewmodels/ProductSelectorVM';
 import { SpecViewModel } from '../commons/Models';
-import { ProductOperationType } from '../commons/Enum';
+import { ProductOperationType } from '../commons/Enums';
 import { ProductInfo } from '../commons/Types';
 
 @ComponentV2
@@ -38,8 +38,9 @@ export struct ProductSelector {
         .align(Alignment.Top)
         .padding({ bottom: 12 })
         .layoutWeight(1)
+
+        this.bottomOperationBuilder();
       }
-      this.bottomOperationBuilder();
     }
     .width('100%')
     .height('100%')
@@ -167,8 +168,8 @@ export struct ProductSelector {
           .amountOperatorIconStyle()
           .fillColor(
             !this.vm.curSku || this.vm.curSku && this.vm.selectedCount >= this.vm.curSku.stock ?
-            Constants.FONT_COLOR_LEVEL3 :
-            Constants.FONT_COLOR_LEVEL1)
+              Constants.FONT_COLOR_LEVEL3 :
+              Constants.FONT_COLOR_LEVEL1)
           .onClick(() => {
             this.vm.handleCountChange();
           });

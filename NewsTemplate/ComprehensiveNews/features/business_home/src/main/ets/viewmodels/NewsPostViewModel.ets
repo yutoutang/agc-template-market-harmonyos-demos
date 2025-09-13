@@ -43,12 +43,11 @@ export class NewsPostViewModel extends UserInfoModel {
       }))
     }
     let setting = newsStyleList.find(item => item.id === this.selectedId)?.setting as string
-    let articleInfo = ArticleServiceApi.addArticle(this.title, this.handleImageSize(this.content), setting, postImgList)
+    ArticleServiceApi.addArticle(this.title, this.handleImageSize(this.content), setting, postImgList)
     // 添加到动态布局文件中
-    ArticleServiceApi.addFlexLayout(articleInfo.id, setting)
     RouterUtils.popToName(RouterMap.INDEX_PAGE)
-    // 通知首页刷新
-    emitter.emit('home_recommend_fresh')
+    // 通知关注刷新
+    emitter.emit('follow_recommend_fresh')
   }
 
   public async publishVideo(surface: string, videoUri: string, title: string) {
@@ -68,7 +67,7 @@ export class NewsPostViewModel extends UserInfoModel {
     ArticleServiceApi.addFlexLayout(articleInfo.id, videoSetting)
     RouterUtils.replacePathByName(RouterMap.INDEX_PAGE)
     // 通知首页刷新
-    emitter.emit('home_recommend_fresh')
+    emitter.emit('follow_recommend_fresh')
   }
 
   public handleImageSize(content: string) {

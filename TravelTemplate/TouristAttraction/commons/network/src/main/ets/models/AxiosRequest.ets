@@ -1,7 +1,7 @@
 import { AxiosResponse, InternalAxiosRequestConfig } from '@ohos/axios';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { AxiosHttpModel } from './AxiosHttpModel';
 import { Constant } from 'common';
+import { AxiosHttpModel } from './AxiosHttpModel';
 
 const request = new AxiosHttpModel(
   {

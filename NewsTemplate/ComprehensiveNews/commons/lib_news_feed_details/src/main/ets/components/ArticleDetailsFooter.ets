@@ -85,7 +85,7 @@ export struct ArticleDetailsFooter {
             type: this.newsFeedVM.articleDetails.type,
             title: this.newsFeedVM.articleDetails.title,
             articleFrom: this.newsFeedVM.articleDetails.articleFrom,
-            createTime: dayjs(this.newsFeedVM.articleDetails.createTime).format('YYYY-MM-DD hh:mm'),
+            createTime: dayjs(this.newsFeedVM.articleDetails.createTime).format('YYYY-MM-DD HH:mm'),
             coverUrl: handlerCoverImage(this.newsFeedVM.articleDetails),
             isVideo: !!this.newsFeedVM.articleDetails.postImgList?.[0]?.surfaceUrl,
           })

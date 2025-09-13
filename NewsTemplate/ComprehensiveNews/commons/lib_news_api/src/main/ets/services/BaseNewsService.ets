@@ -18,9 +18,12 @@ export class BaseNewsService {
    * @param newsId
    * @returns
    */
-  public queryRawNews(newsId: string): BaseNews | undefined {
+  public queryRawNews(newsId: string,isQueryAll:boolean = true): BaseNews | undefined {
     let list: BaseNews[] = [...MockArticle.list, ...MockVideo.list, ...MockPost.list];
-    return list.find(v => v.id === newsId);
+    if(isQueryAll) {
+      return list.find(v => v.id === newsId);
+    }
+    return list.find(v => v.id === newsId && !v.isLocalPublish);
   }
 
   /**

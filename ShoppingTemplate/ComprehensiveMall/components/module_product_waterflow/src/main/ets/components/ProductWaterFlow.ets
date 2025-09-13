@@ -119,7 +119,6 @@ export struct ProductWaterFlow {
           .columnsTemplate(this.columnTemplate)
           .columnsGap(12)
           .rowsGap(12)
-          .backgroundColor(this.bgColor)
           .edgeEffect(this.edgeEffect)
           .onReachEnd(() => {
             this.getDataList();
@@ -131,7 +130,8 @@ export struct ProductWaterFlow {
               this.startBack = false;
             }
           })
-          .nestedScroll({ scrollForward: NestedScrollMode.PARENT_FIRST, scrollBackward: NestedScrollMode.SELF_FIRST });
+          .nestedScroll({ scrollForward: NestedScrollMode.PARENT_FIRST, scrollBackward: NestedScrollMode.SELF_FIRST })
+          .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
 
           if (this.showButton) {
             this.backTopButtonBuilder();
@@ -139,6 +139,7 @@ export struct ProductWaterFlow {
         }
       }
     }
+    .backgroundColor(this.bgColor)
     .width('100%')
     .height('100%')
     .justifyContent(FlexAlign.Center);

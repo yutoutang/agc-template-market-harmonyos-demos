@@ -3,17 +3,22 @@
 ## 目录
 
 - [功能介绍](#功能介绍)
-- [环境要求](#环境要求)
+- [约束与限制](#约束与限制)
 - [快速入门](#快速入门)
 - [示例效果](#示例效果)
-- [权限要求](#权限要求)
 - [开源许可协议](#开源许可协议)
 
 ## 功能介绍
 
-您可以基于此[模板](#模板)直接定制元服务，也可以挑选此模板中提供的多种[组件](#组件)使用，从而降低您的开发难度，提高您的开发效率。
+您可以基于此模板直接定制元服务，也可以挑选此模板中提供的多种组件使用，从而降低您的开发难度，提高您的开发效率。
 
-### 模板
+此模板提供如下组件，所有组件存放在工程根目录的components下，如果您仅需使用组件，可参考对应组件的指导链接；如果您使用此模板，请参考本文档。
+
+| 组件                        | 描述               | 使用指导                                         |
+|:--------------------------|:-----------------|:---------------------------------------------|
+| 停车优惠券组件（module_coupon）    | 支持优惠券的管理和选择      | [使用指导](components/module_coupon/README.md)   |
+| 车牌输入键盘组件（module_keyboard） | 支持国内通用车牌号的输入     | [使用指导](components/module_keyboard/README.md) |
+| 自助积分组件（module_points）     | 支持扫码/拍照积分、管理积分记录 | [使用指导](components/module_points/README.md)   |
 
 本模板为商场类元服务提供了常用功能的开发样例，模板主要分首页、一码通和我的三大模块：
 
@@ -25,9 +30,9 @@
 
 本模板已集成华为账号、支付等服务，只需做少量配置和定制即可快速实现华为账号的登录、停车缴费等功能。
 
-| 首页                                                    | 一码通                                                     | 我的                                                    |
-|-------------------------------------------------------|---------------------------------------------------------|-------------------------------------------------------|
-| <img src="./screenshots/首页.jpg" alt="首页" width="300"> | <img src="./screenshots/一码通.jpg" alt="一码通" width="300"> | <img src="./screenshots/我的.jpg" alt="我的" width="300"> |
+| 首页                                                      | 一码通                                                        | 我的                                                      |
+|---------------------------------------------------------|------------------------------------------------------------|---------------------------------------------------------|
+| <img src="./screenshots/home.jpg" alt="首页" width="300"> | <img src="./screenshots/qrcode.jpg" alt="一码通" width="300"> | <img src="./screenshots/mine.jpg" alt="我的" width="300"> |
 
 本模板主要页面及核心功能如下所示：
 
@@ -193,27 +198,18 @@ ShoppingMall
  
 ```
 
-### 组件
+## 约束与限制
 
-本模板中提供了多种组件，您可以按需选择合适的组件进行使用，所有组件存放在工程根目录的components下。
-
-| 组件                      | 描述               | 使用指导                                         |
-|:------------------------|:-----------------|:---------------------------------------------|
-| 优惠券组件（module_coupon）    | 支持优惠券的管理和选择      | [使用指导](components/module_coupon/README.md)   |
-| 车牌键盘组件（module_keyboard） | 支持国内通用车牌号的输入     | [使用指导](components/module_keyboard/README.md) |
-| 自助积分组件（module_points）   | 支持扫码/拍照积分、管理积分记录 | [使用指导](components/module_points/README.md)   |
-
-## 环境要求
-
-### 软件
+### 环境
 
 * DevEco Studio版本：DevEco Studio 5.0.0 Release及以上
 * HarmonyOS SDK版本：HarmonyOS 5.0.0 Release SDK及以上
+* 设备类型：华为手机（包括双折叠和阔折叠）
+* 系统版本：HarmonyOS 5.0.0(12)及以上
 
-### 硬件
+### 权限
 
-* 设备类型：华为手机（直板机）
-* HarmonyOS版本：HarmonyOS 5.0.0 Release及以上
+- 网络权限：ohos.permission.INTERNET
 
 ## 快速入门
 
@@ -223,8 +219,7 @@ ShoppingMall
 
 1. 在AppGallery Connect创建元服务，将包名配置到模板中。
 
-   a. 参考[创建元服务](https://developer.huawei.com/consumer/cn/doc/app/agc-help-createharmonyapp-0000001945392297)
-   为元服务创建APPID，并将APP ID与元服务进行关联。
+   a. 参考[创建元服务](https://developer.huawei.com/consumer/cn/doc/app/agc-help-create-atomic-service-0000002247795706)为元服务创建APP ID，并将APP ID与元服务进行关联。
 
    b. 返回应用列表页面，查看元服务的包名。
 
@@ -232,20 +227,13 @@ ShoppingMall
 
 2. 配置服务器域名。
 
-   本模板接口均采用mock数据，由于元服务包体大小有限制，部分图片资源将从云端拉取，所以需为模板项目[配置服务器域名](https://developer.huawei.com/consumer/cn/doc/atomic-guides/agc-help-harmonyos-server-domain)
-   ，“httpRequest合法域名”需要配置为：`https://agc-storage-drcn.platform.dbankcloud.cn`
+   本模板接口均采用mock数据，由于元服务包体大小有限制，部分图片资源将从云端拉取，所以需为模板项目[配置服务器域名](https://developer.huawei.com/consumer/cn/doc/atomic-guides/agc-help-harmonyos-server-domain)，“httpRequest合法域名”需要配置为：`https://agc-storage-drcn.platform.dbankcloud.cn`
 
 3. 配置华为账号服务。
 
-   a. 将元服务的client ID配置到products[phone]
-   模块下src/main/module.json5文件，详细参考：[配置Client ID](https://developer.huawei.com/consumer/cn/doc/atomic-guides/account-atomic-client-id)。
+   a. 将元服务的client ID配置到products[phone]模块下src/main/module.json5文件，详细参考：[配置Client ID](https://developer.huawei.com/consumer/cn/doc/atomic-guides/account-atomic-client-id)。
 
-   b.
-   添加公钥指纹，详细参考：[配置应用证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-signature-info-0000001628566748#section5181019153511)。
-
-   c.
-   如需获取用户真实手机号，需要申请phone权限，详细参考：[配置scope权限](https://developer.huawei.com/consumer/cn/doc/atomic-guides/account-guide-atomic-permissions)
-   。在端侧使用快速验证手机号码Button进行[验证获取手机号码](https://developer.huawei.com/consumer/cn/doc/atomic-guides/account-guide-atomic-get-phonenumber)。
+   b. 如需获取用户真实手机号，需要申请phone权限，详细参考：[配置scope权限](https://developer.huawei.com/consumer/cn/doc/atomic-guides/account-guide-atomic-permissions)。在端侧使用快速验证手机号码Button进行[验证获取手机号码](https://developer.huawei.com/consumer/cn/doc/atomic-guides/account-guide-atomic-get-phonenumber)。
 
 4. 配置支付服务。
 
@@ -257,31 +245,28 @@ ShoppingMall
 
    b. 打开ShoppingMall/commons/lib_common/src/main/ets/httprequest/AxiosRequest.ets文件，将config.params配置为请求中的固定参数列表。
 
+6. 对元服务进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing#section297715173233)。
+
+7. 添加手工签名所用证书对应的公钥指纹。详细参考：[配置应用签名证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-cert-fingerprint-0000002278002933)。
+
 ### 运行调试工程
 
 1. 连接调试手机和PC。
 
-2. 对元服务[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing#section297715173233)。
+2. 真机调试
 
-3. 真机调试
-
-   a. 菜单选择“Run > Edit Configurations... ”，左侧导航选择“entry”，选择“Deploy Multi Hap”页签，勾选“Deploy Multi Hap
-   Packages”，勾选上模板中所有模块。
+   a. 菜单选择“Run > Edit Configurations... ”，左侧导航选择“entry”，选择“Deploy Multi Hap”页签，勾选“Deploy Multi Hap Packages”，勾选上模板中所有模块。
 
    b. 点击"Run"，运行模板工程。
 
-   <img src="./screenshots/运行配置.png" alt="运行配置" width="300">
+   <img src="./screenshots/config.png" alt="运行配置" width="300">
 
 ## 示例效果
 
-1. [停车缴费](./screenshots/停车缴费.mp4)
-2. [自助积分](./screenshots/自助积分.mp4)
-3. [贴心服务&店铺导购](./screenshots/贴心服务&店铺导购.mp4)
-4. [我的](./screenshots/我的.mp4)
-
-## 权限要求
-
-- 网络权限：ohos.permission.INTERNET
+1. [停车缴费](./screenshots/parking.mp4)
+2. [自助积分](./screenshots/points.mp4)
+3. [贴心服务&店铺导购](./screenshots/service.mp4)
+4. [我的](./screenshots/mine.mp4)
 
 ## 开源许可协议
 

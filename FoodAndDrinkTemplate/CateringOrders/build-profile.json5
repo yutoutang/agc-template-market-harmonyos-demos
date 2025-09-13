@@ -1,7 +1,6 @@
 {
   "app": {
-    "signingConfigs": [
-    ],
+    "signingConfigs": [],
     "products": [
       {
         "name": "default",
@@ -17,7 +16,7 @@
     ],
     "buildModeSet": [
       {
-        "name": "debug",
+        "name": "debug"
       },
       {
         "name": "release"
@@ -62,6 +61,18 @@
       ]
     },
     {
+      "name": "network",
+      "srcPath": "./commons/network",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
       "name": "personal_center",
       "srcPath": "./features/personal_center",
       "targets": [
@@ -84,6 +95,26 @@
           ]
         }
       ]
+    },
+    {
+      "name": "select_store",
+      "srcPath": "./components/select_store"
+    },
+    {
+      "name": "base_ui",
+      "srcPath": "./components/base_ui"
+    },
+    {
+      "name": "snack_sized_deal",
+      "srcPath": "./components/snack_sized_deal"
+    },
+    {
+      "name": "my_wallet",
+      "srcPath": "./components/my_wallet"
+    },
+    {
+      "name": "goods_detail",
+      "srcPath": "./components/goods_detail"
     }
   ]
 }

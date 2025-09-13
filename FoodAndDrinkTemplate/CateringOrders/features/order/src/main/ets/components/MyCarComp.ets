@@ -1,25 +1,27 @@
-import { Constants, GetMyCarResp } from 'common/Index'
-import { promptAction } from '@kit.ArkUI'
+import { Constants, MyCarModel, RouterMap, RouterModule, StoreInfoModel, UserInfoModel } from 'common/Index'
+import { AppStorageV2, promptAction } from '@kit.ArkUI'
 import { MustGoodsController } from '../models/MustGoodsController'
 
-@Component
+@ComponentV2
 export struct MyCarComp {
-  @StorageProp('buyCarMoney') buyCarMoney: number = 0
-  @StorageProp('myCar') @Watch('carChange') myCar: GetMyCarResp = new GetMyCarResp()
-  @StorageProp('isRest') isRest: boolean = false
-  @Consume('pageStack') pageStack: NavPathStack
-  @Consume('mustGoodsCtrl') mustGoodsCtrl: MustGoodsController
-  @Consume('orderId') @Watch('change') orderId: string
-  @Link showCarList: boolean
-  @State buttonStr: Resource = $r('app.string.place_order')
+  @Local myCarModel: MyCarModel = AppStorageV2.connect(MyCarModel) as MyCarModel
+  @Local storeModel: StoreInfoModel = AppStorageV2.connect(StoreInfoModel, () => new StoreInfoModel())!;
+  @Local userInfoModel: UserInfoModel = AppStorageV2.connect(UserInfoModel, () => new UserInfoModel())!
+  @Consumer('mustGoodsCtrl') mustGoodsCtrl: MustGoodsController = new MustGoodsController()
+  @Consumer('orderId') orderId: string = ''
+  @Param @Require showCarList: boolean
+  @Local buttonStr: Resource = $r('app.string.place_order')
+  @Event changeCarListShow: (flag: boolean) => void = () => {
+  }
 
   aboutToAppear(): void {
     this.change()
   }
 
+  @Monitor('myCarModel.myCar')
   carChange() {
     this.mustGoodsCtrl.cleanCar()
-    this.myCar.res?.forEach(item => {
+    this.myCarModel.myCar.goodsList?.forEach(item => {
       if (item.isMust === Constants.GOODS_MUST) {
         this.mustGoodsCtrl.addIsMust(Number(item.num))
       }
@@ -27,8 +29,9 @@ export struct MyCarComp {
     this.mustGoodsCtrl.change()
   }
 
+  @Monitor('orderId','storeModel.storeInfo.id')
   change() {
-    if (this.isRest) {
+    if (this.storeModel.isRest) {
       this.buttonStr = $r('app.string.store_rest')
     } else if (this.orderId) {
       this.buttonStr = $r('app.string.add_good')
@@ -41,7 +44,7 @@ export struct MyCarComp {
     Row() {
       Row() {
         Badge({
-          count: this.myCar.res?.length ?? 0,
+          count: this.myCarModel.myCar.goodsList?.length ?? 0,
           style: { fontSize: 10, badgeSize: 16 },
         }) {
           Image($r('app.media.buy_car')).width(36)
@@ -56,14 +59,14 @@ export struct MyCarComp {
             .fontSize($r('sys.float.Caption_M'))
             .fontWeight(FontWeight.Medium)
             .fontColor($r('sys.color.multi_color_09'))
-          Span(`${Number(this.myCar.money)}`)
+          Span(`${Number(this.myCarModel.myCar.money)}`)
             .fontSize($r('sys.float.Body_M'))
             .fontColor($r('sys.color.multi_color_09'))
             .fontWeight(FontWeight.Medium)
         }.margin({ left: 16 })
 
       }.layoutWeight(1).onClick(() => {
-        this.showCarList = !this.showCarList
+        this.changeCarListShow(!this.showCarList)
       })
 
 
@@ -78,18 +81,21 @@ export struct MyCarComp {
           bottom: 6,
         })
         .onClick(() => {
-          if (this.isRest) {
+          if (this.storeModel.isRest) {
             promptAction.showToast({ message: $r('app.string.store_rest') })
-          } else if (!this.myCar.res?.length) {
+          }else if (!this.userInfoModel.isRelative) {
+            promptAction.showToast({ message: '请先关联账号~' })
+            return
+          } else if (!this.myCarModel.myCar.goodsList?.length) {
             promptAction.showToast({ message: $r('app.string.need_goods') })
           } else if (this.mustGoodsCtrl.isNeedMustGoods) {
             this.mustGoodsCtrl.clickSubmit()
             this.mustGoodsCtrl.goMustGoods()
             promptAction.showToast({ message: $r('app.string.need_must_goods') })
           } else {
-            this.showCarList = false
+            this.changeCarListShow(false)
             this.mustGoodsCtrl.clickSubmit()
-            this.pageStack.pushPath({ name: 'ConfirmOrderPage' })
+            RouterModule.push(RouterMap.CONFIRM_ORDER_PAGE)
           }
         })
     }

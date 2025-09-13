@@ -24,7 +24,8 @@ export struct FormGender {
     Row({ space: 20 }) {
       ForEach(GENDER_OPTIONS, (v: string, index: number) => {
         Text(v)
-          .fontColor(Color.Black)
+          .fontSize($r('sys.float.Body_L'))
+          .fontColor($r('sys.color.font_primary'))
           .focusOnTouch(true)
           .width(52)
           .height(24)

@@ -73,7 +73,10 @@ export struct AddressManageModule {
   ItemEnd(v: AddrViewModel) {
     Row() {
       Button() {
-        Image($r('app.media.ic_public_delete_filled')).width(24).height(24).fillColor(Color.White)
+        SymbolGlyph($r('sys.symbol.trash_fill'))
+          .fontColor([$r('sys.color.font_on_primary')])
+          .fontWeight(FontWeight.Normal)
+          .fontSize(24)
       }
       .type(ButtonType.Circle)
       .width(40)
@@ -148,8 +151,8 @@ export struct AddressManageModule {
   BottomBar() {
     Row() {
       Button('新增地址')
-        .fontColor(Color.White)
-        .fontSize(16)
+        .fontColor($r('sys.color.font_on_primary'))
+        .fontSize($r('sys.float.Body_L'))
         .fontWeight(500)
         .width('100%')
         .height(40)

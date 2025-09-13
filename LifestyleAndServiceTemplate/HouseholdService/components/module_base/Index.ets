@@ -14,7 +14,6 @@ export {
   RouterMap,
   IntroType,
   TypeGood,
-  AppStorageMap,
   GENDER_OPTIONS,
   IJumpAddrParam,
   GoodCardSize,

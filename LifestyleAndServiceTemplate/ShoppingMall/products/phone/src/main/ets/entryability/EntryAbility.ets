@@ -1,4 +1,4 @@
-import { AbilityConstant, bundleManager, UIAbility, Want } from '@kit.AbilityKit';
+import { AbilityConstant, bundleManager, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { AppStorageV2, window } from '@kit.ArkUI';
 import { AppInfoModel, FormCardJump, Logger, WindowModel } from 'lib_common';
 
@@ -32,6 +32,7 @@ export default class EntryAbility extends UIAbility {
         return;
       }
       Logger.info(TAG, 'Succeeded in loading the content.');
+      this.setColorMode();
     });
   }
 
@@ -67,6 +68,10 @@ export default class EntryAbility extends UIAbility {
     let windowClass: window.Window = windowStage.getMainWindowSync();
     await windowClass.setWindowLayoutFullScreen(true);
     this.setAvoidArea(windowClass);
+  }
+
+  setColorMode() {
+    this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT);
   }
 
   setAvoidArea(windowClass: window.Window) {

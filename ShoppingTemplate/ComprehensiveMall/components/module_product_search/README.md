@@ -18,20 +18,20 @@
 
 ### 环境
 
-* DevEco Studio版本：DevEco Studio 5.0.1 Release及以上
-* HarmonyOS SDK版本：HarmonyOS 5.0.1 Release SDK及以上
-* 设备类型：华为手机（直板机）
-* HarmonyOS版本：HarmonyOS 5.0.1 Release及以上
+- DevEco Studio版本：DevEco Studio 5.0.1 Release及以上
+- HarmonyOS SDK版本：HarmonyOS 5.0.1 Release SDK及以上
+- 设备类型：华为手机（包括双折叠和阔折叠）
+- 系统版本：HarmonyOS 5.0.1(13)及以上
 
 ### 权限
 
-* 网络权限：ohos.permission.INTERNET
+- 网络权限：ohos.permission.INTERNET
 
 ## 快速入门
 
 1. 安装组件。
 
-   如果是在DevEvo Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
+   如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
 
    如果是从生态市场下载组件，请参考以下步骤安装组件。
 
@@ -68,10 +68,10 @@ ProductShare(options: ProductShareOptions)
 
 #### ProductDetailOptions对象说明
 
-| 名称            | 类型                                                                                                                                                                                                                                                             | 是否必填 | 说明                              |
-| --------------- |----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------| -------- |---------------------------------|
-| defaultSearch        | string                                                                                                                     | 否       | 进入页面时搜索框显示的关键字，默认为空             |
-| routerStack     | [NavPathStack](https://developer.huawei.com/consumer/cn/doc/harmonyos-references/ts-basic-components-navigation#navpathstack10) | 否       | 路由框架提供的导航控制器，不传则无法通过返回按钮回退上一页面。 |
+| 名称          | 类型                                                                                                                            | 是否必填 | 说明                                                           |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------- | -------- | -------------------------------------------------------------- |
+| defaultSearch | string                                                                                                                          | 否       | 进入页面时搜索框显示的关键字，默认为空                         |
+| routerStack   | [NavPathStack](https://developer.huawei.com/consumer/cn/doc/harmonyos-references/ts-basic-components-navigation#navpathstack10) | 否       | 路由框架提供的导航控制器，不传则无法通过返回按钮回退上一页面。 |
 
 ### 事件
 

@@ -1,4 +1,4 @@
-import { IBaseStore } from 'utils';
+import { IBaseStore } from 'foundation';
 
 export class StoreDataSource implements IDataSource {
   private listeners: DataChangeListener[] = [];

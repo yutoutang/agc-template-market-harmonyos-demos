@@ -1,4 +1,4 @@
-import { CommonConstants, PopViewUtils } from 'utils';
+import { CommonConstants, PopViewUtils } from 'foundation';
 
 export class QRCodeParams {
   qrcode: string = '';

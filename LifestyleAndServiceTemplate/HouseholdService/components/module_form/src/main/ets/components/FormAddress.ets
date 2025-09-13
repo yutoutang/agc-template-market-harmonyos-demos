@@ -27,8 +27,8 @@ export struct FormAddress {
         label: this.value || '请选择',
         styleOption: {
           styleConfig: new functionalButtonComponentManager.ButtonConfig()
-            .fontSize(14)
-            .fontColor(this.value ? Color.Black : $r('app.color.common_grey'))
+            .fontSize($r('sys.float.Body_L'))
+            .fontColor(this.value ? $r('sys.color.font_primary') : $r('app.color.common_grey'))
             .backgroundColor(Color.Transparent)
             .padding(0)
             .stateEffect(false),

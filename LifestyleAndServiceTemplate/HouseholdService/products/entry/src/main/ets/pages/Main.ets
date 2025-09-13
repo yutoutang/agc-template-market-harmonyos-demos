@@ -14,7 +14,6 @@
  */
 import { AppStorageV2 } from '@kit.ArkUI';
 import { CommonConstants, JumpCategoryParam } from 'lib_foundation';
-import { Logger } from 'module_base';
 import { HomePage } from 'business_home';
 import { Mine } from 'business_mine';
 import { AllCategory } from '../components/AllCategory';
@@ -35,10 +34,6 @@ export function MainBuilder() {
 struct Main {
   @Local allCategoryListIndex: number = 0;
   jumpCategoryParam: JumpCategoryParam = AppStorageV2.connect(JumpCategoryParam, () => new JumpCategoryParam())!;
-
-  aboutToAppear() {
-    Logger.info('Main Page onCreate');
-  }
 
   @Builder
   tabBuilder(index: number, item: TabItemModel) {

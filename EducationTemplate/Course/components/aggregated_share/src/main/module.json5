@@ -1,0 +1,9 @@
+{
+  "module": {
+    "name": "aggregated_share",
+    "type": "har",
+    "deviceTypes": [
+      "phone"
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "module": {
+    "name": "profile_edit",
+    "type": "har",
+    "routerMap": "$profile:route_map",
+    "deviceTypes": [
+      "default"
+    ]
+  }
+}

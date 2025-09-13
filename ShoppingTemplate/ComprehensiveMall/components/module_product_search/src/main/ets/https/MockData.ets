@@ -31,43 +31,43 @@ export const GUESS_LIKE_LIST2: string[] = [
 
 export const HOT_SEARCH_MOCK: HotSearchItem[] = [
   {
-    label:'商务系列',
-    hotRate:9999,
+    label: '商务系列',
+    hotRate: 9999,
   },
   {
-    label:'纯羊毛内搭',
-    hotRate:9998,
+    label: '纯羊毛内搭',
+    hotRate: 9998,
   },
   {
-    label:'暑期流行单品',
-    hotRate:9997,
+    label: '暑期流行单品',
+    hotRate: 9997,
   },
   {
-    label:'旅行出片装扮',
-    hotRate:9996,
+    label: '旅行出片装扮',
+    hotRate: 9996,
   },
   {
-    label:'华为首款鸿蒙电脑',
-    hotRate:9995,
+    label: '华为首款鸿蒙电脑',
+    hotRate: 9995,
   },
   {
-    label:'元气满满MAX化妆品',
-    hotRate:9994,
+    label: '元气满满MAX化妆品',
+    hotRate: 9994,
   },
   {
-    label:'时尚单品',
-    hotRate:9993,
+    label: '时尚单品',
+    hotRate: 9993,
   },
   {
-    label:'针织打底',
-    hotRate:9992,
+    label: '针织打底',
+    hotRate: 9992,
   },
   {
-    label:'空调1.5匹',
-    hotRate:9991,
+    label: '空调1.5匹',
+    hotRate: 9991,
   },
   {
-    label:'夏季遮肉衣物',
-    hotRate:9990,
+    label: '夏季遮肉衣物',
+    hotRate: 9990,
   },
 ];

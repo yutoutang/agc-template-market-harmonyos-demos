@@ -26,6 +26,7 @@ export struct AgreePrivacyBox {
             this.vm.stack.pushPathByName(RouterMap.PROTOCOL_WEBVIEW, {
               content: this.vm.userProtocolInfo,
               isSheet: this.vm.isSheet,
+              sheetType: this.vm.sheetParams.sheetType,
             } as ProtocolRouterParams, true);
           })
         Span('《xxxx隐私政策》')
@@ -36,6 +37,7 @@ export struct AgreePrivacyBox {
             this.vm.stack.pushPathByName(RouterMap.PROTOCOL_WEBVIEW, {
               content: this.vm.privacyInfo,
               isSheet: this.vm.isSheet,
+              sheetType: this.vm.sheetParams.sheetType,
             } as ProtocolRouterParams, true);
           })
         Span('和')
@@ -49,6 +51,7 @@ export struct AgreePrivacyBox {
             this.vm.stack.pushPathByName(RouterMap.PROTOCOL_WEBVIEW, {
               content: this.vm.huaweiUserProtocolInfo,
               isSheet: this.vm.isSheet,
+              sheetType: this.vm.sheetParams.sheetType,
             } as ProtocolRouterParams, true);
           })
       }
