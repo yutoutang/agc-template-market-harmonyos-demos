@@ -90,7 +90,7 @@ export struct AudioDetailListView {
                     this.appPathStack.pushDestination(pathInfo, true);
                   }
                 });
-            });
+            }, (item:VideoCardDetail) => JSON.stringify(item));
           }
           .alignListItem(ListItemAlign.Start)
           .margin({

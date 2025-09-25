@@ -212,8 +212,8 @@ EnterpriseRecruitment
 ### 环境
 - DevEco Studio版本：DevEco Studio 5.0.1 Release及以上
 - HarmonyOS SDK版本：HarmonyOS 5.0.1(13) Release SDK及以上
-- 设备类型：华为手机（直板机）
-- HarmonyOS版本：HarmonyOS 5.0.1 Release及以上
+- 设备类型：华为手机（包括双折叠和阔折叠）
+- 系统版本：HarmonyOS 5.0.1及以上
 ### 权限
 - 网络权限：ohos.permission.INTERNET
 
@@ -223,7 +223,7 @@ EnterpriseRecruitment
 
 1. 在AppGallery Connect创建应用，将包名配置到模板中。
 
-   a. 参考[创建HarmonyOS应用](https://developer.huawei.com/consumer/cn/doc/app/agc-help-createharmonyapp-0000001945392297)为应用创建APP ID，并将APP ID与应用进行关联。
+   a. 参考[创建HarmonyOS应用](https://developer.huawei.com/consumer/cn/doc/app/agc-help-create-app-0000002247955506)为应用创建APP ID，并将APP ID与应用进行关联。
 
    b. 返回应用列表页面，查看应用的包名。
 
@@ -233,10 +233,10 @@ EnterpriseRecruitment
 
    a. 将应用的client ID配置到product/phone模块的src/main/module.json5文件，详细参考：[配置Client ID](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-client-id)。
 
-   b. 申请华为账号一键登录所需的quickLoginMobilePhone权限，详细参考：[配置scope权限](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-config-permissions)。
+   b. 申请华为账号一键登录的权限，详细参考：[申请账号权限](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-config-permissions)。
 
 3. 为应用进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing#section297715173233)。
-4. 添加手工签名所用证书对应的公钥指纹，详细参考：[配置应用证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-signature-info-0000001628566748#section5181019153511)。
+4. 添加手工签名所用证书对应的公钥指纹，详细参考：[配置应用证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-cert-fingerprint-0000002278002933)。
 
 ### 运行调试工程
 1. 用USB线连接调试手机和PC。

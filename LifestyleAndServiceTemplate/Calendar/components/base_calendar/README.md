@@ -1,4 +1,4 @@
-# 日历组件快速入门
+# 多功能日历组件快速入门
 
 ## 目录
 
@@ -27,7 +27,7 @@
 
 1. 安装组件。
 
-   如果是在DevEvo Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
+   如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
 
    如果是从生态市场下载组件，请参考以下步骤安装组件。
 
@@ -215,7 +215,7 @@ onCurrentDateSelected: (date: string) => void = () => {}
    }
 ```
 
-<img src="./screenshot/BaseCalendar_1.png">
+<img src="./screenshot/BaseCalendar_2.png">
 
 ### 示例3（周首日设置）
 
@@ -240,7 +240,7 @@ onCurrentDateSelected: (date: string) => void = () => {}
    }
 ```
 
-<img src="./screenshot/BaseCalendar_1.png">
+<img src="./screenshot/BaseCalendar_6.png">
 
 ### 示例4（句柄使用）
 
@@ -273,3 +273,4 @@ struct Index {
    }
 }
 ```
+<img src="./screenshot/BaseCalendar_5.png">

@@ -55,8 +55,7 @@
     {
       "name": "information_aboutUs",
       "value": "关于我们"
-    }
-  ,
+    },
     {
       "name": "information_hobbies",
       "value": "企业生活"
@@ -229,7 +228,6 @@
       "name": "job_releaseTime6",
       "value": "2025-01-24"
     },
-
     {
       "name": "job_jobBase",
       "value": "南京"
@@ -299,16 +297,16 @@
       "value": "《华为账号用户认证协议》"
     },
     {
-      "name":"and",
-      "value":"和"
+      "name": "and",
+      "value": "和"
     },
     {
-      "name":"end",
-      "value":"。"
+      "name": "end",
+      "value": "。"
     },
     {
-      "name":"read_and_agree",
-      "value":"已阅读并同意"
+      "name": "read_and_agree",
+      "value": "已阅读并同意"
     },
     {
       "name": "hwid_no_internet_connect",
@@ -345,6 +343,10 @@
     {
       "name": "app_chat",
       "value": "消息"
+    },
+    {
+      "name": "agcit_huawei_enterprise_recruitment",
+      "value": "1.0.0"
     }
   ]
 }

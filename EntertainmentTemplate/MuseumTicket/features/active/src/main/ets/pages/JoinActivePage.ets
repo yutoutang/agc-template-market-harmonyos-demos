@@ -31,9 +31,9 @@ struct JoinActivePage {
 
   aboutToAppear(): void {
     this.vm.visitors = [];
-    this.vm.disableId = []
-    this.vm.contactName = ''
-    this.vm.contactPhone = ''
+    this.vm.disableId = [];
+    this.vm.contactName = '';
+    this.vm.contactPhone = '';
     this.vm.getActiveInfo();
   }
 
@@ -79,9 +79,9 @@ struct JoinActivePage {
               PersonManage({
                 navPathStack: RouterModule.getStack(),
                 selectMode: SelectMode.MORE_SELECT,
-                disableId:this.vm.disableId,
+                disableId: this.vm.disableId,
                 onSelect: (data) => {
-                   this.vm.handleVisitors(data as Contact[]);
+                  this.vm.handleVisitors(data as Contact[]);
                 },
                 onBeforeNavigate: () => {
                   focusControl.requestFocus('focusBtn');
@@ -90,8 +90,11 @@ struct JoinActivePage {
               }) {
                 Button() {
                   Row({ space: 4 }) {
-                    Image($r('app.media.contact_add')).width(16).height(16);
-                    Text('添加预约人').fontSize(12).fontColor('#FFFFFF').fontWeight(500);
+                    SymbolGlyph($r('sys.symbol.plus')).fontColor([$r('sys.color.font_on_primary')]);
+                    Text('添加预约人')
+                      .fontSize($r('sys.float.Body_S'))
+                      .fontColor($r('sys.color.font_on_primary'))
+                      .fontWeight(500);
                   };
                 }.width(96).height(28).backgroundColor('#D1B380');
               };
@@ -228,7 +231,7 @@ function baseInputExtend() {
   .borderRadius(0)
   .backgroundColor('transparent')
   .placeholderFont({ weight: FontWeight.Regular, size: $r('sys.float.Body_M') })
-  .placeholderColor($r('sys.color.font_tertiary'));
+  .placeholderColor($r('sys.color.font_secondary'));
 }
 
 @Extend(Text)

@@ -20,6 +20,7 @@ export function CalendarEventBuilder() {
 @ComponentV2
 export struct CalendarEventMain {
   @Local calendarEventVM: CalendarEventVM = CalendarEventVM.instance;
+  @Param isHideBack: boolean = false;
   @Param selectColor: ResourceStr = '#c4272b';
   @Param titleColor: ResourceStr = '#ffffff';
   @Local userEvent: UserEvent = PersistenceV2.connect(UserEvent, () => new UserEvent())!;
@@ -108,10 +109,11 @@ export struct CalendarEventMain {
   build() {
     NavDestination() {
       CalendarNavTitle({
-        title: '倒计日',
+        title: '日程提醒',
         rightBuilder: () => {
           this.eventAdd()
         },
+        isHideBack: this.isHideBack
       })
       CalendarEventDetails({
         eventList: this.eventList,

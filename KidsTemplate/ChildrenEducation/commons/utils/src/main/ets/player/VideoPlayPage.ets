@@ -254,7 +254,7 @@ export struct VideoPlayPage {
       Button('开通会员')
         .width(this.isLandscape ? 100 : 80)
         .aspectRatio(2.57)
-        .fontColor(Color.Black)
+        .fontColor($r('sys.color.font_primary'))
         .backgroundColor('#F8E6CF')
         .borderRadius(14)
         .onClick(() => {
@@ -307,9 +307,9 @@ export struct VideoPlayPage {
           style: SliderStyle.OutSet,
         })
           .blockColor(Color.White)
-          .trackColor('#888888')
-          .selectedColor(Color.White)
-          .trackThickness(1)
+          .trackColor($r('sys.color.comp_background_secondary'))
+          .selectedColor($r('sys.color.comp_background_emphasize'))
+          .trackThickness('4vp')
           .layoutWeight(1)
           .margin({ left: '2.2%' })
           .onChange((value: number, mode: SliderChangeMode) => {
@@ -398,7 +398,7 @@ struct VideoCardDetailShow {
               this.appPathStack.replacePath(pathInfo, true);
             }
           });
-        });
+        }, (item:VideoCardDetail) => JSON.stringify(item));
       }
       .scrollBar(BarState.Off)
       .width(CommonConstants.FULL_PERCENT)

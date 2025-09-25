@@ -17,7 +17,7 @@
 | 组件                   | 描述              | 使用指导                                      |
 |----------------------|-----------------|-------------------------------------------|
 | 滑动视频组件(video_swiper) | 包括滑动视频，视频播放的控制等 | [使用指导](components/video_swiper/README.md) |
-
+| 投屏组件(module_cast)    | 包括投屏播放控制功能      | [使用指导](components/module_cast/README.md)  |
 
 本模板为短剧类应用提供了常用功能的开发样例，模板主要分首页、剧场、我的及详情播放页六大模块：
 
@@ -99,6 +99,7 @@ WebShortDrama
   |   |- module_share                              // 分享组件   
   |   |- open_ads                                  // 广告组件   
   |   |- video_swiper                              // 滑动视频组件     
+  |   |- module_cast                               // 视频投屏组件     
   |   └- vip_center                                // 会员中心组件  
   |
   |- EntryCard                                     // 卡片资源     
@@ -185,14 +186,15 @@ WebShortDrama
 
 ### 环境
 
-- DevEco Studio版本：DevEco Studio 5.0.1 Release及以上
-- HarmonyOS SDK版本：HarmonyOS 5.0.1 Release SDK及以上
-- 设备类型：华为手机（直板机、双折叠）
-- HarmonyOS版本：HarmonyOS 5.0.1 Release及以上
+- DevEco Studio版本：DevEco Studio 5.0.0 Release及以上
+- HarmonyOS SDK版本：HarmonyOS 5.0.0 Release SDK及以上
+- 设备类型：华为手机（包括双折叠和阔折叠）
+- 系统版本：HarmonyOS 5.0.0(12)及以上
 
 ### 权限
 
 - 网络权限：ohos.permission.INTERNET
+- 后台运行权限：ohos.permission.KEEP_BACKGROUND_RUNNING
 
 ### 调试
 
@@ -204,7 +206,8 @@ WebShortDrama
 
 1. 在AppGallery Connect创建应用，将包名配置到模板中。
 
-   a. 参考[创建HarmonyOS应用](https://developer.huawei.com/consumer/cn/doc/app/agc-help-create-app-0000002247955506)为应用创建APP ID，并将APP ID与应用进行关联。
+   a. 参考[创建HarmonyOS应用](https://developer.huawei.com/consumer/cn/doc/app/agc-help-create-app-0000002247955506)
+   为应用创建APP ID，并将APP ID与应用进行关联。
 
    b. 返回应用列表页面，查看应用的包名。
 
@@ -212,9 +215,11 @@ WebShortDrama
 
 2. 配置华为账号服务。
 
-   a. 将应用的client ID配置到products/entry/src/main路径下的module.json5文件中，详细参考：[配置Client ID](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-client-id)。
+   a. 将应用的client
+   ID配置到products/entry/src/main路径下的module.json5文件中，详细参考：[配置Client ID](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-client-id)。
 
-   b. 申请华为账号一键登录所需的quickLoginMobilePhone权限，详细参考：[配置scope权限](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-config-permissions)。
+   b.
+   申请华为账号一键登录所需的quickLoginMobilePhone权限，详细参考：[配置scope权限](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-config-permissions)。
 
 3. 配置支付服务。
 
@@ -222,7 +227,8 @@ WebShortDrama
 
 4. 对应用进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing#section297715173233)。
 
-5. 添加手工签名所用证书对应的公钥指纹。详细参考：[配置应用签名证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-cert-fingerprint-0000002278002933)
+5.
+添加手工签名所用证书对应的公钥指纹。详细参考：[配置应用签名证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-cert-fingerprint-0000002278002933)
 
 ### 运行调试工程
 

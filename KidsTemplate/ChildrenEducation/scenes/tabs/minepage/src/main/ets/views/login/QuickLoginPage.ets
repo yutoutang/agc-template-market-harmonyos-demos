@@ -56,9 +56,29 @@ export struct QuickLoginPage {
       .setAgreementStatus(loginComponentManager.AgreementStatus.NOT_ACCEPTED)
       .onClickLoginWithHuaweiIDButton((error: BusinessError, response: loginComponentManager.HuaweiIDCredential) => {
         // Process the logic of a tap on the one-tap sign-in button.
-        this.handleLoginWithHuaweiIDButton(error, response);
+        // 如果错误，进入mock登录，真实场景需要删除if分支
         if (error) {
-          dealQuickLoginError(error);
+          if (this.isSelected) {
+            // mock登录
+            let uerInfo: emitter.EventData = {
+              data: {
+                isLogin: true,
+                userName: '华为用户',
+                phone: this.quickLoginAnonymousPhone
+              },
+            };
+            emitter.emit(CommonConstants.USER_INFO, uerInfo);
+
+            this.appPathStack.pop();
+          } else {
+            // If the agreements are not accepted, a pop-up message is displayed.
+            this.showPopUp = true;
+          }
+        } else {
+          this.handleLoginWithHuaweiIDButton(error, response);
+          if (error) {
+            dealQuickLoginError(error);
+          }
         }
       });
   @Local quickLoginAnonymousPhone: string = '';
@@ -241,7 +261,7 @@ export struct QuickLoginPage {
                 .height(24)
                 .focusable(true)
                 .focusOnTouch(true)
-                .selectedColor('#CE0E2D')
+                .selectedColor($r('sys.color.comp_background_emphasize'))
                 .select(this.isSelected)
                 .enabled(this.enableStatus)
                 .margin({ top: 0 })

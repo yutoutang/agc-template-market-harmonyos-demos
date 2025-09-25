@@ -47,6 +47,7 @@ export class ShortDramaDetailListVM {
         this.data.pushData(videoData);
       })
       this.ready = true
+      Logger.info(TAG, 'fetch episodeList success')
     } catch (e) {
       Logger.error(TAG, 'fetch episodeList failed')
     }

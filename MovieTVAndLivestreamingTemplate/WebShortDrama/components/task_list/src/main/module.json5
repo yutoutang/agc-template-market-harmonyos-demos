@@ -1,0 +1,9 @@
+{
+  "module": {
+    "name": "task_list",
+    "type": "har",
+    "deviceTypes": [
+      "default"
+    ]
+  }
+}

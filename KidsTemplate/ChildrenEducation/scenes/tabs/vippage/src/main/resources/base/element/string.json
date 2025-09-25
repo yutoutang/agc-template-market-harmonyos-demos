@@ -23,6 +23,10 @@
     {
       "name": "read_before_purchase",
       "value": "read_before_purchase"
+    },
+    {
+      "name": "agcit_huawei_children_education",
+      "value": "1.0.0"
     }
   ]
 }

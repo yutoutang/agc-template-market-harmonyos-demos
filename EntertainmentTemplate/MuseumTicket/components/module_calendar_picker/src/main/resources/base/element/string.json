@@ -51,11 +51,11 @@
     },
     {
       "name": "agcit_huawei_museum_ticket_module_calendar_picker",
-      "value": "1.0.0"
+      "value": "1.0.1"
     },
     {
       "name": "agcittype_huawei_museum_ticket_module_calendar_picker",
-      "value": "sceneTemplate"
+      "value": "serviceComponent"
     }
   ]
 }

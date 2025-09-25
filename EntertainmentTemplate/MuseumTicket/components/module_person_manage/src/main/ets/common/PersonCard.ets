@@ -21,18 +21,12 @@ export struct PersonCard {
 
         if (this.isDisable) {
           Checkbox()
-            .mark({
-              size: 20,
-            })
             .select(true)
             .enabled(false)
-            .selectedColor($r('sys.color.comp_background_emphasize'))
+            .selectedColor($r('sys.color.comp_background_emphasize'));
 
         } else {
           Checkbox()
-            .mark({
-              size: 20,
-            })
             .selectedColor($r('sys.color.comp_background_emphasize'))
             .onChange((value: boolean) => {
               this.onCheckChange(value);

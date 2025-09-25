@@ -3,6 +3,7 @@ import { DramaInfo } from "../../../bean/common/DramaInfo";
 export interface Episode {
   id: number;
   url: string;
+  duration: number
   desc: string;
   dramaId: string;
   socialInfo: {
@@ -36,6 +37,7 @@ export interface Drama {
   likeCount: number
   isLike: boolean
   isVip?: boolean
+  duration?: number
 }
 
 export interface CommentItem {

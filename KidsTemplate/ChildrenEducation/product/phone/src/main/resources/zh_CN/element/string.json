@@ -23,6 +23,10 @@
     {
       "name": "Used_Duration",
       "value": "本日使用时间已到达设置时长"
+    },
+    {
+      "name": "agcit_huawei_children_education",
+      "value": "1.0.0"
     }
   ]
 }

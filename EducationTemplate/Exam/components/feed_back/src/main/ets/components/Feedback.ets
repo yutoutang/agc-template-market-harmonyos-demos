@@ -116,7 +116,7 @@ export struct Feedback {
     .margin({ bottom: 13 })
 
     TextArea({ placeholder: '请输入问题描述' })
-      .placeholderFont({ size: $r('sys.float.Body_S'), weight: 'regular' })
+      .placeholderFont({ size: $r('sys.float.Body_L'), weight: 'regular' })
       .width('100%')
       .height(122)
       .backgroundColor($r('sys.color.background_primary'))

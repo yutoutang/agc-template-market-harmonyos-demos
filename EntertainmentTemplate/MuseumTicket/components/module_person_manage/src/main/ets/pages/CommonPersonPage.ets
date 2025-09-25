@@ -164,7 +164,7 @@ struct CommonPersonPage {
               .backgroundColor('#D1B380')
               .fontSize($r('sys.float.Body_L'))
               .fontWeight(FontWeight.Medium)
-              .fontColor($r('sys.color.background_primary'))
+              .fontColor($r('sys.color.font_on_primary'))
               .onClick(() => {
                 if (this.vm.selectList.length) {
                   this.ctx.onSelect(this.vm.cloneContactList(this.vm.selectList));

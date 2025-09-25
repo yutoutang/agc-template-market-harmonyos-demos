@@ -1,0 +1,20 @@
+{
+  "string": [
+    {
+      "name": "page_show",
+      "value": "page from package"
+    },
+    {
+      "name": "reason_background",
+      "value": "Prevent the app from being frozen in the background when it is cast"
+    },
+    {
+      "name": "agcit_huawei_module_cast",
+      "value": "1.0.0"
+    },
+    {
+      "name": "agcittype_huawei_module_cast",
+      "value": "serviceComponent"
+    }
+  ]
+}

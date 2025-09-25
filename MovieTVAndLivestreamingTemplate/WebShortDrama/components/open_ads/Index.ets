@@ -15,4 +15,4 @@
 
 export { AdService } from './src/main/ets/components/AdService';
 
-export { platformType, adType } from './src/main/ets/common/Constant';
+export { platformType, AdType } from './src/main/ets/common/Constant';

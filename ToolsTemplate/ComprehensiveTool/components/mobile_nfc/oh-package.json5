@@ -7,7 +7,5 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@liushengyi/smartdb": "^4.0.1",
-    "@pura/harmony-utils": "1.2.1",
-    "@abner/dialog": "^1.2.5",
   }
 }

@@ -77,8 +77,7 @@ struct HomePage {
             .fontColor('#603C00')
             .padding(0)
             .width(78)
-            .height(24)
-            .borderRadius(14)
+            .height(28)
             .backgroundColor('#D1B380')
             .onClick(() => {
               RouterModule.push({ url: RouterMap.ACTIVE_PAGE });

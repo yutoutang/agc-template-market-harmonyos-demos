@@ -17,12 +17,12 @@
 
 | 组件                         | 描述                                          | 使用指导                                             |
 |----------------------------|---------------------------------------------|--------------------------------------------------|
-| 日历组件（base_calendar）         | 展示当前日期日历、自定义头部项插槽、节日、节气展示颜色等相关的能力           | [使用指导](components/base_calendar/README.md)       |
+| 多功能日历组件（base_calendar）         | 展示当前日期日历、自定义头部项插槽、节日、节气展示颜色等相关的能力           | [使用指导](components/base_calendar/README.md)       |
 | 黄历组件（calendar_almanac）      | 日历黄历组件，支持日期动态选择，阴历阳历，五行等信息展示                | [使用指导](components/calendar_almanac/README.md)    |
 | 日程提醒（calendar_events）    | 日历重要提醒，支持新增以及编辑日历，生日，纪念日，待办。支持日程添加到系统日历提醒中  | [使用指导](components/calendar_events/README.md)     |
-| 日期计算（date_calculation）   | 本组件日期计算的相关能力，包括日期间隔，日期计算，阴阳转换等功能            | [使用指导](components/date_calculation/README.md)    |
+| 多功能日期计算组件（date_calculation）   | 本组件日期计算的相关能力，包括日期间隔，日期计算，阴阳转换等功能            | [使用指导](components/date_calculation/README.md)    |
 | 节日节气（festival_solar）        | 本组件提供了节日节气展示的相关功能                           | [使用指导](components/festival_solar/README.md)      |
-| 登录（login_info）              | 本组件提供了用户信息展示，登录，个人信息编辑，华为账号一键登录，开通会员入口的相关功能 | [使用指导](components/login_info/README.md)          |
+| 简易登录组件（login_info）              | 本组件提供了用户信息展示，登录，个人信息编辑，华为账号一键登录，开通会员入口的相关功能 | [使用指导](components/login_info/README.md)          |
 | 会员中心（vip_center）            | 本组件提供了用户会员开通功能                              | [使用指导](components/vip_center/README.md)          |
 | 宜忌查询组件（yiji_query）          | 查询开始日期到结束日期内的吉日以及忌日的相关功能                    | [使用指导](components/yiji_query/README.md)          |
 | 城市限行组件（traffic_restriction） | 查询定位城市限行信息                                  | [使用指导](components/traffic_restriction/README.md) |

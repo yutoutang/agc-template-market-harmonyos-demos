@@ -68,4 +68,13 @@ export class DetailModel {
 export class RenameDialogParams {
   name?: string;
   confirm?: Function;
+  cancel?: Function;
+}
+
+export class AddMineDialogParams {
+  confirm?: Function;
+}
+
+export class CloneTipDialogParams {
+  confirm?: Function;
 }

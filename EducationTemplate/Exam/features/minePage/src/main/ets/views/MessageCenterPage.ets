@@ -34,12 +34,12 @@ export struct MessageCenterPage {
       Divider().color($r('sys.color.comp_divider'))
       Column() {
         if (this.propNumbObj.listArr.length > 0) {
-          // 我的课程列表
+          // 消息列表
           this.MessageItemsBuilder()
           // 删除按钮
           this.deleteButtonBuilder()
         } else {
-          Text('当前暂无收藏的课程。')
+          Text('当前暂无消息通知。')
             .height('100%')
             .fontSize($r('sys.float.Body_S'))
             .fontColor($r('sys.color.icon_secondary'))
@@ -240,7 +240,7 @@ export struct MessageCenterPage {
           .margin({ left: $r('app.float.vp_8') })
           .height($r('app.float.vp_40'))
           .width($r('app.float.vp_40'))
-          .opacity(this.swiperLeft ? 0.4 : 1)
+          .opacity(this.propNumbObj.listArr.length === 0 || this.swiperLeft ? 0.4 : 1)
       }
       .onClick(() => {
         if (!this.swiperLeft && this.propNumbObj.listArr.length > 0) {

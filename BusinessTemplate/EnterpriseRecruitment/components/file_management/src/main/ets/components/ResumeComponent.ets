@@ -109,10 +109,10 @@ export struct ResumeComponent {
     Column() {
       Row() {
         Button('重命名')
-          .fontSize('20vp')
+          .fontSize($r('sys.float.Body_L'))
           .height('35%')
           .width(180)
-          .fontColor('#376BFC')
+          .fontColor($r('sys.color.font_emphasize'))
           .stateEffect(false)
           .backgroundColor(Color.Transparent);
       }
@@ -123,10 +123,10 @@ export struct ResumeComponent {
 
       Row() {
         Button('删除')
-          .fontSize('20vp')
+          .fontSize($r('sys.float.Body_L'))
           .height('25%')
           .width(180)
-          .fontColor(Color.Red)
+          .fontColor($r('sys.color.warning'))
           .stateEffect(false)
           .backgroundColor(Color.Transparent);
       }
@@ -137,10 +137,10 @@ export struct ResumeComponent {
 
       Row() {
         Button('取消')
-          .fontSize('20vp')
+          .fontSize($r('sys.float.Body_L'))
           .height('35%')
           .width(180)
-          .fontColor('#376BFC')
+          .fontColor($r('sys.color.font_emphasize'))
           .stateEffect(false)
           .backgroundColor(Color.Transparent);
       }
@@ -209,8 +209,8 @@ export struct ResumeComponent {
           .width('100%')
           .height('100%')
           .maxLength(36)
-          .placeholderColor(Color.Grey)
-          .placeholderFont({ size: '16vp', weight: 400 })
+          .placeholderColor($r('sys.color.font_secondary'))
+          .placeholderFont({ size: $r('sys.float.Body_L'), weight: 400 })
           .showUnderline(true)
           .showCounter(true,
             { thresholdPercentage: 1, highlightBorder: true });

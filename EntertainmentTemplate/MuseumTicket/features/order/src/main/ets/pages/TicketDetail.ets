@@ -100,7 +100,7 @@ struct TicketDetail {
               .fontSize(CommonConstants.FONT_SIZE_M)
               .padding(0)
               .onClick(() => {
-                 this.vm.toPay(this.vm.orderDetail?.orderNo ?? '', this.vm.orderDetail?.orderStr ?? '');
+                this.vm.toPay(this.vm.orderDetail?.orderNo ?? '', this.vm.orderDetail?.orderStr ?? '');
               });
 
           }
@@ -111,7 +111,7 @@ struct TicketDetail {
           .padding(10);
         }
       }
-    }.title(TitleBuilder(this.vm.navTitle), { paddingStart: LengthMetrics.vp(16) }).backgroundColor('#F3F4F5')
+    }.title(TitleBuilder(this.vm.navTitle), { paddingStart: LengthMetrics.vp(16) }).backgroundColor('#F3F4F5');
   }
 
   @Builder
@@ -163,7 +163,7 @@ struct TicketDetail {
         }.width('100%').justifyContent(FlexAlign.SpaceBetween);
 
         if (this.vm.orderDetail?.status !== OrderClass.PENDING_PAYMENT && this.vm.orderDetail?.payTime) {
-          Divider().strokeWidth(0.5);
+          Divider();
           Row() {
             Text('付款时间：').commonTextStyle();
             Text(this.vm.orderDetail?.payTime).commonTextStyle();
@@ -171,7 +171,7 @@ struct TicketDetail {
 
         }
         if (this.vm.orderDetail?.status !== OrderClass.PENDING_PAYMENT && this.vm.orderDetail?.actualPay) {
-          Divider().strokeWidth(0.5);
+          Divider();
           Row() {
             Text('实付款：').commonTextStyle();
             Text(this.vm.orderDetail?.actualPay.toString()).commonTextStyle();
@@ -180,7 +180,7 @@ struct TicketDetail {
         }
       }
       if (this.vm.orderDetail?.status === OrderClass.INVALIDATION) {
-        Divider().strokeWidth(0.5);
+        Divider();
         Row() {
           Text('取消时间：').commonTextStyle();
           Text(this.vm.orderDetail?.cancelTime).commonTextStyle();
@@ -197,20 +197,20 @@ struct TicketDetail {
       Text(this.vm.orderDetail?.visitors?.map(item => item.name).join('、')).commonTextStyle();
     }.width('100%').justifyContent(FlexAlign.SpaceBetween);
 
-    Divider().strokeWidth(0.5);
+    Divider();
     Row() {
       Text('参观人数：').commonTextStyle();
       Text(`${this.vm.orderDetail?.visitors?.length}人`).commonTextStyle();
     }.width('100%').justifyContent(FlexAlign.SpaceBetween);
 
-    Divider().strokeWidth(0.5);
+    Divider();
 
     Row() {
       Text('联系电话：').commonTextStyle();
       Text(this.vm.orderDetail?.contactPhone).commonTextStyle();
     }.width('100%').justifyContent(FlexAlign.SpaceBetween);
 
-    Divider().strokeWidth(0.5);
+    Divider();
 
     Row() {
       Text('预约时间：').commonTextStyle();

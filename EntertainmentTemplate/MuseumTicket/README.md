@@ -16,7 +16,7 @@
 
 | 组件                                   | 描述                                                         | 使用指导                                                  |
 | -------------------------------------- | ------------------------------------------------------------ | --------------------------------------------------------- |
-| 日历选择组件（module_calendar_picker） | 提供了支持指定日期可选范围、以及设置相关提示文字的功能       | [使用指导](./components/module_calendar_picker/README.md) |
+| 预约日期选择组件（module_calendar_picker） | 提供了支持指定日期可选范围、以及设置相关提示文字的功能       | [使用指导](./components/module_calendar_picker/README.md) |
 | 卡片轮播组件（module_card_swiper）     | 提供了随轮播切换，卡片大小变化、文字描述跟随切换的功能       | [使用指导](./components/module_card_swiper/README.md)     |
 | 馆藏珍品组件（module_page_swiper）     | 提供了馆藏珍品组件、支持珍品滑动浏览以及背景图缩小展示详情等功能 | [使用指导](./components/module_page_swiper/README.md)     |
 | 常用人管理组件（module_person_manage） | 提供了支持常用人新增、编辑以及常用人选择的功能               | [使用指导](./components/module_person_manage/README.md)   |

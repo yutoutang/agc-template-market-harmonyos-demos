@@ -30,6 +30,11 @@ class MockDramaFactory {
     'https://agc-storage-drcn.platform.dbankcloud.cn/v0/app-d45y3/drama_video/2.m3u8',
     'https://agc-storage-drcn.platform.dbankcloud.cn/v0/app-d45y3/drama_video/3.m3u8'
   ]
+  videoDuration = [
+    30000,
+    23720,
+    29840
+  ]
   coverUrls = [
     'https://agc-storage-drcn.platform.dbankcloud.cn/v0/app-d45y3/pic1.png',
     'https://agc-storage-drcn.platform.dbankcloud.cn/v0/app-d45y3/pic2.png',
@@ -146,7 +151,8 @@ class MockDramaFactory {
       favoriteCount: this.random(100, 200),
       isLike: false,
       likeCount: this.random(100, 200),
-      isVip: vip
+      isVip: vip,
+      duration:this.videoDuration[randIndex%3],
     }
     this.dramaRepo.set(dramaId, drama)
     return drama;

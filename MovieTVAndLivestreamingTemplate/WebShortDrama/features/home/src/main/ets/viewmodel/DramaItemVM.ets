@@ -12,12 +12,23 @@ export class DramaItemVM implements VideoPlayData {
     return 0
   }
 
-  getPic(): ResourceStr {
+  getPic(): string {
     return this.dramaInfo.coverUrl
   }
 
-
   constructor(dramaInfo: DramaInfo) {
     this.dramaInfo = dramaInfo
+  }
+
+  getName(): string {
+    return this.dramaInfo.name
+  }
+
+  getId(): string {
+    return '1'
+  }
+
+  getDuration(): number {
+    return 0
   }
 }

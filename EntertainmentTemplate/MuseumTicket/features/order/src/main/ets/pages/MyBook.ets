@@ -28,7 +28,7 @@ struct MyBook {
             });
 
             if (this.vm.menuList.length - 1 !== index) {
-              Divider().strokeWidth(0.5);
+              Divider();
             }
 
           }, (item: MenuItem) => item.label);

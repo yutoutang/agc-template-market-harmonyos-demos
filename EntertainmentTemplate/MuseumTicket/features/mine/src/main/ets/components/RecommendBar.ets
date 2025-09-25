@@ -32,9 +32,8 @@ export struct RecommendBar {
               };
 
               Button('预约')
-                .borderRadius(14)
                 .width(78)
-                .height(24)
+                .height(28)
                 .backgroundColor('#D1B380')
                 .fontColor('#603C00')
                 .fontSize($r('sys.float.Body_S'))

@@ -1,7 +1,6 @@
-import { hide } from '@abner/dialog';
-
 export class NfcOpenDialogParams {
   confirm?: Function;
+  cancel?: Function;
 }
 
 @Builder
@@ -21,11 +20,10 @@ export function nfcOpenDialog(params: NfcOpenDialogParams) {
 
     Row() {
       Button('取消').onClick(() => {
-        hide();
+        params.cancel!();
       });
 
       Button('去开启').onClick(() => {
-        hide();
         params.confirm!();
       });
     }.width('100%')
@@ -34,7 +32,7 @@ export function nfcOpenDialog(params: NfcOpenDialogParams) {
   }.backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK, {
     colorMode: ThemeColorMode.LIGHT,
     adaptiveColor: AdaptiveColor.DEFAULT,
-    scale: 1.0
+    scale: 1.0,
   })
   .borderRadius(13)
   .width('80%')

@@ -35,7 +35,7 @@ export struct AudioSectionListView {
                 this.appPathStack.pushPathByName('AudioDetailListView', detail);
               });
           };
-        });
+        }, (item:VideoCard) => JSON.stringify(item));
       }
       .scrollBar(BarState.Off)
       .width(CommonConstants.FULL_PERCENT)

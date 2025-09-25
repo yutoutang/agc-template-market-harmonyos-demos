@@ -1,4 +1,4 @@
-# 答题组件快速入门
+# 多功能答题组件快速入门
 
 ## 目录
 
@@ -10,7 +10,7 @@
 
 ## 简介
 
-本组件提供了答题、定时器、查看答题卡以及添加笔记的功能，当前答题数据均为mock数据，实际开发请填充业务真实数据。
+本组件提供了答题、计时器、查看答题卡以及添加笔记的功能，当前答题数据均为mock数据，实际开发请填充业务真实数据。
 
 | 未答题样式                                        | 已答题样式                                      | 答题卡                                        | 添加笔记                                         |
 |----------------------------------------------|--------------------------------------------|--------------------------------------------|----------------------------------------------|
@@ -18,16 +18,16 @@
 
 ## 约束与限制
 ### 环境
-* DevEco Studio版本：DevEco Studio 5.0.0 Release及以上
-* HarmonyOS SDK版本：HarmonyOS 5.0.0 Release SDK及以上
+* DevEco Studio版本：DevEco Studio 5.0.3 Release及以上
+* HarmonyOS SDK版本：HarmonyOS 5.0.3 Release SDK及以上
 * 设备类型：华为手机（直板机）
-* HarmonyOS版本：HarmonyOS 5.0.0 Release及以上
+* 系统版本：HarmonyOS 5.0.1(13)及以上
 
 ## 快速入门
 
 1. 安装组件。
    
-   如果是在DevEvo Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
+   如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
 
    如果是从生态市场下载组件，请参考以下步骤安装组件。
 
@@ -44,7 +44,7 @@
      }
    ]
    ```
-   c. 在entry目录下oh-package.json5中添加依赖。
+   c. 在项目根目录oh-package.json5中添加依赖。
    ```
    // XXX为组件存放的目录名称
    "dependencies": {
@@ -80,21 +80,17 @@
 ## API参考
 
 ### 接口
-
-AnswerQuestionsPage({
-   ques?: TopicItemModel[],
-   practiceDuration?: number,
-   currentIndex?: number,
-   currentModel?: TopicItemModel,
-   rightCont?: number,
-   errCont?: number,
-   isCollection?: boolean,
-   isCloseAnswerSheet?: boolean
-})
+AnswerQuestionsPage(options:AnswerOptions)
 
 答题组件。
 
 **参数：**
+
+| 参数名          | 类型                     | 是否必填 | 说明       |
+|:-------------|:-----------------------|:---|:---------|
+| options       | [AnswerOptions](#AnswerOptions对象说明) | 是    | 答题组件相关参数 |
+
+### AnswerOptions对象说明
 
 | 参数名                | 类型                                      | 是否必填 | 说明         |
 |:-------------------|:----------------------------------------|:-----|:-----------|

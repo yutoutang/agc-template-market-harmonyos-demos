@@ -3,7 +3,7 @@ import { SwiperItem,PageSwiperController } from '../types/Index';
 @ComponentV2
 export struct PageSwiper {
   @Param swiperData: SwiperItem[] = [];
-  @Param tips: string = '向右滑动查看其它珍品';
+  @Param tips: string = '向左滑动查看其它珍品';
   @Param defaultIndex: number = 0;
   @Param sheetBg: ResourceStr = '';
   @Param @Once isShowTips: boolean = true;

@@ -1,0 +1,24 @@
+{
+  "string": [
+    {
+      "name": "page_show",
+      "value": "page from package"
+    },
+    {
+      "name": "daily_check_in_reward",
+      "value": "签到7天 赚看点"
+    },
+    {
+      "name": "checked_in",
+      "value": "已签到"
+    },
+    {
+      "name": "check_in",
+      "value": "签到"
+    },
+    {
+      "name": "agcit_huawei_web_short_drama",
+      "value": "1.0.2"
+    }
+  ]
+}

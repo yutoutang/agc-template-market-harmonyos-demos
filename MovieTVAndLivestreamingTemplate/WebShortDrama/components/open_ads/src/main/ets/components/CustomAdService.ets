@@ -1,10 +1,10 @@
-import { adType } from '../common/Constant';
 import { display, window } from '@kit.ArkUI';
+import { AdType } from '../common/Constant';
 
 @ComponentV2
 export struct CustomAdService {
   // 广告类型
-  @Param adType?: adType = adType.AD_PICTURE
+  @Param adType?: AdType = AdType.AD_PICTURE
   @Param videoSrc?: ResourceStr = ''
   @Param previewUri?: ResourceStr = ''
   @Param imageUrl?: ResourceStr = ''
@@ -16,7 +16,7 @@ export struct CustomAdService {
   @Param closeCallBack: () => void = () => {
   };
   controller: VideoController = new VideoController();
-  @Local pageCountDown: number = 3;
+  @Local pageCountDown: number = 6;
   private timer: number = 0;
   private windowSize: window.Size = {
     width: display.getDefaultDisplaySync().width,
@@ -30,7 +30,7 @@ export struct CustomAdService {
   startTimer() {
     this.timer = setInterval(() => {
       this.pageCountDown--;
-      if (this.pageCountDown === 0) {
+      if (this.pageCountDown === 1) {
         clearInterval(this.timer); // 关闭定时器
         this.closeCallBack()
       }
@@ -38,9 +38,9 @@ export struct CustomAdService {
   }
 
   build() {
-    Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center }) {
+    Stack({ alignContent: Alignment.TopEnd }) {
       Column() {
-        if (this.adType === adType.AD_PICTURE) {
+        if (this.adType === AdType.AD_PICTURE) {
           Image(this.imageUrl)
             .width('100%')
             .height('100%')
@@ -60,8 +60,7 @@ export struct CustomAdService {
       .width('100%')
       .height('100%')
 
-      // 跳过按钮和倒计时
-      Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
+      Row() {
         Text('跳过')
           .fontSize($r('sys.float.Body_S'))
           .fontWeight(FontWeight.Medium)
@@ -74,10 +73,7 @@ export struct CustomAdService {
           .fontColor(Color.White)
           .margin({ left: 2 })
       }
-      .position({
-        x: this.getUIContext().px2vp(this.windowSize.width - 300),
-        y: 40
-      })
+      .justifyContent(FlexAlign.Center)
       .width(66)
       .height(24)
       .backgroundColor($r('app.string.advertising_description_backgroundColor'))
@@ -87,6 +83,7 @@ export struct CustomAdService {
         clearInterval(this.timer); // 手动跳过时关闭定时器
         this.closeCallBack()
       })
+      .margin({ top: 40, right: 16 })
     }
     .width('100%')
     .height('100%')

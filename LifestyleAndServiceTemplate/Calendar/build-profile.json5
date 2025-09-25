@@ -1,8 +1,6 @@
 {
   "app": {
-    "signingConfigs": [
-      // todo 补充手动签名信息,
-    ],
+    "signingConfigs": [],
     "products": [
       {
         "name": "default",
@@ -19,7 +17,7 @@
     ],
     "buildModeSet": [
       {
-        "name": "debug",
+        "name": "debug"
       },
       {
         "name": "release"
@@ -49,11 +47,11 @@
     },
     {
       "name": "almanac",
-      "srcPath": "./features/almanac",
+      "srcPath": "./features/almanac"
     },
     {
       "name": "mine",
-      "srcPath": "./features/mine",
+      "srcPath": "./features/mine"
     },
     {
       "name": "base_apis",
@@ -69,7 +67,7 @@
     },
     {
       "name": "date_calculation",
-      "srcPath": "./components/date_calculation",
+      "srcPath": "./components/date_calculation"
     },
     {
       "name": "calendar_almanac",
@@ -81,31 +79,31 @@
     },
     {
       "name": "login_info",
-      "srcPath": "./components/login_info",
+      "srcPath": "./components/login_info"
     },
     {
       "name": "vip_center",
-      "srcPath": "./components/vip_center",
+      "srcPath": "./components/vip_center"
     },
     {
       "name": "calendar_events",
-      "srcPath": "./components/calendar_events",
+      "srcPath": "./components/calendar_events"
     },
     {
       "name": "router_module",
-      "srcPath": "./commons/router_module",
+      "srcPath": "./commons/router_module"
     },
     {
       "name": "aggregated_payment",
-      "srcPath": "./sdk/aggregated_payment",
+      "srcPath": "./sdk/aggregated_payment"
     },
     {
       "name": "traffic_restriction",
-      "srcPath": "./components/traffic_restriction",
+      "srcPath": "./components/traffic_restriction"
     },
     {
       "name": "today_history",
-      "srcPath": "./components/today_history",
+      "srcPath": "./components/today_history"
     }
   ]
 }

@@ -1,6 +1,7 @@
 import { CommonConstants, PickerUtil, Title, rightArrow, StringUtil } from '@ohos_agcit/children_education_utils';
 import { emitter } from '@kit.BasicServicesKit';
 import { User } from '@ohos_agcit/children_education_datasource';
+import { CustomContentDialog } from '@kit.ArkUI';
 
 @Builder
 export function PersonalInformationBuilder() {
@@ -11,6 +12,52 @@ export function PersonalInformationBuilder() {
 export struct PersonalInformationPage {
   @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
   @Consumer(CommonConstants.USER_INFO) user: User = new User();
+
+  @Builder
+  buildContent(): void {
+    Column() {
+      Text('确认退出登录')
+        .margin({
+          bottom:32
+        })
+    }
+    .width(CommonConstants.FULL_PERCENT);
+  }
+
+  dialogController: CustomDialogController = new CustomDialogController({
+    builder: CustomContentDialog({
+      primaryTitle: '',
+      contentBuilder: () => {
+        this.buildContent();
+      },
+      buttons: [
+        {
+          value: '取消',
+          buttonStyle: ButtonStyleMode.TEXTUAL,
+          action: () => {
+            console.info('Callback when the button is clicked');
+          },
+        },
+        {
+          value: '确定',
+          buttonStyle: ButtonStyleMode.TEXTUAL,
+          role: ButtonRole.ERROR,
+          action: () => {
+            let userName: emitter.EventData = {
+              data: {
+                isLogin: false,
+                userName: '点击登录',
+                userAvatar: '',
+                phone: '',
+              },
+            };
+            emitter.emit(CommonConstants.USER_INFO, userName);
+            this.appPathStack.pop();
+          },
+        },
+      ],
+    }),
+  });
 
   build() {
     NavDestination() {
@@ -94,26 +141,19 @@ export struct PersonalInformationPage {
         .height(56)
         .borderRadius(16);
 
+        Blank()
+
         Row() {
           Button($r('app.string.log_out'))
-            .fontColor($r('sys.color.black'))
-            .fontSize(16)
+            .fontColor($r('sys.color.font_primary'))
+            .fontSize($r('sys.float.Body_L'))
             .backgroundColor('rgba(0, 0, 0, 0.05)')
             .width('100%')
             .onClick(() => {
-              let userName: emitter.EventData = {
-                data: {
-                  isLogin: false,
-                  userName: '点击登录',
-                  userAvatar: '',
-                  phone: '',
-                },
-              };
-              emitter.emit(CommonConstants.USER_INFO, userName);
-              this.appPathStack.pop();
+                this.dialogController.open();
             });
         }.margin({
-          top: 500,
+          bottom: 60,
         });
       }
       .backgroundColor('#F1F3F5')

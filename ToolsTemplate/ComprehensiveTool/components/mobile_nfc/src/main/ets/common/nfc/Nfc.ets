@@ -1,7 +1,7 @@
 import { AsyncCallback, BusinessError } from '@kit.BasicServicesKit';
-import { LogUtil, StrUtil, ToastUtil } from '@pura/harmony-utils';
 import { bundleManager, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import promptAction from '@ohos.promptAction';
 import { tag } from '@kit.ConnectivityKit';
 import { Application, Card, PROP } from './Spec';
 import Util from '../Util';
@@ -103,7 +103,9 @@ export async function startReadNFC(nfcType: number, callback: AsyncCallback<NFCS
         tag.on('readerMode', NFC.nfcTagElementName, techList, (error: BusinessError, tagInfo: tag.TagInfo) => {
           if (error) {
             hilog.info(0x0000, 'testTag', 'readerModeCb readerModeCb error %{public}s', JSON.stringify(error));
-            ToastUtil.showToast('readerModeCb readerModeCb error ' + JSON.stringify(error));
+            promptAction.showToast({
+              message: 'readerModeCb readerModeCb error ' + JSON.stringify(error),
+            });
             callback(new NFCError(-1, '读取NFC失败'), undefined);
           } else {
             readNFC(nfcType, tagInfo, callback);
@@ -132,7 +134,9 @@ export async function startCloneNFC(nfcType: number, nfcInfo: NfcInfo, callback:
         tag.on('readerMode', NFC.nfcTagElementName, techList, (error: BusinessError, tagInfo: tag.TagInfo) => {
           if (error) {
             hilog.info(0x0000, 'testTag', 'readerModeCb readerModeCb error %{public}s', JSON.stringify(error));
-            ToastUtil.showToast('readerModeCb readerModeCb error ' + JSON.stringify(error));
+            promptAction.showToast({
+              message: 'readerModeCb readerModeCb error ' + JSON.stringify(error),
+            });
             callback(new NFCError(-1, '克隆NFC失败'), undefined);
           } else {
             readNFC(nfcType, tagInfo, (err, result) => {
@@ -180,7 +184,9 @@ export async function startFormatNFC(nfcType: number, actionModel: ActionModel, 
         tag.on('readerMode', NFC.nfcTagElementName, techList, (error: BusinessError, tagInfo: tag.TagInfo) => {
           if (error) {
             hilog.info(0x0000, 'testTag', 'readerModeCb readerModeCb error %{public}s', JSON.stringify(error));
-            ToastUtil.showToast('readerModeCb readerModeCb error ' + JSON.stringify(error));
+            promptAction.showToast({
+              message: 'readerModeCb readerModeCb error ' + JSON.stringify(error)
+            });
             callback(new NFCError(-1, '格式化NFC失败'), undefined);
           } else {
             formatNFC(nfcType, tagInfo, actionModel, callback);
@@ -289,7 +295,7 @@ async function readNFC(nfcType: number, tagInfo: tag.TagInfo, callback: AsyncCal
           card.setProperty(PROP.NFCINFO, nfcInfo);
         }
       } catch (e) {
-        LogUtil.error('readNFC', 'nfcF error: ', JSON.stringify(e));
+        hilog.error(0x0000, 'readNFC', 'nfcF error: ', JSON.stringify(e));
         if (checkTagError(e, callback)) {
           return;
         }
@@ -302,7 +308,7 @@ async function readNFC(nfcType: number, tagInfo: tag.TagInfo, callback: AsyncCal
           await FeliCaReader.readCard(nfcF, card);
         }
       } catch (e) {
-        LogUtil.error('readNFC', 'nfcF error: ', JSON.stringify(e));
+        hilog.error(0x0000, 'readNFC', 'nfcF error: ', JSON.stringify(e));
         if (checkTagError(e, callback)) {
           return;
         }
@@ -315,7 +321,7 @@ async function readNFC(nfcType: number, tagInfo: tag.TagInfo, callback: AsyncCal
           StandardPboc.readCard(isoDep, card);
         }
       } catch (e) {
-        LogUtil.error('readNFC', 'isoDep error: ', JSON.stringify(e));
+        hilog.error(0x0000, 'readNFC', 'nfcF error: ', JSON.stringify(e));
         if (checkTagError(e, callback)) {
           return;
         }
@@ -359,7 +365,7 @@ async function cloneNFC(nfcType: number, nfcInfo: NfcInfo, curNfcInfo: NfcInfo, 
     let section: string[] = curSectionInfo[0];
     if (section != null && section.length > 0) {
       let origin = section[0];
-      if (StrUtil.isNotBlank(origin) && origin.length > mUidLen + 2) {
+      if (Util.isNotBlank(origin) && origin.length > mUidLen + 2) {
         mBlock0Rest = origin.substring(mUidLen + 2);
       }
     }
@@ -417,7 +423,7 @@ async function authenticateSector(mifareClassic: tag.MifareClassicTag,
       auth = true;
       break;
     } catch (e) {
-      LogUtil.error('cloneNFC', 'mifareClassic error: ', JSON.stringify(e));
+      hilog.error(0x0000, 'cloneNFC', 'mifareClassic error: ', JSON.stringify(e));
       if (checkTagError(e, callback)) {
         return undefined;
       }
@@ -459,7 +465,7 @@ function calcSakAtqa(uidLen: number, tagSize: number): string | undefined {
     sak = '18';
   }
 
-  if (!sak|| !atqa) {
+  if (!sak || !atqa) {
     return undefined;
   }
   return sak + atqa;

@@ -43,6 +43,10 @@
     {
       "name": "get_mobile_number_error",
       "value": "Failed to obtain the anonymous mobile number."
+    },
+    {
+      "name": "agcit_huawei_children_education",
+      "value": "1.0.0"
     }
   ]
 }

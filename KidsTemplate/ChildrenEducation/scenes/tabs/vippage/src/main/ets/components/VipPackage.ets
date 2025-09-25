@@ -160,7 +160,9 @@ export struct VipPackage {
               this.selectedIndex = index;
               this.vipDataIndex = item.index;
             });
-          });
+          },
+            (item: VipModel) => JSON.stringify(item)
+          );
         }
         .margin({
           left: '12vp',
@@ -173,8 +175,8 @@ export struct VipPackage {
             .borderRadius(20)
             .backgroundColor('#FFD15D')
             .width(CommonConstants.FULL_PERCENT)
-            .fontColor('#333333')
-            .fontSize('16')
+            .fontColor($r('sys.color.font_primary'))
+            .fontSize($r('sys.float.Body_L'))
             .fontWeight('medium')
             .fontFamily('鸿蒙黑体')
             .onClick(() => {

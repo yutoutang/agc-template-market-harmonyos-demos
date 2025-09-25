@@ -31,7 +31,7 @@ export struct CommonServices {
           if (index !== mineCommonService.length - 1) {
             Divider().width('85%').alignSelf(ItemAlign.End);
           }
-        });
+        }, (item:CommonServiceModel) => JSON.stringify(item));
       }
       .alignItems(HorizontalAlign.Start)
       .width(CommonConstants.FULL_PERCENT)

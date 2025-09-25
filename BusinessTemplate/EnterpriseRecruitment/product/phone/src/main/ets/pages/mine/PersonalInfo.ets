@@ -47,7 +47,7 @@ struct PersonalInfo {
         });
 
       Button('确定')
-        .fontColor('#FFFFFF')
+        .fontColor($r('sys.color.font_on_primary'))
         .backgroundColor('#E84026')
         .width('100%')
         .margin({ left: 28, right: 28 })

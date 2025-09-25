@@ -1,8 +1,6 @@
 {
   "modelVersion": "5.0.1",
   "dependencies": {
-    // "@ohos/hvigor-ohos-online-sign-plugin": "4.0.2",
-    // "@hw-agconnect/template-plugin": "0.0.20"
   },
   "execution": {
     // "analyze": "normal",                     /* Define the build analyze mode. Value: [ "normal" | "advanced" | false ]. Default: "normal" */

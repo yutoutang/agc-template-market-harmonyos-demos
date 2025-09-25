@@ -52,6 +52,7 @@ export class ShortDramaDetailItemVM {
   currentSerial: number = 0; // 当前剧集
   time: string = ''; // 剧集频日期
   playTime: number = 0; // 播放进度
+  duration: number = 0; // 播放时常
   @Trace likeCount: string = ''; // 点赞数量
   @Trace favoriteCount: string = ''; // 收藏数量
   @Trace shareCount: string = ''; // 分享次数

@@ -23,6 +23,10 @@
     {
       "name": "chinese",
       "value": "学汉语"
+    },
+    {
+      "name": "agcit_huawei_children_education",
+      "value": "1.0.0"
     }
   ]
 }

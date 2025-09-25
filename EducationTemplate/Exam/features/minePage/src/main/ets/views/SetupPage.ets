@@ -24,6 +24,14 @@ import { Logger, PreferConstant, PreferenceUtil } from 'commonlib';
 import { Header } from '../components/Header';
 import { UserInfo } from 'login_info';
 
+enum AlertType {
+  // 清除缓存弹框
+  clean = 1,
+  // 退出登录弹框
+  loginOut,
+
+}
+
 @ComponentV2
 struct SetupComponent {
   @Param @Require setupItem: SetupItem
@@ -88,7 +96,7 @@ export struct SetUpPage {
             SetupComponent({ setupItem: item })
               .onClick(() => {
                 if (item.msg === '清除缓存') {
-                  this.showAlert()
+                  this.showAlert(AlertType.clean)
                 } else if (item.msg === '个人信息') {
                   if (item.url && this.logoUser.isLogin) {
                     RouterModule.push({ url: item.url })
@@ -115,9 +123,7 @@ export struct SetUpPage {
           .padding({ top: $r('app.float.vp_12'), bottom: $r('app.float.vp_12') })
           .onClick(() => {
             if (this.logoUser.isLogin) {
-              this.logoUser.isLogin = false
-              this.getUIContext().getPromptAction().showToast({ message: '退出成功', duration: 2000 });
-              RouterModule.pop()
+              this.showAlert(AlertType.loginOut)
             } else {
               this.getUIContext().getPromptAction().showToast({ message: '您还未登录', duration: 2000 });
             }
@@ -164,9 +170,9 @@ export struct SetUpPage {
     });
   }
 
-  showAlert() {
+  showAlert(type: AlertType) {
     this.getUIContext().showAlertDialog({
-      message: '请确认是否清楚缓存',
+      message: type === AlertType.clean ? '请确认是否清除缓存' : '确定要退出登录吗',
       autoCancel: false,
       alignment: DialogAlignment.Center,
       showInSubWindow: true,
@@ -181,7 +187,11 @@ export struct SetUpPage {
         {
           value: '确定',
           action: () => {
-            this.clean()
+            if (type === AlertType.clean) {
+              this.clean()
+            } else {
+              this.loginOut()
+            }
           }
         }
       ]
@@ -195,11 +205,14 @@ export struct SetUpPage {
     moduleContext = await application.createModuleContext(getContext(), 'entry');
     paths.push(moduleContext.cacheDir)
     paths.push(context.cacheDir)
+    paths.push(moduleContext.preferencesDir)
+    paths.push(context.preferencesDir)
     moduleContext.area = contextConstant.AreaMode.EL1;
     context.area = contextConstant.AreaMode.EL1;
     paths.push(moduleContext.cacheDir)
     paths.push(context.cacheDir)
     paths.push(moduleContext.preferencesDir)
+    paths.push(context.preferencesDir)
     PreferenceUtil.getInstance().clear()
     PreferenceUtil.getInstance(PreferConstant.TOPIC_NOTES).clear()
 
@@ -216,7 +229,7 @@ export struct SetUpPage {
             Logger.error(JSON.stringify(e));
           }
           if (isDirectory) {
-            fileIo.rmdirSync(dirPath);
+            fileIo.unlinkSync(dirPath);
           } else {
             fileIo.unlink(dirPath).then(() => {
               Logger.info('remove file succeed');
@@ -228,6 +241,12 @@ export struct SetUpPage {
       })
     }
     this.getClearSize()
+  }
+
+  loginOut() {
+    this.logoUser.isLogin = false
+    this.getUIContext().getPromptAction().showToast({ message: '退出成功', duration: 2000 });
+    RouterModule.pop()
   }
 }
 

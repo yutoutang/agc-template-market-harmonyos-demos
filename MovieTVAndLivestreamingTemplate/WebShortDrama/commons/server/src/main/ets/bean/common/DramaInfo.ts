@@ -20,6 +20,7 @@ export class DramaInfo {
   likeCount: number; // 点赞人数
   isSelect: boolean; // 是否被选中
   isVip?: boolean; //是否是VIP专属
+  duration?:number; //播放时长
 
   constructor(dramaInfo: any) {
     this.id = dramaInfo?.id;
@@ -40,5 +41,6 @@ export class DramaInfo {
     this.isLike = dramaInfo?.isLike;
     this.isSelect = dramaInfo?.isSelect;
     this.isVip = dramaInfo?.isVip;
+    this.duration = dramaInfo?.duration;
   }
 }

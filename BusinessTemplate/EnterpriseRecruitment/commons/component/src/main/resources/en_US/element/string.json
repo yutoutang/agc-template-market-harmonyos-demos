@@ -75,6 +75,10 @@
     {
       "name": "user_name",
       "value": "username"
+    },
+    {
+      "name": "agcit_huawei_enterprise_recruitment",
+      "value": "1.0.0"
     }
   ]
 }

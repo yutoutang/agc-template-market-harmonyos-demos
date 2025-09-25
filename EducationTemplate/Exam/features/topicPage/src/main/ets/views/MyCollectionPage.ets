@@ -281,6 +281,7 @@ export struct MyCollectionPage {
             .fontWeight(FontWeight.Medium)
             .textAlign(TextAlign.Center)
         }
+        .opacity(this.selectCount > 0 ? 1 : 0.4)
         .justifyContent(FlexAlign.Center)
         .alignItems(VerticalAlign.Center)
         .backgroundColor('#4c5dc4')
@@ -352,6 +353,9 @@ export struct MyCollectionPage {
 
   // 移除所选中的
   async deleteSelectData() {
+    if (this.selectCount === 0) {
+      return
+    }
     let arr: string[] = []
     this.collectionQues.forEach((model: CollectionModel) => {
       if (model.isDelete) {

@@ -42,9 +42,9 @@ struct TicketOrders {
         .fontWeight(this.vm.selectedIndex === index ? FontWeight.Medium : FontWeight.Regular)
         .height(19)
         .margin({ bottom: 6, top: 18 });
-      Divider()
-        .strokeWidth(2)
-        .color('#603C00')
+      Row()
+        .height(2)
+        .backgroundColor('#603C00')
         .opacity(this.vm.selectedIndex === index ? 1 : 0)
         .width(36);
     }.width('100%').height(60);
@@ -71,19 +71,19 @@ struct TicketOrders {
         };
 
 
-        Divider().strokeWidth(0.5);
+        Divider();
         Row() {
           Text('参观时间:').commonLabelStyle();
           Text(item.visitTime).commonValueStyle();
         };
 
-        Divider().strokeWidth(0.5);
+        Divider();
         Row() {
           Text('参观人:').commonLabelStyle();
           Text(item.visitor + '人').commonValueStyle();
         };
 
-        Divider().strokeWidth(0.5);
+        Divider();
         if (this.vm.currentIndex !== 4) {
           Row() {
             Text('预约时间:').commonLabelStyle();
@@ -91,7 +91,7 @@ struct TicketOrders {
           };
 
           if ((this.vm.currentIndex !== 2 && this.vm.currentIndex !== 3) || (item.actualPay || item.orderAmount)) {
-            Divider().strokeWidth(0.5);
+            Divider();
           }
         }
         if (this.vm.currentIndex === 4 && item.cancelTime) {
@@ -109,7 +109,7 @@ struct TicketOrders {
 
 
           if (this.vm.currentIndex !== 2) {
-            Divider().strokeWidth(0.5);
+            Divider();
           }
 
 
@@ -121,7 +121,7 @@ struct TicketOrders {
           };
 
           if (this.vm.currentIndex !== 3) {
-            Divider().strokeWidth(0.5);
+            Divider();
           }
         }
         if (this.vm.currentIndex === 0) {
@@ -141,7 +141,7 @@ struct TicketOrders {
               .width(64)
               .height(28)
               .backgroundColor('#0C000000')
-              .fontSize(12)
+              .fontSize($r('sys.float.Body_S'))
               .padding(0)
               .hitTestBehavior(HitTestMode.Block)
               .fontColor($r('sys.color.font_primary'))
@@ -185,9 +185,9 @@ struct TicketOrders {
                       }, (item: OrderInfo, index) => item.orderNo);
                       if (this.vm.orderList.length === 0) {
                         Row() {
-                          Divider().strokeWidth(1).width(40);
+                          Divider().width(40);
                           Text('没有更多了').fontColor($r('sys.color.font_tertiary')).fontSize(14);
-                          Divider().strokeWidth(1).width(40);
+                          Divider().width(40);
                         }.margin({ top: 15 });
                       }
 
@@ -241,7 +241,7 @@ function commonBtnExtend() {
   .height(28)
   .backgroundColor('#D1B380')
   .fontColor($r('sys.color.font_on_primary'))
-  .fontSize(12)
+  .fontSize($r('sys.float.Body_S'))
   .padding(0)
   .hitTestBehavior(HitTestMode.Block);
 }

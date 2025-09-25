@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import { AdService, adType, platformType } from '@agctemplate/open_ads'
+import { AdService, AdType, platformType } from '@agctemplate/open_ads'
 import { NAV_PAGE_NAME } from '@agctemplate/resources'
 import { appRouter, Logger, WindowManager } from '@agctemplate/utils'
 import { common } from '@kit.AbilityKit'
@@ -36,11 +36,10 @@ struct LaunchAdPage {
   build() {
     NavDestination() {
       AdService({
-        platform: platformType.CUSTOM_AD,
+        platform: platformType.HUAWEI_AD,
         adId: 'testd7c5cewoj6',
-        adType: adType.AD_PICTURE,
+        adType: AdType.AD_VIDEO,
         closeCallBack: () => {
-          Logger.info('', 'closeCallBack')
           appRouter.replace({
             builderName: NAV_PAGE_NAME.MainTabPage.name
           })

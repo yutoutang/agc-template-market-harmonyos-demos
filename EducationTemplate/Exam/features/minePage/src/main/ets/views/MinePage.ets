@@ -186,7 +186,7 @@ export struct MinePage {
         if (this.logoUser.isLogin) {
           Badge({
             count: this.propNumber.listArr.length,
-            style: { fontSize: 10, fontWeight: 'regular', badgeSize: 14 }
+            style: { fontSize: 10, fontWeight: 'regular', badgeSize: 16 }
           }) {
             Image($r('app.media.ic_public_message_point'))
               .width(24)
@@ -234,7 +234,7 @@ export struct MinePage {
               .objectFit(ImageFit.Contain)
               .margin({ right: 5 })
             Text('一键拨号')
-              .fontSize(15)
+              .fontSize($r('sys.float.Body_L'))
               .fontColor(Color.White)
               .fontWeight(600)
           }
@@ -243,7 +243,7 @@ export struct MinePage {
         .height(45)
         .type(ButtonType.Normal)
         .backgroundColor('#4c5dc4')
-        .borderRadius(21)
+        .borderRadius($r('sys.float.corner_radius_level10'))
         .onClick(() => {
           if (canIUse('SystemCapability.Applications.Contacts')) {
             call.makeCall('0000-00000000');
@@ -253,7 +253,7 @@ export struct MinePage {
 
         Button() {
           Text('取消')
-            .fontSize(15)
+            .fontSize($r('sys.float.Body_L'))
             .fontColor($r('sys.color.mask_secondary'))
             .fontWeight(600)
         }
@@ -290,7 +290,7 @@ export struct MinePage {
   }
 
   build() {
-    Column({ space: 12 }) {
+    Column({ space: 4 }) {
       Row() {
         Text('我的')
           .size({ width: 328, height: 32 })
@@ -300,37 +300,51 @@ export struct MinePage {
           .margin({ top: 12, bottom: 12 })
       }
 
-      this.perMine()
-      this.minMine()
-      Text('常用服务').fontSize($r('sys.float.Subtitle_L')).fontWeight(FontWeight.Medium)
-      Column({ space: 12 }) {
-        ForEach(this.mineArr, (item: MineItem) => {
-          if (item.titleName === '联系客服') {
-            UserItem({ title: item.titleName, image: item.icon, url: item.url })
-              .bindSheet($$this.isOpen, this.buildMakeCallComponent(), {
-                title: this.buildTitle(),
-                height: 265
-              })
-              .onClick(() => {
-                this.isOpen = true
-              })
-          } else {
-            UserItem({ title: item.titleName, image: item.icon, url: item.url })
-              .onClick(() => {
-                if (this.logoUser.isLogin && item.url &&
-                  (item.titleName === '浏览记录' || item.titleName === '练习记录')) {
-                  RouterModule.push({ url: item.url, param: this.logoUser });
-                } else if (item.url && (item.titleName === '设置')) {
-                  RouterModule.push({ url: item.url });
-                } else {
-                  RouterModule.push({ url: RouterMap.LOGIN_PAGE })
-                }
-              })
+      Scroll() {
+        Column({ space: 12 }) {
+          this.perMine()
+          this.minMine()
+          Text('常用服务').fontSize($r('sys.float.Subtitle_L')).fontWeight(FontWeight.Medium)
+          Column({ space: 12 }) {
+            ForEach(this.mineArr, (item: MineItem) => {
+              if (item.titleName === '联系客服') {
+                UserItem({ title: item.titleName, image: item.icon, url: item.url })
+                  .bindSheet($$this.isOpen, this.buildMakeCallComponent(), {
+                    title: this.buildTitle(),
+                    height: 265
+                  })
+                  .onClick(() => {
+                    this.isOpen = true
+                  })
+              } else {
+                UserItem({ title: item.titleName, image: item.icon, url: item.url })
+                  .onClick(() => {
+                    if (this.logoUser.isLogin && item.url &&
+                      (item.titleName === '浏览记录' || item.titleName === '练习记录')) {
+                      RouterModule.push({ url: item.url, param: this.logoUser });
+                    } else if (this.logoUser.isLogin && item.url && (item.titleName === '设置')) {
+                      RouterModule.push({ url: item.url });
+                    } else {
+                      RouterModule.push({ url: RouterMap.LOGIN_PAGE })
+                    }
+                  })
+              }
+            }, (item: MineItem) => JSON.stringify(item))
           }
-        }, (item: MineItem) => JSON.stringify(item))
+          .size({ width: '100%' })
+          .borderRadius(16)
+
+          Blank()
+            .layoutWeight(1)
+        }
+        .alignItems(HorizontalAlign.Start)
+        .padding({ bottom: 12 })
+
       }
-      .size({ width: '100%' })
-      .borderRadius(16)
+      .alignSelf(ItemAlign.Start)
+      .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring)
+      .layoutWeight(1)
     }
     .backgroundColor($r('sys.color.background_secondary'))
     .alignItems(HorizontalAlign.Start)

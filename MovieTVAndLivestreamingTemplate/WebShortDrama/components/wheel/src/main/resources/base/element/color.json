@@ -1,0 +1,12 @@
+{
+  "color": [
+    {
+      "name": "text_font_color",
+      "value": "#007DFF"
+    },
+    {
+      "name": "dialog_background",
+      "value": "#FFFFFF"
+    }
+  ]
+}

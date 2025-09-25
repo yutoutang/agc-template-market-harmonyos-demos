@@ -51,7 +51,7 @@ export struct ViewNotePage {
   build() {
     Column() {
       this.topBuilder()
-      Divider().color($r('sys.color.comp_divider'))
+      Divider().color($r('sys.color.comp_background_tertiary'))
       // 题目作答详情
       this.answerDetailsBuilder()
     }
@@ -109,14 +109,14 @@ export struct ViewNotePage {
             // 正确答案
             this.correctAnswerBuilder()
             Divider()
-              .color($r('sys.color.background_secondary'))
+              .color($r('sys.color.comp_background_tertiary'))
               .margin({ top: $r('app.float.vp_24'), bottom: $r('app.float.vp_24') })
               .strokeWidth(8)
             // 解析
             this.parseBuilder()
             Divider()
               .strokeWidth(8)
-              .color($r('sys.color.background_secondary'))
+              .color($r('sys.color.comp_background_tertiary'))
               .margin({ top: $r('app.float.vp_24'), bottom: $r('app.float.vp_24') })
             // 笔记
             this.noteBuilder()

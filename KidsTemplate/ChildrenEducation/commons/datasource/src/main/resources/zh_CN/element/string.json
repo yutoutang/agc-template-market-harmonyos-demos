@@ -19,6 +19,10 @@
     {
       "name": "audioUrl",
       "value": "https://sis-sample-audio.obs.cn-north-1.myhuaweicloud.com/16k16bit.mp3"
+    },
+    {
+      "name": "agcit_huawei_children_education",
+      "value": "1.0.0"
     }
   ]
 }

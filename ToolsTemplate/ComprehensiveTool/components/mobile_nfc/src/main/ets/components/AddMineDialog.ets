@@ -1,7 +1,7 @@
-import { hide } from '@abner/dialog';
+import { AddMineDialogParams } from '../model/Index';
 
 @Builder
-export function addMineDialog() {
+export function addMineDialog(params: AddMineDialogParams) {
   Column() {
     Text('温馨提示').fontSize(20).fontWeight(FontWeight.Bold).fontColor($r('sys.color.font_primary'));
     Text('已成功添加到我的卡包')
@@ -9,7 +9,7 @@ export function addMineDialog() {
       .fontColor($r('sys.color.font_primary'))
       .margin({ top: 28, bottom: 20 });
     Text('我知道了').fontWeight(FontWeight.Medium).fontColor($r('sys.color.font_emphasize')).onClick(() => {
-      hide();
+      params.confirm!();
     });
   }
   .alignItems(HorizontalAlign.Center)

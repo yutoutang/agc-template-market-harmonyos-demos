@@ -75,8 +75,7 @@
     {
       "name": "information_aboutUs",
       "value": "information_aboutUs"
-    }
-  ,
+    },
     {
       "name": "information_hobbies",
       "value": "information_hobbies"
@@ -249,7 +248,6 @@
       "name": "job_releaseTime6",
       "value": "job_releaseTime6"
     },
-
     {
       "name": "job_jobBase",
       "value": "job_jobBase"
@@ -270,7 +268,6 @@
       "name": "job_job_type2",
       "value": "job_job_type2"
     },
-
     {
       "name": "shared_desc",
       "value": "description"
@@ -324,16 +321,16 @@
       "value": "HUAWEI ID User Authentication Agreement"
     },
     {
-      "name":"and",
-      "value":" and "
+      "name": "and",
+      "value": " and "
     },
     {
-      "name":"end",
-      "value":"."
+      "name": "end",
+      "value": "."
     },
     {
-      "name":"read_and_agree",
-      "value":"read_and_agree"
+      "name": "read_and_agree",
+      "value": "read_and_agree"
     },
     {
       "name": "hwid_no_internet_connect",
@@ -354,6 +351,10 @@
     {
       "name": "mine_login",
       "value": "Login"
+    },
+    {
+      "name": "agcit_huawei_enterprise_recruitment",
+      "value": "1.0.0"
     }
   ]
 }

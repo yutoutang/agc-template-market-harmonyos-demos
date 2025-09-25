@@ -13,9 +13,34 @@
  * limitations under the License.
  */
 
+import { HomePageBuilder } from 'homepage';
+import { MinePageBuilder } from 'minepage';
+import { CourseHomePageBuilder } from 'topicpage';
+
 export interface TabListItem {
   label: string;
   icon: Resource;
   iconChecked: Resource;
   component: WrappedBuilder<[]>;
 }
+
+export const TAB_CONFIG: TabListItem[] = [
+  {
+    label: '练习',
+    icon: $r('app.media.ic_public_brush_off'),
+    iconChecked: $r('app.media.ic_public_brush_on'),
+    component: wrapBuilder(HomePageBuilder),
+  },
+  {
+    label: '课程',
+    icon: $r('app.media.icon_Question_off'),
+    iconChecked: $r('app.media.icon_Question_on'),
+    component: wrapBuilder(CourseHomePageBuilder),
+  },
+  {
+    label: '我的',
+    icon: $r('app.media.icon_My_off'),
+    iconChecked: $r('app.media.icon_My_on'),
+    component: wrapBuilder(MinePageBuilder),
+  },
+];

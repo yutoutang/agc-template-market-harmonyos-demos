@@ -7,12 +7,13 @@ export class EpisodeInfo {
   dramaId:string // 剧目id
   socialInfo: SocialInfo; //社交信息
   totalCount:number; //剧集总数
-
+  duration:number; // 播放时长
   constructor(episodeInfo: any) {
     this.id = episodeInfo?.id
     this.url = episodeInfo?.url
     this.desc = episodeInfo?.desc
     this.dramaId = episodeInfo?.dramaId
     this.socialInfo = episodeInfo?.socialInfo
+    this.duration = episodeInfo?.duration
   }
 }

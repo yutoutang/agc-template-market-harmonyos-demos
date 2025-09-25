@@ -93,7 +93,7 @@ struct PersonEditPage {
           .backgroundColor('#D1B380')
           .fontSize($r('sys.float.Body_L'))
           .fontWeight(FontWeight.Medium)
-          .fontColor($r('sys.color.background_primary'))
+          .fontColor($r('sys.color.font_on_primary'))
           .onClick(() => {
             if (this.vm.isContactInfoValid()) {
               this.vm.updatePersonInfo(this.vm.contact, () => {
@@ -118,7 +118,7 @@ function baseInputExtend() {
   .borderRadius(0)
   .backgroundColor('transparent')
   .placeholderFont({ weight: FontWeight.Regular, size: $r('sys.float.Body_M') })
-  .placeholderColor($r('sys.color.font_tertiary'));
+  .placeholderColor($r('sys.color.font_secondary'));
 }
 
 @Extend(Text)

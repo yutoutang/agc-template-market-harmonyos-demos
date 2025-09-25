@@ -1,4 +1,20 @@
-import { QuickLogin } from 'login_info';
+/*
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the 'License');
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an 'AS IS' BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import { AppStorageV2 } from '@kit.ArkUI';
+import { QuickLogin, UserInfo } from 'login_info';
 import { RouterMap, RouterModule } from 'router_module';
 
 @ComponentV2
@@ -21,9 +37,22 @@ export struct LoginPage {
         loginBtnBgColor: '#4B5CC4',
         appName: '备考',
         // 登录回调方法
-        onLoginWithHuaweiID: () => {
+        onLoginWithHuaweiID: (flag: boolean, phone?: string) => {
           RouterModule.pop(false)
-          this.getUIContext().getPromptAction().showToast({ message: '登陆成功', duration: 2000 });
+          let prop: UserInfo = AppStorageV2.connect(UserInfo, () => new UserInfo())! as UserInfo
+          if (!prop.name) {
+            prop.name = '华为用户'
+          }
+          prop.isLogin = true
+          prop.id = 0
+          prop.cellphone = phone ?? '177******96'
+          prop.address = 'xxx省xxx市'
+          if (flag) {
+            this.getUIContext().getPromptAction().showToast({ message: '登录成功', duration: 2000 });
+          } else {
+            this.getUIContext().getPromptAction().showToast({ message: 'mock登录', duration: 2000 });
+          }
+
         },
         // 备考隐私协议方法
         onPrivacyPolicy: () => {

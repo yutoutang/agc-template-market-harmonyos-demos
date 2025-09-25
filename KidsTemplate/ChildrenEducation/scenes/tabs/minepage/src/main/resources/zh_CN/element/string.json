@@ -49,16 +49,16 @@
       "value": "《华为账号用户认证协议》"
     },
     {
-      "name":"and",
-      "value":"和"
+      "name": "and",
+      "value": "和"
     },
     {
-      "name":"end",
-      "value":"。"
+      "name": "end",
+      "value": "。"
     },
     {
-      "name":"read_and_agree",
-      "value":"已阅读并同意"
+      "name": "read_and_agree",
+      "value": "已阅读并同意"
     },
     {
       "name": "hwid_no_internet_connect",
@@ -91,6 +91,10 @@
     {
       "name": "log_out",
       "value": "退出登录"
+    },
+    {
+      "name": "agcit_huawei_children_education",
+      "value": "1.0.0"
     }
   ]
 }

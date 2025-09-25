@@ -62,9 +62,75 @@ science_calculator/src/main/ets                   // 科学计算器(har)
    }
    ```
 
+2. 在主工程的EntryAbility.ets文件中onWindowStageCreate的生命周期函数中增加监听窗口尺寸大小的变化。
+   ```typescript
+   let windowClass: window.Window | undefined = undefined;
+   try {
+      window.getLastWindow(this.context, (err: BusinessError, data) => {
+        const errCode: number = err.code;
+        if (errCode) {
+          return;
+        }
+        windowClass = data;
+        try {
+          // 对窗口尺寸大小变化的监听
+          windowClass.on('windowSizeChange', (data) => {
+            AppStorage.setOrCreate('height', px2vp(data.height));
+          });
+        } catch (exception) {
+          hilog.error(DOMAIN, 'testTag', 'Failed to listen windowSizeChange. Cause: %{public}s', JSON.stringify(exception));
+        }
+      });
+    } catch (exception) {
+      hilog.error(DOMAIN, 'testTag', 'Failed to getLastWindow. Cause: %{public}s', JSON.stringify(exception));
+    }
+   ```
+
 ## 示例代码
 
 ```typescript
+// EntryAbility.ets
+import { AbilityConstant, common, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
+import { hilog } from '@kit.PerformanceAnalysisKit';
+import { window } from '@kit.ArkUI';
+import { BusinessError } from '@kit.BasicServicesKit';
+
+export default class EntryAbility extends UIAbility {
+   // ...此处省略上下文
+   async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
+      // ...此处省略上下文
+      let windowClass: window.Window | undefined = undefined;
+      try {
+         window.getLastWindow(this.context, (err: BusinessError, data) => {
+            const errCode: number = err.code;
+            if (errCode) {
+               return;
+            }
+            windowClass = data;
+            try {
+               // 对窗口尺寸大小变化的监听
+               windowClass.on('windowSizeChange', (data) => {
+                  AppStorage.setOrCreate('height', px2vp(data.height));
+               });
+            } catch (exception) {
+               hilog.error(DOMAIN, 'testTag', 'Failed to listen windowSizeChange. Cause: %{public}s', JSON.stringify(exception));
+            }
+         });
+      } catch (exception) {
+         hilog.error(DOMAIN, 'testTag', 'Failed to getLastWindow. Cause: %{public}s', JSON.stringify(exception));
+      }
+      windowStage.loadContent('pages/Index', (err) => {
+         if (err.code) {
+            hilog.error(DOMAIN, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err));
+            return;
+         }
+         hilog.info(DOMAIN, 'testTag', 'Succeeded in loading the content.');
+      });
+   }
+   // ...此处省略上下文
+};
+
+// Index.ets
 @Entry
 @ComponentV2
 export struct Index {

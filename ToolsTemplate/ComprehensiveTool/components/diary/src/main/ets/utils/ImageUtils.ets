@@ -1,0 +1,147 @@
+import { image } from '@kit.ImageKit';
+import { fileIo } from '@kit.CoreFileKit';
+import { Logger } from './Logger';
+
+export class ImageUtils {
+  /**
+   * Read the screenshot PixelMap object into the buffer area
+   * @param {PixelMap} pixelMap - Screenshot PixelMap
+   * @param {number[]} scrollYOffsets - Component scrolls an array of y-axis offsets
+   * @param {number} listWidth - List component width
+   * @param {number} listHeight - List component height
+   * @returns {image.PositionArea} Picture buffer area
+   */
+  // [Start get_snapshot_area]
+  static async getSnapshotArea(pixelMap: PixelMap, scrollYOffsets: number[], listWidth: number,
+    listHeight: number): Promise<image.PositionArea> {
+    // Gets the number of bytes per line of image pixels.
+    let stride = pixelMap.getBytesNumberPerRow();
+    // Get the total number of bytes of image pixels.
+    let bytesNumber = pixelMap.getPixelBytesNumber();
+    let buffer: ArrayBuffer = new ArrayBuffer(bytesNumber);
+    // 	Region size, read based on region.   PositionArea represents the data within the specified area of the image.
+    let len = scrollYOffsets.length;
+
+    // // Except for the first screenshot, you don't need to crop it, and you need to crop the new parts
+    if (scrollYOffsets.length >= 2) {
+      // Realistic roll distance
+      let realScrollHeight = scrollYOffsets[len-1] - scrollYOffsets[len-2];
+      if (listHeight - realScrollHeight > 0) {
+        let cropRegion: image.Region = {
+          x: 0,
+          y: vp2px(listHeight - realScrollHeight),
+          size: {
+            height: vp2px(realScrollHeight),
+            width: vp2px(listWidth)
+          }
+        };
+        // Crop roll area
+        await pixelMap.crop(cropRegion);
+      }
+    }
+
+    let imgInfo = pixelMap.getImageInfoSync();
+    // Region size, read based on region. PositionArea represents the data within the specified area of the image.
+    let area: image.PositionArea = {
+      pixels: buffer,
+      offset: 0,
+      stride: stride,
+      region: {
+        size: {
+          width: imgInfo.size.width,
+          height: imgInfo.size.height
+        },
+        x: 0,
+        y: 0
+      }
+    }
+    // Write data to a specified area
+    pixelMap.readPixelsSync(area);
+    return area;
+  }
+  // [End get_snapshot_area]
+
+  /**
+   * Merge image area array into long screenshots
+   * @param {image.PositionArea[]} areaArray - screenshot area
+   * @param {number} lastOffsetY - The offset Y of the last screenshot
+   * @param {number} listWidth - List component width
+   * @param {number} listHeight - List component height
+   * @returns {PixelMap} Long image after merge
+   */
+  // [Start merge_image]
+  static async mergeImage(areaArray: image.PositionArea[], lastOffsetY: number, listWidth: number,
+    listHeight: number): Promise<PixelMap> {
+    // Create a long screenshot PixelMap
+    let opts: image.InitializationOptions = {
+      editable: true,
+      pixelFormat: 4,
+      size: {
+        width: vp2px(listWidth),
+        height: vp2px(lastOffsetY + listHeight)
+      }
+    };
+    let longPixelMap = image.createPixelMapSync(opts);
+    let imgPosition: number = 0;
+
+    for (let i = 0; i < areaArray.length; i++) {
+      let readArea = areaArray[i];
+      let area: image.PositionArea = {
+        pixels: readArea.pixels,
+        offset: 0,
+        stride: readArea.stride,
+        region: {
+          size: {
+            width: readArea.region.size.width,
+            height: readArea.region.size.height
+          },
+          x: 0,
+          y: imgPosition
+        }
+      }
+      imgPosition += readArea.region.size.height;
+      longPixelMap.writePixelsSync(area);
+    }
+    return longPixelMap;
+  }
+  // [End merge_image]
+
+  // 将图片拷贝到cache
+  static saveToCache(context: Context, srcPath: string, newFileName: string): string {
+    try {
+      let realPath = srcPath.replace('file://', '');
+      // 拼接目标路径（cache 目录）
+      let cachePath = context.cacheDir + '/' + newFileName;
+      // 拷贝文件
+      fileIo.copyFileSync(realPath, cachePath);
+      return 'file://' + cachePath;
+    } catch (err) {
+      Logger.error('保存失败: ' + JSON.stringify(err));
+      return '';
+    }
+  }
+
+  // 找出html中img的src
+  static findImgSrcList(htmlStr: string): string[] {
+    const regx = /<img[^>]+src=["'](file:\/\/[^"']+)["']/g;
+    const matches = htmlStr.matchAll(regx);
+    let imgSrcList: string[] = [];
+    for (const match of matches) {
+      const imgSrc = match[1];
+      imgSrcList.push(imgSrc);
+    }
+    return imgSrcList;
+  }
+
+  // 将不使用的图片移除
+  static removeSandboxImg(srcPath: string) {
+    try {
+      let realPath = srcPath.replace('file://', '');
+      if (fileIo.accessSync(realPath)) {
+        fileIo.unlinkSync(realPath);
+      }
+    } catch (err) {
+      Logger.error('移除失败: ' + JSON.stringify(err));
+    }
+  }
+}

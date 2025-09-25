@@ -1,4 +1,4 @@
-# LoginInfo组件快速入门
+# 简易登录组件快速入门
 
 ## 目录
 
@@ -27,7 +27,7 @@
 
 1. 安装组件。
 
-   如果是在DevEvo Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
+   如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
 
    如果是从生态市场下载组件，请参考以下步骤安装组件。
 
@@ -39,7 +39,7 @@
     // 在项目根目录build-profile.json5填写login_info和base_apis路径。其中XXX为组件存放的目录名
     "modules": [
         {
-        "name": "base_calendar",
+        "name": "login_info",
         "srcPath": "./XXX/login_info",
         },
         {

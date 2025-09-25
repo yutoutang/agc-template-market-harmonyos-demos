@@ -34,6 +34,10 @@ export struct LoginState {
             .fontFamily('鸿蒙黑体')
             .fontWeight(FontWeight.Medium)
             .fontColor($r('sys.color.black'))
+            .maxLines(1)
+            .textOverflow({
+              overflow:TextOverflow.Ellipsis
+            })
             .onClick(() => {
               if (this.user.isLogin) {
                 this.appPathStack.pushPathByName('PersonalInformation', undefined);
@@ -41,7 +45,9 @@ export struct LoginState {
                 this.getQuickLoginAnonymousPhone();
               }
             });
-        };
+        }
+        .alignItems(HorizontalAlign.Start)
+        .layoutWeight(1)
 
         if (this.isVip) {
           Row() {
@@ -76,8 +82,8 @@ export struct LoginState {
         if (!this.isVip) {
           Button($r('app.string.start_vip'))
             .backgroundColor('#F8E6CE')
-            .fontColor($r('sys.color.black'))
-            .fontSize(12)
+            .fontColor($r('sys.color.font_primary'))
+            .fontSize($r('sys.float.Body_S'))
             .width('30%')
             .height(28)
             .onClick(() => {
@@ -122,6 +128,12 @@ export struct LoginState {
       }).catch((error: BusinessError) => {
         hilog.error(this.domainId, this.logTag,
           `Failed to authorize. errCode is ${error.code}, errMessage is ${error.message}`);
+        this.getUIContext().getPromptAction().showToast({
+          message: '获取匿名手机号失败，使用mock登录'
+        })
+        const quickLoginAnonymousPhone = 'a00****0000';
+        AppStorage.setOrCreate('quickLoginAnonymousPhone', quickLoginAnonymousPhone);
+        this.jumpLoginPage(quickLoginAnonymousPhone);
         // dealAllError(error);
         // showToast(error);
       });

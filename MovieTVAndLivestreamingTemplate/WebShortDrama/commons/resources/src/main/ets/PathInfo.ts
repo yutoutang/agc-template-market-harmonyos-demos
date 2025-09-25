@@ -13,6 +13,9 @@
   "MineMainPage": {
     "name": "MineMainPage"
   },
+  "MyMessagePage": {
+    "name": "MyMessagePage"
+  },
   "WatchRecordsPage": {
     "name": "WatchRecordsPage"
   },
@@ -57,6 +60,9 @@
   },
   "LoginPage": {
     "name": "LoginPage"
+  },
+  "MineMessagePage": {
+    "name": "MineMessagePage"
   },
   "SearchPage": {
     "name": "SearchPage"

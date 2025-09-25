@@ -23,7 +23,15 @@
     "decompression_tool": "file:../components/decompression_tool",
     "science_calculator": "file:../components/science_calculator",
     "calendar_events": "file:../components/calendar_events",
-    "mobile_nfc": "file:../components/mobile_nfc"
+    "mobile_nfc": "file:../components/mobile_nfc",
+    "draw_board": "file:../components/draw_board",
+    "simple_recorder": "file:../components/simple_recorder",
+    "bmi_calculator": "file:../components/bmi_calculator",
+    "compass": "file:../components/compass",
+    "diary": "file:../components/diary",
+    "internet_speed_measure": "file:../components/internet_speed_measure",
+    "photo_editing": "file:../components/photo_editing",
+    "zip_tool": "file:../components/zip_tool"
   }
 }
 

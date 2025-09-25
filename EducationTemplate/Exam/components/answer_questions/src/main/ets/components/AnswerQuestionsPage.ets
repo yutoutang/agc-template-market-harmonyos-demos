@@ -218,13 +218,13 @@ export struct AnswerQuestionsComponent {
       // 正确答案
       this.correctAnswerBuilder()
       Divider()
-        .color($r('sys.color.background_secondary'))
+        .color($r('sys.color.comp_background_tertiary'))
         .strokeWidth(8)
         .margin({ top: $r('app.float.vp_24'), bottom: $r('app.float.vp_24') })
       // 解析
       this.parseBuilder()
       Divider()
-        .color($r('sys.color.background_secondary'))
+        .color($r('sys.color.comp_background_tertiary'))
         .strokeWidth(8)
         .margin({ top: $r('app.float.vp_24'), bottom: $r('app.float.vp_24') })
       // 笔记

@@ -157,11 +157,10 @@ struct OrderInfo {
 
         Column() {
           Button('预约')
-            .type(ButtonType.Normal)
-            .borderRadius(20)
             .backgroundColor(this.isContactInfoValid() ?
               '#D1B380' : '#99D1B380')
             .width('calc(100% - 32vp)')
+            .height(40)
             .enabled(this.isContactInfoValid())
             .onClick(() => {
               if (this.isPhoneValid()) {

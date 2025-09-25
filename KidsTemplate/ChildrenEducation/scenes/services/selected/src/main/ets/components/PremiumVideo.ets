@@ -33,7 +33,7 @@ export struct PremiumVideo {
                 Row() {
                   ForEach(item.tags, (tag: string) => {
                     TagLabelCard(tag);
-                  });
+                  }, (tag:string) => tag);
                 }
                 .align(Alignment.BottomStart);
               }
@@ -58,7 +58,7 @@ export struct PremiumVideo {
           detail.videoCard = item;
           this.appPathStack.pushPathByName('VideoDetailListView', detail);
         });
-      });
+      }, (item:VideoCard) => JSON.stringify(item) );
     }
     .padding({
       top: '12vp',

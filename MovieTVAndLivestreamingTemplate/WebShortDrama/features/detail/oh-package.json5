@@ -16,6 +16,7 @@
     "@agctemplate/module_share": "1.0.0",
     "vip_center": "file:../../components/vip_center",
     'base_apis': 'file:../../components/base_apis',
-    'aggregated_payment': 'file:../../sdk/aggregated_payment'
+    'aggregated_payment': 'file:../../sdk/aggregated_payment',
+    'module_cast': "file:../../components/module_cast"
   }
 }

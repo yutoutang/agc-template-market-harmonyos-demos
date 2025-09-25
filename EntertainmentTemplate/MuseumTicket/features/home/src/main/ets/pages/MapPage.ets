@@ -1,7 +1,7 @@
 
 import { MapPageVM } from '../viewModels/MapPageVM';
 import { map, MapComponent } from '@kit.MapKit';
-import { RouterModule } from 'commonlib';
+import { RouterModule,Logger } from 'commonlib';
 
 @Builder
 export function MapPageBuilder() {
@@ -36,8 +36,6 @@ export struct MapPage {
     .onShown(async () => {
       if (this.vm.mapController !== undefined) {
         this.vm.mapController.show();
-      } else {
-
       }
     })
     .onBackPressed(() => {
@@ -47,7 +45,11 @@ export struct MapPage {
     .onHidden(() => {
       // 将地图切换到后台
       if (this.vm.mapController !== undefined) {
-        this.vm.mapController.hide();
+        try {
+          this.vm.mapController.hide();
+        } catch (e) {
+          Logger.error(JSON.stringify(e));
+        }
       }
     });
   }

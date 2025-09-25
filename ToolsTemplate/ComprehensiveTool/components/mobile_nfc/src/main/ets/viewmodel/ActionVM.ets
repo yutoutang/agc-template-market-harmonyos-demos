@@ -1,7 +1,7 @@
-import { showDialogParams } from '@abner/dialog';
-import { ToastUtil } from '@pura/harmony-utils';
 import { common } from '@kit.AbilityKit';
 import { nfcController } from '@kit.ConnectivityKit';
+import { hilog } from '@kit.PerformanceAnalysisKit';
+import { ComponentContent, LevelMode, promptAction } from '@kit.ArkUI';
 import {
   NFC_STATE_COMPLETE,
   NFC_STATE_NORMAL,
@@ -12,12 +12,14 @@ import {
   startCloneNFC,
   startFormatNFC,
   startReadNFC,
-  stopNFC } from '../common/nfc/Nfc';
+  stopNFC,
+} from '../common/nfc/Nfc';
 import { ActionModel, DetailModel, ResultModel } from '../model/Index';
 import { nfcOpenDialog, NfcOpenDialogParams } from '../components/NfcOpenDialog';
 import { getNavPathStack } from '../common/Route';
 import { ACTION_TYPE, NFC_TYPE, PAGE_TYPES, RTYPE } from '../common/Enum';
 import { nfcCardInfo } from '../db/NfcCardInfo';
+import { PromptActionUtil } from '../common/PromptActionUtil';
 
 @ObservedV2
 export class ActionVM {
@@ -67,12 +69,15 @@ export class ActionVM {
     return '';
   }
 
-  preCheck(): boolean {
+  preCheck(uiContext: UIContext): boolean {
     if (canIUse('SystemCapability.Communication.NFC.Core')) {
       if (nfcController.isNfcOpen()) {
         return true;
       } else {
         let params = new NfcOpenDialogParams();
+        params.cancel = () => {
+          PromptActionUtil.closeDialog(nfcOpenContentNode);
+        };
         params.confirm = () => {
           let context = getContext(this) as common.UIAbilityContext;
           context.startAbility({
@@ -80,18 +85,33 @@ export class ActionVM {
             abilityName: 'com.huawei.hmos.settings.MainAbility',
             uri: 'nfc_settings',
           });
+          PromptActionUtil.closeDialog(nfcOpenContentNode);
         };
-        showDialogParams(wrapBuilder(nfcOpenDialog), params);
+
+        let nfcOpenContentNode: ComponentContent<Object> =
+          new ComponentContent(uiContext, wrapBuilder<[NfcOpenDialogParams]>(nfcOpenDialog), params);
+        PromptActionUtil.setContext(uiContext);
+        PromptActionUtil.setContentNode(nfcOpenContentNode);
+        PromptActionUtil.setOptions({
+          levelMode: LevelMode.EMBEDDED,
+          onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
+            hilog.info(0xFF00, 'SubmitFeedBack', JSON.stringify(dismissDialogAction.reason));
+          },
+        });
+
+        PromptActionUtil.openDialog();
       }
     } else {
-      ToastUtil.showToast('当前设备不支持NFC！');
+      promptAction.showToast({
+        message: '当前设备不支持NFC！',
+      });
     }
     return false;
   }
 
-  confirm() {
+  confirm(uiContext: UIContext) {
     if (this.state === NFC_STATE_NORMAL) {
-      if (!this.preCheck()) {
+      if (!this.preCheck(uiContext)) {
         return;
       }
       switch (this.data.action) {
@@ -104,13 +124,18 @@ export class ActionVM {
                 case '3100201':
                 case '3100202':
                   this.state = NFC_STATE_NORMAL;
-                  ToastUtil.showToast('克隆失败：请保持卡片贴于手机背面NFC感应区域，请勿移动卡片');
+                  promptAction.showToast({
+                    message: '克隆失败：请保持卡片贴于手机背面NFC感应区域，请勿移动卡片',
+                  });
                   break;
                 default:
                   this.state = NFC_STATE_NORMAL;
-                  ToastUtil.showToast('读卡失败：卡片可能被加密或不支持此种卡片');
+                  promptAction.showToast({
+                    message: '读卡失败：卡片可能被加密或不支持此种卡片',
+                  });
                   getNavPathStack()
-                    .pushPathByName('ResultPage', new ResultModel(ACTION_TYPE.ACTION_READ, RTYPE.RTYPE_READ_FAIL, this.data));
+                    .pushPathByName('ResultPage',
+                      new ResultModel(ACTION_TYPE.ACTION_READ, RTYPE.RTYPE_READ_FAIL, this.data));
                   break;
               }
             } else {
@@ -129,9 +154,12 @@ export class ActionVM {
                       default:
                         if (result.nfcInfo.balance >= 0) {
                           this.state = NFC_STATE_NORMAL;
-                          ToastUtil.showToast('读卡失败：卡片可能被加密或不支持此种卡片');
+                          promptAction.showToast({
+                            message: '读卡失败：卡片可能被加密或不支持此种卡片',
+                          });
                           getNavPathStack()
-                            .pushPathByName('ResultPage', new ResultModel(ACTION_TYPE.ACTION_READ, RTYPE.RTYPE_READ_FAIL, this.data));
+                            .pushPathByName('ResultPage',
+                              new ResultModel(ACTION_TYPE.ACTION_READ, RTYPE.RTYPE_READ_FAIL, this.data));
                           return;
                         }
                         break;
@@ -139,9 +167,12 @@ export class ActionVM {
                       case NFC_TYPE.NFC_TYPE_BANK:
                         if (result.nfcInfo.balance === -1) {
                           this.state = NFC_STATE_NORMAL;
-                          ToastUtil.showToast('读卡失败：卡片可能被加密或不支持此种卡片');
+                          promptAction.showToast({
+                            message: '读卡失败：卡片可能被加密或不支持此种卡片',
+                          });
                           getNavPathStack()
-                            .pushPathByName('ResultPage', new ResultModel(ACTION_TYPE.ACTION_READ, RTYPE.RTYPE_READ_FAIL, this.data));
+                            .pushPathByName('ResultPage',
+                              new ResultModel(ACTION_TYPE.ACTION_READ, RTYPE.RTYPE_READ_FAIL, this.data));
                           return;
                         }
                         break;
@@ -160,15 +191,21 @@ export class ActionVM {
                       })
                       .catch((e: Error) => {
                         this.state = NFC_STATE_NORMAL;
-                        ToastUtil.showToast('读卡失败：卡片可能被加密或不支持此种卡片');
+                        promptAction.showToast({
+                          message: '读卡失败：卡片可能被加密或不支持此种卡片',
+                        });
                         getNavPathStack()
-                          .pushPathByName('ResultPage', new ResultModel(ACTION_TYPE.ACTION_READ, RTYPE.RTYPE_READ_FAIL, this.data));
+                          .pushPathByName('ResultPage',
+                            new ResultModel(ACTION_TYPE.ACTION_READ, RTYPE.RTYPE_READ_FAIL, this.data));
                       });
                   } else {
                     this.state = NFC_STATE_NORMAL;
-                    ToastUtil.showToast('读卡失败：卡片可能被加密或不支持此种卡片');
+                    promptAction.showToast({
+                      message: '读卡失败：卡片可能被加密或不支持此种卡片',
+                    });
                     getNavPathStack()
-                      .pushPathByName('ResultPage', new ResultModel(ACTION_TYPE.ACTION_READ, RTYPE.RTYPE_READ_FAIL, this.data));
+                      .pushPathByName('ResultPage',
+                        new ResultModel(ACTION_TYPE.ACTION_READ, RTYPE.RTYPE_READ_FAIL, this.data));
                   }
                   break;
               }
@@ -185,13 +222,15 @@ export class ActionVM {
                 case '3100202':
                   this.state = NFC_STATE_NORMAL;
                   getNavPathStack()
-                    .pushPathByName('ResultPage', new ResultModel(ACTION_TYPE.ACTION_CLONE, RTYPE.RTYPE_CLONE_FAIL, this.data,
-                      '克隆失败：请保持卡片贴于手机背面NFC感应区域，请勿移动卡片'));
+                    .pushPathByName('ResultPage',
+                      new ResultModel(ACTION_TYPE.ACTION_CLONE, RTYPE.RTYPE_CLONE_FAIL, this.data,
+                        '克隆失败：请保持卡片贴于手机背面NFC感应区域，请勿移动卡片'));
                   break;
                 default:
                   this.state = NFC_STATE_NORMAL;
                   getNavPathStack()
-                    .pushPathByName('ResultPage', new ResultModel(ACTION_TYPE.ACTION_CLONE, RTYPE.RTYPE_CLONE_FAIL, this.data));
+                    .pushPathByName('ResultPage',
+                      new ResultModel(ACTION_TYPE.ACTION_CLONE, RTYPE.RTYPE_CLONE_FAIL, this.data));
                   break;
               }
             } else {
@@ -203,7 +242,8 @@ export class ActionVM {
                   break;
                 case NFC_STATE_COMPLETE:
                   getNavPathStack()
-                    .pushPathByName('ResultPage', new ResultModel(ACTION_TYPE.ACTION_CLONE, RTYPE.RTYPE_CLONE_SUCCESS, this.data));
+                    .pushPathByName('ResultPage',
+                      new ResultModel(ACTION_TYPE.ACTION_CLONE, RTYPE.RTYPE_CLONE_SUCCESS, this.data));
                   break;
               }
             }
@@ -218,10 +258,14 @@ export class ActionVM {
                 case '3100101':
                 case '3100201':
                 case '3100202':
-                  ToastUtil.showToast('克隆失败：请保持卡片贴于手机背面NFC感应区域，请勿移动卡片');
+                  promptAction.showToast({
+                    message: '克隆失败：请保持卡片贴于手机背面NFC感应区域，请勿移动卡片',
+                  });
                   break;
                 default:
-                  ToastUtil.showToast('格式化失败：卡片可能被加密或不支持此种卡片');
+                  promptAction.showToast({
+                    message: '格式化失败：卡片可能被加密或不支持此种卡片',
+                  });
                   break;
               }
             } else {

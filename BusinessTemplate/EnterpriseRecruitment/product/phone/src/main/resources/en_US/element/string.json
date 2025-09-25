@@ -11,6 +11,10 @@
     {
       "name": "EntryAbility_label",
       "value": "Enterprise Recruitment"
+    },
+    {
+      "name": "agcit_huawei_enterprise_recruitment",
+      "value": "1.0.0"
     }
   ]
 }

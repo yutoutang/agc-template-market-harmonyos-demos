@@ -41,9 +41,9 @@ struct ExplainOrders {
         .fontWeight(this.vm.selectedIndex === index ? FontWeight.Medium : FontWeight.Regular)
         .height(19)
         .margin({ bottom: 6, top: 18 });
-      Divider()
-        .strokeWidth(2)
-        .color('#603C00')
+      Row()
+        .height(2)
+        .backgroundColor('#603C00')
         .opacity(this.vm.selectedIndex === index ? 1 : 0)
         .width(36);
     }.width('100%').height(60);
@@ -62,9 +62,9 @@ struct ExplainOrders {
                   if (this.vm.orders.length === 0) {
                     ListItem() {
                       Row() {
-                        Divider().strokeWidth(1).width(40);
+                        Divider().width(40);
                         Text('没有更多了').fontColor($r('sys.color.font_tertiary')).fontSize(14);
-                        Divider().strokeWidth(1).width(40);
+                        Divider().width(40);
                       }.margin({ top: 15 }).width('100%').justifyContent(FlexAlign.Center);
                     };
                   }
@@ -88,7 +88,7 @@ struct ExplainOrders {
                             Text(val.title).fontSize($r('sys.float.Body_M')).fontColor($r('sys.color.font_primary'));
                           }.width('100%').justifyContent(FlexAlign.SpaceBetween);
 
-                          Divider().strokeWidth(0.5);
+                          Divider();
 
                           Row() {
                             Text('日期/场次').fontSize($r('sys.float.Body_M')).fontColor($r('sys.color.font_primary'));
@@ -97,7 +97,7 @@ struct ExplainOrders {
                               .fontColor($r('sys.color.font_primary'));
                           }.width('100%').justifyContent(FlexAlign.SpaceBetween);
 
-                          Divider().strokeWidth(0.5);
+                          Divider();
 
                           Row() {
                             Text('参观人').fontSize($r('sys.float.Body_M')).fontColor($r('sys.color.font_primary'));
@@ -106,7 +106,7 @@ struct ExplainOrders {
                               .fontColor($r('sys.color.font_primary'));
                           }.width('100%').justifyContent(FlexAlign.SpaceBetween);
 
-                          Divider().strokeWidth(0.5);
+                          Divider();
 
                           Row() {
                             Text('预约时间').fontSize($r('sys.float.Body_M')).fontColor($r('sys.color.font_primary'));
@@ -116,7 +116,7 @@ struct ExplainOrders {
                           }.width('100%').justifyContent(FlexAlign.SpaceBetween);
 
                           if (val.status === OrderStatus.PENDING_PAY || val.status === OrderStatus.PENDING_USE) {
-                            Divider().strokeWidth(0.5);
+                            Divider();
                           }
                           if (val.status === OrderStatus.PENDING_PAY) {
                             Row() {
@@ -184,7 +184,7 @@ function commonBtnExtend() {
   .width(64)
   .height(28)
   .backgroundColor('#D1B380')
-  .fontSize(12)
+  .fontSize($r('sys.float.Body_S'))
   .fontColor($r('sys.color.font_on_primary'))
   .fontWeight(500)
   .padding(0)

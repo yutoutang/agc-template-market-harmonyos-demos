@@ -13,8 +13,7 @@
  * limitations under the License.
  */
 
-import { TAB_CONFIG } from '../common/TabConstants';
-import { TabListItem } from '../model/TabListItem';
+import { TabListItem, TAB_CONFIG } from '../model/TabListItem';
 
 @ObservedV2
 export class MainVM {

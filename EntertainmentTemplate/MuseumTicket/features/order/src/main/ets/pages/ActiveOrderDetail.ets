@@ -43,26 +43,26 @@ struct ActiveOrderDetail {
                 Text(this.vm.detail.title).commonTextExtend();
               }.width('100%').justifyContent(FlexAlign.SpaceBetween);
 
-              Divider().strokeWidth(0.5);
+              Divider();
               Row() {
                 Text('活动时间').commonTextExtend();
                 Text(this.vm.detail.activeTime).commonTextExtend();
               }.width('100%').justifyContent(FlexAlign.SpaceBetween);
 
-              Divider().strokeWidth(0.5);
+              Divider();
               Row() {
                 Text('联系人').commonTextExtend();
                 Text(this.vm.detail.contactName).commonTextExtend();
               }.width('100%').justifyContent(FlexAlign.SpaceBetween);
 
-              Divider().strokeWidth(0.5);
+              Divider();
               Row() {
                 Text('参观人').commonTextExtend();
                 Text(this.vm.detail.visitors.map(item => item.name)
                   .join('、')).commonTextExtend();
               }.width('100%').justifyContent(FlexAlign.SpaceBetween);
 
-              Divider().strokeWidth(0.5);
+              Divider();
               Row() {
                 Text('预约时间').commonTextExtend();
                 Text(FormatUtil.formatFullDate(new Date(this.vm.detail.orderTime), true)).commonTextExtend();
@@ -84,7 +84,7 @@ struct ActiveOrderDetail {
               .width(64)
               .height(28)
               .backgroundColor('#D1B380')
-              .fontSize(12)
+              .fontSize($r('sys.float.Body_S'))
               .fontColor($r('sys.color.font_on_primary'))
               .fontWeight(500)
               .padding(0)

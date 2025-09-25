@@ -163,8 +163,8 @@ export struct JobDetail {
         Blank();
 
         Button('简历投递')
-          .fontSize($r('app.float.font_size_17'))
-          .backgroundColor($r('app.color.common_blue'))
+          .fontSize($r('sys.float.Body_L'))
+          .backgroundColor($r('sys.color.font_emphasize'))
           .height('100%')
           .width('75%')
           .onClick(() => {

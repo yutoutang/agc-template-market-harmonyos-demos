@@ -13,10 +13,10 @@ export class HttpHandler {
       HttpHandler.backend = new Backend();
     }
     let interceptors: Interceptor[] = [];
-    if (isAuth) {
-      interceptors.push(new TokenRefreshInterceptor());
-      interceptors.push(new TokenHeaderInterceptor());
-    }
+    // if (isAuth) {
+    //   interceptors.push(new TokenRefreshInterceptor());
+    //   interceptors.push(new TokenHeaderInterceptor());
+    // }
     interceptors.push(new CommonHeaderInterceptor());
     let response = await HttpHandler.backend.sendRequest(request, interceptors);
     return response;

@@ -62,7 +62,7 @@ export struct TimeCtrl {
             textCommonBuilder('晚间休息');
             Blank();
             Toggle({ type: ToggleType.Switch, isOn: this.nightTimeState })
-              .selectedColor('#FFD15D')
+              .selectedColor($r('sys.color.comp_background_emphasize'))
               .switchPointColor($r('sys.color.comp_background_list_card'))
               .onChange((nightIsOn: boolean) => {
                 this.nightTimeState = nightIsOn;
@@ -137,7 +137,7 @@ export struct TimeCtrl {
             textCommonBuilder('午间休息');
             Blank();
             Toggle({ type: ToggleType.Switch, isOn: this.lunchTimeState })
-              .selectedColor('#FFD15D')
+              .selectedColor($r('sys.color.comp_background_emphasize'))
               .switchPointColor($r('sys.color.comp_background_list_card'))
               .onChange((lunchIsOn: boolean) => {
                 this.lunchTimeState = lunchIsOn;
@@ -211,8 +211,8 @@ export struct TimeCtrl {
           Button('保存')
             .width(CommonConstants.FULL_PERCENT)
             .backgroundColor('#FFD15D')
-            .fontColor($r('sys.color.black'))
-            .fontSize(16)
+            .fontColor($r('sys.color.font_primary'))
+            .fontSize($r('sys.float.Body_L'))
             .onClick(() => {
               GlobalContext.getContext().setObject(CommonConstants.LUNCH_TIME_STATE, this.lunchTimeState);
               GlobalContext.getContext().setObject(CommonConstants.NIGHT_TIME_STATE, this.nightTimeState);

@@ -1,0 +1,1 @@
+export { DaySignIn } from './src/main/ets/components/DaySignIn';

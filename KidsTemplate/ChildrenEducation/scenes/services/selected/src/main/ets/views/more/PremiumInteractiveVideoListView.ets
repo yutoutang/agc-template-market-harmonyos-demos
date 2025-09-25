@@ -34,7 +34,7 @@ export struct PremiumInteractiveVideoListView {
             bottom: $r('app.float.12vp')
           });
 
-        });
+        }, (item:VideoCard) => JSON.stringify(item));
       }
       .width(CommonConstants.FULL_PERCENT)
       .scrollBar(BarState.Off)
@@ -85,7 +85,7 @@ struct PremiumInteractiveVideoListItem {
       Row() {
         ForEach(this.videoCard.tags, (item: string) => {
           TagLabelCard(item);
-        });
+        }, (item:string) => item);
       }
       .width(CommonConstants.FULL_PERCENT)
       .justifyContent(FlexAlign.Start);

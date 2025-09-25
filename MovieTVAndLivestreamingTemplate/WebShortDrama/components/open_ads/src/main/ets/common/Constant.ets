@@ -9,7 +9,7 @@ export enum platformType {
   CUSTOM_AD
 }
 
-export enum adType {
+export enum AdType {
   AD_PICTURE,
   AD_VIDEO
 }

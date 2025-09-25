@@ -1,4 +1,4 @@
-# 倒计日组件快速入门
+# 日程提醒组件快速入门
 
 ## 目录
 
@@ -16,7 +16,7 @@
 
 本组件工程代码结构如下所示：
 ```ts
-calendar_events/src/main/ets                      // 倒计日(har)
+calendar_events/src/main/ets                      // 日程提醒(har)
   |- base                                         // 模块基础组件   
   |- constants                                    // 模块常量定义
   |- components                                   // 模块组件  
@@ -75,7 +75,7 @@ calendar_events/src/main/ets                      // 倒计日(har)
 
 3. 调用组件，详细参数配置说明参见[API参考](#API参考)。
 
-      ```typescript
+   ```typescript
    // 引入组件
    import { CalendarEventMain,UserEventItem } from 'calendar_events';
 
@@ -93,6 +93,7 @@ calendar_events/src/main/ets                      // 倒计日(har)
            onCalendarEventDelete: (userEventInfo: UserEventItem) => {
              console.log('delete userEventInfo', JSON.stringify(userEventInfo));
            },
+           isHideBack: true
          });
        }
        .hideTitleBar(true)
@@ -116,7 +117,7 @@ CalendarEventMain(options?: CalendarEventMainOptions)
 
 | 参数名  | 类型                                                         | 是否必填 | 说明               |
 | ------- | ------------------------------------------------------------ | -------- | ------------------ |
-| options | [CalendarEventMainOptions](#CalendarEventMainOptions对象说明) | 否       | 倒计日组件的参数。 |
+| options | [CalendarEventMainOptions](#CalendarEventMainOptions对象说明) | 否       | 日程提醒组件的参数。 |
 
 ### CalendarEventMainOptions对象说明
 
@@ -197,6 +198,7 @@ struct Index {
             onCalendarEventChange: (userEventInfo: UserEventItem) => {
                console.log('change userEventInfo', JSON.stringify(userEventInfo));
             },
+            isHideBack: true
          })
       }
       .hideTitleBar(true)

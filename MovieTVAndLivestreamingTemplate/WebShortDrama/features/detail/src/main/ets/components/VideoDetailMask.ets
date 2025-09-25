@@ -4,6 +4,7 @@ import { AppStorageKeys, StatusBarHeight } from '@agctemplate/widgets';
 import { PlayController, VideoPlayData, PlaySession } from 'video_swiper';
 import { AppStorageV2 } from '@kit.ArkUI';
 import { DetailMaskLayer } from './DetailMaskLayer';
+import { PromptActionClass } from './PromptActionClass';
 
 /**
  * 功能描述：
@@ -29,8 +30,8 @@ export struct VideoDetailMask {
   aboutToAppear(): void {
     this.playControl.setPlayerHeight(`100%`)
     this.curIndex = this.videoDetailMaskVM.currentSerial
+    PromptActionClass.setContext(this.getUIContext());
   }
-
 
   build() {
     DetailMaskLayer({

@@ -12,8 +12,8 @@
         "reason": "$string:reason"
       },
       {
-        "name" : "ohos.permission.GET_NETWORK_INFO",
-        //        "reason": "$string:get_network_info_permission_reason",
+        "name": "ohos.permission.GET_NETWORK_INFO",
+//        "reason": "$string:get_network_info_permission_reason",
         "usedScene": {
           "when": "inuse"
         }
@@ -51,11 +51,11 @@
     ],
     "metadata": [
       {
-        /**
+/**
          * todo
          */
         "name": "client_id",
-        "value": "xxxxxx"
+        "value": "******"
       }
     ]
   }

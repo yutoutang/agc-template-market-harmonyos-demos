@@ -115,13 +115,16 @@ export struct JobDelivery {
                 this.name = val;
                 this.userContactInfo.realName = val
               })
-              Divider().strokeWidth(1).color(Color.Gray).opacity(0.2)
+              Divider()
+                .strokeWidth('1px')
+                .color($r('sys.color.comp_divider'))
+                .opacity(0.2)
 
               this.MessageInput('手机号码', ContentType.PHONE_NUMBER, this.userContactInfo.phoneNumber, (val: string) => {
                 this.telephoneNumber = val;
                 this.userContactInfo.phoneNumber = val
               })
-              Divider().strokeWidth(1).color(Color.Gray).opacity(0.2)
+              Divider().strokeWidth('1px').color($r('sys.color.comp_divider')).opacity(0.2)
 
               this.MessageInput('邮箱', ContentType.EMAIL_ADDRESS, this.userContactInfo.email, (val: string) => {
                 this.email = val;
@@ -214,7 +217,7 @@ export struct JobDelivery {
       Blank()
 
       Button(this.isDelivery ? '已投递' : '简历投递')
-        .fontSize($r('app.float.font_size_17'))
+        .fontSize($r('sys.float.Body_L'))
         .backgroundColor($r('app.color.common_blue'))
         .width('100%')
         .height(39)
@@ -269,8 +272,8 @@ export struct JobDelivery {
 
       Column() {
         TextInput({ placeholder: '请输入（必填）', text:content})
-          .placeholderFont({ size: 14 })
-          .placeholderColor('rgba(0,0,0,0.40)')
+          .placeholderFont({ size: $r('sys.float.Body_L') })
+          .placeholderColor($r('sys.color.font_secondary'))
           .layoutWeight(1)
           .contentType(contentType)
           .backgroundColor(Color.Transparent)
@@ -311,10 +314,10 @@ export struct JobDelivery {
     Column() {
       Row() {
         Button($r('app.string.upload_from_local'))
-          .fontSize($r('app.float.font_size_20'))
+          .fontSize($r('sys.float.Body_L'))
           .height('40%')
           .width('60%')
-          .fontColor($r('app.color.common_blue'))
+          .fontColor($r('sys.color.font_emphasize'))
           .stateEffect(false)
           .backgroundColor(Color.Transparent)
       }
@@ -346,10 +349,10 @@ export struct JobDelivery {
 
       Row() {
         Button($r('app.string.upload_from_management'))
-          .fontSize($r('app.float.font_size_20'))
+          .fontSize($r('sys.float.Body_L'))
           .height('40%')
           .width('60%')
-          .fontColor($r('app.color.common_blue'))
+          .fontColor($r('sys.color.font_emphasize'))
           .stateEffect(false)
           .backgroundColor(Color.Transparent)
       }

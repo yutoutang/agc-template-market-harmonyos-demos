@@ -162,9 +162,16 @@ export struct AggregatedPaymentPicker {
 
   build() {
     NavDestination() {
-      Column() {
-        this.paymentChannelPicker();
-      }.height('100%').justifyContent(FlexAlign.Center);
-    };
+      Scroll() {
+        Column() {
+          this.paymentChannelPicker();
+        }
+        .justifyContent(FlexAlign.Center);
+      }
+      .layoutWeight(1)
+      .scrollBar(BarState.Off)
+      .scrollable(ScrollDirection.Vertical)
+      .edgeEffect(EdgeEffect.Spring)
+    }
   }
 }

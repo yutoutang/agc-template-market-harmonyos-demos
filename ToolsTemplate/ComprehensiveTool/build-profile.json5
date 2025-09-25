@@ -105,6 +105,38 @@
     {
       "name": "mobile_nfc",
       "srcPath": "./components/mobile_nfc"
+    },
+    {
+      "name": "bmi_calculator",
+      "srcPath": "./components/bmi_calculator"
+    },
+    {
+      "name": "draw_board",
+      "srcPath": "./components/draw_board"
+    },
+    {
+      "name": "simple_recorder",
+      "srcPath": "./components/simple_recorder"
+    },
+    {
+      "name": "compass",
+      "srcPath": "./components/compass"
+    },
+    {
+      "name": "diary",
+      "srcPath": "./components/diary"
+    },
+    {
+      "name": "internet_speed_measure",
+      "srcPath": "./components/internet_speed_measure"
+    },
+    {
+      "name": "photo_editing",
+      "srcPath": "./components/photo_editing"
+    },
+    {
+      "name": "zip_tool",
+      "srcPath": "./components/zip_tool"
     }
   ]
 }

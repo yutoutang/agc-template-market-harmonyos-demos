@@ -18,10 +18,10 @@
 
 ### 环境
 
-- DevEco Studio版本：DevEco Studio 5.0.1 Release及以上
-- HarmonyOS SDK版本：HarmonyOS 5.0.1 Release SDK及以上
+- DevEco Studio版本：DevEco Studio 5.0.0 Release及以上
+- HarmonyOS SDK版本：HarmonyOS 5.0.0 Release SDK及以上
 - 设备类型：华为手机（直板机、双折叠）
-- HarmonyOS版本：HarmonyOS 5.0.1 Release及以上
+- HarmonyOS版本：HarmonyOS 5.0.0 Release及以上
 
 ### 权限
 
@@ -31,7 +31,7 @@
 
 1. 安装组件。 
 
-    如果是在DevEvo Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
+    如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
 
     如果是从生态市场下载组件，请参考以下步骤安装组件。
 
@@ -45,6 +45,10 @@
       {
         "name": "video_swiper",
         "srcPath": "./XXX/video_swiper"
+      },
+      {
+        "name": "module_cast",
+        "srcPath": "./XXX/module_cast"
       }
     ]
     ```
@@ -83,7 +87,19 @@
          this.url = url;
       }
    
-      getUrl(): string | media.AVFileDescriptor {
+      getName(): string {
+         return 'name'
+      }
+   
+      getId(): string {
+         return 'id'
+      }
+   
+      getDuration(): number {
+         return 0
+      }
+   
+      getUrl(): string {
          return this.url
       }
    
@@ -91,7 +107,7 @@
          return 0;
       }
    
-      getPic(): string | ResourceStr {
+      getPic(): string {
          return '';
       }
    }
@@ -302,7 +318,19 @@ onTimeUpdate(key: string, callback: (time: number) => void): void
          this.url = url;
       }
    
-      getUrl(): string | media.AVFileDescriptor {
+      getName(): string {
+         return 'name'
+      }
+   
+      getId(): string {
+         return 'id'
+      }
+   
+      getDuration(): number {
+         return 0
+      }
+   
+      getUrl(): string {
          return this.url
       }
    
@@ -310,7 +338,7 @@ onTimeUpdate(key: string, callback: (time: number) => void): void
          return 0;
       }
    
-      getPic(): string | ResourceStr {
+      getPic(): string {
          return '';
       }
    }
@@ -385,7 +413,19 @@ onTimeUpdate(key: string, callback: (time: number) => void): void
          this.url = url
       }
    
-      getUrl(): string | media.AVFileDescriptor {
+      getName(): string {
+         return 'name'
+      }
+   
+      getId(): string {
+         return 'id'
+      }
+   
+      getDuration(): number {
+         return 0
+      }
+   
+      getUrl(): string {
          return this.url
       }
    
@@ -393,7 +433,7 @@ onTimeUpdate(key: string, callback: (time: number) => void): void
          return 0;
       }
    
-      getPic(): string | ResourceStr {
+      getPic(): string {
          return '';
       }
    

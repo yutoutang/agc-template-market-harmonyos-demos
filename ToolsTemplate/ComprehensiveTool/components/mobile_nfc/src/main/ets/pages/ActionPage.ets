@@ -119,7 +119,7 @@ struct ActionPage {
         .height(40)
         .borderRadius(20)
         .backgroundColor($r('sys.color.background_emphasize'))
-        .onClick(() => this.vm.confirm());
+        .onClick(() => this.vm.confirm(this.getUIContext()));
       }
       .width('100%')
       .height('100%')

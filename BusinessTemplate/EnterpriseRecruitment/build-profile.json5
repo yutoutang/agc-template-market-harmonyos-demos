@@ -1,7 +1,6 @@
 {
   "app": {
-    "signingConfigs": [
-    ],
+    "signingConfigs": [],
     "products": [
       {
         "name": "default",
@@ -52,19 +51,19 @@
     },
     {
       "name": "message_manager",
-      "srcPath": "./components/message_manager",
+      "srcPath": "./components/message_manager"
     },
     {
       "name": "file_management",
-      "srcPath": "./components/file_management",
+      "srcPath": "./components/file_management"
     },
     {
       "name": "ui_steps",
-      "srcPath": "./components/ui_steps",
+      "srcPath": "./components/ui_steps"
     },
     {
       "name": "check_app_update",
-      "srcPath": "./components/check_app_update",
+      "srcPath": "./components/check_app_update"
     }
   ]
 }

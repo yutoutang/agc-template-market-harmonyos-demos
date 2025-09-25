@@ -49,16 +49,16 @@
       "value": "HUAWEI ID User Authentication Agreement"
     },
     {
-      "name":"and",
-      "value":" and "
+      "name": "and",
+      "value": " and "
     },
     {
-      "name":"end",
-      "value":"."
+      "name": "end",
+      "value": "."
     },
     {
-      "name":"read_and_agree",
-      "value":"read_and_agree"
+      "name": "read_and_agree",
+      "value": "read_and_agree"
     },
     {
       "name": "hwid_no_internet_connect",
@@ -91,6 +91,10 @@
     {
       "name": "log_out",
       "value": "log_out"
+    },
+    {
+      "name": "agcit_huawei_children_education",
+      "value": "1.0.0"
     }
   ]
 }

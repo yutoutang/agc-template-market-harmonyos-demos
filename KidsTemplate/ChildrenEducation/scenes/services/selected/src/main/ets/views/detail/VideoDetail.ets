@@ -62,7 +62,7 @@ export struct VideoDetailListView {
             Row() {
               ForEach(this.videoDetail.videoCard.tags, (item: string) => {
                 TagLabelCard(item);
-              });
+              },(item:string) => item);
             };
           }
           .width('50%')
@@ -95,7 +95,7 @@ export struct VideoDetailListView {
                   this.appPathStack.pushDestination(pathInfo, true);
                 }
               });
-          });
+          }, (item:VideoCardDetail) => JSON.stringify(item));
         }
         .scrollBar(BarState.Off)
         .width('105%')

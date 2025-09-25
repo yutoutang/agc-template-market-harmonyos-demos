@@ -5,11 +5,11 @@
       "value": "page from package"
     },
     {
-      "name": "agcit_huawei_money_track",
+      "name": "agcit_huawei_money_track_tool",
       "value": "1.0.0"
     },
     {
-      "name": "agcittype_huawei_money_track",
+      "name": "agcittype_huawei_money_track_tool",
       "value": "serviceComponent"
     }
   ]

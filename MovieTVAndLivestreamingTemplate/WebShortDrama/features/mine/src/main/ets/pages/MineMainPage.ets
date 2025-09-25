@@ -27,7 +27,7 @@ export struct MineMainPage {
     }),
     new ListItemModel(getString('app.string.my_message'), getMedia('app.media.icon_message'))
       .setHandle(() => {
-        promptAction.showToast({ message: '实现中' })
+        this.goToPage(NAV_PAGE_NAME.MyMessagePage.name)
       }),
     new ListItemModel(getString('app.string.my_like'), getMedia('app.media.icon_like')).setHandle(() => {
       this.goToPage(NAV_PAGE_NAME.LikesPage.name)
@@ -87,14 +87,14 @@ export struct MineMainPage {
           builderName: NAV_PAGE_NAME.PersonalInfoPage.name, params: {
             userAvatar: [
               this.userAvatar.setContentImage(this.vm.localInfo.avatar ? this.vm.localInfo.avatar :
-              this.vm.userInfo.avatar)
+                this.vm.userInfo.avatar)
                 .setHandle(() => {
                   appRouter.push({
                     builderName: NAV_PAGE_NAME.ChangePage.name
                   })
                 })],
             userDetail: [this.userName.setContentText(this.vm.localInfo.nickname ? this.vm.localInfo.nickname :
-            this.vm.userInfo.nickname)
+              this.vm.userInfo.nickname)
               .setHandle(() => {
                 appRouter.push({
                   builderName: NAV_PAGE_NAME.ChangePage.name

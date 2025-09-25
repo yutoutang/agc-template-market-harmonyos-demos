@@ -164,8 +164,8 @@ struct PersonalSetting {
 
         // 分割线
         Divider()
-          .strokeWidth(1)
-          .color('#ffe9f0f0')
+          .strokeWidth('1px')
+          .color($r('sys.color.comp_divider'))
           .margin({ left: 18, right: 18 })
 
         // 用户协议

@@ -55,7 +55,7 @@ struct ActiveDetail {
             .fontSize($r('sys.float.Body_L'))
             .fontWeight(FontWeight.Medium)
             .width('100%')
-            .fontColor($r('sys.color.background_primary'));
+            .fontColor($r('sys.color.font_on_primary'));
         }.backgroundColor($r('sys.color.background_secondary'))
         .padding({
           left: 28,

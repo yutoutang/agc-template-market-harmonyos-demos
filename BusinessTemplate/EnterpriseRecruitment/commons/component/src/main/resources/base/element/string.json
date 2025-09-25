@@ -83,6 +83,10 @@
     {
       "name": "mine_setting",
       "value": "mine_setting"
+    },
+    {
+      "name": "agcit_huawei_enterprise_recruitment",
+      "value": "1.0.0"
     }
   ]
 }

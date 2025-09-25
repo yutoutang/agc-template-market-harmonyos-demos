@@ -1,6 +1,6 @@
 import { HashSet } from '@kit.ArkTS';
-import { ToastUtil } from '@pura/harmony-utils';
-import { hide, showDialogParams } from '@abner/dialog';
+import { ComponentContent, LevelMode, promptAction } from '@kit.ArkUI';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 import { getMyNfcName, getNfcItemImg, getNfcName, OnNfcChanged } from '../common/nfc/Nfc';
 import { NfcInfo, nfcCardInfo } from '../db/NfcCardInfo';
 import { delDialog, DelDialogParams } from '../components/DelDialog';
@@ -8,6 +8,7 @@ import { getNavPathStack } from '../common/Route';
 import { ActionModel, DetailModel } from '../model/Index';
 import { ACTION_TYPE, PAGE_TYPES } from '../common/Enum';
 import { CardListVM } from '../viewmodel/CardListVM';
+import { PromptActionUtil } from '../common/PromptActionUtil';
 
 @ComponentV2
 export struct CardAllView {
@@ -54,21 +55,42 @@ export struct CardAllView {
 
   private delAll() {
     if (this.vm.checked.isEmpty()) {
-      ToastUtil.showToast('请先选择记录！');
+      promptAction.showToast({
+        message: '请先选择记录！',
+      });
       return;
     }
     let params = new DelDialogParams();
+    params.cancel = () => {
+      PromptActionUtil.closeDialog(delContentNode);
+    }
     params.confirm = () => {
       nfcCardInfo.deleteNfcInfoByIds(this.vm.checked, false)
         .then(result => {
-          ToastUtil.showToast('删除成功！');
-          hide();
+          promptAction.showToast({
+            message: '删除成功！',
+          });
+          PromptActionUtil.closeDialog(delContentNode);
           this.loadData();
         }).catch((e: Error) => {
-        ToastUtil.showToast('删除失败！');
+        promptAction.showToast({
+          message: '删除失败！',
+        });
       });
     };
-    showDialogParams(wrapBuilder(delDialog), params);
+    let uiContext = this.getUIContext();
+    let delContentNode: ComponentContent<Object> =
+      new ComponentContent(this.getUIContext(), wrapBuilder<[DelDialogParams]>(delDialog), params);
+    PromptActionUtil.setContext(uiContext);
+    PromptActionUtil.setContentNode(delContentNode);
+    PromptActionUtil.setOptions({
+      levelMode: LevelMode.EMBEDDED,
+      onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
+        hilog.info(0xFF00, 'SubmitFeedBack', JSON.stringify(dismissDialogAction.reason));
+      },
+    });
+
+    PromptActionUtil.openDialog();
   }
 
   build() {

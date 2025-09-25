@@ -16,7 +16,7 @@
 import { ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { KeyboardAvoidMode, window } from '@kit.ArkUI';
-import { RouterTable } from '../common/TabConstants';
+import { RouterTable } from '../model/RouterTable';
 
 const DOMAIN = 0x0000;
 

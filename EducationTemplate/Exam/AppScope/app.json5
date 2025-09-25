@@ -1,7 +1,7 @@
 {
   "app": {
-    // todo 修改应用包名
-    "bundleName": "com.huawei.xxxxx",
+// todo 修改应用包名
+    "bundleName": "jybk.1.xxxxxx",
     "vendor": "example",
     "versionCode": 1000001,
     "versionName": "1.0.1",

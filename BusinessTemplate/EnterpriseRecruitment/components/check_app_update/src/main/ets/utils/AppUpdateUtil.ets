@@ -1,6 +1,8 @@
 import { bundleManager, common } from '@kit.AbilityKit';
 import { updateManager } from '@kit.StoreKit';
 import { buffer } from '@kit.ArkTS';
+import { hilog } from '@kit.PerformanceAnalysisKit';
+import { BusinessError } from '@kit.BasicServicesKit';
 
 
 /**
@@ -18,6 +20,41 @@ export function checkUpdate(context: common.UIAbilityContext): Promise<number> {
 }
 
 /**
+ * 拉起更新应用弹窗
+ * @param context
+ */
+export function showUpdateDialog(context: common.UIAbilityContext) {
+  try {
+    updateManager.showUpdateDialog(context)
+      .then((resultCode: updateManager.ShowUpdateResultCode) => {
+        hilog.info(0, 'TAG', 'Succeeded in showing UpdateDialog resultCode:' + resultCode);
+      })
+      .catch((error: BusinessError) => {
+        hilog.error(0, 'TAG', `showUpdateDialog onError.code is ${error.code}, message is ${error.message}`);
+      });
+  } catch (error) {
+    hilog.error(0, 'TAG', `showUpdateDialog onError.code is ${error.code}, message is ${error.message}`);
+  }
+}
+
+
+/**
+ * 检查更新并拉起更新弹窗
+ * @param context
+ */
+export async function checkUpdateAndShowDialog(context: common.UIAbilityContext) {
+  try {
+    const checkResult = await updateManager.checkAppUpdate(context);
+    if (checkResult.updateAvailable === updateManager.UpdateAvailableCode.LATER_VERSION_EXIST) {
+      updateManager.showUpdateDialog(context);
+    }
+  } catch (error) {
+    console.error(`检查更新失败: ${(error as BusinessError).message}`);
+  }
+}
+
+
+/**
  * 拉起应用市场
  * @param context
  */
@@ -29,10 +66,10 @@ export function pullUpAppGallery(context: common.UIAbilityContext) {
   });
 }
 
-function getProtocolUrl(urlKey: string): string {
+function getProtocolUrl(urlKey: string,  fileName: string = 'data.json'): string {
   try {
     // Read files from /AppScope/resources/rawfile.
-    const value: Uint8Array = getContext().resourceManager.getRawFileContentSync('data.json');
+    const value: Uint8Array = getContext().resourceManager.getRawFileContentSync(fileName);
     // Return the link to the HUAWEI ID User Authentication Agreement.
     return JSON.parse(buffer.from(value.buffer).toString())[urlKey] as string;
   } catch (error) {

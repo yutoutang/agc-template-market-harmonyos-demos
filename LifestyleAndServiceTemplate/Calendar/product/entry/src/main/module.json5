@@ -5,13 +5,13 @@
     "description": "$string:module_desc",
     "mainElement": "EntryAbility",
     "deviceTypes": [
-      "phone",
+      "phone"
     ],
-    // todo 替换应用的client_id值,
+// todo 替换应用的client_id值,
     "metadata": [
       {
         "name": "client_id",
-        "value": "xxxxxxx"
+        "value": "******"
       }
     ],
     "deliveryWithInstall": true,

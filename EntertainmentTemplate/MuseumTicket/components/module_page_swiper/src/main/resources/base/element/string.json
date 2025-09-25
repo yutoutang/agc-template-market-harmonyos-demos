@@ -6,11 +6,11 @@
     },
     {
       "name": "agcit_huawei_museum_ticket_module_page_swiper",
-      "value": "1.0.0"
+      "value": "1.0.1"
     },
     {
       "name": "agcittype_huawei_museum_ticket_module_page_swiper",
-      "value": "sceneTemplate"
+      "value": "serviceComponent"
     }
   ]
 }

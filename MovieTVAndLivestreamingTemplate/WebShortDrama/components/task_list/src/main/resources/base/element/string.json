@@ -1,0 +1,32 @@
+{
+  "string": [
+    {
+      "name": "page_show",
+      "value": "page from package"
+    },
+    {
+      "name": "daily_tasks",
+      "value": "日常任务"
+    },
+    {
+      "name": "daily_task_update",
+      "value": "每日凌晨任务更新"
+    },
+    {
+      "name": "watch_drama",
+      "value": "去看剧"
+    },
+    {
+      "name": "completed",
+      "value": "已完成"
+    },
+    {
+      "name": "receive",
+      "value": "领取"
+    },
+    {
+      "name": "agcit_huawei_web_short_drama",
+      "value": "1.0.2"
+    }
+  ]
+}

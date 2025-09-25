@@ -280,7 +280,7 @@ export struct CoursePage {
         Image($r('app.media.ic_public_trash'))
           .width($r('app.float.vp_40'))
           .height($r('app.float.vp_40'))
-          .opacity(this.swiperDel ? 0.4 : 1)
+          .opacity(this.propOrderInfo.orderInfos.length === 0 || this.swiperDel ? 0.4 : 1)
           .margin({ left: $r('app.float.vp_8') })
       }
       .onClick(() => {

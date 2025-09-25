@@ -1,4 +1,4 @@
-# 日历选择组件快速入门
+# 预约日期选择组件快速入门
 
 ## 目录
 
@@ -27,7 +27,7 @@
 
 1. 安装组件。
 
-   如果是在DevEvo Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
+   如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
 
    如果是从生态市场下载组件，请参考以下步骤安装组件。
 
@@ -79,13 +79,13 @@
 
 #### UICalendarPicker(option: UICalendarPickerOptions)
 
-日历选择组件。
+预约日期选择组件。
 
 **参数：**
 
 | 参数名  | 类型                                                        | 是否必填 | 说明                     |
 | ------- | ----------------------------------------------------------- | -------- | ------------------------ |
-| options | [UICalendarPickerOptions](#UICalendarPickerOptions对象说明) | 否       | 配置日历选择组件的参数。 |
+| options | [UICalendarPickerOptions](#UICalendarPickerOptions对象说明) | 否       | 配置预约日期选择组件的参数。 |
 
 #### UICalendarPickerOptions对象说明
 

@@ -1,38 +1,31 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
- * Licensed under the Apache License, Version 2.0 (the 'License');
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  Copyright (c) 2025 Huawei Device Co., Ltd.
+ *  Licensed under the Apache License, Version 2.0 (the 'License');
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an 'AS IS' BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an 'AS IS' BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
  */
 
 import { AppStorageV2, window } from '@kit.ArkUI';
-import { Header } from '../components/Header';
-import { fileSelect } from 'feed_back';
+import { FunctionalButton, functionalButtonComponentManager } from '@kit.ScenarioFusionKit';
 import { UserInfo } from 'login_info';
-
-@Builder
-export function EditPersonalCenterBuilder() {
-  EditPersonalCenter();
-}
+import { Header } from '../components/Header';
 
 @ComponentV2
-export struct EditPersonalCenter {
+export struct EditPersonalCenterPage {
   @Local textName: string = '';
-  @Param message: string = 'Hello World';
-  @Param iconSheetHeight: number = 287;
-  @Param nicknameSheetHeight: number = 744;
   @Local isShowIcon: boolean = false;
   @Local isShowNickname: boolean = false;
   @Local keyboardHeight: number = 0;
-  @Local logoUser: UserInfo = AppStorageV2.connect(UserInfo, () => new UserInfo())!
+  @Local loginUser: UserInfo = AppStorageV2.connect(UserInfo, () => new UserInfo())!
   @Local imageUri: Array<string> = [];
 
   aboutToAppear(): void {
@@ -47,128 +40,203 @@ export struct EditPersonalCenter {
     })
   }
 
-  @Builder
-  myBuilder() {
+  build() {
     Column() {
-      Row() {
-        Image($r('app.media.close_btn')).size({ width: $r('app.float.vp_40'), height: $r('app.float.vp_40') })
-          .onClick(() => {
-            this.isShowIcon = false
-          })
-      }.size({ width: '100%', height: $r('app.float.vp_56') })
-      .padding({ top: $r('app.float.vp_8'), bottom: $r('app.float.vp_8') })
-      .justifyContent(FlexAlign.End)
-
+      Header({ title: '个人信息' })
       Column() {
-        Row() {
-          Image($r('app.media.Mask')).size({ width: $r('app.float.vp_40'), height: $r('app.float.vp_40') })
-            .margin({ right: $r('app.float.vp_12') })
-          Text('使用华为账号头像').height('app.float.vp_21').width('app.float.vp_128')
-          Blank()
-          Image($r('app.media.iconRight')).size({ width: $r('app.float.vp_24'), height: $r('app.float.vp_24') })
-
-        }.size({ width: 304, height: $r('app.float.vp_40') })
-        .padding({ left: $r('app.float.vp_12'), right: $r('app.float.vp_12') })
-        .onClick(() => {
-          this.logoUser.avatar = $r('app.media.Mask')
-          this.isShowIcon = false
-          this.showToast('头像修改成功');
+        // 头像
+        this.avatarBuilder()
+        Column() {
+          // 昵称
+          this.nickNameBuilder()
+          Divider().color($r('sys.color.comp_divider'))
+          // 手机号
+          this.phoneNumberBuilder()
+        }
+        .backgroundColor(Color.White)
+        .width('100%')
+        .height(104)
+        .borderRadius(16)
+        .padding({
+          left: $r('app.float.vp_12'),
+          right: $r('app.float.vp_12'),
+          top: $r('app.float.vp_4'),
+          bottom: $r('app.float.vp_4')
         })
-
-        Divider()
-          .strokeWidth(0.5)
-          .color($r('sys.color.comp_divider'))
-          .margin({ top: $r('app.float.vp_13'), bottom: $r('app.float.vp_13') })
-        Row() {
-          Image($r('app.media.ic_public_image_bg'))
-            .size({ width: $r('app.float.vp_40'), height: $r('app.float.vp_40') })
-            .margin({ right: $r('app.float.vp_12') })
-          Text('从图库选择').height('app.float.vp_21').width('app.float.vp_128')
-          Blank()
-          Image($r('app.media.iconRight')).size({ width: $r('app.float.vp_24'), height: $r('app.float.vp_24') })
-        }.width(304).height('app.float.vp_40')
-        .padding({ left: $r('app.float.vp_12'), right: $r('app.float.vp_12') })
-        .onClick(async () => {
-          let arr = await fileSelect(this.imageUri, 1)
-          if (arr.length === 1) {
-            this.logoUser.avatar = arr[arr.length-1]
-            this.isShowIcon = false
-            this.showToast('头像修改成功');
-          }
-        })
-
-        Divider()
-          .strokeWidth(0.5)
-          .color($r('sys.color.comp_divider'))
-          .margin({ top: $r('app.float.vp_13'), bottom: $r('app.float.vp_13') })
-        Row() {
-          Image($r('app.media.ic_public_camera_bg'))
-            .size({ width: $r('app.float.vp_40'), height: $r('app.float.vp_40') })
-            .margin({ right: $r('app.float.vp_12') })
-          Text('拍照').size({ width: 128, height: 21 })
-          Blank()
-          Image($r('app.media.iconRight')).size({ width: $r('app.float.vp_24'), height: $r('app.float.vp_24') })
-        }.size({ width: 304, height: $r('app.float.vp_40') })
-        .padding({ left: $r('app.float.vp_12'), right: $r('app.float.vp_12') })
       }
-      .borderRadius(16)
-      .padding({ top: $r('app.float.vp_16'), left: $r('app.float.vp_12'), right: $r('app.float.vp_12') })
-      .borderRadius(16)
-      .backgroundColor($r('sys.color.background_primary'))
-      .size({ width: 328, height: 202 })
-    }.backgroundColor($r('sys.color.background_secondary'))
-    .height('100%').width('100%')
-    .padding({ top: $r('app.float.vp_8'), left: $r('app.float.vp_16'), right: $r('app.float.vp_16') })
+      .padding({ left: $r('app.float.vp_16'), right: $r('app.float.vp_16') })
+      .alignItems(HorizontalAlign.Start)
+      .width('100%')
+      .height('100%')
+    }
+    .backgroundColor($r('sys.color.background_secondary'))
+    .width('100%')
+    .height('100%')
+  }
+
+  /**
+   * 手机号
+   */
+  @Builder
+  phoneNumberBuilder() {
+    Row() {
+      Text('手机号')
+        .fontSize($r('sys.float.Subtitle_M'))
+        .fontColor($r('sys.color.font_primary'))
+        .fontWeight(FontWeight.Medium)
+      Blank()
+      Text(this.loginUser.cellphone)
+        .fontColor($r('sys.color.font_secondary'))
+        .fontSize($r('sys.float.Body_M'))
+        .fontWeight(FontWeight.Regular)
+      Image($r('app.media.icon_right'))
+        .width($r('app.float.vp_12'))
+        .height($r('app.float.vp_24'))
+        .margin({ left: $r('app.float.vp_4') })
+    }
+    .height($r('app.float.vp_48'))
+    .width('100%')
+  }
+
+  /**
+   * 昵称
+   */
+  @Builder
+  nickNameBuilder() {
+    Row() {
+      Text('昵称')
+        .fontSize($r('sys.float.Subtitle_M'))
+        .fontColor($r('sys.color.font_primary'))
+        .fontWeight(FontWeight.Medium)
+      Blank()
+      Text(this.loginUser.name)
+        .fontSize($r('sys.float.Body_M'))
+        .fontWeight(FontWeight.Regular)
+        .fontColor($r('sys.color.font_secondary'))
+        .margin({ right: $r('app.float.vp_4') })
+      Image($r('app.media.icon_right'))
+        .width($r('app.float.vp_12'))
+        .height($r('app.float.vp_24'))
+    }
+    .width('100%')
+    .height($r('app.float.vp_48'))
+    .onClick(() => {
+      this.isShowNickname = true;
+    })
+    .bindSheet($$this.isShowNickname, this.setNickNameBuilder(), {
+      height: 744,
+      backgroundColor: $r('sys.color.background_secondary'),
+      showClose: false,
+      maskColor: $r('sys.color.mask_fourth'),
+    })
+  }
+
+  /**
+   * 头像
+   */
+  @Builder
+  avatarBuilder() {
+    Row() {
+      Text('头像')
+        .fontSize($r('sys.float.Subtitle_M'))
+        .fontColor($r('sys.color.font_primary'))
+        .fontWeight(FontWeight.Medium)
+      Blank()
+        .layoutWeight(1)
+      Row({ space: 4 }) {
+        FunctionalButton({
+          params: {
+            openType: functionalButtonComponentManager.OpenType.CHOOSE_AVATAR,
+            label: '',
+            styleOption: {
+              styleConfig: new functionalButtonComponentManager.ButtonConfig()
+                .type(ButtonType.Normal)
+                .backgroundImage((this.loginUser.avatar && this.loginUser.avatar !== '') ? this.loginUser.avatar :
+                $r('app.media.path2x'))
+                .backgroundImageSize(ImageSize.Cover)
+                .width(40)
+                .height(40)
+                .borderRadius(50)
+                .backgroundColor('#E5E5E5'),
+            },
+          },
+          controller: new functionalButtonComponentManager.FunctionalButtonController().onChooseAvatar((err,
+            data) => {
+            if (err) {
+              return;
+            }
+            if (data) {
+              this.loginUser.avatar = data.avatarUri!
+            }
+          }),
+        })
+        Image($r('app.media.icon_right'))
+          .width($r('app.float.vp_12'))
+          .height($r('app.float.vp_24'))
+          .draggable(false)
+      }
+      .accessibilityLevel('yes')
+      .accessibilityText('切换头像')
+    }
+    .innerCard()
+    .stateStyles({
+      normal: this.normalStyles,
+      pressed: this.pressedStyles,
+    })
   }
 
   @Builder
-  myBuilder2() {
+  setNickNameBuilder() {
     Column() {
       Column() {
         Row() {
-          Image($r('app.media.close_btn')).size({ width: $r('app.float.vp_40'), height: $r('app.float.vp_40') })
-            .onClick(() => {
-              this.isShowNickname = false
-            })
-        }.size({ width: '100%', height: $r('app.float.vp_56') })
-        .padding({ top: $r('app.float.vp_8'), bottom: $r('app.float.vp_8') })
-        .justifyContent(FlexAlign.End)
-
-        Row() {
           Text('设置昵称')
-            .width($r('app.float.vp_80'))
-            .height($r('app.float.vp_27'))
             .fontSize($r('sys.float.Title_S'))
             .fontWeight(FontWeight.Bold)
             .fontColor($r('sys.color.font_primary'))
-            .margin({ top: $r('app.float.vp_16'), bottom: $r('app.float.vp_16') })
+          Image($r('app.media.close_btn'))
+            .height($r('app.float.vp_40'))
+            .width($r('app.float.vp_40'))
+            .onClick(() => {
+              this.isShowNickname = false
+            })
         }
+        .width('100%')
+        .height($r('app.float.vp_56'))
+        .alignItems(VerticalAlign.Center)
+        .justifyContent(FlexAlign.SpaceBetween)
 
-        TextInput({ placeholder: '请输入不超过12位的新昵称' },)
+        TextInput({ placeholder: '请输入不超过12位的新昵称' })
+          .width('100%')
+          .height($r('app.float.vp_40'))
+          .fontColor($r('sys.color.font_primary'))
+          .fontSize($r('sys.float.Body_L'))
           .backgroundColor($r('sys.color.comp_background_primary'))
+          .margin({ top: $r('app.float.vp_12') })
           .type(InputType.Normal)
           .cancelButton({
             style: CancelButtonStyle.CONSTANT,
-            icon: { size: $r('app.float.vp_18'), color: $r('sys.color.icon_primary') }
+            icon: { size: $r('app.float.vp_16'), color: $r('sys.color.icon_primary') }
           })
           .onChange((value: string) => {
             this.textName = value;
           })
       }
 
+      Blank()
       Button('确定')
-        .borderRadius($r('app.float.vp_20'))
+        .borderRadius(20)
         .fontColor($r('sys.color.font_on_primary'))
-        .backgroundColor('#4c5dc4')
+        .backgroundColor($r('sys.color.multi_color_01'))
         .fontSize($r('sys.float.Body_L'))
         .fontWeight(FontWeight.Medium)
-        .width(304)
+        .width('100%')
         .height($r('app.float.vp_40'))
         .padding({ top: $r('app.float.vp_12'), bottom: $r('app.float.vp_12') })
-        .margin({ top: this.keyboardHeight ? 208 : 480 })
+        .margin({ bottom: this.keyboardHeight ? $r('app.float.vp_300') : $r('app.float.vp_50') })
         .onClick(() => {
           if (this.textName.trim() !== '' && this.textName.length <= 12) {
-            this.logoUser.name = this.textName
+            this.loginUser.name = this.textName
             this.showToast('昵称修改成功');
             this.isShowNickname = false
           } else if (this.textName.trim() === '') {
@@ -182,7 +250,17 @@ export struct EditPersonalCenter {
     .padding({ top: $r('app.float.vp_8'), left: $r('app.float.vp_16'), right: $r('app.float.vp_16') })
   }
 
-  showToast(message: string) {
+  @Styles
+  normalStyles() {
+    .backgroundColor($r('sys.color.comp_background_primary'))
+  }
+
+  @Styles
+  pressedStyles(): void {
+    .backgroundColor($r('sys.color.interactive_pressed'))
+  }
+
+  showToast(message: ResourceStr) {
     try {
       this.getUIContext().getPromptAction().showToast({
         message: message,
@@ -191,85 +269,21 @@ export struct EditPersonalCenter {
     } catch (error) {
     }
   }
-
-  build() {
-    Column() {
-      Header({ title: '个人信息' })
-      Column() {
-        Row() {
-          Text('头像').size({ width: $r('app.float.vp_120'), height: 21 })
-          Blank()
-          Image(this.logoUser.isLogin ?
-            this.logoUser.avatar !== '' ? this.logoUser.avatar : $r('app.media.path2x') :
-          $r('app.media.person'))
-            .size({ width: $r('app.float.vp_40'), height: $r('app.float.vp_40') })
-            .borderRadius(40)
-          Image($r('app.media.iconRight'))
-            .size({ width: $r('app.float.vp_24'), height: $r('app.float.vp_24') })
-        }
-        .onClick(() => {
-          this.isShowIcon = true;
-        })
-        .size({ width: 328, height: 64 })
-        .margin({ top: '8vp' })
-        .backgroundColor($r('sys.color.font_on_primary'))
-        .padding($r('app.float.vp_12'))
-        .borderRadius(16)
-        .bindSheet($$this.isShowIcon, this.myBuilder(), {
-          height: this.iconSheetHeight,
-          backgroundColor: $r('sys.color.background_secondary'),
-          showClose: false,
-          maskColor: $r('sys.color.mask_fourth'),
-          blurStyle: BlurStyle.Thick,
-        })
-
-        Column() {
-          Row() {
-            Text('昵称').height(21)
-            Blank()
-            Text(this.logoUser.name).height(19)
-              .fontSize($r('sys.float.Body_M'))
-              .fontWeight(FontWeight.Regular)
-              .fontColor($r('sys.color.font_secondary'))
-            Image($r('app.media.ic_public_brush')).size({ width: $r('app.float.vp_24'), height: $r('app.float.vp_24') })
-              .margin({ left: 4 })
-              .fillColor($r('sys.color.icon_primary'))
-
-          }.size({ width: 328, height: 58 })
-          .padding({ left: $r('app.float.vp_12'), right: $r('app.float.vp_12') })
-          .onClick(() => {
-            this.isShowNickname = true;
-          })
-          .bindSheet($$this.isShowNickname, this.myBuilder2(), {
-            height: this.nicknameSheetHeight,
-            backgroundColor: $r('sys.color.background_secondary'),
-            showClose: false,
-            maskColor: $r('sys.color.mask_fourth'),
-          })
-
-          Divider().strokeWidth(0.5).width(304).color($r('sys.color.comp_divider'))
-          Row() {
-            Text('电话').size({ width: $r('app.float.vp_120'), height: 21 })
-            Blank()
-            Text(this.logoUser.cellphone).size({ width: 80, height: 19 })
-              .fontSize($r('sys.float.Body_M'))
-              .fontWeight(FontWeight.Regular)
-              .fontColor($r('sys.color.font_secondary'))
-            Image($r('app.media.iconRight'))
-              .size({ width: $r('app.float.vp_24'), height: $r('app.float.vp_24') })
-              .margin({ left: 4 })
-          }.size({ width: 328, height: 58 })
-          .padding({ left: $r('app.float.vp_12'), right: $r('app.float.vp_12') })
-        }
-        .borderRadius(16)
-        .margin({ top: $r('app.float.vp_12') })
-        .borderRadius(16)
-        .backgroundColor($r('sys.color.background_primary'))
-      }.backgroundColor($r('sys.color.comp_background_gray')).width('100%').height('100%')
-    }
-    .backgroundColor($r('sys.color.background_secondary'))
-    .width('100%').height('100%')
-  }
 }
 
+@Extend(Row)
+function innerCard() {
+  .width('100%')
+  .height($r('app.float.vp_56'))
+  .margin({ top: $r('app.float.vp_8'), bottom: $r('app.float.vp_12') })
+  .padding({ left: $r('app.float.vp_12'), right: $r('app.float.vp_12') })
+  .backgroundColor($r('sys.color.background_primary'))
+  .borderRadius($r('app.float.vp_16'))
+  .justifyContent(FlexAlign.SpaceBetween)
+}
+
+@Builder
+export function EditPersonalCenterBuilder() {
+  EditPersonalCenterPage()
+}
 

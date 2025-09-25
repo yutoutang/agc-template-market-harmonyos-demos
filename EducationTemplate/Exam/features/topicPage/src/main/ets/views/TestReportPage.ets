@@ -98,7 +98,7 @@ export struct TestReportPage {
       // 练习数据
       this.testDataBuilder()
       // 分隔线
-      Divider().color($r('app.color.topic_page_background_gray')).strokeWidth(9)
+      Divider().color($r('sys.color.comp_background_tertiary'))
       // 题目列表
       this.topicListBuilder()
     }
@@ -241,7 +241,7 @@ export struct TestReportPage {
                 .margin({ bottom: $r('app.float.vp_13') })
 
                 // 分隔线
-                Divider().color($r('sys.color.comp_divider')).strokeWidth(1)
+                Divider().color($r('sys.color.comp_background_tertiary')).strokeWidth(1)
                 //解析
                 Row() {
                   Text($r('app.string.parse'))

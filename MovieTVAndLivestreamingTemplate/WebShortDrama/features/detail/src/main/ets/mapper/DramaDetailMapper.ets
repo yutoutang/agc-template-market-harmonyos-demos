@@ -13,6 +13,7 @@ export function mapEpisodeInfo(episodeInfo: EpisodeInfo): DetailVideoData {
   shortDramaDetailItemVM.commentCount = episodeInfo?.socialInfo?.commentCount || ''
   shortDramaDetailItemVM.currentSerial = episodeInfo?.id || 0
   shortDramaDetailItemVM.dramaInfo.totalCount = episodeInfo?.totalCount || 0
+  shortDramaDetailItemVM.duration = episodeInfo?.duration || 0
   let videoPlayData: DetailVideoData = new DetailVideoData(shortDramaDetailItemVM)
   return videoPlayData;
 }

@@ -3,14 +3,25 @@
 ## 目录
 
 - [功能介绍](#功能介绍)
-- [组件](#组件)
-- [环境要求](#环境要求)
+- [约束与限制](#约束与限制)
 - [快速入门](#快速入门)
-- [权限要求](#权限要求)
+- [示例效果](#示例效果)
 - [开源许可协议](#开源许可协议)
 
 ## 功能介绍
 
+本模板中提供了多种组件，您可以按需选择合适的组件进行使用，所有组件存放在工程根目录的components下。
+
+| 组件                     | 描述                | 使用指导                                             |
+|------------------------|-------------------|--------------------------------------------------|
+| 一键登录组件（login_info）     | 支持华为一键登录          | [使用指导](components/login_info/README.md)    |
+| 支付组件（aggregated_payment） | 支持华为支付，微信支付，支付宝支付 | [使用指导](components/aggregated_payment/README.md)  |
+| 多功能答题组件（answer_questions） | 展示题库样式            | [使用指导](components/answer_questions/README.md)             |
+| 分栏基础组件（base_select）    | 左右分栏选项            | [使用指导](components/base_select/README.md) |
+| 多级分栏组件（select_category） | 多级别选项样式           | [使用指导](components/select_category/README.md)    |
+| 搜索组件（search）           | 本组件提供了搜索的相关功能     | [使用指导](components/search/README.md)         |
+| 一键搜题组件（search_question） | 多功能搜题组件           | [使用指导](components/search_question/README.md)       |
+| 意见反馈组件（feed_back）      | 意见反馈组件            | [使用指导](components/feed_back/README.md)       |
 
 本模板为备考类应用提供了常用功能的开发样例，模板主要分练习、课程和我的三大模块：
 
@@ -243,40 +254,29 @@ Exam
      │  ├─pages
      │  │      Index.ets                         // 入口页面
      │  │      LoginPage.ets                     // login页面
+     │  │      MainEntry.ets                     // 主页面
      │  ├─model
-     │  │      TabListItem.ets                   // 数据声明
+     │  │      TabListItem.ets                   // tab数据声明
+     │  │      RouterTable.ets                   // 路由表
      │  ├─viewmodels
      │  │      MainVM.ets                        // 页面数据模型
-     │  ├─common                                 // 常量及Tab数据源
-     │         TabConstants.ets
      └─resources
 ```
-## 组件
 
-本模板中提供了多种组件，您可以按需选择合适的组件进行使用，所有组件存放在工程根目录的components下。
 
-| 组件                         | 描述                | 使用指导                                             |
-|----------------------------|-------------------|--------------------------------------------------|
-| 登录组件（login_info）       | 支持华为一键登录          | [使用指导](components/login_info/README.md)    |
-| 支付组件（aggregated_payment）   | 支持华为支付，微信支付，支付宝支付 | [使用指导](components/aggregated_payment/README.md)  |
-| 答题组件（answer_questions）       | 展示题库样式            | [使用指导](components/answer_questions/README.md)             |
-| 分栏基础组件（base_select）        | 左右分栏选项            | [使用指导](components/base_select/README.md) |
-| 多级分栏组件（select_category）    | 多级别选项样式           | [使用指导](components/select_category/README.md)    |
-| 搜索组件（search）               | 本组件提供了搜索的相关功能     | [使用指导](components/search/README.md)         |
-| 一键搜题组件（search_question） | 多功能搜题组件           | [使用指导](components/search_question/README.md)       |
-| 意见反馈组件（feed_back）          | 意见反馈组件            | [使用指导](components/feed_back/README.md)       |
+## 约束与限制
 
-## 环境要求
+### 环境
 
-### 软件
-
-* DevEco Studio版本：DevEco Studio 5.0.0 Release及以上
-* HarmonyOS SDK版本：HarmonyOS 5.0.0 Release SDK及以上
-
-### 硬件
-
+* DevEco Studio版本：DevEco Studio 5.0.3 Release及以上
+* HarmonyOS SDK版本：HarmonyOS 5.0.3 Release SDK及以上
 * 设备类型：华为手机（直板机）
-* HarmonyOS版本：HarmonyOS 5.0.0 Release及以上
+* 系统版本：HarmonyOS 5.0.1(13)及以上
+
+
+## 权限
+
+- 网络权限：ohos.permission.INTERNET
 
 ### 调试
 本模板不支持使用模拟器调试，请使用真机进行调试。
@@ -299,7 +299,7 @@ Exam
 
    a. 将应用的client ID配置到product/entry/src/main路径下的module.json5文件中，详细参考：[配置Client ID](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-client-id)。
 
-   b. 申请华为账号一键登录所需的quickLoginMobilePhone权限，详细参考：[配置scope权限](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-config-permissions)。
+   b. 申请华为账号一键登录权限，详细参考：[申请账号权限](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-config-permissions)。
 
 3. 配置支付服务。
 
@@ -307,7 +307,7 @@ Exam
 
 4. 对应用进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing#section297715173233)。
 
-5. 添加手工签名所用证书对应的公钥指纹。详细参考：[配置应用签名证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-signature-info-0000001628566748#section5181019153511)
+5. 添加手工签名所用证书对应的公钥指纹。详细参考：[配置公钥指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-cert-fingerprint-0000002278002933)
 
 ### 运行调试工程
 
@@ -315,10 +315,12 @@ Exam
 
 2. 菜单选择“Run > Run 'entry' ”或者“Run > Debug 'entry' ”，运行或调试模板工程。
 
+## 示例效果
 
-## 权限要求
+| 订单                                                       | 答题                                                       | 支付                                                       |
+|----------------------------------------------------------|----------------------------------------------------------|----------------------------------------------------------|
+| <img src="screenshots/exam_01.jpg" alt="订单" width="300"> | <img src="screenshots/exam_02.jpg" alt="答题" width="300"> | <img src="screenshots/exam_03.jpg" alt="支付" width="300"> |
 
-- 网络权限：ohos.permission.INTERNET
 
 ## 开源许可协议
 

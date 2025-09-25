@@ -23,6 +23,10 @@
     {
       "name": "read_before_purchase",
       "value": "购买前请阅读并同意"
+    },
+    {
+      "name": "agcit_huawei_children_education",
+      "value": "1.0.0"
     }
   ]
 }

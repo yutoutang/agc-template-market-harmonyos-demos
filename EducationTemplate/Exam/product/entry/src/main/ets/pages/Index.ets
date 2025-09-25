@@ -15,11 +15,9 @@
 
 import { AlertDialog } from '@kit.ArkUI';
 import { RouterMap, RouterModule } from 'router_module';
-import { RouterTable, TabStyle } from '../common/TabConstants';
-import { TabListItem } from '../model/TabListItem'
-import { MainVM } from '../viewmodels/MainVM';
 import { PreferenceUtil, PreferConstant } from 'commonlib';
 import { QuestionsRouterModel } from 'answer_questions';
+import { RouterTable } from '../model/RouterTable';
 
 @Entry
 @ComponentV2
@@ -117,50 +115,4 @@ struct Index {
     }
     return false
   }
-}
-
-@ComponentV2
-struct MainPage {
-  vm: MainVM = MainVM.instance;
-
-  @Builder
-  tabBarBuilder(item: TabListItem, index: number) {
-    Column({ space: 2 }) {
-      Image(this.vm.curIndex === index ? item.iconChecked : item.icon)
-        .width(TabStyle.ICON_SIZE)
-        .height(TabStyle.ICON_SIZE)
-      Text(item.label)
-        .fontWeight(FontWeight.Medium)
-        .fontSize($r('sys.float.Caption_M'))
-        .fontColor(this.vm.curIndex === index ?
-        $r('app.color.icon_bg_blue') : $r('sys.color.icon_secondary'))
-    }
-    .justifyContent(FlexAlign.Center)
-    .width('100%')
-    .height(TabStyle.BAR_HEIGHT)
-  }
-
-  build() {
-    Column() {
-      Tabs({ barPosition: BarPosition.End, index: $$this.vm.curIndex, controller: this.vm.controller }) {
-        ForEach(this.vm.tabList, (item: TabListItem, index: number) => {
-          TabContent() {
-            item.component.builder();
-          }
-          .tabBar(this.tabBarBuilder(item, index))
-        }, (item: TabListItem, index) => JSON.stringify(item) + '_' + index)
-      }
-      .scrollable(false)
-      .barMode(BarMode.Fixed)
-      .barHeight(TabStyle.BAR_HEIGHT)
-      .height('100%')
-      .animationDuration(TabStyle.ANIMATION_DURATION)
-    }
-    .backgroundColor($r('app.color.system_color_background_white'))
-  }
-}
-
-@Builder
-export function MainPageBuilder() {
-  MainPage()
 }

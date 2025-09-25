@@ -161,8 +161,7 @@ export struct BirthdayRememberList {
             }
             .backgroundColor('#FAFAFA')
             .borderRadius(16)
-            .padding({ left: 12, right: 12 })
-            .height(80)
+            .padding(12)
             .width('100%')
             .onClick(() => {
               const params: Record<string, UserEventItem | string> = {

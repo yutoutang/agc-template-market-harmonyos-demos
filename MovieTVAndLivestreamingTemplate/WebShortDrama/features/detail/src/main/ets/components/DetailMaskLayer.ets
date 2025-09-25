@@ -1,5 +1,5 @@
 import { getMedia, NAV_PAGE_NAME } from '@agctemplate/resources';
-import { appRouter, WindowManager } from '@agctemplate/utils';
+import { appRouter, Logger, WindowManager } from '@agctemplate/utils';
 import { PlayController, PlaySession, ProcessBar } from 'video_swiper';
 import { AggregatedPaymentPicker, ChannelType } from 'aggregated_payment';
 import { calculateNewVipExpiryDate, VipOpen, VipPackage, VipPackageItem } from 'vip_center';
@@ -12,8 +12,12 @@ import { BulletSetting } from './BulletSetting';
 import { PlaySetting } from './PlaySetting';
 import { Side } from './Side';
 import { VideoDesLayer } from './VideoDesLayer';
-import { AppStorageV2, promptAction } from '@kit.ArkUI';
+import { AppStorageV2, ComponentContent, promptAction } from '@kit.ArkUI';
 import { AppStorageKeys, BreakPoint, UserInfoModel } from '@agctemplate/widgets';
+import { CastingLayer, CastService, CastPicker } from 'module_cast';
+import { Params, PromptActionClass } from './PromptActionClass';
+
+const TAG = 'DetailMaskLayer'
 
 interface ParamsModel {
   id: string
@@ -360,6 +364,13 @@ export struct DetailMaskLayer {
     .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
   }
 
+  private isLocked(index: number): boolean {
+    let isLock: boolean = !this.userInfo.isVip  && index > 10 &&
+      !PlayController.lockedDrama.get(this.playControl.id)?.includes(index) &&
+      this.userInfo.bonus < 100 && this.bonusAgree
+    return isLock;
+  }
+
   @Builder
   unlockSheet() {
     Column() {
@@ -594,7 +605,7 @@ export struct DetailMaskLayer {
     .layoutWeight(1)
   }
 
-  aboutToAppear(): void {
+  async aboutToAppear() {
     if (!this.bulletVM.storage.setting.has('setting')) {
       this.bulletVM.storage.setting.set('setting', new BulletSettingItem())
     }
@@ -610,180 +621,233 @@ export struct DetailMaskLayer {
     WindowManager.setVideoFullScreen(false, videoRatio.short.width, videoRatio.short.height)
   }
 
+  onBack() {
+    PromptActionClass.setParam(new Params('是否退出投屏？', [{
+      content: '是', action: () => {
+        PromptActionClass.closeDialog()
+        CastService.getInstance().endCasting()
+      }
+    }, {
+      content: '否', action: () => {
+        PromptActionClass.closeDialog()
+      }
+    }
+    ]));
+    PromptActionClass.setOptions({ alignment: DialogAlignment.Center, maskColor: $r('sys.color.mask_fourth') });
+    PromptActionClass.openDialog()
+  }
+
   build() {
     Stack({ alignContent: Alignment.BottomEnd }) {
-      Stack({ alignContent: Alignment.TopStart }) {
-        if (this.playControl.isLocked) {
-          this.lockedBuilder()
-        }
-
-        Row() {
-          Row() {
-            Image(getMedia('app.media.detail_back'))
-              .height(40)
-              .width(40)
-              .onClick(() => {
-                this.recover();
-                appRouter.back(true, {
-                  params: {
-                    id: this.videoDetailMaskVM.dramaInfo.id,
-                    curIndex: this.playControl.curentIndex
-                  } as ParamsModel
-                })
-                return true
-              })
-          }
-          .height(56)
-          .layoutWeight(1)
-
-          Row({ space: 10 }) {
-            Row() {
-              Image(getMedia('app.media.speed'))
-                .width(22)
-                .height(22)
-              Text(this.storage.selectSpeed)
-                .fontSize(16)
-                .fontWeight(500)
-                .fontColor('#fff')
-                .margin({ left: 5 })
+      if (CastService.getInstance().isCasting) {
+        Stack({ alignContent: Alignment.Bottom }) {
+          CastingLayer({
+            title: `第${this.playControl.curentIndex + 1}集`,
+            castService: CastService.getInstance(),
+            onPlayNext: () => {
+              this.playControl.changeIndex(this.playControl.curentIndex + 1)
+            },
+            onPlayPre: () => {
+              this.playControl.changeIndex(this.playControl.curentIndex - 1)
+            },
+            onBack: () => {
+              this.onBack()
             }
-            .width(92)
-            .height(40)
-            .backgroundColor('rgba(0, 0, 0, 0.05)')
-            .borderRadius(20)
-            .justifyContent(FlexAlign.Center)
-            .onClick(() => {
-              this.isShowSetSpeed = !this.isShowSetSpeed
-            })
-            .bindSheet($$this.isShowSetSpeed, this.setSpeedBuilder(), {
-              height: 340,
-              showClose: false,
-              preferType: SheetType.BOTTOM
-            })
-
-            Image(getMedia('app.media.four'))
-              .width(40)
-              .height(40)
-              .onClick(() => {
-                this.isShowPlaySettingSheet = !this.isShowPlaySettingSheet
-              })
-              .bindSheet($$this.isShowPlaySettingSheet, this.playSettingSheetBuilder(), {
-                height: 352,
-                showClose: false,
-                preferType: SheetType.BOTTOM,
-              })
-          }
-          .height(56)
-          .width(142)
-        }
-        .height(56)
-        .width('100%')
-        .justifyContent(FlexAlign.SpaceBetween)
-        .padding({ left: 16, right: 16, top: 64 })
-      }
-      .width('100%')
-      .height('100%')
-
-      BulletLayer({ bulletVM: this.bulletVM })
-        .position({ top: '15%' })
-        .visibility(this.isShowBullet ? Visibility.Visible : Visibility.Hidden)
-        .animation({ duration: 300, curve: Curve.Smooth })
-        .bindSheet($$this.isShowBulletSettingSheet, this.bulletSettingSheet(), {
-          height: 372,
-          showClose: false,
-          preferType: SheetType.BOTTOM
-        })
-
-      Side({
-        videoDes: this.videoDetailMaskVM,
-        playControl: this.playControl
-      })
-        .margin({ bottom: 126, right: 8 })
-        .visibility(this.showControl ? Visibility.Visible : Visibility.Hidden)
-        .animation({ duration: 300, curve: Curve.Smooth })
-
-      Stack({ alignContent: Alignment.Bottom }) {
-        Column() {
-          Stack({ alignContent: Alignment.Bottom }) {
-            Row() {
-              Column() {
-                Row() {
-                  Text(this.videoDetailMaskVM.dramaInfo.name)
-                    .height(21)
-                    .fontSize(16)
-                    .fontWeight(500)
-                    .fontColor('#fff')
-                    .maxLines(1)
-                    .textOverflow({ overflow: TextOverflow.MARQUEE })
-                  Column() {
-                    Image(getMedia('app.media.arrow_right_white'))
-                      .width(5)
-                      .height(9)
-                  }
-                  .width(16)
-                  .height(16)
-                  .justifyContent(FlexAlign.Center)
-                  .onClick(() => {
-                    WindowManager.setWindowSystemBarProperties({ statusBarContentColor: '#e6000000' })
-                    this.playControl.pause()
-                    appRouter.push({
-                      builderName: NAV_PAGE_NAME.DramaDetailInfoPage.name, params: {
-                        dramaInfo: this.videoDetailMaskVM.dramaInfo,
-                        currentIndex: this.playControl.curentIndex,
-                        changeIndex: (index: number) => {
-                          this.playControl.changeIndex(index)
-                        }
-                      }
-                    })
-                  })
-                }
-                .width(252)
-                .height(21)
-
-                Text(`第${this.videoDetailMaskVM.currentSerial}集` + ' ' + this.videoDetailMaskVM.dramaInfo.description)
-                  .width(252)
-                  .height(16)
-                  .fontSize(12)
-                  .fontWeight(400)
-                  .fontColor('rgba(255, 255, 255, 0.6)')
-                  .maxLines(1)
-                  .margin({ top: 2 })
-                  .textOverflow({ overflow: TextOverflow.Ellipsis })
-              }
-              .width(252)
-              .height(39)
-            }
-            .width('100%')
-            .height(56)
-            .justifyContent(FlexAlign.Start)
-            .padding({ left: 16, right: 16 })
-            .visibility(this.showControl ? Visibility.Visible : Visibility.Hidden)
-            .animation({ duration: 300, curve: Curve.Smooth })
-
-            ProcessBar({ playerSession: this.playerSession })
-              .hitTestBehavior(HitTestMode.Transparent)
-          }
-
-          Row() {
-            VideoDesLayer({
-              dramaInfo: this.videoDetailMaskVM.dramaInfo,
-              playController: this.playControl
-            })
-          }
-          .width('100%')
-          .height(52)
-        }
-        .width('100%')
-
-        if (!this.showControl) {
-          Stack()
+          })
             .width('100%')
             .height('100%')
-            .onClick(() => {
-              this.showControl = true;
-            })
+            .zIndex(100)
+            .padding({ top: 36 })
+          VideoDesLayer({
+            dramaInfo: this.videoDetailMaskVM.dramaInfo,
+            playController: this.playControl,
+            isLocked: (index: number): boolean => {
+              return this.isLocked(index)
+            }
+          })
+            .width('100%')
+            .height(52)
+            .zIndex(100)
         }
+        .width('100%')
+        .height('100%')
+      } else {
+        Stack({ alignContent: Alignment.TopStart }) {
+          if (this.playControl.isLocked) {
+            this.lockedBuilder()
+          }
+          Row() {
+            Row() {
+              Image(getMedia('app.media.detail_back'))
+                .height(40)
+                .width(40)
+                .onClick(() => {
+                  this.recover();
+                  appRouter.back(true, {
+                    params: {
+                      id: this.videoDetailMaskVM.dramaInfo.id,
+                      curIndex: this.playControl.curentIndex
+                    } as ParamsModel
+                  })
+                  return true
+                })
+            }
+            .height(56)
+            .layoutWeight(1)
 
+            Row({ space: 10 }) {
+              Row() {
+                Image(getMedia('app.media.speed'))
+                  .width(22)
+                  .height(22)
+                Text(this.storage.selectSpeed)
+                  .fontSize(16)
+                  .fontWeight(500)
+                  .fontColor('#fff')
+                  .margin({ left: 5 })
+              }
+              .width(92)
+              .height(40)
+              .backgroundColor('rgba(0, 0, 0, 0.05)')
+              .borderRadius(20)
+              .justifyContent(FlexAlign.Center)
+              .onClick(() => {
+                this.isShowSetSpeed = !this.isShowSetSpeed
+              })
+              .bindSheet($$this.isShowSetSpeed, this.setSpeedBuilder(), {
+                height: 340,
+                showClose: false,
+                preferType: SheetType.BOTTOM
+              })
+
+              if(!this.playControl.isLocked){
+                CastPicker()
+              }
+
+              Image(getMedia('app.media.four'))
+                .width(40)
+                .height(40)
+                .onClick(() => {
+                  this.isShowPlaySettingSheet = !this.isShowPlaySettingSheet
+                })
+                .bindSheet($$this.isShowPlaySettingSheet, this.playSettingSheetBuilder(), {
+                  height: 352,
+                  showClose: false,
+                  preferType: SheetType.BOTTOM,
+                })
+            }
+            .height(56)
+          }
+          .height(56)
+          .width('100%')
+          .justifyContent(FlexAlign.SpaceBetween)
+          .padding({ left: 16, right: 16, top: 64 })
+        }
+        .width('100%')
+        .height('100%')
+
+        BulletLayer({ bulletVM: this.bulletVM })
+          .position({ top: '15%' })
+          .visibility(this.isShowBullet ? Visibility.Visible : Visibility.Hidden)
+          .animation({ duration: 300, curve: Curve.Smooth })
+          .bindSheet($$this.isShowBulletSettingSheet, this.bulletSettingSheet(), {
+            height: 372,
+            showClose: false,
+            preferType: SheetType.BOTTOM
+          })
+
+        Side({
+          videoDes: this.videoDetailMaskVM,
+          playControl: this.playControl
+        })
+          .margin({ bottom: 126, right: 8 })
+          .visibility(this.showControl ? Visibility.Visible : Visibility.Hidden)
+          .animation({ duration: 300, curve: Curve.Smooth })
+
+        Stack({ alignContent: Alignment.Bottom }) {
+          Column() {
+            Stack({ alignContent: Alignment.Bottom }) {
+              Row() {
+                Column() {
+                  Row() {
+                    Text(this.videoDetailMaskVM.dramaInfo.name)
+                      .height(21)
+                      .fontSize(16)
+                      .fontWeight(500)
+                      .fontColor('#fff')
+                      .maxLines(1)
+                      .textOverflow({ overflow: TextOverflow.MARQUEE })
+                    Column() {
+                      Image(getMedia('app.media.arrow_right_white'))
+                        .width(5)
+                        .height(9)
+                    }
+                    .width(16)
+                    .height(16)
+                    .justifyContent(FlexAlign.Center)
+                    .onClick(() => {
+                      WindowManager.setWindowSystemBarProperties({ statusBarContentColor: '#e6000000' })
+                      this.playControl.pause()
+                      appRouter.push({
+                        builderName: NAV_PAGE_NAME.DramaDetailInfoPage.name, params: {
+                          dramaInfo: this.videoDetailMaskVM.dramaInfo,
+                          currentIndex: this.playControl.curentIndex,
+                          changeIndex: (index: number) => {
+                            this.playControl.changeIndex(index)
+                          }
+                        }
+                      })
+                    })
+                  }
+                  .width(252)
+                  .height(21)
+
+                  Text(`第${this.videoDetailMaskVM.currentSerial}集` + ' ' +
+                  this.videoDetailMaskVM.dramaInfo.description)
+                    .width(252)
+                    .height(16)
+                    .fontSize(12)
+                    .fontWeight(400)
+                    .fontColor('rgba(255, 255, 255, 0.6)')
+                    .maxLines(1)
+                    .margin({ top: 2 })
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
+                }
+                .width(252)
+                .height(39)
+              }
+              .width('100%')
+              .height(56)
+              .justifyContent(FlexAlign.Start)
+              .padding({ left: 16, right: 16 })
+              .visibility(this.showControl ? Visibility.Visible : Visibility.Hidden)
+              .animation({ duration: 300, curve: Curve.Smooth })
+
+              ProcessBar({ playerSession: this.playerSession })
+                .hitTestBehavior(HitTestMode.Transparent)
+            }
+
+            Row() {
+              VideoDesLayer({
+                dramaInfo: this.videoDetailMaskVM.dramaInfo,
+                playController: this.playControl
+              })
+            }
+            .width('100%')
+            .height(52)
+          }
+          .width('100%')
+
+          if (!this.showControl) {
+            Stack()
+              .width('100%')
+              .height('100%')
+              .onClick(() => {
+                this.showControl = true;
+              })
+          }
+
+        }
       }
     }
     .width('100%')
@@ -863,8 +927,8 @@ export struct DetailMaskLayer {
 
       Column() {
         Text('欢迎您使用“华为短剧”。“华为短剧”采用收费。您须注册华为账号后，才能继续进行购买服务。通过购买程序支付费用后，' +
-            '您就可以使用短剧会员所提供的收费服务。在开始购买程序之前，请您首先同意并接受以下服务条款。\n' +
-            '本协议是您与华为软件技术有限公司（以下统称“华为”）之间关于“华为直播”提供的各种付费服务签订的服务协议，' +
+          '您就可以使用短剧会员所提供的收费服务。在开始购买程序之前，请您首先同意并接受以下服务条款。\n' +
+          '本协议是您与华为软件技术有限公司（以下统称“华为”）之间关于“华为直播”提供的各种付费服务签订的服务协议，' +
           '描述了华为与直播付费服务用户之间关于软件许可以及服务使用及相关方面的权利义务。同意本协议，' +
           '您可享受会员权益。\n您同意本“华为短剧”付费服务协议条款即表示同意遵守《华为短剧用户协议》《关于华为短剧与隐私的声明》' +
           '（以下称“基础协议”），本协议未涉及事项以《华为短剧用户协议》为准，若您拒绝接受本协议，不影响已同意的基础协议。\n' +

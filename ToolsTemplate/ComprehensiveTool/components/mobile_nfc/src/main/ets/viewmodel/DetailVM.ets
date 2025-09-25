@@ -1,11 +1,14 @@
-import { hide, showDialogParams } from '@abner/dialog';
-import { StrUtil, ToastUtil } from '@pura/harmony-utils';
+import { hilog } from '@kit.PerformanceAnalysisKit';
+import { ComponentContent } from '@kit.ArkUI';
+import promptAction, { LevelMode } from '@ohos.promptAction';
 import { OnNfcChanged } from '../common/nfc/Nfc';
 import { getNavPathStack } from '../common/Route';
 import { addMineDialog } from '../components/AddMineDialog';
 import { renameDialog } from '../components/RenameDialog';
 import { nfcCardInfo, NfcInfo } from '../db/NfcCardInfo';
-import { DetailModel, RenameDialogParams } from '../model/Index';
+import { AddMineDialogParams, DetailModel, RenameDialogParams } from '../model/Index';
+import Util from '../common/Util';
+import { PromptActionUtil } from '../common/PromptActionUtil';
 
 @ObservedV2
 export class DetailVM {
@@ -25,23 +28,32 @@ export class DetailVM {
       .then(result => {
         this.nfcInfo = result;
       }).catch((e: Error) => {
-      ToastUtil.showToast('加载失败！');
+      promptAction.showToast({
+        message: '加载失败！',
+      });
       getNavPathStack().pop();
     });
   }
 
-  rename() {
+  rename(uiContext: UIContext) {
     let params = new RenameDialogParams();
     params.name = this.nfcInfo!.name;
+    params.cancel = () => {
+      PromptActionUtil.closeDialog(renameContentNode);
+    };
     params.confirm = (name: string) => {
-      if (StrUtil.isEmpty(name)) {
-        ToastUtil.showToast('请先输入名称');
+      if (Util.isEmpty(name)) {
+        promptAction.showToast({
+          message: '请先输入名称',
+        });
       } else if (name === this.nfcInfo!.name) {
-        hide();
+        PromptActionUtil.closeDialog(renameContentNode);
       } else {
         nfcCardInfo.findByName(name).then(result => {
           if (result) {
-            ToastUtil.showToast('名称重复！');
+            promptAction.showToast({
+              message: '名称重复！',
+            });
           } else {
             this.nfcInfo!.name = name;
             nfcCardInfo.updateNfcInfo(this.nfcInfo!).then(result => {
@@ -49,39 +61,80 @@ export class DetailVM {
                 .eventHub
                 .emit(OnNfcChanged.name,
                   new OnNfcChanged(this.nfcInfo.type, !this.nfcInfo.dealHistory, this.nfcInfo.isMine));
-              ToastUtil.showToast('修改成功！');
-              hide();
+              promptAction.showToast({
+                message: '修改成功！',
+              });
+              PromptActionUtil.closeDialog(renameContentNode);
               this.loadData();
             }).catch((e: Error) => {
-              ToastUtil.showToast('修改失败！');
+              promptAction.showToast({
+                message: '修改失败！',
+              });
             });
           }
         }).catch((e: Error) => {
-          ToastUtil.showToast('修改失败！');
+          promptAction.showToast({
+            message: '修改失败！',
+          });
         });
       }
     };
-    showDialogParams(wrapBuilder(renameDialog), params);
+    let renameContentNode: ComponentContent<Object> =
+      new ComponentContent(uiContext, wrapBuilder<[RenameDialogParams]>(renameDialog), params);
+    PromptActionUtil.setContext(uiContext);
+    PromptActionUtil.setContentNode(renameContentNode);
+    PromptActionUtil.setOptions({
+      levelMode: LevelMode.EMBEDDED,
+      onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
+        hilog.info(0xFF00, 'SubmitFeedBack', JSON.stringify(dismissDialogAction.reason));
+      },
+    });
+
+    PromptActionUtil.openDialog();
   }
 
-  addMine(cardId: string, type: number) {
+  addMine(cardId: string, type: number, uiContext: UIContext) {
     nfcCardInfo.findAllWithMine(type).then(result => {
       if (result.length && result.find(item => item.cardId === cardId)) {
-        ToastUtil.showToast('您已添加过此卡片，请勿重复添加！');
+        promptAction.showToast({
+          message: '您已添加过此卡片，请勿重复添加！',
+        });
       } else {
         this.nfcInfo!.isMine = true;
         nfcCardInfo.updateNfcInfo(this.nfcInfo!).then(result => {
           getContext()
             .eventHub
             .emit(OnNfcChanged.name, new OnNfcChanged(this.nfcInfo.type, true, this.nfcInfo.isMine));
-          showDialogParams(wrapBuilder(addMineDialog), undefined);
+
+
+          let params = new AddMineDialogParams();
+          params.confirm = () => {
+            PromptActionUtil.closeDialog(addMineContentNode);
+          };
+
+          let addMineContentNode: ComponentContent<Object> =
+            new ComponentContent(uiContext, wrapBuilder<[AddMineDialogParams]>(addMineDialog), params);
+          PromptActionUtil.setContext(uiContext);
+          PromptActionUtil.setContentNode(addMineContentNode);
+          PromptActionUtil.setOptions({
+            levelMode: LevelMode.EMBEDDED,
+            onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
+              hilog.info(0xFF00, 'SubmitFeedBack', JSON.stringify(dismissDialogAction.reason));
+            },
+          });
+
+          PromptActionUtil.openDialog();
           this.loadData();
         }).catch((e: Error) => {
-          ToastUtil.showToast('添加失败！');
+          promptAction.showToast({
+            message: '添加失败！',
+          });
         });
       }
     }).catch((e: Error) => {
-      ToastUtil.showToast('添加失败！');
+      promptAction.showToast({
+        message: '添加失败！',
+      });
     });
   }
 }

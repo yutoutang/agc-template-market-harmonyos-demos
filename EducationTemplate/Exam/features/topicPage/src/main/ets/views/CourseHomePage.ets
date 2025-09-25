@@ -269,8 +269,7 @@ export struct CourseHomePage {
         .textAlign(TextAlign.Center)
     }
     .width('100%')
-    .height('auto')
-    .layoutWeight(1)
+    .height(200)
     .justifyContent(FlexAlign.Center)
     .alignItems(HorizontalAlign.Center)
     .visibility(!this.isGoodCourse && this.myCourse.length <= 0 ? Visibility.Visible : Visibility.None)
@@ -344,7 +343,7 @@ export struct CourseHomePage {
         .itemHeight($r('app.float.vp_8'))
         .selectedItemWidth($r('app.float.vp_16'))
         .selectedItemHeight($r('app.float.vp_8'))
-        .color(Color.Gray)
+        .color($r('sys.color.comp_background_tertiary'))
         .selectedColor(Color.Blue)
         .maxDisplayCount(9))
     .curve(Curve.Linear)

@@ -1,5 +1,6 @@
 import { media } from '@kit.MediaKit';
 import { AVPlayerState } from '../constant/AVPlayerState';
+import { PlaySession } from './PlaySession';
 
 @ObservedV2
 export class PlayerLayoutSize {
@@ -22,10 +23,12 @@ export class PlayController {
   autoPlay: boolean = false
   @Trace isLocked: boolean = false
   private avPlayerMap: Map<number, media.AVPlayer> = new Map
-  public curentIndex: number = 0;
+  @Trace curentIndex: number = 0;
   @Trace id: string = ''
   @Trace isVip: boolean = false
   static _lockedDrama: Map<string, Array<number>> = new Map
+  @Trace isCasting: boolean = false
+  @Trace disableSwiper: boolean = false
 
   public static get lockedDrama() {
     if (!PlayController._lockedDrama) {
@@ -65,7 +68,7 @@ export class PlayController {
     return state === AVPlayerState.PLAYING
   }
 
-  public pause() {
+  public async pause() {
     let avPlayer = this.avPlayerMap.get(this.curentIndex)
     if (!avPlayer) {
       return
@@ -73,7 +76,7 @@ export class PlayController {
     if (!this.canPause(avPlayer.state)) {
       return
     }
-    avPlayer.pause();
+    await avPlayer.pause();
   }
 
   private canSeek(state: string): boolean {
@@ -124,5 +127,6 @@ export class PlayController {
   // 播放指定索引的剧集
   public changeIndex(index: number) {
     this.swiperController?.changeIndex(index)
+    this.curentIndex === index
   }
 }

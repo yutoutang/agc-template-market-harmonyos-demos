@@ -238,3 +238,38 @@ MockAdapter
       }
     }
   })
+  .onPost({
+    url: 'https://agc.template.com/commentreplylist'
+  }, {
+    ret: {
+      code: '0'
+    },
+    total: 3,
+    commentList: getCommentList()
+  })
+  .onPost({
+    url: 'https://agc.template.com/commentlikelist'
+  }, {
+    ret: {
+      code: '0'
+    },
+    total: 3,
+    commentList: getCommentList()
+  })
+  .onPost({
+    url: 'https://agc.template.com/deletecommentreplylist'
+  }, {
+    ret: {
+      code: '0'
+    },
+    message: 'success'
+  })
+  .onPost({
+    url: 'https://agc.template.com/deletecommentlikelist'
+  }, {
+    ret: {
+      code: '0'
+    },
+    message: 'fail'
+  })
+

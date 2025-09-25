@@ -1,6 +1,5 @@
 import { tag } from '@kit.ConnectivityKit';
 import { HashMap, PlainArray } from '@kit.ArkTS';
-import { StrUtil } from '@pura/harmony-utils';
 import Util from '../Util';
 import { KEY_MAP } from '../Constant';
 import { Operation } from '../Enum';
@@ -260,7 +259,7 @@ export default class MCReader {
   }
 
   setKeyFile(assets: string): number {
-    if (StrUtil.isBlank(assets)) {
+    if (Util.isBlank(assets)) {
       return -1;
     }
     let keys = KEY_MAP;

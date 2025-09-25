@@ -52,7 +52,7 @@ export struct TwoColumn {
           detail.videoCard = item;
           this.appPathStack.pushPathByName('VideoDetailListView', detail);
         });
-      });
+      }, (item:VideoCard) => JSON.stringify(item));
     }
     .lanes(2)
     .width(CommonConstants.FULL_PERCENT)
@@ -96,7 +96,7 @@ export struct CommonOneColumn {
         Blank();
         ForEach(this.videoCard.tags, (item: string) => {
           TagLabelCard(item);
-        });
+        }, (item:string) => item);
       }
       .width(CommonConstants.FULL_PERCENT)
       .justifyContent(FlexAlign.SpaceAround);

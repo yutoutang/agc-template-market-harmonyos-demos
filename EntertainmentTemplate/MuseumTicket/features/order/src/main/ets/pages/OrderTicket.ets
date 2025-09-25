@@ -139,8 +139,7 @@ struct OrderTicket {
 
         Column() {
           Button('预约')
-            .type(ButtonType.Normal)
-            .borderRadius(20)
+            .height(40)
             .backgroundColor(this.vm.currentSelected !== undefined && this.vm.selectedTime !== undefined ?
               '#D1B380' : '#99D1B380')
             .width('calc(100% - 32vp)')

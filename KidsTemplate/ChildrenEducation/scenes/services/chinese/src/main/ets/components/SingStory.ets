@@ -57,7 +57,7 @@ export struct SingStory {
                 Row() {
                   ForEach(item.videoCard.tags, (tag: string) => {
                     TagLabelCard(tag);
-                  });
+                  }, (item: string) => item);
                 }
                 .align(Alignment.BottomStart);
               }
@@ -77,7 +77,7 @@ export struct SingStory {
           item.videoCardDetail = videoDetail.videoCardDetail;
           this.appPathStack.pushPathByName('VideoDetailListView', item);
         });
-      });
+      }, (item:VideoDetail) => JSON.stringify(item));
     }
     .padding({
       left: '4%',

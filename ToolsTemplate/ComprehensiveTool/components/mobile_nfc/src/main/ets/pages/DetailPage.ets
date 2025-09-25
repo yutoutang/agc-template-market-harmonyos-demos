@@ -1,9 +1,14 @@
-import { DateUtil } from '@pura/harmony-utils';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 import { ACTION_TYPE } from '../common/Enum';
 import { getNfcCardBgImg } from '../common/nfc/Nfc';
+import { PromptActionUtil } from '../common/PromptActionUtil';
 import { getNavPathStack } from '../common/Route';
+import Util from '../common/Util';
 import { ActionModel, DetailModel } from '../model/Index';
 import { DetailVM } from '../viewmodel/DetailVM';
+import { LevelMode } from '@kit.ArkUI';
+
+let uIContext: UIContext;
 
 @Builder
 export function DetailPageBuilder() {
@@ -13,6 +18,16 @@ export function DetailPageBuilder() {
 @ComponentV2
 struct DetailPage {
   vm: DetailVM = DetailVM.instance;
+
+  aboutToAppear(): void {
+    uIContext = this.getUIContext();
+    PromptActionUtil.setOptions({
+      levelMode: LevelMode.EMBEDDED,
+      onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
+        hilog.info(0xFF00, 'NFCDetailPage', JSON.stringify(dismissDialogAction.reason));
+      },
+    });
+  }
 
   build() {
     NavDestination() {
@@ -31,11 +46,14 @@ struct DetailPage {
                     .fontSize(17);
 
                   Image($r('app.media.ic_edit')).size({ width: 16, height: 16 });
-                }.padding(12).onClick(() => this.vm.rename());
+                }.padding(12).onClick(() => {
+                  PromptActionUtil.setContext(this.getUIContext());
+                  this.vm.rename(uIContext);
+                });
               };
 
               this.infoItemBuilder($r('app.media.ic_detail_time'), '添加时间',
-                DateUtil.getFormatDateStr(this.vm.nfcInfo!.ltime, 'yyyy-MM-dd HH:mm:ss'));
+                Util.getFormatDateStr(this.vm.nfcInfo!.ltime, 'yyyy-MM-dd HH:mm:ss'));
               if (this.vm.nfcInfo?.balance === -1) {
                 Divider().margin({ top: 12 });
                 this.infoItemBuilder($r('app.media.ic_detail_id'), '卡片ID', this.vm.nfcInfo!.cardId.toUpperCase());
@@ -84,7 +102,8 @@ struct DetailPage {
                   .backgroundColor($r('sys.color.confirm'))
                   .onClick(() => {
                     getNavPathStack()
-                      .pushPathByName('ActionPage', new ActionModel(ACTION_TYPE.ACTION_CLONE, undefined, this.vm.nfcInfo));
+                      .pushPathByName('ActionPage',
+                        new ActionModel(ACTION_TYPE.ACTION_CLONE, undefined, this.vm.nfcInfo));
                   });
               } else {
                 Button('保存到卡包')
@@ -92,7 +111,9 @@ struct DetailPage {
                   .height(40)
                   .fontColor($r('sys.color.font_on_primary'))
                   .backgroundColor($r('sys.color.background_emphasize'))
-                  .onClick(() => this.vm.addMine(this.vm.nfcInfo?.cardId ?? '', this.vm.nfcInfo?.type ?? 0));
+                  .onClick(() => {
+                    this.vm.addMine(this.vm.nfcInfo?.cardId ?? '', this.vm.nfcInfo?.type ?? 0, uIContext);
+                  });
               }
             }
           };

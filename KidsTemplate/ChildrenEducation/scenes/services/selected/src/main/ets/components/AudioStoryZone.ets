@@ -30,7 +30,7 @@ export struct AudioStoryZone {
           detail.videoCard = item;
           this.appPathStack.pushPathByName('AudioDetailListView', detail);
         });
-      });
+      },(item:VideoCard) => JSON.stringify(item));
     }
     .lanes(3)
     .width(CommonConstants.FULL_PERCENT)

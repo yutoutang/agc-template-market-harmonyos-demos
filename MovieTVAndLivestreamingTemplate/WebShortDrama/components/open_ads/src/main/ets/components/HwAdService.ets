@@ -183,23 +183,22 @@ export struct HwAdService {
       }
     }else {
       Column() {
-        Image($r('app.media.ic_launch')).width($r('app.float.vp_116')).height($r('app.float.vp_116'))
-          .margin({ top: $r('app.float.vp_215') })
+        Image($r('app.media.ic_launch')).width(116).height(116)
+          .margin({ top: 215 })
         Column() {
-          Text('课堂模板')
+          Text('短剧模板')
             .fontSize($r('sys.float.Title_M'))
             .fontWeight(FontWeight.Medium)
-            .fontColor('#483AD5')
-          Text('直播也是如此精彩')
+            .fontColor('#EC6E45')
+          Text('海量短剧 如此精彩')
             .fontSize($r('sys.float.Body_L'))
             .fontWeight(FontWeight.Regular)
-            .fontColor('#564AF7')
+            .fontColor('#EC6E45')
             .opacity(0.9)
-        }.margin({ top: $r('app.float.vp_258') })
+        }.margin({ top: 258 })
       }
       .alignItems(HorizontalAlign.Center)
       .width('100%')
-      .height('100%')
     }
   }
 }

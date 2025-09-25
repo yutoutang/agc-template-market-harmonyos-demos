@@ -13,11 +13,9 @@
  * limitations under the License.
  */
 
-import { loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit';
-import { AppStorageV2 } from '@kit.ArkUI';
+import { util } from '@kit.ArkTS';
+import { authentication, loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { AccountUtil } from '../utils/AccountUtil';
-import { UserInfo } from '../model/UserInfo';
 import { ErrorCode } from '../model/ErrorCode';
 import { AgreementDialog } from './AgreementDialog';
 
@@ -37,8 +35,6 @@ export struct QuickLogin {
   @Param @Require loginBtnBgColor: string | ResourceStr
   //app名字
   @Param @Require appName: string = ''
-  // 是否为mock数据
-  @Local isMock: boolean = true;
   // 展示用户服务协议、隐私协议和华为账号用户认证协议
   privacyText: loginComponentManager.PrivacyText[] = [{
     text: '已阅读并同意',
@@ -62,7 +58,7 @@ export struct QuickLogin {
   /*
 * 华为一键登录点击事件
 * */
-  @Event onLoginWithHuaweiID: () => void = () => {
+  @Event onLoginWithHuaweiID: (flag: boolean, phone?: string) => void = () => {
   }
   /*
    * 隐私协议点击事件
@@ -114,22 +110,10 @@ export struct QuickLogin {
       confirm: () => {
         this.agreementDialog.close();
         this.isSelected = true;
-        if (this.isMock) {
-          this.onLoginWithHuaweiID()
-          let prop: UserInfo = AppStorageV2.connect(UserInfo, () => new UserInfo())! as UserInfo
-          if (!prop.name) {
-            prop.name = '华为用户'
-          }
-          prop.isLogin = true
-          prop.id = 0
-          prop.cellphone = '177******96'
-          prop.address = 'xxx省xxx市'
-          return
-        }
+        // 设置协议状态为ACCEPTED
         this.controller.setAgreementStatus(loginComponentManager.AgreementStatus.ACCEPTED);
-        // 调用此方法，同意协议与登录一并完成，无需再次点击登录按钮
-        this.controller.continueLogin(() => {
-        });
+        this.controller.continueLogin((error: BusinessError) => {
+        })
       },
       clickHyperlinkText: (tag) => {
         this.agreementDialog.close();
@@ -164,77 +148,58 @@ export struct QuickLogin {
 
   handleLoginWithHuaweiIDButton(error: BusinessError | undefined,
     response: loginComponentManager.HuaweiIDCredential) {
-    // 本地mock登录
-    if (this.isMock) {
-      if (this.isSelected) {
-        this.onLoginWithHuaweiID()
-        let prop = AppStorageV2.connect(UserInfo, () => new UserInfo())!
-        prop.isLogin = true
-        if (!prop.name) {
-          prop.name = '华为用户'
-        }
-        prop.id = 0
-        prop.cellphone = '177******96'
-        prop.address = 'xxx省xxx市'
-      } else {
-        this.agreementDialog.open();
-      }
-      return
-    }
     if (error) {
-      if (error.code === ErrorCode.ERROR_CODE_NETWORK_ERROR) {
-        this.showToast('网络异常，请检查网络设置。');
-      } else if (error.code === ErrorCode.ERROR_CODE_AGREEMENT_STATUS_NOT_ACCEPTED) {
+      if (error.code === ErrorCode.ERROR_CODE_AGREEMENT_STATUS_NOT_ACCEPTED) {
         // 未同意协议，弹出协议弹框，推荐使用该回调方式
         this.agreementDialog.open();
-      } else if (error.code === ErrorCode.ERROR_CODE_LOGIN_OUT) {
-        // 华为账号未登录提示
-        this.showToast('华为账号未登录，请重试');
-      } else if (error.code === ErrorCode.ERROR_CODE_NOT_SUPPORTED) {
-        // 不支持该scopes或permissions提示
-        this.showToast('该scopes或permissions不支持');
-      } else if (error.code === ErrorCode.ERROR_CODE_PARAMETER_ERROR) {
-        // 参数错误提示
-        this.showToast('参数错误');
       } else {
-        // 其他提示系统或服务异常
-        this.showToast('服务或网络异常，请稍后重试');
+        // 模拟登录成功后回调
+        this.onLoginWithHuaweiID(false)
       }
       return;
     }
-    try {
-      if (this.isSelected) {
-        if (response) {
-          this.onLoginWithHuaweiID()
-        }
-      } else {
-        this.agreementDialog.open();
+    if (this.isSelected) {
+      // 配置好可用的调试证书和client_id后需要处理response
+      if (response.idToken && response.idToken.length > 0) {
+        // 登录成功后回调
+        this.onLoginWithHuaweiID(true, this.quickLoginAnonymousPhone)
+        return
       }
-    } catch (err) {
-      AlertDialog.show(
-        {
-          message: '服务或网络异常，请稍后重试',
-          offset: { dx: 0, dy: -12 },
-          alignment: DialogAlignment.Bottom,
-          autoCancel: false,
-          confirm: {
-            value: '知道了',
-            action: () => {
-            }
-          }
+      // 模拟登录成功后回调
+      this.onLoginWithHuaweiID(false)
+    } else {
+      this.agreementDialog.open();
+    }
+  }
+
+  getQuickLoginAnonymousPhone() {
+    // 创建授权请求，并设置参数
+    const authRequest = new authentication.HuaweiIDProvider().createAuthorizationWithHuaweiIDRequest();
+    // 获取匿名手机号需传quickLoginAnonymousPhone这个scope，传参之前需要先申请“华为账号一键登录”权限
+    authRequest.scopes = ['quickLoginAnonymousPhone'];
+    // 用于防跨站点请求伪造
+    authRequest.state = util.generateRandomUUID();
+    // 一键登录场景该参数必须设置为false
+    authRequest.forceAuthorization = false;
+    const controller = new authentication.AuthenticationController();
+    try {
+      controller.executeRequest(authRequest).then((response: authentication.AuthorizationWithHuaweiIDResponse) => {
+        // 获取到UnionID、OpenID、匿名手机号
+        const anonymousPhone = response.data?.extraInfo?.quickLoginAnonymousPhone as string;
+        if (anonymousPhone) {
+          this.quickLoginAnonymousPhone = anonymousPhone;
+          return;
         }
-      );
+      }).catch((error: BusinessError) => {
+        // 以下内容配置好可用的调试证书和client_id后删除，当前为模拟数据
+        this.quickLoginAnonymousPhone = '177******96';
+      });
+    } catch (error) {
     }
   }
 
   aboutToAppear(): void {
-    if (AccountUtil.getQuickLoginAnonymousPhone()) {
-      this.isMock = false
-      this.quickLoginAnonymousPhone = AccountUtil.getQuickLoginAnonymousPhone()
-    } else {
-      this.quickLoginAnonymousPhone = '177******96'
-      this.isMock = true
-    }
+    this.getQuickLoginAnonymousPhone()
   }
 
   @Builder

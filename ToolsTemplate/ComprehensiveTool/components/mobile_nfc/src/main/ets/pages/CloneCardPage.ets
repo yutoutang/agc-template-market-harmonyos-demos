@@ -1,9 +1,12 @@
-import { showDialogParams } from '@abner/dialog';
+import { ComponentContent, LevelMode } from '@kit.ArkUI';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 import { ALL_CARD_TAB, NFC_TYPE } from '../common/Enum';
 import { getNfcName } from '../common/nfc/Nfc';
 import { getNavPathStack } from '../common/Route';
 import { cloneTipDialog } from '../components/CloneTipDialog';
 import { CardAllView } from './CardListView';
+import { CloneTipDialogParams } from '../model/Index';
+import { PromptActionUtil } from '../common/PromptActionUtil';
 
 @Builder
 export function CloneCardPageBuilder() {
@@ -28,7 +31,24 @@ struct CloneCardPage {
           };
 
           Image($r('app.media.ic_tutorial_right')).size({ width: 40, height: 40 }).onClick(() => {
-            showDialogParams(wrapBuilder(cloneTipDialog), undefined);
+            let params = new CloneTipDialogParams()
+            params.confirm = () => {
+              PromptActionUtil.closeDialog(cloneTipContentNode);
+            }
+
+            let uiContext = this.getUIContext()
+            let cloneTipContentNode: ComponentContent<Object> =
+              new ComponentContent(uiContext, wrapBuilder<[CloneTipDialogParams]>(cloneTipDialog), params);
+            PromptActionUtil.setContext(uiContext);
+            PromptActionUtil.setContentNode(cloneTipContentNode);
+            PromptActionUtil.setOptions({
+              levelMode: LevelMode.EMBEDDED,
+              onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
+                hilog.info(0xFF00, 'SubmitFeedBack', JSON.stringify(dismissDialogAction.reason));
+              },
+            });
+
+            PromptActionUtil.openDialog();
           });
         }.width('100%').justifyContent(FlexAlign.SpaceBetween).padding({ left: 16, right: 16 });
 

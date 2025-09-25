@@ -15,7 +15,10 @@ export struct PrivacyAgreement {
 
   build() {
     NavDestination() {
-      Web({ src: this.privacyAgreementPath, controller: this.controller }).verticalScrollBarAccess(false)
+      Web({ src: this.privacyAgreementPath, controller: this.controller })
+        .verticalScrollBarAccess(false)
+        .fileAccess(false)
+        .geolocationAccess(false);
     }
     .hideTitleBar(true)
     .margin({

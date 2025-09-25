@@ -37,8 +37,8 @@ struct RenamePage {
           .width('100%')
           .height('100%')
           .maxLength(18)
-          .placeholderColor(Color.Grey)
-          .placeholderFont({ size: 16, weight: 400 })
+          .placeholderColor($r('sys.color.font_secondary'))
+          .placeholderFont({ size: $r('sys.float.Body_L'), weight: 400 })
           .showCounter(true,
             { thresholdPercentage: 80, highlightBorder: true })
       }
@@ -53,7 +53,7 @@ struct RenamePage {
       Button('保存')
         .fontWeight(CommonConstants.FONT_WEIGHT_600)
         .width('90%')
-        .fontColor($r('app.color.common_blue'))
+        .fontColor($r('sys.color.font_emphasize'))
         .backgroundColor($r('app.color.button_gray'))
         .onClick(() => {
           let user = this.userInfo.users.get(this.userInfo.unionID) as User

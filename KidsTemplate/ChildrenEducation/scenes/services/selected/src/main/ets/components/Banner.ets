@@ -11,7 +11,7 @@ export struct Banner {
           .borderRadius(16)
           .width(CommonConstants.FULL_PERCENT)
           .height(300)
-      })
+      }, (item:string) => item)
     }
     .margin({
       top : '2%',

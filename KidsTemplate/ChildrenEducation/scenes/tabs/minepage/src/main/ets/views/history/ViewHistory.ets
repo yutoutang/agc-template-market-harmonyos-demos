@@ -43,7 +43,7 @@ export struct ViewHistory {
             }
             this.appPathStack.pushDestination(pathInfo, true);
           });
-        });
+        }, (item:History) => JSON.stringify(item));
 
         if (this.historyList.length >= 20) {
           ListItem() {

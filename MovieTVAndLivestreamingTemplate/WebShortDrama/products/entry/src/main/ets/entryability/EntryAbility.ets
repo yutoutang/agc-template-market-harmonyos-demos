@@ -10,6 +10,7 @@ import {
   StatusBarHeight
 } from '@agctemplate/widgets';
 import { emitter } from '@kit.BasicServicesKit';
+import { CastService } from 'module_cast';
 
 const TAG = 'EntryAbility'
 
@@ -26,7 +27,7 @@ export default class EntryAbility extends UIAbility {
     Logger.info(TAG, 'Ability onCreate');
     let applicationContext = this.context.getApplicationContext();
     applicationContext.setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT);
-
+    CastService.getInstance().init(this.context)
     this.contextInit();
   }
 

@@ -1,0 +1,9 @@
+{
+  "module": {
+    "name": "wheel",
+    "type": "har",
+    "deviceTypes": [
+      "default"
+    ]
+  }
+}

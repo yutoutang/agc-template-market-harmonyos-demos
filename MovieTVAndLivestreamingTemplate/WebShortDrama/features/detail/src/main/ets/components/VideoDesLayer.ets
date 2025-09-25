@@ -1,17 +1,20 @@
 import { DramaInfo } from '@agctemplate/server';
 import { Logger } from '@agctemplate/utils';
+import { CastService } from 'module_cast';
 import { PlayController } from 'video_swiper';
 import { SerialPicker } from './SerialPicker';
+import { promptAction } from '@kit.ArkUI';
+import { Params, PromptActionClass } from './PromptActionClass';
 
 const TAG = '[VideoDesLayer]'
 
 // 展示视频相关信息
 @ComponentV2
 export struct VideoDesLayer {
-
   @Param @Require dramaInfo: DramaInfo;
   @Local isShowSerialPickerSheet: boolean = false; //是否展示选集
   @Param @Require playController: PlayController
+  @Event isLocked: Function
 
   build() {
     Row() {
@@ -36,7 +39,28 @@ export struct VideoDesLayer {
           this.serialPickerSheetBuilder(this.playController.curentIndex, (index: number) => {
             Logger.info(TAG, `onIndexSelect:${index}`)
             this.isShowSerialPickerSheet = !this.isShowSerialPickerSheet
-            this.playController?.changeIndex(index)
+            if (CastService.getInstance().isCasting && this.isLocked?.(index)) {
+              PromptActionClass.setParam(new Params('当前视频解锁后，可投屏观看？', [{
+                content: '退出投屏', action: () => {
+                  PromptActionClass.closeDialog()
+                  CastService.getInstance().endCasting()
+                  this.playController?.changeIndex(index)
+                }
+              }, {
+                content: '知道了', action: () => {
+                  PromptActionClass.closeDialog()
+                }
+              }
+              ]));
+              PromptActionClass.setOptions({
+                alignment: DialogAlignment.Center,
+                maskColor: $r('sys.color.mask_fourth')
+              });
+              PromptActionClass.openDialog()
+            } else {
+              this.playController?.changeIndex(index)
+            }
+
           }), {
             detents: [SheetSize.MEDIUM, SheetSize.LARGE, 600],
             preferType: SheetType.BOTTOM,
@@ -49,7 +73,6 @@ export struct VideoDesLayer {
     .padding({ left: 16, right: 16 })
     .justifyContent(FlexAlign.SpaceBetween)
   }
-
 
   @Builder
   serialPickerSheetBuilder(curIndex: number, onIndexSelect: (index: number) => void) {
@@ -66,5 +89,4 @@ export struct VideoDesLayer {
       })
     }
   }
-
 }

@@ -43,9 +43,9 @@ struct ActivePage {
           if (!this.vm.activeData.length) {
             ListItem() {
               Row() {
-                Divider().strokeWidth(1).width(40);
+                Divider().width(40);
                 Text('没有更多了').fontColor($r('sys.color.font_tertiary')).fontSize(14);
-                Divider().strokeWidth(1).width(40);
+                Divider().width(40);
               }.margin({ top: 15 }).width('100%').justifyContent(FlexAlign.Center);
             };
           }

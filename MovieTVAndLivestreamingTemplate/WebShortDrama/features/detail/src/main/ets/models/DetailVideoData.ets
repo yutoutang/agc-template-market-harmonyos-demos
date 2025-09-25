@@ -8,8 +8,10 @@ export class DetailVideoData implements VideoPlayData {
   constructor(videoMask: ShortDramaDetailItemVM) {
     this.videoMask = videoMask
   }
-
-  getUrl(): string {
+  getId(): string{
+    return `${this.videoMask.currentSerial}`
+  }
+  getUrl(): ResourceStr {
     return this.videoMask.url
   }
 
@@ -19,5 +21,12 @@ export class DetailVideoData implements VideoPlayData {
 
   getPic(): string {
     return this.videoMask.dramaInfo.coverUrl
+  }
+
+  getName(): string {
+    return this.videoMask.dramaInfo.name
+  }
+  getDuration(): number {
+    return this.videoMask.duration
   }
 }

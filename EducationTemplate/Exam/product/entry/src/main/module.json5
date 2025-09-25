@@ -5,7 +5,7 @@
     "description": "$string:module_desc",
     "mainElement": "EntryAbility",
     "deviceTypes": [
-      "phone",
+      "phone"
     ],
     "deliveryWithInstall": true,
     "installationFree": false,
@@ -49,13 +49,13 @@
         ]
       }
     ],
+// 配置信息如下
     "compressNativeLibs": true,
     "metadata": [
-      // 配置信息如下
+// todo 替换client_id值
       {
         "name": "client_id",
-        // todo 替换client_id值
-        "value": "xxxx"
+        "value": "******"
       }
     ]
   }

@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "page_show",
+      "value": "page from package"
+    },
+    {
+      "name": "completed",
+      "value": "已完成"
+    },
+    {
+      "name": "agcit_huawei_web_short_drama",
+      "value": "1.0.2"
+    }
+  ]
+}

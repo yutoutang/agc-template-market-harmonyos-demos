@@ -92,7 +92,7 @@ export class RequestAPI implements Domain {
   }
 
   @GET({ path: '/theater/search/tip' })
-  getSearchTipList(@Body searchText:string): Promise<BaseResponse<SearchTipRes>> {
+  getSearchTipList(@Body searchText: string): Promise<BaseResponse<SearchTipRes>> {
     return Promise.resolve(new BaseResponse())
   }
 
@@ -107,7 +107,7 @@ export class RequestAPI implements Domain {
   }
 
   @POST({ path: '/api/user/login' })
-  userLogin(@Body id: string ): Promise<BaseResponse<UserLoginRes>> {
+  userLogin(@Body id: string): Promise<BaseResponse<UserLoginRes>> {
     return Promise.resolve(new BaseResponse())
   }
 
@@ -115,10 +115,12 @@ export class RequestAPI implements Domain {
   getUserInfo(@Body id: string): Promise<BaseResponse<GetUserInfoRes>> {
     return Promise.resolve(new BaseResponse());
   }
+
   @POST({ path: '/api/user/associate' })
   associateAccount(@Body data: AssociateAccountRequest): Promise<BaseResponse<AssociateAccountRes>> {
     return Promise.resolve(new BaseResponse());
   }
+
   @POST({ path: '/api/user/disassociate' })
   disassociateAccount(): Promise<BaseResponse<DisassociateAccountRes>> {
     return Promise.resolve(new BaseResponse());
@@ -135,12 +137,12 @@ export class RequestAPI implements Domain {
   }
 
   @POST({ path: '/setfavorite', needLogin: true })
-  setFavorite(@Body dramaId:string): Promise<BaseResponse<MyFollowDramaRes>> {
+  setFavorite(@Body dramaId: string): Promise<BaseResponse<MyFollowDramaRes>> {
     return Promise.resolve(new BaseResponse())
   }
 
   @POST({ path: '/unsetfavorite', needLogin: true })
-  unsetFavorite(@Body dramaId:string): Promise<BaseResponse<MyFollowDramaRes>> {
+  unsetFavorite(@Body dramaId: string): Promise<BaseResponse<MyFollowDramaRes>> {
     return Promise.resolve(new BaseResponse())
   }
 
@@ -150,17 +152,17 @@ export class RequestAPI implements Domain {
   }
 
   @POST({ path: '/unsetsetmyWatchrecord', needLogin: true })
-  unsetMyWatchRecord(@Body dramaId:string): Promise<BaseResponse<MyWatchRecordRes>> {
+  unsetMyWatchRecord(@Body dramaId: string): Promise<BaseResponse<MyWatchRecordRes>> {
     return Promise.resolve(new BaseResponse())
   }
 
   @POST({ path: '/setlike', needLogin: true })
-  setLike(@Body dramaId:string): Promise<BaseResponse<MyLikeDramaRes>> {
+  setLike(@Body dramaId: string): Promise<BaseResponse<MyLikeDramaRes>> {
     return Promise.resolve(new BaseResponse())
   }
 
   @POST({ path: '/unsetlike', needLogin: true })
-  unsetLike(@Body dramaId:string): Promise<BaseResponse<MyLikeDramaRes>> {
+  unsetLike(@Body dramaId: string): Promise<BaseResponse<MyLikeDramaRes>> {
     return Promise.resolve(new BaseResponse())
   }
 
@@ -181,6 +183,26 @@ export class RequestAPI implements Domain {
 
   @POST({ path: '/onreplylike', needLogin: true })
   onReplyLike(@Body replyLike: ReplyLike): Promise<BaseResponse<ReplyLike>> {
+    return Promise.resolve(new BaseResponse())
+  }
+
+  @POST({ path: '/commentreplylist', needLogin: true })
+  getRelyList(@Body pageReq: PageReq): Promise<BaseResponse<CommentListRes>> {
+    return Promise.resolve(new BaseResponse())
+  }
+
+  @POST({ path: '/commentlikelist', needLogin: true })
+  getLikeList(@Body pageReq: PageReq): Promise<BaseResponse<CommentListRes>> {
+    return Promise.resolve(new BaseResponse())
+  }
+
+  @POST({ path: '/deletecommentreplylist', needLogin: true })
+  deleteRelyList(@Body ids: number[]): Promise<BaseResponse<string>> {
+    return Promise.resolve(new BaseResponse())
+  }
+
+  @POST({ path: '/deletecommentlikelist', needLogin: true })
+  deleteLikeList(@Body ids: number[]): Promise<BaseResponse<string>> {
     return Promise.resolve(new BaseResponse())
   }
 }

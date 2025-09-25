@@ -153,7 +153,7 @@
     <td><a href="./KidsTemplate/PostpartumCareCenter/README.md" target="_blank">快速开始</a></td>
   </tr>
   <tr>
-    <td rowspan="4"><a href="#商务">商务</a></td>
+    <td rowspan="5"><a href="#商务">商务</a></td>
     <td><a href="#办公考勤应用模板">办公考勤应用模板</a></td>
     <td><a href="./BusinessTemplate/OfficeAttendance/README.md" target="_blank">快速开始</a></td>
   </tr>
@@ -168,6 +168,10 @@
   <tr>
     <td><a href="#会务元服务模板">会务元服务模板</a></td>
     <td><a href="./BusinessTemplate/Conference/README.md" target="_blank">快速开始</a></td>
+  </tr>
+  <tr>
+    <td><a href="#日程应用模板">日程应用模板</a></td>
+    <td><a href="./BusinessTemplate/DailySchedule/README.md" target="_blank">快速开始</a></td>
   </tr>
   <tr>
     <td rowspan="2"><a href="#汽车">汽车</a></td>
@@ -973,6 +977,29 @@
 | 首页                                                        | 会议详情                                                      | 个人中心                                                   |
 |-----------------------------------------------------------|-----------------------------------------------------------|--------------------------------------------------------|
 | <img src="./BusinessTemplate/Conference/screenshots/homepage.jpg" alt="首页" width="300"> | <img src="./BusinessTemplate/Conference/screenshots/meeting.jpg" alt="详情" width="300"/> | <img src="./BusinessTemplate/Conference/screenshots/my.jpg" alt="个人中心" width="300"/> |
+
+### 日程应用模板
+
+**功能介绍**
+
+您可以基于此模板直接定制应用，也可以挑选此模板中提供的多种组件使用，从而降低您的开发难度，提高您的开发效率。
+
+本模板为日程类应用提供了常用功能的开发样例，模板主要分首页、日历、我的三大模块：
+
+1、首页：展示待办事项（按日期时间顺序），添加待办、按顺序展示
+
+2、日历：展示月、周、日维度的日历，可以选择日期
+
+3、我的：提供登录、意见反馈、联系客服等功能，包括隐私协议、隐私设置
+
+
+本模板已集成账号服务，只需做少量配置和定制即可快速实现华为账号一键登录。
+
+<a href="./BusinessTemplate/DailySchedule/README.md" target="_blank">详细说明</a>
+
+| 首页                                                        | 日历                                                         | 我的                                                          |
+|-----------------------------------------------------------|------------------------------------------------------------|-------------------------------------------------------------|
+| <img src="./BusinessTemplate/DailySchedule/screenshots/homepage.png" alt="首页" width="300"> | <img src="./BusinessTemplate/DailySchedule/screenshots/calendar.png" alt="我的" width="300"/> | <img src="./BusinessTemplate/DailySchedule/screenshots/mine.png" alt="setting" width="300"/> |
 
 ## 汽车
 

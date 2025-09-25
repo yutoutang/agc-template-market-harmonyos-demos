@@ -44,20 +44,21 @@ struct ExplainOrderDetail {
                 Text(this.vm.detail.title).commonTextExtend();
               }.width('100%').justifyContent(FlexAlign.SpaceBetween);
 
-              Divider().strokeWidth(0.5);
+              Divider();
               Row() {
                 Text('日期/场次').commonTextExtend();
                 Text(FormatUtil.dateAsISOCN(new Date(this.vm.detail.time)) + ' ' + this.vm.detail.timeSegment)
                   .commonTextExtend();
               }.width('100%').justifyContent(FlexAlign.SpaceBetween);
 
-              Divider().strokeWidth(0.5);
+              Divider();
               Row() {
                 Text('参观人').commonTextExtend();
                 Text(this.vm.detail.visitors.map(item => item.name)
                   .join('、')).commonTextExtend();
               }.width('100%').justifyContent(FlexAlign.SpaceBetween);
-              Divider().strokeWidth(0.5);
+
+              Divider();
               Row() {
                 Text('预约时间').commonTextExtend();
                 Text(this.vm.detail.orderTime).commonTextExtend();
@@ -79,7 +80,7 @@ struct ExplainOrderDetail {
               .width(64)
               .height(28)
               .backgroundColor('#D1B380')
-              .fontSize(12)
+              .fontSize($r('sys.float.Body_S'))
               .fontColor($r('sys.color.font_on_primary'))
               .fontWeight(500)
               .padding(0)
@@ -95,7 +96,7 @@ struct ExplainOrderDetail {
           .justifyContent(FlexAlign.End)
           .backgroundColor('#FFFFFF');
         }
-      }else {
+      } else {
         LoadingProgress().width(40);
       }
 

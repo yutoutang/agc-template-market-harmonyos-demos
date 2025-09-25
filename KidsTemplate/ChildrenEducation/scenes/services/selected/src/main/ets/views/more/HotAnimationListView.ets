@@ -31,7 +31,7 @@ struct HotAnimationListView {
           .margin({
             bottom: $r('app.float.12vp')
           });
-        });
+        }, (item:VideoCard) => JSON.stringify(item));
       }
       .width(CommonConstants.FULL_PERCENT)
       .scrollBar(BarState.Off)

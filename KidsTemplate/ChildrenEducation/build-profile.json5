@@ -1,7 +1,6 @@
 {
   "app": {
-    "signingConfigs": [
-    ],
+    "signingConfigs": [],
     "products": [
       {
         "name": "default",
@@ -18,7 +17,7 @@
     ],
     "buildModeSet": [
       {
-        "name": "debug",
+        "name": "debug"
       },
       {
         "name": "release"

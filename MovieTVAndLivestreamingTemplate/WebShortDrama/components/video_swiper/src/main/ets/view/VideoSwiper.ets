@@ -128,7 +128,7 @@ export struct VideoSwiper {
               inPage: this.inPage
             })
           },
-            (item: VideoPlayData, index:number) => index + '__' + JSON.stringify(item)
+            (item: VideoPlayData, index: number) => index + '__' + JSON.stringify(item)
           )
         }
         .cachedCount(this.firstFlag ? 0 : 2)
@@ -160,6 +160,7 @@ export struct VideoSwiper {
           this.currentVideoIndex = index;
           this.playController.curentIndex = index
         })
+        .disableSwipe(this.playController.disableSwiper)
       }
       .onStateChange(async (value: RefreshStatus) => {
         this.refreshStatus = value
@@ -169,6 +170,8 @@ export struct VideoSwiper {
           this.refreshing = false
         }
       })
+      .pullDownRatio(this.playController.disableSwiper ? 0 : 1)
+
     }
     .width('100%')
     .height('100%')

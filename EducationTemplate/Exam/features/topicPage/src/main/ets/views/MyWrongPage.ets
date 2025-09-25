@@ -262,6 +262,7 @@ export struct MyWrongIndexPage {
             .fontSize($r('sys.float.Body_L'))
             .textAlign(TextAlign.Center)
         }
+        .opacity(this.selectCount > 0 ? 1 : 0.4)
         .justifyContent(FlexAlign.Center)
         .alignItems(VerticalAlign.Center)
         .width('100%')
@@ -315,6 +316,9 @@ export struct MyWrongIndexPage {
 
   // 移除所选中的
   deleteSelectData() {
+    if (this.selectCount === 0) {
+      return
+    }
     let arr: string[] = []
     this.wrongQues.forEach((model: WrongModel) => {
       if (model.isDelete) {

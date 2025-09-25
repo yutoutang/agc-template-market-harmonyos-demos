@@ -1,4 +1,3 @@
-import { hide } from '@abner/dialog';
 import { RenameDialogParams } from '../model/Index';
 
 @Builder
@@ -16,7 +15,7 @@ export function renameDialog(params: RenameDialogParams) {
         .backgroundColor($r('sys.color.comp_background_tertiary'))
         .size({ width: 140, height: 40 })
         .onClick(() => {
-          hide();
+          params.cancel!();
         });
       Button('确定')
         .backgroundColor($r('sys.color.comp_background_emphasize'))

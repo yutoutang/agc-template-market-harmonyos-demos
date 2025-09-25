@@ -306,6 +306,18 @@
           ]
         }
       ]
+    },
+    {
+      "name": "module_cast",
+      "srcPath": "./components/module_cast",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
     }
   ]
 }

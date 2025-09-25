@@ -49,7 +49,6 @@ export struct Job {
         Row() {
           Search({ placeholder: '职位搜索' })
             .width('85%')
-            .height('100%')
             .onSubmit((input: string) => {
               this.searchInput = input.toLowerCase();
               this.updateList(this.filterByCondition());
@@ -227,7 +226,7 @@ export struct Job {
 
       Row() {
         Button('重置')
-          .fontColor($r('app.color.common_blue'))
+          .fontColor($r('sys.color.font_emphasize'))
           .backgroundColor($r('app.color.button_gray'))
           .width('45%')
           .onClick(() => {
@@ -239,8 +238,8 @@ export struct Job {
           })
 
         Button('完成')
-          .fontColor(Color.White)
-          .backgroundColor($r('app.color.common_blue'))
+          .fontColor($r('sys.color.font_on_primary'))
+          .backgroundColor($r('sys.color.font_emphasize'))
           .width('45%')
           .onClick(() => {
             this.updateList(this.filterByCondition());

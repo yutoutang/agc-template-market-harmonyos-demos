@@ -91,7 +91,7 @@ export struct CourseIntroductionPage {
         .itemHeight($r('app.float.vp_8'))
         .selectedItemWidth($r('app.float.vp_16'))
         .selectedItemHeight($r('app.float.vp_8'))
-        .color(Color.Gray)
+        .color($r('sys.color.comp_background_tertiary'))
         .selectedColor(Color.Blue)
         .maxDisplayCount(9))
     .curve(Curve.Linear)

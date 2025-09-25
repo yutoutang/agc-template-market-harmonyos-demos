@@ -17,7 +17,7 @@ export struct TabButton {
       Button(this.tabController.tabName)
         .height('100%')
         .backgroundColor(this.isActive?this.tabButtonData.activeBgColor:this.tabButtonData.defaultBgColor)
-        .fontSize(14)
+        .fontSize($r('sys.float.Body_M'))
         .fontColor(this.isActive?this.tabButtonData.activeFontColor:this.tabButtonData.defaultFontColor)
         .padding({
           left:8,

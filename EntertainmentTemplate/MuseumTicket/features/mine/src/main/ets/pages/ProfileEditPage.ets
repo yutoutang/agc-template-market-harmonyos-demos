@@ -317,7 +317,6 @@ struct ProfileEditPage {
     Divider()
       .vertical(false)
       .color(CommonConstants.DIVIDER_GRAY)
-      .strokeWidth(0.5);
   }
 }
 

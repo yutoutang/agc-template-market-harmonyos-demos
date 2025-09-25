@@ -1,5 +1,6 @@
 import display from '@ohos.display';
 import { usbManager } from '@kit.BasicServicesKit';
+import { i18n } from '@kit.LocalizationKit';
 import { promptAction } from '@kit.ArkUI';
 import { NFC_TYPE, Operation } from './Enum';
 import { nfcCardInfo } from '../db/NfcCardInfo';
@@ -228,6 +229,118 @@ export default class Util {
       name = tName + index++;
     }
     return name;
+  }
+
+  static isBlank(str: string | undefined | null): boolean {
+    let length: number = 0;
+    if (!str || (str === null) || ((length = str.length) === 0)) {
+      return true;
+    }
+    for (let i = 0; i < length; i++) {
+      if (false === Util.isBlankChar(str.charCodeAt(i))) {
+        return false; //只要有一个非空字符即为非空字符串
+      }
+    }
+    return true;
+  }
+
+  static isBlankChar(c: number): boolean {
+    return Util.isWhitespace(c.toString()) ||
+    Util.isSpaceChar(c.toString()) ||
+      c === 0xFEFF || c === 0x202A || c === 0x0000;
+  }
+
+  /**
+   * 判断字符串char是否是空格符
+   * @param char
+   * @returns
+   */
+  static isSpaceChar(char: string): boolean {
+    return i18n.Unicode.isSpaceChar(char);
+  }
+
+  /**
+   * 判断字符串char是否是空白符
+   * @param char
+   * @returns
+   */
+  static isWhitespace(char: string): boolean {
+    return i18n.Unicode.isWhitespace(char);
+  }
+
+  static getFormatDateStr(date: number | string | Date, format?: string): string {
+    date = Util.getFormatDate(date);
+    if (!format || format === '') {
+      format = 'yyyy-MM-dd HH:mm:ss'; //yyyy-MM-dd HH:mm:ss.fff
+    }
+    const year = date.getFullYear();
+    const month = Util.padZero(date.getMonth() + 1);
+    const day = Util.padZero(date.getDate());
+    const hours = Util.padZero(date.getHours());
+    const minutes = Util.padZero(date.getMinutes());
+    const seconds = Util.padZero(date.getSeconds());
+    let formattedDate = format.replace('yyyy', year.toString());
+    formattedDate = formattedDate.replace('MM', month);
+    formattedDate = formattedDate.replace('dd', day);
+    formattedDate = formattedDate.replace('HH', hours);
+    formattedDate = formattedDate.replace('mm', minutes);
+    formattedDate = formattedDate.replace('ss', seconds);
+    return formattedDate;
+  }
+
+  static padZero(num: number): string {
+    return num.toString().padStart(2, '0');
+  }
+
+  static isNotBlank(str: string | undefined | null): boolean {
+    return false === Util.isBlank(str);
+  }
+
+  static toNumber(value: string): number | string {
+    try {
+      let parsedValue = parseFloat(value);
+      if (isNaN(parsedValue)) {
+        return value;
+      }
+      if (parsedValue.toString().length !== value.length) {
+        return value;
+      }
+      return parsedValue;
+    } catch (e) {
+      return value;
+    }
+  }
+
+  static getFormatDate(date?: number | string | Date): Date {
+    if (!date || date === null) { //无参数
+      date = new Date();
+    } else if (typeof date === 'string') { //字符串日期
+      if (date.length === 0) {
+        date = new Date();
+      } else {
+        if (date.toString().length === 10 || date.toString().length === 13) {
+          date = Util.toNumber(date); //将字符串时间戳 转为 number
+          if (typeof date === 'number') {
+            date = new Date(date);
+            return date;
+          }
+        }
+        let dateStr = date.replaceAll('-', '/')
+          .replace('年', '/')
+          .replace('月', '/')
+          .replace('日', ' ')
+          .replace('  ', ' ')
+          .replace('时', ':')
+          .replace('分', ':')
+          .replace('秒', '');
+        date = new Date(dateStr);
+      }
+    } else if (typeof (date) === 'number') { //时间戳
+      date = new Date(date);
+    } else {
+      date = new Date(date);
+    }
+    return date;
   }
 
   public static isKeyBReadable(c1: number, c2: number, c3: number): boolean {

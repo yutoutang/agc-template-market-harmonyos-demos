@@ -245,7 +245,7 @@ export struct UISteps {
         .vertical(!this.isRow)
         .width(this.isRow ? this.dividerRelSize : null)
         .height(!this.isRow ? this.dividerRelSize : null)
-        .strokeWidth(Constants.DIVIDER_WIDTH)
+        .strokeWidth('1px')
         .color(this.queryColor(index))
         .id(`divider${index}`)
         .alignRules(this.isRow ? {

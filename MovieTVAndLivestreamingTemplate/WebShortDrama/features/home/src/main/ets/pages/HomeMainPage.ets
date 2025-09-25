@@ -29,6 +29,7 @@ export struct HomeMainPage {
   playController: PlayController = new PlayController()
 
   aboutToAppear(): void {
+
     this.getDeleteEmitter()
     this.getDetailInfoFavoriteEmitter()
     this.getSideFavoriteEmitter()

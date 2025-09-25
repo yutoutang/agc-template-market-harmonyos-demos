@@ -80,8 +80,8 @@ struct ExplainPage {
 
                     Button('预约')
                       .backgroundColor(item.remaining > 0 ? '#D1B380' : $r('sys.color.icon_tertiary'))
-                      .fontSize(12)
-                      .fontColor('#FFFFFF')
+                      .fontSize($r('sys.float.Body_S'))
+                      .fontColor($r('sys.color.font_on_primary'))
                       .fontWeight(500)
                       .width(60)
                       .height(28)

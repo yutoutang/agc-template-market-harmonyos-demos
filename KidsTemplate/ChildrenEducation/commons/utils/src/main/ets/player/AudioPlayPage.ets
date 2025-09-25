@@ -285,8 +285,8 @@ export struct AudioPlayPage {
         step: 1,
         style: SliderStyle.OutSet,
       })
-        .trackColor('#fff6f3f3')
-        .selectedColor('#FFD15D')
+        .trackColor($r('sys.color.comp_background_secondary'))
+        .selectedColor($r('sys.color.comp_background_emphasize'))
         .trackThickness(PlayConstants.PROGRESS_TRACK_THICKNESS)
         .layoutWeight(1)
         .onChange((value: number, mode: SliderChangeMode) => {
