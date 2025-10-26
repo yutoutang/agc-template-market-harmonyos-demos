@@ -1,14 +1,26 @@
 import { media } from '@kit.MediaKit';
+import { AvPlayer } from './AvPlayer';
+import { AVPlayerListener } from './AvPlayerListener';
 
 /**
  * 功能描述：播放会话是一个播放条目的播放封装，通过该会话能获取当前播放条目的播放状态
  * 1. 播放会话事件(播放状态变化，播放进度，播放完成事件)
  */
+@ObservedV2
 export class PlaySession {
-  public avPlayer: media.AVPlayer | undefined = undefined;
+  @Trace avPlayer: AvPlayer | undefined = undefined;
   public avPlayerCallback: Map<string, Array<(...arg: string[] | number[]) => void>> = new Map();
   public stateChangeCallbacks: Map<string, Array<(state: string) => void>> = new Map();
   public timeUpdateCallbacks: Map<string, Array<(time: number) => void>> = new Map();
+  public listener?: AVPlayerListener
+
+  registerListener(listener: AVPlayerListener) {
+    this.listener = listener
+  }
+
+  unregisterListener(listener: AVPlayerListener) {
+    this.listener = undefined
+  }
 
   // 状态变化事件监听
   onStateChange(key: string, callback: (state: string) => void): void {
@@ -28,7 +40,7 @@ export class PlaySession {
     }
   }
 
-  setAVPlayer(avPlayer: media.AVPlayer) {
+  setAVPlayer(avPlayer: AvPlayer) {
     this.avPlayer = avPlayer;
   }
 

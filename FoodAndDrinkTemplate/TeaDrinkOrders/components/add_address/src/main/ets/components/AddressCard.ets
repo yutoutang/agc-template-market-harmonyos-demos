@@ -43,7 +43,7 @@ export struct AddressCard {
     .width('100%')
     .justifyContent(FlexAlign.SpaceBetween)
     .borderRadius(16)
-    .backgroundColor(Color.White)
+    .backgroundColor($r('sys.color.background_primary'))
     .padding({
       left: 16,
       right: 16,

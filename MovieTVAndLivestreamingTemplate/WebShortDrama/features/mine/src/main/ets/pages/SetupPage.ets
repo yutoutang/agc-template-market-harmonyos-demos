@@ -5,6 +5,7 @@ import { UserInfoRow } from '../component/UserInfoRow';
 import { getString, NAV_PAGE_NAME } from '@agctemplate/resources';
 import { AppStorageKeys, AssociateUtil, ListItemModel, MinePageVM, StatusBarHeight } from '@agctemplate/widgets';
 import { appRouter, PreferConstant, PreferenceUtil } from '@agctemplate/utils';
+import { TipsDialog } from '@kit.ArkUI';
 
 @ComponentV2
 export struct SetUpPage {
@@ -17,6 +18,37 @@ export struct SetUpPage {
   @Local userAvatar: ListItemModel = new ListItemModel(getString('app.string.avatar'))
   @Local userName: ListItemModel = new ListItemModel(getString('app.string.nick_name'))
   @Local userPhone: ListItemModel = new ListItemModel(getString('app.string.phone_number'))
+  @Local textValue: string = '';
+  dialogController: CustomDialogController | null = new CustomDialogController({
+    builder:TipsDialog({
+      content: '是否退出登录',
+      primaryButton: {
+        value: '取消',
+        action: () => {
+          console.info('Callback when the first button is clicked')
+        },
+      },
+      secondaryButton: {
+        value: '确定',
+        role: ButtonRole.ERROR,
+        action: () => {
+          console.info('Callback when the second button is clicked')
+          this.onAccept()
+        }
+      }
+    })
+  });
+
+  async onAccept() {
+    console.info('Callback when the second button is clicked');
+    await AssociateUtil.disassociateAccount(getContext(this))
+    appRouter.back()
+
+  }
+
+  aboutToDisappear() {
+    this.dialogController = null; // 将dialogController置空
+  }
 
   aboutToAppear(): void {
     this.currentSpeed =
@@ -50,15 +82,15 @@ export struct SetUpPage {
                     builderName: NAV_PAGE_NAME.PersonalInfoPage.name, params: {
                       userAvatar: [
                         this.userAvatar.setContentImage(this.vm.localInfo.avatar ? this.vm.localInfo.avatar :
-                        this.vm.userInfo.avatar)
+                          this.vm.userInfo.avatar)
                           .setHandle(() => {
                             appRouter.push({
                               builderName: NAV_PAGE_NAME.ChangePage.name
                             })
                           })],
                       userDetail: [this.userName.setContentText(this.vm.localInfo.nickname ?
-                      this.vm.localInfo.nickname :
-                      this.vm.userInfo.nickname)
+                        this.vm.localInfo.nickname :
+                        this.vm.userInfo.nickname)
                         .setHandle(() => {
                           appRouter.push({
                             builderName: NAV_PAGE_NAME.ChangePage.name
@@ -150,9 +182,10 @@ export struct SetUpPage {
             .fontWeight(500)
             .width('100%')
             .height(40)
-            .onClick(async () => {
-              await AssociateUtil.disassociateAccount(getContext(this))
-              appRouter.back()
+            .onClick(() => {
+              if (this.dialogController != null) {
+                this.dialogController.open();
+              }
             })
         }
         .justifyContent(FlexAlign.SpaceBetween)

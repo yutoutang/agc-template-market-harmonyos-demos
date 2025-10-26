@@ -1,6 +1,6 @@
 import { getColor, getMedia, NAV_PAGE_NAME } from '@agctemplate/resources';
 import { AiBarHeight, AppStorageKeys, StatusBarHeight, UserInfoModel } from '@agctemplate/widgets';
-import { AppStorageV2, promptAction } from '@kit.ArkUI';
+import { AppStorageV2, promptAction, window } from '@kit.ArkUI';
 import { appRouter, container, NavParams, WindowManager } from '@agctemplate/utils';
 import { DramaCoverVM } from '../viewmodels/DramaCoverVM';
 import { ActorInfo, DramaDetailVM } from '../viewmodels/DramaDetailVM';
@@ -134,21 +134,32 @@ export struct DramaDetailInfoPage {
                   if (index === this.totalTabIndex - 1) {
                     ForEach(this.tailIndexArray, (item: number, indexIndex: number) => {
                       GridItem() {
-                        Stack({ alignContent: Alignment.BottomEnd }) {
-                          Text(`${(index) * this.spliceNum + indexIndex + 1}`)
-                            .textAlign(TextAlign.Center)
-                            .width(48)
-                            .height(48)
-                            .fontColor(this.currentIndex === (index * this.spliceNum + indexIndex) ? '#EC6E45' :
-                              $r('sys.color.font_primary'))
-                            .fontSize($r('sys.float.Body_M'))
-                            .backgroundColor(this.currentIndex === (index * this.spliceNum + indexIndex) ?
-                              'rgba(236, 110, 69, 0.05)' : 'rgba(0, 0, 0, 0.05)')
-                          if (this.currentIndex === (index * this.spliceNum + indexIndex)) {
-                            Image(getMedia('app.media.playing'))
-                              .width(10)
-                              .height(8)
-                              .margin({ bottom: 3, right: 3 })
+                        Stack({ alignContent: Alignment.TopEnd }) {
+                          Stack({ alignContent: Alignment.BottomEnd }) {
+                            Text(`${(index) * this.spliceNum + indexIndex + 1}`)
+                              .textAlign(TextAlign.Center)
+                              .width(48)
+                              .height(48)
+                              .fontColor(this.currentIndex === (index * this.spliceNum + indexIndex) ? '#EC6E45' :
+                                $r('sys.color.font_primary'))
+                              .fontSize($r('sys.float.Body_M'))
+                              .backgroundColor(this.currentIndex === (index * this.spliceNum + indexIndex) ?
+                                'rgba(236, 110, 69, 0.05)' : 'rgba(0, 0, 0, 0.05)')
+                            if (this.currentIndex === (index * this.spliceNum + indexIndex)) {
+                              Image(getMedia('app.media.playing'))
+                                .width(10)
+                                .height(8)
+                                .margin({ bottom: 3, right: 3 })
+                            }
+                          }
+
+                          if (indexIndex > 10 && index === 0 || index > 0) {
+                            Text('VIP')
+                              .textAlign(TextAlign.Center)
+                              .fontSize(6)
+                              .width(13)
+                              .height(11)
+                              .backgroundColor('rgba(255,215,0,0.36)')
                           }
                         }
                       }
@@ -162,22 +173,35 @@ export struct DramaDetailInfoPage {
                   } else {
                     ForEach(this.fullIndexArray, (item: number, indexIndex: number) => {
                       GridItem() {
-                        Stack({ alignContent: Alignment.BottomEnd }) {
-                          Text(`${(index) * this.spliceNum + indexIndex + 1}`)
-                            .textAlign(TextAlign.Center)
-                            .width(48)
-                            .height(48)
-                            .fontColor(this.currentIndex === (index * this.spliceNum + indexIndex) ? '#EC6E45' :
-                              $r('sys.color.font_primary'))
-                            .fontSize($r('sys.float.Body_M'))
-                            .backgroundColor(this.currentIndex === (index * this.spliceNum + indexIndex) ?
-                              'rgba(236, 110, 69, 0.05)' : 'rgba(0, 0, 0, 0.05)')
-                          if (this.currentIndex === (index * this.spliceNum + indexIndex)) {
-                            Image(getMedia('app.media.playing'))
-                              .width(10)
-                              .height(8)
-                              .margin({ bottom: 3, right: 3 })
+                        Stack({ alignContent: Alignment.TopEnd }) {
+                          Stack({ alignContent: Alignment.BottomEnd }) {
+                            Text(`${(index) * this.spliceNum + indexIndex + 1}`)
+                              .textAlign(TextAlign.Center)
+                              .width(48)
+                              .height(48)
+                              .fontColor(this.currentIndex === (index * this.spliceNum + indexIndex) ? '#EC6E45' :
+                                $r('sys.color.font_primary'))
+                              .fontSize($r('sys.float.Body_M'))
+                              .backgroundColor(this.currentIndex === (index * this.spliceNum + indexIndex) ?
+                                'rgba(236, 110, 69, 0.05)' : 'rgba(0, 0, 0, 0.05)')
+                            if (this.currentIndex === (index * this.spliceNum + indexIndex)) {
+                              Image(getMedia('app.media.playing'))
+                                .width(10)
+                                .height(8)
+                                .margin({ bottom: 3, right: 3 })
+                            }
+
                           }
+
+                          if (indexIndex > 10 && index === 0 || index > 0) {
+                            Text('VIP')
+                              .textAlign(TextAlign.Center)
+                              .fontSize(6)
+                              .width(13)
+                              .height(11)
+                              .backgroundColor('rgba(255,215,0,0.36)')
+                          }
+
                         }
                       }
                       .onClick(() => {
@@ -304,7 +328,7 @@ export struct DramaDetailInfoPage {
                         .padding({ left: 4, right: 4 })
                         .backgroundColor('rgba(0, 0, 0, 0.05)')
                         .margin({ left: 12 })
-                    }
+                    }, (item: string) => item
                   )
                 }
                 .height(24)
@@ -390,21 +414,32 @@ export struct DramaDetailInfoPage {
                       Row({ space: 8 }) {
                         if (index === this.totalTabIndex - 1) {
                           ForEach(this.tailIndexArray.slice(0, 6), (item: number, indexIndex: number) => {
-                            Stack({ alignContent: Alignment.BottomEnd }) {
-                              Text(`${(index) * this.spliceNum + indexIndex + 1}`)
-                                .textAlign(TextAlign.Center)
-                                .width(48)
-                                .height(48)
-                                .fontColor(this.currentIndex === (index * this.spliceNum + indexIndex) ? '#EC6E45' :
-                                  $r('sys.color.font_primary'))
-                                .fontSize($r('sys.float.Body_M'))
-                                .backgroundColor(this.currentIndex === (index * this.spliceNum + indexIndex) ?
-                                  'rgba(236, 110, 69, 0.05)' : $r('sys.color.background_secondary'))
-                              if (this.currentIndex === (index * this.spliceNum + indexIndex)) {
-                                Image(getMedia('app.media.playing'))
-                                  .width(10)
-                                  .height(8)
-                                  .margin({ bottom: 3, right: 3 })
+                            Stack({ alignContent: Alignment.TopEnd }) {
+                              Stack({ alignContent: Alignment.BottomEnd }) {
+                                Text(`${(index) * this.spliceNum + indexIndex + 1}`)
+                                  .textAlign(TextAlign.Center)
+                                  .width(48)
+                                  .height(48)
+                                  .fontColor(this.currentIndex === (index * this.spliceNum + indexIndex) ? '#EC6E45' :
+                                    $r('sys.color.font_primary'))
+                                  .fontSize($r('sys.float.Body_M'))
+                                  .backgroundColor(this.currentIndex === (index * this.spliceNum + indexIndex) ?
+                                    'rgba(236, 110, 69, 0.05)' : $r('sys.color.background_secondary'))
+                                if (this.currentIndex === (index * this.spliceNum + indexIndex)) {
+                                  Image(getMedia('app.media.playing'))
+                                    .width(10)
+                                    .height(8)
+                                    .margin({ bottom: 3, right: 3 })
+                                }
+                              }
+
+                              if (indexIndex > 10 && index === 0 || index > 0) {
+                                Text('VIP')
+                                  .textAlign(TextAlign.Center)
+                                  .fontSize(6)
+                                  .width(13)
+                                  .height(11)
+                                  .backgroundColor('rgba(255,215,0,0.36)')
                               }
                             }
                             .onClick(() => {
@@ -416,21 +451,32 @@ export struct DramaDetailInfoPage {
                           }, (item: number) => item.toString())
                         } else {
                           ForEach(this.fullIndexArray.slice(0, 6), (item: number, indexIndex: number) => {
-                            Stack({ alignContent: Alignment.BottomEnd }) {
-                              Text(`${(index) * this.spliceNum + indexIndex + 1}`)
-                                .textAlign(TextAlign.Center)
-                                .width(48)
-                                .height(48)
-                                .fontColor(this.currentIndex === (index * this.spliceNum + indexIndex) ? '#EC6E45' :
-                                  $r('sys.color.font_primary'))
-                                .fontSize($r('sys.float.Body_M'))
-                                .backgroundColor(this.currentIndex === (index * this.spliceNum + indexIndex) ?
-                                  'rgba(236, 110, 69, 0.05)' : $r('sys.color.background_secondary'))
-                              if (this.currentIndex === (index * this.spliceNum + indexIndex)) {
-                                Image(getMedia('app.media.playing'))
-                                  .width(10)
-                                  .height(8)
-                                  .margin({ bottom: 3, right: 3 })
+                            Stack({ alignContent: Alignment.TopEnd }) {
+                              Stack({ alignContent: Alignment.BottomEnd }) {
+                                Text(`${(index) * this.spliceNum + indexIndex + 1}`)
+                                  .textAlign(TextAlign.Center)
+                                  .width(48)
+                                  .height(48)
+                                  .fontColor(this.currentIndex === (index * this.spliceNum + indexIndex) ? '#EC6E45' :
+                                    $r('sys.color.font_primary'))
+                                  .fontSize($r('sys.float.Body_M'))
+                                  .backgroundColor(this.currentIndex === (index * this.spliceNum + indexIndex) ?
+                                    'rgba(236, 110, 69, 0.05)' : $r('sys.color.background_secondary'))
+                                if (this.currentIndex === (index * this.spliceNum + indexIndex)) {
+                                  Image(getMedia('app.media.playing'))
+                                    .width(10)
+                                    .height(8)
+                                    .margin({ bottom: 3, right: 3 })
+                                }
+                              }
+
+                              if (indexIndex > 10 && index === 0 || index > 0) {
+                                Text('VIP')
+                                  .textAlign(TextAlign.Center)
+                                  .fontSize(6)
+                                  .width(13)
+                                  .height(11)
+                                  .backgroundColor('rgba(255,215,0,0.36)')
                               }
                             }
                             .onClick(() => {
@@ -456,13 +502,15 @@ export struct DramaDetailInfoPage {
               .height(85)
 
               RecommendView({
-                recommendList: this.recommendList, gutter: 21, onItemClick: (options: DramaCoverVM) => {
+                recommendList: this.recommendList,
+                gutter: 21,
+                onItemClick: (options: DramaCoverVM) => {
                   this.vm.jumpDetailPage(options)
                 },
                 changeRecommendList: () => {
-                  if(this.pageNum < 10) {
+                  if (this.pageNum < 10) {
                     this.pageNum++
-                  }else {
+                  } else {
                     this.pageNum = 1
                   }
                   this.getRecommendList(this.pageNum).then((data) => {
@@ -511,7 +559,7 @@ export struct DramaDetailInfoPage {
                 }
                 this.isFavorite = this.dramaInfo!.isFavorite
                 this.detailInfoSendFavoriteEmitter()
-              }else {
+              } else {
                 appRouter.push({ builderName: NAV_PAGE_NAME.LoginPage.name })
               }
             })
@@ -561,6 +609,9 @@ export struct DramaDetailInfoPage {
 
 @ComponentV2
 struct RecommendView {
+  windowStage: window.WindowStage = AppStorage.get('windowStage') as window.WindowStage;
+  // 获取主窗口的方式
+  mainWin: window.Window = this.windowStage.getMainWindowSync();
   @Param @Require recommendList: Array<DramaCoverVM>
   @Param @Require gutter: number
   @Event onItemClick: Function
@@ -613,6 +664,14 @@ struct RecommendView {
       .scrollBar(BarState.Off)
     }
     .width('100%')
+    .onVisibleAreaChange([0],(isExpanding: boolean, currentRatio: number)=>{
+      if(isExpanding){
+        let sysBarProps: window.SystemBarProperties = {
+          statusBarContentColor: '#000000'
+        };
+        this.mainWin.setWindowSystemBarProperties(sysBarProps)
+      }
+    })
   }
 }
 

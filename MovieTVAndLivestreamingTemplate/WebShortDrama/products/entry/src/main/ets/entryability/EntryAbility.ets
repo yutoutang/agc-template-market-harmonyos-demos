@@ -11,6 +11,8 @@ import {
 } from '@agctemplate/widgets';
 import { emitter } from '@kit.BasicServicesKit';
 import { CastService } from 'module_cast';
+import { PipManager } from 'module_pip';
+import { Preferences } from '@agctemplate/detail'
 
 const TAG = 'EntryAbility'
 
@@ -36,6 +38,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
+    AppStorage.setOrCreate('windowStage',windowStage);
     // Main window is created, set main page for this ability
     Logger.info(TAG, 'Ability onWindowStageCreate');
     WindowManager.initWindowStage(windowStage);
@@ -52,6 +55,15 @@ export default class EntryAbility extends UIAbility {
       }
       Logger.info(TAG, 'Succeeded in loading the content.');
     });
+    windowStage.getMainWindow().then((window) => {
+      let ctx = window.getUIContext();
+      AppStorage.setOrCreate('UIContext', ctx);
+      // 通过主窗口UIContext创建typeNode节点
+      PipManager.getInstance().makeTypeNode(ctx);
+    })
+    Preferences.createPreferences(this.context)
+    Preferences.writeData('showControl',false)
+    Preferences.writeData('isShowBullet',true)
   }
 
   onWindowStageDestroy(): void {

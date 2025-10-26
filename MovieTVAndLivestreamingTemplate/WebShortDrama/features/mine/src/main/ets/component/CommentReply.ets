@@ -67,9 +67,9 @@ export struct CommentReply {
                 }
                 )
               }
-            }
+            }, (item: Reply) => item.replyName + item.replyContent + item.replyTimeAgo.toString()
           )
-        }
+        }, (item: CommentData) => item.id.toString()
       )
     }
     .width('100%')

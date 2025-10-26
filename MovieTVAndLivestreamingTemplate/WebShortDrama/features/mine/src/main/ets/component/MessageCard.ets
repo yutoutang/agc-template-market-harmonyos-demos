@@ -13,7 +13,7 @@ export struct MessageCard {
     Row() {
       Row() {
         Column() {
-          Image(getMedia(this.reply.replyAvatar))
+          Image(this.reply.replyAvatar)
             .width(16)
             .aspectRatio(1)
             .borderRadius(8)

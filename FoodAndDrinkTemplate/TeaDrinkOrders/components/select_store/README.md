@@ -24,10 +24,15 @@
 * 设备类型：华为手机（包括双折叠和阔折叠）
 * 系统版本：HarmonyOS 5.0.1(13)及以上
 
+### 权限要求
+
+- 获取位置权限：ohos.permission.APPROXIMATELY_LOCATION、ohos.permission.LOCATION
+- 网络权限：ohos.permission.INTERNET
+
 ## 快速入门
 
 1. 安装组件。  
-   如果是在DevEvo Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
+   如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
    如果是从生态市场下载组件，请参考以下步骤安装组件。  
    a. 解压下载的组件包，将包中所有文件夹拷贝至您工程根目录的xxx目录下。  
    b. 在项目根目录build-profile.json5并添加select_store和base_ui模块。
@@ -58,7 +63,46 @@
    import { SelectStore } from 'select_store';
    ```
 
-3. 调用组件，详细参数配置说明参见[API参考](#API参考)。
+3. 在主工程的src/main路径下的module.json5文件的requestPermissions字段中添加如下权限：
+
+   ```typescript
+     "requestPermissions": [
+      ...
+      {
+        "name": "ohos.permission.INTERNET",
+        "reason": "$string:app_name",
+        "usedScene": {
+          "abilities": [
+            "FormAbility"
+          ],
+          "when": "inuse"
+        }
+      },
+      {
+        "name": "ohos.permission.LOCATION",
+        "reason": "$string:app_name",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "inuse"
+        }
+      },
+      {
+        "name": "ohos.permission.APPROXIMATELY_LOCATION",
+        "reason": "$string:app_name",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "inuse"
+        }
+      }
+      ...
+    ],
+   ```
+   
+4. 调用组件，详细参数配置说明参见[API参考](#API参考)。
 
    ```typescript
    SelectStore({
@@ -91,9 +135,10 @@ SelectStore(options?: SelectStoreOptions)
 
 ### SelectStoreOptions对象说明
 
-| 名称            | 类型                            | 是否必填 | 说明   |
-|---------------|-------------------------------|------|------|
-| storeInfoList | [storeInfo](#storeInfo对象说明)[] | 否    | 店铺列表 |
+| 名称            | 类型                            | 是否必填 | 说明           |
+|---------------|-------------------------------|------|--------------|
+| storeInfoList | [storeInfo](#storeInfo对象说明)[] | 否    | 店铺列表         |
+| listOffset    | number                        | 否    | list内容区末尾偏移量 |
 
 ### storeInfo对象说明
 
@@ -183,6 +228,7 @@ struct Index {
       RelativeContainer() {
          SelectStore({
             storeInfoList: this.storeInfoList,
+            listOffset: 30,
             navigateStoreCb: (coordinates: string = '', address: string = '') => {
                // 跳转店铺导航
                promptAction.showToast({ message: '点击店铺导航' })

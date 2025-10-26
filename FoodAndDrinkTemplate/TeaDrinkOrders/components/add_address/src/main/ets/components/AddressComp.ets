@@ -32,10 +32,10 @@ export struct AddressComp {
       }
 
       Row() {
-        Text(this.address.name).fontSize(12).fontColor($r('sys.color.mask_secondary'))
+        Text(this.address.name).fontSize(12).fontColor($r('sys.color.font_secondary'))
         Text(this.address.tel)
           .fontSize(12)
-          .fontColor($r('sys.color.mask_secondary'))
+          .fontColor($r('sys.color.font_secondary'))
           .margin({ left: 12 })
       }.margin({ top: 9 })
     }.alignItems(HorizontalAlign.Start)

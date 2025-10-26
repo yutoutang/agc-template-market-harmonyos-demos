@@ -7,8 +7,8 @@
   "license": "Apache-2.0",
   "dependencies": {
     'aggregated_payment': 'file:../../sdk/aggregated_payment',
-    "@cashier_alipay/cashiersdk": "^15.8.29",
     "dayjs": "^1.11.13",
-    'base_apis': 'file:../base_apis'
+    'base_apis': 'file:../base_apis',
+    "@cashier_alipay/cashiersdk": "./libs/swallow_alipay_sdk"
   }
 }

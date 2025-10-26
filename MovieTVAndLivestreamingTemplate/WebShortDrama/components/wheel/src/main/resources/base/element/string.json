@@ -13,8 +13,12 @@
       "value": "确定"
     },
     {
-      "name": "agcit_huawei_web_short_drama",
-      "value": "1.0.2"
+      "name": "agcit_huawei_wheel",
+      "value": "1.0.0"
+    },
+    {
+      "name": "agcittype_huawei_wheel",
+      "value": "serviceComponent"
     }
   ]
 }

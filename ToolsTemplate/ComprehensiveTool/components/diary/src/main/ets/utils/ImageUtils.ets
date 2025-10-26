@@ -1,5 +1,5 @@
 import { image } from '@kit.ImageKit';
-import { fileIo } from '@kit.CoreFileKit';
+import { fileIo, fileUri } from '@kit.CoreFileKit';
 import { Logger } from './Logger';
 
 export class ImageUtils {
@@ -106,6 +106,21 @@ export class ImageUtils {
   }
   // [End merge_image]
 
+  // 将图片保存到沙箱
+  static saveImgToCache(context: Context, imageUri: string, name: string): string {
+    let cachePath = context.cacheDir + '/' + name;
+    let file = fileIo.openSync(imageUri, fileIo.OpenMode.READ_ONLY);
+    let file2 = fileIo.openSync(cachePath, fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE);
+    fileIo.copyFileSync(file.fd, file2.fd)
+    fileIo.closeSync(file);
+    fileIo.closeSync(file2);
+
+    let uri = fileUri.getUriFromPath(cachePath);
+    // 这里替换是为了在查看详情的时候，web组件能展示图片
+    const resUri = uri.replace(/^file:\/\/[^/]+/, 'file:///');
+    return resUri;
+  }
+
   // 将图片拷贝到cache
   static saveToCache(context: Context, srcPath: string, newFileName: string): string {
     try {
@@ -123,7 +138,7 @@ export class ImageUtils {
 
   // 找出html中img的src
   static findImgSrcList(htmlStr: string): string[] {
-    const regx = /<img[^>]+src=["'](file:\/\/[^"']+)["']/g;
+    const regx = /<img[^>]+src=["']\s*([^"']+)\s*["']/g;
     const matches = htmlStr.matchAll(regx);
     let imgSrcList: string[] = [];
     for (const match of matches) {

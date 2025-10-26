@@ -185,7 +185,7 @@ export async function startFormatNFC(nfcType: number, actionModel: ActionModel, 
           if (error) {
             hilog.info(0x0000, 'testTag', 'readerModeCb readerModeCb error %{public}s', JSON.stringify(error));
             promptAction.showToast({
-              message: 'readerModeCb readerModeCb error ' + JSON.stringify(error)
+              message: 'readerModeCb readerModeCb error ' + JSON.stringify(error),
             });
             callback(new NFCError(-1, '格式化NFC失败'), undefined);
           } else {
@@ -416,7 +416,7 @@ async function cloneNFC(nfcType: number, nfcInfo: NfcInfo, curNfcInfo: NfcInfo, 
 async function authenticateSector(mifareClassic: tag.MifareClassicTag,
   callback: AsyncCallback<NFCState>): Promise<boolean | undefined> {
   let auth = false;
-  // todo: KEY_MAP为扇区数据的加解密秘钥，您需要根据NFC卡的类型替换秘钥内容
+  // todo: KEY_MAP为扇区数据的加解密秘钥，您需要根据NFC卡的类型替换秘钥内容，当前仅支持解密MIFARE Classic卡
   for (let element of KEY_MAP) {
     try {
       await mifareClassic.authenticateSector(0, Util.hex2Bytes(element), true);

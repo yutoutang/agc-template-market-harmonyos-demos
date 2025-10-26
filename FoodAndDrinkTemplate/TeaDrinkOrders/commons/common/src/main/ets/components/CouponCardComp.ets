@@ -101,7 +101,7 @@ export struct CouponCard {
                   .select(!!this.selectCouponId && this.selectCouponId === this.coupon.id)
                   .height(16)
                   .width(16)
-                  .selectedColor($r('app.color.mainColor'))
+                  .selectedColor('#486602')
                   .shape(CheckBoxShape.CIRCLE)
                   .onChange((value: boolean) => {
                     this.changeCoupon(this.coupon, value)

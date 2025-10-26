@@ -4,7 +4,7 @@ import { PlayController } from 'video_swiper';
 import { getMedia, NAV_PAGE_NAME } from '@agctemplate/resources';
 import { UserInfoModel } from '@agctemplate/widgets';
 import { commentBuilder, CommentParam } from './CommentComp';
-import { FirstShare, SheetShowVM } from '@agctemplate/module_share';
+import { Share } from '@agctemplate/module_share';
 import { appRouter, Logger, WindowManager } from '@agctemplate/utils';
 import { MyMessageStorage } from '../models/MyMessageStorage';
 import { emitter } from '@kit.BasicServicesKit';
@@ -24,7 +24,6 @@ export struct Side {
   @Local myMessageStorage: MyMessageStorage = MyMessageStorage.instance()
   @Local isShowShareSheet: boolean = false
   @Local commentShow: boolean = false
-  @Local shareShowVM: SheetShowVM = SheetShowVM.instance
   private commentNode: ComponentContent<CommentParam> = new ComponentContent(
     this.getUIContext(),
     wrapBuilder<[CommentParam]>(commentBuilder),
@@ -64,7 +63,6 @@ export struct Side {
   closeCommentDialog() {
     this.getUIContext().getPromptAction().closeCustomDialog(this.commentNode)
   }
-
 
   // 点击点赞按钮的回调函数
   private changeLikeCount(isAdd: boolean) {
@@ -140,7 +138,7 @@ export struct Side {
     Column({ space: 16 }) {
       Column() {
         Image(this.videoDes.dramaSocialInfo.isLike ? getMedia('app.media.thumb_select') :
-        getMedia('app.media.thumb_white'))
+          getMedia('app.media.thumb_white'))
           .width(22)
           .height(20)
           .margin({ top: 2 })
@@ -150,6 +148,7 @@ export struct Side {
               this.sideSendFavoriteEmitter()
             } else {
               WindowManager.setWindowSystemBarProperties({ statusBarContentColor: '#e6000000' })
+              this.playControl.pause()
               appRouter.push({ builderName: NAV_PAGE_NAME.LoginPage.name, params: { isChange: true } })
             }
           })
@@ -183,7 +182,7 @@ export struct Side {
 
       Column() {
         Image(this.videoDes.dramaSocialInfo.isFavorite ? getMedia('app.media.favorite_select') :
-        getMedia('app.media.favorite_white'))
+          getMedia('app.media.favorite_white'))
           .width(22)
           .height(20)
           .margin({ top: 2 })
@@ -193,6 +192,7 @@ export struct Side {
               this.sideSendFavoriteEmitter()
             } else {
               WindowManager.setWindowSystemBarProperties({ statusBarContentColor: '#e6000000' })
+              this.playControl.pause()
               appRouter.push({ builderName: NAV_PAGE_NAME.LoginPage.name, params: { isChange: true } })
             }
           })
@@ -205,37 +205,41 @@ export struct Side {
       .height(40)
       .id('favoriteButton')
 
-      Column() {
-        Image(getMedia('app.media.share_white'))
-          .width(22)
-          .height(20)
-          .margin({ top: 2 })
-        Text('分享')
-          .fontSize(10)
-          .fontColor('#fff')
-          .margin({ top: 4 })
-      }
-      .width(40)
-      .height(40)
-      .id('shareButton')
-      .onClick(() => {
-        this.shareShowVM.setPosterInfo('', this.videoDes.dramaInfo.coverUrl, '', '', this.videoDes.dramaInfo.name)
-        this.isShowShareSheet = !this.isShowShareSheet
-      })
-      .bindSheet($$this.isShowShareSheet, this.FirstShareBuilder(), {
-        title: { title: '分享到' },
-        height: 352,
-        preferType: SheetType.BOTTOM
-      })
+      this.shareBuilder()
+
     }
     .width(40)
     .height(208)
   }
 
   @Builder
-  FirstShareBuilder() {
-    FirstShare({
-      close: () => {
+  shareCommentBuilder() {
+    Column({ space: 5 }) {
+      Image($r('app.media.share_white'))
+        .width(21)
+        .height(21)
+      Text('分享')
+        .fontSize(10)
+        .fontColor($r('sys.color.font_on_primary'))
+    }
+  }
+
+  @Builder
+  shareBuilder() {
+    Share({
+      qrCodeInfo: {
+        id: this.videoDes.dramaInfo.id,
+        type: 2,
+        title: this.videoDes.dramaInfo.name,
+        createTime: '',
+        coverUrl: this.videoDes.dramaInfo.coverUrl,
+        isVideo: false,
+        articleFrom: this.videoDes.dramaInfo.category[0] + '/' + this.videoDes.dramaInfo.category[1]
+      },
+      shareRenderBuilder: () => {
+        this.shareCommentBuilder()
+      },
+      onClose: () => {
         this.isShowShareSheet = !this.isShowShareSheet
       }
     })

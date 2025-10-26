@@ -5,8 +5,12 @@
       "value": "page from package"
     },
     {
-      "name": "agcit_huawei_web_short_drama",
-      "value": "2.0.0"
+      "name": "agcit_huawei_comprehensive_news_module_share",
+      "value": "1.0.0"
+    },
+    {
+      "name": "agcittype_huawei_comprehensive_news_module_share",
+      "value": "serviceComponent"
     }
   ]
 }

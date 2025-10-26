@@ -7,13 +7,13 @@ import { image } from '@kit.ImageKit';
 import { promptAction } from '@kit.ArkUI';
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
 import { buffer } from '@kit.ArkTS';
-import { SheetShowVM } from '../viewModel/SheetShowVM';
+import { ShareEventDispatcher } from './EventDispatcher';
+import { ShareOptions } from '../model/Model';
 
 
 export class PosterShare {
   context: Context = getContext(this)
   private static _instance: PosterShare
-  shareShowVM: SheetShowVM = SheetShowVM.instance
 
   public static get instance() {
     if (!PosterShare._instance) {
@@ -26,19 +26,12 @@ export class PosterShare {
     this.context = context
   }
 
-  public async share() {
-    let date = new Date()
-    let month: string = date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}` : `${date.getMonth() + 1}`
-    let day: string = date.getDate() < 10 ? `0${date.getDate()}` : `${date.getDate()}`
-    let hour: string = date.getHours() < 10 ? `0${date.getHours()}` : `${date.getHours()}`
-    let minute: string = date.getMinutes() < 10 ? `0${date.getMinutes()}` : `${date.getMinutes()}`
-    let time: string = `${date.getFullYear()}-${month}-${day} ${hour}:${minute}`
-
+  public async share(qrCodeInfo:ShareOptions) {
     let shareData: systemShare.SharedData = new systemShare.SharedData({
       utd: utd.UniformDataType.TEXT,
       content: 'www.vmall.com/index.html?cid=128688',
-      title: this.shareShowVM.title,
-      description: time,
+      title: qrCodeInfo.title,
+      description: `${qrCodeInfo.createTime}`,
     });
 
     let controller: systemShare.ShareController = new systemShare.ShareController(shareData);
@@ -51,6 +44,9 @@ export class PosterShare {
     }).catch((error: BusinessError) => {
       console.error(`ShareController show error. code: ${error.code}, message: ${error.message}`);
     });
+    controller.on('dismiss',() => {
+      ShareEventDispatcher.dispatchToClose()
+    })
   }
 
   public copy() {
@@ -67,20 +63,20 @@ export class PosterShare {
     })
   }
 
-  public async saveImage() {
+  public async saveImage(cover:PixelMap,popClose:(isClose:boolean) => void) {
     const imagePacker = image.createImagePacker();
     const options: image.PackingOption = {
       format: 'image/jpeg',
       quality: 100,
     };
-    const filesDir = this.context.filesDir;
+    const filesDir = this.context.cacheDir;
     const savePath = `${filesDir}/${new Date().getTime()}.png`;
     let file: fs.File = null!;
     let file1: fs.File = null!;
     let file2: fs.File = null!;
     try {
       file = await fs.open(savePath, fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE);
-      const packOutput = await imagePacker.packing(this.shareShowVM.posterImage as image.PixelMap, options);
+      const packOutput = await imagePacker.packing(cover, options);
       await fs.write(file.fd, packOutput);
     } finally {
       await fs.close(file);
@@ -93,11 +89,13 @@ export class PosterShare {
       ];
       let photoCreationConfigs: Array<photoAccessHelper.PhotoCreationConfig> = [
         {
-          title: '短剧模板',
           fileNameExtension: 'jpg',
           photoType: photoAccessHelper.PhotoType.IMAGE,
         },
       ];
+      /*
+       * 调用此接口时请确保module.json5文件中的abilities标签中配置了label和icon项。
+       * */
       let desFileUris: Array<string> = await phAccessHelper.showAssetsCreationDialog(srcFileUris, photoCreationConfigs);
       file1 = fs.openSync(savePath, fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE);
       let arrayBuffer = new ArrayBuffer(4096000);
@@ -106,6 +104,7 @@ export class PosterShare {
       file2 = fs.openSync(desFileUris[0], fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE);
       fs.writeSync(file2.fd, arrayBuffer);
       promptAction.showToast({ message: '保存成功' })
+      popClose(false)
     } catch (err) {
       promptAction.showToast({ message: '保存失败' })
     } finally {

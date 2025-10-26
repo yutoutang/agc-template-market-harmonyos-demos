@@ -18,7 +18,8 @@
     "@agctemplate/award": "1.0.0",
     "@agctemplate/open_ads": "1.0.0",
     "@agctemplate/favor": "1.0.0",
-    'module_cast': "file:../../components/module_cast"
+    'module_cast': "file:../../components/module_cast",
+    'module_pip': 'file:../../components/module_pip'
   }
 }
 

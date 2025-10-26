@@ -25,10 +25,15 @@
 * 设备类型：华为手机（包括双折叠和阔折叠）
 * 系统版本：HarmonyOS 5.0.1(13)及以上
 
+### 权限要求
+
+- 获取位置权限：ohos.permission.APPROXIMATELY_LOCATION、ohos.permission.LOCATION
+- 网络权限：ohos.permission.INTERNET
+
 ## 快速入门
 
 1. 安装组件。  
-   如果是在DevEvo Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
+   如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
    如果是从生态市场下载组件，请参考以下步骤安装组件。  
    a. 解压下载的组件包，将包中所有文件夹拷贝至您工程根目录的xxx目录下。  
    b. 在项目根目录build-profile.json5并添加order_detail和base_ui模块。
@@ -60,7 +65,46 @@
    import { OrderDetail } from 'order_detail';
    ```
 
-3. 调用组件，详细参数配置说明参见[API参考](#API参考)。
+3. 在主工程的src/main路径下的module.json5文件的requestPermissions字段中添加如下权限：
+
+   ```typescript
+     "requestPermissions": [
+      ...
+      {
+        "name": "ohos.permission.INTERNET",
+        "reason": "$string:app_name",
+        "usedScene": {
+          "abilities": [
+            "FormAbility"
+          ],
+          "when": "inuse"
+        }
+      },
+      {
+        "name": "ohos.permission.LOCATION",
+        "reason": "$string:app_name",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "inuse"
+        }
+      },
+      {
+        "name": "ohos.permission.APPROXIMATELY_LOCATION",
+        "reason": "$string:app_name",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "inuse"
+        }
+      }
+      ...
+    ],
+   ```
+   
+4. 调用组件，详细参数配置说明参见[API参考](#API参考)。
 
    ```typescript
    OrderDetail({
@@ -231,8 +275,7 @@ goNavigation(callback: () => void)
 ```typescript
 import { abilityAccessCtrl, common } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { AddressInfo } from 'add_address';
-import { DeliveryInfo, OrderDetail, OrderInfo } from 'order_detail';
+import { AddressInfo, DeliveryInfo, OrderDetail, OrderInfo } from 'order_detail';
 import { GoodsOfOrder } from 'base_ui';
 import { promptAction } from '@kit.ArkUI';
 

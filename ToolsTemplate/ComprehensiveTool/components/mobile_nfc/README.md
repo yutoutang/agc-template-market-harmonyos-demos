@@ -37,6 +37,9 @@ mobile_nfc/src/main/ets                           // 手机NFC(har)
 
 * NFC权限：ohos.permission.NFC_TAG
 
+### 限制
+* 本组件当前仅支持MIFARE Classic类型卡片的读取及克隆
+
 ## 使用
 1. 安装组件。
 

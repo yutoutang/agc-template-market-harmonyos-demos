@@ -3,7 +3,7 @@ import { TITLE_MAP } from '../commons/Constant';
 import { PageMode } from '../commons/Enum';
 import { BaseDiaryMeta } from '../components/BaseDiaryMeta';
 import { MoreMenuView } from '../components/MoreMenuView';
-import { RichEditorArea } from '../components/RichEditorArea';
+import { RichEditorView } from '../components/RichEditorView';
 import { TextSelectView } from '../components/TextSelectView';
 import { DiaryEditorPageVM } from '../viewmodel/DiaryEditorPageVM';
 
@@ -28,17 +28,17 @@ export struct DiaryEditorPage {
 
   @Computed
   get canUndo() {
-    return this.vm.richEditorController.currentIndex >= 1;
+    return this.vm.editorController.htmlModel.undoStack.length > 0;
   }
 
   @Computed
   get canRedo() {
-    return this.vm.richEditorController.undoRecordArray.length > 0
+    return this.vm.editorController.htmlModel.redoStack.length > 0;
   }
 
   @Computed
   get canSave() {
-    return this.vm.richEditorController.richTextContent.length > 0;
+    return this.vm.editorController.richTextContent.length > 0;
   }
 
   aboutToAppear(): void {
@@ -55,32 +55,21 @@ export struct DiaryEditorPage {
 
   build() {
     NavDestination() {
-      if (this.vm.isLoading) {
-        Column() {
-          LoadingProgress().width(72).height(72)
+      Column({ space: 8 }) {
+        if (this.vm.pageMode === PageMode.VIEW) {
+          this.detailView()
+        } else {
+          this.pickerView()
         }
-        .height('100%')
-        .width('100%')
-        .justifyContent(FlexAlign.Center)
-        .alignItems(HorizontalAlign.Center)
-      } else {
-        Column({ space: 8 }) {
-          if (this.vm.pageMode === PageMode.VIEW) {
-            this.detailView()
-          } else {
-            this.pickerView()
-          }
 
-          RichEditorArea({
-            pageMode: this.vm.pageMode,
-            diaryContent: this.vm.currentDiary.styledString,
-            richEditorController: this.vm.richEditorController,
-            snapShotController: this.vm.snapShotController,
-          })
-        }
-        .height('100%')
-        .width('100%')
+        RichEditorView({
+          pageMode: this.vm.pageMode,
+          editorController: this.vm.editorController,
+          snapShotWebController: this.vm.snapShotWebController
+        })
       }
+      .height('100%')
+      .width('100%')
     }
     .menus(this.vm.pageMode === PageMode.VIEW ? this.moreActionView() : this.toolBar())
     .title(this.title)
@@ -95,7 +84,7 @@ export struct DiaryEditorPage {
         this.vm.stopAutoSave()
         return false;
       }
-      if (this.vm.richEditorController.isSave) {
+      if (this.vm.editorController.isSave) {
         this.vm.stopAutoSave();
         this.vm.pathStack.pop(this.vm.pageMode);
         return true
@@ -227,23 +216,23 @@ export struct DiaryEditorPage {
   @Builder
   toolBar() {
     Row({ space: 12 }) {
-      ToolBarItem({
+      ToolBarItemView({
         symbol: 'sys.symbol.undo',
         enable: this.canUndo,
         onClickAction: () => {
-          this.vm.richEditorController.undo();
+          this.vm.editorController.undo();
         }
       })
 
-      ToolBarItem({
+      ToolBarItemView({
         symbol: 'sys.symbol.redo',
         enable: this.canRedo,
         onClickAction: () => {
-          this.vm.richEditorController.redo();
+          this.vm.editorController.redo();
         }
       })
 
-      ToolBarItem({
+      ToolBarItemView({
         symbol: 'sys.symbol.checkmark',
         enable: this.canSave,
         onClickAction: () => {
@@ -286,7 +275,7 @@ export struct DiaryEditorPage {
 
 
 @ComponentV2
-struct ToolBarItem {
+struct ToolBarItemView {
   @Param symbol: string = '';
   @Param enable: boolean = true;
   @Event onClickAction: () => void;

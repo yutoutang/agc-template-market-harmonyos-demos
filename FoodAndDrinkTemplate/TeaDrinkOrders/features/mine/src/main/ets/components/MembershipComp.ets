@@ -40,7 +40,7 @@ export struct MembershipComp {
 
             Row() {
               Text(this.userInfo.isRelative ? $r('app.string.lv_value', this.userInfo.userInfo.level) :
-              $r('app.string.lv_undefined'))
+                $r('app.string.lv_undefined'))
                 .fontSize(10)
                 .fontColor(this.userInfo.isRelative ? $r('sys.color.font_primary') : $r('sys.color.font_secondary'))
 
@@ -50,12 +50,13 @@ export struct MembershipComp {
                 type: ProgressType.Linear,
               })
                 .width(162)
-                .height(6)
+                .height(24)
                 .color('#486602')
                 .borderRadius(6)
+                .padding({ top: 9, bottom: 9 })
                 .margin({ left: 4, right: 4 })
               Text(this.userInfo.isRelative ? $r('app.string.lv_value', this.userInfo.userInfo.level + 1) :
-              $r('app.string.lv_undefined'))
+                $r('app.string.lv_undefined'))
                 .fontSize(10)
                 .fontColor(this.userInfo.isRelative ? $r('sys.color.font_primary') : $r('sys.color.font_secondary'))
             }.margin({ top: 2 })
@@ -77,8 +78,8 @@ export struct MembershipComp {
 
       Row() {
         Column() {
-          Text(this.myCouponsStr).fontSize(18).fontColor($r('sys.color.white'))
-          Text($r('app.string.coupon_label')).fontSize(12).fontColor($r('sys.color.white')).margin({ top: 2 })
+          Text(this.myCouponsStr).fontSize(18).fontColor($r('sys.color.font_on_primary'))
+          Text($r('app.string.coupon_label')).fontSize(12).fontColor($r('sys.color.font_on_primary')).margin({ top: 2 })
         }.width(120).height(54).justifyContent(FlexAlign.Center)
         .onClick(() => {
           this.pageStack?.pushPathByName(RouterMap.MY_COUPONS_PAGE, null, (popInfo: PopInfo) => {
@@ -96,8 +97,8 @@ export struct MembershipComp {
         Column() {
           Text(this.userInfo.isRelative ? $r('app.string.points_param', `${this.userInfo.userInfo.totalScore}`) : '0')
             .fontSize(18)
-            .fontColor($r('sys.color.white'))
-          Text($r('app.string.points')).fontSize(12).fontColor($r('sys.color.white')).margin({ top: 2 })
+            .fontColor($r('sys.color.font_on_primary'))
+          Text($r('app.string.points')).fontSize(12).fontColor($r('sys.color.font_on_primary')).margin({ top: 2 })
         }.width(120).height(54).justifyContent(FlexAlign.Center)
       }.width(Constants.FULL_SIZE).justifyContent(FlexAlign.Center).margin({ top: 12, bottom: 4 })
 

@@ -30,8 +30,11 @@ export struct MemberCodePage {
               .width(40)
               .height(40)
               .borderRadius(50)
-            Text($r('app.string.memberAccount')).fontSize(14).fontColor($r('sys.color.white')).margin({ left: 12 })
-            Text(this.userInfo.getTel()).fontSize(14).fontColor($r('sys.color.white'))
+            Text($r('app.string.memberAccount'))
+              .fontSize(14)
+              .fontColor($r('sys.color.font_on_primary'))
+              .margin({ left: 12 })
+            Text(this.userInfo.getTel()).fontSize(14).fontColor($r('sys.color.font_on_primary'))
           }
           .width(Constants.FULL_SIZE)
           .backgroundColor($r('sys.color.black'))
@@ -45,7 +48,7 @@ export struct MemberCodePage {
           Row() {
             Image($r('app.media.ic_refresh')).width(16).height(16)
             Text($r('app.string.refresh')).fontSize(14).fontColor('#0A59F7').margin({ left: 4 })
-          }.justifyContent(FlexAlign.Center).onClick(()=>{
+          }.justifyContent(FlexAlign.Center).onClick(() => {
             this.qrcodeUrl = this.userInfo.userInfo.id + new Date().getTime()
           })
 
@@ -71,13 +74,13 @@ export struct MemberCodePage {
 @ComponentV2
 struct ImageComponent {
   @Param image: ResourceStr = ''
-  private preGeometryScale: number = 1
   @Local geometryScale: number = 1
   @Local geometryOffsetX: number = 0
   @Local geometryOffsetY: number = 0
   @Local imageWidth: number = 0
   @Local imageHeight: number = 0
   @Param viewWidth: number = 0
+  private preGeometryScale: number = 1
   @Event closeDialog: () => void = () => {
   }
 

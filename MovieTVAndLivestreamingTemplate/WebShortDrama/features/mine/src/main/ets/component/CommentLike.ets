@@ -7,6 +7,7 @@ import { CommentInfo, CommentListRes, LikeInfo } from '@agctemplate/server';
 import { jumpDetailPage, MyMessageStorage } from '@agctemplate/detail';
 import { WindowManager } from '@agctemplate/utils';
 import { MineLikeCard } from './MineLikeCard';
+import { it } from '@ohos/hypium';
 
 @Preview
 @ComponentV2
@@ -67,9 +68,9 @@ export struct CommentLike {
                 }
                 )
               }
-            }
+            }, (item: Reply) => item.replyName + item.replyContent + item.replyTimeAgo.toString()
           )
-        }
+        }, (item: CommentData) => item.id.toString()
       )
     }
     .width('100%')

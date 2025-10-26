@@ -56,7 +56,7 @@ struct PersonalSetting {
   // 未登录提示弹窗控制器
   notLoggedInDialogController: CustomDialogController = new CustomDialogController({
     builder: CustomContentDialog({
-      primaryTitle: '当前未登陆',
+      primaryTitle: '当前未登录',
       contentBuilder: () => {
         this.notLoggedInContent();
       },

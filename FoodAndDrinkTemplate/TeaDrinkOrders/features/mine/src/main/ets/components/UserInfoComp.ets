@@ -42,17 +42,21 @@ export struct UserInfoComp {
               Text(this.userInfo.userInfo.name)
                 .fontSize(18)
                 .fontWeight(500)
+                .maxLines(1)
+                .textOverflow({ overflow: TextOverflow.Ellipsis })
+                .layoutWeight(1)
                 .fontColor($r('sys.color.font_primary'))
               Row() {
                 Image($r('app.media.icon_phone')).width(16)
                 Text(this.userInfo.getTel())
                   .fontSize(18)
-                  .fontColor($r('sys.color.mask_secondary'))
+                  .fontColor($r('sys.color.font_secondary'))
                   .margin({ left: 2 })
               }.margin({ top: 6 }).justifyContent(FlexAlign.Start)
             }
             .alignItems(HorizontalAlign.Start)
             .padding({ left: 12, top: 6 })
+            .layoutWeight(1)
             .height(64)
           } else {
             Image($r('app.media.default_hd'))
@@ -68,7 +72,7 @@ export struct UserInfoComp {
             .padding({ left: 12 })
             .height(64)
           }
-        }.onClick(() => {
+        }.layoutWeight(1).onClick(() => {
           if (this.userInfo.isRelative) {
             this.pageStack?.pushPathByName(RouterMap.USER_INFO_PAGE, null)
           } else {
@@ -179,8 +183,8 @@ export struct UserInfoComp {
           LoadingDialogUtil.close()
         }
       }).catch((err: BusinessError<Object>) => {
-        this.dealAllError(err);
         LoadingDialogUtil.close()
+        this.bindPhoneMock()
       });
     } catch (error) {
       this.dealAllError(error);

@@ -10,22 +10,20 @@
 
 ## 简介
 
-本组件提供了转盘功能
+本组件提供了通过转盘获取奖励的功能。
 
-| 组件控制                                            |
-|-------------------------------------------------|
-| <img src="./screenshot/Wheel.jpeg" width="300"> |
+<img src="./screenshot/Wheel.jpeg" width="300">
 
 ## 约束与限制
 ### 软件
 
 * DevEco Studio版本：DevEco Studio 5.0.0 Release及以上
-* HarmonyOS SDK版本：HarmonyOS 5.0.0 Release及以上
+* HarmonyOS SDK版本：HarmonyOS 5.0.0 Release SDK及以上
 
 ### 硬件
 
-* 设备类型：华为手机（直板机）
-* HarmonyOS版本：HarmonyOS 5.0.0 Release及以上
+* 设备类型：华为手机（包括双折叠和阔折叠）
+* 系统版本：HarmonyOS 5.0.0(12)及以上
 
 ## 快速入门
 
@@ -47,14 +45,14 @@
         "srcPath": "./XXX/wheel",
         }
     ]
-    ```
+   ```
    c. 在项目根目录oh-package.json5中添加依赖。
     ```
     // XXX为组件存放的目录名称
     "dependencies": {
       "wheel": "file:./XXX/wheel"
     }
-   ```
+    ```
 
 2. 引入组件。
 
@@ -68,19 +66,17 @@
    import { Wheel } from 'wheel';
    
    @Entry
-   @Component
+   @ComponentV2
    struct Index {
-     pageInfo: NavPathStack = new NavPathStack()
    
      build() {
-       Navigation(this.pageInfo) {
+       Column() {
          Wheel({
                 textCOIN: ["福利开奖888", "福利开奖124", "福利开奖248", "福利开奖68", "福利开奖268", "福利开奖8"],
                 title: "福利大转盘",
                 subTitle: "看广告领福利，惊喜多多"
               })
        }
-        .hideTitleBar(true)
      }
    }
    ```
@@ -95,17 +91,17 @@
 
 Wheel(options?: WheelOptions)
 
-转盘信息组件。
+转盘组件
 
 **参数：**
 
-| 参数名  | 类型                                          | 必填 | 说明    |
-| ------- | --------------------------------------------- | ---- |-------|
-| options | [WheelOptions](#WheelOptions对象说明) | 否   | 转盘组件。 |
+| 参数名  | 类型                                          | 是否必填 | 说明   |
+| ------- | --------------------------------------------- | ---- |------|
+| options | [WheelOptions](#WheelOptions对象说明) | 否   | 转盘组件 |
 
 ### WheelOptions对象说明
 
-| 名称       | 类型                     | 必填 | 说明                     |
+| 名称       | 类型                     | 是否必填 | 说明                     |
 | :--------- |:-----------------------| ---- |------------------------|
 | textCOIN | string[]               | 否   | 转盘奖项                   |
 | title | string                 | 否   | 活动名称                   |
@@ -117,12 +113,12 @@ Wheel(options?: WheelOptions)
 import { Wheel } from 'wheel';
    
    @Entry
-   @Component
+   @ComponentV2
    struct Index {
-     pageInfo: NavPathStack = new NavPathStack()
+     bonus: number = 0
    
      build() {
-       Navigation(this.pageInfo) {
+       Column() {
          Wheel({
                 textCOIN: ["福利开奖888", "福利开奖124", "福利开奖248", "福利开奖68", "福利开奖268", "福利开奖8"],
                 title: "福利大转盘",
@@ -130,7 +126,6 @@ import { Wheel } from 'wheel';
                 onWheelSuccess: (balance: number) => this.bonus += balance
               })
        }
-        .hideTitleBar(true)
      }
    }
 ```

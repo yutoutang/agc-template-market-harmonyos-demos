@@ -62,7 +62,7 @@ export struct OrderListComp {
         Text($r('app.string.today_order_list'))
           .fontSize(16)
           .fontWeight(FontWeight.Medium)
-          .fontColor(this.orderListType === OrderListTypeEnum.TODAY_LIST ? Color.White : $r('sys.color.mask_secondary'))
+          .fontColor(this.orderListType === OrderListTypeEnum.TODAY_LIST ? Color.White : $r('sys.color.font_secondary'))
           .backgroundColor(this.orderListType === OrderListTypeEnum.TODAY_LIST ? '#486602' :
             '#00000000')
           .borderRadius(18)
@@ -80,7 +80,7 @@ export struct OrderListComp {
           .fontSize(16)
           .fontWeight(FontWeight.Medium)
           .fontColor(this.orderListType === OrderListTypeEnum.HISTORY_LIST ? Color.White :
-          $r('sys.color.mask_secondary'))
+          $r('sys.color.font_secondary'))
           .backgroundColor(this.orderListType === OrderListTypeEnum.HISTORY_LIST ? '#486602' : '#00000000')
           .borderRadius(18)
           .textAlign(TextAlign.Center)
@@ -127,6 +127,7 @@ export struct OrderListComp {
       }), {
         detents: [290, 291],
         blurStyle: BlurStyle.Thick,
+        preferType: SheetType.CENTER,
         showClose: true,
         backgroundColor: $r('sys.color.background_fourth'),
         title: { title: $r('app.string.select_pay_type') },
@@ -146,6 +147,7 @@ export struct OrderListComp {
     }), {
       detents: [309, 310],
       blurStyle: BlurStyle.Thick,
+      preferType: SheetType.CENTER,
       showClose: true,
       backgroundColor: $r('sys.color.background_fourth'),
       title: { title: $r('app.string.contact_us') },
@@ -223,7 +225,7 @@ export struct OrderListComp {
           .fontColor('#241400')
 
           Text($r('app.string.total_num', `${orderInfo.num}`))
-            .fontColor($r('sys.color.mask_secondary'))
+            .fontColor($r('sys.color.font_secondary'))
             .fontSize(10)
             .margin({ top: 4 })
         }
@@ -257,7 +259,7 @@ export struct OrderListComp {
           Text($r('app.string.cancel_order'))
             .fontSize(12)
             .fontColor($r('sys.color.font_primary'))
-            .border({ width: 1, color: $r('sys.color.mask_secondary'), radius: 14 })
+            .border({ width: 1, color: $r('sys.color.font_secondary'), radius: 14 })
             .padding({
               left: 16,
               right: 16,
@@ -289,7 +291,7 @@ export struct OrderListComp {
           Text($r('app.string.contact_us'))
             .fontSize(12)
             .fontColor($r('sys.color.font_primary'))
-            .border({ width: 1, color: $r('sys.color.mask_secondary'), radius: 14 })
+            .border({ width: 1, color: $r('sys.color.font_secondary'), radius: 14 })
             .padding({
               left: 16,
               right: 16,

@@ -318,6 +318,58 @@
           ]
         }
       ]
+    },
+    {
+      "name": "module_pip",
+      "srcPath": "./components/module_pip"
+    },
+    {
+      "name": "day_signin",
+      "srcPath": "./components/day_signin",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "look_ad",
+      "srcPath": "./components/look_ad",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "task_list",
+      "srcPath": "./components/task_list",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "wheel",
+      "srcPath": "./components/wheel",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
     }
   ]
 }

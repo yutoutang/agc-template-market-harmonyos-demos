@@ -229,8 +229,6 @@ export struct RichEditorArea {
             .trackThickness(20)
             // 刻度颜色
             .stepColor($r('sys.color.comp_background_secondary'))
-            // 滑轨背景色
-            .trackColor($r('sys.color.comp_background_tertiary'))
             // 以滑动部分颜色
             .selectedColor($r('sys.color.comp_background_emphasize'))
             // 显示步长刻度

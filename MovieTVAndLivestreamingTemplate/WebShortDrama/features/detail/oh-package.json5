@@ -17,6 +17,7 @@
     "vip_center": "file:../../components/vip_center",
     'base_apis': 'file:../../components/base_apis',
     'aggregated_payment': 'file:../../sdk/aggregated_payment',
-    'module_cast': "file:../../components/module_cast"
+    'module_cast': "file:../../components/module_cast",
+    'module_pip': 'file:../../components/module_pip'
   }
 }

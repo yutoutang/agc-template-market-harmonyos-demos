@@ -1,12 +1,7 @@
-import { unifiedDataChannel } from '@kit.ArkData';
-import { pasteboard } from '@kit.BasicServicesKit';
 import { common } from '@kit.AbilityKit';
 import { PersistenceV2 } from '@kit.ArkUI';
 import dayjs from 'dayjs';
-import { RichEditorController } from '../controller/RichEditorController'
-import { SnapShotController } from '../controller/SnapShotController';
-import { SNAPSHOT_ID, TEXT_PICKER_DATA } from '../commons/Constant';
-import { ChangeDiaryRecord } from '../models/ChangeRecord';
+import { TEXT_PICKER_DATA } from '../commons/Constant';
 import { Diary, DiaryExtraInfo } from '../models/Diary';
 import { DiaryUtil } from '../utils/DiaryUtil';
 import { PopViewUtils } from '../utils/PopViewUtils';
@@ -20,13 +15,15 @@ import { baseDatePickerBuilder } from '../components/BaseDatePicker';
 import { DiaryDB } from '../database/DiaryDB';
 import { ImageUtils } from '../utils/ImageUtils';
 import { handleTaskPoolDelete } from '../utils/TaskPoolHandle';
+import { EditorController } from '../controller/EditorController';
+import { SnapShotWebController } from '../controller/SnapShotWebController';
 
 
 @ObservedV2
 export class DiaryEditorPageVM {
-  richEditorController: RichEditorController = new RichEditorController();
   diaryUtil: DiaryUtil = DiaryUtil.instance;
-  snapShotController: SnapShotController = new SnapShotController(SNAPSHOT_ID, new Scroller());
+  editorController: EditorController = new EditorController();
+  snapShotWebController: SnapShotWebController = new SnapShotWebController(this.editorController.webviewController);
   @Trace diaryExtraInfo: DiaryExtraInfo = PersistenceV2.connect(DiaryExtraInfo, () => new DiaryExtraInfo())!;
 
   @Trace currentDiary: Diary = new Diary();
@@ -35,7 +32,6 @@ export class DiaryEditorPageVM {
   @Trace dateTime: string = dayjs().format('HH:mm');
   @Trace pageMode: PageMode = PageMode.CREATE
   @Trace timer: number | null = null;
-  @Trace isLoading: boolean = true;
   @Trace weatherText: string = '';
   @Trace weatherIcon: string = 'sys.symbol.cloud_and_sun_filled';
   @Trace moodText: string = '';
@@ -54,12 +50,6 @@ export class DiaryEditorPageVM {
         this.pushToEditPage()
       }
     },
-    {
-      name: '分享',
-      onClick: () => {
-        this.snapShotController.onceSnapshot()
-      }
-    },
   ]
 
   uiContext?: UIContext;
@@ -75,19 +65,15 @@ export class DiaryEditorPageVM {
   }
 
   async initData(params: Record<string, Object>) {
-    this.isLoading = true;
     this.pageMode = params.pageMode as PageMode;
     let id = params.diaryId as string;
     if (id) {
       await this.getDiary(id)
     }
-    this.isLoading = false;
     // 处理天气和心情
     this.handleMoodAndWeather()
     // 设置自动保存
     this.setAutoSaveDiary();
-    this.richEditorController.currentIndex = 0;
-    this.richEditorController.historyRecordArray.push(new ChangeDiaryRecord(this.currentDiary.styledString));
     this.moreMenuList[0].name = this.currentDiary.isPrivacy ? '取消私密' : '设为私密';
   }
 
@@ -95,10 +81,8 @@ export class DiaryEditorPageVM {
     let data = await DiaryDB.queryDiaryById(id);
     if (data) {
       let diary = new Diary(data);
-      let styledString = await StyledString.fromHtml(data.htmlContent);
-      diary.styledString = styledString as MutableStyledString;
       this.currentDiary = diary;
-      this.richEditorController.richTextContent = diary.textContent;
+      this.editorController.richTextContent = data.htmlContent;
     }
   }
 
@@ -143,7 +127,7 @@ export class DiaryEditorPageVM {
       clearTimeout(this.timer);
       this.timer = null;
     }
-    this.richEditorController.isSave = false;
+    this.editorController.isSave = false;
   }
 
   // 跳转到编辑页
@@ -154,11 +138,8 @@ export class DiaryEditorPageVM {
     };
     this.pathStack.pushPathByName('DiaryEditorPage', params, async () => {
       // 从编辑页返回详情页，刷新页面
-      this.isLoading = true
       await this.getDiary(this.currentDiary.id);
-      this.isLoading = false;
-      const styledString = await StyledString.fromHtml(this.currentDiary.htmlContent);
-      this.richEditorController.controller.setStyledString(styledString);
+      this.editorController.webviewController.refresh();
     });
   }
 
@@ -171,10 +152,6 @@ export class DiaryEditorPageVM {
 
   // 页面销毁事件
   handleDisappear() {
-    this.richEditorController.currentIndex = -1;
-    // 操作记录
-    this.richEditorController.historyRecordArray = [];
-    this.richEditorController.initState();
   }
 
   showConfirmDialog() {
@@ -321,22 +298,20 @@ export class DiaryEditorPageVM {
     }
     // 处理日记数据
     this.handleSaveDiary();
-    if (this.pageMode === PageMode.EDIT) {
-      await DiaryDB.updateDiary(this.currentDiary);
-    } else {
-      // 新建日记，如果已经自动保存过，在点击保存按钮时，更新数据
-      if (this.createDiaryId === -1) {
-        this.createDiaryId = await DiaryDB.insertDiary(this.currentDiary);
-      } else {
-        this.currentDiary.id = this.createDiaryId.toString();
-        await DiaryDB.updateDiary(this.currentDiary);
-      }
-    }
-    // 点击保存后退出选中状态
-    this.richEditorController.controller.setSelection(0, 0);
-    // 退出编辑状态
-    this.richEditorController.textInputController.stopEditing();
-    this.richEditorController.controller.stopEditing();
+
+    // 保存到本地数据库
+   if (this.pageMode === PageMode.EDIT) {
+     await DiaryDB.updateDiary(this.currentDiary);
+   } else {
+     // 新建日记，如果已经自动保存过，在点击保存按钮时，更新数据
+     if (this.createDiaryId === -1) {
+       this.createDiaryId = await DiaryDB.insertDiary(this.currentDiary);
+     } else {
+       this.currentDiary.id = this.createDiaryId.toString();
+       await DiaryDB.updateDiary(this.currentDiary);
+     }
+   }
+
     this.stopAutoSave();
     if (this.pageMode === PageMode.EDIT) {
       this.pathStack.pop(this.pageMode);
@@ -345,12 +320,16 @@ export class DiaryEditorPageVM {
     }
   }
 
+  checkSaveDiary(): boolean {
+    const htmlContent = this.editorController.richTextContent;
+    return htmlContent.length > 0;
+  }
+
   handleSaveDiary() {
-    const styledString = this.richEditorController.controller.getStyledString();
+    const htmlContent = this.editorController.richTextContent;
     let dateTimeStr = dayjs(this.date).format('YYYY-MM-DD') + 'T' + this.dateTime;
     let timeStr = new Date(dateTimeStr).getTime().toString();
-    this.currentDiary.styledString = styledString;
-    this.currentDiary.textContent = styledString.getString();
+    this.currentDiary.textContent = this.editorController.parseHtmlContent(htmlContent)
     this.currentDiary.weatherText = this.weatherText;
     this.currentDiary.weatherIcon = this.weatherIcon;
     this.currentDiary.moodText = this.moodText;
@@ -359,73 +338,47 @@ export class DiaryEditorPageVM {
       this.currentDiary.createTime = timeStr;
     }
     this.currentDiary.updateTime = timeStr;
-    this.richEditorController.isSave = true;
-    // 处理富文本内容
-    this.handleRichEditorContent();
+    this.editorController.isSave = true;
+
+    this.handleHtmlImgSrc();
   }
 
-  handleRichEditorContent() {
-    const styledString = this.richEditorController.controller.getStyledString();
-    const htmlStr = StyledString.toHtml(styledString);
-
-    const context = this.uiContext!.getHostContext() as common.UIAbilityContext
-    // 找出富文本中的图片
-    const imgSrcList: string[] = ImageUtils.findImgSrcList(htmlStr);
-    const newImgSrcList: string[] = imgSrcList.filter((src: string) => {
-      return src.includes('/temp/htmlconvert/');
-    }).map((src: string) => {
-      const imgName = src.split('/temp/htmlconvert/')[1];
-      const newPath = ImageUtils.saveToCache(context, src, imgName);
-      return newPath
-    });
+  handleHtmlImgSrc() {
+    const context = this.uiContext!.getHostContext() as common.UIAbilityContext;
+    const htmlContent = this.editorController.richTextContent;
+    // 处理图片 找出富文本中的图片
+    const imgSrcList: string[] = ImageUtils.findImgSrcList(htmlContent);
+    const newImgSrcList: string[] = []
+    for (let i = 0; i < imgSrcList.length; i++) {
+      const src = imgSrcList[i];
+      if (src.includes('file://media/Photo')) {
+        const imgName = new Date().getTime() + i + '.jpg';
+        const newPath = ImageUtils.saveImgToCache(context, src, imgName);
+        newImgSrcList.push(newPath);
+      } else {
+        newImgSrcList.push(src);
+      }
+    }
     const firstImg = newImgSrcList[0];
     // 保存第一张图片
     this.currentDiary.firstImage = firstImg ?? '';
     // 替换html中的所有img的src
-    const newHtmlStr = this.replaceImgSrc(htmlStr, newImgSrcList);
+    const newHtmlContent = this.replaceImgSrc(htmlContent, newImgSrcList);
     if (this.pageMode === PageMode.EDIT) {
-      // 需要将富文本中更新的图片从沙箱中删除
+      // 需要将富文本中已经删除的图片从沙箱中删除
       const oldImgSrcList: string[] = ImageUtils.findImgSrcList(this.currentDiary.htmlContent);
       handleTaskPoolDelete(oldImgSrcList, newImgSrcList)
     }
-    this.currentDiary.htmlContent = newHtmlStr;
-  }
-
-  checkSaveDiary(): boolean {
-    const styledString = this.richEditorController.controller.getStyledString();
-    const length = styledString?.length;
-    return length > 0;
+    this.currentDiary.htmlContent = newHtmlContent;
   }
 
   // 替换html中img的地址
   replaceImgSrc(html: string, newSrcList: string[]): string {
     let index = 0;
-    return html.replace(/(<img[^>]+src=["'])([^"']+)(["'])/g, (match, p1: string, oldSrc: string, p3: string) => {
+    return html.replace(/(<img[^>]+src=["'])\s*([^"']+)\s*(["'])/g, (match, p1: string, oldSrc: string, p3: string) => {
       const newSrc: string = newSrcList[index++] || oldSrc;
       return `${p1}${newSrc}${p3}`;
     });
-  }
-
-  // 复制操作
-  copyNoteText() {
-    if (this.currentDiary?.textContent === '') {
-      this.showToast('请输入内容后复制！')
-      return;
-    }
-    let copyText = this.currentDiary?.textContent || '';
-    let plainTextData = new unifiedDataChannel.UnifiedData();
-    let plainText = new unifiedDataChannel.PlainText();
-    plainText.details = {
-      key: 'delayPlaintext',
-      value: copyText,
-    };
-    plainText.textContent = copyText;
-    plainText.abstract = 'delayTextContent';
-    plainTextData.addRecord(plainText);
-    let systemPasteboard: pasteboard.SystemPasteboard = pasteboard.getSystemPasteboard();
-    systemPasteboard.setUnifiedData(plainTextData);
-
-    this.showToast('复制成功')
   }
 
   showToast(message: string) {

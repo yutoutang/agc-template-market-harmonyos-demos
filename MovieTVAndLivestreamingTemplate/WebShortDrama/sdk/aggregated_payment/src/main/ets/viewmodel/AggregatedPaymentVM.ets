@@ -59,10 +59,15 @@ export class AggregatedPaymentVM {
 
   huaweiPay(context: common.UIAbilityContext, orderStr: string | WxExtraInfo,
     paySuccessEvent: (type: ChannelType) => void) {
-    paymentService.requestPayment(context, String(orderStr)).then(() => {
+    try {
+      paymentService.requestPayment(context, String(orderStr)).then(() => {
+        paySuccessEvent(ChannelType.HUAWEI_PAY);
+      }).catch((error: BusinessError) => {
+        paySuccessEvent(ChannelType.HUAWEI_PAY);
+      });
+    } catch (erro) {
       paySuccessEvent(ChannelType.HUAWEI_PAY);
-    }).catch((error: BusinessError) => {
-      paySuccessEvent(ChannelType.HUAWEI_PAY);
-    });
+      console.info('paySuccessEvent is error')
+    }
   }
 }

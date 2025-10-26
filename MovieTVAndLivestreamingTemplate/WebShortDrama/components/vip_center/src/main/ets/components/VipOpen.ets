@@ -45,7 +45,7 @@ export struct VipOpen {
       }
 
       Button(this.isVip ? '立即升级' : '立即开通')
-        .backgroundColor('#BD9164')
+        .backgroundColor('#ff92673b')
         .fontColor($r('sys.color.font_on_primary'))
         .fontWeight(FontWeight.Medium)
         .fontSize(16)

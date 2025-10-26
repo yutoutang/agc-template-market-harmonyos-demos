@@ -25,8 +25,12 @@
       "value": "领取"
     },
     {
-      "name": "agcit_huawei_web_short_drama",
-      "value": "1.0.2"
+      "name": "agcit_huawei_task_list",
+      "value": "1.0.0"
+    },
+    {
+      "name": "agcittype_huawei_task_list",
+      "value": "serviceComponent"
     }
   ]
 }

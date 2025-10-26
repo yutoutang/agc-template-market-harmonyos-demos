@@ -133,6 +133,7 @@ export struct GoodsInfoComp {
     }), {
       detents: [500, 501],
       blurStyle: BlurStyle.Thick,
+      preferType: SheetType.CENTER,
       showClose: true,
       backgroundColor: $r('sys.color.background_fourth'),
       title: { title: '' },

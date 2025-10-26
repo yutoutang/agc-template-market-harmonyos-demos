@@ -1,8 +1,8 @@
-import { avSession } from '@kit.AVSessionKit';
+import avSession from '@ohos.multimedia.avsession';
 import { AvSessionController } from './AvSessionController';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { CommonConstants } from '../common/CommonConstants';
-import { CastService, CastSessionListener } from '../service/CastService';
+import { CastServiceModule, CastSessionListener } from '../model/CastServiceModule'
 
 interface CastListener {
   onPlay(): void
@@ -26,6 +26,7 @@ export class AvCastController {
   castItem?: avSession.AVQueueItem
   private curVolume: number = 0
   maxVolume: number = 0
+  static castServiceModule: CastServiceModule = new CastServiceModule()
 
   public registerCastListener(castListener: CastSessionListener) {
     this.castListener = castListener
@@ -45,8 +46,8 @@ export class AvCastController {
     this.castController = await AvSessionController.getInstance().getAvSession()?.getAVCastController();
     this.setPlaybackStateChangeListener();
     this.prepare();
-    CastService.getInstance().isCasting = true
-    CastService.getInstance().isCastPlaying = true
+    AvCastController.castServiceModule.isCasting = true
+    AvCastController.castServiceModule.isCastPlaying = true
     hilog.debug(DOMAIN, TAG, `startCasting end`)
   }
 
@@ -54,8 +55,8 @@ export class AvCastController {
     hilog.debug(DOMAIN, TAG, `endCasting`)
     AvSessionController.getInstance().getAvSession()?.stopCasting();
     this.stopCast();
-    CastService.getInstance().isCasting = false
-    CastService.getInstance().isCastPlaying = false
+    AvCastController.castServiceModule.isCasting = false
+    AvCastController.castServiceModule.isCastPlaying = false
     hilog.debug(DOMAIN, TAG, `endCasting end`)
   }
 
@@ -94,16 +95,16 @@ export class AvCastController {
     const duration = playbackState?.extras?.duration;
     if (typeof duration === 'number') {
       // hilog.debug(DOMAIN, TAG, `Casting updateDuration`)
-      CastService.getInstance().castDuration = duration as number
+      AvCastController.castServiceModule.castDuration = duration as number
     }
 
     if (typeof playbackState?.position?.elapsedTime !== 'undefined') {
       // hilog.debug(DOMAIN, TAG, `Casting elapsedTime`)
-      CastService.getInstance().castCurrentTime = playbackState?.position?.elapsedTime
+      AvCastController.castServiceModule.castCurrentTime = playbackState?.position?.elapsedTime
     }
     if (playbackState.extras?.maxCastVolume) {
       this.maxVolume = playbackState.extras?.maxCastVolume as number
-      CastService.getInstance().castMaxVolume = this.maxVolume
+      AvCastController.castServiceModule.castMaxVolume = this.maxVolume
       hilog.debug(DOMAIN, TAG, `Casting maxCastVolume ${this.maxVolume}`)
     }
     if (playbackState.state === CommonConstants.PLAYBACK_STATE_PAUSE ||
@@ -111,24 +112,24 @@ export class AvCastController {
       playbackState.state === CommonConstants.PLAYBACK_STATE_PREPARE ||
       playbackState.state === CommonConstants.PLAYBACK_STATE_INITIAL) {
       hilog.debug(DOMAIN, TAG, `Casting not playing`)
-      CastService.getInstance().isCastPlaying = false
+      AvCastController.castServiceModule.isCastPlaying = false
     }
 
     if (playbackState.state === CommonConstants.PLAYBACK_STATE_PLAY) {
       hilog.debug(DOMAIN, TAG, `Casting playing`)
-      CastService.getInstance().isCastPlaying = true
+      AvCastController.castServiceModule.isCastPlaying = true
     }
 
     if (playbackState?.volume) {
       this.curVolume = playbackState?.volume
-      CastService.getInstance().castVolume = playbackState?.volume
+      AvCastController.castServiceModule.castVolume = playbackState?.volume
       hilog.info(DOMAIN, TAG, `Casting Volume:${this.curVolume}`)
     }
   };
   private reloadCasting = async () => {
     this.castItem!.description!.startPosition = 0
     this.prepare();
-    CastService.getInstance().isCastPlaying = true
+    AvCastController.castServiceModule.isCastPlaying = true
   };
   private castReload = async () => {
   };

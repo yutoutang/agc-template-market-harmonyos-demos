@@ -1,4 +1,4 @@
-# 滑动视频组件快速入门
+# 竖屏滑动视频组件快速入门
 
 ## 目录
 
@@ -10,7 +10,7 @@
 
 ## 简介
 
-本组件提供了展示短剧滑动视频、上下滑动切换短剧视频、切换到指定索引短剧视频等相关的能力，可以帮助开发者快速集成滑动短剧视频相关的能力。
+本组件提供了展示短剧竖屏滑动视频、上下滑动切换短剧视频、切换到指定索引短剧视频等相关的能力，可以帮助开发者快速集成滑动短剧视频相关的能力。
 
 <img src="./screenshots/video_swiper.jpeg" height="300">
 
@@ -166,13 +166,13 @@
 
 VideoSwiper(options: VideoSwiperOptions)
 
-滑动视频组件。
+竖屏滑动视频组件。
 
 **参数：**
 
 | 参数名     | 类型                                            | 必填 | 说明         |
 |---------|-----------------------------------------------|----|------------|
-| options | [VideoSwiperOptions](#VideoSwiperOptions对象说明) | 是  | 配置滑动视频的参数。 |
+| options | [VideoSwiperOptions](#VideoSwiperOptions对象说明) | 是  | 配置竖屏滑动视频的参数。 |
 
 ### VideoSwiperOptions对象说明
 
@@ -185,7 +185,7 @@ VideoSwiper(options: VideoSwiperOptions)
 
 ### VideoPlayDataSource
 
-滑动视频组件的视频数据源
+竖屏滑动视频组件的视频数据源
 
 #### totalCount
 
@@ -255,7 +255,7 @@ changeIndex(index: number)
 
 WrappedBuilder<[VideoPlayData, PlayController, PlaySession]>
 
-滑动视频组件自定义播放上层视图接口， 用于开发者自定义显示内容，并和播放视频交互，例如播放控制、事件监听、剧集选集等。
+竖屏滑动视频组件自定义播放上层视图接口， 用于开发者自定义显示内容，并和播放视频交互，例如播放控制、事件监听、剧集选集等。
 
 ### VideoPlayData
 

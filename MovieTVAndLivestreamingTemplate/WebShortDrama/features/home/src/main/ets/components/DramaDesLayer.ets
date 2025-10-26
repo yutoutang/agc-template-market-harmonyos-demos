@@ -3,6 +3,7 @@ import { getMedia, getString, NAV_PAGE_NAME } from '@agctemplate/resources'
 import { DramaInfo } from '@agctemplate/server'
 import { appRouter, Logger, WindowManager } from '@agctemplate/utils'
 import { PlayController, PlaySession } from 'video_swiper'
+import { emitter } from '@kit.BasicServicesKit'
 
 const TAG = '[DramaDesLayer]'
 
@@ -16,7 +17,7 @@ export struct DramaDesLayer {
   @Local maxLine: number = 2
   @Local retractLength: number = 30
   @Local isSpread: boolean = false
-
+  @Event onJump:Function
 
   build() {
     Stack({ alignContent: Alignment.Bottom }) {
@@ -43,27 +44,22 @@ export struct DramaDesLayer {
             .width(21)
             .height(21)
             .justifyContent(FlexAlign.Center)
-            .onClick(() => {
-              WindowManager.setWindowSystemBarProperties({ statusBarContentColor: '#e6000000' })
-              this.playControl.pause()
-              appRouter.push({
-                builderName: NAV_PAGE_NAME.DramaDetailInfoPage.name, params: {
-                  dramaInfo: this.dramaInfo,
-                  currentIndex: 0,
-                  changeIndex: (index: number) => {
-                    this.playControl.pause()
-                    jumpDetailPage(this.dramaInfo, index, this.playerSession.avPlayer?.currentTime,
-                      (data: PopInfo) => {
-                        this.playControl.seek(0)
-                        this.playControl.play()
-                      })
-                  }
-                }
-              })
-            })
           }
           .width('100%')
           .height(21)
+          .onClick(() => {
+            WindowManager.setWindowSystemBarProperties({ statusBarContentColor: '#e6000000' })
+            this.playControl.pause()
+            appRouter.push({
+              builderName: NAV_PAGE_NAME.DramaDetailInfoPage.name, params: {
+                dramaInfo: this.dramaInfo,
+                currentIndex: 0,
+                changeIndex: (index: number) => {
+                  this.onJump?.()
+                }
+              }
+            })
+          })
 
           Stack({ alignContent: Alignment.BottomEnd }) {
             Text(getString('app.string.drama_desc', this.dramaInfo.totalCount.toString(),
@@ -121,17 +117,7 @@ export struct DramaDesLayer {
           .onClick(() => {
             Logger.debug(TAG, `currentPlayTime:${this.playerSession.avPlayer?.currentTime}`)
             // 进入详情页，接续播放
-            this.playControl.pause()
-            jumpDetailPage(this.dramaInfo, this.dramaInfo.curIndex, this.playerSession.avPlayer?.currentTime,
-              (data: PopInfo) => {
-                this.playControl.seek(0)
-                this.playControl.play()
-              })
-            setTimeout(() => {
-              if (this.navPathStack.size() > 2) {
-                appRouter.back()
-              }
-            }, 500)
+            this.onJump?.()
           })
           .height(28)
           .fontSize(14)

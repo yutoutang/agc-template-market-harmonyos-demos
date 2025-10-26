@@ -7,7 +7,7 @@ import { CustomKeyboardItem } from '../commons/Types';
 
 @ComponentV2
 export struct CustomKeyboard {
-  @Param
+  @Param @Once
   amountArr: string[] = [''];
   @Param
   initBill: BillManageModel | undefined = undefined;

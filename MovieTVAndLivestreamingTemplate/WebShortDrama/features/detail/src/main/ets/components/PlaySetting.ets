@@ -1,6 +1,7 @@
 import { SpeedSegmentButton } from './SpeedSegmentButton'
 import { getString } from '@agctemplate/resources';
 import { BulletVM } from '../viewmodels/BulletVM';
+import { Preferences } from '../viewdata/Preferences'
 
 @Preview
 @ComponentV2
@@ -38,7 +39,7 @@ export struct PlaySetting {
       Row() {
         Text(getString('app.string.clear_screen_switch'))
           .textStyle()
-        Toggle({ type: ToggleType.Switch, isOn: false })
+        Toggle({ type: ToggleType.Switch, isOn: Preferences.readData('showControl') })
           .width(36)
           .height(20)
           .selectedColor('#F17F31')
@@ -54,7 +55,7 @@ export struct PlaySetting {
       Row() {
         Text(getString('app.string.danmaku_switch'))
           .textStyle()
-        Toggle({ type: ToggleType.Switch, isOn: this.isShowBullet })
+        Toggle({ type: ToggleType.Switch, isOn: Preferences.readData('isShowBullet') })
           .width(36)
           .height(20)
           .selectedColor('#F17F31')

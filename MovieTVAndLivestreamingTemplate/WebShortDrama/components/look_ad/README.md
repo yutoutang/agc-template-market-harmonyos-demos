@@ -10,8 +10,7 @@
 
 ## 简介
 
-本组件提供了看广告领奖励的功能，**其中看广告功能暂未对接三方广告位，所展示广告均为仅调测广告，实际开发中可以做借鉴使用，具体广告位请对接实际业务
-**
+本组件提供了看广告领奖励的功能，**其中看广告功能暂未对接三方广告位，所展示广告均为调测广告，实际开发中可以做借鉴使用，具体广告位请对接实际业务**。
 
 | 组件控制                                             |
 |--------------------------------------------------|
@@ -22,12 +21,16 @@
 ### 软件
 
 * DevEco Studio版本：DevEco Studio 5.0.0 Release及以上
-* HarmonyOS SDK版本：HarmonyOS 5.0.0 Release及以上
+* HarmonyOS SDK版本：HarmonyOS 5.0.0 Release SDK及以上
 
 ### 硬件
 
-* 设备类型：华为手机（直板机）
-* HarmonyOS版本：HarmonyOS 5.0.0 Release及以上
+* 设备类型：华为手机（包括双折叠和阔折叠）
+* 系统版本：HarmonyOS 5.0.0(12)及以上
+
+### 调试
+
+- 本组件支持模拟器和真机调试。**模拟器调试时，无法实现广告播放功能**。
 
 ## 快速入门
 
@@ -49,14 +52,14 @@
         "srcPath": "./XXX/look_ad",
         }
     ]
-    ```
+   ```
    c. 在项目根目录oh-package.json5中添加依赖。
     ```
     // XXX为组件存放的目录名称
     "dependencies": {
       "look_ad": "file:./XXX/look_ad"
     }
-   ```
+    ```
 
 2. 引入组件。
 
@@ -70,15 +73,13 @@
    import { LookAD } from 'look_ad';
    
    @Entry
-   @Component
+   @ComponentV2
    struct Index {
-     pageInfo: NavPathStack = new NavPathStack()
    
      build() {
-       Navigation(this.pageInfo) {
+       Column() {
          LookAD({award:"领现金"})
        }
-        .hideTitleBar(true)
      }
    }
    ```
@@ -91,19 +92,19 @@
 
 ### 接口
 
-LookAD(options?: LookAD)
+LookAD(options?: LookADOptions)
 
-看广告领奖励组件。
+看广告领奖励组件
 
 **参数：**
 
-| 参数名     | 类型                                     | 必填 | 说明        |
-|---------|----------------------------------------|----|-----------|
-| options | [LookADOptions](#LookADOptions对象说明) | 否  | 看广告领奖励组件。 |
+| 参数名     | 类型                                     | 是否必填 | 说明       |
+|---------|----------------------------------------|----|----------|
+| options | [LookADOptions](#LookADOptions对象说明) | 否  | 看广告领奖励组件 |
 
 ### LookADOptions对象说明
 
-| 名称            | 类型                     | 必填 | 说明                      |
+| 名称            | 类型                     | 是否必填 | 说明                      |
 |:--------------|:-----------------------|----|-------------------------|
 | award         | string                 | 否  | 奖励名称                    |
 | onLookSuccess | (balance:number)=>void | 否  | 定义回调函数，balance为看广告获得金币数 |
@@ -114,15 +115,14 @@ LookAD(options?: LookAD)
 import { LookAD } from 'look_ad';
    
    @Entry
-   @Component
+   @ComponentV2
    struct Index {
-     pageInfo: NavPathStack = new NavPathStack()
+     bonus: number = 0
    
      build() {
-       Navigation(this.pageInfo) {
+       Column() {
          LookAD({ award: "领现金", onLookSuccess: (balance: number) => this.bonus += balance })
        }
-        .hideTitleBar(true)
      }
    }
 ```

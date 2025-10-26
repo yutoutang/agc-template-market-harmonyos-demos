@@ -23,7 +23,7 @@ export struct SelectStoreComp {
           if (this.storeInfo.canTakeaways) {
             Text($r('app.string.can_takeaways'))
               .fontSize(10)
-              .fontColor(Color.White)
+              .fontColor($r('sys.color.font_on_primary'))
               .height(20)
               .padding({ left: 9, right: 9 })
               .backgroundColor('#86AD2B')
@@ -34,7 +34,7 @@ export struct SelectStoreComp {
 
         Row() {
           Image($r('app.media.ic_public_position')).width(12)
-          Text(this.storeInfo.distanceStr).fontSize(10).fontColor($r('sys.color.mask_secondary')).margin({ left: 8 })
+          Text(this.storeInfo.distanceStr).fontSize(10).fontColor($r('sys.color.font_secondary')).margin({ left: 8 })
         }.margin({ left: 8 })
       }.width('100%').justifyContent(FlexAlign.SpaceBetween)
 
@@ -45,10 +45,11 @@ export struct SelectStoreComp {
             total: this.STORE_MAKING_PROCESS_MAX,
             type: ProgressType.Linear,
           })
-            .width(53)
-            .height(2)
-            .color('#86AD2B')
+            .width(72)
+            .height(24)
+            .color('#486602')
             .borderRadius(6)
+            .padding({top:10,bottom:10})
             .margin({ left: 4, right: 4 })
           Row() {
             Text($r('app.string.wait_num_pre')).fontColor($r('sys.color.black')).fontSize(8)
@@ -61,7 +62,7 @@ export struct SelectStoreComp {
       }.width('100%').margin({ top: 6 }).height(20)
 
       Row() {
-        Text(this.storeInfo.address).fontSize(10).fontColor($r('sys.color.mask_secondary')).maxLines(2)
+        Text(this.storeInfo.address).fontSize(10).fontColor($r('sys.color.font_secondary')).maxLines(2)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
       }.margin({ top: 6 }).constraintSize({ maxWidth: 200 })
 
@@ -70,11 +71,11 @@ export struct SelectStoreComp {
           Image($r('app.media.ic_clock_grey')).width(12)
           Text($r('app.string.store_open_time'))
             .fontSize(10)
-            .fontColor($r('sys.color.mask_secondary'))
+            .fontColor($r('sys.color.font_secondary'))
             .margin({ left: 8 })
           Text(`${this.storeInfo.time1} - ${this.storeInfo.time2}`)
             .fontSize(10)
-            .fontColor($r('sys.color.mask_secondary'))
+            .fontColor($r('sys.color.font_secondary'))
         }
 
         Row() {

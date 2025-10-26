@@ -32,9 +32,9 @@ export struct AboutPage {
 
   build() {
     NavDestination() {
-      Column() {
-        Header({ title: '关于'})
+      Stack({ alignContent: Alignment.Bottom }) {
         Column() {
+          Header({ title: '关于' })
           Image($r('app.media.logo'))
             .width(72)
             .height(72)
@@ -84,8 +84,8 @@ export struct AboutPage {
             .justifyContent(FlexAlign.SpaceBetween)
             .width('100%')
             .height(64)
-            .onClick(()=>{
-              promptAction.showToast({message:'已是最新版本'})
+            .onClick(() => {
+              promptAction.showToast({ message: '已是最新版本' })
               // if(this.needUpdate){
               //   AppGalleryUtils.showUpdateDialog(getContext() as common.UIAbilityContext)
               // } else {
@@ -117,7 +117,7 @@ export struct AboutPage {
           }
           .backgroundColor($r('sys.color.comp_background_primary'))
           .width(328)
-          .margin({ top: 61, bottom: 244 })
+          .margin({ top: 61 })
           .padding({
             top: 4,
             left: 12,
@@ -125,35 +125,33 @@ export struct AboutPage {
             bottom: 4
           })
           .borderRadius(16)
-
-          Column() {
-            Text('苏ICP备17040376号-135A')
-              .fontSize(12)
-              .lineHeight(16)
-              .fontWeight(500)
-              .fontColor('#0A59F7')
-            Text('华为xx 版权所有 © 2019-2023')
-              .fontSize(12)
-              .lineHeight(16)
-              .fontWeight(400)
-              .opacity(0.6)
-            Text('技术支持：xxxxxxxx')
-              .fontSize(12)
-              .lineHeight(16)
-              .fontWeight(400)
-              .opacity(0.6)
-          }
-          .width('100%')
-
         }
         .justifyContent(FlexAlign.Start)
         .backgroundColor($r('sys.color.background_secondary'))
         .width('100%')
         .height('100%')
+        .padding({ top: `${px2vp(this.statusBarHeight.value)}vp`, bottom: 36 })
+
+        Column() {
+          Text('苏ICP备17040376号-135A')
+            .fontSize(12)
+            .lineHeight(16)
+            .fontWeight(500)
+            .fontColor('#0A59F7')
+          Text('华为xx 版权所有 © 2019-2023')
+            .fontSize(12)
+            .lineHeight(16)
+            .fontWeight(400)
+            .opacity(0.6)
+          Text('技术支持：xxxxxxxx')
+            .fontSize(12)
+            .lineHeight(16)
+            .fontWeight(400)
+            .opacity(0.6)
+        }
+        .width('100%')
+        .padding({ bottom: 86 })
       }
-      .width('100%').height('100%')
-      .backgroundColor($r('sys.color.background_secondary'))
-      .padding({ top: `${px2vp(this.statusBarHeight.value)}vp`, bottom: 36 })
     }.hideTitleBar(true)
   }
 }

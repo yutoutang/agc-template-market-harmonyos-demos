@@ -1,6 +1,7 @@
 import { media } from '@kit.MediaKit';
 import { AVPlayerState } from '../constant/AVPlayerState';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { util } from '@kit.ArkTS';
 
 const TAG = '[CommonUtils]';
 
@@ -76,4 +77,9 @@ export function releaseVideo(avPlayer: media.AVPlayer | undefined, curIndex: num
   avPlayer.off('error');
   avPlayer.off('stateChange');
   avPlayer.release();
+}
+
+export function getRandomUUID(length: number): string {
+  const uuid = util.generateRandomUUID(true).replace(new RegExp('-', 'g'), '');
+  return length && length > 0 ? uuid.substring(0, length) : uuid;
 }

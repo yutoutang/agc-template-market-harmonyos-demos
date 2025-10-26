@@ -7,6 +7,7 @@ import { SelectStoreComp } from './SelectStoreComp'
 @ComponentV2
 export struct SelectStore {
   @Param storeInfoList: Array<StoreInfo> = []
+  @Param listOffset: number = 12
   @Local searchText: string = ''
   @Local selectIndex: number = 0
   @Local mapHeight: number = Constants.MAP_HEIGHT_DEFAULT
@@ -14,12 +15,6 @@ export struct SelectStore {
   @Local collectStoreList: Array<StoreInfo> = []
   @Local selectStore: MapLocation = new MapLocation()
   @Local searchAddressList: Array<site.Site> = []
-  @Event navigateStoreCb: (coordinates: string, address: string) => void = () => {
-  }
-  @Event selectStoreCb: (storeId: string) => void = () => {
-  }
-  @Event callTelCb: (callTelSheet: boolean, tel: string) => void = () => {
-  }
 
   @Computed
   get locations() {
@@ -41,6 +36,15 @@ export struct SelectStore {
     return this.storeInfoList.filter(item => !this.searchText || item.name.includes(this.searchText))
   }
 
+  @Event navigateStoreCb: (coordinates: string, address: string) => void = () => {
+  }
+
+  @Event selectStoreCb: (storeId: string) => void = () => {
+  }
+
+  @Event callTelCb: (callTelSheet: boolean, tel: string) => void = () => {
+  }
+
   aboutToAppear(): void {
     this.selectStore = this.locations.find(item => item.id === this.storeInfoList[0].id)!
 
@@ -54,6 +58,7 @@ export struct SelectStore {
           .width('100%')
           .placeholderFont({ size: $r('sys.float.Body_L') })
           .maxLength(20)
+          .caretStyle({ color: '#486602' })
       }
       .height(28)
       .margin({ top: 12, bottom: 12 })
@@ -106,7 +111,7 @@ export struct SelectStore {
                 })
             }
           }, (item: StoreInfo) => item.id)
-        }.layoutWeight(1).scrollBar(BarState.Off).contentEndOffset(12)
+        }.layoutWeight(1).scrollBar(BarState.Off).contentEndOffset(this.listOffset)
       }.layoutWeight(1)
       .padding({
         top: 12,

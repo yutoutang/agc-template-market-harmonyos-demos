@@ -262,7 +262,7 @@
     },
     {
       "name": "agcit_huawei_tea_drink_orders",
-      "value": "1.0.2"
+      "value": "1.0.3"
     },
     {
       "name": "agcittype_huawei_tea_drink_orders",
@@ -278,7 +278,7 @@
     },
     {
       "name": "agcitkid_huawei_tea_drink_orders",
-      "value": "agcit_huawei_tea_drink_orders_select_store/1.0.0,agcit_huawei_tea_drink_orders_order_detail/1.0.0,agcit_huawei_tea_drink_orders_shopping_cart/1.0.0,agcit_huawei_tea_drink_orders_add_address/1.0.0"
+      "value": "agcit_huawei_tea_drink_orders_select_store/1.0.1,agcit_huawei_tea_drink_orders_order_detail/1.0.1,agcit_huawei_tea_drink_orders_shopping_cart/1.0.1,agcit_huawei_tea_drink_orders_add_address/1.0.1"
     }
   ]
 }

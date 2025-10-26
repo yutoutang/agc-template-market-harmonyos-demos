@@ -5,7 +5,6 @@ import { LikeCard } from './LikeCard'
 
 @ComponentV2
 export struct LikeContent {
-
   @Param commentDataList: Array<CommentData> = []
   @Param myMessageList: Array<CommentData> = []
   @Local myMessageStorage: MyMessageStorage = MyMessageStorage.instance()
@@ -30,20 +29,20 @@ export struct LikeContent {
                 })
                 this.myMessageStorage.isShowCommentSheet = true
                 let commentIndex: number = this.commentDataList.indexOf(item)
-                if(commentIndex === 0) {
+                if (commentIndex === 0) {
                   this.myMessageStorage.scrollIndex = commentIndex
-                }else {
+                } else {
                   this.myMessageStorage.scrollIndex = commentIndex
                   this.commentDataList.slice(0, commentIndex).forEach((comment) => {
-                    if(comment.replyList.length > 0) {
+                    if (comment.replyList.length > 0) {
                       this.myMessageStorage.scrollIndex++
                     }
                   })
                 }
               })
-            }
+            }, (item: LikeItem) => item.likeAvatar + item.likeName + item.likeTime.toString()
           )
-        }
+        }, (item: CommentData) => item.id.toString()
       )
       ListItem()
         .width('100%')

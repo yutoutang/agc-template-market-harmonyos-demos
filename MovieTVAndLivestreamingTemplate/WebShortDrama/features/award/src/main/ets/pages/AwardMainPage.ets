@@ -1,13 +1,10 @@
-import { TYCard } from '../common/TYCard'
-import { SevenDaySignIn } from '../components/SevenDaySignIn'
-import { LookAD } from '../components/LookAD'
-import { Wheel } from '../components/Wheel'
-import { TaskCard } from '../common/TaskCard'
-import { OnlineCheckIn } from '../components/OnlineCheckIn'
 import { getColor, getMedia, getString } from '@agctemplate/resources'
-import StrConstants from '../constants/StrConstants'
 import { AppStorageKeys, StatusBarHeight, UserInfoModel } from '@agctemplate/widgets'
 import { AppStorageV2 } from '@kit.ArkUI'
+import { DaySignIn } from 'day_signin'
+import { LookAD } from 'look_ad'
+import { TaskList } from 'task_list'
+import { Wheel } from 'wheel'
 
 @ComponentV2
 export struct AwardMainPage {
@@ -89,57 +86,19 @@ export struct AwardMainPage {
                 .margin({ top: 4 })
                 .fontSize(12)
 
-              TYCard({
-                isRightCounting: true
-              }) {
-                SevenDaySignIn()
-              }
+              DaySignIn({
+                onSignSuccess: (day: number, balance: number) => this.bonus += balance
+              })
 
-              TYCard({ isLeftCounting: true, rightTitle: '' }) {
-                LookAD()
-              }
+              LookAD({ onLookSuccess: (balance: number) => this.bonus += balance })
 
-              TYCard({
-                liftTitle: getString('app.string.reward_wheel'),
-                rightTitle: getString('app.string.max_points_winnable'),
-                bottomPadding: 20,
-              }) {
-                Wheel()
-              }
+              Wheel({
+                onWheelSuccess: (balance: number) => this.bonus += balance
+              })
 
-              TYCard({
-                liftTitle: getString('app.string.daily_tasks'),
-                rightTitle: getString('app.string.daily_task_update'),
-                topPadding: 18,
-                bottomPadding: 20,
-                bottomMargin: 23
-              }) {
-                TaskCard({
-                  coinIcon: 'app.media.award_coin888',
-                  isWatchShows: true,
-                  topMargin: 33,
-                  bottomMargin: 0
-                })
-                OnlineCheckIn()
-                TaskCard({
-                  leftIcon: 'app.media.award_lottery_event',
-                  title: StrConstants.LOTTERY_EVENT,
-                  topMargin: 24,
-                  bottomMargin: 0
-                })
-                TaskCard({
-                  leftIcon: 'app.media.award_treasure_box',
-                  title: StrConstants.TREASURE_BOX,
-                  topMargin: 32,
-                  bottomMargin: 0
-                })
-                TaskCard({
-                  leftIcon: 'app.media.award_share_short_dramas',
-                  title: StrConstants.SHARE_SHOW,
-                  topMargin: 32,
-                  bottomMargin: 0
-                })
-              }
+              TaskList({
+                onTaskSuccess: (balance: number) => this.bonus += balance
+              })
             }
             .alignItems(HorizontalAlign.Start)
           }

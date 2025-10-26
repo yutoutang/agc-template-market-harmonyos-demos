@@ -6,7 +6,6 @@ import { MessageCard } from './MessageCard'
 
 @ComponentV2
 export struct CommentReplyContent {
-
   @Param commentDataList: Array<CommentData> = []
   @Param myMessageList: Array<CommentData> = []
   @Local myMessageStorage: MyMessageStorage = MyMessageStorage.instance()
@@ -19,7 +18,7 @@ export struct CommentReplyContent {
           ForEach(
             item.replyList,
             (each: Reply, index: number) => {
-              if(each.replyPeople === item.name) {
+              if (each.replyPeople === item.name) {
                 ListItem() {
                   MessageCard({
                     myMessage: item,
@@ -32,13 +31,18 @@ export struct CommentReplyContent {
                   })
                   this.myMessageStorage.isShowCommentSheet = true
                   this.myMessageStorage.isSpread = true
-                  let commentIndex: number = this.commentDataList.indexOf(item)
+                  let commentIndex: number = -1
+                  for (let i = 0; i < this.commentDataList.length; i++) {
+                    if (this.commentDataList[i].id === item.id) {
+                      commentIndex = i
+                    }
+                  }
                   this.myMessageStorage.moreList[commentIndex] = index - index % 5 + 5
-                  if(commentIndex === 0) {
+                  if (commentIndex === 0) {
                     this.myMessageStorage.scrollIndex = index
-                  }else {
+                  } else {
                     this.commentDataList.slice(0, commentIndex).forEach((comment) => {
-                      if(comment.replyList.length > 0) {
+                      if (comment.replyList.length > 0) {
                         this.myMessageStorage.scrollIndex++
                       }
                     })
@@ -46,9 +50,9 @@ export struct CommentReplyContent {
                   }
                 })
               }
-            }
+            }, (item: Reply) => item.replyName + item.replyContent + item.replyTimeAgo.toString()
           )
-        }
+        }, (item: CommentData) => item.id.toString()
       )
       ListItem()
         .width('100%')

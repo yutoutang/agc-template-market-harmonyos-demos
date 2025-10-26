@@ -42,7 +42,7 @@ export struct GoodsComp {
             Text($r('app.string.insulation_bag')).fontSize(14).fontColor($r('sys.color.font_primary'))
             Text($r('app.string.insulation_bag_desc'))
               .fontSize(14)
-              .fontColor($r('sys.color.mask_secondary'))
+              .fontColor($r('sys.color.font_secondary'))
               .margin({ top: 4 })
           }.alignItems(HorizontalAlign.Start)
 
@@ -59,7 +59,7 @@ export struct GoodsComp {
               Checkbox({ name: 'selectBag', group: '' })
                 .height(12)
                 .width(12)
-                .selectedColor($r('app.color.mainColor'))
+                .selectedColor('#486602')
                 .shape(CheckBoxShape.CIRCLE)
                 .margin({ left: 4 })
                 .onChange(value => {

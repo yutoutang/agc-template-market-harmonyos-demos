@@ -60,6 +60,7 @@ export struct GoodsListComp {
           .width(Constants.FULL_SIZE)
           .placeholderFont({ size: $r('sys.float.Body_L') })
           .maxLength(20)
+          .caretStyle({ color: '#486602' })
           .onChange((value: string) => {
             if (value) {
               this.dishesList = this.dishesList.map((item) => {

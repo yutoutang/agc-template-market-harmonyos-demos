@@ -64,7 +64,7 @@ struct HomePage {
     .margin({ left: Constants.BORDER_WIDTH, right: Constants.BORDER_WIDTH, bottom: 8 })
     .constraintSize({ maxWidth: Constants.FULL_SIZE })
     .borderRadius(16)
-    .backgroundColor(Color.White);
+    .backgroundColor($r('sys.color.background_primary'));
   }
 
   @Builder
@@ -72,7 +72,7 @@ struct HomePage {
     Column() {
       Text(new Date().getHours() < 12 ? $r('app.string.good_morning') : $r('app.string.good_afternoon'))
         .fontSize(12)
-        .fontColor($r('sys.color.mask_secondary'))
+        .fontColor($r('sys.color.font_secondary'))
       Row() {
         Row() {
           Image(this.userIcon).width(40).height(40).borderRadius(50)
@@ -117,7 +117,7 @@ struct HomePage {
           .fontColor('#E6000000')
           .fontWeight(FontWeight.Medium)
           .margin({ top: 10 });
-        Text($r('app.string.pick_self_desc')).fontSize(10).fontColor($r('sys.color.mask_secondary')).margin({ top: 6 });
+        Text($r('app.string.pick_self_desc')).fontSize(10).fontColor($r('sys.color.font_secondary')).margin({ top: 6 });
       }.onClick(() => {
         this.storeModel.orderType = OrderTypeEnum.PICK_SELF
         this.pageStack?.pushPathByName(RouterMap.SELECT_STORE_PAGE, null, (popInfo: PopInfo) => {
@@ -134,7 +134,7 @@ struct HomePage {
           .fontColor('#E6000000')
           .fontWeight(FontWeight.Medium)
           .margin({ top: 10 });
-        Text($r('app.string.takeaways_desc')).fontSize(10).fontColor($r('sys.color.mask_secondary')).margin({ top: 6 });
+        Text($r('app.string.takeaways_desc')).fontSize(10).fontColor($r('sys.color.font_secondary')).margin({ top: 6 });
       }.margin({ left: 40 }).onClick(() => {
         this.storeModel.orderType = OrderTypeEnum.TAKEAWAY_DELIVERY
         this.pageStack?.pushPathByName(RouterMap.SELECT_STORE_PAGE, null, (popInfo: PopInfo) => {
@@ -153,7 +153,7 @@ struct HomePage {
       Row() {
         Text($r('app.string.collect_six_desc'))
           .fontSize(12)
-          .fontColor($r('sys.color.mask_secondary'))
+          .fontColor($r('sys.color.font_secondary'))
           .margin({ left: 1 });
         Text(`${this.userInfo.userInfo.sixProcess}/${Constants.DRINK_PROCESS_MAX}`)
           .fontSize(12)
@@ -174,7 +174,10 @@ struct HomePage {
   promotionCard() {
     Stack() {
       Image($r('app.media.ic_promotion')).width(Constants.FULL_SIZE).height(120);
-      Text($r('app.string.membership_day')).fontSize(24).fontColor(Color.White).margin({ bottom: 11, left: 17 });
+      Text($r('app.string.membership_day'))
+        .fontSize(24)
+        .fontColor($r('sys.color.font_on_primary'))
+        .margin({ bottom: 11, left: 17 });
     }.cardStyle().clip(true).alignContent(Alignment.BottomStart);
   }
 

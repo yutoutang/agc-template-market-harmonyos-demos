@@ -4,4 +4,6 @@ export { CastPicker } from './src/main/ets/components/CastPicker';
 
 export { VideoData } from './src/main/ets/model/VideoData'
 
-export { CastService, CastSessionListener } from './src/main/ets/service/CastService';
+export { CastService } from './src/main/ets/service/CastService';
+
+export { CastSessionListener } from './src/main/ets/model/CastServiceModule'

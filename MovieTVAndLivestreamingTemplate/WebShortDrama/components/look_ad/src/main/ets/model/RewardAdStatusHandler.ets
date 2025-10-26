@@ -1,11 +1,12 @@
-import { BusinessError, commonEventManager, emitter } from '@kit.BasicServicesKit';
+import { BusinessError, commonEventManager } from '@kit.BasicServicesKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { UserInfo } from './UserInfo';
+import { router } from '@kit.ArkUI';
+import { SignInClass } from './SignInModel';
 
 
 const KEY_REWARD_DATA = 'reward_ad_data';
 const KEY_REWARD_STATUS = 'reward_ad_status';
-
 
 
 export class RewardAdStatusHandler {
@@ -14,7 +15,7 @@ export class RewardAdStatusHandler {
   private userInfoFromStorage: UserInfo = AppStorage.get('userInfo') as UserInfo;
   private bookFinish: number = AppStorage.get('bookFinished') as number
   // 订阅方法，需要在每次展示广告前调用
-  public registerPPSReceiver(): void {
+  public registerPPSReceiver(item: SignInClass): void {
     if (this.subscriber) {
       this.unRegisterPPSReceiver();
     }
@@ -61,20 +62,15 @@ export class RewardAdStatusHandler {
               const rewardData: Record<string, string | number> = commonEventSubscriber?.parameters?.[KEY_REWARD_DATA];
               const rewardType: string = rewardData?.rewardType as string;
               const rewardAmount: number = rewardData?.rewardAmount as number;
-              this.userInfoFromStorage.bookCoins += rewardAmount;
-              AppStorage.setOrCreate('bookCoins', this.userInfoFromStorage.bookCoins);
-              this.bookFinish++
-              AppStorage.set('bookFinished', this.bookFinish);
-              emitter.emit({ eventId:15 })
+              item.isLookAD = true
               hilog.info(0x0000, 'testTag', `Status is onAdReward. Type is ${rewardType}, Amount is ${rewardAmount}`);
-              hilog.info(0x0000, 'testTag',
-                `Status is userInfoFromStorage. Type is ${this.userInfoFromStorage.bookCoins}`);
               break;
             case AdStatus.AD_VIDEO_START:
               hilog.info(0x0000, 'testTag', 'Status is onAdVideoStart');
               break;
             case AdStatus.AD_COMPLETED:
               hilog.info(0x0000, 'testTag', 'Status is onAdCompleted');
+              router.replace({ url: 'components/LookAD' })
               break;
             default:
               break;

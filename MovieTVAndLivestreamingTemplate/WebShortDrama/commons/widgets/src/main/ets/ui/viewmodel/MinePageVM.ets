@@ -1,4 +1,4 @@
-import { AppStorageV2, promptAction } from '@kit.ArkUI';
+import { AppStorageV2, promptAction, PersistenceV2 } from '@kit.ArkUI';
 import { AccountUtil, UserInfoModel } from '../../util/AccountUtil';
 
 
@@ -11,7 +11,7 @@ export class MinePageVM {
 
   public static get instance() {
     if (!MinePageVM._instance) {
-      MinePageVM._instance = new MinePageVM();
+      MinePageVM._instance = PersistenceV2.connect(MinePageVM, '_instance', () => new MinePageVM())!;
     }
     return MinePageVM._instance;
   }

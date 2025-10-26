@@ -8,8 +8,10 @@ import { commentBuilder, CommentParam } from './CommentComp';
 import { appRouter, container, Logger, WindowManager } from '@agctemplate/utils';
 import { AppStorageV2, ComponentContent } from '@kit.ArkUI';
 import { UserInfoModel } from '@agctemplate/widgets';
-import { FirstShare, SheetShowVM } from '@agctemplate/module_share';
+import { Share } from '@agctemplate/module_share';
 import { emitter } from '@kit.BasicServicesKit';
+import { ProcessController } from 'video_swiper/src/main/ets/view/ProcessController';
+import { AVPlayerListener } from 'video_swiper/src/main/ets/controller/AvPlayerListener';
 
 const TAG = '[DramaDes]'
 
@@ -32,7 +34,20 @@ export struct HomeDramaDes {
   @Local userInfo: UserInfoModel = AppStorageV2.connect(UserInfoModel, 'userInfo', () => new UserInfoModel())!;
   @Local commentCount: number = 3
   @Local isShowShareSheet: boolean = false
-  @Local shareShowVM: SheetShowVM = SheetShowVM.instance
+  @Consumer('curTabIndex') curTabIndex: number = 0;
+  @Local processController: ProcessController | undefined = undefined
+  avPlayerListener: AVPlayerListener = {
+    onEnded: () => {
+      Logger.info(TAG, 'onEnded')
+      this.playerSession.avPlayer?.pause()
+      this.unEmitter()
+      this.playerSession.unregisterListener(this.avPlayerListener)
+      jumpDetailPage(this.dramaInfo, this.dramaInfo.curIndex + 1, 0, (data: PopInfo) => {
+        Logger.info(TAG, 'onReEnter')
+        this.onReEnter()
+      })
+    }
+  }
   private commentNode: ComponentContent<CommentParam> = new ComponentContent(
     this.getUIContext(),
     wrapBuilder<[CommentParam]>(commentBuilder),
@@ -72,17 +87,10 @@ export struct HomeDramaDes {
   }
 
   aboutToAppear(): void {
+    this.playerSession.registerListener(this.avPlayerListener)
     this.getDeleteEmitter()
     this.getDetailInfoFavoriteEmitter()
     this.getSideFavoriteEmitter()
-    this.playerSession.onStateChange('stateChange', (state: string) => {
-      // 进入详情播放页播放下一集
-      if (state === 'completed') {
-        jumpDetailPage(this.dramaInfo, this.dramaInfo.curIndex + 1, 0, (data: PopInfo) => {
-          this.onReEnter()
-        })
-      }
-    })
     this.isFavorite = this.dramaInfo.isFavorite
     this.isThumb = this.dramaInfo.isLike
     this.likeCount = this.dramaInfo.likeCount
@@ -93,6 +101,48 @@ export struct HomeDramaDes {
     }).then((res) => {
       this.commentCount = res.getBody().commentList.length
     })
+    this.registerEmitter()
+  }
+
+  registerEmitter() {
+    this.backEmitter()
+    this.foreEmitter()
+  }
+
+  onForeground: Callback<emitter.EventData> = (eventData: emitter.EventData) => {
+    Logger.info(TAG, `onForeground: ${JSON.stringify(eventData)}`);
+    // 不响应非本tab事件
+    if (this.curTabIndex === 0) {
+      return
+    }
+    this.playControl.pause()
+  }
+  onBackground: Callback<emitter.EventData> = (eventData: emitter.EventData) => {
+    Logger.info(TAG, `onBackground: ${JSON.stringify(eventData)}`);
+    if (this.curTabIndex !== 0) {
+      return
+    }
+    this.playControl.pause()
+  }
+
+  backEmitter() {
+    let event: emitter.InnerEvent = {
+      eventId: 1
+    };
+    emitter.on(event, this.onBackground);
+  }
+
+  foreEmitter() {
+    let event: emitter.InnerEvent = {
+      eventId: 2
+    };
+    emitter.on(event, this.onForeground);
+  }
+
+  unEmitter() {
+    Logger.info(TAG, 'on jump')
+    emitter.off(1, this.onBackground)
+    emitter.off(2, this.onForeground)
   }
 
   getDeleteEmitter() {
@@ -136,7 +186,21 @@ export struct HomeDramaDes {
 
   build() {
     Stack({ alignContent: Alignment.BottomEnd }) {
-      DramaDesLayer({ dramaInfo:this.dramaInfo, playControl: this.playControl, playerSession: this.playerSession})
+      DramaDesLayer({
+        dramaInfo: this.dramaInfo,
+        playControl: this.playControl,
+        playerSession: this.playerSession,
+        onJump: () => {
+          Logger.info(TAG, 'onJump')
+          this.playControl.pause()
+          this.unEmitter()
+          jumpDetailPage(this.dramaInfo, this.dramaInfo.curIndex, this.playerSession.avPlayer?.currentTime,
+            (data: PopInfo) => {
+              Logger.info(TAG, 'onReEnter')
+              this.onReEnter()
+            })
+        }
+      })
 
       Column({ space: 16 }) {
         Column() {
@@ -146,16 +210,17 @@ export struct HomeDramaDes {
             .margin({ top: 2 })
             .onClick(() => {
               if (this.userInfo.isPhoneAssociated) {
-                if(this.isThumb) {
+                if (this.isThumb) {
                   this.likeCount--
                   container.resolve(RequestAPI).unsetLike(this.dramaInfo.id)
-                }else {
+                } else {
                   this.likeCount++
                   container.resolve(RequestAPI).setLike(this.dramaInfo.id)
                 }
                 this.isThumb = !this.isThumb
               } else {
                 WindowManager.setWindowSystemBarProperties({ statusBarContentColor: '#e6000000' })
+                this.playControl.pause()
                 appRouter.push({ builderName: NAV_PAGE_NAME.LoginPage.name, params: { isChange: true } })
               }
             })
@@ -187,22 +252,23 @@ export struct HomeDramaDes {
 
         Column() {
           Image(this.isFavorite ? getMedia('app.media.favorite_select') :
-          getMedia('app.media.favorite_white'))
+            getMedia('app.media.favorite_white'))
             .width(22)
             .height(20)
             .margin({ top: 2 })
             .onClick(() => {
               if (this.userInfo.isPhoneAssociated) {
-                if(this.isFavorite) {
+                if (this.isFavorite) {
                   this.favoriteCount--
                   container.resolve(RequestAPI).unsetFavorite(this.dramaInfo.id)
-                }else {
+                } else {
                   this.favoriteCount++
                   container.resolve(RequestAPI).setFavorite(this.dramaInfo.id)
                 }
                 this.isFavorite = !this.isFavorite
               } else {
                 WindowManager.setWindowSystemBarProperties({ statusBarContentColor: '#e6000000' })
+                this.playControl.pause()
                 appRouter.push({ builderName: NAV_PAGE_NAME.LoginPage.name, params: { isChange: true } })
               }
             })
@@ -214,50 +280,68 @@ export struct HomeDramaDes {
         .width(40)
         .height(40)
 
-        Column() {
-          Image(getMedia('app.media.share_white'))
-            .width(22)
-            .height(20)
-            .margin({ top: 2 })
-          Text('分享')
-            .fontSize(10)
-            .fontColor('#fff')
-            .margin({ top: 4 })
-        }
-        .width(40)
-        .height(40)
-        .onClick(() => {
-          this.shareShowVM.setPosterInfo('', this.dramaInfo.coverUrl, '', '', this.dramaInfo.name)
-          this.isShowShareSheet = !this.isShowShareSheet
-        })
-        .bindSheet($$this.isShowShareSheet, this.FirstShareBuilder(), {
-          title: { title: '分享到' },
-          height: 352,
-          preferType: SheetType.BOTTOM
-        })
+        this.shareBuilder()
+
       }
       .width(40)
       .height(208)
       .margin({ bottom: 72, right: 8 })
+      .onVisibleAreaChange([0],(isExpanding:boolean,currentRatio:number)=>{
+        if(isExpanding){
+          this.playControl.play()
+        }
+      })
 
-      ProcessBar({ playerSession: this.playerSession })
-        .hitTestBehavior(HitTestMode.Transparent)
+      if (this.playerSession.avPlayer?.isReady) {
+        ProcessBar({ avPlayer: this.playerSession.avPlayer })
+          .hitTestBehavior(HitTestMode.Transparent)
+      }
+
     }
     .width('100%')
     .height('100%')
   }
 
+
   @Builder
-  FirstShareBuilder() {
-    FirstShare({
-      close: () => {
+  shareCommentBuilder() {
+    Column({ space: 5 }) {
+      Image($r('app.media.share_white'))
+        .width(21)
+        .height(21)
+      Text('分享')
+        .fontSize(10)
+        .fontColor($r('sys.color.font_on_primary'))
+    }
+  }
+
+  @Builder
+  shareBuilder() {
+    Share({
+      qrCodeInfo: {
+        id: this.dramaInfo.id,
+        type: 2,
+        title: this.dramaInfo.name,
+        createTime: '',
+        coverUrl: this.dramaInfo.coverUrl,
+        isVideo: false,
+        articleFrom: this.dramaInfo.category[0] + '/' + this.dramaInfo.category[1]
+      },
+      shareRenderBuilder: () => {
+        this.shareCommentBuilder()
+      },
+      onClose: () => {
         this.isShowShareSheet = !this.isShowShareSheet
       }
     })
   }
 
   onReEnter() {
+    this.playControl.seek(0)
     this.playControl.play()
+    this.registerEmitter()
+    Logger.info(TAG, 'registerListener')
+    this.playerSession.registerListener(this.avPlayerListener)
   }
 }
 

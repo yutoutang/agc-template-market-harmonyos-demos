@@ -10,6 +10,7 @@ export interface VideoPlayData {
   getName():string
   getId():string
   getDuration():number
+  isLocked():boolean
 }
 
 /**

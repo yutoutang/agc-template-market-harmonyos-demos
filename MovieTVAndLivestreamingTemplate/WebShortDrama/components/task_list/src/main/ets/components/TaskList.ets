@@ -8,7 +8,8 @@ import { TaskModel } from '../model/TaskModel'
 export struct TaskList {
   @Provider('balance') balance: number = 0
   @Event onTaskSuccess: (balance: number) => void
-  @Param button: () => void = () => {}
+  @Param button: () => void = () => {
+  }
   @Param taskmsg: Array<TaskModel> = [
     new TaskModel(StrConstants.LOTTERY_EVENT, 'app.media.award_lottery_event'),
     new TaskModel(StrConstants.TREASURE_BOX, 'app.media.award_treasure_box'),
@@ -26,7 +27,7 @@ export struct TaskList {
       TaskCard({
         coinIcon: 'app.media.award_coin888',
         isWatchShows: true,
-        button:()=>this.button,
+        button: () => this.button,
         topMargin: 33,
         bottomMargin: 0
       })
@@ -39,11 +40,11 @@ export struct TaskList {
           title: item.title,
           dailyPointLimit: item.subTitle,
           addAward: () => this.onTaskSuccess(this.balance),
-          button:()=>this.button,
+          button: () => this.button,
           topMargin: 32,
           bottomMargin: 0
         })
-      })
+      }, (item: TaskModel) => item.title)
     }
   }
 }

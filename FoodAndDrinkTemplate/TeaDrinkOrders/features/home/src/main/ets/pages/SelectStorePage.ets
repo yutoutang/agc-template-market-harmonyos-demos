@@ -3,7 +3,6 @@ import { common, Want } from '@kit.AbilityKit'
 import {
   AppInfoModel,
   CallTelSheetBuilder,
-  Constants,
   HttpCode,
   HttpRequestApi,
   IndexPageRouter,
@@ -37,6 +36,7 @@ struct SelectStorePage {
       NavHeaderBar({ title: $r('app.string.store_list') })
       SelectStore({
         storeInfoList: this.storeInfoList,
+        listOffset: this.windowModel.getWindowBottomHeight(),
         navigateStoreCb: (coordinates: string = '', address: string = '') => {
           this.goNavigationStore(coordinates, address)
         },
@@ -51,13 +51,13 @@ struct SelectStorePage {
       }), {
         detents: [309, 310],
         blurStyle: BlurStyle.Thick,
+        preferType: SheetType.CENTER,
         showClose: true,
         backgroundColor: $r('sys.color.background_fourth'),
         title: { title: $r('app.string.contact_us') },
       });
     }
-    .margin({ bottom: this.windowModel.getWindowBottomHeight() })
-    .constraintSize({ maxHeight: Constants.FULL_SIZE })
+
     .hideTitleBar(true)
     .onShown(() => {
       Promise.all([PermissionUtil.getLocation(), HttpRequestApi.getStoreList()]).then(res => {

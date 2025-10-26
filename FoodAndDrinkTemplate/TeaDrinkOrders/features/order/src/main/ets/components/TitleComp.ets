@@ -1,11 +1,4 @@
-import {
-  Constants,
-  OrderTypeEnum,
-  Reduction,
-  RouterMap,
-  StoreInfoModel,
-  WindowModel,
-} from 'common/Index';
+import { Constants, OrderTypeEnum, Reduction, RouterMap, StoreInfoModel, WindowModel } from 'common/Index';
 import { AppStorageV2 } from '@kit.ArkUI';
 
 @Preview
@@ -25,7 +18,7 @@ export struct TitleComp {
             .fontSize(12)
             .fontWeight(FontWeight.Medium)
             .fontColor(this.storeModel.orderType === OrderTypeEnum.PICK_SELF ? Color.White :
-            $r('sys.color.mask_secondary'))
+              $r('sys.color.font_secondary'))
             .backgroundColor(this.storeModel.orderType === OrderTypeEnum.PICK_SELF ? '#86AD2B' : '#00000000')
             .borderRadius(14)
             .padding({
@@ -42,7 +35,7 @@ export struct TitleComp {
             .fontSize(12)
             .fontWeight(FontWeight.Medium)
             .fontColor(this.storeModel.orderType === OrderTypeEnum.TAKEAWAY_DELIVERY ? Color.White :
-            $r('sys.color.mask_secondary'))
+              $r('sys.color.font_secondary'))
             .backgroundColor(this.storeModel.orderType === OrderTypeEnum.TAKEAWAY_DELIVERY ? '#86AD2B' : '#00000000')
             .borderRadius(14)
             .padding({
@@ -78,7 +71,7 @@ export struct TitleComp {
             Image($r('app.media.ic_position')).width(12);
             Text($r('app.string.store_distance', this.storeModel.storeInfo.distanceStr))
               .fontSize(10)
-              .fontColor($r('sys.color.mask_secondary'))
+              .fontColor($r('sys.color.font_secondary'))
               .lineHeight(16)
               .layoutWeight(1)
               .maxLines(1)
@@ -146,6 +139,7 @@ export struct TitleComp {
       .bindSheet($$this.showShopDiscount, this.myBuilder(), {
         detents: [421, 422],
         blurStyle: BlurStyle.Thick,
+        preferType: SheetType.CENTER,
         showClose: true,
         backgroundColor: $r('sys.color.background_fourth'),
         title: { title: $r('app.string.store_announce') },
@@ -171,7 +165,7 @@ export struct TitleComp {
               Row() {
                 Image($r('app.media.ic_news1')).width(16)
                 Text(reduction.name)
-                  .fontSize(12)
+                  .fontSize($r('sys.float.Caption_L'))
                   .fontColor($r('sys.color.font_secondary'))
                   .margin({ left: 12 })
                   .layoutWeight(1)
@@ -179,20 +173,15 @@ export struct TitleComp {
                   .textOverflow({ overflow: TextOverflow.Ellipsis })
               }.layoutWeight(1)
 
-              Button(reduction.status === 0 ? $r('app.string.claim_btn') : $r('app.string.collected'))
-                .fontColor(Color.White)
-                .fontSize(8)
-                .fontWeight(FontWeight.Regular)
-                .height(18)
-                .margin({ left: 8 })
-                .padding({ left: 8, right: 8 })
+              Text(reduction.status === 0 ? $r('app.string.claim_btn') : $r('app.string.collected'))
+                .fontColor($r('sys.color.font_on_primary'))
+                .fontSize($r('sys.float.Caption_S'))
+                .padding({ top: 2, bottom: 2, left: 6, right: 6 })
                 .backgroundColor(reduction.status === 0 ? '#61860B' : '#000000')
                 .opacity(reduction.status === 0 ? 1 : 0.4)
-                .onClick(() => {
-                  reduction.status = 1
-                })
-
-            }.width(Constants.FULL_SIZE).justifyContent(FlexAlign.SpaceBetween)
+            }.width(Constants.FULL_SIZE).justifyContent(FlexAlign.SpaceBetween).onClick(() => {
+              reduction.status = 1
+            })
           }
         }, (reduction: Reduction) => JSON.stringify(reduction))
       }

@@ -87,12 +87,14 @@ struct UserInfoPage {
         }.width(Constants.FULL_SIZE).margin({ top: 54 }).alignContent(Alignment.Center)
 
         Column() {
-          Text($r('app.string.nickname')).fontSize(16).fontColor($r('sys.color.font_primary'))
+          Text($r('app.string.nickname'))
+            .fontSize($r('sys.float.Body_L'))
+            .fontColor($r('sys.color.font_primary'))
+            .fontWeight(FontWeight.Medium)
           TextInput({ text: $$this.nickName, placeholder: $r('app.string.inputMsg') })
-            .placeholderFont({ size: 10 })
-            .placeholderColor($r('sys.color.mask_secondary'))
-            .fontSize(10)
-            .fontColor($r('sys.color.mask_secondary'))
+            .fontColor($r('sys.color.font_primary'))
+            .caretColor('#486602')
+            .maxLength(20)
             .padding({
               left: 12,
               right: 12,
@@ -160,7 +162,7 @@ struct UserInfoPage {
         Row() {
           Text($r('app.string.complete'))
             .fontSize(14)
-            .fontColor(Color.White)
+            .fontColor($r('sys.color.font_on_primary'))
             .fontWeight(FontWeight.Medium)
             .padding({ top: 6, bottom: 6 })
         }

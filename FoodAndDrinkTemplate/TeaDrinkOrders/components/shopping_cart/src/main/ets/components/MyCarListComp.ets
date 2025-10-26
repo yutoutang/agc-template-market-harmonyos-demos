@@ -77,7 +77,10 @@ export struct MyCarListComp {
                       .onChange((value: boolean) => {
                         this.changeCarCheck(carGoodsInfo.id, !value)
                       })
-                    Image(`${Constants.CLOUD_STORAGE_URL}${carGoodsInfo.logo}`).width(60).height(60).margin({ left: 12 })
+                    Image(`${Constants.CLOUD_STORAGE_URL}${carGoodsInfo.logo}`)
+                      .width(60)
+                      .height(60)
+                      .margin({ left: 12 })
                     Column() {
                       Text(carGoodsInfo.name)
                         .fontSize(14)
@@ -94,7 +97,7 @@ export struct MyCarListComp {
                       .maxLines(1)
                       .textOverflow({ overflow: TextOverflow.Ellipsis })
                       .visibility(carGoodsInfo.specType !== Constants.PACKAGE_TYPE ? Visibility.Visible :
-                      Visibility.None)
+                        Visibility.None)
 
                       Text() {
                         Span($r('app.string.currency_symbol'))
@@ -122,7 +125,7 @@ export struct MyCarListComp {
                     Text(carGoodsInfo.num.toString())
                       .margin({ left: 8, right: 8 })
                       .fontSize(14)
-                      .fontColor($r('sys.color.mask_secondary'))
+                      .fontColor($r('sys.color.font_secondary'))
                       .lineHeight(20)
                     Image($r('app.media.ic_add_car')).width(22).onClick(() => {
                       if (carGoodsInfo?.id && carGoodsInfo?.num) {
@@ -151,7 +154,7 @@ export struct MyCarListComp {
         .margin({ left: 16, right: 16 })
         .padding({ left: 12, right: 14, top: 12 })
         .borderRadius({ topLeft: 12, topRight: 12 })
-        .backgroundColor($r('sys.color.white'))
+        .backgroundColor($r('sys.color.background_primary'))
         .layoutWeight(1)
         .scrollBar(BarState.Off)
       }

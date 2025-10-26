@@ -1,6 +1,5 @@
 import {
   AddDnOrderReq,
-  AddressInfo,
   calculatorUtils,
   CarGoodsInfo,
   ConfirmOrderRouter,
@@ -26,7 +25,8 @@ import { common } from '@kit.AbilityKit';
 import { Decimal } from '@kit.ArkTS';
 import { AddressSheetBuilder } from '../components/AddressSheetComp';
 import { GoodsComp } from 'base_ui';
-import { AddressComp } from 'add_address';
+import { AddressComp, AddressInfo } from 'add_address';
+import { getAddressInfoResp } from '../mapper/Index';
 
 @Builder
 export function ConfirmOrderPageBuilder() {
@@ -145,14 +145,16 @@ struct ConfirmOrderPage {
       boxMoney: this.storeModel.orderType === OrderTypeEnum.TAKEAWAY_DELIVERY ? this.boxMoney : 0,
       bagMoney: this.selectBagMoney ? this.storeModel.storeInfo.bagMoney : 0,
     } as AddDnOrderReq
-    HttpRequest.addDnOrder(this.carGoods, req, this.storeModel.storeInfo, this.selectAddress).then((resp: number) => {
-      this.orderId = `${resp}`
-      this.pageStackHelper.replacePathByName('order_list', RouterMap.ORDER_DETAIL_PAGE,
-        { orderId: `${this.orderId}`, isOrderJump: true } as OrderDetailRouter)
-    }).catch((e: BusinessError) => {
-      console.error(`confirmOrder error: ${JSON.stringify(e)}.`);
-      promptAction.showToast({ message: $r('app.string.place_order_failed_msg', JSON.stringify(e)) })
-    })
+    HttpRequest.addDnOrder(this.carGoods, req, this.storeModel.storeInfo, getAddressInfoResp(this.selectAddress))
+      .then((resp: number) => {
+        this.orderId = `${resp}`
+        this.pageStackHelper.replacePathByName('order_list', RouterMap.ORDER_DETAIL_PAGE,
+          { orderId: `${this.orderId}`, isOrderJump: true } as OrderDetailRouter)
+      })
+      .catch((e: BusinessError) => {
+        console.error(`confirmOrder error: ${JSON.stringify(e)}.`);
+        promptAction.showToast({ message: $r('app.string.place_order_failed_msg', JSON.stringify(e)) })
+      })
   }
 
   @Styles
@@ -193,7 +195,7 @@ struct ConfirmOrderPage {
                     Image($r('app.media.ic_position')).width(12);
                     Text(this.storeModel.storeInfo.address)
                       .fontSize(10)
-                      .fontColor($r('sys.color.mask_secondary'))
+                      .fontColor($r('sys.color.font_secondary'))
                       .layoutWeight(1)
                       .maxLines(1)
                       .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -238,7 +240,7 @@ struct ConfirmOrderPage {
                   Text($r('app.string.appointment_time')).fontSize(10).fontColor($r('sys.color.font_primary'))
                   Row() {
                     Text(this.selectTime.getTime() > new Date().getTime() ? Utils.getTime(this.selectTime) :
-                    $r('app.string.pick_now')).fontSize(10).fontColor($r('app.color.mainColor'))
+                      $r('app.string.pick_now')).fontSize(10).fontColor($r('app.color.mainColor'))
                     Image($r('app.media.ic_right2')).width(14).margin({ left: 10 })
                   }.onClick(() => {
                     this.showTimePicker()
@@ -263,7 +265,7 @@ struct ConfirmOrderPage {
                 .borderRadius(12)
                 .layoutWeight(1)
                 .borderColor(this.storeModel.orderType === OrderTypeEnum.PICK_SELF ? $r('app.color.mainColor') :
-                Color.White)
+                  Color.White)
                 .onClick(() => {
                   this.storeModel.orderType = OrderTypeEnum.PICK_SELF
                 })
@@ -282,7 +284,7 @@ struct ConfirmOrderPage {
                 .borderRadius(12)
                 .layoutWeight(1)
                 .borderColor(this.storeModel.orderType === OrderTypeEnum.TAKEAWAY_DELIVERY ? $r('app.color.mainColor') :
-                Color.White)
+                  Color.White)
                 .onClick(() => {
                   this.storeModel.orderType = OrderTypeEnum.TAKEAWAY_DELIVERY
                 })
@@ -313,13 +315,14 @@ struct ConfirmOrderPage {
                 }).visibility(this.selectAddress.id ? Visibility.Visible : Visibility.None)
               }
               .visibility(this.storeModel.orderType === OrderTypeEnum.TAKEAWAY_DELIVERY ? Visibility.Visible :
-              Visibility.None)
+                Visibility.None)
               .bindSheet($$this.addressSheetShow,
                 AddressSheetBuilder(this.selectAddress, (selectAddress?: AddressInfo) => {
                   this.closeAddressSheet(selectAddress)
                 }), {
                   detents: [736, 737],
                   blurStyle: BlurStyle.Thick,
+                  preferType: SheetType.CENTER,
                   showClose: true,
                   backgroundColor: $r('sys.color.background_fourth'),
                   title: { title: $r('app.string.select_address') },
@@ -404,6 +407,7 @@ struct ConfirmOrderPage {
                 .bindSheet($$this.couponSheetShow, this.couponSheetBuilder(), {
                   detents: [600, 601],
                   blurStyle: BlurStyle.Thick,
+                  preferType: SheetType.CENTER,
                   showClose: true,
                   backgroundColor: $r('sys.color.background_fourth'),
                   title: { title: $r('app.string.select_coupon_title') },
@@ -482,7 +486,7 @@ struct ConfirmOrderPage {
                 Row() {
                   Text(this.remarks || $r('app.string.fill_remarks'))
                     .fontSize(12)
-                    .fontColor($r('sys.color.mask_secondary'))
+                    .fontColor($r('sys.color.font_secondary'))
                     .textAlign(TextAlign.End)
                     .width(200)
                     .maxLines(1)
@@ -546,7 +550,7 @@ struct ConfirmOrderPage {
           }
 
           Button($r('app.string.commit_order'))
-            .fontSize(12)
+            .fontSize($r('sys.float.Body_S'))
             .fontWeight(FontWeight.Bold)
             .fontColor($r('sys.color.comp_background_list_card'))
             .width(120)
@@ -575,6 +579,7 @@ struct ConfirmOrderPage {
       .bindSheet($$this.remarkSheet, this.remarkSheetBuilder(), {
         detents: [480, 481],
         blurStyle: BlurStyle.Thick,
+        preferType: SheetType.CENTER,
         showClose: true,
         backgroundColor: $r('sys.color.background_fourth'),
         title: { title: $r('app.string.remark') },
@@ -585,6 +590,7 @@ struct ConfirmOrderPage {
     .bindSheet($$this.cutlerySheetShow, this.cutlerySheetBuilder(), {
       detents: [480, 481],
       blurStyle: BlurStyle.Thick,
+      preferType: SheetType.CENTER,
       showClose: true,
       backgroundColor: $r('sys.color.background_fourth'),
       title: { title: $r('app.string.dinner_num_label') },
@@ -597,10 +603,12 @@ struct ConfirmOrderPage {
       Column() {
         TextArea({ text: $$this.remarksTemp })
           .height(144)
+          .selectedBackgroundColor('#486602')
           .borderRadius(8)
           .width(Constants.FULL_SIZE)
           .showCounter(true)
           .maxLength(100)
+          .caretStyle({ color: '#486602' })
           .backgroundColor($r('sys.color.background_secondary'))
         if (this.storeModel.storeInfo.taste.length) {
           Text($r('app.string.quick_input'))
@@ -821,15 +829,7 @@ struct ConfirmOrderPage {
 
   closeAddressSheet(selectAddress?: AddressInfo) {
     if (selectAddress) {
-      this.selectAddress.id = selectAddress.id
-      this.selectAddress.addressPre = selectAddress.addressPre
-      this.selectAddress.addressNum = selectAddress.addressNum
-      this.selectAddress.name = selectAddress.name
-      this.selectAddress.sex = selectAddress.sex
-      this.selectAddress.tel = selectAddress.tel
-      this.selectAddress.tag = selectAddress.tag
-      this.selectAddress.latitude = selectAddress.latitude
-      this.selectAddress.longitude = selectAddress.longitude
+      this.selectAddress.init(selectAddress)
     }
     this.addressSheetShow = false
   }

@@ -2,6 +2,9 @@ import { IconTextItem } from './Interface';
 
 export const SNAPSHOT_ID = 'SNAPSHOT_ID'
 export const RICH_ID = 'RICH_ID';
+export const WEB_ID = 'editor_web';
+export const CALLBACK_SCHEME = 're-callback://';
+export const STATE_SCHEME = 're-state://';
 
 export const WEEK_MAP = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
 
@@ -43,6 +46,6 @@ export const HIGHLIGHT_COLOR_FILTER: ColorFilter = [
 ];
 
 // 调色盘选项
-export const COLOR_LIST: ResourceColor[] =
-  ['#E5000000', '#FF774342', '#FFFFF200', '#FFFF7F27', '#FFED1C24',
-    '#FFEF88BE', '#FFA349A4', '#FF00A2E8', '#FF22B14C', '#FF888888'];
+export const COLOR_LIST: string[] =
+  ['#000000', '#774342', '#FFF200', '#FF7F27', '#ED1C24',
+    '#EF88BE', '#A349A4', '#00A2E8', '#22B14C', '#888888'];

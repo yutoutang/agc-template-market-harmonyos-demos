@@ -17,8 +17,12 @@
       "value": "签到"
     },
     {
-      "name": "agcit_huawei_web_short_drama",
-      "value": "1.0.2"
+      "name": "agcit_huawei_day_signin",
+      "value": "1.0.0"
+    },
+    {
+      "name": "agcittype_huawei_day_signin",
+      "value": "serviceComponent"
     }
   ]
 }

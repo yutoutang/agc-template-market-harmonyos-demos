@@ -10,7 +10,6 @@ export enum RouterMap {
   MY_COUPONS_PAGE = 'MyCouponsPage',
   USER_INFO_PAGE = 'UserInfoPage',
   ADDRESS_MG_PAGE = 'AddressMgPage',
-  ADD_ADDRESS_PAGE = 'AddAddressPage',
   SELECT_ADDRESS_PAGE = 'SelectAddressPage',
   SELECT_STORE_PAGE = 'SelectStorePage',
   MEMBER_CODE_PAGE = 'MemberCodePage',

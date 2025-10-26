@@ -64,6 +64,7 @@ export struct MenuComp {
     }), {
       detents: [309, 310],
       blurStyle: BlurStyle.Thick,
+      preferType: SheetType.CENTER,
       showClose: true,
       backgroundColor: $r('sys.color.background_fourth'),
       title: { title: $r('app.string.contact_us') },

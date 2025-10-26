@@ -131,7 +131,7 @@ export struct VideoSwiper {
             (item: VideoPlayData, index: number) => index + '__' + JSON.stringify(item)
           )
         }
-        .cachedCount(this.firstFlag ? 0 : 2)
+        .cachedCount(0)
         .width('100%')
         .height('100%')
         .vertical(true)

@@ -38,10 +38,10 @@ export struct HwAdService {
       // 广告请求失败回调
       onAdLoadFailure: (errorCode: number, errorMsg: string) => {
         hilog.error(0x0000, 'testTag', `Failed to load ad. Code is ${errorCode}, message is ${errorMsg}`);
-        this.getUIContext().getPromptAction().showToast({
-          message: `Failed to load ad, errorCode is:  ${errorCode} , errorMsg is: ${errorMsg}`,
-          duration: 1000,
-        });
+        // this.getUIContext().getPromptAction().showToast({
+        //   message: `Failed to load ad, errorCode is:  ${errorCode} , errorMsg is: ${errorMsg}`,
+        //   duration: 1000,
+        // });
       },
       // 广告请求成功回调
       onAdLoadSuccess: (ads: Array<advertising.Advertisement>) => {

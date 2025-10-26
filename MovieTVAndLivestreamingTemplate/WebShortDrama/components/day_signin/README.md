@@ -10,23 +10,21 @@
 
 ## 简介
 
-本组件提供了福利页面的打卡功能，**其中打卡获取金币数据均为mock数据，实际开发中可以做借鉴使用**
+本组件提供了福利页面的打卡功能，**其中打卡获取金币数据均为mock数据，实际开发中可以做借鉴使用**。
 
-| 组件控制                                                |
-|-----------------------------------------------------|
-| <img src="./screenshot/DaySignIn.jpeg" width="300"> |
+<img src="./screenshot/DaySignIn.jpeg" width="300">
 
 ## 约束与限制
 
 ### 软件
 
 * DevEco Studio版本：DevEco Studio 5.0.0 Release及以上
-* HarmonyOS SDK版本：HarmonyOS 5.0.0 Release及以上
+* HarmonyOS SDK版本：HarmonyOS 5.0.0 Release SDK及以上
 
 ### 硬件
 
-* 设备类型：华为手机（直板机）
-* HarmonyOS版本：HarmonyOS 5.0.0 Release及以上
+* 设备类型：华为手机（包括双折叠和阔折叠）
+* 系统版本：HarmonyOS 5.0.0(12)及以上
 
 ## 快速入门
 
@@ -48,9 +46,9 @@
         "srcPath": "./XXX/day_signin",
         }
     ]
-
+   ```
    c. 在项目根目录oh-package.json5中添加依赖。
-   ```typescript
+   ```
     // XXX为组件存放的目录名称
     "dependencies": {
       "day_signin": "file:./XXX/day_signin"
@@ -69,18 +67,16 @@
    import { DaySignIn } from 'day_signin'
    
    @Entry
-   @Component
+   @ComponentV2
    struct Index {
-     pageInfo: NavPathStack = new NavPathStack()
    
      build() {
-       Navigation(this.pageInfo) {
+       Column() {
          DaySignIn({
                 title : "天天看好剧",
                 coinArray : [50,90,30,23,33,44,55,30,23,33,44,55]
          })
        }
-        .hideTitleBar(true)
      }
    }
    ```
@@ -95,19 +91,19 @@
 
 DaySignIn(options?: DaySignInOptions)
 
-福利签到组件。
+福利签到组件
 
 **参数：**
 
-| 参数名     | 类型                                        | 必填 | 说明      |
-|---------|-------------------------------------------|----|---------|
-| options | [DaySignInOptions](#DaySignInOptions对象说明) | 否  | 福利签到组件。 |
+| 参数名     | 类型                                        | 是否必填 | 说明     |
+|---------|-------------------------------------------|------|--------|
+| options | [DaySignInOptions](#DaySignInOptions对象说明) | 否    | 福利签到组件 |
 
 ### DaySignInOptions对象说明
 
-| 名称            | 类型                                   | 必填 | 说明                           |
+| 名称            | 类型                                   | 是否必填 | 说明                           |
 |:--------------|:-------------------------------------|----|------------------------------|
-| title         | string                               | 否  | 活动名称                         |
+| title         | ResourceStr                               | 否  | 活动名称                         |
 | coinArray     | number[]                             | 否  | 活动周期每日获取金币数                  |
 | onSignSuccess | (day: number, balance: number)=>void | 否  | 定义回调函数，day为签到天数，balance为金币奖励 |
 
@@ -117,19 +113,18 @@ DaySignIn(options?: DaySignInOptions)
 import { DaySignIn } from 'day_signin'
    
    @Entry
-   @Component
+   @ComponentV2
    struct Index {
-     pageInfo: NavPathStack = new NavPathStack()
-   
+     bonus: number = 0
+     
      build() {
-       Navigation(this.pageInfo) {
+       Column() {
          DaySignIn({
                 title: "天天看好剧",
                 coinArray: [50, 90, 30, 23, 33, 44, 55, 30, 23, 33, 44, 55],
                 onSignSuccess: (day: number, balance: number) => this.bonus += balance
               })
        }
-        .hideTitleBar(true)
      }
    }
 ```

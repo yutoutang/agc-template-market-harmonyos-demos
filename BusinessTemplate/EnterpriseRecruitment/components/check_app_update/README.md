@@ -26,6 +26,9 @@
 - 设备类型：华为手机（包括双折叠和阔折叠）
 - 系统版本：HarmonyOS 5.0.1及以上
 
+### 权限
+- 网络权限：ohos.permission.INTERNET
+
 
 ## 快速入门
 
@@ -56,13 +59,6 @@
     }
    ```
 
-   d. 在项目根目录AppScope/resources下创建文件夹rawfile, 在rawfile文件夹下创建data.json文件, 内容如下
-   ```json
-   {
-      "app_gallery_url": "https://appgallery.huawei.com/app/detail?id="
-    }
-
-   ```
    
 2. 引入组件。
 
@@ -72,7 +68,15 @@
    
 3. 调用组件(自定升级对话框)。
 
-```typescript
+     在项目根目录AppScope/resources下创建文件夹rawfile, 在rawfile文件夹下创建data.json文件, 内容如下(注:链接后id值为包名)
+   ```json
+   {
+      "app_gallery_url": "https://appgallery.huawei.com/app/detail?id=XXX"
+    }
+
+   ```
+     
+ ```typescript
 import { ComponentContent } from '@kit.ArkUI';
 import { checkUpdate, DialogController, findNewVersion, Params } from 'check_app_update';
 import { common } from '@kit.AbilityKit';
@@ -115,7 +119,6 @@ struct Index {
 
 
 ```typescript
-import { ComponentContent } from '@kit.ArkUI';
 import { checkUpdateAndShowDialog } from 'check_app_update';
 import { common } from '@kit.AbilityKit';
 

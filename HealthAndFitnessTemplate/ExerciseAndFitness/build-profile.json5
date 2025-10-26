@@ -1,0 +1,105 @@
+{
+  "app": {
+    "signingConfigs": [],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+        "compatibleSdkVersion": "5.0.3(15)",
+        "runtimeOS": "HarmonyOS",
+        "buildOption": {
+          "strictMode": {
+            "caseSensitiveCheck": true,
+            "useNormalizedOHMUrl": true
+          }
+        }
+      }
+    ],
+    "buildModeSet": [
+      {
+        "name": "debug"
+      },
+      {
+        "name": "release"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "phone",
+      "srcPath": "./products/phone",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "home",
+      "srcPath": "./features/home"
+    },
+    {
+      "name": "course",
+      "srcPath": "./features/course"
+    },
+    {
+      "name": "plan",
+      "srcPath": "./features/plan"
+    },
+    {
+      "name": "mine",
+      "srcPath": "./features/mine"
+    },
+    {
+      "name": "lib_common",
+      "srcPath": "./commons/lib_common"
+    },
+    {
+      "name": "lib_widget",
+      "srcPath": "./commons/lib_widget"
+    },
+    {
+      "name": "module_transition",
+      "srcPath": "./components/module_transition"
+    },
+    {
+      "name": "lib_account",
+      "srcPath": "./commons/lib_account"
+    },
+    {
+      "name": "setting",
+      "srcPath": "./features/setting"
+    },
+    {
+      "name": "lib_api",
+      "srcPath": "./commons/lib_api"
+    },
+    {
+      "name": "module_feedback",
+      "srcPath": "./components/module_feedback"
+    },
+    {
+      "name": "module_imagepreview",
+      "srcPath": "./components/module_imagepreview"
+    },
+    {
+      "name": "module_chart",
+      "srcPath": "./components/module_chart"
+    },
+    {
+      "name": "module_search",
+      "srcPath": "./components/module_search"
+    },
+    {
+      "name": "module_player",
+      "srcPath": "./components/module_player"
+    },
+    {
+      "name": "aggregated_payment",
+      "srcPath": "./components/aggregated_payment"
+    }
+  ]
+}

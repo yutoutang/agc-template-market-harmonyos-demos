@@ -1,24 +1,23 @@
+import { AvPlayer } from '../controller/AvPlayer'
+
 @ComponentV2
 export struct CoverLayer {
-
-  @Param @Require isPlaying: boolean
-  @Param @Require preparedFlag: boolean
+  @Param @Require avPlayer: AvPlayer
   @Param @Require curIndex: number
   @Param @Require index: number
-  @Param @Require isLoading: boolean
   @Param @Require previewUri: ResourceStr
   @Param @Require xComponentWidth: number | string
   @Param @Require xComponentHeight: number | string
 
   build() {
     Stack({ alignContent: Alignment.Center }) {
-      if (this.curIndex === this.index && !this.isPlaying && this.preparedFlag && !this.isLoading) {
+      if (this.curIndex === this.index && !this.avPlayer.isPlaying) {
         Image($r('app.media.ic_paused'))
           .width(60)
           .height(60)
           .zIndex(2)
       }
-      if (this.curIndex === this.index && !this.preparedFlag) {
+      if (this.curIndex === this.index && this.avPlayer.isBufferUpdate) {
         Column() {
           LoadingProgress()
             .width(50)
@@ -30,7 +29,7 @@ export struct CoverLayer {
         }
         .zIndex(3);
       }
-      if (!this.isPlaying && this.isLoading) {
+      if (!this.avPlayer.isReady) {
         Image(this.previewUri)
           .zIndex(2)
           .width(this.xComponentWidth)

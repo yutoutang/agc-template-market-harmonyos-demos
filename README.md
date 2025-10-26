@@ -46,10 +46,14 @@
     <td><a href="#娱乐票务元服务模板">娱乐票务元服务模板</a></td>
     <td><a href="./EntertainmentTemplate/MuseumTicket/README.md" target="_blank">快速开始</a></td>
   </tr>
-  <tr>
+  <tr rowspan="2">
     <td><a href="#运动健康">运动健康</a></td>
     <td><a href="#健身房元服务模板">健身房元服务模板</a></td>
     <td><a href="./HealthAndFitnessTemplate/FitnessCenter/README.md" target="_blank">快速开始</a></td>
+  </tr>
+  <tr>
+    <td><a href="#运动">运动</a></td>
+    <td><a href="./HealthAndFitnessTemplate/ExerciseAndFitness/README.md" target="_blank">快速开始</a></td>
   </tr>
   <tr>
     <td rowspan="3"><a href="#旅游">旅游</a></td>
@@ -143,6 +147,10 @@
     <td><a href="#综合工具应用模板">综合工具应用模板</a></td>
     <td><a href="./ToolsTemplate/ComprehensiveTool/README.md" target="_blank">快速开始</a></td>
   </tr>
+    <tr>
+    <td><a href="#AI应用模板">AI应用模板</a></td>
+    <td><a href="./ToolsTemplate/AIOffice/README.md" target="_blank">快速开始</a></td>
+  </tr>
   <tr>
     <td rowspan="2"><a href="#儿童">儿童</a></td>
     <td><a href="#儿童教育应用模板">儿童教育应用模板</a></td>
@@ -153,7 +161,7 @@
     <td><a href="./KidsTemplate/PostpartumCareCenter/README.md" target="_blank">快速开始</a></td>
   </tr>
   <tr>
-    <td rowspan="5"><a href="#商务">商务</a></td>
+    <td rowspan="6"><a href="#商务">商务</a></td>
     <td><a href="#办公考勤应用模板">办公考勤应用模板</a></td>
     <td><a href="./BusinessTemplate/OfficeAttendance/README.md" target="_blank">快速开始</a></td>
   </tr>
@@ -416,6 +424,27 @@
 | 首页                              | 预约                                 | 我的                              |
 |---------------------------------|------------------------------------|---------------------------------|
 | <img src="./HealthAndFitnessTemplate//FitnessCenter/screenshots/homePage.png" alt="首页" width="300"> | <img src="./HealthAndFitnessTemplate//FitnessCenter/screenshots/bookingPage.png" alt="产品" width="300"> | <img src="./HealthAndFitnessTemplate/FitnessCenter/screenshots/minePage.png" alt="我的" width="300"> |
+
+## 运动
+
+### 运动应用模板
+
+**功能介绍**
+
+本模板为运动健身类应用提供了常用功能的开发样例，模板主要分首页、课程、计划和我的四大模块：
+
+* 首页：提供运动健身常识普及、热门课程、进阶课程等功能。
+* 课程：提供搜索筛选、课程详情、添加日历、VIP课程、课程视频等功能。
+* 计划：提供一周计划、本周目标、推荐课程、制定计划等功能。
+* 我的：提供个人信息查看、运动记录、意见反馈、设置等功能。
+
+本模板已集成华为账号等服务，只需做少量配置和定制即可快速实现华为账号的登录、媒体播放等功能。
+
+<a href="./HealthAndFitnessTemplate/ExerciseAndFitness/README.md" target="_blank">详细说明</a>
+
+| 首页                                                    | 课程                                                      | 计划                                                    | 我的                                                    |
+| ------------------------------------------------------- | --------------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------- |
+| <img src="./HealthAndFitnessTemplate/ExerciseAndFitness/screenshots/home.png" alt="首页" width="300"> | <img src="./HealthAndFitnessTemplate/ExerciseAndFitness/screenshots/course.png" alt="课程" width="300"> | <img src="./HealthAndFitnessTemplate/ExerciseAndFitness/screenshots/plan.png" alt="计划" width="300"> | <img src="./HealthAndFitnessTemplate/ExerciseAndFitness/screenshots/mine.png" alt="我的" width="300"> |
 
 ## 休闲娱乐
 
@@ -850,6 +879,22 @@
 | 首页                                                      | 我的                                                      |
 |---------------------------------------------------------|---------------------------------------------------------|
 | <img src="./ToolsTemplate/ComprehensiveTool/screenshots/home.png" alt="首页" width="300"> | <img src="./ToolsTemplate/ComprehensiveTool/screenshots/mine.png" alt="我的" width="300"> |
+
+### AI应用模板
+
+**功能介绍**
+
+您可以基于此模板直接定制应用，也可以挑选此模板中提供的多种组件使用，从而降低您的开发难度，提高您的开发效率。
+
+本模板为AI应用提供了常用功能的开发样例，模板主要分为AI对话、AI办公、和我的三大模块：
+
+- AI对话：基于大语言模型提供智能对话功能等智能交互。
+
+- AI办公：主要提供论文写作、AI总结等办公场景的AI能力。
+
+- 我的：提供用户个人信息管理、设置、意见反馈等功能。
+
+<a href="./ToolsTemplate/AIOffice/README.md" target="_blank">详细说明</a>
 
 ## 儿童
 

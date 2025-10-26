@@ -1,6 +1,5 @@
 import { AsWebRichText, Constants, HttpRequest, NavHeaderBar, WindowModel } from 'common/Index';
 import { AppStorageV2 } from '@kit.ArkUI';
-import web_webview from '@ohos.web.webview';
 
 @Builder
 export function PrivacyPageBuilder() {
@@ -12,7 +11,6 @@ struct PrivacyPage {
   @Consumer('pageStack') pageStack?: NavPathStack
   @Local windowModel: WindowModel = AppStorageV2.connect(WindowModel, () => new WindowModel())!
   @Local privacyInfo: string = ''
-  controller: web_webview.WebviewController = new web_webview.WebviewController();
 
   aboutToAppear() {
     this.getPrivacyInfo()

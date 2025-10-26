@@ -185,12 +185,8 @@
       "value": "取消"
     },
     {
-      "name": "agcit_huawei_tea_drink_orders",
-      "value": "1.0.1"
-    },
-    {
       "name": "agcit_huawei_tea_drink_orders_order_detail",
-      "value": "1.0.0"
+      "value": "1.0.1"
     },
     {
       "name": "agcittype_huawei_tea_drink_orders_order_detail",

@@ -14,10 +14,14 @@
 
 此模板提供如下组件，所有组件存放在工程根目录的components下，如果您仅需使用组件，可参考对应组件的指导链接；如果您使用此模板，请参考本文档。
 
-| 组件                   | 描述              | 使用指导                                      |
-|----------------------|-----------------|-------------------------------------------|
-| 滑动视频组件(video_swiper) | 包括滑动视频，视频播放的控制等 | [使用指导](components/video_swiper/README.md) |
-| 投屏组件(module_cast)    | 包括投屏播放控制功能      | [使用指导](components/module_cast/README.md)  |
+| 组件                           | 描述                               | 使用指导                                      |
+| ------------------------------ | ---------------------------------- | --------------------------------------------- |
+| 竖屏滑动视频组件(video_swiper) | 提供滑动视频，视频播放的控制等功能 | [使用指导](components/video_swiper/README.md) |
+| 投屏组件(module_cast)          | 提供投屏播放控制功能               | [使用指导](components/module_cast/README.md)  |
+| 福利签到组件(day_signin)       | 提供福利页面的打卡功能             | [使用指导](components/day_signin/README.md)   |
+| 看广告领奖励组件(look_ad)      | 提供看广告领取奖励的功能           | [使用指导](components/look_ad/README.md)      |
+| 日常任务组件(task_list)        | 提供做日常任务的功能               | [使用指导](components/task_list/README.md)    |
+| 转盘组件(wheel)                | 提供福利转盘的功能                 | [使用指导](components/wheel/README.md)        |
 
 本模板为短剧类应用提供了常用功能的开发样例，模板主要分首页、剧场、我的及详情播放页六大模块：
 
@@ -186,10 +190,10 @@ WebShortDrama
 
 ### 环境
 
-- DevEco Studio版本：DevEco Studio 5.0.0 Release及以上
-- HarmonyOS SDK版本：HarmonyOS 5.0.0 Release SDK及以上
+- DevEco Studio版本：DevEco Studio 5.0.3 Release及以上
+- HarmonyOS SDK版本：HarmonyOS 5.0.3 Release SDK及以上
 - 设备类型：华为手机（包括双折叠和阔折叠）
-- 系统版本：HarmonyOS 5.0.0(12)及以上
+- 系统版本：HarmonyOS 5.0.1(13)及以上
 
 ### 权限
 
@@ -198,7 +202,19 @@ WebShortDrama
 
 ### 调试
 
-本模板不支持模拟器调试，请使用真机调试
+- 本模板支持模拟器调试。**模拟器调试时，支付功能仅为展示，无功能实现，无法实现开屏广告功能**。
+- 本模板支持真机调试，可根据需要进行第三方支付SDK替换。
+  
+```
+修改components\vip_center\oh-package.json5和sdk\aggregated_payment\oh-package.json5中的依赖
+"dependencies": {
+  "@tencent/wechat_open_sdk": "1.0.7",
+  // 支付宝 SDK 官方版本 (当前仅支持真机)
+  // "@cashier_alipay/cashiersdk": "15.8.39",
+  // 支付宝 SDK 兼容版本 (接口一致，功能无实现，用于确保引入支付组件的应用可以在模拟器正常运行)
+  "@cashier_alipay/cashiersdk": "./libs/swallow_alipay_sdk"
+}
+```
 
 ## 快速入门
 
@@ -206,9 +222,8 @@ WebShortDrama
 
 1. 在AppGallery Connect创建应用，将包名配置到模板中。
 
-   a. 参考[创建HarmonyOS应用](https://developer.huawei.com/consumer/cn/doc/app/agc-help-create-app-0000002247955506)
-   为应用创建APP ID，并将APP ID与应用进行关联。
-
+   a. 参考[创建HarmonyOS应用](https://developer.huawei.com/consumer/cn/doc/app/agc-help-create-app-0000002247955506)为应用创建APP ID，并将APP ID与应用进行关联。
+   
    b. 返回应用列表页面，查看应用的包名。
 
    c. 将模板工程根目录下AppScope/app.json5文件中的bundleName替换为创建应用的包名。
@@ -218,8 +233,7 @@ WebShortDrama
    a. 将应用的client
    ID配置到products/entry/src/main路径下的module.json5文件中，详细参考：[配置Client ID](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-client-id)。
 
-   b.
-   申请华为账号一键登录所需的quickLoginMobilePhone权限，详细参考：[配置scope权限](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-config-permissions)。
+   b. 申请华为账号一键登录所需的quickLoginMobilePhone权限，详细参考：[配置scope权限](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-config-permissions)。
 
 3. 配置支付服务。
 
@@ -227,22 +241,13 @@ WebShortDrama
 
 4. 对应用进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing#section297715173233)。
 
-5.
-添加手工签名所用证书对应的公钥指纹。详细参考：[配置应用签名证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-cert-fingerprint-0000002278002933)
+5. 添加手工签名所用证书对应的公钥指纹。详细参考：[配置应用签名证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-cert-fingerprint-0000002278002933)
 
 ### 运行调试工程
 
 1. 连接调试手机和PC。
 
-2. 配置多模块调试：由于本模板存在多个模块，运行时需确保所有模块安装至调试设备。
-
-   a. 运行模块选择“entry”。
-
-   b. 下拉框选择“Edit Configurations”，在“Run/Debug Configurations”界面，选择“Deploy Multi Hap”页签，勾选上模板中所有模块。
-
-   ![调试步骤](./screenshots/调试步骤.png)
-
-   c. 点击"Run"，运行模板工程。
+2. 菜单选择“Run > Run 'entry' ”或者“Run > Debug 'entry' ”，运行或调试模板工程。
 
 ## 示例效果
 

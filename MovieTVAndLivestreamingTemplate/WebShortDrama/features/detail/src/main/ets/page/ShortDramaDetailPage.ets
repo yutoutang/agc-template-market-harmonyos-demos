@@ -1,4 +1,4 @@
-import { AppStorageV2 } from '@kit.ArkUI';
+import { AppStorageV2, PiPWindow } from '@kit.ArkUI';
 import { ShortDramaDetailListVM, ContinueVideoData } from '../viewmodels/ShortDramaDetailListVM';
 import { VideoDetailComponent as VideoDetailComponent } from '../components/VideoDetailMask';
 import {
@@ -25,10 +25,13 @@ import { MyStorage } from '../models/SpeedData';
 import { getDramaInfo } from '@agctemplate/server/src/main/ets/api/mock/mockData/mockDramaFactory';
 import { emitter } from '@kit.BasicServicesKit';
 import { CastListenerImpl } from '../listener/CastListenerImpl';
-import { CastingLayer, CastService } from 'module_cast';
+import { CastService } from 'module_cast';
 import { VideoData } from 'module_cast/src/main/ets/model/VideoData';
-import { VideoDesLayer } from '../components/VideoDesLayer';
 import { Params, PromptActionClass } from '../components/PromptActionClass';
+import { PipManager, PipVideoConfig } from 'module_pip';
+import { MediaSource } from 'video_swiper/src/main/ets/constant/MediaSource';
+import { DetailVideoData } from '../models/DetailVideoData';
+import { JSON } from '@kit.ArkTS';
 
 const TAG: string = 'ShortVideo';
 
@@ -51,13 +54,48 @@ export struct ShortDramaDetailPage {
   @Local storage: MyStorage = MyStorage.instance();
   @Param @Require continueVideoData: ContinueVideoData;
   // 短视频数据
-  @Local vm: ShortDramaDetailListVM = new ShortDramaDetailListVM;
+  @Local vm: ShortDramaDetailListVM = ShortDramaDetailListVM.instance;
   @Local playController: PlayController = new PlayController()
   @Local myWatchRecordRes: MyWatchRecordRes = new MyWatchRecordRes();
   @Local title: string = ''
   @Local userInfo: UserInfoModel = AppStorageV2.connect(UserInfoModel, 'userInfo', () => new UserInfoModel())!
   @Local bonus: number = this.userInfo.bonus
+  isBackground: boolean = false
+  enablePip: boolean = false
+  restoredFromPip: boolean = false
   castListener: CastListenerImpl = new CastListenerImpl(this.playController)
+  isStart: boolean = false
+  pipSurfaceId: string = ''
+  surfaceId?: string = ''
+  private pipStateCallback: Function = (state: PiPWindow.PiPState) => {
+    Logger.info(TAG, `pipStateChange: state ${state}`);
+    if (state === PiPWindow.PiPState.ABOUT_TO_STOP) {
+    }
+    if (state === PiPWindow.PiPState.ABOUT_TO_START) {
+    }
+    if (state === PiPWindow.PiPState.ABOUT_TO_RESTORE) {
+      this.restoredFromPip = true
+    }
+    if (state === PiPWindow.PiPState.ABOUT_TO_STOP) {
+      Logger.info(TAG, 'pip stop')
+      if (!this.restoredFromPip) {
+        Logger.info(TAG, 'pip not restoredFromPip as stop')
+        if (this.isBackground) {
+          // during pip, click pip close
+          this.playController.playIndex(PipManager.getInstance().getIndex())
+          this.playController.pause()
+        } else {
+          // during pip, click app in launcher
+          this.playController.playIndex(PipManager.getInstance().getIndex())
+        }
+      } else {
+        // during pip, click pip restore
+        Logger.info(TAG, 'pip playIndex')
+        this.playController.playIndex(PipManager.getInstance().getIndex())
+      }
+      this.restoredFromPip = false
+    }
+  };
 
   @Monitor('playController.curentIndex',)
   onStrChange(monitor: IMonitor) {
@@ -79,7 +117,7 @@ export struct ShortDramaDetailPage {
       url: videoPlayData.getUrl() as string,
       head: videoPlayData.getPic(),
       name: videoPlayData.getName() + ` 第${this.playController.curentIndex + 1}集`,
-      index: this.currentVideoIndex
+      index: this.currentVideoIndex,
     }
     CastService.getInstance()
       .setAVMetadata(videoData, this.playController.getAVPlayer()?.duration || videoPlayData.getDuration())
@@ -97,16 +135,6 @@ export struct ShortDramaDetailPage {
 
   // 视频数据初始化
   async aboutToAppear() {
-    this.getFavoriteEmitter()
-    this.storage.selectSpeed =
-      PreferenceUtil.getInstance(getContext()).get(PreferConstant.PLAY_SPEED_SETTINGS, '1.0x') as string
-    this.playController.autoPlay = true
-
-    await this.vm.init(this.continueVideoData)
-    CastService.getInstance().registerSessionListener(this.castListener)
-    this.currentVideoIndex = this.continueVideoData.currentIndex || 0
-    WindowManager.setWindowSystemBarProperties({ statusBarContentColor: '#e6ffffff' })
-    // 注册事件监听
     Logger.info(TAG, 'aboutToAppear')
     // 观看记录
     container.resolve(RequestAPI).getMyWatchRecord({
@@ -115,9 +143,76 @@ export struct ShortDramaDetailPage {
     }).then((res) => {
       this.myWatchRecordRes = new MyWatchRecordRes(res.getBody());
     })
+    this.enablePip = PreferenceUtil.getInstance(getContext())
+      .get(PreferConstant.BACKGROUND_MINI_WINDOW_PLAYBACK, false) as boolean
+    Logger.info(TAG, `enablePip:${this.enablePip}`)
+    if (this.enablePip) {
+      PipManager.getInstance().setAutoStart(true)
+    }
+    this.getFavoriteEmitter()
+    this.storage.selectSpeed =
+      PreferenceUtil.getInstance(getContext()).get(PreferConstant.PLAY_SPEED_SETTINGS, '1.0x') as string
+    this.playController.autoPlay = true
+
+    this.vm.deinit()
+    await this.vm.init(this.continueVideoData)
+    CastService.getInstance().registerSessionListener(this.castListener)
+    this.currentVideoIndex = this.continueVideoData.currentIndex || 0
+
+    Logger.info(TAG, `aboutToAppear continueVideoData:${JSON.stringify(this.continueVideoData)}}`)
+    WindowManager.setWindowSystemBarProperties({ statusBarContentColor: '#e6ffffff' })
+    PipManager.getInstance().registerLifecycleCallback(this.pipStateCallback);
+    PipManager.getInstance().registerPipStateChangeListener();
+    this.registerEmitter()
+    let mediaSource: MediaSource[] = [];
+    this.vm.data.videoList.map(item => {
+      mediaSource.push(new MediaSource(item.getId(), item.getUrl() as string, item.isLocked()))
+    })
+    this.playController.setPlayList(mediaSource)
+  }
+
+  registerEmitter() {
+    this.backEmitter()
+    this.foreEmitter()
+  }
+
+  onForeground: Callback<emitter.EventData> = (eventData: emitter.EventData) => {
+    this.isBackground = false
+    Logger.info(TAG, `onForeground: ${JSON.stringify(eventData)}`);
+    this.playController.play()
+  }
+  onBackground: Callback<emitter.EventData> = (eventData: emitter.EventData) => {
+    Logger.info(TAG, `onBackground: ${JSON.stringify(eventData)}`);
+    this.isBackground = true
+    if (!this.enablePip) {
+      this.playController.pause()
+    }
+  }
+
+  backEmitter() {
+    let event: emitter.InnerEvent = {
+      eventId: 1
+    };
+    emitter.on(event, this.onBackground);
+  }
+
+  foreEmitter() {
+    let event: emitter.InnerEvent = {
+      eventId: 2
+    };
+    emitter.on(event, this.onForeground);
+  }
+
+  unEmitter() {
+    Logger.info(TAG, 'on jump')
+    emitter.off(1, this.onBackground)
+    emitter.off(2, this.onForeground)
   }
 
   aboutToDisappear(): void {
+    Logger.info(TAG, 'aboutToDisappear')
+    this.unEmitter()
+    PipManager.getInstance().setAutoStart(false)
     CastService.getInstance().unregisterSessionListener(this.castListener)
     this.storage.selectSpeed =
       PreferenceUtil.getInstance(getContext()).get(PreferConstant.PLAY_SPEED_SETTINGS, '1.0x') as string
@@ -136,6 +231,9 @@ export struct ShortDramaDetailPage {
     } else {
       container.resolve(RequestAPI).setMyWatchRecord(drama)
     }
+    PipManager.getInstance().unregisterPipStateChangeListener();
+    PipManager.getInstance().unRegisterLifecycleCallback(this.pipStateCallback);
+    this.vm.deinit()
   }
 
   build() {
@@ -171,6 +269,43 @@ export struct ShortDramaDetailPage {
         params: { id: this.vm.dramaInfo.id, curIndex: this.playController.curentIndex } as ParamsModel
       })
       return true
+    })
+    .onWillShow(() => {
+      if (this.vm.ready === false) {
+        this.vm.init(this.continueVideoData)
+      }
+    })
+    .onShown(() => {
+      Logger.info(TAG, 'onShown')
+      if (this.enablePip) {
+        if (this.isStart) {
+          Logger.info(TAG, 'pip stop')
+          PipManager.getInstance().stopPip();
+        } else {
+          Logger.info(TAG, 'pip init')
+          PipManager.getInstance().init(this.getUIContext().getHostContext() as Context);
+          this.isStart = true
+        }
+      }
+    })
+    .onHidden(() => {
+      if (!this.enablePip) {
+        Logger.info(TAG, 'onHidden, no pip mode!')
+        return
+      }
+      if ((this.vm.data.getData(this.currentVideoIndex) as DetailVideoData).isLocked()) {
+        PipManager.getInstance().setAutoStart(false)
+        Logger.info(TAG, 'onHidden, no locked pip mode!')
+        return
+      }
+      PipManager.getInstance().setAutoStart(true)
+      // 如果是能小窗播放，设置播放列表到小窗管理器中，小窗管理器内复用播放器实现无缝播放
+      let pipConfig: PipVideoConfig = new PipVideoConfig()
+      this.vm.data.videoList.map(item => {
+        pipConfig.mediaSource.push(new MediaSource(item.getId(), item.getUrl() as string, item.isLocked()))
+      })
+      pipConfig.index = this.playController.curentIndex
+      PipManager.getInstance().startPip(pipConfig)
     })
   }
 

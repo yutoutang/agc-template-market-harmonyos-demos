@@ -9,8 +9,12 @@
       "value": "已完成"
     },
     {
-      "name": "agcit_huawei_web_short_drama",
-      "value": "1.0.2"
+      "name": "agcit_huawei_look_ad",
+      "value": "1.0.0"
+    },
+    {
+      "name": "agcittype_huawei_look_ad",
+      "value": "serviceComponent"
     }
   ]
 }

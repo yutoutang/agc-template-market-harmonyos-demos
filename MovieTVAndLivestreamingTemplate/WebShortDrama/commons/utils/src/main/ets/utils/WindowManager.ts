@@ -36,7 +36,16 @@ export class WindowManager {
       if (display.isFoldable()) {
         if (display.getFoldStatus() === display.FoldStatus.FOLD_STATUS_FOLDED) {
           Logger.info(TAG, "video fold status: " + display.getFoldStatus());
-          await w.setPreferredOrientation(videoFullScreen ? window.Orientation.LANDSCAPE : window.Orientation.PORTRAIT);
+          if (videoFullScreen) {
+            if (isLandscapeVideo) { // 长视频（横屏比例）允许自动旋转
+              await w.setPreferredOrientation(window.Orientation.AUTO_ROTATION_LANDSCAPE_RESTRICTED);
+            } else { // 短视频（竖屏比例）锁定竖屏
+              await w.setPreferredOrientation(window.Orientation.PORTRAIT);
+            }
+          } else {
+            await w.setPreferredOrientation(window.Orientation.PORTRAIT); // 非全屏保持竖屏
+          }
+          // await w.setPreferredOrientation(videoFullScreen ? window.Orientation.LANDSCAPE : window.Orientation.PORTRAIT);
         } else {
           await w.setPreferredOrientation(window.Orientation.AUTO_ROTATION_RESTRICTED);
         }

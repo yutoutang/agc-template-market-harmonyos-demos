@@ -57,7 +57,7 @@ export class ShortDramaDetailItemVM {
   @Trace favoriteCount: string = ''; // 收藏数量
   @Trace shareCount: string = ''; // 分享次数
   @Trace commentCount: string = ''; // 评论数量
-
+  @Trace isLocked:boolean = false
   setFavorite() {
 
   }

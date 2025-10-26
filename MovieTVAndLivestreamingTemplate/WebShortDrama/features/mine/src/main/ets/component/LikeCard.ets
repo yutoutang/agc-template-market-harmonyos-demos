@@ -13,7 +13,7 @@ export struct LikeCard {
     Row() {
       Row() {
         Column() {
-          Image(getMedia(this.likeItem.likeAvatar))
+          Image(this.likeItem.likeAvatar)
             .width(16)
             .aspectRatio(1)
             .borderRadius(8)

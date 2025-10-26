@@ -8,14 +8,14 @@ import {
   BreakPointValue,
   StatusBarHeight,
 } from '@agctemplate/widgets';
-import { appRouter, WindowManager } from '@agctemplate/utils';
+import { appRouter, Logger, WindowManager } from '@agctemplate/utils';
 import { AppStorageV2 } from '@kit.ArkUI';
 
 export interface TabInfo {
   tabHeaderInfo: TabHeaderInfo;
   tabContentBuilder: WrappedBuilder<[number]>;
 }
-
+const TAG = 'MainTabPage'
 @ComponentV2
 export struct MainTabPage {
   @Local currentBreakpoint: BreakPoint = AppStorageV2.connect(BreakPoint, AppStorageKeys.CURRENT_BREAK_POINT,
@@ -27,6 +27,7 @@ export struct MainTabPage {
   @Provider('curTabIndex') currentIndex: number = 0;
   @Provider('tabState') tabState: boolean = true;
   @Local isDarkEnable: boolean = true; // 默认主页为深色tab
+  @Provider('tabShown') tabShown: boolean = true;
   private controller: TabsController = new TabsController();
   private isFirstTimeIn: boolean = true; // 优化首次进入无弹跳效果
 
@@ -95,9 +96,17 @@ export struct MainTabPage {
         bottom: this.currentBreakpoint.value === BreakPointValue.LG ? 0 : `${px2vp(this.aiBarHeight.value)}vp`
       })
     }.onBackPressed(() => {
-      appRouter.back(true)
+      // appRouter.back(true)
       return true;
     }).hideTitleBar(true)
+    .onWillHide(()=>{
+      Logger.info(TAG, 'onWillHide')
+      this.tabShown = false
+    })
+    .onWillShow(()=>{
+      Logger.info(TAG, 'onWillShow')
+      this.tabShown = true;
+    })
   }
 }
 

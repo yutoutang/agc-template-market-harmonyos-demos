@@ -217,6 +217,7 @@ struct DietPlanPage {
 
             Button('确定')
               .backgroundColor(this.vm.selectFoods.length ? '#E84026' : '#1A000000')
+              .fontColor($r('sys.color.font_tertiary'))
               .layoutWeight(1)
               .onClick(() => {
                 this.vm.addDietPlan();

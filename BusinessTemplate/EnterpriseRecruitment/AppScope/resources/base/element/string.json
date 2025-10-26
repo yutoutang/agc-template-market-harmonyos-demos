@@ -6,7 +6,7 @@
     },
     {
       "name": "agcit_huawei_enterprise_recruitment",
-      "value": "2.0.1"
+      "value": "2.0.2"
     },
     {
       "name": "agcittype_huawei_enterprise_recruitment",
@@ -14,7 +14,7 @@
     },
     {
       "name": "agcitkid_huawei_enterprise_recruitment",
-      "value": "agcit_huawei_enterprise_recruitment_file_management/1.0.1,agcit_huawei_enterprise_recruitment_message_manager/1.0.1,agcit_huawei_enterprise_recruitment_check_app_update/1.0.1"
+      "value": "agcit_huawei_enterprise_recruitment_file_management/1.0.1,agcit_huawei_enterprise_recruitment_message_manager/1.0.1,agcit_huawei_enterprise_recruitment_check_app_update/1.0.2"
     }
   ]
 }

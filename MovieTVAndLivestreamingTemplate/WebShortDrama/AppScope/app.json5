@@ -3,7 +3,7 @@
 /*
     todo: 修改应用包名
     */
-    "bundleName": "com.template.xxxxxx",
+    "bundleName": "wldj.1.xxxxxx",
     "vendor": "example",
     "versionCode": 1000000,
     "versionName": "1.0.0",

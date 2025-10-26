@@ -1,3 +1,6 @@
-export { FirstShare } from './src/main/ets/components/FirstShare'
+export { Share } from './src/main/ets/views/Share';
 
-export { SheetShowVM } from './src/main/ets/viewModel/SheetShowVM'
+export { ShareOptions } from './src/main/ets/model/Model';
+
+export { WxShareViewModel } from './src/main/ets/viewModel/WxShareViewModel'
+

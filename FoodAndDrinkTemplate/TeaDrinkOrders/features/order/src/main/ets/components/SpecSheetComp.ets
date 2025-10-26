@@ -249,7 +249,7 @@ struct SpecSheet {
           Button($r('app.string.revert_select'))
             .fontSize($r('sys.float.Body_L'))
             .fontWeight(FontWeight.Medium)
-            .fontColor($r('app.color.fontMainColor'))
+            .fontColor('#486602')
             .backgroundColor($r('sys.color.background_primary'))
             .width(148)
             .height(40)

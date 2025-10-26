@@ -11,3 +11,9 @@ export { PlayController, PlayerLayoutSize } from './src/main/ets/controller/Play
 export { PlaySession } from './src/main/ets/controller/PlaySession'
 
 export { ProcessBar } from './src/main/ets/view/ProcessBar'
+
+export { AvPlayer } from './src/main/ets/controller/AvPlayer'
+
+export { AvPlayerPool } from './src/main/ets/controller/AvPlayerPool'
+
+export { MediaSource } from './src/main/ets/constant/MediaSource'

@@ -112,7 +112,11 @@ export struct MineMainPage {
       .padding({ top: `${px2vp(this.statusBarHeight.value)}vp` })
       .bindSheet($$this.isOpen, this.buildMakeCallComponent(), {
         title: this.buildTitle(),
-        height: 265
+        height: 265,
+        preferType: SheetType.CENTER
+      })
+      .onVisibleAreaChange([0], () => {
+        this.onUserLoginChange()
       })
   }
 

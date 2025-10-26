@@ -8,10 +8,6 @@ export struct MyCarComp {
   @Param @Require isRest: Boolean
   @Param @Require showCarList: Boolean
   @Param carCheck: Array<string> = []
-  @Event changeCarPanel: (value: boolean) => void = () => {
-  };
-  @Event goConfirmOrderCb: (carGoodsSelect: Array<CarGoodsInfo>) => void = () => {
-  };
 
   @Computed
   get carBtnName() {
@@ -33,6 +29,12 @@ export struct MyCarComp {
     })
     return totalMoney
   }
+
+  @Event changeCarPanel: (value: boolean) => void = () => {
+  };
+
+  @Event goConfirmOrderCb: (carGoodsSelect: Array<CarGoodsInfo>) => void = () => {
+  };
 
   build() {
     Row() {
@@ -69,7 +71,7 @@ export struct MyCarComp {
       Button(this.carBtnName)
         .height(32)
         .fontSize(14)
-        .fontColor($r('sys.color.white'))
+        .fontColor($r('sys.color.font_on_primary'))
         .backgroundColor($r('app.color.mainColor'))
         .padding({
           left: 11,
@@ -100,7 +102,7 @@ export struct MyCarComp {
     .width('100%')
     .height(48)
     .padding({ left: 16, right: 16 })
-    .backgroundColor(Color.White)
+    .backgroundColor($r('sys.color.background_primary'))
     .justifyContent(FlexAlign.SpaceBetween)
     .shadow({
       radius: 4,

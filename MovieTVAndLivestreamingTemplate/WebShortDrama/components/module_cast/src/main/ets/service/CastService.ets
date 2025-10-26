@@ -2,24 +2,16 @@ import { AvCastController } from '../controller/AvCastController';
 import { AvSessionController } from '../controller/AvSessionController';
 import { avSession } from '@kit.AVSessionKit';
 import { VideoData } from '../model/VideoData';
-import { promptAction } from '@kit.ArkUI';
+import promptAction from '@ohos.promptAction';
 import { common } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { CastServiceModule,CastSessionListener } from '../model/CastServiceModule'
 
 const TAG = '[CastService]'
 const DOMAIN = 0x000
 
 @ObservedV2
-export class CastService {
-  @Trace isCasting: boolean = false;
-  @Trace isCastPlaying: boolean = false;
-  @Trace castCurrentTime: number = 0
-  @Trace castDuration: number = 0
-  @Trace castResolution: string = ''
-  @Trace castVolume: number = 0;
-  @Trace castMaxVolume: number = 100;
-  @Trace currentDeviceName: string = ''
-  @Trace currentDeviceType: avSession.DeviceType = avSession.DeviceType.DEVICE_TYPE_LOCAL
+export class CastService extends CastServiceModule {
   private static instance: CastService | null;
   private context?: common.UIAbilityContext;
   private sessionController: AvSessionController = AvSessionController.getInstance();
@@ -142,7 +134,7 @@ export class CastService {
     if (this.sessionController) {
       let playbackState: avSession.AVPlaybackState = {
         state: this.isCastPlaying ? avSession.PlaybackState.PLAYBACK_STATE_PLAY :
-        avSession.PlaybackState.PLAYBACK_STATE_PAUSE,
+          avSession.PlaybackState.PLAYBACK_STATE_PAUSE,
         position: position,
         duration: duration
       }
@@ -169,7 +161,7 @@ export class CastService {
     if (this.sessionController) {
       let playbackState: avSession.AVPlaybackState = {
         state: this.isCastPlaying ? avSession.PlaybackState.PLAYBACK_STATE_PLAY :
-        avSession.PlaybackState.PLAYBACK_STATE_PAUSE,
+          avSession.PlaybackState.PLAYBACK_STATE_PAUSE,
         position: {
           elapsedTime: this.castCurrentTime * 1000,
           updateTime: new Date().getTime()
@@ -288,26 +280,6 @@ export class CastService {
     hilog.debug(DOMAIN, TAG, `sessionSeek`)
     this.sessionListener?.onSeek(seekTime)
   };
-}
-
-export interface CastSessionListener {
-  onStartCasting(): void
-
-  onEndCasting(): void
-
-  onPlay(): void
-
-  onPause(): void
-
-  onPlayNext(): void
-
-  onPlayPre(): void
-
-  onSeek(time: number): void
-
-  onFastForward(time: number): void
-
-  onRewind(time: number): void
 }
 
 export interface CastListener {

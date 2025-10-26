@@ -62,7 +62,7 @@ struct MineMessagePage {
           Row({ space: 16 }) {
             ForEach(this.tabsContent, (item: string, index: number) => {
               this.Tab(item, index)
-            })
+            }, (item: string) => item)
           }
           .justifyContent(FlexAlign.Start)
         }
@@ -82,7 +82,7 @@ struct MineMessagePage {
                 CommentLike()
               }
             }
-          })
+          }, (item: string) => item)
         }
         .barHeight(0)
         .animationDuration(100)

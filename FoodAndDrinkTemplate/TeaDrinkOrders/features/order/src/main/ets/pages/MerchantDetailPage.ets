@@ -60,7 +60,7 @@ struct MerchantDetailPage {
                       .textOverflow({ overflow: TextOverflow.Ellipsis })
                     Text(this.storeModel.storeInfo?.address)
                       .fontSize(12)
-                      .fontColor($r('sys.color.mask_secondary'))
+                      .fontColor($r('sys.color.font_secondary'))
                       .lineHeight(14)
                       .constraintSize({ maxWidth: 190 })
                       .maxLines(1)
@@ -106,7 +106,7 @@ struct MerchantDetailPage {
                   Span(Constants.MID_DAY_TIME)
                   Span('-')
                   Span(this.storeModel.storeInfo?.time2)
-                }.margin({ left: 9 }).fontSize(12).fontColor($r('sys.color.mask_secondary')).lineHeight(20)
+                }.margin({ left: 9 }).fontSize(12).fontColor($r('sys.color.font_secondary')).lineHeight(20)
               }
               .width(Constants.FULL_SIZE)
               .margin({ top: 11 })
@@ -189,13 +189,13 @@ struct MerchantDetailPage {
                 Text($r('app.string.food_safe'))
                   .fontSize(12)
                   .fontWeight(500)
-                  .fontColor($r('sys.color.mask_secondary'))
+                  .fontColor($r('sys.color.font_secondary'))
                   .lineHeight(20)
                 Row() {
                   Image($r('app.media.ic_doc_list')).width(16)
                   Text($r('app.string.licensed'))
                     .fontSize(12)
-                    .fontColor($r('sys.color.mask_secondary'))
+                    .fontColor($r('sys.color.font_secondary'))
                     .lineHeight(20)
                     .margin({ left: 5 })
                 }.margin({ left: 24 })
@@ -204,7 +204,7 @@ struct MerchantDetailPage {
                   Image($r('app.media.ic_security')).width(16)
                   Text($r('app.string.worry_free'))
                     .fontSize(12)
-                    .fontColor($r('sys.color.mask_secondary'))
+                    .fontColor($r('sys.color.font_secondary'))
                     .lineHeight(20)
                     .margin({ left: 5 })
                 }.margin({ left: 16 })
@@ -214,13 +214,13 @@ struct MerchantDetailPage {
                 Text($r('app.string.basic_service'))
                   .fontSize(12)
                   .fontWeight(500)
-                  .fontColor($r('sys.color.mask_secondary'))
+                  .fontColor($r('sys.color.font_secondary'))
                   .lineHeight(20)
                 Row() {
                   Image($r('app.media.ic_wifi')).width(16)
                   Text($r('app.string.free_wifi'))
                     .fontSize(12)
-                    .fontColor($r('sys.color.mask_secondary'))
+                    .fontColor($r('sys.color.font_secondary'))
                     .lineHeight(20)
                     .margin({ left: 5 })
                 }.margin({ left: 24 })
@@ -229,7 +229,7 @@ struct MerchantDetailPage {
                   Image($r('app.media.ic_car')).width(16)
                   Text($r('app.string.free_parking'))
                     .fontSize(12)
-                    .fontColor($r('sys.color.mask_secondary'))
+                    .fontColor($r('sys.color.font_secondary'))
                     .lineHeight(20)
                     .margin({ left: 5 })
                 }.margin({ left: 16 })
@@ -248,7 +248,7 @@ struct MerchantDetailPage {
                   Image($r('app.media.ic_news')).width(16).margin({ top: 2 })
                   Text(this.storeModel.storeInfo?.announcement)
                     .fontSize(12)
-                    .fontColor($r('sys.color.mask_secondary'))
+                    .fontColor($r('sys.color.font_secondary'))
                     .lineHeight(20)
                     .layoutWeight(1)
                     .margin({ left: 4 })
@@ -272,6 +272,7 @@ struct MerchantDetailPage {
       }), {
         detents: [309, 310],
         blurStyle: BlurStyle.Thick,
+        preferType: SheetType.CENTER,
         showClose: true,
         backgroundColor: $r('sys.color.background_fourth'),
         title: { title: $r('app.string.contact_us') },

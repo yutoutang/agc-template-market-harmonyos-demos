@@ -37,6 +37,8 @@ export struct MyMessagePage {
   @Local myMessageStorage: MyMessageStorage = MyMessageStorage.instance()
   private controller: TabsController = new TabsController()
   tabsContent: string[] = ['评论回复', '点赞']
+  @Local isReplyListShow: boolean = true
+  @Local isLikeListShow: boolean = true
   deleteDialogController: CustomDialogController = new CustomDialogController({
     builder: AlertDialog({
       content: '是否清空' + (this.currentIndex === 0 ? '评论' : '点赞') + '数据',
@@ -52,11 +54,13 @@ export struct MyMessagePage {
         action: () => {
           if (this.currentIndex === 0) {
             this.myMessageList.map(item => item.replyList = [])
+            this.isReplyListShow = false
             PreferenceUtil.getInstance(getContext()).put(PreferConstant.MY_MESSAGE_LIST_SETTINGS, this.myMessageList)
             this.myMessageList = [...this.myMessageList]
             promptAction.showToast({ message: '操作成功' })
           } else {
             this.myMessageList.map(item => item.likeList = [])
+            this.isLikeListShow = false
             PreferenceUtil.getInstance(getContext()).put(PreferConstant.MY_MESSAGE_LIST_SETTINGS, this.myMessageList)
             this.myMessageList = [...this.myMessageList]
             promptAction.showToast({ message: '操作成功' })
@@ -115,7 +119,7 @@ export struct MyMessagePage {
               Row({ space: 16 }) {
                 ForEach(this.tabsContent, (item: string, index: number) => {
                   this.Tab(item, index)
-                })
+                }, (item: string) => item)
               }
               .justifyContent(FlexAlign.Start)
             }
@@ -128,19 +132,19 @@ export struct MyMessagePage {
             Tabs({ barPosition: BarPosition.Start, controller: this.controller }) {
               ForEach(this.tabsContent, (item: string, index: number) => {
                 TabContent() {
-                  if (index === 0) {
+                  if (index === 0 && this.isReplyListShow) {
                     CommentReplyContent({
                       commentDataList: this.commentDataList,
                       myMessageList: this.myMessageList
                     })
-                  } else {
+                  } else if (index === 1 && this.isLikeListShow) {
                     LikeContent({
                       commentDataList: this.commentDataList,
                       myMessageList: this.myMessageList
                     })
                   }
                 }
-              })
+              }, (item: string) => item)
             }
             .barHeight(0)
             .animationDuration(100)

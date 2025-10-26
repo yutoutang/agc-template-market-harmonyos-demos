@@ -25,14 +25,6 @@
       }
     },
     {
-      "name": "AddAddressPage",
-      "pageSourceFile": "src/main/ets/pages/AddAddressPage.ets",
-      "buildFunction": "AddAddressPageBuilder",
-      "data": {
-        "description": ""
-      }
-    },
-    {
       "name": "SettingPage",
       "pageSourceFile": "src/main/ets/pages/SettingPage.ets",
       "buildFunction": "SettingPageBuilder",

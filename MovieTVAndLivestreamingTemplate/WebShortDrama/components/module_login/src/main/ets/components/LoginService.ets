@@ -8,10 +8,13 @@ import Logger from '../common/Logger';
 import { AggregatedLoginVM } from '../viewmodel/AggregatedLoginVM';
 import { common } from '@kit.AbilityKit';
 import { Channel } from '../model/Index';
-
+import { window } from '@kit.ArkUI';
 
 @ComponentV2
 export struct LoginService {
+  windowStage: window.WindowStage = AppStorage.get('windowStage') as window.WindowStage;
+  // 获取主窗口的方式
+  mainWin: window.Window = this.windowStage.getMainWindowSync();
   vm: AggregatedLoginVM = AggregatedLoginVM.instance;
   /**
    * 应用icon
@@ -79,7 +82,7 @@ export struct LoginService {
   }];
   controller: loginComponentManager.LoginWithHuaweiIDButtonController =
     new loginComponentManager.LoginWithHuaweiIDButtonController()
-      // 需要用户同意协议才能完成华为账号登录，请先设置协议状态为NOT_ACCEPTED，当用户同意协议后设置协议状态为ACCEPTED，才可以完成华为账号登录
+    // 需要用户同意协议才能完成华为账号登录，请先设置协议状态为NOT_ACCEPTED，当用户同意协议后设置协议状态为ACCEPTED，才可以完成华为账号登录
       .setAgreementStatus(loginComponentManager.AgreementStatus.NOT_ACCEPTED)
       .onClickLoginWithHuaweiIDButton((error: BusinessError, response: loginComponentManager.HuaweiIDCredential) => {
         // 处理用户点击一键登录按钮逻辑，灰度传入undefined模拟流程，应用申请权限后，传入error
@@ -372,7 +375,7 @@ export struct LoginService {
             this.isShow = true;
           })
           .bindSheet($$this.isShow, this.loginTypeSheet(),
-            { showClose: false, height: '20%' });
+            { showClose: false, height: '20%', preferType: SheetType.CENTER });
         }.width('100%').margin({ top: 12 });
       };
 
@@ -426,7 +429,16 @@ export struct LoginService {
       .alignItems(VerticalAlign.Center)
       .margin({ bottom: 40 })
 
-    }.constraintSize({ minHeight: '100%' }).justifyContent(FlexAlign.SpaceBetween).padding({ left: 16, right: 16 });
+    }.constraintSize({ minHeight: '100%' }).justifyContent(FlexAlign.SpaceBetween).padding({ left: 16, right: 16 })
+    .onVisibleAreaChange([0], (isExpanding: boolean, currentRatio: number) => {
+      if (isExpanding) {
+        let sysBarProps: window.SystemBarProperties = {
+          statusBarContentColor: '#000000'
+        };
+        this.mainWin.setWindowSystemBarProperties(sysBarProps)
+      }
+
+    })
   }
 
   getQuickLoginAnonymousPhone() {

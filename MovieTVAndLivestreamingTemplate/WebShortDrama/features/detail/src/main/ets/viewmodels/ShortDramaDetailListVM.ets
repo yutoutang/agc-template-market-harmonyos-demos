@@ -6,7 +6,7 @@ import { BaseResponse, container, Logger } from '@agctemplate/utils';
 import { EpisodeListRes } from '@agctemplate/server';
 import { DramaSocialInfo } from './ShortDramaDetailItemVM';
 
-const TAG = 'ShortDramaDetailListVM'
+const TAG = 'DetailListVM'
 
 export interface ContinueVideoData {
   currentIndex?: number,
@@ -31,6 +31,7 @@ export class ShortDramaDetailListVM {
   }
 
   async init(continueVideoData: ContinueVideoData) {
+    Logger.info(TAG, 'init')
     try {
       this.data.videoList = []
       let res: BaseResponse<EpisodeListRes> =
@@ -40,8 +41,13 @@ export class ShortDramaDetailListVM {
       let dramaSocialInfo: DramaSocialInfo =
         new DramaSocialInfo(this.dramaInfo.id, this.dramaInfo.isFavorite, this.dramaInfo.favoriteCount,
           this.dramaInfo.isLike, this.dramaInfo.likeCount)
+      let count = 0
       dramaListRes.episodeList?.map((episodeInfo: EpisodeInfo) => {
         let videoData: DetailVideoData = mapEpisodeInfo(episodeInfo)
+        if(count > 10){
+          videoData.videoMask.isLocked = true
+        }
+        count++
         videoData.videoMask.dramaInfo = this.dramaInfo
         videoData.videoMask.dramaSocialInfo = dramaSocialInfo
         this.data.pushData(videoData);
@@ -55,7 +61,13 @@ export class ShortDramaDetailListVM {
       this.setContinuePlayTime(continueVideoData.currentIndex, continueVideoData.playTime)
     }
   }
-
+  deinit(){
+    Logger.info(TAG, 'deinit')
+    this.data.videoList = []
+    this.dramaInfo = new DramaInfo('')
+    this.playTime = 0
+    this.ready = false
+  }
   private setContinuePlayTime(index: number, playTime: number) {
     (this.data.videoList[index] as DetailVideoData).videoMask.playTime = playTime
   }

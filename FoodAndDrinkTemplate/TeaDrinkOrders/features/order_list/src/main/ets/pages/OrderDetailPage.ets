@@ -65,6 +65,7 @@ struct OrderDetailPage {
         }), {
           detents: [309, 310],
           blurStyle: BlurStyle.Thick,
+          preferType: SheetType.CENTER,
           showClose: true,
           backgroundColor: $r('sys.color.background_fourth'),
           title: { title: $r('app.string.contact_us') },
@@ -93,6 +94,7 @@ struct OrderDetailPage {
         }), {
           detents: [290, 291],
           blurStyle: BlurStyle.Thick,
+          preferType: SheetType.CENTER,
           showClose: true,
           backgroundColor: $r('sys.color.background_fourth'),
           title: { title: $r('app.string.select_pay_type') },

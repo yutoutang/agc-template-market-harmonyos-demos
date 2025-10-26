@@ -137,6 +137,18 @@
     {
       "name": "zip_tool",
       "srcPath": "./components/zip_tool"
+    },
+    {
+      "name": "guitar_tuning",
+      "srcPath": "./components/guitar_tuning"
+    },
+    {
+      "name": "video_clip",
+      "srcPath": "./components/video_clip"
+    },
+    {
+      "name": "clone",
+      "srcPath": "./components/clone"
     }
   ]
 }

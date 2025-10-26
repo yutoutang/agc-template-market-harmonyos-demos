@@ -101,8 +101,7 @@ export struct LookAD {
    */
   toAD(item: SignInClass, index: number) {
     promptAction.showToast({ message: `去看广告${index + 1}` })
-    this.loadAd()
-    item.isLookAD = true
+    this.loadAd(item)
   }
 
   /**
@@ -114,7 +113,7 @@ export struct LookAD {
     this.claimedCount += 1
   }
 
-  public loadAd(): void {
+  public loadAd(item: SignInClass): void {
     // 广告请求回调监听
     const adLoadListener: advertising.AdLoadListener = {
       // 广告请求失败回调
@@ -125,7 +124,7 @@ export struct LookAD {
       onAdLoadSuccess: (ads: Array<advertising.Advertisement>) => {
         hilog.info(0x0000, 'testTag', 'Succeeded in loading ad');
         // 注册激励广告状态监听器
-        new RewardAdStatusHandler().registerPPSReceiver();
+        new RewardAdStatusHandler().registerPPSReceiver(item);
         const adDisplayOptions: advertising.AdDisplayOptions = {
           // 是否静音，默认不静音
           mute: true,

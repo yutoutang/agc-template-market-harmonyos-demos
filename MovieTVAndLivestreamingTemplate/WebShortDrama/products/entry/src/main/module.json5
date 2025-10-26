@@ -7,6 +7,10 @@
     "deviceTypes": [
       "phone"
     ],
+    "querySchemes": [
+      "weixin",
+      "wxopensdk"
+    ],
     "deliveryWithInstall": true,
     "installationFree": true,
     "pages": "$profile:main_pages",
@@ -31,7 +35,8 @@
               "entity.system.home"
             ],
             "actions": [
-              "action.system.home"
+              "action.system.home",
+              "wxentity.action.open"
             ]
           }
         ],

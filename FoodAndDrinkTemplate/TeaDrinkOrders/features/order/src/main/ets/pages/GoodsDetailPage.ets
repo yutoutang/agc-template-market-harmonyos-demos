@@ -13,7 +13,6 @@ import {
   PackageSpec,
   WindowModel,
 } from 'common/Index';
-import web_webview from '@ohos.web.webview';
 import { AppStorageV2, promptAction } from '@kit.ArkUI';
 import { SpecSheetBuilder } from '../components/SpecSheetComp';
 import { Decimal } from '@kit.ArkTS';
@@ -50,7 +49,6 @@ struct GoodsDetailPage {
   private opacityDefaultValue: number = 1;
   // 透明度计算基数
   private opacityComputeRadix: number = 35;
-  controller: web_webview.WebviewController = new web_webview.WebviewController();
 
   aboutToAppear(): void {
     this.getParams();
@@ -100,7 +98,7 @@ struct GoodsDetailPage {
                 .loop(true)
                 .autoPlay(true)
                 .vertical(false)
-                .indicator(new DotIndicator().selectedColor($r('sys.color.multi_color_09')))
+                .indicator(new DotIndicator().selectedColor('#486602'))
                 .interval(2000)
                 .onChange((index) => {
                   this.swiperIndex = index;
@@ -188,6 +186,7 @@ struct GoodsDetailPage {
         }, 430, true, this.packageCar.find((item: GoodsSpecInfo) => this.sheetGoods?.id === item.goodsId)), {
           detents: [430, 431],
           blurStyle: BlurStyle.Thick,
+          preferType: SheetType.CENTER,
           showClose: true,
           backgroundColor: $r('sys.color.background_fourth'),
           title: { title: '' },
@@ -421,7 +420,7 @@ struct GoodsDetailPage {
             .margin({ left: 12, right: 12 })
             .fontSize($r('sys.float.Body_L'))
             .fontWeight(FontWeight.Medium)
-            .fontColor($r('sys.color.mask_secondary'));
+            .fontColor($r('sys.color.font_secondary'));
           Image($r('app.media.ic_add_car')).width(22).onClick(() => {
             this.goodsNum = this.goodsNum + 1
             this.sumPrice = new Decimal(this.goodsSinglePrice).mul(this.goodsNum).toString()
@@ -430,9 +429,9 @@ struct GoodsDetailPage {
       }.width(Constants.FULL_SIZE).justifyContent(FlexAlign.SpaceBetween);
 
       Button($r('app.string.add_car'))
-        .fontSize(14)
+        .fontSize($r('sys.float.Body_M'))
         .fontWeight(500)
-        .fontColor($r('sys.color.white'))
+        .fontColor($r('sys.color.font_on_primary'))
         .width(336)
         .height(40)
         .margin({ top: 16 })

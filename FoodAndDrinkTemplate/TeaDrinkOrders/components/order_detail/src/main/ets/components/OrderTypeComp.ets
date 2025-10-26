@@ -74,18 +74,18 @@ export struct OrderTypeComp {
         .fontWeight(FontWeight.Medium)
         .fontColor($r('sys.color.font_primary'))
       Text() {
-        Span($r('app.string.please')).fontColor($r('sys.color.mask_secondary'))
+        Span($r('app.string.please')).fontColor($r('sys.color.font_secondary'))
         if (this.countdownMin) {
           Span($r('app.string.minute_params', `${this.countdownMin}`)).fontColor('#FF0000')
         }
         Span($r('app.string.second_params', `${this.countdownSec % 60}`)).fontColor('#FF0000')
-        Span($r('app.string.timeout_cancel')).fontColor($r('sys.color.mask_secondary'))
+        Span($r('app.string.timeout_cancel')).fontColor($r('sys.color.font_secondary'))
       }.fontSize(14).margin({ top: 8, bottom: 16 })
 
       Row({ space: 12 }) {
         Text($r('app.string.pay'))
           .fontSize(12)
-          .fontColor(Color.White)
+          .fontColor($r('sys.color.font_on_primary'))
           .backgroundColor('#486602')
           .borderRadius(23)
           .padding({
@@ -99,7 +99,7 @@ export struct OrderTypeComp {
           })
         Text($r('app.string.cancel'))
           .fontSize(12)
-          .fontColor($r('sys.color.mask_secondary'))
+          .fontColor($r('sys.color.font_secondary'))
           .lineHeight(16)
           .borderRadius(23)
           .borderWidth(1)
@@ -133,7 +133,7 @@ export struct OrderTypeComp {
           Row({ space: 12 }) {
             Text($r('app.string.one_more_order'))
               .fontSize(12)
-              .fontColor(Color.White)
+              .fontColor($r('sys.color.font_on_primary'))
               .backgroundColor('#486602')
               .borderRadius(23)
               .padding({
@@ -173,7 +173,7 @@ export struct OrderTypeComp {
             .height(30)
           Text($r('app.string.pick_order_id'))
             .fontSize(14)
-            .fontColor($r('sys.color.white'))
+            .fontColor($r('sys.color.font_on_primary'))
             .backgroundImage($r('app.media.bg_pick_num'))
             .backgroundImageSize({ width: 82, height: 30 })
             .height(30)
@@ -241,7 +241,7 @@ export struct OrderTypeComp {
       Text($r('app.string.use_close_order'))
         .fontSize(10)
         .fontWeight(400)
-        .fontColor($r('sys.color.mask_secondary'))
+        .fontColor($r('sys.color.font_secondary'))
         .margin({ top: 15 })
     }.cardStyle()
     .width('100%')

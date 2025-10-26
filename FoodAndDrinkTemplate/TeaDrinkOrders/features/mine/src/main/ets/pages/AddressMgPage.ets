@@ -1,17 +1,19 @@
 import {
-  AddressInfo,
+  AddressInfo as AddressInfoResp,
   BaseResponse,
   Constants,
   EmptyComp,
   HttpCode,
   HttpRequestApi,
   NavHeaderBar,
-  RouterMap,
+  PermissionUtil,
   Utils,
 } from 'common/Index';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { promptAction } from '@kit.ArkUI';
-import { ADDRESS_TAG_MAP, AddressTagEnum } from 'add_address';
+import { AddAddress, ADDRESS_TAG_MAP, AddressInfo, AddressTagEnum } from 'add_address';
+import { geoLocationManager } from '@kit.LocationKit';
+import { getAddressInfoMapper } from '../mapper/Index';
 
 @Builder
 export function AddressMgPageBuilder() {
@@ -22,6 +24,15 @@ export function AddressMgPageBuilder() {
 struct AddressMgPage {
   @Consumer('pageStack') pageStack?: NavPathStack
   @Local addressList: Array<AddressInfo> = []
+  @Local myLocation?: geoLocationManager.Location
+  @Local addAddressSheetShow: boolean = false
+  @Local modifyAddress: AddressInfo = new AddressInfo()
+
+  aboutToAppear(): void {
+    PermissionUtil.getLocation().then(res => {
+      this.myLocation = res
+    })
+  }
 
   build() {
     NavDestination() {
@@ -29,7 +40,8 @@ struct AddressMgPage {
       Column() {
         Row() {
           Image($r('app.media.ic_plus')).width(28).height(28).onClick(() => {
-            this.pageStack?.pushPathByName(RouterMap.ADD_ADDRESS_PAGE, null)
+            this.modifyAddress = new AddressInfo()
+            this.addAddressSheetShow = true
           })
         }
         .width(Constants.FULL_SIZE)
@@ -68,10 +80,10 @@ struct AddressMgPage {
                     }
 
                     Row() {
-                      Text(address.name).fontSize(12).fontColor($r('sys.color.mask_secondary'))
+                      Text(address.name).fontSize(12).fontColor($r('sys.color.font_secondary'))
                       Text(Utils.getAnonymousTel(address.tel))
                         .fontSize(12)
-                        .fontColor($r('sys.color.mask_secondary'))
+                        .fontColor($r('sys.color.font_secondary'))
                         .margin({ left: 12 })
                     }.margin({ top: 9 })
                   }.alignItems(HorizontalAlign.Start).layoutWeight(1)
@@ -91,7 +103,8 @@ struct AddressMgPage {
                   bottom: 12,
                 })
                 .onClick(() => {
-                  this.pageStack?.pushPathByName(RouterMap.ADD_ADDRESS_PAGE, address.id)
+                  this.modifyAddress = address
+                  this.addAddressSheetShow = true
                 })
               }
               .swipeAction({
@@ -120,8 +133,30 @@ struct AddressMgPage {
       .width(Constants.FULL_SIZE)
       .layoutWeight(1)
       .backgroundColor($r('sys.color.background_secondary'))
+      .bindSheet($$this.addAddressSheetShow, this.addAddressSheet(this.modifyAddress), {
+        detents: [736, 737],
+        blurStyle: BlurStyle.Thick,
+        preferType: SheetType.CENTER,
+        showClose: true,
+        backgroundColor: $r('sys.color.background_fourth'),
+        title: { title: this.modifyAddress?.id ? $r('app.string.modify_address') : $r('app.string.add_address') },
+        onWillDismiss: () => {
+          this.addAddressSheetShow = false
+        },
+      })
     }.hideTitleBar(true).onShown(() => {
       this.getUserAddressList()
+    })
+  }
+
+  @Builder
+  addAddressSheet(selectAddress: AddressInfo) {
+    AddAddress({
+      addressInfo: selectAddress,
+      myLocation: this.myLocation,
+      modifyAddressInfo: (addressInfo: AddressInfo) => {
+        this.modifyAddressInfo(addressInfo)
+      },
     })
   }
 
@@ -156,12 +191,38 @@ struct AddressMgPage {
   }
 
   getUserAddressList() {
-    HttpRequestApi.getUserAddressList().then((resp: BaseResponse<Array<AddressInfo>>) => {
+    HttpRequestApi.getUserAddressList().then((resp: BaseResponse<Array<AddressInfoResp>>) => {
       if (resp.code === HttpCode.SUCCESS) {
-        this.addressList = resp.data
+        this.addressList = resp.data.map((item: AddressInfoResp) => {
+          return getAddressInfoMapper(item);
+        })
       }
     }).catch((e: BusinessError) => {
       console.error(`getUserAddressList error: ${JSON.stringify(e)}.`);
+    })
+  }
+
+  modifyAddressInfo(addressInfo: AddressInfo) {
+    let address = new AddressInfoResp()
+    address.addressPre = addressInfo.addressPre
+    address.addressNum = addressInfo.addressNum
+    address.name = addressInfo.name
+    address.sex = addressInfo.sex
+    address.tel = addressInfo.tel
+    address.tag = addressInfo.tag
+    address.latitude = addressInfo.latitude
+    address.longitude = addressInfo.longitude
+    if (addressInfo.id) {
+      address.id = addressInfo.id
+    }
+    HttpRequestApi.modifyUserAddress(address).then((resp: BaseResponse) => {
+      if (resp.code === HttpCode.SUCCESS) {
+        this.addAddressSheetShow = false
+        this.getUserAddressList()
+      } else {
+        console.info(`modifyUserAddress failed. Error:${resp.msg}`);
+        promptAction.showToast({ message: $r('app.string.save_address_failed') })
+      }
     })
   }
 

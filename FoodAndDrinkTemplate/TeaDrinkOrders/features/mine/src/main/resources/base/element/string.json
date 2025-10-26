@@ -66,11 +66,11 @@
     },
     {
       "name": "relate_account_msg1",
-      "value": "帐号关联失败，请重试~"
+      "value": "账号关联失败，请重试~"
     },
     {
       "name": "relate_account_msg2",
-      "value": "帐号关联失败"
+      "value": "账号关联失败"
     },
     {
       "name": "drink_value",

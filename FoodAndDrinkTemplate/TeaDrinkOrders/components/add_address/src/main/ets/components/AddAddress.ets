@@ -10,7 +10,12 @@ import { AddressTagEnum, Constants } from '../constants/Index';
 export struct AddAddress {
   @Param addressInfo: AddressInfo = new AddressInfo()
   @Param @Require myLocation: geoLocationManager.Location
+  @Local currentAddress: AddressInfo = new AddressInfo()
   @Event modifyAddressInfo: (addressInfo: AddressInfo) => void = () => {
+  }
+
+  aboutToAppear(): void {
+    this.currentAddress.init(this.addressInfo)
   }
 
   @Styles
@@ -19,35 +24,29 @@ export struct AddAddress {
     .margin({ left: Constants.BORDER_WIDTH, right: Constants.BORDER_WIDTH })
     .constraintSize({ maxWidth: Constants.FULL_SIZE })
     .borderRadius(12)
-    .padding(12)
-    .backgroundColor(Color.White);
+    .backgroundColor($r('sys.color.background_primary'));
   }
 
   build() {
     Column({ space: 12 }) {
       Column() {
         Row() {
-          Row() {
-            Text($r('app.string.address'))
-              .fontSize(14)
-              .fontColor($r('sys.color.font_primary'))
-              .fontWeight(FontWeight.Medium)
-              .width(50)
-            Text(this.addressInfo.addressPre || $r('app.string.select_address'))
-              .fontSize(12)
-              .fontColor('#486602')
-              .margin({ left: 4 })
+          Row({ space: 24 }) {
+            Text($r('app.string.address')).labelStyle()
+            Text(this.currentAddress.addressPre || $r('app.string.select_address'))
+              .fontSize($r('sys.float.Body_L'))
+              .fontColor(this.currentAddress.addressPre ? $r('sys.color.font_primary') : $r('sys.color.font_secondary'))
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
           }.layoutWeight(1)
 
-          Image($r('app.media.ic_right')).width(16).margin({ left: 8 })
+          Image($r('app.media.ic_address_right')).width(16).margin({ left: 8 })
         }.width(Constants.FULL_SIZE).justifyContent(FlexAlign.SpaceBetween).onClick(() => {
           if (this.myLocation) {
             let locationChoosingOptions: sceneMap.LocationChoosingOptions = {
               location: {
-                latitude: this.addressInfo.latitude || this.myLocation?.latitude,
-                longitude: this.addressInfo.longitude || this.myLocation?.longitude,
+                latitude: this.currentAddress.latitude || this.myLocation?.latitude,
+                longitude: this.currentAddress.longitude || this.myLocation?.longitude,
               },
               language: 'zh',
               searchEnabled: true,
@@ -55,9 +54,9 @@ export struct AddAddress {
             };
             sceneMap.chooseLocation(getContext(this) as common.UIAbilityContext, locationChoosingOptions)
               .then((data) => {
-                this.addressInfo.addressPre = data.name || ''
-                this.addressInfo.latitude = data.location.latitude
-                this.addressInfo.longitude = data.location.longitude
+                this.currentAddress.addressPre = data.name || ''
+                this.currentAddress.latitude = data.location.latitude
+                this.currentAddress.longitude = data.location.longitude
                 console.info('ChooseLocation', 'Succeeded in choosing location.');
               })
               .catch((err: BusinessError) => {
@@ -67,227 +66,97 @@ export struct AddAddress {
           }
         })
 
-        Divider().margin({ top: 10, bottom: 10 })
+        Divider().margin({ top: 12, bottom: 12 })
         Row() {
-          Row() {
-            Text($r('app.string.house_number'))
-              .fontSize(14)
-              .fontColor($r('sys.color.font_primary'))
-              .fontWeight(FontWeight.Medium)
-              .width(50)
-            TextInput({ text: $$this.addressInfo.addressNum, placeholder: $r('app.string.address_num_tip') })
-              .placeholderFont({ size: 12 })
-              .placeholderColor($r('sys.color.mask_secondary'))
-              .fontSize(12)
-              .showUnderline(true)
-              .underlineColor({
-                normal: '#00000000',
-                typing: '#00000000',
-                error: '#00000000',
-                disable: '#00000000',
-              })
-              .borderWidth(0)
-              .fontColor($r('sys.color.mask_secondary'))
-              .padding({
-                top: 2,
-                bottom: 2,
-              })
-              .layoutWeight(1)
-              .margin({ left: 4 })
+          Row({ space: 24 }) {
+            Text($r('app.string.house_number')).labelStyle()
+            TextInput({ text: $$this.currentAddress.addressNum, placeholder: $r('app.string.address_num_tip') })
+              .inputStyle()
           }.layoutWeight(1)
         }.width(Constants.FULL_SIZE).justifyContent(FlexAlign.SpaceBetween)
 
-        Divider().margin({ top: 10, bottom: 10 })
+        Divider().margin({ top: 12, bottom: 12 })
         Row() {
-          Row() {
-            Text($r('app.string.address_user'))
-              .fontSize(14)
-              .fontColor($r('sys.color.font_primary'))
-              .fontWeight(FontWeight.Medium)
-              .width(50)
-            TextInput({ text: $$this.addressInfo.name })
-              .placeholderFont({ size: 12 })
-              .placeholderColor($r('sys.color.mask_secondary'))
-              .fontSize(12)
-              .fontColor($r('sys.color.mask_secondary'))
-              .showUnderline(true)
-              .underlineColor({
-                normal: '#00000000',
-                typing: '#00000000',
-                error: '#00000000',
-                disable: '#00000000',
-              })
-              .padding({
-                top: 2,
-                bottom: 2,
-              })
-              .layoutWeight(1)
-              .margin({ left: 4 })
+          Row({ space: 24 }) {
+            Text($r('app.string.address_user')).labelStyle()
+            TextInput({ text: $$this.currentAddress.name, placeholder: '输入收货人' }).inputStyle()
               .cancelButton({
-                style: CancelButtonStyle.CONSTANT,
+                style: CancelButtonStyle.INPUT,
                 icon: {
                   size: 16,
                   src: $r('app.media.ic_close'),
                 },
               })
           }.layoutWeight(1)
-
-          Row() {
-            Radio({ value: '1', group: 'sexGroup', indicatorType: RadioIndicatorType.DOT })
-              .checked(this.addressInfo.sex)
-              .radioStyle({
-                checkedBackgroundColor: $r('app.color.mainColor'),
-              })
-              .height(14)
-              .width(14)
-            Text($r('app.string.man')).fontSize(12).fontColor($r('sys.color.font_primary')).margin({ left: 8 })
-            Radio({ value: '2', group: 'sexGroup', indicatorType: RadioIndicatorType.DOT })
-              .checked(false)
-              .radioStyle({
-                checkedBackgroundColor: $r('app.color.mainColor'),
-              })
-              .height(14)
-              .width(14)
-              .margin({ left: 20 })
-            Text($r('app.string.woman')).fontSize(12).fontColor($r('sys.color.font_primary')).margin({ left: 8 })
-          }.margin({ left: 8 })
         }.width(Constants.FULL_SIZE).justifyContent(FlexAlign.SpaceBetween)
 
-        Divider().margin({ top: 10, bottom: 10 })
-        Row() {
-          Text($r('app.string.address_tel'))
-            .fontSize(14)
-            .fontColor($r('sys.color.font_primary'))
-            .fontWeight(FontWeight.Medium)
-            .width(50)
-          TextInput({ text: $$this.addressInfo.tel, placeholder: $r('app.string.address_tel_tip') })
-            .placeholderFont({ size: 12 })
-            .placeholderColor($r('sys.color.mask_secondary'))
-            .fontSize(12)
-            .fontColor($r('sys.color.mask_secondary'))
-            .showUnderline(true)
-            .underlineColor({
-              normal: '#00000000',
-              typing: '#00000000',
-              error: '#00000000',
-              disable: '#00000000',
-            })
-            .padding({
-              top: 2,
-              bottom: 2,
-            })
-            .layoutWeight(1)
-            .margin({ left: 4 })
+        Divider().margin({ top: 12, bottom: 12 })
+        Row({ space: 24 }) {
+          Text($r('app.string.address_tel')).labelStyle()
+          TextInput({ text: $$this.currentAddress.tel, placeholder: $r('app.string.address_tel_tip') }).inputStyle()
             .cancelButton({
-              style: CancelButtonStyle.CONSTANT,
+              style: CancelButtonStyle.INPUT,
               icon: {
                 size: 16,
                 src: $r('app.media.ic_close'),
               },
             })
         }
-      }.cardStyle().margin({ top: 12, left: Constants.BORDER_WIDTH, right: Constants.BORDER_WIDTH })
+      }
+      .cardStyle()
+      .padding({
+        top: 18,
+        bottom: 18,
+        left: 12,
+        right: 12,
+      })
+      .margin({ top: 12, left: Constants.BORDER_WIDTH, right: Constants.BORDER_WIDTH })
 
       Column() {
-        Row() {
-          Text($r('app.string.address_tag'))
-            .fontSize(14)
-            .fontColor($r('sys.color.font_primary'))
-            .fontWeight(FontWeight.Medium)
-            .width(50)
-          Row({ space: 8 }) {
-            Text($r('app.string.address_home'))
-              .fontSize(10)
-              .fontColor(this.addressInfo.tag === AddressTagEnum.HOME ? '#486602' : $r('sys.color.font_primary'))
-              .padding({
-                left: 12,
-                right: 12,
-                top: 2,
-                bottom: 2,
-              })
-              .backgroundColor(this.addressInfo.tag === AddressTagEnum.HOME ? '#339DC540' : Color.White)
-              .border({
-                width: 1,
-                color: this.addressInfo.tag === AddressTagEnum.HOME ? '#486602' : '#80000000',
-                radius: 4,
-              })
+        Row({ space: 12 }) {
+          Text($r('app.string.address_tag')).labelStyle()
+          Row({ space: 12 }) {
+            Text($r('app.string.address_home')).tagStyle(this.currentAddress.tag === AddressTagEnum.HOME)
               .onClick(() => {
-                this.addressInfo.tag = AddressTagEnum.HOME
+                this.currentAddress.tag = AddressTagEnum.HOME
               })
-            Text($r('app.string.address_company'))
-              .fontSize(10)
-              .fontColor(this.addressInfo.tag === AddressTagEnum.COMPANY ? '#486602' : $r('sys.color.font_primary'))
-              .padding({
-                left: 12,
-                right: 12,
-                top: 2,
-                bottom: 2,
-              })
-              .backgroundColor(this.addressInfo.tag === AddressTagEnum.COMPANY ? '#339DC540' : Color.White)
-              .border({
-                width: 1,
-                color: this.addressInfo.tag === AddressTagEnum.COMPANY ? '#486602' : '#80000000',
-                radius: 4,
-              })
+            Text($r('app.string.address_company')).tagStyle(this.currentAddress.tag === AddressTagEnum.COMPANY)
               .onClick(() => {
-                this.addressInfo.tag = AddressTagEnum.COMPANY
+                this.currentAddress.tag = AddressTagEnum.COMPANY
               })
-            Text($r('app.string.address_school'))
-              .fontSize(10)
-              .fontColor(this.addressInfo.tag === AddressTagEnum.SCHOOL ? '#486602' : $r('sys.color.font_primary'))
-              .padding({
-                left: 12,
-                right: 12,
-                top: 2,
-                bottom: 2,
-              })
-              .backgroundColor(this.addressInfo.tag === AddressTagEnum.SCHOOL ? '#339DC540' : Color.White)
-              .border({
-                width: 1,
-                color: this.addressInfo.tag === AddressTagEnum.SCHOOL ? '#486602' : '#80000000',
-                radius: 4,
-              })
+            Text($r('app.string.address_school')).tagStyle(this.currentAddress.tag === AddressTagEnum.SCHOOL)
               .onClick(() => {
-                this.addressInfo.tag = AddressTagEnum.SCHOOL
+                this.currentAddress.tag = AddressTagEnum.SCHOOL
               })
           }
         }.width(Constants.FULL_SIZE)
 
-        Row() {
-          Text($r('app.string.save_address'))
-            .fontSize(14)
-            .fontColor(Color.White)
-            .fontWeight(FontWeight.Medium)
-            .padding({ top: 6, bottom: 6 })
-        }
-        .width(Constants.FULL_SIZE)
-        .height(40)
-        .constraintSize({ maxWidth: Constants.FULL_SIZE })
-        .margin({ left: 4, right: 4, top: 32 })
-        .backgroundColor('#486602')
-        .borderRadius(16)
-        .justifyContent(FlexAlign.Center)
-        .onClick(() => {
-          if (!this.addressInfo.addressPre) {
-            promptAction.showToast({ message: $r('app.string.select_address_pre') })
-            return
-          } else if (!this.addressInfo.addressNum) {
-            promptAction.showToast({ message: $r('app.string.input_address_num') })
-            return
-          } else if (!this.addressInfo.name) {
-            promptAction.showToast({ message: $r('app.string.input_address_user') })
-            return
-          } else if (!this.addressInfo.tel) {
-            promptAction.showToast({ message: $r('app.string.input_address_tel') })
-            return
-          } else if (this.addressInfo.tel.length < Constants.TELEPHONE_LENGTH) {
-            promptAction.showToast({ message: $r('app.string.address_tel_error') })
-            return
-          }
-          this.modifyAddressInfo(this.addressInfo)
-        })
+        Button($r('app.string.save_address'))
+          .width(Constants.FULL_SIZE)
+          .constraintSize({ maxWidth: Constants.FULL_SIZE })
+          .margin({ left: 12, right: 12, top: 24 })
+          .backgroundColor('#486602')
+          .onClick(() => {
+            if (!this.currentAddress.addressPre) {
+              promptAction.showToast({ message: $r('app.string.select_address_pre') })
+              return
+            } else if (!this.currentAddress.addressNum) {
+              promptAction.showToast({ message: $r('app.string.input_address_num') })
+              return
+            } else if (!this.currentAddress.name) {
+              promptAction.showToast({ message: $r('app.string.input_address_user') })
+              return
+            } else if (!this.currentAddress.tel) {
+              promptAction.showToast({ message: $r('app.string.input_address_tel') })
+              return
+            } else if (this.currentAddress.tel.length < Constants.TELEPHONE_LENGTH) {
+              promptAction.showToast({ message: $r('app.string.address_tel_error') })
+              return
+            }
+            this.modifyAddressInfo(this.currentAddress)
+          })
 
-      }.cardStyle()
+      }.cardStyle().padding(12)
     }
     .layoutWeight(1)
   }
@@ -307,4 +176,46 @@ export struct AddAddress {
       return '#33FFC62F'
     }
   }
+}
+
+@Extend(Text)
+function labelStyle() {
+  .fontSize($r('sys.float.Subtitle_M'))
+  .fontColor($r('sys.color.font_primary'))
+  .fontWeight(FontWeight.Medium)
+  .width(48)
+}
+
+@Extend(Text)
+function tagStyle(isCheck: boolean) {
+  .fontSize($r('sys.float.Body_M'))
+  .fontWeight(FontWeight.Medium)
+  .fontColor(isCheck ? $r('sys.color.font_on_primary') : $r('sys.color.font_primary'))
+  .padding({
+    left: 12,
+    right: 12,
+    top: 4,
+    bottom: 4,
+  })
+  .backgroundColor(isCheck ? '#486602' : $r('sys.color.comp_background_tertiary'))
+  .borderRadius(14)
+}
+
+@Extend(TextInput)
+function inputStyle() {
+  .placeholderColor($r('sys.color.font_secondary'))
+  .fontSize($r('sys.float.Body_L'))
+  .fontColor($r('sys.color.font_primary'))
+  .fontSize($r('sys.float.Body_L'))
+  .caretColor('#486602')
+  .showUnderline(true)
+  .underlineColor({
+    normal: '#00000000',
+    typing: '#00000000',
+    error: '#00000000',
+    disable: '#00000000',
+  })
+  .borderWidth(0)
+  .padding({ top: 2, bottom: 2 })
+  .layoutWeight(1)
 }

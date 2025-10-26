@@ -10,7 +10,7 @@
 
 ## 简介
 
-本组件提供了新建和展示联系地址功能，可以地图选点获取位置信息，输入联系人信息保存后可以展示信息。
+本组件提供了新建和展示联系地址功能，可以通过地图选点获取位置信息，输入联系人信息保存后可以展示信息。
 
 <img src="./screenshot/Screenshot_1.jpeg" width="300">
 
@@ -31,7 +31,7 @@
 ## 快速入门
 
 1. 安装组件。  
-   如果是在DevEvo Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
+   如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
    如果是从生态市场下载组件，请参考以下步骤安装组件。  
    a. 解压下载的组件包，将包中所有文件夹拷贝至您工程根目录的xxx目录下。  
    b. 在项目根目录build-profile.json5并添加add_address模块。
@@ -168,10 +168,10 @@ AddAddress(options?: AddAddressOptions)
 
 ### AddAddressOptions对象说明
 
-| 名称          | 类型                                                                                                                | 必填 | 说明       |
-|-------------|-------------------------------------------------------------------------------------------------------------------|----|----------|
-| addressInfo | [AddressInfo](#AddressInfo对象说明)                                                                                   | 否  | 选择修改地址信息 |
-| myLocation  | [Location](https://developer.huawei.com/consumer/cn/doc/harmonyos-references/js-apis-geolocationmanager#location) | 是  | 我的位置信息   |
+| 名称          | 类型                                                                                                                | 是否必填 | 说明       |
+|-------------|-------------------------------------------------------------------------------------------------------------------|------|----------|
+| addressInfo | [AddressInfo](#AddressInfo对象说明)                                                                                   | 否    | 选择修改地址信息 |
+| myLocation  | [Location](https://developer.huawei.com/consumer/cn/doc/harmonyos-references/js-apis-geolocationmanager#location) | 是    | 我的位置信息   |
 
 ### AddressInfo对象说明
 

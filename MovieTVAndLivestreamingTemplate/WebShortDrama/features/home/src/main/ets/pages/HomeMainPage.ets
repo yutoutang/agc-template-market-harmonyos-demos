@@ -3,6 +3,7 @@ import { DramaDesComponent } from '../components/DramaDes';
 import { PlayErrorLayer } from '../components/PlayErrorLayer';
 import { DramaListVM } from '../viewmodel/DramaListVM';
 import { emitter } from '@kit.BasicServicesKit';
+import { Logger } from '@agctemplate/utils';
 
 const TAG = 'HomeMainPage'
 
@@ -15,12 +16,14 @@ export struct HomeMainPage {
   @Monitor('curTabIndex')
   onIndexChange(monitor: IMonitor) {
     monitor.dirty.forEach((path: string) => {
-      console.log(`${path} change from ${monitor.value(path)?.before} to ${monitor.value(path)?.now}`);
-      let curIndex = monitor.value(path)?.now as number
-      if (this.index === curIndex) {
-        this.playController.play();
-      } else {
-        this.playController.pause()
+      Logger.debug(TAG, `${path} change from ${monitor.value(path)?.before} to ${monitor.value(path)?.now}`);
+      if (path === 'curTabIndex') {
+        let curIndex = monitor.value(path)?.now as number
+        if (this.index === curIndex) {
+          this.playController.play();
+        } else {
+          this.playController.pause()
+        }
       }
     })
   }
@@ -29,7 +32,7 @@ export struct HomeMainPage {
   playController: PlayController = new PlayController()
 
   aboutToAppear(): void {
-
+    Logger.info(TAG, 'main aboutToAppear')
     this.getDeleteEmitter()
     this.getDetailInfoFavoriteEmitter()
     this.getSideFavoriteEmitter()
@@ -37,7 +40,7 @@ export struct HomeMainPage {
       this.noFlash = false;
     }, 1000);
     this.vm.init()
-    this.playController.autoPlay = true
+    this.playController.autoPlay = false
   }
 
   getDeleteEmitter() {
@@ -78,8 +81,12 @@ export struct HomeMainPage {
           playController: this.playController,
           videoPlayDataSource: this.vm.data,
           contentBuilder: wrapBuilder(DramaDesComponent),
-          refresh: () => { this.vm.refresh() },
-          loadMore: () => { this.vm.init() },
+          refresh: () => {
+            this.vm.refresh()
+          },
+          loadMore: () => {
+            this.vm.init()
+          },
           inPage: 'Home'
         })
           .width('100%')
@@ -89,13 +96,15 @@ export struct HomeMainPage {
       .width('100%')
       .height('100%')
       .backgroundColor(Color.Black)
-    } else if(!this.noFlash) {
-      PlayErrorLayer({ vm: this.vm})
+    } else if (!this.noFlash) {
+      PlayErrorLayer({ vm: this.vm })
     }
   }
 }
 
 @Builder
 export function HomeMainPageBuilder(index: number) {
-  HomeMainPage({ index: index })
+  HomeMainPage({
+    index: index
+  })
 }

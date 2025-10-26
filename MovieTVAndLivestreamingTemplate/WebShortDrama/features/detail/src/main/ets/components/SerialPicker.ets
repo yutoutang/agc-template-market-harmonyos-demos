@@ -3,6 +3,10 @@ import { DramaInfo } from '@agctemplate/server'
 import { appRouter, WindowManager } from '@agctemplate/utils'
 import { PlayController } from 'video_swiper'
 import { util } from '@kit.ArkTS'
+import { ShortDramaDetailListVM } from '../viewmodels/ShortDramaDetailListVM'
+import { DetailVideoData } from '../models/DetailVideoData'
+import { UserInfoModel } from '@agctemplate/widgets'
+import { AppStorageV2 } from '@kit.ArkUI'
 
 export class ActorInfo {
   id: string = ''
@@ -103,9 +107,11 @@ export struct SerialPicker {
   @Param @Once spliceNum: number = 30
   @Param @Once currentIndex: number = 5
   @Local currentTabIndex: number = 0
+  @Local shortDramaDetailListVM: ShortDramaDetailListVM = ShortDramaDetailListVM.instance
   @Event closeSheet: () => void
   @Event onIndexSelect: (index: number) => void = (index: number) => {
   };
+  @Local userInfo: UserInfoModel = AppStorageV2.connect(UserInfoModel, 'userInfo', () => new UserInfoModel())!
   pageStack: NavPathStack = new NavPathStack();
   totalTabIndex: number = 0
   leftIndex: number = 0
@@ -179,15 +185,14 @@ export struct SerialPicker {
                           .fontSize($r('sys.float.Body_M'))
                           .backgroundColor(this.currentIndex === (index * this.spliceNum + indexIndex) ?
                             'rgba(236, 110, 69, 0.05)' : $r('sys.color.background_secondary'))
-                        if(this.currentIndex === (index * this.spliceNum + indexIndex)) {
+                        if (this.currentIndex === (index * this.spliceNum + indexIndex)) {
                           Image(getMedia('app.media.playing'))
                             .width(10)
                             .height(8)
                             .margin({ bottom: 3, right: 3 })
                         }
-                        if((index * this.spliceNum + indexIndex) > 10 && !PlayController.lockedDrama.get(
-                          this.playController.id)?.includes((index * this.spliceNum + indexIndex)) &&
-                          !this.playController.isVip) {
+                        if ((index * this.spliceNum + indexIndex) > 10 &&
+                        this.isLocked(index * this.spliceNum + indexIndex)) {
                           Image(getMedia('app.media.icon_Lock'))
                             .width(16)
                             .height(16)
@@ -212,15 +217,14 @@ export struct SerialPicker {
                           .fontSize($r('sys.float.Body_M'))
                           .backgroundColor(this.currentIndex === (index * this.spliceNum + indexIndex) ?
                             'rgba(236, 110, 69, 0.05)' : $r('sys.color.background_secondary'))
-                        if(this.currentIndex === (index * this.spliceNum + indexIndex)) {
+                        if (this.currentIndex === (index * this.spliceNum + indexIndex)) {
                           Image(getMedia('app.media.playing'))
                             .width(10)
                             .height(8)
                             .margin({ bottom: 3, right: 3 })
                         }
-                        if((index * this.spliceNum + indexIndex) > 10 && !PlayController.lockedDrama.get(
-                          this.playController.id)?.includes((index * this.spliceNum + indexIndex)) &&
-                          !this.playController.isVip) {
+                        if ((index * this.spliceNum + indexIndex) > 10 &&
+                        this.isLocked(index * this.spliceNum + indexIndex)) {
                           Image(getMedia('app.media.icon_Lock'))
                             .width(16)
                             .height(16)
@@ -249,5 +253,20 @@ export struct SerialPicker {
     .alignContent(Alignment.BottomEnd)
     .height(487)
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
+  }
+
+  isLocked(index: number): boolean {
+    try {
+      if (this.userInfo.isVip) {
+        return false
+      }
+      if (!(this.shortDramaDetailListVM.data.getData(index) as DetailVideoData).videoMask.isLocked) {
+        return false
+      }
+      return true
+    }catch (err){
+      console.info('can not read video isLocked!')
+      return false
+    }
   }
 }
