@@ -150,6 +150,7 @@ export struct HistoryModal {
     Column() {}
     .bindSheet(this.isSheetVisible, this.buildSheetContent(), {
       height: SheetSize.LARGE,
+      preferType: SheetType.CENTER,
       backgroundColor: '#FAFAFA',
       title: { title: '历史记录' },
       dragBar: true,

@@ -1,11 +1,11 @@
 {
   "string": [
     {
-      "name": "agcit_huawei_full_service_hotel_module_date_selector",
+      "name": "agcit_huawei_home_stay_calendar_select",
       "value": "1.0.0"
     },
     {
-      "name": "agcittype_huawei_full_service_hotel_module_date_selector",
+      "name": "agcittype_huawei_home_stay_calendar_select",
       "value": "serviceComponent"
     }
   ]

@@ -33,7 +33,7 @@ export default struct HotelOrderPage {
 
       this.paymentPanelBuilder();
     }
-    .title(this.vm.pageTitle)
+    .title(this.vm.pageTitle, { backgroundColor: $r('app.color.background_color_grey') })
     .backgroundColor($r('app.color.background_color_grey'));
   }
 

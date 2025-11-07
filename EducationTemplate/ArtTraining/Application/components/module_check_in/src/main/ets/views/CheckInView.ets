@@ -1,4 +1,4 @@
-import { CommonButton, ContainerColumn } from 'module_ui_base';
+import { BreakpointStorage, BreakpointSystem, BreakpointTypeEnum, CommonButton, ContainerColumn } from 'module_ui_base';
 import { CheckInDataModel } from '../commons/Models';
 import { MediaPreviewSheet } from '../components/MediaPreviewSheet';
 import { PickerPreviewItem, PickerResourceType, PickerUtil } from '../utils/PickerUtil';
@@ -25,11 +25,25 @@ export struct CheckInView {
   showPreview: boolean = false;
   @Local
   previewItem: PickerPreviewItem | undefined = undefined;
+  @Local
+  curBreakpoint: BreakpointStorage = BreakpointSystem.currentBreakpoint
 
   @Computed
   get previewGridHeight() {
     const rowNum = Math.ceil(this.pickerUtil.mediaPreviewList.length / 3);
     return rowNum * 118;
+  }
+
+  @Computed
+  get previewGridTemplate(){
+    if(this.curBreakpoint.value === BreakpointTypeEnum.MD){
+      return '1fr 1fr 1fr 1fr 1fr'
+    }
+    return '1fr 1fr 1fr'
+  }
+
+  aboutToAppear(): void {
+    BreakpointSystem.register(this.getUIContext())
   }
 
   aboutToDisappear(): void {
@@ -159,12 +173,15 @@ export struct CheckInView {
         });
       }, (item: PickerPreviewItem, index: number) => index + JSON.stringify(item.uri));
     }
-    .columnsTemplate('1fr 1fr 1fr')
+    .columnsTemplate(this.previewGridTemplate)
     .columnsGap(8)
     .rowsGap(8)
     .margin({ top: $r('app.string.space_m') })
     .height(this.previewGridHeight)
-    .bindSheet($$this.showPreview, this.fullScreenPreviewBuilder(), { showClose: false });
+    .bindSheet($$this.showPreview, this.fullScreenPreviewBuilder(), {
+      showClose: false,
+      preferType:SheetType.CENTER,
+    });
 
   }
 

@@ -28,7 +28,7 @@ struct FollowersPage {
               }
 
               Button(item.isFollower ? '已关注' : '关注', { controlSize: ControlSize.SMALL })
-                .fontSize(14)
+                .fontSize($r('sys.float.Body_M'))
                 .fontColor(item.isFollower ? '#E84026' : $r('sys.color.font_on_primary'))
                 .fontWeight(FontWeight.Medium)
                 .backgroundColor(item.isFollower ? '#33FD4238' : '#FD4238')

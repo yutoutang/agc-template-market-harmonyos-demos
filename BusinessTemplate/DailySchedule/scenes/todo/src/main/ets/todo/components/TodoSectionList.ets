@@ -1,12 +1,17 @@
 import { TodoDataManager } from '../../mock/TodoDataManager';
 import { TodoSection } from '../components/TodoSection';
 import { ExtInfo, FilterInfo } from '../../mock/TitleDataManager';
-import { UpdateTodoPlanTimeInfo } from '../../mock/UpdateTodoInfo';
+import { UpdateTodoPlanTimeVM } from '../../mock/TodoInfoVM';
 import { DatePickerUpdater } from '../components/DatePickerUpdater';
 import { SectionParam } from '../../types/Types';
+import { AppStorageV2 } from '@kit.ArkUI';
+import { BreakpointType, GlobalInfoModel } from '@ohos_agcit/daily_schedule_utils';
 
 @ComponentV2
 export struct TodoSectionList {
+  @Local maxLen: number = 16
+  @Local globalInfo: GlobalInfoModel =
+    AppStorageV2.connect<GlobalInfoModel>(GlobalInfoModel, () => new GlobalInfoModel())!;
   @Param labels: string[] = []
   @Param params: SectionParam[] = []
   @Param onScrollStartInvoke: () => void = () => {
@@ -14,9 +19,9 @@ export struct TodoSectionList {
   @Param onScrollEdgeInvoke: () => void = () => {
   }
   scroller: Scroller = new Scroller()
+  vm: UpdateTodoPlanTimeVM = UpdateTodoPlanTimeVM.instance
   dataManager: TodoDataManager = TodoDataManager.instance
   statusManager: FilterInfo = FilterInfo.instance
-  updateTodoInfo: UpdateTodoPlanTimeInfo = UpdateTodoPlanTimeInfo.instance
   extInfo: ExtInfo = ExtInfo.instance
   deleteDialogController: CustomDialogController = new CustomDialogController({
     builder: () => {
@@ -33,13 +38,26 @@ export struct TodoSectionList {
     alignment: DialogAlignment.Center
   });
 
+  /**
+   * 监听断点变化
+   * @param index
+   */
+  @Monitor('globalInfo.currentBreakpoint')
+  onCurrentBreakpointChange() {
+    this.maxLen = new BreakpointType<number>({
+      sm: 16,
+      md: 32,
+      lg: 48,
+    }).getValue(this.globalInfo.currentBreakpoint)
+  }
+
   onDelete(taskID: string) {
-    this.updateTodoInfo.deleteTaskID = taskID
+    this.vm.deleteTaskID = taskID
     this.deleteDialogController.open()
   }
 
   onModify(taskID: string) {
-    this.updateTodoInfo.modifyTaskID = taskID
+    this.vm.modifyTaskID = taskID
     this.modifyDialogController.open()
   }
 
@@ -51,6 +69,7 @@ export struct TodoSectionList {
             TodoSection({
               label: item.label,
               todoItems: item.data,
+              maxLen: this.maxLen,
               onDelete: (taskID) => {
                 this.onDelete(taskID)
               },
@@ -59,7 +78,7 @@ export struct TodoSectionList {
               }
             })
           }
-        },(item: SectionParam)=>JSON.stringify(item))
+        }, (item: SectionParam) => JSON.stringify(item))
       }
       .zIndex(1)
     }
@@ -111,7 +130,7 @@ export struct TodoSectionList {
         .justifyContent(FlexAlign.Center)
         .width('50%')
         .onClick(() => {
-          this.dataManager.deleteById(this.updateTodoInfo.deleteTaskID)
+          this.dataManager.deleteById(this.vm.deleteTaskID)
           this.deleteDialogController.close();
         })
       }
@@ -155,7 +174,7 @@ export struct TodoSectionList {
         .justifyContent(FlexAlign.Center)
         .width('50%')
         .onClick(() => {
-          this.dataManager.updateTaskPlanTime(this.updateTodoInfo.modifyTaskID, this.updateTodoInfo.modifyPlanTime)
+          this.dataManager.updateTaskPlanTime(this.vm.modifyTaskID, this.vm.modifyPlanTime)
           this.modifyDialogController.close();
         })
       }

@@ -1,18 +1,19 @@
 import { FormatUtil } from '@ohos_agcit/daily_schedule_common_lib';
 import { curves } from '@kit.ArkUI';
+import {AddTodoVM} from '../../mock/TodoInfoVM'
 
 @ComponentV2
 export struct DatePickerComponent {
+  vm: AddTodoVM = AddTodoVM.instance
   @Local isDatePickerFocus: boolean = false;
   @Local isTimePickerFocus: boolean = false;
-  @Consumer('selectedTime') selectedTime: Date = new Date('2022-07-22T08:00:00');
 
   build() {
     Column() {
       Row() {
-        Text('时间').fontSize($r('sys.float.Body_L')).fontWeight(500)
+        Text('时间').fontSize($r('sys.float.Body_L')).fontWeight(FontWeight.Medium)
         Blank()
-        Button(FormatUtil.formatTimeToCN(this.selectedTime))
+        Button(FormatUtil.formatTimeToCN(this.vm.selectedTime))
           .height(28)
           .width(140)
           .fontSize($r('sys.float.Body_M'))
@@ -25,7 +26,7 @@ export struct DatePickerComponent {
             }
           })
         Blank().width(5)
-        Button(FormatUtil.formatDate(this.selectedTime, FormatUtil.DATE_24H_mm))
+        Button(FormatUtil.formatDate(this.vm.selectedTime, FormatUtil.DATE_24H_mm))
           .height(28)
           .width(70)
           .fontSize($r('sys.float.Body_M'))
@@ -54,7 +55,7 @@ export struct DatePickerComponent {
         DatePicker({
           start: new Date('1970-1-1'),
           end: new Date('2100-1-1'),
-          selected: this.selectedTime
+          selected: this.vm.selectedTime
         })
           .height(180)
           .expandSafeArea()
@@ -74,14 +75,14 @@ export struct DatePickerComponent {
           })
           .lunar(false)
           .onDateChange((value: Date) => {
-            this.selectedTime = value
+            this.vm.selectedTime = value
             console.info('select current date is: ' + value.toString());
           })
       }
       if (this.isTimePickerFocus) {
         // 时间选择器
         TimePicker({
-          selected: this.selectedTime
+          selected: this.vm.selectedTime
         })
           .height(180)
           .textStyle({
@@ -101,7 +102,7 @@ export struct DatePickerComponent {
           .useMilitaryTime(true)
           .onChange((value: TimePickerResult) => {
             if (value.hour >= 0) {
-              this.selectedTime.setHours(value.hour, value.minute);
+              this.vm.selectedTime.setHours(value.hour, value.minute);
               console.info('select current time is: ' + JSON.stringify(value));
             }
           })

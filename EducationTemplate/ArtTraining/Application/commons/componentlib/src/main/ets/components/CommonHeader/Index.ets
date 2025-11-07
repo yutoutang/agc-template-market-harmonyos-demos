@@ -13,28 +13,41 @@ export struct CommonHeader {
   }
 
   build() {
-    Row() {
-      if (this.showBackButton) {
-        Row() {
-          Image($r('app.media.ic_arrow_left'))
-            .fillColor($r('app.color.font_color_level1'))
-            .height($r('app.integer.icon_size_24'))
-            .margin({ right: $r('app.string.margin_m') });
+    Column() {
+      Row() {
+        if (this.showBackButton) {
+          Row() {
+            Image($r('app.media.ic_back'))
+              .width(40)
+              .height(40)
+              .aspectRatio(1)
+              .draggable(false)
+              .margin({ right: $r('app.string.margin_s') })
+              .borderRadius($r('app.string.border_radius_capsule'))
+              .stateStyles({
+                normal: { .backgroundColor(Color.Transparent)
+                },
+                pressed: { .backgroundColor($r('sys.color.interactive_pressed'))
+                },
+              })
+          }
+          .onClick(() => {
+            RouterModule.pop();
+          });
         }
-        .onClick(() => {
-          RouterModule.pop();
-        });
+        Text(this.title)
+          .fontSize(this.showBackButton ? $r('app.string.font_size_20') : $r('app.string.font_size_24'))
+          .fontColor($r('app.color.font_color_level1'))
+          .fontWeight(FontWeight.Bold);
       }
-      Text(this.title)
-        .fontSize(this.showBackButton ? $r('app.string.font_size_20') : $r('app.string.font_size_24'))
-        .fontColor($r('app.color.font_color_level1'))
-        .fontWeight(FontWeight.Medium);
+      .width($r('app.string.width_percent_full'))
+      .justifyContent(FlexAlign.Start)
+      .alignItems(VerticalAlign.Center)
+      .height(this._topBannerHeight)
+      .padding({ left: $r('app.string.padding_l') })
     }
-    .width($r('app.string.width_percent_full'))
+    .alignItems(HorizontalAlign.Start)
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
     .backgroundColor(this.bgColor)
-    .justifyContent(FlexAlign.Start)
-    .alignItems(VerticalAlign.Center)
-    .height(this._topBannerHeight)
-    .padding({ left: $r('app.string.padding_xl') });
   }
 }

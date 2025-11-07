@@ -29,16 +29,22 @@ struct EditNotes {
   aboutToAppear(): void {
     // 启用压缩模式避让软键盘
     this.getUIContext().setKeyboardAvoidMode(KeyboardAvoidMode.RESIZE_WITH_CARET);
+
+    this.getUIContext().getUIObserver().on('navDestinationSwitch', (info) => {
+      if (info.to === 'navBar') {
+        // 还原默认上抬模式
+        this.getUIContext().setKeyboardAvoidMode(KeyboardAvoidMode.OFFSET);
+      }
+    });
   }
 
   aboutToDisappear(): void {
-    // 还原默认上抬模式
-    this.getUIContext().setKeyboardAvoidMode(KeyboardAvoidMode.OFFSET);
-
     this.richEditorController.currentIndex = -1;
     // 操作记录
     this.richEditorController.historyRecordArray = [];
     this.richEditorController.initState();
+    // 取消监听
+    this.getUIContext().getUIObserver().off('navDestinationSwitch');
   }
 
   copyNoteText() {

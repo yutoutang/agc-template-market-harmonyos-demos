@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-import { DateElement } from '../types/DateElement';
+import { DateModel } from '../models/DateModel';
 
 export class CalendarUtil {
-  static buildKeyByDateElement(date: DateElement): string {
-    const year = date.year.toString()
-    const month = (date.month + 1).toString().padStart(2, '0');
-    const day = date.day.toString().padStart(2, '0');
+  static buildKeyByDateModel(item: DateModel): string {
+    const year = item.dayjsObj.year().toString()
+    const month = (item.dayjsObj.month() + 1).toString().padStart(2, '0');
+    const day = item.dayjsObj.date().toString().padStart(2, '0');
     return `${year}-${month}-${day}`
   }
 

@@ -1,17 +1,17 @@
-import { TodoItem } from '../../model/TodoItem';
+import { CustomIcon, TodoItem } from '@ohos_agcit/daily_schedule_component_lib';
 import { TodoDataManager } from '../../mock/TodoDataManager';
 import { DateUtils, FormatUtil, ThemeController } from '@ohos_agcit/daily_schedule_common_lib';
 import { leftSwipeButtonBuilder } from '../builder/LeftSwipeButtonBuilder';
-import { CustomIcon } from '@ohos_agcit/daily_schedule_component_lib';
 import { PriorityEnum } from '../../enum/TodoItemEnum';
-import { UpdateTodoPlanTimeInfo } from '../../mock/UpdateTodoInfo';
-import { curves } from '@kit.ArkUI';
+import { UpdateTodoPlanTimeVM } from '../../mock/TodoInfoVM';
+import { AppStorageV2, curves } from '@kit.ArkUI';
 import { ConfigurationConstant } from '@kit.AbilityKit';
+import { BreakpointType, GlobalInfoModel } from '@ohos_agcit/daily_schedule_utils';
 
 @ComponentV2
 export struct TodoSection {
+  vm: UpdateTodoPlanTimeVM = UpdateTodoPlanTimeVM.instance
   dataManager: TodoDataManager = TodoDataManager.instance
-  updateTodoInfo: UpdateTodoPlanTimeInfo = UpdateTodoPlanTimeInfo.instance
   themeController: ThemeController = ThemeController.instance;
   controller: Scroller = new Scroller()
   @Param label: string | Resource = '今天'
@@ -20,12 +20,15 @@ export struct TodoSection {
   }
   @Param onModify: (taskID: string) => void = () => {
   }
+  @Param maxLen: number = 16
   @Local isExpand: boolean = true
 
   build() {
     Column() {
       Row() {
-        Text(this.label).fontColor($r('sys.color.font_secondary')).fontSize($r('sys.float.Body_L'))
+        Text(this.label)
+          .fontColor($r('sys.color.font_secondary'))
+          .fontSize($r('sys.float.Body_L'))
         Blank()
         Text(this.todoItems.length.toString())
           .fontColor($r('app.color.color_gray_deeper'))
@@ -38,11 +41,11 @@ export struct TodoSection {
             this.isExpand = !this.isExpand
           })
       }
-      .height(60)
+      .height(45)
       .width('100%')
 
       if (this.isExpand) {
-        List({ scroller: this.controller, space: 15 }) {
+        List({ scroller: this.controller, space: 12 }) {
           ForEach(this.todoItems, (item: TodoItem, index: number) => {
             ListItem() {
               Row() {
@@ -64,7 +67,7 @@ export struct TodoSection {
                 .justifyContent(FlexAlign.Start)
 
                 Column() {
-                  Text(item.title.length > 16 ? item.title.substring(0, 16) + '...' : item.title)
+                  Text(item.title.length > this.maxLen ? item.title.substring(0, this.maxLen) + '...' : item.title)
                     .fontWeight(FontWeight.Regular)
                     .fontSize($r('sys.float.Body_L'))
                     .fontColor(this.chooseTitleColor(item))
@@ -102,7 +105,6 @@ export struct TodoSection {
             })
           }, (item: string, index: number) => JSON.stringify(item))
         }
-        .margin({ bottom: '5%' })
         .width('100%')
       }
     }
@@ -146,9 +148,9 @@ export struct TodoSection {
 
   private calcHeight(): Length {
     if (!this.isExpand || this.todoItems.length === 0) {
-      return 60
+      return 45
     }
-    return 60 + this.todoItems.length * 80 + (this.todoItems.length - 1) * 15 + 15;
+    return 45 + this.todoItems.length * 76 + (this.todoItems.length - 1) * 12;
   }
 
   @Builder

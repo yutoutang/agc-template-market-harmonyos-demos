@@ -19,7 +19,7 @@ struct FindNewVersion{
       // todo
       // 0 不存在新版本， 1 存在新版本
       Text(this.params.text === 0 ? '未发现新版本, 开始mock' : '发现新版本')
-        .fontSize(20)
+        .fontSize($r('sys.float.Title_S'))
         .fontWeight(FontWeight.Bold)
         .fontColor($r('sys.color.font_primary'))
         .alignSelf(ItemAlign.Start)

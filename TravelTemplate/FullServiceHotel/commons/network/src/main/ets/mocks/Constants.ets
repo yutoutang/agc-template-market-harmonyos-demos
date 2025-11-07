@@ -10,7 +10,7 @@ export enum MockImageMap {
   IMG_BANNER1 = 'img_banner1.png?token=c335c660-e957-4ff7-8ac6-2b90167eb768',
   IMG_BANNER2 = 'img_banner2.png?token=56df743a-35cc-4a88-a550-1ca2708ce3e5',
   IMG_BANQUET_COVER1 = 'mockImage://img_banquet_cover1',
-  IMG_BANQUET_COVER2 = 'mockImage://img_banquet_cover2',
+  IMG_BANQUET_COVER2 = 'mockImage://img_banquet_cover1',
   IMG_GRADE_LEVEL1 = 'img_grade_level1.png?token=41034a1b-45f1-4fc8-b3f4-9772568c84b7',
   IMG_GRADE_LEVEL2 = 'img_grade_level2.png?token=b4275619-25c5-4bda-ac57-acc449bfa4d9',
   IMG_HOTEL_COVER1 = 'img_hotel_cover1.png?token=c10abfb9-a5fb-4c75-a019-b5b249648c82',

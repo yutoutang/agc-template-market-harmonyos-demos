@@ -1,5 +1,6 @@
 import { util } from '@kit.ArkTS';
 import { WindowUtil } from 'commonlib';
+import { display } from '@kit.ArkUI';
 
 
 @ComponentV2
@@ -16,10 +17,12 @@ export struct CommonBanner {
   @Event handleClick: (index: number) => void;
 
   async aboutToAppear() {
-    let screenWidth: number = WindowUtil.display.width;
-    let topAvoidHeight: number = WindowUtil.avoidAreaSize.top;
-    this._swiperHeight = px2vp(screenWidth / this.coverRatio);
-    this._swiperBottomAnchor = this._swiperHeight - topAvoidHeight;
+    this.setSize()
+    WindowUtil.mainWindow?.on('windowSizeChange', this.setSize.bind(this))
+  }
+
+  aboutToDisappear(): void {
+    WindowUtil.mainWindow?.off('windowSizeChange', this.setSize)
   }
 
   build() {
@@ -66,5 +69,12 @@ export struct CommonBanner {
     }
     .width('100%')
     .height('auto');
+  }
+
+  setSize() {
+    let screenWidth: number = display.getDefaultDisplaySync().width;
+    let topAvoidHeight: number = WindowUtil.avoidAreaSize.top;
+    this._swiperHeight = px2vp(screenWidth / this.coverRatio);
+    this._swiperBottomAnchor = this._swiperHeight - topAvoidHeight;
   }
 }

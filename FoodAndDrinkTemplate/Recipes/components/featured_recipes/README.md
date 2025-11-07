@@ -1,4 +1,4 @@
-# 瀑布流组件快速入门
+# 菜谱瀑布流组件快速入门
 
 ## 目录
 - [简介](#简介)
@@ -150,6 +150,7 @@ changeDeleteState(callback: (isToDelete:boolean) => void)
 ## 示例代码
 
 ```typescript
+import { promptAction } from '@kit.ArkUI';
 import { FeaturedRecipes, LazyDataSource, RecipeBriefInfo } from 'featured_recipes';
 
 @Entry
@@ -185,15 +186,17 @@ struct Index {
             showTitle: true,
             onClickCb: (id: number) => {
                // 点击跳转菜谱详情
+               promptAction.showToast({ message: '跳转菜谱详情' })
             },
             jumpBloggerInfo: (id: number) => {
                // 点击跳转菜谱作者主页
+               promptAction.showToast({ message: '跳转菜谱作者主页' })
             },
          })
       }
       .height('100%')
       .width('100%')
-      .padding(16)
+      .padding({ top: 45 })
    }
 }
 ```

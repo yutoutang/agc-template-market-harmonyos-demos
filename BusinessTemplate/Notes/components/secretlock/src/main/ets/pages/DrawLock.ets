@@ -37,11 +37,11 @@ struct DrawLock {
               radius: 10,
             })// 设置组件的宽度和高度（宽高相同）
             .sideLength(300)// 设置宫格中圆点的半径
-            .circleRadius(10)// 设置连线的宽度
+            .circleRadius('12vp')// 设置连线的宽度
             .pathStrokeWidth(14)// 设置连线的颜色
-            .pathColor('#90EE90')// 设置宫格圆点在“激活”状态的填充颜色，“激活”状态为手指经过圆点但还未选中的状态
-            .activeColor('#B0C4DE')// 设置宫格圆点在“选中“状态的填充颜色
-            .selectedColor('#228B22')// 设置在完成密码输入后再次在组件区域按下时是否重置组件状态，默认为true
+            .pathColor($r('sys.color.icon_fourth'))// 设置宫格圆点在“激活”状态的填充颜色，“激活”状态为手指经过圆点但还未选中的状态
+            .activeColor($r('sys.color.comp_foreground_primary'))// 设置宫格圆点在“选中“状态的填充颜色
+            .selectedColor($r('sys.color.comp_foreground_primary'))// 设置在完成密码输入后再次在组件区域按下时是否重置组件状态，默认为true
             .autoReset(true)// 设置宫格圆点在“激活”状态的背景圆环样式
             .activateCircleStyle({
               color: '#90EE90',

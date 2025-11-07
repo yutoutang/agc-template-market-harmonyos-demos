@@ -108,7 +108,7 @@ export struct PracticeView {
     })
     .bindSheet($$this.isShowSetting, showSettingSheet(), {
       height: 200,
-      width: '100%',
+      width: 400,
       title: { title: '设置' },
       backgroundColor: Color.White,
     });

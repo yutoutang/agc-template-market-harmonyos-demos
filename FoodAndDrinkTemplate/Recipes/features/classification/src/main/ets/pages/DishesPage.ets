@@ -72,7 +72,7 @@ struct DishesPage {
                   })
 
                   Button(this.vm.isFollower ? '已关注' : '关注', { controlSize: ControlSize.SMALL })
-                    .fontSize(14)
+                    .fontSize($r('sys.float.Body_M'))
                     .fontColor(this.vm.isFollower ? '#E84026' : $r('sys.color.font_on_primary'))
                     .fontWeight(FontWeight.Medium)
                     .backgroundColor(this.vm.isFollower ? '#33FD4238' : '#FD4238')
@@ -96,7 +96,7 @@ struct DishesPage {
                   Text('用料').fontSize(18).fontWeight(FontWeight.Medium).fontColor($r('sys.color.font_primary'));
                   Button(this.isInBasket ? '已加入菜篮子' : '加入菜篮子',
                     { controlSize: ControlSize.SMALL })
-                    .fontSize(14)
+                    .fontSize($r('sys.float.Body_M'))
                     .fontWeight(FontWeight.Medium)
                     .fontColor($r('sys.color.font_primary'))
                     .padding({

@@ -6,7 +6,6 @@ export function orderSubmittedPageBuilder() {
   OrderSubmittedPage();
 }
 
-
 @ComponentV2
 export struct OrderSubmittedPage {
   vm: OrderSubmittedVM = OrderSubmittedVM.instance;
@@ -20,7 +19,9 @@ export struct OrderSubmittedPage {
         Column() {
           Image($r('app.media.ic_submit_success'))
             .width($r('app.string.width_percent_75'))
-            .margin($r('app.string.margin_l'));
+            .margin($r('app.string.margin_l'))
+            .constraintSize({ maxHeight: '50%' })
+            .objectFit(ImageFit.Contain)
           Text(this.vm.orderTips)
             .fontColor($r('app.color.font_color_level1'))
             .margin({

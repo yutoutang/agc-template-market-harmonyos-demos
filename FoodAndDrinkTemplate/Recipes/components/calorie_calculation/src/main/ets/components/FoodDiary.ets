@@ -64,6 +64,7 @@ export struct FoodDiary {
       .bindSheet($$this.showAddSheet, this.addSnackSheet(), {
         detents: [312, 313, 314],
         blurStyle: BlurStyle.Thick,
+        preferType: SheetType.CENTER,
         showClose: true,
         title: { title: '加餐时间段' },
       })

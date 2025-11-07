@@ -14,7 +14,7 @@ export struct ButtonSelectComponent {
             Button(item)
               .width('100%')
               .fontSize($r('sys.float.Body_M'))
-              .fontWeight(400)
+              .fontWeight(FontWeight.Regular)
               .fontColor(this.selectIndex === index ? $r('sys.color.font_on_primary') : $r('sys.color.font_primary'))
               .backgroundColor(this.selectIndex === index ?
               $r('sys.color.multi_color_04') : $r('sys.color.comp_background_tertiary'))

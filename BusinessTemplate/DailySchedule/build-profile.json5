@@ -51,8 +51,8 @@
       "srcPath": "./components/feed_back"
     },
     {
-      "name": "login",
-      "srcPath": "./components/login"
+      "name": "aggregated_login",
+      "srcPath": "./components/aggregated_login"
     },
     {
       "name": "network",

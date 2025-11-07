@@ -1,9 +1,9 @@
-import { TodoItem } from '../model/TodoItem';
-import { DateUtils, FormatUtil } from '@ohos_agcit/daily_schedule_common_lib';
+import { TodoItem } from '@ohos_agcit/daily_schedule_component_lib';
+import { CardManager, DateUtils, FormatUtil, FormDataClass } from '@ohos_agcit/daily_schedule_common_lib';
 import { BaseResponse } from '@ohos_agcit/daily_schedule_network';
 import { PriorityFilterEnum } from '../enum/FilterEnum';
 import { TodoListTabInfo } from '../mock/TitleDataManager';
-import { PriorityEnum } from '../../../../Index';
+import { PriorityEnum } from '../enum/TodoItemEnum';
 
 @ObservedV2
 export class TodoDataManager {
@@ -18,6 +18,14 @@ export class TodoDataManager {
   @Trace refreshNum: number = 0;
   private static _instance: TodoDataManager
   todoListTabInfo: TodoListTabInfo = TodoListTabInfo.instance
+
+  static get instance() {
+    if (!TodoDataManager._instance) {
+      TodoDataManager._instance = new TodoDataManager();
+      TodoDataManager._instance.allTasks = []
+    }
+    return TodoDataManager._instance;
+  }
 
   onAllTasksChange(isDescending: boolean = true) {
     let priorityIndex = this.todoListTabInfo.priorityIndex
@@ -34,7 +42,7 @@ export class TodoDataManager {
     } else {
       priorityValue = undefined
     }
-    
+
     this.todayTasks.splice(0, this.todayTasks.length)
     this.todayTasks.push(...this.refreshTodayTasks(isDescending, priorityValue))
 
@@ -43,15 +51,15 @@ export class TodoDataManager {
 
     this.allNotCompleteTasks.splice(0, this.allNotCompleteTasks.length)
     this.allNotCompleteTasks.push(...this.refreshAllNotCompleteTasks(isDescending, priorityValue))
-    
+
     this.expiredTasks.splice(0, this.expiredTasks.length)
     this.expiredTasks.push(...this.refreshExpiredTasks(isDescending, priorityValue))
 
     this.finishedTasks.splice(0, this.finishedTasks.length)
     this.finishedTasks.push(...this.refreshFinishedTasks(isDescending, priorityValue))
-    
+
     this.taskMap.clear()
-    this.allTasks.filter((item:TodoItem) => !item.isFinished).forEach((task: TodoItem) => {
+    this.allTasks.filter((item: TodoItem) => !item.isFinished).forEach((task: TodoItem) => {
       const dateKey = FormatUtil.formatDate(task.planTime, FormatUtil.DATE_YYYY_MM_DD)
       if (!this.taskMap.has(dateKey)) {
         this.taskMap.set(dateKey, []);
@@ -59,14 +67,8 @@ export class TodoDataManager {
       this.taskMap.get(dateKey)!.push(task);
     })
     this.refreshNum++
-  }
 
-  static get instance() {
-    if (!TodoDataManager._instance) {
-      TodoDataManager._instance = new TodoDataManager();
-      TodoDataManager._instance.allTasks = []
-    }
-    return TodoDataManager._instance;
+    this.updateAtomicCard()
   }
 
   loadMockTodos(): TodoItem[] {
@@ -80,12 +82,7 @@ export class TodoDataManager {
 
   public addTask(item: TodoItem): Promise<BaseResponse<undefined>> {
     this.addTodo(item);
-    let resp: BaseResponse = { code: 200, data: undefined };
-    return Promise.resolve(resp);
-  }
 
-  public filterTask(priorityIndex: number): Promise<BaseResponse<undefined>> {
-    this.filter(priorityIndex);
     let resp: BaseResponse = { code: 200, data: undefined };
     return Promise.resolve(resp);
   }
@@ -250,6 +247,12 @@ export class TodoDataManager {
         const timeB = b?.planTime ? new Date(b.planTime).getTime() : 0;
         return isDescending ? timeB - timeA : timeA - timeB;
       });
+  }
+
+  public updateAtomicCard() {
+    let dataClass = new FormDataClass()
+    dataClass.titles = this.todayTasks.map(item => item.title)
+    CardManager.get().updateCard(dataClass)
   }
 }
 

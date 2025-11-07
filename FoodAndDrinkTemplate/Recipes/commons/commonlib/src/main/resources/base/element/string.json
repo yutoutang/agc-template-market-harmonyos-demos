@@ -11,6 +11,10 @@
     {
       "name": "bg_red",
       "value": "#E84026"
+    },
+    {
+      "name": "agcit_huawei_recipes",
+      "value": "1.0.3"
     }
   ]
 }

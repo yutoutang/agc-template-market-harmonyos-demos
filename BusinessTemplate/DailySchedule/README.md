@@ -10,13 +10,13 @@
 
 ## 功能介绍
 
-您可以基于此模板直接定制应用，也可以挑选此模板中提供的多种组件使用，从而降低您的开发难度，提高您的开发效率。
+您可以基于此模板直接定制应用，从而降低您的开发难度，提高您的开发效率。
 
 本模板为日程类应用提供了常用功能的开发样例，模板主要分首页、日历、我的三大模块：
 
 1、首页：展示待办事项（按日期时间顺序），添加待办、按顺序展示
 
-2、日历：展示月、周、日维度的日历，可以选择日期
+2、日历：展示年、月、周、日维度的日历，可以选择日期
 
 3、我的：提供登录、意见反馈、联系客服等功能，包括隐私协议、隐私设置
 
@@ -40,6 +40,7 @@
  |    |-- 明天
  |    |-- 已完成
  |-- 日历
+ |    |-- 年 
  |    |-- 月
  |    |-- 周
  |    |-- 日
@@ -61,6 +62,7 @@
       |    |    └-- 昵称修改
       |    |-- 隐私设置
       |    |-- 检测版本
+      |    |-- 清除缓存
       |    |-- 关于我们
       |    └-- 退出登录
       └-- 联系客服
@@ -74,12 +76,14 @@ DailySchedule
   |- commons                                       // 公共层
   |   |- common_lib/src/main/ets/                  
   |   |    |- constants                            // 常量
+  |   |    |     CheckInEnums.ets                // 版本更新常量  
   |   |    |     CommonContants.ets                // 常用常量
   |   |    |     CommonEnums.ets                   // 数字常量
   |   |    |- utils                                // 工具包
   |   |    |     AccountUtil.ets                   // 账户工具
   |   |    |     BreakpointType.ets                // 断点存储工具
   |   |    |     DateUtil.ets                      // 日期工具
+  |   |    |     FileUtil.ets                      // 文件工具  
   |   |    |     DialogUtil.ets                    // 对话框工具
   |   |    |     FormatUtil.ets                    // 格式工具
   |   |    |     Logger.ets                        // 日志工具
@@ -96,18 +100,7 @@ DailySchedule
   |   |          CustomIconOptions.ets             // 组件图标类型
   |   |
   |- network/src/main/ets/                         // 网络
-  |   |    |- apis                       
-  |   |    |     HttpApis.ets                      // 请求方法
-  |   |    |- constants                            // 常量
-  |   |    |     NetworkEnums.ets                  // 网络请求常量
-  |   |    |- mocks                                // 数据模拟
-  |   |    |     HttpApisMock.ets                  // 模拟数据请求
-  |   |    |     MockRequestMap.ets                // 模拟网络请求  
-  |   |    |- models.ets                           // 模型
-  |   |    |     AxiosHttpModel.ets                // 网络数据模型 
-  |   |    |     AxiosRequest.ets                  // 请求数据模型 
   |   |    └- types                                // 类型定义
-  |   |          RequestTypes.ets                  // 请求类型  
   |   |          ResponseTypes.ets                  // 回复类型    
   |   |   
   |   └- utils/src/main/ets                        // 工具类
@@ -149,18 +142,31 @@ DailySchedule
   |   |          Logger.ets                        // 日志
   |   |          PreferenceUtil.ets                // 持久化
   |   |
-  |   |- login/src/main/ets                        // 登录
+  |   |- aggregated_login/src/main/ets                        // 登录
   |   |    |- common  
-  |   |    |     LoginConstants.ets                // 登录常量
+  |   |    |     Constants.ets                     // 常量
+  |   |    |     LoginConstants.ets                // 登录常量  
   |   |    |- components  
+  |   |    |     AggregatedLogini.ets              // 登录
+  |   |    |     AgreePrivacyBox.ets               // 隐私协议
+  |   |    |     OtherLoginPage.ets                // 其他登录页    
   |   |    |     RightArrow.ets                    // 右箭头
   |   |    |- model  
   |   |    |     UserInfo.ets                      // 用户模型
-  |   |    |- pages  
-  |   |    |     QuickLoginPage.ets                // 一键登录页面        
-  |   |    |     UserInfoPage.ets                  // 用户信息页面        
-  |   |    └- utils  
-  |   |          ReadDataUtil.ets                  // 读取数据工具类
+  |   |    |     Index.ets                         // 数据模型
+  |   |    |- utils  
+  |   |    |     LoginSheetUtils.ets               // 登录页表格       
+  |   |    |     PopViewUtils.ets                  // 弹出视图   
+  |   |    |     Utils.ets                         // 综合工具  
+  |   |    |     WXApiUtils.ets                    // 微信工具    
+  |   |    |- viewmodel  
+  |   |    |     AggregatedLoginVM.ets             // 登录数据模型        
+  |   |    └- Views  
+  |   |          AggregatedLoginPage.ets           // 综合登录页面
+  |   |          LogOutDialog.ets                  // 登出会话框
+  |   |          ProtocolWebView.ets               // 网页视图工具
+  |   |          QuickLoginPage.ets                // 快捷登录页
+  |   |          UserInfoPage.ets                  // 用户信息页
   |   |      
   |
   └- products/phone                               

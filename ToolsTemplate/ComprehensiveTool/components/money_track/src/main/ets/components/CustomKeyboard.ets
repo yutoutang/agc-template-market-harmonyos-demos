@@ -68,6 +68,7 @@ export struct CustomKeyboard {
       title: {
         title: '选择日期',
       },
+      preferType: SheetType.CENTER,
     });
   }
 

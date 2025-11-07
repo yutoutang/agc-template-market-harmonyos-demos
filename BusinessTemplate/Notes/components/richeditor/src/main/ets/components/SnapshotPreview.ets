@@ -268,7 +268,7 @@ export struct SnapshotPreview {
       Button('取消')
         .width('calc(50% - 24vp)')
         .height(40)
-        .fontSize(16)
+        .fontSize($r('sys.float.Body_L'))
         .backgroundColor(Color.White)
         .fontColor($r('sys.color.font_emphasize'))
         .onClick(() => {

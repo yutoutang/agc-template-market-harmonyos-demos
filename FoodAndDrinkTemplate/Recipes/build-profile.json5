@@ -18,7 +18,7 @@
     ],
     "buildModeSet": [
       {
-        "name": "debug",
+        "name": "debug"
       },
       {
         "name": "release"
@@ -40,19 +40,19 @@
     },
     {
       "name": "commonlib",
-      "srcPath": "./commons/commonlib",
+      "srcPath": "./commons/commonlib"
     },
     {
       "name": "classification",
-      "srcPath": "./features/classification",
+      "srcPath": "./features/classification"
     },
     {
       "name": "home",
-      "srcPath": "./features/home",
+      "srcPath": "./features/home"
     },
     {
       "name": "mine",
-      "srcPath": "./features/mine",
+      "srcPath": "./features/mine"
     },
     {
       "name": "network",
@@ -60,11 +60,11 @@
     },
     {
       "name": "link_category",
-      "srcPath": "./components/link_category",
+      "srcPath": "./components/link_category"
     },
     {
       "name": "featured_recipes",
-      "srcPath": "./components/featured_recipes",
+      "srcPath": "./components/featured_recipes"
     },
     {
       "name": "home_search",
@@ -72,7 +72,7 @@
     },
     {
       "name": "calories",
-      "srcPath": "./features/calories",
+      "srcPath": "./features/calories"
     },
     {
       "name": "calorie_calculation",
@@ -92,19 +92,19 @@
     },
     {
       "name": "base_ui",
-      "srcPath": "./components/base_ui",
+      "srcPath": "./components/base_ui"
     },
     {
       "name": "shopping_basket",
-      "srcPath": "./components/shopping_basket",
+      "srcPath": "./components/shopping_basket"
     },
     {
       "name": "upload_recipe",
-      "srcPath": "./components/upload_recipe",
+      "srcPath": "./components/upload_recipe"
     },
     {
       "name": "personal_homepage",
-      "srcPath": "./components/personal_homepage",
+      "srcPath": "./components/personal_homepage"
     }
   ]
 }

@@ -3,7 +3,7 @@ import { SettingController } from '../controller/SettingController';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { setAutoColorMode, setDarkColorMode, setLightColorMode, ThemeController } from '../controller/ThemeController';
 import { ConfigurationConstant } from '@kit.AbilityKit';
-import { rightArrow } from 'login';
+import { rightArrow } from 'aggregated_login';
 
 @ComponentV2
 export struct SingleArrow {
@@ -251,6 +251,75 @@ export struct MergeArrow {
   }
 }
 
+@ComponentV2
+export struct ThreeMergeArrow {
+  @Param @Once @Require text1: string;
+  @Param @Once @Require text1Click: VoidCallback;
+  @Param @Once @Require text2: string;
+  @Param @Once @Require text2Click: VoidCallback;
+  @Param @Once @Require text3: string;
+  @Param @Once @Require text3Click: VoidCallback;
+  @Param   extraText2: string='';
+
+  build() {
+    Column(){
+      Row() {
+        Text(this.text1)
+          .textExtend()
+          .fontColor($r('sys.color.font_primary'));
+        Blank();
+        rightArrow()
+      }
+      .width('100%')
+      .height(56)
+      .onClick(() => {
+        this.text1Click();
+      })
+      Divider()
+        .height(0.5)
+        .width('100%')
+        .color($r('sys.color.comp_divider'))
+      Row(){
+        Text(this.text2)
+          .textExtend()
+          .fontColor($r('sys.color.font_primary'));
+        Blank();
+        if (this.extraText2 !== '') {
+          Text(this.extraText2)
+            .fontSize($r('sys.float.Body_M'))
+            .fontColor($r('sys.color.font_tertiary'))
+            .margin({ right: 8 })
+        }
+        rightArrow()
+      }
+      .width('100%')
+      .height(56)
+      .onClick(() => {
+        this.text2Click();
+      })
+      Row(){
+        Text(this.text3)
+          .textExtend()
+          .fontColor($r('sys.color.font_primary'));
+        Blank();
+        rightArrow()
+      }
+      .width('100%')
+      .height(56)
+      .onClick(() => {
+        this.text3Click();
+      })
+    }
+    .padding({
+      left: 12,
+      right: 12
+    })
+    .borderRadius(16)
+    .height(168.5)
+    .backgroundColor($r('sys.color.comp_background_list_card'))
+    .width('100%')
+  }
+}
 @Extend(Text)
 function textExtend() {
   .fontSize($r('sys.float.Body_L'))

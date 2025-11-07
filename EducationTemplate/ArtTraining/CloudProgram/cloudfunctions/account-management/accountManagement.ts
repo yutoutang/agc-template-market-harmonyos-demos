@@ -3,7 +3,7 @@ import { DatabaseHelper } from './utils/DatabaseHelper';
 
 const TAG = '[account-management]';
 
-let myHandler = async function (event, context, callback, logger) {
+const myHandler = async function (event, context, callback, logger): Promise<void> {
   logger.info(event);
   let userId: string = event.headers ? event.headers.uid : event.userId;
   let trigger: string = event.body ? JSON.parse(event.body).trigger : event.trigger;
@@ -35,12 +35,13 @@ let myHandler = async function (event, context, callback, logger) {
         result = await databaseHelper.updateUserInfo(params);
         break;
       default:
-        return callback({
+        callback({
           ret: {
             code: -1,
             message: 'no such operation',
           },
         });
+        return;
     }
     if (result) {
       callback({

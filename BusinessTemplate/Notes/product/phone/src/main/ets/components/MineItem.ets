@@ -89,11 +89,10 @@ export struct ContactItem {
 
       Button(){
         Row({ space: 4 }){
-          Image($r('app.media.phone'))
-            .width(14)
-            .height(14)
+          SymbolGlyph($r('sys.symbol.phone_badge_waveform_2_fill'))
+            .fontSize(14)
           Text('一键拨号')
-            .fontSize(16)
+            .fontSize($r('sys.float.Body_L'))
             .fontWeight(FontWeight.Medium)
             .fontColor($r('sys.color.font_on_primary'))
         }
@@ -113,9 +112,9 @@ export struct ContactItem {
       })
 
       Button('取消')
-        .fontSize(16)
+        .fontSize($r('sys.float.Body_L'))
         .fontWeight(FontWeight.Medium)
-        .fontColor($r('sys.color.font_secondary'))
+        .fontColor($r('sys.color.font_tertiary'))
         .height(40)
         .width('94%')
         .backgroundColor($r('sys.color.comp_background_tertiary'))

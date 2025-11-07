@@ -11,6 +11,10 @@
     {
       "name": "EntryAbility_label",
       "value": "label"
+    },
+    {
+      "name": "agcit_huawei_recipes",
+      "value": "1.0.3"
     }
   ]
 }

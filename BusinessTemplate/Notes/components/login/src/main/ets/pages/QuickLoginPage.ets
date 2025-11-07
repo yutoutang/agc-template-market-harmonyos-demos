@@ -245,7 +245,7 @@ export struct QuickLoginPage {
                     .height(24)
                     .focusable(true)
                     .focusOnTouch(true)
-                    .selectedColor('#CE0E2D')
+                    .selectedColor($r('sys.color.comp_background_emphasize'))
                     .select(this.isSelected)
                     .enabled(this.enableStatus)
                     .margin({ top: 0 })

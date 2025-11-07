@@ -50,6 +50,7 @@ export struct SubmitComment {
     .bindSheet($$this.showDialog, this.storeSelectionSheetBuilder(), {
       title: { title: '门店选择' },
       height: 300,
+      preferType: SheetType.CENTER
     })
     .onReady((context) => {
       this.vm.stack = context.pathStack
@@ -70,7 +71,7 @@ export struct SubmitComment {
             .commonTextStyle()
             .fontWeight(FontWeight.Medium)
             .margin({ right: $r('app.string.space_s') })
-          Image($r('app.media.ic_right_arrow')).height('24lpx');
+          Image($r('app.media.ic_right_arrow')).height(16);
         }
         .onClick(() => {
           this.showDialog = true;

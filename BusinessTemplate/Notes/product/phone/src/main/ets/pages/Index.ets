@@ -507,8 +507,8 @@ struct Index {
       Button() {
         Row() {
           Text($r('app.string.go_note_category'))
-            .fontSize(16)
-            .fontColor(Color.White)
+            .fontSize($r('sys.float.Body_L'))
+            .fontColor($r('sys.color.font_on_primary'))
             .fontWeight(FontWeight.Medium);
           SymbolGlyph($r('sys.symbol.chevron_right'))
             .fontWeight(FontWeight.Medium)
@@ -633,8 +633,8 @@ struct Index {
         Search({
           placeholder: $r('app.string.search_note'),
         })
-          .placeholderFont({size: 14})
-          .placeholderColor('#999999')
+          .placeholderFont({size: $r('sys.float.Body_L')})
+          .placeholderColor($r('sys.color.font_secondary'))
           .fontColor($r('sys.color.font_primary'))
           .margin(new BreakpointType<Margin>({
             sm: {

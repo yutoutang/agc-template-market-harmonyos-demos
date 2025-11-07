@@ -4,7 +4,6 @@
     "type": "feature",
     "deviceTypes": [
       "default",
-      "tablet"
     ],
     "deliveryWithInstall": true,
     "installationFree": true

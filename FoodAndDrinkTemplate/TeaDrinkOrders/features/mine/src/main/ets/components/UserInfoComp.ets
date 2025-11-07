@@ -134,7 +134,12 @@ export struct UserInfoComp {
                 // 授权码处理。
                 let authorizationCode = data.code;
                 LoadingDialogUtil.openLoadingDialog()
-                this.getQuickLoginAnonymousPhone()
+                if (authorizationCode) {
+                  this.login(authorizationCode)
+                } else {
+                  promptAction.showToast({ message: $r('app.string.relate_account_msg2') })
+                  LoadingDialogUtil.close()
+                }
               }),
           })
         }
@@ -149,47 +154,6 @@ export struct UserInfoComp {
       MembershipComp()
     }
 
-  }
-
-  getQuickLoginAnonymousPhone() {
-    // 创建授权请求，并设置参数
-    const authRequest = new authentication.HuaweiIDProvider().createAuthorizationWithHuaweiIDRequest();
-    // 获取手机号需要传如下scope，传参数之前需要先申请对应scope权限,才能返回对应数据
-    authRequest.scopes = ['phone'];
-    // 获取code需传如下permission
-    authRequest.permissions = ['serviceauthcode'];
-    // 用户是否需要登录授权，该值为true且用户未登录或未授权时，会拉起用户登录或授权页面
-    authRequest.forceAuthorization = true;
-    // 用于防跨站点请求伪造
-    authRequest.state = util.generateRandomUUID();
-    try {
-      const controller = new authentication.AuthenticationController(getContext(this));
-      controller.executeRequest(authRequest).then((data) => {
-        const authorizationWithHuaweiIDResponse = data as authentication.AuthorizationWithHuaweiIDResponse;
-        const state = authorizationWithHuaweiIDResponse.state;
-        if (state !== undefined && authRequest.state !== state) {
-          hilog.error(0x0000, 'testTag', `Failed to authorize. The state is different, response state: ${state}`);
-          return;
-        }
-        hilog.info(0x0000, 'testTag', 'Succeeded in authentication.');
-        const authorizationWithHuaweiIDCredential = authorizationWithHuaweiIDResponse.data!;
-        const code = authorizationWithHuaweiIDCredential.authorizationCode;
-        this.authCode = code ?? ''
-        // 开发者处理code
-        if (code) {
-          this.login(code)
-        } else {
-          promptAction.showToast({ message: $r('app.string.relate_account_msg2') })
-          LoadingDialogUtil.close()
-        }
-      }).catch((err: BusinessError<Object>) => {
-        LoadingDialogUtil.close()
-        this.bindPhoneMock()
-      });
-    } catch (error) {
-      this.dealAllError(error);
-      LoadingDialogUtil.close()
-    }
   }
 
   cancelRelative() {
@@ -235,7 +199,9 @@ export struct UserInfoComp {
     }).catch(() => {
       promptAction.showToast({ message: $r('app.string.relate_account_msg2') })
     }).finally(() => {
-      LoadingDialogUtil.close()
+      setTimeout(()=>{
+        LoadingDialogUtil.close()
+      },100)
     })
   }
 

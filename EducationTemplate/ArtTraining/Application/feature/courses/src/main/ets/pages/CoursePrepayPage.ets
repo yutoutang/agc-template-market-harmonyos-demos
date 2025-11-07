@@ -16,7 +16,6 @@ export struct CoursePrepayPage {
 
   build() {
     NavDestination() {
-      CommonHeader({ title: '订单结算' });
       if (this.vm.isLoading) {
         CommonLoading();
       } else {
@@ -40,7 +39,7 @@ export struct CoursePrepayPage {
         this.bottomButtonBuilder();
       }
     }
-    .hideTitleBar(true)
+    .title('订单结算', { backgroundColor: $r('app.color.system_color_background_white') })
     .onReady(() => {
       this.vm.initCourseOrder();
     })
@@ -81,7 +80,7 @@ export struct CoursePrepayPage {
     ContainerRow() {
       Text('支付方式')
         .mainTextStyle()
-        .width($r('app.string.width_percent_25'));
+        .width(150);
       Row() {
         ForEach(PAYMENT_RADIO_LIST, (item: CoursePaymentMethod) => {
           this.paymentMethodButton(item);
@@ -95,7 +94,7 @@ export struct CoursePrepayPage {
           Text('学员').mainTextStyle();
           Text('*').requiredInputStyle();
         }
-        .width($r('app.string.width_percent_15'));
+        .width(150);
 
         TextInput({ placeholder: '请输入学员姓名', text: this.vm.courseOrder.student })
           .type(InputType.Normal)
@@ -118,7 +117,7 @@ export struct CoursePrepayPage {
           Text('手机').mainTextStyle();
           Text('*').requiredInputStyle();
         }
-        .width($r('app.string.width_percent_15'));
+        .width(150);
 
         TextInput({ placeholder: '请输入手机号码', text: this.vm.courseOrder.phone })
           .type(InputType.PhoneNumber)

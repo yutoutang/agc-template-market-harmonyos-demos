@@ -38,6 +38,7 @@ struct SearchFoodPage {
             }.bindSheet($$this.vm.showAddFoodSheet, this.addFoodSheet(item), {
               height: 533,
               blurStyle: BlurStyle.Thick,
+              preferType: SheetType.CENTER,
               showClose: false,
             });
           }, (item: FoodCalories) => JSON.stringify(item))
@@ -68,9 +69,9 @@ struct SearchFoodPage {
           Select(this.vm.menuList)
             .selected(this.vm.selectIndex)
             .value(this.vm.selectText)
-            .font({ size: 16, weight: FontWeight.Medium })
+            .font({ size: $r('sys.float.Body_L'), weight: FontWeight.Medium })
             .fontColor($r('sys.color.font_primary'))
-            .space(16)
+            .space(8)
             .width(124)
             .optionWidth(224)
             .optionHeight(296)
@@ -106,7 +107,7 @@ struct SearchFoodPage {
           TextInput({ text: $$this.vm.inputText, placeholder: '100' })
             .fontSize(16)
             .fontColor($r('sys.color.font_primary'))
-            .placeholderFont({ size: 16 })
+            .placeholderFont({ size: $r('sys.float.Body_L') })
             .placeholderColor($r('sys.color.font_secondary'))
             .enabled(false)
           Text('克').fontSize(16).fontColor($r('sys.color.font_secondary')).margin({ right: 13 })
@@ -124,12 +125,12 @@ struct SearchFoodPage {
           ForEach(this.vm.keyboardList, (item: string) => {
             GridItem() {
               Button(item, { type: ButtonType.Normal })
-                .fontSize(18)
+                .fontSize($r('sys.float.Body_L'))
                 .fontWeight(FontWeight.Medium)
                 .fontColor($r('sys.color.font_primary'))
                 .width(72)
                 .height(48)
-                .borderRadius(6)
+                .borderRadius($r('sys.float.corner_radius_level4'))
                 .backgroundColor($r('sys.color.background_primary'))
                 .shadow({
                   offsetX: 0,
@@ -155,7 +156,7 @@ struct SearchFoodPage {
           }
           .layoutWeight(1)
           .width('100%')
-          .borderRadius(6)
+          .borderRadius($r('sys.float.corner_radius_level4'))
           .backgroundColor($r('sys.color.background_primary'))
           .onClick(() => {
             this.vm.deleteBtn()
@@ -164,10 +165,10 @@ struct SearchFoodPage {
           Button('确定', { type: ButtonType.Normal })
             .layoutWeight(1)
             .width('100%')
-            .fontSize(18)
+            .fontSize($r('sys.float.Body_L'))
             .fontWeight(FontWeight.Medium)
             .fontColor($r('sys.color.font_on_primary'))
-            .borderRadius(6)
+            .borderRadius($r('sys.float.corner_radius_level4'))
             .backgroundColor('#E84026')
             .onClick(() => {
               this.vm.confirmBtn(item)

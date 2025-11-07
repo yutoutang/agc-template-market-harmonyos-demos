@@ -2,6 +2,7 @@ import { SheetCallbacks } from '../../types/Types';
 import { DatePickerComponent } from '../components/DateTimePicker';
 import { menuBuilder } from '../builder/MenuBuilder';
 import { CustomIcon } from '@ohos_agcit/daily_schedule_component_lib';
+import { AddTodoVM } from '../../mock/TodoInfoVM'
 
 @Builder
 export function addTodoTaskBuilder(callbacks: SheetCallbacks) {
@@ -13,12 +14,7 @@ export function addTodoTaskBuilder(callbacks: SheetCallbacks) {
 
 @ComponentV2
 export struct AddTodoTaskSheet {
-  @Consumer('title') title: string = ''
-  @Consumer('selectedTime') selectedTime: Date = new Date('2022-07-22T08:00:00');
-  @Consumer('repetitionType') repetitionType: number = 0
-  @Consumer('reminderType') reminderType: number = 0
-  @Consumer('repetitionMultiType') repetitionMultiType: number[] = [];
-  @Consumer('priorityType') priorityType: number = 0
+  vm: AddTodoVM = AddTodoVM.instance
   @Param showRemind: boolean = false
   @Param onConfirm: () => void = () => {
   };
@@ -62,19 +58,19 @@ export struct AddTodoTaskSheet {
             Button(item)
               .height(28)
               .width('100%')
-              .backgroundColor(this.repetitionMultiType.indexOf(index) !== -1 ? 'rgb(100, 187, 92)' :
+              .backgroundColor(this.vm.repetitionMultiType.indexOf(index) !== -1 ? 'rgb(100, 187, 92)' :
                 'rgba(0, 0, 0, 0.05)')
-              .fontColor(this.repetitionMultiType.indexOf(index) !== -1 ? 'rgb(255, 255, 255)' : 'rgba(0, 0, 0, 0.9)')
+              .fontColor(this.vm.repetitionMultiType.indexOf(index) !== -1 ? 'rgb(255, 255, 255)' : 'rgba(0, 0, 0, 0.9)')
               .onClick(() => {
-                const num = this.repetitionMultiType.indexOf(index);
+                const num = this.vm.repetitionMultiType.indexOf(index);
                 if (num !== -1) {
-                  this.repetitionMultiType.splice(num, 1)
+                  this.vm.repetitionMultiType.splice(num, 1)
                 } else {
-                  this.repetitionMultiType.push(index);
+                  this.vm.repetitionMultiType.push(index);
                 }
-                const dayArr = this.repetitionMultiType.map((item: number) => this.customRepeatData[item])
+                const dayArr = this.vm.repetitionMultiType.map((item: number) => this.customRepeatData[item])
                 this.repeatDay = dayArr.join('、')
-                this.repetitionType = 4;
+                this.vm.repetitionType = 4;
               })
           }
 
@@ -99,8 +95,8 @@ export struct AddTodoTaskSheet {
           onClick: this.onClose
         })
         Text('添加待办')
-          .fontWeight(700)
-          .fontSize(20)
+          .fontWeight(FontWeight.Bold)
+          .fontSize($r('sys.float.Title_S'))
           .margin({ left: '2.5%' })
         Blank()
         CustomIcon({
@@ -125,7 +121,7 @@ export struct AddTodoTaskSheet {
           .maxLength(50)
           .showCounter(true, { thresholdPercentage: 1, highlightBorder: true })
           .onChange((value: string) => {
-            this.title = value;
+            this.vm.title = value;
           })
       }
       .borderRadius(16)
@@ -139,13 +135,13 @@ export struct AddTodoTaskSheet {
 
       Column() {
         Row() {
-          Text('重复').fontSize($r('sys.float.Body_L')).fontWeight(500)
+          Text('重复').fontSize($r('sys.float.Body_L')).fontWeight(FontWeight.Medium)
           Blank()
           Row() {
             Row() {
-              Text(this.repetitionMenuItems[this.repetitionType] || this.repeatDay)
+              Text(this.repetitionMenuItems[this.vm.repetitionType] || this.repeatDay)
                 .fontSize($r('sys.float.Body_M'))
-                .fontWeight(400)
+                .fontWeight(FontWeight.Regular)
                 .fontColor($r('sys.color.font_secondary'))
                 .margin({ right: 5 })
               Image($r("app.media.icon_arrow_bottom")).height(6).width(8)
@@ -155,7 +151,7 @@ export struct AddTodoTaskSheet {
                 this.showRepeat = true;
                 return;
               }
-              this.repetitionType = newIndex;
+              this.vm.repetitionType = newIndex;
             }))
           }.layoutWeight(1)
           .justifyContent(FlexAlign.End)
@@ -172,18 +168,18 @@ export struct AddTodoTaskSheet {
         if (this.showRemind) {
           Divider().strokeWidth('1px')
           Row() {
-            Text('提醒').fontSize($r('sys.float.Body_L')).fontWeight(500)
+            Text('提醒').fontSize($r('sys.float.Body_L')).fontWeight(FontWeight.Medium)
             Blank()
             Row() {
-              Text(this.remindMenuItems[this.reminderType])
+              Text(this.remindMenuItems[this.vm.reminderType])
                 .fontSize($r('sys.float.Body_M'))
-                .fontWeight(400)
+                .fontWeight(FontWeight.Regular)
                 .fontColor($r('sys.color.font_secondary'))
                 .margin({ right: 5 })
               Image($r("app.media.icon_arrow_bottom")).height(6).width(8)
             }
             .bindMenu(menuBuilder(this.remindMenuItems, (newIndex: number) => {
-              this.reminderType = newIndex
+              this.vm.reminderType = newIndex
             }))
           }
           .height('8%')
@@ -198,18 +194,18 @@ export struct AddTodoTaskSheet {
       .justifyContent(FlexAlign.SpaceEvenly)
 
       Row() {
-        Text('优先级').fontSize($r('sys.float.Body_L')).fontWeight(500)
+        Text('优先级').fontSize($r('sys.float.Body_L')).fontWeight(FontWeight.Medium)
         Blank()
         Row() {
-          Text(this.priorityMenuItems[this.priorityType])
+          Text(this.priorityMenuItems[this.vm.priorityType])
             .fontSize($r('sys.float.Body_M'))
-            .fontWeight(400)
+            .fontWeight(FontWeight.Regular)
             .fontColor($r('sys.color.font_secondary'))
             .margin({ right: 5 })
           Image($r("app.media.icon_arrow_bottom")).height(6).width(8)
         }
         .bindMenu(menuBuilder(this.priorityMenuItems, (newIndex: number) => {
-          this.priorityType = newIndex
+          this.vm.priorityType = newIndex
         }))
       }
       .width('90%')

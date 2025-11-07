@@ -6,11 +6,15 @@
     },
     {
       "name": "agcit_huawei_dailyschedule",
-      "value": "1.0.0"
+      "value": "1.0.1"
     },
     {
       "name": "agcittype_huawei_dailyschedule",
       "value": "industryTemplate"
+    },
+    {
+      "name": "agcitkit_huawei_dailyschedule",
+      "value": "agcit_huawei_enterprise_recruitment_check_app_update/1.0.2,agcit_huawei_exam_feed_back/1.0.2"
     }
   ]
 }

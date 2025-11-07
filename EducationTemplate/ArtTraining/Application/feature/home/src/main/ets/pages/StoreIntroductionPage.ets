@@ -47,7 +47,6 @@ export struct StoreIntroductionPage {
               left: $r('app.string.padding_l'),
               right: $r('app.string.padding_l'),
             })
-            .layoutWeight(1);
           }
           .width($r('app.string.width_percent_full'))
           .alignItems(HorizontalAlign.Start);

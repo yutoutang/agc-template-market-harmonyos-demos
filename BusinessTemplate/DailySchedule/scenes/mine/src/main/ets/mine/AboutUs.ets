@@ -26,7 +26,7 @@ export struct AboutUs {
     Column({ space: 12 }){
       Text('000000')
         .fontWeight(FontWeight.Medium)
-        .fontSize(18)
+        .fontSize($r('sys.float.Subtitle_L'))
         .fontColor($r('sys.color.font_primary'))
         .padding({
           top: 16

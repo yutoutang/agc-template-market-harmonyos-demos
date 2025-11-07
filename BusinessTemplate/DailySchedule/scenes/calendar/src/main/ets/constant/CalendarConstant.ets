@@ -16,8 +16,6 @@
 export class TimeLineConstants {
   static DEFAULT_FIRST_HOUR = 0;
   static DEFAULT_LAST_HOUR = 24;
+  static TODO_CARD_HEIGHT = 28;
+  static TODO_CARD_WIDTH = 60;
 }
-
-export const GRID_LARGE_SIZE = 45;
-
-export const TODO_CARD_WIDTH = 60;

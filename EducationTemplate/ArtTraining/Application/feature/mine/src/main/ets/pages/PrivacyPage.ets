@@ -14,7 +14,7 @@ export struct PrivacyPage {
     NavDestination() {
       CommonHeader({ title: '隐私声明' });
       Column() {
-        AtomicServiceWeb({ src: $rawfile('privacy.html'), controller: this.controller });
+        AtomicServiceWeb({ src: $rawfile('privacy.html'), controller: this.controller })
       }
       .padding($r('app.string.padding_s'))
       .layoutWeight(1);

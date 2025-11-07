@@ -32,9 +32,9 @@ export struct SearchComponent {
           value: $$this.searchCondition,
         })
           .placeholderFont({
-            size: 14,
+            size: $r('sys.float.Body_L'),
           })
-          .placeholderColor('rgba(0,0,0,0.60)')
+          .placeholderColor($r('sys.color.font_secondary'))
           .layoutWeight(1)
           .margin({
             left: '4%',

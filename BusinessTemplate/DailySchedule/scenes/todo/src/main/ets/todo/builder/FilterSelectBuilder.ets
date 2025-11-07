@@ -34,8 +34,8 @@ struct FilterSelectComponent {
           onClick: this.onClose
         })
         Text('筛选')
-          .fontSize(20)
-          .fontWeight(700)
+          .fontSize($r('sys.float.Title_S'))
+          .fontWeight(FontWeight.Bold)
           .margin({ left: '2.5%' })
         Blank()
         CustomIcon({
@@ -65,7 +65,7 @@ struct FilterSelectComponent {
           }
         })
         Column() {
-          Text('优先级').fontSize(18).fontWeight(FontWeight.Medium)
+          Text('优先级').fontSize($r('sys.float.Subtitle_L')).fontWeight(FontWeight.Medium)
         }
         .height(40)
         .justifyContent(FlexAlign.Center)

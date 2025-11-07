@@ -55,8 +55,8 @@ struct ChapterListView {
                     type: ProgressType.Linear
                   })
                     .width(88)
-                    .height(4)
-                    .color('rgba(0,0,0,0.2)')
+                    .height(24)
+                    .color($r('sys.color.comp_background_emphasize'))
                   Text(`${item.examManger.correctNumber}/${item.examManger.total}`)
                     .fontSize(10)
                     .fontColor('rgba(0,0,0,0.6)')

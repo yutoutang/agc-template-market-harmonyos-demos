@@ -36,7 +36,7 @@ export struct UserInfoPage {
         });
 
       Button('确定')
-        .fontColor(Color.White)
+        .fontColor($r('sys.color.font_primary'))
         .backgroundColor($r('sys.color.warning'))
         .width('100%')
         .margin({ left: 28, right: 28 })

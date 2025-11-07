@@ -19,7 +19,7 @@ export class DatabaseHelper {
     this.userList = cloud.database({ zoneName: ZONE_NAME }).collection(UserInfo);
   }
 
-  public async bindPhone(params: BindPhoneReq) {
+  public async bindPhone(params: BindPhoneReq): Promise<GetUserInfoResp | undefined> {
     const LOGGER_TAG = TAG + AccountTriggerMap.BIND_PHONE;
     const authCode = params.authCode;
     const createMock = params.createMock;
@@ -39,10 +39,10 @@ export class DatabaseHelper {
     } catch (err) {
       this.logger.error(LOGGER_TAG + ` error: ${err}`);
     }
-    return;
+    return undefined;
   }
 
-  public async unbindPhone() {
+  public async unbindPhone(): Promise<number | undefined> {
     const LOGGER_TAG = TAG + AccountTriggerMap.UNBIND_PHONE;
     try {
       const userQuery: CloudDBZoneQuery<UserInfo> = this.userList
@@ -62,10 +62,10 @@ export class DatabaseHelper {
     } catch (err) {
       this.logger.error(LOGGER_TAG + ` error: ${err}`);
     }
-    return;
+    return undefined;
   }
 
-  public async getUserInfo() {
+  public async getUserInfo(): Promise<GetUserInfoResp | undefined> {
     const LOGGER_TAG = TAG + AccountTriggerMap.GET_INFO;
     try {
       const userQuery: CloudDBZoneQuery<UserInfo> = this.userList
@@ -86,10 +86,10 @@ export class DatabaseHelper {
     } catch (err) {
       this.logger.error(LOGGER_TAG + `error: ${err}`);
     }
-    return;
+    return undefined;
   }
 
-  public async updateUserInfo(params: UpdateUserInfoReq) {
+  public async updateUserInfo(params: UpdateUserInfoReq): Promise<GetUserInfoResp | undefined> {
     const LOGGER_TAG = TAG + AccountTriggerMap.UPDATE_INFO;
     try {
       const userResp = await this.getUserInfo();
@@ -112,10 +112,11 @@ export class DatabaseHelper {
     } catch (err) {
       this.logger.error(LOGGER_TAG + ` error: ${err}`);
     }
-    return;
+    return undefined;
   }
 
-  private async _createUser(authCode: string, createMock: boolean = false, userResp: GetUserInfoResp | undefined) {
+  private async _createUser(authCode: string, createMock: boolean = false,
+    userResp: GetUserInfoResp | undefined): Promise<UserInfo | undefined> {
     const LOGGER_TAG = TAG + 'create-user';
     try {
       let initData;
@@ -141,10 +142,10 @@ export class DatabaseHelper {
     } catch (err) {
       this.logger.error(LOGGER_TAG + `error: ${err}`);
     }
-    return;
+    return undefined;
   }
 
-  private _getUserInfoResp(item: UserInfo) {
+  private _getUserInfoResp(item: UserInfo): GetUserInfoResp {
     const userResp: GetUserInfoResp = {
       avatar: item.getAvatar(),
       nickname: item.getNickname(),

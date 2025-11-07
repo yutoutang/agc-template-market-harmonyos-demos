@@ -54,7 +54,7 @@ export struct SecretLockSwitch {
           type: ToggleType.Switch,
           isOn: this.secretLock.gesture,
         })
-          .selectedColor(Color.Orange)// 设置enable=false时，会有一层透明度覆盖原本颜色来阻断交互，
+          .selectedColor($r('sys.color.comp_background_emphasize'))// 设置enable=false时，会有一层透明度覆盖原本颜色来阻断交互，
             // 使用.hitTestBehavior(this.isEnable? HitTestMode.Transparent: HitTestMode.None) 代替enable阻断交互
           .hitTestBehavior(this.secretLock.gesture ? HitTestMode.Transparent : HitTestMode.None)
           .onClick(() => {
@@ -96,7 +96,7 @@ export struct SecretLockSwitch {
           type: ToggleType.Switch,
           isOn: this.secretLock.fingerprint,
         })
-          .selectedColor(Color.Orange)
+          .selectedColor($r('sys.color.comp_background_emphasize'))
           .hitTestBehavior(this.secretLock.fingerprint ? HitTestMode.Transparent : HitTestMode.None)
           .onClick(() => {
             if (!this.secretLock.gesture) {

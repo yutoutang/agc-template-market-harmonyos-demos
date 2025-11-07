@@ -123,7 +123,7 @@ struct PersonalInfo {
                   this.isShow = true;
                 })
                 .bindSheet($$this.isShow, this.nickNameBuilder(), {
-                  height: 420, title: { title: '设置昵称' },
+                  height: 420, preferType: SheetType.CENTER, title: { title: '设置昵称' },
                 });
             };
           }.width('100%')

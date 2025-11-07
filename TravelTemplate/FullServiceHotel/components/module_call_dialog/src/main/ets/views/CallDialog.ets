@@ -24,6 +24,7 @@ export struct CallDialog {
       height: 280,
       dragBar: true,
       backgroundColor: $r('app.color.background_color_grey'),
+      preferType:SheetType.CENTER,
     })
     .hitTestBehavior(HitTestMode.Block)
     .onClick(() => {

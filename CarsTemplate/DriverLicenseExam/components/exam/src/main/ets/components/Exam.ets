@@ -7,12 +7,14 @@ import { JSON } from '@kit.ArkTS';
 // 设置 和 模拟考试时按返回键时打开弹窗
 let examController: ExamController = ExamController.instance;
 
+@Entry
 @ComponentV2
 export struct Exam {
   @Param @Require appPathStack: NavPathStack;
   @Param @Require examManager: ExamManager;
   // 记录模拟考试分数回调, 用于计算模拟考试平均分
-  @Param mockExamCall: (score: number) => void = (score: number) => {};
+  @Param mockExamCall: (score: number) => void = (score: number) => {
+  };
   // 监听monitor中isShowMockExamDialog的变化
   private examController: ExamController = ExamController.instance;
   // 显示剩余时间
@@ -29,7 +31,7 @@ export struct Exam {
     if (examController.isShowMockExamDialog) {
       examController.isShowMockExamDialog = false;
       this.isStop = true;
-      this.mockExamDialog.open();
+      this.examExitDialog.open();
     }
   }
 
@@ -46,7 +48,7 @@ export struct Exam {
           } else {
             showDialog = false;
             this.isStop = true;
-            this.mockExamDialog.open();
+            this.examSubmitDialog.open();
           }
         }
 
@@ -149,73 +151,130 @@ export struct Exam {
       ],
     }),
   });
-  mockExamDialog: CustomDialogController = new CustomDialogController({
+  examExitDialog: CustomDialogController = new CustomDialogController({
     builder: () => {
-      this.mockExamBuilder();
+      this.examExitBuilder();
     },
     autoCancel: false,
   });
 
   @Builder
-  mockExamBuilder() {
+  examExitBuilder() {
+    Column() {
+      Text('考试尚未结束')
+        .dialogTitleStyle()
+
+      Blank().height(12)
+      
+      Text('是否确认立即退出考试?')
+        .dialogInfoStyle()
+
+      Blank().height(28)
+
+      Row() {
+        Text('继续考试')
+          .dialogChooseStyle()
+          .fontColor('#64BB5C')
+          .onClick(() => {
+            this.examExitDialog.close()
+            this.isStop = false;
+          })
+        Column() {
+          Column() {
+
+          }
+          .height(24)
+          .width(1)
+          .backgroundColor('rgba(0,0,0,0.05)')
+        }
+        .justifyContent(FlexAlign.Center)
+        .alignItems(HorizontalAlign.Center)
+        .width(8)
+        .height('100%')
+
+        Text('确认退出')
+          .dialogChooseStyle()
+          .fontColor('rgba(0,0,0,0.40)')
+          .onClick(() => {
+            this.examExitDialog.close()
+            this.examSubmitDialog.open();
+          })
+      }
+      .width(296)
+      .height(40)
+
+      Blank()
+    }
+    .width(328)
+    .height(164)
+  }
+
+  examSubmitDialog: CustomDialogController = new CustomDialogController({
+    builder: () => {
+      this.submitExamBuilder();
+    },
+    autoCancel: false,
+    onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
+      
+    }
+  });
+
+  @Builder
+  submitExamBuilder() {
     Column() {
       Text(this.calcExamScore() ? '成绩合格' : '成绩不合格')
-        .fontSize(20)
-        .fontColor(this.calcExamScore() ? '#64BB5C' : '#E84026')
-        .fontWeight(FontWeight.Bold)
-        .padding({
-          top: 15,
-        });
+        .dialogTitleStyle()
 
-      Flex({ justifyContent: FlexAlign.SpaceAround }) {
-        Text('未答题数: ' + (this.examManager.total - this.examManager.correctNumber - this.examManager.errorNumber))
-          .fontSize(16)
-          .fontColor('rgba(0,0,0,0.90)');
+      Blank().height(12)
+      
+      Text('未答题数: ' + (this.examManager.total - this.examManager.correctNumber - this.examManager.errorNumber) +
+        '           ' + '考试成绩: ' + this.examManager.correctNumber + '分')
+        .dialogInfoStyle()
 
-        Text('考试成绩: ' + this.examManager.correctNumber + '分')
-          .fontSize(16)
-          .fontColor('rgba(0,0,0,0.90)');
-      }
-      .padding({
-        top: 27,
-        bottom: 27,
-      })
-      .width('100%');
+      Blank().height(28)
+      
+      Row() {
+        Text('重新考试')
+          .dialogChooseStyle()
+          .fontColor('#64BB5C')
+          .onClick(() => {
+            this.isStop = false;
+            this.examSubmitDialog.close();
 
-      Flex({ justifyContent: FlexAlign.SpaceAround }) {
-        Row() {
-          Text('继续考试')
-            .fontSize(16)
-            .fontColor('#64BB5C')
-            .fontWeight(FontWeight.Medium);
+            this.examManager.clearRecords();
+            this.examController.renderView = !this.examController.renderView;
+            examController.swiperController.changeIndex(0);
+            this.remainTime = this.examManager.timeLimit * 60;
+          })
+        Column() {
+          Column() {
+
+          }
+          .height(24)
+          .width(1)
+          .backgroundColor('rgba(0,0,0,0.05)')
         }
         .justifyContent(FlexAlign.Center)
-        .onClick(() => {
-          this.isStop = false;
-          this.mockExamDialog.close();
-        })
-        .width('50%')
-        .visibility(this.remainTime > 0 ? Visibility.Visible : Visibility.None);
+        .alignItems(HorizontalAlign.Center)
+        .width(8)
+        .height('100%')
 
-        Row() {
-          Text('现在交卷')
-            .fontSize(16)
-            .fontColor('rgba(0,0,0,0.40)')
-            .fontWeight(FontWeight.Medium);
-        }
-        .justifyContent(FlexAlign.Center)
-        .onClick(() => {
-          this.isStop = false;
-          this.mockExamDialog.close();
-          this.mockExamCall(this.examManager.correctNumber);
-          this.appPathStack.pop();
-        })
-        .width('50%');
+        Text('我知道了')
+          .dialogChooseStyle()
+          .fontColor('rgba(0,0,0,0.40)')
+          .onClick(() => {
+            this.isStop = false;
+            this.examSubmitDialog.close();
+            this.mockExamCall(this.examManager.correctNumber);
+            this.appPathStack.pop();
+          })
       }
-      .width('100%');
+      .width(296)
+      .height(40)
+
+      Blank()
     }
-    .backgroundColor(Color.White)
-    .width('100%')
+    .width(328)
     .height(164);
   }
 
@@ -265,8 +324,9 @@ export struct Exam {
         this.isShowProblemListSheet = !this.isShowProblemListSheet;
       })
       .bindSheet($$this.isShowProblemListSheet, this.showProblemListSheet(), {
-        height: '80%',
+        height: '70%',
         width: '100%',
+        preferType: SheetType.CENTER,
         title: { title: '答题卡' },
         backgroundColor: Color.White,
       });
@@ -311,7 +371,7 @@ export struct Exam {
       })
       .onClick(() => {
         this.isStop = true;
-        this.mockExamDialog.open();
+        this.examExitDialog.open();
       })
       .visibility(this.examManager.timeLimit === 0 ? Visibility.None : Visibility.Visible);
     }
@@ -362,11 +422,13 @@ export struct Exam {
       .rowsGap(16)
       .columnsTemplate('repeat(auto-stretch, 69)')
       .height('75%')
-      .scrollBar(BarState.Off);
+      .scrollBar(BarState.Off)
+
+      Blank('15%')
 
       Button('清空记录')
-        .fontSize(16)
-        .fontColor(Color.White)
+        .fontSize($r('sys.float.Body_L'))
+        .fontColor($r('sys.color.font_on_primary'))
         .fontWeight(FontWeight.Medium)
         .backgroundColor('#64BB5C')
         .height(40)
@@ -383,6 +445,7 @@ export struct Exam {
       left: '2%',
       right: '2%',
     })
+    .height('100%')
     .width('100%');
   }
 
@@ -423,6 +486,35 @@ export struct Exam {
 }
 
 
+@Extend(Text)
+function dialogTitleStyle() {
+  .fontSize(20)
+  .fontColor('#E84026')
+  .fontWeight(FontWeight.Bold)
+  .width('100%')
+  .textAlign(TextAlign.Center)
+  .width(280)
+  .height(56)
+}
+
+@Extend(Text)
+function dialogInfoStyle() {
+  .fontSize(16)
+  .fontWeight(FontWeight.Regular)
+  .width('100%')
+  .textAlign(TextAlign.Center)
+  .height(21)
+}
+
+@Extend(Text)
+function dialogChooseStyle() {
+  .fontSize(16)
+  .fontWeight(FontWeight.Medium)
+  .width(144)
+  .height('100%')
+  .textAlign(TextAlign.Center)
+}
+
 @Builder
 export function showSettingSheet() {
   Column({ space: 20 }) {
@@ -441,7 +533,7 @@ export function showSettingSheet() {
           examController.showNext = false;
         });
     }
-    .width('100%')
+    .width(360)
     .padding({
       top: 5,
     });
@@ -477,7 +569,7 @@ export function showSettingSheet() {
         .fontSize(16)
         .fontColor('rgba(0,0,0,0.90)');
     }
-    .width('100%');
+    .width(360);
   }
   .height('100%')
   .margin({

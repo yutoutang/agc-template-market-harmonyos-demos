@@ -13,8 +13,8 @@
  *   limitations under the License.
  */
 
-import { TodoItem } from '@ohos_agcit/daily_schedule_todo';
-import { TODO_CARD_WIDTH } from '../constant/CalendarConstant';
+import { TodoItem } from '@ohos_agcit/daily_schedule_component_lib';
+import { TimeLineConstants } from '../constant/CalendarConstant';
 
 export class LayoutUtil {
   private static readonly TIMELINE_HEIGHT = 37;
@@ -42,6 +42,6 @@ export class LayoutUtil {
     let hour = item.planTime.getHours()
     let sameHourItems: TodoItem[] = itemList.filter(x => x.planTime.getHours() === hour)
       .sort((a, b) => a.planTime.getTime() - b.planTime.getTime());
-    return sameHourItems.indexOf(item) * TODO_CARD_WIDTH + 42
+    return sameHourItems.indexOf(item) * TimeLineConstants.TODO_CARD_WIDTH + 42
   }
 }

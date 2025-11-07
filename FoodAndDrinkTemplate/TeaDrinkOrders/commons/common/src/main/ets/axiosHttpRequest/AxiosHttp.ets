@@ -14,6 +14,14 @@ export class AxiosHttpRequest {
   interceptorHooks?: InterceptorHooks;
   mockFlag: boolean = false;
 
+  constructor(options: HttpRequestConfig, mockFlag: boolean = false) {
+    this.mockFlag = mockFlag;
+    this.config = options;
+    this.instance = axios.create(options);
+    this.interceptorHooks = options.interceptorHooks;
+    this.setupInterceptor()
+  }
+
   setupInterceptor(): void {
     this.instance.interceptors.request.use(
       this.interceptorHooks?.requestInterceptor,
@@ -25,32 +33,25 @@ export class AxiosHttpRequest {
     );
   }
 
-  constructor(options: HttpRequestConfig, mockFlag: boolean = false) {
-    this.mockFlag = mockFlag;
-    this.config = options;
-    this.instance = axios.create(options);
-    this.interceptorHooks = options.interceptorHooks;
-    this.setupInterceptor()
-  }
-
   request<T>(config: HttpRequestConfig): Promise<T> {
     return new Promise<T>((resolve, reject) => {
       if (this.mockFlag) {
         let res = MockResponse.getMockResponse<T>(config)
         resolve(res)
-        return
+      } else {
+        this.instance
+          .request<null, T>(config)
+          .then(res => {
+            resolve(res);
+          })
+          .catch((err: BusinessError) => {
+            console.error('网络请求Request异常：', err.message)
+            if (err) {
+              reject(err);
+            }
+          });
       }
-      this.instance
-        .request<null, T>(config)
-        .then(res => {
-          resolve(res);
-        })
-        .catch((err: BusinessError) => {
-          console.error('网络请求Request异常：', err.message)
-          if (err) {
-            reject(err);
-          }
-        });
+
     });
   }
 

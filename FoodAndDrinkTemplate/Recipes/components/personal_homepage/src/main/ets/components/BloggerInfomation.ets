@@ -29,7 +29,7 @@ export struct BloggerInfomation {
         Column({ space: 12 }) {
           Row() {
             Column() {
-              Text(this.bloggerInfo.name)
+              Text(!this.bloggerInfo.name && this.isSelf ? '华为用户' : this.bloggerInfo.name)
                 .fontSize(24)
                 .fontWeight(FontWeight.Medium)
                 .fontColor($r('sys.color.font_primary'))
@@ -103,7 +103,7 @@ export struct BloggerInfomation {
         }
 
         Button(this.isFollower ? '已关注' : '关注', { controlSize: ControlSize.SMALL })
-          .fontSize(14)
+          .fontSize($r('sys.float.Body_M'))
           .fontColor(this.isFollower ? '#E84026' : $r('sys.color.font_on_primary'))
           .fontWeight(FontWeight.Medium)
           .backgroundColor(this.isFollower ? '#33FD4238' : '#FD4238')

@@ -150,6 +150,7 @@ goRecipeDetail(callback: (id: number) => void)
 ## 示例代码
 
 ```typescript
+import { promptAction } from '@kit.ArkUI';
 import { HomeSearch, RecipeBriefInfo } from 'home_search';
 
 @Entry
@@ -192,20 +193,25 @@ struct Index {
             isShowSearch: true,
             searchDishes: (keyword: string) => {
                // 调用搜索查询事件
+               promptAction.showToast({ message: '调用搜索查询' })
             },
             changeIndex: (index: number, keyword: string) => {
                // 切换搜索排序的事件
+               promptAction.showToast({ message: '切换搜索排序' })
             },
             changeShowResult: (flag: boolean) => {
                // 切换展示搜索结果的事件
+               promptAction.showToast({ message: '切换展示搜索结果' })
             },
             goRecipeDetail: (id: number) => {
                // 跳转菜谱详情事件
+               promptAction.showToast({ message: '跳转菜谱详情' })
             },
          })
       }
       .height('100%')
       .width('100%')
+      .padding({ top: 45 })
    }
 }
 ```

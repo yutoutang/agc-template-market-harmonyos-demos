@@ -1,114 +1,153 @@
 import { SegmentButton, SegmentController } from './component/SegmentButton';
 import { TimelineBar } from './component/TimelineBar';
 import { CalendarButtonType } from '../types/Types';
-import { CalendarUtil, CalenderView, CommonConstants, DateUtils, DateElement } from 'calendar_component';
+import { CalendarVM, MonthWeekCalendar, ViewTypeEnum, YearCalendar } from 'calendar_component';
 import { LayoutUtil } from '../utils/LayoutUtil';
 import { TimeLineConstants } from '../constant/CalendarConstant';
-import { PriorityEnum, TodoDataManager, TodoItem, TodoSectionList } from '@ohos_agcit/daily_schedule_todo';
-import { AvoidArea } from '@ohos_agcit/daily_schedule_component_lib';
+import { TodoDataManager, TodoSectionList } from '@ohos_agcit/daily_schedule_todo';
+import { AvoidArea, TodoCard, TodoItem } from '@ohos_agcit/daily_schedule_component_lib';
 import { AppStorageV2, curves } from '@kit.ArkUI';
-import { TodoCard } from './component/TodoCard';
 import { ThemeController } from '@ohos_agcit/daily_schedule_common_lib';
 import { DataPreferencesUtils } from '../utils/DataPreferencesUtils';
 import { Utils } from '../utils/Utils';
 import { ConfigurationConstant } from '@kit.AbilityKit';
+import { BreakpointType, GlobalInfoModel } from '@ohos_agcit/daily_schedule_utils';
+import dayjs from 'dayjs';
 
 @ComponentV2
 export struct CalendarPage {
-  buttons: string[] = ['月', '周', '日'];
+  buttons: string[] = ['年', '月', '周', '日'];
   dataManager: TodoDataManager = TodoDataManager.instance
   controller: Scroller = new Scroller()
   themeController: ThemeController = ThemeController.instance;
-  dateTimeController: CustomDialogController = new CustomDialogController({
-    builder: () => {
-      this.dateTimeDialog();
-    },
-    alignment: DialogAlignment.Center
-  });
+  vm: CalendarVM = CalendarVM.instance;
   // 避让区域
   @Local avoidArea: AvoidArea = AppStorageV2.connect(AvoidArea, () => new AvoidArea(0, 0))!;
+  // 断点控制器 
+  @Local globalInfo: GlobalInfoModel =
+    AppStorageV2.connect<GlobalInfoModel>(GlobalInfoModel, () => new GlobalInfoModel())!;
   // 分段式按钮控制器
-  @Local segmentController: SegmentController = new SegmentController(0, this.onChange.bind(this));
-  // 视图模式触发
+  @Local segmentController: SegmentController = new SegmentController(0, this.onButtonChange.bind(this));
+  // 视图模式按钮
   @Local viewButtonType: CalendarButtonType = CalendarButtonType.MONTH
-  // 今日待办
-  @Local todayTodoItems: TodoItem[] = []
-  // 选择的日期
-  @Local selectedDay: DateElement = new DateElement(DateUtils.getCurrentYear(),
-    DateUtils.getCurrentMonth(), DateUtils.getCurrentDay());
-  // 时间筛选器的时间
-  @Local selectedDateTime: Date =
-    new Date(`${this.selectedDay.year}-${this.selectedDay.month + 1}-${this.selectedDay.day}`);
-  @Local selectedMonth: DateElement =
-    new DateElement(DateUtils.getCurrentYear(), DateUtils.getCurrentMonth(), 0);
-  @Local showYear: number = DateUtils.getCurrentYear();
-  @Local showMonth: number = DateUtils.getCurrentMonth();
-  @Local isShowLunar: boolean = true;
-  @Local viewType: number = CommonConstants.MONTH_VIEW;
-  @Local scaleNum: number = 1;
-  @Local scheduleDates: Array<string> = [];
+  // 所有今日待办
+  @Local allTodayTodoItems: TodoItem[] = []
+  // 时间线中展示的今日待办
+  @Local todayTodoItemsInTimeline: TodoItem[] = []
+  // 是否展示农历
+  @Local isShowLunar: boolean = true
+  // 待办信息
+  @Local todoData: Map<string, TodoItem[]> = new Map()
 
-  @Monitor('viewTypes')
-  onViewTypeChange() {
-    this.refreshTodoData();
+  aboutToAppear(): void {
+    this.isShowLunar = this.isSettingLunar()
+    this.segmentController.updateActiveIndex(1)
+    this.refreshAllTodoCard();
+    this.refreshTodayTodoData(new Date());
   }
 
+  /**
+   * 监听待办数据变化
+   */
   @Monitor('dataManager.refreshNum')
   onTaskMapChange() {
     if (this.dataManager.refreshNum) {
       this.dataManager.refreshNum = 0
-      this.refreshTodoData();
+      this.refreshAllTodoCard();
+      this.refreshTodayTodoData(this.vm.selectDate.toDate());
     }
-    this.scheduleDates = Array.from(this.dataManager.taskMap.keys());
   }
 
-  aboutToAppear(): void {
-    this.todayTodoItems = Utils.filterTodayTasks(this.dataManager.allTasks,
-      new Date(`${this.selectedDay.year}-${this.selectedDay.month}-${this.selectedDay.day}`))
-    this.selectedDateTime = new Date(`${this.selectedDay.year}-${this.selectedDay.month + 1}-${this.selectedDay.day}`)
-    this.refreshTodoData();
-    this.scheduleDates = Array.from(this.dataManager.taskMap.keys());
+  /**
+   * 监听视图模式变化
+   */
+  @Monitor('vm.viewType')
+  onViewTypeChange() {
+    if (this.vm.viewType === ViewTypeEnum.MONTH) {
+      this.segmentController.updateActiveIndex(CalendarButtonType.MONTH)
+      return;
+    }
+    if (this.vm.viewType === ViewTypeEnum.WEEK) {
+      this.segmentController.updateActiveIndex(CalendarButtonType.WEEK)
+      return;
+    }
   }
 
+  /**
+   * 监听断点变化
+   * @param index
+   */
+  @Monitor('globalInfo.currentBreakpoint')
+  onCurrentBreakpointChange() {
+    this.refreshTodayTodoData(this.vm.selectDate.toDate())
+  }
+  
   /**
    * 分段式按钮回调函数
    * @param index
    */
-  onChange(index: number) {
+  onButtonChange(index: number) {
     console.log(String(index))
-    if (this.segmentController.activeIndex === 0) {
-      this.viewButtonType = CalendarButtonType.MONTH
-      this.viewType = CommonConstants.MONTH_VIEW
+    if (this.segmentController.activeIndex === CalendarButtonType.YEAR &&
+      this.vm.viewType !== ViewTypeEnum.YEAR) {
+      getContext(this).eventHub.emit('viewTypeChange', ViewTypeEnum.YEAR);
+      return
     }
-    if (this.segmentController.activeIndex === 1) {
-      this.viewButtonType = CalendarButtonType.WEEK
-      getContext(this).eventHub.emit('WEEK', 1);
-      this.viewType = CommonConstants.WEEK_VIEW
+    if (this.segmentController.activeIndex === CalendarButtonType.MONTH &&
+      this.vm.viewType !== ViewTypeEnum.MONTH) {
+      getContext(this).eventHub.emit('viewTypeChange', ViewTypeEnum.MONTH);
+      return
     }
-    if (this.segmentController.activeIndex === 2) {
-      this.viewButtonType = CalendarButtonType.DAY
-      getContext(this).eventHub.emit('WEEK', 1);
-      this.viewType = CommonConstants.WEEK_VIEW;
+    if (this.segmentController.activeIndex === CalendarButtonType.WEEK &&
+      this.vm.viewType !== ViewTypeEnum.WEEK) {
+      getContext(this).eventHub.emit('viewTypeChange', ViewTypeEnum.WEEK);
+      return
     }
-    this.refreshTodoData();
+    if (this.segmentController.activeIndex === CalendarButtonType.DAY &&
+      this.vm.viewType !== ViewTypeEnum.DAY) {
+      getContext(this).eventHub.emit('viewTypeChange', ViewTypeEnum.DAY);
+      return
+    }
   }
 
   /**
    * 刷新待办数据
    */
-  refreshTodoData() {
-    this.selectedDateTime = new Date(`${this.selectedDay.year}-${this.selectedDay.month + 1}-${this.selectedDay.day}`)
-    this.todayTodoItems = Utils.filterTodayTasks(this.dataManager.allTasks,
-      new Date(`${this.showYear}-${this.showMonth + 1}-${this.selectedDay.day}`))
+  refreshTodayTodoData(date: Date) {
+    this.allTodayTodoItems = Utils.filterTodayTasks(this.dataManager.allTasks, date)
+
+
+    // 1. 按小时分组
+    const groupedByHour = new Map<number, TodoItem[]>();
+
+    this.allTodayTodoItems.forEach(item => {
+      const hour = item.planTime.getHours();
+      if (!groupedByHour.has(hour)) {
+        groupedByHour.set(hour, []);
+      }
+      groupedByHour.get(hour)?.push(item);
+    });
+
+    // 2. 每组内按时间排序
+    groupedByHour.forEach(items => {
+      items.sort((a, b) => a.planTime.getTime() - b.planTime.getTime());
+    });
+
+    // 3. 取每组前N个并合并
+    this.todayTodoItemsInTimeline = Array.from(groupedByHour.values())
+      .flatMap(items => items.slice(0, new BreakpointType<number>({
+        sm: 4,
+        md: 8,
+        lg: 12,
+      }).getValue(this.globalInfo.currentBreakpoint)))
+      .sort((a, b) => a.planTime.getTime() - b.planTime.getTime());
   }
 
-  buildHeaderText(): string {
-    let year = this.selectedDay.year;
-    let month = this.selectedDay.month + 1;
-    if (month < 10) {
-      return year + '年' + '0' + month + '月'
-    }
-    return year + '年' + month + '月'
+  /**
+   * 刷新卡片数据
+   */
+  refreshAllTodoCard() {
+    this.todoData = Utils.getAllCard(this.dataManager.taskMap);
   }
 
   @Builder
@@ -118,235 +157,87 @@ export struct CalendarPage {
         .fontSize(26)
         .fontWeight(FontWeight.Bold)
         .width('100%')
-        .textAlign(TextAlign.Start);
+        .textAlign(TextAlign.Start)
     }
-    .height('7%')
+    .height(35)
     .width('100%')
-    .padding({ 'left': '5%', right: '5%' })
+    .padding({ left: '5%', right: '5%' })
   }
 
   @Builder
   segmentButton() {
-    Column() {
-      SegmentButton({
-        tabOptions: this.buttons,
-        activeButtonHeight: 35,
-        buttonHeight: 40,
-        buttonWidth: '90%',
-        buttonRadius: 24,
-        textFontColor: $r('sys.color.font_secondary'),
-        buttonBgColor: $r('sys.color.interactive_pressed'),
-        textActiveFontColor: $r('sys.color.font_primary'),
-        textActiveBgColor: this.themeController.currentColorMode ===
-        ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? $r('sys.color.comp_background_secondary') :
-        $r('sys.color.comp_background_primary'),
-        controller: this.segmentController
-      })
-        .height(50);
-    }
-    .height('12%')
-    .justifyContent(FlexAlign.Center)
-  }
-
-  @Builder
-  timeSelector() {
-    Row() {
-      Text(this.buildHeaderText())
-        .fontSize($r('app.integer.month_title_font_size'))
-        .fontWeight(500)
-        .textAlign(TextAlign.Start);
-      SymbolGlyph($r('sys.symbol.arrowtriangle_down_fill'))
-        .fontSize(15)
-        .fontColor([$r('sys.color.ohos_id_color_foreground')])
-        .margin({ left: 5 });
-    }
-    .padding({ left: '5%', right: '5%' })
-    .height('6%')
-    .width('100%')
-    .onClick(() => {
-      this.dateTimeController.open();
+    SegmentButton({
+      tabOptions: this.buttons,
+      activeButtonHeight: 35,
+      buttonHeight: 40,
+      buttonWidth: '90%',
+      buttonRadius: 24,
+      textFontColor: $r('sys.color.font_secondary'),
+      buttonBgColor: $r('sys.color.interactive_pressed'),
+      textActiveFontColor: $r('sys.color.font_primary'),
+      textActiveBgColor: this.themeController.currentColorMode ===
+      ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? $r('sys.color.comp_background_secondary') :
+      $r('sys.color.comp_background_primary'),
+      controller: this.segmentController
     })
   }
 
-  changeMonth(selectedMonth: DateElement) {
-    this.showYear = selectedMonth.year;
-    this.showMonth = selectedMonth.month;
-  }
-
-  changeLunar() {
-    this.isShowLunar = this.isSettingLunar()
-  }
-
   isSettingLunar() {
-    return DataPreferencesUtils.LUNAR_SETTING_ON ===
+    return DataPreferencesUtils.LUNAR_SETTING_OFF !==
     DataPreferencesUtils.getSync(DataPreferencesUtils.LUNAR_SETTING, DataPreferencesUtils.LUNAR_SETTING_ON)
-  }
-
-  @Builder
-  endNavigation() {
-    Column() {
-      Column() {
-      }
-      .borderRadius(2.5)
-      .backgroundColor($r('sys.color.icon_fourth'))
-      .width(50)
-      .height(5)
-    }
-    .width('100%')
-    .height(30)
-    .justifyContent(FlexAlign.Center)
-    .alignItems(HorizontalAlign.Center)
-  }
-
-  /**
-   * 日期选择器弹窗
-   */
-  @Builder
-  dateTimeDialog() {
-    Column() {
-      Row() {
-        Text() {
-          Span(CalendarUtil.buildDateStringByDate(this.selectedDateTime))
-          Span(' ')
-          Span(CalendarUtil.getWeekDescription(this.selectedDateTime))
-        }
-        .fontSize(20)
-        .fontWeight(700)
-      }
-      .justifyContent(FlexAlign.Center)
-      .width('100%')
-      .height(70)
-
-      // 日期选择器
-      DatePicker({
-        start: new Date('1970-1-1'),
-        end: new Date('2100-1-1'),
-        selected: this.selectedDateTime
-      })
-        .height(220)
-        .expandSafeArea()
-        .textStyle({
-          font: {
-            size: $r('sys.float.Subtitle_M'),
-            weight: FontWeight.Normal
-          },
-          color: $r('sys.color.font_primary')
-        })
-        .selectedTextStyle({
-          color: $r('sys.color.multi_color_04'),
-          font: {
-            size: $r('sys.float.Title_S'),
-            weight: FontWeight.Bold
-          }
-        })
-        .lunar(false)
-        .onDateChange((value: Date) => {
-          this.selectedDateTime = value
-        })
-
-      Row() {
-        Row() {
-          Text($r('app.string.text_cancel'))
-            .fontColor($r('sys.color.font_tertiary'))
-            .fontSize(18)
-            .fontWeight(FontWeight.Medium)
-        }
-        .justifyContent(FlexAlign.Center)
-        .width('50%')
-        .onClick(() => {
-          this.dateTimeController.close();
-        })
-
-        Row() {
-          Text($r('app.string.text_confirm'))
-            .fontSize(18)
-            .fontColor($r('sys.color.multi_color_04'))
-            .fontWeight(FontWeight.Medium)
-        }
-        .justifyContent(FlexAlign.Center)
-        .width('50%')
-        .onClick(() => {
-          this.showYear = new Date(this.selectedDateTime).getFullYear();
-          this.showMonth = new Date(this.selectedDateTime).getMonth();
-          const day = new Date(this.selectedDateTime).getDate();
-          this.selectedDay = new DateElement(this.showYear, this.showMonth, day);
-          this.dateTimeController.close();
-        })
-      }
-      .width('100%')
-      .height(60)
-    }
-    .justifyContent(FlexAlign.Center)
-    .backgroundColor($r('sys.color.background_primary'))
-    .borderRadius(32)
-    .height(350)
-    .width('100%')
   }
 
   build() {
     Column() {
       // 标题
       this.titleBar()
+      Blank().height(10)
+
       // 分段式按钮
       this.segmentButton()
-      // // 时间选择器
-      this.timeSelector()
-
+      Blank().height(18)
 
       Column() {
-        // 日历
-        CalenderView({
-          scheduleDates: this.scheduleDates,
-          scaleNumber: this.scaleNum,
-          viewType: this.viewType,
-          selectedDay: this.selectedDay,
-          showMonth: new DateElement(this.showYear, this.showMonth, this.selectedDay.day),
-          isShowLunar: this.isShowLunar,
-          onChangeDay: (day: DateElement) => {
-            this.selectedDay = new DateElement(day.year, day.month, day.day);
-            this.refreshTodoData();
-          },
-          onChangeMonth: (month: DateElement) => {
-            this.selectedMonth = month;
-            this.changeMonth(month);
-            this.refreshTodoData();
-          },
-          onChangeViewType: (viewType: number) => {
-            this.viewType = viewType;
+        // 年视图
+        YearCalendar({
+          todoData: this.todoData,
+          onClickMonth: (index) => {
+            let newDate = new Date(this.vm.selectDate.year(), index, 1)
+            this.vm.selectDate = dayjs(new Date(this.vm.selectDate.year(), index, 1));
+            this.refreshTodayTodoData(newDate)
+            this.segmentController.updateActiveIndex(1)
           }
         })
+          .visibility(this.vm.viewType === ViewTypeEnum.YEAR ? Visibility.Visible : Visibility.None)
 
-        // 底部导航条
-        this.endNavigation()
+        // 月周视图
+        MonthWeekCalendar({
+          selectedStyle: 'circle',
+          startWeekday: 'sunday',
+          isShowLunar: this.isShowLunar,
+          selectedColor: $r('sys.color.multi_color_04'),
+          todoData: this.todoData,
+          onChangeDay: (date: Date) => {
+            this.refreshTodayTodoData(date)
+          }
+        })
+          .visibility(this.vm.viewType !== ViewTypeEnum.YEAR ? Visibility.Visible : Visibility.None)
       }
       .padding({
-        left: 10,
-        right: 10
+        left: 16,
+        right: 16
       })
       .justifyContent(FlexAlign.Start)
-      .gesture(PanGesture({ fingers: 1, direction: PanDirection.Vertical, distance: 5 })
-        .onActionEnd((e: GestureEvent) => {
-          if (this.viewType === CommonConstants.MONTH_VIEW) {
-            this.viewType = CommonConstants.WEEK_VIEW;
-          } else {
-            this.viewType = CommonConstants.MONTH_VIEW;
-          }
-          this.scaleNum = 1;
-        })
-        .onActionUpdate((e: GestureEvent) => {
-          if (e.offsetY <= 20 && e.offsetY >= -20) {
-            this.scaleNum = e.offsetY;
-          }
-        })
-      )
 
       // 待办列表
-      if (this.segmentController.activeIndex === 0 || this.segmentController.activeIndex === 1) {
+      if ((this.segmentController.activeIndex === CalendarButtonType.MONTH ||
+        this.segmentController.activeIndex === CalendarButtonType.WEEK) &&
+        this.vm.viewType !== ViewTypeEnum.MONTH_DETAIL) {
         TodoSectionList({
           params: [
             {
               label: $r('app.string.title_today'),
-              data: this.todayTodoItems,
+              data: this.allTodayTodoItems,
               isShow: true,
             }
           ]
@@ -355,7 +246,7 @@ export struct CalendarPage {
       }
 
       // 日程卡片
-      if (this.segmentController.activeIndex === 2) {
+      if (this.segmentController.activeIndex === CalendarButtonType.DAY) {
         Column() {
           Text('待办').width('100%').textAlign(TextAlign.Start).height(50).padding({ left: 20 })
           Column() {
@@ -367,10 +258,15 @@ export struct CalendarPage {
                     lastHour: TimeLineConstants.DEFAULT_LAST_HOUR
                   })
                   Column() {
-                    ForEach(this.todayTodoItems, (item: TodoItem, index: number) => {
-                      TodoCard({ item: item, color: this.chooseCardColor(item) })
+                    ForEach(this.todayTodoItemsInTimeline, (item: TodoItem, index: number) => {
+                      TodoCard({
+                        title: item.title,
+                        cardHeight: TimeLineConstants.TODO_CARD_HEIGHT,
+                        cardWidth: TimeLineConstants.TODO_CARD_WIDTH,
+                        color: Utils.chooseCardColor(item)
+                      })
                         .position({
-                          x: LayoutUtil.getXPosition(this.todayTodoItems, index),
+                          x: LayoutUtil.getXPosition(this.todayTodoItemsInTimeline, index),
                           y: LayoutUtil.getYPosition(item)
                         })
                     }, (item: TodoItem) => JSON.stringify(item))
@@ -389,24 +285,8 @@ export struct CalendarPage {
     }
     .width('100%')
     .height('100%')
-    .padding({ top: px2vp(this.avoidArea.topRectHeight) + 10 })
+    .padding({ top: px2vp(this.avoidArea.topRectHeight) })
     .backgroundColor($r('sys.color.background_secondary'))
     .justifyContent(FlexAlign.Start)
-  }
-
-  private chooseCardColor(item: TodoItem): ResourceColor | undefined {
-    if (item.priorityType === PriorityEnum.NO) {
-      return $r('app.color.card_gray')
-    }
-    if (item.priorityType === PriorityEnum.LOW) {
-      return $r('app.color.card_green')
-    }
-    if (item.priorityType === PriorityEnum.MID) {
-      return $r('app.color.card_orange')
-    }
-    if (item.priorityType === PriorityEnum.HIGH) {
-      return $r('app.color.card_red')
-    }
-    return $r('app.color.card_gray')
   }
 }

@@ -123,7 +123,8 @@ struct Index {
          })
       }
       .height('100%')
-         .width('100%')
+      .width('100%')
+      .padding({ top: 45 })
    }
 }
 ```

@@ -130,6 +130,7 @@ removeRecipe(callback: (param: [BasketItem](#BasketItem对象说明)) => void)
 ## 示例代码
 
 ```typescript
+import { promptAction } from '@kit.ArkUI';
 import { BasketItem, IngredientItem, ShoppingBasket } from 'shopping_basket';
 
 @Entry
@@ -148,14 +149,17 @@ struct Index {
             basketList: this.basketList,
             goRecipeDetail: (id: number) => {
                // 跳转菜谱详情
+               promptAction.showToast({ message: '跳转菜谱详情' })
             },
             removeRecipe: (param: BasketItem) => {
                // 删除菜篮子里的菜谱
+               promptAction.showToast({ message: '删除菜篮子里的菜谱' })
             },
          })
       }
       .height('100%')
-         .width('100%')
+      .width('100%')
+      .padding({ top: 45 })
    }
 }
 ```

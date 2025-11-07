@@ -29,25 +29,4 @@ export class FormatUtil {
   public static formatTime(date: Date): string {
     return FormatUtil.formatDate(date, FormatUtil.DATE_24H_mm_ss);
   }
-
-  public static dateTimeAppendZero(value: number): string {
-    let v = value + 1;
-    return v < 10 ? '0' + v : '' + v;
-  }
-
-  public static formatImgResource(str: string): string {
-    if (!str.length) {
-      return '';
-    }
-    if (str.startsWith('mockImage://')) {
-      const resourceName = str.split('//')[1];
-      try {
-        const resource = getContext().resourceManager.getMediaBase64ByNameSync(resourceName);
-        return resource;
-      } catch (err) {
-        console.error(TAG, 'get image resource failed', err);
-      }
-    }
-    return str;
-  }
 }

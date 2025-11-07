@@ -195,7 +195,7 @@ struct Index {
                center: { anchor: '__container__', align: VerticalAlign.Center },
                middle: { anchor: '__container__', align: HorizontalAlign.Center },
             })
-            .bindSheet($$this.isShow, this.paymentChannelSheet(), { showClose: false, height: 250 })
+            .bindSheet($$this.isShow, this.paymentChannelSheet(), { showClose: false, preferType: SheetType.CENTER, height: 250 })
             .onClick(() => {
                this.isShow = true;
             })

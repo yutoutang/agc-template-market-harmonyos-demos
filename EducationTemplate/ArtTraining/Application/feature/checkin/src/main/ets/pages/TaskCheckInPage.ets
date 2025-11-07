@@ -43,7 +43,10 @@ export struct CheckInTaskPage {
         .backgroundColor($r('app.color.system_color_background_auxiliary'))
         .layoutWeight(1)
         .width($r('app.string.width_percent_full'))
-        .bindSheet($$this.showPreview, this.fullScreenPreviewBuilder(),{showClose:false});
+        .bindSheet($$this.showPreview, this.fullScreenPreviewBuilder(),{
+          showClose:false,
+          preferType:SheetType.CENTER,
+        });
       }
     }
     .hideTitleBar(true)

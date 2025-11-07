@@ -1,5 +1,5 @@
 import { UIAbility, Want } from '@kit.AbilityKit';
-import { window } from '@kit.ArkUI';
+import { window, KeyboardAvoidMode } from '@kit.ArkUI';
 import { FrameworkUtil, Logger, RouterMap, RouterModule, TabsIndexMap, WindowUtil } from 'commonlib';
 import { buffer } from '@kit.ArkTS';
 import auth from '@hw-agconnect/auth';
@@ -49,8 +49,14 @@ export default class EntryAbility extends UIAbility {
         Logger.error(TAG, 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');
         return;
       }
-      WindowUtil.initWindowUtil(windowStage.getMainWindowSync());
-      Logger.info(TAG, 'Succeeded in loading the content.');
+      try {
+        const win = windowStage.getMainWindowSync()
+        WindowUtil.initWindowUtil(win)
+        win.getUIContext().setKeyboardAvoidMode(KeyboardAvoidMode.OFFSET_WITH_CARET)
+        Logger.info(TAG, 'Succeeded in loading the content.');
+      } catch (err) {
+        Logger.error(TAG, 'failed in loading the content.');
+      }
     });
   }
 

@@ -1,0 +1,13 @@
+{
+  "name": "video_clip",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "libveditor.so": "file:./src/main/cpp/types/libveditor",
+    "@ohos/axios": "^2.2.4",
+    "@hw-agconnect/axios-mock-adapter": "^1.0.0"
+  }
+}

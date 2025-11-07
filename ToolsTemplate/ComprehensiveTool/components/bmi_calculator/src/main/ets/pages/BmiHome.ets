@@ -347,6 +347,7 @@ export struct BmiHome {
     })
     .bindSheet(this.showDetailModal, this.buildDetailSheetContent(), {
       height: SheetSize.MEDIUM,
+      preferType: SheetType.CENTER,
       backgroundColor: '#FFFFFF',
       title: { title: '' },
       dragBar: true,

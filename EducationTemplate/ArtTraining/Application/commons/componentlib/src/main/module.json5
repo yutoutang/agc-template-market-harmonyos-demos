@@ -3,7 +3,8 @@
     "name": "componentlib",
     "type": "har",
     "deviceTypes": [
-      "phone"
+      "phone",
+      "tablet"
     ],
     "routerMap": "$profile:router_map"
   }

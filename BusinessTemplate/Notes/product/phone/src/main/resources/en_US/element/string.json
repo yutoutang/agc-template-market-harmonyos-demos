@@ -123,6 +123,10 @@
     {
       "name": "latest_in_trash",
       "value": "latest_in_trash"
+    },
+    {
+      "name": "agcit_huawei_notes",
+      "value": "1.0.2"
     }
   ]
 }

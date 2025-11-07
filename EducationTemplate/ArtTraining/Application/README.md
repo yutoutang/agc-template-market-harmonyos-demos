@@ -123,7 +123,7 @@ ArtTraining
 
 - DevEco Studio版本：DevEco Studio 5.0.2 Release及以上
 - HarmonyOS SDK版本：HarmonyOS 5.0.2 Release SDK及以上
-- 设备类型：华为手机（直板机）
+- 设备类型：华为手机（包括双折叠和阔折叠）
 - HarmonyOS版本：HarmonyOS 5.0.2 Release及以上
 
 ### 权限

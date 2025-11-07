@@ -6,7 +6,7 @@
     },
     {
       "name": "agcit_huawei_recipes",
-      "value": "1.0.3"
+      "value": "1.0.4"
     },
     {
       "name": "agcittype_huawei_recipes",
@@ -14,7 +14,7 @@
     },
     {
       "name": "agcitkid_huawei_recipes",
-      "value": "agcit_huawei_recipes_aggregated_ads/1.0.1,agcit_huawei_recipes_aggregated_login/1.0.1,agcit_huawei_recipes_aggregated_payment/1.0.1,agcit_huawei_recipes_calorie_calculation/1.0.2,agcit_huawei_recipes_featured_recipes/1.0.2,agcit_huawei_recipes_home_search/1.0.1,agcit_huawei_recipes_link_category/1.0.2,agcit_huawei_recipes_personal_homepage/1.0.2,agcit_huawei_recipes_shopping_basket/1.0.1,agcit_huawei_recipes_upload_recipe/1.0.2"
+      "value": "agcit_huawei_recipes_aggregated_ads/1.0.2,agcit_huawei_recipes_aggregated_login/1.0.2,agcit_huawei_recipes_aggregated_payment/1.0.2,agcit_huawei_recipes_calorie_calculation/1.0.3,agcit_huawei_recipes_featured_recipes/1.0.3,agcit_huawei_recipes_home_search/1.0.2,agcit_huawei_recipes_link_category/1.0.3,agcit_huawei_recipes_personal_homepage/1.0.3,agcit_huawei_recipes_shopping_basket/1.0.3,agcit_huawei_recipes_upload_recipe/1.0.3"
     }
   ]
 }

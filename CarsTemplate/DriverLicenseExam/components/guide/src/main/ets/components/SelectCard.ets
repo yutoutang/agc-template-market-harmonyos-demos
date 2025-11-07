@@ -24,7 +24,7 @@ export struct SelectCard {
       if (this.hasSelect()) {
         Radio({ value: String(this.value), group: GROUP }).checked(this.hasSelect())
           .radioStyle({
-            checkedBackgroundColor: '#64BB5C'
+            checkedBackgroundColor: $r('sys.color.comp_background_emphasize')
           })
           .height(20)
           .width(20)

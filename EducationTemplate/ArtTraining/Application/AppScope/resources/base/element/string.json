@@ -6,7 +6,7 @@
     },
     {
       "name": "agcit_huawei_art_training",
-      "value": "1.0.1"
+      "value": "1.0.2"
     },
     {
       "name": "agcittype_huawei_art_training",
@@ -14,7 +14,7 @@
     },
     {
       "name": "agcitkid_huawei_art_training",
-      "value": "agcit_huawei_art_training_module_course_check_in/1.0.0,agcit_huawei_art_training_module_store_map/1.0.0,agcit_huawei_art_training_module_course_list/1.0.0"
+      "value": "agcit_huawei_art_training_module_course_check_in/1.0.1,agcit_huawei_art_training_module_store_map/1.0.0,agcit_huawei_art_training_module_course_list/1.0.1"
     }
   ]
 }

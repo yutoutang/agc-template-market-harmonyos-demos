@@ -127,6 +127,10 @@
     {
       "name": "latest_in_trash",
       "value": "最迟进入回收站时间"
+    },
+    {
+      "name": "agcit_huawei_notes",
+      "value": "1.0.2"
     }
   ]
 }

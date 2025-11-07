@@ -195,7 +195,7 @@ export struct UICitySelect {
 
         Blank()
         if (this.isLoading) {
-          LoadingProgress().width(24).height(24).color($r('app.color.common_theme_color')).margin({ left: 10 })
+          LoadingProgress().width(24).height(24).color($r('sys.color.icon_on_primary')).margin({ left: 10 })
         } else {
           Text('重新定位')
             .fontSize(14)

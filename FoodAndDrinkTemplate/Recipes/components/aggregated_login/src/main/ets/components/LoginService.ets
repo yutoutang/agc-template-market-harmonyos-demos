@@ -62,8 +62,6 @@ export struct LoginService {
   // 是否勾选协议
   @Local isSelected: boolean = false;
   @Local isShow: boolean = false;
-  // 弹窗是否已开启
-  private customerDiaLogOpen: boolean = false;
   error?: BusinessError;
   response: loginComponentManager.HuaweiIDCredential = {} as loginComponentManager.HuaweiIDCredential;
   // 控制登录中不可点击协议和复选框的状态变量
@@ -99,14 +97,12 @@ export struct LoginService {
       cancel: () => {
         this.enableStatus = true;
         this.agreementDialog.close();
-        this.customerDiaLogOpen = false;
         // 设置协议状态为NOT_ACCEPTED
         this.controller.setAgreementStatus(loginComponentManager.AgreementStatus.NOT_ACCEPTED);
       },
       confirm: () => {
         this.enableStatus = false;
         this.agreementDialog.close();
-        this.customerDiaLogOpen = false;
         this.isSelected = true;
         // 设置协议状态为ACCEPTED
         this.controller.setAgreementStatus(loginComponentManager.AgreementStatus.ACCEPTED);
@@ -154,7 +150,6 @@ export struct LoginService {
       } else if (error.code === LoginErrorCode.ERROR_CODE_AGREEMENT_STATUS_NOT_ACCEPTED) {
         // 未同意协议，弹出协议弹框，推荐使用该回调方式
         this.agreementDialog.open();
-        this.customerDiaLogOpen = true;
       } else if (error.code === LoginErrorCode.ERROR_CODE_LOGIN_OUT) {
         // 华为账号未登录提示
         this.showToast($r('app.string.not_login_in'));
@@ -184,7 +179,6 @@ export struct LoginService {
         this.loginFinishedCb(false)
       } else {
         this.agreementDialog.open();
-        this.customerDiaLogOpen = true;
       }
     } catch (e) {
       Logger.info(this.domainId, this.logTag,
@@ -379,7 +373,7 @@ export struct LoginService {
             this.isShow = true;
           })
           .bindSheet($$this.isShow, this.loginTypeSheet(),
-            { showClose: false, height: '20%' });
+            { showClose: false, preferType: SheetType.CENTER, height: '20%' });
         }.margin({ top: 16 });
       };
 

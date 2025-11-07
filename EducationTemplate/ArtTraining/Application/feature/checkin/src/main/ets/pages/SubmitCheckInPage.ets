@@ -13,8 +13,6 @@ export struct SubmitCheckInPage {
 
   build() {
     NavDestination() {
-      CommonHeader({ title: '提交打卡' });
-
       CheckInView({
         handleSubmit: (data) => {
           this.vm.submitRecord(data);
@@ -23,7 +21,7 @@ export struct SubmitCheckInPage {
         this.taskDetailBuilder();
       };
     }
-    .hideTitleBar(true)
+    .title('提交打卡', { backgroundColor: $r('app.color.system_color_background_white') })
     .onReady(() => {
       this.vm.initRecord();
     })

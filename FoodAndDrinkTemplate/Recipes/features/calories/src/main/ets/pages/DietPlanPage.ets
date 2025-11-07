@@ -64,9 +64,8 @@ struct DietPlanPage {
           Select(this.vm.menuList)
             .selected(this.vm.selectIndex)
             .value(this.vm.selectText)
-            .font({ size: 16, weight: FontWeight.Medium })
+            .font({ size: $r('sys.float.Body_L'), weight: FontWeight.Medium })
             .fontColor($r('sys.color.font_primary'))
-            .space(16)
             .width(124)
             .optionWidth(224)
             .optionHeight(296)
@@ -172,6 +171,7 @@ struct DietPlanPage {
           .bindSheet($$this.vm.showAddFoodSheet, this.addFoodSheet(), {
             height: 400,
             blurStyle: BlurStyle.Thick,
+            preferType: SheetType.CENTER,
             showClose: false,
           });
         }.layoutWeight(1)
@@ -209,7 +209,7 @@ struct DietPlanPage {
           Select(this.vm.menuList)
             .selected(this.vm.selectIndex)
             .value(this.vm.selectText)
-            .font({ size: 16, weight: FontWeight.Medium })
+            .font({ size: $r('sys.float.Body_L'), weight: FontWeight.Medium })
             .fontColor($r('sys.color.font_primary'))
             .space(16)
             .width(124)
@@ -273,16 +273,16 @@ struct DietPlanPage {
 
       Row({ space: 16 }) {
         Button('取消')
-          .fontSize(16)
+          .fontSize($r('sys.float.Body_L'))
           .fontWeight(FontWeight.Medium)
-          .fontColor($r('sys.color.font_secondary'))
+          .fontColor($r('sys.color.font_primary'))
           .backgroundColor('#e6e8e9')
           .layoutWeight(1)
           .onClick(() => {
             this.vm.showAddFoodSheet = false
           })
         Button('确定')
-          .fontSize(16)
+          .fontSize($r('sys.float.Body_L'))
           .fontWeight(FontWeight.Medium)
           .fontColor($r('sys.color.font_on_primary'))
           .backgroundColor('#E84026')

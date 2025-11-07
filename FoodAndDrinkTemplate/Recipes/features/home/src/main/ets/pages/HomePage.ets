@@ -33,10 +33,10 @@ struct HomePage {
           .loop(true)
           .indicator( // 设置圆点导航点样式
             new DotIndicator()
-              .itemWidth(8)
-              .itemHeight(8)
+              .itemWidth(6)
+              .itemHeight(6)
               .selectedItemWidth(12)
-              .selectedItemHeight(8)
+              .selectedItemHeight(6)
               .color('#33FFFFFF')
               .selectedColor('#E84026'))
           .borderRadius(16);

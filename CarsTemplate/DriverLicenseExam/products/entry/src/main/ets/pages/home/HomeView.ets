@@ -341,7 +341,7 @@ export struct HomeView {
 
           if (this.currentTab === index) {
             Divider()
-              .color($r('app.color.icon_color_highlight'))
+              .color($r('sys.color.comp_divider'))
               .strokeWidth(2)
               .width(CommonConstants.FULL_WIDTH)
               .margin({ top: 4 });

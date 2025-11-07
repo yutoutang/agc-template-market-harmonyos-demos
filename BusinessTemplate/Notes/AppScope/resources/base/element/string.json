@@ -6,7 +6,7 @@
     },
     {
       "name": "agcit_huawei_notes",
-      "value": "1.0.1"
+      "value": "1.0.2"
     },
     {
       "name": "agcittype_huawei_notes",
@@ -14,7 +14,7 @@
     },
     {
       "name": "agcitkid_huawei_notes",
-      "value": "agcit_huawei_notes_secretlock/1.0.1,agcit_huawei_notes_richeditor/1.0.1"
+      "value": "agcit_huawei_notes_secretlock/1.0.2,agcit_huawei_notes_richeditor/1.0.2"
     }
   ]
 }

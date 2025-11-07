@@ -24,7 +24,7 @@
 
 * DevEco Studio版本：DevEco Studio 5.0.2 Release及以上
 * HarmonyOS SDK版本：HarmonyOS 5.0.2 Release SDK及以上
-* 设备类型：华为手机（直板机）
+* 设备类型：华为手机（包括双折叠和阔折叠）
 * HarmonyOS版本：HarmonyOS 5.0.2 Release及以上
 
 ### 权限
@@ -37,7 +37,7 @@
 
 1. 安装组件。
 
-   如果是在DevEvo Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
+   如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
 
    如果是从生态市场下载组件，请参考以下步骤安装组件。
 
@@ -81,15 +81,15 @@
    
    @Entry
    @Component
-   struct Index {
+   struct CheckInPage1 {
      build() {
-       Column() {
+       Navigation() {
          CheckInView() {
            Column() {
              Text('打卡要求xxx');
            };
          };
-       };
+       }.title('提交打卡')
      }
    }
    ```
@@ -161,7 +161,7 @@ import { CheckInDataModel, CheckInView } from 'module_check_in';
 @ComponentV2
 struct CheckInPage2 {
   build() {
-    Column() {
+    Navigation() {
       CheckInView(
         {
           textLimit: 100,
@@ -171,14 +171,14 @@ struct CheckInPage2 {
         },
       ) {
         Column() {
-          Text('文字要求: 不少于10字').cardContentStyle();
-          Text('图片要求: 不少于3张').cardContentStyle();
+          Text(`文字要求: 不少于10字`).cardContentStyle();
+          Text(`图片要求: 不少于3张`).cardContentStyle();
           Text('视频要求: 至少上传1个打卡视频').cardContentStyle();
         }
         .width('100%')
         .alignItems(HorizontalAlign.Start);
       };
-    };
+    }.title('提交打卡')
   }
 
   handleSubmit(data: CheckInDataModel) {

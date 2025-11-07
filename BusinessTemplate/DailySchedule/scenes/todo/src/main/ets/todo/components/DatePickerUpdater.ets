@@ -1,22 +1,22 @@
 import { FormatUtil } from '@ohos_agcit/daily_schedule_common_lib';
 import { curves } from '@kit.ArkUI';
-import { UpdateTodoPlanTimeInfo } from '../../mock/UpdateTodoInfo';
+import { UpdateTodoPlanTimeVM } from '../../mock/TodoInfoVM';
 
 @ComponentV2
 export struct DatePickerUpdater {
-  updateTodoInfo: UpdateTodoPlanTimeInfo = UpdateTodoPlanTimeInfo.instance
+  vm: UpdateTodoPlanTimeVM = UpdateTodoPlanTimeVM.instance
   @Local isDatePickerFocus: boolean = true;
   @Local isTimePickerFocus: boolean = false;
   @Param selectedTime: Date = new Date();
 
   aboutToAppear(): void {
-    this.updateTodoInfo.modifyPlanTime = this.selectedTime
+    this.vm.modifyPlanTime = this.selectedTime
   }
 
   build() {
     Column() {
       Row() {
-        Text('时间').fontSize(20).fontWeight(600)
+        Text('时间').fontSize($r('sys.float.Title_S')).fontWeight(600)
         Blank()
         Button(FormatUtil.formatDate(this.selectedTime, FormatUtil.DATE_YYYY_MM_DD))
           .width(120)
@@ -76,7 +76,7 @@ export struct DatePickerUpdater {
           })
           .lunar(false)
           .onDateChange((value: Date) => {
-            this.updateTodoInfo.modifyPlanTime = value
+            this.vm.modifyPlanTime = value
             console.info('select current date is: ' + value.toString());
           })
       }
@@ -103,7 +103,7 @@ export struct DatePickerUpdater {
           .useMilitaryTime(true)
           .onChange((value: TimePickerResult) => {
             if (value.hour >= 0) {
-              this.updateTodoInfo.modifyPlanTime.setHours(value.hour, value.minute)
+              this.vm.modifyPlanTime.setHours(value.hour, value.minute)
               console.info('select current time is: ' + JSON.stringify(value));
             }
           })

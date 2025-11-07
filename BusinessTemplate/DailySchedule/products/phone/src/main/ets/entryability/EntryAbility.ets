@@ -1,16 +1,18 @@
-import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
+import { AbilityConstant, Configuration, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { AppStorageV2, window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { AvoidArea } from '@ohos_agcit/daily_schedule_component_lib';
 import { ThemeController } from '@ohos_agcit/daily_schedule_common_lib';
-import { Configuration } from '@kit.AbilityKit';
+import { WindowUtil } from '@ohos_agcit/daily_schedule_utils';
+import { TodoDataManager } from '@ohos_agcit/daily_schedule_todo';
 
 const DOMAIN = 0x0000;
 
 export default class EntryAbility extends UIAbility {
   private themeController: ThemeController = ThemeController.instance;
-  
+  dataManager: TodoDataManager = TodoDataManager.instance
+
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
     this.themeController.currentColorMode = this.context.config.colorMode;
@@ -24,6 +26,9 @@ export default class EntryAbility extends UIAbility {
   onWindowStageCreate(windowStage: window.WindowStage): void {
     // Main window is created, set main page for this ability
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
+
+    // 一多适配
+    WindowUtil.registerBreakPoint(windowStage);
 
     windowStage.loadContent('pages/MainEntry', (err) => {
       if (err.code) {
@@ -58,7 +63,6 @@ export default class EntryAbility extends UIAbility {
         avoidArea.bottomRectHeight = data.area.bottomRect.height;
       }
     });
-    
   }
 
   onWindowStageDestroy(): void {
@@ -85,5 +89,9 @@ export default class EntryAbility extends UIAbility {
     this.themeController.isFollowSystemSetting) {
       this.themeController.currentColorMode = newConfig.colorMode;
     }
+  }
+
+  onNewWant(want: Want, _launchParam: AbilityConstant.LaunchParam): void {
+    this.dataManager.updateAtomicCard()
   }
 }

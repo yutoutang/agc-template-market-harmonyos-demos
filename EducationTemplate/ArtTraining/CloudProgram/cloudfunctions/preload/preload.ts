@@ -2,7 +2,7 @@ import { DatabaseHelper } from './DatabaseHelper';
 
 const TAG = '[preload]';
 
-let myHandler = async function (event, context, callback, logger) {
+let myHandler = async function (event, context, callback, logger): Promise<void> {
   logger.info(event);
   const databaseHelper: DatabaseHelper = new DatabaseHelper(logger);
 
@@ -34,8 +34,6 @@ let myHandler = async function (event, context, callback, logger) {
       },
     });
   }
-
-
 };
 
 export { myHandler };

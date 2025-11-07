@@ -213,7 +213,7 @@ export struct UploadRecipe {
         Button('上传')
           .height(40)
           .width('100%')
-          .fontSize(16)
+          .fontSize($r('sys.float.Body_L'))
           .fontWeight(FontWeight.Medium)
           .backgroundColor('#E84026')
           .onClick(() => {
@@ -238,7 +238,7 @@ export struct UploadRecipe {
     Row() {
       Text('删除')
         .padding(5)
-        .fontSize(16)
+        .fontSize($r('sys.float.Body_L'))
         .backgroundColor('#E84026')
         .fontColor(Color.White)
         .borderRadius(16)
@@ -261,7 +261,7 @@ export struct UploadRecipe {
     Row() {
       Text('删除')
         .padding(5)
-        .fontSize(16)
+        .fontSize($r('sys.float.Body_L'))
         .backgroundColor('#E84026')
         .fontColor(Color.White)
         .borderRadius(16)

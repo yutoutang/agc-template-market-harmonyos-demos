@@ -24,7 +24,7 @@
 
 * DevEco Studio版本：DevEco Studio 5.0.2 Release及以上
 * HarmonyOS SDK版本：HarmonyOS 5.0.2 Release SDK及以上
-* 设备类型：华为手机（直板机）
+* 设备类型：华为手机（包括双折叠和阔折叠）
 * HarmonyOS版本：HarmonyOS 5.0.2 Release及以上
 
 ### 权限
@@ -37,7 +37,7 @@
 
 1. 安装组件。
 
-   如果是在DevEvo Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
+   如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
 
    如果是从生态市场下载组件，请参考以下步骤安装组件。
 
@@ -158,7 +158,7 @@ handleClick: (course: [CourseInfo](#CourseInfo接口说明)) => void
 
 ## 示例代码
 
-### 示例一 （展示用户位置和信息窗，点击导航跳转华为地图）
+### 示例一
 
 ```ts
 import { CourseInfo, CourseList } from 'module_course_list';
@@ -211,54 +211,52 @@ const mock2: CourseInfo = {
 @ComponentV2
 struct PreviewPage {
   @Local
-  list: CourseInfo[] = [];
+  list: CourseInfo[] = [mock1, mock2];
   @Local
-  isLoading: boolean = false;
+  open: boolean = false
+  @Local
+  isVertical: boolean = false;
+
+  @Computed
+  get title() {
+    return this.isVertical ? '课程列表竖版' : '课程列表横版'
+  }
 
   build() {
-    Scroll() {
-      Column({ space: 16 }) {
-        if (!this.list.length) {
-          Button('获取课程').onClick(() => {
-            this.isLoading = true;
-            const timer = setTimeout(() => {
-              this.list = [mock1, mock2];
-              this.isLoading = false; 
-              clearTimeout(timer);
-            }, 500);
-          });
-        }
-        Column() {
-          Text('课程列表横版');
-          CourseList({
-            coursesList: this.list,
-            isVertical: false,
-            isLoading: this.isLoading,
-            handleClick: (item: CourseInfo) => {
-              this.getUIContext().getPromptAction().showToast({
-                message: `点击了课程，名称为${item.name}`,
-              });
-            },
-          });
-        };
+    Column({ space: 16 }) {
+      Button('课程列表横版')
+        .onClick(() => {
+          this.isVertical = false;
+          this.open = true
+        })
 
-        Column() {
-          Text('课程列表竖版');
-          CourseList({
-            coursesList: this.list,
-            isLoading: this.isLoading,
-            handleClick: (item: CourseInfo) => {
-              this.getUIContext().getPromptAction().showToast({
-                message: `点击了课程，名称为${item.name}`,
-              });
-            },
+      Button('课程列表竖版')
+        .onClick(() => {
+          this.isVertical = true;
+          this.open = true
+        })
+    }
+    .bindSheet($$this.open, this.buildList, {
+      preferType: SheetType.CENTER,
+      detents: [SheetSize.MEDIUM],
+      title: { title: this.title },
+    })
+  }
+
+  @Builder
+  buildList() {
+    Column() {
+      CourseList({
+        coursesList: this.list,
+        isVertical: this.isVertical,
+        handleClick: (item: CourseInfo) => {
+          this.getUIContext().getPromptAction().showToast({
+            message: `点击了课程，名称为${item.name}`,
           });
-        }
-        .backgroundColor('#f1f3f5')
-        .padding(16)
-        .layoutWeight(1);
-      };
-    };
+        },
+      });
+    }
+    .padding(24)
   }
 }
 ```

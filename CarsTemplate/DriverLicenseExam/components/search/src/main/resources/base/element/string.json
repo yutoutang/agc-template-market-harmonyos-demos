@@ -6,7 +6,7 @@
     },
     {
       "name": "agcit_huawei_driver_license_exam_guide",
-      "value": "1.0.0"
+      "value": "1.0.3"
     },
     {
       "name": "agcittype_huawei_driver_license_exam_guide",
@@ -14,7 +14,7 @@
     },
     {
       "name": "agcit_huawei_driver_license_exam_search",
-      "value": "1.0.2"
+      "value": "1.0.3"
     },
     {
       "name": "agcittype_huawei_driver_license_exam_search",
@@ -22,7 +22,7 @@
     },
     {
       "name": "agcitkid_huawei_driver_license_exam_search",
-      "value": "agcit_huawei_driver_license_exam_exam/1.0.2"
+      "value": "agcit_huawei_driver_license_exam_exam/1.0.3"
     }
   ]
 }

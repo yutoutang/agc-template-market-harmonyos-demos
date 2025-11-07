@@ -17,11 +17,13 @@ export struct BindPhonePage {
 
         Column() {
           Image($r('app.media.img_bind_account'))
-            .width($r('app.string.width_percent_40'));
+            .width($r('app.string.width_percent_40'))
+            .constraintSize({ maxHeight: '60%' })
+            .objectFit(ImageFit.Contain)
           Text('绑定手机号后体验更多功能')
             .fontColor($r('app.color.font_color_level1'))
             .fontWeight(500)
-            .fontSize($r('app.string.font_size_18'));
+            .fontSize($r('app.string.font_size_18'))
           FunctionalButton({
             params: {
               openType: functionalButtonComponentManager.OpenType.GET_PHONE_NUMBER,
@@ -30,9 +32,12 @@ export struct BindPhonePage {
                 plain: true,
                 styleConfig: new functionalButtonComponentManager
                   .ButtonConfig()
+                  .type(ButtonType.Capsule)
                   .fontColor($r('app.color.font_color_level1_invert'))
                   .backgroundColor($r('app.color.system_theme_color'))
                   .width($r('app.string.width_percent_full'))
+                  .height(40)
+                  .constraintSize({ maxWidth: 400 })
                   .margin({ top: $r('app.string.margin_l') }),
               },
             },

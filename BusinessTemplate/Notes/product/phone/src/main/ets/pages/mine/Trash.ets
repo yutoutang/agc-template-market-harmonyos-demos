@@ -163,8 +163,8 @@ export struct Trash {
             placeholder: $r('app.string.searchtrash_note'),
             controller: this.searchCtrl.controller
           })
-            .placeholderFont({ size: 14 })
-            .placeholderColor('#999999')
+            .placeholderFont({ size: $r('sys.float.Body_L') })
+            .placeholderColor($r('sys.color.font_secondary'))
             .onSubmit((value: string) => this.onSearch(value))
             .onChange((value: string) => {
               if (!value){

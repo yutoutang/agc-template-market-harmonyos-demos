@@ -79,7 +79,7 @@ export class SearchFoodPageVM {
       id: item.id,
       name: item.name,
       weight: Number(this.inputText) || 100,
-      calories: item.calories,
+      calories: item.calories / 100 * (Number(this.inputText) ? Number(this.inputText) : 100),
     })
     addDietPlans(this.selectIndex, this.selectText.toString(), data).then(res => {
       if (res.status === 200) {

@@ -208,6 +208,7 @@ changeDeleteState(callback: (isToDelete: boolean) => void)
 ### 示例1
 
 ```typescript
+import { promptAction } from '@kit.ArkUI';
 import { LazyDataSource } from 'featured_recipes';
 import { BloggerInfo, PersonalHomepage, RecipeBriefInfo } from 'personal_homepage';
 
@@ -260,9 +261,11 @@ struct Index {
             },
             onClickCb: (id: number) => {
                // 跳转菜谱详情
+               promptAction.showToast({ message: '跳转菜谱详情' })
             },
             jumpBloggerInfo: (id: number) => {
                // 跳转博主详情
+               promptAction.showToast({ message: '跳转博主详情' })
             },
             changeTabIndex: (index: number) => {
                // 切换tab时，更新数据
@@ -270,14 +273,17 @@ struct Index {
             },
             login: () => {
                // 未登录时跳转登录
+               promptAction.showToast({ message: '未登录时跳转登录' })
             },
             jumpFollowers: () => {
                // 跳转关注页面
+               promptAction.showToast({ message: '跳转关注页面' })
             },
          })
       }
       .height('100%')
-         .width('100%')
+      .width('100%')
+      .padding({ top: 45 })
    }
 }
 ```

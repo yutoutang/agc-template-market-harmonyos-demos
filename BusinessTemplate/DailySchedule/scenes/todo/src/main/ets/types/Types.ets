@@ -1,4 +1,4 @@
-import {TodoItem} from '../model/TodoItem'
+import { TodoItem } from '@ohos_agcit/daily_schedule_component_lib';
 
 export interface SheetCallbacks {
   onConfirm: () => void;

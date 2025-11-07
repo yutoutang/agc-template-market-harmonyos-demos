@@ -34,3 +34,9 @@ export interface CourseTimetable {
   startTime: string;
   endTime: string;
 }
+
+export interface StoreConfig {
+  banners?: string[];
+  storeInfo?: StoreInfo;
+  courseList?: CourseInfoResp[];
+}

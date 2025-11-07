@@ -1,6 +1,6 @@
 import { cloud, CloudDBCollection, CloudDBZoneQuery } from '@hw-agconnect/cloud-server';
 import { CloudCourseInfo } from './models/CloudCourseInfo';
-import { CourseInfoResp } from './types/ResponseTypes';
+import { CourseInfoResp, StoreConfig } from './types/ResponseTypes';
 import { ListResp } from './models/ListResp';
 import { BANNERS, STORE_INFO } from './constants';
 
@@ -16,12 +16,12 @@ export class DatabaseHelper {
     this.courseList = cloud.database({ zoneName: ZONE_NAME }).collection(CloudCourseInfo);
   }
 
-  public async getStoreConfig() {
+  public async getStoreConfig(): Promise<StoreConfig | undefined> {
     const LOGGER_TAG = TAG + '[get-store-config]';
     try {
       const initList = await this.courseList.query();
       const listResp = await this._createCourseInfoRespList(initList);
-      const result = {
+      const result: StoreConfig = {
         banners: BANNERS,
         storeInfo: STORE_INFO,
         courseList: listResp.courseList ?? [],
@@ -33,7 +33,7 @@ export class DatabaseHelper {
     }
   }
 
-  private async _createCourseInfoRespList(query: CloudDBZoneQuery<CloudCourseInfo>) {
+  private async _createCourseInfoRespList(query: CloudDBZoneQuery<CloudCourseInfo>): Promise<ListResp<CourseInfoResp>> {
     const LOGGER_TAG = TAG + 'create activity resp list';
     const listResp: ListResp<CourseInfoResp> = new ListResp<CourseInfoResp>(0, 0, []);
     try {
@@ -48,10 +48,10 @@ export class DatabaseHelper {
       });
       listResp.totalCount = totalCount;
       listResp.returnCount = totalCount;
-      return listResp
+      return listResp;
     } catch (err) {
       this.logger.error(LOGGER_TAG + ` error: ${err}`);
-      throw new Error(err)
+      throw new Error(err);
     }
   }
 

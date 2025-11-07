@@ -1,5 +1,5 @@
 import { BreakpointType, GlobalInfoModel } from '@ohos_agcit/daily_schedule_utils';
-import { UserInfo } from 'login';
+import { UserInfo } from 'aggregated_login';
 import {  MainEntryVM } from '@ohos_agcit/daily_schedule_common_lib';
 import { AppStorageV2 } from '@kit.ArkUI';
 import { ContactItem, MineItem } from '../components/MineItem';
@@ -46,7 +46,7 @@ export struct MinePage {
               .margin({ left: 12 })
 
             Text(this.userInfo.userName)
-              .fontSize(18)
+              .fontSize($r('sys.float.Subtitle_L'))
               .fontColor($r('sys.color.font_primary'))
               .fontWeight(FontWeight.Medium)
               .margin({ left: 12 })
@@ -117,7 +117,7 @@ export struct MinePage {
         right: $r('sys.float.padding_level16'),
       },
     }).getValue(this.globalInfo.currentBreakpoint))
-    .padding({left:'5%', top: px2vp(this.avoidArea.topRectHeight) +10 ,right:'5%'})
+    .padding({left:'5%', top: px2vp(this.avoidArea.topRectHeight), right:'5%'})
     .backgroundColor($r('sys.color.background_secondary'))
   }
 }

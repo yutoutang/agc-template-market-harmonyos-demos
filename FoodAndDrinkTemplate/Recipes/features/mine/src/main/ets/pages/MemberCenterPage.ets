@@ -143,7 +143,7 @@ struct MemberCenterPage {
               .backgroundColor('#E39331')
               .width(CommonConstants.FULL_WIDTH)
               .bindSheet($$this.vm.isShow, this.paymentChannelSheet(),
-                { showClose: false, height: 250 })
+                { showClose: false, preferType: SheetType.CENTER, height: 250 })
               .onClick(() => {
                 if (!this.vm.selectCheckbox) {
                   promptAction.showToast({ message: '请勾选会员服务协议' });

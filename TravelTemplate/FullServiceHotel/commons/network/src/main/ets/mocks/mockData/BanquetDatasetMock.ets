@@ -51,7 +51,7 @@ const banquetRoomMock2: BanquetRoomItem = {
 const banquetRoomDetailMock:GetBanquetRoomDetailResp = {
   id: 25,
   banquetName: '维多利亚厅',
-  banquetTel: '86-631-7577777',
+  banquetTel: '025-123456',
   labelList: ['可容纳500人', '大型宴会'],
   introduce:
   '位于酒店3楼，厅正无柱子，歌剧院式尖顶设计，规模宏大，气势非凡，透气明亮，配备先进视听设备，灵活布局，满足不同规模会议，宴请需求',

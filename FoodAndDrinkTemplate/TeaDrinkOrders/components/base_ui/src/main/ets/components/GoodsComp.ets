@@ -51,7 +51,7 @@ export struct GoodsComp {
               .fontSize(8)
               .fontWeight(FontWeight.Medium)
               .fontColor($r('sys.color.font_primary'))
-            Text(this.bagMoney.toString())
+            Text(this.bagMoney?.toString())
               .fontSize(14)
               .fontWeight(FontWeight.Medium)
               .fontColor($r('sys.color.font_primary'))

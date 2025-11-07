@@ -1,0 +1,26 @@
+{
+  "module": {
+    "name": "video_clip",
+    "type": "har",
+    "routerMap": '$profile:router_map',
+    "deviceTypes": [
+      "default"
+    ],
+    "requestPermissions": [
+      {
+        "name": "ohos.permission.INTERNET",
+        "reason":"$string:network_request_reason",
+        "usedScene": {
+          "when": "inuse"
+        }
+      },
+      {
+        "name":"ohos.permission.WRITE_MEDIA",
+        "reason":"$string:media_request_reason",
+        "usedScene": {
+          "when": "inuse"
+        }
+      }
+    ]
+  }
+}

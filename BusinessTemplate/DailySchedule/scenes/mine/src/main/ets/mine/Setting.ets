@@ -1,19 +1,19 @@
-import { AppUtil, BreakpointType, GlobalInfoModel, DialogUtil} from '@ohos_agcit/daily_schedule_utils';
-import { UserInfo } from 'login';
-import {  MainEntryVM } from '@ohos_agcit/daily_schedule_common_lib';
-import { DarkModeToggle, MergeArrow, NoticeToggle, SingleArrow } from '../components/SettingComponents';
+import { AppUtil, BreakpointType, DialogUtil, GlobalInfoModel } from '@ohos_agcit/daily_schedule_utils';
+import { UserInfo } from 'aggregated_login';
+import { MainEntryVM } from '@ohos_agcit/daily_schedule_common_lib';
+import { MergeArrow, ThreeMergeArrow } from '../components/SettingComponents';
 import { ThemeController } from '../controller/ThemeController';
 import { AppStorageV2, ComponentContent } from '@kit.ArkUI';
 import { checkUpdate, findNewVersion, Params } from 'check_app_update';
 import { AvoidArea } from '@ohos_agcit/daily_schedule_component_lib';
-
-
+import { SettingViewModel } from './SettingViewModel';
 
 @Builder
 export function SettingBuilder() {
   Setting();
 }
 let themeController: ThemeController = ThemeController.instance;
+
 @ComponentV2
 export struct Setting {
   vm: MainEntryVM = MainEntryVM.instance;
@@ -22,6 +22,12 @@ export struct Setting {
   @Local avoidArea: AvoidArea = AppStorageV2.connect(AvoidArea, () => new AvoidArea(0, 0))!;
   @Local globalInfo: GlobalInfoModel =
     AppStorageV2.connect<GlobalInfoModel>(GlobalInfoModel, () => new GlobalInfoModel())!;
+
+  @Local settingVm: SettingViewModel = new SettingViewModel();
+
+  aboutToAppear(): void {
+    this.settingVm.getCacheSize();
+  }
 
   build() {
     NavDestination() {
@@ -42,13 +48,18 @@ export struct Setting {
               },
             });
 
-            MergeArrow({
+            ThreeMergeArrow({
               text1: '检测版本',
               text1Click: () => {
                 checkUpdateFunc();
               },
-              text2: '关于我们',
+              text2: '清除缓存',
+              extraText2: this.settingVm.cacheSize+'M',
               text2Click: () => {
+                this.settingVm.clearCache();
+              },
+              text3: '关于我们',
+              text3Click: () => {
                 this.vm.navStack.pushPathByName('AboutUs', undefined);
               },
             });

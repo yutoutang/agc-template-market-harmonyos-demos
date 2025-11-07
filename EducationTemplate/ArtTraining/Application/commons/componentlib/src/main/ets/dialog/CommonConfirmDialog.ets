@@ -9,6 +9,7 @@ export interface ConfirmParam {
   isConfirm: boolean;
 }
 
+@Entry
 @ComponentV2
 export struct CommonConfirmDialog {
   @Local dialogOption: ConfirmDialogOption = {
@@ -68,6 +69,7 @@ export struct CommonConfirmDialog {
         .backgroundColor($r('app.color.system_color_background_white'))
         .padding($r('app.string.padding_xl'))
         .borderRadius($r('app.string.border_radius_24'))
+        .constraintSize({ maxWidth: 480 })
       }
       .padding($r('app.string.padding_l'))
       .width($r('app.string.width_percent_full'))

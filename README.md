@@ -42,9 +42,13 @@
     <td><a href="./LifestyleAndServiceTemplate/Calendar/README.md" target="_blank">快速开始</a></td>
   </tr>
   <tr>
-    <td><a href="#休闲娱乐">休闲娱乐</a></td>
+    <td rowspan="2"><a href="#休闲娱乐">休闲娱乐</a></td>
     <td><a href="#娱乐票务元服务模板">娱乐票务元服务模板</a></td>
     <td><a href="./EntertainmentTemplate/MuseumTicket/README.md" target="_blank">快速开始</a></td>
+  </tr>
+  <tr>
+    <td><a href="#音乐应用模板">音乐应用模板</a></td>
+    <td><a href="./EntertainmentTemplate/Music/README.md" target="_blank">快速开始</a></td>
   </tr>
   <tr rowspan="2">
     <td><a href="#运动健康">运动健康</a></td>
@@ -467,6 +471,24 @@
 | 首页                                                                      | 会员                                                                               | 我的                                                                       |
 | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
 | ![首页](./EntertainmentTemplate/MuseumTicket/screenshots/首页.jpeg) | ![我的预定](./EntertainmentTemplate/MuseumTicket//screenshots/我的预订.jpeg) | ![我的](./EntertainmentTemplate/MuseumTicket//screenshots/我的.jpeg) |
+
+### 音乐应用模板
+
+**功能介绍**
+
+本模板为音乐类应用提供了常用功能的开发样例，模板主要分首和我的两大模块：
+
+* 首页：提供推荐在线歌单、热门歌曲、搜索、播放条等功能。
+
+* 我的：提供个人主页查看、我的喜欢、我的歌单、本地歌曲、意见反馈、设置等功能。
+
+本模板已集成华为账号、广告、微信登录、主题切换、MV播放、会员中心、图片预览、支付、分享等服务，只需做少量配置和定制即可快速实现华为账号的登录、广告、支付、分享等功能。
+
+<a href="./EntertainmentTemplate/Music/README.md" target="_blank">详细说明</a>
+
+| 首页                                       | 我的                                       |
+| ---------------------------------------- | ---------------------------------------- |
+| <img src="./EntertainmentTemplate/Music/screenshots/home.jpg" width="300"> | <img src="./EntertainmentTemplate/Music/screenshots/mine.jpg" width="300"> |
 
 ## 旅游
 

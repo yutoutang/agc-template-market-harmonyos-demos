@@ -23,7 +23,7 @@ export class DatabaseHelper {
     this.userCourseList = cloud.database({ zoneName: ZONE_NAME }).collection(CloudUserCourseInfo);
   }
 
-  public async getOrderList(params: GetOrderListReq) {
+  public async getOrderList(params: GetOrderListReq): Promise<ListResp<OrderInfoResp> | undefined> {
     const LOGGER_TAG = TAG + OrderTriggerMap.GET_ORDER_LIST;
     const statusArr = params.orderStatus;
     try {
@@ -39,10 +39,10 @@ export class DatabaseHelper {
     } catch (err) {
       this.logger.error(LOGGER_TAG + ` error: ${err}`);
     }
-    return;
+    return undefined;
   }
 
-  public async getOrderDetail(params: GetOrderDetailReq) {
+  public async getOrderDetail(params: GetOrderDetailReq): Promise<OrderInfoResp | undefined> {
     const LOGGER_TAG = TAG + OrderTriggerMap.GET_ORDER_DETAIL;
     const orderNo = params.orderNo;
     try {
@@ -61,10 +61,10 @@ export class DatabaseHelper {
     } catch (err) {
       this.logger.error(LOGGER_TAG + ` error: ${err}`);
     }
-    return;
+    return undefined;
   }
 
-  public async createCourseOrder(params: CourseOrderReq) {
+  public async createCourseOrder(params: CourseOrderReq): Promise<OrderInfoResp | undefined> {
     const LOGGER_TAG = TAG + OrderTriggerMap.CREATE_COURSE_ORDER;
     try {
       const courseInfo = await this._getCourseDetail(params.courseId);
@@ -100,21 +100,21 @@ export class DatabaseHelper {
     } catch (err) {
       this.logger.error(LOGGER_TAG + ` error: ${err}`);
     }
-    return;
+    return undefined;
   }
 
-  public async cancelCourseOrder(params: OrderNoReq) {
+  public async cancelCourseOrder(params: OrderNoReq): Promise<number | undefined> {
     const LOGGER_TAG = TAG + OrderTriggerMap.CANCEL_COURSE_ORDER;
     const orderNo = params.orderNo;
     try {
       const orderResource = await this._queryOrderItem(orderNo);
       if (!orderResource) {
         this.logger.error(LOGGER_TAG + 'cannot find order');
-        return;
+        return undefined;
       }
       if (orderResource.orderStatus === OrderStatusMap.CANCEL) {
         this.logger.error(LOGGER_TAG + 'order has been canceled');
-        return;
+        return undefined;
       }
       const res = await this._updateCourseStatus(orderResource, OrderStatusMap.CANCEL);
       this.logger.info(LOGGER_TAG + 'update order status to cancel success');
@@ -122,17 +122,17 @@ export class DatabaseHelper {
     } catch (err) {
       this.logger.error(LOGGER_TAG + ` error: ${err}`);
     }
-    return;
+    return undefined;
   }
 
-  public async requestRefundCourseOrder(params: OrderNoReq) {
+  public async requestRefundCourseOrder(params: OrderNoReq): Promise<number | undefined> {
     const LOGGER_TAG = TAG + OrderTriggerMap.REQUEST_REFUND_COURSE_ORDER;
     const orderNo = params.orderNo;
     try {
       const orderResource = await this._queryOrderItem(orderNo);
       if (!orderResource) {
         this.logger.error(LOGGER_TAG + 'cannot find order');
-        return;
+        return undefined;
       }
       const res = await this._updateCourseStatus(orderResource, OrderStatusMap.REFUND_IN_PROGRESS);
       if (res) {
@@ -142,17 +142,17 @@ export class DatabaseHelper {
     } catch (err) {
       this.logger.error(LOGGER_TAG + ` error: ${err}`);
     }
-    return;
+    return undefined;
   }
 
-  public async cancelRefundCourseOrder(params: OrderNoReq) {
+  public async cancelRefundCourseOrder(params: OrderNoReq): Promise<number | undefined> {
     const LOGGER_TAG = TAG + OrderTriggerMap.CANCEL_REFUND_COURSE_ORDER;
     const orderNo = params.orderNo;
     try {
       const orderResource = await this._queryOrderItem(orderNo);
       if (!orderResource) {
         this.logger.error(LOGGER_TAG + 'cannot find order');
-        return;
+        return undefined;
       }
       const res = await this._updateCourseStatus(orderResource, OrderStatusMap.COMPLETE);
       if (res) {
@@ -162,10 +162,10 @@ export class DatabaseHelper {
     } catch (err) {
       this.logger.error(LOGGER_TAG + ` error: ${err}`);
     }
-    return;
+    return undefined;
   }
 
-  public async deleteCourseOrder(params: OrderNoReq) {
+  public async deleteCourseOrder(params: OrderNoReq): Promise<number | undefined> {
     const LOGGER_TAG = TAG + OrderTriggerMap.DELETE_COURSE_ORDER;
     const orderNo = params.orderNo;
     try {
@@ -185,7 +185,7 @@ export class DatabaseHelper {
     return;
   }
 
-  private async _queryOrderItem(orderNo: string) {
+  private async _queryOrderItem(orderNo: string): Promise<OrderInfo | undefined> {
     const LOGGER_TAG = TAG + '[query-order-item]';
     try {
       const orderQuery: CloudDBZoneQuery<OrderInfo> = this.orderList
@@ -200,10 +200,10 @@ export class DatabaseHelper {
     } catch (err) {
       this.logger.error(LOGGER_TAG + ` error: ${err}`);
     }
-    return;
+    return undefined;
   }
 
-  private async _updateCourseStatus(item: OrderInfo, status: OrderStatusMap) {
+  private async _updateCourseStatus(item: OrderInfo, status: OrderStatusMap): Promise<number | undefined> {
     const LOGGER_TAG = TAG + 'update-course-status.';
     const curStatus = item.getOrderStatus();
     let flag = false;
@@ -238,10 +238,10 @@ export class DatabaseHelper {
     } else {
       this.logger.error(LOGGER_TAG, `init order status:${curStatus} doesn not match target status:${status}`);
     }
-    return;
+    return undefined;
   }
 
-  private async _getCourseDetail(courseId: number) {
+  private async _getCourseDetail(courseId: number): Promise<CourseInfoResp | undefined> {
     const LOGGER_TAG = TAG + 'get course detail';
     try {
       const courseQuery: CloudDBZoneQuery<CloudUserCourseInfo> = this.userCourseList
@@ -259,10 +259,10 @@ export class DatabaseHelper {
     } catch (err) {
       this.logger.error(LOGGER_TAG + `error: ${err}`);
     }
-    return;
+    return undefined;
   }
 
-  private async _createOrderInfoRespList(query: CloudDBZoneQuery<OrderInfo>) {
+  private async _createOrderInfoRespList(query: CloudDBZoneQuery<OrderInfo>): Promise<ListResp<OrderInfoResp> | undefined> {
     const LOGGER_TAG = TAG + 'create activity resp list';
     try {
       const userData = await query.get();
@@ -287,7 +287,7 @@ export class DatabaseHelper {
     } catch (err) {
       this.logger.error(LOGGER_TAG + ` error: ${err}`);
     }
-    return;
+    return undefined;
   }
 
   private _createCourseInfoRespItem(item: CloudUserCourseInfo): CourseInfoResp {

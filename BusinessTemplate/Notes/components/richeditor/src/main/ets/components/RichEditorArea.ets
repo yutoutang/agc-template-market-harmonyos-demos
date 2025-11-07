@@ -41,13 +41,13 @@ export struct RichEditorArea {
             // 刻度颜色
             .stepColor($r('sys.color.comp_background_secondary'))
             // 滑轨背景色
-            .trackColor($r('sys.color.comp_background_tertiary'))
+            .trackColor($r('sys.color.comp_background_secondary'))
             // 以滑动部分颜色
-            .selectedColor('#F8D9D4')
+            .selectedColor($r('sys.color.comp_background_emphasize'))
             // 显示步长刻度
             .showSteps(true)
             .blockStyle({ type: SliderBlockType.IMAGE, image: $r('app.media.font_setting') })
-            .blockSize({ width: 20, height: 20 })
+            .blockSize({ width: 12, height: 12 })
             .onChange((value: number, mode: SliderChangeMode) => {
               this.richEditorController.fontSize = LengthMetrics.vp(value);
               this.richEditorController.onSelectionStyleChange(StyledStringKey.FONT, new TextStyle({
@@ -299,8 +299,8 @@ export struct RichEditorArea {
               text: this.noteTitle,
               controller: this.richEditorController.textInputController
             })
-              .placeholderColor($r('sys.color.font_tertiary'))
-              .placeholderFont({ size: 18, weight: FontWeight.Bold })
+              .placeholderColor($r('sys.color.font_secondary'))
+              .placeholderFont({ size: $r('sys.float.Body_L'), weight: FontWeight.Bold })
               .fontSize(20)
               .fontWeight(FontWeight.Medium)
               .fontColor($r('sys.color.font_primary'))

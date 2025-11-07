@@ -18,20 +18,20 @@ export struct MyIDCardPage {
       }
       .layoutWeight(1)
       .padding({
-        left: $r('app.string.padding_xxl'),
-        right: $r('app.string.padding_xxl'),
+        left: $r('app.string.padding_l'),
+        right: $r('app.string.padding_l'),
       })
       .width($r('app.string.width_percent_full'))
-      .backgroundColor($r('app.color.system_color_background_auxiliary'));
     }
-    .hideTitleBar(true);
+    .hideTitleBar(true)
+    .backgroundColor($r('app.color.system_color_background_auxiliary'));
   }
 
   @Builder
   infoCardBuilder() {
     Stack({ alignContent: Alignment.Top }) {
       Image($r('app.media.img_idcard'))
-        .width($r('app.string.width_percent_full'));
+        .height(540);
       Column() {
         Image(this.userInfo.avatar)
           .width(64)
@@ -52,7 +52,6 @@ export struct MyIDCardPage {
             Text('生日: ').infoLabelStyle();
           }
           .alignItems(HorizontalAlign.Start)
-          .width($r('app.string.width_percent_40'));
 
           Column() {
             Text(this.userInfo.studentID ? this.userInfo.studentID : '未获取')
@@ -63,7 +62,7 @@ export struct MyIDCardPage {
           }
           .alignItems(HorizontalAlign.Start);
         }
-        .width($r('app.string.width_percent_75'))
+        .justifyContent(FlexAlign.Center)
         .margin({ top: 50 });
       }
       .margin({ top: 200 });
@@ -78,7 +77,7 @@ function infoLabelStyle() {
   .fontColor($r('app.color.font_color_info'))
   .fontSize($r('app.string.font_size_14'))
   .fontWeight(FontWeight.Medium)
-  .margin({ bottom: $r('app.string.margin_l') });
+  .margin({ bottom: $r('app.string.margin_l'),right:$r('app.string.margin_l') });
 }
 
 @Extend(Text)

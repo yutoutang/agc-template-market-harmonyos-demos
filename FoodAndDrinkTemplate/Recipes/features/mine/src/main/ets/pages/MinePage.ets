@@ -117,7 +117,7 @@ struct MinePage {
       Image($r('app.media.bg_membership')).width('100%')
       Row() {
         Button(this.vm.userInfo.isMembership ? '会员中心' : '开通会员', { controlSize: ControlSize.SMALL })
-          .fontSize(14)
+          .fontSize($r('sys.float.Body_M'))
           .fontWeight(FontWeight.Medium)
           .fontColor($r('sys.color.font_on_primary'))
           .backgroundColor('#E3922F')

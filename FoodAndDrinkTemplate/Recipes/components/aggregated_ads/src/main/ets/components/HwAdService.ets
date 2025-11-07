@@ -63,6 +63,7 @@ export struct HwAdService {
           message: `Failed to request ad, errorCode is:  ${errorCode} , errorMsg is: ${errorMsg}`,
           duration: 1000,
         });
+        this.closeCallBack()
       },
       onAdLoadSuccess: (ads: Array<advertising.Advertisement>) => {
         if (canIUse('SystemCapability.Advertising.Ads')) {

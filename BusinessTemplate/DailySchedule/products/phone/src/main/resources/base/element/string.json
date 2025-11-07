@@ -53,12 +53,12 @@
       "value": "form_label"
     },
     {
-      "name": "attendence_desc",
-      "value": "attendence_desc"
+      "name": "calendar_desc",
+      "value": "calendar_desc"
     },
     {
-      "name": "attendence_display_name",
-      "value": "attendence_display_name"
+      "name": "calendar_display_name",
+      "value": "calendar_display_name"
     },
     {
       "name": "card_list_title",
@@ -97,8 +97,20 @@
       "value": "TODO"
     },
     {
+      "name": "widget_desc",
+      "value": "This is a service widget."
+    },
+    {
+      "name": "widget_display_name",
+      "value": "widget"
+    },
+    {
+      "name": "calendar_card_title",
+      "value": "日历"
+    },
+    {
       "name": "agcit_huawei_dailyschedule",
-      "value": "1.0.0"
+      "value": "1.0.1"
     }
   ]
 }

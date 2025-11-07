@@ -95,6 +95,30 @@
     {
       "name": "icon_margin",
       "value": "28vp"
+    },
+    {
+      "name": "font_size",
+      "value": "14fp"
+    },
+    {
+      "name": "calendar_date_font_size",
+      "value": "20.0"
+    },
+    {
+      "name": "calendar_week_font_size",
+      "value": "14.0"
+    },
+    {
+      "name": "calendar_event_label_font_size",
+      "value": "12.0"
+    },
+    {
+      "name": "calendar_event_count_font_size",
+      "value": "11.0"
+    },
+    {
+      "name": "calendar_button_font_size",
+      "value": "12.0"
     }
   ]
 }

@@ -1,5 +1,5 @@
 import { map, MapComponent } from '@kit.MapKit';
-import { WindowUtil } from 'module_ui_base';
+import { BreakpointStorage, BreakpointSystem, BreakpointTypeEnum, WindowUtil } from 'module_ui_base';
 import { StoreMapInfo } from '../commons/Types';
 import { StoreMapVM } from '../viewmodels/StoreMapVM';
 
@@ -17,11 +17,22 @@ export struct StoreMap {
   showUserLocation: boolean = false;
   // 自定义信息窗BuilderParam
   @BuilderParam customInfoWindow: ($$: map.MarkerDelegate) => void = this.customInfoWindowBuilder;
+  @Local
+  curBreakpoint: BreakpointStorage = BreakpointSystem.currentBreakpoint
 
   vm: StoreMapVM = new StoreMapVM();
 
+  @Computed
+  get infoWindowPadding(){
+    if(this.curBreakpoint.value === BreakpointTypeEnum.MD){
+      return '16%';
+    }
+    return '32%';
+  }
+
   aboutToAppear() {
     WindowUtil.initWindowUtil(this.getUIContext());
+    BreakpointSystem.register(this.getUIContext())
     if (this.storeInfo) {
       this.vm.initController(this.storeInfo, this.showUserLocation);
     }
@@ -41,7 +52,6 @@ export struct StoreMap {
     .width(this.mapWidth)
     .height(this.mapHeight);
   }
-
 
   // 自定义信息窗Builder
   @Builder
@@ -89,11 +99,12 @@ export struct StoreMap {
           .padding(12)
           .margin({ left: $r('app.string.space_s') });
         }
-        .width('70%');
+        .width(240)
       }
       .width('100%')
-      .alignItems(HorizontalAlign.End)
-      .height(70);
+      .padding({ left: this.infoWindowPadding })
+      .alignItems(HorizontalAlign.Center)
+      .height(75);
     }
   }
 }

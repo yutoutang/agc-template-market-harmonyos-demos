@@ -49,9 +49,9 @@ struct HotelListPage {
   @Builder
   topBannerBuilder() {
     RelativeContainer() {
-      Image(this.vm.topBanner)
+      Image($r('app.media.img_hotellist_banner'))
         .width('100%')
-        .aspectRatio(16 / 9)
+        .objectFit(ImageFit.Fill)
         .id(RelativeAnchorMap.HOTEL_LIST_BANNER_CONTAINER)
         .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
       HotelDateSelector({

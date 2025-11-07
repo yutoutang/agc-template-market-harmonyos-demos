@@ -16,3 +16,7 @@
 - 检测版本
 - 弹窗优化（DialogUtil和NavDestination）
 - ReadMe修改
+
+## 1.0.2
+### 变更内容
+- ReadMe修改

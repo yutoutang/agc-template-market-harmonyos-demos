@@ -13,7 +13,7 @@
     "@ohos_agcit/daily_schedule_mine": "file:../../scenes/mine",
     "@ohos_agcit/daily_schedule_utils": "file:../../commons/utils",
     "check_app_update": "file:../../components/check_app_update",
-    "login": "file:../../components/login",
+    "aggregated_login": "file:../../components/aggregated_login",
     "feed_back": "file:../../components/feed_back"
   },
   "devDependencies": {},

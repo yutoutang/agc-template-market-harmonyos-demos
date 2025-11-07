@@ -46,7 +46,7 @@ struct PrivacyPolicyPage {
             Row({ space: 12 }) {
               Button('取消')
                 .layoutWeight(1)
-                .fontSize(16)
+                .fontSize($r('sys.float.Body_L'))
                 .fontWeight(FontWeight.Medium)
                 .fontColor('#E84026')
                 .backgroundColor($r('sys.color.background_secondary'))
@@ -56,7 +56,7 @@ struct PrivacyPolicyPage {
                 })
               Button('同意')
                 .layoutWeight(1)
-                .fontSize(16)
+                .fontSize($r('sys.float.Body_L'))
                 .fontWeight(FontWeight.Medium)
                 .fontColor($r('sys.color.font_on_primary'))
                 .backgroundColor('#E84026')

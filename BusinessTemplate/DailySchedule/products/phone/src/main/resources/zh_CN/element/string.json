@@ -49,12 +49,12 @@
       "value": "form_label"
     },
     {
-      "name": "attendence_desc",
-      "value": "考勤打卡桌面卡片"
+      "name": "calendar_desc",
+      "value": "日历日程桌面卡片"
     },
     {
-      "name": "attendence_display_name",
-      "value": "办公"
+      "name": "calendar_display_name",
+      "value": "日历日程"
     },
     {
       "name": "card_list_title",
@@ -94,7 +94,7 @@
     },
     {
       "name": "agcit_huawei_dailyschedule",
-      "value": "1.0.0"
+      "value": "1.0.1"
     }
   ]
 }

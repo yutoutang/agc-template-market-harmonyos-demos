@@ -130,6 +130,7 @@ changeCurrentIndex(callback: (currentIndex: number) => void)
 ## 示例代码
 
 ```typescript
+import { promptAction } from '@kit.ArkUI';
 import { LinkCategory, RecipeBriefInfo, RecipeCategory } from 'link_category';
 
 @Entry
@@ -157,6 +158,7 @@ struct Index {
             currentIndex: this.currentIndex,
             onRecipeClick: (listItem) => {
                // 跳转详情页
+               promptAction.showToast({ message: '跳转详情页' })
             },
             changeCurrentIndex: (index: number) => {
                // 点击分类标签切换index事件
@@ -166,6 +168,7 @@ struct Index {
       }
       .height('100%')
       .width('100%')
+      .padding({ top: 45 })
    }
 }
 ```

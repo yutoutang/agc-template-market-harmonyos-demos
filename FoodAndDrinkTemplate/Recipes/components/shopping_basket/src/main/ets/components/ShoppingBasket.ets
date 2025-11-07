@@ -141,7 +141,7 @@ export struct ShoppingBasket {
                       })
 
                       Button('删除', { controlSize: ControlSize.SMALL })
-                        .fontSize(14)
+                        .fontSize($r('sys.float.Body_M'))
                         .fontWeight(FontWeight.Medium)
                         .fontColor($r('sys.color.font_on_primary'))
                         .width(72)
@@ -199,6 +199,7 @@ export struct ShoppingBasket {
             }
             .bindSheet($$this.showAddSheet, this.addIngredientSheet(), {
               detents: ['100%', '101%'],
+              preferType: SheetType.CENTER,
               title: { title: '添加用料' },
             })
             .visibility(this.currentIndex === TabIndexEnum.SECOND ? Visibility.Visible : Visibility.None);
@@ -230,7 +231,7 @@ export struct ShoppingBasket {
       Row({ space: 16 }) {
         Button('取消')
           .width(120)
-          .fontSize(16)
+          .fontSize($r('sys.float.Body_L'))
           .fontWeight(FontWeight.Medium)
           .fontColor('#E84026')
           .backgroundColor($r('sys.color.background_primary'))
@@ -245,7 +246,7 @@ export struct ShoppingBasket {
           })
         Button('确定')
           .width(120)
-          .fontSize(16)
+          .fontSize($r('sys.float.Body_L'))
           .fontWeight(FontWeight.Medium)
           .fontColor($r('sys.color.font_on_primary'))
           .backgroundColor('#E84026')
@@ -293,7 +294,7 @@ export struct ShoppingBasket {
       }
 
       Button('确定')
-        .fontSize(16)
+        .fontSize($r('sys.float.Body_L'))
         .fontWeight(FontWeight.Medium)
         .fontColor($r('sys.color.font_on_primary'))
         .backgroundColor('#E84026')

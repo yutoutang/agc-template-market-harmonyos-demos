@@ -17,7 +17,7 @@ struct AddTodoMenu {
           // 文字
           Text(item)
             .fontSize($r('sys.float.Body_L'))
-            .fontWeight(400)
+            .fontWeight(FontWeight.Regular)
             .fontColor($r('sys.color.font_primary'))
             .width('100%')
             .textAlign(TextAlign.Start)

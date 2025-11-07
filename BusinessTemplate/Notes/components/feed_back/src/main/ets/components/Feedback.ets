@@ -217,7 +217,7 @@ export struct Feedback {
       .backgroundColor($r('sys.color.comp_background_primary'))
       .type(InputType.PhoneNumber)
       .maxLength(11)
-      .placeholderFont({ size: $r('sys.float.Body_S'), weight: FontWeight.Regular })
+      .placeholderFont({ size: $r('sys.float.Body_L'), weight: FontWeight.Regular })
       .onChange((value: string) => {
         this.phoneLength = value.length
         this.phoneValue = value
