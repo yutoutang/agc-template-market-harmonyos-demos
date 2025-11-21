@@ -2,6 +2,7 @@ import {
   AddressModel,
   AddressType,
   AddressUtil,
+  AppStorageMap,
   CommonConstants,
   EmitterConstants,
   RouterMap,
@@ -70,6 +71,7 @@ export struct CommonAddress {
       AssociateUtil.checkBindPhone(() => {
         if (address.siteId) {
           emitter.emit(EmitterConstants.TO_FIND);
+          AppStorage.setOrCreate(AppStorageMap.SELECTED_ADDRESS,address.name);
           MapController.move(address.location);
         } else {
           RouterModule.push({ url: RouterMap.COMMON_ADDRESS });

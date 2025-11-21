@@ -6,11 +6,15 @@
     },
     {
       "name": "agcit_huawei_government_template",
-      "value": "1.0.1"
+      "value": "1.0.2"
     },
     {
       "name": "agcittype_huawei_government_template",
       "value": "industryTemplate"
+    },
+    {
+      "name": "agcitkid_huawei_government_template",
+      "value": "agcit_huawei_common_login/1.0.1"
     }
   ]
 }

@@ -1,4 +1,4 @@
-# 工具（计算器）元服务模板快速入门
+# 工具（计算器）应用模板快速入门
 
 ## 目录
 
@@ -10,18 +10,18 @@
 
 ## 功能介绍
 
-您可以基于此模板直接定制元服务，也可以挑选此模板中提供的多种组件使用，从而降低您的开发难度，提高您的开发效率。
+您可以基于此模板直接定制应用，也可以挑选此模板中提供的多种组件使用，从而降低您的开发难度，提高您的开发效率。
 
 本模板中提供了多种组件，您可以按需选择合适的组件进行使用，所有组件存放在工程根目录的components下。
 
 | 组件                        | 描述                         | 使用指导                                             |
 |---------------------------|----------------------------|--------------------------------------------------|
-| 日期间隔与计算（module_date_calculation）  | 本组件提供日期之间计算能力，包括计算2个日期之间的天数，计算选中日期前后的时间等功能 | [使用指导](components/module_date_calculation/README.md)    |
-| 标准计算器（module_standard_calculator） | 提供标准计算器计算以及查看历史记录能力        | [使用指导](components/module_standard_calculator/README.md)     |
+| 日期间隔与计算（module_date_calculation） | 本组件提供日期之间计算能力，包括计算2个日期之间的天数，计算选中日期前后的时间等功能 | [使用指导](components/module_date_calculation/README.md)    |
+| 计算器（module_standard_calculator） | 提供标准计算器计算、科学计算器以及查看历史记录能力        | [使用指导](components/module_standard_calculator/README.md)     |
 
-本模板为计算器元服务提供了常用功能的开发样例，模板主要分为计算器、工具、和我的三大模块：
+本模板为计算器应用提供了常用功能的开发样例，模板主要分为计算器、工具、和我的三大模块：
 
-- 计算器：主要提供标准计算器、查看历史记录等功能。
+- 计算器：主要提供标准计算器、科学计算器、查看历史记录等功能。
 
 - 工具：主要提供日期间隔计算、日期计算功能。
 
@@ -76,8 +76,9 @@ Calculator
 │     └──Index.ets                           // 对外接口类
 │   ├──module_standard_calculator            // 标准计算器组件
 │     │  └──common                           // 常量定义
-│     │  └──constants                        // 基础组件计算器键盘
+│     │  └──components                       // 基础组件计算器键盘
 │     │  └──model                            // 基础组件数据模型
+│     │  └──utils                            // 工具类
 │     └──Index.ets                           // 对外接口类
 ├──features                                  // 基础特性层
 │  ├──business_home/src/main/ets             // 计算器
@@ -96,9 +97,9 @@ Calculator
 └─products/entry/src/main   
    ├─ets  
    │  ├─entryability
-   │  │  ├──EntryAbility.ets                 // 元服务程序入口
+   │  │  ├──EntryAbility.ets                 // 应用程序入口
    │  ├─entryformability
-   │  │  ├──EntryFormAbility.ets             // 元服务程序入口
+   │  │  ├──EntryFormAbility.ets             // 应用程序入口
    │  ├─page
    │  │  ├──Index.ets                        // 入口
    │  ├─model
@@ -118,7 +119,7 @@ Calculator
 
 ### 硬件
 
-* 设备类型：华为手机（直板机）
+* 设备类型：华为手机（包括双折叠和阔折叠）
 * HarmonyOS版本：HarmonyOS 5.0.4(16)及以上
 
 ## 快速入门
@@ -127,16 +128,16 @@ Calculator
 
 在运行此模板前，需要完成以下配置：
 
-1. 在AppGallery Connect创建元服务，将包名配置到模板中。
+1. 在AppGallery Connect创建应用，将包名配置到模板中。
 
-   a. 参考[创建元服务](https://developer.huawei.com/consumer/cn/doc/app/agc-help-create-atomic-service-0000002247795706)为元服务创建APP ID，并将APP ID与元服务进行关联。
+   a. 参考[创建应用](https://developer.huawei.com/consumer/cn/doc/app/agc-help-create-app-0000002247955506)为应用创建APP ID，并将APP ID与应用进行关联。
 
-   b. 返回应用列表页面，查看元服务的包名。
+   b. 返回应用列表页面，查看应用的包名。
 
-   c. 将模板工程根目录下AppScope/app.json5文件中的bundleName替换为创建元服务的包名。
+   c. 将模板工程根目录下AppScope/app.json5文件中的bundleName替换为创建应用的包名。
 
 
-2. 对元服务进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing#section297715173233)。
+2. 对应用进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing#section297715173233)。
 
 ### 运行调试工程
 
@@ -154,11 +155,7 @@ Calculator
 
 ## 示例效果
 
-- [计算器](./screenshot/home.mp4)
-
-- [工具](./screenshot/tool.mp4)
-
-- [我的](./screenshot/mine.mp4)
+<img src="screenshot/demo.png" alt="计算器" width="300">
 
 ## 开源许可协议
 

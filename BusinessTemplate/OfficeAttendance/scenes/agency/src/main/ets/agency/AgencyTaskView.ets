@@ -107,9 +107,8 @@ export struct AgencyTaskView {
           Blank().height('2%').width('100%')
 
           Search({ placeholder: $r('app.string.search_tip') })
-            .height(40)
             .width('100%')
-            .textFont({ size: 16, weight: FontWeight.Regular })
+            .textFont({ size: $r('sys.float.Body_L'), weight: FontWeight.Regular })
             .margin({ top: 0, bottom: 0 })
             .onChange((data: string) => {
               this.searchTxt = data;
@@ -174,7 +173,7 @@ export struct AgencyTaskView {
                   item: item
                 })
               }.swipeAction({ end: this.deleteButton(item.taskID) })
-            })
+            }, (item:TaskItem) => JSON.stringify(item))
           }
           .height('100%')
           .width('100%')

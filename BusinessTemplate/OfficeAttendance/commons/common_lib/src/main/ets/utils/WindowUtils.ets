@@ -15,9 +15,9 @@
 
 import { window, AppStorageV2 } from '@kit.ArkUI';
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import { deviceInfo } from '@kit.BasicServicesKit';
 import { AppStorageData } from '../viewmodel/AppStorageData';
 import { CommonConstants } from '../constants/CommonContants';
+import { resourceManager } from '@kit.LocalizationKit';
 
 const TAG: string = 'WindowUtil';
 
@@ -47,7 +47,7 @@ export class WindowUtil {
     });
   }
 
-  updateWidthBp(): void {
+  updateWidthBp(context:Context): void {
     if (this.mainWindowClass === undefined){
       return; // 规避crash问题
     }
@@ -55,7 +55,8 @@ export class WindowUtil {
     let mainWindow: window.WindowProperties = this.mainWindowClass!.getWindowProperties();
     let windowWidthVp = px2vp(mainWindow.windowRect.width)
     let windowHeightVp = px2vp(mainWindow.windowRect.height)
-    if (deviceInfo.deviceType === '2in1') {
+    if (context.resourceManager.getDeviceCapabilitySync().deviceType ===
+    resourceManager.DeviceType.DEVICE_TYPE_2IN1) {
       windowWidthVp -= 2 * 5.4;
     }
     let widthBp: string = '';

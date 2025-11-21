@@ -40,6 +40,7 @@ export struct ProductReviewCard {
             }, (item: string, index: number) => index + item)
           }
           .fontSize($r('app.string.font_size_12'))
+
           .fontColor(Constants.FONT_COLOR_LEVEL3)
           .layoutWeight(1)
           .margin({ right: $r('app.string.space_l') })
@@ -96,6 +97,7 @@ export struct ProductReviewCard {
             .margin({ top: $r('app.string.space_m') })
         }
         .margin({ left: 32 })
+        .alignItems(HorizontalAlign.Start)
       }
     }
     .width($r('app.string.size_percent_full'))

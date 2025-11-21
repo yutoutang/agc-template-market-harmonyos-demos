@@ -8,8 +8,9 @@ import {
   TabIndex,
   WindowUtil
 } from '@ohos_agcit/office_attendance_common_lib';
-import { BusinessError, deviceInfo } from '@kit.BasicServicesKit';
-import { CheckInChannelUtil } from '@ohos_agcit/office_attendance_checkin';
+import { BusinessError } from '@kit.BasicServicesKit';
+import { CheckInChannelUtil } from 'clock_in';
+import { resourceManager } from '@kit.LocalizationKit';
 
 const TAG: string = '[EntryAbility]';
 
@@ -17,7 +18,7 @@ export default class EntryAbility extends UIAbility {
   private vm: MainEntryVM = MainEntryVM.instance;
   private windowUtil?: WindowUtil = WindowUtil.getInstance();
   private onWindowSizeChange: (windowSize: window.Size) => void = () => {
-    this.windowUtil!.updateWidthBp();
+    this.windowUtil!.updateWidthBp(this.context);
   }
 
   public onWindowStageCreate(windowStage: window.WindowStage): void {
@@ -41,10 +42,12 @@ export default class EntryAbility extends UIAbility {
         Logger.error(TAG, 'Failed to get the main window. Cause: %{public}s', JSON.stringify(err) ?? '');
         return;
       }
-      this.windowUtil!.updateWidthBp();
+      this.windowUtil!.updateWidthBp(this.context);
       data.on('windowSizeChange', this.onWindowSizeChange);
       windowClass = data;
-      if (deviceInfo.deviceType === '2in1') {
+
+      if (this.context.resourceManager.getDeviceCapabilitySync().deviceType ===
+      resourceManager.DeviceType.DEVICE_TYPE_2IN1) {
         data.setWindowDecorVisible(false);
         data.setWindowDecorHeight(64);
       } else {

@@ -116,6 +116,7 @@ export struct TodoList {
       }.visibility(this.todoList.length ? Visibility.Visible : Visibility.None)
     }
     .layoutWeight(1)
+    .padding({ bottom: 16 })
     .scrollBar(BarState.Off)
     .backgroundColor($r('sys.color.background_primary'))
   }

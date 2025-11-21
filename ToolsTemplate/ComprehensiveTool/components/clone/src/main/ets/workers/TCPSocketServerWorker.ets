@@ -11,7 +11,7 @@ import Logger from '../common/Constant'
 
 const workerPort: ThreadWorkerGlobalScope = worker.workerPort;
 
-const socketServer= socket.constructTCPSocketServerInstance();
+const socketServer = socket.constructTCPSocketServerInstance();
 
 /** 二进制消息缓冲区映射 */
 let binaryBufferMap: Map<string, BinaryMessageBuffer> = new Map();
@@ -25,12 +25,6 @@ workerPort.onmessage = (event: MessageEvents) => {
     default:
       break;
   }
-};
-
-workerPort.onmessageerror = (event: MessageEvents) => {
-};
-
-workerPort.onerror = (event: ErrorEvent) => {
 };
 
 function listenServerAddress(data: ConnectionVo) {

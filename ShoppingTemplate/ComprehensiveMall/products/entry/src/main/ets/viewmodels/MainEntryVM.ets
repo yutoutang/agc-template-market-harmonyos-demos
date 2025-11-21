@@ -1,5 +1,5 @@
 import { promptAction } from '@kit.ArkUI';
-import { iData, routerStack } from 'lib_foundation';
+import { BreakpointSystem, BreakpointTypeEnum, iData, routerStack } from 'lib_foundation';
 import { CartApi } from 'module_shopping_cart';
 
 @ObservedV2
@@ -9,6 +9,11 @@ export class MainEntryVM {
   // 当前页签
   @Trace curIndex: number = 0;
   @Trace firstBackTime: number = 0;
+
+  @Computed
+  get isTablet(){
+    return BreakpointSystem.currentBreakpoint.value === BreakpointTypeEnum.LG
+  }
 
   public handleBackPressed() {
     let nowTime = Date.now();

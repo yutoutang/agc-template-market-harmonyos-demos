@@ -17,6 +17,8 @@
     "plugin:@hw-stylistic/recommended"
   ],
   "rules": {
+    "@performance/avoid-overusing-custom-component-check": "suggestion",
+    "@performance/hp-arkts-no-use-any-export-other": "suggestion",
     // 不允许对不是“Thenable”对象的值使用await关键字
     "@typescript-eslint/await-thenable": "error",
     // 定义数组类型时，使用相同的样式 T[]

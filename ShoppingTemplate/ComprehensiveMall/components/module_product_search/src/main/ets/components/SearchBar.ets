@@ -3,6 +3,8 @@ import { Constants } from '../commons/Constants';
 @ComponentV2
 export struct SearchBar {
   @Param
+  placeholder:string = ''
+  @Param
   searchWords: string = '';
   @Param
   disabled: boolean = false;
@@ -40,7 +42,6 @@ export struct SearchBar {
       if (this.disabled) {
         Row() {
           Text(this.searchWords)
-            .fontSize(14)
             .fontColor(Constants.FONT_COLOR_LEVEL2);
         }
         .height(40)
@@ -59,19 +60,16 @@ export struct SearchBar {
         Search({
           value: this.searchWords,
           controller: this.controller,
-          placeholder: '请输入搜索内容',
+          placeholder: this.placeholder ?this.placeholder: '请输入搜索内容',
         })
           .layoutWeight(1)
           .backgroundColor(Constants.BACKGROUND_COLOR_GREY_2)
           .searchButton('搜索', {
-            fontSize: 14,
             fontColor: Constants.THEME_COLOR,
           })
           .defaultFocus(true)
           .enableKeyboardOnFocus(true)
           .searchIcon({ size: 0 })
-          .textFont({ size: 14 })
-          .placeholderFont({ size: 14 })
           .caretStyle({ color: Constants.THEME_COLOR })
           .id(this.SEARCH_BAR_ID)
           .onVisibleAreaChange([1], (_isExpanding: boolean, currentRatio: number) => {
@@ -83,14 +81,13 @@ export struct SearchBar {
             this.updateSearchWords?.(value);
           })
           .onSubmit((value) => {
-            this.submitSearch?.(value);
+            this.submitSearch?.(value?value:this.placeholder);
           });
       }
     }
     .padding({
       left: Constants.SPACE_L,
-      right: Constants.SPACE_L,
-      bottom: Constants.SPACE_S,
+      right: Constants.SPACE_S,
     })
     .backgroundColor(Constants.BACKGROUND_COLOR)
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP]);

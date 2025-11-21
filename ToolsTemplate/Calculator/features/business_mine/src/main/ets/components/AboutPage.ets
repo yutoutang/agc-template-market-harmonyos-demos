@@ -1,4 +1,4 @@
-import { CommonConstants, RouterModule, BaseNavTitle } from 'lib_foundation';
+import { CommonConstants, RouterModule } from 'lib_foundation';
 
 @Builder
 export function AboutPageBuilder() {
@@ -11,14 +11,11 @@ export struct AboutPage {
 
   build() {
     NavDestination() {
-      BaseNavTitle({
-        title: '关于',
-        routerModule: RouterModule.getStack()
-      }).margin({ bottom: 20, left: 16 })
       Column() {
         Row({ space: 16 }) {
-          Text('用户协议与隐私政策').fontColor($r('sys.color.ohos_id_color_primary_dark')).margin({left: 13})
-          Image($r('app.media.chevron_right_new')).width(12).height(24)
+          Text('用户协议与隐私政策').fontColor($r('sys.color.font_primary'))
+            .margin({ left: 13 })
+          Image($r('app.media.chevron_right_new')).width(8).height(14).margin({left: 10, top: 7, bottom: 7, right: 10})
         }.rowStyle()
         .onClick(() => {
           const params: Record<string, string> = {
@@ -28,7 +25,8 @@ export struct AboutPage {
           RouterModule.getStack().pushPathByName('AgreementPrivacy', params)
         })
       }.padding({left: 16, right: 16})
-    }.hideTitleBar(true).backgroundColor('#000000')
+    }
+    .backgroundColor($r('sys.color.background_secondary')).title('关于')
   }
 }
 
@@ -37,6 +35,6 @@ export struct AboutPage {
 function rowStyle() {
   .justifyContent(FlexAlign.SpaceBetween).alignItems(VerticalAlign.Center)
   .borderRadius(16)
-  .backgroundColor('rgba(255, 255, 255, 0.1)')
+  .backgroundColor($r('sys.color.comp_background_list_card'))
   .padding(16).width(CommonConstants.FULL_PERCENT)
 }

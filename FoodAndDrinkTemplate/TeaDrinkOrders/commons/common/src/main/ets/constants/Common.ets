@@ -96,7 +96,7 @@ export class Constants {
   static readonly AM_PM = 12
   static readonly MAP_HEIGHT_DEFAULT = 216
   static readonly MID_DAY_TIME = '12:00'
-  // 配送范围：10公里
+  // todo 配送范围：10000米（10公里）
   static readonly ADDRESS_OVER = 10000
   static readonly RICH_TEXT_URI = 'resource://rawfile/richtext.html'
 }

@@ -73,11 +73,11 @@ ProductShare(options: ProductShareOptions)
 #### ProductResource类型说明
 
 | 字段名 | 类型                                                                                                  | 是否必填 | 说明     |
-| ------ | ----------------------------------------------------------------------------------------------------- | ---- | -------- |
-| image  | [ResourceStr](https://developer.huawei.com/consumer/cn/doc/harmonyos-references/ts-types#resourcestr) | 是   | 商品图片 |
-| title  | string                                                                                                | 是   | 商品标题 |
-| price  | number                                                                                                | 是   | 商品价格 |
-| url    | string                                                                                                | 是   | 商品链接 |
+| ------ | ----------------------------------------------------------------------------------------------------- | -------- | -------- |
+| image  | [ResourceStr](https://developer.huawei.com/consumer/cn/doc/harmonyos-references/ts-types#resourcestr) | 是       | 商品图片 |
+| title  | string                                                                                                | 是       | 商品标题 |
+| price  | number                                                                                                | 是       | 商品价格 |
+| url    | string                                                                                                | 是       | 商品链接 |
 
 ## 示例代码
 
@@ -118,5 +118,3 @@ struct PreviewPage {
   }
 }
 ```
-
-<img src="snapshots/example.gif" width="300">

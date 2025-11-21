@@ -4,7 +4,7 @@ const TAG = '[VideoPlayDataSource]'
  * 视频播放数据,提供给video player使用
  */
 export interface VideoPlayData {
-  getUrl(): ResourceStr
+  getUrl(): media.AVFileDescriptor | string
   getPlayTime():number
   getPic(): string
   getName():string

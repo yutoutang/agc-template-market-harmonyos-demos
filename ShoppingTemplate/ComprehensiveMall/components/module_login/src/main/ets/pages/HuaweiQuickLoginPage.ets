@@ -113,42 +113,46 @@ export struct HuaweiQuickLoginPage {
                 .margin({ top: 48 })
                 .alignItems(HorizontalAlign.Center)
 
-                LoginWithHuaweiIDButton({
-                  params: {
-                    style: loginComponentManager.Style.BUTTON_CUSTOM,
-                    borderRadius: 20,
-                    supportDarkMode: false,
-                    loginType: loginComponentManager.LoginType.QUICK_LOGIN,
-                    customButtonParams: {
-                      fontColor: loginComponentManager.FontColor.WHITE,
-                      backgroundColor: IColor.THEME_PRIMARY,
+                Column() {
+                  LoginWithHuaweiIDButton({
+                    params: {
+                      style: loginComponentManager.Style.BUTTON_CUSTOM,
+                      borderRadius: 20,
+                      supportDarkMode: false,
+                      loginType: loginComponentManager.LoginType.QUICK_LOGIN,
+                      customButtonParams: {
+                        fontColor: loginComponentManager.FontColor.WHITE,
+                        backgroundColor: IColor.THEME_PRIMARY,
+                      },
+                      verifyPhoneNumber: true,
+                      extraStyle: {
+                        buttonStyle: new loginComponentManager.ButtonStyle()
+                          .buttonSize({ width: '100%', height: 40 })
+                          .fontSize(16)
+                          .fontWeight(600)
+                          .fontColor(IColor.WHITE)
+                          .backgroundColor(IColor.THEME_PRIMARY)
+                          .border({ radius: 20 })
+                          .loadingStyle({ show: true }),
+                      },
+                      loginButtonTextType: loginComponentManager.LoginButtonTextType.QUICK_LOGIN,
                     },
-                    verifyPhoneNumber: true,
-                    extraStyle: {
-                      buttonStyle: new loginComponentManager.ButtonStyle()
-                        .buttonSize({ width: '100%', height: 40 })
-                        .fontSize(16)
-                        .fontWeight(600)
-                        .fontColor(IColor.WHITE)
-                        .backgroundColor(IColor.THEME_PRIMARY)
-                        .border({ radius: 20 })
-                        .loadingStyle({ show: true }),
-                    },
-                    loginButtonTextType: loginComponentManager.LoginButtonTextType.QUICK_LOGIN,
-                  },
-                  controller: this.loginButtonController,
-                })
-                  .margin({ top: 48 })
-                Button('其他方式登录')
-                  .fontColor($r('sys.color.font_primary'))
-                  .width('100%')
-                  .height(40)
-                  .backgroundColor(IColor.BLACK_TRANSPARENT_5)
-                  .margin({ top: 12 })
-                  .onClick(() => {
-                    this.isFinish = true;
-                    routerStack.replacePathByName(RouterMap.USER_OTHER_LOGIN, this.onFinish);
+                    controller: this.loginButtonController,
                   })
+                    .margin({ top: 48 })
+                  Button('其他方式登录')
+                    .fontColor($r('sys.color.font_primary'))
+                    .width('100%')
+                    .height(40)
+                    .backgroundColor(IColor.BLACK_TRANSPARENT_5)
+                    .margin({ top: 12 })
+                    .onClick(() => {
+                      this.isFinish = true;
+                      routerStack.replacePathByName(RouterMap.USER_OTHER_LOGIN, this.onFinish);
+                    })
+                }
+                .width('100%')
+                .constraintSize({ maxWidth: 480 })
               }
               .width('100%')
               .alignItems(HorizontalAlign.Center)
@@ -187,7 +191,7 @@ export struct HuaweiQuickLoginPage {
                         .fontWeight(600)
                         .onClick(() => {
                           if (text.extraParams) {
-                            routerStack.pushPathByName(RouterMap.AGREEMENT, text.extraParams);
+                            routerStack.pushPathByName(RouterMap.SETTING_AGREEMENT, text.extraParams);
                           }
                         })
                     }
@@ -201,7 +205,7 @@ export struct HuaweiQuickLoginPage {
             }
           }
           .width('100%')
-          .constraintSize({ minHeight: '100%' })
+          .constraintSize({ minHeight: '100%', maxWidth: 480 })
           .justifyContent(FlexAlign.SpaceBetween)
           .padding({ left: 16, right: 16 })
         }
@@ -235,7 +239,6 @@ export struct HuaweiQuickLoginPage {
   }
 
   private onMockLogin(isShowToast: boolean = true): void {
-    iData.local.userToken = 'mock_token';
     iData.global.isLogin = true;
     iData.global.userInfo.reset();
     iData.global.userInfo.nickname = '华为用户';

@@ -1,16 +1,17 @@
 import { BusinessError } from '@kit.BasicServicesKit';
-import { ItemInfo } from 'common';
+import { ItemInfo, MineItemList } from 'common';
 import { getDataFromJSON } from 'h5';
+import { AppStorageV2 } from '@kit.ArkUI';
 
-@Component
+@ComponentV2
 export struct ServiceManage {
   allServiceItems: Array<ItemInfo> = [];
-  @State changedItem: Array<ItemInfo> = [];
-  @StorageLink('mineItem') mineItem: Array<ItemInfo> = [];
-  @Consume('pageInfos') pageInfos: NavPathStack
+  @Local changedItem: Array<ItemInfo> = [];
+  @Local mineItemList: MineItemList = AppStorageV2.connect<MineItemList>(MineItemList, () => new MineItemList())!;
+  @Consumer ('pageInfos') pageInfos: NavPathStack = new NavPathStack()
   saveAndRouterBack = () => {
     try {
-      this.mineItem = this.changedItem;
+      this.mineItemList.itemInfoList = this.changedItem;
       this.pageInfos.pop();
     } catch (err) {
       console.log(`error code is: ${(err as BusinessError).name}, error message is: ${(err as BusinessError).message}`);
@@ -23,9 +24,9 @@ export struct ServiceManage {
   }
 
   initDataSource() {
-    this.changedItem = [...this.mineItem];
+    this.changedItem = [...this.mineItemList.itemInfoList];
     this.allServiceItems = getDataFromJSON<ItemInfo>('ServiceMgntPage-AllService.json', this);
-    this.mineItem = getDataFromJSON<ItemInfo>('HomePage-MineItem.json', this);
+    this.mineItemList.itemInfoList = getDataFromJSON<ItemInfo>('HomePage-MineItem.json', this);
   }
 
   build() {

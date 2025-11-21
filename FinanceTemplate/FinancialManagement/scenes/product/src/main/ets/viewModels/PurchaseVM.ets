@@ -103,10 +103,10 @@ export class PurchaseVM {
   public getLimitMoney(value: number): string {
     if (this.account.bankAmount < value) {
       return this.productInfo!.remainingPurchaseAmount < this.account.bankAmount ?
-      this.productInfo!.remainingPurchaseAmount.toString() : this.account.bankAmount.toString()
+        this.productInfo!.remainingPurchaseAmount.toString() : this.account.bankAmount.toString()
     } else {
       return this.productInfo!.remainingPurchaseAmount < value ?
-      this.productInfo!.remainingPurchaseAmount.toString() : value.toString()
+        this.productInfo!.remainingPurchaseAmount.toString() : value.toString()
     }
   }
 
@@ -196,15 +196,20 @@ export class PurchaseVM {
       promptAction.showToast({ message: res.msg });
     }
     if (res && res.code === 0) {
-      paymentService
-        .requestPayment(this.context, res.data.orderStr)
-        .then(() => {
-          Logger.info('succeeded in paying');
-        })
-        .catch((error: BusinessError) => {
-          promptAction.showToast({ message: '支付失败！' });
-          Logger.error(`failed to pay, error.code: ${error.code}, error.message: ${error.message}`);
-        });
+      try {
+        paymentService
+          .requestPayment(this.context, res.data.orderStr)
+          .then(() => {
+            Logger.info('succeeded in paying');
+          })
+          .catch((error: BusinessError) => {
+            promptAction.showToast({ message: '支付失败！' });
+            Logger.error(`failed to pay, error.code: ${error.code}, error.message: ${error.message}`);
+          });
+      } catch (error) {
+        promptAction.showToast({ message: '支付失败！' });
+        Logger.error(`failed to pay`, JSON.stringify(error));
+      }
     }
   }
 }

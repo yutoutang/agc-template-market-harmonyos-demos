@@ -2,6 +2,7 @@ import { routerStack, RouterMap } from 'lib_foundation';
 import { NavTitleBar } from 'lib_widget';
 import { CategoryItem, HomeApis, ProductSummaryItem } from 'lib_network';
 import { ProductCategory } from 'module_product_category';
+import { LoneTakeAnimationsTransition, LongTakeTransitionParam } from 'module_transition';
 
 @ComponentV2
 export struct CategoryPageContent {
@@ -17,6 +18,8 @@ export struct CategoryPageContent {
   curIndex: number = 0;
   @Local
   productList: ProductSummaryItem[] = []
+
+  private readonly SEARCH_ID = 'category_search'
 
   async getCategoryProductData(id: string) {
     this.isLoading = true;
@@ -51,14 +54,14 @@ export struct CategoryPageContent {
       Column() {
         NavTitleBar({
           title: '分类',
-          bgColor: $r('app.color.background_color_white'),
         }) {
           Row() {
             Image($r('app.media.ic_search_filled'))
               .width(40)
               .height(40)
+              .id(this.SEARCH_ID)
               .onClick(() => {
-                routerStack.pushPathByName(RouterMap.PRODUCT_SEARCH, null);
+                routerStack.pushPath({name: RouterMap.PRODUCT_SEARCH});
               })
           }
           .layoutWeight(1)
@@ -79,10 +82,10 @@ export struct CategoryPageContent {
       }
       .width('100%')
       .height('100%')
-      .backgroundColor(Color.White)
       .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP]);
     }
     .hideTitleBar(true)
+    .backgroundColor($r('app.color.background_color_grey'))
   }
 }
 

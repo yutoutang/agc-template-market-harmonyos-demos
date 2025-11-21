@@ -2,6 +2,7 @@
 export struct ContainerColumn {
   @Param title: string = '';
   @Param subTitle: string = '';
+  @Param bottomGap: boolean = true
   @BuilderParam customBuilderParam: () => void = this.buildEmpty;
 
   build() {
@@ -22,7 +23,8 @@ export struct ContainerColumn {
       this.customBuilderParam();
     }
     .alignItems(HorizontalAlign.Center)
-    .margin({ bottom: $r('app.float.space_l') })
+    .justifyContent(FlexAlign.Center)
+    .margin({ bottom: this.bottomGap ? $r('app.float.space_m') : 0 })
     .backgroundColor($r('app.color.background_color_white'))
     .borderRadius($r('app.float.border_radius_l'))
     .width($r('app.string.size_percent_full'))
@@ -31,7 +33,8 @@ export struct ContainerColumn {
   }
 
   @Builder
-  buildEmpty(){}
+  buildEmpty() {
+  }
 }
 
 @Extend(Text)

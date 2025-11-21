@@ -1,9 +1,6 @@
 import { RequestUrlMap } from '../../constants/Enums';
 import {
-  PreOrderInfoReq,
-  OrderCreateReq,
-  OrderUpdateReq,
-  OrderReviewReq,
+  PreOrderInfoReq, OrderCreateReq, OrderUpdateReq, OrderReviewReq,
 } from '../../types/RequestTypes';
 import { BaseResponse } from '../../types/responses/BaseResponse';
 import {
@@ -11,6 +8,7 @@ import {
   OrderListResp,
   OrderDetailResp,
   OrderCreateResp,
+  OrderExpressResp,
 } from '../../types/responses/OrderResponse';
 import request from '../Request';
 
@@ -48,6 +46,15 @@ class OrderApis {
         orderId,
       },
     });
+  }
+
+  /**
+   * 获取订单物流信息
+   */
+  public async getExpressInfo(orderId: string): Promise<OrderExpressResp> {
+    return request.get(RequestUrlMap.ORDER_EXPRESS, {
+      params: { orderId },
+    })
   }
 
   /**

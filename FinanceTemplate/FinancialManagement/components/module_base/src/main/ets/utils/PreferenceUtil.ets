@@ -23,7 +23,7 @@ export class PreferenceUtil {
   }
 
 
-  public put(key: string, value: object | string) {
+  public put(key: string, value: preferences.ValueType) {
     if (!this.dataPreferences) {
       Logger.info('PreferenceUtil: dataPreferences is null');
     }

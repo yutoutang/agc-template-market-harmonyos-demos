@@ -60,7 +60,13 @@
       "look_ad": "file:./XXX/look_ad"
     }
     ```
-
+   d.在entry模块的EntryAbility.ets文件下，EntryAbility类的onWindowStageCreate方法中添加状态存储
+   ```
+   onWindowStageCreate(windowStage: window.WindowStage): void {
+      AppStorage.setOrCreate('windowStage',windowStage);
+      ......
+   }
+   ```
 2. 引入组件。
 
    ```

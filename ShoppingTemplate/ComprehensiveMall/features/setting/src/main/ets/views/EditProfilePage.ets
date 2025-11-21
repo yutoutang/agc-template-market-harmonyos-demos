@@ -1,12 +1,15 @@
-import { Style } from 'lib_foundation';
+import { routerStack, Style } from 'lib_foundation';
 import { FunctionalButton, functionalButtonComponentManager } from '@kit.ScenarioFusionKit';
 import { EditProfileVM } from '../viewmodels/EditProfileVM';
-import { NavTitleBar } from 'lib_widget';
+import { CommonConfirmDialog, ContainerColumn, NavTitleBar } from 'lib_widget';
 
+@Entry
 @ComponentV2
 export struct EditProfilePage {
   @Local
   showNicknameDialog: boolean = false;
+  @Local
+  hasChange: boolean = false;
   vm: EditProfileVM = new EditProfileVM();
 
   aboutToAppear(): void {
@@ -15,25 +18,52 @@ export struct EditProfilePage {
 
   build() {
     NavDestination() {
-      NavTitleBar({ title: '我的信息' })
-
-      Column() {
-        this.editAvatarBuilder();
-        this.editNicknameBuilder();
-        Blank();
-        Button('保存')
-          .backgroundColor(Style.THEME_COLOR)
-          .width('100%')
-          .onClick(() => {
-            this.vm.handleSave();
-          });
+      GridRow({
+        columns: {
+          sm: 4,
+          md: 6,
+          lg: 8,
+        },
+      }) {
+        GridCol({
+          span: 4,
+          offset: {
+            sm: 0,
+            md: 1,
+            lg: 2,
+          },
+        }) {
+          Column() {
+            this.editAvatarBuilder();
+            this.editNicknameBuilder();
+            Blank();
+            Button('保存')
+              .backgroundColor(Style.THEME_COLOR)
+              .width('100%')
+              .onClick(() => {
+                this.vm.handleSave();
+              });
+          }
+          .layoutWeight(1)
+        }
       }
       .layoutWeight(1)
-      .padding(16);
+      .padding(16)
     }
-    .hideTitleBar(true)
-    .backgroundColor(Style.BACKGROUND_COLOR_GREY);
-
+    .title('个人信息', { backgroundColor: $r('app.color.background_color_grey') })
+    .backgroundColor(Style.BACKGROUND_COLOR_GREY)
+    .onBackPressed(() => {
+      if (this.hasChange) {
+        CommonConfirmDialog.show({
+          content: '当前编辑内容未保存，是否确认返回？',
+          confirm: () => {
+            routerStack.pop()
+          },
+        })
+        return true
+      }
+      return false
+    })
   }
 
   @Builder
@@ -48,7 +78,7 @@ export struct EditProfilePage {
             styleConfig: new functionalButtonComponentManager.ButtonConfig()
               .type(ButtonType.Circle)
               .backgroundImage(this.vm.avatar && this.vm.avatar !== '' ? this.vm.avatar :
-              $r('app.media.default_avatar'))
+                $r('app.media.default_avatar'))
               .backgroundImageSize(ImageSize.Cover)
               .width(28)
               .height(28)
@@ -58,6 +88,7 @@ export struct EditProfilePage {
           },
         },
         controller: new functionalButtonComponentManager.FunctionalButtonController().onChooseAvatar((error, data) => {
+          this.hasChange = true
           this.vm.getAvatarSrc(error, data);
         }),
       });
@@ -67,28 +98,41 @@ export struct EditProfilePage {
 
   @Builder
   editNicknameBuilder() {
-    Row() {
-      Text('昵称').titleStyle();
+    ContainerColumn() {
       Row() {
-        Text(this.vm.nickname.length ? this.vm.nickname : '请输入昵称')
-          .fontSize(14)
-          .fontColor(Style.FONT_COLOR_LEVEL2);
-        Image($r('app.media.ic_info_edit')).rightIconStyle();
+        Text('昵称').titleStyle();
+        Row() {
+          Text(this.vm.nickname.length ? this.vm.nickname : '请输入昵称')
+            .fontSize(14)
+            .fontColor(Style.FONT_COLOR_LEVEL2);
+          Image($r('app.media.ic_info_edit')).rightIconStyle();
+        }
+        .onClick(() => {
+          this.showNicknameDialog = true;
+        });
       }
-      .onClick(() => {
-        this.showNicknameDialog = true;
+      .bindSheet($$this.showNicknameDialog, this.nicknameDialogBuilder(), {
+        detents: [SheetSize.MEDIUM],
+        preferType: SheetType.CENTER,
+        title: { title: '设置昵称' },
+        onWillDismiss: (action) => {
+          this.vm.tempNickname = '';
+          action.dismiss();
+        },
       });
 
+      Divider().margin({ top: $r('app.float.space_m'), bottom: $r('app.float.space_m') })
+
+      Row() {
+        Text('手机号').titleStyle();
+        Row() {
+          Text(this.vm.displayPhone)
+            .fontSize(14)
+            .fontColor(Style.FONT_COLOR_LEVEL2);
+        }
+      }
     }
-    .formContainerStyle()
-    .bindSheet($$this.showNicknameDialog, this.nicknameDialogBuilder(), {
-      detents: [SheetSize.MEDIUM],
-      title: { title: '设置昵称' },
-      onWillDismiss: (action) => {
-        this.vm.tempNickname = '';
-        action.dismiss();
-      },
-    });
+
   }
 
   @Builder
@@ -97,6 +141,7 @@ export struct EditProfilePage {
       TextInput({ text: this.vm.nickname, placeholder: '请输入昵称' })
         .maxLength(7)
         .backgroundColor(Style.BACKGROUND_COLOR)
+        .caretColor($r('app.color.theme_color'))
         .borderRadius(16)
         .cancelButton({
           icon: {
@@ -106,6 +151,7 @@ export struct EditProfilePage {
           },
         })
         .onChange((value) => {
+          this.hasChange = true;
           this.vm.tempNickname = value;
         });
 

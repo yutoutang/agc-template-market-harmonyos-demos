@@ -29,9 +29,11 @@
 
 - 网络权限：ohos.permission.INTERNET
 
-### 服务
+### 调试
 
-- 华为账号收货地址管理服务：组件支持获取华为账号收货地址，使用此功能需满足一定条件。详细参考：[收货地址服务开发前提](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-choose-address-dev#section1061219267293)。
+- 如果您需要在模拟器环境下进行相关测试，请使用 HarmonyOS 5.1.0(18) 及以上的模拟器。(高版本模拟器可以通过最新的 DevEco Studio 下载)
+- 当前模拟器不支持智能识别地址功能。
+- 当前模拟器不支持华为账号收货地址导入功能。
 
 ## 快速入门
 
@@ -43,11 +45,15 @@
 
    a. 解压下载的组件包，将包中所有文件夹拷贝至您工程根目录的XXX目录下。
 
-   b. 在项目根目录build-profile.json5添加module_address_manage模块。
+   b. 在项目根目录build-profile.json5添加module_ui_base和module_product_detail模块。
 
    ```
-   // 项目根目录下build-profile.json5填写module_address_manage路径。其中XXX为组件存放的目录名
+   // 项目根目录下build-profile.json5填写module_ui_base和module_address_manage路径。其中XXX为组件存放的目录名
    "modules": [
+     {
+       "name": "module_ui_base",
+       "srcPath": "./XXX/module_ui_base"
+     },
      {
        "name": "module_address_manage",
        "srcPath": "./XXX/module_address_manage"
@@ -55,55 +61,69 @@
    ]
    ```
 
+   c. 在项目根目录 oh-package.json5 中添加依赖。
+
    ```
-   // 在项目根目录oh-package.json5中添加依赖
+   // XXX 为组件存放的目录名称
    "dependencies": {
      "module_address_manage": "file:./XXX/module_address_manage"
    }
    ```
 
-2. 引入组件。
+2. 配置地图服务。
+
+   地址管理组件支持并依赖地图服务的区划选择能力，这需要您提前开通地图服务并完成手动签名。详细参考：[地图服务开发准备](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/map-config-agc)
+
+3. 配置华为账号服务 (可选)。
+
+   地址管理组件支持从华为账号中导入收货地址，这需要您完成账号权限的申请并满足一系列开发前提。详细参考：[收货地址能力开发前提](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-choose-address-dev#section1061219267293)
+
+   您可以暂时跳过该项配置，仅会导致地址编辑页面的 '获取华为账号地址' 不可用。
+
+4. 引入组件。
 
    ```
    import { AddressManage, AddressDTO } from 'module_address_manage';
    ```
 
+5. 调用组件，详细参数配置说明参见[API参考](#API参考)。
+
 ## API参考
 
 ### getDefaultAddress(Promise<[AddressDTO](#AddressDTO) | undefined>)
 
-**获取默认地址**
+获取默认地址。
 
 ### AddressManage(option: AddressManageOptions)
 
 **AddressManageOptions对象说明**
 
 | 参数名           | 类型                                         | 是否必填 | 说明                                  |
-| :--------------- | :------------------------------------------- | :--- | :------------------------------------ |
-| navPathStack     | NavPathStack                                 | 是   | Navigation路由栈实例                  |
-| isSelectMode     | boolean                                      | 否   | 是否开启地址选择模式                  |
-| onSelect         | (address: [AddressDTO](#AddressDTO)) => void | 否   | 选择地址后的回调                      |
-| onBeforeNavigate | () => boolean                                | 否   | 页面跳转前的回调，返回false将取消跳转 |
+| :--------------- | :------------------------------------------- | :------- | :------------------------------------ |
+| navPathStack     | NavPathStack                                 | 是       | Navigation路由栈实例                  |
+| isSelectMode     | boolean                                      | 否       | 是否开启地址选择模式                  |
+| onSelect         | (address: [AddressDTO](#AddressDTO)) => void | 否       | 选择地址后的回调                      |
+| onBeforeNavigate | () => boolean                                | 否       | 页面跳转前的回调，返回false将取消跳转 |
 
 ### AddressDTO
 
 表示地址数据的结构体，用于页面组件传入、组件内部管理，或作为网络接口的请求/响应格式。
 
 | 字段名        | 类型      | 是否必填 | 说明                             |
-| ------------- | --------- | ---- | -------------------------------- |
-| `id`          | `string`  | 是   | 地址唯一标识符                   |
-| `name`        | `string`  | 是   | 姓名                             |
-| `phone`       | `string`  | 是   | 手机号                           |
-| `countryCode` | `string`  | 是   | 国家代码（如 `"CN"` 表示中国）   |
-| `country`     | `string`  | 是   | 国家名称（如 `"中国"`）          |
-| `province`    | `string`  | 是   | 所在省份                         |
-| `city`        | `string`  | 是   | 所在城市                         |
-| `district`    | `string`  | 是   | 所在区/县                        |
-| `street`      | `string`  | 是   | 街道名称（如乡镇、街道）         |
-| `detail`      | `string`  | 是   | 详细地址（如门牌号、楼栋房间号） |
-| `isDefault`   | `boolean` | 是   | 是否为默认地址                   |
-| `createdAt`   | `number`  | 是   | 创建时间戳（毫秒）               |
-| `updatedAt`   | `number`  | 是   | 更新时间戳（毫秒）               |
+| ------------- | --------- | -------- | -------------------------------- |
+| `id`          | `string`  | 是       | 地址唯一标识符                   |
+| `name`        | `string`  | 是       | 姓名                             |
+| `phone`       | `string`  | 是       | 手机号                           |
+| `countryCode` | `string`  | 是       | 国家代码（如 `"CN"` 表示中国）   |
+| `country`     | `string`  | 是       | 国家名称（如 `"中国"`）          |
+| `province`    | `string`  | 是       | 所在省份                         |
+| `city`        | `string`  | 是       | 所在城市                         |
+| `district`    | `string`  | 是       | 所在区/县                        |
+| `street`      | `string`  | 是       | 街道名称（如乡镇、街道）         |
+| `detail`      | `string`  | 是       | 详细地址（如门牌号、楼栋房间号） |
+| `isDefault`   | `boolean` | 是       | 是否为默认地址                   |
+| `createdAt`   | `number`  | 是       | 创建时间戳（毫秒）               |
+| `updatedAt`   | `number`  | 是       | 更新时间戳（毫秒）               |
 
 ## 示例代码
 

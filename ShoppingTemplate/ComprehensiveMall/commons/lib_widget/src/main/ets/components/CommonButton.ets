@@ -26,21 +26,14 @@ export struct CommonButton {
         Row() {
           if (this.icon) {
             Image(this.icon)
-              .width(16)
-              .height(16)
+              .width(24)
+              .height(24)
               .objectFit(ImageFit.Contain)
-              .margin({ right: $r('app.float.space_s') })
+              .margin({ right: $r('app.float.space_xs') })
           }
           Text(this.title)
             .fontSize($r('app.float.font_size_16'))
             .fontWeight(500);
-          if(this.isLoading){
-            LoadingProgress()
-              .width(16)
-              .height(16)
-              .color(this.fontColor)
-              .margin({ left: $r('app.float.space_s') })
-          }
         }
       }
       .width(this.fullWidth ? '100%' : 'auto')

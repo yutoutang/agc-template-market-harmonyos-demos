@@ -18,10 +18,9 @@ struct TransactionSearch {
         Row() {
           Search({ value: this.vm.searchText, placeholder: '请输入产品名称/代码', controller: this.searchController })
             .width('100%')
-            .height(40)
             .placeholderColor($r('sys.color.font_secondary'))
-            .placeholderFont({ size: 16, weight: FontWeight.Regular })
-            .textFont({ size: 16, weight: FontWeight.Regular })
+            .placeholderFont({ size: $r('sys.float.Body_L'), weight: FontWeight.Regular })
+            .textFont({ size: $r('sys.float.Body_L'), weight: FontWeight.Regular })
             .fontColor($r('sys.color.font_primary'))
             .onSubmit((value: string) => {
               this.vm.search(value)

@@ -96,7 +96,7 @@ export struct MainTabPage {
         bottom: this.currentBreakpoint.value === BreakPointValue.LG ? 0 : `${px2vp(this.aiBarHeight.value)}vp`
       })
     }.onBackPressed(() => {
-      // appRouter.back(true)
+      appRouter.back(true)
       return true;
     }).hideTitleBar(true)
     .onWillHide(()=>{

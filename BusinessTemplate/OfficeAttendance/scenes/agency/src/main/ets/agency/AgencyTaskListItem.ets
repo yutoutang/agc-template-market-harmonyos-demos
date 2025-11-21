@@ -27,7 +27,7 @@ export struct AgencyTaskListItem {
             .borderRadius(4)
             .backgroundColor($r('app.color.white'))
             .border({ color: $r('app.color.black_1'), style: BorderStyle.Solid })
-            .selectedColor($r('app.color.sys_default_blue'))
+            .selectedColor($r('sys.color.comp_background_emphasize'))
             .shape(CheckBoxShape.ROUNDED_SQUARE)
             .onChange((value: boolean) => {
               this.checkCallback(value);

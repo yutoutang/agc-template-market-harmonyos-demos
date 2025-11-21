@@ -102,17 +102,11 @@ export struct ShoppingCart {
                   .constraintSize({ minHeight: '100%' })
                   .alignItems(HorizontalAlign.Center)
                   .justifyContent(FlexAlign.Start)
-                  .expandSafeArea(
-                    [SafeAreaType.SYSTEM, SafeAreaType.CUTOUT],
-                    this.isChildRoute ? [SafeAreaEdge.BOTTOM] : [],
-                  )
+                  .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
                 }
                 .height('100%')
                 .scrollBar(BarState.Off)
-                .expandSafeArea(
-                  [SafeAreaType.SYSTEM, SafeAreaType.CUTOUT],
-                  this.isChildRoute ? [SafeAreaEdge.BOTTOM] : [],
-                )
+                .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
               }
               .layoutWeight(1)
               .onRefreshing(() => {
@@ -131,6 +125,7 @@ export struct ShoppingCart {
                 // 越接近最大距离，下拉跟手系数越小
                 this.vm.ratio = 1 - Math.pow(offset / this.vm.maxRefreshingHeight, 3);
               })
+              .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
             }
             .width('100%')
             .height('100%')
@@ -138,6 +133,7 @@ export struct ShoppingCart {
               // 用来清空步进器的焦点
               this.getUIContext().getFocusController().clearFocus();
             })
+            .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
 
             // 底部结算面板
             if (this.vm.cartCards.length) {
@@ -169,6 +165,7 @@ export struct ShoppingCart {
           }
           .width('100%')
           .height('100%')
+          .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
         }
       } else {
         // 用户未登录
@@ -177,7 +174,7 @@ export struct ShoppingCart {
     }
     .width('100%')
     .layoutWeight(1)
-    .backgroundColor($r('sys.color.comp_background_focus'))
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
     .onVisibleAreaChange([0.0, 1.0], (isExpanding: boolean) => {
       if (this.vm.isLogin && isExpanding) {
         this.vm.init();
@@ -271,22 +268,29 @@ export struct ShoppingCart {
   @Builder
   cartEmptyBuilder() {
     Column() {
-      Image($r('app.media.empty_status_logo'))
-        .width(160)
-        .height(160)
-        .draggable(false)
-        .objectFit(ImageFit.Cover)
-        .margin({ bottom: 16 })
-      Text('购物车空空如也，去逛逛吧~')
-        .fontSize(13)
-        .fontColor($r('sys.color.mask_secondary'))
-        .margin({ bottom: 24 })
+      Column() {
+        Image($r('app.media.empty_status_logo'))
+          .width(160)
+          .height(160)
+          .draggable(false)
+          .objectFit(ImageFit.Cover)
+          .margin({ bottom: 16 })
+        Text('购物车空空如也，去逛逛吧~')
+          .fontSize(12)
+          .fontColor($r('sys.color.mask_secondary'))
+          .margin({ bottom: 24 })
+      }
+      .backgroundColor(Color.White)
+      .borderRadius(16)
+      .width('100%')
+      .height('100%')
     }
     .width('100%')
     .height('45%')
     .constraintSize({ minHeight: 200 })
+    .padding(16)
     .alignItems(HorizontalAlign.Center)
     .justifyContent(FlexAlign.Center)
-    .backgroundColor(Color.White)
+
   }
 }

@@ -2,6 +2,7 @@ import { abilityAccessCtrl, Permissions } from '@kit.AbilityKit';
 import { CustomFilter } from '../model/CustomFilter';
 import { CameraVM } from '../viewmodel/CameraVM';
 import { getInstance } from '../util/RouteModule';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 
 @Builder
 export function FilteredCameraBuilder() {
@@ -130,6 +131,7 @@ export struct FilteredCamera {
     }
     .hideTitleBar(true)
     .onWillShow(async () => {
+      hilog.error(0xFF00, 'pictureTest', `申请权限失败`);
       this.cameraVM.context = this.context;
       await this.requestPermissionsFn();
       await this.cameraVM.initImageReceiver();

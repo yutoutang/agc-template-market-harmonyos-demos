@@ -1,11 +1,4 @@
-import {
-  CommonButton,
-  CommonConstants,
-  CommonHeader,
-  RouterMap,
-  RouterModule,
-  WindowUtil,
-} from 'common';
+import { CommonButton, CommonConstants, CommonHeader, RouterMap, RouterModule, WindowUtil } from 'common';
 import { CommonKeyboard } from 'module_license_keyboard';
 import { LicensePageVM } from '../viewmodels/LicensePageVM';
 
@@ -36,7 +29,7 @@ export struct AddLicensePage {
 
         /** 设置默认 **/
         Row({ space: 10 }) {
-          Toggle({ type: ToggleType.Checkbox, isOn: $$this.vm.isDefault }).selectedColor($r('app.color.btn_blue1'))
+          Toggle({ type: ToggleType.Checkbox, isOn: $$this.vm.isDefault })
           Text('设为默认').fontSize($r('sys.float.Subtitle_M')).fontColor($r('sys.color.font_primary'))
         }
         .justifyContent(FlexAlign.Start)

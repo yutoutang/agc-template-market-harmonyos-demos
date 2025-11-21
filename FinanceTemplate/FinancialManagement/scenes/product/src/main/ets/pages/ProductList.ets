@@ -17,10 +17,9 @@ struct ProductList {
       Column() {
         Search({ value: this.vm.searchText, placeholder: '请输入产品名称/代码', controller: this.searchController })
           .width('100%')
-          .height(40)
           .placeholderColor($r('sys.color.font_secondary'))
-          .placeholderFont({ size: 16, weight: FontWeight.Regular })
-          .textFont({ size: 16, weight: FontWeight.Regular })
+          .placeholderFont({ size: $r('sys.float.Body_L'), weight: FontWeight.Regular })
+          .textFont({ size: $r('sys.float.Body_L'), weight: FontWeight.Regular })
           .focusable(false)
           .onClick(() => {
             FormatUtil.jumpToNext(RouterMap.PRODUCT_SEARCH)

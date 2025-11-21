@@ -61,7 +61,8 @@ export struct PosterSharePopContent {
         .height(this.coverUrl ? 370 : 270)
         .margin({ top: this.marginTop })
         .onAreaChange(() => {
-          this.marginTop = display.getDefaultDisplaySync().orientation === display.Orientation.PORTRAIT ? '30%' : ''
+          this.marginTop = display.getFoldStatus() === display.FoldStatus.FOLD_STATUS_EXPANDED ? '20%' :
+            display.getDefaultDisplaySync().orientation === display.Orientation.PORTRAIT ? '30%' : ''
         })
       Blank()
       Row() {

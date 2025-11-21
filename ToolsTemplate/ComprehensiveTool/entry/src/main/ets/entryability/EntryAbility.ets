@@ -3,6 +3,7 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { appDB, initNFC } from 'mobile_nfc';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { sensor } from '@kit.SensorServiceKit';
 
 const DOMAIN = 0x0000;
 
@@ -70,5 +71,6 @@ export default class EntryAbility extends UIAbility {
   onBackground(): void {
     // Ability has back to background
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onBackground');
+    sensor.off(sensor.SensorId.ORIENTATION);
   }
 };

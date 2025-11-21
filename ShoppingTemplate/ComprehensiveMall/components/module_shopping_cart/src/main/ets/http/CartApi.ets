@@ -1,6 +1,12 @@
 import { util } from '@kit.ArkTS';
 import { PersistenceV2 } from '@kit.ArkUI';
-import { CartCardDto, Product, CartDto, MockCart, UpdateCartReq } from '../commons/Model';
+import {
+  CartCardDto,
+  Product,
+  CartDto,
+  MockCart,
+  UpdateCartReq,
+} from '../commons/Model';
 import { MockProductData } from './MockProductData';
 
 function handleBannerIcon(banner: string): ResourceStr {
@@ -21,11 +27,7 @@ export class CartApi {
 
   // 获取购物车列表数据
   public static getCartList(): Promise<Product[]> {
-    let mockCart: MockCart = PersistenceV2.connect(
-      MockCart,
-      'MockCart',
-      () => new MockCart(),
-    )!;
+    let mockCart: MockCart = CartApi._getMockCart();
     let resList: Product[] = [];
     if (mockCart.data) {
       const resData = JSON.parse(mockCart.data) as CartDto;
@@ -53,12 +55,8 @@ export class CartApi {
     data: string[],
     isRemain: boolean = true,
   ): Promise<string> {
-    let mockCart: MockCart = PersistenceV2.connect(
-      MockCart,
-      'MockCart',
-      () => new MockCart(),
-    )!;
-    const mockCartData = CartApi._getCartData()
+    let mockCart: MockCart = CartApi._getMockCart();
+    const mockCartData = CartApi._getCartData();
     let remainList: CartCardDto[] = mockCartData.cards.filter(
       (item: CartCardDto) =>
         isRemain ? data.includes(item.skuCode) : !data.includes(item.skuCode),
@@ -74,14 +72,8 @@ export class CartApi {
   }
 
   // 更新购物车商品的数量
-  public static updateProductCount(
-    data: UpdateCartReq,
-  ): Promise<string> {
-    let mockCart: MockCart = PersistenceV2.connect(
-      MockCart,
-      'MockCart',
-      () => new MockCart(),
-    )!;
+  public static updateProductCount(data: UpdateCartReq): Promise<string> {
+    let mockCart: MockCart = CartApi._getMockCart();
     const mockCartData = JSON.parse(mockCart.data) as CartDto;
     for (let i = 0; i < mockCartData.cards.length; i++) {
       if (mockCartData.cards[i].skuCode === data.skuCode) {
@@ -127,11 +119,7 @@ export class CartApi {
   }
 
   private static _getCartData() {
-    let mockCart: MockCart = PersistenceV2.connect(
-      MockCart,
-      'MockCart',
-      () => new MockCart(),
-    )!;
+     let mockCart: MockCart = CartApi._getMockCart();
     if (!mockCart.data) {
       return {
         version: 'mock_cart_version_empty',
@@ -144,11 +132,15 @@ export class CartApi {
   }
 
   private static _setCartData(data: CartDto) {
-    let mockCart: MockCart = PersistenceV2.connect(
+    let mockCart: MockCart = CartApi._getMockCart();
+    mockCart.data = JSON.stringify(data);
+  }
+
+  private static _getMockCart(){
+    return PersistenceV2.connect(
       MockCart,
       'MockCart',
       () => new MockCart(),
-    )!;
-    mockCart.data = JSON.stringify(data);
+    )!
   }
 }

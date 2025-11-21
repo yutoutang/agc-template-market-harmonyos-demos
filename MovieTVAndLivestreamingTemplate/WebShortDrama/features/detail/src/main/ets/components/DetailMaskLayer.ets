@@ -154,7 +154,7 @@ export struct DetailMaskLayer {
 
   build() {
     Stack({ alignContent: Alignment.BottomEnd }) {
-      if (CastService.getInstance().isCasting) {
+      if (CastService.getInstance().castStatusModel.isCasting) {
         this.castControlBuilder()
       } else {
         Stack({ alignContent: Alignment.TopStart }) {
@@ -267,9 +267,9 @@ export struct DetailMaskLayer {
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.MARQUEE });
             Column() {
-              Image(getMedia('app.media.arrow_right_white'))
-                .width(5)
-                .height(9);
+              SymbolGlyph($r('sys.symbol.chevron_right'))
+                .fontSize(16)
+                .fontColor([$r('sys.color.white')])
             }
             .width(16)
             .height(16)

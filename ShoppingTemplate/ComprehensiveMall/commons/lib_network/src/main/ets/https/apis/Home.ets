@@ -1,5 +1,8 @@
 import { RequestUrlMap } from '../../constants/Enums';
-import { CategoryProductListResp, HomeConfigResp } from '../../types/responses/HomeConfigResponse';
+import {
+  CategoryProductListResp,
+  HomeConfigResp,
+} from '../../types/responses/HomeConfigResponse';
 import request from '../Request';
 
 class HomeApis {
@@ -13,9 +16,12 @@ class HomeApis {
   /**
    * 获取分类内商品
    */
-  public getCategoryProductList(subId: string): Promise<CategoryProductListResp> {
-    return request.get(RequestUrlMap.COMMON_CATEGORY_PRODUCT, { params: { subId } });
-
+  public getCategoryProductList(
+    subId: string,
+  ): Promise<CategoryProductListResp> {
+    return request.get(RequestUrlMap.COMMON_CATEGORY_PRODUCT, {
+      params: { subId },
+    });
   }
 }
 

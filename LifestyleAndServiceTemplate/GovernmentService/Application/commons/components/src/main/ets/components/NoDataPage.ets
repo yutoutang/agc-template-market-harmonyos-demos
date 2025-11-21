@@ -1,6 +1,6 @@
-@Component
+@ComponentV2
 export struct NodataPage {
-  title: string = ''
+  @Param title: string = ''
 
   build() {
     NavDestination() {

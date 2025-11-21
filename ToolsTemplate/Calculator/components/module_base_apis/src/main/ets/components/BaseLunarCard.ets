@@ -22,14 +22,11 @@ export struct BaseLunarCard {
       Row({ space: 12 }) {
         Column({ space: 12 }) {
           Text(dayjs(this.lunarInfo.solarDate).format('YYYY.MM-DD').split('-')[0])
-            .attributeModifier(new BaseTextStyleModifier(`${this.isWeekDay(this.lunarInfo) ? '#DB6B42' :
-              'font_on_primary'}/Body_S/Regular`)).opacity(0.7)
+            .attributeModifier(new BaseTextStyleModifier(`alert/Body_S/Regular`)).fontColor($r('sys.color.alert'))
           Text(dayjs(this.lunarInfo.solarDate).format('YYYY.MM-DD').split('-')[1])
-            .attributeModifier(new BaseTextStyleModifier(`${this.isWeekDay(this.lunarInfo) ? '#DB6B42' :
-              'font_on_primary'}/30/Regular`)).opacity(0.7)
+            .attributeModifier(new BaseTextStyleModifier(`alert/30/Regular`)).fontColor($r('sys.color.alert'))
           Text(this.lunarInfo.weekday)
-            .attributeModifier(new BaseTextStyleModifier(`${this.isWeekDay(this.lunarInfo) ? '#DB6B42' :
-              'font_on_primary'}/Body_S/Regular`)).opacity(0.7)
+            .attributeModifier(new BaseTextStyleModifier(`alert/Body_S/Regular`)).fontColor($r('sys.color.alert'))
         }
         .border({
           width: { right: 1 },
@@ -39,35 +36,35 @@ export struct BaseLunarCard {
 
         Column({ space: 5 }) {
           Text(this.lunarInfo.lunarDate)
-            .attributeModifier(new BaseTextStyleModifier('font_on_primary/Subtitle_S/Regular')).opacity(0.7)
+            .attributeModifier(new BaseTextStyleModifier('font_primary/Subtitle_S/Regular'))
           Row({ space: 5 }) {
             Text(this.lunarInfo.ganZhiYear)
-              .attributeModifier(new BaseTextStyleModifier('font_on_primary/Subtitle_S/Regular')).opacity(0.7)
+              .attributeModifier(new BaseTextStyleModifier('font_primary/Subtitle_S/Regular'))
             Text(this.lunarInfo.ganZhiMonth)
-              .attributeModifier(new BaseTextStyleModifier('font_on_primary/Subtitle_S/Regular')).opacity(0.7)
+              .attributeModifier(new BaseTextStyleModifier('font_primary/Subtitle_S/Regular'))
             Text(this.lunarInfo.ganZhiDay)
-              .attributeModifier(new BaseTextStyleModifier('font_on_primary/Subtitle_S/Regular')).opacity(0.7)
+              .attributeModifier(new BaseTextStyleModifier('font_primary/Subtitle_S/Regular'))
           }
 
           Row({ space: 5 }) {
             Text('值神：天刑')
-              .attributeModifier(new BaseTextStyleModifier('font_on_primary/Body_S/Regular')).opacity(0.6)
+              .attributeModifier(new BaseTextStyleModifier('font_secondary/Body_S/Regular'))
             Text('十二神：满日')
-              .attributeModifier(new BaseTextStyleModifier('font_on_primary/Body_S/Regular')).opacity(0.6)
+              .attributeModifier(new BaseTextStyleModifier('font_secondary/Body_S/Regular'))
           }
 
 
           Text('星宿：胃土雉宿星')
-            .attributeModifier(new BaseTextStyleModifier('font_on_primary/Body_S/Regular')).opacity(0.6)
+            .attributeModifier(new BaseTextStyleModifier('font_secondary/Body_S/Regular'))
         }
         .alignItems(HorizontalAlign.Start)
       }
 
       Row() {
         Text(this.lunarInfo.daysFromNow ? this.lunarInfo.daysFromNow.toString() : '今天')
-          .attributeModifier(new BaseTextStyleModifier('font_on_primary/Subtitle_L/Bold'))
-        Text(this.lunarInfo.forwardOrBack === CALCULATION_TYPE.FORWARD ? '天前' : '天后').opacity(0.7)
-          .attributeModifier(new BaseTextStyleModifier('font_on_primary/Body_S/Regular')).opacity(0.7)
+          .attributeModifier(new BaseTextStyleModifier('font_primary/Subtitle_L/Bold'))
+        Text(this.lunarInfo.forwardOrBack === CALCULATION_TYPE.FORWARD ? '天前' : '天后')
+          .attributeModifier(new BaseTextStyleModifier('font_secondary/Body_S/Regular'))
           .visibility(this.lunarInfo.daysFromNow ? Visibility.Visible : Visibility.None)
       }
     }
@@ -80,7 +77,7 @@ export struct BaseLunarCard {
     .onClick(() => {
       this.onLunarInfoCardClick(this.lunarInfo)
     })
-    .backgroundColor('#202224')
+    .backgroundColor($r('sys.color.background_tertiary'))
     .borderRadius(16)
   }
 }

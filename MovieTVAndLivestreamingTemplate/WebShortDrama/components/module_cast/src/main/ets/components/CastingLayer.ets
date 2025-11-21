@@ -116,7 +116,7 @@ struct DeviceView {
 
   build() {
     Column() {
-      Text(`投屏设备:${this.castService.currentDeviceName}`)
+      Text(`投屏设备:${this.castService.castStatusModel.currentDeviceName}`)
         .fontSize(16)
         .fontColor($r('sys.color.font_on_primary'))
         .margin({ top: 49, bottom: 16 })
@@ -131,7 +131,8 @@ struct DeviceView {
             .fontColor($r('sys.color.font_on_primary'))
             .margin({ left: 5 })
         }
-      }.backgroundColor('#1AFFFFFF')
+      }
+      .backgroundColor('#1AFFFFFF')
       .borderRadius(20)
       .height(28)
       .width(97)
@@ -198,14 +199,14 @@ struct ControlView {
       .justifyContent(FlexAlign.SpaceBetween)
 
       Column() {
-        SymbolGlyph(this.castService.isCastPlaying ? $r('sys.symbol.pause') : $r('sys.symbol.play'))
+        SymbolGlyph(this.castService.castStatusModel.isCastPlaying ? $r('sys.symbol.pause') : $r('sys.symbol.play'))
           .fontSize(40)
           .fontColor([$r('sys.color.icon_on_primary')])
       }.justifyContent(FlexAlign.Center)
       .width(40)
       .height(40)
       .onClick(() => {
-        this.castService.isCastPlaying ? this.castService.pause() : this.castService.play()
+        this.castService.castStatusModel.isCastPlaying ? this.castService.pause() : this.castService.play()
       })
     }.width(208)
     .height(208)

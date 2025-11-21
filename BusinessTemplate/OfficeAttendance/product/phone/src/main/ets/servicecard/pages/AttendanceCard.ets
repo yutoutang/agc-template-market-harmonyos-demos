@@ -1,6 +1,6 @@
-import { CheckInStatus } from '@ohos_agcit/office_attendance_common_lib/src/main/ets/constants/CheckInEnums';
 import { CardListComponent } from '../view/CardListComponent';
 import { CardListParameter } from '../viewmodel/CardListParameter';
+import { ClockInStatus } from 'clock_in'
 
 let storageLocal = new LocalStorage();
 
@@ -9,7 +9,7 @@ let storageLocal = new LocalStorage();
 struct AttendanceCard {
   @LocalStorageProp('startTime') startTime: string = '--:--:--';
   @LocalStorageProp('endTime') endTime: string = '--:--:--';
-  @LocalStorageProp('checkInStatus') checkInStatus: CheckInStatus = CheckInStatus.NOT_STARTED;
+  @LocalStorageProp('ClockInStatus') clockInStatus: ClockInStatus = ClockInStatus.NOT_STARTED;
   @State cardListParameter: CardListParameter = new CardListParameter(Color.White,
     $r('app.string.card_list_title'), '', ImageSize.Auto, $r('app.media.servicecard'), true,
     Color.White, true, 2, $r('sys.color.ohos_id_color_emphasize'),
@@ -88,7 +88,7 @@ struct AttendanceCard {
 
   build() {
     Row() {
-      CardListComponent({ cardListParameter: this.cardListParameter, checkInStatus: this.checkInStatus }) {
+      CardListComponent({ cardListParameter: this.cardListParameter, clockInStatus: this.clockInStatus }) {
         this.cardListBuilder();
       }
     }

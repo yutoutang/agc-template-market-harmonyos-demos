@@ -109,10 +109,6 @@
       "value": "1.0.0"
     },
     {
-      "name": "aagcittype_huawei_office_attendance_schedule",
-      "value": "sceneTemplate"
-    },
-    {
       "name": "new_success",
       "value": "新建成功"
     },
@@ -231,6 +227,10 @@
     {
       "name": "schedule_lc_desc",
       "value": "中国农历"
+    },
+    {
+      "name": "agcit_huawei_office_attendance",
+      "value": "1.0.1"
     }
   ]
 }

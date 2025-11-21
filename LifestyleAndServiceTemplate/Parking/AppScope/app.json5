@@ -1,7 +1,7 @@
 {
   "app": {
-    // todo
-    "bundleName": "com.atomicservice.xxx",
+// todo:替换包名
+    "bundleName": "com.atomicservice.xxxxxx",
     "bundleType": "atomicService",
     "vendor": "example",
     "versionCode": 1000000,

@@ -3,17 +3,17 @@ import { geoLocationManager } from '@kit.LocationKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { LeftTab, LeftTabContent, NavigationParams, RequestPermission, SubTabContent, TabData } from 'common';
 
-@Component
+@ComponentV2
 export struct OfficePage {
-  @StorageLink('selectedCity') selectedCity: ResourceStr = $r('app.string.please_select');
-  @Consume('pageInfos') pageInfos: NavPathStack
+  @Local selectedCity: ResourceStr = $r('app.string.please_select');
+  @Consumer('pageInfos') pageInfos: NavPathStack = new NavPathStack()
   private requestPermission: RequestPermission = new RequestPermission()
-  @State activateIndex: number = 1;
-  @State selectedLeft: number = 0;
-  @State selectedClassify: number = 0;
-  @State tabDataList: Array<TabData> = [];
-  @State leftTabList: Array<LeftTab> = [];
-  @State leftTabContentList: Array<LeftTabContent> = [];
+  @Local activateIndex: number = 1;
+  @Local selectedLeft: number = 0;
+  @Local selectedClassify: number = 0;
+  @Local tabDataList: Array<TabData> = [];
+  @Local leftTabList: Array<LeftTab> = [];
+  @Local leftTabContentList: Array<LeftTabContent> = [];
   private ERROR_INFO = $r('app.string.repositioning')
 
   /**
@@ -26,7 +26,7 @@ export struct OfficePage {
   }
 
   goSiteListPage = () => {
-    this.pageInfos.pushPathByName('SiteList', null)
+    this.pageInfos.pushPathByName('SiteList', this.selectedCity)
   }
   goSearchPage = () => {
     this.pageInfos.pushPathByName('SearchPage', null)

@@ -8,7 +8,7 @@
       "phone",
     ],
     "metadata": [
-      // todo 替换元服务的client_id值
+      // todo 替换应用的client_id值
       {
         "name": "client_id",
         "value": "xxxxx"

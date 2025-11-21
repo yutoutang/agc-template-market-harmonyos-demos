@@ -32,7 +32,7 @@ export struct LoginView {
             .margin({ top: 40 })
             .textAlign(TextAlign.Start)
 
-          Divider().strokeWidth(1).color($r('app.string.black_20'))
+          Divider().strokeWidth('1px').color($r('sys.color.comp_background_tertiary'))
 
           TextInput({ placeholder: $r('app.string.login_tip_password') })
             .backgroundColor(Color.Transparent)
@@ -48,15 +48,15 @@ export struct LoginView {
             .margin({ top: 10 })
             .textAlign(TextAlign.Start)
 
-          Divider().strokeWidth(1).color($r('app.string.black_20'))
+          Divider().strokeWidth('1px').color($r('sys.color.comp_background_tertiary'))
 
           Button($r('app.string.login'))
             .width('100%')
             .height(40)
             .border({ radius: 20 })
-            .fontColor(Color.White)
+            .fontColor($r('sys.color.font_on_primary'))
             .backgroundColor($r('app.color.account_binding_button'))
-            .fontSize(16)
+            .fontSize($r('sys.float.Body_L'))
             .margin({ top: 32 })
             .onClick(() => {
               if (this.account === '') {
@@ -75,7 +75,7 @@ export struct LoginView {
 
         if (this.isChecking) {
           Row() {
-            LoadingProgress().width(80).height(80)
+            LoadingProgress().width(80).height(72)
           }
           .width('100%')
           .height(this.checkInComponentHeight)

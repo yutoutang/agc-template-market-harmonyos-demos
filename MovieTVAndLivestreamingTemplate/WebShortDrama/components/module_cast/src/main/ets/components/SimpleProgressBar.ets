@@ -19,12 +19,12 @@ export struct SimpleProgressBar {
   @Local durationStringTime: string = '00:00';
   @Local currentStringTime: string = '00:00';
 
-  @Monitor('castService.castCurrentTime', 'castService.castDuration')
+  @Monitor('castService.castStatusModel.castCurrentTime', 'castService.castStatusModel.castDuration')
   onTimeChange(monitor: IMonitor) {
     monitor.dirty.forEach((path: string) => {
 
       let time: number = monitor.value(path)?.now as number
-      if (path === 'castService.castCurrentTime' && time) {
+      if (path === 'castService.castStatusModel.castCurrentTime' && time) {
         this.currentStringTime = secondToTime(Math.floor(time / 1000))
         this.currentTime = time
       }
@@ -37,11 +37,11 @@ export struct SimpleProgressBar {
   }
 
   aboutToAppear(): void {
-    this.currentTime = this.castService.castCurrentTime
-    this.durationTime = this.castService.castDuration
+    this.currentTime = this.castService.castStatusModel.castCurrentTime
+    this.durationTime = this.castService.castStatusModel.castDuration
     this.currentStringTime = secondToTime(Math.floor(this.currentTime / 1000))
     this.durationStringTime = secondToTime(Math.floor(this.durationTime / 1000))
-    hilog.info(DOMAIN, TAG, `aboutToAppear ${this.castService.castDuration}`);
+    hilog.info(DOMAIN, TAG, `aboutToAppear ${this.castService.castStatusModel.castDuration}`);
   }
 
   sliderOnChange(value: number, mode: SliderChangeMode) {

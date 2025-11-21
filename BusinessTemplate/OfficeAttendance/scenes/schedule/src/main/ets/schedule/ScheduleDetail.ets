@@ -42,14 +42,7 @@ export struct ScheduleDetail {
   }
 
   hide() {
-    animateTo({
-      duration: 300,
-      curve: Curve.Friction,
-      onFinish: () => {
-        RouterModule.popWithParam([], true);
-      },
-    }, () => {
-    });
+    RouterModule.popWithParam([], true);
   }
 
   getReminderDesc() {

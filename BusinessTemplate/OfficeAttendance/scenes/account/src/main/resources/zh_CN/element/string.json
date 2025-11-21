@@ -65,6 +65,22 @@
       "value": "关于我们"
     },
     {
+      "name": "tools",
+      "value": "常用工具"
+    },
+    {
+      "name": "protractor",
+      "value": "量角器"
+    },
+    {
+      "name": "area_measure",
+      "value": "面积测量"
+    },
+    {
+      "name": "ruler",
+      "value": "直尺"
+    },
+    {
       "name": "account_name",
       "value": "华为用户"
     },
@@ -131,10 +147,6 @@
     {
       "name": "agcit_huawei_office_attendance_account",
       "value": "1.0.0"
-    },
-    {
-      "name": "agcittype_huawei_office_attendance_account",
-      "value": "sceneTemplate"
     },
     {
       "name": "user_info",

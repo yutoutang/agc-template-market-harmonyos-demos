@@ -1,4 +1,5 @@
-import { https, IUserInfo,IPositionItem,INoticeItem,IUserAccount } from 'lib_foundation';
+import { https, IUserInfo, IPositionItem, INoticeItem, IUserAccount } from 'lib_foundation';
+import { PreferenceUtil } from 'module_base';
 
 @ObservedV2
 export class MinePageVM {
@@ -21,7 +22,7 @@ export class MinePageVM {
   }
 
   init() {
-    const isLogin = AppStorage.get<boolean>('isLogin');
+    const isLogin = PreferenceUtil.getInstance().get('isLogin') as boolean
     if (isLogin) {
       this.isLogin = isLogin
       this.getUserInfo()

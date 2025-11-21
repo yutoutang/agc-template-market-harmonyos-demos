@@ -11,8 +11,6 @@
         './src/main/ets/workers/FileWorker.ets',
         './src/main/ets/workers/TCPSocketServerWorker.ets',
         './src/main/ets/workers/TCPSocketWorker.ets',
-        './src/main/ets/workers/UDPWorker.ets',
-        './src/main/ets/workers/UDPServerWorker.ets'
       ]
     },
   },

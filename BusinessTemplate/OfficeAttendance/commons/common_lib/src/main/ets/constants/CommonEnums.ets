@@ -15,7 +15,16 @@ export enum RouterMap {
 
   ABOUT = 'about',
 
-  USER_INFO = 'userInfo'
+  USER_INFO = 'userInfo',
+
+  TOOLS = 'tools',
+
+  PROTRACTOR = 'protractor',
+
+  AREA_CALCULATE = 'area_calculate',
+
+  RULER = 'ruler'
+
 }
 
 export enum DialogMap {

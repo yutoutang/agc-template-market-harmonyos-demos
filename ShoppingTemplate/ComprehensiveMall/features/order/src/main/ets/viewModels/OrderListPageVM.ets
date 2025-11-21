@@ -4,7 +4,7 @@ import {
 import { OrderApis, OrderItem } from 'lib_network';
 import { ORDER_TAB_LIST } from '../common/Constants';
 import { OrderActionMap, OrderStatusMap, OrderTabsMap } from '../common/Enums';
-import { UpdateAddressSheetOptions } from '../pages/UpdateAddressSheet';
+import { UpdateAddressSheetOptions } from '../views/UpdateAddressSheet';
 import { OrderUtil } from '../utils/OrderUtil';
 
 @ObservedV2
@@ -125,10 +125,11 @@ export class OrderListPageVM {
       OrderUtil.handleViewReview({
         orderNo: orderItem.orderInfo.orderNo,
         data: orderItem,
-      })
+      });
     } else {
       OrderUtil.handleOrderAction(action, {
         orderNo: orderItem.orderInfo.orderNo,
+        data: orderItem,
         callback: () => {
           this.refreshOrderList();
         },

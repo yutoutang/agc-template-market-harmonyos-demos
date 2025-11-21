@@ -41,6 +41,7 @@ export interface OrderActionReq {
   data?: object;
 }
 
+
 export class MyButtonModifier implements AttributeModifier<ButtonAttribute> {
   buttonStyle: OrderButtonStyleMap = OrderButtonStyleMap.FULFILL;
   size: ControlSize = ControlSize.NORMAL;

@@ -24,7 +24,7 @@ export class CastListenerImpl implements CastSessionListener {
 
   onEndCasting(): void {
     this.playController.disableSwiper = false
-    this.playController.seek(CastService.getInstance().castCurrentTime)
+    this.playController.seek(CastService.getInstance().castStatusModel.castCurrentTime)
     this.playController.getAVPlayer()?.play()
   }
 

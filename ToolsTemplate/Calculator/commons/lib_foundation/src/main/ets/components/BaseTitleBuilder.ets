@@ -1,7 +1,7 @@
 @Builder
 export function BaseTitleBuilder(title: string) {
   Row() {
-    Text(title).fontColor('rgba(255, 255, 255, 0.9)')
+    Text(title).fontColor($r('sys.color.font_primary'))
       .fontSize(24)
       .fontWeight(700)
   }

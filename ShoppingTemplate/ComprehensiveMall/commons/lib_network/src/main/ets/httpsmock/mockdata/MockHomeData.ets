@@ -1,19 +1,23 @@
-import { CategoryItem, ProductSummaryItem, SubCategoryItem } from '../../types/responses/HomeConfigResponse';
+import {
+  CategoryItem,
+  ProductSummaryItem,
+  SubCategoryItem,
+} from '../../types/responses/HomeConfigResponse';
 
 const subCategoryMock: SubCategoryItem[] = [
   {
     id: '1001',
-    label: '男士经典',
+    label: '女士经典',
   },
   {
     id: '1002',
-    label: '女士经典',
+    label: '男士经典',
   },
   {
     id: '1003',
     label: '儿童',
   },
-]
+];
 
 export class MockHomeConfig {
   static readonly categoryBarList: CategoryItem[] = [
@@ -76,86 +80,92 @@ export class MockHomeConfig {
     {
       banner: $r('app.media.mock2_spec_white'),
       title: '经典休闲短袖',
-      id: '1001_001',
-      subCategoryId: '1001',
+      id: '1002_001',
+      subCategoryId: '1002',
     },
     {
       banner: $r('app.media.mock2_spec_black'),
       title: '经典舒适短袖',
-      id: '1001_002',
-      subCategoryId: '1001',
+      id: '1002_002',
+      subCategoryId: '1002',
     },
     {
       banner: $r('app.media.mock2_spec_shirt'),
       title: '经典休闲衬衫',
-      subCategoryId: '1001',
-      id: '1001_003',
+      subCategoryId: '1002',
+      id: '1002_003',
     },
     {
       banner: $r('app.media.mock2_spec_blue'),
       title: '经典商务衬衫',
-      subCategoryId: '1001',
-      id: '1001_004',
+      subCategoryId: '1002',
+      id: '1002_004',
     },
     {
       banner: $r('app.media.mock2_spec_white'),
       title: '经典休闲短袖',
-      subCategoryId: '1001',
-      id: '1001_005',
+      subCategoryId: '1002',
+      id: '1002_005',
     },
     {
       banner: $r('app.media.mock2_spec_black'),
       title: '经典舒适短袖',
+      subCategoryId: '1002',
+      id: '1002_006',
+    },
+    {
+      banner: $r('app.media.mock_spec_white'),
+      title: '经典针织打底',
+      id: '1001_001',
       subCategoryId: '1001',
-      id: '1001_006',
-    },
-    {
-      banner: $r('app.media.mock_spec_white'),
-      title: '经典针织打底',
-      id: '1002_001',
-      subCategoryId: '1002',
     },
     {
       banner: $r('app.media.mock_spec_pink'),
       title: '时尚针织打底',
-      id: '1002_002',
-      subCategoryId: '1002',
+      id: '1001_002',
+      subCategoryId: '1001',
     },
     {
       banner: $r('app.media.mock_spec_green'),
       title: '纯羊毛内搭',
-      subCategoryId: '1002',
-      id: '1002_003',
+      subCategoryId: '1001',
+      id: '1001_003',
     },
     {
-      banner: $r('app.media.mock_spec_stripe'),
+      banner: $r('app.media.mock_spec_yellow'),
       title: '轻商务系列',
-      subCategoryId: '1002',
-      id: '1002_004',
+      subCategoryId: '1001',
+      id: '1001_004',
     },
     {
       banner: $r('app.media.mock_spec_white'),
       title: '经典针织打底',
-      id: '1002_001',
-      subCategoryId: '1002',
+      id: '1001_001',
+      subCategoryId: '1001',
     },
     {
       banner: $r('app.media.mock_spec_pink'),
       title: '时尚针织打底',
-      id: '1002_002',
-      subCategoryId: '1002',
+      id: '1001_002',
+      subCategoryId: '1001',
     },
     {
       banner: $r('app.media.mock_spec_green'),
       title: '纯羊毛内搭',
-      subCategoryId: '1002',
-      id: '1002_003',
+      subCategoryId: '1001',
+      id: '1001_003',
     },
     {
-      banner: $r('app.media.mock_spec_stripe'),
+      banner: $r('app.media.mock_spec_yellow'),
       title: '轻商务系列',
-      subCategoryId: '1002',
-      id: '1002_004',
+      subCategoryId: '1001',
+      id: '1001_004',
     },
-  ]
+  ];
+  static readonly searchList: string[] = [
+    '时尚轻商务系列',
+    '秋季穿搭',
+    '针织',
+    '衬衫',
+  ];
 }

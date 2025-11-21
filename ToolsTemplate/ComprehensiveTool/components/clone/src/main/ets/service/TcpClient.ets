@@ -1,6 +1,8 @@
 import { MessageEvents, worker } from '@kit.ArkTS';
 import { WorkerMessageType, BinaryMessageType, LENGTH_TRANSFER_HEADER } from '../common/Constant';
+import { ContactMessage, FileCountMessage } from '../model/BinaryProtocol';
 import { ConnectionVo } from '../model/ConnectionVo';
+import { FileCount, FileVo } from '../model/FileVo';
 import { TcpCallback } from '../model/TcpCallback';
 import { WorkerMessage } from '../model/WorkerMessage';
 import { BufferUtil } from '../utils/BufferUtil';
@@ -48,16 +50,25 @@ export class TcpClient {
     }
   }
 
-  /**
-   * 发送二进制数据
-   */
-  static sendBinaryData(data: ArrayBuffer, dataType: BinaryMessageType): void {
-    let headerBuffer = TcpClient.generateBinaryDataHeader(data.byteLength, dataType);
-    let sendData = BufferUtil.mergeArrayBuffer(headerBuffer, data)
+  static sendFileCount(fileCount: FileCountMessage) {
+    TcpClient.tcpWorker.postMessage({
+      type: WorkerMessageType.SEND_FILE_COUNT,
+      data: fileCount,
+    } as WorkerMessage)
+  }
+
+  static sendContactData(contactMessage: ContactMessage): void {
+    TcpClient.tcpWorker.postMessage({
+      type: WorkerMessageType.SEND_CONTACT,
+      data: contactMessage,
+    } as WorkerMessage)
+  }
+
+  static sendFileData(fileVo: FileVo): void {
     TcpClient.tcpWorker.postMessage({
       type: WorkerMessageType.SEND,
-      data: sendData,
-    } as WorkerMessage, [sendData])
+      data: fileVo,
+    } as WorkerMessage)
   }
 
   static close() {
@@ -67,7 +78,7 @@ export class TcpClient {
     } as WorkerMessage)
   }
 
-  private static generateBinaryDataHeader(binaryDataLength: number, dataType: BinaryMessageType): ArrayBuffer {
+  static generateBinaryDataHeader(binaryDataLength: number, dataType: BinaryMessageType): ArrayBuffer {
     // 创建缓冲区
     const buffer: ArrayBuffer = new ArrayBuffer(LENGTH_TRANSFER_HEADER);
     const view: DataView = new DataView(buffer); // 用于读取和写入 ArrayBuffer 中的数据的视图对象

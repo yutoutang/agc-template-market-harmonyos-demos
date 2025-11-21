@@ -32,14 +32,7 @@ export struct NewSchedule {
   }
 
   hide() {
-    animateTo({
-      duration: 300,
-      curve: Curve.Friction,
-      onFinish: () => {
-        RouterModule.pop();
-      },
-    }, () => {
-    });
+    RouterModule.pop();
   }
 
   save() {

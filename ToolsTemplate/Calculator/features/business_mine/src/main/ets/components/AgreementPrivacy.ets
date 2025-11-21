@@ -1,4 +1,4 @@
-import { CommonConstants, RouterModule, BaseNavTitle } from 'lib_foundation';
+import { CommonConstants } from 'lib_foundation';
 
 @Builder
 export function AgreementPrivacyBuilder() {
@@ -25,7 +25,7 @@ export struct AgreementPrivacy {
   [
     '二、个人信息使用',
     '内部使用：您提供的个人信息将仅在本馆内部使用和共享，使用目的仅限于以下方面：',
-    '本隐私政策的修改权和解释权属于本元服务。本元服务会在网站上公布隐私政策的更新内容，若您继续使用本元服务，则视为您同意接受修改后的隐私政策。',
+    '本隐私政策的修改权和解释权属于本应用。本应用会在网站上公布隐私政策的更新内容，若您继续使用本应用，则视为您同意接受修改后的隐私政策。',
     '处理您的预约、申请等请求，为您提供相应的服务。',
     '分析用户需求和行为，以便不断优化服务内容和质量。',
     '与您沟通相关的服务信息、活动通知等。',
@@ -41,16 +41,12 @@ export struct AgreementPrivacy {
   ],
   [
    '五、联系方式',
-   '如果您有任何疑问和建议，可以通过本网站上的联系方式与本元服务联系，本元服务将尽最大的努力去解决。',
+   '如果您有任何疑问和建议，可以通过本网站上的联系方式与本应用联系，本应用将尽最大的努力去解决。',
   ],
 ];
 
   build() {
     NavDestination() {
-      BaseNavTitle({
-        title: '用户协议与隐私政策',
-        routerModule: RouterModule.getStack()
-      }).margin({ bottom: 20, left: 16 })
       Row() {
         Column() {
           Scroll() {
@@ -60,7 +56,8 @@ export struct AgreementPrivacy {
                   ForEach(item, (v: string) => {
                     Text(v)
                       .width('100%')
-                      .fontColor(CommonConstants.FONT_COLOR_WHITE)
+                      .fontColor($r('sys.color.font_primary'))
+                      .opacity(0.9)
                       .fontSize($r('sys.float.Body_L'))
                       .textAlign(TextAlign.JUSTIFY)
                       .lineHeight(22);
@@ -69,13 +66,17 @@ export struct AgreementPrivacy {
               }, (item: string[], index: number) => index.toString());
             }.width('100%')
             .padding(12)
-            .borderRadius(16)
-            .backgroundColor('rgba(255, 255, 255, 0.1)');
-          }.height(CommonConstants.FULL_PERCENT).scrollBar(BarState.Off).align(Alignment.Top);
-        }.padding({ left: 16, right: 16, bottom: 55 })
-      }.backgroundColor('#000000');
-    }.hideTitleBar(true)
-    .backgroundColor('#000000')
+            .backgroundColor($r('sys.color.comp_background_list_card'));
+          }.height(CommonConstants.FULL_PERCENT).scrollBar(BarState.Off).align(Alignment.Top)
+          .borderRadius(16);
+        }
+        .padding({ left: 16, right: 16, bottom: 55 })
+        .height('100%')
+      }
+      .backgroundColor($r('sys.color.background_secondary'));
+    }
+    .title('用户协议与隐私政策')
+    .backgroundColor($r('sys.color.background_secondary'))
     .onReady((context) =>{
       const params = context.pathInfo.param as Record<string, string>;
       this.title = params.title;

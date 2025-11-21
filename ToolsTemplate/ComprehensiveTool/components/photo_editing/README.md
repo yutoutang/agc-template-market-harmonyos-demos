@@ -65,7 +65,7 @@ export struct Index {
             // PhotoEditing为修图神器路由入口页面名称
             this.pageStack.pushPathByName('PhotoEditing', null);
          });
-      }.hideTitleBar(true);
+      }.hideTitleBar(true).mode(NavigationMode.Stack);
    }
 }
 ```

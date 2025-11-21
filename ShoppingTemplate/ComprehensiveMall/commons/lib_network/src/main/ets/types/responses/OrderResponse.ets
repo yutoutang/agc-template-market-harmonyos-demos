@@ -21,6 +21,10 @@ export interface OrderCreateResp extends BaseResponse {
   orderStr: string;
 }
 
+export interface OrderExpressResp extends BaseResponse {
+  info: OrderExpressInfo
+}
+
 export interface OrderItem {
   orderInfo: OrderInfo;
   logisticInfo: LogisticsItem[];
@@ -45,6 +49,9 @@ export interface AddressInfo {
   name: string;
   cellphone: string;
   address: string;
+  city?: string;
+  latitude?: number,
+  longitude?: number
 }
 
 export interface DiscountItem {
@@ -66,7 +73,7 @@ export interface OrderSkuItem {
 }
 
 export interface LogisticsItem {
-  icon: string;
+  icon: ResourceStr;
   status: number; //1: 待确认  2: 已发货  3: 运输中  4:已签收
   desc: string;
   time: string;
@@ -74,7 +81,7 @@ export interface LogisticsItem {
 
 export interface SkuReview {
   productId: string;
-  date:number;
+  date: number;
   skuCode: string;
   skuDesc: string;
   rating: number;
@@ -85,4 +92,20 @@ export interface SkuReview {
 export interface ReviewMediaItem {
   uri: ResourceStr;
   type: number;
+}
+
+export interface OrderExpressInfo {
+  orderId: string
+  expressNo: string
+  expressName: string
+  origins: OrderPosition,
+  destination: OrderPosition,
+  waypoints: OrderPosition[],
+  sendPosition: string,
+  getPosition: string,
+}
+
+export interface OrderPosition {
+  latitude: number,
+  longitude: number
 }

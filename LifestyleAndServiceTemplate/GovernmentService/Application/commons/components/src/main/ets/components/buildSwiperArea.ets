@@ -1,15 +1,15 @@
 import { getDataFromJSON } from 'h5'
 import { NavigationParams, SwiperInfo } from 'common'
 
-@Component
+@ComponentV2
 export struct buildSwiperArea {
   private swiperController: SwiperController = new SwiperController()
-  @Consume('pageInfos') pageInfos: NavPathStack
-  swiperHeight: number | string = 0
-  isNeedPadding: boolean = false
+  @Consumer('pageInfos') pageInfos: NavPathStack = new NavPathStack()
+  @Param swiperHeight: number | string = 0
+  @Param isNeedPadding: boolean = false
   swiperData: SwiperInfo[] = []
   goH5Page = (title: string) => {
-    this.pageInfos.pushPathByName('H5', new NavigationParams(title,'news.html'))
+    this.pageInfos.pushPathByName('H5', new NavigationParams(title, 'news.html'))
   }
 
   aboutToAppear(): void {
@@ -41,23 +41,23 @@ export struct buildSwiperArea {
                 left: 12,
                 right: 12,
                 top: 5,
-                bottom: 5
+                bottom: 5,
               })
               .borderRadius({
                 topRight: 10,
-                bottomRight: 10
+                bottomRight: 10,
               })
           }
         }
         .margin({ top: 10 })
-      },(data: SwiperInfo) => JSON.stringify(data))
+      }, (data: SwiperInfo) => JSON.stringify(data))
     }
     .loop(true)
     .autoPlay(true)
     .interval(2500)
     .indicator(
       Indicator.dot()
-        .selectedColor($r('sys.color.comp_background_emphasize'))
+        .selectedColor($r('sys.color.comp_background_emphasize')),
     )
   }
 

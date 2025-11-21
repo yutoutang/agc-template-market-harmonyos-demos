@@ -2,7 +2,7 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import { authentication, loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit';
 import { BusinessError, emitter } from '@kit.BasicServicesKit';
 import { MinePageVM } from '../viewModels/MinePageVM';
-import { FormatUtil, RouterMap, RouterModule } from 'module_base';
+import { FormatUtil, PreferenceUtil, RouterMap, RouterModule } from 'module_base';
 import { util } from '@kit.ArkTS';
 import { promptAction } from '@kit.ArkUI';
 
@@ -19,22 +19,22 @@ export struct QuickLoginPage {
   @Local anonymousPhone: string = ''
   privacyText: loginComponentManager.PrivacyText[] = [{
     text: '已阅读并同意',
-    type: loginComponentManager.TextType.PLAIN_TEXT
+    type: loginComponentManager.TextType.PLAIN_TEXT,
   }, {
     text: '《用户服务协议》 ',
     tag: '用户服务协议',
-    type: loginComponentManager.TextType.RICH_TEXT
+    type: loginComponentManager.TextType.RICH_TEXT,
   }, {
     text: '《隐私协议》',
     tag: '隐私协议',
-    type: loginComponentManager.TextType.RICH_TEXT
+    type: loginComponentManager.TextType.RICH_TEXT,
   }, {
     text: '和',
-    type: loginComponentManager.TextType.PLAIN_TEXT
+    type: loginComponentManager.TextType.PLAIN_TEXT,
   }, {
     text: '《华为账号用户认证协议》',
     tag: '华为账号用户认证协议',
-    type: loginComponentManager.TextType.RICH_TEXT
+    type: loginComponentManager.TextType.RICH_TEXT,
   }];
   controller: loginComponentManager.LoginWithHuaweiIDButtonController =
     new loginComponentManager.LoginWithHuaweiIDButtonController()
@@ -44,10 +44,12 @@ export struct QuickLoginPage {
       .setAgreementStatus(loginComponentManager.AgreementStatus.NOT_ACCEPTED)
       .onClickLoginWithHuaweiIDButton((error: BusinessError, response: loginComponentManager.HuaweiIDCredential) => {
         // Process the logic of a tap on the one-tap sign-in button.
-        this.handleLoginWithHuaweiIDButton(error, response);
-        if (error) {
-
+        if (!this.isSelected) {
+          promptAction.showToast({ message: '请勾选协议！', alignment: Alignment.Center })
+          this.showPopUp = true
+          return
         }
+        this.handleLoginWithHuaweiIDButton(error, response);
       });
   @Local quickLoginAnonymousPhone: string = '';
   // Specify whether to accept the agreements.
@@ -61,85 +63,39 @@ export struct QuickLoginPage {
     this.getQuickLoginAnonymousPhone()
   }
 
+  getLoginData() {
+    this.vm.login()
+    PreferenceUtil.getInstance().put('isLogin', true)
+    RouterModule.pop()
+    let uerInfo: emitter.EventData = {
+      data: {
+        isLogin: true,
+        userName: '华为用户',
+        phone: this.quickLoginAnonymousPhone,
+      },
+    };
+    emitter.emit('isLogin', uerInfo);
+  }
+
   // Method that processes a tap on the one-tap sign-in button.
   handleLoginWithHuaweiIDButton(error: BusinessError | undefined, response: loginComponentManager.HuaweiIDCredential) {
     this.enableStatus = false;
     if (error) {
+      this.enableStatus = true;
+      this.getLoginData()
       hilog.error(this.domainId, this.logTag,
         `Failed to login with LoginWithHuaweiIDButton. errCode is ${error.code}, errMessage is ${error.message}`);
-      this.enableStatus = true;
-      if (this.isSelected) {
-        this.vm.login()
-        AppStorage.setOrCreate<boolean>('isLogin', true);
-        RouterModule.pop()
-        let uerInfo: emitter.EventData = {
-          data: {
-            isLogin: true,
-          },
-        };
-        emitter.emit('isLogin', uerInfo);
-      } else {
-        promptAction.showToast({ message: '请勾选协议！', alignment: Alignment.Center })
-        this.showPopUp = true
-      }
       return;
     }
     try {
-      if (this.isSelected) {
-        if (response) {
-          hilog.info(this.domainId, this.logTag, 'Succeeded in clicking LoginWithHuaweiIDButton.');
-          const authCode = response.authorizationCode;
-          const openID = response.openID;
-          const unionID = response.unionID;
-          const idToken = response.idToken;
-          this.vm.login()
-          AppStorage.setOrCreate<boolean>('isLogin', true);
-          let uerInfo: emitter.EventData = {
-            data: {
-              isLogin: true,
-              userName: '华为用户',
-              phone: this.quickLoginAnonymousPhone
-            },
-          };
-          emitter.emit('isLogin', uerInfo);
-
-          RouterModule.pop()
-        }
-      } else {
-        promptAction.showToast({ message: '请勾选协议！', alignment: Alignment.Center })
-        this.showPopUp = true;
+      if (response) {
+        this.getLoginData()
+        hilog.info(this.domainId, this.logTag, 'Succeeded in clicking LoginWithHuaweiIDButton.');
       }
     } catch (error) {
-      if (this.isSelected) {
-        this.vm.login()
-        AppStorage.setOrCreate<boolean>('isLogin', true);
-        RouterModule.pop()
-        let uerInfo: emitter.EventData = {
-          data: {
-            isLogin: true,
-          },
-        };
-        emitter.emit('isLogin', uerInfo);
-      } else {
-        promptAction.showToast({ message: '请勾选协议！', alignment: Alignment.Center })
-        this.showPopUp = true
-      }
+      this.getLoginData()
       hilog.error(this.domainId, this.logTag,
         `Failed to login with LoginWithHuaweiIDButton. errCode is ${error.code}, errMessage is ${error.message}`);
-      if (this.isSelected) {
-        this.vm.login()
-        AppStorage.setOrCreate<boolean>('isLogin', true);
-        RouterModule.pop()
-        let uerInfo: emitter.EventData = {
-          data: {
-            isLogin: true,
-          },
-        };
-        emitter.emit('isLogin', uerInfo);
-      } else {
-        promptAction.showToast({ message: '请勾选协议！', alignment: Alignment.Center })
-        this.showPopUp = true
-      }
     } finally {
       this.enableStatus = true;
     }
@@ -193,10 +149,10 @@ export struct QuickLoginPage {
                   .maxLines(1)
                   .constraintSize({ maxWidth: '100%' })
                   .margin({
-                    top: 8
+                    top: 8,
                   })
               }.margin({
-                top: 64
+                top: 64,
               })
             }
             .width('100%')
@@ -245,7 +201,7 @@ export struct QuickLoginPage {
             .height(24)
             .focusable(true)
             .focusOnTouch(true)
-            .selectedColor('#CE0E2D')
+            .selectedColor($r('sys.color.comp_background_emphasize'))
             .select(this.isSelected)
             .enabled(this.enableStatus)
             .margin({ top: 0 })

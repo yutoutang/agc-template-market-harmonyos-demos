@@ -37,9 +37,9 @@ export struct DramaDesLayer {
               .fontWeight(500)
               .fontColor('#fff')
             Column() {
-              Image(getMedia('app.media.arrow_right_white'))
-                .width(5)
-                .height(9)
+              SymbolGlyph($r('sys.symbol.chevron_right'))
+                .fontSize(21)
+                .fontColor([$r('sys.color.white')])
             }
             .width(21)
             .height(21)
@@ -86,9 +86,9 @@ export struct DramaDesLayer {
                 .fontWeight(500)
                 .fontColor('#fff')
               Column() {
-                Image(getMedia('app.media.arrow_down_white'))
-                  .width(9)
-                  .height(5)
+                SymbolGlyph($r('sys.symbol.chevron_down'))
+                  .fontSize(16)
+                  .fontColor([$r('sys.color.white')])
                   .rotate({ angle: this.isSpread ? 180 : 0})
               }
               .width(16)

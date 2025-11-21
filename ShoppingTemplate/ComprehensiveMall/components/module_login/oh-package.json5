@@ -6,6 +6,7 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "lib_foundation": "file:../../commons/lib_foundation"
+    "lib_foundation": "file:../../commons/lib_foundation",
+    "module_ui_base": "file:../module_ui_base"
   }
 }

@@ -1,6 +1,7 @@
 import { DataPreferencesUtils } from '@ohos_agcit/office_attendance_common_lib';
 import { DateElement } from '@ohos_agcit/office_attendance_component_lib/src/main/ets/types/DateElement';
 
+@Entry
 @ComponentV2
 export struct ScheduleTitle {
   @Param selectedMonth: DateElement = new DateElement(0, 0, 0);

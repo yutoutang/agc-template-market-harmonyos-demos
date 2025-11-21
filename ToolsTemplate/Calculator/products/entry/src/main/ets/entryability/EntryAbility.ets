@@ -45,16 +45,31 @@ export default class EntryAbility extends UIAbility {
   }
 
   onWindowStageCreate(windowStage: window.WindowStage): void {
-    let sysBarProps: window.SystemBarProperties = {
-      statusBarColor: '#000000',
-      statusBarContentColor: '#ffffff'
-    };
-    windowStage.getMainWindowSync().setWindowSystemBarProperties(sysBarProps);
     // Main window is created, set main page for this ability
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
     AppStorage.setOrCreate('widget_router', this.widgetMessage)
     if (this.currentWindowStage === null) {
       this.currentWindowStage = windowStage;
+    }
+    let windowClass: window.Window | undefined = undefined;
+    try {
+      window.getLastWindow(this.context, (err: BusinessError, data) => {
+        const errCode: number = err.code;
+        if (errCode) {
+          return;
+        }
+        windowClass = data;
+        try {
+          // 对窗口尺寸大小变化的监听
+          windowClass.on('windowSizeChange', (data) => {
+            AppStorage.setOrCreate('height', px2vp(data.height));
+          });
+        } catch (exception) {
+          hilog.error(DOMAIN, 'testTag', 'Failed to listen windowSizeChange. Cause: %{public}s', JSON.stringify(exception));
+        }
+      });
+    } catch (exception) {
+      hilog.error(DOMAIN, 'testTag', 'Failed to getLastWindow. Cause: %{public}s', JSON.stringify(exception));
     }
     windowStage.loadContent('pages/Index', (err) => {
       if (err.code) {

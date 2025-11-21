@@ -1,17 +1,14 @@
-import { ProductWaterFlow } from 'module_product_waterflow';
 import {
   iData,
   routerStack,
   RouterMap,
-  BreakpointSystem,
-  BreakpointStorage,
-  BreakpointTypeEnum,
   Style,
 } from 'lib_foundation';
 import { Product, ShoppingCart } from 'module_shopping_cart';
 import { promptAction } from '@kit.ArkUI';
 import { CartPageVM } from '../viewmodels/CartPageVM';
 import { PreOrderInfoReq, PreOrderItem } from 'lib_network';
+import { ProductWaterFlow } from 'product';
 
 @ComponentV2
 struct CartPage {
@@ -19,15 +16,6 @@ struct CartPage {
   public pageName?: string = undefined;
   private vm: CartPageVM = new CartPageVM()
   @Local isChildRoute: boolean = false;
-  @Local curBreakpoint: BreakpointStorage = BreakpointSystem.currentBreakpoint
-
-  @Computed
-  get waterFlowTemplate() {
-    if (this.curBreakpoint.value === BreakpointTypeEnum.SM) {
-      return '1fr 1fr'
-    }
-    return '1fr 1fr 1fr'
-  }
 
   aboutToAppear(): void {
     this.isChildRoute = Boolean(this.pageName);
@@ -72,7 +60,7 @@ struct CartPage {
         onCardClick: (id: string) => {
           // 点击购物车卡片
           routerStack.pushPath({
-            name: RouterMap.PRODUCT_INFO_NEW,
+            name: RouterMap.PRODUCT_INFO,
             param: id,
           });
         },
@@ -86,6 +74,7 @@ struct CartPage {
       })
     }
     .hideTitleBar(true)
+    .backgroundColor($r('app.color.background_color_grey'))
     .onShown(() => {
       this.isChildRoute = true;
       if (this.vm.isSubPage) {
@@ -102,18 +91,19 @@ struct CartPage {
     buildSpecialDivider();
     Column() {
       ProductWaterFlow({
-        customColumnTemplate: this.waterFlowTemplate,
         bgColor: Style.BACKGROUND_COLOR_GREY,
         handleProductClick: (id) => {
           routerStack.pushPath({
-            name: RouterMap.PRODUCT_INFO_NEW,
+            name: RouterMap.PRODUCT_INFO,
             param: id,
           });
         },
       })
+        .expandSafeArea([SafeAreaType.SYSTEM],[SafeAreaEdge.BOTTOM])
     }
     .padding({ left: 12, right: 12 })
     .backgroundColor($r('app.color.background_color_grey'))
+    .expandSafeArea([SafeAreaType.SYSTEM],[SafeAreaEdge.BOTTOM])
   }
 }
 

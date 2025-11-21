@@ -39,4 +39,7 @@ export enum RouterMap {
   PERSONAL_INFORMATION_PAGE = 'PersonalInformationPage',
   EDIT_PAGE = 'EditPage',
   TRANSACTION_SEARCH = 'TransactionSearch',
+  AGREE_PRIVACY_PAGE = 'AgreePrivacyPage',
+  SAFE_PAGE = 'SafePage',
+  MAIN_ENTRY = 'MainEntry',
 }

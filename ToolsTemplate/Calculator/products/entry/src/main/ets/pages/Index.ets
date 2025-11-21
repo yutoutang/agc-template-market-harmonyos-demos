@@ -29,6 +29,7 @@ struct Index {
           TabContent() {
             HomePage();
           }
+          .clip(false)
           .tabBar(this.tabBuilder(0, {
             label: '计算器',
             icon: $r('app.media.calculator_unselect'),
@@ -60,7 +61,7 @@ struct Index {
         .width(CommonConstants.FULL_PERCENT)
         .scrollable(false)
         .barPosition(BarPosition.End)
-        .barBackgroundColor('#000000')
+        .barBackgroundColor($r('sys.color.background_secondary'))
         .onTabBarClick((index: number) => {
           this.selectIndex = index;
         })
@@ -69,7 +70,8 @@ struct Index {
       .width(CommonConstants.FULL_PERCENT)
     }.hideTitleBar(true)
     .expandSafeArea([SafeAreaType.SYSTEM])
-    .backgroundColor('#000000')
+    .backgroundColor($r('sys.color.background_secondary'))
+    .mode(NavigationMode.Stack);
   }
 
 
@@ -81,8 +83,7 @@ struct Index {
         .width(20)
         .height(20);
       Text(item.label)
-        .fontColor(this.selectIndex === index ? '#5291FF' :
-        'rgba(255, 255, 255, 0.6)')
+        .fontColor(this.selectIndex === index ? $r('sys.color.font_emphasize') : $r('sys.color.font_secondary'))
         .fontSize(10)
         .fontWeight(500)
         .lineHeight(13)

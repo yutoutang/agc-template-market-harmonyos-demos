@@ -7,6 +7,8 @@
   "license": "Apache-2.0",
   "dependencies": {
     "h5": "file:../../commons/H5",
-    "common": "file:../../commons/common"
+    "common": "file:../../commons/common",
+    "aggregated_login": "file:../../components/aggregated_login",
+    "@tencent/wechat_open_sdk": "^1.0.7"
   }
 }

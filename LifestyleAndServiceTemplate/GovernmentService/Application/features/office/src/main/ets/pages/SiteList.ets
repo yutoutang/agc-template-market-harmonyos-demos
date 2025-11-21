@@ -3,13 +3,13 @@ import {  Permissions } from '@kit.AbilityKit';
 import { CityJson, ProvincesJson } from 'common';
 
 
-@Component
+@ComponentV2
 export struct SiteList {
-  @State pcData: Array<ProvincesJson> = [];
-  @Consume('pageInfos') pageInfos: NavPathStack
-  @State curCity: ResourceStr = $r('app.string.repositioning');
-  @State obtainSiteSuccess: boolean = false;
-  @StorageLink('selectedCity') selectedCity: string = '东城市';
+  @Local pcData: Array<ProvincesJson> = [];
+  @Consumer ('pageInfos') pageInfos: NavPathStack  = new NavPathStack()
+  @Local curCity: ResourceStr = $r('app.string.repositioning');
+  @Local obtainSiteSuccess: boolean = false;
+  @Local selectedCity: ResourceStr = '东城市';
   permissions: Array<Permissions> = ['ohos.permission.APPROXIMATELY_LOCATION', 'ohos.permission.LOCATION'];
   ERROR_INFO: ResourceStr = $r('app.string.get_site_failed');
 
@@ -106,6 +106,9 @@ export struct SiteList {
       .width('100%')
       .height('100%')
     }
+    .onReady((content) => {
+      this.selectedCity = content.pathStack.getParamByName('SiteList')[0] as ResourceStr
+    })
     .hideTitleBar(true)
     .padding({ top: Number(AppStorage.get('topRectHeight')) })
   }

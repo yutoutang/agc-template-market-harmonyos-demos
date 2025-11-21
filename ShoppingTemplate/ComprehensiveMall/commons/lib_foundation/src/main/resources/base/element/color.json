@@ -55,6 +55,14 @@
     {
       "name": "icon_color_grey",
       "value": "#33000000"
+    },
+    {
+      "name": "label_color_primary",
+      "value": "#0096FA"
+    },
+    {
+      "name": "label_color_secondary",
+      "value": "#827CFB"
     }
   ]
 }

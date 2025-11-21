@@ -12,8 +12,7 @@
 
 本组件展示了购物车商品列表信息和推荐商品信息，提供了商品选择、删除、增减商品数量、查看明细、结算、查看商品详情、查看推荐商品信息等相关功能，帮助开发者快速集成购物车相关的能力。
 
-![cartPage](./screenshot/shoppingCartPage.gif)
-
+![cartPage](./screenshot/cartPage.png)
 
 ## 约束与限制
 
@@ -27,7 +26,6 @@
 ### 权限
 
 - 网络权限：ohos.permission.INTERNET
-
 
 ## 快速入门
 

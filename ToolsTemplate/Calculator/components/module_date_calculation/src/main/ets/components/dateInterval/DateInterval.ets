@@ -23,7 +23,7 @@ export struct DateInterval {
   /**
    * 分割线
    */
-  @Local egDivider: DividerTmp = new DividerTmp(0.2, 2, 2, '#ffe9f0f0')
+  @Local egDivider: DividerTmp = new DividerTmp(0.2, 2, 2, $r('sys.color.comp_divider'))
   /**
    * 开始时间
    */
@@ -72,18 +72,17 @@ export struct DateInterval {
 
   build() {
     Column() {
-      Text('查询两个日期的间隔天数')
-        .attributeModifier(new BaseTextStyleModifier(`font_on_primary/Body_M/Regular`)).opacity(0.7)
+      Text('查询两个日期的间隔天数').fontColor($r('sys.color.font_primary'))
 
       List({ space: 16 }) {
         ListItem() {
           Row() {
             Text('日期1')
-              .attributeModifier(new BaseTextStyleModifier(`font_on_primary/Subtitle_M/Medium`)).opacity(0.7)
+              .attributeModifier(new BaseTextStyleModifier(`font_primary/Subtitle_M/Medium`))
             Row({ space: 5 }) {
               Text(dayjs(this.localStartDate).format('YYYY年MM月DD日'))
-                .attributeModifier(new BaseTextStyleModifier(`font_on_primary/Body_M/Regular`)).opacity(0.7)
-              Image($r('app.media.chevron_right_new')).width(12).height(24)
+                .attributeModifier(new BaseTextStyleModifier(`font_primary/Body_M/Regular`))
+              Image($r('app.media.chevron_right_new')).width(7).height(15)
             }
           }
           .width('100%')
@@ -93,7 +92,8 @@ export struct DateInterval {
             baseActionSheet.show({
               id: 'datePickerBuilder',
               detents: [300, 301],
-              backgroundColor: '#2e3033',
+              backgroundColor: ($r('app.color.base_nav_action_sheet_background_color')),
+              blurStyle: BlurStyle.COMPONENT_ULTRA_THICK,
               showClose: false,
               customContent: () => {
                 this.datePickerBuilder('start')
@@ -106,11 +106,11 @@ export struct DateInterval {
           Column() {
             Row() {
               Text('日期2')
-                .attributeModifier(new BaseTextStyleModifier(`font_on_primary/Subtitle_M/Medium`)).opacity(0.7)
+                .attributeModifier(new BaseTextStyleModifier(`font_primary/Subtitle_M/Medium`))
               Row({ space: 5 }) {
                 Text(dayjs(this.localEndDate).format('YYYY年MM月DD日'))
-                  .attributeModifier(new BaseTextStyleModifier(`font_on_primary/Body_M/Regular`)).opacity(0.7)
-                Image($r('app.media.chevron_right_new')).width(12).height(24)
+                  .attributeModifier(new BaseTextStyleModifier(`font_primary/Body_M/Regular`))
+                Image($r('app.media.chevron_right_new')).width(7).height(15)
               }
             }
             .width('100%')
@@ -120,7 +120,8 @@ export struct DateInterval {
               baseActionSheet.show({
                 id: 'datePickerBuilder',
                 detents: [300, 301],
-                backgroundColor: '#2e3033',
+                backgroundColor: ($r('app.color.base_nav_action_sheet_background_color')),
+                blurStyle: BlurStyle.COMPONENT_ULTRA_THICK,
                 showClose: false,
                 customContent: () => {
                   this.datePickerBuilder('end')
@@ -128,7 +129,7 @@ export struct DateInterval {
               })
             });
 
-            Divider().strokeWidth(0.2).margin({ left: '2vp', right: '2vp', top: 8 }).color('#ffe9f0f0')
+            Divider().margin({ left: '2vp', right: '2vp', top: 8 }).color($r('sys.color.comp_divider'))
           }
         }
       }
@@ -136,14 +137,14 @@ export struct DateInterval {
       .scrollBar(BarState.Off)
       .divider(this.egDivider)
       Button('查询', { type: ButtonType.Normal, stateEffect: true })
-        .backgroundColor(this.buttonColor)
-        .fontColor(this.textColor)
+        .backgroundColor($r('sys.color.background_emphasize'))
+        .fontColor($r('sys.color.font_on_primary'))
         .fontSize($r('sys.float.Body_L'))
         .fontWeight(FontWeight.Medium)
         .padding({ top: 12, bottom: 12 })
         .width('100%')
         .height(40)
-        .borderRadius(20)
+        .borderRadius($r('sys.float.corner_radius_level10'))
         .margin({ top: 48 })
         .onClick(() => {
           this.calculateDaysBetweenDates()
@@ -151,7 +152,7 @@ export struct DateInterval {
         })
       Column() {
         Text(`间隔${this.betweenDates.toString()}天`)
-          .attributeModifier(new BaseTextStyleModifier(`font_on_primary/Title_S/Medium`))
+          .attributeModifier(new BaseTextStyleModifier(`font_primary/Title_S/Medium`))
       }
       .width('100%')
       .margin({ top: 24 })
@@ -159,7 +160,7 @@ export struct DateInterval {
       .borderRadius(8)
       .height(56)
       .justifyContent(FlexAlign.Center)
-      .backgroundColor('#2e3033')
+      .backgroundColor($r('sys.color.comp_background_tertiary'))
     }
     .height('100%')
     .margin({ top: 18 })

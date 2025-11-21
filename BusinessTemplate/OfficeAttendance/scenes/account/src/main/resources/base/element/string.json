@@ -65,6 +65,22 @@
       "value": "about_us"
     },
     {
+      "name": "tools",
+      "value": "tools"
+    },
+    {
+      "name": "protractor",
+      "value": "protractor"
+    },
+    {
+      "name": "area_measure",
+      "value": "area_measure"
+    },
+    {
+      "name": "ruler",
+      "value": "ruler"
+    },
+    {
       "name": "account_name",
       "value": "about_us"
     },
@@ -131,10 +147,6 @@
     {
       "name": "agcit_huawei_office_attendance_account",
       "value": "1.0.0"
-    },
-    {
-      "name": "agcittype_huawei_office_attendance_account",
-      "value": "sceneTemplate"
     },
     {
       "name": "user_info",

@@ -36,19 +36,29 @@ export struct BaseDatePicker {
   /**
    * 关闭回调
    */
-  @Event cancel: () => void = () => {}
+  @Event cancel: () => void = () => {
+  }
   /**
    * 确认选择回调
    */
-  @Event confirm: (datePicker: Date) => void = () => {}
+  @Event confirm: (datePicker: Date) => void = () => {
+  }
   /**
    * 切换选择回调
    */
-  @Event onDatePickerChange: (datePicker: Date) => void = () => {}
+  @Event onDatePickerChange: (datePicker: Date) => void = () => {
+  }
   /**
    * 切换选择回调
    */
-  @Event onLunarChange: (value: boolean) => void = () => {}
+  @Event onLunarChange: (value: boolean) => void = () => {
+  }
+  @Local datePickerModeList: (DatePickerMode)[] = [
+    DatePickerMode.DATE,
+    DatePickerMode.YEAR_AND_MONTH,
+    DatePickerMode.MONTH_AND_DAY,
+  ];
+  @Param datePickerModeIndex: number = 0;
 
   aboutToAppear(): void {
     this.datePickerLocal = this.datePicker ?? new Date()
@@ -56,12 +66,14 @@ export struct BaseDatePicker {
 
   build() {
     Column() {
-      Row(){
-        Text(dayjs(this.datePickerLocal).format('YYYY年MM月DD日') + getWeekday(this.datePickerLocal)).fontWeight(FontWeight.Bold)
+      Row() {
+        Text(dayjs(this.datePickerLocal).format(this.datePickerModeIndex === 2 ? 'MM月DD日' : 'YYYY年MM月DD日') +
+        getWeekday(this.datePickerLocal)).fontWeight(FontWeight.Bold)
           .fontSize(20)
       }
-      .margin({top:16,bottom:16})
+      .margin({ top: 16, bottom: 16 })
       .visibility(this.isOperationShow && this.isBottom ? Visibility.Visible : Visibility.None)
+
       BasePickerOperation({
         currentDate: dayjs(this.datePickerLocal).format('YYYY年MM月DD日') + getWeekday(this.datePickerLocal),
         isShowTitle: this.isShowDateTitle,
@@ -77,10 +89,17 @@ export struct BaseDatePicker {
         start: new Date('1970-1-1'),
         end: new Date('2100-1-1'),
         selected: this.datePickerLocal,
+        mode: this.datePickerModeList[this.datePickerModeIndex],
       })
         .lunar(this.isLunarDate)
-        .disappearTextStyle({ color: $r('sys.color.font_primary'), font: { size: $r('sys.float.Subtitle_S'), weight: FontWeight.Bold } })
-        .textStyle({ color: $r('sys.color.font_primary'), font: { size: $r('sys.float.Subtitle_M'), weight: FontWeight.Normal } })
+        .disappearTextStyle({
+          color: $r('sys.color.font_primary'),
+          font: { size: $r('sys.float.Subtitle_S'), weight: FontWeight.Bold },
+        })
+        .textStyle({
+          color: $r('sys.color.font_primary'),
+          font: { size: $r('sys.float.Subtitle_M'), weight: FontWeight.Normal },
+        })
         .selectedTextStyle({
           color: '#C4272B',
           font: { size: $r('sys.float.Title_S'), weight: FontWeight.Medium },
@@ -107,10 +126,11 @@ export struct BaseDatePicker {
       .width('100%')
       .justifyContent(FlexAlign.Start)
       .visibility(this.isLunar ? Visibility.Visible : Visibility.None)
+
       BasePickerOperation({
         currentDate: dayjs(this.datePickerLocal).format('YYYY年MM月DD日') + getWeekday(this.datePickerLocal),
         isShowTitle: false,
-        isBottom:true,
+        isBottom: true,
         cancel: () => {
           this.cancel()
         },

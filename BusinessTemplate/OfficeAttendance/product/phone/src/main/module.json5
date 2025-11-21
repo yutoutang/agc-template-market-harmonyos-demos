@@ -12,8 +12,11 @@
     "pages": "$profile:main_pages",
     "metadata": [
       {
+/**
+         * todo
+         */
         "name": "client_id",
-        "value": "XX"
+        "value": "******"
       }
     ],
     "requestPermissions": [
@@ -21,8 +24,8 @@
         "name": "ohos.permission.INTERNET"
       },
       {
-        "name": 'ohos.permission.APPROXIMATELY_LOCATION',
-        "reason": '$string:permission_reason_location',
+        "name": "ohos.permission.LOCATION",
+        "reason": "$string:permission_reason_location",
         "usedScene": {
           "abilities": [
             "EntryAbility"
@@ -31,8 +34,8 @@
         }
       },
       {
-        "name": 'ohos.permission.VIBRATE',
-        "reason": '$string:permission_reason_vibrate',
+        "name": "ohos.permission.VIBRATE",
+        "reason": "$string:permission_reason_vibrate",
         "usedScene": {
           "abilities": [
             "EntryAbility"
@@ -41,10 +44,10 @@
         }
       },
       {
-        "name": 'ohos.permission.KEEP_BACKGROUND_RUNNING'
+        "name": "ohos.permission.KEEP_BACKGROUND_RUNNING"
       },
       {
-        "name": "ohos.permission.PRIVACY_WINDOW",
+        "name": "ohos.permission.PRIVACY_WINDOW"
       }
     ],
     "abilities": [
@@ -52,9 +55,9 @@
         "name": "EntryAbility",
         "srcEntry": "./ets/entryability/EntryAbility.ets",
         "description": "$string:EntryAbility_desc",
-        "icon": "$media:startIcon",
+        "icon": "$media:layered_image",
         "label": "$string:EntryAbility_label",
-        "startWindowIcon": "$media:startIcon",
+        "startWindowIcon": "$media:foreground",
         "startWindowBackground": "$color:start_window_background",
         "exported": true,
         "skills": [
@@ -75,7 +78,7 @@
         "srcEntry": "./ets/phoneformability/PhoneFormAbility.ets",
         "label": "$string:PhoneFormAbility_label",
         "description": "$string:PhoneFormAbility_desc",
-        "icon": "$media:startIcon",
+        "icon": "$media:layered_image",
         "type": "form",
         "metadata": [
           {

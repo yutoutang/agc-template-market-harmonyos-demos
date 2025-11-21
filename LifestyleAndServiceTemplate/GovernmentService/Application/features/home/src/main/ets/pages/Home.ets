@@ -1,28 +1,29 @@
-import { ItemInfo, NavigationParams } from 'common';
+import { ItemInfo, MineItemList, NavigationParams, UserState } from 'common';
 import { getDataFromJSON } from 'h5';
 import { buildSwiperArea } from 'components';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { scanBarcode, scanCore } from '@kit.ScanKit';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { AppStorageV2, PersistenceV2 } from '@kit.ArkUI';
 
-@Component
+@ComponentV2
 export struct HomePage {
   bannerInfo: ItemInfo[] = [];
   gridItems: Array<ItemInfo>[] = [];
   tabBarNames: string[] = [];
   hotServiceItems: ItemInfo[] = [];
-  @State newsList: string[] = [];
-  @State subTabBarIndex: number = 0;
-  @StorageLink('mineItem') mineItemList: ItemInfo[] = [];
-  @StorageLink('recentlyUsed') recentlyUsed: Set<ItemInfo> = new Set();
-  @StorageLink('isLogin') isLogin: boolean = false
-  @Consume('pageInfos') pageInfos: NavPathStack
+  @Local newsList: string[] = [];
+  @Local subTabBarIndex: number = 0;
+  @Local mineItemList: MineItemList = AppStorageV2.connect<MineItemList>(MineItemList, () => new MineItemList())!;
+  @Local recentlyUsed: Set<ItemInfo> = new Set();
+  @Local userState: UserState = PersistenceV2.connect(UserState, () => new UserState())!;
+  @Consumer('pageInfos') pageInfos: NavPathStack = new NavPathStack()
 
   initDateSource() {
     this.bannerInfo = getDataFromJSON<ItemInfo>('HomePage-TopRibbonBanner.json', this);
     this.gridItems = getDataFromJSON<Array<ItemInfo>>('HomePage-MainFunctionalAreaGrid.json', this);
     this.hotServiceItems = getDataFromJSON<ItemInfo>('HomePage-HotService.json', this);
-    this.mineItemList = getDataFromJSON<ItemInfo>('HomePage-MineItem.json', this);
+    this.mineItemList.itemInfoList = getDataFromJSON<ItemInfo>('HomePage-MineItem.json', this);
     this.tabBarNames = getDataFromJSON<string>('HomePage-TabName.json', this);
     this.newsList = getDataFromJSON<string>('HomePage-NewsList.json', this);
   }
@@ -31,7 +32,7 @@ export struct HomePage {
     this.pageInfos.pushPathByName('SearchPage', null)
   }
   goLevel2Page = () => {
-    this.pageInfos.pushPathByName('ServiceManage', null)
+    this.pageInfos.pushPathByName('ServiceManage',null)
   }
   goEmptyPage = (title: ResourceStr) => {
     this.pageInfos.pushPathByName('Empty', new NavigationParams(title))
@@ -182,7 +183,7 @@ export struct HomePage {
       }
       if (this.subTabBarIndex === 1) {
         Grid() {
-          ForEach(this.mineItemList, (mineItem: ItemInfo) => {
+          ForEach(this.mineItemList.itemInfoList, (mineItem: ItemInfo) => {
             GridItem() {
               buildMainAreaItem(mineItem, (mineItem: ItemInfo) => {
                 this.mainToGoH5(mineItem)

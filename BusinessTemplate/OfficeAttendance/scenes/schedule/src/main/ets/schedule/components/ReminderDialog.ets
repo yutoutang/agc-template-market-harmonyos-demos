@@ -45,7 +45,7 @@ export struct ReminderDialog {
             }
 
             Divider();
-          })
+          },  (item:number) => JSON.stringify(item))
         }
       }.layoutWeight(1)
       .scrollBar(BarState.Off)

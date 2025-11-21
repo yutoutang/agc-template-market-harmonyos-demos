@@ -1,4 +1,4 @@
-import { ReviewMediaType } from './Enums';
+import { ProductOperationType, ReviewMediaType } from './Enums';
 
 export interface ProductInfo {
   id: string;
@@ -47,6 +47,7 @@ export interface SpecValue {
 
 export interface SpecOption {
   key: string;
+  label: string;
   values: SpecValue[];
 }
 
@@ -72,4 +73,17 @@ export interface ProductReviewResp {
   curPage: number;
   total: number;
   isFinal: boolean;
+}
+
+export interface ProductSaleOptions {
+  productId: string;
+  isLogin: boolean;
+  cartProdNum?: number;
+  operationType?: ProductOperationType;
+  productInfo?: ProductInfo;
+  clickCart?: () => void;
+  handleAddCart?: (skuCode: string, count: number) => void;
+  handlePayNow?: (skuCode: string, count: number) => void;
+  handleNotLogin?: () => void;
+  getProductInfo?: (data: ProductInfo) => void;
 }

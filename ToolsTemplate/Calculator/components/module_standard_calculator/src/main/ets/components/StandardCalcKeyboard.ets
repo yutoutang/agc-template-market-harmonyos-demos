@@ -5,6 +5,7 @@ import { CalcButtonItemModel } from '../model/CalcButtonItemModel'
 import { HistoryUtils } from '../utils/HistoryUtils';
 import CheckEmptyUtil from '../common/CheckEmptyUtil';
 import CalculateUtil from '../common/CalculateUtil';
+import { BreakpointModel, BreakpointStorage, BreakpointSystem, BreakpointTypeEnum } from '../utils/BreakpointSystem';
 
 @ComponentV2
 export struct StandardCalcKeyboard {
@@ -16,46 +17,61 @@ export struct StandardCalcKeyboard {
   @Local lastBtnIsEqu: boolean = false
   @Local isClickEquBtn: boolean = false
   context: common.Context = getContext(this) as common.UIAbilityContext;
+  @Local curBreakpoint: BreakpointStorage = BreakpointSystem.currentBreakpoint
   @Event changeResult: (result: string, expression: string) => void = (result: string, expression: string) => {
   }
   calcButtonItemModel: CalcButtonItemModel[] = [
-    new CalcButtonItemModel($r('app.media.ic_standard_delete'), 'del', BUTTON_TYPE.LETTERS, 0),
-    new CalcButtonItemModel($r('app.media.ic_standard_clear'), 'C', BUTTON_TYPE.LETTERS, 2),
-    new CalcButtonItemModel($r('app.media.ic_standard_percent'), '%', BUTTON_TYPE.LETTERS, 1),
-    new CalcButtonItemModel($r('app.media.ic_standard_plus'), '+', BUTTON_TYPE.ICON, 2),
+    new CalcButtonItemModel('del', BUTTON_TYPE.LETTERS, 0, 'C',
+      $r('sys.color.background_emphasize')),
+    new CalcButtonItemModel('C', BUTTON_TYPE.LETTERS, 2, 'AC',
+      $r('sys.color.background_emphasize')),
+    new CalcButtonItemModel('%', BUTTON_TYPE.LETTERS, 1, '%',
+      $r('sys.color.background_emphasize')),
+    new CalcButtonItemModel('+', BUTTON_TYPE.ICON, 2, '+', $r('sys.color.alert')),
 
-    new CalcButtonItemModel($r('app.media.ic_standard_7'), '7', BUTTON_TYPE.NUMBER, 1),
-    new CalcButtonItemModel($r('app.media.ic_standard_8'), '8', BUTTON_TYPE.NUMBER, 1),
-    new CalcButtonItemModel($r('app.media.ic_standard_9'), '9', BUTTON_TYPE.NUMBER, 1),
-    new CalcButtonItemModel($r('app.media.ic_standard_divide'), '÷', BUTTON_TYPE.ICON, 2),
+    new CalcButtonItemModel('7', BUTTON_TYPE.NUMBER, 1, '7',
+      $r('sys.color.background_tertiary')),
+    new CalcButtonItemModel('8', BUTTON_TYPE.NUMBER, 1, '8',
+      $r('sys.color.background_tertiary')),
+    new CalcButtonItemModel('9', BUTTON_TYPE.NUMBER, 1, '9',
+      $r('sys.color.background_tertiary')),
+    new CalcButtonItemModel('÷', BUTTON_TYPE.ICON, 2, '÷', $r('sys.color.alert')),
 
-    new CalcButtonItemModel($r('app.media.ic_standard_4'), '4', BUTTON_TYPE.NUMBER, 1),
-    new CalcButtonItemModel($r('app.media.ic_standard_5'), '5', BUTTON_TYPE.NUMBER, 1),
-    new CalcButtonItemModel($r('app.media.ic_standard_6'), '6', BUTTON_TYPE.NUMBER, 1),
-    new CalcButtonItemModel($r('app.media.ic_standard_times'), '×', BUTTON_TYPE.ICON, 2),
+    new CalcButtonItemModel('4', BUTTON_TYPE.NUMBER, 1, '4',
+      $r('sys.color.background_tertiary')),
+    new CalcButtonItemModel('5', BUTTON_TYPE.NUMBER, 1, '5',
+      $r('sys.color.background_tertiary')),
+    new CalcButtonItemModel('6', BUTTON_TYPE.NUMBER, 1, '6',
+      $r('sys.color.background_tertiary')),
+    new CalcButtonItemModel('×', BUTTON_TYPE.ICON, 2, '×', $r('sys.color.alert')),
 
-    new CalcButtonItemModel($r('app.media.ic_standard_1'), '1', BUTTON_TYPE.NUMBER, 1),
-    new CalcButtonItemModel($r('app.media.ic_standard_2'), '2', BUTTON_TYPE.NUMBER, 1),
-    new CalcButtonItemModel($r('app.media.ic_standard_3'), '3', BUTTON_TYPE.NUMBER, 1),
-    new CalcButtonItemModel($r('app.media.ic_standard_minus'), '-', BUTTON_TYPE.ICON, 2),
-    new CalcButtonItemModel($r('app.media.ic_standard_0'), '0', BUTTON_TYPE.NUMBER, 1),
-    new CalcButtonItemModel($r('app.media.ic_standard_point'), '.', BUTTON_TYPE.NUMBER, 1),
-    new CalcButtonItemModel($r('app.media.ic_standard_equal'), '=', BUTTON_TYPE.ICON, 3),
-  ]
+    new CalcButtonItemModel('1', BUTTON_TYPE.NUMBER, 1, '1',
+      $r('sys.color.background_tertiary')),
+    new CalcButtonItemModel('2', BUTTON_TYPE.NUMBER, 1, '2',
+      $r('sys.color.background_tertiary')),
+    new CalcButtonItemModel('3', BUTTON_TYPE.NUMBER, 1, '3',
+      $r('sys.color.background_tertiary')),
+    new CalcButtonItemModel('-', BUTTON_TYPE.ICON, 2, '-', $r('sys.color.alert')),
+    new CalcButtonItemModel('0', BUTTON_TYPE.NUMBER, 1, '0',
+      $r('sys.color.background_tertiary')),
+    new CalcButtonItemModel('.', BUTTON_TYPE.NUMBER, 1, '.',
+      $r('sys.color.background_tertiary')),
+    new CalcButtonItemModel('=', BUTTON_TYPE.ICON, 3, '=', $r('sys.color.alert')),
+  ];
   layoutOptions: GridLayoutOptions = {
     regularSize: [1, 1],
     onGetRectByIndex: (index: number) => {
-      if (index === 16) { // key2是“=”按键对应的index
-        return [5, 0, 1, 2]
+      if (index === 16) { // key是“=”按键对应的index
+        return [5, 0, 1, 2];
       }
-      return [0, 0, 0, 0]
+      return [0, 0, 0, 0];
     }
   }
 
   @Monitor('inputValue')
   inputValueChange() {
     if (this.inputValue !== null || this.inputValue !== undefined) {
-      this.inputValue = this.resultFormat((this.inputValue))
+      this.inputValue = this.resultFormat((this.inputValue));
       this.arr = Array.from(this.inputValue);
     }
   }
@@ -72,8 +88,17 @@ export struct StandardCalcKeyboard {
       ForEach(this.calcButtonItemModel, (item: CalcButtonItemModel) => {
         GridItem() {
           Column() {
-            Image(item.iconUrl).objectFit(ImageFit.Contain).height(70).width(item.value === '0' ? 155 : 70)
-          }
+            Text(item.text)
+              .fontSize(30)
+              .fontColor((item.type === BUTTON_TYPE.LETTERS || item.flag === 2 || item.flag === 3) ?
+              $r('sys.color.font_on_primary') :
+              $r('sys.color.font_primary'))
+              .padding({ top: 15, bottom: 15 })
+              .backgroundColor(item.bgColor)
+              .textAlign(TextAlign.Center)
+              .width('100%')
+              .borderRadius(16);
+          };
         }
         .onClick(() => {
           // 根据flag判断是数字还是符号
@@ -86,20 +111,28 @@ export struct StandardCalcKeyboard {
             this.inputSymbol(item.value);
           } else {
             if (this.lastBtnIsEqu) {
-              this.expressions = []
+              this.expressions = [];
             }
             this.lastBtnIsEqu = false;
             this.inputNumber(item.value);
           }
           this.changeResult(this.resultFormat(this.calValue), this.expressions.join(''));
-        })
-      }, (item: CalcButtonItemModel) => JSON.stringify(item))
+        });
+      }, (item: CalcButtonItemModel) => JSON.stringify(item));
     }
     .columnsTemplate('1fr 1fr 1fr 1fr')
     .rowsTemplate('1fr 1fr 1fr 1fr 1fr')
     .columnsGap(16)
-    .rowsGap(16)
-    .height(420)
+    .rowsGap(new BreakpointModel<number>({
+      [BreakpointTypeEnum.TABLET_LANDSCAPE]: 8,
+      [BreakpointTypeEnum.LG_WIDE]: 8,
+      [BreakpointTypeEnum.LG_NORMAL]: 16,
+    }).getValue(this.curBreakpoint.height))
+    .height(new BreakpointModel<number>({
+      [BreakpointTypeEnum.TABLET_LANDSCAPE]: 388,
+      [BreakpointTypeEnum.LG_WIDE]: 388,
+      [BreakpointTypeEnum.LG_NORMAL]: 420,
+    }).getValue(this.curBreakpoint.height));
   }
 
   /**
@@ -131,13 +164,13 @@ export struct StandardCalcKeyboard {
           if (!result) {
             return;
           }
-          HistoryUtils.updateHistoryResult(`${this.expressions.join('')}=${this.calValue}`)
+          HistoryUtils.updateHistoryResult(`${this.expressions.join('')}=${this.calValue}`);
           this.inputValue = this.calValue;
           this.calValue = '';
           this.expressions = [];
           this.lastBtnIsEqu = true;
           this.changeResult(this.inputValue, '');
-        })
+        });
         break;
       default:
         this.inputOperators(len, value);

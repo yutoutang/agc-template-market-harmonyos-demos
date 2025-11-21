@@ -5,19 +5,26 @@ import { VideoData } from '../model/VideoData';
 import promptAction from '@ohos.promptAction';
 import { common } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import { CastServiceModule,CastSessionListener } from '../model/CastServiceModule'
+import { CastSessionListener, CastStatusModel } from '../model/CastStatusModel'
+import { media } from '@kit.MediaKit';
+import { fileIo } from '@kit.CoreFileKit';
+import { BusinessError } from '@kit.BasicServicesKit';
 
 const TAG = '[CastService]'
 const DOMAIN = 0x000
 
 @ObservedV2
-export class CastService extends CastServiceModule {
+export class CastService {
   private static instance: CastService | null;
   private context?: common.UIAbilityContext;
   private sessionController: AvSessionController = AvSessionController.getInstance();
   private castController?: AvCastController;
   private sessionListener?: CastSessionListener;
   private curSource?: VideoData;
+  @Trace castStatusModel: CastStatusModel = CastStatusModel.instance
+
+  constructor() {
+  }
 
   public static getInstance(): CastService {
     if (!CastService.instance) {
@@ -31,6 +38,18 @@ export class CastService extends CastServiceModule {
     this.context = context
     await this.sessionController.initAvSession(context)
     await this.initAvCastController()
+  }
+
+  public deinit() {
+    this.sessionController.release()
+
+  }
+
+  private async reInit() {
+    hilog.info(DOMAIN, TAG, 're init')
+    await this.sessionController.initAvSession(this.context!!)
+    await this.initAvCastController()
+    this.castController = undefined
   }
 
   getAvSessionController(): AvSessionController {
@@ -67,8 +86,8 @@ export class CastService extends CastServiceModule {
   private sessionOutputDeviceChange = async (connectState: avSession.ConnectionState,
     device: avSession.OutputDeviceInfo) => {
     let currentDevice: avSession.DeviceInfo = device?.devices?.[0];
-    this.currentDeviceName = device?.devices[0].deviceName
-    this.currentDeviceType = device?.devices[0].deviceType
+    this.castStatusModel.currentDeviceName = device?.devices[0].deviceName
+    this.castStatusModel.currentDeviceType = device?.devices[0].deviceType
     if (currentDevice.castCategory === avSession.AVCastCategory.CATEGORY_REMOTE &&
       connectState === avSession.ConnectionState.STATE_CONNECTED) {
       if (this.curSource) {
@@ -79,14 +98,14 @@ export class CastService extends CastServiceModule {
             this.castController.registerCastListener(this.sessionListener)
           }
           this.changeCasting()
-          this.isCasting = true
+          this.castStatusModel.isCasting = true
           this.sessionListener?.onStartCasting()
         }
       } else {
         promptAction.showToast({ message: '获取投播资源失败' })
         hilog.error(DOMAIN, TAG, 'can not get video source')
         this.castController?.endCasting()
-        this.isCasting = false
+        this.castStatusModel.isCasting = false
       }
     } else if ((currentDevice.castCategory === avSession.AVCastCategory.CATEGORY_REMOTE &&
       connectState === avSession.ConnectionState.STATE_DISCONNECTED) ||
@@ -94,7 +113,7 @@ export class CastService extends CastServiceModule {
         connectState === avSession.ConnectionState.STATE_CONNECTED)) {
       if (device) {
         hilog.info(DOMAIN, TAG, `remote to local`)
-        this.isCasting = false
+        this.castStatusModel.isCasting = false
         this.castController?.endCasting()
       }
     }
@@ -114,11 +133,11 @@ export class CastService extends CastServiceModule {
       }
       this.sessionController.setAvSessionPlayState(playbackState)
       if (duration !== undefined) {
-        this.castDuration = duration
-        hilog.debug(DOMAIN, TAG, `play duration:${this.castDuration}`)
+        this.castStatusModel.castDuration = duration
+        hilog.debug(DOMAIN, TAG, `play duration:${this.castStatusModel.castDuration}`)
       }
       hilog.debug(DOMAIN, TAG, 'session play')
-      if (this.castController && this.isCasting) {
+      if (this.castController && this.castStatusModel.isCasting) {
         await this.castController.play()
         hilog.debug(DOMAIN, TAG, 'cast play')
       }
@@ -133,15 +152,15 @@ export class CastService extends CastServiceModule {
     hilog.debug(DOMAIN, TAG, `pause elapsedTime:${position?.elapsedTime} duration:${duration}`)
     if (this.sessionController) {
       let playbackState: avSession.AVPlaybackState = {
-        state: this.isCastPlaying ? avSession.PlaybackState.PLAYBACK_STATE_PLAY :
-          avSession.PlaybackState.PLAYBACK_STATE_PAUSE,
+        state: this.castStatusModel.isCastPlaying ? avSession.PlaybackState.PLAYBACK_STATE_PLAY :
+        avSession.PlaybackState.PLAYBACK_STATE_PAUSE,
         position: position,
         duration: duration
       }
       this.sessionController.setAvSessionPlayState(playbackState)
       if (duration !== undefined) {
-        this.castDuration = duration
-        hilog.debug(DOMAIN, TAG, `pause duration:${this.castDuration}`)
+        this.castStatusModel.castDuration = duration
+        hilog.debug(DOMAIN, TAG, `pause duration:${this.castStatusModel.castDuration}`)
       }
       hilog.debug(DOMAIN, TAG, 'session pause')
       if (this.castController) {
@@ -160,17 +179,17 @@ export class CastService extends CastServiceModule {
     hilog.debug(DOMAIN, TAG, 'seek')
     if (this.sessionController) {
       let playbackState: avSession.AVPlaybackState = {
-        state: this.isCastPlaying ? avSession.PlaybackState.PLAYBACK_STATE_PLAY :
-          avSession.PlaybackState.PLAYBACK_STATE_PAUSE,
+        state: this.castStatusModel.isCastPlaying ? avSession.PlaybackState.PLAYBACK_STATE_PLAY :
+        avSession.PlaybackState.PLAYBACK_STATE_PAUSE,
         position: {
-          elapsedTime: this.castCurrentTime * 1000,
+          elapsedTime: this.castStatusModel.castCurrentTime * 1000,
           updateTime: new Date().getTime()
         },
-        duration: this.castDuration
+        duration: this.castStatusModel.castDuration
       }
       this.sessionController.setAvSessionPlayState(playbackState)
       hilog.debug(DOMAIN, TAG, 'session seek')
-      if (this.castController && this.isCasting) {
+      if (this.castController && this.castStatusModel.isCasting) {
         this.castController.seekCasting(time)
         hilog.debug(DOMAIN, TAG, 'cast seek')
       }
@@ -189,47 +208,81 @@ export class CastService extends CastServiceModule {
   }
 
   // 播控中心：设置播控信息，更换播放内容时必须设置
-  public setAVMetadata(videoData: VideoData, duration?: number) {
+  public async setAVMetadata(videoData: VideoData, duration?: number) {
     hilog.debug(DOMAIN, TAG, `setAVMetadata ${JSON.stringify(videoData)} duration:${duration}`)
     let preSource = this.curSource
     this.curSource = videoData
     if (duration !== undefined) {
-      this.castDuration = duration
-      hilog.debug(DOMAIN, TAG, `setAVMetadata duration:${this.castDuration}`)
+      this.castStatusModel.castDuration = duration
+      hilog.debug(DOMAIN, TAG, `setAVMetadata duration:${this.castStatusModel.castDuration}`)
+    }
+    if (!this.sessionController.getAvSession()) {
+      // 重新初始化
+      await this.reInit()
     }
     if (this.sessionController) {
-      this.sessionController.setAVMetadata(videoData, duration)
+      await this.sessionController.setAVMetadata(videoData, duration)
       hilog.debug(DOMAIN, TAG, `session setAVMetadata`)
     }
-    if (this.castController && this.isCasting) {
+    if (this.castController && this.castStatusModel.isCasting) {
       if (preSource !== this.curSource) {
-        this.changeCasting()
+        await this.changeCasting()
       }
     }
 
   }
 
   private async changeCasting(): Promise<boolean> {
+    let castItem: avSession.AVQueueItem
     if (!this.curSource) {
       return false
     }
-    let castItem: avSession.AVQueueItem = {
-      itemId: this.curSource.index,
-      description: {
-        assetId: '${this.curSource?.index}',
-        title: this.curSource.name,
-        mediaUri: this.curSource.url,
-        mediaType: 'VIDEO',
-        mediaImage: this.curSource.head
+    if(this.curSource.url?.substring(0,4) === 'http'){
+      castItem = {
+        itemId: this.curSource.index,
+        description: {
+          assetId: '${this.curSource?.index}',
+          title: this.curSource.name,
+          mediaUri: this.curSource.url,
+          mediaType: 'VIDEO',
+          mediaImage: this.curSource.head
+        }
       }
-    };
+    }else if(this.curSource.url?.substring(0,4) === 'file'){
+      let file = fileIo.openSync(this.curSource.url, fileIo.OpenMode.READ_ONLY);
+      let fileSize:number = 0
+      fileIo.stat(this.curSource.url, (err: BusinessError, stat: fileIo.Stat) => {
+        if (err) {
+          console.error('get file info failed with error message: ' + err.message + ', error code: ' + err.code);
+        } else {
+          fileSize = stat.size
+          console.info('get file info succeed, the size of file is ' + stat.size);
+        }
+      });
+      let buffer = new ArrayBuffer(fileSize);
+      fileIo.readSync(file.fd, buffer);
+      let avFileDescriptor: media.AVFileDescriptor = { fd: file.fd }
+      castItem = {
+        itemId: this.curSource.index,
+        description: {
+          assetId: '${this.curSource?.index}',
+          title: this.curSource.name,
+          fdSrc: avFileDescriptor,
+          mediaType: 'VIDEO',
+          mediaImage: this.curSource.head
+        }
+      }
+    }else{
+      promptAction.showToast({ message: '获取投播资源失败' })
+      return false
+    }
     if (castItem) {
       await this.castController?.startCasting(castItem)
-      this.isCasting = true
+      this.castStatusModel.isCasting = true
     } else {
       hilog.error(DOMAIN, TAG, `no cast item`)
       this.castController?.endCasting()
-      this.isCasting = false
+      this.castStatusModel.isCasting = false
       this.sessionListener?.onEndCasting()
     }
     return true;
@@ -240,7 +293,7 @@ export class CastService extends CastServiceModule {
     hilog.debug(DOMAIN, TAG, `user endCasting`)
     if (this.castController) {
       this.castController.endCasting()
-      this.isCasting = false
+      this.castStatusModel.isCasting = false
       this.sessionListener?.onEndCasting()
       hilog.debug(DOMAIN, TAG, `user cast endCasting`)
     }

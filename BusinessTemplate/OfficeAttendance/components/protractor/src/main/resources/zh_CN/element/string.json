@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "page_show",
+      "value": "展示页面"
+    },
+    {
+      "name": "camera",
+      "value": "相机权限"
+    },
+    {
+      "name": "agcit_huawei_office_attendance",
+      "value": "1.0.1"
+    }
+  ]
+}

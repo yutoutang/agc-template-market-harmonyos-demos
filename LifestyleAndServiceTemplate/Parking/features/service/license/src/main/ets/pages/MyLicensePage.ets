@@ -49,7 +49,7 @@ export struct MyLicensePage {
     .scrollBar(BarState.Off)
     .padding({ left: $r('app.string.padding_16'), right: $r('app.string.padding_16') })
     .layoutWeight(1)
-    .bindSheet($$this.vm.showOpt, this.optionBuilder, { height: SheetSize.FIT_CONTENT })
+    .bindSheet($$this.vm.showOpt, this.optionBuilder, { height: SheetSize.FIT_CONTENT, preferType: SheetType.CENTER })
   }
 
   @Builder

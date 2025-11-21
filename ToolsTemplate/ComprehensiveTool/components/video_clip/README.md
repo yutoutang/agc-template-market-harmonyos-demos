@@ -82,7 +82,7 @@ export struct Index {
             // VideoManage为视频剪辑路由入口页面名称
             this.pageStack.pushPathByName('VideoManage', null);
          });
-      }.hideTitleBar(true);
+      }.hideTitleBar(true).mode(NavigationMode.Stack);
    }
 }
 ```

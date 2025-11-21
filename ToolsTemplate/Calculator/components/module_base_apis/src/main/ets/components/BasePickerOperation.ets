@@ -12,7 +12,7 @@ export struct BasePickerOperation {
     Row() {
       Row() {
         Text('取消')
-          .fontColor('#FFFFFF')
+          .fontColor($r('sys.color.font_primary'))
           .opacity(0.9)
           .fontSize($r('sys.float.Title_S'))
           .fontWeight(FontWeight.Bold)
@@ -29,7 +29,7 @@ export struct BasePickerOperation {
 
       Row() {
         Text('确认')
-          .fontColor('#FFFFFF')
+          .fontColor($r('sys.color.font_primary'))
           .opacity(0.9)
           .fontSize($r('sys.float.Title_S'))
           .fontWeight(FontWeight.Bold)
@@ -40,7 +40,7 @@ export struct BasePickerOperation {
     }
     .width('100%')
     .justifyContent(FlexAlign.SpaceBetween)
-    .backgroundColor('#2e3033')
+    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
     .padding({
       left: 28,
       right: 28,

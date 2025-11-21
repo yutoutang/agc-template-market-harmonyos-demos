@@ -81,6 +81,7 @@ export struct ScheduleList {
         }, (item: UserEventItem) => JSON.stringify(item))
       }
       .layoutWeight(1)
+      .padding({ bottom: 16 })
       .scrollBar(BarState.Off)
     }
     .layoutWeight(1)

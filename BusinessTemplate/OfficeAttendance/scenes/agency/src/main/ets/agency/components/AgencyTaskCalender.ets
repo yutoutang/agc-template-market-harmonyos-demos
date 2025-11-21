@@ -238,7 +238,7 @@ export struct AgencyTaskCalender {
                   .height(24)
                   .width(24)
                   .textAlign(TextAlign.Center)
-              })
+              }, (item:Resource) => JSON.stringify(item))
             }
             .width('100%')
             .padding({ left: 24, right: 24 })
@@ -266,11 +266,11 @@ export struct AgencyTaskCalender {
                       this.showMonth = day.month;
                       this.showYear = day.year;
                     })
-                })
+                }, (item:DateElement) => JSON.stringify(item))
               }
               .width('100%')
               .margin({ top: 16 })
-            })
+            }, (item:DateElement) => JSON.stringify(item))
           }
           .padding({ left: 24, right: 24 })
           .width('100%')

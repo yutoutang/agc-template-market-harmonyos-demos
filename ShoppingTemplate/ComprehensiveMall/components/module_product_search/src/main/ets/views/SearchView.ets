@@ -18,28 +18,36 @@ export struct SearchView {
   animate: boolean = false;
   @Local
   refreshRotateVal: number = 0;
-  vm: SearchVM = new SearchVM();
+  vm: SearchVM = new SearchVM(this.getUIContext());
   controller: SearchController = new SearchController();
+
+  @Computed
+  get keyword() {
+    return this.vm.searchWords ? this.vm.searchWords : this.defaultSearch
+  }
 
   aboutToAppear(): void {
     this.vm.initData();
-    this.vm.searchWords = this.defaultSearch;
   }
 
   build() {
     Column() {
+
       SearchBar({
+        placeholder: this.defaultSearch,
         searchWords: this.vm.searchWords,
         clickBack: () => {
           this.routerStack?.pop?.();
         },
         updateSearchWords: (value) => {
-          this.vm.updateSearchWords(value);
+          this.vm.searchWords = value;
         },
         submitSearch: () => {
-          this.vm.submitSearch(this.getUIContext(), this.handleSearch);
+          this.vm.submitSearch(this.keyword, this.handleSearch);
         },
-      });
+      })
+        .padding({ bottom: 8, right: 8 })
+        .backgroundColor($r('sys.color.background_primary'))
       Scroll() {
         if (this.vm.isLoading) {
           LoadingProgress().width(32).height(32);
@@ -50,7 +58,7 @@ export struct SearchView {
             HistorySearch({
               historyList: this.vm.historyList,
               handleClickItem: (value) => {
-                this.vm.updateSearchWords(value);
+                this.vm.submitSearch(value, this.handleSearch);
               },
               updateList: (list) => {
                 this.vm.updateHistoryList(list);
@@ -105,7 +113,7 @@ export struct SearchView {
             .width('45%')
             .flexShrink(0)
             .onClick(() => {
-              this.vm.updateSearchWords(item);
+              this.vm.submitSearch(item, this.handleSearch);
             });
         }, (item: string, index: number) => index + '__' + item);
       }
@@ -149,7 +157,7 @@ export struct SearchView {
         .justifyContent(FlexAlign.SpaceBetween)
         .margin({ top: Constants.SPACE_L })
         .onClick(() => {
-          this.vm.updateSearchWords(item.label);
+          this.vm.submitSearch(item.label, this.handleSearch);
         });
       }, (item: HotSearchItem, index: number) => index + '__' + item.label);
     }

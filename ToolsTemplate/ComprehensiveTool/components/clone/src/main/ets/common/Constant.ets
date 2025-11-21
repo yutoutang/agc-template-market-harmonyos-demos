@@ -13,6 +13,8 @@ export enum WorkerMessageType {
   RECEIVE, //接收
   CONNECT, //连接
   SEND, //发送
+  SEND_FILE_COUNT, //发送文件数量
+  SEND_CONTACT, //发送联系人
   CLOSE_CLIENT, // 关闭客户端
   SAVE_FILE //保存文件
 }

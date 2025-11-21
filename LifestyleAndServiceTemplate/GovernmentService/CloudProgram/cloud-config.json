@@ -1,5 +1,6 @@
 {
   "appSelected": {
+    // todo:替换成真实的appid,appName,projectId,projectName
     "appId": "xxxxx",
     "appName": "政务模板",
     "deviceTypes": [

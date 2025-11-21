@@ -3,9 +3,22 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { BrightnessUtil, getTokenSyn, requestOAIDTrackingConsentPermissions } from 'common';
+import { wxEventHandler } from 'aggregated_login';
+
+import * as wxopensdk from '@tencent/wechat_open_sdk';
+
+export const wxApi = wxopensdk.WXAPIFactory.createWXAPI('xxx')
+
+
 
 export default class EntryAbility extends UIAbility {
+
+  private handleWeChatCallIfNeed(want: Want) {
+    wxApi.handleWant(want, wxEventHandler)
+  }
+
   async onCreate(want: Want, launchParam: AbilityConstant.LaunchParam) {
+    this.handleWeChatCallIfNeed(want)
     let pushToken:string = await getTokenSyn()
     AppStorage.setOrCreate('pushToken', pushToken)
     console.log('pushToken', pushToken)
@@ -14,6 +27,10 @@ export default class EntryAbility extends UIAbility {
 
   onDestroy(): void {
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onDestroy');
+  }
+
+  onNewWant(want: Want): void {
+    this.handleWeChatCallIfNeed(want)
   }
 
   getSafeArea(windowStage: window.WindowStage) {

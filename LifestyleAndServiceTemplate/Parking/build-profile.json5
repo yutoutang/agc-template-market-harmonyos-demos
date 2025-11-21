@@ -1,7 +1,6 @@
 {
   "app": {
-    "signingConfigs": [
-    ],
+    "signingConfigs": [],
     "products": [
       {
         "name": "default",
@@ -40,7 +39,7 @@
     },
     {
       "name": "network",
-      "srcPath": "./commons/network",
+      "srcPath": "./commons/network"
     },
     {
       "name": "common",
@@ -144,7 +143,7 @@
     },
     {
       "name": "module_swiper_preview",
-      "srcPath": "./components/module_swiper_preview",
+      "srcPath": "./components/module_swiper_preview"
     },
     {
       "name": "module_parking_spots",
@@ -152,19 +151,19 @@
     },
     {
       "name": "module_parking_base",
-      "srcPath": "./components/module_parking_base",
+      "srcPath": "./components/module_parking_base"
     },
     {
       "name": "module_parking_map",
-      "srcPath": "./components/module_parking_map",
+      "srcPath": "./components/module_parking_map"
     },
     {
       "name": "module_address_search",
-      "srcPath": "./components/module_address_search",
+      "srcPath": "./components/module_address_search"
     },
     {
       "name": "module_license_keyboard",
-      "srcPath": "./components/module_license_keyboard",
+      "srcPath": "./components/module_license_keyboard"
     }
   ]
 }

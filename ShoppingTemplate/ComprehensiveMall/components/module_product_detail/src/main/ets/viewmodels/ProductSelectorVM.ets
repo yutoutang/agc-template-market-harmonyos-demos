@@ -75,6 +75,7 @@ export class ProductSelectorVM {
       option.values.forEach((item) => {
         const view = new SpecViewModel(
           option.key,
+          option.label,
           item.id,
           item.text,
           this.isSpecOutOfStock(item.id, this.skuMap),

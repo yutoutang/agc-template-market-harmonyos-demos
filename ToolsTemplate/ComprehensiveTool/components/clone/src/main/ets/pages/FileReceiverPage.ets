@@ -7,7 +7,6 @@ import { FileCountMessage } from '../model/BinaryProtocol';
 import { FileReceiverPageVM } from '../viewmodel/FileReceiverPageVM';
 import { FileType, TransferState, TransferType } from '../common/Constant';
 import { BufferUtil } from '../utils/BufferUtil';
-import { UdpClient } from '../service/UdpClient';
 import { TransferSuccess } from '../components/TransferSuccess';
 import { TransferError } from '../components/TransferError';
 import { getInstance } from '../common/CommonRoute';
@@ -73,7 +72,6 @@ struct FileReceiverPage {
         }
 
         const sendTypeBuffer = BufferUtil.stringToArrayBuffer(JSON.stringify(sendType))
-        UdpClient.send(sendTypeBuffer)
       },
       onComplete: async (fileVo: FileVo, fileData?: ArrayBuffer) => {
         this.vm.checkIsTransferAll()

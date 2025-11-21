@@ -109,56 +109,56 @@
 选择优惠券入参类型。
 
 | 参数       | 类型                                          | 是否必填 | 说明             |
-| ---------- | --------------------------------------------- | ---- | ---------------- |
-| totalMoney | number                                        | 是   | 订单总金额       |
-| selectId   | string                                        | 是   | 已选优惠券ID     |
-| confirm    | (params: [OnPopParams](#OnPopParams)) => void | 否   | 确定按钮执行回调 |
+| ---------- | --------------------------------------------- | -------- | ---------------- |
+| totalMoney | number                                        | 是       | 订单总金额       |
+| selectId   | string                                        | 是       | 已选优惠券ID     |
+| confirm    | (params: [OnPopParams](#OnPopParams)) => void | 否       | 确定按钮执行回调 |
 
 ### OnPopParams
 
 确定按钮回调传递数据类型。
 
 | 参数     | 类型   | 是否必填 | 说明                           |
-| -------- | ------ | ---- | ------------------------------ |
-| reduce   | number | 是   | 减免金额，为空时为0            |
-| selectId | string | 是   | 选择优惠券ID，为空时为空字符串 |
+| -------- | ------ | -------- | ------------------------------ |
+| reduce   | number | 是       | 减免金额，为空时为0            |
+| selectId | string | 是       | 选择优惠券ID，为空时为空字符串 |
 
 ### MyCouponsView
 
 浏览我的优惠券组件。
 
 | 参数   | 类型                       | 是否必填 | 说明                                         |
-| ------ | -------------------------- | ---- | -------------------------------------------- |
-| useNow | (couponId: string) => void | 否   | 立即使用按钮，执行回调事件。传递当前优惠券ID |
+| ------ | -------------------------- | -------- | -------------------------------------------- |
+| useNow | (couponId: string) => void | 否       | 立即使用按钮，执行回调事件。传递当前优惠券ID |
 
 ### TabComp
 
 自定义带导航条动画的Tab组件。
 
 | 参数              | 类型                           | 是否必填 | 说明                             |
-| ----------------- | ------------------------------ | ---- | -------------------------------- |
-| tabBar            | string[]                       | 是   | 页签名数组                       |
-| index             | number                         | 否   | 初始Tab页索引,支持!!双向绑定     |
-| contentUi         | (index: number) => void        | 否   | 自定义内容区域                   |
-| tabBarUi          | () => void                     | 否   | 页签居左时，自定义尾部页签区域   |
-| top               | boolean                        | 否   | 页签所处位置: 默认居顶           |
-| start             | boolean                        | 否   | 页签对齐方式: 默认居中           |
-| friction          | number \| Resource             | 否   | 页签居左可滚动时，设置的摩擦系数 |
-| space             | number                         | 否   | 页签间隙                         |
-| offsetLeft        | number                         | 否   | 页签左边距                       |
-| offsetRight       | number                         | 否   | 页签右边距                       |
-| activeColor       | ResourceColor                  | 否   | 选中文字颜色，包括导航条         |
-| frozenColor       | ResourceColor                  | 否   | 正常文字颜色                     |
-| activeSize        | string \| number \| Resource   | 否   | 选中文字大小                     |
-| frozenSize        | string \| number \| Resource   | 否   | 正常文字大小                     |
-| activeWeight      | number \| string \| FontWeight | 否   | 选中文字粗细                     |
-| frozenWeight      | number \| string \| FontWeight | 否   | 正常文字粗细                     |
-| tabBarBgColor     | ResourceColor                  | 否   | 页签区背景颜色                   |
-| tabContentBgColor | ResourceColor                  | 否   | 内容背景颜色                     |
-| animationDuration | number                         | 否   | 动画时长                         |
-| tabBarHeight      | Length                         | 否   | 导航区高度                       |
-| lineHeight        | Length                         | 否   | 导航条高度                       |
-| relativeY         | number                         | 否   | 条形相对页签的垂直位置           |
+| ----------------- | ------------------------------ | -------- | -------------------------------- |
+| tabBar            | string[]                       | 是       | 页签名数组                       |
+| index             | number                         | 否       | 初始Tab页索引,支持!!双向绑定     |
+| contentUi         | (index: number) => void        | 否       | 自定义内容区域                   |
+| tabBarUi          | () => void                     | 否       | 页签居左时，自定义尾部页签区域   |
+| top               | boolean                        | 否       | 页签所处位置: 默认居顶           |
+| start             | boolean                        | 否       | 页签对齐方式: 默认居中           |
+| friction          | number \| Resource             | 否       | 页签居左可滚动时，设置的摩擦系数 |
+| space             | number                         | 否       | 页签间隙                         |
+| offsetLeft        | number                         | 否       | 页签左边距                       |
+| offsetRight       | number                         | 否       | 页签右边距                       |
+| activeColor       | ResourceColor                  | 否       | 选中文字颜色，包括导航条         |
+| frozenColor       | ResourceColor                  | 否       | 正常文字颜色                     |
+| activeSize        | string \| number \| Resource   | 否       | 选中文字大小                     |
+| frozenSize        | string \| number \| Resource   | 否       | 正常文字大小                     |
+| activeWeight      | number \| string \| FontWeight | 否       | 选中文字粗细                     |
+| frozenWeight      | number \| string \| FontWeight | 否       | 正常文字粗细                     |
+| tabBarBgColor     | ResourceColor                  | 否       | 页签区背景颜色                   |
+| tabContentBgColor | ResourceColor                  | 否       | 内容背景颜色                     |
+| animationDuration | number                         | 否       | 动画时长                         |
+| tabBarHeight      | Length                         | 否       | 导航区高度                       |
+| lineHeight        | Length                         | 否       | 导航条高度                       |
+| relativeY         | number                         | 否       | 条形相对页签的垂直位置           |
 
 ## 示例代码
 

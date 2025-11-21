@@ -1,0 +1,9 @@
+{
+  "module": {
+    "name": "area_calculate",
+    "type": "har",
+    "deviceTypes": [
+      "default"
+    ]
+  }
+}

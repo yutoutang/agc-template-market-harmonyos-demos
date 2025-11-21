@@ -6,6 +6,11 @@
       "buildFunction": "buildSettingPage"
     },
     {
+      "name": "SettingPrivacyPage",
+      "pageSourceFile": "src/main/ets/views/SettingPrivacyPage.ets",
+      "buildFunction": "buildSettingPrivacyPage"
+    },
+    {
       "name": "AgreementPage",
       "pageSourceFile": "src/main/ets/views/AgreementPage.ets",
       "buildFunction": "buildAgreementPage"
@@ -19,6 +24,16 @@
       "name": "CouponPage",
       "pageSourceFile": "src/main/ets/views/CouponPage.ets",
       "buildFunction": "buildCouponPage"
+    },
+    {
+      "name": "MyCollectionPage",
+      "pageSourceFile": "src/main/ets/views/MyCollectionPage.ets",
+      "buildFunction": "buildMyCollectionPage"
+    },
+    {
+      "name": "ViewHistoryPage",
+      "pageSourceFile": "src/main/ets/views/ViewHistoryPage.ets",
+      "buildFunction": "buildViewHistoryPage"
     }
   ]
 }

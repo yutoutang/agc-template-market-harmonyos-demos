@@ -3,7 +3,7 @@
     "name": "business_home",
     "type": "shared",
     "deviceTypes": [
-      "default"
+      "phone",
     ],
     "deliveryWithInstall": true,
     "installationFree": true

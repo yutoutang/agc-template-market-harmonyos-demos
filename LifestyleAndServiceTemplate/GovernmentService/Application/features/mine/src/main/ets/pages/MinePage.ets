@@ -1,14 +1,14 @@
 import { goH5, getDataFromJSON } from 'h5';
-import { CardInfo, NavigationParams, UserInfo, ItemInfo, SettingItem, commonToast } from 'common';
+import { CardInfo, NavigationParams, UserInfo, ItemInfo, SettingItem, commonToast, UserState } from 'common';
+import { PersistenceV2 } from '@kit.ArkUI';
 
-@Component
+@ComponentV2
 export struct MinePage {
   gridItems: Array<ItemInfo> = [];
   cardItems: Array<CardInfo> = [];
   settingItems: Array<SettingItem> = [];
-  @StorageLink('isLogin') isLogin: boolean = AppStorage.get('isLogin') ?? false;
-  @StorageLink('userInfo') userInfo: UserInfo = AppStorage.get('userInfo') ?? new UserInfo();
-  @Consume('pageInfos') pageInfos: NavPathStack
+  @Local userState: UserState = PersistenceV2.connect(UserState, () => new UserState())!;
+  @Consumer ('pageInfos') pageInfos: NavPathStack = new NavPathStack()
   goLogInPage = () => {
     this.pageInfos.pushPathByName('LoginWithHuaweiIDComponent', null)
   }
@@ -30,6 +30,7 @@ export struct MinePage {
     this.gridItems = getDataFromJSON<ItemInfo>('MinePage-GridItems.json', this);
     this.cardItems = getDataFromJSON<CardInfo>('MinePage-CardItems.json', this);
     this.settingItems = getDataFromJSON<SettingItem>('MinePage-SettingItems.json', this);
+    PersistenceV2.save(UserState);
   }
 
   build() {
@@ -42,7 +43,7 @@ export struct MinePage {
         this.buildVoiceOnLineView()
 
         // 构建我的卡证视图
-        if (this.isLogin) {
+        if (this.userState.isLogin) {
           this.buildMyCardView()
         }
 
@@ -70,25 +71,25 @@ export struct MinePage {
     Row() {
       Row() {
         Image(
-          this.userInfo.avatar ||
+          this.userState.userInfo.avatar ||
           $r('app.media.un_login_avatar'))
           .width(48)
           .height(48)
           .borderRadius($r('sys.float.corner_radius_level10'))
           .margin({ right: 14 })
           .objectFit(ImageFit.Fill);
-        if (this.isLogin) {
+        if (this.userState.isLogin) {
           Column() {
-            Text(this.userInfo.userName)
+            Text(this.userState.userInfo.userName)
               .fontSize($r('app.integer.text_font_little_big'))
               .fontWeight(FontWeight.Medium)
               .margin({ bottom: 5 })
-            Text(this.userInfo.phoneNumber.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2'))
+            Text(this.userState.userInfo.phoneNumber.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2'))
               .fontColor('#434343')
               .fontSize($r('app.integer.text_font_normal'))
           }.alignItems(HorizontalAlign.Start)
         }
-        if (!this.isLogin) {
+        if (!this.userState.isLogin) {
           Text($r('app.string.login'))
             .fontColor($r('sys.color.font_primary'))
             .fontSize(18)
@@ -114,7 +115,7 @@ export struct MinePage {
     .borderRadius(16)
     .justifyContent(FlexAlign.SpaceBetween)
     .onClick(() => {
-      if (this.isLogin) {
+      if (this.userState.isLogin) {
         this.pageInfos.pushPathByName('PersonInformation', null)
       } else {
         this.goLogInPage()

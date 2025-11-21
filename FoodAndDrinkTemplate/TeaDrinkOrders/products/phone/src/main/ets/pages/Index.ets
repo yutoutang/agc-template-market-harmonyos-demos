@@ -21,7 +21,7 @@ import { AppInfoModel } from 'common/src/main/ets/models/StorageModel';
 @ComponentV2
 struct Index {
   @Provider('pageStack') pageStack: NavPathStack = RouterModule.getStack();
-  @Local appInfo: AppInfoModel = AppStorageV2.connect(AppInfoModel)!;
+  @Local appInfo: AppInfoModel = AppStorageV2.connect(AppInfoModel, () => new AppInfoModel())!;
   @Local storeInfo: StoreInfoModel = AppStorageV2.connect(StoreInfoModel, () => new StoreInfoModel())!;
   @Local userInfo: UserInfoModel = AppStorageV2.connect(UserInfoModel, () => new UserInfoModel())!;
   @Local openId: string = '';

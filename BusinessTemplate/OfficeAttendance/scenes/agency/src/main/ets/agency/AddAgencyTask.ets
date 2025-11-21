@@ -53,14 +53,7 @@ export struct AddAgencyTask {
   }
 
   hide() {
-    animateTo({
-      duration: 300,
-      curve: Curve.Friction,
-      onFinish: () => {
-        RouterModule.closeDialog();
-      },
-    }, () => {
-    });
+    RouterModule.closeDialog();
   }
 
   build() {

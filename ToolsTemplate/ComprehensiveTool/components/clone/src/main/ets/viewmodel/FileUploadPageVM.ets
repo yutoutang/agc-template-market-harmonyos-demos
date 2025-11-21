@@ -2,15 +2,12 @@ import { FileVo, SendType } from '../model/FileVo';
 import { promptAction } from '@kit.ArkUI';
 import { FileUtil, getLocalIPAddress } from '../utils/FileUtil';
 import { FileBasic, FileType, MainFile, TransferState } from '../common/Constant';
-import { abilityAccessCtrl, common } from '@kit.AbilityKit';
+import { common } from '@kit.AbilityKit';
 import { contact } from '@kit.ContactsKit';
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
 import { dataSharePredicates } from '@kit.ArkData';
 import { sendFile, sendFileCount } from '../service/FileSendService';
-import { UdpServer } from '../service/UdpServer';
-import { WorkerMessage } from '../model/WorkerMessage';
 import { TcpClient } from '../service/TcpClient';
-import { bundleManager } from '@kit.AbilityKit';
 
 @ObservedV2
 export class FileUploadPageVM {
@@ -112,35 +109,35 @@ export class FileUploadPageVM {
       this.video.fileSize = this.getAllSize(this.video.list)
     }
     const ipAddress = await getLocalIPAddress()
-    UdpServer.create(ipAddress, (data: WorkerMessage) => {
-      try {
-        const stringData = data.data as string
-        const parsedData: SendType = JSON.parse(stringData);
-
-        // 提取type和size的值
-        const typeValue = parsedData.type;
-        const sizeValue = parsedData.size;
-        const countValue = parsedData.count
-
-        if (typeValue === FileType.IMAGE) {
-          this.image.recvSize = sizeValue
-          this.image.count = countValue
-          if (this.image.recvSize === this.image.fileSize) {
-            this.stateList[1] = TransferState.AFTER
-          }
-        } else {
-          this.video.recvSize = sizeValue
-          this.video.count = countValue
-          if (this.video.recvSize === this.video.fileSize) {
-            this.stateList[2] = TransferState.AFTER
-          }
-        }
-        this.checkIsTransferAll()
-      } catch (error) {
-        // 处理JSON解析错误
-        console.error('解析JSON失败:', error);
-      }
-    })
+    // UdpServer.create(ipAddress, (data: WorkerMessage) => {
+    //   try {
+    //     const stringData = data.data as string
+    //     const parsedData: SendType = JSON.parse(stringData);
+    //
+    //     // 提取type和size的值
+    //     const typeValue = parsedData.type;
+    //     const sizeValue = parsedData.size;
+    //     const countValue = parsedData.count
+    //
+    //     if (typeValue === FileType.IMAGE) {
+    //       this.image.recvSize = sizeValue
+    //       this.image.count = countValue
+    //       if (this.image.recvSize === this.image.fileSize) {
+    //         this.stateList[1] = TransferState.AFTER
+    //       }
+    //     } else {
+    //       this.video.recvSize = sizeValue
+    //       this.video.count = countValue
+    //       if (this.video.recvSize === this.video.fileSize) {
+    //         this.stateList[2] = TransferState.AFTER
+    //       }
+    //     }
+    //     this.checkIsTransferAll()
+    //   } catch (error) {
+    //     // 处理JSON解析错误
+    //     console.error('解析JSON失败:', error);
+    //   }
+    // })
     // 将文件数据发送给新机
     sendFileCount({
       contact: this.contact,
@@ -201,13 +198,16 @@ export class FileUploadPageVM {
   }
 
   async uploadFile() {
+    this.checkIsConnected()
+    if (this.state === TransferState.ERROR) {
+      console.log('hello', '链接断开')
+    }
     await this.getSelectedFile()
     if (this.selectedFiles.length === 0) {
       promptAction.showToast({ message: '请选择文件' })
       return;
     }
     this.state = TransferState.MIDDLE
-    this.checkIsConnected()
     for (let idx = 0; idx < this.selectedFiles.length; idx++) {
       await sendFile(this.selectedFiles[idx])
       this.stateList[0] = TransferState.AFTER

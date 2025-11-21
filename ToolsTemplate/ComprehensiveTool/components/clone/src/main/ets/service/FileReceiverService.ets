@@ -1,4 +1,3 @@
-import { fileSaveService } from './FileSaveService';
 import { common } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { ContactMessage, FileCountMessage, FileEndMessage, FileStartMessage } from '../model/BinaryProtocol';
@@ -8,8 +7,6 @@ import { BinaryMessageType, FileType, LENGTH_WRITE_FILE_CHUNK } from '../common/
 import { BinaryProtocolCodec } from '../utils/BinaryProtocolCodec';
 import { FileVo } from '../model/FileVo';
 import { BufferUtil } from '../utils/BufferUtil';
-import { FileSaveVo } from '../model/FileSaveVo';
-import { UdpClient } from './UdpClient';
 
 
 export class FileReceiverService {
@@ -66,7 +63,6 @@ export class FileReceiverService {
    */
   private handleFileCount(data: ArrayBuffer) {
     const message: FileCountMessage = BinaryProtocolCodec.decodeFileCountMessage(data);
-    UdpClient.init(message.ip);
     if (this.fileTransCallback.onBefore) {
       this.fileTransCallback.onBefore(message);
     }
@@ -139,16 +135,6 @@ export class FileReceiverService {
       if (fileEndMessage.fileName !== this.fileStartMessage.fileName) {
         console.log(`文件接收失败，文件名：${fileEndMessage.fileName}, 应收文件块${fileEndMessage.totalChunks}, 实收文件块${this.receivedChunkSize}`);
         return;
-      }
-      if (this.receivedChunks.byteLength > 0) {
-        if (this.targetPath && this.context) {
-          fileSaveService.saveFile(this.context, {
-            path: this.targetPath,
-            offset: this.targetOffset,
-            data: this.receivedChunks,
-            type: this.fileStartMessage.fileType,
-          } as FileSaveVo);
-        }
       }
       if (this.fileTransCallback.onComplete) {
         this.fileTransCallback.onComplete({

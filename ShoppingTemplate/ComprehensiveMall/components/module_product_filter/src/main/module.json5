@@ -1,0 +1,10 @@
+{
+  "module": {
+    "name": "module_product_filter",
+    "type": "har",
+    "deviceTypes": [
+      "default",
+      "tablet"
+    ]
+  }
+}

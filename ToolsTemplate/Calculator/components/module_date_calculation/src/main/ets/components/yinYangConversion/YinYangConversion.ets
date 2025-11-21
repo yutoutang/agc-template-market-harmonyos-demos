@@ -100,7 +100,7 @@ export struct YinYangConversion {
               Radio({ value: 'Radio3', group: 'radioGroup2' })
                 .checked(true)
                 .radioStyle({
-                  checkedBackgroundColor: this.themeColor,
+                  checkedBackgroundColor: $r('sys.color.comp_background_emphasize'),
                 })
 
               Text('公历转阴历')

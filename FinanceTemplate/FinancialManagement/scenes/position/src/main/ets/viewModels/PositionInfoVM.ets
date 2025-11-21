@@ -1,5 +1,5 @@
 import { https, IPositionInfo, IDataset, IProfile } from 'lib_foundation';
-import { RouterMap, RouterModule, } from 'module_base';
+import { PreferenceUtil, RouterMap, RouterModule } from 'module_base';
 import { positionInfoData } from '../constants';
 
 const TAG = '[PositionInfoVM]';
@@ -29,7 +29,7 @@ export class PositionInfoVM {
   }
 
   init() {
-    const isLogin = AppStorage.get<boolean>('isLogin');
+    const isLogin = PreferenceUtil.getInstance().get('isLogin') as boolean
     if (isLogin) {
       this.isLogin = isLogin
     }

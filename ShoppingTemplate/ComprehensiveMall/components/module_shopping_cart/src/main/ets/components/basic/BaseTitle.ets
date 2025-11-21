@@ -5,11 +5,12 @@ export struct BaseTitle {
   // 是否展示返回按钮
   @Param public showBackBtn: boolean = false;
   // 背景色
-  @Param public barColor: ResourceColor = Color.White;
+  @Param public barColor: ResourceColor = $r('app.color.background_color_grey')
   // 是否使用沉浸式扩展
   @Param public barExpandSafeArea: boolean = true;
   // 返回按钮点击事件
-  @Event onBack: () => void = () => {};
+  @Event onBack: () => void = () => {
+  };
   // 自定义内容
   @BuilderParam titleContentBuilder: CustomBuilder;
 

@@ -77,24 +77,24 @@ export struct BaseDatePicker {
       })
         .lunar(this.isLunarDate)
         .layoutWeight(1)
-        .disappearTextStyle({ color: Color.Gray, font: { size: $r('sys.float.Body_M'), weight: FontWeight.Bold } })
-        .textStyle({ color: '#FFFFFFE5', font: { size: $r('sys.float.Body_M'), weight: FontWeight.Normal } })
+        .disappearTextStyle({ color: $r('sys.color.font_primary'), font: { size: $r('sys.float.Subtitle_S'), weight: FontWeight.Bold } })
+        .textStyle({ color: $r('sys.color.font_primary'), font: { size: $r('sys.float.Subtitle_M'), weight: FontWeight.Normal } })
         .selectedTextStyle({
-          color: '#5291FF',
-          font: { size: 20, weight: FontWeight.Medium },
+          color: $r('sys.color.font_emphasize'),
+          font: { size: $r('sys.float.Title_S'), weight: FontWeight.Medium },
         })
         .onDateChange((value: Date) => {
           this.datePickerLocal = value
           this.onDatePickerChange(value)
         })
-        .backgroundColor('#2e3033')
+        .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
         .padding({
           top: 20,
           bottom: 20,
         })
     }
     .justifyContent(FlexAlign.End)
-    .backgroundColor('#2e3033')
+    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
     .transition(TransitionEffect.translate({ y: 500 }))
   }
 }

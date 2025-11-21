@@ -5,6 +5,8 @@ import { TcpCallback } from '../model/TcpCallback';
 import { WorkerMessage } from '../model/WorkerMessage';
 import fileReceiverService from './FileReceiverService';
 import { worker, MessageEvents } from '@kit.ArkTS';
+import { common } from '@kit.AbilityKit';
+import { FileSaveVo } from '../model/FileSaveVo';
 
 export class TcpServer {
   private static tcpWorker = new worker.ThreadWorker('../workers/TCPSocketServerWorker.ets');
@@ -51,6 +53,14 @@ export class TcpServer {
     if (TcpServer.tcpCallback.onConnected) {
       TcpServer.tcpCallback.onConnected();
     }
+  }
+
+  static saveFile(context: common.UIAbilityContext, fileSaveVo: FileSaveVo) {
+    TcpServer.tcpWorker.postMessage({
+      type: WorkerMessageType.SAVE_FILE,
+      data: fileSaveVo,
+      context,
+    } as WorkerMessage, [fileSaveVo.data])
   }
 
   /**

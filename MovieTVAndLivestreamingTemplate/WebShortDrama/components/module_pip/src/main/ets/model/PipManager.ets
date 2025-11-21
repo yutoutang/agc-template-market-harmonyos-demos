@@ -230,6 +230,12 @@ export class PipManager {
 
   }
 
+  onPlaybackStatus(isPlay: boolean) {
+    let status: PiPWindow.PiPControlStatus =
+      isPlay ? PiPWindow.PiPControlStatus.PLAY : PiPWindow.PiPControlStatus.PAUSE;
+    this.pipController?.updatePiPControlStatus(PiPWindow.PiPControlType.VIDEO_PLAY_PAUSE, status)
+  }
+
   onSurfaceDestroyed(surfaceId: string): void {
     console.log(TAG, `onSurfaceDestroyed surfaceId: ${surfaceId}`);
     this.pipVideoController.pipSurfaceId = undefined

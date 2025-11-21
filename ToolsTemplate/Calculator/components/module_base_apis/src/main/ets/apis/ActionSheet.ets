@@ -53,6 +53,7 @@ class ActionSheetOption {
    * 背景
    */
   backgroundColor?: ResourceStr = ''
+  blurStyle?: BlurStyle;
   onWillAppear?: () => void
 }
 
@@ -114,6 +115,7 @@ class ActionSheet {
       preferType: params.preferType,
       backgroundColor: params.backgroundColor ? params.backgroundColor : ($r('sys.color.background_primary')),
       showClose: params.showClose,
+      blurStyle: params.blurStyle,
       onWillDismiss: async (dismissSheetAction: DismissSheetAction) => {
         // 0: 点击三键back、左滑/右滑、键盘ESC 1 点击蒙层  3: 跟手拖拽
         let reason = dismissSheetAction.reason
@@ -137,6 +139,9 @@ class ActionSheet {
     }
     if (params.backgroundColor) {
       sheetOption.backgroundColor = params.backgroundColor
+    }
+    if (params.blurStyle) {
+      sheetOption.blurStyle = params.blurStyle
     }
     this.contentNodeMap.set(key, {
       content: contentNode,

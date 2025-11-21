@@ -4,7 +4,7 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { functionalButtonComponentManager } from '@kit.ScenarioFusionKit';
 import fs from '@ohos.file.fs';
 import { iData, routerStack } from 'lib_foundation';
-import { UserInfoModel } from 'lib_foundation/src/main/ets/models/UserInfoModel';
+import { UserInfoModel } from 'lib_foundation';
 
 @ObservedV2
 export class EditProfileVM {
@@ -16,6 +16,14 @@ export class EditProfileVM {
   nickname: string = '';
   @Trace
   userInfo: UserInfoModel = iData.global.userInfo;
+
+  @Computed
+  get displayPhone(){
+    if(!this.userInfo.phone){
+      return ''
+    }
+    return `${this.userInfo.phone.substring(0, 3)}****${this.userInfo.phone.substring(7)}`;
+  }
 
   initData() {
     this.avatar = this.userInfo.avatar;
@@ -34,7 +42,7 @@ export class EditProfileVM {
     try {
       avatarFile = fs.openSync(data.avatarUri!, fs.OpenMode.READ_ONLY);
       let newPath =
-        getContext().cacheDir + `/${util.generateRandomUUID(false)}.png`;
+        getContext().filesDir + `/${util.generateRandomUUID(false)}.png`;
       fs.copyFileSync(avatarFile.fd, newPath);
       this.avatar = 'file://' + newPath;
     } catch (err) {
@@ -43,7 +51,6 @@ export class EditProfileVM {
       if (avatarFile) {
         try {
           fs.closeSync(avatarFile);
-          this.avatar = data.avatarUri!;
         } catch (err) {
           console.error('close file failed,error:' + JSON.stringify(err));
         }

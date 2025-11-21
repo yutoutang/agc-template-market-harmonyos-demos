@@ -4,7 +4,7 @@
 
 - [简介](#简介)
 - [约束与限制](#约束与限制)
-- [快速入门](#快速入门)
+- [使用](#使用)
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
@@ -21,18 +21,14 @@
 
 * DevEco Studio版本：DevEco Studio 5.0.0 Release及以上
 * HarmonyOS SDK版本：HarmonyOS 5.0.0 Release SDK及以上
-* 设备类型：华为手机（直板机）
+* 设备类型：华为手机（包括双折叠和阔折叠）
 * HarmonyOS版本：HarmonyOS 5.0.0 Release及以上
 
-### 权限
-
-无
-
-## 快速入门
+## 使用
 
 1. 安装组件。
 
-   如果是在DevEvo Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
+   如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
 
    如果是从生态市场下载组件，请参考以下步骤安装组件。
 
@@ -50,8 +46,9 @@
    ]
    ```
 
+   c. 在项目根目录oh-package.json5中添加依赖。
    ```
-   // 在项目根目录oh-package.json5中添加依赖
+   // XXX为组件存放的目录名
    "dependencies": {
       "module_address_search": "file:./XXX/module_address_search"
    }
@@ -83,13 +80,13 @@ AddressSearch(options?:AddressSearchOptions)
 
 **参数：**
 
-| 参数名     | 类型                                                | 必填 | 说明           |
-|---------|---------------------------------------------------|----|--------------|
-| options | [AddressSearchOptions](#AddressSearchOptions对象说明) | 否  | 配置地址搜索组件的参数。 |
+| 名称      | 类型                                                | 是否必填 | 说明           |
+|---------|---------------------------------------------------|------|--------------|
+| options | [AddressSearchOptions](#AddressSearchOptions对象说明) | 否    | 配置地址搜索组件的参数。 |
 
 ### AddressSearchOptions对象说明
 
-| 参数       | 类型                                               | 是否必填 | 说明     |
+| 名称       | 类型                                               | 是否必填 | 说明     |
 |----------|--------------------------------------------------|------|--------|
 | textInit | string                                           | 否    | 初始搜索   |
 | click    | (address: [IAddressInfo](#IAddressInfo)) => void | 否    | 点击回调事件 |
@@ -99,16 +96,16 @@ AddressSearch(options?:AddressSearchOptions)
 
 搜索地址结果类型。
 
-| 字段名             | 类型                                                                                                                     | 说明     |
-|-----------------|------------------------------------------------------------------------------------------------------------------------|--------|
-| siteId          | string                                                                                                                 | ID     |
-| name            | string                                                                                                                 | 简称     |
-| addr            | string                                                                                                                 | 全称     |
-| location        | [mapCommon.LatLng](https://developer.huawei.com/consumer/cn/doc/harmonyos-references/map-common#section20691173773810) | 经纬度    |
+| 名称       | 类型                                                                                                                     | 是否必填 | 说明     |
+|----------|------------------------------------------------------------------------------------------------------------------------|------|--------|
+| siteId   | string                                                                                                                 | 是    | ID     |
+| name     | string                                                                                                                 | 是    | 简称     |
+| addr     | string                                                                                                                 | 是    | 全称     |
+| location | [mapCommon.LatLng](https://developer.huawei.com/consumer/cn/doc/harmonyos-references/map-common#section20691173773810) | 是    | 经纬度    |
 
 ## 示例代码
 
-本示例通过AddressSearch地址搜索组件，实现地址搜索。
+本示例通过AddressSearch实现地址搜索的自动联想补全与点击回调。
 
 ```
 import { AddressSearch } from 'module_address_search';

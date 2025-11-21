@@ -69,7 +69,7 @@ export struct DateCalculation {
       cancel: () => {
         baseActionSheet.close()
       },
-    }).backgroundColor('#2e3033')
+    })
   }
 
   @Builder
@@ -89,17 +89,17 @@ export struct DateCalculation {
   build() {
     Column() {
       Text('某日期前后几天是什么日子')
-        .attributeModifier(new BaseTextStyleModifier(`font_on_primary/Body_M/Regular`)).opacity(0.7)
+        .attributeModifier(new BaseTextStyleModifier(`font_primary/Body_M/Regular`))
 
       List({ space: 16 }) {
         ListItem() {
           Row() {
             Text('起始日')
-              .attributeModifier(new BaseTextStyleModifier(`font_on_primary/Subtitle_M/Medium`)).opacity(0.7)
+              .attributeModifier(new BaseTextStyleModifier(`font_primary/Subtitle_M/Medium`))
             Row({ space: 5 }) {
               Text(dayjs(this.localStartDate).format('YYYY年MM月DD日'))
-                .attributeModifier(new BaseTextStyleModifier(`font_on_primary/Body_M/Regular`)).opacity(0.7)
-              Image($r('app.media.chevron_right_new')).width(12).height(24)
+                .attributeModifier(new BaseTextStyleModifier(`font_primary/Body_M/Regular`))
+              Image($r('app.media.chevron_right_new')).width(7).height(15)
             }
           }
           .width('100%')
@@ -109,7 +109,8 @@ export struct DateCalculation {
             baseActionSheet.show({
               id: 'datePickerBuilder',
               detents:[300,301],
-              backgroundColor: '#2e3033',
+              blurStyle: BlurStyle.COMPONENT_ULTRA_THICK,
+              backgroundColor: ($r('app.color.base_nav_action_sheet_background_color')),
               showClose: false,
               customContent: () => {
                 this.datePickerBuilder('start')
@@ -121,11 +122,11 @@ export struct DateCalculation {
         ListItem() {
           Row() {
             Text('天数')
-              .attributeModifier(new BaseTextStyleModifier(`font_on_primary/Subtitle_M/Medium`)).opacity(0.7)
+              .attributeModifier(new BaseTextStyleModifier(`font_primary/Subtitle_M/Medium`))
             Row({ space: 5 }) {
               Text(this.dayCount.toString())
-                .attributeModifier(new BaseTextStyleModifier(`font_on_primary/Body_M/Regular`)).opacity(0.7)
-              Image($r('app.media.chevron_right_new')).width(12).height(24)
+                .attributeModifier(new BaseTextStyleModifier(`font_primary/Body_M/Regular`))
+              Image($r('app.media.chevron_right_new')).width(7).height(15)
             }
           }
           .width('100%')
@@ -134,7 +135,8 @@ export struct DateCalculation {
             baseActionSheet.show({
               id: 'datePickerBuilder',
               detents:[300,301],
-              backgroundColor: '#2e3033',
+              blurStyle: BlurStyle.COMPONENT_ULTRA_THICK,
+              backgroundColor: ($r('app.color.base_nav_action_sheet_background_color')),
               showClose: false,
               customContent: () => {
                 this.textPickerBuilder()
@@ -149,26 +151,26 @@ export struct DateCalculation {
               Radio({ value: 'Radio1', group: 'radioGroup1' })
                 .checked(this.forwardOrBack === CALCULATION_TYPE.FORWARD)
                 .radioStyle({
-                  checkedBackgroundColor: this.buttonColor,
+                  checkedBackgroundColor: $r('sys.color.comp_background_emphasize'),
                 })
                 .onChange((value) => {
                   this.forwardOrBack = CALCULATION_TYPE.FORWARD
                 })
               Text('向前')
-                .attributeModifier(new BaseTextStyleModifier(`font_on_primary/Body_M/Regular`)).opacity(0.7)
+                .attributeModifier(new BaseTextStyleModifier(`font_primary/Body_M/Regular`))
             }
 
             Row({ space: 5 }) {
               Radio({ value: 'Radio2', group: 'radioGroup1' })
                 .checked(this.forwardOrBack === CALCULATION_TYPE.BACKWARD)
                 .radioStyle({
-                  checkedBackgroundColor: this.buttonColor,
+                  checkedBackgroundColor: $r('sys.color.comp_background_emphasize'),
                 })
                 .onChange((value) => {
                   this.forwardOrBack = CALCULATION_TYPE.BACKWARD
                 })
               Text('向后')
-                .attributeModifier(new BaseTextStyleModifier(`font_on_primary/Body_M/Regular`)).opacity(0.7)
+                .attributeModifier(new BaseTextStyleModifier(`font_primary/Body_M/Regular`))
             }
           }
           .width('100%')
@@ -179,14 +181,14 @@ export struct DateCalculation {
       .margin({ bottom: 16, top: 16 })
 
       Button('查询', { type: ButtonType.Normal, stateEffect: true })
-        .backgroundColor(this.buttonColor)
-        .fontColor(this.textColor)
+        .backgroundColor($r('sys.color.background_emphasize'))
+        .fontColor($r('sys.color.font_on_primary'))
         .fontSize($r('sys.float.Body_L'))
         .fontWeight(FontWeight.Medium)
         .padding({ top: 12, bottom: 12 })
         .width('100%')
         .height(40)
-        .borderRadius(20)
+        .borderRadius($r('sys.float.corner_radius_level10'))
         .margin({ top: 25 })
         .onClick(() => {
           this.calculateInfo = calculateDaysLater(this.localStartDate, Number(this.dayCount), this.forwardOrBack)

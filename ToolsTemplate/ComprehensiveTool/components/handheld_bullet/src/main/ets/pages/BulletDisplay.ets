@@ -41,6 +41,7 @@ export struct BulletDisplay {
     NavDestination() {
       Image(this.vm.isLock ? $r('app.media.ic_lock') : $r('app.media.ic_unlock'))
         .size({ width: 40, height: 40 }).position({ x: 36, y: (this.vm.contentWidth - 40) / 2 })
+        .zIndex(9999)
         .onClick(() => {
           this.vm.isLock = !this.vm.isLock;
         });
@@ -62,7 +63,11 @@ export struct BulletDisplay {
             })
             .backgroundColor(Color.Transparent)
             .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM, SafeAreaEdge.TOP])
-            .height('100%');
+            .height('100%')
+            .onSizeChange((oldValue: SizeOptions, newValue: SizeOptions) => {
+              this.vm.offsetX = Number(newValue.height);
+              this.vm.contentWidth = Number(newValue.height);
+            });
           } else {
             Row() {
               Text(this.vm.bullet.content)
@@ -95,7 +100,11 @@ export struct BulletDisplay {
             .width(this.vm.bullet.content.length * this.vm.bullet.fontSize)
             .position({ x: 0 })
             .justifyContent(FlexAlign.Center)
-            .alignItems(VerticalAlign.Center);
+            .alignItems(VerticalAlign.Center)
+            .onSizeChange((oldValue: SizeOptions, newValue: SizeOptions) => {
+              this.vm.offsetX = Number(newValue.height);
+              this.vm.contentWidth = Number(newValue.height);
+            });
           } else {
             Row() {
               Text(this.vm.bullet.content)
@@ -105,7 +114,10 @@ export struct BulletDisplay {
             }
             .height('100%')
             .justifyContent(FlexAlign.Center)
-            .alignItems(VerticalAlign.Center);
+            .alignItems(VerticalAlign.Center).onSizeChange((oldValue: SizeOptions, newValue: SizeOptions) => {
+              this.vm.offsetX = Number(newValue.height);
+              this.vm.contentWidth = Number(newValue.height);
+            });
           }
         }
 
@@ -121,10 +133,7 @@ export struct BulletDisplay {
               this.vm.stack.pop();
             });
         }
-      }.onSizeChange((oldValue: SizeOptions, newValue: SizeOptions) => {
-        this.vm.offsetX = Number(newValue.height);
-        this.vm.contentWidth = Number(newValue.height);
-      });
+      };
     }.onClick(() => {
       if (!this.vm.isLock) {
         this.vm.isShowBack = !this.vm.isShowBack;

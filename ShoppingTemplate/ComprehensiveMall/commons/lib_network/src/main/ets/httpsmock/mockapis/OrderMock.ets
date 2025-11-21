@@ -7,17 +7,21 @@ import {
 import { BaseResponse } from '../../types/responses/BaseResponse';
 import {
   OrderCreateResp,
+  OrderExpressInfo,
+  OrderExpressResp,
   OrderItem,
   OrderListResp,
   OrderSkuItem,
   PreOrderResp,
 } from '../../types/responses/OrderResponse';
-import { MockOrderData } from '../mockdata/MockOrderData';
+import { mockExpress, MockOrderData } from '../mockdata/MockOrderData';
 import { MockProductData } from '../mockdata/MockProductData';
 
 export class OrderMockApis {
   private readonly PAGE_SIZE = 6;
-  private _orderList: OrderItem[] = JSON.parse(JSON.stringify(MockOrderData.orderList));
+  private _orderList: OrderItem[] = JSON.parse(
+    JSON.stringify(MockOrderData.orderList),
+  );
 
   public start(adapter: AxiosMockAdapter) {
     // 获取预支付商品信息
@@ -113,6 +117,30 @@ export class OrderMockApis {
           },
         ];
       });
+
+    // 获取订单物流信息
+    adapter
+      .onGet(RequestUrlMap.ORDER_EXPRESS)
+      .reply((config: AxiosRequestConfig) => {
+        const orderId = config.params.orderId as string
+        const express = JSON.parse(JSON.stringify(mockExpress)) as OrderExpressInfo
+        express.orderId = orderId
+        const order = this._orderList.find(
+          (item) => item.orderInfo.orderNo === orderId,
+        );
+        if (order?.orderInfo?.addressInfo) {
+          express.destination = {
+            latitude: order.orderInfo.addressInfo.latitude ?? MockOrderData.DEFAULT_LATITUDE,
+            longitude: order.orderInfo.addressInfo.longitude ?? MockOrderData.DEFAULT_LONGITUDE,
+          }
+          express.getPosition = order.orderInfo.addressInfo.city ?? ''
+        }
+        const res: OrderExpressResp = {
+          code: 0,
+          info: express,
+        }
+        return [HttpStatusCode.Ok, res]
+      })
 
     // 创建订单
     adapter

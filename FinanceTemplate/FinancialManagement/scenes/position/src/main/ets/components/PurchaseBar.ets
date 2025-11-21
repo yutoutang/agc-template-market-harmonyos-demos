@@ -13,7 +13,7 @@ export struct PurchaseBar {
             .width(155)
             .backgroundColor($r('sys.color.comp_background_tertiary'))
             .fontColor('#E4480C')
-            .fontSize(16)
+            .fontSize($r('sys.float.Body_L'))
             .fontWeight(FontWeight.Medium)
             .onClick(() => {
               if (this.vm.isLogin) {
@@ -26,8 +26,8 @@ export struct PurchaseBar {
           Button('追加购买')
             .width(156)
             .backgroundColor('#E4480C')
-            .fontColor(Color.White)
-            .fontSize(16)
+            .fontColor($r('sys.color.font_on_primary'))
+            .fontSize($r('sys.float.Body_L'))
             .fontWeight(FontWeight.Medium)
             .onClick(() => {
               if (this.vm.isLogin) {

@@ -43,6 +43,10 @@
     {
       "name": "widget2x2_display_name",
       "value": "停车缴费"
+    },
+    {
+      "name": "agcit_huawei_parking",
+      "value": "1.0.3"
     }
   ]
 }

@@ -81,10 +81,6 @@
       "value": "1.0.0"
     },
     {
-      "name": "aagcittype_huawei_office_attendance_agency",
-      "value": "sceneTemplate"
-    },
-    {
       "name": "new_success",
       "value": "success"
     },
@@ -115,10 +111,6 @@
     {
       "name": "agcit_huawei_office_attendance_agency",
       "value": "1.0.0"
-    },
-    {
-      "name": "agcittype_huawei_office_attendance_agency",
-      "value": "sceneTemplate"
     },
     {
       "name": "btn_save",

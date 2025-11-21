@@ -11,7 +11,6 @@ import { PromptActionUtil } from '../util/PromptActionUtil';
 import { VideoManageVM } from '../viewmodel/VideoManageVM';
 import { OperationComponent } from '../components/OperationComponent';
 import { VideoControlComponent } from '../components/VideoControlComponent';
-import { common } from '@kit.AbilityKit';
 
 @Builder
 export function VideoEditBuilder() {
@@ -64,8 +63,42 @@ function videoShare(previewUri: PixelMap) {
   .justifyContent(FlexAlign.SpaceBetween);
 }
 
+@Builder
+function stopExport() {
+  Column({ space: 16 }) {
+    Text('确认停止导出吗？')
+      .fontWeight(FontWeight.Medium)
+      .fontColor($r('sys.color.font_primary'))
+      .opacity(0.9);
+    Row({ space: 24 }) {
+      Button('停止导出')
+        .layoutWeight(1)
+        .fontColor($r('sys.color.warning'))
+        .fontWeight(FontWeight.Medium)
+        .backgroundColor($r('sys.color.comp_background_tertiary'))
+        .onClick(() => {
+          PromptActionUtil.closeDialog(stopContentNode);
+          VideoEditVM.instance.showExportingBindCover = false;
+        });
+      Button('继续导出')
+        .fontColor($r('sys.color.font_on_primary'))
+        .backgroundColor($r('sys.color.comp_background_emphasize'))
+        .layoutWeight(1)
+        .fontWeight(FontWeight.Medium)
+        .onClick(() => {
+          PromptActionUtil.closeDialog(stopContentNode);
+        });
+    };
+  }
+  .padding(24)
+  .borderRadius(32)
+  .backgroundColor($r('sys.color.ohos_id_blur_style_component_ultra_thick_color'))
+  .width('90%');
+}
+
 let getUIContext: UIContext;
 let shareContentNode: ComponentContent<Object>;
+let stopContentNode: ComponentContent<Object>;
 
 @ComponentV2
 struct VideoEdit {
@@ -77,6 +110,8 @@ struct VideoEdit {
     getUIContext = this.getUIContext();
     shareContentNode =
       new ComponentContent(getUIContext, wrapBuilder<[PixelMap]>(videoShare), this.vm.draft.previewUri!);
+    stopContentNode =
+      new ComponentContent(getUIContext, wrapBuilder<[]>(stopExport));
   }
 
   // 组件销毁时清理资源
@@ -94,11 +129,11 @@ struct VideoEdit {
     }
   }
 
-  showShareContent() {
+  showNodeContent(node: ComponentContent<Object>, mode: LevelMode) {
     PromptActionUtil.setContext(getUIContext);
-    PromptActionUtil.setContentNode(shareContentNode);
+    PromptActionUtil.setContentNode(node);
     PromptActionUtil.setOptions({
-      levelMode: LevelMode.EMBEDDED,
+      levelMode: mode,
       onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
         hilog.info(0xFF00, 'VideoClip', JSON.stringify(dismissDialogAction.reason));
       },
@@ -112,7 +147,7 @@ struct VideoEdit {
       this.vm.saveFile().then(() => {
         this.vm.showExportingBindCover = false;
         shareContentNode.update(this.vm.draft.previewUri);
-        this.showShareContent();
+        this.showNodeContent(shareContentNode, LevelMode.EMBEDDED);
       });
 
       if (this.vm.wordFilePaths.length > 0) {
@@ -176,13 +211,6 @@ struct VideoEdit {
         .onClick(() => {
           this.vm.showExportingBindCover = true;
           this.vm.exportProgress = 0;
-          setTimeout(() => {
-            if (this.vm.exportProgress === 0) {
-              PromptActionUtil.closeDialog(shareContentNode);
-              this.manageVM.pathStack.pop();
-              promptAction.showToast({ message: '导出失败，请重新编辑~' });
-            }
-          }, 5000);
           sdk.Export(this.vm.totalOutputVideoFilePath,
             (progress: number) => {
               this.vm.exportProgress = progress;
@@ -191,7 +219,12 @@ struct VideoEdit {
         })
         .bindContentCover($$this.vm.showExportingBindCover, this.FullExportBuilder(), {
           onWillDismiss: (() => {
-            promptAction.showToast({ message: '视频导出过程中请勿退出', duration: 1000 });
+            if (this.vm.exportProgress) {
+              promptAction.showToast({ message: '视频导出过程中请勿退出', duration: 1000 });
+            } else {
+              // 进度为0，允许退出
+              this.showNodeContent(stopContentNode, LevelMode.OVERLAY);
+            }
           }),
         });
     }.width('100%').justifyContent(FlexAlign.SpaceBetween).margin({ bottom: 16 }).padding({ left: 16, right: 16 });

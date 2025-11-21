@@ -53,7 +53,7 @@ class ShareOperationUtil {
     PopViewUtil.openDialog(
       wrapBuilder(posterDialogBuilder),
       {
-        isModal: false,
+        isModal: true,
         autoCancel: true,
         alignment: DialogAlignment.Top,
         offset: {

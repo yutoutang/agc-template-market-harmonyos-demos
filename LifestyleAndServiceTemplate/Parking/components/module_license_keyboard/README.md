@@ -4,7 +4,7 @@
 
 - [简介](#简介)
 - [约束与限制](#约束与限制)
-- [快速入门](#快速入门)
+- [使用](#使用)
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
@@ -21,18 +21,14 @@
 
 * DevEco Studio版本：DevEco Studio 5.0.0 Release及以上
 * HarmonyOS SDK版本：HarmonyOS 5.0.0 Release SDK及以上
-* 设备类型：华为手机（直板机）
+* 设备类型：华为手机（包括双折叠和阔折叠）
 * HarmonyOS版本：HarmonyOS 5.0.0 Release及以上
 
-### 权限
-
-无
-
-## 快速入门
+## 使用
 
 1. 安装组件。
 
-   如果是在DevEvo Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
+   如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
 
    如果是从生态市场下载组件，请参考以下步骤安装组件。
 
@@ -50,8 +46,9 @@
    ]
    ```
 
+   c. 在项目根目录oh-package.json5中添加依赖。
    ```
-   // 在项目根目录oh-package.json5中添加依赖
+   // XXX为组件存放的目录名
    "dependencies": {
       "module_license_keyboard": "file:./XXX/module_license_keyboard"
    }
@@ -88,13 +85,13 @@ QueryKeyboard(options?: QueryKeyboardOptions)
 
 **参数：**
 
-| 参数名     | 类型                                                | 必填 | 说明           |
-|---------|---------------------------------------------------|----|--------------|
-| options | [QueryKeyboardOptions](#QueryKeyboardOptions对象说明) | 否  | 配置车牌查询组件的参数。 |
+| 名称      | 类型                                                | 是否必填 | 说明           |
+|---------|---------------------------------------------------|------|--------------|
+| options | [QueryKeyboardOptions](#QueryKeyboardOptions对象说明) | 否    | 配置车牌查询组件的参数。 |
 
 ### QueryKeyboardOptions对象说明
 
-| 参数         | 类型                          | 是否必填 | 说明                 |
+| 名称         | 类型                          | 是否必填 | 说明                 |
 |------------|-----------------------------|------|--------------------|
 | myLicenses | string[]                    | 否    | 我的车牌号码数组           |
 | click      | (carNumber: string) => void | 否    | 查询按钮回调事件。车牌号码完整时触发 |
@@ -105,16 +102,23 @@ QueryKeyboard(options?: QueryKeyboardOptions)
 
 通用车牌组件。
 
-| 参数             | 类型                                                 | 是否必填 | 说明       |
+**参数：**
+
+| 名称      | 类型                                                  | 是否必填 | 说明           |
+|---------|-----------------------------------------------------|------|--------------|
+| options | [CommonKeyboardOptions](#CommonKeyboardOptions对象说明) | 否    | 配置通用车牌组件的参数。 |
+
+### CommonKeyboardOptions对象说明
+
+| 名称             | 类型                                                 | 是否必填 | 说明       |
 |----------------|----------------------------------------------------|------|----------|
 | intFocus       | boolean                                            | 否    | 初始是否激活键盘 |
 | defaultNumbers | string                                             | 否    | 设置默认车牌显示 |
 | onChange       | (carNumber: string[], isComplete: boolean) => void | 否    | 变化时回调操作  |
 
-
 ## 示例代码
 
-本示例通过组件实现车牌号码的快速输入以及查询操作。
+本示例实现车牌号码的快速输入以及查询操作。
 
 ```
 import { QueryKeyboard } from 'module_license_keyboard';

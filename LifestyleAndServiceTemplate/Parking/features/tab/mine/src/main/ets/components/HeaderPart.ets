@@ -13,7 +13,7 @@ export struct HeadPart {
     Row() {
       Row({ space: 12 }) {
         Image(!this.vm.userInfo.isPhoneAssociated || this.vm.userInfo.avatar === '' ?
-        $r('app.media.ic_avatar_outer') : this.vm.userInfo.avatar)
+          $r('app.media.ic_avatar_outer') : this.vm.userInfo.avatar)
           .width(64)
           .borderRadius('50%')
           .clip(true)
@@ -46,8 +46,8 @@ export struct HeadPart {
           })
           .width(ButtonStyle.buttonWidth)
           .height(ButtonStyle.buttonHeight)
-          .fontSize(ButtonStyle.buttonTextSize)
-          .fontColor(ButtonStyle.buttonTextColorBound)
+          .fontSize($r('sys.float.Body_M'))
+          .fontColor($r('sys.color.font_emphasize'))
           .backgroundColor(ButtonStyle.buttonBgColorBound)
       } else {
         FunctionalButton({

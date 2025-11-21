@@ -25,7 +25,6 @@ export struct BirthdayRememberList {
     this.countdown.startCountdown(this.birthdayRememberList[0])
   }
 
-
   aboutToAppear(): void {
     RemindEventDispatcher.eventChangeCallback = (userEventInfo: UserEventItem) => {
       if ([EVENT_TYPE.BIRTHDAY, EVENT_TYPE.ANNIVERSARIES].includes(userEventInfo.eventType)) {
@@ -38,21 +37,17 @@ export struct BirthdayRememberList {
   itemEnd(item: UserEventItem) {
     ListEndSwiperAction({
       userEventInfo: item,
-      onToTop:(item: UserEventItem) => {
-       const targetIndex =   this.birthdayRememberList.findIndex(value => value.id === item.id)
-        if(targetIndex !== -1) {
-          this.calendarEventVM.restBirRemIsTop(this.birthdayRememberList[targetIndex],this.eventType)
-          this.birthdayRememberList.unshift(...this.birthdayRememberList.splice(targetIndex,1))
-          this.countdown.startCountdown(this.birthdayRememberList[0])
-        }
-      }
+      onToTop: (item: UserEventItem) => {
+        this.birthdayRememberList.forEach(item => item.isTop = false)
+        item.isTop = true
+      },
     })
   }
 
   @Builder
-  EventDayCountdown() {
+  EventDayCountdown(item: UserEventItem) {
     Column({ space: 16 }) {
-      Text(`距离${this.birthdayRememberList[0].content}`)
+      Text(`距离${item.content}`)
         .fontWeight(FontWeight.Bold)
         .fontSize(18)
         .maxLines(1)
@@ -61,7 +56,7 @@ export struct BirthdayRememberList {
         .fontWeight(FontWeight.Bold)
         .fontSize(18)
         .fontColor('#C4272B')
-        .visibility(this.countdown.isToday(this.birthdayRememberList[0].date[0].date) ? Visibility.Visible :
+        .visibility(this.countdown.isToday(item.date[0].date) ? Visibility.Visible :
         Visibility.None)
       Row({ space: 5 }) {
         Text(this.countdown.days > 9 ? this.countdown.days.toString() : '0' + this.countdown.days)
@@ -88,7 +83,7 @@ export struct BirthdayRememberList {
           .borderRadius(4)
           .fontColor($r('sys.color.font_on_primary'))
       }
-      .visibility(this.countdown.isToday(this.birthdayRememberList[0].date[0].date) ? Visibility.None :
+      .visibility(this.countdown.isToday(item.date[0].date) ? Visibility.None :
       Visibility.Visible)
     }
     .height(120)
@@ -108,17 +103,26 @@ export struct BirthdayRememberList {
   build() {
     Column() {
       List({ space: 12 }) {
-        if (this.birthdayRememberList.length) {
-          ListItem() {
-            this.EventDayCountdown()
+        ForEach(this.birthdayRememberList.filter(item => item.isTop), (item: UserEventItem, index: number) => {
+          if (this.birthdayRememberList.length) {
+            ListItem() {
+              this.EventDayCountdown(item)
+            }
+            .onClick(() => {
+              const params: Record<string, UserEventItem | string> = {
+                'userEventInfo': item,
+                'eventType': this.eventType,
+              }
+              this.calendarEventVM.getPageInfo()?.pushPathByName('BirthdayRememberDetails', params)
+            })
+            .onAppear(() => {
+              this.countdown.startCountdown(item)
+            })
+            .onDisAppear(() => {
+              this.countdown.stopCountdown()
+            })
           }
-          .onAppear(() => {
-            this.countdown.startCountdown(this.birthdayRememberList[0])
-          })
-          .onDisAppear(() => {
-            this.countdown.stopCountdown()
-          })
-        }
+        }, (item: UserEventItem) => JSON.stringify(item))
         ListItem() {
           Column() {
             Image($r('app.media.no_data')).width(120).height(120)
@@ -131,7 +135,7 @@ export struct BirthdayRememberList {
         }
         .visibility(this.birthdayRememberList.length ? Visibility.None : Visibility.Visible)
 
-        ForEach(this.birthdayRememberList, (item: UserEventItem, index: number) => {
+        ForEach(this.birthdayRememberList.filter(item => !item.isTop), (item: UserEventItem, index: number) => {
           ListItem() {
             Flex({ justifyContent: FlexAlign.SpaceBetween, alignItems: ItemAlign.Center }) {
               Column() {
@@ -150,7 +154,7 @@ export struct BirthdayRememberList {
                   .maxLines(1)
                   .textOverflow({ overflow: TextOverflow.Ellipsis })
                 Text(`${item.date[0].isLunar ? item.date[0].lunarDate :
-                dayjs(item.date[0].date).format('YYYY年MM月DD日')} ${getWeekday(item.date[0].date)}`)
+                dayjs(item.date[0].date).format('MM月DD日')} ${getWeekday(item.date[0].date)}`)
                   .fontSize(12)
                   .fontColor($r('sys.color.font_secondary'))
                 Text(item.remarks)
@@ -161,12 +165,17 @@ export struct BirthdayRememberList {
               .margin({ left: 16 })
               .alignItems(HorizontalAlign.Start)
 
-              Column() {
-                DistanceToday({
-                  endDate: item.date[0].date,
-                })
+              Row() {
+                Text(this.calendarEventVM.getDaysUntilBirthday(dayjs(item.date[0].date).format('YYYY-MM-DD'))
+                  .toString())
+                  .fontColor('#C4272B')
+                  .fontSize(18)
+                  .fontWeight(FontWeight.Bold)
+                Text('天')
+                  .fontSize(14)
+                  .fontColor($r('sys.color.font_secondary'))
               }
-              .width(80)
+              .width(60)
             }
             .backgroundColor('#FAFAFA')
             .borderRadius(16)
@@ -191,9 +200,11 @@ export struct BirthdayRememberList {
         }, (item: UserEventItem) => JSON.stringify(item))
       }
       .scrollBar(BarState.Off)
+      .layoutWeight(1)
     }
     .margin({ top: 12 })
-    .height('100%')
+    .layoutWeight(1)
+    .padding({ bottom: 16 })
     .justifyContent(FlexAlign.Start)
   }
 }

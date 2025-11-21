@@ -2,6 +2,7 @@ import { PickerUtil, RouterModule } from '@ohos_agcit/office_attendance_common_l
 import { CustomContentDialog, router } from '@kit.ArkUI';
 import { RequestProxy } from '../api/RequestProxy';
 import { BaseResponse } from '@ohos_agcit/office_attendance_network';
+import { LoginController } from '../model/LoginController';
 
 @Builder
 export function UserInfoBuilder() {
@@ -10,8 +11,7 @@ export function UserInfoBuilder() {
 
 @ComponentV2
 export struct UserInfo {
-  @Local userName: ResourceStr = $r('app.string.account_name');
-  @Local imageUri: string | undefined = undefined;
+  private loginController: LoginController = LoginController.instance;
   @Param callback: () => void = () => {
   };
 
@@ -61,7 +61,7 @@ export struct UserInfo {
               left: 12,
             });
 
-          Image(this.imageUri === undefined ? $r('app.media.ic_user_default') : this.imageUri)
+          Image(this.loginController.userAvatar)
             .width(40)
             .height(40)
             .borderRadius(100)
@@ -73,7 +73,9 @@ export struct UserInfo {
                 maxSelectNumber: 1,
               })
                 .then((uris) => {
-                  this.imageUri = uris[0] ? uris[0] : this.imageUri;
+                  if (uris[0]) {
+                    this.loginController.userAvatar = uris[0];
+                  }
                 });
             });
 
@@ -92,7 +94,7 @@ export struct UserInfo {
             .lineHeight(22)
             .padding({ left: 12 });
           TextInput({
-            text: this.userName,
+            text: this.loginController.userName,
           })
             .textAlign(TextAlign.End)
             .fontSize(14)
@@ -100,6 +102,9 @@ export struct UserInfo {
             .backgroundColor(Color.White)
             .fontColor($r('app.string.black_60'))
             .selectionMenuHidden(true)
+            .onChange((value) => {
+              this.loginController.userName = value;
+            })
             .padding({ right: 6 });
           Image($r('app.media.arrow_right')).margin({ right: 12 }).height(24).width(12)
         }
@@ -107,17 +112,19 @@ export struct UserInfo {
         .height(56)
         .borderRadius(16);
 
+        Blank()
+
         Row() {
           Button($r('app.string.log_out'))
-            .fontColor($r('app.color.button_text_color'))
-            .fontSize(16)
+            .fontColor($r('sys.color.font_emphasize'))
+            .fontSize($r('sys.float.Body_L'))
             .backgroundColor('rgba(0, 0, 0, 0.05)')
             .width('100%')
             .onClick(() => {
               this.dialogController.open();
             });
         }.margin({
-          top: 500,
+          bottom: 32,
         });
       }
       .backgroundColor('#F1F3F5')

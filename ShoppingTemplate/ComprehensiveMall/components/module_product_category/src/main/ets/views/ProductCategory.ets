@@ -62,55 +62,52 @@ export struct ProductCategory {
   }
 
   build() {
-    NavDestination() {
-      Row() {
-        List() {
-          ForEach(this.categoryTabs, (item: CategoryItem, index: number) => {
-            ListItem() {
-              this.tabBarItemBuilder(item, index);
-            };
-          }, (item: CategoryItem, index: number) => index + JSON.stringify(item));
-        }
-        .width('30%')
-        .height('100%')
-        .borderWidth({ right: 1 })
-        .borderColor($r('app.color.background_color_grey'));
-
-        Column() {
-          if (this.curSubCategoryList.length) {
-            this.subCategoryBarBuilder()
-          }
-          if (this.isLoading) {
-            Column() {
-              LoadingProgress().width(32)
-            }
-            .layoutWeight(1)
-            .justifyContent(FlexAlign.Center)
-          } else if (!this.productList.length) {
-            Column() {
-              Image($r('app.media.ic_search_empty'))
-                .width(120)
-                .height(120);
-              Text('暂无数据')
-                .fontSize($r('app.string.font_size_12'))
-                .fontColor($r('app.color.font_color_level2'));
-            }
-            .layoutWeight(1)
-            .justifyContent(FlexAlign.Center)
-          } else {
-            this.productListBuilder()
-          }
-        }
-        .padding({ left: $r('app.string.space_l'), right: $r('app.string.space_l') })
-        .height('100%')
-        .layoutWeight(1)
+    Row() {
+      List() {
+        ForEach(this.categoryTabs, (item: CategoryItem, index: number) => {
+          ListItem() {
+            this.tabBarItemBuilder(item, index);
+          };
+        }, (item: CategoryItem, index: number) => index + JSON.stringify(item));
       }
-      .width('100%')
+      .width('30%')
+      .constraintSize({ maxWidth: 240 })
       .height('100%')
-      .backgroundColor(Color.White)
-      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP]);
+      .borderWidth({ right: 1 })
+      .borderColor($r('app.color.background_color_grey'));
+
+      Column() {
+        if (this.curSubCategoryList.length) {
+          this.subCategoryBarBuilder()
+        }
+        if (this.isLoading) {
+          Column() {
+            LoadingProgress().width(32)
+          }
+          .layoutWeight(1)
+          .justifyContent(FlexAlign.Center)
+        } else if (!this.productList.length) {
+          Column() {
+            Image($r('app.media.ic_search_empty'))
+              .width(120)
+              .height(120);
+            Text('暂无数据')
+              .fontSize($r('app.string.font_size_12'))
+              .fontColor($r('app.color.font_color_level2'));
+          }
+          .layoutWeight(1)
+          .justifyContent(FlexAlign.Center)
+        } else {
+          this.productListBuilder()
+        }
+      }
+      .padding({ left: $r('app.string.space_l'), right: $r('app.string.space_l') })
+      .height('100%')
+      .layoutWeight(1)
     }
-    .hideTitleBar(true)
+    .width('100%')
+    .height('100%')
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP]);
   }
 
   @Builder
@@ -173,7 +170,7 @@ export struct ProductCategory {
       GridRow({
         columns: {
           xs: 2,
-          md: 3,
+          md: 4,
         },
         gutter: { x: 12, y: 12 },
       }) {

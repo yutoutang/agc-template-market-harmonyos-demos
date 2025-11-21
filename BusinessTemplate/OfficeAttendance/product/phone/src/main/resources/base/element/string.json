@@ -87,6 +87,10 @@
     {
       "name": "lastTime",
       "value": "lastTime"
+    },
+    {
+      "name": "agcit_huawei_office_attendance",
+      "value": "1.0.1"
     }
   ]
 }

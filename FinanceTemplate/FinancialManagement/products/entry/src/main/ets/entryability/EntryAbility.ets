@@ -9,7 +9,7 @@ const TAG = '[EntryAbility]';
 export default class EntryAbility extends UIAbility {
   public onWindowStageCreate(windowStage: window.WindowStage): void {
     UIBase.init(windowStage);
-    windowStage.loadContent('pages/MainEntry', (err) => {
+    windowStage.loadContent('pages/Index', (err) => {
       if (err.code) {
         Logger.error(TAG, 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');
         return;

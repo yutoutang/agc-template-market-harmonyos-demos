@@ -8,8 +8,6 @@
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
-
-
 ## 简介
 
 本组件提供商品评价功能，支持评定星级、填写评价、上传图片。
@@ -24,8 +22,6 @@
 - HarmonyOS SDK版本：HarmonyOS 5.0.1 Release SDK及以上
 - 设备类型：华为手机（包括双折叠和阔折叠）
 - 系统版本：HarmonyOS 5.0.1(13)及以上
-
-
 
 ## 快速入门
 
@@ -74,34 +70,30 @@ ProductReviewCreation(options: ProductReviewCreationOptions)
 
 商品评价组件。
 
-| 参数名  | 类型                                                         | 是否必填 | 说明                     |
-| ------- | ------------------------------------------------------------ | -------- | ------------------------ |
+| 参数名  | 类型                                                                  | 是否必填 | 说明                     |
+| ------- | --------------------------------------------------------------------- | -------- | ------------------------ |
 | options | [ProductReviewCreationOptions](#ProductReviewCreationOptions对象说明) | 否       | 配置商品评价组件的参数。 |
 
 ### ProductReviewCreationOptions对象说明
 
-| 名称         | 类型                                                | 是否必填 | 说明                 |
-| ------------ | --------------------------------------------------- | -------- | -------------------- |
-| skuList      | [OrderSkuItem](#OrderSkuItem类型说明)[]             | 否       | 待评价的商品列表     |
+| 名称         | 类型                                                 | 是否必填 | 说明                 |
+| ------------ | ---------------------------------------------------- | -------- | -------------------- |
+| skuList      | [OrderSkuItem](#OrderSkuItem类型说明)[]              | 否       | 待评价的商品列表     |
 | handleSubmit | (value: [ReviewDraft](#ReviewDraft类型说明)) => void | 否       | 点击提交后的回调事件 |
-
-
 
 ### OrderSkuItem类型说明
 
-| 字段名      | 类型                                                         | 是否必填 | 说明         |
-| ----------- | ------------------------------------------------------------ | -------- | ------------ |
-| productId   | string                                                       | 是       | 商品ID       |
-| skuCode     | string                                                       | 是       | 商品SKU编码  |
-| skuDesc     | string                                                       | 是       | 商品SKU描述  |
-| count       | number                                                       | 是       | 商品数量     |
+| 字段名      | 类型                                                                                                  | 是否必填 | 说明         |
+| ----------- | ----------------------------------------------------------------------------------------------------- | -------- | ------------ |
+| productId   | string                                                                                                | 是       | 商品ID       |
+| skuCode     | string                                                                                                | 是       | 商品SKU编码  |
+| skuDesc     | string                                                                                                | 是       | 商品SKU描述  |
+| count       | number                                                                                                | 是       | 商品数量     |
 | banner      | [ResourceStr](https://developer.huawei.com/consumer/cn/doc/harmonyos-references/ts-types#resourcestr) | 是       | 商品轮播图   |
-| title       | string                                                       | 是       | 商品标题     |
-| serviceDesc | string                                                       | 是       | 商品服务描述 |
-| dashPrice   | number                                                       | 是       | 商品原价     |
-| price       | number                                                       | 是       | 商品价格     |
-
-
+| title       | string                                                                                                | 是       | 商品标题     |
+| serviceDesc | string                                                                                                | 是       | 商品服务描述 |
+| dashPrice   | number                                                                                                | 是       | 商品原价     |
+| price       | number                                                                                                | 是       | 商品价格     |
 
 ### ReviewDraft类型说明
 
@@ -112,8 +104,6 @@ ProductReviewCreation(options: ProductReviewCreationOptions)
 | feedback       | string                            | 是       | 用户反馈内容       |
 | date           | number                            | 是       | 评论日期（时间戳） |
 | reviewList     | [SkuReview](#SkuReview类型说明)[] | 是       | 商品评论列表       |
-
-
 
 ### SkuReview类型说明
 
@@ -126,16 +116,12 @@ ProductReviewCreation(options: ProductReviewCreationOptions)
 | content   | string                                        | 是       | 商品评论内容 |
 | mediaList | [ReviewMediaItem](#ReviewMediaItem类型说明)[] | 是       | 评论媒体列表 |
 
-
-
 ### ReviewMediaItem类型说明
 
-| 字段名 | 类型                                                        | 是否必填 | 说明        |
-| ------ | ----------------------------------------------------------- | -------- | ----------- |
+| 字段名 | 类型                                                                                                  | 是否必填 | 说明        |
+| ------ | ----------------------------------------------------------------------------------------------------- | -------- | ----------- |
 | uri    | [ResourceStr](https://developer.huawei.com/consumer/cn/doc/harmonyos-references/ts-types#resourcestr) | 是       | 媒体资源uri |
-| type   | [ReviewMediaType](#ReviewMediaType枚举说明)                 | 是       | 媒体类型    |
-
-
+| type   | [ReviewMediaType](#ReviewMediaType枚举说明)                                                           | 是       | 媒体类型    |
 
 ### ReviewMediaType枚举说明
 
@@ -143,8 +129,6 @@ ProductReviewCreation(options: ProductReviewCreationOptions)
 | ------ | -------- |
 | IMAGE  | 图片类型 |
 | VIDEO  | 视频类型 |
-
-
 
 ## 示例代码
 

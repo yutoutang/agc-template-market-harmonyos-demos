@@ -13,6 +13,7 @@ import i18n from '@ohos.i18n';
 import { PromptAction, MeasureUtils } from '@ohos.arkui.UIContext';
 import { sceneMap } from '@kit.MapKit';
 import { BusinessError } from '@ohos.base';
+import { CommonConfirmDialog } from 'module_ui_base';
 
 @ComponentV2
 struct AddressEditPage {
@@ -28,6 +29,13 @@ struct AddressEditPage {
   private isSelectingAddress: boolean = false;
   @Local
   private isResolvingClipboardText: boolean = false;
+  @Local
+  private hasChange: boolean = false;
+
+  @Monitor('clipboardText','address.name','address.phone','address.province','address.city','address.district','address.street','address.detail')
+  handleEdit() {
+    this.hasChange = true
+  }
 
   @Computed
   private get isFocusable(): boolean {
@@ -56,16 +64,6 @@ struct AddressEditPage {
   public build(): void {
     NavDestination() {
       Column() {
-        TitleBar({
-          onBackButtonClick: () => this.ctx.navPathStack.pop(),
-          barColor: IColor.WHITE,
-        }) {
-          Text(this.ctx.operation === Operation.EDIT ? '编辑地址' : '新增地址')
-            .fontSize(IFontSize.TITLE)
-            .fontColor(IColor.BLACK_TRANSPARENT_90)
-            .fontWeight(500)
-        }
-
         Stack() {
           this.buildMainContent();
           if (this.showLoadingMask) {
@@ -81,7 +79,19 @@ struct AddressEditPage {
       .backgroundColor(IColor.BACKGROUND)
       .expandSafeArea([SafeAreaType.SYSTEM, SafeAreaType.CUTOUT], [SafeAreaEdge.BOTTOM, SafeAreaEdge.TOP])
     }
-    .hideTitleBar(true)
+    .title(this.ctx.operation === Operation.EDIT ? '编辑地址' : '新增地址')
+    .onBackPressed(() => {
+      if (this.hasChange) {
+        CommonConfirmDialog.show({
+          content: '当前编辑内容未保存，是否确认返回？',
+          confirm: () => {
+            this.ctx.navPathStack.pop()
+          },
+        })
+        return true
+      }
+      return false
+    })
   }
 
   @Builder
@@ -115,6 +125,7 @@ struct AddressEditPage {
             TextArea({ text: this.clipboardText, placeholder: '在此粘贴复制的地址信息，自动拆分姓名，电话和地址' })
               .width('100%')
               .height(105)
+              .selectedBackgroundColor($r('app.color.theme_color'))
               .placeholderColor(IColor.BLACK_TRANSPARENT_40)
               .placeholderFont({ size: 14 })
               .caretColor(IColor.THEME_PRIMARY)
@@ -182,7 +193,7 @@ struct AddressEditPage {
                 .margin({ right: 24 })
               TextInput({ text: this.address.name, placeholder: '请填写收货人姓名' })
                 .layoutWeight(1)
-                .placeholderColor(IColor.BLACK_TRANSPARENT_40)
+                .placeholderColor($r('sys.color.font_secondary'))
                 .caretColor(IColor.THEME_PRIMARY)
                 .maxLength(25)
                 .fontColor(IColor.BLACK_TRANSPARENT_90)
@@ -212,9 +223,9 @@ struct AddressEditPage {
               TextInput({ text: this.address.phone, placeholder: '请填写收货人手机号' })
                 .layoutWeight(1)
                 .type(InputType.PhoneNumber)
-                .placeholderColor(IColor.BLACK_TRANSPARENT_40)
+                .placeholderColor($r('sys.color.font_secondary'))
                 .caretColor(IColor.THEME_PRIMARY)
-                .maxLength(30)
+                .maxLength(11)
                 .fontColor(IColor.BLACK_TRANSPARENT_90)
                 .fontSize(14)
                 .placeholderFont({ size: 14 })
@@ -288,6 +299,7 @@ struct AddressEditPage {
                 .textAlign(TextAlign.Start)
                 .margin({ right: 24 })
               TextArea({ text: this.address.detail, placeholder: '小区、写字楼、门牌号等' })
+                .selectedBackgroundColor($r('app.color.theme_color'))
                 .layoutWeight(1)
                 .placeholderColor(IColor.BLACK_TRANSPARENT_40)
                 .placeholderFont({ size: 14 })
@@ -325,7 +337,6 @@ struct AddressEditPage {
               .fontColor(IColor.BLACK_TRANSPARENT_60)
             Toggle({ type: ToggleType.Switch, isOn: this.address.isDefault })
               .selectedColor(IColor.THEME_PRIMARY)
-              .switchPointColor(IColor.WHITE)
               .onChange((isOn: boolean) => {
                 this.address.isDefault = isOn;
               })
@@ -412,6 +423,8 @@ struct AddressEditPage {
               break;
             case 'ADMINISTRATIVE_AREA_LEVEL_4':
               this.address.street = district.name ?? '';
+              this.address.latitude = district.location?.latitude ?? this.address.latitude;
+              this.address.longitude = district.location?.longitude ?? this.address.longitude;
               break;
           }
         }

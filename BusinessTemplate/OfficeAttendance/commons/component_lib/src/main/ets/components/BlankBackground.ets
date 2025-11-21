@@ -3,14 +3,7 @@ import { RouterModule } from '@ohos_agcit/office_attendance_common_lib'
 @ComponentV2
 export struct BlankBackground {
   hide() {
-    animateTo({
-      duration: 300,
-      curve: Curve.Friction,
-      onFinish: () => {
-        RouterModule.closeDialog();
-      },
-    }, () => {
-    });
+    RouterModule.closeDialog();
   }
 
   build() {

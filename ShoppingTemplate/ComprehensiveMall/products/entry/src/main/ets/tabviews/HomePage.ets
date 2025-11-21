@@ -14,7 +14,21 @@ export struct HomePage {
 
   build(): void {
     Column() {
-      this.buildPageHeader()
+      NavTitleBar({
+        title: '首页',
+        bgColor: this.vm.isTablet ? $r('app.color.background_color_transparent') :
+          $r('app.color.background_color_white'),
+      }) {
+        if (this.vm.isTablet) {
+          Blank()
+          this.buildSearchBar()
+        }
+      }
+
+      if (!this.vm.isTablet) {
+        this.buildSearchBar()
+      }
+
       Refresh({
         refreshing: $$this.vm.isRefreshing,
         builder: this.buildRefreshingContent,
@@ -31,7 +45,8 @@ export struct HomePage {
                 handleClickCategory: (id) => {
                   this.vm.jumpToCategoryPage(id);
                 },
-              });
+              })
+                .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
             } else {
               Text('当前页面加载失败，请重新发起尝试')
                 .fontSize($r('app.float.font_size_14'))
@@ -44,8 +59,8 @@ export struct HomePage {
                 });
             }
           }
-          .constraintSize({ minHeight: $r('app.string.size_percent_full') })
           .justifyContent(FlexAlign.Center)
+          .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
         }
         .nestedScroll({
           scrollForward: NestedScrollMode.PARENT_FIRST,
@@ -55,6 +70,7 @@ export struct HomePage {
         .edgeEffect(EdgeEffect.Spring)
         .align(Alignment.Top)
         .layoutWeight(1)
+        .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
       }
       .layoutWeight(1)
       .onStateChange((state) => {
@@ -66,28 +82,67 @@ export struct HomePage {
     }
     .width($r('app.string.size_percent_full'))
     .height($r('app.string.size_percent_full'))
+    .backgroundColor($r('app.color.background_color_grey'))
     .alignItems(HorizontalAlign.Start)
     .justifyContent(FlexAlign.Start)
     .expandSafeArea([SafeAreaType.SYSTEM, SafeAreaType.CUTOUT], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM]);
   }
 
   @Builder
-  buildPageHeader() {
-    NavTitleBar({
-      title: '首页',
-      bgColor: $r('app.color.background_color_white'),
-    }) {
+  buildSearchBar() {
+    Row() {
       Row() {
-        Image($r('app.media.ic_search_filled'))
-          .width(40)
-          .height(40)
-          .onClick(() => {
-            routerStack.pushPathByName(RouterMap.PRODUCT_SEARCH, null);
+        Image($r('app.media.ic_home_search'))
+          .width(16)
+          .margin({
+            right: $r('app.float.space_l'),
           })
+        Swiper() {
+          ForEach(this.vm.searchList, (str: string) => {
+            Text(str).fontColor($r('app.color.font_color_level2'))
+          }, (str: string, index: number) => index + str)
+          if (!this.vm.searchList.length) {
+            Text('请输入关键字搜索').fontColor($r('app.color.font_color_level2'))
+          }
+        }
+        .indicator(false)
+        .loop(true)
+        .autoPlay(true)
+        .vertical(true)
+        .onChange((index) => {
+          if (this.vm.searchList.length) {
+            this.vm.currentSearchStr = this.vm.searchList[index];
+          }
+        })
       }
+      .height(40)
+      .backgroundColor($r('sys.color.comp_background_tertiary'))
+      .borderRadius(20)
       .layoutWeight(1)
-      .justifyContent(FlexAlign.End)
+      .padding({
+        left: $r('app.float.space_l'),
+        right: $r('app.float.space_l'),
+      })
+      .margin({ right: $r('app.float.space_s') })
+      .id('search')
+      .onClick(() => {
+        this.vm.jumpToSearchPage(this.getUIContext(), 'search')
+      })
+
+      Image($r('app.media.ic_scan'))
+        .width(40)
+        .onClick(() => {
+          this.vm.jumpToScanPage()
+        })
     }
+    .width(this.vm.isTablet ? 400 : $r('app.string.size_percent_full'))
+    .height(56)
+    .backgroundColor(this.vm.isTablet ? $r('app.color.background_color_grey') : $r('app.color.background_color_white'))
+    .alignItems(VerticalAlign.Center)
+    .padding({
+      left: $r('app.float.space_l'),
+      right: $r('app.float.space_l'),
+    })
   }
 
   @Builder
@@ -97,14 +152,14 @@ export struct HomePage {
         LoadingProgress().width($r('app.float.loading_icon_size'))
       } else if (this.vm.refreshStatus === RefreshStatus.OverDrag) {
         Text('释放可刷新页面')
-          .fontColor(Style.FONT_COLOR_LEVEL2)
-          .fontSize(Style.FONT_SIZE_12)
+          .fontColor($r('sys.color.font_secondary'))
+          .fontSize($r('sys.float.Body_M'))
           .lineHeight(32)
           .halfLeading(true);
       } else if (this.vm.refreshStatus === RefreshStatus.Drag) {
         Text('下拉刷新')
-          .fontColor(Style.FONT_COLOR_LEVEL2)
-          .fontSize(Style.FONT_SIZE_12)
+          .fontColor($r('sys.color.font_secondary'))
+          .fontSize($r('sys.float.Body_M'))
           .lineHeight(32)
           .halfLeading(true);
       }

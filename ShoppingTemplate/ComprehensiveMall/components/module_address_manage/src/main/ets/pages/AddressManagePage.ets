@@ -103,7 +103,7 @@ struct AddressManagePage {
             .shape(CheckBoxShape.CIRCLE)
             .select(address.isDefault)
           Text(address.isDefault ? '已默认' : '设为默认')
-            .fontColor(IColor.BLACK_TRANSPARENT_60)
+            .fontColor($r('sys.color.font_primary'))
             .fontSize(12)
             .margin({ left: 8 })
         }
@@ -127,40 +127,34 @@ struct AddressManagePage {
           this.ctx.addressMgr.update(dto);
         })
 
-        Row() {
-          Button(){
+        Row({ space: 12 }) {
+          Row() {
             Text('删除')
               .fontColor(IColor.BLACK_TRANSPARENT_60)
               .fontSize(10)
           }
-            .width(36)
-            .backgroundColor(IColor.WHITE)
-            .borderWidth(1)
-            .borderColor('#99000000')
-            .onClick(() => {
-              const uiContext = this.getUIContext();
-              const promptAction = uiContext.getPromptAction();
-              const params: ParamsForDeleteDialog = new ParamsForDeleteDialog();
-              const contentNode = new ComponentContent(uiContext, wrapBuilder(buildDeleteDialog), params);
-              params.onClose = () => promptAction.closeCustomDialog(contentNode);
-              params.onDelete = () => this.ctx.addressMgr.delete(address.id);
-              promptAction.openCustomDialog(contentNode);
-            })
-          Button(){
+          .buttonStyle()
+          .onClick(() => {
+            const uiContext = this.getUIContext();
+            const promptAction = uiContext.getPromptAction();
+            const params: ParamsForDeleteDialog = new ParamsForDeleteDialog();
+            const contentNode = new ComponentContent(uiContext, wrapBuilder(buildDeleteDialog), params);
+            params.onClose = () => promptAction.closeCustomDialog(contentNode);
+            params.onDelete = () => this.ctx.addressMgr.delete(address.id);
+            promptAction.openCustomDialog(contentNode);
+          })
+
+          Row() {
             Text('修改')
               .fontColor(IColor.BLACK_TRANSPARENT_60)
               .fontSize(10)
           }
-            .width(36)
-            .backgroundColor(IColor.WHITE)
-            .borderWidth(1)
-            .borderColor(IColor.BLACK_TRANSPARENT_60)
-            .margin({ left: 8 })
-            .onClick(() => {
-              this.ctx.editingAddressDTO = address.toDTO();
-              this.ctx.operation = Operation.EDIT;
-              this.ctx.navPathStack.pushPathByName(RouteMap.ADDRESS_EDIT_PAGE, this.ctx);
-            })
+          .buttonStyle()
+          .onClick(() => {
+            this.ctx.editingAddressDTO = address.toDTO();
+            this.ctx.operation = Operation.EDIT;
+            this.ctx.navPathStack.pushPathByName(RouteMap.ADDRESS_EDIT_PAGE, this.ctx);
+          })
         }
       }
       .width('100%')
@@ -260,4 +254,17 @@ function buildDeleteDialog(params: ParamsForDeleteDialog): void {
   .justifyContent(FlexAlign.Start)
   .backgroundColor(IColor.GRAY_LIGHT_TRANSPARENT_85)
   .borderRadius(24)
+}
+
+@Extend(Row)
+function buttonStyle() {
+  .borderWidth(1)
+  .borderColor('#99000000')
+  .borderRadius($r('app.string.border_radius_capsule'))
+  .padding({
+    left: 8,
+    right: 8,
+    top: 4,
+    bottom: 4,
+  })
 }

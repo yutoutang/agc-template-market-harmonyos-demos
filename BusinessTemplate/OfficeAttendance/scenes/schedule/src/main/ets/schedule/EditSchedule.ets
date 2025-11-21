@@ -37,14 +37,7 @@ export struct EditSchedule {
   }
 
   hide() {
-    animateTo({
-      duration: 300,
-      curve: Curve.Friction,
-      onFinish: () => {
-        RouterModule.popWithParam([], true);
-      },
-    }, () => {
-    });
+    RouterModule.popWithParam([], true);
   }
 
   build() {

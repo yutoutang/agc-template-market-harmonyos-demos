@@ -130,6 +130,7 @@ export struct PersonalNotesPage {
           title: { title: '笔记分类' },
           width: '100%',
           height: 400,
+          preferType: SheetType.CENTER,
           radius:{
             topLeft:16,
             topRight:16
@@ -147,6 +148,7 @@ export struct PersonalNotesPage {
             width: '100%',
             showClose: false,
             height: 376,
+            preferType: SheetType.CENTER,
             radius:{
               topLeft:16,
               topRight:16

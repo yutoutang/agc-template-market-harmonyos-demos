@@ -46,6 +46,17 @@ export class PreferenceUtil {
     }
   }
 
+  public getWithPreference(preference: preferences.Preferences, key: string, defaultValue?: object | string) {
+    try {
+      let data = preference.getSync(key, defaultValue)
+      logger.info(`PreferenceUtil: get: ${key} = ${JSON.stringify(data)}`)
+      return data
+    } catch (e) {
+      logger.info(`PreferenceUtil: get error: ${JSON.stringify(e)}`)
+      return defaultValue
+    }
+  }
+
   public putToArray(key: string, value: string) {
     if (!this.dataPreferences) {
       logger.info(`PreferenceUtil: dataPreferences is null`)

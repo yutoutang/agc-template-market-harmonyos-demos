@@ -1,7 +1,9 @@
 import { RouterMap, routerStack } from 'lib_foundation';
 import { OrderApis, OrderItem } from 'lib_network';
-import { OrderActionMap, OrderShipmentMap, OrderStatusMap } from '../common/Enums';
-import { UpdateAddressSheetOptions } from '../pages/UpdateAddressSheet';
+import {
+  OrderActionMap, OrderShipmentMap, OrderStatusMap,
+} from '../common/Enums';
+import { UpdateAddressSheetOptions } from '../views/UpdateAddressSheet';
 import { formatTime } from '../utils';
 import { OrderUtil } from '../utils/OrderUtil';
 
@@ -20,7 +22,10 @@ export class OrderInfoPageVM {
   get enableEditAddress() {
     if (this.orderItem) {
       const status = this.orderItem.orderInfo.status;
-      if (this.orderItem.orderInfo.receivingMethod === OrderShipmentMap.SELF_PICK_UP) {
+      if (
+        this.orderItem.orderInfo.receivingMethod ===
+        OrderShipmentMap.SELF_PICK_UP
+      ) {
         return false;
       }
       if (
@@ -31,6 +36,30 @@ export class OrderInfoPageVM {
       }
     }
     return false;
+  }
+
+  @Computed
+  get enableExpressPage() {
+    if (!this.orderItem || this.orderItem.orderInfo.receivingMethod === OrderShipmentMap.SELF_PICK_UP) {
+      return false
+    }
+    const enableArr = [
+      OrderStatusMap.PENDING_RECEIPT,
+      OrderStatusMap.PENDING_REVIEW,
+      OrderStatusMap.REVIEWED,
+      OrderStatusMap.REFUND_IN_PROGRESS,
+      OrderStatusMap.REFUNDED,
+    ]
+    return enableArr.includes(this.orderItem.orderInfo.status)
+  }
+
+  @Computed
+  get logisticInfo() {
+    const len = this.orderItem?.logisticInfo?.length
+    if (this.orderItem && len) {
+      return this.orderItem.logisticInfo[0]
+    }
+    return undefined
   }
 
   getGapTime(remainingTime: number) {
@@ -99,10 +128,11 @@ export class OrderInfoPageVM {
       OrderUtil.handleViewReview({
         orderNo: this.orderNo,
         data: this.orderItem,
-      })
+      });
     } else {
       OrderUtil.handleOrderAction(action, {
         orderNo: this.orderItem.orderInfo.orderNo,
+        data: this.orderItem,
         callback: () => {
           this.getOrderItem(this.orderNo);
         },
@@ -125,5 +155,14 @@ export class OrderInfoPageVM {
       },
       false,
     );
+  }
+
+  jumpToExpressPage() {
+    if (this.enableExpressPage) {
+      routerStack.pushPath({
+        name: RouterMap.ORDER_EXPRESS_INFO,
+        param: this.orderItem,
+      })
+    }
   }
 }

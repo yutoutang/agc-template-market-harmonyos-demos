@@ -73,8 +73,7 @@ export struct BaseSliderSwitch {
             Row() {
               Text(item.name)
                 .fontColor(this.currentIndex === index ? $r('sys.color.font_on_primary') :
-                $r('sys.color.font_on_primary'))
-                .opacity(this.currentIndex === index ? 1 : 0.7)
+                $r('sys.color.font_secondary'))
             }
             .height('100%')
             .justifyContent(FlexAlign.Center)
@@ -98,7 +97,7 @@ export struct BaseSliderSwitch {
       .borderRadius(18)
       .height(36)
       .padding(3)
-      .backgroundColor('#202224')
+      .backgroundColor($r('sys.color.comp_background_tertiary'))
     }
   }
 }

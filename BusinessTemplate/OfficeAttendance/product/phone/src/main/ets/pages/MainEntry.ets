@@ -2,10 +2,11 @@ import { TAB_LIST } from '../constants/Constants';
 import { AgencyTaskView } from '@ohos_agcit/office_attendance_agency';
 import { ScheduleView } from '@ohos_agcit/office_attendance_schedule';
 import { TabListItem } from '@ohos_agcit/office_attendance_agency';
-import { CheckInView } from '@ohos_agcit/office_attendance_checkin';
+import { ClockInView } from 'clock_in';
 import { CommonConstants, MainEntryVM } from '@ohos_agcit/office_attendance_common_lib';
 import { MineView } from '@ohos_agcit/office_attendance_account';
 import { router } from '@kit.ArkUI';
+import { AddressParam } from 'clock_in';
 
 
 @Builder
@@ -32,7 +33,17 @@ struct MainEntry {
     Navigation(this.vm.navStack) {
       Tabs({ barPosition: BarPosition.End, index: this.vm.curIndex }) {
         TabContent() {
-          CheckInView();
+          ClockInView({
+            latitude:31.978252425174848,
+            longitude:118.76696853313138,
+            distance: 50,
+            onSuccess:(address:AddressParam) => {
+              console.log('打卡成功', JSON.stringify(address))
+            },
+            onFailed:() => {
+              console.log('打卡失败')
+            }
+          })
         }
         .tabBar(this.tabBarBuilder(TAB_LIST[0], 0));
 

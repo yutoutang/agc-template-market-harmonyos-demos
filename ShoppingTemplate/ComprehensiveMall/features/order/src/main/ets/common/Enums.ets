@@ -39,7 +39,7 @@ export enum OrderActionMap {
   DELETE,
 }
 
-export enum OrderShipmentMap{
+export enum OrderShipmentMap {
   EXPRESS,
   SELF_PICK_UP,
 }

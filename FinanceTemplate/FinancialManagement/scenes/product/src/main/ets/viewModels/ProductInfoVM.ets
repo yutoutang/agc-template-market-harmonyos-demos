@@ -1,4 +1,4 @@
-import { RouterMap, RouterModule, } from 'module_base';
+import { PreferenceUtil, RouterMap, RouterModule, } from 'module_base';
 import {
   https,
   IBuyRule,
@@ -53,7 +53,7 @@ export class ProductInfoVM {
   }
 
   init() {
-    const isLogin = AppStorage.get<boolean>('isLogin');
+    const isLogin = PreferenceUtil.getInstance().get('isLogin') as boolean
     if (isLogin) {
       this.isLogin = isLogin
     }

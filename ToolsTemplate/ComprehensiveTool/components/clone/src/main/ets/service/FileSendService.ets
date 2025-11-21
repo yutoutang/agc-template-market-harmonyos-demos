@@ -46,8 +46,7 @@ class FileSendService {
         recvSize: fileCount.video.recvSize,
       },
     }
-    TcpClient.sendBinaryData(BinaryProtocolCodec.encodeBinaryProtocolMessage(fileCountMessage),
-      BinaryMessageType.FILE_COUNT)
+    TcpClient.sendFileCount(fileCountMessage)
   }
 
   // 发送文件
@@ -57,76 +56,10 @@ class FileSendService {
       const startMessage: ContactMessage = {
         fileType: fileVo.type,
         list: fileVo.contactList,
-        deviceImgData: fileVo.deviceImgData,
-        deviceName: fileVo.deviceName,
       };
-      TcpClient.sendBinaryData(BinaryProtocolCodec.encodeBinaryProtocolMessage(startMessage),
-        BinaryMessageType.CONTACT)
       return
     }
-    let streamReader: FileReaderService | null = null
-    try {
-      // 1. 读取文件信息
-      // 创建流式文件读取器
-      streamReader = new FileReaderService(LENGTH_READ_FILE_CHUNK);
-      // 打开文件
-      await streamReader.openFile(fileVo);
-      const fileData = streamReader.getFileInfo();
-      // 添加null检查
-      if (!fileData) {
-        console.error('文件读取失败，无法发送文件:', fileVo.name);
-        return;
-      }
-      const totalChunks = fileData.totalChunks
-
-      // 2. 发送文件开始消息
-      const startMessage: FileStartMessage = {
-        fileName: fileVo.name,
-        fileSize: fileVo.size,
-        fileType: fileVo.type,
-        totalChunks: totalChunks,
-        chunkSize: fileData.chunkSize,
-        deviceImgData: fileVo.deviceImgData,
-        deviceName: fileVo.deviceName,
-      };
-      TcpClient.sendBinaryData(BinaryProtocolCodec.encodeBinaryProtocolMessage(startMessage),
-        BinaryMessageType.FILE_START)
-
-      // 3. 分片发送
-      for (let i = 0; i < totalChunks; i++) {
-        const chunk = await streamReader?.readNextChunk()
-        if (!chunk) {
-          console.error('文件读取失败，无法发送文件:', fileVo.name);
-          return;
-        }
-        // 计算最优分片大小
-        const optimalTransferChunkSize = TransferUtil.calculateOptimalChunkSize(chunk.size);
-        const transferBatches = chunk.size / optimalTransferChunkSize + 1
-        for (let index = 0; index < transferBatches; index++) {
-          let transferBufferData = chunk.data.slice(0, optimalTransferChunkSize);
-          if (transferBufferData.byteLength > 0) {
-            TcpClient.sendBinaryData(transferBufferData, BinaryMessageType.FILE_CHUNK);
-          }
-          chunk.data = chunk.data.slice(optimalTransferChunkSize)
-        }
-      }
-
-      // 4. 发送文件结束消息
-      const endMessage: FileEndMessage = {
-        fileName: fileVo.name,
-        fileSize: fileVo.size,
-        totalChunks: totalChunks,
-      };
-      TcpClient.sendBinaryData(BinaryProtocolCodec.encodeBinaryProtocolMessage(endMessage),
-        BinaryMessageType.FILE_END);
-      if (this.fileTransferCallback.onComplete) {
-        this.fileTransferCallback.onComplete(fileVo)
-      }
-    } catch (error) {
-      console.error('文件发送失败:', JSON.stringify(error));
-    } finally {
-      streamReader?.destroy() // 销毁流式读取器
-    }
+    TcpClient.sendFileData(fileVo)
   }
 }
 

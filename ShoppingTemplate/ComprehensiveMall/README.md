@@ -14,15 +14,18 @@
 
 本模板提供如下组件，所有组件存放在工程根目录的components下，如果您仅需使用组件，可参考对应组件的指导链接；如果您使用此模板，请参考本文档。
 
-| 组件                                   | 描述                                                         | 使用指导                                                 |
-| -------------------------------------- | ------------------------------------------------------------ | -------------------------------------------------------- |
-| 地址管理组件（module_address_manage）  | 提供新增/编辑/删除地址相关的场景化组件                       | [使用指导](./components/module_address_manage/README.md) |
-| 商城优惠券组件（module_coupons）       | 提供了优惠券的浏览、选择能力                                 | [使用指导](./components/module_coupons/README.md)        |
-| 商品详情组件（module_product_detail）  | 提供商品详情组件，支持详情展示和规格选择                     | [使用指导](./components/module_product_detail/README.md) |
-| 商品搜索组件（module_product_search）  | 提供了查看并编辑搜索历史，查看并刷新推荐关键词，查看热搜榜的搜索页面组件 | [使用指导](./components/module_product_search/README.md) |
-| 商品分享组件（module_product_share）   | 支持保存商品为海报，复制商品链接，拉起华为系统分享和碰一碰分享功能 | [使用指导](./components/module_product_share/README.md)  |
-| 商城购物车组件（module_shopping_cart） | 提供了购物车商品列表展示，商品选择、删除、增减商品数量、查看明细、结算等相关功能的场景化组件 | [使用指导](./components/module_shopping_cart/README.md)  |
-| 商品评价组件（module_product_review）  | 提供商品评价功能，支持评定星级、填写评价、上传图片。         | [使用指导](./components/module_product_review/README.md) |
+| 组件                                       | 描述                                                         | 使用指导                                                     |
+| ------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| 地址管理组件（module_address_manage）      | 提供新增/编辑/删除地址相关的场景化组件                       | [使用指导](./components/module_address_manage/README.md)     |
+| 商城优惠券组件（module_coupons）           | 提供了优惠券的浏览、选择能力                                 | [使用指导](./components/module_coupons/README.md)            |
+| 商品详情组件（module_product_detail）      | 提供商品详情组件，支持详情展示和规格选择                     | [使用指导](./components/module_product_detail/README.md)     |
+| 商品搜索组件（module_product_search）      | 提供了查看并编辑搜索历史，查看并刷新推荐关键词，查看热搜榜的搜索页面组件 | [使用指导](./components/module_product_search/README.md)     |
+| 商品分享组件（module_product_share）       | 支持保存商品为海报，复制商品链接，拉起华为系统分享和碰一碰分享功能 | [使用指导](./components/module_product_share/README.md)      |
+| 商城购物车组件（module_shopping_cart）     | 提供了购物车商品列表展示，商品选择、删除、增减商品数量、查看明细、结算等相关功能的场景化组件 | [使用指导](./components/module_shopping_cart/README.md)      |
+| 商品评价组件（module_product_review）      | 提供商品评价功能，支持评定星级、填写评价、上传图片。         | [使用指导](./components/module_product_review/README.md)     |
+| 客服聊天组件（module_custom_service_chat） | 提供客服聊天组件，提供原生的聊天交互界面。                   | [使用指导](./components/module_custom_service_chat/README.md) |
+| 商品筛选组件（module_product_filter）      | 提供了根据筛选条件对商品进行筛选的功能。                         | [使用指导](./components/module_product_filter/README.md)     |
+| 商品识别组件（module_product_scan）        | 支持扫描商品条码/二维码，拍摄商品图片并获取返回结果。        | [使用指导](./components/module_product_scan/README.md)       |
 
 本模板为综合商城应用提供了常用功能的开发样例，模板主要分首页、分类、购物车、和我的四大模块：
 
@@ -57,6 +60,7 @@
  |              ├── 加入购物车
  |              └── 发起预下单
  ├── 分类
+ |    ├── 分类二级页
  |    ├── 商品搜索
  |    └── 商品分类浏览
  ├── 购物车
@@ -66,9 +70,10 @@
  └── 我的
       ├── 账号登录
       ├── 个人信息展示
+      ├── 签到/积分兑换
       ├── 订单管理
-      ├── 地址管理
-      └── 联系客服
+      ├── 优惠券/收藏/消息/地址管理
+      └── 浏览历史/意见反馈/联系客服/设置
 ```
 
 本模板工程代码结构如下所示：
@@ -76,14 +81,7 @@
 ```ts
 ├── commons
 │   ├──lib_foundation/src/main/ets                // 应用基础工具包
-│   │   ├── basecomponents                        // 基础组件
-│   │   │   └── TitleBar.ets                      // 标题栏组件
 │   │   ├── constants                             // 常量定义
-│   │   ├── featurecomponents                     // 场景组件
-│   │   │   ├── callbutton                        // 拨号组件
-│   │   │   ├── dialog                            // 弹窗封装
-│   │   │   ├── search                            // 搜索组件
-│   │   │   └── tabsswiper                        // 标题栏组件
 │   │   ├── models                                // 数据模型定义
 │   │   ├── types                                 // 数据接口定义
 │   │   └── utils
@@ -92,64 +90,83 @@
 │   │       ├── resmanage                         // 资源处理工具
 │   │       └── routerstack                       // 路由工具
 │   │
-│   └── lib_network/src/main/ets
-│       ├── api
-│       │   ├── CardList.ets                      // 卡片列表相关请求封装
-│       │   ├── Cart.ets                          // 购物车相关请求封装
-│       │   ├── Homepage.ets                      // 首页相关请求封装
-│       │   ├── Order.ets                         // 订单相关请求封装
-│       │   ├── Product.ets                       // 商品相关请求封装
-│       │   ├── Search.ets                        // 搜索相关请求封装
-│       │   └── User.ets                          // 用户相关请求封装
-│       ├── mock
-│       │   ├── MockDatabase.ets                  // Mock 模拟数据库
-│       │   └── MockDataMgr.ets                   // Mock 数据管理类
-│       ├── utils
-│       │   ├── MathUtil.ets                      // 数学工具类
-│       │   └── MockUtil.ets                      // Mock 工具类
-│       ├── HttpClient.ets                        // Http 客户端
-│       └── MockServer.ets                        // Mock 服务器
+│   │── lib_network/src/main/ets
+│   │   ├── constants                             // 常量
+│   │   ├── https                                 // 网络请求封装
+│   │   ├── httpsmock                             // 网络请求本地mock
+│   │   └── types                                 // 网络请求、响应数据类型
+│   │
+│   └── lib_widget/src/main/ets/components
+│       ├── CommonButton                          // 通用按钮组件
+│       ├── CommonConfirmDialog                   // 通用确认弹窗
+│       ├── CommonLoading                         // 通用加载标识
+│       ├── CommonScroll                          // 通用滚动容器
+│       ├── CommonSymbol                          // 通用Symbol图标
+│       ├── ContainerColumn                       // 通用Column容器
+│       ├── CustomService                         // 通用客服联系弹窗
+│       └── NavTitleBar                           // 通用页面标题栏
 │
 ├── components
+│   ├── app_setting                               // 应用设置组件
 │   ├── module_address_manage                     // 地址管理组件
 │   ├── module_coupons                            // 优惠券组件
+│   ├── module_custom_service                     // 客服聊天组件
+│   ├── module_feedback                           // 意见反馈组件
 │   ├── module_login                              // 登录组件
+│   ├── module_notice_center                      // 消息中心组件
 │   ├── module_privacy_agreement                  // 协议授权组件
+│   ├── module_product_category                   // 商品分类组件
 │   ├── module_product_detail                     // 商品详情组件
+│   ├── module_product_filter                     // 商品筛选组件
 │   ├── module_product_review                     // 商品评价组件
+│   ├── module_product_scan                       // 商品识别组件
 │   ├── module_product_search                     // 商品搜索组件
 │   ├── module_product_share                      // 商品分享组件
-│   ├── module_product_waterflow                  // 商品瀑布流
-│   └── module_shopping_cart                      // 购物车组件
+│   ├── module_product_cart                       // 购物车组件
+│   ├── module_transition                         // 一镜到底组件
+│   └── module_ui_base                            // 组件通用层
 │
-├── scenes                                        // 场景化模块
+├── features                                      // 场景化模块
+│    ├── member/src/main/ets                      // 会员
+│    │  └── views
+│    │      ├── MemberBenefitsPage.ets            // 会员福利页
+│    │      ├── PointsRecordPage.ets              // 积分记录页
+│    │      └── RedemptionSubmitPage.ets          // 积分兑换页
 │    ├── order/src/main/ets                       // 订单
 │    │  └── pages
 │    │      ├── OrderInfoPage.ets                 // 订单详情页
 │    │      ├── OrderListPage.ets                 // 订单列表页
-│    │      └── OrderSearchPage.ets               // 订单搜索页
+│    │      ├── OrderReviewCreatePage.ets         // 订单创建评价页
+│    │      ├── OrderReviewInfoPage.ets           // 订单查看评价页
+│    │      ├── OrderSearchPage.ets               // 订单搜索页
+│    │      └── UpdateAddressSheet.ets            // 更新地址页
+│    ├── product/src/main/ets                     // 商品
+│    │  └── views
+│    │      └── ProductSwiperPage.ets             // 商品推荐页
+│    ├── setting/src/main/ets                     // 设置
+│    │  └── views
+│    │      ├── AgreementPage.ets                 // 隐私政策&用户协议页
+│    │      ├── CouponPage.ets                    // 个人优惠券
+│    │      ├── EditProfilePage.ets               // 用户信息编辑
+│    │      ├── MyCollectionPage.ets              // 个人收藏页
+│    │      ├── SettingPage.ets                   // 设置页
+│    │      ├── SettingPrivacyPage.ets            // 隐私信息设置页
+│    │      └── ViewHistoryPage.ets               // 浏览记录页
 │    └──shopping/src/main/ets
 │       └── pages
-│           ├── CartPage.ets                      // 购物车页面
-│           ├── OrderSubmitPage.ets               // 订单提交页面
-│           ├── ProductInfoPage.ets               // 商品详情页面
-│           ├── ProductSearchPage.ets             // 商品搜索页面
-│           └── ProductSearchResultsPage.ets      // 商品搜索结果页面
+│           ├── CustomServicePage.ets             // 客服聊天页
+│           ├── OrderSubmitPage.ets               // 订单提交页
+│           ├── ProductInfoPage.ets               // 商品详情页
+│           ├── ProductSearchPage.ets             // 商品搜索页
+│           ├── ProductSearchResultsPage.ets      // 商品搜索结果页
+│           └── SubCategoryPage.ets               // 二级分类页
 │
 └── products
     └── entry/src/main/ets
-       ├── components
-       │   ├──HomePageContent.ets                 // 首页详情
-       │   └──IconTextTab.ets
-       ├── pages
-       │   ├── AgreementPage.ets                  // 隐私政策&用户协议页
-       │   ├── CategoryPage.ets                   // 分类页
-       │   ├── CouponPage.ets                     // 个人优惠券
-       │   ├── EditProfilePage.ets                // 用户信息编辑
-       │   ├── HomePage.ets                       // 首页
-       │   ├── Index.ets                          // 入口页
-       │   ├── ProfilePage.ets                    // 我的页
-       │   └── SettingPage.ets                    // 设置页
+       ├── views
+       │   ├── Index.ets                          // 应用启动根页面
+       │   ├── MainEntry.ets                      // 首页
+       │   └── SafePage.ets                       // 首启用户授权页
        └── widget                                 // 服务卡片
 
 ```
@@ -158,15 +175,15 @@
 
 ### 软件
 
-* DevEco Studio版本：DevEco Studio5.0.4 Release及以上
-* HarmonyOS SDK版本：HarmonyOS5.0.4 Release SDK及以上
-* 设备类型：华为手机（包括双折叠和阔折叠）
-* 系统版本：HarmonyOS 5.0.4(16)及以上
+- DevEco Studio版本：DevEco Studio 5.0.4 Release及以上
+- HarmonyOS SDK版本：HarmonyOS 5.0.4 Release SDK及以上
+- 设备类型：华为手机（包括双折叠和阔折叠）、华为平板
+- 系统版本：HarmonyOS 5.0.4(16)及以上
 
 ### 权限要求
 
-* 获取位置权限：ohos.permission.APPROXIMATELY_LOCATION，ohos.permission.LOCATION。
-* 网络权限：ohos.permission.INTERNET
+- 获取位置权限：ohos.permission.APPROXIMATELY_LOCATION，ohos.permission.LOCATION。
+- 网络权限：ohos.permission.INTERNET
 
 ## 快速入门
 
@@ -192,21 +209,25 @@
 
    华为支付当前仅支持商户接入，在使用服务前，需要完成商户入网、开发服务等相关配置，本模板仅提供了端侧集成的示例。详细参考：[支付服务接入准备](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/payment-preparations)。
 
-4. 配置华为账号收货地址管理服务。
+4. 配置地图服务。
+
+   a. 将应用的client ID配置到entry/src/main路径下的module.json5文件，如果华为账号服务已配置，可跳过此步骤。
+
+   b. [开通地图服务](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/map-config-agc)。
+
+5. 配置华为账号收货地址管理服务。
 
    当前模板的地址管理组件支持获取华为账号收货地址，使用此功能需满足一定条件。详细参考：[收货地址服务开发前提](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-choose-address-dev#section1061219267293)。
 
-5. 对应用进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing#section297715173233)。
+6. 对应用进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing#section297715173233)。
 
-6. 添加手工签名所用证书对应的公钥指纹。详细参考：[配置应用签名证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-cert-fingerprint-0000002278002933)
+7. 添加手工签名所用证书对应的公钥指纹。详细参考：[配置应用签名证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-cert-fingerprint-0000002278002933)
 
 ### 运行调试工程
 
 1. 连接调试手机和PC。
 
 2. 菜单选择“Run > Run 'entry' ”或者“Run > Debug 'entry' ”，运行或调试模板工程。
-
-
 
 ## 开源许可协议
 

@@ -63,9 +63,10 @@ export struct ModuleProductList {
           .fontSize(14)
           .fontWeight(this.currentIndex === index ? FontWeight.Bold : FontWeight.Regular)
           .margin({ top: 17, bottom: 7 })
-        Divider()
-          .strokeWidth(2)
-          .color('#E4480C')
+        Row()
+          .width('100%')
+          .height(2)
+          .backgroundColor('#E4480C')
           .opacity(this.currentIndex === index ? 1 : 0)
       }
       .width(56)

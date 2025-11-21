@@ -1,4 +1,7 @@
-import { ProductSkuItem } from '../../types/responses/ProductResponse';
+import {
+  ProductCardItem,
+  ProductSkuItem,
+} from '../../types/responses/ProductResponse';
 
 export class MockProductData {
   public static readonly PRODUCT_SKU_TABLE: ProductSkuItem[] = [
@@ -92,6 +95,318 @@ export class MockProductData {
       title: '休闲简约经典商务衬衫T恤日系风高级感',
       serviceDesc: '运费险｜7天无理由',
       price: 128,
+    },
+  ];
+  public static readonly PRODUCT_CARD_LIST: ProductCardItem[] = [
+    {
+      productId: 'product_10001',
+      categoryId: '1001_10001',
+      price: 188,
+      dashPrice: 200,
+      title: '时尚轻商务系列针织打底纯羊毛内搭',
+      banner: $r('app.media.mock_spec_pink'),
+      promotion: ['任选2件7.5折,任选3件7折'],
+      label: [
+        {
+          preset: 0,
+          data: '上新折扣',
+        },
+        {
+          preset: 1,
+          data: '热销爆款',
+        },
+      ],
+      summary: {
+        size: ['xs', 's', 'm', 'l', 'xl'],
+        minPrice: 188,
+        maxPrice: 200,
+        place: '中国',
+      },
+      sales: 3000, // 热销爆款且有折扣，销量最高
+    },
+    {
+      productId: 'product_10002',
+      categoryId: '1001_10002',
+      price: 188,
+      dashPrice: 200,
+      title: '时尚轻商务系列针织打底纯羊毛内搭',
+      banner: $r('app.media.mock_spec_white'),
+      promotion: [],
+      label: [],
+      summary: {
+        size: ['xs', 's', 'm', 'l', 'xl'],
+        minPrice: 188,
+        maxPrice: 200,
+        place: '中国',
+      },
+      sales: 800, // 普通商品，销量较低
+    },
+    {
+      productId: 'product_10003',
+      categoryId: '1001_10003',
+      price: 188,
+      dashPrice: 200,
+      title: '时尚轻商务系列针织打底纯羊毛内搭',
+      banner: $r('app.media.mock_spec_yellow'),
+      promotion: ['8.5折'],
+      label: [],
+      summary: {
+        size: ['xs', 's', 'm', 'l', 'xl'],
+        minPrice: 188,
+        maxPrice: 200,
+        place: '中国',
+      },
+      sales: 1500, // 有折扣，销量中等
+    },
+    {
+      productId: 'product_10004',
+      categoryId: '1001_10004',
+      price: 188,
+      dashPrice: 200,
+      title: '时尚轻商务系列针织打底纯羊毛内搭',
+      banner: $r('app.media.mock_spec_green'),
+      promotion: [],
+      label: [],
+      summary: {
+        size: ['xs', 's', 'm', 'l', 'xl'],
+        minPrice: 188,
+        maxPrice: 200,
+        place: '中国',
+      },
+      sales: 600, // 普通商品，销量较低
+    },
+    {
+      productId: 'product_10005',
+      categoryId: '1001_10001',
+      price: 188,
+      dashPrice: 200,
+      title: '时尚轻商务系列针织打底纯羊毛内搭',
+      banner: $r('app.media.mock_spec_pink'),
+      promotion: ['任选2件7.5折,任选3件7折'],
+      label: [
+        {
+          preset: 0,
+          data: '上新折扣',
+        },
+        {
+          preset: 1,
+          data: '热销爆款',
+        },
+      ],
+      summary: {
+        size: ['xs', 's', 'm', 'l', 'xl'],
+        minPrice: 188,
+        maxPrice: 200,
+        place: '中国',
+      },
+      sales: 3200, // 热销爆款且有折扣，销量最高
+    },
+    {
+      productId: 'product_10006',
+      categoryId: '1001_10002',
+      price: 188,
+      dashPrice: 200,
+      title: '时尚轻商务系列针织打底纯羊毛内搭',
+      banner: $r('app.media.mock_spec_white'),
+      promotion: [],
+      label: [],
+      summary: {
+        size: ['xs', 's', 'm', 'l', 'xl'],
+        minPrice: 188,
+        maxPrice: 200,
+        place: '中国',
+      },
+      sales: 700, // 普通商品，销量较低
+    },
+    {
+      productId: 'product_10007',
+      categoryId: '1001_10003',
+      price: 188,
+      dashPrice: 200,
+      title: '时尚轻商务系列针织打底纯羊毛内搭',
+      banner: $r('app.media.mock_spec_yellow'),
+      promotion: ['8.5折'],
+      label: [],
+      summary: {
+        size: ['xs', 's', 'm', 'l', 'xl'],
+        minPrice: 188,
+        maxPrice: 200,
+        place: '中国',
+      },
+      sales: 1300, // 有折扣，销量中等
+    },
+    {
+      productId: 'product_10008',
+      categoryId: '1001_10004',
+      price: 188,
+      dashPrice: 200,
+      title: '时尚轻商务系列针织打底纯羊毛内搭',
+      banner: $r('app.media.mock_spec_green'),
+      promotion: [],
+      label: [],
+      summary: {
+        size: ['xs', 's', 'm', 'l', 'xl'],
+        minPrice: 188,
+        maxPrice: 200,
+        place: '中国',
+      },
+      sales: 500, // 普通商品，销量较低
+    },
+    {
+      productId: 'product_20001',
+      categoryId: '1002_20001',
+      price: 98,
+      dashPrice: 128,
+      title: '休闲简约经典商务衬衫T恤日系风高级感',
+      banner: $r('app.media.mock2_spec_black'),
+      promotion: ['单件包邮'],
+      label: [
+        {
+          preset: 1,
+          data: '热销爆款',
+        },
+      ],
+      summary: {
+        size: ['s', 'm', 'l'],
+        minPrice: 98,
+        maxPrice: 128,
+        place: '中国',
+      },
+      sales: 2500, // 热销爆款，销量较高
+    },
+    {
+      productId: 'product_20002',
+      categoryId: '1002_20002',
+      price: 98,
+      dashPrice: 128,
+      title: '休闲简约经典商务衬衫T恤日系风高级感',
+      banner: $r('app.media.mock2_spec_blue'),
+      promotion: ['单件包邮'],
+      label: [
+        {
+          preset: 1,
+          data: '热销爆款',
+        },
+      ],
+      summary: {
+        size: ['s', 'm', 'l'],
+        minPrice: 98,
+        maxPrice: 128,
+        place: '中国',
+      },
+      sales: 2200, // 热销爆款，销量较高
+    },
+    {
+      productId: 'product_20003',
+      categoryId: '1002_20003',
+      price: 98,
+      dashPrice: 128,
+      title: '休闲简约经典商务衬衫T恤日系风高级感',
+      banner: $r('app.media.mock2_spec_shirt'),
+      promotion: [],
+      label: [],
+      summary: {
+        size: ['s', 'm', 'l'],
+        minPrice: 98,
+        maxPrice: 128,
+        place: '中国',
+      },
+      sales: 1800, // 普通商品，销量中等
+    },
+    {
+      productId: 'product_20004',
+      categoryId: '1002_20004',
+      price: 98,
+      dashPrice: 128,
+      title: '休闲简约经典商务衬衫T恤日系风高级感',
+      banner: $r('app.media.mock2_spec_white'),
+      promotion: [],
+      label: [],
+      summary: {
+        size: ['s', 'm', 'l'],
+        minPrice: 98,
+        maxPrice: 128,
+        place: '中国',
+      },
+      sales: 1500, // 普通商品，销量中等
+    },
+    {
+      productId: 'product_20005',
+      categoryId: '1002_20005',
+      price: 98,
+      dashPrice: 128,
+      title: '休闲简约经典商务衬衫T恤日系风高级感',
+      banner: $r('app.media.mock2_spec_black'),
+      promotion: ['单件包邮'],
+      label: [
+        {
+          preset: 1,
+          data: '热销爆款',
+        },
+      ],
+      summary: {
+        size: ['s', 'm', 'l'],
+        minPrice: 98,
+        maxPrice: 128,
+        place: '中国',
+      },
+      sales: 2800, // 热销爆款，销量最高
+    },
+    {
+      productId: 'product_20006',
+      categoryId: '1002_20006',
+      price: 98,
+      dashPrice: 128,
+      title: '休闲简约经典商务衬衫T恤日系风高级感',
+      banner: $r('app.media.mock2_spec_blue'),
+      promotion: ['单件包邮'],
+      label: [
+        {
+          preset: 1,
+          data: '热销爆款',
+        },
+      ],
+      summary: {
+        size: ['s', 'm', 'l'],
+        minPrice: 98,
+        maxPrice: 128,
+        place: '中国',
+      },
+      sales: 2400, // 热销爆款，销量较高
+    },
+    {
+      productId: 'product_20007',
+      categoryId: '1002_20007',
+      price: 98,
+      dashPrice: 128,
+      title: '休闲简约经典商务衬衫T恤日系风高级感',
+      banner: $r('app.media.mock2_spec_shirt'),
+      promotion: [],
+      label: [],
+      summary: {
+        size: ['s', 'm', 'l'],
+        minPrice: 98,
+        maxPrice: 128,
+        place: '中国',
+      },
+      sales: 1600, // 普通商品，销量中等
+    },
+    {
+      productId: 'product_20008',
+      categoryId: '1002_20008',
+      price: 98,
+      dashPrice: 128,
+      title: '休闲简约经典商务衬衫T恤日系风高级感',
+      banner: $r('app.media.mock2_spec_white'),
+      promotion: [],
+      label: [],
+      summary: {
+        size: ['s', 'm', 'l'],
+        minPrice: 98,
+        maxPrice: 128,
+        place: '中国',
+      },
+      sales: 1200, // 普通商品，销量较低
     },
   ];
 }

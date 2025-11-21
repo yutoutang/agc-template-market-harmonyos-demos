@@ -1,5 +1,5 @@
 import { SignInClass } from '../model/SignInModel'
-import { promptAction } from '@kit.ArkUI'
+import { promptAction, window } from '@kit.ArkUI'
 import { TYCard } from '../common/TYCard'
 import { abilityAccessCtrl, common, PermissionRequestResult } from '@kit.AbilityKit';
 import { advertising, identifier } from '@kit.AdsKit';
@@ -18,6 +18,8 @@ export struct LookAD {
   @Param adType:number = 7
   @Param award:string = '领看点'
   private context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
+  windowStage: window.WindowStage = AppStorage.get('windowStage') as window.WindowStage;
+  mainWin: window.Window = this.windowStage.getMainWindowSync();
 
   // 广告请求参数
   private adRequestParams: advertising.AdRequestParams = {
@@ -74,6 +76,11 @@ export struct LookAD {
               .backgroundColor(item.isClaim ? $r('sys.color.comp_background_tertiary') : 'rgba(236,110,69,0.1)')
               .onClick(() => {
                 this.handleButtonClick(item, index)
+                let sysBarProps: window.SystemBarProperties = {
+                  statusBarColor: '#00000000',
+                  statusBarContentColor: '#ffffff'
+                };
+                this.mainWin.setWindowSystemBarProperties(sysBarProps)
               })
           }
         }, (item: SignInClass) => item.coinNumber.toString())

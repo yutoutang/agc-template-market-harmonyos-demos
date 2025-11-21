@@ -1,553 +1,169 @@
-import { authentication, loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit';
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import * as wxopensdk from '@tencent/wechat_open_sdk';
+import { PersistenceV2, PromptAction } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { promptAction, router } from '@kit.ArkUI';
-import { connection } from '@kit.NetworkKit';
-import { util } from '@kit.ArkTS';
-import { CloudFunction, CloudFunctionResult, commonToast, UserInfo } from 'common';
+import {
+  AggregatedLogin,
+  Channel,
+  LoginController,
+  LoginChannelType,
+  ApiController,
+  LoginParams,
+  LoginType,
+} from 'aggregated_login';
+import { UserInfo, UserState } from 'common';
 
-@Component
+@ComponentV2
 export struct LoginWithHuaweiIDComponent {
-  @Consume('pageInfos') pageInfos: NavPathStack
-  logTag: string = 'QuickLoginButtonComponent';
-  @StorageLink('isLogin') isLogin: boolean = false;
-  domainId: number = 0x0000;
-  // 第二步获取的匿名化手机号传到此处
-  @State quickLoginAnonymousPhone: string = '';
-  // 是否勾选协议
-  @State isSelected: boolean = false;
-  // 华为账号用户认证协议链接，此处仅为示例，实际开发过程中，域名不建议硬编码在本地
-  private static USER_AUTHENTICATION_PROTOCOL: string =
-    '';
-  private static USER_SERVICE_TAG = '用户服务协议';
-  private static PRIVACY_TAG = '隐私协议';
+  promptAction: PromptAction = this.getUIContext().getPromptAction();
+  controller: LoginController = new LoginController()
+  navPathStack: NavPathStack = new NavPathStack()
+  // todo 需要传入应用申请到的AppID
+  wxApi = wxopensdk.WXAPIFactory.createWXAPI('xxx')
+  @Local userState: UserState = PersistenceV2.connect(UserState, () => new UserState())!;
 
   mockUserLogin() {
     /*
      * mock登录数据
      * */
-    let mockUserInfo: UserInfo = {
+    let mockUserInfo: UserInfo = new UserInfo({
+      'authCode': '',
       'idToken': '',
+      'openID': '',
       'userName': '华为用户',
-      'avatar': $r('app.media.avatar'),
+      'avatar': '',
       'phoneNumber': '123456xxxxx789',
-    }
-    AppStorage.setOrCreate('userInfo', mockUserInfo)
-    AppStorage.setOrCreate('isLogin', true)
-    let allPath = this.pageInfos.getAllPathName()
-    let currentPath = this.pageInfos.getIndexByName('LoginWithHuaweiIDComponent')
+    })
+    this.userState.userInfo = mockUserInfo
+    this.userState.isLogin = true
+    let allPath = this.navPathStack.getAllPathName()
+    let currentPath = this.navPathStack.getIndexByName('LoginWithHuaweiIDComponent')
     if (allPath[currentPath[currentPath.length-1] -1] === 'Login') {
-      this.pageInfos.clear();
+      this.navPathStack.clear();
       return
     }
-    this.pageInfos.pop();
+    this.navPathStack.pop();
   }
 
-  getQuickLoginAnonymousPhone() {
-    // 创建授权请求，并设置参数
-    const authRequest = new authentication.HuaweiIDProvider().createAuthorizationWithHuaweiIDRequest();
-    // 获取手机号需要传如下scope，传参数之前需要先申请对应scope权限,才能返回对应数据
-    authRequest.scopes = ['quickLoginAnonymousPhone'];
-    authRequest.permissions = ['serviceauthcode'];
-    // 用户是否需要登录授权，该值为true且用户未登录或未授权时，会拉起用户登录或授权页面
-    authRequest.forceAuthorization = false;
-    // 用于防跨站点请求伪造
-    authRequest.state = util.generateRandomUUID();
+  huaweiCountLogin(loginParams: LoginParams) {
+    // todo 拿到真实的authorizationCode换取登录信息,这里采用mock登录
+    this.mockUserLogin()
+  }
+
+  huaweiLogin = async (loginParams: LoginParams): Promise<void> => {
+    this.huaweiCountLogin(loginParams)
+    this.getUIContext().getPromptAction().showToast({ message: '华为一键登录成功' })
+  }
+  wxLogin = async (): Promise<void> => {
+    // todo:替换成微信登录成功之后正确的登录信息，这里是用mock替代
+    this.mockUserLogin()
+    this.getUIContext().getPromptAction().showToast({ message: '微信登录成功' })
+  }
+  verifyCodeLogin = async (loginParams: LoginParams): Promise<void> => {
     try {
-      const controller = new authentication.AuthenticationController(getContext(this));
-      controller.executeRequest(authRequest).then((response) => {
-        const authorizationWithHuaweiIDResponse = response as authentication.AuthorizationWithHuaweiIDResponse;
-        const state = authorizationWithHuaweiIDResponse.state;
-        if (state !== undefined && authRequest.state !== state) {
-          hilog.error(0x0000, 'testTag', `Failed to authorize. The state is different, response state: ${state}`);
-          return;
-        }
-        hilog.info(0x0000, 'testTag', 'Succeeded in authentication.');
-        const authorizationWithHuaweiIDCredential = authorizationWithHuaweiIDResponse.data!;
-        const code = authorizationWithHuaweiIDCredential.authorizationCode;
-        const unionID = authorizationWithHuaweiIDCredential.unionID;
-        const openID = authorizationWithHuaweiIDCredential.openID;
-        const anonymousPhone = authorizationWithHuaweiIDCredential?.extraInfo?.quickLoginAnonymousPhone as string;
-        if (anonymousPhone) {
-          hilog.info(0x0000, 'testTag', 'Succeeded in authentication.');
-          this.quickLoginAnonymousPhone = anonymousPhone;
-          return;
-        }
-        // 开发者处理code、unionID、openID
-      }).catch((err: BusinessError) => {
-        this.dealAllError(err);
-      });
-    } catch (error) {
-      this.dealAllError(error);
-    }
-  }
-
-  // 定义LoginWithHuaweiIDButton展示的隐私文本，展示应用的用户服务协议、隐私协议和华为账号用户认证协议
-  privacyText: loginComponentManager.PrivacyText[] = [{
-    text: '已阅读并同意',
-    type: loginComponentManager.TextType.PLAIN_TEXT,
-  }, {
-    text: '《用户服务协议》',
-    tag: LoginWithHuaweiIDComponent.USER_SERVICE_TAG,
-    type: loginComponentManager.TextType.RICH_TEXT,
-  },
-    {
-      text: '和',
-      type: loginComponentManager.TextType.PLAIN_TEXT,
-    }, {
-      text: '《隐私协议》',
-      tag: LoginWithHuaweiIDComponent.PRIVACY_TAG,
-      type: loginComponentManager.TextType.RICH_TEXT,
-    }];
-  // 构造LoginWithHuaweiIDButton组件的控制器
-  controller: loginComponentManager.LoginWithHuaweiIDButtonController =
-    new loginComponentManager.LoginWithHuaweiIDButtonController()
-      /**
-       * 当应用使用自定义的登录页时，如果用户未同意协议，需要设置协议状态为NOT_ACCEPTED，当用户同意协议后再设置
-       * 协议状态为ACCEPTED，才可以使用华为账号一键登录功能
-       */
-      .setAgreementStatus(loginComponentManager.AgreementStatus.NOT_ACCEPTED)
-      .onClickLoginWithHuaweiIDButton((error: BusinessError | undefined,
-        response: loginComponentManager.HuaweiIDCredential) => {
-        this.handleLoginWithHuaweiIDButton(error, response);
+      const data = await this.promptAction.showDialog({
+        title: '温馨提示',
+        message: '模拟验证码登录成功？',
+        buttons: [
+          { text: '取消', color: '#000000' },
+          { text: '确认', color: '#000000' },
+        ],
       })
-      .onClickEvent((error: BusinessError, clickEvent: loginComponentManager.ClickEvent) => {
-        if (error) {
-          this.dealAllError(error);
-          return;
-        }
-        hilog.info(this.domainId, this.logTag, `onClickEvent clickEvent: ${clickEvent}`);
-      });
-  agreementDialog: CustomDialogController = new CustomDialogController({
-    builder: AgreementDialog({
-      privacyText: this.privacyText,
-      cancel: () => {
-        this.agreementDialog.close();
-        this.controller.setAgreementStatus(loginComponentManager.AgreementStatus.NOT_ACCEPTED);
-      },
-      confirm: () => {
-        this.agreementDialog.close();
-        this.isSelected = true;
-        this.controller.setAgreementStatus(loginComponentManager.AgreementStatus.ACCEPTED);
-        // 调用此方法，同意协议与登录一并完成，无需再次点击登录按钮
-        this.controller.continueLogin((error: BusinessError) => {
-          if (error) {
-            hilog.error(this.domainId, this.logTag,
-              `Failed to click agreementDialog continueLogin. errCode is ${error.code}, errMessage is ${error.message}`);
-          } else {
-            hilog.info(this.domainId, this.logTag,
-              'Succeeded in clicking agreementDialog continueLogin.');
-          }
-        });
-      },
-      clickHyperlinkText: () => {
-        this.agreementDialog.close();
-      },
-    }),
-    autoCancel: false,
-    alignment: DialogAlignment.Center,
-  });
-
-  // 传递页面渲染所需的数据，如匿名手机号等
-  aboutToAppear(): void {
-    //   获取匿名手机号
-    this.getQuickLoginAnonymousPhone()
-  }
-
-  // Toast提示
-  showToast(resource: string) {
-    try {
-      promptAction.showToast({
-        message: resource,
-        duration: 2000,
-      });
-    } catch (error) {
-      const message = (error as BusinessError).message
-      const code = (error as BusinessError).code
-      hilog.error(this.domainId, this.logTag, `showToast args  errCode is ${code}, errMessage is ${message}`);
-    }
-  }
-
-  handleLoginWithHuaweiIDButton(error: BusinessError | undefined,
-    response: loginComponentManager.HuaweiIDCredential) {
-    if (error) {
-      hilog.error(this.domainId, this.logTag,
-        `Failed to click LoginWithHuaweiIDButton. errCode is ${error.code}, errMessage is ${error.message}`);
-      if(error.code === ErrorCode.ERROR_CODE_AGREEMENT_STATUS_NOT_ACCEPTED) {
-        // 未同意协议，弹出协议弹框，推荐使用该回调方式
-        this.agreementDialog.open();
-        return
-        }
-      this.mockUserLogin()
-      return;
-    }
-    try {
-      if (this.isSelected) {
-        if (response) {
-          commonToast.show({
-            type: 'loading',
-          })
-          hilog.info(this.domainId, this.logTag, 'Succeeded in clicking LoginWithHuaweiIDButton.');
-          // 开发者根据实际业务情况使用以下信息
-          const authCode = response.authorizationCode;
-          const openID = response.openID;
-          const unionID = response.unionID;
-          const idToken = response.idToken;
-          /*
-           * 获取到authCode之后，使用云函数获取用户信息,正常来说是拿AT给后台，后台利用AT调用rest api去拿正确的手机号
-           * 云函数、云数据库开发指导 https://developer.huawei.com/consumer/cn/doc/harmonyos-guides-V5/cloudfoundation-introduction-V5
-           * */
-          CloudFunction.getUserInfo(authCode).then((userInfo) => {
-            commonToast.hideAll()
-            if ((userInfo as CloudFunctionResult).result.ret.code === 0) {
-              AppStorage.setOrCreate('isLogin', true)
-              AppStorage.setOrCreate('userInfo', (userInfo as CloudFunctionResult).result.result[0])
-              AppStorage.setOrCreate('unionID', unionID)
-              /*
-               * 如果是登录跳转过来的 pop直接跳过登录
-               * */
-              let allPath = this.pageInfos.getAllPathName()
-              let currentPath = this.pageInfos.getIndexByName('LoginWithHuaweiIDComponent')
-              if (allPath[currentPath[currentPath.length-1] -1] === 'Login') {
-                this.pageInfos.clear();
-                return
-              }
-              this.pageInfos.pop();
-            }
-          }).catch((err: BusinessError) => {
-           this.mockUserLogin()
-            commonToast.hideAll()
-          })
-        }
-      } else {
-        this.agreementDialog.open();
+      // todo:替换成验证码登录成功之后正确的登录信息，这里是用mock替代
+      if (data.index === 1) {
+        this.getUIContext().getPromptAction().showToast({ message: '验证码登录成功' })
+        this.controller.clearLoginInfo();
+        this.navPathStack.clear();
+        this.mockUserLogin()
       }
     } catch (err) {
-      hilog.error(this.domainId, this.logTag,
-        `Failed to LoginWithHuaweiIDButton, errCode: ${err.code}, errMessage: ${err.message}`);
       this.mockUserLogin()
+      console.error('弹窗操作异常:', (err as BusinessError).message);
     }
   }
-
-  // 错误处理
-  dealAllError(error: BusinessError): void {
-    hilog.error(this.domainId, this.logTag,
-      `Failed to login, errorCode is ${error.code}, errorMessage is ${error.message}`);
+  obtainVerifyCode = async () => {
+    this.getUIContext().getPromptAction().showToast({ message: '获取验证码为模拟场景，真实获取验证码以业务实现为准' })
+  }
+  handleLoginFail = (loginChannelType: LoginChannelType, error: BusinessError | wxopensdk.BaseResp) => {
+    if (loginChannelType === LoginChannelType.HUAWEI) {
+      const businessError = error as BusinessError
+      const errorMsg = ERROR_MSG_MAP[businessError.code] ?? '未知错误。';
+      this.promptAction.showDialog({
+        title: '温馨提示',
+        message: '是否先模拟登录成功？',
+        buttons: [
+          { text: '取消', color: '#000000' },
+          { text: '确认', color: '#000000' },
+        ],
+      }, (err: BusinessError, data) => { // 按钮动作回调
+        // 根据按钮索引处理动作
+        if (data.index === 1) {
+          this.getUIContext().getPromptAction().showToast({ message: '华为一键登录成功' })
+          this.mockUserLogin()
+          this.controller.clearLoginInfo();
+        }
+      })
+      return;
+    }
   }
 
   build() {
     NavDestination() {
-      Scroll() {
-        Column() {
-          Column() {
-            Column() {
-              Image($r('app.media.ic_start_icon'))
-                .width(54)
-                .height(54)
-                .draggable(false)
-                .copyOption(CopyOptions.None)
-                .onComplete(() => {
-                  hilog.info(this.domainId, this.logTag, 'appIcon loading success.');
-                })
-                .onError(() => {
-                  hilog.error(this.domainId, this.logTag, 'appIcon loading fail.');
-                })
-
-              Text('政务模板')
-                .fontFamily($r('sys.string.ohos_id_text_font_family_medium'))
-                .fontWeight(FontWeight.Medium)
-                .fontWeight(FontWeight.Bold)
-                .maxFontSize($r('sys.float.ohos_id_text_size_headline8'))
-                .minFontSize($r('sys.float.ohos_id_text_size_body1'))
-                .maxLines(1)
-                .fontColor($r('sys.color.ohos_id_color_text_primary'))
-                .constraintSize({ maxWidth: '100%' })
-                .margin({
-                  top: 12,
-                })
-            }.margin({
-              top: 100,
-            })
-
-            Column() {
-              Text(this.quickLoginAnonymousPhone)
-                .fontSize(36)
-                .fontColor($r('sys.color.ohos_id_color_text_primary'))
-                .fontFamily($r('sys.string.ohos_id_text_font_family_medium'))
-                .fontWeight(FontWeight.Bold)
-                .lineHeight(48)
-                .textAlign(TextAlign.Center)
-                .maxLines(1)
-                .constraintSize({ maxWidth: '100%', minHeight: 48 })
-
-              Text('华为账号绑定号码')
-                .fontSize($r('sys.float.ohos_id_text_size_body2'))
-                .fontColor($r('sys.color.ohos_id_color_text_secondary'))
-                .fontFamily($r('sys.string.ohos_id_text_font_family_regular'))
-                .fontWeight(FontWeight.Regular)
-                .lineHeight(19)
-                .textAlign(TextAlign.Center)
-                .maxLines(1)
-                .constraintSize({ maxWidth: '100%' })
-                .margin({
-                  top: 8,
-                })
-            }.margin({
-              top: 64,
-            })
-
-            Column() {
-              LoginWithHuaweiIDButton({
-                params: {
-                  // LoginWithHuaweiIDButton支持的样式
-                  style: loginComponentManager.Style.BUTTON_RED,
-                  // 账号登录按钮在登录过程中展示加载态
-                  extraStyle: {
-                    buttonStyle: new loginComponentManager.ButtonStyle().loadingStyle({
-                      show: true,
-                    }),
-                  },
-                  // LoginWithHuaweiIDButton的边框圆角半径
-                  borderRadius: 24,
-                  // LoginWithHuaweiIDButton支持的登录类型
-                  loginType: loginComponentManager.LoginType.QUICK_LOGIN,
-                  // LoginWithHuaweiIDButton支持按钮的样式跟随系统深浅色模式切换
-                  supportDarkMode: true,
-                  // verifyPhoneNumber：如果华为账号用户在过去90天内未进行短信验证，是否拉起Account Kit提供的短信验证码页面
-                  verifyPhoneNumber: true,
-                },
-                controller: this.controller,
-              })
-            }
-            .height(40)
-            .margin({
-              top: 56,
-            })
-
-            Column() {
-              Column() {
-                Text($r('app.string.login_in_other'))
-                  .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
-                  .fontFamily($r('sys.string.ohos_id_text_font_family_medium'))
-                  .fontWeight(FontWeight.Medium)
-                  .fontSize($r('sys.float.ohos_id_text_size_button1'))
-                  .focusable(true)
-                  .focusOnTouch(true)
-                  .textOverflow({ overflow: TextOverflow.Ellipsis })
-                  .maxLines(1)
-                  .padding({ left: 8, right: 8 })
-              }
-              .backgroundColor($r('sys.color.ohos_id_color_button_normal'))
-              .constraintSize({ minHeight: 40 })
-              .justifyContent(FlexAlign.Center)
-              .borderRadius(16)
-              .width('100%')
-              .onClick(() => {
-                this.pageInfos.replacePathByName('Login', null)
-              })
-            }.margin({ top: 16 })
-          }.width('100%')
-
-          Row() {
-            Row() {
-              Checkbox({ name: 'privacyCheckbox', group: 'privacyCheckboxGroup' })
-                .width(24)
-                .height(24)
-                .focusable(true)
-                .focusOnTouch(true)
-                .select(this.isSelected)
-                .onChange((value: boolean) => {
-                  if (value) {
-                    this.isSelected = true;
-                    this.controller.setAgreementStatus(loginComponentManager.AgreementStatus.ACCEPTED);
-                  } else {
-                    this.isSelected = false;
-                    this.controller.setAgreementStatus(loginComponentManager.AgreementStatus.NOT_ACCEPTED);
-                  }
-                  hilog.info(this.domainId, this.logTag, `agreementChecked: ${value}`);
-                })
-            }
-
-            Row() {
-              Text() {
-                ForEach(this.privacyText, (item: loginComponentManager.PrivacyText) => {
-                  if (item?.type === loginComponentManager.TextType.PLAIN_TEXT && item?.text) {
-                    Span(item?.text)
-                      .fontColor($r('sys.color.ohos_id_color_text_secondary'))
-                      .fontFamily($r('sys.string.ohos_id_text_font_family_regular'))
-                      .fontWeight(FontWeight.Regular)
-                      .fontSize($r('sys.float.ohos_id_text_size_body3'))
-                  } else if (item?.type === loginComponentManager.TextType.RICH_TEXT && item?.text) {
-                    Span(item?.text)
-                      .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
-                      .fontFamily($r('sys.string.ohos_id_text_font_family_medium'))
-                      .fontWeight(FontWeight.Medium)
-                      .fontSize($r('sys.float.ohos_id_text_size_body3'))
-                      .focusable(true)
-                      .focusOnTouch(true)
-                      .onClick(() => {
-                        // 应用需要根据item.tag实现协议页面的跳转逻辑
-                        hilog.info(this.domainId, this.logTag, `click privacy text tag: ${item.tag}`);
-                        // 华为账号用户认证协议
-                        if (item.tag === LoginWithHuaweiIDComponent.USER_SERVICE_TAG) {
-                          this.pageInfos.pushPathByName('TermsOfServicePage', null)
-                        } else {
-                          this.pageInfos.pushPathByName('PrivacyPolicyPage', null)
-                        }
-                      })
-                  }
-                }, (item: loginComponentManager.PrivacyText, index: number) => `${item.text}_${index}}`)
-              }
-              .width('100%')
-            }
-            .margin({ left: 12 })
-            .layoutWeight(1)
-            .constraintSize({ minHeight: 24 })
-          }
-          .alignItems(VerticalAlign.Center)
-          .margin({
-            bottom: Number(AppStorage.get('bottomRectHeight')),
-          })
-        }
-        .justifyContent(FlexAlign.SpaceBetween)
-        .constraintSize({ minHeight: '100%' })
-        .margin({
-          left: 16,
-          right: 16,
-        })
+      Column() {
+        // 登录使用
+        AggregatedLogin({
+          wxApi: this.wxApi,
+          routerModule: this.navPathStack,
+          icon: $r('app.media.ic_start_icon'), // todo 需要替换为开发者所需的图像资源文件。
+          themeColor: '#0A59F7',
+          isSheet: false,
+          autoSheet: false,
+          isPersistence: false,
+          loginTypes: [new Channel(LoginType.WECHAT, '微信', {
+            appId: 'xxx',
+            scope: 'snsapi_userinfo,snsapi_friend,snsapi_message,snsapi_contact',
+            transaction: 'test123',
+            state: 'none',
+          }, $r('app.media.wx_count'))],
+          privacyContent: [{
+            privacyLabel: '《用户协议》',
+            privacyUrl: ProtocolData.termOfServiceProtocol,
+            privacyTag: '用户协议',
+          }, {
+            privacyLabel: '《xxxx隐私政策》',
+            privacyUrl: ProtocolData.privacyProtocol,
+            privacyTag: '隐私政策',
+          }, {
+            privacyLabel: '《华为账号用户认证协议》',
+            privacyUrl: ProtocolData.huaweiUserProtocol,
+            privacyTag: '华为账号用户认证协议',
+          }],
+          apiController: new ApiController(this.huaweiLogin, this.wxLogin, this.verifyCodeLogin),
+          handleLoginFail: this.handleLoginFail,
+          obtainVerifyCode: this.obtainVerifyCode,
+          loginController: this.controller,
+        });
       }
-      .width('100%')
-      .height('100%')
-      .padding({
-        top: Number(AppStorage.get('topRectHeight')),
-      })
     }
+    .backgroundColor($r('sys.color.background_secondary'))
+    .padding({ top: Number(AppStorage.get('topRectHeight')), bottom: Number(AppStorage.get('bottomRectHeight')) })
     .hideTitleBar(true)
-    .padding({ top: Number(AppStorage.get('topRectHeight')) })
-  }
-}
-
-@CustomDialog
-export struct AgreementDialog {
-  logTag: string = 'AgreementDialog';
-  domainId: number = 0x0000;
-  dialogController?: CustomDialogController;
-  cancel: () => void = () => {
-  };
-  confirm: () => void = () => {
-  };
-  clickHyperlinkText: () => void = () => {
-  };
-  privacyText: loginComponentManager.PrivacyText[] = [];
-
-  build() {
-    Column() {
-      Row() {
-        Text('用户协议与隐私条款')
-          .id('loginPanel_agreement_dialog_privacy_title')
-          .maxFontSize($r('sys.float.ohos_id_text_size_headline8'))
-          .minFontSize($r('sys.float.ohos_id_text_size_body1'))
-          .fontColor($r('sys.color.ohos_id_color_text_primary'))
-          .fontFamily($r('sys.string.ohos_id_text_font_family_medium'))
-          .fontWeight(FontWeight.Bold)
-          .textAlign(TextAlign.Center)
-          .textOverflow({ overflow: TextOverflow.Ellipsis })
-          .maxLines(2)
-      }
-      .alignItems(VerticalAlign.Center)
-      .constraintSize({ minHeight: 56, maxWidth: 400 })
-      .margin({
-        left: $r('sys.float.ohos_id_max_padding_start'),
-        right: $r('sys.float.ohos_id_max_padding_start'),
-      })
-
-      Row() {
-        Text() {
-          ForEach(this.privacyText, (item: loginComponentManager.PrivacyText) => {
-            if (item?.type === loginComponentManager.TextType.PLAIN_TEXT && item?.text) {
-              Span(item?.text)
-                .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                .fontColor($r('sys.color.ohos_id_color_text_primary'))
-                .fontFamily($r('sys.string.ohos_id_text_font_family_regular'))
-                .fontWeight(FontWeight.Regular)
-            } else if (item?.type === loginComponentManager.TextType.RICH_TEXT && item?.text) {
-              Span(item?.text)
-                .fontSize($r('sys.float.ohos_id_text_size_body1'))
-                .fontColor('#CE0E2D')
-                .fontFamily($r('sys.string.ohos_id_text_font_family_medium'))
-                .fontWeight(FontWeight.Medium)
-                .focusable(true)
-                .focusOnTouch(true)
-            }
-          }, (item: loginComponentManager.PrivacyText, index: number) => `${item.text}_${index}}`)
-        }
-        .width('100%')
-        .textOverflow({ overflow: TextOverflow.Ellipsis })
-        .maxLines(10)
-        .textAlign(TextAlign.Start)
-        .focusable(true)
-        .focusOnTouch(true)
-        .padding({ left: 24, right: 24 })
-      }.width('100%')
-
-      Flex({
-        direction: FlexDirection.Row,
-      }) {
-        Button('取消',
-          { type: ButtonType.Capsule, stateEffect: true })
-          .id('loginPanel_agreement_cancel_btn')
-          .fontColor($r('sys.color.font_emphasize'))
-          .fontSize($r('sys.float.ohos_id_text_size_button1'))
-          .fontFamily($r('sys.string.ohos_id_text_font_family_medium'))
-          .backgroundColor(Color.Transparent)
-          .fontWeight(FontWeight.Medium)
-          .focusable(true)
-          .focusOnTouch(true)
-          .constraintSize({ minHeight: 40, maxWidth: 400 })
-          .width('50%')
-          .onClick(() => {
-            hilog.info(this.domainId, this.logTag, 'AgreementDialog cancel.');
-            this.cancel();
-          })
-
-        Button('同意并登录',
-          { type: ButtonType.Capsule, stateEffect: true })
-          .id('loginPanel_agreement_dialog_huawei_id_login_btn')
-          .fontColor($r('sys.color.font_on_primary'))
-          .backgroundColor($r('sys.color.comp_background_emphasize'))
-          .fontSize($r('sys.float.ohos_id_text_size_button1'))
-          .fontFamily($r('sys.string.ohos_id_text_font_family_medium'))
-          .fontWeight(FontWeight.Medium)
-          .focusable(true)
-          .focusOnTouch(true)
-          .constraintSize({ minHeight: 40, maxWidth: 400 })
-          .width('50%')
-          .onClick(() => {
-            hilog.info(this.domainId, this.logTag, 'AgreementDialog confirm.');
-            this.confirm();
-          })
-      }
-      .margin({
-        top: 8,
-        left: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
-        right: $r('sys.float.ohos_id_elements_margin_horizontal_l'),
-        bottom: 16,
-      })
-    }
-    .padding({
-      left: 16,
-      right: 16,
+    .onReady((context: NavDestinationContext) => {
+      this.navPathStack = context.pathStack;
     })
   }
 }
 
-export enum ErrorCode {
-  // 账号未登录
-  ERROR_CODE_LOGIN_OUT = 1001502001,
-  // 该账号不支持一键登录，如儿童账号、海外账号
-  ERROR_CODE_NOT_SUPPORTED = 1001500003,
-  // 网络错误
-  ERROR_CODE_NETWORK_ERROR = 1001502005,
-  // 用户未同意用户协议
-  ERROR_CODE_AGREEMENT_STATUS_NOT_ACCEPTED = 1005300001
+export class ProtocolData {
+  static termOfServiceProtocol: string =
+    '<html lang="zh-CN" id="container"><head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>用户协议</title>\n    <style type="text/tailwindcss">\n        @layer utilities {\n            .content-auto {\n                content-visibility: auto;\n            }\n            .scrollbar-hide {\n                -ms-overflow-style: none;\n                scrollbar-width: none;\n            }\n            .scrollbar-hide::-webkit-scrollbar {\n                display: none;\n            }\n            .text-balance {\n                text-wrap: balance;\n            }\n        }\n    </style>\n</head>\n<body class="font-inter bg-gray-50 text-gray-800 min-h-screen flex flex-col">\n    <header class="bg-white shadow-sm sticky top-0 z-10 transition-all duration-300">\n        <div class="container mx-auto px-4 py-4 flex justify-between items-center">\n            <div class="flex items-center space-x-2">\n                <i class="fa fa-file-text-o text-primary text-2xl"></i>\n                <h1 class="text-xl font-bold text-gray-800">用户协议</h1>\n            </div>\n        </div>\n    </header>\n\n    <main class="flex-grow container mx-auto px-4 py-8">\n        <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg">\n            <div class="p-6 md:p-8">\n                <div class="mb-8">\n                    <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-gray-900 mb-4 text-balance">服务条款</h2>\n                    <p class="text-gray-600">请仔细阅读以下条款，使用我们的服务即表示您同意这些条款。</p>\n                </div>\n\n                <div class="space-y-8">\n                    <section id="section1" class="scroll-mt-20">\n                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">\n                            <span class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">1</span>\n                            服务概述\n                        </h3>\n                        <p class="text-gray-600 leading-relaxed mb-4">\n                            我们通过网站及移动应用（以下统称"服务"）为用户提供信息、工具和服务。这些服务可能包括但不限于内容浏览、社交互动、交易服务和个性化推荐。\n                        </p>\n                        <p class="text-gray-600 leading-relaxed">\n                            我们保留随时修改或停止服务的权利，而无需事先通知您。我们不会对您或任何第三方因服务的修改、暂停或终止而遭受的任何损失承担责任。\n                        </p>\n                    </section>\n\n                    <section id="section2" class="scroll-mt-20">\n                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">\n                            <span class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">2</span>\n                            用户账号\n                        </h3>\n                        <p class="text-gray-600 leading-relaxed mb-4">\n                            使用我们的服务可能需要您创建一个账号。您同意提供准确、完整和最新的个人信息，并维护和及时更新这些信息。\n                        </p>\n                        <p class="text-gray-600 leading-relaxed">\n                            您对您账号下发生的所有活动负责。如果您发现任何未经授权使用您账号的情况，您应立即通知我们。您不得将您的账号转让给任何第三方。\n                        </p>\n                    </section>\n\n                    <section id="section3" class="scroll-mt-20">\n                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">\n                            <span class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">3</span>\n                            隐私政策\n                        </h3>\n                        <p class="text-gray-600 leading-relaxed mb-4">\n                            我们重视您的隐私，并根据我们的隐私政策收集、使用和保护您的个人信息。使用我们的服务即表示您同意我们按照该隐私政策处理您的信息。\n                        </p>\n                        <p class="text-gray-600 leading-relaxed">\n                            我们可能会更新我们的隐私政策，建议您定期查看。继续使用我们的服务即表示您同意这些更新。\n                        </p>\n                    </section>\n\n                    <section id="section4" class="scroll-mt-20">\n                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">\n                            <span class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">4</span>\n                            内容使用\n                        </h3>\n                        <p class="text-gray-600 leading-relaxed mb-4">\n                            我们服务中提供的内容（包括但不限于文本、图形、图像、视频、音频）受版权、商标和其他知识产权法律的保护。\n                        </p>\n                        <p class="text-gray-600 leading-relaxed">\n                            您可以为个人非商业用途查看和使用这些内容，但未经我们明确书面许可，不得复制、修改、分发、传输或创建衍生作品。\n                        </p>\n                    </section>\n\n                    <section id="section5" class="scroll-mt-20">\n                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">\n                            <span class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">5</span>\n                            用户行为\n                        </h3>\n                        <p class="text-gray-600 leading-relaxed mb-4">\n                            您同意不利用我们的服务从事非法活动，或促进、鼓励任何非法活动。您不得干扰或破坏服务的正常运行，或试图访问未授权的系统或数据。\n                        </p>\n                        <p class="text-gray-600 leading-relaxed">\n                            您不得在服务中发布或传播垃圾邮件、病毒、恶意软件或任何其他有害内容。您不得收集或存储其他用户的个人信息。\n                        </p>\n                    </section>\n\n                    <section id="section6" class="scroll-mt-20">\n                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">\n                            <span class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">6</span>\n                            免责声明\n                        </h3>\n                        <p class="text-gray-600 leading-relaxed mb-4">\n                            我们的服务按"原样"提供，不附带任何形式的明示或暗示保证，包括但不限于适销性、特定用途适用性和不侵权的保证。\n                        </p>\n                        <p class="text-gray-600 leading-relaxed">\n                            在适用法律允许的最大范围内，我们不对因使用或无法使用服务而导致的任何直接、间接、偶然、特殊、惩罚性或后果性损害承担责任。\n                        </p>\n                    </section>\n\n                    <section id="section7" class="scroll-mt-20">\n                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">\n                            <span class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">7</span>\n                            法律适用与争议解决\n                        </h3>\n                        <p class="text-gray-600 leading-relaxed mb-4">\n                            本协议受[具体司法管辖区]法律管辖。因本协议引起的或与本协议有关的任何争议，应通过双方友好协商解决；协商不成的，任何一方均有权将争议提交[具体仲裁机构或法院]解决。\n                        </p>\n                        <p class="text-gray-600 leading-relaxed">\n                            如果本协议的任何条款被认定为无效或不可执行，该条款应被删除或修改，而其余条款应继续有效。\n                        </p>\n                    </section>\n\n                    <section id="section8" class="scroll-mt-20">\n                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">\n                            <span class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">8</span>\n                            协议更新\n                        </h3>\n                        <p class="text-gray-600 leading-relaxed mb-4">\n                            我们可能会不时更新本服务条款。当我们进行重大更改时，我们将通过在我们的网站上发布新的服务条款通知您，并且在某些情况下，我们可能会通过电子邮件或其他通信方式通知您。\n                        </p>\n                        <p class="text-gray-600 leading-relaxed">\n                            您继续使用我们的服务即表示您接受这些更新。我们鼓励您定期查看本服务条款。\n                        </p>\n                    </section>\n                </div>\n            </div>\n        </div>\n    </main>\n\n\n    </body></html>'
+  static privacyProtocol: string =
+    '<html lang="zh-CN" id="container"><head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>隐私协议</title>\n    <style type="text/tailwindcss">\n        @layer utilities {\n            .content-auto {\n                content-visibility: auto;\n            }\n            .scrollbar-hide {\n                -ms-overflow-style: none;\n                scrollbar-width: none;\n            }\n            .scrollbar-hide::-webkit-scrollbar {\n                display: none;\n            }\n            .text-balance {\n                text-wrap: balance;\n            }\n        }\n    </style>\n</head>\n<body class="font-inter bg-gray-50 text-gray-800 min-h-screen flex flex-col">\n    <header class="bg-white shadow-sm sticky top-0 z-10 transition-all duration-300">\n        <div class="container mx-auto px-4 py-4 flex justify-between items-center">\n            <div class="flex items-center space-x-2">\n                <i class="fa fa-file-text-o text-primary text-2xl"></i>\n                <h1 class="text-xl font-bold text-gray-800">隐私协议</h1>\n            </div>\n        </div>\n    </header>\n\n    <main class="flex-grow container mx-auto px-4 py-8">\n        <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg">\n            <div class="p-6 md:p-8">\n                <div class="mb-8">\n                    <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-gray-900 mb-4 text-balance">服务条款</h2>\n                    <p class="text-gray-600">请仔细阅读以下条款，使用我们的服务即表示您同意这些条款。</p>\n                </div>\n\n                <div class="space-y-8">\n                    <section id="section1" class="scroll-mt-20">\n                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">\n                            <span class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">1</span>\n                            服务概述\n                        </h3>\n                        <p class="text-gray-600 leading-relaxed mb-4">\n                            我们通过网站及移动应用（以下统称"服务"）为用户提供信息、工具和服务。这些服务可能包括但不限于内容浏览、社交互动、交易服务和个性化推荐。\n                        </p>\n                        <p class="text-gray-600 leading-relaxed">\n                            我们保留随时修改或停止服务的权利，而无需事先通知您。我们不会对您或任何第三方因服务的修改、暂停或终止而遭受的任何损失承担责任。\n                        </p>\n                    </section>\n\n                    <section id="section2" class="scroll-mt-20">\n                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">\n                            <span class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">2</span>\n                            用户账号\n                        </h3>\n                        <p class="text-gray-600 leading-relaxed mb-4">\n                            使用我们的服务可能需要您创建一个账号。您同意提供准确、完整和最新的个人信息，并维护和及时更新这些信息。\n                        </p>\n                        <p class="text-gray-600 leading-relaxed">\n                            您对您账号下发生的所有活动负责。如果您发现任何未经授权使用您账号的情况，您应立即通知我们。您不得将您的账号转让给任何第三方。\n                        </p>\n                    </section>\n\n                    <section id="section3" class="scroll-mt-20">\n                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">\n                            <span class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">3</span>\n                            隐私政策\n                        </h3>\n                        <p class="text-gray-600 leading-relaxed mb-4">\n                            我们重视您的隐私，并根据我们的隐私政策收集、使用和保护您的个人信息。使用我们的服务即表示您同意我们按照该隐私政策处理您的信息。\n                        </p>\n                        <p class="text-gray-600 leading-relaxed">\n                            我们可能会更新我们的隐私政策，建议您定期查看。继续使用我们的服务即表示您同意这些更新。\n                        </p>\n                    </section>\n\n                    <section id="section4" class="scroll-mt-20">\n                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">\n                            <span class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">4</span>\n                            内容使用\n                        </h3>\n                        <p class="text-gray-600 leading-relaxed mb-4">\n                            我们服务中提供的内容（包括但不限于文本、图形、图像、视频、音频）受版权、商标和其他知识产权法律的保护。\n                        </p>\n                        <p class="text-gray-600 leading-relaxed">\n                            您可以为个人非商业用途查看和使用这些内容，但未经我们明确书面许可，不得复制、修改、分发、传输或创建衍生作品。\n                        </p>\n                    </section>\n\n                    <section id="section5" class="scroll-mt-20">\n                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">\n                            <span class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">5</span>\n                            用户行为\n                        </h3>\n                        <p class="text-gray-600 leading-relaxed mb-4">\n                            您同意不利用我们的服务从事非法活动，或促进、鼓励任何非法活动。您不得干扰或破坏服务的正常运行，或试图访问未授权的系统或数据。\n                        </p>\n                        <p class="text-gray-600 leading-relaxed">\n                            您不得在服务中发布或传播垃圾邮件、病毒、恶意软件或任何其他有害内容。您不得收集或存储其他用户的个人信息。\n                        </p>\n                    </section>\n\n                    <section id="section6" class="scroll-mt-20">\n                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">\n                            <span class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">6</span>\n                            免责声明\n                        </h3>\n                        <p class="text-gray-600 leading-relaxed mb-4">\n                            我们的服务按"原样"提供，不附带任何形式的明示或暗示保证，包括但不限于适销性、特定用途适用性和不侵权的保证。\n                        </p>\n                        <p class="text-gray-600 leading-relaxed">\n                            在适用法律允许的最大范围内，我们不对因使用或无法使用服务而导致的任何直接、间接、偶然、特殊、惩罚性或后果性损害承担责任。\n                        </p>\n                    </section>\n\n                    <section id="section7" class="scroll-mt-20">\n                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">\n                            <span class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">7</span>\n                            法律适用与争议解决\n                        </h3>\n                        <p class="text-gray-600 leading-relaxed mb-4">\n                            本协议受[具体司法管辖区]法律管辖。因本协议引起的或与本协议有关的任何争议，应通过双方友好协商解决；协商不成的，任何一方均有权将争议提交[具体仲裁机构或法院]解决。\n                        </p>\n                        <p class="text-gray-600 leading-relaxed">\n                            如果本协议的任何条款被认定为无效或不可执行，该条款应被删除或修改，而其余条款应继续有效。\n                        </p>\n                    </section>\n\n                    <section id="section8" class="scroll-mt-20">\n                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">\n                            <span class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">8</span>\n                            协议更新\n                        </h3>\n                        <p class="text-gray-600 leading-relaxed mb-4">\n                            我们可能会不时更新本服务条款。当我们进行重大更改时，我们将通过在我们的网站上发布新的服务条款通知您，并且在某些情况下，我们可能会通过电子邮件或其他通信方式通知您。\n                        </p>\n                        <p class="text-gray-600 leading-relaxed">\n                            您继续使用我们的服务即表示您接受这些更新。我们鼓励您定期查看本服务条款。\n                        </p>\n                    </section>\n                </div>\n            </div>\n        </div>\n    </main>\n\n\n    </body></html>'
+  static huaweiUserProtocol: string =
+    '<html lang="zh-CN" id="container"><head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>华为账号用户认证协议</title>\n    <style type="text/tailwindcss">\n        @layer utilities {\n            .content-auto {\n                content-visibility: auto;\n            }\n            .scrollbar-hide {\n                -ms-overflow-style: none;\n                scrollbar-width: none;\n            }\n            .scrollbar-hide::-webkit-scrollbar {\n                display: none;\n            }\n            .text-balance {\n                text-wrap: balance;\n            }\n        }\n    </style>\n</head>\n<body class="font-inter bg-gray-50 text-gray-800 min-h-screen flex flex-col">\n    <header class="bg-white shadow-sm sticky top-0 z-10 transition-all duration-300">\n        <div class="container mx-auto px-4 py-4 flex justify-between items-center">\n            <div class="flex items-center space-x-2">\n                <i class="fa fa-file-text-o text-primary text-2xl"></i>\n                <h1 class="text-xl font-bold text-gray-800">华为账号用户认证协议</h1>\n            </div>\n        </div>\n    </header>\n\n    <main class="flex-grow container mx-auto px-4 py-8">\n        <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg">\n            <div class="p-6 md:p-8">\n                <div class="mb-8">\n                    <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-gray-900 mb-4 text-balance">服务条款</h2>\n                    <p class="text-gray-600">请仔细阅读以下条款，使用我们的服务即表示您同意这些条款。</p>\n                </div>\n\n                <div class="space-y-8">\n                    <section id="section1" class="scroll-mt-20">\n                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">\n                            <span class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">1</span>\n                            服务概述\n                        </h3>\n                        <p class="text-gray-600 leading-relaxed mb-4">\n                            我们通过网站及移动应用（以下统称"服务"）为用户提供信息、工具和服务。这些服务可能包括但不限于内容浏览、社交互动、交易服务和个性化推荐。\n                        </p>\n                        <p class="text-gray-600 leading-relaxed">\n                            我们保留随时修改或停止服务的权利，而无需事先通知您。我们不会对您或任何第三方因服务的修改、暂停或终止而遭受的任何损失承担责任。\n                        </p>\n                    </section>\n\n                    <section id="section2" class="scroll-mt-20">\n                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">\n                            <span class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">2</span>\n                            用户账号\n                        </h3>\n                        <p class="text-gray-600 leading-relaxed mb-4">\n                            使用我们的服务可能需要您创建一个账号。您同意提供准确、完整和最新的个人信息，并维护和及时更新这些信息。\n                        </p>\n                        <p class="text-gray-600 leading-relaxed">\n                            您对您账号下发生的所有活动负责。如果您发现任何未经授权使用您账号的情况，您应立即通知我们。您不得将您的账号转让给任何第三方。\n                        </p>\n                    </section>\n\n                    <section id="section3" class="scroll-mt-20">\n                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">\n                            <span class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">3</span>\n                            隐私政策\n                        </h3>\n                        <p class="text-gray-600 leading-relaxed mb-4">\n                            我们重视您的隐私，并根据我们的隐私政策收集、使用和保护您的个人信息。使用我们的服务即表示您同意我们按照该隐私政策处理您的信息。\n                        </p>\n                        <p class="text-gray-600 leading-relaxed">\n                            我们可能会更新我们的隐私政策，建议您定期查看。继续使用我们的服务即表示您同意这些更新。\n                        </p>\n                    </section>\n\n                    <section id="section4" class="scroll-mt-20">\n                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">\n                            <span class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">4</span>\n                            内容使用\n                        </h3>\n                        <p class="text-gray-600 leading-relaxed mb-4">\n                            我们服务中提供的内容（包括但不限于文本、图形、图像、视频、音频）受版权、商标和其他知识产权法律的保护。\n                        </p>\n                        <p class="text-gray-600 leading-relaxed">\n                            您可以为个人非商业用途查看和使用这些内容，但未经我们明确书面许可，不得复制、修改、分发、传输或创建衍生作品。\n                        </p>\n                    </section>\n\n                    <section id="section5" class="scroll-mt-20">\n                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">\n                            <span class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">5</span>\n                            用户行为\n                        </h3>\n                        <p class="text-gray-600 leading-relaxed mb-4">\n                            您同意不利用我们的服务从事非法活动，或促进、鼓励任何非法活动。您不得干扰或破坏服务的正常运行，或试图访问未授权的系统或数据。\n                        </p>\n                        <p class="text-gray-600 leading-relaxed">\n                            您不得在服务中发布或传播垃圾邮件、病毒、恶意软件或任何其他有害内容。您不得收集或存储其他用户的个人信息。\n                        </p>\n                    </section>\n\n                    <section id="section6" class="scroll-mt-20">\n                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">\n                            <span class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">6</span>\n                            免责声明\n                        </h3>\n                        <p class="text-gray-600 leading-relaxed mb-4">\n                            我们的服务按"原样"提供，不附带任何形式的明示或暗示保证，包括但不限于适销性、特定用途适用性和不侵权的保证。\n                        </p>\n                        <p class="text-gray-600 leading-relaxed">\n                            在适用法律允许的最大范围内，我们不对因使用或无法使用服务而导致的任何直接、间接、偶然、特殊、惩罚性或后果性损害承担责任。\n                        </p>\n                    </section>\n\n                    <section id="section7" class="scroll-mt-20">\n                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">\n                            <span class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">7</span>\n                            法律适用与争议解决\n                        </h3>\n                        <p class="text-gray-600 leading-relaxed mb-4">\n                            本协议受[具体司法管辖区]法律管辖。因本协议引起的或与本协议有关的任何争议，应通过双方友好协商解决；协商不成的，任何一方均有权将争议提交[具体仲裁机构或法院]解决。\n                        </p>\n                        <p class="text-gray-600 leading-relaxed">\n                            如果本协议的任何条款被认定为无效或不可执行，该条款应被删除或修改，而其余条款应继续有效。\n                        </p>\n                    </section>\n\n                    <section id="section8" class="scroll-mt-20">\n                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">\n                            <span class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">8</span>\n                            协议更新\n                        </h3>\n                        <p class="text-gray-600 leading-relaxed mb-4">\n                            我们可能会不时更新本服务条款。当我们进行重大更改时，我们将通过在我们的网站上发布新的服务条款通知您，并且在某些情况下，我们可能会通过电子邮件或其他通信方式通知您。\n                        </p>\n                        <p class="text-gray-600 leading-relaxed">\n                            您继续使用我们的服务即表示您接受这些更新。我们鼓励您定期查看本服务条款。\n                        </p>\n                    </section>\n                </div>\n            </div>\n        </div>\n    </main>\n\n\n    </body></html>'
 }
+
+export const ERROR_MSG_MAP: Record<number, string> = {
+  1001502001: '用户未登录华为账号，请前往设置-登录华为账号。',
+  1001500001: '应用指纹证书校验失败，请检查client_id、应用指纹证书配置。',
+  1001502014: '应用未申请scopes或permissions权限。',
+};

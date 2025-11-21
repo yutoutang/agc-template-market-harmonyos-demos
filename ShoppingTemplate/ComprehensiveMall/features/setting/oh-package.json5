@@ -7,7 +7,9 @@
   "license": "Apache-2.0",
   "dependencies": {
     "lib_foundation": "file:../../commons/lib_foundation",
+    "lib_network": "file:../../commons/lib_network",
     "lib_widget": "file:../../commons/lib_widget",
-    "module_coupons": "file:../../components/module_coupons"
+    "module_coupons": "file:../../components/module_coupons",
+    "app_setting": "file:../../components/app_setting"
   }
 }

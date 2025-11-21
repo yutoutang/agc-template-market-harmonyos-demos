@@ -60,10 +60,6 @@
       "srcPath": "./components/module_address_manage"
     },
     {
-      "name": "module_product_waterflow",
-      "srcPath": "./components/module_product_waterflow"
-    },
-    {
       "name": "module_shopping_cart",
       "srcPath": "./components/module_shopping_cart"
     },
@@ -110,6 +106,42 @@
     {
       "name": "module_product_category",
       "srcPath": "./components/module_product_category"
+    },
+    {
+      "name": "module_product_scan",
+      "srcPath": "./components/module_product_scan"
+    },
+    {
+      "name": "module_product_filter",
+      "srcPath": "./components/module_product_filter"
+    },
+    {
+      "name": "module_custom_service_chat",
+      "srcPath": "./components/module_custom_service_chat"
+    },
+    {
+      "name": "module_feedback",
+      "srcPath": "./components/module_feedback"
+    },
+    {
+      "name": "product",
+      "srcPath": "./features/product"
+    },
+    {
+      "name": "module_notice_center",
+      "srcPath": "./components/module_notice_center"
+    },
+    {
+      "name": "app_setting",
+      "srcPath": "./components/app_setting"
+    },
+    {
+      "name": "module_transition",
+      "srcPath": "./components/module_transition"
+    },
+    {
+      "name": "member",
+      "srcPath": "./features/member"
     }
   ]
 }

@@ -6,7 +6,7 @@
     },
     {
       "name": "agcit_huawei_parking",
-      "value": "1.0.1"
+      "value": "1.0.2"
     },
     {
       "name": "agcittype_huawei_parking",
@@ -14,7 +14,7 @@
     },
     {
       "name": "agcitkid_huawei_parking",
-      "value": "agcit_huawei_parking_module_address_search/1.0.0,agcit_huawei_parking_module_license_keyboard/1.0.0,agcit_huawei_parking_module_parking_base/1.0.0,agcit_huawei_parking_module_parking_map/1.0.0,agcit_huawei_parking_module_parking_spots/1.0.0,agcit_huawei_parking_module_swiper_preview/1.0.0"
+      "value": "agcit_huawei_parking_module_address_search/1.0.1,agcit_huawei_parking_module_license_keyboard/1.0.0,agcit_huawei_parking_module_parking_base/1.0.1,agcit_huawei_parking_module_parking_map/1.0.1,agcit_huawei_parking_module_parking_spots/1.0.1,agcit_huawei_parking_module_swiper_preview/1.0.1"
     }
   ]
 }

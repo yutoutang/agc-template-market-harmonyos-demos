@@ -1,15 +1,13 @@
-import { clearCache, commonToast, ExtendSettingItem, getCache, UserInfo } from 'common';
+import { clearCache, commonToast, ExtendSettingItem, getCache, UserInfo, UserState } from 'common';
 import { getDataFromJSON } from 'h5';
-import { promptAction } from '@kit.ArkUI';
+import { PersistenceV2, promptAction } from '@kit.ArkUI';
 
-@Component
+@ComponentV2
 export struct Settings {
-  @StorageLink('isLogin') isLogin: boolean = false;
-  @State extendSettingItems: Array<ExtendSettingItem> = [];
-  @Consume('pageInfos') pageInfos: NavPathStack
-  @StorageLink('userInfo') userInfo: UserInfo = AppStorage.get('userInfo') ?? new UserInfo();
-  @State cache: string = ''
-
+  @Local extendSettingItems: Array<ExtendSettingItem> = [];
+  @Consumer ('pageInfos') pageInfos: NavPathStack = new NavPathStack()
+  @Local cache: string = ''
+  @Local userState: UserState = PersistenceV2.connect(UserState, () => new UserState())!;
   initDataSource() {
     this.extendSettingItems = getDataFromJSON<ExtendSettingItem>('SettingPage-MoreSettings.json', this);
   }
@@ -36,9 +34,8 @@ export struct Settings {
               hasTitle: $r('app.string.log_out'),
               message: $r('app.string.log_out_confirm'),
               confirmAction: () => {
-                this.isLogin = false
-                AppStorage.setOrCreate('isLogin', false)
-                AppStorage.setOrCreate('userInfo', '')
+                this.userState.isLogin = false
+                this.userState.userInfo = new UserInfo()
                 commonToast.hide()
                 this.pageInfos.pop();
               },
@@ -136,7 +133,7 @@ export struct Settings {
 
   @Builder
   buildLogOutView() {
-    if (this.isLogin) {
+    if (this.userState.isLogin) {
       Button($r('app.string.log_out'))
         .width('90%')
         .height(44)
@@ -149,9 +146,8 @@ export struct Settings {
             hasTitle: $r('app.string.log_out'),
             message: $r('app.string.log_out_confirm'),
             confirmAction: () => {
-              this.isLogin = false
-              AppStorage.setOrCreate('isLogin', '')
-              AppStorage.setOrCreate('userInfo', '')
+              this.userState.isLogin = false
+              this.userState.userInfo = new UserInfo()
               commonToast.hide()
               this.pageInfos.pop();
             },

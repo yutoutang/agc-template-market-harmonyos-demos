@@ -12,10 +12,11 @@ export struct BaseNavTitle {
           this.routerModule?.pop()
         })
       }.borderRadius('50%').padding(8)
-      .backgroundColor('rgba(255, 255, 255, 0.1)')
+      .backgroundColor($r('app.color.base_nav_title_icon'))
+      .opacity(0.1)
       .justifyContent(FlexAlign.Center)
 
-      Text(this.title).fontColor('rgba(255, 255, 255, 0.9)').fontSize(20).fontWeight(700)
+      Text(this.title).fontColor($r('app.color.base_nav_title_icon')).fontSize(20).fontWeight(700).opacity(0.9)
         .lineHeight(27)
     }
     .height(36)

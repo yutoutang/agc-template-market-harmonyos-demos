@@ -2,7 +2,7 @@ export { getTokenSyn,
   requestOAIDTrackingConsentPermissions,
   getPictureFromAlbum,getCache,clearCache,choosePhoto } from './src/main/ets/utils/CommonUtils'
 
-export { UserInfo,
+export {
   NavigationParams,
   TabsInfo,
   questionAnswer,
@@ -18,9 +18,9 @@ export { UserInfo,
   TabData,
   ParamsObj,
   ServiceList,
-  Suggestion,ScanCodeRectArray } from './src/main/ets/interface/CommonInterface'
+  Suggestion,SuggestionList,ScanCodeRectArray } from './src/main/ets/interface/CommonInterface'
 
-export { ItemInfo, SwiperInfo } from './src/main/ets/model/ItemInfo'
+export { ItemInfo, MineItemList,SwiperInfo } from './src/main/ets/model/ItemInfo'
 
 export { RequestPermission } from './src/main/ets/utils/RequestPermission'
 
@@ -33,3 +33,6 @@ export { DividerTmp } from './src/main/ets/dividerTmp/DividerTmp'
 export { BrightnessUtil } from './src/main/ets/utils/BrightnessUtil'
 
 export { commonToast } from './src/main/ets/utils/Toast'
+
+
+export { UserInfo, UserState, ReservationRecord } from './src/main/ets/model/UserStateModel'

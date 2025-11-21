@@ -92,7 +92,7 @@ export struct Feedback {
       Button('提交反馈')
         .borderRadius(20)
         .fontColor($r('sys.color.font_on_primary'))
-        .backgroundColor($r('sys.color.comp_background_emphasize'))
+        .backgroundColor($r('sys.color.brand'))
         .fontSize($r('sys.float.Body_L'))
         .fontWeight(FontWeight.Medium)
         .opacity(this.vm.content.length ? 1 : 0.4)

@@ -90,6 +90,7 @@ export struct PrivacyAgreementView {
               bottom: $r('app.string.space_l'),
             })
           }
+          .constraintSize({ maxWidth: 480 })
           .margin({
             top: $r('app.string.space_m'),
           })
@@ -189,6 +190,7 @@ export struct PrivacyAgreementView {
         .fontColor($r('sys.color.font_secondary'))
     }
     .width('100%')
+    .constraintSize({ maxWidth: 480 })
     .alignItems(HorizontalAlign.Start)
   }
 }

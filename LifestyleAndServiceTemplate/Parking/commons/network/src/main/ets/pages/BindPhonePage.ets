@@ -17,7 +17,7 @@ export struct BindPhonePage {
           Column() {
             Image($r('app.media.ic_bind_account'))
               .width('40%')
-              .height(180)
+              .aspectRatio(1)
             Text('绑定手机号后体验更多功能')
               .fontColor('#191919')
               .fontWeight(FontWeight.Medium)

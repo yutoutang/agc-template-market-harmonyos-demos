@@ -1,15 +1,16 @@
 import { getDataFromJSON, goH5 } from 'h5';
 import { buildSwiperArea } from 'components';
-import { NavigationParams, questionAnswer, ItemInfo } from 'common';
+import { NavigationParams, questionAnswer, ItemInfo, UserState } from 'common';
+import { PersistenceV2 } from '@kit.ArkUI';
 
-@Component
+@ComponentV2
 export struct InteractionPage {
-  @StorageLink('isLogin') isLogin: boolean = false
+  @Local userState: UserState = PersistenceV2.connect(UserState, () => new UserState())!;
   arrowDown: string = 'app.media.interaction_page_pic1';
   arrowUp: string = 'app.media.interaction_page_pic2';
   voiceOnlineList: Array<ItemInfo> = []
-  @State questionAnswerList: Array<questionAnswer> = [];
-  @Consume('pageInfos') pageInfos: NavPathStack
+  @Local questionAnswerList: Array<questionAnswer> = [];
+  @Consumer ('pageInfos') pageInfos: NavPathStack = new NavPathStack()
   goH5Page = (title: string) => {
     this.pageInfos.pushPathByName('Empty', new NavigationParams(title))
   }

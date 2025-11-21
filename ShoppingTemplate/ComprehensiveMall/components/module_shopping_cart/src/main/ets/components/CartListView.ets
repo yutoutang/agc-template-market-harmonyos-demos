@@ -1,3 +1,4 @@
+import { BreakpointStorage, BreakpointSystem, BreakpointTypeEnum } from 'module_ui_base';
 import { Product } from '../commons/Model';
 import { CartCard } from './CartCard';
 
@@ -8,14 +9,18 @@ export struct CartListView {
   // 是否编辑态
   @Param isEdit: boolean = false;
   // 购物车商品数量变化的事件回调
-  @Event onChangeCount: (skuCode: string) => void = (skuCode: string) => {};
+  @Event onChangeCount: (skuCode: string) => void = (skuCode: string) => {
+  };
   // 删除操作
-  @Event onDelete: (skuCode: string) => void = (skuCode: string) => {};
+  @Event onDelete: (skuCode: string) => void = (skuCode: string) => {
+  };
   // 商品卡片事件回调
-  @Event onCardClick: (id: string) => void = (id: string) => {};
+  @Event onCardClick: (id: string) => void = (id: string) => {
+  };
+  @Local curBreakpoint: BreakpointStorage = BreakpointSystem.currentBreakpoint
 
   build() {
-    List({space: 12}) {
+    List({ space: 12 }) {
       ForEach(this.listData, (card: Product, index: number) => {
         ListItem() {
           CartCard({
@@ -32,6 +37,8 @@ export struct CartListView {
             },
           })
         }
+        .margin({ left: 8, right: 8 })
+        .borderRadius(16)
         .transition({ type: TransitionType.Delete, opacity: 0 })
         .swipeAction(this.isEdit ? {} : {
           end: this.CardItemEnd(card, index),
@@ -41,9 +48,10 @@ export struct CartListView {
     }
     .width('100%')
     .height('auto')
+    .lanes(this.curBreakpoint.value === BreakpointTypeEnum.LG ? 2 : 1)
     .edgeEffect(EdgeEffect.None)
     .margin({ top: 10 })
-    .padding({left: 12, right: 12})
+    .padding({ left: 8, right: 8 })
     .clip(true)
   }
 
@@ -56,8 +64,8 @@ export struct CartListView {
           .fontColor(Color.White)
       }
       .height('100%')
-      .padding({left:14, right: 14})
-      .backgroundColor('#E84026')
+      .padding({ left: 14, right: 14 })
+      .backgroundColor($r('app.color.theme_color'))
       .onClick(() => {
         this.onDelete && this.onDelete(card.skuCode);
       })

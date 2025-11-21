@@ -54,6 +54,11 @@ class BreakpointSystem {
   private _uiContext: UIContext | undefined;
   private _windowClass: window.Window | undefined;
 
+  @Computed
+  get isTablet(){
+    return this.currentBreakpoint.value === BreakpointTypeEnum.LG;
+  }
+
   public register(uiContext: UIContext) {
     this._uiContext = uiContext;
     if (this._uiContext) {

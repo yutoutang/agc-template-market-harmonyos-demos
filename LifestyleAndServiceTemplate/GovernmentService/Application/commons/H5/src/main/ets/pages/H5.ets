@@ -5,7 +5,6 @@ export struct H5 {
   @State title: string = '';
   @State loadUrl: string = '';
   @State controller: AtomicServiceWebController = new AtomicServiceWebController();
-  @Consume('pageInfos') pageInfos: NavPathStack
 
   build() {
     NavDestination() {

@@ -19,8 +19,8 @@ class ConfirmDialogParams implements IConfirmDialogParams {
   content: ResourceStr = '';
   priBtnV: ResourceStr = '取消';
   secBtnV: ResourceStr = '确定';
-  priBtnFg: ResourceColor = $r('app.color.theme_color');
-  secBtnFg: ResourceColor = $r('app.color.font_color_level2');
+  priBtnFg: ResourceColor = $r('app.color.font_color_level2');
+  secBtnFg: ResourceColor = $r('app.color.theme_color');
   confirm: () => void = () => {
   };
   cancel: () => void = () => {
@@ -84,7 +84,7 @@ function confirmDialogView(params: ConfirmDialogParams) {
       })
     }
     .width($r('app.string.size_percent_full'))
-    .borderRadius($r('app.float.border_radius_l'))
+    .borderRadius($r('app.float.border_radius_xl'))
     .backgroundColor($r('sys.color.comp_background_primary'))
     .constraintSize({ maxWidth: 400})
   }

@@ -1,9 +1,10 @@
-import { Suggestion } from 'common';
+import { Suggestion, SuggestionList } from 'common';
+import { PersistenceV2 } from '@kit.ArkUI';
 
-@Component
+@ComponentV2
 export struct FeedbackList {
-  @StorageLink('suggestionList') suggestionList: Suggestion[] =
-    AppStorage.get('SuggestionList') ?? [];
+  @Local suggestionList: SuggestionList = PersistenceV2.connect(SuggestionList, () => new SuggestionList())!;
+
 
   formatDate(dateString: Date): string {
     const date = new Date(dateString);
@@ -19,10 +20,14 @@ export struct FeedbackList {
     return formattedDate
   }
 
+  aboutToAppear(): void {
+    PersistenceV2.save(Suggestion)
+  }
+
   build() {
     NavDestination() {
       List({ space: 10 }) {
-        if (!this.suggestionList.length) {
+        if (!this.suggestionList.suggestion.length) {
           ListItem() {
             Column({ space: 10 }) {
               Image($r('app.media.no_data')).width(48).height(48)
@@ -30,7 +35,7 @@ export struct FeedbackList {
             }.width('100%').height('100%').justifyContent(FlexAlign.Center)
           }
         } else {
-          ForEach(this.suggestionList, (item: Suggestion) => {
+          ForEach(this.suggestionList.suggestion, (item: Suggestion) => {
             ListItem() {
               Column() {
                 Text(this.formatDate(item.date) + '')

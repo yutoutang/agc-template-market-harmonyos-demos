@@ -1,5 +1,5 @@
 // 用于存储部分图片资源的云存储域名
-// todo
+// todo:替换域名
 export const CLOUD_STORAGE_URL = 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/cloud-urahf/';
 
 // 请求URL枚举

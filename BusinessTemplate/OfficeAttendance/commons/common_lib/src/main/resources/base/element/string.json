@@ -47,6 +47,10 @@
     {
       "name": "approximately_location_permission",
       "value": "approximately_location_permission"
+    },
+    {
+      "name": "agcit_huawei_office_attendance",
+      "value": "1.0.1"
     }
   ]
 }

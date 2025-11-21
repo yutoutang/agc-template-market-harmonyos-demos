@@ -21,6 +21,10 @@
       "value": "#99000000"
     },
     {
+      "name": "font_color_level2_invert",
+      "value": "#99ffffff"
+    },
+    {
       "name": "font_color_level3",
       "value": "#66000000"
     },

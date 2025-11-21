@@ -75,6 +75,8 @@
    import { hilog } from '@kit.PerformanceAnalysisKit'
    import { common } from '@kit.AbilityKit'
    
+   const TAG = 'CastDemo'
+   
    @Entry
    @ComponentV2
    struct Index {
@@ -195,13 +197,9 @@ CastingLayer(options: [CastingLayerOptions](#CastingLayerOptions对象说明))
 | setVolumeByOffset         | (value: number) => void                                                     | 设置远端播放音量           |
 | setAVMetadata             | (videoData: [VideoData](#VideoData对象说明), duration?: number) => void         | 设置当前播放媒体信息         |
 | endCasting                | () => void                                                                  | 停止投屏               |
-| isCasting                 | boolean                                                                     | 是否投屏中              |
-| isCastPlaying             | boolean                                                                     | 停止投屏处于播放中          |
-| castCurrentTime           | number                                                                      | 当前投屏时间             |
-| castDuration              | number                                                                      | 当前投屏总时长            |
-| currentDeviceName         | string                                                                      | 当前投屏设备名称           |
-| castVolume                | number                                                                      | 当前投屏音量             |
-| currentDeviceType         | avSession.DeviceType                                                        | 停止投屏设备类型           |
+| castStatusModel           | [CastStatusModel](#CastStatusModel对象说明)                                     | 投屏状态               |
+| deinit                    | ()=>void                                                                    | 销毁CastService      |
+| reInit                    | ()=>void                                                                    | 重新初始化CastService   |
 
 ### CastSessionListener对象说明
 
@@ -219,12 +217,26 @@ CastingLayer(options: [CastingLayerOptions](#CastingLayerOptions对象说明))
 
 ### VideoData对象说明
 
-| 参数名   | 类型     | 说明   |
-|:------|:-------|:-----|
-| url   | string | 投屏链接 |
-| index | number | 投屏id |
-| head  | string | 投屏封面 |
-| name  | string | 投屏名称 |
+| 参数名   | 类型     | 说明                          |
+|:------|:-------|:----------------------------|
+| url   | string | 投屏链接(支持网络链接和图库视频的file://格式) |
+| index | number | 投屏id                        |
+| head  | string | 投屏封面                        |
+| name  | string | 投屏名称                        |
+
+### CastStatusModel对象说明
+
+| 参数名               | 类型                   | 说明        |
+|:------------------|:---------------------|:----------|
+| isCasting         | boolean              | 是否投屏中     |
+| isCastPlaying     | boolean              | 停止投屏处于播放中 |
+| castCurrentTime   | number               | 当前投屏时间    |
+| castDuration      | number               | 当前投屏总时长   |
+| castResolution    | string               | 当前投屏分辨率   |
+| currentDeviceName | string               | 当前投屏设备名称  |
+| castVolume        | number               | 当前投屏音量    |
+| castMaxVolume     | number               | 当前投屏最大音量  |
+| currentDeviceType | avSession.DeviceType | 停止投屏设备类型  |
 
 ## 示例代码
 
@@ -232,6 +244,8 @@ CastingLayer(options: [CastingLayerOptions](#CastingLayerOptions对象说明))
 import { CastingLayer, CastPicker, CastService, CastSessionListener, VideoData } from 'module_cast'
    import { hilog } from '@kit.PerformanceAnalysisKit'
    import { common } from '@kit.AbilityKit'
+   import { photoAccessHelper } from '@kit.MediaLibraryKit'
+   import { BusinessError } from '@kit.BasicServicesKit'
    
    const TAG = 'CastDemo'
    const DOMAIN = 0x0000
@@ -242,6 +256,26 @@ import { CastingLayer, CastPicker, CastService, CastSessionListener, VideoData }
      @Local castService: CastService = CastService.getInstance()
      @Local listener: CastSessionListenerImpl = new CastSessionListenerImpl()
      @Local ready: boolean = false
+     private photoSelectOptions = new photoAccessHelper.PhotoSelectOptions();
+
+     playLocalVideo(){
+       this.photoSelectOptions.MIMEType = photoAccessHelper.PhotoViewMIMETypes.VIDEO_TYPE; // 过滤选择媒体文件类型为VIDEO。
+       this.photoSelectOptions.maxSelectNumber = 5; // 选择媒体文件的最大数目。
+       const photoViewPicker = new photoAccessHelper.PhotoViewPicker();
+       photoViewPicker.select(this.photoSelectOptions).then((photoSelectResult: photoAccessHelper.PhotoSelectResult) => {
+         photoSelectResult.photoUris.forEach((item:string,index:number)=>{
+           let video: VideoData = {
+             index: 4+index,
+             url: item,
+             name: `第${4+index}集`,
+             head: 'https://developer.huawei.com/allianceCmsResource/resource/HUAWEI_Developer_VUE/images/0603public/APPICON.png'
+           }
+           this.listener.videoList.push(video)
+         })
+       }).catch((err: BusinessError) => {
+         console.error(`Invoke photoViewPicker.select failed, code is ${err.code}, message is ${err.message}`);
+       })
+     }
    
      aboutToAppear(): void {
        this.castService.init(this.getUIContext().getHostContext() as common.UIAbilityContext)
@@ -250,7 +284,7 @@ import { CastingLayer, CastPicker, CastService, CastSessionListener, VideoData }
    
      build() {
        Stack({ alignContent: Alignment.TopStart }) {
-         if (this.castService.isCasting) {
+         if (this.castService.castStatusModel.isCasting) {
            CastingLayer({
              castService: this.castService,
              title: `第${this.listener.currentIndex + 1}集`,
@@ -269,6 +303,12 @@ import { CastingLayer, CastPicker, CastService, CastSessionListener, VideoData }
               if (this.ready) {
                  CastPicker()
                    .margin({ left: 12 })
+                 SymbolGlyph($r('sys.symbol.picture_2'))
+                    .fontSize(24)
+                    .fontColor([$r('sys.color.font_on_primary')])
+                    .onClick(()=>{
+                      this.playLocalVideo()
+                    })
               }
            }.height(40)
            .width('100%')

@@ -111,7 +111,7 @@ export class UserEventItem {
   @Trace remindList: string[] = ['正点提醒']
   @Trace remarks: string = ''
   @Trace isDone: boolean = false
-  @Trace isTop?: boolean = false
+  @Trace isTop?: boolean = true
 }
 
 @ObservedV2

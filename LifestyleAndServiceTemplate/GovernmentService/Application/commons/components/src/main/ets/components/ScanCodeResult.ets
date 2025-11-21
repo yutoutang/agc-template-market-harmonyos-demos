@@ -1,6 +1,6 @@
-@Component
+@ComponentV2
 export struct ScanCodeResult {
-  scanResult: string = ''
+  @Param scanResult: string = ''
 
   build() {
     NavDestination() {

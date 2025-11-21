@@ -47,7 +47,9 @@ export class ProductDetailMockApis {
         const endIndex = startIndex + Constants.PAGE_SIZE;
         const list = this._mockReviewList.list;
         const reviewList = list.slice(startIndex, endIndex);
-        const isFinal = reviewList.length < Constants.PAGE_SIZE || endIndex === this._mockReviewList.list.length;
+        const isFinal =
+          reviewList.length < Constants.PAGE_SIZE ||
+          endIndex === this._mockReviewList.list.length;
         const total = list.length;
         const res: ProductReviewResp = {
           isFinal,

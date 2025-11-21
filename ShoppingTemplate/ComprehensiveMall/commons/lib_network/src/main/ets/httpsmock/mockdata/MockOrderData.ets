@@ -1,6 +1,7 @@
 import {
   AddressInfo,
   LogisticsItem,
+  OrderExpressInfo,
   OrderItem,
   OrderSkuItem,
 } from '../../types/responses/OrderResponse';
@@ -33,35 +34,67 @@ const mockAddress: AddressInfo = {
   name: '张三',
   cellphone: '12300000000',
   address: '北京市海淀区某小区',
+  city:'北京市',
+  latitude:39.95,
+  longitude:116.30
 };
 
+
 const mockLogistic1: LogisticsItem = {
-  icon: 'app://dev/media/icon/ic_car.svg',
+  icon: $r('app.media.ic_car'),
   status: 1,
-  desc: '您提交了订单，请等待系统确认',
+  desc: '您提交了订单，请等待商家确认',
   time: '2025-03-01 09:00:00',
 };
 
 const mockLogistic2: LogisticsItem = {
-  icon: 'app://dev/media/icon/ic_car.svg',
+  icon: $r('app.media.ic_car'),
   status: 2,
-  desc: '您的订单已发货',
-  time: '2025-03-01 09:05:00',
+  desc: '快递员已取包裹，即将开始运输',
+  time: '2025-03-01 17:00:00',
 };
 
 const mockLogistic3: LogisticsItem = {
-  icon: 'app://dev/media/icon/ic_car.svg',
+  icon: $r('app.media.ic_car'),
   status: 3,
-  desc: '预计XX月XX日送达',
-  time: '2025-03-01 10:00:00',
+  desc: '您的包裹正在快马加鞭运输中',
+  time: '2025-03-02 10:00:00',
 };
 
 const mockLogistic4: LogisticsItem = {
-  icon: 'app://dev/media/icon/ic_car.svg',
-  status: 4,
-  desc: '您的商品已签收',
-  time: '2025-03-02 10:00:00',
+  icon: $r('app.media.ic_car'),
+  status: 3,
+  desc: '派件交给【华为快递员，联系电话：10000000000】，正在派送途中（如 有任何问题可优先联系我！）',
+  time: '2025-03-02 20:00:00',
 };
+
+const mockLogistic5: LogisticsItem = {
+  icon: $r('app.media.ic_car'),
+  status: 4,
+  desc: '您的商品已签收，如有疑问请电话联系快递员。',
+  time: '2025-03-03 10:00:00',
+};
+
+export const mockExpress: OrderExpressInfo = {
+  orderId: '',
+  expressName: 'XX快递',
+  expressNo: 'HW12345678',
+  sendPosition: '南京市',
+  getPosition: '北京市',
+  origins: {
+    latitude: 31.975,
+    longitude: 118.78,
+  },
+  destination: {
+    latitude: 31.976,
+    longitude: 118.86,
+  },
+  waypoints: [
+    { longitude: 118.78, latitude: 31.982 },
+    { longitude: 118.79, latitude: 31.985 },
+    { longitude: 118.80, latitude: 31.978 },
+  ],
+}
 
 export class MockOrderData {
   static orderList: OrderItem[] = [
@@ -83,12 +116,7 @@ export class MockOrderData {
         refundTime: '2023-10-13 10:00:00',
         receivingMethod: 0,
       },
-      logisticInfo: [
-        mockLogistic1,
-        mockLogistic2,
-        mockLogistic3,
-        mockLogistic4,
-      ],
+      logisticInfo: [],
       skuInfo: [mockSku1],
     },
     {
@@ -107,7 +135,7 @@ export class MockOrderData {
           },
         ],
       },
-      logisticInfo: [],
+      logisticInfo: [mockLogistic1],
       skuInfo: [mockSku1],
     },
     {
@@ -127,7 +155,7 @@ export class MockOrderData {
           },
         ],
       },
-      logisticInfo: [mockLogistic1, mockLogistic2],
+      logisticInfo: [mockLogistic3, mockLogistic2, mockLogistic1],
       skuInfo: [mockSku1],
     },
     {
@@ -148,10 +176,11 @@ export class MockOrderData {
         ],
       },
       logisticInfo: [
-        mockLogistic1,
-        mockLogistic2,
-        mockLogistic3,
+        mockLogistic5,
         mockLogistic4,
+        mockLogistic3,
+        mockLogistic2,
+        mockLogistic1,
       ],
       skuInfo: [mockSku1],
     },
@@ -173,10 +202,11 @@ export class MockOrderData {
         ],
       },
       logisticInfo: [
-        mockLogistic1,
-        mockLogistic2,
-        mockLogistic3,
+        mockLogistic5,
         mockLogistic4,
+        mockLogistic3,
+        mockLogistic2,
+        mockLogistic1,
       ],
       skuInfo: [mockSku1, mockSku2],
     },
@@ -199,10 +229,12 @@ export class MockOrderData {
         refundTime: '2023-10-13 10:00:00',
       },
       logisticInfo: [
-        mockLogistic1,
-        mockLogistic2,
-        mockLogistic3,
-        mockLogistic4,
+        {
+          icon: $r('app.media.ic_car'),
+          status: 4,
+          desc: '您的商品已由本人到店领取。',
+          time: '2025-03-03 10:00:00',
+        }
       ],
       skuInfo: [mockSku1],
     },
@@ -225,12 +257,15 @@ export class MockOrderData {
         refundTime: '2023-10-13 10:00:00',
       },
       logisticInfo: [
-        mockLogistic1,
-        mockLogistic2,
-        mockLogistic3,
+        mockLogistic5,
         mockLogistic4,
+        mockLogistic3,
+        mockLogistic2,
+        mockLogistic1,
       ],
       skuInfo: [mockSku1],
     },
   ];
+  static  DEFAULT_LATITUDE = 31.97;
+  static  DEFAULT_LONGITUDE = 118.75;
 }

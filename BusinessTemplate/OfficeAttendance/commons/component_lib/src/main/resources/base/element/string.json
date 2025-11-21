@@ -39,6 +39,10 @@
     {
       "name": "schedule_detail_title",
       "value": "schedule title"
+    },
+    {
+      "name": "agcit_huawei_office_attendance",
+      "value": "1.0.1"
     }
   ]
 }

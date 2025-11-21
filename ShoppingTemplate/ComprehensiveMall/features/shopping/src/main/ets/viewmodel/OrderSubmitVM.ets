@@ -6,6 +6,7 @@ import {
   AddressInfo,
   OrderApis,
   OrderCreateReq,
+  OrderPosition,
   OrderSkuItem,
   PreOrderInfoReq,
 } from 'lib_network';
@@ -26,6 +27,13 @@ export class OrderSubmitVM {
   @Trace
   customerPhone: string = '';
   @Trace
+  getPosition: OrderPosition = {
+    latitude: 0,
+    longitude: 0,
+  }
+  @Trace
+  city:string = ''
+  @Trace
   skuList: OrderSkuItem[] = [];
   @Trace
   totalPrice: number = 0;
@@ -39,7 +47,7 @@ export class OrderSubmitVM {
   remarkCache: string = '';
   @Trace
   preOrderRequest: PreOrderInfoReq | undefined = undefined;
-  readonly SHOP_ADDRESS: string = '店铺地址';
+  readonly SHOP_ADDRESS: string = '江苏省南京市XX路';
   readonly SHOP_PHONE: string = '12345678';
 
   @Computed
@@ -79,6 +87,11 @@ export class OrderSubmitVM {
         this.customerPhone = res.phone;
         this.customerAddress =
           res.province + res.city + res.district + res.street + res.detail;
+        this.city = res.city;
+        this.getPosition = {
+          latitude: res.latitude,
+          longitude: res.longitude,
+        }
       }
     });
     OrderApis.getPreOrderInfo(preOrderRequest)
@@ -99,7 +112,7 @@ export class OrderSubmitVM {
     }
     if (
       this.shippingIndex === ShippingOption.EXPRESS &&
-      (!this.customerName || !this.customerAddress)
+        (!this.customerName || !this.customerAddress)
     ) {
       promptAction.showToast({ message: '请选择地址' });
       return;
@@ -112,15 +125,18 @@ export class OrderSubmitVM {
     const addressInfo: AddressInfo =
       this.shippingIndex === ShippingOption.EXPRESS
         ? {
-            name: this.customerName,
-            cellphone: this.customerPhone,
-            address: this.customerAddress,
-          }
+        name: this.customerName,
+        cellphone: this.customerPhone,
+        address: this.customerAddress,
+      }
         : {
-            name: this.customerName,
-            cellphone: this.SHOP_PHONE,
-            address: this.SHOP_ADDRESS,
-          };
+        name: this.customerName,
+        cellphone: this.SHOP_PHONE,
+        address: this.SHOP_ADDRESS,
+      };
+    addressInfo.latitude = this.getPosition.latitude;
+    addressInfo.longitude = this.getPosition.longitude;
+    addressInfo.city = this.city;
     const data: OrderCreateReq = {
       skuList: this.skuList,
       orderInfo: {
@@ -141,8 +157,10 @@ export class OrderSubmitVM {
       if (res.code === 0) {
         paymentService
           .requestPayment(getContext() as common.UIAbilityContext, res.orderStr)
-          .then(() => {})
-          .catch(() => {})
+          .then(() => {
+          })
+          .catch(() => {
+          })
           .finally(() => {
             const codes: string[] = [];
             this.preOrderRequest!.items.forEach((item) => {

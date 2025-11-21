@@ -60,8 +60,8 @@
     "metadata": [
       {
         "name": "client_id",
-        // todo
-        "value": "xxx"
+// todo:替换client_id
+        "value": "******"
       }
     ],
     "extensionAbilities": [

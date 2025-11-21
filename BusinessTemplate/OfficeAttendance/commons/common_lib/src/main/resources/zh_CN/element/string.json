@@ -47,6 +47,10 @@
     {
       "name": "approximately_location_permission",
       "value": "允许应用获取设备模糊位置信息"
+    },
+    {
+      "name": "agcit_huawei_office_attendance",
+      "value": "1.0.1"
     }
   ]
 }

@@ -1,14 +1,15 @@
-import { promptAction } from '@kit.ArkUI';
-import { commonToast, UserInfo } from 'common';
+import { PersistenceV2, promptAction } from '@kit.ArkUI';
+import { commonToast, UserInfo, UserState } from 'common';
+import { ValueType } from '@kit.ArkData';
 
-@Component
+@ComponentV2
 export struct Login {
-  @State isAgree: boolean = false;
-  @State verifyCodeTime: number = 0;
-  @StorageLink('isLogin') isLogin: boolean = false;
-  @Consume('pageInfos') pageInfos: NavPathStack
-  @State phoneNum: string = '';
-  @State verifyCode: string = ''
+  @Local isAgree: boolean = false;
+  @Local verifyCodeTime: number = 0;
+  @Local userState: UserState = PersistenceV2.connect(UserState, () => new UserState())!;
+  @Consumer('pageInfos') pageInfos: NavPathStack = new NavPathStack()
+  @Local phoneNum: string = '';
+  @Local verifyCode: string = ''
 
   build() {
     NavDestination() {
@@ -196,14 +197,16 @@ export struct Login {
     if (!this.validateLogin()) {
       return
     }
-    this.isLogin = true;
-    let mockUserInfo: UserInfo = {
+    this.userState.isLogin = true;
+    let mockUserInfo: UserInfo = new UserInfo({
+      'authCode': '',
       'idToken': '',
+      'openID': '',
       'userName': '华为用户',
-      'avatar': $r('app.media.avatar'),
+      'avatar': '',
       'phoneNumber': this.phoneNum,
-    }
-    AppStorage.setOrCreate('userInfo', mockUserInfo)
+    })
+    this.userState.userInfo = mockUserInfo
     this.pageInfos.pop();
   }
 

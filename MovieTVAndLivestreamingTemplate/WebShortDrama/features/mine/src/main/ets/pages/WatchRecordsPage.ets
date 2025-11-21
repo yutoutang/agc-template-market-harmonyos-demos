@@ -90,34 +90,36 @@ export struct WatchRecordsPage {
     Grid() {
       Repeat<MyWatchRecordData>(this.myWatchRecordRes.myWatchRecord)
         .each((ri: RepeatItem<MyWatchRecordData>) => {
-          GridItem() {
-            VideoSeries({
-              title: ri.item.name,
-              currentEpisode: ri.item.currentWatch + 1,
-              totalCount: ri.item.totalCount,
-              isDeleting: this.isDeleting,
-              likeCount: ri.item.likeCount,
-              isLike: false,
-              isSelectBack: (isSelect) => {
-                ri.item.isSelect = isSelect
-                this.getSelectedIds()
-              },
-              cover: ri.item.coverUrl,
-              isVip: ri.item.isVip,
-              onContinueWatch: () => {
-                if (!this.isDeleting) {
-                  jumpDetailPage(ri.item, ri.item.currentWatch, 0, (params) => {
-                    WindowManager.setWindowSystemBarProperties({ statusBarContentColor: '#e6000000' })
-                    const paramsInfo = params.result as ParamsModel
-                    const drama = getDramaInfo(paramsInfo.id)
-                    drama.curIndex = paramsInfo.curIndex
-                    unsetMyWatchRecord(drama.id)
-                    setMyWatchRecord(drama)
-                    this.updateWatchedRecords()
-                  })
+          if(ri.item){
+            GridItem() {
+              VideoSeries({
+                title: ri.item.name,
+                currentEpisode: ri.item.currentWatch + 1,
+                totalCount: ri.item.totalCount,
+                isDeleting: this.isDeleting,
+                likeCount: ri.item.likeCount,
+                isLike: false,
+                isSelectBack: (isSelect) => {
+                  ri.item.isSelect = isSelect
+                  this.getSelectedIds()
+                },
+                cover: ri.item.coverUrl,
+                isVip: ri.item.isVip,
+                onContinueWatch: () => {
+                  if (!this.isDeleting) {
+                    jumpDetailPage(ri.item, ri.item.currentWatch, 0, (params) => {
+                      WindowManager.setWindowSystemBarProperties({ statusBarContentColor: '#e6000000' })
+                      const paramsInfo = params.result as ParamsModel
+                      const drama = getDramaInfo(paramsInfo.id)
+                      drama.curIndex = paramsInfo.curIndex
+                      unsetMyWatchRecord(drama.id)
+                      setMyWatchRecord(drama)
+                      this.updateWatchedRecords()
+                    })
+                  }
                 }
-              }
-            })
+              })
+            }
           }
         })
         .key((item: MyWatchRecordData, index: number): string => item.id)// 键值生成函数

@@ -16,10 +16,6 @@ export struct HistoryResult {
 
   build() {
     NavDestination() {
-      BaseNavTitle({
-        title: '历史记录',
-        routerModule: CalculatorVM.getStack()
-      }).margin({ bottom: 20 })
       if (this.calcHistory.length) {
         Stack({ alignContent: Alignment.Bottom }) {
           List() {
@@ -46,7 +42,7 @@ export struct HistoryResult {
             Image($r('app.media.no_result')).height(120).width(120)
             Text('暂无记录~~')
               .fontSize($r('sys.float.Body_L'))
-              .fontColor($r('sys.color.ohos_id_color_text_secondary_dark'))
+              .fontColor($r('sys.color.font_secondary'))
               .margin({ top: 24 })
           }
         }.height('calc(100% - 108vp)')
@@ -55,8 +51,9 @@ export struct HistoryResult {
           Image($r('app.media.ic_public_trash')).height(40).width(40);
         }
       }
-    }.hideTitleBar(true).padding({ left: 16, right: 16 })
-    .backgroundColor('#000000')
+    }
+    .title('历史记录')
+    .backgroundColor(this.calcHistory.length  ? $r('sys.color.background_primary') : $r('sys.color.background_secondary'))
     .onReady(() => {
       this.calcHistory = HistoryUtils.getHistoryResult().reverse();
     })
@@ -77,7 +74,7 @@ export struct HistoryResult {
           .fontSize($r('sys.float.Body_L'))
           .textAlign(TextAlign.Start)
           .width('100%')
-          .fontColor($r('sys.color.ohos_id_color_text_secondary_dark'))
+          .fontColor($r('sys.color.font_secondary'))
           .lineHeight(21)
       }
       .padding({ left: 10 })
@@ -89,13 +86,13 @@ export struct HistoryResult {
           .width('100%')
           .lineHeight(21)
           .textAlign(TextAlign.Start)
-          .fontColor($r('sys.color.ohos_id_color_text_primary_dark'))
+          .fontColor($r('sys.color.font_primary'))
       }
       .justifyContent(FlexAlign.Start)
       .padding({ left: 10 })
       .margin({ bottom: 13 });
 
-      Divider().color('rgba(255, 255, 255, 0.2)').margin({ bottom: 12 })
+      Divider().color($r('sys.color.comp_divider')).margin({ bottom: 12 })
     }
   }
 }

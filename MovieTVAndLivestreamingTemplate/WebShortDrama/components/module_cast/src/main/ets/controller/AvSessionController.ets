@@ -13,7 +13,6 @@ export class AvSessionController {
   private avSession: avSession.AVSession | undefined = undefined;
   private avSessionMetadata: avSession.AVMetadata | undefined = undefined;
   private avSessionController: avSession.AVSessionController | undefined = undefined
-
   constructor() {
   }
 
@@ -36,9 +35,16 @@ export class AvSessionController {
     hilog.info(0x0000, TAG, `session controller create successed : sessionId : ${this.avSession.sessionId}`);
     BackgroundTaskManager.startContinuousTask(this.context);
     this.setLaunchAbility();
-    this.avSession.setExtras({
+    await this.avSession.setExtras({
       requireAbilityList: ['url-cast']
     });
+  }
+
+  public async release() {
+    this.unregisterSessionListener()
+    await this.avSession?.deactivate()
+    await this.avSession?.destroy()
+    this.avSession = undefined
   }
 
   private setLaunchAbility() {
@@ -87,11 +93,11 @@ export class AvSessionController {
       title: curSource.name as string,
       mediaImage: curSource.head,
       duration: duration,
-      filter: avSession.ProtocolType.TYPE_CAST_PLUS_STREAM|avSession.ProtocolType.TYPE_DLNA,
+      filter: avSession.ProtocolType.TYPE_CAST_PLUS_STREAM | avSession.ProtocolType.TYPE_DLNA,
     };
     hilog.info(0x0000, TAG, `SetAVMetadata ${JSON.stringify(metadata)}`);
     if (this.avSession) {
-      this.avSession.setAVMetadata(metadata).then(() => {
+      await this.avSession.setAVMetadata(metadata).then(() => {
         this.avSessionMetadata = metadata;
         hilog.info(0x0000, TAG, 'SetAVMetadata successfully');
       }).catch((err: BusinessError) => {

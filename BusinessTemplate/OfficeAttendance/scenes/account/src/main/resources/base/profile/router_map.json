@@ -15,6 +15,38 @@
       "data": {
         "description": ""
       }
+    },
+    {
+      "name": "tools",
+      "pageSourceFile": "src/main/ets/account/Tools.ets",
+      "buildFunction": "toolsBuilder",
+      "data": {
+        "description": ""
+      }
+    },
+    {
+      "name": "protractor",
+      "pageSourceFile": "src/main/ets/tools/Protractor.ets",
+      "buildFunction": "protractorBuilder",
+      "data": {
+        "description": ""
+      }
+    },
+    {
+      "name": "area_calculate",
+      "pageSourceFile": "src/main/ets/tools/AreaCalculateComponent.ets",
+      "buildFunction": "areaCalculateBuilder",
+      "data": {
+        "description": ""
+      }
+    },
+    {
+      "name": "ruler",
+      "pageSourceFile": "src/main/ets/tools/RulerComponent.ets",
+      "buildFunction": "rulerBuilder",
+      "data": {
+        "description": ""
+      }
     }
   ]
 }

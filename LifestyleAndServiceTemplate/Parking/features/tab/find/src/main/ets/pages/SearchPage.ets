@@ -20,7 +20,7 @@ export struct SearchPage {
         click: (address) => {
           this.vm.clickCardNextDo(address as IAddressInfo);
         },
-      }).width('calc(100% - 32vp)')
+      }).width('calc(100% - 32vp)').layoutWeight(1)
     }
     .backgroundColor($r('app.color.system_color_background_gray'))
     .padding({ bottom: WindowUtil.getAvoidArea().bottom })

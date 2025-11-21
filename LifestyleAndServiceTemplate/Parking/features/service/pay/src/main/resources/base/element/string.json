@@ -3,6 +3,10 @@
     {
       "name": "shared_desc",
       "value": "查询支付模块"
+    },
+    {
+      "name": "agcit_huawei_parking",
+      "value": "1.0.3"
     }
   ]
 }

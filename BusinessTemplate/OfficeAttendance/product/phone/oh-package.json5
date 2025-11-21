@@ -10,7 +10,7 @@
     "@ohos_agcit/office_attendance_component_lib": "file:../../commons/component_lib",
     "@ohos_agcit/office_attendance_agency": "file:../../scenes/agency",
     "@ohos_agcit/office_attendance_schedule": "file:../../scenes/schedule",
-    "@ohos_agcit/office_attendance_checkin": "file:../../scenes/checkin",
-    "@ohos_agcit/office_attendance_account": "file:../../scenes/account"
+    "@ohos_agcit/office_attendance_account": "file:../../scenes/account",
+    "clock_in": "file:../../components/clock_in"
   }
 }

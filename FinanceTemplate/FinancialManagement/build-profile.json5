@@ -1,15 +1,11 @@
 {
   "app": {
-    "signingConfigs": [
-      /*
-      :todo 补充手动签名
-      */
-    ],
+    "signingConfigs": [],
     "products": [
       {
         "name": "default",
         "signingConfig": "default",
-        "compatibleSdkVersion": "5.0.0(12)",
+        "compatibleSdkVersion": "5.0.1(13)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
           "strictMode": {
@@ -21,7 +17,7 @@
     ],
     "buildModeSet": [
       {
-        "name": "debug",
+        "name": "debug"
       },
       {
         "name": "release"
@@ -67,11 +63,11 @@
     },
     {
       "name": "module_notice_board",
-      "srcPath": "./components/module_notice_board",
+      "srcPath": "./components/module_notice_board"
     },
     {
       "name": "module_base",
-      "srcPath": "./components/module_base",
+      "srcPath": "./components/module_base"
     },
     {
       "name": "module_line_chart",
@@ -79,15 +75,15 @@
     },
     {
       "name": "module_time_line",
-      "srcPath": "./components/module_time_line",
+      "srcPath": "./components/module_time_line"
     },
     {
       "name": "business_home",
-      "srcPath": "./scenes/business_home",
+      "srcPath": "./scenes/business_home"
     },
     {
       "name": "business_mine",
-      "srcPath": "./scenes/business_mine",
+      "srcPath": "./scenes/business_mine"
     },
     {
       "name": "lib_foundation",
@@ -95,7 +91,7 @@
     },
     {
       "name": "module_product_list",
-      "srcPath": "./components/module_product_list",
+      "srcPath": "./components/module_product_list"
     }
   ]
 }

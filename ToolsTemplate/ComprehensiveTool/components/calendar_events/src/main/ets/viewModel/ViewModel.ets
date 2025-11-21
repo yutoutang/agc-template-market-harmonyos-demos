@@ -42,6 +42,7 @@ export class CalendarEventVM {
     this.userEventInfo.isDone = eventInfo.isDone
     this.userEventInfo.eventId = eventInfo.eventId
     this.userEventInfo.remarks = eventInfo.remarks
+    this.userEventInfo.isTop = eventInfo.isTop
   }
 
   validateSchedule(userEventInfo: UserEventItem): boolean {
@@ -101,6 +102,7 @@ export class CalendarEventVM {
         item.remindList = [...this.userEventInfo.remindList]
         item.remarks = this.userEventInfo.remarks
         item.isDone = this.userEventInfo.isDone
+        item.isTop = this.userEventInfo.isTop
       }
     })
     RemindEventDispatcher.dispatchToEventChange(this.userEventInfo)
@@ -129,7 +131,7 @@ export class CalendarEventVM {
       .finally(() => {
         RemindEventDispatcher.dispatchToEventChange(userEventInfo)
         this.userEvent.userEventList.unshift(userEventInfo)
-        this.restBirRemIsTop(userEventInfo,userEventInfo.eventType)
+        this.restBirRemIsTop(userEventInfo, userEventInfo.eventType)
         baseActionSheet.close('CalendarReminder')
       })
   }
@@ -186,15 +188,33 @@ export class CalendarEventVM {
     this.currentIndex = 0
   }
 
-  public restBirRemIsTop(target: UserEventItem,eventType:string) {
-    this.userEvent.userEventList.filter(item => [eventType].includes(item.eventType))
-      .forEach(value => {
-        if (value.id !== target.id) {
-          value.isTop = false
-        } else {
-          value.isTop = true
-        }
-      })
+  public restBirRemIsTop(target: UserEventItem, eventType: string) {
+    let cap = this.userEvent.userEventList.filter(item => [eventType].includes(item.eventType))
+    if (target.isTop) {
+      cap.forEach(value => value.isTop = false)
+      let cap1 = cap.find(item => item.id === target.id)
+      if (cap1) {
+        cap1.isTop = true
+      }
+    }
+  }
+
+  public getDaysUntilBirthday(birthday: string | Date) {
+    const birthDate = typeof birthday === 'string'
+      ? new Date(birthday)
+      : new Date(birthday);
+    if (isNaN(birthDate.getTime())) {
+      throw new Error('无效的生日日期，请使用 "YYYY-MM-DD" 格式');
+    }
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let nextBirthday = new Date(today.getFullYear(), birthDate.getMonth(), birthDate.getDate());
+    nextBirthday.setHours(0, 0, 0, 0);
+    if (nextBirthday < today) {
+      nextBirthday.setFullYear(today.getFullYear() + 1);
+    }
+    const timeDiff = nextBirthday.getTime() - today.getTime();
+    return Math.floor(timeDiff / (1000 * 60 * 60 * 24)) || '今'; // 用 floor 更准确
   }
 }
 

@@ -1,16 +1,16 @@
-import { choosePhoto, commonToast, UserInfo } from 'common'
+import { choosePhoto, commonToast, UserInfo, UserState } from 'common'
 import fs from '@ohos.file.fs';
 import { util } from '@kit.ArkTS';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { PersistenceV2 } from '@kit.ArkUI';
 
-@Component
+@ComponentV2
 export struct PersonInformation {
-  @StorageLink('userInfo') userInfo: UserInfo = AppStorage.get('userInfo') ?? new UserInfo();
-  @StorageLink('isLogin') isLogin: boolean = false
-  @State isEdit: boolean = false
-  @State nickName: string = this.userInfo.userName
-  @State avatar: string = this.userInfo.userName
-  @Consume('pageInfos') pageInfos: NavPathStack
+  @Local userState: UserState = PersistenceV2.connect(UserState, () => new UserState())!;
+  @Local isEdit: boolean = false
+  @Local nickName: string = ''
+  @Local avatar: string = ''
+  @Consumer('pageInfos') pageInfos: NavPathStack = new NavPathStack()
 
   @Styles
   infoFancyStyle() {
@@ -36,7 +36,7 @@ export struct PersonInformation {
   }
 
   aboutToAppear(): void {
-    this.nickName = this.userInfo.userName
+    this.nickName = this.userState.userInfo.userName
   }
 
   build() {
@@ -50,7 +50,7 @@ export struct PersonInformation {
               .fontColor($r('sys.color.font_primary'))
             Row() {
               Row() {
-                Image(this.userInfo.avatar || $r('app.media.avatar_grey')).width(40).height(40)
+                Image(this.userState.userInfo.avatar || $r('app.media.avatar_grey')).width(40).height(40)
               }
               .borderRadius('50%')
               .clip(true)
@@ -70,11 +70,11 @@ export struct PersonInformation {
             let file: fs.File = null!;
             try {
               file = fs.openSync(uri, fs.OpenMode.READ_ONLY)
-              this.userInfo.avatar = `${util.generateRandomUUID(false)}.jpg`
+              this.userState.userInfo.avatar = `${util.generateRandomUUID(false)}.jpg`
 
-              let imagePath = `${getContext().filesDir}/${this.userInfo.avatar}`
+              let imagePath = `${getContext().filesDir}/${this.userState.userInfo.avatar}`
               fs.copyFileSync(file.fd, imagePath)
-              this.userInfo.avatar = 'file://' + imagePath
+              this.userState.userInfo.avatar = 'file://' + imagePath
             } catch (error) {
               let err: BusinessError = error as BusinessError;
               console.error(`PhotoViewPicker failed with err: ${err.code}, ${err.message}`);
@@ -93,11 +93,12 @@ export struct PersonInformation {
                   TextInput({ text: this.nickName })
                     .showUnderline(true)
                     .width('40%')
+                    .maxLength(8)
                     .fontSize($r('sys.float.Body_M'))
                     .key('nickName_input')
                     .onChange((value) => {
                       this.nickName = value
-                      this.userInfo.userName = value
+                      this.userState.userInfo.userName = value
                     })
                     .onBlur(() => {
                       this.isEdit = false
@@ -122,7 +123,8 @@ export struct PersonInformation {
                 .fontWeight(FontWeight.Medium)
                 .fontColor($r('sys.color.font_primary'))
               Row() {
-                Text(this.userInfo.phoneNumber && this.userInfo.phoneNumber.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2'))
+                Text(this.userState.userInfo.phoneNumber &&
+                this.userState.userInfo.phoneNumber.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2'))
                   .fontSize($r('sys.float.Body_M'))
                   .fontWeight(FontWeight.Regular)
                   .fontColor($r('sys.color.font_secondary'))

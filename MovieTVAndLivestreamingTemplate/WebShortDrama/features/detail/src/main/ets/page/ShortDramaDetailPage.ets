@@ -25,7 +25,7 @@ import { MyStorage } from '../models/SpeedData';
 import { getDramaInfo } from '@agctemplate/server/src/main/ets/api/mock/mockData/mockDramaFactory';
 import { emitter } from '@kit.BasicServicesKit';
 import { CastListenerImpl } from '../listener/CastListenerImpl';
-import { CastService } from 'module_cast';
+import { CastService, CastStatusModel } from 'module_cast';
 import { VideoData } from 'module_cast/src/main/ets/model/VideoData';
 import { Params, PromptActionClass } from '../components/PromptActionClass';
 import { PipManager, PipVideoConfig } from 'module_pip';
@@ -60,6 +60,8 @@ export struct ShortDramaDetailPage {
   @Local title: string = ''
   @Local userInfo: UserInfoModel = AppStorageV2.connect(UserInfoModel, 'userInfo', () => new UserInfoModel())!
   @Local bonus: number = this.userInfo.bonus
+  @Local castService: CastService = CastService.getInstance()
+  @Local castStatusModel: CastStatusModel = CastService.getInstance().castStatusModel
   isBackground: boolean = false
   enablePip: boolean = false
   restoredFromPip: boolean = false
@@ -67,11 +69,18 @@ export struct ShortDramaDetailPage {
   isStart: boolean = false
   pipSurfaceId: string = ''
   surfaceId?: string = ''
-  private pipStateCallback: Function = (state: PiPWindow.PiPState) => {
+  private pipStateCallback: Function = async (state: PiPWindow.PiPState) => {
     Logger.info(TAG, `pipStateChange: state ${state}`);
     if (state === PiPWindow.PiPState.ABOUT_TO_STOP) {
     }
     if (state === PiPWindow.PiPState.ABOUT_TO_START) {
+      // 取消控制中心
+      if (CastService.getInstance().getAvSessionController().getAvSession()) {
+        Logger.info(TAG, `pipStateChange: deactive session`);
+        CastService.getInstance().deinit()
+      }
+      // 这里需要重置下播放状态，因为这个小窗是单例的
+      PipManager.getInstance().onPlaybackStatus(true)
     }
     if (state === PiPWindow.PiPState.ABOUT_TO_RESTORE) {
       this.restoredFromPip = true
@@ -80,18 +89,37 @@ export struct ShortDramaDetailPage {
       Logger.info(TAG, 'pip stop')
       if (!this.restoredFromPip) {
         Logger.info(TAG, 'pip not restoredFromPip as stop')
+
+        this.currentVideoIndex = PipManager.getInstance().getIndex()
         if (this.isBackground) {
           // during pip, click pip close
+          await this.setAvMetaData()
           this.playController.playIndex(PipManager.getInstance().getIndex())
           this.playController.pause()
+          CastService.getInstance().pause({
+            elapsedTime: (this.playController.getAVPlayer()?.currentTime || 0) * 1000,
+            updateTime: new Date().getTime()
+          }, this.playController.getAVPlayer()?.duration)
+
         } else {
           // during pip, click app in launcher
+          await this.setAvMetaData()
           this.playController.playIndex(PipManager.getInstance().getIndex())
+          CastService.getInstance().play({
+            elapsedTime: (this.playController.getAVPlayer()?.currentTime || 0) * 1000,
+            updateTime: new Date().getTime()
+          }, this.playController.getAVPlayer()?.duration)
         }
+
       } else {
         // during pip, click pip restore
+        await this.setAvMetaData()
         Logger.info(TAG, 'pip playIndex')
         this.playController.playIndex(PipManager.getInstance().getIndex())
+        CastService.getInstance().play({
+          elapsedTime: (this.playController.getAVPlayer()?.currentTime || 0) * 1000,
+          updateTime: new Date().getTime()
+        }, this.playController.getAVPlayer()?.duration)
       }
       this.restoredFromPip = false
     }
@@ -107,7 +135,22 @@ export struct ShortDramaDetailPage {
     });
   }
 
-  setAvMetaData() {
+  @Monitor('castStatusModel.isCasting')
+  onCastChange(monitor: IMonitor) {
+    monitor.dirty.forEach((path: string) => {
+      if (path === 'castStatusModel.isCasting') {
+        let isCasting: boolean = monitor.value(path)?.now as boolean
+        Logger.info(TAG, `isCasting:${isCasting}`)
+        if (isCasting) {
+          PipManager.getInstance().setAutoStart(false)
+        } else {
+          PipManager.getInstance().setAutoStart(true)
+        }
+      }
+    });
+  }
+
+  async setAvMetaData() {
     let videoPlayData = this.vm.data.getData(this.currentVideoIndex)
     if (!videoPlayData) {
       Logger.warn(TAG, 'can not set av metadata, cast will not effect')
@@ -119,7 +162,7 @@ export struct ShortDramaDetailPage {
       name: videoPlayData.getName() + ` 第${this.playController.curentIndex + 1}集`,
       index: this.currentVideoIndex,
     }
-    CastService.getInstance()
+    await CastService.getInstance()
       .setAVMetadata(videoData, this.playController.getAVPlayer()?.duration || videoPlayData.getDuration())
   }
 
@@ -184,6 +227,12 @@ export struct ShortDramaDetailPage {
   onBackground: Callback<emitter.EventData> = (eventData: emitter.EventData) => {
     Logger.info(TAG, `onBackground: ${JSON.stringify(eventData)}`);
     this.isBackground = true
+
+    if (this.enablePip && !this.castStatusModel.isCasting) {
+      Logger.info(TAG, `onBackground enablePip:${this.enablePip}`)
+      PipManager.getInstance().setAutoStart(true)
+      this.playController.play()
+    }
     if (!this.enablePip) {
       this.playController.pause()
     }
@@ -214,6 +263,7 @@ export struct ShortDramaDetailPage {
     this.unEmitter()
     PipManager.getInstance().setAutoStart(false)
     CastService.getInstance().unregisterSessionListener(this.castListener)
+    CastService.getInstance().deinit()
     this.storage.selectSpeed =
       PreferenceUtil.getInstance(getContext()).get(PreferConstant.PLAY_SPEED_SETTINGS, '1.0x') as string
     // 观看记录
@@ -261,7 +311,7 @@ export struct ShortDramaDetailPage {
     }
     .hideTitleBar(true)
     .onBackPressed(() => {
-      if (CastService.getInstance().isCasting) {
+      if (CastService.getInstance().castStatusModel.isCasting) {
         this.onBack()
         return true
       }
@@ -298,7 +348,6 @@ export struct ShortDramaDetailPage {
         Logger.info(TAG, 'onHidden, no locked pip mode!')
         return
       }
-      PipManager.getInstance().setAutoStart(true)
       // 如果是能小窗播放，设置播放列表到小窗管理器中，小窗管理器内复用播放器实现无缝播放
       let pipConfig: PipVideoConfig = new PipVideoConfig()
       this.vm.data.videoList.map(item => {

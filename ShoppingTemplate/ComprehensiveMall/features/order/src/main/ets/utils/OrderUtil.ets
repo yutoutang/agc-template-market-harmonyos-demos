@@ -1,17 +1,10 @@
 import { common } from '@kit.AbilityKit';
 import { BusinessError, pasteboard } from '@kit.BasicServicesKit';
 import { paymentService } from '@kit.PaymentKit';
-import {
-  buildMakeCallComponent,
-  Logger,
-  PopViewUtil,
-  RouterMap,
-  routerStack,
-  WindowUtil,
-} from 'lib_foundation';
-import { AddressInfo, OrderApis, OrderInfo, OrderSkuItem } from 'lib_network';
+import { Logger, RouterMap, routerStack, WindowUtil } from 'lib_foundation';
+import { AddressInfo, OrderApis, OrderItem, OrderSkuItem } from 'lib_network';
 import { OrderReviewReq } from 'lib_network';
-import { CommonConfirmDialog } from 'lib_widget';
+import { CommonConfirmDialog, CustomServiceSheet } from 'lib_widget';
 import { CartApi } from 'module_shopping_cart';
 import {
   ORDER_STATUS_COMPLETE,
@@ -23,9 +16,12 @@ import {
   ORDER_STATUS_REFUND_IN_PROGRESS,
   ORDER_STATUS_REVIEWED,
 } from '../common/Constants';
-import { OrderActionMap, OrderShipmentMap, OrderStatusMap } from '../common/Enums';
+import {
+  OrderActionMap,
+  OrderShipmentMap,
+  OrderStatusMap,
+} from '../common/Enums';
 import { OrderActionReq, OrderStatusInfo } from '../common/Types';
-import { data } from '@kit.TelephonyKit';
 
 const TAG: string = '[OrderUtil]';
 
@@ -51,6 +47,16 @@ export class OrderUtil {
       return '到店自取';
     }
     return '';
+  }
+
+  public static getLogisticStatusLabel(status: number) {
+    const labelMap: Map<number, string> = new Map([
+      [1, '待确认'],
+      [2, '已发货'],
+      [3, '运输中'],
+      [4, '已签收'],
+    ])
+    return labelMap.get(status) ?? ''
   }
 
   public static getButtonList(status: number) {
@@ -199,7 +205,7 @@ export class OrderUtil {
     routerStack.pushPath({
       name: RouterMap.ORDER_REVIEW_INFO,
       param: param.data,
-    })
+    });
   }
 
   /**
@@ -207,11 +213,7 @@ export class OrderUtil {
    * @param param
    */
   public static handleContactCustomerService(param: OrderActionReq) {
-    PopViewUtil.openSheet(wrapBuilder(buildMakeCallComponent), {
-      title: { title: '联系客服' },
-      dragBar: true,
-      detents: [SheetSize.FIT_CONTENT],
-    });
+    CustomServiceSheet.show();
   }
 
   /**
@@ -240,12 +242,19 @@ export class OrderUtil {
    * @param param
    */
   public static handleCancelRefund(param: OrderActionReq) {
+    const data = param.data as OrderItem;
+    let status:number = 0
+    if(data?.logisticInfo?.length === 1){
+      status = OrderStatusMap.PENDING_SHIPMENT
+    }else{
+      status = OrderStatusMap.PENDING_RECEIPT
+    }
     CommonConfirmDialog.show({
       primaryTitle: '提示',
       content: '是否确认取消退款申请？',
       confirm: () => {
         OrderApis.updateDetail(param.orderNo, {
-          status: OrderStatusMap.PENDING_RECEIPT,
+          status,
         }).then((res) => {
           if (res.code === 0) {
             WindowUtil.toast(
@@ -315,7 +324,10 @@ export class OrderUtil {
       })
       .catch((err: BusinessError) => {
         WindowUtil.toast('复制失败!');
-        Logger.error(TAG, 'copy order number failed. error:' + JSON.stringify(err));
+        Logger.error(
+          TAG,
+          'copy order number failed. error:' + JSON.stringify(err),
+        );
       });
   }
 }

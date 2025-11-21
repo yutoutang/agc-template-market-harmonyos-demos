@@ -2,13 +2,13 @@ import { DividerTmp, NavigationParams, ServiceList, TabData } from 'common'
 import { SymbolGlyphModifier } from '@kit.ArkUI'
 import { getDataFromJSON } from 'h5'
 
-@Component
+@ComponentV2
 export struct ServiceSearch {
-  @State searchValue: string = ''
-  @State refineServicesArray: ServiceList[] = []
-  @State refineServicesArrayOrigin: ServiceList[] = []
-  @State egDivider: DividerTmp = new DividerTmp(1, 10, 10, '#ffe9f0f0')
-  @Consume('pageInfos') pageInfos: NavPathStack
+  @Local searchValue: string = ''
+  @Local refineServicesArray: ServiceList[] = []
+  @Local refineServicesArrayOrigin: ServiceList[] = []
+  @Local egDivider: DividerTmp = new DividerTmp(1, 10, 10, '#ffe9f0f0')
+  @Consumer('pageInfos') pageInfos: NavPathStack = new NavPathStack()
   controller: SearchController = new SearchController()
 
   aboutToAppear(): void {

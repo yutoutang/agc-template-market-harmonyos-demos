@@ -79,7 +79,9 @@ struct UserInfoPage {
                 let err: BusinessError = error as BusinessError;
                 console.error(`PhotoViewPicker failed with err: ${err.code}, ${err.message}`);
               } finally {
-                fs.closeSync(file);
+                if (file) {
+                  fs.closeSync(file);
+                }
               }
             }),
           })

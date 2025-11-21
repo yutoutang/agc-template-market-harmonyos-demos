@@ -72,11 +72,11 @@ export struct ProfileEditPage {
         .placeholderColor($r('sys.color.font_secondary'))
         .placeholderFont({
           weight: FontWeight.Medium,
-          size: $r('sys.float.Body_M'),
+          size: $r('sys.float.Body_L'),
         })
         .fontWeight(FontWeight.Medium)
         .fontColor($r('sys.color.font_secondary'))
-        .fontSize($r('sys.float.Body_M'))
+        .fontSize($r('sys.float.Body_L'))
         .padding({
           left: 0,
           right: 2,
@@ -113,7 +113,7 @@ function titleStyle() {
 
 @Extend(Text)
 function textStyle() {
-  .fontSize($r('sys.float.Body_M'))
+  .fontSize($r('sys.float.Body_L'))
   .fontColor($r('sys.color.font_secondary'))
 }
 

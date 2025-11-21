@@ -31,10 +31,9 @@ struct TransactionRecordList {
         Row() {
           Search({ value: this.vm.searchText, placeholder: '搜索', controller: this.searchController })
             .width('100%')
-            .height(40)
-            .placeholderColor(Color.Grey)
-            .placeholderFont({ size: 16, weight: FontWeight.Regular })
-            .textFont({ size: 16, weight: FontWeight.Regular })
+            .placeholderColor($r('sys.color.font_secondary'))
+            .placeholderFont({ size: $r('sys.float.Body_L'), weight: FontWeight.Regular })
+            .textFont({ size: $r('sys.float.Body_L'), weight: FontWeight.Regular })
             .margin({ bottom: 16 })
             .focusable(false)
             .onClick(() => {
@@ -47,7 +46,7 @@ struct TransactionRecordList {
           Row() {
             Select(this.vm.selectTransactionTypeList)
               .value(this.vm.getLabel(this.vm.transactionTypeList, this.vm.transactionType))
-              .font({ size: 14, weight: FontWeight.Regular })
+              .font({ size: $r('sys.float.Body_M'), weight: FontWeight.Regular })
               .backgroundColor($r('sys.color.background_secondary'))
               .onSelect((index: number, value: string) => {
                 const arrangement = this.vm.getValue(this.vm.transactionTypeList, value)
@@ -58,7 +57,7 @@ struct TransactionRecordList {
               })
             Select(this.vm.selectTransactionDateList)
               .value(this.vm.getLabel(this.vm.transactionDateList, this.vm.transactionDate))
-              .font({ size: 14, weight: FontWeight.Regular })
+              .font({ size: $r('sys.float.Body_M'), weight: FontWeight.Regular })
               .backgroundColor($r('sys.color.background_secondary'))
               .onSelect((index: number, value: string) => {
                 const arrangement = this.vm.getValue(this.vm.transactionDateList, value)
@@ -254,7 +253,7 @@ struct TransactionRecordList {
 
             Button('完成')
               .height(40)
-              .fontColor(Color.White)
+              .fontColor($r('sys.color.font_on_primary'))
               .backgroundColor('#E4480C')
               .flexGrow(1)
               .onClick(() => {

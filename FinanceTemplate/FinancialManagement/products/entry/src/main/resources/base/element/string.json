@@ -27,6 +27,10 @@
     {
       "name": "widget_display_name",
       "value": "金融理财模板卡片"
+    },
+    {
+      "name": "agcit_huawei_financial_management",
+      "value": "1.0.2"
     }
   ]
 }

@@ -134,7 +134,7 @@ export struct AttachUpload {
               .height(30)
               .justifyContent(FlexAlign.SpaceBetween)
             }.width('100%')
-          })
+          }, (item:string) => item)
         }.width('100%')
         .constraintSize({ maxHeight: 100 })
       }

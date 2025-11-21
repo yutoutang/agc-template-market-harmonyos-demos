@@ -1,3 +1,4 @@
+import { BreakpointSystem } from 'module_ui_base';
 import { Constants } from '../commons/Constants';
 import { ProductOperationType } from '../commons/Enums';
 import { ProductInfo, ProductReviewItem } from '../commons/Types';
@@ -5,7 +6,7 @@ import { ProductInfoCard } from '../components/ProductInfoCard';
 import { ProductReviewCard } from '../components/ProductReviewCard';
 import { ProductSwiper } from '../components/ProductSwiper';
 import { ProductDetailApis } from '../https/Apis';
-import { ProductSelector } from './ProductSelector';
+import { ProductSaleUtil } from '../utils/ProductSaleUtil';
 
 @ComponentV2
 export struct ProductDetail {
@@ -17,6 +18,8 @@ export struct ProductDetail {
   isLogin: boolean = false;
   @Param
   cartProdNum: number = 0;
+  @Event
+  clickCustomService: () => void
   @Event
   clickCart: () => void;
   @Event
@@ -30,20 +33,28 @@ export struct ProductDetail {
   @Local
   isLoading: boolean = false;
   @Local
-  productInfo: ProductInfo | undefined = undefined;
-  @Local
   reviewList: ProductReviewItem[] = []
   @Local
   reviewNum: number = 0
-  @Local
-  showSelector: boolean = false;
-  @Local
-  operationType: ProductOperationType = ProductOperationType.ADD_TO_CART;
+  util: ProductSaleUtil = new ProductSaleUtil()
+
+  @Monitor('isLogin')
+  changeLoginStatus() {
+    this.util.options.isLogin = this.isLogin;
+  }
 
   async aboutToAppear() {
     this.isLoading = true;
-    this.productInfo = await ProductDetailApis.getProductDetail(this.productId);
-    this.getProductInfo?.(this.productInfo);
+    await this.util.init({
+      productId: this.productId,
+      isLogin: this.isLogin,
+      cartProdNum: this.cartProdNum,
+      clickCart: this.clickCart,
+      handleAddCart: this.handleAddCart,
+      handlePayNow: this.handlePayNow,
+      handleNotLogin: this.handleNotLogin,
+      getProductInfo: this.getProductInfo,
+    })
     this.getReviewList()
     this.isLoading = false;
   }
@@ -51,34 +62,86 @@ export struct ProductDetail {
   build() {
     Column() {
       if (this.isLoading) {
-        LoadingProgress().width(32);
-      } else {
-        Scroll() {
-          Column() {
-            // 顶部轮播
-            ProductSwiper({
-              imgList: this.productInfo?.banners ?? [],
-            });
-            // 基本信息
-            ProductInfoCard({
-              productInfo: this.productInfo,
-            }).margin({ bottom: 8 });
-            // 用户评价
-            this.productReviewBuilder()
-            // 详情介绍
-            this.productDescBuilder();
-          };
+        Column() {
+          LoadingProgress().width(32);
         }
-        .edgeEffect(EdgeEffect.Spring)
-        .scrollBar(BarState.Off)
-        .layoutWeight(1);
+        .layoutWeight(1)
+      } else if (!this.util.options.productInfo) {
+        Column() {
+          Image($r('app.media.ic_search_empty'))
+            .width(120)
+            .height(120);
+          Text('暂无搜索结果')
+            .fontSize(14)
+            .fontColor($r('app.color.font_color_level2'));
+        }
+        .layoutWeight(1)
+        .justifyContent(FlexAlign.Center)
+      } else {
+        if (BreakpointSystem.isTablet) {
+          GridRow({
+            columns: {
+              lg: 2,
+            },
+            gutter: 12,
+          }) {
+            GridCol({ span: 1 }) {
+              Column() {
+                // 顶部轮播
+                ProductSwiper({
+                  imgList: this.util.options.productInfo?.banners ?? [],
+                });
+              }
+              .layoutWeight(1)
+            }
 
+            GridCol({ span: 1 }) {
+              Scroll() {
+                Column() {
+                  // 基本信息
+                  ProductInfoCard({
+                    productInfo: this.util.options.productInfo,
+                  }).margin({ bottom: 8 });
+                  // 用户评价
+                  this.productReviewBuilder()
+                  // 详情介绍
+                  this.productDescBuilder();
+                };
+              }
+              .edgeEffect(EdgeEffect.Spring)
+              .scrollBar(BarState.Off)
+              .layoutWeight(1);
+            }
+          }
+          .backgroundColor($r('app.color.background_color_grey'))
+          .layoutWeight(1);
+        } else {
+          Scroll() {
+            Column() {
+              // 顶部轮播
+              ProductSwiper({
+                imgList: this.util.options.productInfo?.banners ?? [],
+              });
+              // 基本信息
+              ProductInfoCard({
+                productInfo: this.util.options.productInfo,
+              }).margin({ bottom: 8 });
+              // 用户评价
+              this.productReviewBuilder()
+              // 详情介绍
+              this.productDescBuilder();
+            };
+          }
+          .edgeEffect(EdgeEffect.Spring)
+          .scrollBar(BarState.Off)
+          .layoutWeight(1);
+        }
         Blank();
         // 底部操作栏
         this.bottomOperationBarBuilder();
       }
     }
-    .height('100%')
+    .layoutWeight(1)
     .width('100%')
     .alignItems(HorizontalAlign.Center)
     .justifyContent(FlexAlign.Center)
@@ -90,8 +153,8 @@ export struct ProductDetail {
   productDescBuilder() {
     Column() {
       Text('商品详情').chapterTitleStyle();
-      if (this.productInfo?.pictures) {
-        ForEach(this.productInfo.pictures, (item: ResourceStr) => {
+      if (this.util.options.productInfo?.pictures) {
+        ForEach(this.util.options.productInfo.pictures, (item: ResourceStr) => {
           Image(item)
             .width('100%')
             .objectFit(ImageFit.Contain)
@@ -154,8 +217,23 @@ export struct ProductDetail {
   @Builder
   bottomOperationBarBuilder() {
     Row() {
+      Column() {
+        SymbolGlyph($r('sys.symbol.service'))
+          .fontSize(24)
+          .fontColor([$r('sys.color.icon_primary')])
+          .margin({ bottom: 2 });
+
+        Text('客服')
+          .fontSize(12)
+          .fontColor(Constants.FONT_COLOR_LEVEL1);
+      }
+      .onClick(() => {
+        this.clickCustomService?.()
+      })
+      .margin({ right: $r('app.string.space_l') })
+
       Badge({
-        count: this.cartProdNum,
+        count: this.isLogin ? this.cartProdNum : 0,
         style: {
           badgeSize: 16,
           badgeColor: Constants.THEME_COLOR,
@@ -165,14 +243,13 @@ export struct ProductDetail {
         position: BadgePosition.RightTop,
       }) {
         Column() {
-          Image($r('app.media.ic_tab_inactive_cart'))
-            .width(24)
-            .height(24)
-            .fillColor(Constants.FONT_COLOR_LEVEL2)
+          SymbolGlyph($r('sys.symbol.cart'))
+            .fontSize(24)
+            .fontColor([$r('sys.color.icon_primary')])
             .margin({ bottom: 2 });
           Text('购物车')
-            .fontSize(8)
-            .fontColor(Constants.FONT_COLOR_LEVEL2);
+            .fontSize(12)
+            .fontColor(Constants.FONT_COLOR_LEVEL1);
         }
         .padding(4);
       }
@@ -180,34 +257,35 @@ export struct ProductDetail {
         this.clickCart?.();
       });
 
+
       Blank();
       Button('加入购物车')
-        .bottomButtonStyle()
+        .bottomButtonStyle(BreakpointSystem.isTablet)
         .borderColor(Constants.BACKGROUND_COLOR_GREY_2)
         .fontColor(Constants.THEME_COLOR)
         .backgroundColor(Constants.BACKGROUND_COLOR_GREY_2)
         .borderRadius({
-          topLeft: Constants.BORDER_RADIUS_CAPSULE,
-          bottomLeft: Constants.BORDER_RADIUS_CAPSULE,
+          topLeft: $r('sys.float.corner_radius_level10'),
+          bottomLeft: $r('sys.float.corner_radius_level10'),
           topRight: 0,
           bottomRight: 0,
         })
         .onClick(() => {
-          this.handleButtonClick(ProductOperationType.ADD_TO_CART);
+          this.util.handleButtonClick(ProductOperationType.ADD_TO_CART);
         });
 
       Button('立即购买')
-        .bottomButtonStyle()
+        .bottomButtonStyle(BreakpointSystem.isTablet)
         .borderColor(Constants.THEME_COLOR)
         .backgroundColor(Constants.THEME_COLOR)
         .borderRadius({
           topLeft: 0,
           bottomLeft: 0,
-          topRight: Constants.BORDER_RADIUS_CAPSULE,
-          bottomRight: Constants.BORDER_RADIUS_CAPSULE,
+          topRight: $r('sys.float.corner_radius_level10'),
+          bottomRight: $r('sys.float.corner_radius_level10'),
         })
         .onClick(() => {
-          this.handleButtonClick(ProductOperationType.PAY_NOW);
+          this.util.handleButtonClick(ProductOperationType.PAY_NOW);
         });
     }
     .width('100%')
@@ -218,46 +296,6 @@ export struct ProductDetail {
     })
     .backgroundColor(Constants.BACKGROUND_COLOR)
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
-    .bindSheet($$this.showSelector,
-      this.productSelectorBuilder(),
-      {
-        title: { title: '商品规格选择' },
-        detents: [SheetSize.LARGE],
-        backgroundColor: Constants.BACKGROUND_COLOR,
-        onWillDismiss: (action: DismissSheetAction) => {
-          if (action.reason === DismissReason.PRESS_BACK || action.reason === DismissReason.CLOSE_BUTTON) {
-            action.dismiss();
-          }
-        },
-      });
-  }
-
-  @Builder
-  productSelectorBuilder() {
-    ProductSelector({
-      operationType: this.operationType,
-      productInfo: this.productInfo,
-      handleCancel: () => {
-        this.showSelector = false;
-      },
-      handleAddCart: (skuCode: string, count: number) => {
-        this.handleAddCart?.(skuCode, count);
-        this.showSelector = false;
-      },
-      handlePayNow: (skuCode: string, count: number) => {
-        this.handlePayNow?.(skuCode, count);
-        this.showSelector = false;
-      },
-    });
-  }
-
-  handleButtonClick(operationType: ProductOperationType) {
-    if (!this.isLogin) {
-      this.handleNotLogin?.();
-      return;
-    }
-    this.operationType = operationType;
-    this.showSelector = true;
   }
 
   async getReviewList() {
@@ -269,17 +307,17 @@ export struct ProductDetail {
 
 @Extend(Text)
 function chapterTitleStyle() {
-  .fontSize(14)
   .textIndent(16)
   .fontColor(Constants.FONT_COLOR_LEVEL1)
-  .fontWeight(FontWeight.Medium)
+  .fontWeight(FontWeight.Bold)
   .margin({ bottom: 16 });
 }
 
 @Extend(Button)
-function bottomButtonStyle() {
+function bottomButtonStyle(isTablet: boolean = false) {
   .fontSize($r('sys.float.Body_M'))
   .borderWidth(1)
+  .width(isTablet ? 200 : 'auto')
   .height(40)
   .type(ButtonType.Normal);
 }

@@ -44,9 +44,9 @@ export struct BaseTextPicker {
       })
 
       TextPicker({ range: this.textList, selected: this.select })
-        .textStyle({ color: '#FFFFFFE5', font: { size: $r('sys.float.Body_M'), weight: FontWeight.Normal } })
+        .textStyle({ color: $r('sys.color.font_primary'), font: { size: $r('sys.float.Body_M'), weight: FontWeight.Normal } })
         .selectedTextStyle({
-          color: '#5291FF',
+          color: $r('sys.color.font_emphasize'),
           font: { size: 20, weight: FontWeight.Medium },
         })
         .onChange((value: string | string[], index: number | number[]) => {
@@ -58,8 +58,10 @@ export struct BaseTextPicker {
           console.info('Picker scroll stopped, value: ' + value + ', index: ' + index)
         })
         .height(240)
+        .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
     }
-    .backgroundColor('#2e3033')
+    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+    .backgroundColor($r('sys.color.background_tertiary'))
     .justifyContent(FlexAlign.End)
     .width('100%')
     .height('100%')

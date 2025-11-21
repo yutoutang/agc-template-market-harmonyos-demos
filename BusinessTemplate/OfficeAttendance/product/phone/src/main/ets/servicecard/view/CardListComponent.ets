@@ -1,11 +1,11 @@
-import { CheckInStatus } from '@ohos_agcit/office_attendance_common_lib/src/main/ets/constants/CheckInEnums';
+import { ClockInStatus } from 'clock_in';
 import { CardListParameter } from '../viewmodel/CardListParameter';
 
 const LAYOUT_WEIGHT = 1;
 
 @Component
 export struct CardListComponent {
-  @Link checkInStatus: CheckInStatus | undefined;
+  @Link clockInStatus: ClockInStatus | undefined;
   @BuilderParam customBuilderParam: () => void = this.customBuilder;
   @Link cardListParameter: CardListParameter | undefined;
   /**
@@ -56,23 +56,23 @@ export struct CardListComponent {
 
         Button({ type: ButtonType.Capsule }) {
           Row() {
-            if (this.checkInStatus === CheckInStatus.NOT_STARTED) {
+            if (this.clockInStatus === ClockInStatus.NOT_STARTED) {
               Text($r('app.string.servicecard_button_tip')).fontColor(Color.White)
-            } else if (this.checkInStatus === CheckInStatus.ON_GOING) {
+            } else if (this.clockInStatus === ClockInStatus.ON_GOING) {
               LoadingProgress().enableLoading(true).margin({ right: 4 })
               Text($r('app.string.servicecard_button_ongoing_tip')).fontColor(Color.White)
-            } else if (this.checkInStatus === CheckInStatus.FINISHED) {
+            } else if (this.clockInStatus === ClockInStatus.FINISHED) {
               Text($r('app.string.servicecard_button_finished_tip')).fontColor(Color.White)
             }
           }.justifyContent(FlexAlign.Center)
         }.height(36).width('100%').backgroundColor($r('app.color.service_card_button_background'))
         .onClick(() => {
-          if (this.checkInStatus !== CheckInStatus.NOT_STARTED) {
-            this.checkInStatus = CheckInStatus.NOT_STARTED;
+          if (this.clockInStatus !== ClockInStatus.NOT_STARTED) {
+            this.clockInStatus = ClockInStatus.NOT_STARTED;
             return;
           }
 
-          this.checkInStatus = CheckInStatus.ON_GOING;
+          this.clockInStatus = ClockInStatus.ON_GOING;
           postCardAction(this, {
             action: 'router',
             abilityName: 'EntryAbility',

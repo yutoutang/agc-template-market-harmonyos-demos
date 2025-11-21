@@ -1,10 +1,11 @@
 import { TabsInfo } from 'common';
 import { getDataFromJSON } from 'h5';
 
-@Component
+@ComponentV2
 export struct CustomTabBar {
-  @Link currentIndex: number;
-  @State tabsInfos: TabsInfo[] = []
+  @Param currentIndex: number = 0;
+  @Local tabsInfos: TabsInfo[] = []
+  @Event $currentIndex:(index:number) => void = () => {}
   aboutToAppear(): void {
     this.tabsInfos = getDataFromJSON<TabsInfo>('Tabs_Info.json', this);
   }
@@ -24,7 +25,7 @@ export struct CustomTabBar {
             .fontColor(this.currentIndex === index ? '#007DFF' : $r('sys.color.icon_secondary'))
             .fontSize($r('sys.float.Caption_M'))
         }.onClick(() => {
-          this.currentIndex = index
+          this.$currentIndex(index)
         })
       }, (item: TabsInfo) => JSON.stringify(item))
     }

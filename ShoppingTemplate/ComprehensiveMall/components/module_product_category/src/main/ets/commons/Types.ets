@@ -11,8 +11,8 @@ export interface SubCategoryItem {
 }
 
 export interface ProductSummaryItem {
-  banner: ResourceStr
-  title: string
-  subCategoryId: string
-  id: string
+  banner: ResourceStr;
+  title: string;
+  subCategoryId: string;
+  id: string;
 }

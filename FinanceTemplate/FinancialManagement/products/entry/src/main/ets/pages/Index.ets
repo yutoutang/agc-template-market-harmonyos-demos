@@ -1,0 +1,20 @@
+import { IndexVM } from '../viewModels/IndexVM';
+
+@Entry
+@ComponentV2
+struct Index {
+  vm: IndexVM = new IndexVM();
+  @Local isEnabled: boolean = true;
+
+  aboutToAppear(): void {
+    this.vm.setInterception();
+  }
+
+  build() {
+    Navigation(this.vm.navStack) {
+    }
+    .hideNavBar(true)
+    .enabled(this.isEnabled)
+    .hideTitleBar(true)
+  }
+}

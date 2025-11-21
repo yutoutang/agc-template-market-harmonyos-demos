@@ -189,14 +189,15 @@ export class CompressPageVM {
       })
     } else {
       docSel.maxSelectNumber = 1
-      docSel.fileSuffixFilters = ['.zip', '.rar', '.war'];
+      docSel.fileSuffixFilters = ['.zip', '.rar', '.war', '.7z'];
       docPic.select(docSel).then(async (documentSelectResult: Array<string>) => {
         if (documentSelectResult.length <= 0) {
           return
         }
         const arr = documentSelectResult[0].split('.')
-        if (!(arr[arr.length-1] === 'zip' || arr[arr.length-1] === 'rar' || arr[arr.length-1] === 'war')) {
-          promptAction.showToast({ message: '请选择后缀为zip、rar、war的文件！' })
+        if (!(arr[arr.length-1] === 'zip' || arr[arr.length-1] === 'rar' || arr[arr.length-1] === 'war' ||
+          arr[arr.length-1] === '7z')) {
+          promptAction.showToast({ message: '请选择后缀为zip、rar、war、7z的文件！' })
           return
         }
         this.documentSelectResult = documentSelectResult

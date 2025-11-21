@@ -11,6 +11,7 @@ import { CastService } from 'module_cast';
 import { AvPlayer } from '../controller/AvPlayer';
 import { AvPlayerPool } from '../controller/AvPlayerPool';
 import { MediaSource } from '../constant/MediaSource'
+import { media } from '@kit.MediaKit';
 
 const TAG = '[VideoPlayer]';
 const otherClickHeight = 200
@@ -136,7 +137,8 @@ export struct VideoPlayView {
                 hilog.info(0x0000, TAG,
                   `surfaceID: ${this.surfaceID}, curIndex: ${this.curIndex}, index: ${this.index}.`);
                 let mediaSource: MediaSource =
-                  new MediaSource(this.videoData.getId(), this.videoData.getUrl() as string, this.videoData.isLocked())
+                  new MediaSource(this.videoData.getId(), this.videoData.getUrl() as media.AVFileDescriptor | string,
+                    this.videoData.isLocked())
                 this.avPlayer = await this.playerPool.acquire(mediaSource)
                 this.playerSession.setAVPlayer(this.avPlayer)
                 hilog.info(0x000, TAG, `normal setSurfaceID:${this.surfaceID} id:${this.avPlayer.id}`)
@@ -270,7 +272,7 @@ export struct VideoPlayView {
       if (this.videoData.isLocked()) {
         return
       }
-      if (CastService.getInstance().isCasting) {
+      if (CastService.getInstance().castStatusModel.isCasting) {
         hilog.info(0x0000, TAG,
           `enter onIndexChange but casting. curIndex: ${this.curIndex}, index: ${this.index}.`);
         return
@@ -292,12 +294,12 @@ export struct VideoPlayView {
     hilog.debug(0x000, TAG, `updateIsPlay:${isPlay}`)
     if (isPlay) {
       CastService.getInstance().play({
-        elapsedTime: this.avPlayer?.currentTime || 0,
+        elapsedTime: (this.avPlayer?.currentTime || 0)*1000,
         updateTime: new Date().getTime()
       }, this.avPlayer?.duration)
     } else {
       CastService.getInstance().pause({
-        elapsedTime: this.avPlayer?.currentTime || 0,
+        elapsedTime: (this.avPlayer?.currentTime || 0)*1000,
         updateTime: new Date().getTime()
       }, this.avPlayer?.duration)
     }

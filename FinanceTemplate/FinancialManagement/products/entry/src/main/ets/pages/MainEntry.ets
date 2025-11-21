@@ -3,6 +3,11 @@ import { MainEntryVM } from '../viewModels/MainEntryVM';
 import { WidgetCardVM } from '../viewModels/WidgetCardVM';
 import { emitter } from '@kit.BasicServicesKit';
 
+@Builder
+export function MainEntryBuilder() {
+  MainEntry()
+}
+
 @Entry
 @ComponentV2
 struct MainEntry {
@@ -22,7 +27,7 @@ struct MainEntry {
   }
 
   build() {
-    Navigation(this.vm.navStack) {
+    NavDestination() {
       Column() {
         Tabs({ barPosition: BarPosition.End, index: this.vm.curIndex, controller: this.controller }) {
           ForEach(this.vm.tabList, (item: TabListItem, index: number) => {
@@ -48,8 +53,6 @@ struct MainEntry {
     }
     .hideTitleBar(true)
     .hideToolBar(true)
-    .hideBackButton(true)
-    .mode(NavigationMode.Stack)
   }
 
   async aboutToAppear() {

@@ -4,7 +4,6 @@ import { AddressDTO } from '../model/AddressDTO';
 export class AddressVM {
   @Trace
   public id: string = '';
-
   @Trace
   public name: string = ''; // 姓名
 
@@ -40,6 +39,11 @@ export class AddressVM {
 
   @Trace
   public updatedAt: number = 0; // 地址更新时间
+
+  @Trace
+  latitude: number = 0
+  @Trace
+  longitude: number = 0
 
   @Computed
   public get title(): string {
@@ -96,6 +100,8 @@ export class AddressVM {
     this.isDefault = address.isDefault ?? false;
     this.createdAt = address.createdAt ?? 0;
     this.updatedAt = address.updatedAt ?? 0;
+    this.latitude = address.latitude ?? 0;
+    this.longitude = address.longitude ?? 0;
   }
 
   public toDTO(): AddressDTO {
@@ -113,6 +119,8 @@ export class AddressVM {
       isDefault: this.isDefault,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
+      latitude: this.latitude,
+      longitude: this.longitude,
     };
   }
 }

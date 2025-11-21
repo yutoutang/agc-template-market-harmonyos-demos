@@ -22,6 +22,8 @@ export class Api {
       isDefault: true,
       createdAt: new Date().getTime(),
       updatedAt: new Date().getTime(),
+      latitude:31.99,
+      longitude:118.78
     },
   ];
 

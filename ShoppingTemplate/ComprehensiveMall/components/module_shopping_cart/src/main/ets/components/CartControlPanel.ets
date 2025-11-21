@@ -1,3 +1,4 @@
+import { CommonConfirmDialog } from 'module_ui_base';
 import { PopupSheet } from './PopupSheet';
 
 @ComponentV2
@@ -13,12 +14,14 @@ export struct CartControlPanel {
   // 选择的商品个数
   @Param quantity: number = 0;
   // 全选的回调事件
-  @Event onSelectAll: () => void = () => {};
+  @Event onSelectAll: () => void = () => {
+  };
   // 删除事件
-  @Event onDelete: () => void = () => {};
+  @Event onDelete: () => void = () => {
+  };
   // 结算
-  @Event onCheckout: () => void = () => {};
-
+  @Event onCheckout: () => void = () => {
+  };
   @Local visible: boolean = false;
   @Local popupMaskHeight: Length = '';
 
@@ -39,6 +42,7 @@ export struct CartControlPanel {
             .baselineOffset(-1)
             .margin({ left: 8, right: 8 })
         }
+
         Row() {
           if (this.isEdit) {
             // 删除
@@ -59,13 +63,12 @@ export struct CartControlPanel {
       }
       .width('100%')
       .height(60)
-      .shadow(this.isChildRoute ? undefined : { radius: 10, color: '#30000000' })
-      .borderWidth(this.isChildRoute ? { top: 0.1 } : { bottom: 0.1 })
+      .borderWidth(this.isChildRoute ? { top: 0.1 } : {})
       .borderColor('#30000000')
       .backgroundColor(Color.White)
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
       .justifyContent(FlexAlign.SpaceBetween)
       .padding({ left: 16, right: 16 })
-
 
       PopupSheet({
         visible: this.visible!!,
@@ -77,6 +80,7 @@ export struct CartControlPanel {
         title: '金额明细',
       })
     }
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
     .backgroundColor(Color.White)
     .onAreaChange((ov, nv) => {
       if (nv.globalPosition.y) {
@@ -87,22 +91,18 @@ export struct CartControlPanel {
 
   @Builder
   DeleteBtn() {
-    Button() {
-      Text('删除')
-        .fontSize(13)
-        .fontColor(Color.White)
-        .fontWeight(500)
-    }
-    .width(80)
-    .height(32)
-    .type(ButtonType.Normal)
-    .backgroundColor(Color.Red)
-    .borderColor('#FFE64566')
-    .borderRadius(21)
-    .margin({ left: 16 })
-    .onClick(() => {
-      this.onDelete && this.onDelete();
-    })
+    Button('删除')
+      .width(80)
+      .backgroundColor($r('app.color.theme_color'))
+      .margin({ left: 16 })
+      .onClick(() => {
+        CommonConfirmDialog.show({
+          content: '确认删除选中的商品吗？',
+          confirm: () => {
+            this.onDelete();
+          },
+        })
+      })
   }
 
   @Builder
@@ -113,11 +113,11 @@ export struct CartControlPanel {
         .fontColor('#E6000000')
       Text('¥')
         .fontSize(12)
-        .fontColor('#E84026')
+        .fontColor($r('app.color.theme_color'))
         .fontWeight(FontWeight.Medium)
       Text(this.totalPrice.toString())
         .fontSize(16)
-        .fontColor('#E84026')
+        .fontColor($r('app.color.theme_color'))
         .fontWeight(FontWeight.Medium)
     }
     .justifyContent(FlexAlign.End)
@@ -126,7 +126,7 @@ export struct CartControlPanel {
 
   @Builder
   TotalCostDetailView() {
-    Column({space: 4}) {
+    Column({ space: 4 }) {
       Row() {
         Text(`已选${this.quantity}件, `).fontSize(12).fontColor('#959496')
         this.TotalView();
@@ -140,15 +140,15 @@ export struct CartControlPanel {
             Span('共减 ¥')
             Span(this.discountAmount.toString())
           }
-          .fontSize(10).fontColor('#E84026')
-          .margin({right: 8})
+          .fontSize(10).fontColor($r('app.color.theme_color'))
+          .margin({ right: 8 })
         }
-        Text('查看明细').fontSize(10).fontColor('#E84026').margin({right: 2})
+        Text('查看明细').fontSize(10).fontColor($r('app.color.theme_color')).margin({ right: 2 })
         Image($r('app.media.ic_left_arrow'))
           .height(12)
           .objectFit(ImageFit.Contain)
           .rotate({ angle: 90 })
-          .fillColor('#E84026')
+          .fillColor($r('app.color.theme_color'))
           .draggable(false)
       }
       .onClick(() => {
@@ -179,7 +179,7 @@ export struct CartControlPanel {
 
   @Builder
   PopupContentBuilder() {
-    Column({space: 14}) {
+    Column({ space: 14 }) {
       this.PopupContentItem('商品金额', this.totalPrice + (this.discountAmount || 0));
       // 是否有优惠
       if (this.discountAmount) {
@@ -197,7 +197,7 @@ export struct CartControlPanel {
           Span(this.totalPrice.toString())
             .fontSize(16)
         }
-        .fontColor('#E84026')
+        .fontColor($r('app.color.theme_color'))
         .fontWeight(FontWeight.Medium)
       }
       .width('100%')

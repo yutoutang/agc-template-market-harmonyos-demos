@@ -132,5 +132,3 @@ export struct SearchPage {
   }
 }
 ```
-
-<img src="snapshots/example.gif" width="300">

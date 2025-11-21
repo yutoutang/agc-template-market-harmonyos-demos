@@ -77,7 +77,7 @@ struct Other {
       Row() {
         Button('退出登录')
           .fontColor('#E4480C')
-          .fontSize(16)
+          .fontSize($r('sys.float.Body_L'))
           .fontWeight(FontWeight.Medium)
           .backgroundColor($r('sys.color.comp_background_tertiary'))
           .width('100%')

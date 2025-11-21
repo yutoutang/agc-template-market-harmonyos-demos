@@ -29,7 +29,7 @@ struct Widget1x2Card {
   }
 
   build() {
-    Row({ space: 6 }) {
+    Row({ space: 4 }) {
       Image($r('app.media.app_icon_rect'))
         .width(28)
         .aspectRatio(1)
@@ -37,17 +37,17 @@ struct Widget1x2Card {
         .clip(true)
 
       if (this.default) {
-        Row({ space: 3 }) {
+        Row({ space: 2 }) {
           Text(this.default)
             .fontWeight(FontWeight.Medium)
             .fontColor('rgba(0,0,0,0.90)')
             .fontSize(14)
           Text('默认')
             .padding({
-              left: 4,
-              right: 4,
-              top: 3,
-              bottom: 3,
+              left: 2,
+              right: 2,
+              top: 2,
+              bottom: 2,
             })
             .backgroundColor($r('app.color.system_color_background_gray'))
             .borderRadius($r('app.string.border_radius_8'))

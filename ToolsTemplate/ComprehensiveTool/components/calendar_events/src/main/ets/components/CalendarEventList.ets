@@ -77,7 +77,9 @@ export struct CalendarEventDetails {
                 })
               }
             }
+            .layoutWeight(1)
           }
+          .layoutWeight(1)
         }, (item: ToggleItem) => item.id)
       }
       .scrollable(false)

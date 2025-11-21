@@ -74,8 +74,8 @@ struct Redemption {
                     controller: this.controller,
                   })
                     .type(InputType.Number)
-                    .placeholderColor($r('sys.color.font_tertiary'))
-                    .placeholderFont({ size: 16, weight: FontWeight.Regular })
+                    .placeholderColor($r('sys.color.font_secondary'))
+                    .placeholderFont({ size: $r('sys.float.Body_L'), weight: FontWeight.Regular })
                     .backgroundColor(Color.White)
                     .width('100%')
                     .fontSize(16)
@@ -108,7 +108,7 @@ struct Redemption {
                   ForEach(this.vm.redemptionButton, (item: IRedemptionButton, index: number) => {
                     Button(item.text)
                       .buttonStyles()
-                      .fontSize(12)
+                      .fontSize($r('sys.float.Body_S'))
                       .fontWeight(FontWeight.Regular)
                       .fontColor(this.vm.selectedMoneyIndex === index ? '#E4480C' : $r('sys.color.font_primary'))
                       .borderColor(this.vm.selectedMoneyIndex === index ? '#E4480C' : 'rgba(0,0,0,0.20)')
@@ -138,7 +138,7 @@ struct Redemption {
           Button('确认赎回')
             .width('100%')
             .height('100%')
-            .fontColor(Color.White)
+            .fontColor($r('sys.color.font_on_primary'))
             .backgroundColor('#E4480C')
             .enabled(this.vm.checkShare())
             .onClick(() => {
@@ -254,7 +254,7 @@ struct Redemption {
                 .backgroundColor(Color.White)
                 .padding({ left: 0 })
                 .placeholderColor($r('sys.color.font_secondary'))
-                .placeholderFont({ size: 16, weight: FontWeight.Regular })
+                .placeholderFont({ size:  $r('sys.float.Body_L'), weight: FontWeight.Regular })
                 .fontSize(16)
                 .fontWeight(FontWeight.Regular)
                 .fontColor($r('sys.color.font_primary'))

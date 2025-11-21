@@ -245,11 +245,16 @@ export class AvPlayer {
     this.avPlayer = await media.createAVPlayer();
     // 创建状态机变化回调函数
     this.setAVPlayerCallback(this.avPlayer);
-    let mediaSource: media.MediaSource =
-      media.createMediaSourceWithUrl(videoInfo.url);
-    let playbackStrategy : media.PlaybackStrategy =
-      {preferredWidth: 1, preferredHeight: 2, preferredBufferDuration: 3, preferredHdr: false};
-    this.avPlayer.setMediaSource(mediaSource, playbackStrategy);
+    if(typeof videoInfo.url === 'string'){
+      this.setAVPlayerCallback(this.avPlayer);
+      let mediaSource: media.MediaSource =
+        media.createMediaSourceWithUrl(videoInfo.url);
+      let playbackStrategy : media.PlaybackStrategy =
+        {preferredWidth: 1, preferredHeight: 2, preferredBufferDuration: 3, preferredHdr: false};
+      this.avPlayer.setMediaSource(mediaSource, playbackStrategy);
+    }else{
+      this.avPlayer.fdSrc = videoInfo.url as media.AVFileDescriptor;
+    }
     this.videoInfo = videoInfo
     this.id = this.videoInfo.id
   }

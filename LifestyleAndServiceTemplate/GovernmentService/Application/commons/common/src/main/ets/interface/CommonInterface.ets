@@ -129,10 +129,17 @@ export class ServiceList {
   icon: string = ''
 }
 
+@ObservedV2
 export class Suggestion {
-  date: Date = new Date()
-  title: string = ''
-  image?: string[] = []
+  @Trace date: Date = new Date()
+  @Trace title: string = ''
+  @Trace image?: string[] = []
+}
+
+@ObservedV2
+export class SuggestionList {
+  @Type(Suggestion)
+  @Trace suggestion: Suggestion[] = []
 }
 
 export class ScanCodeRect {

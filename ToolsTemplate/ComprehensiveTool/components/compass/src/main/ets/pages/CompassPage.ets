@@ -45,8 +45,6 @@ struct CompassPage {
       this.facingDirection = this.controller.findMountain(this.angle);
       this.sittingDirection = this.controller.findMountain(sittingAngle);
     });
-
-    this.controller.getAngle();
   }
 
   aboutToDisappear(): void {
@@ -171,7 +169,9 @@ struct CompassPage {
       .backgroundColor($r('sys.color.background_secondary'))
       .padding({ left: 16, right: 16 })
       .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
-    }.title(this.navBarBuilder())
+    }.title(this.navBarBuilder()).onShown(() => {
+      this.controller.getAngle();
+    })
   }
 
   @Builder

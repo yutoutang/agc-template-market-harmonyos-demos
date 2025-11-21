@@ -4,7 +4,7 @@
 
 - [简介](#简介)
 - [约束与限制](#约束与限制)
-- [快速入门](#快速入门)
+- [使用](#使用)
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
@@ -21,7 +21,7 @@
 
 * DevEco Studio版本：DevEco Studio 5.0.0 Release及以上
 * HarmonyOS SDK版本：HarmonyOS 5.0.0 Release SDK及以上
-* 设备类型：华为手机（直板机）
+* 设备类型：华为手机（包括双折叠和阔折叠）
 * HarmonyOS版本：HarmonyOS 5.0.0 Release及以上
 
 ### 权限
@@ -30,11 +30,11 @@
 
 * 网络权限：ohos.permission.INTERNET
 
-## 快速入门
+## 使用
 
 1. 安装组件。
 
-   如果是在DevEvo Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
+   如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
 
    如果是从生态市场下载组件，请参考以下步骤安装组件。
 
@@ -52,8 +52,9 @@
    ]
    ```
 
+   c. 在项目根目录oh-package.json5中添加依赖。
    ```
-   // 在项目根目录oh-package.json5中添加依赖
+   // XXX为组件存放的目录名
    "dependencies": {
       "module_swiper_preview": "file:./XXX/module_swiper_preview"
    }
@@ -90,13 +91,13 @@ SwiperPicsPreview(options?: SwiperPicsPreviewOptions)
 
 **参数：**
 
-| 参数名     | 类型                                                        | 必填 | 说明             |
+| 名称      | 类型                                                        | 必填 | 说明             |
 |---------|-----------------------------------------------------------|----|----------------|
 | options | [SwiperPicsPreviewOptions](#SwiperPicsPreviewOptions对象说明) | 否  | 配置图片轮播预览组件的参数。 |
 
 ### SwiperPicsPreviewOptions对象说明
 
-| 参数      | 类型                  | 是否必填 | 说明                         |
+| 名称      | 类型                  | 是否必填 | 说明                         |
 |---------|---------------------|------|----------------------------|
 | pics    | ResourceStr[]       | 是    | 轮播图片数组                     |
 | index   | number              | 否    | 初始图片索引                     |
@@ -108,7 +109,7 @@ SwiperPicsPreview(options?: SwiperPicsPreviewOptions)
 
 ## 示例代码
 
-本示例通过本组件实现图片的轮播展示，点击对应图片可进行大图预览。
+本示例实现图片的轮播展示，点击对应图片可进行大图预览。
 
 ```
 import { SwiperPicsPreview } from 'module_swiper_preview';

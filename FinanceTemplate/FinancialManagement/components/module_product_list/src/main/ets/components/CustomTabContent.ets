@@ -37,7 +37,7 @@ export struct CustomTabContent {
         Row() {
           Select(this.vm.selectArrangementList)
             .value(getLabel(this.vm.arrangementList, this.vm.arrangement))
-            .font({ size: 14, weight: FontWeight.Regular })
+            .font({ size: $r('sys.float.Body_M'), weight: FontWeight.Regular })
             .backgroundColor($r('sys.color.background_secondary'))
             .onSelect((index: number, value: string) => {
               const arrangement = getValue(this.vm.arrangementList, value)
@@ -48,7 +48,7 @@ export struct CustomTabContent {
             })
           Select(this.vm.selectSaleTypeList)
             .value(getLabel(this.vm.saleTypeList, this.vm.saleType))
-            .font({ size: 14, weight: FontWeight.Regular })
+            .font({ size: $r('sys.float.Body_M'), weight: FontWeight.Regular })
             .backgroundColor($r('sys.color.background_secondary'))
             .onSelect((index: number, value: string) => {
               const saleType = getValue(this.vm.saleTypeList, value)
@@ -265,7 +265,7 @@ export struct CustomTabContent {
             Button('完成')
               .width('100%')
               .height(40)
-              .fontColor(Color.White)
+              .fontColor($r('sys.color.font_on_primary'))
               .backgroundColor('#E4480C')
           }
           .width('calc(50% - 6vp)')

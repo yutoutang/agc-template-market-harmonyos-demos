@@ -9,14 +9,17 @@ export struct CartCard {
   // 是否编辑态
   @Param isEdit: boolean = false;
   // 购物车商品数量变化的事件回调
-  @Event onChangeCount: (skuCode: string) => void = (skuCode: string) => {};
+  @Event onChangeCount: (skuCode: string) => void = (skuCode: string) => {
+  };
   // 商品卡片事件回调
-  @Event onCardClick: () => void = () => {};
+  @Event onCardClick: () => void = () => {
+  };
   // 管理态，点击删除图标
-  @Event onDelete: (skuCode: string) => void = (skuCode: string) => {};
+  @Event onDelete: (skuCode: string) => void = (skuCode: string) => {
+  };
 
   build() {
-    Row({space: 12}) {
+    Row({ space: 12 }) {
       this.checkboxBuilder();
       this.cardImgBuilder();
       this.cardInfoBuilder();
@@ -24,7 +27,12 @@ export struct CartCard {
     .alignItems(VerticalAlign.Top)
     .backgroundColor(Color.White)
     .width('100%')
-    .padding({ left: 12, right: 12, top: 16, bottom: 16 })
+    .padding({
+      left: 12,
+      right: 12,
+      top: 16,
+      bottom: 16,
+    })
     .borderRadius(8)
     .onClick(() => {
       this.onCardClick && this.onCardClick();
@@ -69,9 +77,9 @@ export struct CartCard {
       Text(this.data.serviceDesc)
         .fontColor($r('sys.color.mask_tertiary'))
         .fontSize(12)
-        .margin({top: 2})
+        .margin({ top: 2 })
 
-      Row({space: 4}) {
+      Row({ space: 4 }) {
         Text(this.data.skuDesc)
           .fontColor($r('sys.color.mask_tertiary'))
           .fontSize(10)
@@ -83,37 +91,43 @@ export struct CartCard {
           .draggable(false)
       }
       .borderRadius(4)
-      .margin({top: 4})
-      .padding({ top: 2, bottom: 2, left: 8, right: 8 })
+      .margin({ top: 4 })
+      .padding({
+        top: 2,
+        bottom: 2,
+        left: 8,
+        right: 8,
+      })
       .backgroundColor('#0D000000')
-
-      if (this.data.dashPrice) {
-        Text() {
-          Span('¥')
-          Span(this.data.dashPrice.toString())
-        }
-        .fontSize(10)
-        .fontColor('#66000000')
-        .decoration({
-          type: TextDecorationType.LineThrough,
-          color: '#66000000',
-        })
-        .margin({top: 8})
-      }
 
       Row() {
         Text() {
-          Span('¥').fontSize(12)
-          Span(this.data.price.toString()).fontSize(16)
+          Span('¥').fontSize(10).fontColor('#FFE84026')
+          Span(this.data.price.toString()).fontSize(16).fontColor('#FFE84026')
+
+          if (this.data.dashPrice) {
+            Span(' ').letterSpacing(2)
+            Span('¥')
+              .decoration({
+                type: TextDecorationType.LineThrough,
+                color: '#66000000',
+              })
+            Span(this.data.dashPrice.toString())
+              .decoration({
+                type: TextDecorationType.LineThrough,
+                color: '#66000000',
+              })
+          }
         }
-        .fontColor('#FFE84026')
+        .fontSize(10)
+        .fontColor('#66000000')
 
         if (this.isEdit) {
           Button({ type: ButtonType.Normal, stateEffect: true }) {
             Image($r('app.media.ic_delete')).fillColor(Color.White).width(14).height(14)
           }
           .padding(4)
-          .backgroundColor('#E84026')
+          .backgroundColor($r('app.color.theme_color'))
           .borderRadius(4)
           .onClick(() => {
             this.onDelete && this.onDelete(this.data.skuCode);
@@ -147,7 +161,7 @@ export struct CartCard {
       .width('100%')
       .justifyContent(FlexAlign.SpaceBetween)
       .alignItems(VerticalAlign.Center)
-      .margin({top: 9})
+      .margin({ top: 12 })
     }
     .layoutWeight(1)
     .justifyContent(FlexAlign.SpaceBetween)

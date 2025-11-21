@@ -17,9 +17,9 @@ export interface AddressDTO {
   isDefault: boolean; // 是否为默认地址
   createdAt: number; // 地址创建时间
   updatedAt: number; // 地址更新时间
-
+  latitude: number; // 纬度
+  longitude: number; // 经度
   // 可结合业务需求灵活拓展更多属性
   // tag: string;       // 标签（家、公司、学校）
-  // latitude: number;  // 纬度
-  // longitude: number; // 经度
+
 }

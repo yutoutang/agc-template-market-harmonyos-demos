@@ -197,7 +197,7 @@ export struct CalenderView {
             .justifyContent(FlexAlign.Center)
             .width($r('app.float.content_size'))
             .height($r('app.float.height_or_line_height'))
-          })
+          }, (item: Resource) => JSON.stringify(item))
         }
         .width(CommonConstants.FULL_PERCENT)
         .borderRadius($r('app.float.height_or_line_height'))
@@ -252,11 +252,11 @@ export struct CalenderView {
                 .justifyContent(FlexAlign.Center)
                 .width($r('app.float.content_size'))
                 .height($r('app.float.content_size'))
-              })
+              }, (item:DateElement) => JSON.stringify(item))
             }
             .width('100%')
             .margin({ top: '6vp' })
-          })
+          }, (item:DateElement) => JSON.stringify(item))
       }
       .width('100%')
       .gesture(PanGesture({ fingers: 1, direction: PanDirection.Horizontal, distance: 5 })

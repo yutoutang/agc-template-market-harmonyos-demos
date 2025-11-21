@@ -6,7 +6,7 @@ export const PRODUCT_ITEM1: ProductInfo = {
   banners: [
     $r('app.media.mock_spec_pink'),
     $r('app.media.mock_spec_white'),
-    $r('app.media.mock_spec_stripe'),
+    $r('app.media.mock_spec_yellow'),
   ],
   price: '188',
   dashPrice: '200',
@@ -16,15 +16,14 @@ export const PRODUCT_ITEM1: ProductInfo = {
   logistics: [
     {
       icon: $r('app.media.ic_truck'),
-      content: '48小时内发货',
+      content: '48小时内发货 | 免运费',
     },
-    { icon: '', content: '免运费｜江苏无锡发货' },
   ],
   service: [{ icon: $r('app.media.ic_heart'), content: '运费险｜7天无理由' }],
   pictures: [
     $r('app.media.mock_spec_pink'),
     $r('app.media.mock_spec_white'),
-    $r('app.media.mock_spec_stripe'),
+    $r('app.media.mock_spec_yellow'),
     $r('app.media.mock_spec_green'),
   ],
   selectionInfo: {
@@ -122,7 +121,8 @@ export const PRODUCT_ITEM1: ProductInfo = {
     ],
     specOptions: [
       {
-        key: '尺码',
+        key: 'size',
+        label: '尺码',
         values: [
           { id: 'uuid_160_80A', text: '160/80A' },
           { id: 'uuid_165_84A', text: '165/84A' },
@@ -132,6 +132,7 @@ export const PRODUCT_ITEM1: ProductInfo = {
     ],
     specOptionWithImage: {
       key: 'color',
+      label: '颜色',
       values: [
         {
           id: 'uuid_pink',
@@ -145,8 +146,8 @@ export const PRODUCT_ITEM1: ProductInfo = {
         },
         {
           id: 'uuid_stripe',
-          text: '条纹',
-          image: $r('app.media.mock_spec_stripe'),
+          text: '黄色',
+          image: $r('app.media.mock_spec_yellow'),
         },
         {
           id: 'uuid_green',
@@ -167,7 +168,7 @@ export const PRODUCT_ITEM2: ProductInfo = {
   title: '休闲简约经典商务衬衫T恤日系风高级感',
   tags: ['7天无理由'],
   logistics: [
-    { icon: '', content: '24小时发货' },
+    { icon: $r('app.media.ic_truck'), content: '24小时发货' },
   ],
   service: [{ icon: $r('app.media.ic_heart'), content: '运费险｜7天无理由' }],
   pictures: [
@@ -271,7 +272,8 @@ export const PRODUCT_ITEM2: ProductInfo = {
     ],
     specOptions: [
       {
-        key: '尺码',
+        key: 'size',
+        label: '尺码',
         values: [
           { id: 'S', text: 'S' },
           { id: 'M', text: 'M' },
@@ -281,6 +283,7 @@ export const PRODUCT_ITEM2: ProductInfo = {
     ],
     specOptionWithImage: {
       key: 'color',
+      label: '颜色',
       values: [
         {
           id: 'uuid_black',
@@ -315,7 +318,7 @@ export function getProductListMock(): ProductInfo[] {
     const bannerList: ResourceStr[] = [
       $r('app.media.mock_spec_pink'),
       $r('app.media.mock_spec_white'),
-      $r('app.media.mock_spec_stripe'),
+      $r('app.media.mock_spec_yellow'),
       $r('app.media.mock_spec_green'),
     ];
     const first = bannerList.splice(index % 4, 1);
@@ -350,14 +353,7 @@ export const REVIEW_ITEM_MOCK1: ProductReviewItem = {
   date: 1704220800000, // 2023-11-01 00:00:00
   content:
   '这款针织打底衫质量非常棒，纯羊毛材质，穿着舒适，保暖性很好。适合商务场合，搭配西装外套也很合适。',
-  mediaList: [
-    { uri: $r('app.media.mock_spec_pink'), type: ReviewMediaType.IMAGE },
-    { uri: $r('app.media.mock_spec_pink'), type: ReviewMediaType.IMAGE },
-    { uri: $r('app.media.mock_spec_pink'), type: ReviewMediaType.IMAGE },
-    { uri: $r('app.media.mock_spec_pink'), type: ReviewMediaType.IMAGE },
-    { uri: $r('app.media.mock_spec_pink'), type: ReviewMediaType.IMAGE },
-    { uri: $r('app.media.mock_spec_pink'), type: ReviewMediaType.IMAGE },
-  ],
+  mediaList: [],
 };
 
 export const REVIEW_ITEM_MOCK2: ProductReviewItem = {

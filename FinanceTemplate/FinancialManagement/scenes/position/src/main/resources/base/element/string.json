@@ -3,6 +3,10 @@
     {
       "name": "shared_desc",
       "value": "description"
+    },
+    {
+      "name": "agcit_huawei_financial_management",
+      "value": "1.0.2"
     }
   ]
 }

@@ -15,7 +15,7 @@ export struct PhotoFramePage {
   @Local vm: PhotoFrameVM = new PhotoFrameVM();
   @Local frameIndex: number = 0;
   @Local dispW: Array<number> = new Array<number>(PHOTO_FRAMES.length).fill(1200);
-  @Local dispH: Array<number> = Array<number>(PHOTO_FRAMES.length).fill(1600);
+  @Local dispH: Array<number> = new Array<number>(PHOTO_FRAMES.length).fill(1600);
   @Local dragStartX: number = 0;
   @Local dragStartY: number = 0;
   @Local scaleStart: number = 0;
@@ -53,7 +53,6 @@ export struct PhotoFramePage {
               .objectFit(ImageFit.Contain)
               .gesture(
                 GestureGroup(GestureMode.Parallel,
-
                   PinchGesture()
                     .onActionStart((e: GestureEvent) => {
                       this.scaleStart = this.itemScale;
@@ -108,13 +107,14 @@ export struct PhotoFramePage {
             })
             .hitTestBehavior(HitTestMode.Transparent);
         }
-        .height(this.dispH[this.frameIndex] + 'px')
+        .height('calc(100% - 200vp)')
         .width(this.dispW[this.frameIndex] + 'px')
         .id('photoFrame')
         .clip(true);
 
         Blank()
           .layoutWeight(1);
+
         Row() {
           List() {
             Repeat(PHOTO_FRAMES)
@@ -145,7 +145,7 @@ export struct PhotoFramePage {
           .alignListItem(ListItemAlign.Center)
           .listDirection(Axis.Horizontal);
         };
-      };
+      }
     }
     .hideTitleBar(true).onReady((ctx) => {
       this.uri = ctx.pathInfo.param as string;

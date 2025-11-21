@@ -39,7 +39,7 @@ export struct VideoDesLayer {
           this.serialPickerSheetBuilder(this.playController.curentIndex, (index: number) => {
             Logger.info(TAG, `onIndexSelect:${index}`)
             this.isShowSerialPickerSheet = !this.isShowSerialPickerSheet
-            if (CastService.getInstance().isCasting && this.isLocked?.(index)) {
+            if (CastService.getInstance().castStatusModel.isCasting && this.isLocked?.(index)) {
               PromptActionClass.setParam(new Params('当前视频解锁后，可投屏观看？', [{
                 content: '退出投屏', action: () => {
                   PromptActionClass.closeDialog()

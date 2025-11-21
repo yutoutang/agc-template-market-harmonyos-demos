@@ -108,7 +108,7 @@ export struct ProductSelector {
   specsInfoBuilder() {
     Column() {
       ForEach(Array.from(this.vm.specViewListMap), (item: [string, SpecViewModel[]]) => {
-        Text(item[0]).specKeyTextStyle();
+        Text(item[1][0]?.label ?? '').specKeyTextStyle();
         Flex({ wrap: FlexWrap.Wrap, space: { main: LengthMetrics.vp(8), cross: LengthMetrics.vp(8) } }) {
           ForEach(item[1], (item: SpecViewModel) => {
             Row() {
@@ -188,7 +188,7 @@ export struct ProductSelector {
       .width('100%')
       .height(40)
       .backgroundColor(this.vm.enableConfirm ? Constants.THEME_COLOR : Constants.FONT_COLOR_LEVEL3)
-      .fontColor(Constants.FONT_COLOR_1_INVERT)
+      .fontColor($r('sys.color.font_on_primary'))
       .onClick(() => {
         if (!this.vm.curSku) {
           promptAction.showToast({ message: '还有规格没有选择' });
@@ -201,7 +201,8 @@ export struct ProductSelector {
             this.handlePayNow?.(this.vm.curSku.skuCode, this.vm.selectedCount);
           }
         }
-      });
+      })
+      .margin({ bottom: $r('app.string.space_l') })
   }
 }
 

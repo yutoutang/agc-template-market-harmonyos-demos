@@ -1,6 +1,7 @@
 import { formBindingData, formProvider } from '@kit.FormKit';
-import { PreferenceUtil } from '../utils/PreferenceUtil';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { preferences } from '@kit.ArkData';
+import { PreferenceUtil } from '../utils/PreferenceUtil';
 
 export class FormDataClass {
   storeName: ResourceStr = ''
@@ -25,7 +26,9 @@ export class CardManager {
   static KEY_CARD_INFO = 'card_info'
 
   public getFormIdArray() {
-    return PreferenceUtil.getInstance().get(CardManager.KEY_CARD_ID) as Array<string>
+    let preference = preferences.getPreferencesSync(getContext(), { name: 'default' })
+    preferences.removePreferencesFromCacheSync(getContext(), { name: 'default' })
+    return PreferenceUtil.getInstance().getWithPreference(preference, CardManager.KEY_CARD_ID) as Array<string>
   }
 
   public createFormData(data: FormDataClass): formBindingData.FormBindingData {

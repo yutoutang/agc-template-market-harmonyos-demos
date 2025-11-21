@@ -58,6 +58,18 @@ compass/src/main/ets                              // 罗盘(har)
    }
    ```
 
+2. 在主工程的EntryAbility.ets文件中onBackground的生命周期函数中释放传感器资源。
+
+   ```typescript
+   import { sensor } from '@kit.SensorServiceKit';
+   
+   onBackground(): void {
+      ...
+      sensor.off(sensor.SensorId.ORIENTATION);
+      ...
+   }
+   ```
+
 ## 示例代码
 
 ```typescript

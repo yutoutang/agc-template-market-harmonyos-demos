@@ -120,5 +120,3 @@ struct PreviewPage {
   }
 }
 ```
-
-<img src="snapshots/example.gif" width="300">

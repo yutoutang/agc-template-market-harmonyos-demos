@@ -40,6 +40,7 @@ export struct CalendarBirRem {
     BaseDatePicker({
       datePicker: this.userEventInfo.date[0].date,
       isShowDateTitle: true,
+      datePickerModeIndex: 2,
       isBottom: true,
       isLunar: true,
       isLunarDate: this.userEventInfo.date[0].isLunar,
@@ -90,8 +91,8 @@ export struct CalendarBirRem {
         Text(this.isBirthDay() ? '生日日期' : '日期')
           .fontWeight(FontWeight.Medium)
         Row() {
-          Text(this.userEventInfo.date[0].isLunar ? this.userEventInfo.date[0].lunarDate :
-          dayjs(this.userEventInfo.date[0].date).format('YYYY年MM月DD日'))
+          Text(this.userEventInfo.date[0].isLunar ? this.userEventInfo.date[0].lunarDate.split('年')[1] :
+          dayjs(this.userEventInfo.date[0].date).format('MM月DD日'))
             .fontSize(14)
             .fontColor(this.readonly ? $r('sys.color.font_secondary') : $r('sys.color.font_primary'))
           Image(this.readonly ? $r('app.media.chevron_up_grey') : $r('app.media.chevron_up')).width(12).height(24)
@@ -103,7 +104,7 @@ export struct CalendarBirRem {
         }
         baseActionSheet.show({
           id: 'datePickerBuilder',
-          detents:[400,401],
+          detents: [400, 401],
           showClose: false,
           customContent: () => {
             this.datePickerBuilder()
@@ -161,15 +162,16 @@ export struct CalendarBirRem {
 
   @Builder
   topShow() {
-    Row(){
+    Row() {
       Text('首页置顶')
         .fontWeight(FontWeight.Medium)
         .fontColor($r('sys.color.font_primary'))
       Blank()
-      Toggle({ type: ToggleType.Switch, isOn: true })
+      Toggle({ type: ToggleType.Switch, isOn: this.userEventInfo.isTop })
         .onChange((value) => {
           this.userEventInfo.isTop = value
         })
+        .enabled(!this.readonly)
     }
     .width('100%')
     .backgroundColor($r('sys.color.background_primary'))
@@ -183,6 +185,7 @@ export struct CalendarBirRem {
         ListItem() {
           this.eventTarget()
         }
+
         ListItem() {
           this.topShow()
         }

@@ -11,6 +11,14 @@
 
 ## 功能介绍
 
+您可以基于此模板直接定制应用，也可以挑选此模板中提供的多种组件使用，从而降低您的开发难度，提高您的开发效率。
+
+本模板提供如下组件，所有组件存放在工程根目录的components下，如果您仅需使用组件，可参考对应组件的指导链接；如果您使用此模板，请参考本文档。
+
+| 组件                             | 描述                 | 使用指导                                          |
+| -------------------------------- | -------------------- | ------------------------------------------------- |
+| 通用登录组件（aggregated_login） | 通用登录组件相关能力 | [使用指导](components/aggregated_login/README.md) |
+
 本模板为政务应用提供了常用功能的开发样例，模板主要分首页、办事、互动、和我的四大模块：
 
 * 首页：主要提供服务查询，身份码，资讯公告，热门服务，我的收藏，最近使用，专题服务等功能
@@ -164,17 +172,22 @@ CloudProgram
 * 本模版登录中获取验证码获取场景为模拟场景，真实场景以业务实际场景为准
 * 本模版在未配置华为账号一键登录的情况下为保证正常使用本模版，均采用模拟用户信息登录，实际开发中请按照业务为准！
 
-## 环境要求
+## 约束与限制
 
-### 软件
+### 环境
 
-* DevEco Studio版本：DevEco Studio 5.0.0 Release及以上
-* HarmonyOS SDK版本：HarmonyOS 5.0.0 Release SDK及以上
+- DevEco Studio版本：DevEco Studio 5.0.3 Release及以上
+- HarmonyOS SDK版本：HarmonyOS 5.0.3 Release SDK及以上
 
-### 硬件
+- 设备类型：华为手机（包括双折叠和阔折叠）
 
-* 设备类型：华为手机（直板机）
-* HarmonyOS版本：HarmonyOS 5.0.0 Release及以上
+- 系统版本：HarmonyOS 5.0.0(12)及以上
+
+### 权限
+
+- 网络权限: ohos.permission.INTERNET, ohos.permission.GET_NETWORK_INFO
+- 跨应用关联权限: ohos.permission.APP_TRACKING_CONSENT
+
 
 ## 快速入门
 
@@ -184,7 +197,7 @@ CloudProgram
 
 1. 在AppGallery Connect创建应用，将包名配置到模板中。
 
-   a. 参考[创建HarmonyOS应用](https://developer.huawei.com/consumer/cn/doc/app/agc-help-createharmonyapp-0000001945392297) 为应用创建APP ID，并将APP ID与应用进行关联。
+   a. 参考[创建HarmonyOS应用](https://developer.huawei.com/consumer/cn/doc/app/agc-help-create-app-0000002247955506)为应用创建APP ID，并将APP ID与应用进行关联。
 
    b. 返回应用列表页面，查看应用的包名。
 
@@ -196,7 +209,7 @@ CloudProgram
 
    b. 申请华为账号一键登录所需的quickLoginMobilePhone权限，详细参考：[配置scope权限](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-config-permissions)。
 
-   c.在cloudfunctions/govn-template-userinfo/AxiosApi.ts文件中配置client_id、client_secret。client_id、client_secret信息的查询请参考[查看应用基本信息](https://developer.huawei.com/consumer/cn/doc/app/agc-help-appinfo-0000001100014694)。
+   c. 在cloudfunctions/govn-template-userinfo/AxiosApi.ts文件中配置client_id、client_secret。client_id、client_secret信息的查询请参考[查看应用基本信息](https://developer.huawei.com/consumer/cn/doc/app/agc-help-view-app-info-0000002282674569)。
 
    ![截图](screenshot/img_7.png)
 
@@ -208,7 +221,7 @@ CloudProgram
 
    a. [开通云函数服务](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/cloudfoundation-enable-function)和[开通云数据库服务](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/cloudfoundation-enable-database)。
 
-   b. 在CloudProgram/cloud-config.json文件中配置相关信息，依次填写当前项目的appId、appName、projectId、teamId、projectName，相关信息查询参考[查看应用基本信息](https://developer.huawei.com/consumer/cn/doc/app/agc-help-appinfo-0000001100014694) 。
+   b. 在CloudProgram/cloud-config.json文件中配置相关信息，依次填写当前项目的appId、appName、projectId、teamId、projectName，相关信息查询参考[查看应用基本信息](https://developer.huawei.com/consumer/cn/doc/app/agc-help-view-app-info-0000002282674569) 。
 
    ![截图](screenshot/img_3.png)
 
@@ -230,8 +243,8 @@ CloudProgram
 
 5. 配置推送服务。
 
-   a. [开发准备](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/push-preparations),请先确认您已按照指导文档完成推送相关的准备工作
-   
+   a. 参考[开发准备](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/push-preparations)，完成推送服务相关的准备工作
+
    b. [推送场景化消息](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/push-send-alert)
 
    c. [端云调试](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/push-server)
@@ -242,7 +255,7 @@ CloudProgram
 
 6. 对应用进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing#section297715173233)。
 
-7. 添加手工签名所用证书对应的公钥指纹。详细参考：[配置应用签名证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-signature-info-0000001628566748#section5181019153511)
+7. 添加手工签名所用证书对应的公钥指纹。详细参考：[配置公钥指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-cert-fingerprint-0000002278002933)
 
 ### 运行调试工程
 
@@ -264,6 +277,10 @@ CloudProgram
 
 * 获取位置权限：ohos.permission.APPROXIMATELY_LOCATION
 * 网络权限：ohos.permission.INTERNET
+
+## 调试
+
+本模板不支持使用模拟器调试，请使用真机进行调试
 
 ## 开源许可协议
 

@@ -157,6 +157,26 @@
     {
       "name": "image_recognition",
       "srcPath": "./components/image_recognition"
+    },
+    {
+      "name": "financial_calculator",
+      "srcPath": "./components/financial_calculator"
+    },
+    {
+      "name": "pension_calculator",
+      "srcPath": "./components/pension_calculator"
+    },
+    {
+      "name": "kinship_calculator",
+      "srcPath": "./components/kinship_calculator"
+    },
+    {
+      "name": "retirement_age_calculator",
+      "srcPath": "./components/retirement_age_calculator"
+    },
+    {
+      "name": "credentials_photo",
+      "srcPath": "./components/credentials_photo"
     }
   ]
 }

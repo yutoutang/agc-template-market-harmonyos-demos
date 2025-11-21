@@ -37,6 +37,10 @@ zip_tool/src/main/ets                             // 解压缩工具(har)
 
 * 无
 
+### 限制
+* 解压缩工具支持手机软件的zip、rar、war格式解压，若希望支持rar和war的压缩，可将@ohos/oh7zip替换为OpenHarmony三方库中心仓的@dove/p7zip，并做相应适配开发。
+* 解压缩工具不支持模拟器使用
+
 ## 使用
 1. 安装组件。
 

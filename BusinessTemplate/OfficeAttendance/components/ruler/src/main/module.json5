@@ -1,0 +1,9 @@
+{
+  "module": {
+    "name": "ruler",
+    "type": "har",
+    "deviceTypes": [
+      "default"
+    ]
+  }
+}

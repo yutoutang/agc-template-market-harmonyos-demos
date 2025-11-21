@@ -30,6 +30,6 @@ export struct ToolPage {
       }
       .height('100%')
       .padding({ left: 8, right: 8 })
-    }.title(BaseTitleBuilder('工具')).backgroundColor('#000000')
+    }.title(BaseTitleBuilder('工具')).backgroundColor($r('sys.color.background_primary'))
   }
 }

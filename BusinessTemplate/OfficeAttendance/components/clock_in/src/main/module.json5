@@ -1,0 +1,44 @@
+{
+  "module": {
+    "name": "clock_in",
+    "type": "har",
+    "deviceTypes": [
+      "default"
+    ],
+    "requestPermissions": [
+      {
+        "name": "ohos.permission.INTERNET"
+      },
+      {
+        "name": 'ohos.permission.LOCATION',
+        "reason": '$string:permission_reason_location',
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "inuse"
+        }
+      },
+      {
+        "name": 'ohos.permission.APPROXIMATELY_LOCATION',
+        "reason": '$string:permission_reason_location',
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "inuse"
+        }
+      },
+      {
+        "name": 'ohos.permission.VIBRATE',
+        "reason": '$string:permission_reason_vibrate',
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "inuse"
+        }
+      }
+    ]
+  }
+}

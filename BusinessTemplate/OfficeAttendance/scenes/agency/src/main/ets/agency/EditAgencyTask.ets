@@ -75,14 +75,7 @@ export struct EditAgencyTask {
   }
 
   hide() {
-    animateTo({
-      duration: 300,
-      curve: Curve.Friction,
-      onFinish: () => {
-        RouterModule.popWithParam([], true);
-      },
-    }, () => {
-    });
+    RouterModule.popWithParam([], true);
   }
 
   gotoAgencyTask(task: TaskItem): void {
@@ -194,7 +187,7 @@ export struct EditAgencyTask {
                     .borderRadius(4)
                     .backgroundColor($r('app.color.white'))
                     .border({ color: $r('app.color.black_1'), style: BorderStyle.Solid })
-                    .selectedColor($r('app.color.sys_default_blue'))
+                    .selectedColor($r('sys.color.comp_background_emphasize'))
                     .shape(CheckBoxShape.ROUNDED_SQUARE)
                     .margin({ bottom: 16 })
                     .onClick(() => {
@@ -332,7 +325,7 @@ export struct EditAgencyTask {
                             .borderRadius(4)
                             .backgroundColor($r('app.color.white'))
                             .border({ color: $r('app.color.black_1'), style: BorderStyle.Solid })
-                            .selectedColor($r('app.color.sys_default_blue'))
+                            .selectedColor($r('sys.color.comp_background_emphasize'))
                             .shape(CheckBoxShape.ROUNDED_SQUARE)
                             .onClick(() => {
                               task.isFinished = !task.isFinished;
@@ -351,7 +344,7 @@ export struct EditAgencyTask {
                         .alignItems(VerticalAlign.Center)
                         .justifyContent(FlexAlign.Start)
                       }
-                    })
+                    }, (item:TaskItem) => JSON.stringify(item))
                   }.constraintSize({ maxHeight: 150 })
                 }.scrollable(ScrollDirection.Vertical)
                 .scrollBar(BarState.Auto)
@@ -394,11 +387,11 @@ export struct EditAgencyTask {
 
             Column() {
               Button($r('app.string.btn_save'))
-                .fontSize(16)
+                .fontSize($r('sys.float.Body_L'))
                 .fontWeight(FontWeight.Medium)
                 .height(40)
                 .backgroundColor(Color.Transparent)
-                .fontColor(Color.White)
+                .fontColor($r('sys.color.font_on_primary'))
             }
             .height(40)
             .layoutWeight(1)

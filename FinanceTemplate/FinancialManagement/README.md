@@ -203,17 +203,18 @@ FinancialManagement
   |   |    └- viewmodels                           // 与页面一一对应的vm层  
 ```
 
-## 环境要求
+## 约束与限制
 
-### 软件
+### 环境
 
-* DevEco Studio版本：DevEco Studio 5.0.0 Release及以上
-* HarmonyOS SDK版本：HarmonyOS 5.0.0 Release SDK及以上
-
-### 硬件
-
+* DevEco Studio版本：DevEco Studio 5.0.1 Release及以上
+* HarmonyOS SDK版本：HarmonyOS 5.0.1 Release SDK及以上
 * 设备类型：华为手机（直板机）
-* HarmonyOS版本：HarmonyOS 5.0.0 Release及以上
+* 系统版本：HarmonyOS 5.0.1(13)及以上
+
+### 权限
+
+* 网络权限：ohos.permission.INTERNET
 
 ## 快速入门
 
@@ -262,10 +263,6 @@ FinancialManagement
 | 产品列表                                                 | 产品详情                                                 | 购买                                                   | 持仓详情                                                 |
 |------------------------------------------------------|------------------------------------------------------|------------------------------------------------------|------------------------------------------------------|
 | <img src="screenshots/产品列表.jpeg" alt="产品列表" width="300"> | <img src="screenshots/产品详情.jpeg" alt="产品详情" width="300"> | <img src="screenshots/购买.jpeg" alt="购买" width="300"> | <img src="screenshots/持仓详情.jpeg" alt="持仓详情" width="300"> |
-
-## 权限要求
-
-* 网络权限：ohos.permission.INTERNET
 
 ## 开源许可协议
 

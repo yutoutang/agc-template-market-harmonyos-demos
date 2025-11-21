@@ -2,7 +2,7 @@ import { formBindingData, FormExtensionAbility, formInfo } from '@kit.FormKit';
 import { Want } from '@kit.AbilityKit';
 import { DateUtils, Logger } from '@ohos_agcit/office_attendance_common_lib';
 import { preferences } from '@kit.ArkData';
-import { CheckInHistoryDataItem } from '@ohos_agcit/office_attendance_checkin/src/main/ets/types/Types';
+import { CheckInHistoryDataItem } from 'clock_in/src/main/ets/types/Types';
 
 const TAG = '[PhoneFormAbility]';
 

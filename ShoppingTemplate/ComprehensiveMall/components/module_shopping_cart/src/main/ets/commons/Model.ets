@@ -51,11 +51,10 @@ export interface ProductSkuItem {
 }
 
 export interface UpdateCartReq {
-  skuCode: string,
-  count: number
+  skuCode: string;
+  count: number;
 }
 
 export class PopupSheetController {
-  hide: () => void = () => {
-  };
+  hide: () => void = () => {};
 }

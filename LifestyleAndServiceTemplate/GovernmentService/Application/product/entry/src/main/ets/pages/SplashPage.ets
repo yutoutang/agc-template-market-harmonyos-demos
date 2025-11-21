@@ -17,7 +17,7 @@ enum AdType {
  **/
 
 @Entry
-@Component
+@ComponentV2
 struct SplashPage {
   private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
   private oaid: string = '';

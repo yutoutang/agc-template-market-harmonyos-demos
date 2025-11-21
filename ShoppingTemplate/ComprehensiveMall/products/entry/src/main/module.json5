@@ -4,7 +4,8 @@
     "type": "entry",
     "mainElement": "EntryAbility",
     "deviceTypes": [
-      "phone"
+      "phone",
+      "tablet"
     ],
     "routerMap": "$profile:route_map",
     "deliveryWithInstall": true,
@@ -43,7 +44,7 @@
           // todo: 修改client_id
           {
             "name": "client_id",
-            "value": "6917579572381969601"
+            "value": "6917575039181311605"
           }
         ]
       }

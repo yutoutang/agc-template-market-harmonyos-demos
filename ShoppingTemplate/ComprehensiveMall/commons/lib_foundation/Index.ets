@@ -16,8 +16,6 @@ export {
 
 export { Logger } from './src/main/ets/utils/Logger';
 
-export * from './src/main/ets/featurecomponents/Index';
-
 export * from './src/main/ets/models/Index';
 
 export * from './src/main/ets/constants/Index';
@@ -26,7 +24,6 @@ export { WindowUtil } from './src/main/ets/utils/WindowUtil';
 
 export { PopViewUtil } from './src/main/ets/utils/PopViewUtil';
 
-export {
-  CallButton,
-  buildMakeCallComponent,
-} from './src/main/ets/featurecomponents/callbutton/Index';
+export { UserInfoModel } from './src/main/ets/models/UserInfoModel';
+
+export { Formatter } from './src/main/ets/utils/Formatter'

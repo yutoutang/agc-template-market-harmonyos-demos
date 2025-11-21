@@ -1,4 +1,5 @@
-import { BrightnessUtil, UserInfo } from 'common';
+import { BrightnessUtil, UserInfo, UserState } from 'common';
+import { PersistenceV2 } from '@kit.ArkUI';
 
 /**
  * click set brightness
@@ -9,10 +10,10 @@ const SET_BRIGHTNESS_CLICK: number = -1;
  */
 const SET_BRIGHTNESS_SLIDE: number = 1;
 
-@Component
+@ComponentV2
 export struct CodeMockPage {
-  @StorageLink('userInfo') userInfo: UserInfo = AppStorage.get('userInfo') ?? new UserInfo();
-  title: string = ''
+  @Local userState: UserState = PersistenceV2.connect(UserState, () => new UserState())!;
+  @Param title: string = ''
 
   aboutToAppear(): void {
     /*
@@ -30,7 +31,7 @@ export struct CodeMockPage {
       Column({ space: 10 }) {
         Column() {
           Stack() {
-            QRCode(JSON.stringify(this.userInfo))
+            QRCode(JSON.stringify(this.userState.userInfo))
               .width(200)
               .height(200)
             Image($r('app.media.ic_start_icon'))

@@ -1,6 +1,4 @@
 import { MainFile, TransferState } from '../common/Constant';
-import { TcpServer } from '../service/TcpServer';
-import { UdpClient } from '../service/UdpClient';
 
 @ObservedV2
 export class FileReceiverPageVM {

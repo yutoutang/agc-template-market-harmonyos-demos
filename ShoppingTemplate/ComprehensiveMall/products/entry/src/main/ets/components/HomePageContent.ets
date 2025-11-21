@@ -7,8 +7,9 @@ import {
   routerStack,
   Style,
 } from 'lib_foundation';
-import { ProductWaterFlow } from 'module_product_waterflow';
 import { CategoryItem } from 'lib_network';
+import { LoneTakeAnimationsTransition, LongTakeTransitionParam } from 'module_transition';
+import { ProductWaterFlow } from 'product';
 
 @ComponentV2
 export struct HomePageContent {
@@ -16,7 +17,6 @@ export struct HomePageContent {
   bannerList: ResourceStr[] = [
     $r('app.media.mock_homepage_banner1'),
     $r('app.media.mock_homepage_banner2'),
-    $r('app.media.mock_homepage_banner3'),
   ];
   @Param
   categoryList: CategoryItem[] = [];
@@ -36,6 +36,17 @@ export struct HomePageContent {
     return '1fr 1fr 1fr'
   }
 
+  @Computed
+  get bannerAspectRatio() {
+    if (this.curBreakpoint.value === BreakpointTypeEnum.SM) {
+      return 4 / 3
+    }
+    if (this.curBreakpoint.value === BreakpointTypeEnum.MD) {
+      return 2.5
+    }
+    return 5
+  }
+
   aboutToAppear(): void {
     this.getCategoryDisplayList();
   }
@@ -45,20 +56,27 @@ export struct HomePageContent {
       this.bannerBuilder();
       this.categoryBuilder();
       ProductWaterFlow({
-        customColumnTemplate: this.waterFlowTemplate,
+        preId: 'home/',
+        openSwiper: true,
         handleProductClick: (id) => {
           routerStack.pushPath({
-            name: RouterMap.PRODUCT_INFO_NEW,
+            name: RouterMap.PRODUCT_INFO,
             param: id,
           });
         },
         handleBack: () => {
           this.scroller.scrollEdge(Edge.Top);
         },
-      });
+      })
+        .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
     }
-    .padding(16)
-    .backgroundColor(Style.BACKGROUND_COLOR_GREY);
+    .padding({
+      left: $r('app.float.space_l'),
+      right: $r('app.float.space_l'),
+      top: $r('app.float.space_l'),
+    })
+    .backgroundColor(Style.BACKGROUND_COLOR_GREY)
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
   }
 
   @Builder
@@ -73,7 +91,7 @@ export struct HomePageContent {
     .width('100%')
     .indicator(false)
     .autoPlay(true)
-    .aspectRatio(this.curBreakpoint.value === BreakpointTypeEnum.SM ? 4 / 3 : 16 / 9)
+    .aspectRatio(this.bannerAspectRatio)
     .clip(true)
     .borderRadius($r('app.float.border_radius_l'));
   }
@@ -81,34 +99,61 @@ export struct HomePageContent {
   @Builder
   categoryBuilder() {
     Column() {
-      Scroll() {
-        Row({ space: 16 }) {
-          ForEach(this.categoryDisplayList, (list: CategoryItem[]) => {
-            Column({ space: 16 }) {
-              ForEach(list, (category: CategoryItem) => {
-                Column() {
-                  Image(iResourceMgr.resolveUri(category.iconUrl))
-                    .width(48)
-                    .height(48)
-                    .margin({ bottom: 4 });
-                  Text(category.label)
-                    .fontSize(12)
-                    .fontColor(Style.FONT_COLOR_LEVEL3);
-                }
-                .constraintSize({ minWidth: 70 })
-                .onClick(() => {
-                  this.handleClickCategory?.(category.id)
-                })
-              }, (item: CategoryItem) => item.id)
+      if (this.curBreakpoint.value === BreakpointTypeEnum.LG) {
+        Row() {
+          ForEach(this.categoryList, (category: CategoryItem) => {
+            Column() {
+              Image(iResourceMgr.resolveUri(category.iconUrl))
+                .width(48)
+                .height(48)
+                .margin({ bottom: 4 });
+              Text(category.label)
+                .fontSize(12)
+                .fontColor(Style.FONT_COLOR_LEVEL3);
             }
-          }, (_item: CategoryItem[], index: number) => index + '__')
+            .onClick(() => {
+              this.handleClickCategory?.(category.id)
+            })
+          },(category:CategoryItem)=>category.id)
         }
-        .constraintSize({ minWidth: '100%' })
+        .width($r('app.string.size_percent_full'))
         .justifyContent(FlexAlign.SpaceBetween)
+        .padding({ left: $r('app.float.space_m'), right: $r('app.float.space_m') })
+      } else {
+        Scroll() {
+          Row({ space: 16 }) {
+            ForEach(this.categoryDisplayList, (list: CategoryItem[]) => {
+              Column({ space: 16 }) {
+                ForEach(list, (category: CategoryItem) => {
+                  Column() {
+                    Image(iResourceMgr.resolveUri(category.iconUrl))
+                      .width(48)
+                      .height(48)
+                      .margin({ bottom: 4 });
+                    Text(category.label)
+                      .fontSize(12)
+                      .fontColor(Style.FONT_COLOR_LEVEL3);
+                  }
+                  .constraintSize({ minWidth: 70 })
+                  .onClick(() => {
+                    this.handleClickCategory?.(category.id)
+                  })
+                }, (item: CategoryItem) => item.id)
+              }
+            }, (_item: CategoryItem[], index: number) => index + '__')
+          }
+          .constraintSize({ minWidth: '100%' })
+          .justifyContent(
+            this.curBreakpoint.value === BreakpointTypeEnum.SM ?
+              FlexAlign.SpaceBetween :
+              FlexAlign.SpaceAround,
+          )
+        }
+        .scrollable(ScrollDirection.Horizontal)
+        .scrollBar(BarState.Off)
+        .edgeEffect(EdgeEffect.Spring)
       }
-      .scrollable(ScrollDirection.Horizontal)
-      .scrollBar(BarState.Off)
-      .edgeEffect(EdgeEffect.Spring)
+
     }
     .backgroundColor(Style.BACKGROUND_COLOR)
     .padding({ top: 16, bottom: 16 })

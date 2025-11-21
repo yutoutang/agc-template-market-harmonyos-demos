@@ -1,16 +1,15 @@
-import { getPictureFromAlbum, Suggestion } from 'common'
+import { getPictureFromAlbum, Suggestion, SuggestionList } from 'common'
 import { PersistenceV2, promptAction } from '@kit.ArkUI'
 
-@Component
+@ComponentV2
 export struct SuggestionPage {
-  @State text: string = ''
-  @State phoneNumber: string = ''
-  @State imagePickerList: string[] = []
-  @State phoneValidate: boolean = false
-  @State descriptionValidate: boolean = false
-  @Consume('pageInfos') pageInfos: NavPathStack
-  @StorageLink('suggestionList') suggestionList: Suggestion[] =
-    AppStorage.get('SuggestionList') ?? [];
+  @Local text: string = ''
+  @Local phoneNumber: string = ''
+  @Local imagePickerList: string[] = []
+  @Local phoneValidate: boolean = false
+  @Local descriptionValidate: boolean = false
+  @Consumer ('pageInfos') pageInfos: NavPathStack = new NavPathStack()
+  @Local suggestionList: SuggestionList = PersistenceV2.connect(SuggestionList, () => new SuggestionList())!;
   controller: TextAreaController = new TextAreaController()
   textInputController: TextInputController = new TextInputController()
   private imageListMaxLength: number = 4
@@ -178,7 +177,7 @@ export struct SuggestionPage {
                 this.descriptionValidate = true
                 return
               }
-              this.suggestionList.push({
+              this.suggestionList.suggestion.push({
                 title: this.text,
                 date: new Date(),
                 image: this.imagePickerList,

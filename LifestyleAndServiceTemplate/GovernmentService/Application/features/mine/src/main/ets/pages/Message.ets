@@ -1,11 +1,11 @@
 import { MessageInfo } from 'common';
 import { getDataFromJSON } from 'h5';
 
-@Component
+@ComponentV2
 export struct Message {
-  @State messageInfo: Array<MessageInfo> = [];
-  @State currentIndex: number = 0;
-  @Consume('pageInfos') pageInfos: NavPathStack
+  @Local messageInfo: Array<MessageInfo> = [];
+  @Local currentIndex: number = 0;
+  @Consumer ('pageInfos') pageInfos: NavPathStack = new NavPathStack()
 
   initDataSource() {
     this.messageInfo = getDataFromJSON<MessageInfo>('MessagePage-message.json', this);

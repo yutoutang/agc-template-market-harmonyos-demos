@@ -19,25 +19,16 @@ export class GlobalStateMgr {
 }
 
 @ObservedV2
-export class Persistence {
-  @Trace
-  public userToken: string = '';
-}
-
-@ObservedV2
 class IData {
-  @Trace
-  public readonly global: GlobalStateMgr = PersistenceV2.connect(
-    GlobalStateMgr,
-    () => new GlobalStateMgr(),
-  )!;
-  @Trace
-  public readonly local: Persistence = PersistenceV2.connect(
-    Persistence,
-    () => new Persistence(),
-  )!;
+  public get global() {
+    return PersistenceV2.connect(
+      GlobalStateMgr,
+      'GlobalStateMgr',
+      () => new GlobalStateMgr(),
+    )!
+  }
 }
 
-const iData: IData = new IData();
+const iData = new IData()
 
 export { iData };

@@ -1,13 +1,11 @@
 {
   "app": {
-    "signingConfigs": [
-     
-    ],
+    "signingConfigs": [],
     "products": [
       {
         "name": "default",
         "signingConfig": "default",
-        "compatibleSdkVersion": "5.0.1(13)",
+        "compatibleSdkVersion": "5.0.3(15)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
           "strictMode": {
@@ -19,7 +17,7 @@
     ],
     "buildModeSet": [
       {
-        "name": "debug",
+        "name": "debug"
       },
       {
         "name": "release"
@@ -49,7 +47,7 @@
     },
     {
       "name": "network",
-      "srcPath": "./commons/network",
+      "srcPath": "./commons/network"
     },
     {
       "name": "agency",
@@ -76,18 +74,6 @@
       ]
     },
     {
-      "name": "checkin",
-      "srcPath": "./scenes/checkin",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
-    },
-    {
       "name": "account",
       "srcPath": "./scenes/account",
       "targets": [
@@ -98,6 +84,22 @@
           ]
         }
       ]
+    },
+    {
+      "name": "clock_in",
+      "srcPath": "./components/clock_in"
+    },
+    {
+      "name": "protractor",
+      "srcPath": "./components/protractor"
+    },
+    {
+      "name": "area_calculate",
+      "srcPath": "./components/area_calculate"
+    },
+    {
+      "name": "ruler",
+      "srcPath": "./components/ruler"
     }
   ]
 }

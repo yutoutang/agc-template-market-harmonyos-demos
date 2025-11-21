@@ -1,12 +1,11 @@
-import { zlib } from '@kit.BasicServicesKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { promptAction } from '@kit.ArkUI';
+import { Uncompress, Compress, Config7z } from '@ohos/oh7zip'
 import Logger from './ZipLogger';
 import { fileIo as fs, picker } from '@kit.CoreFileKit';
 import { CompressedFile } from '../model/ZipModel';
 import { formatBytes, formatTimestamp } from './BaseUtil';
 import { FileType } from '../common/Constant';
-import { Compress, Decompress } from '@dove/p7zip'
 
 // 在沙箱中创建一个固定的文件夹保存压缩包
 export function createDirInSandbox(path: string) {
@@ -63,7 +62,7 @@ export function readCompressedFile(path: string) {
     if (index !== -1) {
       const name = file.slice(0, index)
       const format = file.slice(index)
-      if (format === '.zip' || format === '.rar' || format === '.war') {
+      if (format === '.zip' || format === '.rar' || format === '.war' || format === '.7z') {
         fileList.push(new CompressedFile(FileType.ZIP, file, name, format, formatBytes(stat.size), 0, ''))
       } else {
         fileList.push(new CompressedFile(FileType.FILE, file, name, format, formatBytes(stat.size), 0, ''))
@@ -149,8 +148,24 @@ export function moveFile(type: FileType, name: string, filePath: string, moveToP
 // 压缩
 export async function compress(dirPath: string, path: string, format: string) {
   const inFile = dirPath
-  const outFile = dirPath + `.${format}`
-  await Compress.compressToPath(inFile, outFile)
+  let outFile = dirPath + `.${format}`
+  // 判断文件是否存在
+  const res = fs.accessSync(outFile)
+  if (res) {
+    outFile = dirPath + `(1).${format}`
+  }
+  try {
+    let compress: Compress = new Compress()
+    let config: Config7z = {
+      src: inFile,
+      dst: outFile,
+      fmt: format,
+    }
+    compress.compressSync(config)
+  } catch (error) {
+    let err: BusinessError = error as BusinessError;
+    Logger.info('compress error = ' + JSON.stringify(err));
+  }
   fs.rmdirSync(dirPath)
   return await readCompressedFile(path)
 }
@@ -158,9 +173,15 @@ export async function compress(dirPath: string, path: string, format: string) {
 // 解压缩
 export async function decompress(dirPath: string, currentFolderPath: string, name: string) {
   const inFile = dirPath + `/${decodeURI(name)}`
-  const outFile = dirPath
+  let outFile = dirPath
   try {
-    await Decompress.decompressFile(inFile, outFile)
+    let uncompress: Uncompress = new Uncompress()
+    let config: Config7z = {
+      src: inFile,
+      dst: outFile,
+      pwd: 'test_7z',
+    }
+    uncompress.extractSync(config)
     fs.unlinkSync(inFile)
   } catch (error) {
     let err: BusinessError = error as BusinessError;

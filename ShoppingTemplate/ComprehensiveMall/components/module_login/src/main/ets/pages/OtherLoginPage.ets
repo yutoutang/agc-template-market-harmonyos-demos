@@ -1,8 +1,9 @@
 import { loginComponentManager } from '@kit.AccountKit';
 import { promptAction } from '@kit.ArkUI';
-import { iData, RouterMap, routerStack, SimpleDialog } from 'lib_foundation';
+import { iData, RouterMap, routerStack } from 'lib_foundation';
 import { IPrivacyText } from '../models/IPrivacyText';
 import { IColor } from '../commons/CommonConst';
+import { CommonConfirmDialog } from 'module_ui_base';
 
 @ComponentV2
 export struct OtherLoginPage {
@@ -68,7 +69,7 @@ export struct OtherLoginPage {
                 .height(40)
                 .width('100%')
                 .type(InputType.Number)
-                .placeholderColor(IColor.BLACK_TRANSPARENT_40)
+                .placeholderColor($r('sys.color.font_secondary'))
                 .caretColor(IColor.THEME_PRIMARY)
                 .maxLength(11)
                 .fontColor(IColor.BLACK_TRANSPARENT_90)
@@ -89,13 +90,12 @@ export struct OtherLoginPage {
                 TextInput({ text: this.smsCode, placeholder: '请输入验证码' })
                   .layoutWeight(1)
                   .type(InputType.Number)
-                  .placeholderColor(IColor.BLACK_TRANSPARENT_40)
+                  .placeholderColor($r('sys.color.font_secondary'))
                   .caretColor(IColor.THEME_PRIMARY)
                   .maxLength(6)
                   .borderRadius(0)
                   .fontColor(IColor.BLACK_TRANSPARENT_90)
                   .fontSize(16)
-                  .placeholderFont({ size: 16 })
                   .padding(0)
                   .maxLines(1)
                   .backgroundColor(IColor.WHITE)
@@ -121,11 +121,11 @@ export struct OtherLoginPage {
               .margin({ top: 12 })
 
               Button('点击登录')
-              .width('100%')
-              .height(40)
-              .backgroundColor(IColor.THEME_PRIMARY)
-              .margin({ top: 36 })
-              .onClick(() => this.onMockLogin())
+                .width('100%')
+                .height(40)
+                .backgroundColor(IColor.THEME_PRIMARY)
+                .margin({ top: 36 })
+                .onClick(() => this.onMockLogin())
 
               Text('其他方式登录')
                 .fontSize(14)
@@ -148,6 +148,7 @@ export struct OtherLoginPage {
                 .margin({ top: 12 })
             }
             .width('100%')
+            .constraintSize({ maxWidth: 360 })
             .alignItems(HorizontalAlign.Center)
             .justifyContent(FlexAlign.Start)
 
@@ -176,7 +177,7 @@ export struct OtherLoginPage {
                       .fontWeight(600)
                       .onClick(() => {
                         if (text.extraParams) {
-                          routerStack.pushPathByName(RouterMap.AGREEMENT, text.extraParams);
+                          routerStack.pushPathByName(RouterMap.SETTING_AGREEMENT, text.extraParams);
                         }
                       })
                   }
@@ -186,11 +187,12 @@ export struct OtherLoginPage {
               .fontSize(12)
             }
             .alignItems(VerticalAlign.Center)
-            .constraintSize({ minHeight: 56 })
+            .constraintSize({ minHeight: 56, maxWidth: 360 })
           }
           .width('100%')
           .constraintSize({ minHeight: '100%' })
           .justifyContent(FlexAlign.SpaceBetween)
+          .alignItems(HorizontalAlign.Center)
           .padding({ left: 16, right: 16 })
         }
         .layoutWeight(1)
@@ -214,9 +216,10 @@ export struct OtherLoginPage {
     if (this.verifyCodeTime > 0) {
       return;
     }
-    const dialog: SimpleDialog = new SimpleDialog(this.getUIContext())
-      .setMessage('获取验证码为模拟场景，真实获取验证码以业务实现为准')
-      .onConfirm(() => {
+
+    CommonConfirmDialog.show({
+      content: '获取验证码为模拟场景，真实获取验证码以业务实现为准',
+      confirm: () => {
         this.verifyCodeTime = 60;
         const timerId: number = setInterval(() => {
           this.verifyCodeTime--;
@@ -224,15 +227,14 @@ export struct OtherLoginPage {
             clearInterval(timerId);
           }
         }, 1000);
-      });
-    dialog.open();
+      },
+    })
   }
 
   private onMockLogin(): void {
     if (!this.verify()) {
       return;
     }
-    iData.local.userToken = 'mock_token';
     iData.global.isLogin = true;
     iData.global.userInfo.reset();
     iData.global.userInfo.nickname = '华为用户';

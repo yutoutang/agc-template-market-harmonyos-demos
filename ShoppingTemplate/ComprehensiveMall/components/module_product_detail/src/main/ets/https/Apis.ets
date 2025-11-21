@@ -1,12 +1,12 @@
+import { BusinessError } from '@kit.BasicServicesKit';
 import axios, { AxiosResponse } from '@ohos/axios';
 import { Logger } from 'module_ui_base';
+import { RequestUrlMap } from '../commons/Enums';
 import {
   ProductInfo,
   ProductReviewResp,
   ProductSelectionInfo,
 } from '../commons/Types';
-import { BusinessError } from '@kit.BasicServicesKit';
-import { RequestUrlMap } from '../commons/Enums';
 
 const TAG: string = '[ProductDetailApis]';
 

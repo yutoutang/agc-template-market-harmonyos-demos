@@ -12,7 +12,9 @@
     "mine": "file:../../features/mine",
     "h5": "file:../../commons/H5",
     "common": "file:../../commons/common",
-    "components": "file:../../commons/components"
+    "components": "file:../../commons/components",
+    "aggregated_login": "file:../../components/aggregated_login",
+    "@tencent/wechat_open_sdk": "^1.0.7"
   }
 }
 

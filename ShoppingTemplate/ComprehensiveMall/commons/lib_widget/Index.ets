@@ -9,3 +9,7 @@ export { NavTitleBar } from './src/main/ets/components/NavTitleBar';
 export { CommonButton } from './src/main/ets/components/CommonButton';
 
 export { CommonLoading } from './src/main/ets/components/CommonLoading';
+
+export { CommonSymbol } from './src/main/ets/components/CommonSymbol';
+
+export { CustomServiceSheet } from './src/main/ets/components/CustomService';

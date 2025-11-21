@@ -5,7 +5,7 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 const TAG = 'Ads SplashFullScreenAdPage';
 
 @Entry
-@Component
+@ComponentV2
 struct SplashFullScreenAdPage {
   private ads: Array<advertising.Advertisement> = [];
   private displayOptions?: advertising.AdDisplayOptions;

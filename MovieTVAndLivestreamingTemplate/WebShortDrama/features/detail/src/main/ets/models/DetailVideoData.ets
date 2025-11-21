@@ -1,5 +1,6 @@
 import { VideoPlayData } from 'video_swiper';
 import { ShortDramaDetailItemVM } from '../viewmodels/ShortDramaDetailItemVM';
+import { media } from '@kit.MediaKit';
 
 // 详情数据结构
 export class DetailVideoData implements VideoPlayData {
@@ -17,7 +18,7 @@ export class DetailVideoData implements VideoPlayData {
     return `${this.videoMask.currentSerial}`
   }
 
-  getUrl(): ResourceStr {
+  getUrl(): media.AVFileDescriptor | string {
     return this.videoMask.url
   }
 

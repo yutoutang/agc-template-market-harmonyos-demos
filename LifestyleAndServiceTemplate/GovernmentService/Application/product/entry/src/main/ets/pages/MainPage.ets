@@ -3,10 +3,10 @@ import { Login, LoginWithHuaweiIDComponent, Message, MinePage, Settings } from '
 import { InteractionPage } from 'interaction';
 import { OfficePage, SiteList } from 'office';
 import { common } from '@kit.AbilityKit';
-import { promptAction } from '@kit.ArkUI';
+import { PersistenceV2, promptAction } from '@kit.ArkUI';
 import { CustomTabBar } from './components/CustomTabBar';
 import { H5 } from 'h5';
-import { CloudFunction, ParamsObj } from 'common';
+import { CloudFunction, ParamsObj, UserState } from 'common';
 import {
   AboutUs,
   CodeMockPage,
@@ -21,19 +21,14 @@ import {
 import { notificationManager } from '@kit.NotificationKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 
-PersistentStorage.persistProp('isLogin', '')
-PersistentStorage.persistProp('userInfo', '')
-PersistentStorage.persistProp('suggestionList', [])
-PersistentStorage.persistProp('isAllowPush', true)
-
 @Entry
-@Component
+@ComponentV2
 struct MainPage {
-  @Provide('pageInfos') pageInfos: NavPathStack = new NavPathStack()
-  @State currentIndex: number = 0;
+  @Provider('pageInfos') pageInfos: NavPathStack = new NavPathStack()
+  @Local currentIndex: number = 0;
   private tabsController: TabsController = new TabsController();
-  @State tabCurrentIndex: number = 0
-  @StorageLink('isLogin') isLogin: boolean = AppStorage.get('isLogin') ?? false;
+  @Local tabCurrentIndex: number = 0
+  @Local userState: UserState = PersistenceV2.connect(UserState, () => new UserState())!;
   private firstBackTimestamp: number = 0;
 
   /*
@@ -52,7 +47,8 @@ struct MainPage {
          * 判断登录状态,并跳转到我的页面进行关联
          * */
         let target: NavDestinationContext = to as NavDestinationContext;
-        if (!this.isLogin && !['PrivacyPolicyPage', 'Login', 'TermsOfServicePage'].includes(target.pathInfo.name)) {
+        if (!this.userState.isLogin && !['PrivacyPolicyPage', 'Login', 'TermsOfServicePage', 'OtherLoginPage',
+          'ProtocolWebView'].includes(target.pathInfo.name)) {
           target.pathStack.pop();
           this.pageInfos.pushPathByName('LoginWithHuaweiIDComponent', null)
         }
@@ -139,7 +135,7 @@ struct MainPage {
       TermsOfServicePage()
     } else if (name === 'ScanCodeResult') {
       ScanCodeResult({
-        scanResult: params.title ,
+        scanResult: params.title,
       })
     }
   }
@@ -175,7 +171,7 @@ struct MainPage {
           .layoutWeight(1)
           .animationDuration(0) //去掉切换页面的动画
           CustomTabBar({
-            currentIndex: this.tabCurrentIndex,
+            currentIndex: this.tabCurrentIndex!!,
           })
         }
       }.width('100%')

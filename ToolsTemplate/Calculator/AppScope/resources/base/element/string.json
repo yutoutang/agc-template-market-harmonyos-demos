@@ -2,11 +2,7 @@
   "string": [
     {
       "name": "app_name",
-      "value": "计算器元服务模板"
-    },
-    {
-      "name": "agcit_huawei_calculator",
-      "value": "1.0.1"
+      "value": "计算器模板"
     },
     {
       "name": "agcittype_huawei_calculator",
@@ -14,7 +10,11 @@
     },
     {
       "name": "agcitkid_huawei_calculator",
-      "value": "agcit_huawei_calculator_date_calculation/1.0.1,agcit_huawei_calculator_module_standard_calculator/1.0.1"
+      "value": "agcit_huawei_calculator_date_calculation/1.0.2,agcit_huawei_calculator_module_standard_calculator/1.0.2"
+    },
+    {
+      "name": "agcit_huawei_calculator",
+      "value": "1.0.2"
     }
   ]
 }

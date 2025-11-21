@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpRequestApi,
   PermissionUtil,
+  StoreInfoModel,
   WindowModel,
 } from 'common';
 import { AppStorageV2, promptAction } from '@kit.ArkUI';
@@ -27,6 +28,7 @@ export function AddressSheetBuilder(selectAddress: AddressInfo, close: (selectAd
 @ComponentV2
 struct AddressSheet {
   @Local windowModel: WindowModel = AppStorageV2.connect(WindowModel, () => new WindowModel())!
+  @Local storeInfoModel: StoreInfoModel = AppStorageV2.connect(StoreInfoModel, () => new StoreInfoModel())!
   @Param @Require selectAddress: AddressInfo;
   @Local modifyAddress: AddressInfo = new AddressInfo()
   @Local addressList: Array<AddressInfo> = [];
@@ -153,18 +155,21 @@ struct AddressSheet {
   }
 
   getUserAddressList() {
-    Promise.all([PermissionUtil.getLocation(), HttpRequestApi.getUserAddressList()]).then(res => {
-      let myLocation = res[0]
-      if (res[1].code === HttpCode.SUCCESS && res[1].data) {
+    HttpRequestApi.getUserAddressList().then(res => {
+      if (res.code === HttpCode.SUCCESS && res.data) {
         this.addressList = []
         this.addressOverList = []
-        res[1].data.forEach((item: AddressInfoResp) => {
-          let address: AddressInfo = getAddressInfoMapper(item);
+        res.data.forEach((item: AddressInfoResp) => {
           let fromLatLng: mapCommon.LatLng = {
-            latitude: myLocation.latitude,
-            longitude: myLocation.longitude,
+            latitude: 0,
+            longitude: 0,
           };
-
+          let locationArr = this.storeInfoModel.storeInfo?.coordinates?.split(',')
+          if (locationArr?.length === 2) {
+            fromLatLng.latitude = Number(locationArr[0])
+            fromLatLng.longitude = Number(locationArr[1])
+          }
+          let address: AddressInfo = getAddressInfoMapper(item);
           let toLatLng: mapCommon.LatLng = {
             latitude: address.latitude,
             longitude: address.longitude,

@@ -6,8 +6,7 @@ export enum FileType {
 
 export enum CompressedFormat {
   ZIP = 'zip',
-  RAR = 'rar',
-  WAR = 'war'
+  ZZ = '7z',
 }
 
-export const compressedFormat: string[] = ['zip', 'rar', 'war']
+export const compressedFormat: string[] = ['zip', '7z']

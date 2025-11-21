@@ -6,13 +6,15 @@ export * from './src/main/ets/types/responses/HomeConfigResponse';
 
 export * from './src/main/ets/types/responses/OrderResponse';
 
-export {
-  PreOrderInfoReq,
-  OrderCreateReq,
-  PreOrderItem,
-  OrderUpdateReq,
-  OrderReviewReq,
-} from './src/main/ets/types/RequestTypes';
+export * from './src/main/ets/types/responses/ProductResponse';
+
+export * from './src/main/ets/types/responses/UserResponse';
+
+export * from './src/main/ets/types/RequestTypes';
+
+export { ProductApis } from './src/main/ets/https/apis/Product';
+
+export { UserApis } from './src/main/ets/https/apis/User'
 
 // 启动mock
 import('./src/main/ets/httpsmock/MockAdapter');

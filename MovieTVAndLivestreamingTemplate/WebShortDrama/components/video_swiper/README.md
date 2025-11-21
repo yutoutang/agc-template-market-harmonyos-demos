@@ -79,11 +79,12 @@
       VideoSwiper
    } from 'video_swiper';
    import { media } from '@kit.MediaKit';
+   import common from '@ohos.app.ability.common';
    
    class EpisodeData implements VideoPlayData {
-      url: string
+      url: media.AVFileDescriptor | string
    
-      constructor(url: string) {
+      constructor(url: media.AVFileDescriptor | string) {
          this.url = url;
       }
    
@@ -99,7 +100,7 @@
          return 0
       }
    
-      getUrl(): string {
+      getUrl(): media.AVFileDescriptor | string {
          return this.url
       }
    
@@ -109,6 +110,9 @@
    
       getPic(): string {
          return '';
+      }
+      isLocked():boolean{
+         return false;
       }
    }
    
@@ -128,15 +132,30 @@
    @ComponentV2
    struct Index {
       data: VideoPlayDataSource = new VideoPlayDataSource()
+      httpUrls: Array<string> = []
+      rawUrls: Array<string> = []
+      private context: common.UIAbilityContext | undefined = undefined;
    
       aboutToAppear() {
-         // 初始化数据
-         let videoData1: EpisodeData =
-            new EpisodeData('https://agc-storage-drcn.platform.dbankcloud.cn/v0/app-d45y3/drama_video/2.m3u8')
-         let videoData2: EpisodeData =
-            new EpisodeData('https://agc-storage-drcn.platform.dbankcloud.cn/v0/app-d45y3/drama_video/3.m3u8')
-         this.data.pushData(videoData1);
-         this.data.pushData(videoData2);
+      //初始化数据
+      this.httpUrls = ['https://agc-storage-drcn.platform.dbankcloud.cn/v0/app-d45y3/drama_video/2.m3u8','https://agc-storage-drcn.platform.dbankcloud.cn/v0/app-d45y3/drama_video/3.m3u8']
+      this.httpUrls.forEach((item:string)=>{
+        let videoData: EpisodeData =
+          new EpisodeData(item)
+        this.data.pushData(videoData);
+      })
+
+      this.rawUrls = ['XX.mp4','XX.mp4']//1、将本地视频放在模块的resources/rawfile文件夹下 2、数组中填写本地视频文件名称(本地视频必须为mp4格式)
+      this.context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+      this.rawUrls.forEach(async (item:string)=> {
+        let fileName = item; 
+        let fileDescriptor = await this.context!.resourceManager.getRawFd(fileName);
+        let avFileDescriptor: media.AVFileDescriptor =
+          { fd: fileDescriptor.fd, offset: fileDescriptor.offset, length: fileDescriptor.length };
+        let videoData: EpisodeData =
+          new EpisodeData(avFileDescriptor)
+        this.data.pushData(videoData);
+        })
       }
    
       build() {
@@ -185,7 +204,7 @@ VideoSwiper(options: VideoSwiperOptions)
 
 ### VideoPlayDataSource
 
-竖屏滑动视频组件的视频数据源
+竖屏滑动视频组件的视频数据源。**支持网络链接和本地资源，本地资源文件放在模块的resources/rawfile文件夹下。**
 
 #### totalCount
 
@@ -310,11 +329,12 @@ onTimeUpdate(key: string, callback: (time: number) => void): void
       VideoSwiper
    } from 'video_swiper';
    import { media } from '@kit.MediaKit';
+   import common from '@ohos.app.ability.common';
    
    class EpisodeData implements VideoPlayData {
-      url: string
+      url: media.AVFileDescriptor | string
    
-      constructor(url: string) {
+      constructor(url: media.AVFileDescriptor | string) {
          this.url = url;
       }
    
@@ -330,7 +350,7 @@ onTimeUpdate(key: string, callback: (time: number) => void): void
          return 0
       }
    
-      getUrl(): string {
+      getUrl(): media.AVFileDescriptor | string {
          return this.url
       }
    
@@ -340,6 +360,9 @@ onTimeUpdate(key: string, callback: (time: number) => void): void
    
       getPic(): string {
          return '';
+      }
+      isLocked():boolean{
+         return false;
       }
    }
    
@@ -359,15 +382,30 @@ onTimeUpdate(key: string, callback: (time: number) => void): void
    @ComponentV2
    struct Index {
       data: VideoPlayDataSource = new VideoPlayDataSource()
+      httpUrls: Array<string> = []
+      rawUrls: Array<string> = []
+      private context: common.UIAbilityContext | undefined = undefined;
    
       aboutToAppear() {
-         // 初始化数据
-         let videoData1: EpisodeData =
-            new EpisodeData('https://agc-storage-drcn.platform.dbankcloud.cn/v0/app-d45y3/drama_video/2.m3u8')
-         let videoData2: EpisodeData =
-            new EpisodeData('https://agc-storage-drcn.platform.dbankcloud.cn/v0/app-d45y3/drama_video/3.m3u8')
-         this.data.pushData(videoData1);
-         this.data.pushData(videoData2);
+      //初始化数据
+      this.httpUrls = ['https://agc-storage-drcn.platform.dbankcloud.cn/v0/app-d45y3/drama_video/2.m3u8','https://agc-storage-drcn.platform.dbankcloud.cn/v0/app-d45y3/drama_video/3.m3u8']
+      this.httpUrls.forEach((item:string)=>{
+         let videoData: EpisodeData =
+            new EpisodeData(item)
+         this.data.pushData(videoData);
+      })
+
+      this.rawUrls = ['XX.mp4','XX.mp4']//1、将本地视频放在模块的resources/rawfile文件夹下 2、数组中填写本地视频文件名称(本地视频必须为mp4格式)
+      this.context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+      this.rawUrls.forEach(async (item:string)=> {
+         let fileName = item;
+         let fileDescriptor = await this.context!.resourceManager.getRawFd(fileName);
+         let avFileDescriptor: media.AVFileDescriptor =
+            { fd: fileDescriptor.fd, offset: fileDescriptor.offset, length: fileDescriptor.length };
+         let videoData: EpisodeData =
+            new EpisodeData(avFileDescriptor)
+         this.data.pushData(videoData);
+        })
       }
    
       build() {
@@ -403,12 +441,13 @@ onTimeUpdate(key: string, callback: (time: number) => void): void
    } from 'video_swiper';
    import { media } from '@kit.MediaKit';
    import { hilog } from '@kit.PerformanceAnalysisKit';
+   import common from '@ohos.app.ability.common';
    
    class EpisodeData implements VideoPlayData {
       desc: string;
-      url:string;
+      url:media.AVFileDescriptor | string;
    
-      constructor(url:string, desc: string) {
+      constructor(url:media.AVFileDescriptor | string, desc: string) {
          this.desc = desc
          this.url = url
       }
@@ -425,7 +464,7 @@ onTimeUpdate(key: string, callback: (time: number) => void): void
          return 0
       }
    
-      getUrl(): string {
+      getUrl(): media.AVFileDescriptor | string {
          return this.url
       }
    
@@ -440,9 +479,13 @@ onTimeUpdate(key: string, callback: (time: number) => void): void
       getDesc(): string {
          return this.desc
       }
+      isLocked():boolean{
+         return false;
+      }
    }
    
    let index: number = 0
+   let length: number = 0
    
    @ComponentV2
    struct VideoDetail {
@@ -473,19 +516,15 @@ onTimeUpdate(key: string, callback: (time: number) => void): void
                .onClick(() => {
                   this.playControl.pause()
                })
-            Button('changeIndex')
-               .onClick(() => {
-                  this.changeIndex()
-               })
          }
       }.height('100%')
    }
    
    changeIndex() {
-      if (index === 0) {
-         index = 1
-      } else {
+      if (index === length - 1) {
          index = 0
+      } else {
+         index ++
       }
       this.playControl.changeIndex(index)
    }
@@ -495,14 +534,31 @@ onTimeUpdate(key: string, callback: (time: number) => void): void
    @ComponentV2
    struct Index {
       data: VideoPlayDataSource = new VideoPlayDataSource()
+      httpUrls: Array<string> = []
+      rawUrls: Array<string> = []
+      private context: common.UIAbilityContext | undefined = undefined;
    
       aboutToAppear() {
-         let videoData1: EpisodeData = new EpisodeData(
-            'https://agc-storage-drcn.platform.dbankcloud.cn/v0/app-d45y3/drama_video/2.m3u8', 'this is episode 1')
-         let videoData2: EpisodeData = new EpisodeData(
-            'https://agc-storage-drcn.platform.dbankcloud.cn/v0/app-d45y3/drama_video/1.m3u8', 'this is episode 2')
-         this.data.pushData(videoData1); // 初始化数据
-         this.data.pushData(videoData2); // 初始化数据
+      //初始化数据
+      this.httpUrls = ['https://agc-storage-drcn.platform.dbankcloud.cn/v0/app-d45y3/drama_video/2.m3u8','https://agc-storage-drcn.platform.dbankcloud.cn/v0/app-d45y3/drama_video/3.m3u8']
+      this.httpUrls.forEach((item:string,index:number)=>{
+         let videoData: EpisodeData =
+            new EpisodeData(item,`this is episode for http ${index}`)
+         this.data.pushData(videoData);
+      })
+
+      this.rawUrls = ['XX.mp4','XX.mp4']//1、将本地视频放在模块的resources/rawfile文件夹下 2、数组中填写本地视频文件名称(本地视频必须为mp4格式)
+      this.context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+      this.rawUrls.forEach(async (item:string,index:number)=> {
+         let fileName = item;
+         let fileDescriptor = await this.context!.resourceManager.getRawFd(fileName);
+         let avFileDescriptor: media.AVFileDescriptor =
+            { fd: fileDescriptor.fd, offset: fileDescriptor.offset, length: fileDescriptor.length };
+         let videoData: EpisodeData =
+            new EpisodeData(avFileDescriptor,`this is episode for rawfile ${index}`)
+         this.data.pushData(videoData);
+         length = this.data.totalCount()
+        })
       }
    
       build() {

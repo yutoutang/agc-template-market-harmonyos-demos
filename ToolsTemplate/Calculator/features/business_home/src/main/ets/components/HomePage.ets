@@ -27,6 +27,6 @@ export struct HomePage {
       }
       .height('100%')
       .padding({ left: 8, right: 8 })
-    }.title(BaseTitleBuilder('计算器')).backgroundColor('#000000')
+    }.title(BaseTitleBuilder('计算器')).backgroundColor($r('sys.color.background_primary'))
   }
 }

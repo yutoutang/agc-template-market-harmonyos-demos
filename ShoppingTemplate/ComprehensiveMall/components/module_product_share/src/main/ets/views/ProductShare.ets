@@ -33,6 +33,7 @@ export struct ProductShare {
     .bindSheet($$this.showPanel, this.sharePanelBuilder(), {
       height: this.panelHeight,
       title: { title: '分享' },
+      preferType:SheetType.CENTER,
       onWillDismiss: (action) => {
         PopViewUtil.closeAllDialog();
         action.dismiss();
@@ -85,7 +86,7 @@ export struct ProductShare {
           .justifyContent(FlexAlign.Center);
 
           Text('系统分享')
-            .margin({ top: Constants.SPACE_S })
+            .margin({ top: Constants.SPACE_M })
             .fontSize(12)
             .fontColor(Constants.FONT_COLOR_LEVEL2);
         }
@@ -100,11 +101,12 @@ export struct ProductShare {
       Blank();
       Button('取消')
         .backgroundColor(Constants.BACKGROUND_COLOR_GREY_2)
-        .fontColor(Constants.FONT_COLOR_LEVEL1)
+        .fontColor($r('sys.color.font_primary'))
         .width('100%')
         .onClick(() => {
           this.showPanel = false;
-        });
+        })
+        .margin({bottom:Constants.SPACE_L})
     }
     .height('100%')
     .width('100%')

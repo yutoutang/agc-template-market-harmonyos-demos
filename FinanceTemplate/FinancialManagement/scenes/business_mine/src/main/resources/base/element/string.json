@@ -23,6 +23,10 @@
     {
       "name": "log_out",
       "value": "log_out"
+    },
+    {
+      "name": "agcit_huawei_financial_management",
+      "value": "1.0.2"
     }
   ]
 }

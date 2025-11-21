@@ -8,6 +8,9 @@
   "dependencies": {
     "@ohos_agcit/office_attendance_common_lib": "file:../../commons/common_lib",
     "@ohos_agcit/office_attendance_component_lib": "file:../../commons/component_lib",
-    "@ohos_agcit/office_attendance_network": "file:../../commons/network"
+    "@ohos_agcit/office_attendance_network": "file:../../commons/network",
+    "protractor": "file:../../components/protractor",
+    "area_calculate": "file:../../components/area_calculate",
+    "ruler": "file:../../components/ruler"
   }
 }

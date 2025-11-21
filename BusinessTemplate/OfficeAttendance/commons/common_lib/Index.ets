@@ -7,9 +7,6 @@ export { Logger } from './src/main/ets/utils/Logger';
 // 路由工具
 export { RouterModule, NavRouterInfo, DialogInfo } from './src/main/ets/utils/RouterModule';
 
-// 权限管理工具
-export { PermissionUtil } from './src/main/ets/utils/PermissionUtil';
-
 // 格式化工具
 export { FormatUtil } from './src/main/ets/utils/FormatUtil';
 
@@ -25,10 +22,6 @@ export { AppStorageData } from './src/main/ets/viewmodel/AppStorageData';
 export * from './src/main/ets/constants/CommonEnums';
 
 export { MainEntryVM } from './src/main/ets/viewmodel/MainEntryVM';
-
-export { VibratorUtil } from './src/main/ets/utils/VibratorUtil';
-
-export { LocationUtil } from './src/main/ets/utils/LocationUtil';
 
 export { DateUtils } from './src/main/ets/utils/DateUtil';
 

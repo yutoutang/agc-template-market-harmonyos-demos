@@ -13,6 +13,11 @@ export class SearchVM {
   hotSearchList: HotSearchItem[] = [];
   @Trace
   searchWords: string = '';
+  uiContext: UIContext;
+
+  constructor(uiContext: UIContext) {
+    this.uiContext = uiContext;
+  }
 
   async initData() {
     this.isLoading = true;
@@ -49,19 +54,16 @@ export class SearchVM {
     this.historyList = await ProductSearchApis.getSearchHistoryList();
   }
 
-  async submitSearch(uiContext: UIContext, callback?: Callback<string>) {
-    if (!this.searchWords) {
-      uiContext.getPromptAction().showToast({
+  async submitSearch(keyword: string, callback?: Callback<string>) {
+    if (!keyword) {
+      this.uiContext.getPromptAction().showToast({
         message: '请输入搜索内容~',
       });
       return;
     }
-    callback?.(this.searchWords);
-    await ProductSearchApis.addSearchHistory(this.searchWords);
+    this.searchWords = keyword;
+    callback?.(keyword);
+    await ProductSearchApis.addSearchHistory(keyword);
     this.historyList = await ProductSearchApis.getSearchHistoryList();
-  }
-
-  updateSearchWords(value: string) {
-    this.searchWords = value;
   }
 }

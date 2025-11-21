@@ -233,7 +233,7 @@ export struct ScheduleForm {
             Divider().width('90%').height(1)
           }.height(45)
           .width('100%')
-        })
+        }, (item:number) => JSON.stringify(item))
       }.layoutWeight(1)
 
       Column().width('2%')

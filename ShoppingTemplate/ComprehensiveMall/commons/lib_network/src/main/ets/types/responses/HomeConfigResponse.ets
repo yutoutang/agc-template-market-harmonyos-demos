@@ -2,10 +2,11 @@ import { BaseResponse } from './BaseResponse';
 
 export interface HomeConfigResp extends BaseResponse {
   categoryList: CategoryItem[];
+  searchList: string[];
 }
 
 export interface CategoryProductListResp extends BaseResponse {
-  productList: ProductSummaryItem[]
+  productList: ProductSummaryItem[];
 }
 
 export interface CategoryItem {
@@ -21,8 +22,8 @@ export interface SubCategoryItem {
 }
 
 export interface ProductSummaryItem {
-  banner: ResourceStr
-  title: string
-  subCategoryId: string
-  id: string
+  banner: ResourceStr;
+  title: string;
+  subCategoryId: string;
+  id: string;
 }

@@ -118,11 +118,11 @@ struct Purchase {
                 .backgroundColor(Color.White)
                 .borderRadius(0)
                 .padding({ left: 0 })
-                .placeholderFont({ size: 16, weight: FontWeight.Regular })
-                .placeholderColor($r('sys.color.font_tertiary'))
+                .placeholderFont({ size: $r('sys.float.Body_L'), weight: FontWeight.Regular })
+                .placeholderColor($r('sys.color.font_secondary'))
                 .onWillInsert((info: InsertValue) => {
                   const res = this.vm.account.bankAmount > this.vm.productInfo!.remainingPurchaseAmount ?
-                  this.vm.productInfo!.remainingPurchaseAmount : this.vm.account.bankAmount
+                    this.vm.productInfo!.remainingPurchaseAmount : this.vm.account.bankAmount
                   if (Number.parseInt(this.vm.money) >= res) {
                     this.getUIContext().getFocusController().clearFocus()
                     return false
@@ -130,7 +130,7 @@ struct Purchase {
                   return true;
                 })
                 .onChange((value) => {
-                  if(value){
+                  if (value) {
                     this.vm.money = this.vm.getLimitMoney(Number(value))
                   }
                 })
@@ -145,7 +145,7 @@ struct Purchase {
               ForEach(this.vm.buttonMoney, (item: IButtonMoney, index: number) => {
                 Button(item.text)
                   .buttonStyles()
-                  .fontSize(12)
+                  .fontSize($r('sys.float.Body_S'))
                   .fontWeight(FontWeight.Regular)
                   .fontColor(this.vm.selectedMoneyIndex === index ? '#E4480C' : $r('sys.color.font_primary'))
                   .borderColor(this.vm.selectedMoneyIndex === index ? '#E4480C' : 'rgba(0,0,0,0.20)')
@@ -202,8 +202,8 @@ struct Purchase {
                 .fontWeight(FontWeight.Medium)
                 .fontColor($r('sys.color.font_primary'))
               TextInput({ text: this.vm.recommendationCode, placeholder: '选填' })
-                .placeholderFont({ size: 14, weight: FontWeight.Regular })
-                .placeholderColor($r('sys.color.font_tertiary'))
+                .placeholderFont({ size: $r('sys.float.Body_L'), weight: FontWeight.Regular })
+                .placeholderColor($r('sys.color.font_secondary'))
                 .textAlign(TextAlign.End)
                 .backgroundColor(Color.White)
                 .width('40%')
@@ -224,7 +224,7 @@ struct Purchase {
             Flex({ alignItems: ItemAlign.Start }) {
               Checkbox({ name: 'checkbox2', group: 'checkboxGroup' })
                 .select($$this.vm.isCheckedAgreement)
-                .selectedColor(0x39a2db)
+                .selectedColor($r('sys.color.comp_background_emphasize'))
                 .shape(CheckBoxShape.ROUNDED_SQUARE)
                 .margin({ right: 10 })
               Row() {
@@ -254,7 +254,7 @@ struct Purchase {
               .width('100%')
               .height(40)
               .backgroundColor('#E4480C')
-              .fontColor(Color.White)
+              .fontColor($r('sys.color.font_on_primary'))
               .margin({ bottom: 24 })
               .enabled(this.vm.checkPurchaseInformation())
               .onClick(() => {
@@ -488,7 +488,7 @@ struct Purchase {
               Button('确认')
                 .width('100%')
                 .height(40)
-                .fontColor(Color.White)
+                .fontColor($r('sys.color.font_on_primary'))
                 .backgroundColor('#E4480C')
             }
             .width('calc(50% - 6vp)')

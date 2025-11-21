@@ -37,6 +37,11 @@
     "clone": "file:../components/clone",
     "handheld_bullet": "file:../components/handheld_bullet",
     "image_recognition": "file:../components/image_recognition",
+    "financial_calculator": "file:../components/financial_calculator",
+    "pension_calculator": "file:../components/pension_calculator",
+    "kinship_calculator": "file:../components/kinship_calculator",
+    "retirement_age_calculator": "file:../components/retirement_age_calculator",
+    "credentials_photo": "file:../components/credentials_photo",
   }
 }
 

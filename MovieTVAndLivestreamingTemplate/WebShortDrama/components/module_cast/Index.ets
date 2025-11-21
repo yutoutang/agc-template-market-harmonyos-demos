@@ -6,4 +6,4 @@ export { VideoData } from './src/main/ets/model/VideoData'
 
 export { CastService } from './src/main/ets/service/CastService';
 
-export { CastSessionListener } from './src/main/ets/model/CastServiceModule'
+export { CastSessionListener, CastStatusModel } from './src/main/ets/model/CastStatusModel'

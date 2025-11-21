@@ -1,5 +1,6 @@
 import { common } from '@kit.AbilityKit';
 import { promptAction } from '@kit.ArkUI';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 import sdk from 'libveditor.so';
 import { EditVideo } from '../model/Index';
 import { VideoManageVM } from '../viewmodel/VideoManageVM';
@@ -44,13 +45,18 @@ struct VideoManage {
       .width('100%')
       .borderRadius(16)
       .onClick(() => {
-        if (!this.vm.isAccept) {
-          promptAction.showToast({ message: '请在“设置-应用和元服务”中打开应用的文件写入权限' });
-          this.handlePermission();
-          return;
+        try {
+          if (!this.vm.isAccept) {
+            promptAction.showToast({ message: '请在“设置-应用和元服务”中打开应用的文件写入权限' });
+            this.handlePermission();
+            return;
+          }
+          sdk.InitEditor();
+          this.vm.selectVideo();
+        } catch (err) {
+          promptAction.showToast({ message: '当前设备不支持剪辑，请使用真机使用~' });
+          hilog.error(0xFF00, 'VideoClip', JSON.stringify(err));
         }
-        sdk.InitEditor();
-        this.vm.selectVideo();
       })
       .linearGradient({
         direction: GradientDirection.Right, // 渐变方向
