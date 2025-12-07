@@ -13,9 +13,9 @@
 本组件提供了华为账号一键登录、微信登录、手机号登录的能力，开发者可以根据业务需要快速实现应用登录。
 
 
-| 半模态样式                                     | 全模态样式                                     |
-| ---------------------------------------------- | ---------------------------------------------- |
-| <img src='screenshot/login01.jpg' width='300'> | <img src='screenshot/login02.jpg' width='300'> |
+| 半模态样式                                           | 全模态样式                                           |
+|-------------------------------------------------|-------------------------------------------------|
+| <img src='screenshot/login01.jpeg' width='300'> | <img src='screenshot/login02.jpeg' width='300'> |
 
 ## 约束与限制
 
@@ -77,7 +77,7 @@
    ```
    b. [配置签名和指纹](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-sign-fingerprints)。
 
-   c. [申请scope权限](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-config-permissions) 。
+   c. [申请账号权限](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-config-permissions) 。
 
 
 4. 微信登录请前往微信开放平台申请AppId并配置鸿蒙应用信息，详情参考[鸿蒙接入指南](https://developers.weixin.qq.com/doc/oplatform/Mobile_App/Access_Guide/ohos.html)。
@@ -207,7 +207,7 @@ onAuthentication: () => void = () => {}
           this.getUIContext().getPromptAction().showToast({ message: '消失', duration: 2000 });
         },
         loginFinished: (flag: boolean, unionID?: string) => {
-          this.getUIContext().getPromptAction().showToast({ message: '登陆成功', duration: 2000 });
+          this.getUIContext().getPromptAction().showToast({ message: '登录成功', duration: 2000 });
         }
       })
     }

@@ -1,27 +1,17 @@
-import { LENGTH_READ_FILE_CHUNK, BinaryMessageType, FileType } from '../common/Constant';
-import { FileStartMessage, FileEndMessage, FileCountMessage, ContactMessage } from '../model/BinaryProtocol';
-import { FileTransferCallback } from '../model/FileTransferCallback';
+import { FileType, TransferState } from '../common/Constant';
+import { FileCountMessage, ContactMessage } from '../model/BinaryProtocol';
 import { FileCount, FileVo } from '../model/FileVo';
-import { BinaryProtocolCodec } from '../utils/BinaryProtocolCodec';
-import { TransferUtil } from '../utils/TransferUtil';
-import { FileReaderService } from './FileReadService';
 import { TcpClient } from './TcpClient';
 import { getLocalIPAddress } from '../utils/FileUtil';
 
 class FileSendService {
-  private fileTransferCallback: FileTransferCallback = {} as FileTransferCallback;
-
-  // 设置进度回调
-  setFileTransferCallback(fileTransferCallback: FileTransferCallback): void {
-    this.fileTransferCallback = fileTransferCallback;
-  }
-
   // 发送文件数量
   async sendFileCount(fileCount: FileCount) {
     const ipAddress = await getLocalIPAddress()
     const fileCountMessage: FileCountMessage = {
       ip: ipAddress,
       contact: {
+        state: TransferState.BEFORE,
         list: [...fileCount.contact.list],
         count: fileCount.contact.count,
         isSelected: fileCount.contact.isSelected,
@@ -30,6 +20,7 @@ class FileSendService {
         recvSize: fileCount.contact.recvSize,
       },
       image: {
+        state: TransferState.BEFORE,
         list: [...fileCount.image.list],
         count: fileCount.image.count,
         isSelected: fileCount.image.isSelected,
@@ -38,6 +29,7 @@ class FileSendService {
         recvSize: fileCount.image.recvSize,
       },
       video: {
+        state: TransferState.BEFORE,
         list: [...fileCount.video.list],
         count: fileCount.video.count,
         isSelected: fileCount.video.isSelected,
@@ -57,26 +49,17 @@ class FileSendService {
         fileType: fileVo.type,
         list: fileVo.contactList,
       };
-      return
+      TcpClient.sendContactData(startMessage)
+    } else {
+      TcpClient.sendFileData(fileVo)
     }
-    TcpClient.sendFileData(fileVo)
   }
 }
 
 const instance = new FileSendService();
 
-export function registerFileSendTransferCallback(callback: FileTransferCallback) {
-  instance.setFileTransferCallback(callback)
-}
-
-export function sendFile(fileVo: FileVo): Promise<void> {
-  return new Promise((resolve, reject) => {
-    instance.sendFile(fileVo).then(() => {
-      resolve();
-    }).catch(() => {
-      reject()
-    })
-  })
+export function sendFile(fileVo: FileVo) {
+  instance.sendFile(fileVo)
 }
 
 export function sendFileCount(fileCount: FileCount) {

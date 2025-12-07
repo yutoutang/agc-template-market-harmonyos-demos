@@ -189,7 +189,13 @@ struct VideoEdit {
       .width('100%')
       .height('100%')
       .backgroundColor($r('sys.color.background_secondary'))
-      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM, SafeAreaEdge.TOP]);
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM, SafeAreaEdge.TOP])
+      .onSizeChange((oldValue: SizeOptions, newValue: SizeOptions) => {
+        this.vm.params.screenWidth = newValue.width;
+        this.vm.params.screenHeight = newValue.height;
+        // 重新绘制xComponent组件
+        this.vm.load();
+      });
     }.hideTitleBar(true).onReady((ctx) => {
       this.vm.params = ctx.pathInfo.param as VideoAsset;
       this.vm.duration = this.vm.params.screenWidth as number * 0.7;
@@ -272,30 +278,7 @@ struct VideoEdit {
             controller: this.vm.xComponentController,
           })
             .onLoad(() => {
-              hilog.info(0xFF00, 'VideoClip', 'XComponent Onload');
-              this.vm.fetchFrameByTime();
-              // XComponent的容器宽度
-              hilog.info(0xFF00, 'VideoClip',
-                `calculate container size, screenWidth: ${this.vm.params.screenWidth}, screenHeight: ${this.vm.params.screenHeight}`);
-              let containerWidth = vp2px(this.vm.params.screenWidth as number);
-              let containerHeight = vp2px((this.vm.params.screenHeight as number * 0.65));
-              hilog.info(0xFF00, 'VideoClip',
-                `containerWidth: ${containerWidth}, containerHeight: ${containerHeight}`);
-              // 根据容器宽度和视频的宽高比计算高度
-              sdk.SetCanvasSize(containerHeight, containerWidth);
-              const videoInfo: Array<Point> | undefined = sdk.GetDrawableArea();
-              if (videoInfo !== undefined) {
-                const videoWidth = videoInfo[1].x - videoInfo[0].x;
-                const videoHeight = videoInfo[3].y - videoInfo[0].y;
-                this.vm.xComponentController.setXComponentSurfaceRect({
-                  offsetX: (containerWidth + 1 - videoWidth) / 2,
-                  offsetY: (containerHeight + 1 - videoHeight) / 2, // 居中视频
-                  surfaceWidth: videoWidth,
-                  surfaceHeight: videoHeight,
-                });
-                this.vm.surfaceID = this.vm.xComponentController.getXComponentSurfaceId();
-                sdk.Play();
-              }
+              this.vm.load();
             });
         }
         .zIndex(1);

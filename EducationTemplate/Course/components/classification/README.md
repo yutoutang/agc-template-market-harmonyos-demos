@@ -12,7 +12,7 @@
 
 本组件提供了一级通用分类的能力，引入一二三级嵌套所有数据。开发者可以根据实际业务需要快速实现一级分类。
 
-<img src='./screenshot/classification01.jpg' width='300'>
+<img src='./screenshot/classification01.jpeg' width='300'>
 
 ## 约束与限制
 ### 环境

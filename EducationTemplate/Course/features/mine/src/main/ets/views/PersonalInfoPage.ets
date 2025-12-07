@@ -16,9 +16,7 @@
 
 import { AppStorageV2, window } from '@kit.ArkUI';
 import { TopBar, UserInfo } from 'commonlib';
-import { fileSelect } from 'feed_back';
 import { camera, cameraPicker as picker } from '@kit.CameraKit'
-import { image } from '@kit.ImageKit';
 import { FunctionalButton, functionalButtonComponentManager } from '@kit.ScenarioFusionKit';
 
 @ComponentV2
@@ -124,6 +122,7 @@ export struct PersonalInfoPage {
       height: $r('app.float.vp_744'),
       backgroundColor: $r('sys.color.background_secondary'),
       showClose: false,
+      preferType:SheetType.CENTER,
       maskColor: $r('sys.color.mask_fourth'),
     })
   }

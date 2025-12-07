@@ -42,13 +42,15 @@
 | 吉他调音器（guitar_tuning）               | 提供了吉他调音功能。                               | [使用指导](./components/guitar_tuning/README.md)           |
 | 视频剪辑（video_clip）                   | 提供了视频剪辑及草稿管理功能。                          | [使用指导](./components/video_clip/README.md)              |
 | 克隆工具（clone）                        | 提供了克隆、隔空投送等功能                            | [使用指导](./components/clone/README.md)                   |
-| 手持弹幕（handheld_bullet）              | 手持弹幕、荧光棒及历史记录管理功能。                       | [使用指导](./components/handheld_bullet/README.md)         |
+| 手持弹幕（handheld_bullet）              | 提供了手持弹幕、荧光棒及历史记录管理功能。                    | [使用指导](./components/handheld_bullet/README.md)         |
 | 图文识别（image_recognition）            | 提供图文识别等功能。                               | [使用指导](./components/image_recognition/README.md)       |
-| 理财计算器（financial_calculator）        | 本组件银行理财、复利理财、定投理财功能。                     | [使用指导](./components/financial_calculator/README.md)    |
-| 养老金计算器（pension_calculator）         | 本组件养老金计算功能。                              | [使用指导](./components/pension_calculator/README.md)      |
-| 亲属称呼换算器（kinship_calculator）        | 本组件亲属称呼换算功能。                             | [使用指导](./components/kinship_calculator/README.md)      |
-| 退休年龄计算器（retirement_age_calculator） | 本组件退休年龄计算功能。                             | [使用指导](./components/retirement_age_calculator/README.md) |
+| 理财计算器（financial_calculator）        | 提供了银行理财、复利理财、定投理财功能。                     | [使用指导](./components/financial_calculator/README.md)    |
+| 养老金计算器（pension_calculator）         | 提供了养老金计算功能。                              | [使用指导](./components/pension_calculator/README.md)      |
+| 亲属称呼换算器（kinship_calculator）        | 提供了亲属称呼换算功能。                             | [使用指导](./components/kinship_calculator/README.md)      |
+| 退休年龄计算器（retirement_age_calculator） | 提供了退休年龄计算功能。                             | [使用指导](./components/retirement_age_calculator/README.md) |
 | 证件照（credentials_photo）             | 提供证件照生成功能。                               | [使用指导](./components/credentials_photo/README.md)       |
+| AR测量（ar_measure）                   | 提供AR体积测量及空间测量组件。                         | [使用指导](./components/ar_measure/README.md)                        |
+| 翻译（translator）                     | 提供文本翻译、语音翻译组件。                           | [使用指导](./components/translator/README.md)                        |
 
 本模板为工具类应用提供了常用功能的开发样例，模板主要分首页、我的两大模块：
 
@@ -137,6 +139,8 @@
  |    |-- 亲属称呼换算器
  |    |-- 退休年龄计算器 
  |    |-- 证件照 
+ |    |-- AR测量 
+ |    |-- 翻译 
  └-- 我的
       |-- 问题反馈
       |    └-- 提交反馈
@@ -196,6 +200,8 @@ ComprehensiveTool
   |   |- handheld_bullet/src/main/ets                      // 手持弹幕(har)
   |   |- image_recognition/src/main/ets                    // 图文识别(har)
   |   |- credentials_photo/src/main/ets                    // 证件照(har)
+  |   |- ar_measure/src/main/ets                           // AR测量(har)
+  |   |- translator/src/main/ets                           // 翻译(har)
   |
   |   |- entry/src/main/ets    
   |   |    |- apis                                         // 模块接口  
@@ -213,10 +219,10 @@ ComprehensiveTool
 ## 约束与限制
 
 ### 环境
-* DevEco Studio版本：DevEco Studio 5.1.0 Release及以上
-* HarmonyOS SDK版本：HarmonyOS 5.1.0 Release SDK及以上
+* DevEco Studio版本：DevEco Studio 6.0.0 Release及以上
+* HarmonyOS SDK版本：HarmonyOS 6.0.0 Release SDK及以上
 * 设备类型：华为手机（包括双折叠和阔折叠）
-* HarmonyOS版本：HarmonyOS 5.1.0(18)及以上
+* HarmonyOS版本：HarmonyOS 6.0.0(20)及以上
 
 ### 权限
 
@@ -230,6 +236,8 @@ ComprehensiveTool
 * 写入联系人权限：ohos.permission.WRITE_CONTACTS
 * 读取图片视频权限：ohos.permission.READ_IMAGEVIDEO
 * 写入图片视频权限：ohos.permission.WRITE_IMAGEVIDEO
+* 陀螺仪传感器权限：ohos.permission.GYROSCOPE
+* 加速度传感器权限：ohos.permission.ACCELEROMETER
 
 ## 快速入门
 

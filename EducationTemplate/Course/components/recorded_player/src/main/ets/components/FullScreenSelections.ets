@@ -67,6 +67,7 @@ export struct FullScreenSelections {
         }, (item: string) => JSON.stringify(item))
       }
       .padding({ bottom: 10 })
+      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
       .layoutWeight(1)
     }
     .width('100%')

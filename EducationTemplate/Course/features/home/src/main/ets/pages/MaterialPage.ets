@@ -245,6 +245,7 @@ export struct MaterialPage {
       .height('auto')
       .width('auto')
       .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
       .layoutWeight(1)
       .margin({ bottom: $r('app.float.vp_8') })
     }
@@ -392,8 +393,8 @@ struct InfoItem {
               }
             })
           LoadingProgress()
-            .width($r('app.float.vp_20'))
-            .height($r('app.float.vp_20'))
+            .width($r('app.float.vp_24'))
+            .height($r('app.float.vp_24'))
             .visibility(this.isShowLoading ? Visibility.Visible : Visibility.None)
         }
         .width($r('app.float.vp_64'))
@@ -402,18 +403,6 @@ struct InfoItem {
         .alignItems(VerticalAlign.Center)
         .justifyContent(FlexAlign.Center)
         .backgroundColor($r('sys.color.comp_background_tertiary'))
-
-        // .enabled(this.isDown ? false : true)
-        // .onClick(() => {
-        //   this.isDown = !this.isDown
-        //   this.isShowLoading = true
-        //   PreferenceUtil.getInstance().put(PreferConstant.DOWNLOAD_KEY, '1')
-        //   setTimeout(() => {
-        //     this.isDown = true
-        //     this.isShowLoading = false
-        //     this.getLoadData()
-        //   }, 2000)
-        // })
       }
       .justifyContent(FlexAlign.SpaceBetween)
       .width('100%')

@@ -81,14 +81,7 @@ export struct LiveStreamingItem {
     .backgroundColor($r('sys.color.background_primary'))
     .borderRadius(8)
     .clip(true)
-    .onClick(() => {
-      // 跳转直播或者直播回顾
-      if (this.course.liveState! === 1) {
-        //直播间
-      } else if (this.course.liveState! === 0) {
-        //精彩回顾
-      }
-    })
+
   }
 
   /**
@@ -107,7 +100,7 @@ export struct LiveStreamingItem {
         .fontColor($r('sys.color.font_on_primary'))
     }
     .position({ x: $r('app.float.vp_2'), y: $r('app.float.vp_2') })
-    .backgroundColor($r('sys.color.mask_fourth'))
+    .backgroundColor($r('sys.color.mask_secondary'))
     .width($r('app.float.vp_62'))
     .height($r('app.float.vp_16'))
     .visibility(this.course.liveState! === 0 ? Visibility.Visible : Visibility.None)

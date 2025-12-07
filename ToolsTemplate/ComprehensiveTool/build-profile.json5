@@ -5,8 +5,8 @@
       {
         "name": "default",
         "signingConfig": "default",
-        "targetSdkVersion": "5.1.0(18)",
-        "compatibleSdkVersion": "5.1.0(18)",
+        "targetSdkVersion": "6.0.0(20)",
+        "compatibleSdkVersion": "6.0.0(20)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
           "strictMode": {
@@ -147,10 +147,6 @@
       "srcPath": "./components/video_clip"
     },
     {
-      "name": "clone",
-      "srcPath": "./components/clone"
-    },
-    {
       "name": "handheld_bullet",
       "srcPath": "./components/handheld_bullet"
     },
@@ -177,6 +173,18 @@
     {
       "name": "credentials_photo",
       "srcPath": "./components/credentials_photo"
+    },
+    {
+      "name": "ar_measure",
+      "srcPath": "./components/ar_measure"
+    },
+    {
+      "name": "translator",
+      "srcPath": "./components/translator"
+    },
+    {
+      "name": "clone",
+      "srcPath": "./components/clone"
     }
   ]
 }

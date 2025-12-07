@@ -61,7 +61,7 @@ export struct SearchResult {
 
                   Text(item.likes > 0 ? `${item.likes}人收藏过` : '').fontSize(12);
                   Row({ space: 4 }) {
-                    Image($r(`app.media.${item.authorAvatar}`)).width(16).height(16).borderRadius(8);
+                    Image($r(`app.media.${item.authorAvatar}`)).width(20).height(20).borderRadius(10);
                     Text(item.author).fontSize(12).fontColor($r('sys.color.font_secondary'));
                   };
                 }

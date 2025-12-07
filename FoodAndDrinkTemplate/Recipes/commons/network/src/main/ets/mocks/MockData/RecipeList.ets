@@ -23,7 +23,7 @@ const recipList: Array<RecipeDetail> = [
     difficulty: '中等',
     authorId: 2,
     author: '炖菜高手',
-    authorAvatar: 'avatar2',
+    authorAvatar: 'avatar6',
     ingredients: [
       {
         name: '牛腩',
@@ -871,7 +871,7 @@ const recipList: Array<RecipeDetail> = [
     difficulty: '中等',
     authorId: 10,
     author: '美食博主',
-    authorAvatar: 'avatar2',
+    authorAvatar: 'avatar6',
     ingredients: [
       {
         name: '扇贝',
@@ -1531,7 +1531,7 @@ const recipList: Array<RecipeDetail> = [
     difficulty: '简单',
     authorId: 10,
     author: '美食博主',
-    authorAvatar: 'avatar2',
+    authorAvatar: 'avatar6',
     ingredients: [
       { name: '豆腐', quantity: '1', unit: '块' },
       { name: '香菜', quantity: '适量', unit: '' },

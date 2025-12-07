@@ -13,14 +13,16 @@
  * limitations under the License.
  */
 
-import { ManageStatus } from '../constant/Enum';
+import { ManageStatus, ToolType } from '../constant/Enum';
 import { ToolTypeModule } from '../model/Index';
 import { HomeVM } from '../viewmodel/HomeVM';
+import { abilityAccessCtrl } from '@kit.AbilityKit';
 
 @ComponentV2
 export struct ToolsContainer {
   vm: HomeVM = HomeVM.instance;
   @Local text: string = '拖拽移动位置';
+  @Local context: Context = this.getUIContext().getHostContext() as Context;
   @Param manageStatus: ManageStatus = ManageStatus.NONE;
   @Param toolList: ToolTypeModule[] = [];
 
@@ -38,6 +40,20 @@ export struct ToolsContainer {
     this.vm.homeToolTypes.list = JSON.stringify(this.vm.homeToolList);
     this.vm.calculatorToolTypes.list = JSON.stringify(this.vm.calculatorToolList);
     this.vm.lifeToolListTypes.list = JSON.stringify(this.vm.lifeToolList);
+  }
+
+  async requestPermissionsFn(): Promise<void> {
+    let atManager = abilityAccessCtrl.createAtManager();
+    if (this.context) {
+      let res = await atManager.requestPermissionsFromUser(this.context, ['ohos.permission.CAMERA']);
+      for (let i = 0; i < res.permissions.length; i++) {
+        if ('ohos.permission.CAMERA' === res.permissions[i] && res.authResults[i] === 0) {
+          this.vm.hasPermission = true;
+          this.vm.pathStack.clear();
+          this.vm.pathStack.pushDestinationByName('ARMeasure', null);
+        }
+      }
+    }
   }
 
   @Builder
@@ -77,7 +93,15 @@ export struct ToolsContainer {
             .width('100%')
             .height(104);
           }.onClick(() => {
-            this.vm.handleToolLayout(this.manageStatus, item, this.toolList, index);
+            if (item.id === ToolType.AR_MEASURE) {
+              if (!this.vm.hasPermission) {
+                this.requestPermissionsFn();
+              } else {
+                this.vm.handleToolLayout(this.manageStatus, item, this.toolList, index);
+              }
+            } else {
+              this.vm.handleToolLayout(this.manageStatus, item, this.toolList, index);
+            }
           });
         }, (item: ToolTypeModule) => JSON.stringify(item));
       }

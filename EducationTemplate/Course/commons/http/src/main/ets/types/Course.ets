@@ -32,7 +32,7 @@ export interface Course {
   learnNumber?: number; // 学习人数
   reservationTime?: number; // 直播开始时间
   liveNumber?: number; // 在线人数
-  liveState?: number; //直播状态 1正在直播  0已结束
+  liveState?: number; // 直播状态 1正在直播  0已结束 2未开播
   time: number; // 发布时间
   courseCatalog?: CourseCatalog[]; // 课程章节
 }

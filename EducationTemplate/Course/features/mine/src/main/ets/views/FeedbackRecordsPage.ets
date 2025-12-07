@@ -126,6 +126,7 @@ export struct FeedbackRecordsPage {
     }
     .width('100%')
     .height('auto')
+    .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
     .scrollBar(BarState.Off)
     .visibility(this.feedbackList.length > 0 ? Visibility.Visible : Visibility.None)
   }

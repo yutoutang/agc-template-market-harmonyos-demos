@@ -1,6 +1,7 @@
 import { ResultInfo, ResultModel } from '../model/Index';
 import { getNavPathStack } from '../common/Route';
 import { RESULT_INFO_MAP } from '../common/nfc/Common';
+import { RTYPE } from '../common/Enum';
 
 @Builder
 export function ResultPageBuilder() {
@@ -12,21 +13,15 @@ struct ResultPage {
   @Local data: ResultModel = new ResultModel();
   @Local resultInfo: ResultInfo = new ResultInfo();
 
-  aboutToAppear(): void {
-    this.resultInfo = RESULT_INFO_MAP.get(this.data?.rtype) ?? new ResultInfo();
-    if (this.data.msg) {
-      this.resultInfo.hintInfo = this.data.msg;
-    }
-  }
-
   build() {
     NavDestination() {
       Column() {
-        Image($r('app.media.ic_read_error')).fitOriginalSize(true).margin({ top: 76 });
+        Image(this.data?.rtype !== RTYPE.RTYPE_CLONE_SUCCESS ? $r('app.media.ic_read_error') :
+          $r('app.media.ic_clone_success')).fitOriginalSize(true).margin({ top: 76 });
         Text(this.resultInfo.hintInfo)
           .fontColor($r('sys.color.font_secondary')).fontSize(14).margin({ top: 12, bottom: 160 });
 
-        Button('重试')
+        Button(this.data?.rtype !== RTYPE.RTYPE_CLONE_SUCCESS ? '重试' : '返回')
           .width('100%')
           .fontColor($r('sys.color.font_on_primary'))
           .backgroundColor($r('sys.color.background_emphasize'))
@@ -35,7 +30,12 @@ struct ResultPage {
             if (this.resultInfo.retry) {
               getNavPathStack().pushPathByName('ActionPage', this.data.actionModel);
             } else {
-              getNavPathStack().pop();
+              let names = getNavPathStack().getAllPathName();
+              if (names.find((item => item === 'CloneCardPage'))) {
+                getNavPathStack().popToName('CloneCardPage');
+              } else {
+                getNavPathStack().popToName('DetailPage');
+              }
             }
           });
       }
@@ -45,6 +45,10 @@ struct ResultPage {
       .padding(16);
     }.hideTitleBar(true).onReady((ctx) => {
       this.data = ctx.pathInfo.param as ResultModel;
+      this.resultInfo = RESULT_INFO_MAP.get(this.data?.rtype) ?? new ResultInfo();
+      if (this.data.msg) {
+        this.resultInfo.hintInfo = this.data.msg;
+      }
     });
   }
 }

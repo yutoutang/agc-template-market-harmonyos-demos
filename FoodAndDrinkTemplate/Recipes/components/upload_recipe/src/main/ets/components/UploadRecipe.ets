@@ -192,8 +192,6 @@ export struct UploadRecipe {
                       this.vm.steps.push(new Step('', ''));
                     });
                   }
-
-
                 }.columnWrapExtend().margin({ top: 12 });
               }.swipeAction({
                 end: {
@@ -204,9 +202,7 @@ export struct UploadRecipe {
               });
             }, (item: Step, index) => item.stepImg + index);
           };
-
         }.padding({ top: 12, bottom: 20 });
-
       }.height('calc(100% - 76vp)').align(Alignment.Top).scrollBar(BarState.Off).edgeEffect(EdgeEffect.Spring);
 
       Row() {
@@ -227,11 +223,12 @@ export struct UploadRecipe {
               }
               this.uploadRecipe(data)
             }
-
           });
       }.height(76).width('100%').padding({ left: 40, right: 40, top: 24 });
-
-    }.height('100%').backgroundColor('#F1F3F5');
+    }
+    .height('100%')
+    .backgroundColor('#F1F3F5')
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
   }
   @Builder
   itemEnd(index: number) {

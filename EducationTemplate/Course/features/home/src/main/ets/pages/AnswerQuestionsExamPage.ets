@@ -227,7 +227,7 @@ export struct AnswerQuestionsExamPage {
       .backgroundColor(this.currentIndex === 0 ? $r('sys.color.comp_background_tertiary') :
       $r('app.color.view_report_btn'))
       .stateEffect(this.currentIndex === 0 ? false : true)
-      .fontColor($r('sys.color.font_on_primary'))
+      .fontColor(this.currentIndex === 0 ? $r('sys.color.font_tertiary') : $r('sys.color.font_on_primary'))
       .fontSize($r('sys.float.Body_L'))
       .fontWeight(FontWeight.Medium)
       .height($r('app.float.vp_40'))

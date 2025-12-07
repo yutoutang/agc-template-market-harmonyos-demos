@@ -14,7 +14,7 @@ const followers: BloggerFollower[] = [
     id: 2,
     authorId: 1002,
     author: '米其林在家',
-    authorAvatar: 'avatar2',
+    authorAvatar: 'avatar6',
     isFollower:false
   },
   {
@@ -84,7 +84,7 @@ const followers: BloggerFollower[] = [
     id: 12,
     authorId: 1012,
     author: '快手菜专家',
-    authorAvatar: 'avatar2',
+    authorAvatar: 'avatar6',
     isFollower:false
   },
   {
@@ -154,7 +154,7 @@ const followers: BloggerFollower[] = [
     id: 22,
     authorId: 1022,
     author: '泰式风味',
-    authorAvatar: 'avatar2',
+    authorAvatar: 'avatar6',
     isFollower:false
   },
   {

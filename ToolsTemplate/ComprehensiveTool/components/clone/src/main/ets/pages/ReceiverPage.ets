@@ -3,6 +3,7 @@ import { getInstance } from '../common/CommonRoute';
 import { ConnectionVo } from '../model/ConnectionVo';
 import { TcpCallback } from '../model/TcpCallback';
 import { TcpServer } from '../service/TcpServer';
+import { common } from '@kit.AbilityKit';
 
 @ComponentV2
 struct ReceiverPage {
@@ -10,6 +11,7 @@ struct ReceiverPage {
   @Local qrCodeData: string = ''; // 二维码数据
   @Local isConnected: boolean = AppStorage.get('isConnected') ?? false;
   @Local port: number = 0;
+  context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext
   private tcpCallback: TcpCallback = {
     onPrepared: async (port?: number) => {
       if (port) {
@@ -35,6 +37,7 @@ struct ReceiverPage {
     this.generateQRCodeData()
 
     if (!this.isConnected) {
+      TcpServer.context = this.context
       TcpServer.create(this.ipAddress, this.tcpCallback)
     }
   }

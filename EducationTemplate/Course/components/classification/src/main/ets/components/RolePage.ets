@@ -130,6 +130,7 @@ export struct RolePage {
       }), (item: SelectRoleModel, index: number) => item.title + index)
     }
     .scrollBar(BarState.Off)
+    .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
     .width('100%')
     .height('auto')
   }
@@ -157,6 +158,7 @@ export struct RolePage {
       }), (item: SelectRoleModel, index: number) => item.title + index)
     }
     .scrollBar(BarState.Off)
+    .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
     .width('100%')
     .height('auto')
   }
@@ -184,6 +186,7 @@ export struct RolePage {
       }), (item: SelectRoleModel, index: number) => item.title + index)
     }
     .scrollBar(BarState.Off)
+    .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
     .width('100%')
     .height('auto')
   }
@@ -210,6 +213,7 @@ export struct RolePage {
       }), (item: SelectRoleModel, index: number) => item.title + index)
     }
     .scrollBar(BarState.Off)
+    .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
     .width('100%')
     .height('auto')
   }

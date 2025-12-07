@@ -396,6 +396,10 @@ async function cloneNFC(nfcType: number, nfcInfo: NfcInfo, curNfcInfo: NfcInfo, 
     return;
   }
 
+  if (!mifareClassic.isConnected()) {
+    mifareClassic.connect();
+  }
+
   let auth = await authenticateSector(mifareClassic, callback);
   if (!auth) {
     return;
@@ -404,7 +408,7 @@ async function cloneNFC(nfcType: number, nfcInfo: NfcInfo, curNfcInfo: NfcInfo, 
   }
 
   //开始写入
-  let block: number = mifareClassic.getBlockIndex(0);
+  let block: number = mifareClassic.getBlockIndex(0) + 1;
   try {
     await mifareClassic.writeSingleBlock(block, Util.hex2Bytes(mBlock0Complete));
     callback(undefined, new NFCState(NFC_STATE_COMPLETE));

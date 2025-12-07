@@ -36,3 +36,9 @@ export { AnswerQuestionsExamBuilder } from './src/main/ets/pages/AnswerQuestions
 export { ExamResultBuilder } from './src/main/ets/pages/ExamResultPage';
 
 export { LookFileBuilder } from './src/main/ets/pages/LookFilePage';
+
+export { LiveDetailPageBuilder } from './src/main/ets/pages/LiveDetailPage';
+
+export { LiveStreamingPageBuilder } from './src/main/ets/pages/LiveStreamingPage';
+
+export { InputCommentBuilder } from './src/main/ets/pages/InputCommentPage';

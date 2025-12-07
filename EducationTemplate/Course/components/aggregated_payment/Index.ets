@@ -1,32 +1,11 @@
-/*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+export { PaymentCallback, PaymentType } from './src/main/ets/common/CustomTypes';
 
-import * as wxopensdk from '@tencent/wechat_open_sdk';
+export { WechatPaymentInfo } from './src/main/ets/models/WechatPaymentInfo';
 
-export { AggregatedPaymentPicker } from './src/main/ets/components/AggregatedPaymentPicker';
+export { HuaweiPaymentInfo } from './src/main/ets/models/HuaweiPaymentInfo';
 
-export { PickerType, ChannelType, WxExtraInfo } from './src/main/ets/common/Constant'
+export { AlipayPaymentInfo } from './src/main/ets/models/AlipayPaymentInfo';
 
-export { MockApi } from './src/main/ets/common/MockApi'
+export { CashierPicker } from './src/main/ets/CashierPicker';
 
-export { SignUtils } from './src/main/ets/common/SignUtils';
-
-export { OrderInfoUtil } from './src/main/ets/common/OrderInfoUtil';
-
-export { ChannelInfo } from './src/main/ets/model/PaymentModels'
-
-export { wxEventHandler as WXEventHandler } from './src/main/ets/model/WXApiWrap'
-
-export const wxApi = wxopensdk.WXAPIFactory.createWXAPI('wx05b3e2e9fc730840')
+export { aggregatedPaymentService } from './src/main/ets/AggregatedPaymentService';

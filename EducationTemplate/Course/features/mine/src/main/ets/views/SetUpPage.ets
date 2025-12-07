@@ -241,6 +241,7 @@ struct setVideoItem {
           dragBar: true, // 是否显示控制条
           backgroundColor: Color.White,
           showClose: true, // 是否显示关闭图标
+          preferType:SheetType.CENTER,
           shouldDismiss: ((sheetDismiss: SheetDismiss) => {
             sheetDismiss.dismiss();
             this.isShowDefinitionSheet = false

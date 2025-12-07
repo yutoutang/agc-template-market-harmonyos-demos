@@ -7,6 +7,10 @@
     {
       "name": "my_learn",
       "value": "我的学习"
+    },
+    {
+      "name": "agcit_huawei_course_service",
+      "value": "1.0.0"
     }
   ]
 }

@@ -52,6 +52,13 @@ export enum RouterMap {
   EXAM_RESULT_PAGE = 'ExamResultPage',
   // 文件预览
   LOOK_FILE_PAGE = 'LookFilePage',
+  // 直播详情页
+  LIVE_DETAIL_PAGE = 'LiveDetailPage',
+  // 直播
+  LIVE_STREAMING_PAGE = 'LiveStreamingPage',
+  // 弹幕评论
+  INPUT_COMMENT_PAGE = 'InputCommentPage',
+
   // -----------------------------------------------------我的
   // 个人信息页
   PERSONAL_INFO_PAGE = 'PersonalInfoPage',

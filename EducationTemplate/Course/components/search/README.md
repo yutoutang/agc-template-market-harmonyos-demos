@@ -12,7 +12,7 @@
 
 本组件提供了搜索文本的功能，开发者可以根据业务需要快速搭建搜索页面。
 
-<img src="./screenshot/search01.jpg" width="300">
+<img src="./screenshot/search01.jpeg" width="300">
 
 ## 约束与限制
 ### 环境

@@ -10,8 +10,8 @@
     "http": "file:../../commons/http",
     "recorded_player": "file:../../components/recorded_player",
     "search": "file:../../components/search",
-    "aggregated_payment": "file:../../components/aggregated_payment",
     "aggregated_share": "file:../../components/aggregated_share",
-    "classification": "file:../../components/classification"
+    "classification": "file:../../components/classification",
+    "live_streaming": "file:../../components/live_streaming"
   }
 }

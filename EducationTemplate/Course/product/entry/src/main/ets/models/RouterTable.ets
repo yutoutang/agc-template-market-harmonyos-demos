@@ -20,7 +20,10 @@ import {
   ChapterDetailBuilder,
   CourseListPageBuilder,
   ExamResultBuilder,
+  InputCommentBuilder,
+  LiveDetailPageBuilder,
   LiveStreamingListPageBuilder,
+  LiveStreamingPageBuilder,
   LookFileBuilder,
   MaterialPageBuilder,
   RecordedDetailBuilder,
@@ -50,7 +53,7 @@ import {
   MyWrongQuestionPageBuilder,
   WatchHistoryPageBuilder,
   MyCourseCommentsBuilder,
-  OrderDetailPageBuilder
+  OrderDetailPageBuilder,
 } from 'mine';
 import { LaunchPageBuilder } from '../pages/Launch';
 import { LaunchAdPageBuilder } from '../pages/LaunchAd';
@@ -89,6 +92,10 @@ export class RouterTable {
     RouterTable.builderMap.set(RouterMap.ANSWER_REPORT_PAGE, wrapBuilder(TestReportBuilder));
     RouterTable.builderMap.set(RouterMap.EXAM_RESULT_PAGE, wrapBuilder(ExamResultBuilder));
     RouterTable.builderMap.set(RouterMap.LOOK_FILE_PAGE, wrapBuilder(LookFileBuilder));
+    RouterTable.builderMap.set(RouterMap.LIVE_DETAIL_PAGE, wrapBuilder(LiveDetailPageBuilder));
+    RouterTable.builderMap.set(RouterMap.LIVE_STREAMING_PAGE, wrapBuilder(LiveStreamingPageBuilder));
+    RouterTable.builderMap.set(RouterMap.INPUT_COMMENT_PAGE, wrapBuilder(InputCommentBuilder));
+
     // -------------------------------------------------- course
 
     // -------------------------------------------------- mine

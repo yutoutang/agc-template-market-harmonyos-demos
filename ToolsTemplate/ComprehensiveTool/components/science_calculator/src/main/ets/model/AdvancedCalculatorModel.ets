@@ -3,6 +3,7 @@ import { Lexer } from '../utils/Lexer';
 import { Decimal } from '@kit.ArkTS';
 import { CalculatorState } from './CalculatorState';
 import { MemoryManager } from './MemoryManager';
+import { functionNameMap } from '../common/Constant';
 
 export class AdvancedCalculatorModel {
   // 用于显示的表达式（用户看到的）
@@ -64,7 +65,13 @@ export class AdvancedCalculatorModel {
   }
 
   deleteLast(): void {
-    if (this.displayExpression.length > 0) {
+    if (this.displayExpression.length > 0) { // 尝试删除整个函数
+      if (this.tryDeleteFunction()) { // 如果删除后表达式为空，重置连续计算状态
+        if (this.displayExpression.length === 0) {
+          this.state.resetContinuousMode();
+        }
+        return;
+      }
       this.displayExpression = this.displayExpression.substring(0, this.displayExpression.length - 1);
       this.calculationExpression = this.calculationExpression.substring(0, this.calculationExpression.length - 1);
       // 如果删除后表达式为空，重置连续计算状态
@@ -74,6 +81,19 @@ export class AdvancedCalculatorModel {
     }
   }
 
+  tryDeleteFunction(): boolean {
+    for (const pattern of functionNameMap) {
+      if (this.displayExpression.endsWith(pattern.display) &&
+      this.calculationExpression.endsWith(pattern.calculation)) {
+        this.displayExpression =
+          this.displayExpression.substring(0, this.displayExpression.length - pattern.display.length);
+        this.calculationExpression =
+          this.calculationExpression.substring(0, this.calculationExpression.length - pattern.calculation.length);
+        return true;
+      }
+    }
+    return false;
+  }
   // 设置表达式对
   setExpressions(displayExpr: string, calculationExpr: string): void {
     this.displayExpression = displayExpr;
@@ -229,7 +249,7 @@ export class AdvancedCalculatorModel {
 
   // 检查是否是函数
   private isFunction(value: string): boolean {
-    return ['sin(', 'cos(', 'tan(', 'log(', 'ln(', 'sqrt('].includes(value);
+    return ['sin(', 'cos(', 'tan(', 'log(', 'ln(', 'sqrt(', 'sinh(', 'cosh(', 'tanh('].includes(value);
   }
 
   // 检查是否是常量
@@ -437,7 +457,7 @@ export class AdvancedCalculatorModel {
           if (b === 0) {
             throw new Error('Division by zero');
           }
-          return new Decimal(a).div(b).toNumber();
+          return Number(new Decimal(a).div(b).toFixed(16, 4));
         case '^':
           return Math.pow(a, b);
         case '√':

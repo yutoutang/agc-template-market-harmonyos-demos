@@ -214,7 +214,13 @@ export struct MyCollectionPage {
               this.isSelectData(item)
             } else {
               if (this.isCourse) {
-                RouterModule.push({ url: RouterMap.RECORDED_DETAIL_PAGE, param: item.id })
+                if (item.liveState === 1) {
+                  RouterModule.push({ url: RouterMap.LIVE_STREAMING_PAGE, param: item?.id })
+                } else if (item.liveState === 2) {
+                  RouterModule.push({ url: RouterMap.LIVE_DETAIL_PAGE, param: item?.id })
+                } else {
+                  RouterModule.push({ url: RouterMap.RECORDED_DETAIL_PAGE, param: item?.id })
+                }
               } else {
                 let routerModel: QuestionsRouterModel = new QuestionsRouterModel()
                 routerModel.sourcePageTitle = '我的收藏'
@@ -246,7 +252,8 @@ export struct MyCollectionPage {
       }), (item: CollectionModel, index: number) => item.id + index)
     }
     .width('100%')
-    .height('auto')
+    .height('100%')
+    .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
     .scrollBar(BarState.Off)
     .padding({ bottom: $r('app.float.vp_8') })
   }
@@ -326,6 +333,7 @@ export struct MyCollectionPage {
       courseModel.courseDuration = item.courseDuration
       courseModel.learnProgress = item.learnProgress
       courseModel.cover = item.cover
+      courseModel.liveState = item.liveState
       this.collectionCourseList.push(courseModel)
     })
     this.collectionList = this.collectionCourseList

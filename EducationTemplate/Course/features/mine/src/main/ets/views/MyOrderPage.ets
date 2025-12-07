@@ -40,7 +40,7 @@ export struct MyOrderPage {
       Divider()
         .strokeWidth(2)
         .width(20)
-        .color($r('sys.color.font_emphasize'))
+        .color($r('sys.color.comp_background_emphasize'))
         .opacity(this.selectedIndex === index ? 1 : 0)
     }
     .width('100%')

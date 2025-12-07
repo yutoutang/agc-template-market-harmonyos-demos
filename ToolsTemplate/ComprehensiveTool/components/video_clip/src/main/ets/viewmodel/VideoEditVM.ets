@@ -17,6 +17,7 @@ import {
   DownloadSound,
   DownloadSoundList,
   EditVideo,
+  Point,
   SoundByTag,
   TextInfo,
   TImageInfo,
@@ -103,6 +104,33 @@ export class VideoEditVM {
     return VideoEditVM._instance;
   }
 
+  load() {
+    hilog.info(0xFF00, 'VideoClip', 'XComponent Onload');
+    this.fetchFrameByTime();
+    // XComponent的容器宽度
+    hilog.info(0xFF00, 'VideoClip',
+      `calculate container size, screenWidth: ${this.params.screenWidth}, screenHeight: ${this.params.screenHeight}`);
+    let containerWidth = vp2px(this.params.screenWidth as number);
+    let containerHeight = vp2px((this.params.screenHeight as number * 0.65));
+    hilog.info(0xFF00, 'VideoClip',
+      `containerWidth: ${containerWidth}, containerHeight: ${containerHeight}`);
+    // 根据容器宽度和视频的宽高比计算高度
+    sdk.SetCanvasSize(containerHeight, containerWidth);
+    const videoInfo: Array<Point> | undefined = sdk.GetDrawableArea();
+    if (videoInfo !== undefined) {
+      const videoWidth = videoInfo[1].x - videoInfo[0].x;
+      const videoHeight = videoInfo[3].y - videoInfo[0].y;
+      this.xComponentController.setXComponentSurfaceRect({
+        offsetX: (containerWidth + 1 - videoWidth) / 2,
+        offsetY: (containerHeight + 1 - videoHeight) / 2,
+        surfaceWidth: videoWidth,
+        surfaceHeight: videoHeight,
+      });
+      this.surfaceID = this.xComponentController.getXComponentSurfaceId();
+      sdk.Play();
+    }
+  }
+
   // 画出贴纸
   @Monitor('imgUri')
   buildSticker() {
@@ -141,6 +169,9 @@ export class VideoEditVM {
     if (this.exportInterval) {
       clearInterval(this.exportInterval);
     }
+    this.textTabIndex = 0;
+    this.soundTabIndex = 0;
+    this.stickerTabIndex = 0;
     this.isInCut = false;
     // 重置所有资源
     this.pixelMaps = [];

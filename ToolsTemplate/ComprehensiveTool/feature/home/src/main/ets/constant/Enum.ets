@@ -48,6 +48,8 @@ export enum ToolType {
   KINSHIP_CALCULATOR = 31,
   RETIREMENT_AGE_CALCULATOR = 32,
   CREDENTIALS_PHOTO = 33,
+  AR_MEASURE = 34,
+  TRANSLATOR = 35
 }
 
 export enum TabBarType {

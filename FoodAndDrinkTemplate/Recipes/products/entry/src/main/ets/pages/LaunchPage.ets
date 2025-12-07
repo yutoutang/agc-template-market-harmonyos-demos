@@ -29,8 +29,10 @@ struct LaunchPage {
         Column() {
           Text('菜谱').fontSize(24).fontWeight(FontWeight.Medium).fontColor('#FF0000')
           Text('开启舌尖上的美味').fontSize(16).fontWeight(FontWeight.Medium).fontColor('#99FF0000')
-        }.margin({ top: 220 })
-      }.margin({ top: 177 })
+        }
+      }
+      .justifyContent(FlexAlign.SpaceEvenly)
+      .height('100%')
     }
     .hideTitleBar(true)
     .backgroundColor('#FDF7F8')

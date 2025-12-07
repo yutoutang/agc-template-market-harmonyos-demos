@@ -687,7 +687,7 @@ void Editor::OnExport(int64_t pts)
         }
     }
     
-    if (isDecoderStopped && encoderFrameCount + 5 >= decoderFrameCount){ // 这里容忍丢5帧
+    if (isDecoderStopped && encoderFrameCount + 10 >= decoderFrameCount){ // 这里容忍丢5帧
         LOGI("Editor::OnExport decoder stopped and encoder received enough frames %{public}d. Encoder pts is %{public}d", 
              encoderFrameCount.load(),
              pts
@@ -704,7 +704,6 @@ void Editor::OnExport(int64_t pts)
                 }
             });
             t.detach();
-            
         }
     }
 }

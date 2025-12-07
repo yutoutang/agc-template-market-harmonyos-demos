@@ -23,6 +23,10 @@
     {
       "name": "single_choice",
       "value": "单选"
+    },
+    {
+      "name": "agcit_huawei_course_service",
+      "value": "1.0.0"
     }
   ]
 }

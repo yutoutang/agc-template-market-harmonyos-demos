@@ -17,6 +17,7 @@ export class HomeVM {
   @Trace homeToolList: ToolTypeModules = [];
   @Trace calculatorToolList: ToolTypeModules = [];
   @Trace lifeToolList: ToolTypeModules = [];
+  @Trace hasPermission: boolean = false;
   @Trace pathStack: NavPathStack = new NavPathStack()
   private static _instance: HomeVM;
 

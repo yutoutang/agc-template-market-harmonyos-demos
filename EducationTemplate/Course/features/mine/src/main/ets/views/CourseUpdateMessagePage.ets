@@ -56,6 +56,7 @@ export struct CourseUpdateMessagePage {
               })
             }), (item: CourseMessageModel, index: number) => item.id + index)
           }
+          .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
           .width('100%')
           .height('auto')
         }

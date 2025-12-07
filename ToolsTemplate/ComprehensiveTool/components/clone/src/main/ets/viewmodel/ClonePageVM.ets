@@ -6,11 +6,12 @@ import { TcpClient } from '../service/TcpClient';
 import { abilityAccessCtrl, PermissionRequestResult, Permissions } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import Logger from '../common/Constant'
+import { checkAccessToken } from '../utils/Permission';
+import { promptAction } from '@kit.ArkUI';
 
 @ObservedV2
 export class ClonePageVM {
   private static _instance: ClonePageVM
-  @Trace isPermission: boolean = false
 
   public static get instance() {
     if (!ClonePageVM._instance) {
@@ -32,6 +33,23 @@ export class ClonePageVM {
       .catch((err: BusinessError) => {
         console.log(JSON.stringify(err))
       });
+  }
+
+  // 检测权限
+  async checkAccessToken() {
+    let res = -1
+    const permissions: Array<Permissions> =
+      ['ohos.permission.WRITE_CONTACTS', 'ohos.permission.READ_CONTACTS', 'ohos.permission.READ_IMAGEVIDEO',
+        'ohos.permission.WRITE_IMAGEVIDEO'];
+    for (let i = 0; i < permissions.length; i++) {
+      res = await checkAccessToken(permissions[i])
+    }
+    if (res === 0) {
+      return true
+    } else {
+      promptAction.showToast({ message: '请授权联系人读写权限，图片视频读写权限！' })
+      return false
+    }
   }
 
   // 处理扫码结果

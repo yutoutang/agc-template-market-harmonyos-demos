@@ -3,7 +3,13 @@
     "name": "aggregated_share",
     "type": "har",
     "deviceTypes": [
-      "phone"
+      "phone",
+      "tablet"
+    ],
+    "requestPermissions": [
+      {
+        "name": "ohos.permission.INTERNET",
+      },
     ]
   }
 }

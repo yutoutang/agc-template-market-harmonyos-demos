@@ -164,7 +164,8 @@ export struct MyDownloadPage {
       }), (item: DownloadModel, index: number) => item.materialName + index)
     }
     .width('100%')
-    .height('auto')
+    .height('100%')
+    .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
     .scrollBar(BarState.Off)
     .padding({ bottom: $r('app.float.vp_8'), top: $r('app.float.vp_8') })
   }

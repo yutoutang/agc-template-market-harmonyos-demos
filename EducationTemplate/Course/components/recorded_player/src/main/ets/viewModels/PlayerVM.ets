@@ -15,6 +15,7 @@
 
 import { emitter } from '@kit.BasicServicesKit';
 import { MoreItem, MovieItem, ReportItem } from '../models/Type';
+import { PipManager } from '../tools/PipManager';
 
 @ObservedV2
 export class PlayerVM {
@@ -33,6 +34,11 @@ export class PlayerVM {
   ]
   private static _instance: PlayerVM;
   public moreItemList: MoreItem[] = [
+    {
+      label: '分享',
+      icon: $r('app.media.icon_share'),
+      itemId: '01',
+    },
     {
       label: '倍速',
       icon: $r('app.media.icon_speed_multiple'),
@@ -123,4 +129,7 @@ export class PlayerVM {
     emitter.emit('autoStartEnabled', eventData)
   }
 
+  stopPip() {
+    PipManager.getInstance().stopPip()
+  }
 }

@@ -21,7 +21,9 @@ export struct ClonePage {
         titleBuilder('数据迁移')
         routerBuilder($r('sys.symbol.phone_transmission_phone'), $r('sys.color.multi_color_02'), '#C5EDFF',
           '旧设备点这里', () => {
-
+            if (!this.vm.checkAccessToken()) {
+              return
+            }
             SystemUtil.startScanAbility(this.getUIContext().getHostContext()).then((value) => {
               this.vm.handleScanResult(value)
             }).catch(() => {
@@ -29,6 +31,9 @@ export struct ClonePage {
             })
           })
         routerBuilder($r('sys.symbol.dual_phone_pairing'), '#68AFFF', '#EEF6FF', '新设备点这里', () => {
+          if (!this.vm.checkAccessToken()) {
+            return
+          }
           getInstance().pushPathByName('ReceiverPage', true)
         })
         titleBuilder('隔空投送')

@@ -80,9 +80,9 @@ export struct QuickLoginPage {
           prop.address = 'xxx省xxx市'
           RouterModule.pop()
           if (flag) {
-            this.getUIContext().getPromptAction().showToast({ message: '登陆成功', duration: 2000 });
-          }else {
-            this.getUIContext().getPromptAction().showToast({ message: 'mock登陆', duration: 2000 });
+            this.getUIContext().getPromptAction().showToast({ message: '登录成功', duration: 2000 });
+          } else {
+            this.getUIContext().getPromptAction().showToast({ message: 'mock登录', duration: 2000 });
           }
         }
       })

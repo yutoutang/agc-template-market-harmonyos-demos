@@ -135,7 +135,8 @@ export struct MyWrongQuestionPage {
       }), (item: WrongQuestionModel, index: number) => item.id + index)
     }
     .width('100%')
-    .height('auto')
+    .height('100%')
+    .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
     .scrollBar(BarState.Off)
     .padding({ bottom: $r('app.float.vp_8') })
   }

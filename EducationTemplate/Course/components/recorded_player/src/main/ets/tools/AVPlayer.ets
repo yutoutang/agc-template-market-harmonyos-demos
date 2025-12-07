@@ -56,6 +56,7 @@ export class AVPlayer {
   seekTime: number = 0;
   // 碰到特殊场景进入其他页时，即便加载成功也不需要播放
   isResetPause: boolean = false;
+  videoUrl: string = '';
 
   async init(url: string, seekTime: number): Promise<void> {
     await this.release();
@@ -66,6 +67,7 @@ export class AVPlayer {
     await this.setSourceInfoCallback();
     this.isCreate = true;
     this.isResetPause = false;
+    this.videoUrl = url
     this.avPlayer.url = url;
     this.isLoading = true;
     this.seekTime = seekTime;
@@ -127,6 +129,7 @@ export class AVPlayer {
       await this.avPlayer.reset()
       this.totalDuration = 0
       this.seekTime = seekTime
+      this.videoUrl = url
       this.avPlayer.url = url
     }
   }
@@ -244,12 +247,10 @@ export class AVPlayer {
         // 正在播放状态
         case AVPlayerState.PLAYING:
           this.isLoading = false;
-          this.isPlaying = true;
           break;
         // 暂停状态
         case AVPlayerState.PAUSED:
           this.isLoading = false;
-          this.isPlaying = false;
           break;
         // 播放至结尾状态
         case AVPlayerState.COMPLETED:

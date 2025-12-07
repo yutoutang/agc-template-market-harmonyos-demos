@@ -103,6 +103,7 @@ export struct CourseListPage {
     .width('100%')
     .height('auto')
     .scrollBar(BarState.Off)
+    .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
     .layoutWeight(1)
     .padding({ bottom: $r('app.float.vp_8') })
   }
@@ -114,7 +115,6 @@ export struct CourseListPage {
   searchBuilder() {
     Search({ placeholder: '搜索', value: this.searchValue })
       .width('100%')
-      .height($r('app.float.vp_40'))
       .backgroundColor($r('sys.color.comp_background_tertiary'))
       .onChange((value: string) => {
         this.searchCourse(value)

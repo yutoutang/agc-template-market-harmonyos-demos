@@ -42,6 +42,8 @@
     "kinship_calculator": "file:../components/kinship_calculator",
     "retirement_age_calculator": "file:../components/retirement_age_calculator",
     "credentials_photo": "file:../components/credentials_photo",
+    "ar_measure": "file:../components/ar_measure",
+    "translator": "file:../components/translator"
   }
 }
 

@@ -87,7 +87,7 @@ mock.onGet('/home/premiumCourseData').reply(async () => {
 // 查询正在直播课程数据
 mock.onGet('/home/liveBroadcastCourseData').reply(async () => {
   let liveBroadcastCourseData: Course[] =
-    COURSE_DATA.filter((item: Course) => item.category === 2 && item.liveState === 1)
+    COURSE_DATA.filter((item: Course) => item.category === 2 && (item.liveState === 1 || item.liveState === 2))
   liveBroadcastCourseData.sort((a, b) => b.liveNumber! - a.liveNumber!)
   return {
     status: HttpStatusCode.Ok,

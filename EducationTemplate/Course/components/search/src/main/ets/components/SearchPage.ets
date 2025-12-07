@@ -106,6 +106,7 @@ export struct SearchPage {
       }, (item: string) => JSON.stringify(item))
     }
     .scrollBar(BarState.Off)
+    .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
     .cachedCount(1)
     .width('100%')
     .height('auto')
@@ -190,7 +191,6 @@ export struct SearchPage {
       // 搜索文本框
       Search({ placeholder: '搜索', value: this.searchValue })
         .layoutWeight(1)
-        .height($r('app.float.vp_40'))
         .backgroundColor($r('sys.color.comp_background_tertiary'))
         .defaultFocus(true)
         .fontColor($r('sys.color.font_primary'))

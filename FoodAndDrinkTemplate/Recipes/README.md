@@ -14,18 +14,18 @@
 
 此模板提供如下组件，所有组件存放在工程根目录的components下，如果您仅需使用组件，可参考对应组件的指导链接；如果您使用此模板，请参考本文档。
 
-| 组件                          | 描述                | 使用指导                                             |
-|-----------------------------|-------------------|--------------------------------------------------|
-| 广告组件（aggregated_ads）        | 展示开屏广告            | [使用指导](components/aggregated_ads/README.md)      |
-| 登录组件（aggregated_login）      | 支持华为一键登录和微信登录     | [使用指导](components/aggregated_login/README.md)    |
-| 支付组件（aggregated_payment）    | 支持华为支付，微信支付，支付宝支付 | [使用指导](components/aggregated_payment/README.md)  |
-| 热量计算组件（calorie_calculation） | 提供了统计饮食计划的卡路里     | [使用指导](components/calorie_calculation/README.md) |
-| 菜谱瀑布流组件（featured_recipes）   | 提供了展示菜谱列表瀑布流      | [使用指导](components/featured_recipes/README.md)    |
-| 搜索组件（home_search）           | 本组件提供了菜谱搜索的相关功能   | [使用指导](components/home_search/README.md)         |
-| 分类列表组件（link_category）       | 提供了按分类展示菜谱列表      | [使用指导](components/link_category/README.md)       |
-| 个人中心组件（personal_homepage）   | 提供了个人中心页面展示       | [使用指导](components/personal_homepage/README.md)   |
-| 菜篮子组件（shopping_basket）      | 本组件提供了菜篮子相关功能     | [使用指导](components/shopping_basket/README.md)     |
-| 上传菜谱组件（upload_recipe）       | 提供了上传菜谱的功能        | [使用指导](components/upload_recipe/README.md)       |
+| 组件                                | 描述                               | 使用指导                                             |
+| ----------------------------------- | ---------------------------------- | ---------------------------------------------------- |
+| 广告组件（aggregated_ads）          | 支持展示开屏广告                   | [使用指导](components/aggregated_ads/README.md)      |
+| 登录组件（aggregated_login）        | 支持华为一键登录和微信登录         | [使用指导](components/aggregated_login/README.md)    |
+| 支付组件（aggregated_payment）      | 支持华为支付，微信支付，支付宝支付 | [使用指导](components/aggregated_payment/README.md)  |
+| 热量计算组件（calorie_calculation） | 支持统计饮食计划的卡路里           | [使用指导](components/calorie_calculation/README.md) |
+| 菜谱瀑布流组件（featured_recipes）  | 支持展示菜谱列表瀑布流             | [使用指导](components/featured_recipes/README.md)    |
+| 搜索组件（home_search）             | 支持菜谱搜索的相关功能             | [使用指导](components/home_search/README.md)         |
+| 分类列表组件（link_category）       | 支持按分类展示菜谱列表             | [使用指导](components/link_category/README.md)       |
+| 个人中心组件（personal_homepage）   | 支持个人中心页面展示               | [使用指导](components/personal_homepage/README.md)   |
+| 菜篮子组件（shopping_basket）       | 支持菜篮子相关功能                 | [使用指导](components/shopping_basket/README.md)     |
+| 上传菜谱组件（upload_recipe）       | 支持上传菜谱的功能                 | [使用指导](components/upload_recipe/README.md)       |
 
 本模板为美食菜谱类应用提供了常用功能的开发样例，模板主要分首页、分类、热量计算和我的四大模块：
 
@@ -118,6 +118,7 @@ Recipes
   │  │         Logger.ets                     // 日志工具类
   │  │         PermissionUtil.ets             // 权限获取工具类
   │  │         PreferenceUtil.ets             // 数据持久化工具类
+  │  │         RdbManager.ets                 // 关系型数据库工具类
   │  │         RouterModule.ets               // 路由工具类
   │  │         WindowUtil.ets                 // 窗口管理工具类
   │  └─resources
@@ -132,7 +133,6 @@ Recipes
   │  │  │         Mine.ets                    // 我的mock数据
   │  │  │         Notice.ets                  // 通知mock数据
   │  │  │         RecipeList.ets              // 菜谱mock数据
-  │  │  │      AxiosMock.ets                  // mock请求
   │  │  │      RequestMock.ets                // mock API
   │  │  └─types
   │  │         Calories.ets                   // 热量抽象类
@@ -358,7 +358,7 @@ Recipes
 
 * DevEco Studio版本：DevEco Studio 5.0.4 Release及以上
 * HarmonyOS SDK版本：HarmonyOS 5.0.4 Release SDK及以上
-* 设备类型：华为手机（包括双折叠和阔折叠）
+* 设备类型：华为手机
 * 系统版本：HarmonyOS 5.0.4(16)及以上
 
 ### 权限要求
@@ -377,7 +377,7 @@ Recipes
 
 1. 在AppGallery Connect创建应用，将包名配置到模板中。
 
-   a. 参考[创建应用](https://developer.huawei.com/consumer/cn/doc/app/agc-help-createharmonyapp-0000001945392297)为应用创建APP ID，并将APP ID与应用进行关联。
+   a. 参考[创建应用](https://developer.huawei.com/consumer/cn/doc/app/agc-help-create-app-0000002247955506)为应用创建APP ID，并将APP ID与应用进行关联。
 
    b. 返回应用列表页面，查看应用的包名。
 
@@ -385,18 +385,17 @@ Recipes
 
 2. 配置华为账号服务。
 
-   a. 将应用的client ID配置到products/entry/src/main路径下的[module.json5](./products/entry/src/main/module.json5)
-   文件中，详细参考：[配置Client ID](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-client-id)。
+   a. 将应用的client ID配置到products/entry/src/main路径下的[module.json5](./products/entry/src/main/module.json5)文件中，详细参考：[配置Client ID](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-client-id)。
 
-   b.
-   申请华为账号一键登录所需的quickLoginMobilePhone权限，详细参考：[配置scope权限](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-config-permissions)。
+   b. 申请华为账号一键登录所需的权限，详细参考：[申请账号权限](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-config-permissions)。
+
 3. 配置支付服务。
 
    华为支付当前仅支持商户接入，在使用服务前，需要完成商户入网、开发服务等相关配置，本模板仅提供了端侧集成的示例。详细参考：[支付服务接入准备](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/payment-preparations)。
 
-4. 对应用进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing)。
+4. 对应用进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing#section297715173233)。
 
-5. 添加手工签名所用证书对应的公钥指纹。详细参考：[配置应用签名证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-signature-info-0000001628566748#section5181019153511)。
+5. 添加手工签名所用证书对应的公钥指纹。详细参考：[配置公钥指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-cert-fingerprint-0000002278002933)。
 
 ### 运行调试工程
 

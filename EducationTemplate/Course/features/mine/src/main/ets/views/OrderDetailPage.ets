@@ -165,8 +165,8 @@ export struct OrderDetailPage {
         .fontWeight(FontWeight.Medium)
         .fontColor($r('sys.color.font_primary'))
       Divider()
-        .strokeWidth(1)
-        .color($r('sys.color.comp_divider'))
+        .strokeWidth(2)
+        .color($r('sys.color.comp_background_tertiary'))
         .margin({ top: $r('app.float.vp_12') })
       this.infoPayItem('支付方式', this.payType,
         this.info.orderState === OrderState.WAIT_TO_PAY ? $r('app.media.icon_right') : undefined)
@@ -316,8 +316,8 @@ export struct OrderDetailPage {
       .margin({ top: $r('app.float.vp_12') })
 
       Divider()
-        .strokeWidth(1)
-        .color($r('sys.color.comp_divider'))
+        .strokeWidth(2)
+        .color($r('sys.color.comp_background_tertiary'))
         .margin({ left: $r('app.float.vp_108'), top: $r('app.float.vp_12') })
       Row() {
         Text('实际金额：')

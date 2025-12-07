@@ -1,6 +1,6 @@
 import { AxiosRequestConfig, HttpStatusCode } from '@ohos/axios';
 import { axiosInstance } from '../apis/HttpRequest';
-import { AxiosMock } from './AxiosMock';
+import AxiosMockAdapter from '@hw-agconnect/axios-mock-adapter';
 import {
   changeFollowers,
   deleteRecipe,
@@ -36,7 +36,7 @@ import {
 import { ChangeFollowersBody, CustomFoodBody, DietPlanBody } from '../types/Calories';
 import { getNoticeList } from './MockData/Notice';
 
-const mock: AxiosMock = new AxiosMock(axiosInstance, {
+const mock: AxiosMockAdapter = new AxiosMockAdapter(axiosInstance, {
   delayResponse: 300,
 });
 
@@ -102,17 +102,13 @@ mock.onGet('/recipe/collection/list').reply(async () => {
 mock.onPost('/recipe/collection').reply(async (config: AxiosRequestConfig) => {
   const id = Number(JSON.parse(config.data).id);
   addCollection(id);
-  return {
-    status: HttpStatusCode.Ok,
-  };
+  return [HttpStatusCode.Ok];
 });
 
 mock.onDelete('/recipe/collection').reply(async (config: AxiosRequestConfig) => {
   const id = Number(JSON.parse(config.data).id);
   removeCollection(id);
-  return {
-    status: HttpStatusCode.Ok,
-  };
+  return [HttpStatusCode.Ok];
 });
 
 mock.onGet('/recipe/hot-keys').reply(async () => {
@@ -126,9 +122,7 @@ mock.onPost('/recipe/upload').reply(async (config: AxiosRequestConfig) => {
   const data = JSON.parse(config.data) as UploadRecipeBody;
   const id = uploadRecipe(data);
   addMyRecipe(id);
-  return {
-    status: HttpStatusCode.Ok,
-  };
+  return [HttpStatusCode.Ok];
 });
 
 
@@ -137,9 +131,7 @@ mock.onDelete('/recipe/remove').reply(async (config: AxiosRequestConfig) => {
   const ids = data.ids;
   deleteRecipe(ids);
   removeMyRecipe(ids);
-  return {
-    status: HttpStatusCode.Ok,
-  };
+  return [HttpStatusCode.Ok];
 });
 
 mock.onGet('/calories/food-category').reply(async (config: AxiosRequestConfig) => {
@@ -152,9 +144,7 @@ mock.onGet('/calories/food-category').reply(async (config: AxiosRequestConfig) =
 mock.onPost('/calories/add-diet-plans').reply(async (config: AxiosRequestConfig) => {
   const data = JSON.parse(config.data) as DietPlanBody;
   addDietPlans(data);
-  return {
-    status: HttpStatusCode.Ok,
-  };
+  return [HttpStatusCode.Ok];
 });
 mock.onGet('/calories/diet-plans').reply(async (config: AxiosRequestConfig) => {
   return {
@@ -186,9 +176,7 @@ mock.onGet('/blogger/blogger-followers').reply(async (config: AxiosRequestConfig
 mock.onGet('/blogger/change-followers').reply(async (config: AxiosRequestConfig) => {
   const data = JSON.parse(config.data) as ChangeFollowersBody;
   changeFollowers(data);
-  return {
-    status: HttpStatusCode.Ok,
-  };
+  return [HttpStatusCode.Ok];
 });
 mock.onGet('/notice/list').reply(async (config: AxiosRequestConfig) => {
   return {
@@ -206,9 +194,7 @@ mock.onGet('/calories/search').reply(async (config: AxiosRequestConfig) => {
 mock.onPost('/calories/food').reply(async (config: AxiosRequestConfig) => {
   const data = JSON.parse(config.data) as CustomFoodBody;
   addCustomFood(data);
-  return {
-    status: HttpStatusCode.Ok,
-  };
+  return [HttpStatusCode.Ok];
 });
 mock.onGet('/member/packages').reply(async (config: AxiosRequestConfig) => {
   return {

@@ -1,16 +1,18 @@
 import { WorkerMessageType } from '../common/Constant';
-import { BinaryProtocolData } from '../model/BinaryProtocol';
+import { FileCountMessage } from '../model/BinaryProtocol';
 import { ConnectionVo } from '../model/ConnectionVo';
 import { TcpCallback } from '../model/TcpCallback';
-import { WorkerMessage } from '../model/WorkerMessage';
-import fileReceiverService from './FileReceiverService';
+import { ReceiveProgressInfo, WorkerMessage } from '../model/WorkerMessage';
 import { worker, MessageEvents } from '@kit.ArkTS';
+import { FileVo } from '../model/FileVo';
 import { common } from '@kit.AbilityKit';
-import { FileSaveVo } from '../model/FileSaveVo';
+import { FileTransferCallback } from '../model/FileTransferCallback';
 
 export class TcpServer {
   private static tcpWorker = new worker.ThreadWorker('../workers/TCPSocketServerWorker.ets');
   private static tcpCallback: TcpCallback = {}
+  static context: common.UIAbilityContext | undefined;
+  static fileTransCallback: FileTransferCallback = {} as FileTransferCallback;
 
   static create(ip: string, tcpCallback: TcpCallback) {
     TcpServer.tcpCallback = tcpCallback;
@@ -23,13 +25,37 @@ export class TcpServer {
         case WorkerMessageType.CONNECT:
           TcpServer.handleConnectionCallback();
           break;
-        case WorkerMessageType.RECEIVE:
-          TcpServer.handleBinaryReceiveCallback(data.data as BinaryProtocolData);
+        case WorkerMessageType.RECEIVE_FILE_COUNT:
+          if (TcpServer.fileTransCallback.onBefore) {
+            TcpServer.fileTransCallback.onBefore(data.data as FileCountMessage)
+          }
+          break;
+        case WorkerMessageType.START:
+          const type = Number(data.data as string)
+          if (TcpServer.fileTransCallback.onStart) {
+            TcpServer.fileTransCallback.onStart(type)
+          }
+          break;
+        case WorkerMessageType.PROGRESS:
+          const event = data.data as ReceiveProgressInfo
+          if (TcpServer.fileTransCallback.onProgress) {
+            TcpServer.fileTransCallback.onProgress(event.fileVo, event.byteLength)
+          }
+          break;
+        case WorkerMessageType.END:
+          const fileVo = data.data as FileVo
+          if (TcpServer.fileTransCallback.onComplete) {
+            TcpServer.fileTransCallback.onComplete(fileVo)
+          }
           break;
         default:
           break;
       }
     }
+    TcpServer.tcpWorker.postMessage({
+      type: WorkerMessageType.CONTEXT,
+      data: TcpServer.context,
+    } as WorkerMessage)
     TcpServer.tcpWorker.postMessage({
       type: WorkerMessageType.LISTEN,
       data: {
@@ -52,26 +78,6 @@ export class TcpServer {
   static handleConnectionCallback() {
     if (TcpServer.tcpCallback.onConnected) {
       TcpServer.tcpCallback.onConnected();
-    }
-  }
-
-  static saveFile(context: common.UIAbilityContext, fileSaveVo: FileSaveVo) {
-    TcpServer.tcpWorker.postMessage({
-      type: WorkerMessageType.SAVE_FILE,
-      data: fileSaveVo,
-      context,
-    } as WorkerMessage, [fileSaveVo.data])
-  }
-
-  /**
-   * 处理二进制数据接收回调
-   */
-  static handleBinaryReceiveCallback(binaryProtocolData: BinaryProtocolData) {
-    try {
-      // 转发给文件接收服务处理
-      fileReceiverService.handleBinaryFileMessage(binaryProtocolData.type, binaryProtocolData.data);
-    } catch (error) {
-      console.error('处理二进制接收数据失败:', error);
     }
   }
 

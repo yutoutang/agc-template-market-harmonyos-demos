@@ -1,0 +1,13 @@
+{
+  "name": "translator",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@ohos/crypto-js": "2.0.1",
+    "@ohos/axios": "^2.2.4",
+    "@ohos/mp4parser": "^2.0.6"
+  }
+}

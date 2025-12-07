@@ -1,0 +1,11 @@
+{
+  "name": "live_streaming",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@ohos/danmakuflamemaster": "2.1.1",
+  }
+}

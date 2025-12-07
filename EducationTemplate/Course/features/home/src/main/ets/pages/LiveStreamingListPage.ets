@@ -14,25 +14,31 @@
  *
  */
 
-import { display } from '@kit.ArkUI'
+import { AppStorageV2, display } from '@kit.ArkUI'
+import { emitter } from '@kit.BasicServicesKit'
 import dayjs from 'dayjs'
-import { TopBar } from 'commonlib'
-import { Course } from 'http'
+import { RouterMap, RouterModule, TopBar, UserInfo } from 'commonlib'
+import { Course, CourseModel } from 'http'
 import { HomeVM } from '../viewModels/HomeVM'
 import { LiveBroadcastSign } from '../components/LiveBroadcastSign'
 import { LiveNumberOverlay } from '../components/LiveNumberOverlay'
 import { LiveStreamingItem } from '../components/LiveStreamingItem'
+import { PlayerVM } from 'recorded_player'
+import { LiveStreamingVM } from 'live_streaming'
 
 @ComponentV2
 export struct LiveStreamingListPage {
+  // 屏幕宽度
+  @Param screenWidth: number = display.getDefaultDisplaySync().width / display.getDefaultDisplaySync().scaledDensity;
   @Local searchValue: string = ''
   // 搜索后的正在直播课程列表
   @Local searchLiveBroadcastCourseList: Course[] = []
   // 搜索后的精彩回顾课程列表
   @Local searchHighlightsCourseList: Course[] = []
   @Local columnsTemplateCount: number = 0
-  // 屏幕宽度
-  @Param screenWidth: number = display.getDefaultDisplaySync().width / display.getDefaultDisplaySync().scaledDensity;
+  @Local playerVM: PlayerVM = PlayerVM.instance;
+  @Local liveVM: LiveStreamingVM = LiveStreamingVM.instance;
+  @Local loginUser: UserInfo = AppStorageV2.connect(UserInfo, () => new UserInfo())!
   model: HomeVM = HomeVM.instance
   // 当前屏幕折叠态（仅折叠屏设备下有效）
   curFoldStatus: display.FoldStatus = display.FoldStatus.FOLD_STATUS_UNKNOWN;
@@ -80,13 +86,17 @@ export struct LiveStreamingListPage {
           // 精彩回顾
           this.highlightsBuilder()
         }
+        .constraintSize({ minHeight: '100%' })
+        .width('100%')
         .alignItems(HorizontalAlign.Start)
+        .justifyContent(FlexAlign.Start)
       }
       .padding({ left: $r('app.float.vp_16'), right: $r('app.float.vp_16'), bottom: $r('app.float.vp_16') })
       .layoutWeight(1)
       .scrollBar(BarState.Off)
       .scrollable(ScrollDirection.Vertical)
       .edgeEffect(EdgeEffect.Spring)
+      .align(Alignment.Top)
     }
     .alignItems(HorizontalAlign.Start)
     .width('100%')
@@ -110,13 +120,25 @@ export struct LiveStreamingListPage {
     Stack() {
       NoSearchCourse()
         .visibility(this.searchValue && this.searchLiveBroadcastCourseList.length === 0 ? Visibility.Visible :
-        Visibility.None)
+          Visibility.None)
       Grid() {
         ForEach(this.searchValue ? this.searchLiveBroadcastCourseList : this.model.liveBroadcastCourseList,
           (item: Course) => {
             GridItem() {
               this.liveBroadcastItemBuilder(item)
             }
+            .onClick(() => {
+              this.playerVM.stopPip()
+              if (this.loginUser.isLogin) {
+                if (item.liveState === 2) {
+                  RouterModule.push({ url: RouterMap.LIVE_DETAIL_PAGE, param: item?.id })
+                } else {
+                  RouterModule.push({ url: RouterMap.LIVE_STREAMING_PAGE, param: item?.id })
+                }
+              } else {
+                RouterModule.push({ url: RouterMap.LOGIN_PAGE })
+              }
+            })
           }, (item: Course) => item.id)
       }
       .rowsTemplate('1r')
@@ -145,6 +167,7 @@ export struct LiveStreamingListPage {
       }
 
       LiveBroadcastSign().position({ x: $r('app.float.vp_8'), y: $r('app.float.vp_8') })
+        .visibility(item.liveState === 1 ? Visibility.Visible : Visibility.None)
       Column() {
         Text(item.courseTitle)
           .fontSize($r('sys.float.Body_L'))
@@ -156,8 +179,8 @@ export struct LiveStreamingListPage {
           .wordBreak(WordBreak.BREAK_ALL)
         Column() {
           Text(dayjs().year() === dayjs(item.reservationTime).year() ?
-          dayjs(item.reservationTime).format('MM/DD HH:mm') :
-          dayjs(item.reservationTime).format('YYYY/MM/DD HH:mm'))
+            dayjs(item.reservationTime).format('MM/DD HH:mm') :
+            dayjs(item.reservationTime).format('YYYY/MM/DD HH:mm'))
             .fontSize($r('sys.float.Caption_L'))
             .fontWeight(FontWeight.Medium)
             .fontColor($r('sys.color.font_secondary'))
@@ -201,13 +224,26 @@ export struct LiveStreamingListPage {
       .visibility(this.model.highlightsCourseList.length === 0 ? Visibility.Visible : Visibility.None)
     NoSearchCourse()
       .visibility(this.searchValue && this.searchHighlightsCourseList.length === 0 ? Visibility.Visible :
-      Visibility.None)
+        Visibility.None)
     Grid() {
       ForEach(this.searchValue ? this.searchHighlightsCourseList : this.model.highlightsCourseList,
-        (item: Course) => {
+        (item: Course, idx: number) => {
           GridItem() {
             LiveStreamingItem({ course: item })
           }
+          .onClick(() => {
+            this.liveVM.stopPip()
+            if (this.loginUser.isLogin) {
+              let courseDetail =
+                this.model.courseData.courseList.find((course: CourseModel) => item?.id ===
+                course.id) as CourseModel
+              courseDetail.catalogIndex = 0
+              emitter.emit('changeCourseId', { data: { courseId: courseDetail.id } })
+              RouterModule.push({ url: RouterMap.CHAPTER_DETAIL_PAGE, param: courseDetail })
+            } else {
+              RouterModule.push({ url: RouterMap.LOGIN_PAGE })
+            }
+          })
         }, (item: Course) => item.id)
     }
     .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
@@ -230,7 +266,6 @@ export struct LiveStreamingListPage {
     Search({ placeholder: '搜索', value: this.searchValue })
       .backgroundColor($r('sys.color.comp_background_tertiary'))
       .width('100%')
-      .height($r('app.float.vp_40'))
       .onChange((value: string) => {
         this.searchLiveStreamingCourse(value)
       })

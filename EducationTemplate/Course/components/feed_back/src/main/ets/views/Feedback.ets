@@ -205,7 +205,7 @@ export struct Feedback {
 
       TextInput({ placeholder: $r('app.string.contact_info_placeholder') })
         .placeholderFont({ size: $r('sys.float.Body_L'), weight: FontWeight.Regular })
-        .placeholderColor($r('sys.color.font_tertiary'))
+        .placeholderColor($r('sys.color.font_secondary'))
         .backgroundColor($r('sys.color.comp_background_tertiary'))
         .fontColor($r('sys.color.font_primary'))
         .fontSize($r('sys.float.Body_L'))

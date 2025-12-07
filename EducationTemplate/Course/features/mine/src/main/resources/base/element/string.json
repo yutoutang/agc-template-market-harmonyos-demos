@@ -319,6 +319,10 @@
     {
       "name": "order_detail",
       "value": "订单详情"
+    },
+    {
+      "name": "agcit_huawei_course_service",
+      "value": "1.0.0"
     }
   ]
 }

@@ -37,7 +37,7 @@ export struct LiveNumberOverlay {
     }
     .width('100%')
     .height($r('app.float.vp_20'))
-    .backgroundColor($r('sys.color.mask_fourth'))
+    .backgroundColor($r('sys.color.mask_tertiary'))
     .justifyContent(FlexAlign.End)
     .padding({ right: $r('app.float.vp_4') })
   }

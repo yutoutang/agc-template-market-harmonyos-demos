@@ -1,5 +1,5 @@
-import { ALL_CARD_TAB } from '../common/Enum';
-import { getMyNfcName, NFC_TYPE_BANK, NFC_TYPE_BUS, NFC_TYPE_DOOR } from '../common/nfc/Nfc';
+import { ALL_CARD_TAB, NFC_TYPE } from '../common/Enum';
+import { getMyNfcName } from '../common/nfc/Nfc';
 import { CardListVM } from '../viewmodel/CardListVM';
 import { CardAllView } from './CardListView';
 
@@ -52,35 +52,35 @@ struct CardAllPage {
         TabContent() {
           CardAllView({
             isShowTitle: false,
-            nfcType: NFC_TYPE_DOOR,
+            nfcType: NFC_TYPE.NFC_TYPE_DOOR,
             index: ALL_CARD_TAB.TAB_INDEX_DOOR,
             editMode: this.vm.editModeDoor,
             clonePage: false,
           });
         }
-        .tabBar(this.TabBuilder(ALL_CARD_TAB.TAB_INDEX_DOOR, getMyNfcName(NFC_TYPE_DOOR)));
+        .tabBar(this.TabBuilder(ALL_CARD_TAB.TAB_INDEX_DOOR, getMyNfcName(NFC_TYPE.NFC_TYPE_DOOR)));
 
         TabContent() {
           CardAllView({
             isShowTitle: false,
-            nfcType: NFC_TYPE_BUS,
+            nfcType: NFC_TYPE.NFC_TYPE_BUS,
             index: ALL_CARD_TAB.TAB_INDEX_BUS,
             editMode: this.vm.editModeBus,
             clonePage: false,
           });
         }
-        .tabBar(this.TabBuilder(ALL_CARD_TAB.TAB_INDEX_BUS, getMyNfcName(NFC_TYPE_BUS)));
+        .tabBar(this.TabBuilder(ALL_CARD_TAB.TAB_INDEX_BUS, getMyNfcName(NFC_TYPE.NFC_TYPE_BUS)));
 
         TabContent() {
           CardAllView({
             isShowTitle: false,
-            nfcType: NFC_TYPE_BANK,
+            nfcType: NFC_TYPE.NFC_TYPE_BANK,
             index: ALL_CARD_TAB.TAB_INDEX_BANK,
             editMode: this.vm.editModeBank,
             clonePage: false,
           });
         }
-        .tabBar(this.TabBuilder(ALL_CARD_TAB.TAB_INDEX_BANK, getMyNfcName(NFC_TYPE_BANK)));
+        .tabBar(this.TabBuilder(ALL_CARD_TAB.TAB_INDEX_BANK, getMyNfcName(NFC_TYPE.NFC_TYPE_BANK)));
       }
       .width('100%')
       .layoutWeight(1)

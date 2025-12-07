@@ -14,7 +14,6 @@
  *
  */
 
-
 @ObservedV2
 export class MyCourseClass {
   @Trace courseList: CourseModel[] = []
@@ -31,7 +30,7 @@ export class CourseModel {
   id: string = '';
   courseTitle: string = ''; // 课程标题
   description?: string; // 课程描述
-  category?: number; // 1课程 2直播 3名师
+  @Trace category?: number; // 1课程 2直播 3名师
   isFree?: boolean; // 是否付费
   @Trace isPay?: boolean; // 是否购买
   @Trace payStatus: number = 0; // 支付状态 0 未支付 1已支付 2待支付 3已取消
@@ -50,7 +49,7 @@ export class CourseModel {
   learnNumber?: number; // 学习人数
   reservationTime?: number; // 直播开始时间
   liveNumber?: number; // 在线人数
-  liveState?: number; //直播状态 1正在直播  0已结束
+  @Trace liveState?: number; // 直播状态 1正在直播  0已结束 2未开始
   time: number = 0; // 时间
   courseCatalog: CourseCatalogModel[] = []
   catalogIndex: number = 0

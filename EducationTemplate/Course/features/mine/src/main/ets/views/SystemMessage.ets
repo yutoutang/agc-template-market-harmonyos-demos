@@ -58,6 +58,7 @@ export struct SystemMessage {
           }
           .width('100%')
           .height('auto')
+          .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
           .margin({ top: $r('app.float.vp_12') })
         }.width('100%')
 

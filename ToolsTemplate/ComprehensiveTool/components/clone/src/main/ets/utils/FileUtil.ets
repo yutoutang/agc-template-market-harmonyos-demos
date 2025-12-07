@@ -39,20 +39,6 @@ export class FileUtil {
     return `${(bytes / (1000 * 1000 * 1000)).toFixed(1)} GB`
   }
 
-  // 选择文件
-  static async selectFiles(context: common.UIAbilityContext, fileType: FileType): Promise<string[]> {
-    switch (fileType) {
-      case FileType.IMAGE:
-        return selectImageFile();
-      case FileType.VIDEO:
-        return selectVideoFile();
-      case FileType.AUDIO:
-        return selectAudioFile(context);
-      default:
-        return selectDocumentFile(context);
-    }
-  }
-
   // 获取文件信息
   static async getFileInfo(uri: string, type: FileType): Promise<FileVo | null> {
     try {
@@ -86,24 +72,6 @@ export class FileUtil {
         Logger.error(`Invoke documentViewPicker.save failed, code is ${err.code}, message is ${err.message}`);
         reject(err)
       })
-    })
-  }
-
-  static saveFile(targetPath: string, data: ArrayBuffer, offset: number): Promise<void> {
-    return new Promise((resolve, reject) => {
-      let file: fs.File | null = null
-      try {
-        file = fileIo.openSync(targetPath, fileIo.OpenMode.CREATE | fileIo.OpenMode.WRITE_ONLY);
-        fs.writeSync(file.fd, data, { offset: offset });
-        resolve()
-      } catch (err) {
-        Logger.error(`saveFile failed, ${JSON.stringify(err)}`)
-        reject(err)
-      } finally {
-        if (file) {
-          fs.closeSync(file)
-        }
-      }
     })
   }
 
@@ -166,59 +134,6 @@ export class FileUtil {
     }
   }
 
-  // 将base64文件存储到沙箱
-  // 在FileUtil类中添加以下方法
-  static async saveBase64ToSandbox(context: common.UIAbilityContext, base64Data: string,
-    fileName: string): Promise<string> {
-    let file: fs.File | null = null
-    try {
-      // 移除base64数据URL前缀（如果有）
-      let base64Content = base64Data;
-      const commaIndex = base64Data.indexOf(',');
-      if (commaIndex !== -1) {
-        base64Content = base64Data.substring(commaIndex + 1);
-      }
-      // 将base64字符串转换为ArrayBuffer
-      const arrayBuffer = BufferUtil.base64ToArrayBuffer(base64Content);
-      // 获取沙箱目录
-      const sandboxDir = context.filesDir;
-      const targetPath = `${sandboxDir}/${fileName}`;
-      // 创建并写入文件
-      file = fs.openSync(targetPath, fs.OpenMode.CREATE | fs.OpenMode.WRITE_ONLY);
-      fs.writeSync(file.fd, arrayBuffer);
-      Logger.info('Base64文件已保存到沙箱:', targetPath);
-      return targetPath;
-    } catch (error) {
-      Logger.error('保存base64文件到沙箱失败:', error);
-      return '保存base64文件到沙箱失败';
-    } finally {
-      if (file) {
-        fs.closeSync(file);
-      }
-    }
-  }
-
-  // 保存arrayBuffer文件到沙箱
-  static saveBufferToSandbox(context: common.UIAbilityContext, arrayBuffer: ArrayBuffer,
-    fileName: string) {
-    let file: fs.File | null = null
-    try {
-      // 获取沙箱目录
-      const sandboxDir = context.filesDir;
-      const targetPath = `${sandboxDir}/${fileName}`;
-      // 创建并写入文件
-      file = fs.openSync(targetPath, fs.OpenMode.CREATE | fs.OpenMode.WRITE_ONLY);
-      fs.writeSync(file.fd, arrayBuffer);
-      return targetPath;
-    } catch (error) {
-      return '保存arrayBuffer文件到沙箱失败';
-    } finally {
-      if (file) {
-        fs.closeSync(file);
-      }
-    }
-  }
-
   // 根据后缀名获取文件的类型
   static classifyFiles(filePaths: string[]): FileGroups {
     // 定义各类文件的后缀名集合
@@ -273,71 +188,6 @@ function getSize(uri: string): number {
       fs.closeSync(file)
     }
   }
-}
-
-export async function selectImageFile(num?: number): Promise<string[]> {
-  let photoSelectOptions = new photoAccessHelper.PhotoSelectOptions();
-  photoSelectOptions.MIMEType = photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE
-  photoSelectOptions.maxSelectNumber = num ?? 10;
-  photoSelectOptions.recommendationOptions = {
-    recommendationType: photoAccessHelper.RecommendationType.QR_CODE,
-  }
-  let photoPicker = new photoAccessHelper.PhotoViewPicker();
-  try {
-    let photoSelectResult = await photoPicker.select(photoSelectOptions)
-    if (photoSelectResult && photoSelectResult.photoUris && photoSelectResult.photoUris.length > 0) {
-      return photoSelectResult.photoUris;
-    }
-  } catch (err) {
-    Logger.error('文件选择失败:', JSON.stringify(err))
-  }
-  return []
-}
-
-async function selectVideoFile(): Promise<string[]> {
-  let photoSelectOptions = new photoAccessHelper.PhotoSelectOptions();
-  photoSelectOptions.MIMEType = photoAccessHelper.PhotoViewMIMETypes.VIDEO_TYPE
-  photoSelectOptions.maxSelectNumber = 10;
-  photoSelectOptions.recommendationOptions = {
-    recommendationType: photoAccessHelper.RecommendationType.QR_CODE,
-  }
-  let photoPicker = new photoAccessHelper.PhotoViewPicker();
-  try {
-    let photoSelectResult = await photoPicker.select(photoSelectOptions)
-    if (photoSelectResult && photoSelectResult.photoUris && photoSelectResult.photoUris.length > 0) {
-      return photoSelectResult.photoUris;
-    }
-  } catch (err) {
-    Logger.error('文件选择失败:', JSON.stringify(err))
-  }
-  return []
-}
-
-async function selectAudioFile(context: Context): Promise<string[]> {
-  let audioSelectOptions = new picker.AudioSelectOptions();
-  audioSelectOptions.maxSelectNumber = 10;
-  // 创建音频选择器实例
-  let audioViewPicker = new picker.AudioViewPicker(context);
-  try {
-    return await audioViewPicker.select(audioSelectOptions)
-  } catch (err) {
-    Logger.error('文件选择失败:', JSON.stringify(err))
-  }
-  return []
-}
-
-async function selectDocumentFile(context: Context): Promise<string[]> {
-  // 选择文件参数
-  let documentSelectOptions = new picker.DocumentSelectOptions();
-  documentSelectOptions.maxSelectNumber = 10;
-  // 创建音频选择器实例
-  let documentViewPicker = new picker.DocumentViewPicker(context);
-  try {
-    return await documentViewPicker.select(documentSelectOptions)
-  } catch (err) {
-    Logger.error('文件选择失败:', JSON.stringify(err))
-  }
-  return []
 }
 
 export function formatBytes(bytes: number, decimals: number = 2): string {

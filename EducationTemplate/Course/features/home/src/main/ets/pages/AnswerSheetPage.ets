@@ -170,7 +170,7 @@ export struct AnswerSheetPage {
   viewReportBuilder() {
     Row() {
       Button(this.quesType === 1 ? '查看报告' : '交卷', { type: ButtonType.Capsule, stateEffect: true })
-        .backgroundColor($r('app.color.view_report_btn'))
+        .backgroundColor($r('sys.color.comp_background_emphasize'))
         .width($r('app.float.vp_300'))
         .onClick(() => {
           this.viewReport()

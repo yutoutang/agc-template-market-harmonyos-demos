@@ -10,13 +10,19 @@ export const LENGTH_WRITE_FILE_CHUNK = 30 * 1024 * 1024
 
 export enum WorkerMessageType {
   LISTEN, //监听
-  RECEIVE, //接收
+  RECEIVE_FILE_COUNT, //接收
   CONNECT, //连接
   SEND, //发送
   SEND_FILE_COUNT, //发送文件数量
-  SEND_CONTACT, //发送联系人
+  CONTEXT, //发送上下文
+  CONTACT, //发送联系人
   CLOSE_CLIENT, // 关闭客户端
-  SAVE_FILE //保存文件
+  SAVE_FILE, //保存文件
+  START, //开始发送
+  PROGRESS, //监听进度变化
+  END, //结束
+  GET_CLONE_FILE, //获取克隆数据
+  SEND_CLONE_FILE //发送克隆数据
 }
 
 export enum BinaryMessageType {
@@ -101,6 +107,9 @@ export interface FileBasic {
 
 @ObservedV2
 export class MainFile {
+  // 传输状态
+  @Trace state: TransferState = TransferState.BEFORE
+  // 数据列表
   @Trace list: FileBasic[] = []
   // 列表数量
   @Trace size: number = 0

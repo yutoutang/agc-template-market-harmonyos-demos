@@ -1,4 +1,4 @@
-import { AccountUtil, RouterMap, RouterModule, UserInfo } from 'commonlib';
+import { AccountUtil, RouterMap, RouterModule, UserInfo, RdbManager, recipesData, CommonConstants } from 'commonlib';
 import {
   deleteMyRecipe,
   getBloggerInfo,
@@ -12,6 +12,7 @@ import { LazyDataSource, RecipeBriefInfo } from 'featured_recipes';
 import { TabIndexEnum } from 'base_ui';
 import { BloggerInfo } from 'personal_homepage';
 import { promptAction } from '@kit.ArkUI';
+import { common } from '@kit.AbilityKit';
 
 const TAG = '[MinePageVM]';
 
@@ -26,6 +27,9 @@ export class MinePageVM {
   @Trace noticeList: Notice[] = [];
   @Trace isToDelete: boolean = false;
   private static _instance: MinePageVM;
+  private context: common.UIAbilityContext = getContext() as common.UIAbilityContext;
+  private rdbManager: RdbManager = new RdbManager(this.context);
+  @Trace recipes: Array<recipesData> = [];
 
   public static get instance() {
     if (!MinePageVM._instance) {
@@ -34,7 +38,7 @@ export class MinePageVM {
     return MinePageVM._instance;
   }
 
-  @Monitor('userInfo.nickname','userInfo.avatar')
+  @Monitor('userInfo.nickname', 'userInfo.avatar')
   changeUserInfo(monitor: IMonitor) {
     this.bloggerInfo.name = this.userInfo.isLogin ? this.userInfo.nickname : '去登录'
     this.bloggerInfo.avatar = this.formatAvatar(this.userInfo.avatar)
@@ -94,9 +98,23 @@ export class MinePageVM {
       return
     }
     this.recipeList.clear()
-    const res = await queryCollectionList();
-    if (this.currentIndex === TabIndexEnum.SECOND) {
-      this.recipeList.pushArrayData(recipeListMapper(res.data));
+
+    // 接口查询或者rdb查询
+    if (CommonConstants.RDB_FLAG) {
+      // rdb 初始化rdb数据库
+      await this.rdbManager.initDatabase(this.context);
+      let result: recipesData[] = await this.rdbManager.query('', true);
+      // 过滤收藏的
+      result = result.filter(item => Boolean(item.isCollected))
+      if (this.currentIndex === TabIndexEnum.SECOND) {
+        this.recipeList.pushArrayData(recipeListMapper(result));
+      }
+    } else {
+      //如果有接口，走接口查数据
+      const res = await queryCollectionList();
+      if (this.currentIndex === TabIndexEnum.SECOND) {
+        this.recipeList.pushArrayData(recipeListMapper(res.data));
+      }
     }
   }
 

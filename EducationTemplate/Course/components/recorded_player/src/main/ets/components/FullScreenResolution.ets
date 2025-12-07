@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-import { LengthMetrics } from '@kit.ArkUI'
-import { MoreItem } from '../models/Type';
 import { PlayerVM } from '../viewModels/PlayerVM';
 
 @ComponentV2
@@ -68,6 +66,7 @@ export struct FullScreenResolution {
         }, (item: string) => JSON.stringify(item))
       }
       .padding({ bottom: 10 })
+      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
       .layoutWeight(1)
     }
     .width('100%')

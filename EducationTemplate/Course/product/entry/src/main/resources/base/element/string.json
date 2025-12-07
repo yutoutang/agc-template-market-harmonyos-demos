@@ -11,6 +11,10 @@
     {
       "name": "EntryAbility_label",
       "value": "课堂应用模板"
+    },
+    {
+      "name": "agcit_huawei_course_service",
+      "value": "1.0.0"
     }
   ]
 }

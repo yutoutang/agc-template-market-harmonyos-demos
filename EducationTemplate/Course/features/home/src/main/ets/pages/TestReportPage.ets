@@ -86,7 +86,9 @@ export struct TestReportPage {
       // 练习数据
       this.testDataBuilder()
       // 分隔线
-      Divider().color($r('app.color.topic_page_background_gray')).strokeWidth(9)
+      Divider()
+        .color($r('sys.color.comp_background_tertiary'))
+        .strokeWidth(8)
       // 题目列表
       this.topicListBuilder()
     }
@@ -128,6 +130,7 @@ export struct TestReportPage {
                   }
                 }, (item: AnswerItem, index: number) => item.ansID + index)
               }
+              .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
               .width('auto')
               .height('auto')
 
@@ -158,7 +161,7 @@ export struct TestReportPage {
                 .margin({ bottom: $r('app.float.vp_13') })
 
                 // 分隔线
-                Divider().opacity(0.2).strokeWidth(1)
+                Divider().opacity(0.2).strokeWidth(2)
                 //解析
                 Row() {
                   Text($r('app.string.parse'))
@@ -200,6 +203,7 @@ export struct TestReportPage {
                   }
                 }, (item: AnswerItem, index: number) => item.ansID + index)
               }
+              .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
               .width('auto')
               .height('auto')
 
@@ -230,7 +234,7 @@ export struct TestReportPage {
                 .margin({ bottom: $r('app.float.vp_13') })
 
                 // 分隔线
-                Divider().color($r('sys.color.comp_divider')).strokeWidth(1)
+                Divider().color($r('sys.color.comp_divider')).strokeWidth(2)
                 //解析
                 Row() {
                   Text($r('app.string.parse'))
@@ -272,6 +276,7 @@ export struct TestReportPage {
                   }
                 }, (item: AnswerItem, index: number) => item.ansID + index)
               }
+              .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
               .width('auto')
               .height('auto')
 
@@ -300,6 +305,7 @@ export struct TestReportPage {
     .layoutWeight(1)
     .width('auto')
     .height('auto')
+    .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
     .margin($r('app.float.vp_16'))
     .scrollBar(BarState.Off)
   }

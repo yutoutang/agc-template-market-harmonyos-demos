@@ -54,7 +54,7 @@ export struct MyLearnPage {
           .visibility(this.model.isSuccess ? Visibility.None : Visibility.Visible)
         NoData({ text: '当前暂无已学习课程。' })
           .visibility(this.model.isSuccess && this.model.learnedCourseList.length === 0 ?
-          Visibility.Visible : Visibility.None)
+            Visibility.Visible : Visibility.None)
         // 已学习课程总数
         this.learnedCourseTotalBuilder()
         // 已学习课程列表
@@ -84,7 +84,7 @@ export struct MyLearnPage {
         .fontColor($r('sys.color.font_tertiary'))
         .fontWeight(FontWeight.Regular)
         .textAlign(TextAlign.Center)
-        .onClick(()=>{
+        .onClick(() => {
           RouterModule.push({ url: RouterMap.LOGIN_PAGE })
         })
     }
@@ -173,7 +173,6 @@ export struct MyLearnPage {
     Search({ placeholder: '搜索', value: this.searchValue })
       .backgroundColor($r('sys.color.comp_background_tertiary'))
       .width('100%')
-      .height($r('app.float.vp_40'))
       .onChange((value: string) => {
         this.searchCourseChange(value)
       })

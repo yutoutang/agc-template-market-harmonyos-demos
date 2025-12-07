@@ -23,13 +23,7 @@ export const canvasToolsList: ToolsItem[] = [
     id: 'pattern',
     selected:$r('app.media.shape_active'),
     unSelected:$r('app.media.shape')
-  },
-  {
-    name: '背景',
-    id: 'background',
-    selected:$r('app.media.draw_background_active'),
-    unSelected:$r('app.media.draw_background')
-  },
+  }
 ]
 
 export interface ButtonType {

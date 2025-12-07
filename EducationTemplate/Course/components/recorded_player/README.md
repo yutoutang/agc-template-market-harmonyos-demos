@@ -12,18 +12,18 @@
 
 本组件提供了视频播放的能力。
 
-| 未加锁 | 加锁 | 无控制层 |
-| ------ | ---- | -------- |
-|   <img src="./screenshot/player05.jpg" width="500">     | <img src="./screenshot/player02.jpg" width="500">     |   <img src="./screenshot/player06.jpg" width="500">       |
+| 未加锁                                                | 加锁                                                 | 无控制层                                               |
+|----------------------------------------------------|----------------------------------------------------|----------------------------------------------------|
+| <img src="./screenshot/player05.jpeg" width="500"> | <img src="./screenshot/player02.jpeg" width="500"> | <img src="./screenshot/player06.jpeg" width="500"> |
 
-| 更多 | 举报 |
-| ---- | ---- |
-|  <img src="./screenshot/player04.jpg" width="700">    |   <img src="./screenshot/player03.jpg" width="700">   |
+| 更多                                                 | 举报                                                 |
+|----------------------------------------------------|----------------------------------------------------|
+| <img src="./screenshot/player04.jpeg" width="700"> | <img src="./screenshot/player03.jpeg" width="700"> |
 
 
 实现[画中画](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/pipwindow-xcomponent#section417212014278)效果：
 
-<img src="./screenshot/player01.jpg" width="300" >
+<img src="./screenshot/player01.jpeg" width="300" >
 
 ## 约束与限制
 

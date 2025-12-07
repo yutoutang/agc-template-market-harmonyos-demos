@@ -21,7 +21,6 @@ import { MineVM } from '../viewmodel/MineVM';
 @ComponentV2
 export struct Feedback {
   vm: MineVM = MineVM.instance;
-
   text?: ResourceStr;
   //输入的内容
   // @Local content: string = '';
@@ -92,10 +91,10 @@ export struct Feedback {
       Button('提交反馈')
         .borderRadius(20)
         .fontColor($r('sys.color.font_on_primary'))
-        .backgroundColor($r('sys.color.brand'))
+        .backgroundColor(this.vm.content.length ? $r('sys.color.comp_background_emphasize') :
+          $r('sys.color.comp_emphasize_secondary'))
         .fontSize($r('sys.float.Body_L'))
         .fontWeight(FontWeight.Medium)
-        .opacity(this.vm.content.length ? 1 : 0.4)
         .enabled(this.vm.content.length ? true : false)
         .height(40)
         .width('100%')

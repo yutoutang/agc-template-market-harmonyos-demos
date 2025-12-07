@@ -39,3 +39,12 @@ export { MenuItemBuilder } from './src/main/ets/components/MenuItemBuilder'
 
 // 标题下拉菜单
 export { HeaderMenuBuilder } from './src/main/ets/components/HeaderMenuBuilder'
+
+// 下拉刷新
+export { HeaderRefreshBuilder } from './src/main/ets/components/HeaderRefreshBuilder'
+
+// 下拉刷新
+export { RdbManager } from './src/main/ets/utils/RdbManager'
+
+
+

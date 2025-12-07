@@ -155,7 +155,7 @@ export struct AnswerQuestionsComponent {
       // 正确答案
       this.correctAnswerBuilder()
       Divider()
-        .color($r('sys.color.background_secondary'))
+        .color($r('sys.color.comp_background_tertiary'))
         .strokeWidth(8)
         .margin({ top: $r('app.float.vp_24'), bottom: $r('app.float.vp_24') })
       // 解析
@@ -288,7 +288,7 @@ export struct AnswerQuestionsComponent {
     Button($r('app.string.pre_question'), { type: ButtonType.Normal, stateEffect: true })
       .backgroundColor(this.currentIndex === 0 ? $r('sys.color.comp_background_tertiary') :
       $r('app.color.view_report_btn'))
-      .fontColor($r('sys.color.font_on_primary'))
+      .fontColor(this.currentIndex === 0 ? $r('sys.color.font_tertiary') : $r('sys.color.font_on_primary'))
       .fontSize($r('sys.float.Body_L'))
       .stateEffect(this.currentIndex === 0 ? false : true)
       .fontWeight(FontWeight.Medium)

@@ -14,18 +14,25 @@
  */
 
 import { common } from '@kit.AbilityKit'
-import { MyScrollModifier, RouterMap, RouterModule, CourseItemComponent } from 'commonlib'
-import { Course } from 'http';
+import { emitter } from '@kit.BasicServicesKit';
+import { MyScrollModifier, RouterMap, RouterModule, CourseItemComponent, UserInfo } from 'commonlib'
+import { Course, CourseModel } from 'http';
 import { HomeTop, SelectRoleItem } from '../components/HomeTop';
 import { MENU_DATA, HomeMenuModel } from '../models/HomeMenuModel'
 import { HomeVM } from '../viewModels/HomeVM';
 import { LiveStreamingItem } from '../components/LiveStreamingItem';
+import { AppStorageV2 } from '@kit.ArkUI';
+import { LiveStreamingVM } from 'live_streaming';
+import { PlayerVM } from 'recorded_player';
 
 @ComponentV2
 export struct HomePage {
   @Local scrollModifier: MyScrollModifier = new MyScrollModifier()
   @Local isShow: boolean = false;
   @Local roleStr: string = '一级建造师';
+  @Local loginUser: UserInfo = AppStorageV2.connect(UserInfo, () => new UserInfo())!
+  @Local liveVM: LiveStreamingVM = LiveStreamingVM.instance;
+  @Local playerVM: PlayerVM = PlayerVM.instance;
   context = getContext(this) as common.UIAbilityContext
   homeData: HomeVM = HomeVM.instance;
 
@@ -91,6 +98,7 @@ export struct HomePage {
       height: SheetSize.LARGE,
       blurStyle: BlurStyle.Thick,
       showClose: true,
+      preferType:SheetType.CENTER,
       title: { title: $r('app.string.please_select') },
       onWillDismiss: () => {
         this.isShow = false;
@@ -154,12 +162,16 @@ export struct HomePage {
               lecturer: item.lecturer,
               learnNumber: item.learnNumber
             }).onClick(() => {
+              if (item.liveState !== 0) {
+                this.playerVM.stopPip()
+              }
               RouterModule.push({ url: RouterMap.RECORDED_DETAIL_PAGE, param: item.id })
             })
           }
         }), (item: Course, index: number) => item.courseTitle + index)
       }
       .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
       .width('100%')
       .height('auto')
       .padding({ bottom: $r('app.float.vp_8') })
@@ -185,10 +197,31 @@ export struct HomePage {
       .margin({ bottom: $r('app.float.vp_16') })
     Column() {
       Grid() {
-        ForEach(this.homeData.popularLiveList, (info: Course) => {
+        ForEach(this.homeData.popularLiveList, (info: Course, idx: number) => {
           GridItem() {
             LiveStreamingItem({ course: info })
           }
+          .onClick(() => {
+            if (this.loginUser.isLogin) {
+              if (info.liveState === 1) {
+                this.playerVM.stopPip()
+                RouterModule.push({ url: RouterMap.LIVE_STREAMING_PAGE, param: info?.id })
+              } else if (info.liveState === 2) {
+                this.playerVM.stopPip()
+                RouterModule.push({ url: RouterMap.LIVE_DETAIL_PAGE, param: info?.id })
+              } else {
+                this.liveVM.stopPip()
+                let courseDetail =
+                  this.homeData.courseData.courseList.find((course: CourseModel) => info?.id ===
+                  course.id) as CourseModel
+                courseDetail.catalogIndex = 0
+                emitter.emit('changeCourseId', { data: { courseId: courseDetail.id } })
+                RouterModule.push({ url: RouterMap.CHAPTER_DETAIL_PAGE, param: courseDetail })
+              }
+            } else {
+              RouterModule.push({ url: RouterMap.LOGIN_PAGE })
+            }
+          })
         }, (item: Course) => {
           return item.id.toString()
         })
@@ -233,6 +266,7 @@ export struct HomePage {
     .backgroundColor($r('sys.color.background_primary'))
     .borderRadius(16)
     .scrollBar(BarState.Off)
+    .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
     .padding($r('app.float.vp_12'))
   }
 
@@ -257,12 +291,19 @@ export struct HomePage {
         .objectFit(ImageFit.Fill)
         .width('100%')
         .height($r('app.float.vp_184'))
+        .draggable(false)
+        .onClick(()=>{
+          console.info('hello')
+        })
+
       Image($r('app.media.home_banner_image1'))
         .interpolation(ImageInterpolation.High)
         .objectFit(ImageFit.Fill)
         .width('100%')
         .height($r('app.float.vp_184'))
+        .draggable(false)
     }
+    .draggable(false)
     .loop(true)
     .autoPlay(true)
     .interval(2000)

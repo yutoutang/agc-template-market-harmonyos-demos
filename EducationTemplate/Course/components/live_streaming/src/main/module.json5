@@ -1,0 +1,14 @@
+{
+  "module": {
+    "name": "live_streaming",
+    "type": "har",
+    "deviceTypes": [
+      "phone"
+    ],
+    "requestPermissions": [
+      {
+        "name": "ohos.permission.INTERNET"
+      }
+    ]
+  }
+}

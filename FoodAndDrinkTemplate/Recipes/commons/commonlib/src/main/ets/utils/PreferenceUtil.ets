@@ -52,9 +52,9 @@ export class PreferenceUtil {
     }
     let array: Array<string> = this.get(key) as Array<string> || []
     if (array.indexOf(value) !== -1) {
-      return
+      array.splice(array.indexOf(value),1);
     }
-    array.push(value)
+    array.unshift(value)
     this.put(key, array)
   }
 
@@ -66,4 +66,14 @@ export class PreferenceUtil {
     array.splice(array.indexOf(value), 1)
     this.put(key, array)
   }
+
+  public clearArray(key: string) {
+    if (!this.dataPreferences) {
+      Logger.info(`PreferenceUtil: dataPreferences is null`)
+    }
+    let array: Array<string> = this.get(key) as Array<string> || []
+    array.splice(0, array.length)
+    this.put(key, array)
+  }
+
 }

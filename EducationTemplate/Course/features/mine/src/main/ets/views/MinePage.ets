@@ -72,6 +72,7 @@ export struct MinePage {
 
         }, (item: ServiceModel, index: number) => item.titleName.toString() + index)
       }
+      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
       .width('100%')
       .height('auto')
     }
@@ -97,6 +98,7 @@ export struct MinePage {
     .height('auto')
     .backgroundColor($r('sys.color.background_primary'))
     .borderRadius($r('app.float.vp_16'))
+    .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
     .padding({ left: $r('app.float.vp_12'), right: $r('app.float.vp_12') })
   }
 
@@ -249,7 +251,8 @@ struct ServiceItem {
     .alignItems(VerticalAlign.Center)
     .bindSheet($$this.isOpen, this.buildMakeCallComponent(), {
       title: this.buildTitle(),
-      height: $r('app.float.vp_265')
+      height: $r('app.float.vp_265'),
+      preferType:SheetType.CENTER,
     })
     .onClick(() => {
       if (this.loginUser.isLogin) {

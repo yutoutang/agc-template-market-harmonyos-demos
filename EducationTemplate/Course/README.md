@@ -14,18 +14,18 @@
 
 此模板提供如下组件，所有组件存放在工程根目录的components下，如果您仅需使用组件，可参考对应组件的指导链接；如果您使用此模板，请参考本文档。
 
-| 组件                           | 描述                   | 使用指导                                            |
-| :----------------------------- | :--------------------- | :-------------------------------------------------- |
-| 视频播控组件（recorded_player）    | 视频播放支持加解锁、画中画、倍速、分辨率等功能 | [使用指导](components/recorded_player/README.md)    |
-| 分类选择组件（classification） | 多层级选择             | [使用指导](components/classification/README.md)     |
-| 支付组件（aggregated_payment）     | 支付能力               | [使用指导](components/aggregated_payment/README.md) |
-| 分享组件（aggregated_share）   | 分享能力               | [使用指导](components/aggregated_share/README.md)   |
-| 意见反馈组件（feed_back）      | 意见反馈               | [使用指导](components/feed_back/README.md)          |
-| 登录组件（login_info）         | 登录功能               | [使用指导](components/login_info/README.md)         |
-| 搜索组件（search）             | 搜索能力               | [使用指导](components/search/README.md)             |
+| 组件                       | 描述                      | 使用指导                                            |
+|:-------------------------|:------------------------| :-------------------------------------------------- |
+| 视频播放组件（recorded_player）  | 视频播放支持加解锁、画中画、倍速、分辨率等功能 | [使用指导](components/recorded_player/README.md)    |
+| 分类选择组件（classification）   | 多层级选择                   | [使用指导](components/classification/README.md)     |
+| 支付组件（aggregated_payment） | 支付能力                    | [使用指导](components/aggregated_payment/README.md) |
+| 分享组件（aggregated_share）   | 分享能力                    | [使用指导](components/aggregated_share/README.md)   |
+| 意见反馈组件（feed_back）        | 意见反馈                    | [使用指导](components/feed_back/README.md)          |
+| 登录组件（login_info）         | 登录功能                    | [使用指导](components/login_info/README.md)         |
+| 搜索组件（search）             | 搜索能力                    | [使用指导](components/search/README.md)             |
+| 直播间组件（live_streaming）    | 直播间弹幕、分享、评论等功能          | [使用指导](components/live_streaming/README.md)     |
 
 本模板为教育类应用提供了常用功能的开发样例，对视频播放器进行了定制化的开发，模板主要分首页、学习、我的三大模块：
-
 * 首页：提供推荐课程信息流、搜索等功能。
 
 * 学习：提供学习记录、视频播放等功能。
@@ -34,9 +34,9 @@
 
 本模板已集成华为账号、广告等服务，只需做少量配置和定制即可快速实现华为账号的登录、媒体播放等功能。
 
-| 首页                                                | 学习                                                | 我的                                                |
-|---------------------------------------------------|---------------------------------------------------|---------------------------------------------------|
-| <img src="./screenshot/course03.jpg" width="300"> | <img src="./screenshot/course01.jpg" width="300"> | <img src="./screenshot/course02.jpg" width="300"> |
+| 首页                                                 | 学习                                                 | 我的                                                 |
+|----------------------------------------------------|----------------------------------------------------|----------------------------------------------------|
+| <img src="./screenshot/course03.jpeg" width="300"> | <img src="./screenshot/course01.jpeg" width="300"> | <img src="./screenshot/course02.jpeg" width="300"> |
 
 本模板主要页面及核心功能如下所示：
 
@@ -150,13 +150,14 @@ Course
 │       └──types  
 │           └──Course.ets                                 // 课程数据协议 
 ├──components
-│  ├──aggregated_payment                                       // 支付组件                     
+│  ├──aggregated_payment                                   // 支付组件                     
 │  ├──aggregated_share                                     // 分享组件
 │  ├──classification                                       // 分类组件 
 │  ├──feed_back                                            // 意见反馈组件
 │  ├──login_info                                           // 登录组件
 │  ├──open_ads                                             // 广告组件
 │  ├──search                                               // 搜索组件
+│  ├──live_streaming                                       // 直播间组件
 │  └──recorded_player                                      // 视频播放组件            
 ├──features                
 │  ├──course/src/main/ets                                  // 学习课程模块             
@@ -172,6 +173,8 @@ Course
 │  │    │   ├──AnswerQuestionsComponent.ets                // 答题view
 │  │    │   ├──CommentPopup.ets                            // 评分弹框
 │  │    │   ├──CourseCatalogComponents.ets                 // 课程章节弹框
+│  │    │   ├──DescribeComponent.ets                       // 详情描述view
+│  │    │   ├──DownLoadSheet.ets                           // 下载sheet
 │  │    │   ├──LiveBroadcastSign.ets                       // 直播标签view
 │  │    │   ├──LiveNumberOverlay.ets                       // 数量view
 │  │    │   ├──LiveStreamingItem.ets                       // 直播列表item
@@ -194,7 +197,11 @@ Course
 │  │        ├──ExamResultPage.ets                          // 答题结果页面
 │  │        ├──HomePage.ets                                // 首页
 │  │        ├──HomeSearch.ets                              // 搜索页面
-│  │        ├──LiveStreamingListPage.ets                   // 直播页面
+│  │        ├──LiveStreamingListPage.ets                   // 直播列表页面
+│  │        ├──InputCommentPage.ets                        // 文本输入页面
+│  │        ├──LiveDetailPage.ets                          // 直播前页面
+│  │        ├──LiveStreamingPage.ets                       // 直播中页面
+│  │        ├──LookFilePage.ets                            // 文件预览页面
 │  │        ├──MaterialPage.ets                            // 资料页面
 │  │        ├──TestReportPage.ets                          // 结果页面
 │  │        └──RecordedDetail.ets                          // 课程详情页面  
@@ -265,18 +272,17 @@ Course
 
 ### 环境
 
-- DevEco Studio版本：DevEco Studio 5.0.3 Release及以上
-- HarmonyOS SDK版本：HarmonyOS 5.0.3 Release SDK及以上
+- DevEco Studio版本：DevEco Studio 5.0.5 Release及以上
+- HarmonyOS SDK版本：HarmonyOS 5.0.5 Release SDK及以上
 - 设备类型：华为手机（包括双折叠和阔折叠）
-- 系统版本：HarmonyOS 5.0.1(13)及以上
+- 系统版本：HarmonyOS 5.0.5(17)及以上
 
 ### 权限
 
 - 网络权限: ohos.permission.INTERNET, ohos.permission.GET_NETWORK_INFO, ohos.permission.GET_WIFI_INFO
 
 ### 调试
-本模板不支持使用模拟器调试，请使用真机进行调试。
-
+由于当前模拟器无法兼容支付宝SDK，若您需要在模拟器环境下进行相关测试，请参考支付组件中的[使用说明](components/aggregated_payment/README.md)
 ## 快速入门
 
 ### 配置工程
@@ -295,7 +301,7 @@ Course
 
    a. 将应用的Client ID配置到products/phone/src/main路径下的module.json5文件中，详细参考：[配置Client ID](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-client-id)。
 
-   b. 申请华为账号一键登录所需的quickLoginMobilePhone权限，详细参考：[配置scope权限](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-config-permissions)。
+   b. 申请华为账号一键登录权限，详细参考：[申请账号权限](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-config-permissions)。
 
 3. 配置广告服务。
 
@@ -321,24 +327,24 @@ Course
 
 未加锁
 
-<img src="./screenshot/player05.jpg" width="600">
+<img src="./screenshot/player05.jpeg" width="600">
 
 加锁
 
-<img src="./screenshot/player02.jpg" width="600">
+<img src="./screenshot/player02.jpeg" width="600">
 
 更多
 
-<img src="./screenshot/player04.jpg" width="600">
+<img src="./screenshot/player04.jpeg" width="600">
 
 举报
 
-<img src="./screenshot/player03.jpg" width="600">
+<img src="./screenshot/player03.jpeg" width="600">
 
 
-| 分享                                                 | 习题练习                                               | 课程学习                                               |
-|----------------------------------------------------|----------------------------------------------------|----------------------------------------------------|
-| <img src="./screenshot/course001.jpg" width="300"> | <img src="./screenshot/course002.jpg" width="300"> | <img src="./screenshot/course003.jpg" width="300"> |
+| 分享                                                  | 习题练习                                                | 课程学习                                                |
+|-----------------------------------------------------|-----------------------------------------------------|-----------------------------------------------------|
+| <img src="./screenshot/course001.jpeg" width="300"> | <img src="./screenshot/course002.jpeg" width="300"> | <img src="./screenshot/course003.jpeg" width="300"> |
 
 
 ## 开源许可协议

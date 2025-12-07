@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
+import { window } from '@kit.ArkUI';
 import { MainEntryVM } from '../viewmodels/MainEntryVM';
 import { TabListItem } from '../models/Types';
-import { window } from '@kit.ArkUI';
 import { CourseVM } from 'course';
 
 @Builder

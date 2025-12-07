@@ -1,4 +1,4 @@
-import { buildTitleBar, CommonConstants } from 'commonlib';
+import { buildTitleBar, CommonConstants, PreferenceUtil } from 'commonlib';
 import { LengthMetrics } from '@kit.ArkUI';
 import { SearchPageVM } from '../viewModels/SearchPageVM';
 import { HomeSearch } from 'home_search';
@@ -16,6 +16,7 @@ struct SearchPage {
   aboutToAppear(): void {
     this.vm.getHotkeys();
     this.vm.getDefaultSearch();
+    this.vm.historyInfo = PreferenceUtil.getInstance().get(CommonConstants.SEARCH_KEYS) as [] ?? [];
   }
 
   build() {
@@ -26,6 +27,7 @@ struct SearchPage {
           resultList: this.vm.resultList,
           paramsKeyword: this.vm.paramsKeyword,
           isShowResult: this.vm.isShowResult,
+          historyInfo: this.vm.historyInfo,
           isShowSearch: this.vm.formPage !== CommonConstants.CLASSIFICATION_PAGE,
           searchDishes: (keyword: string) => {
             this.vm.searchDishes(keyword)
@@ -40,8 +42,16 @@ struct SearchPage {
           goRecipeDetail: (id: number) => {
             this.vm.goRecipeDetail(id)
           },
+          submitKeyWords: (keyword: string) => {
+            this.vm.submitKeyWords(keyword)
+          },
+          onKeyClick: (keyword: string) => {
+            this.vm.onKeyClick(keyword)
+          },
+          clearRecords: () => {
+            this.vm.clearRecords()
+          }
         })
-
       }
       .height('100%')
       .scrollBar(BarState.Off)

@@ -1,17 +1,22 @@
-import { ErrorEvent, JSON, MessageEvents, ThreadWorkerGlobalScope, worker } from '@kit.ArkTS';
+import { MessageEvents, ThreadWorkerGlobalScope, worker } from '@kit.ArkTS';
 import { socket } from '@kit.NetworkKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { WorkerMessage } from '../model/WorkerMessage';
-import { LENGTH_TRANSFER_HEADER, WorkerMessageType } from '../common/Constant';
+import { BinaryMessageType, LENGTH_TRANSFER_HEADER, WorkerMessageType } from '../common/Constant';
 import { ConnectionVo } from '../model/ConnectionVo';
 import { BufferUtil } from '../utils/BufferUtil';
 import { BinaryProtocolData, BinaryProtocolHeader } from '../model/BinaryProtocol';
 import { BinaryProtocolCodec } from '../utils/BinaryProtocolCodec';
 import Logger from '../common/Constant'
+import { hilog } from '@kit.PerformanceAnalysisKit';
+import { ReceiverUtil } from '../service/ReceiverUtil'
+import { common } from '@kit.AbilityKit';
 
 const workerPort: ThreadWorkerGlobalScope = worker.workerPort;
 
 const socketServer = socket.constructTCPSocketServerInstance();
+
+const receiverUtil = new ReceiverUtil(workerPort)
 
 /** 二进制消息缓冲区映射 */
 let binaryBufferMap: Map<string, BinaryMessageBuffer> = new Map();
@@ -19,6 +24,10 @@ let binaryBufferMap: Map<string, BinaryMessageBuffer> = new Map();
 workerPort.onmessage = (event: MessageEvents) => {
   let data = event.data as WorkerMessage;
   switch (data.type) {
+    case WorkerMessageType.CONTEXT:
+      const context = data.data as common.UIAbilityContext
+      receiverUtil.setContext(context)
+      break;
     case WorkerMessageType.LISTEN:
       listenServerAddress(data.data as ConnectionVo);
       break;
@@ -77,13 +86,50 @@ function handleClientBinaryMessage(clientId: number, data: socket.SocketMessageI
     // 处理每个完整的消息
     binaryProtocolDataList.forEach(binaryProtocolData => {
       // 根据消息类型发送到主线程
-      workerPort.postMessage({
-        type: WorkerMessageType.RECEIVE,
-        data: binaryProtocolData,
-      } as WorkerMessage, [binaryProtocolData.data]);
+      handleBinaryReceiveCallback(binaryProtocolData)
     });
   } catch (error) {
     Logger.error('处理二进制消息失败:', error);
+  }
+}
+
+/**
+ * 处理二进制数据接收回调
+ */
+function handleBinaryReceiveCallback(binaryProtocolData: BinaryProtocolData) {
+  try {
+    // 转发给文件接收服务处理
+    handleBinaryFileMessage(binaryProtocolData.type, binaryProtocolData.data);
+  } catch (error) {
+    console.error('处理二进制接收数据失败:', error);
+  }
+}
+
+/**
+ * 处理二进制文件消息
+ */
+function handleBinaryFileMessage(messageType: BinaryMessageType, data: ArrayBuffer) {
+  try {
+    switch (messageType) {
+      case BinaryMessageType.FILE_START:
+        receiverUtil.handleFileStart(data);
+        break;
+      case BinaryMessageType.FILE_CHUNK:
+        receiverUtil.handleFileChunk(data);
+        break;
+      case BinaryMessageType.FILE_END:
+        receiverUtil.handleFileEnd(data);
+        break;
+      case BinaryMessageType.CONTACT:
+        receiverUtil.handleContact(data);
+        break;
+      case BinaryMessageType.FILE_COUNT:
+        receiverUtil.handleFileCount(data)
+      default:
+        hilog.info(0x0001, 'testTag', '%{public}s', '未知的二进制消息类型');
+    }
+  } catch (error) {
+    console.error('处理二进制文件消息失败:', JSON.stringify(error));
   }
 }
 

@@ -31,6 +31,8 @@ export class CollectionModel {
   topicSource?: string;
   // 收藏时间
   time: number = 0;
+  //直播状态 1正在直播  0已结束 2未开始
+  liveState?: number;
   // 是否删除
   @Trace isDelete: boolean = false;
 }

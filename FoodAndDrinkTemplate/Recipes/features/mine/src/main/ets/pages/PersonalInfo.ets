@@ -55,7 +55,7 @@ struct PersonalInfo {
         .fontColor('#FFFFFF')
         .backgroundColor('#E84026')
         .width('100%')
-        .margin({ left: 28, right: 28 })
+        .margin({ left: 28, right: 28, bottom: 12 })
         .onClick(() => {
           this.vm.userInfo.nickname = this.nickName;
           this.isShow = false;
@@ -139,7 +139,11 @@ struct PersonalInfo {
           }.width('100%')
           .justifyContent(FlexAlign.SpaceBetween);
         }.personalColumn();
-      }.height('100%').backgroundColor('#F1F3F5').padding({ top: 12, left: 16, right: 16 });
+      }
+      .height('100%')
+      .backgroundColor('#F1F3F5')
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
+      .padding({ top: 12, left: 16, right: 16 });
     }
     .title(buildTitleBar('个人信息'), { paddingStart: LengthMetrics.vp(16) });
   }

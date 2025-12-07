@@ -256,4 +256,18 @@ export const TOOL_TYPE_MODULES: ToolTypeModule[] = [
     icon: $r('app.media.credentials'),
     url: 'CredentialsPage',
   },
+  {
+    id: ToolType.AR_MEASURE,
+    title: 'AR测量',
+    category: Category.LIFE,
+    icon: $r('app.media.ar_measure'),
+    url: 'ARMeasure',
+  },
+  {
+    id: ToolType.TRANSLATOR,
+    title: '翻译',
+    category: Category.CALCULATE,
+    icon: $r('app.media.translator'),
+    url: 'TranslatorPage',
+  },
 ];

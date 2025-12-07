@@ -36,7 +36,7 @@ export class FileReaderService {
    * @returns Promise<boolean> 是否成功打开文件
    * @throws Error 文件打开失败时抛出异常
    */
-  async openFile(fileVo: FileVo): Promise<boolean> {
+  openFile(fileVo: FileVo) {
     try {
       // 打开文件
       this.file = fileIo.openSync(fileVo.uri, fileIo.OpenMode.READ_ONLY);
@@ -51,8 +51,6 @@ export class FileReaderService {
       // 重置读取位置
       this.currentPosition = 0;
       this.currentChunkIndex = 0;
-
-      console.log(`文件打开成功: ${fileVo.name}, 大小: ${this.fileSize} bytes, 分片数: ${this.totalChunks}`);
       return true;
     } catch (error) {
       console.error('打开文件失败:', error);
@@ -66,7 +64,7 @@ export class FileReaderService {
    * @returns Promise<FileChunk | null> 文件分片数据，如果已读取完毕则返回null
    * @throws Error 读取失败时抛出异常
    */
-  async readNextChunk(): Promise<ChunkItem | null> {
+  readNextChunk(): ChunkItem | null {
     if (!this.file || this.currentPosition >= this.fileSize) {
       return null;
     }
@@ -101,8 +99,6 @@ export class FileReaderService {
       };
 
       this.currentChunkIndex++;
-
-      console.log(`读取分片 ${chunk.index + 1}/${this.totalChunks}, 大小: ${chunk.size} bytes`);
 
       return chunk;
     } catch (error) {
@@ -193,7 +189,6 @@ export class FileReaderService {
     if (this.file) {
       try {
         fileIo.closeSync(this.file.fd);
-        console.log('文件已关闭');
       } catch (error) {
         console.error('关闭文件失败:', error);
       } finally {

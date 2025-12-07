@@ -3,7 +3,8 @@
     "name": "aggregated_payment",
     "type": "har",
     "deviceTypes": [
-      "phone"
+      "default",
+      "tablet"
     ]
   }
 }

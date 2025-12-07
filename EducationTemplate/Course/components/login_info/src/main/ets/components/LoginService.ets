@@ -419,7 +419,7 @@ export struct QuickLogin {
         .height(20)
         .focusable(true)
         .focusOnTouch(true)
-        .selectedColor('#007DFF')
+        .selectedColor($r('sys.color.comp_background_emphasize'))
         .select(this.isSelected)
         .onChange((value: boolean) => {
           if (value) {
@@ -591,6 +591,7 @@ export struct QuickLogin {
             dragBar: true, // 是否显示控制条
             backgroundColor: $r('sys.color.background_secondary'),
             showClose: true, // 是否显示关闭图标
+            preferType:SheetType.CENTER,
             shouldDismiss: ((sheetDismiss: SheetDismiss) => { // 半模态页面交互式关闭回调函数
               this.shouldDismiss();
               sheetDismiss.dismiss();

@@ -83,6 +83,7 @@ export struct OrderListPage {
           }, (item: OrderInfo, idx: number) => item.orderNo + idx)
         }
         .scrollBar(BarState.Off)
+        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
         .layoutWeight(1)
       }
     }

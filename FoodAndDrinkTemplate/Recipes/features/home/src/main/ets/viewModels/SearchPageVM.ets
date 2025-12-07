@@ -1,5 +1,5 @@
 import { queryRecipeList, querySearchHotkeys, RecipeBriefInfo } from 'network';
-import { CommonConstants, RouterMap, RouterModule } from 'commonlib';
+import { CommonConstants, PreferenceUtil, RouterMap, RouterModule } from 'commonlib';
 
 const TAG = '[SearchPageVM]';
 
@@ -14,6 +14,8 @@ export class SearchPageVM {
   // 来源页
   @Trace formPage: string = '';
   @Trace title: string = '菜谱搜索';
+  @Trace preferenceUtil:PreferenceUtil = PreferenceUtil.getInstance();
+  @Trace historyInfo: string[] = [];
 
   // 搜索菜谱
   public async searchDishes(keyword: string) {
@@ -43,6 +45,24 @@ export class SearchPageVM {
     }
   }
 
+  public submitKeyWords(keyword: string) {
+    if (keyword) {
+      PreferenceUtil.getInstance().putToArray(CommonConstants.SEARCH_KEYS, keyword)
+      // 插入历史记录,并去重
+      this.historyInfo.unshift(keyword);
+      this.historyInfo = Array.from(new Set(this.historyInfo));
+    }
+  }
+
+  public onKeyClick(keyword: string) {
+    this.submitKeyWords(keyword);
+  }
+
+  public clearRecords() {
+    this.historyInfo = [];
+    PreferenceUtil.getInstance().clearArray(CommonConstants.SEARCH_KEYS)
+  }
+
   changeIndex(index: number, keyword: string) {
     if (index === 1) {
       this.resultList = this.resultList.sort((a, b) => b.likes - a.likes);
@@ -53,7 +73,7 @@ export class SearchPageVM {
     }
   }
 
-  goRecipeDetail(id: number) {
+  async goRecipeDetail(id: number) {
     RouterModule.push(RouterMap.DISHES, { 'id': id } as Record<string, number>);
   }
 }

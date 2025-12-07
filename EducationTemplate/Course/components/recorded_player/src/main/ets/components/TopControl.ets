@@ -102,6 +102,8 @@ export struct TopControl {
           .fontSize($r('sys.float.Title_S'))
           .fontColor(Color.White)
           .fontWeight(FontWeight.Bold)
+          .visibility(this.playerVM.movieItemList.length > 1 ? Visibility.Visible : Visibility.None)
+
         Blank()
           .layoutWeight(1)
         Image(this.speedIcon)
@@ -154,6 +156,7 @@ export struct TopControl {
         dragBar: true, // 是否显示控制条
         backgroundColor: Color.White,
         showClose: true, // 是否显示关闭图标
+        preferType:SheetType.CENTER,
         shouldDismiss: ((sheetDismiss: SheetDismiss) => { // 半模态页面交互式关闭回调函数
           sheetDismiss.dismiss();
           this.isShowSettingSheet = false
@@ -170,6 +173,7 @@ export struct TopControl {
           dragBar: true, // 是否显示控制条
           backgroundColor: Color.White,
           showClose: true, // 是否显示关闭图标
+          preferType:SheetType.CENTER,
           shouldDismiss: ((sheetDismiss: SheetDismiss) => {
             sheetDismiss.dismiss();
             this.isShowDefinitionSheet = false
@@ -183,6 +187,7 @@ export struct TopControl {
           dragBar: true, // 是否显示控制条
           backgroundColor: Color.White,
           showClose: true, // 是否显示关闭图标
+          preferType:SheetType.CENTER,
           shouldDismiss: ((sheetDismiss: SheetDismiss) => {
             sheetDismiss.dismiss();
             this.isShowReport = false

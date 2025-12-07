@@ -9,13 +9,13 @@ export struct HomeSearch {
   @Param isShowResult: boolean = false;
   @Param isShowSearch: boolean = true;
   @Param paramsKeyword: string = '';
+  @Param historyInfo: string[] = [];
   @Local tabList: TabItem[] =
     [{ label: '综合', sortType: SortType.General }, { label: '收藏最多', sortType: SortType.Grade },
       { label: '浏览最多', sortType: SortType.Cooked }];
   // 搜索框聚焦
   @Local isFocus: boolean = true;
   @Local keyword: string = '';
-  @Local historyInfo: string[] = [];
   // 当前tab栏索引
   @Local curTabIndex: number = 0;
   @Event searchDishes: (keyword: string) => void = () => {
@@ -26,6 +26,10 @@ export struct HomeSearch {
   }
   @Event goRecipeDetail: (id: number) => void = () => {
   }
+  @Event submitKeyWords: (keyword: string) => void = () => {}
+  @Event onKeyClick: (keyword: string) => void = () => {}
+  @Event clearRecords: () => void = () => {}
+
 
   aboutToAppear(): void {
     this.keyword = this.paramsKeyword
@@ -42,12 +46,8 @@ export struct HomeSearch {
           }
         })
         .onSubmit(() => {
-          if (this.keyword) {
-            // 插入历史记录,并去重
-            this.historyInfo.unshift(this.keyword);
-            this.historyInfo = Array.from(new Set(this.historyInfo));
-            this.curTabIndex = 0
-          }
+          this.submitKeyWords(this.keyword)
+          this.curTabIndex = 0
           this.searchDishes(this.keyword);
         })
         .searchButton('搜索', {
@@ -57,7 +57,6 @@ export struct HomeSearch {
         .defaultFocus(true)
         .margin({ top: 8 })
         .visibility(this.isShowSearch ? Visibility.Visible : Visibility.None)
-
 
       if (this.isShowResult) {
         SearchResult({
@@ -77,12 +76,8 @@ export struct HomeSearch {
             title: '搜索历史',
             keys: this.historyInfo,
             onKeyClick: (key: string) => {
+              this.onKeyClick(key);
               this.keyword = key;
-              if (this.keyword) {
-                // 插入历史记录,并去重
-                this.historyInfo.unshift(this.keyword);
-                this.historyInfo = Array.from(new Set(this.historyInfo));
-              }
               this.searchDishes(this.keyword);
               this.curTabIndex = 0
             },
@@ -97,7 +92,7 @@ export struct HomeSearch {
               .backgroundColor('#0D000000')
               .borderRadius(14)
               .onClick(() => {
-                this.historyInfo = [];
+                this.clearRecords()
               });
           }
         }
@@ -108,11 +103,7 @@ export struct HomeSearch {
           keys: this.hotInfo,
           onKeyClick: (item) => {
             this.keyword = item;
-            if (this.keyword) {
-              // 插入历史记录,并去重
-              this.historyInfo.unshift(this.keyword);
-              this.historyInfo = Array.from(new Set(this.historyInfo));
-            }
+            this.onKeyClick(this.keyword);
             this.searchDishes(this.keyword);
             this.curTabIndex = 0
           },

@@ -4,19 +4,16 @@ import { formatBytes } from '../utils/FileUtil'
 @ComponentV2
 export struct ContentBlock {
   @Param type: TransferType = TransferType.Send
-  @Param state: TransferState = TransferState.BEFORE
   @Param title: string = ''
-  @Param mainFile: MainFile = new MainFile()
+  @Require @Param mainFile: MainFile
   @Param img: ResourceStr = ''
-  @Param count: number = 0
-  @Param progress: string = ''
   @Event onChange: (value: boolean) => void = () => {
   }
 
   build() {
     Row() {
       Row() {
-        if (this.state === TransferState.BEFORE && this.type === TransferType.Send) {
+        if (this.mainFile.state === TransferState.BEFORE && this.type === TransferType.Send) {
           Checkbox({ name: 'checkbox2', group: 'checkboxGroup' })
             .select(true)
             .shape(CheckBoxShape.ROUNDED_SQUARE)
@@ -33,7 +30,7 @@ export struct ContentBlock {
           Text() {
             Span(this.title)
               .margin({ right: 12 })
-            if (this.state === TransferState.BEFORE && this.type === TransferType.Send) {
+            if (this.mainFile.state === TransferState.BEFORE && this.type === TransferType.Send) {
               Span(`(${this.mainFile.isSelected ? this.mainFile.size : 0}/${this.mainFile.size})`)
             }
           }
@@ -55,17 +52,17 @@ export struct ContentBlock {
         .alignItems(HorizontalAlign.Start)
       }
 
-      if (this.state === TransferState.MIDDLE || this.state === TransferState.AFTER) {
+      if (this.mainFile.state === TransferState.MIDDLE || this.mainFile.state === TransferState.AFTER) {
         Column() {
-          Text(this.progress)
+          Text(Math.floor(this.mainFile.recvSize / this.mainFile.fileSize * 100) + '%')
             .fontSize($r('sys.float.Body_M'))
             .fontColor($r('sys.color.font_primary'))
             .fontWeight(FontWeight.Medium)
             .margin({ bottom: 2 })
           Text() {
-            if (this.state === TransferState.MIDDLE) {
+            if (this.mainFile.state === TransferState.MIDDLE) {
               Span('正在传输')
-              Span(`(${this.count}/${this.mainFile.size})`)
+              Span(`(${this.mainFile.count}/${this.mainFile.size})`)
             } else {
               Span('传输完成!')
             }

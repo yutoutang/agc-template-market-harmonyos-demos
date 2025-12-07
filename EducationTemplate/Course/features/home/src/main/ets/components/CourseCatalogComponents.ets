@@ -76,6 +76,7 @@ export struct CourseCatalogComponents {
         }), (item: CourseCatalogModel, index: number) => item.catalogTitle + index)
       }
       .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
       .width('100%')
       .height('auto')
     }

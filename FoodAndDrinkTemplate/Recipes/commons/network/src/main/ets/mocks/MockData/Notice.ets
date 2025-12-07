@@ -12,7 +12,7 @@ const noticeList: Notice[] = [
   },
   {
     id: 2,
-    icon: 'avatar2',
+    icon: 'avatar1',
     type: 2,
     title: '懒洋洋',
     subTitle: '我更新了新的菜谱，快来学习吧~',
@@ -21,7 +21,7 @@ const noticeList: Notice[] = [
   },
   {
     id: 3,
-    icon: 'avatar2',
+    icon: 'avatar1',
     type: 2,
     title: '懒洋洋',
     subTitle: '我更新了新的菜谱，快来学习吧~',

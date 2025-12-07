@@ -1,11 +1,12 @@
 {
   "app": {
+// todo 修改签名
     "signingConfigs": [],
     "products": [
       {
         "name": "default",
         "signingConfig": "default",
-        "compatibleSdkVersion": "5.0.1(13)",
+        "compatibleSdkVersion": "5.0.5(17)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
           "strictMode": {
@@ -17,7 +18,7 @@
     ],
     "buildModeSet": [
       {
-        "name": "debug",
+        "name": "debug"
       },
       {
         "name": "release"
@@ -39,27 +40,27 @@
     },
     {
       "name": "commonlib",
-      "srcPath": "./commons/commonlib",
+      "srcPath": "./commons/commonlib"
     },
     {
       "name": "home",
-      "srcPath": "./features/home",
+      "srcPath": "./features/home"
     },
     {
       "name": "mine",
-      "srcPath": "./features/mine",
+      "srcPath": "./features/mine"
     },
     {
       "name": "course",
-      "srcPath": "./features/course",
+      "srcPath": "./features/course"
     },
     {
       "name": "http",
-      "srcPath": "./commons/http",
+      "srcPath": "./commons/http"
     },
     {
       "name": "login_info",
-      "srcPath": "./components/login_info",
+      "srcPath": "./components/login_info"
     },
     {
       "name": "aggregated_payment",
@@ -67,11 +68,11 @@
     },
     {
       "name": "aggregated_share",
-      "srcPath": "./components/aggregated_share",
+      "srcPath": "./components/aggregated_share"
     },
     {
       "name": "feed_back",
-      "srcPath": "./components/feed_back",
+      "srcPath": "./components/feed_back"
     },
     {
       "name": "recorded_player",
@@ -79,15 +80,19 @@
     },
     {
       "name": "search",
-      "srcPath": "./components/search",
+      "srcPath": "./components/search"
     },
     {
       "name": "classification",
-      "srcPath": "./components/classification",
+      "srcPath": "./components/classification"
     },
     {
       "name": "open_ads",
-      "srcPath": "./components/open_ads",
+      "srcPath": "./components/open_ads"
+    },
+    {
+      "name": "live_streaming",
+      "srcPath": "./components/live_streaming"
     }
   ]
 }

@@ -99,7 +99,7 @@ struct PrivacyPolicy {
             .layoutWeight(1)
             .fontSize($r('sys.float.Body_L'))
             .fontWeight(FontWeight.Medium)
-            .fontColor($r('sys.color.multi_color_01'))
+            .fontColor($r('sys.color.font_emphasize'))
             .backgroundColor($r('sys.color.comp_background_tertiary'))
             .onClick(() => {
               RouterModule.push({ url: RouterMap.PRIVACY_STATEMENT_ALERT_PAGE }, false)
@@ -176,7 +176,7 @@ struct PrivacyPolicy {
           .layoutWeight(1)
           .fontSize($r('sys.float.Body_L'))
           .fontWeight(FontWeight.Medium)
-          .fontColor($r('sys.color.multi_color_01'))
+          .fontColor($r('sys.color.font_emphasize'))
           .backgroundColor($r('sys.color.comp_background_tertiary'))
           .onClick(() => {
             RouterModule.push({ url: RouterMap.PRIVACY_STATEMENT_ALERT_PAGE }, false)

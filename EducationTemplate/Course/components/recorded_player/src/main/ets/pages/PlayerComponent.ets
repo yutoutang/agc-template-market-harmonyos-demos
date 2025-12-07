@@ -34,6 +34,9 @@ export struct PlayerComponent {
   }
   @Param callbackTimeUpdate: (nol: number, total: number) => void = () => {
   };
+  // 分享事件
+  @Param shareEvent: () => void = () => {
+  }
   @Local controlShow: boolean = false; // 控制器是否显示
   @Local isLayoutFullScreen: boolean = false;
   // 清晰度
@@ -56,7 +59,7 @@ export struct PlayerComponent {
       PipManager.getInstance().player.getPause();
     } else {
       PipManager.getInstance().player.isPlaying ? PipManager.getInstance().player.getPlay() :
-      PipManager.getInstance().player.getPause();
+        PipManager.getInstance().player.getPause();
     }
   }
 
@@ -176,6 +179,10 @@ export struct PlayerComponent {
   }
 
   aboutToDisappear() {
+    emitter.off('playerPause')
+    emitter.off('autoStartPip')
+    emitter.off('chapterDetailBack')
+    this.playerVM.movieItem.movieUrl = 'null'
     this.isLayoutFullScreen = false
     this.setR(this.isLayoutFullScreen ? 2 : 1)
     this.setFullScreen(this.isLayoutFullScreen)
@@ -240,9 +247,9 @@ export struct PlayerComponent {
           // 加载页面
           Column() {
             LoadingProgress()
-              .color(Color.White)
-              .width(80)
-              .height(80)
+              .color($r('sys.color.icon_on_primary'))
+              .width(72)
+              .height(72)
             Text('加载中')
               .fontSize(16)
               .fontColor(Color.White)
@@ -277,6 +284,12 @@ export struct PlayerComponent {
             selectionEvent: (item: MovieItem) => {
               let idx = this.playerVM.movieItemList.indexOf(item)
               this.selectionEvent(idx)
+            },
+            shareEvent: () => {
+              this.isLayoutFullScreen = false
+              this.setR(this.isLayoutFullScreen ? 2 : 1)
+              this.setFullScreen(this.isLayoutFullScreen)
+              this.shareEvent()
             }
           })
             .width('100%')

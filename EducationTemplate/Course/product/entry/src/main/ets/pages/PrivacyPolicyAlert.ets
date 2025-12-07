@@ -80,7 +80,7 @@ export struct PrivacyPolicyAlert {
             })
             .width($r('app.float.vp_140'))
             .height($r('app.float.vp_40'))
-            .fontColor('#4B5CC4')
+            .fontColor($r('sys.color.font_emphasize'))
             .fontSize($r('sys.float.Body_L'))
             .fontWeight(FontWeight.Medium)
             .backgroundColor($r('sys.color.comp_background_tertiary'))

@@ -130,10 +130,7 @@ export class PipManager {
       case PiPWindow.PiPState.STOPPED:
         // 画中画关闭
         PipManager.getInstance().player.isPipOpen = false;
-        // 小窗口点击关闭画中画，视频暂停播放
-        if (!PipManager.getInstance().player.isPiPWindowRestore) {
-          PipManager.getInstance().player.isPlaying = false;
-        }
+        // // 小窗口点击关闭画中画，视频暂停播放
         PipManager.getInstance().player.isPiPWindowRestore = false;
         break;
       // 表示画中画将从小窗播放恢复到原始播放界面
@@ -142,9 +139,6 @@ export class PipManager {
         PipManager.getInstance().player.isPipOpen = false;
         // 从小窗口复原
         PipManager.getInstance().player.isPiPWindowRestore = true;
-        if (!PipManager.getInstance().player.isPlaying) {
-          PipManager.getInstance().player.isPlaying = true;
-        }
         break;
       // 表示画中画生命周期执行过程出现了异常
       case PiPWindow.PiPState.ERROR:

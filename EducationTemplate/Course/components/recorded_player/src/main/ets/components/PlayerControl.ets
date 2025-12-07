@@ -23,7 +23,6 @@ import { FullScreenMore } from './FullScreenMore';
 import { FullScreenReport } from './FullScreenReport';
 import { FullScreenResolution } from './FullScreenResolution';
 import { FullScreenSelections } from './FullScreenSelections';
-import { FullScreenShare } from './FullScreenShare';
 import { FullScreenSpeed } from './FullScreenSpeed';
 import { TopControl } from './TopControl'
 
@@ -33,6 +32,9 @@ const CONTROLLER_DElAY = 2000; // 控制器时延
 export struct PlayerControl {
   // 横竖屏切换事件
   @Param fullScreen: (isLayoutFullScreen: boolean) => void = () => {
+  }
+  // 分享事件
+  @Param shareEvent: () => void = () => {
   }
   // 选集
   @Param selectionEvent: (item: MovieItem) => void = () => {
@@ -118,11 +120,15 @@ export struct PlayerControl {
     emitter.on('movieSelections', (event: emitter.EventData) => {
       let idx = this.playerVM.movieItemList.indexOf(this.playerVM.movieItem)
       let indexNumber = event.data!.movieSelection as number
-      if (idx === indexNumber) {
+      if (idx === indexNumber && this.playerVM.movieItem.movieUrl === PipManager.getInstance().player.videoUrl) {
         return
       }
       this.playerVM.movieItem = this.playerVM.movieItemList[indexNumber]
       this.getUIContext().getPromptAction().showToast({ message: `${this.playerVM.movieItem.movieTitle}正在播放` })
+      if (PipManager.getInstance().player.isPipOpen &&
+        this.playerVM.movieItem.movieUrl !== PipManager.getInstance().player.videoUrl) {
+        PipManager.getInstance().stopPip()
+      }
       PipManager.getInstance().player.changePlay(this.playerVM.movieItem.movieUrl,
         this.playerVM.movieItem.learnProgress)
     })
@@ -169,7 +175,7 @@ export struct PlayerControl {
 
         Column() {
           Image(this.isLock ? $r('app.media.icon_lock_close_fill') :
-          $r('app.media.icon_lock_open_fill'))
+            $r('app.media.icon_lock_open_fill'))
             .id('isPlaying')
             .width(40)
             .height(40)
@@ -230,6 +236,10 @@ export struct PlayerControl {
               reportEvent: () => {
                 this.isShowMore = false
                 this.getUIContext().getPromptAction().showToast({ message: '举报成功' })
+              },
+              shareEvent: () => {
+                this.isShowMore = false
+                this.shareEvent()
               }
             })
           }
@@ -299,11 +309,12 @@ export struct MoreSetControl {
   // 举报事件
   @Param reportEvent: (reasons: string[], reason: string) => void = () => {
   }
+  // 分享事件
+  @Param shareEvent: () => void = () => {
+  }
   @Local playerVM: PlayerVM = PlayerVM.instance;
   // 是否展示更多
   @Local isShowMore: boolean = true;
-  // 是否展示分享
-  @Local isShowShare: boolean = false;
   // 是否展示倍速
   @Local isShowSpeed: boolean = false;
   // 是否展示清晰度
@@ -322,22 +333,6 @@ export struct MoreSetControl {
       .width('100%')
       .height('100%')
       .visibility(this.isShowMore ? Visibility.Visible : Visibility.Hidden)
-  }
-
-  @Builder
-  shareBuild() {
-    FullScreenShare({
-      backClick: () => {
-        this.isShowMore = true
-        this.isShowShare = false
-      },
-      shareItemEvent: (item: string) => {
-        this.shareItemEvent(item)
-      }
-    })
-      .width('100%')
-      .height('100%')
-      .visibility(this.isShowShare ? Visibility.Visible : Visibility.Hidden)
   }
 
   @Builder
@@ -395,7 +390,7 @@ export struct MoreSetControl {
   moreItemEvent(item: string) {
     this.isShowMore = false
     if (item === '分享') {
-      this.isShowShare = true
+      this.shareEvent()
     } else if (item === '倍速') {
       this.isShowSpeed = true
     } else if (item === '画中画') {
@@ -430,7 +425,6 @@ export struct MoreSetControl {
   build() {
     Stack({ alignContent: Alignment.TopStart }) {
       this.moreBuild()
-      this.shareBuild()
       this.speedBuild()
       this.resolutionBuild()
       this.reportBuild()

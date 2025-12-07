@@ -52,7 +52,7 @@ export struct RecommendedCard {
         .fontSize(14);
       Row() {
         Row({ space: 4 }) {
-          Image($r(`app.media.${this.recipe.authorAvatar}`)).width(16).height(16).borderRadius(8);
+          Image($r(`app.media.${this.recipe.authorAvatar}`)).width(20).height(20).borderRadius(10);
           Text(this.recipe.author).fontSize(12).fontColor($r('sys.color.font_secondary'));
         }.onClick(() => {
           this.jumpBloggerInfo()

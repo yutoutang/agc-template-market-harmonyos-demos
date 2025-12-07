@@ -16,6 +16,7 @@
 import { pdfService, PdfView, pdfViewManager } from '@kit.PDFKit';
 import { fileIo } from '@kit.CoreFileKit';
 import { TopBar } from 'commonlib';
+import { emitter } from '@kit.BasicServicesKit';
 
 @ComponentV2
 export struct LookFilePage {
@@ -40,6 +41,10 @@ export struct LookFilePage {
       });
       await this.controller.loadDocument(filePath);
     })()
+  }
+
+  aboutToDisappear(): void {
+    emitter.emit('livePlayer', { data: { isPlaying: true } })
   }
 
   build() {

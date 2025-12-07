@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
-
+import { AbilityConstant, common, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { AppStorageV2, window } from '@kit.ArkUI';
 import { RouterTable } from '../models/RouterTable';
-import { RouterModule, WindowSize } from 'commonlib';
+import { Logger, WindowSize } from 'commonlib';
 import { LoginVM, wXApi, wXEventHandler } from 'login_info';
+import { aggregatedPaymentService } from 'aggregated_payment';
 
 const DOMAIN = 0x0000;
 
@@ -27,13 +27,18 @@ export default class EntryAbility extends UIAbility {
   private mWindow!: window.Window;
   private vm: LoginVM = LoginVM.instance;
 
+  onNewWant(want: Want, _launchParam: AbilityConstant.LaunchParam): void {
+    this.handleWeChatCallIfNeed(want);
+  }
+
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     // 初始化路由表
-    RouterTable.routerInit()
+    RouterTable.routerInit();
+    this.handleWeChatCallIfNeed(want);
+
     // 全局设置为浅色模式
     let applicationContext = this.context.getApplicationContext();
     applicationContext.setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT);
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');
   }
 
   onDestroy(): void {
@@ -52,29 +57,29 @@ export default class EntryAbility extends UIAbility {
       hilog.info(DOMAIN, 'testTag', 'Succeeded in loading the content.');
     });
     // 设置屏幕方向为竖屏
-    this.mWindow.setPreferredOrientation(window.Orientation.PORTRAIT);
+  //  this.mWindow.setPreferredOrientation(window.Orientation.PORTRAIT);
     // 订阅窗口尺寸变化
     this.mWindow.on('windowSizeChange', (size: window.Size) => {
-      let windowModel: WindowSize = AppStorageV2.connect(WindowSize, () => new WindowSize())!
-      windowModel.screenHeight = size.height
-      windowModel.screenWidth = size.width
+      let windowModel: WindowSize = AppStorageV2.connect(WindowSize, () => new WindowSize())!;
+      windowModel.screenHeight = size.height;
+      windowModel.screenWidth = size.width;
     });
 
     // 安全区域变化时更新状态栏和导航栏高度
     this.mWindow.on('avoidAreaChange', (data) => {
-      let windowModel: WindowSize = AppStorageV2.connect(WindowSize, () => new WindowSize())!
+      let windowModel: WindowSize = AppStorageV2.connect(WindowSize, () => new WindowSize())!;
       if (data.type === window.AvoidAreaType.TYPE_SYSTEM) {
         // 存储窗口内容规避的状态栏高度
-        windowModel.statusHeight = data.area.topRect.height
+        windowModel.statusHeight = data.area.topRect.height;
       } else if (data.type === window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR) {
         // 存储窗口内容规避的底部安全区高度
-        windowModel.bottomHeight = data.area.bottomRect.height
+        windowModel.bottomHeight = data.area.bottomRect.height;
       }
-    })
+    });
 
     this.mWindow.on('windowStatusChange', (windowStatusType) => {
-      let windowModel: WindowSize = AppStorageV2.connect(WindowSize, () => new WindowSize())!
-      windowModel.windowStatusType = windowStatusType
+      let windowModel: WindowSize = AppStorageV2.connect(WindowSize, () => new WindowSize())!;
+      windowModel.windowStatusType = windowStatusType;
     });
   }
 
@@ -93,15 +98,8 @@ export default class EntryAbility extends UIAbility {
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onBackground');
   }
 
-  onNewWant(want: Want, _launchParam: AbilityConstant.LaunchParam): void {
-    if (!want.action) {
-      this.handleWeChatCallIfNeed(want);
-    }
-  }
-
   private handleWeChatCallIfNeed(want: Want) {
-    wXApi.handleWant(want, wXEventHandler);
-    this.vm.loginFinished(false)
-    RouterModule.pop()
+    aggregatedPaymentService.handleWant(want); // 处理 Want 实例，接收可能存在的微信支付回调消息
+    this.vm.loginFinished(false);
   }
-}
+};
