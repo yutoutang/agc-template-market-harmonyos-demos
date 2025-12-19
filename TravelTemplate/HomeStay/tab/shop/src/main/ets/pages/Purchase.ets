@@ -3,10 +3,8 @@ import { promptAction } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { common } from '@kit.AbilityKit';
 import { Constants, NavPathName } from 'constant';
-import { AccountUtil } from 'account';
-import { createOrder } from '../viewmodel/PurchasePageVM';
 import { PurchaseInfo } from 'type';
-import { doRandBySync, getCurrentTime, Logger } from 'util';
+import { AccountUtil, doRandBySync, getCurrentTime, Logger } from 'util';
 import { TitleBar } from 'component';
 import { CreateOrderRequest, https, UpdateOrderRequest } from 'network';
 
@@ -15,12 +13,12 @@ export function PurchaseBuilder() {
   Purchase();
 }
 
-@Component
+@ComponentV2
 export struct Purchase {
-  @State remark: string = '';
-  @State openId: string | undefined = AccountUtil.getOpenId();
-  @State purchaseInfo: PurchaseInfo = new PurchaseInfo();
-  @Consume('mainPathStack') mainPathStack: NavPathStack;
+  @Local remark: string = '';
+  @Local openId: string = '';
+  @Local purchaseInfo: PurchaseInfo = new PurchaseInfo();
+  @Consumer('mainPathStack') mainPathStack: NavPathStack = new NavPathStack();
   context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
 
   build() {
@@ -72,11 +70,11 @@ export struct Purchase {
 
               Row() {
                 Text('备注').fontSize(14).opacity(0.6);
-                Blank().layoutWeight(1);
-                TextInput({ placeholder: '请输入备注', text: this.remark })
-                  .width(70)
-                  .textAlign(TextAlign.End)
+                TextInput({ placeholder: '请输入备注，10字以内', text: this.remark })
+                  .maxLength(10)
+                  .width('50%')
                   .padding(0)
+                  .textAlign(TextAlign.End)
                   .fontSize(14)
                   .fontColor('#333333')
                   .placeholderFont({ size: 14 })
@@ -164,26 +162,31 @@ export struct Purchase {
       goodsBanner: '',
     };
 
-    const res = await createOrder(data);
+    const res = await https.createOrder(data);
 
     if (res.code === 200) {
       //拉起支付
       let payStr = '';
-      paymentService.requestPayment(getContext(this) as common.UIAbilityContext, res.data).then(() => {
-        payStr = '支付成功';
-      }).catch(async (error: BusinessError) => {
+      try {
+        paymentService.requestPayment(getContext(this) as common.UIAbilityContext, res.data).then(() => {
+          payStr = '支付成功';
+        }).catch(async (error: BusinessError) => {
+          this.updateOrder(data.orderSn);
+          if (error.code === 1001930000) {
+            payStr = '取消支付';
+          } else if (error.code === 1001930001) {
+            payStr = '参数错误';
+          } else if (error.code === 1001930011) {
+            payStr = '网络链接异常';
+          } else if (error.code === 1001930010) {
+            payStr = '重复请求';
+          }
+          Logger.info('pay fail with reason ' + payStr);
+        });
+      } catch (e) {
         this.updateOrder(data.orderSn);
-        if (error.code === 1001930000) {
-          payStr = '取消支付';
-        } else if (error.code === 1001930001) {
-          payStr = '参数错误';
-        } else if (error.code === 1001930011) {
-          payStr = '网络链接异常';
-        } else if (error.code === 1001930010) {
-          payStr = '重复请求';
-        }
-        Logger.info('pay fail with reason ' + payStr);
-      });
+        Logger.info('pay fail with reason ' + JSON.stringify(e));
+      }
     }
   }
 }

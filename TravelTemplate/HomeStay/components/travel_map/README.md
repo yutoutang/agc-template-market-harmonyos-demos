@@ -28,7 +28,7 @@
 
 ## 快速入门
 1. 安装组件。
-   如果是在DevEvo Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
+   如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
 
    如果是从生态市场下载组件，请参考以下步骤安装组件。
 
@@ -133,7 +133,7 @@ import { CommonMap } from 'travel_map';
 import { promptAction } from '@kit.ArkUI';
 
 @Entry
-@Component
+@ComponentV2
 export struct Home {
   build() {
     Column() {
@@ -146,7 +146,7 @@ export struct Home {
             },
             icon: $r('app.media.point'),
             titleOptions: {
-              name: '原舍望山民宿',
+              name: '一间民宿',
               strokeColor: 0xFFFFFFFF,
             },
             cameraSpeed: 1000,

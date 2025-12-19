@@ -112,7 +112,10 @@ export struct ContentCard {
     .backgroundColor($r('sys.color.font_on_primary'))
     .borderRadius($r('app.float.card_radius'))
     .onClick(() => {
-      this.mainPathStack.pushPathByName('PageDetail', this.data.id );
+      let list = this.mainPathStack.getIndexByName('PageDetail')
+      if (!list.length) {
+        this.mainPathStack.pushPathByName('PageDetail', this.data.id );
+      }
     });
   }
 }

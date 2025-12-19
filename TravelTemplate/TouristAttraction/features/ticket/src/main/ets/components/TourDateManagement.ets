@@ -19,16 +19,16 @@ export struct TourDateManagement {
   DateItem(item: Date, index: number) {
     Column() {
       Text(`${CommonUtil.padWithZeros(item.getMonth() + 1)}-${CommonUtil.padWithZeros(item.getDate())}`)
-        .opacity(0.6)
-        .fontColor(this.vm.selectedIndex === index ? '#64BB5C' : Color.Black);
+        .fontSize(14)
+        .fontColor(this.vm.selectedIndex === index ? '#64BB5C' : '#666666');
       Text(`￥${this.ticketType?.discountPrice}`)
-        .opacity(0.6)
-        .fontColor(this.vm.selectedIndex === index ? '#64BB5C' : Color.Black);
+        .fontSize(14)
+        .fontColor(this.vm.selectedIndex === index ? '#64BB5C' : '#666666');
     }
     .border({
       width: 1,
       radius: 8,
-      color: this.vm.selectedIndex === index ? 'rgb(100, 187, 92)' : 'rgba(0, 0, 0, 0.05)',
+      color: this.vm.selectedIndex === index ? 'rgba(100, 187, 92, 1)' : 'rgba(0, 0, 0, 0.05)',
     })
     .backgroundColor(this.vm.selectedIndex === index ? 'rgba(100, 187, 92, 0.2)' : 'rgb(255, 255, 255)')
     .padding({

@@ -6,9 +6,9 @@ export function PrivacyPolicyPageBuilder() {
   PrivacyPolicyPage();
 }
 
-@Component
+@ComponentV2
 export struct PrivacyPolicyPage {
-  @Consume('mainPathStack') mainPathStack: NavPathStack;
+  @Consumer('mainPathStack') mainPathStack: NavPathStack = new NavPathStack();
 
   build() {
     NavDestination() {

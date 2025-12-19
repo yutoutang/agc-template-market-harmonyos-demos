@@ -17,7 +17,6 @@ class PrivacyItem {
 }
 
 @ComponentV2
-@Preview
 export struct PrivacyListPage {
   vm: MainEntryVM = MainEntryVM.instance;
   private privacyItems: Array<PrivacyItem> = [
@@ -57,8 +56,8 @@ export struct PrivacyListPage {
               });
 
               Divider()
-                .color('rgba(0,0,0,0.20)')
-                .strokeWidth(1);
+                .color($r('sys.color.comp_divider'))
+                .strokeWidth('1px');
             };
           }
           .padding({ left: $r('app.string.padding_16'), right: $r('app.string.padding_16') });

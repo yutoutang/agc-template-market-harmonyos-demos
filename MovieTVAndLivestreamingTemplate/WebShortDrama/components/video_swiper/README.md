@@ -332,10 +332,12 @@ onTimeUpdate(key: string, callback: (time: number) => void): void
    import common from '@ohos.app.ability.common';
    
    class EpisodeData implements VideoPlayData {
+      id: string
       url: media.AVFileDescriptor | string
    
-      constructor(url: media.AVFileDescriptor | string) {
+      constructor(url: media.AVFileDescriptor | string, id: string) {
          this.url = url;
+         this.id = id;
       }
    
       getName(): string {
@@ -343,7 +345,7 @@ onTimeUpdate(key: string, callback: (time: number) => void): void
       }
    
       getId(): string {
-         return 'id'
+         return this.id
       }
    
       getDuration(): number {
@@ -385,13 +387,14 @@ onTimeUpdate(key: string, callback: (time: number) => void): void
       httpUrls: Array<string> = []
       rawUrls: Array<string> = []
       private context: common.UIAbilityContext | undefined = undefined;
+      private videoIndex:number = 0;
    
       aboutToAppear() {
       //初始化数据
       this.httpUrls = ['https://agc-storage-drcn.platform.dbankcloud.cn/v0/app-d45y3/drama_video/2.m3u8','https://agc-storage-drcn.platform.dbankcloud.cn/v0/app-d45y3/drama_video/3.m3u8']
       this.httpUrls.forEach((item:string)=>{
          let videoData: EpisodeData =
-            new EpisodeData(item)
+            new EpisodeData(item,String(this.videoIndex++))
          this.data.pushData(videoData);
       })
 
@@ -403,7 +406,7 @@ onTimeUpdate(key: string, callback: (time: number) => void): void
          let avFileDescriptor: media.AVFileDescriptor =
             { fd: fileDescriptor.fd, offset: fileDescriptor.offset, length: fileDescriptor.length };
          let videoData: EpisodeData =
-            new EpisodeData(avFileDescriptor)
+            new EpisodeData(avFileDescriptor,String(this.videoIndex++))
          this.data.pushData(videoData);
         })
       }
@@ -444,12 +447,14 @@ onTimeUpdate(key: string, callback: (time: number) => void): void
    import common from '@ohos.app.ability.common';
    
    class EpisodeData implements VideoPlayData {
+      id: string;
       desc: string;
       url:media.AVFileDescriptor | string;
    
-      constructor(url:media.AVFileDescriptor | string, desc: string) {
+      constructor(url:media.AVFileDescriptor | string, desc: string, id: string) {
          this.desc = desc
          this.url = url
+         this.id = id
       }
    
       getName(): string {
@@ -457,7 +462,7 @@ onTimeUpdate(key: string, callback: (time: number) => void): void
       }
    
       getId(): string {
-         return 'id'
+         return this.id
       }
    
       getDuration(): number {
@@ -516,6 +521,10 @@ onTimeUpdate(key: string, callback: (time: number) => void): void
                .onClick(() => {
                   this.playControl.pause()
                })
+            Button('changeIndex')
+               .onClick(() => {
+                  this.changeIndex()
+            })
          }
       }.height('100%')
    }
@@ -537,13 +546,14 @@ onTimeUpdate(key: string, callback: (time: number) => void): void
       httpUrls: Array<string> = []
       rawUrls: Array<string> = []
       private context: common.UIAbilityContext | undefined = undefined;
+      private videoIndex:number = 0;
    
       aboutToAppear() {
       //初始化数据
       this.httpUrls = ['https://agc-storage-drcn.platform.dbankcloud.cn/v0/app-d45y3/drama_video/2.m3u8','https://agc-storage-drcn.platform.dbankcloud.cn/v0/app-d45y3/drama_video/3.m3u8']
       this.httpUrls.forEach((item:string,index:number)=>{
          let videoData: EpisodeData =
-            new EpisodeData(item,`this is episode for http ${index}`)
+            new EpisodeData(item,`this is episode for http ${index}`, String(this.videoIndex++))
          this.data.pushData(videoData);
       })
 
@@ -555,7 +565,7 @@ onTimeUpdate(key: string, callback: (time: number) => void): void
          let avFileDescriptor: media.AVFileDescriptor =
             { fd: fileDescriptor.fd, offset: fileDescriptor.offset, length: fileDescriptor.length };
          let videoData: EpisodeData =
-            new EpisodeData(avFileDescriptor,`this is episode for rawfile ${index}`)
+            new EpisodeData(avFileDescriptor,`this is episode for rawfile ${index}`, String(this.videoIndex++))
          this.data.pushData(videoData);
          length = this.data.totalCount()
         })

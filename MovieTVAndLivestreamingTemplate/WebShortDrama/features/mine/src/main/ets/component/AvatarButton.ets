@@ -2,13 +2,14 @@ import { getMedia } from '@agctemplate/resources';
 import { Logger } from '@agctemplate/utils';
 import { MinePageVM } from '@agctemplate/widgets';
 import { FunctionalButton, functionalButtonComponentManager } from '@kit.ScenarioFusionKit';
-
+import fs from '@ohos.file.fs';
 
 const TAG = '[AvatarButton]';
 
 @ComponentV2
 export struct AvatarButton {
   vm: MinePageVM = MinePageVM.instance;
+  bundleName:string = AppStorage.get('bundleName')!
 
   build() {
     FunctionalButton({
@@ -33,7 +34,19 @@ export struct AvatarButton {
           return;
         }
         if (data.avatarUri) {
-          this.vm.updateAvatar(data.avatarUri);
+          let pathDir = getContext().filesDir;
+          let file:fs.File = null!
+          let file2:fs.File = null!
+          try {
+            file = fs.openSync(data.avatarUri, fs.OpenMode.READ_ONLY)
+            file2 = fs.openSync(`${pathDir}/picture${data.avatarUri.slice(-9,-4)}.jpg`, fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE)
+            fs.copyFileSync(file.fd, file2.fd)
+          }catch (e) {
+          }finally {
+            fs.closeSync(file);
+            fs.closeSync(file2);
+          }
+          this.vm.updateAvatar(`file://${this.bundleName}${pathDir}/picture${data.avatarUri.slice(-9,-4)}.jpg`);
           Logger.info(TAG, 'succeeded in choosing avatar');
         } else {
           Logger.error(TAG, 'Failed: the uri is empty.');

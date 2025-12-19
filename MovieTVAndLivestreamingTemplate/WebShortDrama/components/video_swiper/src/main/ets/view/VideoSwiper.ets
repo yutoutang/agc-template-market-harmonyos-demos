@@ -73,12 +73,11 @@ export struct VideoSwiper {
   getRefreshDisplay() {
     Row() {
       LoadingProgress()
-        .width(40)
-        .aspectRatio(1)
+        .size({ width:40, height:40 })
         .color(Color.White)
       Text(this.getStatusText())
         .fontSize(14)
-        .fontColor(Color.White)
+        .fontColor($r('sys.color.font_secondary'))
     }
     .width('100%')
     .height(50)
@@ -89,10 +88,8 @@ export struct VideoSwiper {
   getLoadMoreDisplay() {
     Row() {
       LoadingProgress()
-        .width(40)
-        .height(60)
-        .aspectRatio(1)
-        .color(Color.White)
+        .size({ width:40, height:40 })
+        .color($r('sys.color.icon_secondary'))
       Text($r('app.string.loading'))
         .fontSize(14)
         .fontColor(Color.White)
@@ -141,14 +138,6 @@ export struct VideoSwiper {
         .indicator(false)
         .backgroundColor(Color.Black)
         .index($$this.currentVideoIndex)
-        .onGestureSwipe((index: number, extraInfo: SwiperAnimationEvent) => {
-          hilog.debug(0x0000, TAG, `onGestureSwipe index: ${index}, extraInfo: ${extraInfo}.`);
-        })
-        .onAnimationStart((index: number, targetIndex: number, extraInfo: SwiperAnimationEvent) => {
-          hilog.debug(0x0000, TAG,
-            `onAnimationStart index: ${index}, targetIndex: ${targetIndex}, extraInfo: ${extraInfo}.`);
-          this.currentVideoIndex = targetIndex;
-        })
         .onAnimationEnd((index: number, extraInfo: SwiperAnimationEvent) => {
           hilog.debug(0x0000, TAG, `onAnimationEnd index: ${index}, extraInfo: ${extraInfo}.`);
           if (index === this.videoPlayDataSource.totalCount() - 1) {

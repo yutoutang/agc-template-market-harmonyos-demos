@@ -31,7 +31,7 @@ export struct CommentInputDialog {
             .width('100%')
             .height(40)
             .backgroundColor('rgba(0, 0, 0, 0.05)')
-            .placeholderColor('rgba(0, 0, 0, 0.4)')
+            .placeholderColor($r('sys.color.font_secondary'))
             .placeholderFont({ size: 16 })
             .fontSize(16)
             .fontColor('#000')

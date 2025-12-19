@@ -6,11 +6,15 @@
     },
     {
       "name": "agcit_huawei_postpartum_care_center",
-      "value": "1.0.0"
+      "value": "1.0.1"
     },
     {
       "name": "agcittype_huawei_postpartum_care_center",
       "value": "industryTemplate"
+    },
+    {
+      "name": "agcitkid_huawei_postpartum_care_center",
+      "value": "agcit_huawei_postpartum_care_center_double_layer_tabs/1.0.0"
     }
   ]
 }

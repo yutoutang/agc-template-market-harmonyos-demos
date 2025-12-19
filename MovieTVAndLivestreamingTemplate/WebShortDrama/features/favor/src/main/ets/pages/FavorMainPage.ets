@@ -130,7 +130,6 @@ export struct FavorMainPage {
         .margin({ left: 8 })
         .height(40)
         .borderRadius(20)
-        .fontSize(16)
         .fontColor($r('sys.color.font_primary'))
         .backgroundColor($r('sys.color.comp_background_tertiary'))
         .onClick(() => {

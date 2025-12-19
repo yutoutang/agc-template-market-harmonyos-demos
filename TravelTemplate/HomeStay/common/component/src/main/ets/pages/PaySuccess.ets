@@ -7,10 +7,10 @@ export function PaySuccessBuilder() {
   PaySuccess();
 }
 
-@Component
+@ComponentV2
 export struct PaySuccess {
-  @Consume('mainPathStack') mainPathStack: NavPathStack;
-  @State type: number = 0;
+  @Consumer('mainPathStack') mainPathStack: NavPathStack = new NavPathStack();
+  @Local type: number = 0;
 
   back() {
     // 预订和详情页弹出栈

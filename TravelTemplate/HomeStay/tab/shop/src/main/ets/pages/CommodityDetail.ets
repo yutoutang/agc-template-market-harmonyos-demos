@@ -1,39 +1,52 @@
-import { Constants, NavPathName } from 'constant';
+import { common } from '@kit.AbilityKit';
 import { CounterComponent, CounterType, promptAction } from '@kit.ArkUI';
-import { SelectKeys } from '../model/Index';
+import { Constants, NavPathName } from 'constant';
 import { Commodity } from 'type';
-import { mapCommodityParam } from '../mapper/CommodityInfoMapper';
-import { Logger } from 'util';
-import { Basic } from '../components/Basic';
 import { TitleBar } from 'component';
-import { AccountUtil } from 'account';
+import { Logger, AccountUtil } from 'util';
+import { SelectKeys } from '../model/Index';
+import { mapCommodityParam } from '../mapper/CommodityInfoMapper';
+import { Basic } from '../components/Basic';
 
 @Builder
 export function CommodityDetailBuilder() {
   CommodityDetail();
 }
 
-@Component
+@ComponentV2
 export struct CommodityDetail {
-  @StorageLink('currentUser') currentUser: string | undefined = AccountUtil.getCurrentUser();
-  @State commodity: Commodity = new Commodity();
-  @State @Watch('onSelectKeysChange') selectKeys: SelectKeys = {
-    index: 0,
-    isSelected: false,
-  };
-  @Consume('mainPathStack') mainPathStack: NavPathStack;
-  private tabIndexArr: Array<number> = [0, 1];
-  @State isShow: boolean = false;
-  @State value: number = 1;
-  @State selectedSfc: string = '';
-  @State activeIndex: number = 0;
-  @State detailIndex: number = 0;
-  @State amount: number = 0;
+  @Local currentUser: string | undefined = AccountUtil.getUserId();
+  @Local commodity: Commodity = new Commodity();
+  @Local selectKeys: SelectKeys = new SelectKeys();
+  @Local isShow: boolean = false;
+  @Local value: number = 1;
+  @Local selectedSfc: string = '';
+  @Local activeIndex: number = 0;
+  @Local detailIndex: number = 0;
+  @Local amount: number = 0;
   scroller = new Scroller();
   detailScroller = new Scroller();
+  @Consumer('mainPathStack') mainPathStack: NavPathStack = new NavPathStack();
+  private tabIndexArr: number[] = [0, 1];
 
-  onSelectKeysChange() {
-    Logger.info('specification has changed' + this.selectedSfc);
+  @Monitor('selectKeys')
+  selectKeysChange(monitor: IMonitor) {
+    Logger.info('select key is ' + monitor.value());
+  }
+
+  aboutToAppear(): void {
+    (getContext(this) as common.UIAbilityContext).eventHub.on('reLogin',
+      (uid: string) => {
+        AccountUtil.setUserId(uid);
+        if (!AccountUtil.getAvatar()) {
+          AccountUtil.setAvatar($r('app.media.avatar'));
+          AccountUtil.setNickName('华为用户');
+        }
+      });
+  }
+
+  aboutToDisappear(): void {
+    (getContext(this) as common.UIAbilityContext).eventHub.off('reLogin');
   }
 
   @Builder
@@ -41,7 +54,7 @@ export struct CommodityDetail {
     Column() {
       Text(Constants.commodityFeatureTab[index].title)
         .fontColor(this.activeIndex === index ? $r('app.color.keyword_type_font_color') :
-        Color.Black)
+          Color.Black)
         .fontSize(14)
         .fontWeight(this.activeIndex === index ? 600 : 400)
         .enableDataDetector(this.activeIndex === index ? true : false);
@@ -61,10 +74,6 @@ export struct CommodityDetail {
   SpecificationBuilder() {
     Column() {
       Column() {
-        Row() {
-          Text(this.commodity.goodsName).fontSize(16).maxLines(2).fontWeight(500).width('80%');
-        }.height(80).alignItems(VerticalAlign.Center).width(Constants.FULL_SCREEN).padding({ left: 16, right: 16 });
-
         Divider().vertical(false);
 
         Column() {
@@ -129,6 +138,9 @@ export struct CommodityDetail {
               this.isShow = false;
               this.mainPathStack.pushPathByName(NavPathName.QUICK_LOGIN_PAGE, null, (popInfo: ESObject) => {
                 this.currentUser = popInfo.result;
+                AccountUtil.setUserId(popInfo.result);
+                (getContext(this) as common.UIAbilityContext).eventHub.emit('reLogin',
+                  popInfo.result);
                 Logger.info('quick login success');
               });
             } else {
@@ -227,8 +239,12 @@ export struct CommodityDetail {
               this.isShow = true;
             })
             .bindSheet($$this.isShow, this.SpecificationBuilder(), {
+              preferType: SheetType.CENTER,
               height: '60%',
               backgroundColor: Color.White,
+              title: {
+                title: this.commodity.goodsName
+              }
             });
         }
         .position({ y: '90%' })

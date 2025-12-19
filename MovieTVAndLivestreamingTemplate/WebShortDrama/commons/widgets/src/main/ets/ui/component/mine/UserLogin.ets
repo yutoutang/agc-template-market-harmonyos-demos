@@ -68,7 +68,7 @@ export struct UserLogin {
 
           Blank()
           Button(this.vm.userInfo.isVip ? getString('app.string.VIP_button') : getString('app.string.Non_VIP_button'))
-            .fontSize(14)
+            .fontSize($r('sys.float.Body_M'))
             .fontWeight(500)
             .fontColor($r('sys.color.font_primary'))
             .height(28)

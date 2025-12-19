@@ -9,12 +9,12 @@
     "personal": "file:../tab/personal",
     "home": "file:../tab/home",
     "map": "file:../tab/map",
-    "account": "file:../function/account",
     "shop": "file:../tab/shop",
-    "network": "file:../function/network",
+    "network": "file:../common/network",
     "type": "file:../common/type",
     "constant": "file:../common/constant",
     "component": "file:../common/component",
-    "travel_discovery": "file:../components/travel_discovery"
+    "travel_discovery": "file:../components/travel_discovery",
+    "util": "file:../common/util"
   }
 }

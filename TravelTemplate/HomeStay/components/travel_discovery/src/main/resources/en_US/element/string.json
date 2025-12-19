@@ -87,6 +87,10 @@
     {
       "name": "query_fail",
       "value": "请求失败，请联网重试"
+    },
+    {
+      "name": "agcit_huawei_home_stay",
+      "value": "1.0.4"
     }
   ]
 }

@@ -32,7 +32,7 @@ export class NewsContentVM extends BaseViewModel {
     this.rendNewsInfoList = rendNewsInfoList
     this.resource = resource
     this.isRefreshing = true
-    emitter.on('follow_recommend_fresh',() => {
+    emitter.on('follow_recommend_fresh', () => {
       this.refresh()
     })
   }
@@ -59,6 +59,7 @@ export class NewsContentVM extends BaseViewModel {
        * */
       newsInfoList.forEach(item => {
         item.extraInfo.isFollow = true
+        item.extraInfo.isNeedAuthor = false
       })
     }
     let list = this.rendNewsInfoList.find(item => item.id === resource)
@@ -76,7 +77,11 @@ export class NewsContentVM extends BaseViewModel {
       this.currentIndex += 5
       let newsInfoList: RequestListData[] =
         await HomeServiceApi.queryNextPageData(this.resource, this.currentIndex, this.currentPage);
-      newsInfoList.forEach(item => newsList.pushData(item))
+      if (!newsInfoList.length) {
+        this.emptyToast()
+      } else {
+        newsInfoList.forEach(item => newsList.pushData(item))
+      }
       this.isLoading = false
     } else {
       this.isLoading = false;
@@ -122,15 +127,22 @@ export class NewsContentVM extends BaseViewModel {
     }
   }
 
+  public emptyToast() {
+    promptAction.showToast({
+      message: '暂无更新数据',
+      alignment: Alignment.Bottom,
+    })
+  }
+
   public throttle(func: Function, interval: number) {
     let lastTime = 0;
     return () => {
       const nowTime = Date.now();
       const remainTime = interval - (nowTime - lastTime);
       if (remainTime <= 0) {
-        lastTime = nowTime; func();
+        lastTime = nowTime;
+        func();
       }
     };
   }
-
 }

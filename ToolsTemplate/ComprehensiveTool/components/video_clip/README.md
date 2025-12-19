@@ -37,7 +37,6 @@
 
 ### 权限
 
-* 媒体写入权限：ohos.permission.WRITE_MEDIA
 * 网络权限：ohos.permission.INTERNET
 
 ### 限制

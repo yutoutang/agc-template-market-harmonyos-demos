@@ -52,16 +52,15 @@ const STORE_LIST : StoreModel[] = [
     $r('app.media.store_pic1'), '无锡', 31.52, 120.45),
 ];
 
-@Entry
-@Preview
 @ComponentV2
 export struct Home {
   vm: MainEntryVM = MainEntryVM.instance;
+  uiContext: UIContext = this.getUIContext() as UIContext;
 
   aboutToAppear(): void {
     this.vm.storeList.storeList = STORE_LIST;
     this.vm.storeListNearby.storeList = STORE_LIST;
-    this.vm.requestLocationPermission();
+    this.vm.requestLocationPermission(this.uiContext);
   }
 
   build() {

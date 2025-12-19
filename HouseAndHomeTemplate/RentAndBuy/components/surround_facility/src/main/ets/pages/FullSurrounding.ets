@@ -15,10 +15,10 @@ export struct FullSurrounding {
   @Local isShow: boolean = true;
   @Local isMinSheet: boolean = false;
   sheetHeight: number = 400;
-  private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+  private context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
 
   aboutToAppear(): void {
-    this.vm.getFullSurroundFacilityList();
+    this.vm.getFullSurroundFacilityList(this.context);
     this.context.eventHub.on('point-click', () => {
       this.isShow = true;
     });
@@ -129,6 +129,7 @@ export struct FullSurrounding {
 
         TitleBar({ title: '完整配套', stack: this.vm.stack }).alignSelf(ItemAlign.Start);
       }.bindSheet($$this.isShow, this.facilitySheetBuilder(), {
+        preferType: SheetType.CENTER,
         dragBar: true,
         showClose: false,
         detents: [this.sheetHeight, 124],

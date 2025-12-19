@@ -41,7 +41,7 @@ struct Tools {
           .borderRadius(16)
         }
         .onClick(() => {
-          RouterModule.replace({ 'url': RouterMap.AREA_CALCULATE })
+          RouterModule.push({ 'url': RouterMap.AREA_CALCULATE })
         })
         .padding({
           left:16,
@@ -61,7 +61,7 @@ struct Tools {
           .borderRadius(16)
         }
         .onClick(() => {
-          RouterModule.replace({ 'url': RouterMap.RULER })
+          RouterModule.push({ 'url': RouterMap.RULER })
         })
         .padding({
           left:16,

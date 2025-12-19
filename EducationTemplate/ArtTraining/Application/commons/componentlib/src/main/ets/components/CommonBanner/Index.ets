@@ -52,12 +52,9 @@ export struct CommonBanner {
       .interval(3500)
       .indicator(this.covers && this.covers.length > 1 ?
       new DotIndicator()
-        .color('#80FFFFFF')
+        .color($r('sys.color.comp_background_secondary'))
         .selectedColor($r('sys.color.navigation_drag_bar_item_default'))
-        .itemWidth(4)
-        .itemHeight(4)
-        .selectedItemWidth(12)
-        .selectedItemHeight(4) :
+        .selectedItemWidth(12):
         false,
       )
       .loop(true)

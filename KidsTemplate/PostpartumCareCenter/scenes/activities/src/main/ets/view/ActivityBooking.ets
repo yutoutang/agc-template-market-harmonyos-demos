@@ -21,6 +21,7 @@ export function ActivityBookingBuilder() {
 struct ActivityBooking {
   vm: ActivityEntryVM = ActivityEntryVM.instance;
   mainVm: MainEntryVM = MainEntryVM.instance;
+  uiContext: UIContext = this.getUIContext() as UIContext;
   @Local activity: ActivityModel | null = null;
   @Local activityBookingRecord: ActivityBookingRecordModel | null = null;
 
@@ -69,13 +70,13 @@ struct ActivityBooking {
               placeholder: $r('app.string.booking_name_input'),
             })
               .height(48)
-              .fontSize($r('app.string.font_size_16'))
+              .fontSize($r('sys.float.Body_L'))
               .fontFamily('HarmonyHeiTi')
               .fontWeight(FontWeight.Regular)
               .fontColor('rgba(0,0,0,0.90)')
-              .placeholderColor('rgba(0,0,0,0.40)')
+              .placeholderColor($r('sys.color.font_secondary'))
               .placeholderFont({
-                size: $r('app.string.font_size_16'),
+                size: $r('sys.float.Body_L'),
                 family: 'HarmonyHeiTi',
                 weight: FontWeight.Regular,
               })
@@ -94,8 +95,8 @@ struct ActivityBooking {
             Divider()
               .margin({ bottom: $r('app.string.margin_ms') })
               .padding({ left: $r('app.string.padding_6'), right: $r('app.string.padding_6') })
-              .color('rgba(0,0,0,0.20)')
-              .strokeWidth(1);
+              .color($r('sys.color.comp_divider'))
+              .strokeWidth('1px');
 
             Row() {
               Text($r('app.string.booking_must'))
@@ -117,13 +118,13 @@ struct ActivityBooking {
               text: this.mainVm.userInfo.phone
             })
               .height(48)
-              .fontSize($r('app.string.font_size_16'))
+              .fontSize($r('sys.float.Body_L'))
               .fontFamily('HarmonyHeiTi')
               .fontWeight(FontWeight.Regular)
               .fontColor('rgba(0,0,0,0.90)')
-              .placeholderColor('rgba(0,0,0,0.40)')
+              .placeholderColor($r('sys.color.font_secondary'))
               .placeholderFont({
-                size: $r('app.string.font_size_16'),
+                size: $r('sys.float.Body_L'),
                 family: 'HarmonyHeiTi',
                 weight: FontWeight.Regular,
               })
@@ -140,8 +141,8 @@ struct ActivityBooking {
             Divider()
               .margin({ bottom: $r('app.string.margin_ms') })
               .padding({ left: $r('app.string.padding_6'), right: $r('app.string.padding_6') })
-              .color('rgba(0,0,0,0.20)')
-              .strokeWidth(1);
+              .color($r('sys.color.comp_divider'))
+              .strokeWidth('1px');
           }
           .padding({ left: $r('app.string.padding_10'), right: $r('app.string.padding_10') });
         };
@@ -149,7 +150,7 @@ struct ActivityBooking {
         Column() {
           Button({ type: ButtonType.Normal, stateEffect: true }) {
             Text($r('app.string.submit_immediately'))
-              .fontSize($r('app.string.font_size_16'))// 设置字号为16
+              .fontSize($r('sys.float.Body_L'))// 设置字号为16
               .fontFamily('HarmonyHeiTi')
               .fontWeight(FontWeight.Medium)
               .fontColor('#FFFFFF');
@@ -164,11 +165,11 @@ struct ActivityBooking {
           .margin({ top: $r('app.string.margin_xl') })
           .onClick(() => {
             if (!CommonUtil.isStringValid(this.activityBookingRecord?.userName)) {
-              promptAction.showToast({ message: '请输入姓名', alignment: Alignment.Center });
+              this.uiContext.getPromptAction().showToast({ message: '请输入姓名', alignment: Alignment.Center });
               return;
             }
             if (!CommonUtil.isStringValid(this.mainVm.userInfo.phone)){
-              promptAction.showToast({ message: '请关联手机号', alignment: Alignment.Center });
+              this.uiContext.getPromptAction().showToast({ message: '请关联手机号', alignment: Alignment.Center });
               return;
             }
             if (this.activityBookingRecord != null) {
@@ -178,7 +179,7 @@ struct ActivityBooking {
             if(this.mainVm.getActivityBookingRec().find(rec =>
             rec.phone === this.activityBookingRecord?.phone &&
               rec.activity?.id ===this.activityBookingRecord.activity?.id)){
-              promptAction.showToast({
+              this.uiContext.getPromptAction().showToast({
                 message: `手机号【${this.activityBookingRecord?.phone}】已预约该活动，请重新选择活动或修改信息`,
                 alignment: Alignment.Center,
               });

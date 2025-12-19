@@ -57,7 +57,7 @@ export struct SetUpPage {
 
   @Builder
   line() {
-    Divider().strokeWidth(0.5).width('100%').color($r('sys.color.comp_divider')).padding({ left: 12, right: 12 })
+    Divider().strokeWidth('1px').width('100%').color($r('sys.color.comp_divider')).padding({ left: 12, right: 12 })
   }
 
   @Builder
@@ -252,7 +252,7 @@ struct Speed {
           })
 
           Divider()
-            .strokeWidth(0.5)
+            .strokeWidth('1px')
             .color($r('sys.color.mask_fourth'))
             .margin({ bottom: 16 })
         }

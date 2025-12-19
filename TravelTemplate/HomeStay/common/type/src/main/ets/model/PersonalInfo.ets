@@ -1,30 +1,11 @@
+@ObservedV2
 export class PersonalInfo {
-  id: number;
-  openId: string;
-  nickName: string;
-  gender: number;
-  birthday: string;
-  phone: string;
-  avatar: ResourceStr;
-  appId: string;
-
-  constructor(
-    id: number = 0,
-    openId: string = '',
-    nickName: string = '',
-    gender: number = 0,
-    birthday: string = '',
-    phone: string = '',
-    avatar: ResourceStr = '',
-    appId: string = '',
-  ) {
-    this.id = id;
-    this.openId = openId;
-    this.nickName = nickName;
-    this.gender = gender;
-    this.birthday = birthday;
-    this.phone = phone;
-    this.avatar = avatar;
-    this.appId = appId;
-  }
+  @Trace id: number = 0;
+  @Trace uid: string = '';
+  @Trace openId: string = '';
+  @Trace nickName: string = '';
+  @Trace gender: number = 0;
+  @Trace birthday: string = '1970-01-01';
+  @Trace phone: string = '';
+  @Trace avatar: ResourceStr = '';
 }

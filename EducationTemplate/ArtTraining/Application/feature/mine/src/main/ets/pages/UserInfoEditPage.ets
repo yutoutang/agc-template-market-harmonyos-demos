@@ -176,12 +176,10 @@ function titleStyle() {
 
 @Extend(TextInput)
 function textInputStyle() {
-  .placeholderColor($r('app.color.font_color_level2'))
-  .placeholderFont({ size: $r('app.string.font_size_14') })
+  .placeholderColor($r('sys.color.font_secondary'))
   .backgroundColor($r('app.color.system_color_background_white'))
   .width(150)
   .textAlign(TextAlign.End)
-  .fontSize($r('app.string.font_size_14'))
   .fontColor($r('app.color.font_color_level1'))
   .padding({ right: $r('app.string.padding_xs') })
   .margin(0);

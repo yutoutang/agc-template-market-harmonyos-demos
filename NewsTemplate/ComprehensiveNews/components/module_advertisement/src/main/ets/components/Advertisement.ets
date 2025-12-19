@@ -46,6 +46,8 @@ export struct AdvertisementComponent {
     // 是否静音
     mute: true,
   };
+  @Local translateX: string = '-100%'
+  @Local adOpen: boolean = false
 
   aboutToAppear(): void {
     requestOAID(this.context).then((data) => {
@@ -81,34 +83,67 @@ export struct AdvertisementComponent {
   private bannerAd() {
     if (this.visibilityState) {
       Row() {
-        AutoAdComponent({
-          adParam: this.adRequestParams,
-          adOptions: this.adOptions,
-          displayOptions: this.adDisplayOptions,
-          interactionListener: {
-            onStatusChanged: (status: string, ad: advertising.Advertisement, data: string) => {
-              switch (status) {
-                case AdStatus.AD_OPEN:
-                  hilog.info(0x0000, 'testTag', `Status is onAdOpen${JSON.stringify(ad)},data:${data}`);
-                  break;
-                case AdStatus.AD_CLICKED:
-                  hilog.info(0x0000, 'testTag', 'Status is onAdClick');
-                  break;
-                case AdStatus.AD_CLOSED:
-                  hilog.info(0x0000, 'testTag', 'Status is onAdClose');
-                  this.visibilityState = false;
-                  break;
-                case AdStatus.AD_LOAD:
-                  hilog.info(0x0000, 'testTag', 'Status is onAdLoad');
-                  break;
-                case AdStatus.AD_FAIL:
-                  hilog.error(0x0000, 'testTag', 'Status is onAdFail');
-                  this.visibilityState = false;
-                  break;
-              }
+        Stack() {
+          AutoAdComponent({
+            adParam: this.adRequestParams,
+            adOptions: this.adOptions,
+            displayOptions: this.adDisplayOptions,
+            interactionListener: {
+              onStatusChanged: (status: string, ad: advertising.Advertisement, data: string) => {
+                switch (status) {
+                  case AdStatus.AD_OPEN:
+                    hilog.info(0x0000, 'testTag', `Status is onAdOpen${JSON.stringify(ad)},data:${data}`);
+                    this.adOpen = true
+                    break;
+                  case AdStatus.AD_CLICKED:
+                    hilog.info(0x0000, 'testTag', 'Status is onAdClick');
+                    break;
+                  case AdStatus.AD_CLOSED:
+                    hilog.info(0x0000, 'testTag', 'Status is onAdClose');
+                    this.visibilityState = false;
+                    break;
+                  case AdStatus.AD_LOAD:
+                    hilog.info(0x0000, 'testTag', 'Status is onAdLoad');
+                    break;
+                  case AdStatus.AD_FAIL:
+                    hilog.error(0x0000, 'testTag', 'Status is onAdFail');
+                    this.visibilityState = false;
+                    break;
+                }
+              },
             },
-          },
-        })
+          })
+          Stack() {
+            Text()
+              .width('100%')
+              .height(100)
+              .backgroundColor($r('sys.color.background_secondary'))
+
+            Text()
+              .width('100%')
+              .height(100)
+              .translate({ x: this.translateX })
+              .onAppear(() => {
+                this.translateX = '100%'
+              })
+              .animation({
+                duration: 1500,
+                iterations: -1,
+              })
+              .linearGradient({
+                angle: 90,
+                colors: [
+                  ['rgba(255,255,255,0)', 0],
+                  ['rgba(255,255,255,1)', 0.5],
+                  ['rgba(255,255,255,0)', 1],
+                ],
+              })
+          }
+          .width('100%')
+          .height(100)
+          .clip(true)
+          .visibility(this.adOpen ? Visibility.None : Visibility.Visible)
+        }
       }
       .width('100%')
       .aspectRatio(this.ratio)

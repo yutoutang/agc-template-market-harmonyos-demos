@@ -75,7 +75,7 @@ export struct HouseCard {
 
   build() {
     Row({ space: 14 }) {
-      Image(CommonUtils.handleImgUrl(this.houseOptions.house.thumbnail))
+      Image(CommonUtils.handleImgUrl(this.houseOptions.house.thumbnail, this.getUIContext().getHostContext()!))
         .size({ height: 122, width: 120 })
         .borderRadius({ topLeft: 16, bottomLeft: 16 })
         .autoResize(true);
@@ -152,7 +152,7 @@ export struct HouseCard {
     .backgroundColor($r('sys.color.white'))
     .width(Constant.FULL_PERCENT)
     .onClick(() => {
-      (getContext(this) as common.UIAbilityContext).eventHub.emit(EventEmitName.INIT_MAP,
+      (this.getUIContext().getHostContext() as common.UIAbilityContext).eventHub.emit(EventEmitName.INIT_MAP,
         this.houseOptions.house.latitude, this.houseOptions.house.longitude);
       this.recordHistory();
       RouterModule.push({

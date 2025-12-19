@@ -90,7 +90,7 @@ export struct HouseSearch {
               .fontColor($r('sys.color.black'));
           }.width(Constant.FULL_PERCENT).justifyContent(FlexAlign.SpaceBetween);
         }.onClick(() => {
-          (getContext(this) as common.UIAbilityContext).eventHub.emit(EventEmitName.INIT_MAP,
+          (this.getUIContext().getHostContext() as common.UIAbilityContext).eventHub.emit(EventEmitName.INIT_MAP,
             item.latitude, item.longitude);
           this.recordHistory(item.houseId);
           RouterModule.push({
@@ -110,9 +110,7 @@ export struct HouseSearch {
       Column() {
         TitleBar({ title: '搜索' });
         Column() {
-          Search({ value: this.keyword, placeholder: '请输入关键字搜索' }).placeholderColor($r('sys.color.black')).searchIcon({
-            src: $r('sys.media.ohos_ic_public_search_filled')
-          }).searchButton('搜索', {
+          Search({ value: this.keyword, placeholder: '请输入关键字搜索' }).searchButton('搜索', {
             fontSize: 14,
           }).onSubmit((value: string) => {
             this.keyword = value;

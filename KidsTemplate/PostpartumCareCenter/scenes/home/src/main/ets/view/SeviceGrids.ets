@@ -2,7 +2,6 @@ import { MainEntryVM } from '@ohos_agcit/postpartum_care_center_uicomponents';
 import { SERVICE_LIST } from '../constants/Constants';
 import { ServiceGridItem } from '../model/ServiceGridItem';
 
-@Preview
 @ComponentV2
 export struct ServiceGrids {
   vm: MainEntryVM = MainEntryVM.instance;

@@ -64,8 +64,9 @@ export class Utils {
     return cityGroupList.map(v => v.name);
   }
 
-  static applyLocationPermission(): Promise<string> {
+  static applyLocationPermission(context: Context): Promise<string> {
     return new Promise((resolve) => {
+      SystemSceneUtils.context = context as common.UIAbilityContext;
       SystemSceneUtils.applyLocationPermission().then((isGranted) => {
         if (isGranted) {
           SystemSceneUtils.getCurrentCityInfo().then((city: string) => {
@@ -84,7 +85,7 @@ export class Utils {
  */
 export class SystemSceneUtils {
   static isApplyLocPermAgain: boolean = false;
-  static context: Context = getContext() as common.UIAbilityContext;
+  static context: Context;
 
   /**
    * 检查用户是否授权
@@ -130,9 +131,6 @@ export class SystemSceneUtils {
     if (isGrantedAppLo) {
       Logger.info('already granted location and approximate location permissions')
       return true;
-    }
-    if (!SystemSceneUtils.context) {
-      SystemSceneUtils.context = getContext() as common.UIAbilityContext;
     }
     // 向用户申请
     const atManager = abilityAccessCtrl.createAtManager();

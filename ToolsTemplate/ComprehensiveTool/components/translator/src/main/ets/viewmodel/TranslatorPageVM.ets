@@ -34,8 +34,6 @@ export class TranslatorPageVM {
         this.inputText)
     if (this.translatorRes) {
       this.history.addHistory(new HistoryInfo(util.generateRandomUUID(false), this.inputText, this.translatorRes))
-    } else {
-      promptAction.showToast({ message: '暂不支持！' })
     }
   }
 

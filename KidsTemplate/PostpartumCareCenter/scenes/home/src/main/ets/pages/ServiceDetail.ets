@@ -9,6 +9,7 @@ export function ServiceDetailBuilder() {
 @ComponentV2
 struct ServiceDetail {
   vm: MainEntryVM = MainEntryVM.instance;
+  uiContext: UIContext = this.getUIContext() as UIContext;
   @Local message: string = '';
   @Local screenWidth: number = 0;
 
@@ -27,12 +28,12 @@ struct ServiceDetail {
               .startPoint([0,0])
               .endPoint([50,0]) // 线段长度50vp
               .stroke(Color.Black)
-              .strokeWidth(1)
+              .strokeWidth('1px')
               .margin({ right: 10 }) // 与Text的间距
 
             // 居中文字
             Text('新科研护理模式')
-              .fontSize($r('app.string.font_size_16'))
+              .fontSize($r('sys.float.Body_L'))
               .fontFamily('HarmonyHeiTi')
               .fontWeight(FontWeight.Medium)
               .fontColor('#000000')
@@ -44,7 +45,7 @@ struct ServiceDetail {
               .startPoint([0,0])
               .endPoint([50,0]) // 线段长度50vp
               .stroke(Color.Black)
-              .strokeWidth(1)
+              .strokeWidth('1px')
               .margin({ left: 10 }) // 与Text的间距
           }
           .width('100%')
@@ -119,7 +120,7 @@ struct ServiceDetail {
     .onReady((context: NavDestinationContext) => {
       this.message = context.pathInfo.param as string;
       const displayClass = display.getDefaultDisplaySync();
-      this.screenWidth = px2vp(displayClass.width);
+      this.screenWidth = this.uiContext.px2vp(displayClass.width);
     });
   }
 }

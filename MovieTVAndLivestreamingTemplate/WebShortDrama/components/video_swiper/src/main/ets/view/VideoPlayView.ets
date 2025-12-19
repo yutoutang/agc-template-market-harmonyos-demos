@@ -84,6 +84,24 @@ export struct VideoPlayView {
   private xComponentId: string = 'XComponentId' + this.componentId;
   playerSession: PlaySession = new PlaySession()
 
+  @Monitor('avPlayer.videoHeight','avPlayer.videoWidth')
+  ratioChange(monitor: IMonitor) {
+    monitor.dirty.forEach((path: string) => {
+      switch (path) {
+        case 'avPlayer.videoHeight':
+          this.videoHeight = monitor.value(path)?.now as number
+          this.autoVideoSize()
+          console.info(`触发监听器，修改高${this.videoHeight}`)
+          break;
+        case 'avPlayer.videoWidth':
+          this.videoWidth = monitor.value(path)?.now as number
+          this.autoVideoSize()
+          console.info(`触发监听器，修改宽${this.videoWidth}`)
+          break;
+      }
+    })
+  }
+
   aboutToDisappear(): void {
     hilog.info(0x0000, TAG,
       `aboutToDisappear curIndex: ${this.curIndex}, index: ${this.index}, isPageShow: ${this.isPageShow}.`);
@@ -164,7 +182,7 @@ export struct VideoPlayView {
           .id(this.componentId)
           .width(this.layoutSize.playerWidth)
           .height(this.layoutSize.playerHeight)
-          .position({ y: this.layoutSize.playerPositionY })
+          .position({ x: this.layoutSize.playerPositionX, y: this.layoutSize.playerPositionY })
           .onSizeChange(() => {
             hilog.info(0x0000, TAG,
               `onSizeChange.`);

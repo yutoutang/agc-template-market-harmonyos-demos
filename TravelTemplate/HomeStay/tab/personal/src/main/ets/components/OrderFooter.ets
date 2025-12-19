@@ -1,14 +1,14 @@
 import { Constants, OrderTabBarType } from 'constant';
 import { Order } from 'type';
-import { updateOrder } from 'util';
+import { AppStorageBank } from 'util';
 import { OrderPageVM } from '../viewmodel/OrderPageVM';
 
-@Component
+@ComponentV2
 export struct OrderFooter {
   vm: OrderPageVM = OrderPageVM.instance;
-  @Prop order: Order;
-  @Consume('orderTabIndex') orderTabIndex: number;
-  @Consume('mainPathStack') mainPathStack: NavPathStack;
+  @Param @Require order: Order;
+  @Consumer('orderTabIndex') orderTabIndex: number = 0;
+  @Consumer('mainPathStack') mainPathStack: NavPathStack = new NavPathStack();
 
   build() {
     Row() {
@@ -28,7 +28,7 @@ export struct OrderFooter {
             }
           }));
           // 更新到AppStorage
-          updateOrder(this.vm.orderList);
+          AppStorageBank.updateOrder(this.vm.orderList);
           this.mainPathStack.pop(this.order);
         });
 
@@ -49,7 +49,7 @@ export struct OrderFooter {
             }
           }));
           // 更新到AppStorage
-          updateOrder(this.vm.orderList);
+          AppStorageBank.updateOrder(this.vm.orderList);
           this.mainPathStack.pop(this.order);
         });
     }.width(Constants.FULL_SCREEN).justifyContent(FlexAlign.Center);

@@ -186,7 +186,7 @@ export class ARMeasureVM {
     });
   }
 
-  saveMeasureRecord() {
+  save() {
     if (this.volumeData.length) {
       this.measureHistory.list.unshift({
         type: this.semanticDenseMode,
@@ -201,8 +201,17 @@ export class ARMeasureVM {
         time: new Date(),
       });
     }
+  }
+
+  saveMeasureRecord() {
+    this.save();
     // 清空测量数据
     this.volumeData = [];
     this.spaceData = [];
+    this.hasMeasured = false;
+  }
+
+  saveManually() {
+    this.save();
   }
 }

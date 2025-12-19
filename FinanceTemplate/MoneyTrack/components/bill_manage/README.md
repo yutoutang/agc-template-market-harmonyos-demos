@@ -31,12 +31,16 @@
 * 设备类型：华为手机（包括双折叠和阔折叠）
 * 系统版本：HarmonyOS 5.0.2(14)及以上
 
+### 权限
+
+无
+
 
 ## 快速入门
 
 1. 安装组件。
 
-   如果是在DevEvo Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
+   如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
 
    如果是从生态市场下载组件，请参考以下步骤安装组件。
 
@@ -287,6 +291,7 @@ struct ResourceManageSheetExample1 {
             title: { title: '分类管理' },
             detents: [SheetSize.FIT_CONTENT],
             backgroundColor: '#fff',
+            preferType:SheetType.CENTER,
           },
         );
     }
@@ -301,7 +306,8 @@ struct ResourceManageSheetExample1 {
           this.showResourceSheet = true;
         },
       }), {
-        title: { title: '选择资产类型' },
+        title: { title: '账单类型' },
+        preferType:SheetType.BOTTOM,
         detents: [SheetSize.FIT_CONTENT],
       });
   }

@@ -1,16 +1,23 @@
-# 母婴(月子中心)行业模板
+# 母婴（月子中心）应用模板快速入门
 
 ## 目录
 
 - [功能介绍](#功能介绍)
-- [环境要求](#环境要求)
+- [约束与限制](#约束与限制)
 - [快速入门](#快速入门)
 - [示例效果](#示例效果)
-- [权限要求](#权限要求)
 - [开源许可协议](#开源许可协议)
 
 
 ## 功能介绍
+
+您可以基于此模板直接定制应用，也可以挑选此模板中提供的多种组件使用，从而降低您的开发难度，提高您的开发效率。
+
+本模板提供如下组件，所有组件存放在工程根目录的components下，如果您仅需使用组件，可参考对应组件的指导链接；如果您使用此模板，请参考本文档。
+
+| 组件                        | 描述                                                         | 使用指导                                          |
+|---------------------------| ------------------------------------------------------------ | ------------------------------------------------- |
+| 双层嵌套标签页组件（double_layer_tabs） | 本组件使用系统Tabs组件，提供了双层嵌套标签页的功能。 | [使用指导](./components/double_layer_tabs/README.md) |
 
 本模板为母婴行业（月子中心）类应用提供了常用功能的开发样例，模板主要分为首页、门店、活动和我的四大模块：
 
@@ -25,9 +32,9 @@
 本模板已集成华为账号、地图等服务，只需做少量配置和定制即可快速实现华为账号的登录、定位导航和预约门店、活动等功能。
 
 
-| 首页                         | 门店                         | 活动                         | 我的                         |
-|----------------------------|----------------------------|----------------------------|----------------------------|
-| ![首页](screenshots/首页.jpeg) | ![门店](screenshots/门店.jpeg) | ![活动](screenshots/活动.jpeg) | ![我的](screenshots/我的.jpeg) |
+| 首页                        | 门店                        | 活动                         | 我的                         |
+|---------------------------|---------------------------|----------------------------|----------------------------|
+| ![首页](screenshots/活动.png) | ![门店](screenshots/门店.png) | ![活动](screenshots/活动.png) | ![我的](screenshots/我的.png) |
 
 
 
@@ -98,7 +105,7 @@
 
 ```ts
 postpartum_care_center
-  ├─components/uicomponents/src/main
+  ├─commons/uicomponents/src/main
   │  ├─ets
   │  │  ├─components
   │  │  │      AssociatePhone.ets            // 手机号关联组件
@@ -114,8 +121,6 @@ postpartum_care_center
   │  │  │      Constants.ets                 // 公共常量
   │  │  │
   │  │  ├─model
-  │  │  │      ActivityTypeItem.ets          // 活动数据模型
-  │  │  │      CityItem.ets                  // 城市数据模型
   │  │  │      StoreBookingRecordItem.ets    // 门店预约记录模型
   │  │  │      StoreListClass.ets            // 门店列表类
   │  │  │      StoreModel.ets                // 门店数据模型
@@ -124,7 +129,7 @@ postpartum_care_center
   │  │          MainEntryVM.ets              // 公共VM层                                   
   │  └─resources  
   │
-  ├─components/utils/src/main
+  ├─commons/utils/src/main
   │  ├─ets
   │  │  ├─constants
   │  │  │      CommonContants.ets            // 公共常量
@@ -150,7 +155,19 @@ postpartum_care_center
   │  │          RouterModule.ets             // 路由模块
   │  │                                       
   │  └─resources                             
-  │                                                                                
+  │                
+  ├─components/double_layer_tabs/src/main
+  │   ├─ets
+  │      │─components
+  │      │      ActivityCard.ets              // 活动卡片组件
+  │      │      ActivityList.ets              // 活动列表组件
+  │      │      DoubleLayerTabs.ets           // 双层标签页组件
+  │      │
+  │      └─model
+  │             ActivityCardModel.ets         // 活动数据模型
+  │             ActivityTypeItem.ets          // 活动类别模型
+  │             CityItem.ets                  // 城市类别模型
+  │                                                               
   │─products/src/main                           
   │  ├─ets   
   │  │  ├─contants
@@ -175,9 +192,7 @@ postpartum_care_center
   │  │  ├─view                          
   │  │  │      ActivityBooking.ets           // 活动预约报名 
   │  │  │      ActivityBookingSuccess.ets    // 活动预约报名成功
-  │  │  │      ActivityCard.ets              // 活动卡片组件
   │  │  │      ActivityDetail.ets            // 活动详情组件
-  │  │  │      ActivityList.ets              // 活动列表组件                             
   │  │  │
   │  │  └─viewmodel                           
   │  │          ActivityEntryVM.ets          // 活动页面VM
@@ -225,9 +240,6 @@ postpartum_care_center
      ├─ets                                    
      │  ├─constants                              
      │  │      Constants.ets                 // 常量 
-     │  │                                    
-     │  ├─model                          
-     │  │      CityItem.ets                  // 城市数据模型 
      │  │                                     
      │  ├─pages                               
      │  │      Stores.ets                    // 门店页面
@@ -240,68 +252,55 @@ postpartum_care_center
 
 
 
-## 环境要求
-
-### 软件
-* DevEco Studio版本：DevEco Studio 5.0.0 Release及以上
-* HarmonyOS SDK版本：HarmonyOS 5.0.0 Release SDK及以上
-### 硬件
-* 设备类型：华为手机（直板机）
-* HarmonyOS版本：HarmonyOS 5.0.0 Release及以上
-
-
+## 约束与限制
+### 环境
+* DevEco Studio版本：DevEco Studio 5.0.3 Release及以上
+* HarmonyOS SDK版本：HarmonyOS 5.0.3 Release SDK及以上
+* 设备类型：华为手机（包括双折叠和阔折叠）
+* 系统版本：HarmonyOS 5.0.3(15)及以上
+### 权限
+* 获取位置权限：ohos.permission.APPROXIMATELY_LOCATION，ohos.permission.LOCATION
+* 网络权限：ohos.permission.INTERNET
+* 日历日程权限：ohos.permission.READ_CALENDAR，ohos.permission.WRITE_CALENDAR
 
 ## 快速入门
 ###  配置工程
 在运行此模板前，需要完成以下配置：
 
-1. 在DevEco Studio中打开此模板。
+1. 在AppGallery Connect创建应用，将包名配置到模板中。
 
-2. 在AppGallery Connect创建应用，将包名配置到模板中。
-
-   a. 参考[创建应用](https://developer.huawei.com/consumer/cn/doc/app/agc-help-createharmonyapp-0000001945392297)为应用创建APPID，并进行关联。
+   a. 参考[创建HarmonyOS应用](https://developer.huawei.com/consumer/cn/doc/app/agc-help-create-app-0000002247955506)为应用创建APP ID，并将APP ID与应用进行关联。
 
    b. 返回应用列表页面，查看应用的包名。
 
    c. 将模板工程根目录下AppScope/app.json5文件中的bundleName替换为创建应用的包名。
 
-3. 配置华为账号服务。
+2. 配置华为账号服务。
 
-   a. 将应用的client ID配置到phone模块的module.json5文件，详细参考：[配置Client ID](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-client-id)。
+   a. 将应用的client ID配置到products/phone模块的src/main/module.json5文件，详细参考：[配置Client ID](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-client-id)。
 
-   b. [申请调试证书](https://developer.huawei.com/consumer/cn/doc/app/agc-help-add-debugcert-0000001914263178)，用于配置公钥指纹和调试时对应用签名。
+   b. 申请华为账号一键登录所需的权限，详细参考：[申请账号权限](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-config-permissions)。
 
-   c. 添加公钥指纹，详细参考：[配置应用证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-signature-info-0000001628566748#section5181019153511)。
+3. 配置地图服务。
 
-   d. 如需获取用户真实手机号，需要申请phone权限，详细参考：[配置scope权限](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-config-permissions)，并在端侧使用快速验证手机号码Button进行[验证获取手机号码](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-get-phonenumber)。
-
-4. 配置地图服务。
-
-   a. 将应用的client ID配置到phone模块的module.json5文件，如果华为账号服务已配置，可跳过此步骤。
+   a. 将应用的client ID配置到products/phone模块的src/main/module.json5文件，如果华为账号服务已配置，可跳过此步骤。
 
    b. 添加公钥指纹，如果华为账号服务已配置，可跳过此步骤。
 
    c. [开通地图服务](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/map-config-agc)。
+4. 为应用进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing#section297715173233)。
+5. 添加手工签名所用证书对应的公钥指纹，详细参考：[配置公钥指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-cert-fingerprint-0000002278002933)。
 
 ### 定制说明
 建议在用户未登录状态下允许查看门店、活动，门店预约、活动预约功能须先跳转登录页面登录成功后才能操作。跳转登录功能可参考QuickLoginPage.ets文件中的实现。
 
-###  运行调试工程
+### 运行调试工程
 1. 连接调试手机和PC。
 
-2. 对应用签名：由于模板中集成了华为账号、地图等服务，所以需要采用[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides-V5/ide-signing-V5#section297715173233)。
-
-3. 菜单选择“Run > Run 'phone' ”或者“Run > Debug 'phone' ”，运行或调试模板工程。
-
+2. 菜单选择“Run > Run 'phone' ”或者“Run > Debug 'phone' ”，运行或调试模板工程。
 
 ## 示例效果
 -  [功能展示录屏](./screenshots/功能展示.mp4)
-
-## 权限要求
-
-* 获取位置权限：ohos.permission.APPROXIMATELY_LOCATION，ohos.permission.LOCATION
-* 网络权限：ohos.permission.INTERNET
-* 日历日程权限：ohos.permission.READ_CALENDAR，ohos.permission.WRITE_CALENDAR
 
 ## 开源许可协议
 

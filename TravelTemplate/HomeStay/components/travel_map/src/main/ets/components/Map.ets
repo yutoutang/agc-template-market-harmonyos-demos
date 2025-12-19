@@ -2,9 +2,9 @@ import { map, mapCommon, MapComponent } from '@kit.MapKit';
 import { AsyncCallback } from '@kit.BasicServicesKit';
 import { TravelMapOptions } from '../model/Index';
 
-@Component
+@ComponentV2
 export struct CommonMap {
-  @Prop travelMapOptions: TravelMapOptions;
+  @Param @Require travelMapOptions: TravelMapOptions;
   private mapOptions?: mapCommon.MapOptions;
   private callback?: AsyncCallback<map.MapComponentController>;
   private mapController?: map.MapComponentController;

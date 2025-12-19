@@ -208,8 +208,8 @@ export struct PageDetail {
     Column({ space: 10 }) {
       // 帖子图片
       Swiper() {
-        ForEach(this.data.images as string[], (v: string) => {
-          Image(handleImgSrc(v))
+        Repeat<string>(this.data.images as string[]).each((repeatItem: RepeatItem<string>) => {
+          Image(handleImgSrc(repeatItem.item))
             .height(CommonConstant.FULL_PERCENT)
             .width(CommonConstant.FULL_PERCENT)
             .margin({ bottom: 30 })
@@ -222,8 +222,9 @@ export struct PageDetail {
                 this.imgAspectRadioList.push(event.width / event.height);
               }
             });
-        }, (v: string) => v);
+        }).key((item: string, index: number) => item).virtualScroll();
       }
+      .cachedCount(3)
       .width(CommonConstant.FULL_PERCENT)
       .aspectRatio(this.aspectRatioSwiper)
       .autoPlay(false)
@@ -387,6 +388,7 @@ export struct PageDetail {
             this.isEditComment = true;
           })
           .bindSheet($$this.isEditComment, this.buildInputSheet(), {
+            preferType: SheetType.CENTER,
             height: SheetSize.FIT_CONTENT,
             showClose: false,
           });
@@ -406,7 +408,7 @@ export struct PageDetail {
       Row({ space: 16 }) {
         Row({ space: 6 }) {
           Image(this.data.currentUserLikeStatus === StatusFLAG.YES ? $r('app.media.ic_public_like_filled') :
-          $r('app.media.ic_public_like'))
+            $r('app.media.ic_public_like'))
             .width(20)
             .height(20)
             .objectFit(ImageFit.Contain);
@@ -439,7 +441,7 @@ export struct PageDetail {
 
         Row({ space: 6 }) {
           Image(this.data.currentUserCollectStatus === StatusFLAG.YES ? $r('app.media.ic_public_mark_filled') :
-          $r('app.media.ic_public_favourites'))
+            $r('app.media.ic_public_favourites'))
             .width(24)
             .height(24)
             .objectFit(ImageFit.Contain);

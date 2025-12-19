@@ -15,8 +15,10 @@
         "name": "EntryAbility",
         "srcEntry": "./ets/entryability/EntryAbility.ets",
         "description": "$string:EntryAbility_desc",
-        "supportWindowMode": ["fullscreen"],
-        "icon": "$media:app_icon",
+        "supportWindowMode": [
+          "fullscreen"
+        ],
+        "icon": "$media:layered_image",
         "label": "$string:EntryAbility_label",
         "startWindowIcon": "$media:app_icon",
         "startWindowBackground": "$color:start_window_background",
@@ -34,10 +36,10 @@
       }
     ],
     "metadata": [
+// todo 替换为您的应用的client_id值
       {
         "name": "client_id",
-        // todo 替换为您的应用的client_id值
-        "value": ""
+        "value": "******"
       }
     ],
     "requestPermissions": [

@@ -3,15 +3,13 @@ import { VipPackage } from '../components/VipPackage';
 import { VipBenefits } from '../components/VipBenefits';
 import { VipOpen } from '../components/VipOpen';
 import { VipPackageItem } from '../model/Model';
-import { calculateNewVipExpiryDate, getVipDuration } from '../utils/Utils';
-import { MockApi } from '../utils/MockApi'
-import { WxExtraInfo, AggregatedPaymentPicker, ChannelType } from 'aggregated_payment';
-import { promptAction } from '@kit.ArkUI';
+import { aggregatedPaymentService, CashierPicker, PaymentType } from 'aggregated_payment';
+import { UIContext } from '@kit.ArkUI';
+import { deviceInfo } from '@kit.BasicServicesKit';
 import dayjs from 'dayjs';
 
 @ComponentV2
 export struct VipCenter {
-  private wxOrderReq: WxExtraInfo = new WxExtraInfo();
   @Local egDivider: DividerTmp = new DividerTmp(1, 10, 10, '#ffe9f0f0')
   @Param userName: string = ''
   @Param avatar: string = ''
@@ -29,44 +27,58 @@ export struct VipCenter {
   }
   @Local vipPackage: VipPackageItem = new VipPackageItem()
   @Local customDialogId: number = 0
-  @Local isPaymentChannelSheetShow: boolean = false
   @Local isMemberServiceAgreementSheetShow: boolean = false
-
-  @Builder
-  paymentChannelSheet() {
-    AggregatedPaymentPicker({
-      title: this.vipPackage.title || '会员周卡',
-      amount: this.vipPackage.amount || 5,
-      channelInfo: [{
-        channelType: ChannelType.HUAWEI_PAY,
-        name: '华为支付',
-        icon: $r('app.media.hwpay'),
-        preOrderInfo: this.hwOrderStr,
-        event: () => {
+  private uiContext: UIContext = this.getUIContext();
+  private navPathStack: NavPathStack = new NavPathStack();
+  private cashierPicker: CashierPicker = new CashierPicker(this.uiContext)
+    .onRealPayment(async (type: PaymentType) => {
+      // todo: 根据支付类型向服务器请求支付所需参数
+      if (type === PaymentType.ALIPAY) {
+        /**
+         * 请求拉起支付宝
+         *
+         * 临时测试时，orderInfo 不推荐传入空字符串，这会导致跳转至支付宝行为仅仅是跳转，不会有支付相关的交互
+         * 未安装支付宝且参数真实时，SDK 会尝试使用 this.navPathStack 跳转至 H5 页面继续支付，该参数可不传
+         */
+        aggregatedPaymentService.requestPaymentByAliPay({ orderInfo: 'ORDER_INFO' }, this.navPathStack);
+      } else if (type === PaymentType.HUAWEI) {
+        /**
+         * 请求拉起华为支付
+         */
+        if (deviceInfo.marketName === 'emulator') {
+          this.showToast('华为支付在模拟器场景下无任何响应');
+          return;
         }
-      }, {
-        channelType: ChannelType.WECHAT_PAY,
-        preOrderInfo: this.wxOrderReq,
-        appId: MockApi.WX_APP_ID,
-        icon: $r('app.media.wechat'),
-        name: '微信支付',
-        event: () => {
-          // this.isShow = false;
-        },
-      }, {
-        channelType: ChannelType.ALI_PAY,
-        name: '支付宝支付',
-        icon: $r('app.media.alipay'),
-        preOrderInfo: this.aliOrderStr,
-      }],
-      paySuccessEvent: (type: ChannelType) => {
-        this.isVip = true
-        this.vipType = this.vipPackage.duration || 'week'
-        this.vipExpiryDate = calculateNewVipExpiryDate(this.vipExpiryDate, this.vipPackage.duration || 'week')
-        this.packageBack(this.isVip, this.vipExpiryDate)
-        promptAction.showToast({ message: '开通成功' })
-      },
+        aggregatedPaymentService.requestPaymentByHuawei(this.uiContext, { orderStr: '' });
+      } else if (type === PaymentType.WECHAT) {
+        /**
+         * 请求拉起微信支付
+         *
+         * 微信支持获取拉起结果，如果拉起成功，则可以进一步尝试等待支付回调。如果拉起失败，则不会有支付回调。
+         */
+        const isWeChatOpenSuccess: boolean =
+          await aggregatedPaymentService.requestPaymentByWeChat(this.uiContext, {
+            partnerId: '',
+            prepayId: '',
+            nonceStr: '',
+            timeStamp: '',
+            sign: ''
+          });
+        if (!isWeChatOpenSuccess) {
+          this.showToast('微信拉起失败');
+        }
+      }
+    })
+    .onWillDismiss((reason: DismissReason) => {
+      if (reason === DismissReason.TOUCH_OUTSIDE) {
+        this.showToast('已拦截点击其它区域进行关闭的交互方式');
+      } else {
+        this.cashierPicker.close();
+      }
     });
+
+  private showToast(msg: string): void {
+    this.uiContext.getPromptAction().showToast({ message: `Test: ${msg}` });
   }
 
   @Builder
@@ -169,9 +181,16 @@ export struct VipCenter {
   }
 
   aboutToAppear(): void {
-    MockApi.getAliPreOrderInfo().then((res) => {
-      this.aliOrderStr = res;
-    });
+    // todo: 端侧支付回调仅可用于参考，以辅助提升支付结果判定效率，不建议完全依赖。如：实际支付成功，但支付回调没有触发。
+    aggregatedPaymentService.registerPaymentCallback(
+      (type: PaymentType, isSuccess: boolean) => {
+        this.showToast(`收到 ${type} 支付回调，支付结果：${(isSuccess ? '成功' : '失败')}`);
+      }
+    );
+  }
+
+  aboutToDisappear(): void {
+    aggregatedPaymentService.unregisterAllPaymentCallbacks();
   }
 
   build() {
@@ -230,7 +249,11 @@ export struct VipCenter {
           Column() {
             VipOpen({
               onVipOpen: () => {
-                this.isPaymentChannelSheetShow = !this.isPaymentChannelSheetShow
+                this.cashierPicker
+                  .reset() // 内部状态重置
+                  .setAmount(this.vipPackage.amount*100 || 500) // 支付金额，单位：分
+                  .setTradeSummary(this.vipPackage.title || '会员周卡') // 订单摘要 (可选，不填则不显示)
+                  .open();
               },
               isVip:this.isVip,
               onMemberServiceAgreementSheetOpen: () => {
@@ -251,11 +274,6 @@ export struct VipCenter {
                 preferType: SheetType.BOTTOM
               })
           }
-          .bindSheet(
-            this.isPaymentChannelSheetShow,
-            this.paymentChannelSheet(),
-            { height: 438, preferType: SheetType.BOTTOM }
-          )
           .layoutWeight(1)
           .justifyContent(FlexAlign.SpaceBetween)
         }

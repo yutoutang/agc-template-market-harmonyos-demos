@@ -1,5 +1,5 @@
 import { CheckInTaskItem } from 'commonlib';
-import { CommonButton, CommonHeader, CommonLoading, ContainerColumn } from 'componentlib';
+import { CommonButton, CommonDivider, CommonHeader, CommonLoading, ContainerColumn } from 'componentlib';
 import { TASK_INTRO_TAB_LIST } from '../constants/Constants';
 import { TaskIntroTabMap } from '../constants/Enums';
 import { TaskIntroTabItem } from '../types/Index';
@@ -111,7 +111,7 @@ export struct ActivityIntroductionPage {
             this.vm.currentIndex = index;
           });
 
-          Divider().strokeWidth(1).color($r('app.color.system_color_divider'));
+          CommonDivider({ gap: 0 })
 
           if (this.vm.currentIndex === TaskIntroTabMap.INTRO) {
             this.taskIntroBuilder();
@@ -184,7 +184,7 @@ export struct ActivityIntroductionPage {
     Column() {
       Text(name)
         .fontColor(this.vm.currentIndex === index ? $r('app.color.system_theme_color') :
-        $r('app.color.font_color_level1'))
+          $r('app.color.font_color_level1'))
         .fontSize($r('app.string.font_size_16'))
         .fontWeight(FontWeight.Medium)
         .lineHeight(22)

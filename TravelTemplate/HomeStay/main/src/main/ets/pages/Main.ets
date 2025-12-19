@@ -7,14 +7,18 @@ import { CustomTabBar } from './CustomTabBar';
 import { MainPageVM } from '../viewmodel/MainPageVM';
 import { PageGround } from 'travel_discovery';
 
-@Entry
-@Component
+@Builder
+export function MainBuilder() {
+  Main();
+}
+
+@ComponentV2
 struct Main {
   vm: MainPageVM = MainPageVM.instance;
-  @Provide('homeTabIndex') homeTabIndex: number = 0;
-  @Provide('orderTabIndex') orderTabIndex: number = 0;
-  @Provide('mainPathStack') mainPathStack: NavPathStack = new NavPathStack();
-  @State windowBottomHeight: number = AppStorage.get('windowBottomHeight') as number || 28;
+  @Provider('homeTabIndex') homeTabIndex: number = 0;
+  @Provider('orderTabIndex') orderTabIndex: number = 0;
+  @Consumer('mainPathStack') mainPathStack: NavPathStack = new NavPathStack();
+  @Local windowBottomHeight: number = AppStorage.get('windowBottomHeight') as number || 28;
 
   @Builder
   tabBuilder(title: ResourceStr, targetIndex: number, selectedImg: Resource, normalImg: Resource) {
@@ -31,7 +35,7 @@ struct Main {
   }
 
   build() {
-    Navigation(this.mainPathStack) {
+    NavDestination() {
       Flex({
         direction: FlexDirection.Column,
       }) {
@@ -43,11 +47,11 @@ struct Main {
           TabContent() {
             PageGround({
               isShowBack: false,
-            })
+            });
           };
 
           TabContent() {
-            MapPage({ homeTabIndex: $homeTabIndex });
+            MapPage();
           };
 
           TabContent() {
@@ -65,7 +69,12 @@ struct Main {
           this.homeTabIndex = index;
         });
 
-        CustomTabBar({ homeTabIndex: $homeTabIndex });
+        CustomTabBar({
+          homeTabIndex: this.homeTabIndex,
+          changeIndex: (index: number) => {
+            this.homeTabIndex = index;
+          },
+        });
       }
       .width(Constants.FULL_SCREEN)
       .height(Constants.FULL_SCREEN)
@@ -73,7 +82,6 @@ struct Main {
       .backgroundColor(Color.White);
     }
     .hideTitleBar(true)
-    .mode(NavigationMode.Stack);
   }
 
   aboutToAppear() {

@@ -356,7 +356,7 @@ export struct OrderView {
 
   build() {
     NavDestination() {
-      Column() {
+      Column({ space: 12 }) {
         Row() {
           this.OrderTitleBuilder();
         }.width(Constant.FULL_PERCENT).justifyContent(FlexAlign.Center);
@@ -364,7 +364,6 @@ export struct OrderView {
         Tabs({ index: this.vm.orderTabIndex }) {
           this.OrderListBuilder();
         }
-        .barHeight(48)
         .edgeEffect(EdgeEffect.Spring)
         .barMode(BarMode.Fixed)
         .animationDuration(0)

@@ -5,8 +5,8 @@
       {
         "name": "default",
         "signingConfig": "default",
-        "compatibleSdkVersion": "5.0.1(13)",
-        "targetSdkVersion": "5.0.1(13)",
+        "compatibleSdkVersion": "5.0.3(15)",
+        "targetSdkVersion": "5.0.3(15)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
           "arkOptions": {
@@ -212,8 +212,8 @@
       ]
     },
     {
-      "name": "feed_back",
-      "srcPath": "./components/feed_back",
+      "name": "feedback",
+      "srcPath": "./components/feedback",
       "targets": [
         {
           "name": "default",
@@ -248,18 +248,6 @@
       ]
     },
     {
-      "name": "aggregated_payment",
-      "srcPath": "./sdk/aggregated_payment",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
-    },
-    {
       "name": "open_ads",
       "srcPath": "./components/open_ads",
       "targets": [
@@ -284,8 +272,8 @@
       ]
     },
     {
-      "name": "module_share",
-      "srcPath": "./components/module_share",
+      "name": "aggregated_share",
+      "srcPath": "./components/aggregated_share",
       "targets": [
         {
           "name": "default",
@@ -296,8 +284,8 @@
       ]
     },
     {
-      "name": "module_login",
-      "srcPath": "./components/module_login",
+      "name": "aggregated_login",
+      "srcPath": "./components/aggregated_login",
       "targets": [
         {
           "name": "default",
@@ -370,6 +358,10 @@
           ]
         }
       ]
+    },
+    {
+      "name": "aggregated_payment",
+      "srcPath": "./components/aggregated_payment"
     }
   ]
 }

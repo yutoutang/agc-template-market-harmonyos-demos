@@ -2,8 +2,8 @@
   "modelVersion": "5.0.5",
   "description": "Please describe the basic information.",
   "dependencies": {
-    "dayjs": "^1.11.13",
-    "@ohos/axios": "^2.2.4",
+    "dayjs": "1.11.13",
+    "@ohos/axios": "2.2.4",
     "aggregated_payment": "file:./components/aggregated_payment"
   },
   "devDependencies": {

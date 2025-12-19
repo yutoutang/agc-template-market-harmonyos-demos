@@ -7,7 +7,6 @@ export function StoreBookingRecordsPageBuilder() {
   StoreBookingRecordsPage();
 }
 
-@Preview
 @ComponentV2
 struct StoreBookingRecordsPage {
   vm: MainEntryVM = MainEntryVM.instance;
@@ -61,9 +60,9 @@ struct StoreBookingRecordsPage {
                   .margin({ bottom: 9 })
 
                Divider()
-                  .color('rgba(0,0,0,0.20)')
+                  .color($r('sys.color.comp_divider'))
                   .padding({ right: 16 })
-                  .strokeWidth(1);
+                  .strokeWidth('1px');
 
               }
               .margin({right: $r('app.string.margin_ms')})

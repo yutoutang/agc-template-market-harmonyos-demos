@@ -49,7 +49,8 @@ export enum ToolType {
   RETIREMENT_AGE_CALCULATOR = 32,
   CREDENTIALS_PHOTO = 33,
   AR_MEASURE = 34,
-  TRANSLATOR = 35
+  TRANSLATOR = 35,
+  CAST_TOOL = 36,
 }
 
 export enum TabBarType {

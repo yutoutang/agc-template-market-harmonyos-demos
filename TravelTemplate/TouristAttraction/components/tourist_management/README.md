@@ -4,7 +4,7 @@
 
 - [简介](#简介)
 - [约束与限制](#约束与限制)
-- [快速入门](#快速入门)
+- [使用](#使用)
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
@@ -23,7 +23,10 @@
 * 设备类型：华为手机（包括双折叠和阔折叠）
 * HarmonyOS版本：HarmonyOS 5.0.3(15)及以上
 
-## 快速入门
+### 权限
+* 无
+
+## 使用
 1. 安装组件。
 
    如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
@@ -142,8 +145,9 @@ struct Index {
       },
       type: 0,
     }),
-    customStyle: true,
+    customStyle: false,
     autoCancel: true,
+    backgroundColor: $r('sys.color.ohos_id_blur_style_component_ultra_thick_color'),
   });
 
   build() {
@@ -156,7 +160,7 @@ struct Index {
           }
         },
       });
-    }.title('游客列表');
+    }.title('游客列表').mode(NavigationMode.Stack);
   }
 }
 ```

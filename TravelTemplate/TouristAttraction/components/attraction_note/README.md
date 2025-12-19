@@ -4,7 +4,7 @@
 
 - [简介](#简介)
 - [约束与限制](#约束与限制)
-- [快速入门](#快速入门)
+- [使用](#使用)
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
@@ -22,9 +22,9 @@
 * HarmonyOS版本：HarmonyOS 5.0.3(15)及以上
 
 ### 权限
-* 获取位置权限：ohos.permission.APPROXIMATELY_LOCATION、ohos.permission.LOCATION。
+* 获取位置权限：ohos.permission.APPROXIMATELY_LOCATION、ohos.permission.LOCATION、ohos.permission.INTERNET。
 
-## 快速入门
+## 使用
 1. 安装组件。
    如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
 
@@ -48,7 +48,8 @@
    c. 在项目根目录oh-package.json5中添加依赖
    ```typescript
    "dependencies": {
-      "attraction_note": "file:./xxx/attraction_note"
+      "attraction_note": "file:./xxx/attraction_note",
+      "module_base": "file:./xxx/module_base"
    }
    ```
 
@@ -99,6 +100,21 @@
       this.locationInfo.longitude = 113.86
    }
    ```
+5. 在module_base模块的src/main/resources/base/profile目录下的router_map.json文件中配置如下内容：
+   ```typescript
+   ...
+   {
+      "name": "Tickets",
+      "pageSourceFile": "src/main/ets/pages/Tickets.ets",
+      "buildFunction": "TicketsBuilder"
+    },
+    {
+      "name": "AttractionDetail",
+      "pageSourceFile": "src/main/ets/pages/AttractionDetail.ets",
+      "buildFunction": "AttractionDetailBuilder"
+    }
+   ...
+   ```
    
 ## API参考
 
@@ -138,7 +154,7 @@ struct Index {
         PageGround({
           isShowBack: false,
         })
-      }
+      }.height('90%')
     }.hideTitleBar(true);
   }
 }

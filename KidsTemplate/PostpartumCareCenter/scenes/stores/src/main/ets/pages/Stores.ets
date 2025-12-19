@@ -1,8 +1,7 @@
-import { CITY_LIST, CityItem, MainEntryVM, TitleTop } from '@ohos_agcit/postpartum_care_center_uicomponents';
+import { CITY_LIST, MainEntryVM, TitleTop } from '@ohos_agcit/postpartum_care_center_uicomponents';
+import { CityItem } from 'double_layer_tabs';
 import { StoreList } from '../view/StoreList';
 
-@Entry
-@Preview
 @ComponentV2
 export struct Stores {
   vm: MainEntryVM = MainEntryVM.instance;
@@ -21,7 +20,7 @@ export struct Stores {
       Divider()
         .width(28)
         .strokeWidth(2)
-        .color(this.currentIndex === targetIndex ? '#000000' : 'transparent')
+        .color(this.currentIndex === targetIndex ? $r('sys.color.comp_divider') : 'transparent')
         .opacity(this.currentIndex === targetIndex ? 1 : 0);
     }
     .margin(targetIndex === 0 ?

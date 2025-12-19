@@ -9,7 +9,7 @@ export class CommonUtils {
    * @param url
    * @returns
    */
-  static handleImgUrl(url: string): string {
+  static handleImgUrl(url: string, context: Context): string {
     if (!url) {
       return '';
     }
@@ -27,7 +27,7 @@ export class CommonUtils {
     if (url.startsWith('resourceImage://')) {
       const resourceName = url.split('//')[1];
       try {
-        const resource = getContext().resourceManager.getMediaBase64ByNameSync(resourceName);
+        const resource = context.resourceManager.getMediaBase64ByNameSync(resourceName);
         return resource;
       } catch (err) {
         hilog.info(0xff00, 'CommonUtils', `get image resource failed, ${err}, ${resourceName}`);

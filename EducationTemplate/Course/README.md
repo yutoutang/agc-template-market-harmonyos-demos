@@ -14,16 +14,13 @@
 
 此模板提供如下组件，所有组件存放在工程根目录的components下，如果您仅需使用组件，可参考对应组件的指导链接；如果您使用此模板，请参考本文档。
 
-| 组件                       | 描述                      | 使用指导                                            |
-|:-------------------------|:------------------------| :-------------------------------------------------- |
-| 视频播放组件（recorded_player）  | 视频播放支持加解锁、画中画、倍速、分辨率等功能 | [使用指导](components/recorded_player/README.md)    |
-| 分类选择组件（classification）   | 多层级选择                   | [使用指导](components/classification/README.md)     |
-| 支付组件（aggregated_payment） | 支付能力                    | [使用指导](components/aggregated_payment/README.md) |
-| 分享组件（aggregated_share）   | 分享能力                    | [使用指导](components/aggregated_share/README.md)   |
-| 意见反馈组件（feed_back）        | 意见反馈                    | [使用指导](components/feed_back/README.md)          |
-| 登录组件（login_info）         | 登录功能                    | [使用指导](components/login_info/README.md)         |
-| 搜索组件（search）             | 搜索能力                    | [使用指导](components/search/README.md)             |
-| 直播间组件（live_streaming）    | 直播间弹幕、分享、评论等功能          | [使用指导](components/live_streaming/README.md)     |
+| 组件                         | 描述                      | 使用指导                                            |
+|:---------------------------|:------------------------| :-------------------------------------------------- |
+| 播放组件（recorded_player）      | 视频播放支持加解锁、画中画、倍速、分辨率等功能 | [使用指导](components/recorded_player/README.md)    |
+| 通用支付组件（aggregated_payment） | 支付能力                    | [使用指导](components/aggregated_payment/README.md) |
+| 通用分享组件（aggregated_share）   | 分享能力                    | [使用指导](components/aggregated_share/README.md)   |
+| 意见反馈组件（feed_back）          | 意见反馈                    | [使用指导](components/feed_back/README.md)          |
+| 登录组件（login_info）           | 登录功能                    | [使用指导](components/login_info/README.md)         |
 
 本模板为教育类应用提供了常用功能的开发样例，对视频播放器进行了定制化的开发，模板主要分首页、学习、我的三大模块：
 * 首页：提供推荐课程信息流、搜索等功能。

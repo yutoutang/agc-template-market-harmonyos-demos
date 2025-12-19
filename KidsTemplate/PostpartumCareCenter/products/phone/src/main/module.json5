@@ -15,9 +15,9 @@
         "name": "EntryAbility",
         "srcEntry": "./ets/entryability/EntryAbility.ets",
         "description": "$string:EntryAbility_desc",
-        "icon": "$media:ic_widget",
+        "icon": "$media:layered_image",
         "label": "$string:EntryAbility_label",
-        "startWindowIcon": "$media:ic_widget",
+        "startWindowIcon": "$media:foreground",
         "startWindowBackground": "$color:start_window_background",
         "exported": true,
         "skills": [
@@ -37,8 +37,8 @@
         "name": "ohos.permission.INTERNET"
       },
       {
-        "name": 'ohos.permission.APPROXIMATELY_LOCATION',
-        "reason": '$string:permission_reason_location',
+        "name": "ohos.permission.APPROXIMATELY_LOCATION",
+        "reason": "$string:permission_reason_location",
         "usedScene": {
           "abilities": [
             "EntryAbility"
@@ -48,7 +48,7 @@
       },
       {
         "name": "ohos.permission.LOCATION",
-        "reason": '$string:permission_reason_location',
+        "reason": "$string:permission_reason_location",
         "usedScene": {
           "abilities": [
             "EntryAbility"
@@ -58,7 +58,7 @@
       },
       {
         "name": "ohos.permission.READ_CALENDAR",
-        "reason": '$string:permission_reason_read_calendar',
+        "reason": "$string:permission_reason_read_calendar",
         "usedScene": {
           "abilities": [
             "EntryAbility"
@@ -68,7 +68,7 @@
       },
       {
         "name": "ohos.permission.WRITE_CALENDAR",
-        "reason": '$string:permission_reason_write_calendar',
+        "reason": "$string:permission_reason_write_calendar",
         "usedScene": {
           "abilities": [
             "EntryAbility"
@@ -79,9 +79,12 @@
     ],
     "metadata": [
       {
+/**
+         * todo
+         */
         "name": "client_id",
-        "value": "xxx"
-        // 配置为获取的Client ID
+        "value": "******"
+// 配置为获取的Client ID
       }
     ]
   }

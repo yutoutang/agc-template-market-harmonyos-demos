@@ -23,6 +23,10 @@
     {
       "name": "getNetworkInfo",
       "value": "Allow the app to obtain network information during the login scenario"
+    },
+    {
+      "name": "agcit_huawei_home_stay",
+      "value": "1.0.4"
     }
   ]
 }

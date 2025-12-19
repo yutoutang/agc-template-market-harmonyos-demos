@@ -89,7 +89,7 @@ export struct SimpleProgressBar {
           this.sliderOnChange(value, mode);
         })
         .zIndex(3)
-      Text(this.durationStringTime)
+      Text(secondToTime(Math.floor(this.castService.castStatusModel.castDuration / 1000)))
         .textAlign(TextAlign.Start)
         .fontSize(10)
         .fontColor($r('sys.color.font_on_primary'))

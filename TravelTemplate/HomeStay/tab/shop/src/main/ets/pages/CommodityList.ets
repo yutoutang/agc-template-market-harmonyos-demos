@@ -9,10 +9,10 @@ export function CommodityListBuilder() {
   CommodityList();
 }
 
-@Component
+@ComponentV2
 export struct CommodityList {
   vm: ShopPageVM = ShopPageVM.instance;
-  @Consume('mainPathStack') mainPathStack: NavPathStack;
+  @Consumer('mainPathStack') mainPathStack: NavPathStack = new NavPathStack();
 
   build() {
     NavDestination() {

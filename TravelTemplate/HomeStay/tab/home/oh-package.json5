@@ -8,8 +8,7 @@
   "packageType": "InterfaceHar",
   "dependencies": {
     "util": "file:../../common/util",
-    "network": "file:../../function/network",
-    "account": "file:../../function/account",
+    "network": "file:../../common/network",
     "type": "file:../../common/type",
     "constant": "file:../../common/constant",
     "component": "file:../../common/component",

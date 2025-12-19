@@ -13,7 +13,6 @@ function simulateDelay<T>(data: T, delay: number): Promise<T> {
 
 function mockErrorHandler(msg?: string): Promise<string> {
   const errMsg: string = 'replace mock data fail!';
-  promptAction.showToast({ message: errMsg });
   return Promise.reject(errMsg);
 }
 

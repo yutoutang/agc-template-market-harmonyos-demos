@@ -10,13 +10,13 @@ export function ComplaintBuilder() {
   Complaint();
 }
 
-@Component
+@ComponentV2
 export struct Complaint {
-  @State isSelected: boolean = false;
-  @State text: string = '';
-  @State localImgUri: string = '';
-  @State phoneNo: string = '';
-  @Consume('mainPathStack') mainPathStack: NavPathStack;
+  @Local isSelected: boolean = false;
+  @Local text: string = '';
+  @Local localImgUri: string = '';
+  @Local phoneNo: string = '';
+  @Consumer('mainPathStack') mainPathStack: NavPathStack = new NavPathStack();
   controller: TextInputController = new TextInputController();
 
   build() {
@@ -54,7 +54,7 @@ export struct Complaint {
                 .size({ width: 80, height: 80 })
                 .objectFit(ImageFit.Contain)
                 .onClick(async () => {
-                  const result = await requestAndUploadPic(getContext(this) as common.UIAbilityContext);
+                  const result = await requestAndUploadPic();
                   if (result && result?.photoUris.length !== 0) {
                     this.isSelected = true;
                     this.localImgUri = result.photoUris[0];

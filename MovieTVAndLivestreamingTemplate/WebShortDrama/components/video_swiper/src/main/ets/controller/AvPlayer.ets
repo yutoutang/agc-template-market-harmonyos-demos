@@ -6,6 +6,7 @@ import { secondToTime } from '../utils/CommonUtils';
 import { AVPlayerState } from '../constant/AVPlayerState';
 import { AVPlayerListener } from './AvPlayerListener';
 import { MediaSource } from '../constant/MediaSource';
+import { Constants as Const } from '../constant/Contants'
 
 interface PlayerParam {
   videoInfo: VideoPlayData;
@@ -26,6 +27,8 @@ const DOMAIN = 0x0000
 
 @ObservedV2
 export class AvPlayer {
+  @Trace videoHeight:number = Const.SURFACE_HEIGHT;
+  @Trace videoWidth:number = Const.SURFACE_WIDTH;
   @Trace isPlaying: boolean = false;
   @Trace isReady: boolean = false;
   @Trace currentTime: number = 0;
@@ -227,6 +230,8 @@ export class AvPlayer {
     avPlayer.on('videoSizeChange', (width: number, height: number) => {
       hilog.info(DOMAIN, TAG,
         `AVPlayer[${this.id}] state videoSizeChange success,and width is:${width}, height is : ${height}`);
+      this.videoHeight = height;
+      this.videoWidth = width;
     })
     avPlayer.on('startRenderFrame', () => {
       this.firstFrame = true;

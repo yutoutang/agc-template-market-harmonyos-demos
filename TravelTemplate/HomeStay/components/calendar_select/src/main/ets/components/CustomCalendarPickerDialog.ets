@@ -1,4 +1,5 @@
 import { promptAction } from '@kit.ArkUI';
+import { common } from '@kit.AbilityKit';
 import { Constants } from '../constant/Constants';
 import { DateModel, Price } from '../model/DateModel';
 import { getMonthDate, getRealTimeDate } from '../utils/Time';
@@ -14,37 +15,17 @@ export struct CustomCalendarPickerDialog {
   @State nextMonthDay: number[] = [];
   @State currentMonthDay: number[] = [];
   @State initialIndex: number = 0;
-  @Link currentMonth: number;
-  @Link currentDay: number;
-  @Link currentYear: number;
-  @Link endDate: DateModel;
-  @Link startDate: DateModel;
-  @Link night: number;
+  @State currentMonth: number = 0;
+  @State currentDay: number = 0;
+  @State currentYear: number = 0;
+  @State endDate: DateModel = CalendarUtil.getEndDate();
+  @State startDate: DateModel = CalendarUtil.getStartDate();
+  @State night: number = CalendarUtil.getNight();
   @Prop priceList: Price[];
-  @Prop isShowPrice: boolean;
-  @Link @Watch('readyToClose') readyCloseDialog: boolean;
-  @State cloneStartDate: DateModel = new DateModel(0, 0, 0, 0);
+  cloneStartDate: DateModel = new DateModel();
+  cloneEndDate: DateModel = new DateModel();
   controller: CustomDialogController;
-  @State customY: number = 0;
-
-  readyToClose() {
-    setTimeout(() => {
-      this.controller.close();
-      // 未选择离店日期时重置
-      if (this.endDate.day === 0) {
-        this.startDate =
-          new DateModel(this.cloneStartDate.day, 0, this.cloneStartDate.month, this.cloneStartDate.year);
-        this.endDate =
-          CalendarUtil.getEndDate() ??
-            new DateModel(this.cloneStartDate.day + 1, 0, this.cloneStartDate.month, this.cloneStartDate.year);
-      }
-    }, Constants.TRANSITION_DURATION);
-    animateTo({
-      duration: Constants.TRANSITION_DURATION,
-    }, () => {
-      this.customY = 800;
-    });
-  }
+  customY: number = 0;
 
   isApplySelected(day: number, month: number | string) {
     return (day === this.startDate.day && month ===
@@ -52,11 +33,32 @@ export struct CustomCalendarPickerDialog {
     this.endDate.month);
   }
 
+  aboutToDisappear(): void {
+    let resetFlag = this.endDate.day === 0 ||
+      (this.startDate.day === this.cloneEndDate.day && this.startDate.month === this.cloneEndDate.month &&
+        this.startDate.year === this.cloneEndDate.year);
+    // 未选择离店时间或入住日期与上次离店日期相同
+    if (resetFlag) {
+      this.startDate =
+        new DateModel(this.cloneStartDate.day, 0, this.cloneStartDate.month, this.cloneStartDate.year);
+      this.endDate =
+        CalendarUtil.getEndDate() ??
+          new DateModel(this.cloneStartDate.day + 1, 0, this.cloneStartDate.month, this.cloneStartDate.year);
+    }
+    //写入应用内存
+    CalendarUtil.setStartDate(this.startDate);
+    CalendarUtil.setEndDate(this.endDate);
+    (getContext() as common.UIAbilityContext).eventHub.emit('update_date', this.startDate, this.endDate);
+  }
+
   // 获取当前月和下个月的日期数据
   aboutToAppear() {
     this.cloneStartDate.year = this.startDate.year;
     this.cloneStartDate.month = this.startDate.month;
     this.cloneStartDate.day = this.startDate.day;
+    this.cloneEndDate.year = this.endDate.year;
+    this.cloneEndDate.month = this.endDate.month;
+    this.cloneEndDate.day = this.endDate.day;
     let currentDate: DateModel = getRealTimeDate() ?? new DateModel(0, 0, 0, 0);
     this.currentMonth = currentDate.month;
     this.currentDay = currentDate.day;
@@ -98,7 +100,7 @@ export struct CustomCalendarPickerDialog {
       let dayInfo = new DayInfo();
       let priceItem = this.priceList.find((priceItem: Price) => priceItem.date ===
         `${year}-${month < 10 ? month.toString().padStart(2, '0') : month}-${item < 10 ?
-        item.toString().padStart(2, '0') : item}`);
+          item.toString().padStart(2, '0') : item}`);
 
       if (priceItem) {
         dayInfo.day = item;
@@ -257,7 +259,6 @@ export struct CustomCalendarPickerDialog {
               .textAlign(TextAlign.Center)
               .width(Constants.FULL_SCREEN)
               .fontSize(16)
-              .height(20)
               .fontColor(Color.Black);
           }
           .width('14.3%');
@@ -276,17 +277,15 @@ export struct CustomCalendarPickerDialog {
             ListItemGroup({ header: this.itemHead(monthItem.month) }) {
               ListItem() {
                 Grid() {
-                  ForEach(monthItem.daysInfo, (dayInfo: DayInfo) => {
+                  ForEach(monthItem.daysInfo, (dayInfo: DayInfo, index: number) => {
                     GridItem() {
                       Column() {
-                        if (dayInfo.day !== 0) {
-                          Text(`${dayInfo.day.toString()}`)
-                            .fontSize(14)
-                            .fontColor(this.getFontColor(dayInfo, monthItem))
-                            .opacity(this.isTransparent(dayInfo, monthItem) ? 1 : 0.2);
-                        }
+                        Text(`${dayInfo.day ? dayInfo.day.toString() : ''}`)
+                          .fontSize(14)
+                          .fontColor(this.getFontColor(dayInfo, monthItem))
+                          .opacity(this.isTransparent(dayInfo, monthItem) ? 1 : 0.2);
 
-                        if (this.isShowPrice && dayInfo.price !== 0) {
+                        if (this.priceList.length && dayInfo.price !== 0) {
                           Text(`￥${dayInfo.price.toString()}`)
                             .fontSize(10)
                             .fontColor(this.getPriceFontColor(dayInfo, monthItem));
@@ -298,13 +297,13 @@ export struct CustomCalendarPickerDialog {
                     .onClick(() => {
                       this.selectDate(dayInfo, monthItem);
                     });
-                  }, (item: DayInfo) => item.day.toString());
+                  }, (item: DayInfo, index: number) => item.day.toString() + index.toString());
                 }
                 .columnsTemplate('1fr 1fr 1fr 1fr 1fr 1fr 1fr')
                 .rowsTemplate(Math.floor(monthItem.daysInfo.length / 7) === 6 ? '1fr 1fr 1fr 1fr 1fr 1fr' :
                   '1fr 1fr 1fr 1fr 1fr')
                 .padding(0);
-              }.height(240);
+              }.height(`${Math.floor(monthItem.daysInfo.length / 7) * 42}`);
             }.margin({ top: 24 });
           }, (item: Month) => item.month);
         }
@@ -313,15 +312,13 @@ export struct CustomCalendarPickerDialog {
         .sticky(StickyStyle.Header);
       };
     }
+    .padding({ bottom: 16 })
     .width(Constants.FULL_SCREEN)
-    .translate({ x: 0, y: this.customY })
-    .transition(TransitionEffect.translate({ x: 0, y: 600 })
-      .animation({ duration: Constants.TRANSITION_DURATION }))
     .borderRadius({
       topLeft: 16,
       topRight: 16,
     })
-    .backgroundColor(Color.White)
+    .backgroundColor($r('sys.color.comp_background_primary'))
     .alignItems(HorizontalAlign.Center);
   }
 
@@ -337,7 +334,7 @@ export struct CustomCalendarPickerDialog {
       this.endDate = new DateModel(0, 0, 0, this.currentYear);
       promptAction.showToast({
         message: '请选择离店日期',
-        duration: 500,
+        duration: 200,
       });
     } else {
       let endYear = Number(monthItem.month.split('年')[0]);
@@ -345,7 +342,7 @@ export struct CustomCalendarPickerDialog {
         this.startDate.year === endYear) {
         promptAction.showToast({
           message: '入住日期与离店日期不能为同一天',
-          duration: 500,
+          duration: 200,
         });
         return;
       }
@@ -362,18 +359,7 @@ export struct CustomCalendarPickerDialog {
       }
 
       this.calcNight();
-      //写入应用内存
-      AppStorage.setOrCreate('startDate', this.startDate);
-      AppStorage.setOrCreate('endDate', this.endDate);
-
-      setTimeout(() => {
-        this.controller.close();
-      }, 500);
-      animateTo({
-        duration: 100,
-      }, () => {
-        this.customY = 800;
-      });
+      this.controller.close();
     }
   }
 
@@ -392,6 +378,6 @@ export struct CustomCalendarPickerDialog {
       let curentMonthDays = getMonthDate(this.startDate.month, this.startDate.year).filter((item) => item !== 0).length;
       this.night = curentMonthDays - this.startDate.day + this.endDate.day;
     }
-    AppStorage.setOrCreate('night', this.night);
+    CalendarUtil.setNight(this.night);
   }
 }

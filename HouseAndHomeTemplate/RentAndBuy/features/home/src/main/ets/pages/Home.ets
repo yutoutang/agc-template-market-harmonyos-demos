@@ -4,6 +4,7 @@ import {
   Constant,
   EventEmitName,
   HouseTabBarModule,
+  Logger,
   RouterModule,
   ShortCutModule,
 } from 'foundation';
@@ -21,11 +22,11 @@ export struct Home {
   vm: HomeVM = HomeVM.instance;
   @Local searchValue: string = '';
   @Local keyword: string = '';
-  private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+  private context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
 
   aboutToAppear(): void {
     this.vm.loading = true;
-    this.vm.init();
+    this.vm.init(this.getUIContext().getHostContext()!);
   }
 
   aboutToDisappear(): void {
@@ -83,7 +84,7 @@ export struct Home {
     }.padding({ left: 8, top: 16, bottom: 16 }).width('100%').justifyContent(FlexAlign.Start);
 
     if (this.vm.loading) {
-      LoadingProgress().width(30).height(30);
+      LoadingProgress().width(32).height(32);
     } else {
       HotHouse({ hotHouseList: this.vm.hotHouseList, index: this.vm.hotTabIndex });
     }
@@ -94,7 +95,11 @@ export struct Home {
     Row({ space: 4 }) {
       Row() {
         Row() {
-          Text(this.vm.currentCity).fontSize(14).fontWeight(FontWeight.Medium).margin({ right: 4 }).fontColor($r('sys.color.black'));
+          Text(this.vm.currentCity)
+            .fontSize(14)
+            .fontWeight(FontWeight.Medium)
+            .margin({ right: 4 })
+            .fontColor($r('sys.color.black'));
           Image($r('app.media.ic_down')).size({ width: 12, height: 12 });
         }.onClick(() => {
           RouterModule.stack.pushPathByName('CitySelect', null, (popInfo: PopInfo) => {
@@ -108,15 +113,28 @@ export struct Home {
           .padding(0)
           .width(160)
           .backgroundColor(Color.Transparent)
-          .placeholderFont({ size: 14 })
-          .placeholderColor('#999999')
           .onFocus(() => {
             RouterModule.push({
               url: 'HouseSearch',
             });
             // 清除焦点
             this.getUIContext().getFocusController().clearFocus();
-          });
+          })
+          .gesture(
+            // 绑定可以重复触发的LongPressGesture
+            LongPressGesture({ repeat: true })
+              .onAction((event?: GestureEvent) => {
+                if (event) {
+                  RouterModule.push({
+                    url: 'HouseSearch',
+                  });
+                }
+              })
+              .onActionEnd(() => {
+                // 清除焦点
+                this.getUIContext().getFocusController().clearFocus();
+              }),
+          );
       };
     }
     .padding(12)

@@ -3,10 +3,9 @@
 ## 目录
 
 - [功能介绍](#功能介绍)
-- [环境要求](#环境要求)
+- [约束与限制](#约束与限制)
 - [快速入门](#快速入门)
 - [示例效果](#示例效果)
-- [权限要求](#权限要求)
 - [开源许可协议](#开源许可协议)
 
 ## 功能介绍
@@ -227,7 +226,7 @@ RentAndBuy
   |   |    |       |    Index.ets                          // 主页面                
 ```
 
-## 环境要求
+## 约束与限制
 
 ### 软件
 * DevEco Studio版本：DevEco Studio 5.0.5 Release及以上
@@ -235,7 +234,11 @@ RentAndBuy
 
 ### 硬件
 * 设备类型：华为手机（直板机）
-* HarmonyOS版本：HarmonyOS 5.0.1 Release及以上
+* HarmonyOS版本：HarmonyOS 5.0.5(17)Release及以上
+
+### 权限
+* 获取位置权限：ohos.permission.APPROXIMATELY_LOCATION、ohos.permission.LOCATION。
+* 网络权限：ohos.permission.INTERNET
 
 ## 快速入门
 
@@ -295,11 +298,6 @@ RentAndBuy
 3. 周边全部配套
 
    <img src="screenshots/facility.png" alt="首页" width="300">
-
-## 权限要求
-
-- 获取位置权限：ohos.permission.APPROXIMATELY_LOCATION、ohos.permission.LOCATION。
-- 网络权限：ohos.permission.INTERNET
 
 ## 开源许可协议
 

@@ -37,7 +37,7 @@ export struct ChangePage {
               appRouter.back()
               })
               .backgroundColor(0xffffff)
-              .fontColor(Color.Black)
+              .fontColor($r('sys.color.font_primary'))
 
             Button(getString('app.string.confirm'))
               .onClick(() => {
@@ -49,7 +49,7 @@ export struct ChangePage {
                 appRouter.back(true)
               })
               .backgroundColor(0xffffff)
-              .fontColor(Color.Red)
+              .fontColor($r('sys.color.warning'))
           }
           .margin({ top: 10, bottom: 10 })
         }

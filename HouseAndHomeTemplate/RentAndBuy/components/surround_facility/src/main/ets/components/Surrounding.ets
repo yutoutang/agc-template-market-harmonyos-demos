@@ -31,7 +31,7 @@ export struct Surrounding {
         if (this.vm.mapUtil.mapOptions?.position) {
           this.pathStack.pushPathByName('FullSurrounding', null);
         } else {
-          promptAction.showToast({ message: '请退出房源详情页后重试', duration: 1000 });
+          this.getUIContext().getPromptAction().showToast({ message: '请退出房源详情页后重试', duration: 1000 });
         }
       });
 

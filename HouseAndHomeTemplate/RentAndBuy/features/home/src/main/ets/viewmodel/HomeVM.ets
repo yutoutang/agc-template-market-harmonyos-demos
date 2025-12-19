@@ -34,7 +34,6 @@ export class HomeVM {
   @Trace loading: boolean = false;
   private static _instance: HomeVM;
   private mu: MapUtil = MapUtil.instance;
-  private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
 
   public static get instance() {
     if (!HomeVM._instance) {
@@ -43,8 +42,8 @@ export class HomeVM {
     return HomeVM._instance;
   }
 
-  init() {
-    this.applyLocationPermission();
+  init(context: Context) {
+    this.applyLocationPermission(context);
     this.getHouseListByIndex(this.hotTabIndex);
   }
 
@@ -71,17 +70,17 @@ export class HomeVM {
     });
   }
 
-  applyLocationPermission() {
-    SystemUtils.applyLocationPermission().then((isGranted) => {
+  applyLocationPermission(context: Context) {
+    SystemUtils.applyLocationPermission(context).then((isGranted) => {
       if (isGranted) {
         SystemUtils.getCurrentCityInfo().then((addressInfo: CurrentAddressInfo) => {
           if (addressInfo.city) {
             this.currentCity = addressInfo.city;
             AppStorageBank.setCurrentCity(this.currentCity);
             AppStorageBank.setCurrentLocation(addressInfo.latitude, addressInfo.longitude);
-            this.context.eventHub.on(EventEmitName.INIT_MAP,
+            (context as common.UIAbilityContext).eventHub.on(EventEmitName.INIT_MAP,
               (latitude: number, longitude: number) => {
-                this.mu.initMap(latitude, longitude);
+                this.mu.initMap(latitude, longitude, context);
               });
           }
         });

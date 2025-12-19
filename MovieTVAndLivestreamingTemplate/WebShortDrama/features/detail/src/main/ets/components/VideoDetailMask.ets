@@ -28,7 +28,7 @@ export struct VideoDetailMask {
   }
 
   aboutToAppear(): void {
-    this.playControl.setPlayerHeight(`100%`)
+    // this.playControl.setPlayerHeight(`100%`)
     this.curIndex = this.videoDetailMaskVM.currentSerial
     PromptActionClass.setContext(this.getUIContext());
   }

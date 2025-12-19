@@ -4,7 +4,7 @@ export { CustomCalendarPickerDialog } from './src/main/ets/components/CustomCale
 
 export { Constants } from './src/main/ets/constant/Constants';
 
-export { DateModel, Price, CalendarOption } from './src/main/ets/model/DateModel';
+export { DateModel, Price } from './src/main/ets/model/DateModel';
 
 export { CalendarUtil } from './src/main/ets/utils/CalendarUtil';
 

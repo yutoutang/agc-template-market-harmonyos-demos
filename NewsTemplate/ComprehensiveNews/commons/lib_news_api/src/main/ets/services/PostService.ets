@@ -2,6 +2,7 @@ import { NewsEnum } from '../constants/Constants';
 import { BaseNews } from '../database/NewsType';
 import { PostRequest } from '../params/request/CommonRequest';
 import { NewsResponse } from '../params/response/NewsResponse';
+import { AsyncFunc } from '../utils/AsyncUtils';
 import { Utils } from '../utils/Utils';
 import { BaseNewsService, BaseNewsServiceApi } from './BaseNewsService';
 import { MineServiceApi } from './MineService';
@@ -26,6 +27,7 @@ export class PostService extends BaseNewsService {
    * 查询关注
    * @returns
    */
+  @AsyncFunc
   public queryPostFollowList(currentIndex: number = 10, currentPage = 0): NewsResponse[] {
     const myUserInfo = MineServiceApi.queryAuthorRaw();
     const posts = MockPost.list

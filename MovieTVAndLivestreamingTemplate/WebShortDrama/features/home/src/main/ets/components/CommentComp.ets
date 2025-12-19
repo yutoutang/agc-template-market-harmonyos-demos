@@ -1,8 +1,8 @@
 import { getMedia, NAV_PAGE_NAME } from '@agctemplate/resources'
 import { UserInfoModel } from '@agctemplate/widgets';
-import { AppStorageV2, ComponentContent } from '@kit.ArkUI'
+import { AppStorageV2, ComponentContent, display } from '@kit.ArkUI'
 import { commentInputDialogBuilder } from './CommentInputDialog'
-import { BusinessError } from '@kit.BasicServicesKit';
+import { BusinessError, deviceInfo } from '@kit.BasicServicesKit';
 import { appRouter, container, Logger, WindowManager } from '@agctemplate/utils';
 import { CommentInfo, CommentListRes, DramaInfo, ReplyInfo, RequestAPI } from '@agctemplate/server';
 import { CommentData, Reply } from '../models/CommentData';
@@ -27,11 +27,20 @@ export struct CommentComp {
   @Local commentId: number = 1
   @Local replyPerson: string = ''
   @Local replyContent: string = ''
+  @Local isTabletLandScape: boolean = deviceInfo.deviceType === 'tablet' &&
+    display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE
   @Event commentNum: Function = () => {
   }
   @Event closeSheet: Function = () => {
   }
-
+  callback:Callback<number> = (data:number) =>{
+    if(deviceInfo.deviceType === 'tablet' &&
+      display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE){
+      this.isTabletLandScape = true
+    }else{
+      this.isTabletLandScape = false
+    }
+  }
   // 发布评论
   publishComment(textComment: string): void {
     if (this.contentNode !== null) {
@@ -105,6 +114,7 @@ export struct CommentComp {
 
 
   aboutToAppear(): void {
+    display.on('change',this.callback)
     container.resolve(RequestAPI).getCommentList({
       pageSize: 1,
       pageNum: 20
@@ -130,6 +140,9 @@ export struct CommentComp {
     })
   }
 
+  aboutToDisappear(): void {
+    display.off('change',this.callback)
+  }
 
   openReplyDialog() {
     this.getUIContext().getPromptAction().openCustomDialog(this.replyNode, {
@@ -433,8 +446,8 @@ export struct CommentComp {
         }
       })
     }
-    .width('100%')
-    .height(468)
+    .width(this.isTabletLandScape ? '40%' : '100%')
+    .height(this.isTabletLandScape ? '90%' : '40%')
     .padding({ left: 16, top: 8, right: 16 })
     .backgroundColor('#F1F3F5')
   }

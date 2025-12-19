@@ -6,7 +6,7 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "dayjs": "^1.11.13",
+    "dayjs": "1.11.13",
     "module_imagepreview": "file:../module_imagepreview",
     "module_highlight": "file:../module_highlight",
     "module_share": "file:../module_share",

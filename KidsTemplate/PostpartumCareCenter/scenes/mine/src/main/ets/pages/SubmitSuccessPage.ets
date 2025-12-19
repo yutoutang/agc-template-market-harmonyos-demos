@@ -5,7 +5,6 @@ export function SubmitSuccessPageBuilder() {
   SubmitSuccessPage();
 }
 
-@Preview
 @ComponentV2
 export struct SubmitSuccessPage {
 
@@ -27,7 +26,7 @@ export struct SubmitSuccessPage {
 
         Text('提交成功')
           .width('100%')
-          .fontSize($r('app.string.font_size_16'))
+          .fontSize($r('sys.float.Body_L'))
           .fontFamily('HarmonyHeiTi')
           .fontWeight(FontWeight.Medium)
           .fontColor('rgba(0,0,0,0.90)')

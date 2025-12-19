@@ -43,6 +43,10 @@
     {
       "name": "middle_display_name",
       "value": "middle widget"
+    },
+    {
+      "name": "agcit_huawei_art_training",
+      "value": "1.0.1"
     }
   ]
 }

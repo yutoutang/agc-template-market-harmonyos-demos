@@ -5,17 +5,16 @@
     "description": "$string:module_desc",
     "mainElement": "EntryAbility",
     "deviceTypes": [
-      "phone",
-      "tablet"
+      "phone"
     ],
     "deliveryWithInstall": true,
     "installationFree": true,
     "pages": "$profile:main_pages",
     "metadata": [
-      // todo: client_id配置
+// todo: client_id配置
       {
         "name": "client_id",
-        "value": "xxx"
+        "value": "******"
       }
     ],
     "requestPermissions": [
@@ -33,7 +32,10 @@
         "startWindowIcon": "$media:startIcon",
         "startWindowBackground": "$color:start_window_background",
         "exported": true,
-        "supportWindowMode": ["floating","fullscreen"],
+        "supportWindowMode": [
+          "floating",
+          "fullscreen"
+        ],
         "skills": [
           {
             "entities": [

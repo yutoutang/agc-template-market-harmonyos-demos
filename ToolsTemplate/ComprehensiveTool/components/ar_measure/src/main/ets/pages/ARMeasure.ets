@@ -109,7 +109,7 @@ export struct ARMeasure {
               this.showDialog(recordContentNode);
             });
           };
-        }, (item: History) => item.record.toString());
+        }, (item: History) => item.time.toString());
       }.padding(16).height('80%');
 
       Row() {
@@ -189,6 +189,12 @@ export struct ARMeasure {
             this.vm.spaceData, this.vm.semanticDenseMode))
             .fontWeight(FontWeight.Medium)
             .fontColor($r('sys.color.font_on_primary'));
+
+          Text('Tips：您可以点击屏幕手动保存测试结果')
+            .fontSize(12)
+            .fontColor($r('sys.color.font_on_secondary'))
+            .fontWeight(FontWeight.Medium)
+            .margin({ top: 12 });
         }
         .position({ left: 16, top: 120 })
         .backgroundColor($r('sys.color.mask_fourth'))
@@ -240,6 +246,11 @@ export struct ARMeasure {
           });
       }
     }
+    .onClick(() => {
+      if (this.vm.hasMeasured) {
+        this.vm.saveManually();
+      }
+    })
     .onAppear(() => {
       this.vm.init(this.context, this.vm.volumeIdStr);
     })
@@ -258,6 +269,10 @@ export struct ARMeasure {
     })
     .onReady((context: NavDestinationContext) => {
       this.vm.pageInfos = context.pathStack;
+    })
+    .onBackPressed(() => {
+      this.vm.pageInfos.pop();
+      return true;
     })
     .hideTitleBar(true)
     .hideBackButton(true);

@@ -1,4 +1,4 @@
-import { UIUtils } from '@kit.ArkUI';
+import { promptAction, UIUtils } from '@kit.ArkUI';
 import { emitter } from '@kit.BasicServicesKit';
 import { LoginSheetUtils } from 'lib_account';
 import { BaseViewModel, RouterParams, RouterToNews } from 'lib_common';
@@ -132,10 +132,23 @@ export class InteractionViewModel extends BaseViewModel {
     cardInfo.likeCount -= 1
   }
 
-  public loadMore() {
+  public emptyToast() {
+    promptAction.showToast({
+      message: '暂无更新数据',
+      alignment: Alignment.Bottom,
+    })
+  }
+
+  public async loadMore() {
+    this.isLoading = true
     this.currentIndex += this.currentPage
     this.currentPage += 5
-    let followList = PostServiceApi.queryPostFollowList(this.currentIndex, this.currentPage)
-    followList.forEach(item => this.interactionList.push(UIUtils.makeObserved(item)))
+    let followList = await PostServiceApi.queryPostFollowList(this.currentIndex, this.currentPage)
+    if (!followList.length) {
+      this.emptyToast()
+    } else {
+      followList.forEach(item => this.interactionList.push(UIUtils.makeObserved(item)))
+    }
+    this.isLoading = false
   }
 }

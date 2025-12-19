@@ -19,12 +19,15 @@
 * DevEco Studio版本：DevEco Studio 5.0.5 Release及以上
 * HarmonyOS SDK版本：HarmonyOS 5.0.5 Release SDK及以上
 * 设备类型：华为手机（直板机）
-* HarmonyOS版本：HarmonyOS 5.0.1 Release及以上
+* HarmonyOS版本：HarmonyOS 5.0.5(17)及以上
+
+### 权限
+* 获取位置权限：ohos.permission.APPROXIMATELY_LOCATION、ohos.permission.LOCATION。
 
 ## 快速入门
 
 1. 安装组件。
-   如果是在DevEvo Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
+   如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
 
    如果是从生态市场下载组件，请参考以下步骤安装组件。
 

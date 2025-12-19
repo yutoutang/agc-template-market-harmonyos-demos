@@ -134,7 +134,7 @@ ArtTraining
 
 ### 调试
 
-本模板不支持模拟器调试，请使用真机调试
+- 模拟器：HarmonyOS 6.0.0(20) Beta5及以上
 
 ## 快速入门
 
@@ -173,9 +173,11 @@ ArtTraining
    ![项目打开](screenshots/开通华为账号认证.PNG)
 
    e. 在“项目设置”中下载SDK配置文件，并保存在工程的products/entry/src/main/resources/rawfile文件夹中，替换原示例的
-   `agconent-services.json`，不可修改名称。
+   `agconnent-services.json`，不可修改名称。
 
    ![项目打开](screenshots/下载SDK配置.PNG)
+
+   f. 如使用模拟器调试，需创建HarmonyOS 6.0.0(20) Beta5及以上版本，详细参考：[使用模拟器调试](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/cloudfoundation-emulator)
 
 3. 配置华为账号服务。
 

@@ -1,0 +1,11 @@
+{
+  "module": {
+    "name": "double_layer_tabs",
+    "type": "har",
+    "deviceTypes": [
+      "default",
+    ],
+    "requestPermissions": [
+    ]
+  }
+}

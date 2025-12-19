@@ -1,17 +1,3 @@
-/*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
- * Licensed under the Apache License, Version 2.0 (the 'License');
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an 'AS IS' BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 import { Home } from 'home';
 import { Mine } from 'mine';
 import { TabBarType } from '../model/Index';
@@ -30,7 +16,7 @@ struct Main {
       Text(title)
         .fontSize(10)
         .fontColor(this.homeTabIndex === targetIndex ? $r('sys.color.font_emphasize') :
-        $r('sys.color.font_secondary'))
+          $r('sys.color.font_secondary'))
         .opacity(this.homeTabIndex === targetIndex ? 1 : 0.6);
     }
     .onClick(() => {
@@ -47,12 +33,12 @@ struct Main {
         TabContent() {
           Home({ pathStack: this.stack });
         }
-        .tabBar(this.mainTabBar('首页', TabBarType.HOME, $r('app.media.home_active'), $r('app.media.home_inactive')));
+        .tabBar(this.mainTabBar('棣栭〉', TabBarType.HOME, $r('app.media.home_active'), $r('app.media.home_inactive')));
 
         TabContent() {
           Mine({ pathStack: this.stack });
         }.expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
-        .tabBar(this.mainTabBar('我的', TabBarType.MINE, $r('app.media.mine_active'), $r('app.media.mine_inactive')));
+        .tabBar(this.mainTabBar('鎴戠殑', TabBarType.MINE, $r('app.media.mine_active'), $r('app.media.mine_inactive')));
       }
       .clip(true)
       .barMode(BarMode.Fixed)

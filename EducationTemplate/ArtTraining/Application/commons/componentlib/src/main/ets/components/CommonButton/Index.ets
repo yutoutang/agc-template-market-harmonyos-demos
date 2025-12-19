@@ -55,7 +55,7 @@ export struct CommonButton {
 
 @Extend(Button)
 function commonButtonStyle(isFullWidth: boolean) {
-  .fontSize($r('app.string.font_size_16'))
+  .fontSize($r('sys.float.Body_L'))
   .fontWeight(500)
   .width(isFullWidth ? '100%' : 'auto')
   .padding({
@@ -68,8 +68,7 @@ function commonButtonStyle(isFullWidth: boolean) {
 @Extend(Button)
 function primaryButtonStyle(themeColor: ResourceColor) {
   .backgroundColor(themeColor)
-  .fontColor($r('app.color.icon_color_level1_invert'));
-
+  .fontColor($r('sys.color.font_on_primary'));
 }
 
 @Extend(Button)
@@ -83,5 +82,5 @@ function outlineButtonStyle(themeColor: ResourceColor) {
 @Extend(Button)
 function disabledButtonStyle() {
   .backgroundColor($r('app.color.system_color_grey'))
-  .fontColor($r('app.color.font_color_level3'));
+  .fontColor($r('sys.color.font_tertiary'));
 }

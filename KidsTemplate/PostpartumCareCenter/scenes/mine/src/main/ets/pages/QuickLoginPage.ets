@@ -1,12 +1,13 @@
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit';
-import { ErrorCode, dealAllError } from '../common/Constants';
+import { dealAllError, ErrorCode } from '../common/Constants';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { connection } from '@kit.NetworkKit';
 import { showToast } from '../common/ShowToast';
 import { common } from '@kit.AbilityKit';
 import { buffer } from '@kit.ArkTS';
 import { MainEntryVM } from '@ohos_agcit/postpartum_care_center_uicomponents';
+import { AccountUtil, Logger } from '@ohos_agcit/postpartum_care_center_utils';
 
 @Builder
 export function QuickLoginPageBuilder() {
@@ -14,10 +15,14 @@ export function QuickLoginPageBuilder() {
 }
 
 const PRIVACY_URL = 'privacy_url';
+const TAG: string = '[QuickLoginPage]';
 
 @ComponentV2
 export struct QuickLoginPage {
   logTag: string = 'QuickLoginPage';
+  popMessage: string = ''
+  uiContext: UIContext = this.getUIContext() as UIContext;
+  hostContext: common.Context = this.uiContext.getHostContext() as Context;
   domainId: number = 0x0000;
   // File used to configure the link to the HUAWEI ID User Authentication Agreement.
   private readonly srcPath = 'data.json';
@@ -28,12 +33,12 @@ export struct QuickLoginPage {
       type: loginComponentManager.TextType.PLAIN_TEXT,
     },
     {
-    text: $r('app.string.app_user_agreement'),
-    type: loginComponentManager.TextType.RICH_TEXT,
-    // Change the link to that of your own privacy policy.
-    // ...
-    tag: '',
-  }, {
+      text: $r('app.string.app_user_agreement'),
+      type: loginComponentManager.TextType.RICH_TEXT,
+      // Change the link to that of your own privacy policy.
+      // ...
+      tag: '',
+    }, {
     text: $r('app.string.app_privacy_policy'),
     type: loginComponentManager.TextType.RICH_TEXT,
     // Change the link to that of your own privacy policy.
@@ -52,15 +57,24 @@ export struct QuickLoginPage {
   }];
   controller: loginComponentManager.LoginWithHuaweiIDButtonController =
     new loginComponentManager.LoginWithHuaweiIDButtonController()
-      // Users need to accept relevant agreements before they can sign in wth HUAWEI IDs.
-      // Set the agreement status to NOT_ACCEPTED first. Once the user accepts the agreements,
-      // change the agreement status to ACCEPTED to complete HUAWEI ID sign-in.
+    // Users need to accept relevant agreements before they can sign in wth HUAWEI IDs.
+    // Set the agreement status to NOT_ACCEPTED first. Once the user accepts the agreements,
+    // change the agreement status to ACCEPTED to complete HUAWEI ID sign-in.
       .setAgreementStatus(loginComponentManager.AgreementStatus.NOT_ACCEPTED)
       .onClickLoginWithHuaweiIDButton((error: BusinessError, response: loginComponentManager.HuaweiIDCredential) => {
-        // Process the logic of a tap on the one-tap sign-in button.
-        this.handleLoginWithHuaweiIDButton(error, response);
         if (error) {
-          dealAllError(error);
+          if (this.isSelected) {
+            // mock登录
+            AccountUtil.logIn()
+            this.vm.navStack.pop();
+          } else {
+            this.showPopUp = true;
+          }
+        } else {
+          this.handleLoginWithHuaweiIDButton(error, response);
+          if (error) {
+            dealAllError(error);
+          }
         }
       });
   @Local quickLoginAnonymousPhone: string = '';
@@ -76,13 +90,13 @@ export struct QuickLoginPage {
   handleLoginWithHuaweiIDButton(error: BusinessError | undefined, response: loginComponentManager.HuaweiIDCredential) {
     this.enableStatus = false;
     if (error) {
-      hilog.error(this.domainId, this.logTag,
+      hilog.error(this.domainId, TAG,
         `Failed to login with LoginWithHuaweiIDButton. errCode is ${error.code}, errMessage is ${error.message}`);
       if (error.code === ErrorCode.ERROR_CODE_AGREEMENT_STATUS_NOT_ACCEPTED) {
         // If the agreements are not accepted, a pop-up message is displayed.
         this.showPopUp = true;
       } else {
-        showToast(error);
+        showToast(this.uiContext, error);
       }
       this.enableStatus = true;
       return;
@@ -90,7 +104,7 @@ export struct QuickLoginPage {
     try {
       if (this.isSelected) {
         if (response) {
-          hilog.info(this.domainId, this.logTag, 'Succeeded in clicking LoginWithHuaweiIDButton.');
+          hilog.info(this.domainId, TAG, 'Succeeded in clicking LoginWithHuaweiIDButton.');
           const authCode = response.authorizationCode;
           const openID = response.openID;
           const unionID = response.unionID;
@@ -110,9 +124,9 @@ export struct QuickLoginPage {
         this.showPopUp = true;
       }
     } catch (error) {
-      hilog.error(this.domainId, this.logTag,
+      hilog.error(this.domainId, TAG,
         `Failed to login with LoginWithHuaweiIDButton. errCode is ${error.code}, errMessage is ${error.message}`);
-      showToast(error as BusinessError);
+      showToast(this.uiContext, error as BusinessError);
     } finally {
       this.enableStatus = true;
     }
@@ -120,16 +134,22 @@ export struct QuickLoginPage {
 
   // Redirect to the HUAWEI ID User Authentication Agreement page.
   jumpToPrivacyWebView(privacyText: loginComponentManager.PrivacyText) {
-    const hasNet: boolean = connection.hasDefaultNetSync();
-    if (!hasNet) {
-      const hint: string = getContext().resourceManager.getStringSync($r('app.string.hwid_no_internet_connect'));
-      showToast(hint);
-      return;
+    try {
+      const hasNet: boolean = connection.hasDefaultNetSync();
+      if (!hasNet) {
+        const hint: string =
+          this.hostContext.resourceManager.getStringSync($r('app.string.hwid_no_internet_connect').id);
+        showToast(this.uiContext, hint);
+        return;
+      }
+    } catch (error) {
+      Logger.error(TAG, 'data:' + JSON.stringify(error));
     }
+
     if (privacyText.tag && privacyText.tag !== '') {
       // Obtain the multi-language environment information of the system.
-      const systemLanguage: string = (getContext() as common.UIExtensionContext).config.language ?? '';
-      hilog.info(this.domainId, this.logTag, `systemLanguage is ${systemLanguage}`);
+      const systemLanguage: string = (this.hostContext as common.UIExtensionContext).config.language ?? '';
+      hilog.info(this.domainId, TAG, `systemLanguage is ${systemLanguage}`);
       const params: Record<string, Object> = { 'protocolUrl': privacyText.tag + systemLanguage };
       // Concatenate link parameters.
       this.vm.navStack?.pushPathByName('PrivacyAgreement', params);
@@ -140,13 +160,21 @@ export struct QuickLoginPage {
   getProtocolUrl(privacyUrl: string): string {
     try {
       // Read files from /AppScope/resources/rawfile.
-      const value: Uint8Array = getContext().resourceManager.getRawFileContentSync(this.srcPath);
+      const value: Uint8Array = this.hostContext.resourceManager.getRawFileContentSync(this.srcPath);
       // Return the link to the HUAWEI ID User Authentication Agreement.
       return JSON.parse(buffer.from(value.buffer).toString())[privacyUrl] as string;
     } catch (error) {
-      hilog.error(this.domainId, this.logTag,
+      hilog.error(this.domainId, TAG,
         `getProtocolUrl Error. errCode is ${error.code}, errMessage is ${error.message}`);
       return '';
+    }
+  }
+  
+  aboutToAppear(): void {
+    try {
+      this.popMessage = this.hostContext.resourceManager.getStringSync($r('app.string.read_and_agree_protocol').id)
+    } catch (error) {
+      Logger.error(TAG, 'data:' + JSON.stringify(error));
     }
   }
 
@@ -162,13 +190,13 @@ export struct QuickLoginPage {
               .copyOption(CopyOptions.None)
               .borderRadius(20)
               .onComplete(() => {
-                hilog.info(this.domainId, this.logTag, 'Succeeded in loading appIcon.');
+                hilog.info(this.domainId, TAG, 'Succeeded in loading appIcon.');
               })
               .padding({
                 top: 10,
               })
               .onError(() => {
-                hilog.error(this.domainId, this.logTag, 'Failed to load appIcon.');
+                hilog.error(this.domainId, TAG, 'Failed to load appIcon.');
               });
           }
           .padding({
@@ -235,12 +263,12 @@ export struct QuickLoginPage {
                 .height(24)
                 .focusable(true)
                 .focusOnTouch(true)
-                .selectedColor('#CE0E2D')
+                .selectedColor($r('sys.color.comp_background_emphasize'))
                 .select(this.isSelected)
                 .enabled(this.enableStatus)
                 .margin({ top: 0 })
                 .onChange((value: boolean) => {
-                  hilog.info(this.domainId, this.logTag, `agreementChecked: ${value}`);
+                  hilog.info(this.domainId, TAG, `agreementChecked: ${value}`);
                   if (value) {
                     this.isSelected = true;
                     this.showPopUp = false;
@@ -255,7 +283,7 @@ export struct QuickLoginPage {
             }
             .padding({ right: 12 })
             .bindPopup(this.showPopUp, {
-              message: getContext().resourceManager.getStringSync($r('app.string.read_and_agree_protocol')),
+              message: this.popMessage,
               onStateChange: (event) => {
                 this.showPopUp = event.isVisible;
               },
@@ -283,7 +311,7 @@ export struct QuickLoginPage {
                         .enabled(this.enableStatus)
                         .id('quickLoginProtocolUrlSpan')
                         .onClick(() => {
-                          hilog.info(this.domainId, this.logTag, 'Click protocol url');
+                          hilog.info(this.domainId, TAG, 'Click protocol url');
                           if (this.enableStatus) {
                             try {
                               // this.appPathStack?.pushPathByName('PrivacyAgreement', undefined);
@@ -291,7 +319,7 @@ export struct QuickLoginPage {
                             } catch (error) {
                               const code: number = error.code;
                               const message: string = error.message;
-                              hilog.error(this.domainId, this.logTag,
+                              hilog.error(this.domainId, TAG,
                                 `Failed to jump privacy webview. errCode is ${code}, errMessage is ${message}`);
                             }
                           }

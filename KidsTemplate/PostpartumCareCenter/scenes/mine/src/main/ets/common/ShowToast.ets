@@ -1,7 +1,7 @@
 /*
  * Copyright (c) Huawei Technologies Co., Ltd. 2024-2025. All rights reserved.
  */
-import { promptAction } from '@kit.ArkUI';
+import { Logger } from '@ohos_agcit/postpartum_care_center_utils';
 import { BusinessError } from '@kit.BasicServicesKit';
 
 /**
@@ -17,10 +17,13 @@ function getErrorHint(error: BusinessError): string {
  * Display the toast message based on the prompt character string or BusinessError.
  * @param error Prompt character string or BusinessError.
  */
-export function showToast(error: BusinessError | string) {
+export function showToast(context: UIContext, error: BusinessError | string) {
   const message: string = typeof error === 'string' ? error : getErrorHint(error);
-  promptAction.showToast({
-    message,
-    duration: 2000
-  });
+  try {
+    context.getPromptAction().showToast({
+      message,
+      duration: 2000
+    });
+  } catch (error) {
+  }
 }

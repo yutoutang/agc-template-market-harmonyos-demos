@@ -4,16 +4,21 @@
 import { StatusFLAG } from '../constant/Index';
 import { IComment, ITravelogue } from './IResponse';
 
-@Observed
+@ObservedV2
+export class HistoryList {
+  historyList: string[] = [];
+}
+
+@ObservedV2
 export class CommentModel implements IComment {
   // 评价创建人
-  createBy: string = '';
+  @Trace createBy: string = '';
   // 评价创建时间
-  createTime: string | number = '';
+  @Trace createTime: string | number = '';
   // 评价内容
-  evaluateContent: string = '';
+  @Trace evaluateContent: string = '';
   // 评价人头像
-  userHeadImg: string = '';
+  @Trace userHeadImg: string = '';
 }
 
 export class FindModule {
@@ -23,7 +28,7 @@ export class FindModule {
   isOpenApp: boolean = false;
 }
 
-@Observed
+@ObservedV2
 export class PostCardModel implements ITravelogue {
   // 游记ID
   id: number = 0;
@@ -36,19 +41,19 @@ export class PostCardModel implements ITravelogue {
   // 发布时间
   publishTime: string = '';
   // 游记图片
-  images: string[] | string = [];
+  @Trace images: string[] | string = [];
   // 游记内容
-  content: string = '';
+  @Trace content: string = '';
   // 点赞数
-  likeNum: number = 0;
+  @Trace likeNum: number = 0;
   // 收藏数
-  collectNum: number = 0;
+  @Trace collectNum: number = 0;
   // 评论数
   commentNum: number = 0;
   // 当前用户点赞状态（Y是，N否）
-  currentUserLikeStatus: StatusFLAG = StatusFLAG.NO;
+  @Trace currentUserLikeStatus: StatusFLAG = StatusFLAG.NO;
   // 当前用户收藏状态（Y是，N否）
-  currentUserCollectStatus: StatusFLAG = StatusFLAG.NO;
+  @Trace currentUserCollectStatus: StatusFLAG = StatusFLAG.NO;
 
   constructor(item?: PostCardModel) {
     this.id = item?.id || 1;
@@ -70,10 +75,10 @@ export class PostCardModel implements ITravelogue {
   }
 }
 
-@Observed
+@ObservedV2
 export class PostDetailModel extends PostCardModel {
-  travelogueEvaluateList: CommentModel[] = [];
-  relatedModules: FindModule[] = [];
+  @Trace travelogueEvaluateList: CommentModel[] = [];
+  @Trace relatedModules: FindModule[] = [];
 
   constructor(item?: PostDetailModel) {
     super(item);

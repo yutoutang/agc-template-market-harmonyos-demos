@@ -7,6 +7,10 @@
     {
       "name": "test",
       "value": "description%s"
+    },
+    {
+      "name": "agcit_huawei_rent_and_buy",
+      "value": "1.0.0"
     }
   ]
 }

@@ -12,6 +12,6 @@
     "@agctemplate/detail": "1.0.0",
     "@agctemplate/server": "1.0.0",
     "video_swiper": "1.0.0",
-    "@agctemplate/module_share": "1.0.0"
+    "aggregated_share": "file:../../components/aggregated_share"
   }
 }

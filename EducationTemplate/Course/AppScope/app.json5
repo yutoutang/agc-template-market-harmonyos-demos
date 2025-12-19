@@ -3,8 +3,8 @@
 // todo 修改应用包名
     "bundleName": "course.1.xxxxxx",
     "vendor": "example",
-    "versionCode": 1000000,
-    "versionName": "1.0.1",
+    "versionCode": 1000002,
+    "versionName": "1.0.2",
     "icon": "$media:layered_image",
     "label": "$string:app_name"
   }

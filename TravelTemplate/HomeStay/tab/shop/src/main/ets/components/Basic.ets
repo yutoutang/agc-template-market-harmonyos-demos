@@ -1,10 +1,10 @@
 import { Constants } from 'constant';
 import { Commodity } from 'type';
 
-@Component
+@ComponentV2
 export struct Basic {
   private swiperController: SwiperController = new SwiperController();
-  @Prop commodity: Commodity;
+  @Param @Require commodity: Commodity;
 
   build() {
     Column() {

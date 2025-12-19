@@ -339,7 +339,7 @@ export struct DetailMaskLayer {
       .bindSheet($$this.isShowBulletSettingSheet, this.bulletSettingSheet(), {
         height: 372,
         showClose: false,
-        preferType: SheetType.BOTTOM
+        preferType: SheetType.CENTER
       })
   }
 
@@ -402,7 +402,7 @@ export struct DetailMaskLayer {
           .bindSheet($$this.isShowPlaySettingSheet, this.playSettingSheetBuilder(), {
             height: 352,
             showClose: false,
-            preferType: SheetType.BOTTOM,
+            preferType: SheetType.CENTER,
           });
       }
       .height(56);

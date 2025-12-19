@@ -14,15 +14,15 @@
 
 此模板提供如下组件，所有组件存放在工程根目录的components下，如果您仅需使用组件，可参考对应组件的指导链接；如果您使用此模板，请参考本文档。
 
-| 组件                               | 描述               | 使用指导 |
-|----------------------------------|------------------| -------- |
-| 景点播报组件（attraction_announcement）  | 提供景点介绍语音播报功能。    |  [使用指导](components/attraction_announcement/README.md)        |
-| 景区导览组件（attraction_guide）         | 提供景区景点及配套设施导览功能。 |  [使用指导](components/attraction_guide/README.md)        |
-| 景区实况组件（attraction_live）          | 提供景区实况情况介绍功能。    |  [使用指导](components/attraction_live/README.md)        |
-| 周边餐饮住宿组件（catering_accommodation） | 提供景区周边餐饮住宿浏览功能。  |  [使用指导](components/catering_accommodation/README.md)        |
-| 服务热线组件（service_hotline）          | 提供景区服务热线查询与拨打功能。 |  [使用指导](components/service_hotline/README.md)        |
-| 常用游客管理组件（tourist_management）     | 提供常用游客查看与管理功能。   |  [使用指导](components/tourist_management/README.md)        |
-| 游记组件（attraction_note）         | 提供景区游记浏览搜索、详情查看、游记评论、推荐线路查看等功能。   |  [使用指导](components/attraction_note/README.md)        |
+| 组件                               | 描述                              | 使用指导 |
+|----------------------------------|---------------------------------| -------- |
+| 景点播报组件（attraction_announcement）  | 提供景点介绍语音播报功能。                   |  [使用指导](components/attraction_announcement/README.md)        |
+| 景区导览组件（attraction_guide）         | 提供景区景点及配套设施导览功能。                |  [使用指导](components/attraction_guide/README.md)        |
+| 景点实况组件（attraction_live）          | 提供景点实况情况介绍功能。                   |  [使用指导](components/attraction_live/README.md)        |
+| 周边餐饮住宿组件（catering_accommodation） | 提供景区周边餐饮住宿浏览功能。                 |  [使用指导](components/catering_accommodation/README.md)        |
+| 服务热线组件（service_hotline）          | 提供景区服务热线查询与拨打功能。                |  [使用指导](components/service_hotline/README.md)        |
+| 常用游客管理组件（tourist_management）     | 提供常用游客查看与管理功能。                  |  [使用指导](components/tourist_management/README.md)        |
+| 游记组件（attraction_note）         | 提供景区游记浏览搜索、详情查看、游记评论、推荐线路查看等功能。 |  [使用指导](components/attraction_note/README.md)        |
 
 本模板为景区旅游类元服务提供了常用功能的开发样例，模板主要分首页、门票、导览、订单和我的五大模块：
 * 首页：提供景区轮播展示、公告信息、主要服务导航、热门景点推荐、攻略游记推荐。
@@ -169,7 +169,7 @@ TrousitAttraction
   |        |- model                               // 类型定义
   |        |- mapper                              // 数据映射方法          
   |        └- viewmodel                           // 与页面一一对应的vm层
-  |  └- attraction_live/src/main/ets              // 景区导览组件                                                                                                        
+  |  └- attraction_live/src/main/ets              // 景点实况组件                                                                                                        
   |        |- components                          // ui组件                               
   |        |- model                               // 类型定义
   |        |- mapper                              // 数据映射方法          

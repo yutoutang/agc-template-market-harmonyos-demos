@@ -1,18 +1,12 @@
 import {
-  CalenderAddition,
   callDialog,
   callPhone,
   MainEntryVM,
-  StoreBookingRecordItem,
+  StoreBookingRecordItem
 } from '@ohos_agcit/postpartum_care_center_uicomponents';
-import { ComponentContent, promptAction } from '@kit.ArkUI';
-import { call } from '@kit.TelephonyKit';
-import { BusinessError } from '@kit.BasicServicesKit';
+import { ComponentContent } from '@kit.ArkUI';
 import {
-  Logger,
-  PromptActionClass,
-  StoreBookingProjectMap,
-  StoreBookingStatusMap,
+  Logger, PromptActionClass, StoreBookingStatusMap
 } from '@ohos_agcit/postpartum_care_center_utils';
 import { cancelledImage } from '../view/CommonView';
 
@@ -23,10 +17,10 @@ export function StoreBookingDetailBuilder() {
 
 const NOT_FOUND = -1;
 
-@Preview
 @ComponentV2
 struct StoreBookingDetail {
   vm: MainEntryVM = MainEntryVM.instance;
+  uiContext: UIContext = this.getUIContext() as UIContext;
   @Local storeBookingRecord: StoreBookingRecordItem = new StoreBookingRecordItem(1, '', '', '', '', 0, 0, '', false);
   private contentNode: ComponentContent<object> =
     new ComponentContent(this.getUIContext(), wrapBuilder(callDialog), callPhone);
@@ -129,7 +123,7 @@ struct StoreBookingDetail {
             }
             .width('75%')
             .onClick(() => {
-              this.vm.queryLocation(
+              this.vm.queryLocation(this.uiContext,
                 this.vm.storeList.storeList.find(
                   store => store.name === this.storeBookingRecord.storeName)!);
             });
@@ -165,8 +159,8 @@ struct StoreBookingDetail {
 
           Button({ type: ButtonType.Normal, stateEffect: true }) {
             Text(this.storeBookingRecord.status === StoreBookingStatusMap.BOOKING_SUCCESS ?
-            $r('app.string.booking_cancel_button') : $r('app.string.back'))
-              .fontSize($r('app.string.font_size_16'))
+              $r('app.string.booking_cancel_button') : $r('app.string.back'))
+              .fontSize($r('sys.float.Body_L'))
               .fontFamily('HarmonyHeiTi')
               .fontWeight(FontWeight.Medium)
               .fontColor('rgba(0,0,0,0.90)');
@@ -175,7 +169,7 @@ struct StoreBookingDetail {
             top: $r('app.string.padding_10'),
             bottom: $r('app.string.padding_9'),
           })
-          .borderRadius($r('app.string.border_radius_20'))
+          .borderRadius($r('sys.float.corner_radius_level10'))
           .backgroundColor('rgba(0,0,0,0.05)')
           .width('100%')
           .onClick(() => {
@@ -187,7 +181,7 @@ struct StoreBookingDetail {
             if (index > -1) {
               this.vm.storeBookingRecord[index].status = StoreBookingStatusMap.BOOKING_CANCEL;
               this.vm.navStack.pop();
-              promptAction.showToast({ message: '预约取消成功' });
+              this.uiContext.getPromptAction().showToast({ message: '预约取消成功' });
             } else {
               this.vm.navStack.pop();
             }

@@ -11,6 +11,10 @@
     {
       "name": "EntryAbility_label",
       "value": "label"
+    },
+    {
+      "name": "agcit_huawei_home_stay",
+      "value": "1.0.4"
     }
   ]
 }

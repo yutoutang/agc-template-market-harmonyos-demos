@@ -54,9 +54,9 @@ export class WsParam {
 
 export const ws = webSocket.createWebSocket();
 
-// TODO 添加文本翻译对应的Websocket服务接口认证信息
+// TODO 添加文本翻译对应的Websocket服务接口认证信息(appid、apiSecret、apiKey)
 export const wsParam =
-  new WsParam('dd674b07', 'bf6949ea0abbd9dd17b5fed25002525b', 'ZmZmYzBhNjM5ZTAxY2IzNzc4MGJkMGNj', '');
+  new WsParam('xxx', 'xxx', 'xxx', '');
 
 export class WsUtil {
   static text: string = ''

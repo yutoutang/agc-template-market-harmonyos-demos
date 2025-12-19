@@ -1,4 +1,4 @@
-import { AccountUtil } from 'account';
+import { common } from '@kit.AbilityKit';
 import {
   CalendarUtil,
   CustomCalendarPickerDialog,
@@ -10,7 +10,7 @@ import {
 } from 'calendar_select';
 import { Constants, NavPathName } from 'constant';
 import { CarouselImage, RoomType } from 'type';
-import { Logger } from 'util';
+import { AccountUtil, Logger } from 'util';
 import { BasicInfoArea } from '../components/BasicInfoArea';
 import { EnhancedSource } from '../model/Index';
 import { HomePageVM } from '../viewmodel/HomePageVM';
@@ -20,50 +20,47 @@ export function HomeBuilder() {
   Home();
 }
 
-@Component
+@ComponentV2
 export struct Home {
   vm: HomePageVM = HomePageVM.instance;
   private swiperController: SwiperController = new SwiperController();
   private scrollerForScroll: Scroller = new Scroller();
-  @State isShow: boolean = false;
-  @State showIndex: number = 0;
-  @StorageLink('night') night: number = CalendarUtil.getNight() ?? 1;
-  @State isShowPrice: boolean = false;
-  @State readyCloseDialog: boolean = false;
-  @State priceList: Price[] = [];
-  @State currentMonthDay: number[] = [];
-  @State currentMonth: number | undefined = CalendarUtil.getCurrentDate()?.month;
-  @State currentDay: number | undefined = CalendarUtil.getCurrentDate()?.day;
-  @State currentYear: number | undefined = CalendarUtil.getCurrentDate()?.year;
-  @StorageLink('startDate') startDate: DateModel | undefined = CalendarUtil.getStartDate();
-  @StorageLink('endDate') endDate: DateModel | undefined = CalendarUtil.getEndDate();
-  @StorageLink('currentUser') currentUser: string | undefined = AccountUtil.getCurrentUser();
-  @Consume('homeTabIndex') homeTabIndex: number;
-  @Consume('mainPathStack') mainPathStack: NavPathStack;
+  @Local isShow: boolean = false;
+  @Local showIndex: number = 0;
+  @Local night: number = CalendarUtil.getNight() ?? 1;
+  @Local readyCloseDialog: boolean = false;
+  @Local priceList: Price[] = [];
+  @Local currentMonthDay: number[] = [];
+  @Local startDate: DateModel = CalendarUtil.getStartDate();
+  @Local endDate: DateModel = CalendarUtil.getEndDate();
+  @Local currentUser: string | undefined = AccountUtil.getUserId();
+  @Consumer('homeTabIndex') homeTabIndex: number = 0;
+  @Consumer('mainPathStack') mainPathStack: NavPathStack = new NavPathStack();
   dialogController: CustomDialogController = new CustomDialogController({
     builder: CustomCalendarPickerDialog({
-      currentMonth: this.currentMonth,
-      currentDay: this.currentDay,
-      currentYear: this.currentYear,
-      startDate: this.startDate,
-      endDate: this.endDate,
-      night: this.night,
-      isShowPrice: this.isShowPrice,
-      readyCloseDialog: this.readyCloseDialog,
       priceList: this.priceList,
     }),
     alignment: DialogAlignment.Bottom,
     customStyle: true,
     onWillDismiss: () => {
-      this.readyCloseDialog = true;
-      setTimeout(() => {
-        this.readyCloseDialog = false;
-      }, Constants.TRANSITION_DURATION);
+      this.dialogController.close();
     },
   });
 
   aboutToAppear() {
     this.initialDate();
+    (getContext(this) as common.UIAbilityContext).eventHub.on('reLogin',
+      (uid: string) => {
+      AccountUtil.setUserId(uid);
+        if (!AccountUtil.getAvatar()) {
+          AccountUtil.setAvatar($r('app.media.avatar'));
+          AccountUtil.setNickName('华为用户');
+        }
+      });
+  }
+
+  aboutToDisappear(): void {
+    (getContext(this) as common.UIAbilityContext).eventHub.off('reLogin');
   }
 
   initialDate() {
@@ -72,8 +69,7 @@ export struct Home {
       if (!AppStorage.get('startDate') && !AppStorage.get('endDate')) {
         this.startDate = getRealTimeDate();
         let date = new Date();
-        let days = getLastDayOfMonth(this.currentYear ?? date.getFullYear(),
-          this.currentMonth ?? date.getMonth());
+        let days = getLastDayOfMonth(date.getFullYear(), date.getMonth());
         if (this.startDate.day >= days) {
           this.endDate =
             new DateModel(this.startDate.day - days + 1, this.startDate.week, this.startDate.month + 1,
@@ -83,9 +79,9 @@ export struct Home {
             new DateModel(this.startDate.day + 1, this.startDate.week, this.startDate.month, this.startDate.year);
         }
 
-        AppStorage.setOrCreate('currentDate', this.startDate);
-        AppStorage.setOrCreate('startDate', this.startDate);
-        AppStorage.setOrCreate('endDate', this.endDate);
+        CalendarUtil.setStartDate(this.startDate);
+        CalendarUtil.setCurrentDate(this.startDate);
+        CalendarUtil.setEndDate(this.endDate);
       }
     });
 
@@ -95,45 +91,11 @@ export struct Home {
   }
 
   @Builder
-  BasicInfoBuilder() {
-    Row({ space: 8 }) {
-      Image($r('app.media.brand')).size({ width: 60, height: 60 }).borderRadius(8);
-
-      Column({ space: 6 }) {
-        Row() {
-          Text(this.vm.hotelInfo.appInfo.appName)
-            .fontSize(20)
-            .fontWeight(500)
-            .fontColor('#111111')
-            .width(200)
-            .maxLines(1)
-            .textOverflow({ overflow: TextOverflow.Ellipsis });
-
-          Row({ space: 16 }) {
-            Image($r('app.media.navigating')).size({ height: 16, width: 16 });
-            Image($r('app.media.phone')).size({ height: 16, width: 16 });
-          };
-        }.justifyContent(FlexAlign.SpaceBetween).width(Constants.FULL_SCREEN);
-
-        Row({ space: 4 }) {
-          Image($r('app.media.icon_position')).size({ height: 12, width: 12 });
-          Text(this.vm.hotelInfo.appInfo.address).fontSize(12);
-        }.alignSelf(ItemAlign.Start);
-      }.width('80%');
-    }.width(Constants.FULL_SCREEN).justifyContent(FlexAlign.Start);
-  }
-
-  @Builder
   DateAreaBuilder() {
     DateInfo(
       {
-        startDate: CalendarUtil.getStartDate(),
-        endDate: CalendarUtil.getEndDate(),
-        night: this.night,
-        isShowPrice: false,
         priceList: [],
-      },
-    )
+      })
       .backgroundColor('#f5f6fa')
       .borderRadius(8);
   }
@@ -141,7 +103,7 @@ export struct Home {
   @Builder
   RoomInfoCard(item: RoomType) {
     Column({ space: 8 }) {
-      Image(item.roomTypeBanner).height(120).borderRadius(8);
+      Image(item.roomTypeBanner).height(120).borderRadius(8).width('100%');
 
       Column({ space: 4 }) {
         Text(item.roomTypeName).fontColor('#111111');
@@ -182,6 +144,9 @@ export struct Home {
             if (!this.currentUser) {
               this.mainPathStack.pushPathByName(NavPathName.QUICK_LOGIN_PAGE, null, (popInfo: ESObject) => {
                 this.currentUser = popInfo.result;
+                AccountUtil.setUserId(popInfo.result);
+                (getContext(this) as common.UIAbilityContext).eventHub.emit('reLogin',
+                  popInfo.result);
                 Logger.info('quick login success');
               });
             } else {
@@ -192,7 +157,7 @@ export struct Home {
             }
           });
       }.width(Constants.FULL_SCREEN).justifyContent(FlexAlign.SpaceBetween);
-    }.onClick(() => {
+    }.width('100%').onClick(() => {
       this.mainPathStack.pushPathByName(NavPathName.HOTEL_DETAIL, item);
     });
   }

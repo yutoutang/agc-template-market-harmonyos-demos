@@ -95,6 +95,7 @@ export struct ShareView {
       Row() {
         Text(this.sheetTitle)
           .fontSize($r('sys.float.Title_S'))
+          .fontColor($r('sys.color.font_primary'))
           .fontWeight(FontWeight.Bold)
           .maxLines(1)
       }
@@ -132,7 +133,7 @@ export struct ShareView {
       .edgeEffect(EdgeEffect.Spring)
       .nestedScroll({
         scrollForward: NestedScrollMode.PARENT_FIRST,
-        scrollBackward: NestedScrollMode.SELF_FIRST
+        scrollBackward: NestedScrollMode.SELF_FIRST,
       })
 
       Screenshot({

@@ -1,5 +1,3 @@
-import { promptAction } from '@kit.ArkUI'
-
 @ComponentV2
 export struct VipOpen {
   @Local isAgreed: boolean = false
@@ -48,7 +46,6 @@ export struct VipOpen {
         .backgroundColor('#ff92673b')
         .fontColor($r('sys.color.font_on_primary'))
         .fontWeight(FontWeight.Medium)
-        .fontSize(16)
         .width('100%')
         .enabled(this.isAgreed)
         .onClick(() => {

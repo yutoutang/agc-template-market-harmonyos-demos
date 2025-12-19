@@ -1,18 +1,22 @@
-import { AssociatePhone, MainEntryVM, TitleTop } from '@ohos_agcit/postpartum_care_center_uicomponents';
-import { ServiceItem } from '@ohos_agcit/postpartum_care_center_utils';
+import { MainEntryVM, TitleTop } from '@ohos_agcit/postpartum_care_center_uicomponents';
+import { Logger, ServiceItem } from '@ohos_agcit/postpartum_care_center_utils';
 import { authentication } from '@kit.AccountKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { dealAllError } from '../common/Constants';
 import { showToast } from '../common/ShowToast';
+import { common } from '@kit.AbilityKit';
 
-@Entry
+
+const TAG: string = '[Mine]';
+
 @ComponentV2
 export struct Mine {
-  logTag: string = 'PrepareLoginPage';
   domainId: number = 0x0000;
   @Local message: string = '我的';
   @Param vm: MainEntryVM = MainEntryVM.instance;
+  uiContext: UIContext = this.getUIContext() as UIContext;
+  hostContext: common.Context = this.uiContext.getHostContext() as Context;
 
   build() {
     Stack() {
@@ -26,13 +30,15 @@ export struct Mine {
         Column() {
           Column() {
             Row({ space: 12 }) {
-              Image(this.vm.userInfo.isLogin && this.vm.userInfo.avatar !== '' ? this.vm.userInfo.avatar : $r('app.media.ic_user_default'))
+              Image(this.vm.userInfo.isLogin && this.vm.userInfo.avatar !== '' ? this.vm.userInfo.avatar :
+                $r('app.media.ic_user_default'))
                 .width(48)
                 .height(48)
                 .borderRadius(100)
 
               Column({ space: 8 }) {
-                Text(this.vm.userInfo.isLogin && this.vm.userInfo.nickname !== '' ? this.vm.userInfo.nickname : '点击登录')
+                Text(this.vm.userInfo.isLogin && this.vm.userInfo.nickname !== '' ? this.vm.userInfo.nickname :
+                  '点击登录')
                   .fontSize($r('app.string.font_size_18'))
                   .fontFamily('HarmonyHeiTi')
                   .fontWeight(FontWeight.Medium)
@@ -54,6 +60,7 @@ export struct Mine {
               this.getQuickLoginAnonymousPhone();
             }
           });
+
           Column() {
             Text('常用服务')
               .width('100%')
@@ -105,8 +112,8 @@ export struct Mine {
                     if (index !== this.vm.serviceItems.length - 1) {
                       Divider()
                         .margin({ left: $r('app.string.margin_40') })
-                        .color('rgba(0,0,0,0.05)')
-                        .strokeWidth(1);
+                        .color($r('sys.color.comp_divider'))
+                        .strokeWidth('1px');
                     }
                   };
                 }
@@ -157,16 +164,19 @@ export struct Mine {
         const quickLoginAnonymousPhone = response.data?.extraInfo?.quickLoginAnonymousPhone as string;
         AppStorage.setOrCreate('quickLoginAnonymousPhone', quickLoginAnonymousPhone);
         this.jumpLoginPage(quickLoginAnonymousPhone);
-        hilog.info(this.domainId, this.logTag,
+        hilog.info(this.domainId, TAG,
           `Succeeded in authorizing. QuickLoginAnonymousPhone is ${quickLoginAnonymousPhone}`);
       }).catch((error: BusinessError) => {
-        hilog.error(this.domainId, this.logTag,
+        hilog.error(this.domainId, TAG,
           `Failed to authorize. errCode is ${error.code}, errMessage is ${error.message}`);
         dealAllError(error);
-        showToast(error);
+        this.getUIContext().getPromptAction().showToast({
+          message: '获取匿名手机号失败，使用mock登录'
+        })
+        this.jumpLoginPage('a00****0000');
       });
     } catch (error) {
-      hilog.error(this.domainId, this.logTag,
+      hilog.error(this.domainId, TAG,
         `Failed to authorize. errCode is ${error.code}, errMessage is ${error.message}`);
     }
   }
@@ -179,11 +189,13 @@ export struct Mine {
       this.vm.navStack.pushPathByName('QuickLoginPage', params);
     } else {
       // If the anonymous mobile number cannot be obtained, an error message is displayed.
-      const hint: string = getContext().resourceManager.getStringSync($r('app.string.get_mobile_number_error'));
-      showToast(hint);
+      try {
+        const hint: string =
+          this.hostContext.resourceManager.getStringSync($r('app.string.get_mobile_number_error').id);
+        showToast(this.uiContext, hint);
+      } catch (error) {
+        Logger.error(TAG, 'data:' + JSON.stringify(error));
+      }
     }
   }
-
-
-
 }

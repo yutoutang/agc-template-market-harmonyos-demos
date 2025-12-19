@@ -11,7 +11,7 @@ export struct Action {
   @Param phone: string = '';
   @Event changeFavorite: () => void = () => {
   };
-  private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+  private context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
 
   aboutToAppear(): void {
     this.context.eventHub.on(EventEmitName.MAKE_CALL, (phone: string) => {
@@ -50,8 +50,8 @@ export struct Action {
       .onClick(() => {
         this.isShow = true;
       })
-      .bindSheet($$this.isShow, CustomServiceDialog(this.phone),
-        { title: { title: '预约看房' }, height: 280 });
+      .bindSheet($$this.isShow, CustomServiceDialog(this.phone, this.getUIContext().getHostContext()!),
+        { title: { title: '预约看房' }, height: 280, preferType: SheetType.CENTER });
     }.width(Constant.FULL_PERCENT).justifyContent(FlexAlign.Start);
   }
 }

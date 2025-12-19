@@ -2,7 +2,7 @@
 export struct FullLoadingComponent {
   build() {
     Column() {
-      LoadingProgress().width(30).height(30)
+      LoadingProgress().width(32).height(32)
     }
     .justifyContent(FlexAlign.Center)
     .width('100%')

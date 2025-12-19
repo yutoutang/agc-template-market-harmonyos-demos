@@ -1,8 +1,7 @@
 import { Constants } from 'constant';
-import { isValidPhoneNo, hasPassenger } from 'util';
+import { isValidPhoneNo, hasPassenger, AccountUtil } from 'util';
 import { promptAction } from '@kit.ArkUI';
 import { AddOrModifyPassengerRequest, https } from 'network';
-import { AccountUtil } from 'account';
 import { TitleBar } from 'component';
 import { Passenger } from 'type';
 
@@ -11,17 +10,16 @@ export function AddGuestBuilder() {
   AddGuest();
 }
 
-@Component
+@ComponentV2
 export struct AddGuest {
   controller: TextInputController = new TextInputController();
-  @State psgId: number = 0;
-  @State isModify: boolean = false;
-  @State guestName: string = '';
-  @State phoneNo: string = '';
-  @State openId: string | undefined = AccountUtil.getOpenId();
-  @State cardNo: string = '';
-  @State windowBottomHeight: number = AppStorage.get('windowBottomHeight') as number || 28;
-  @Consume('mainPathStack') mainPathStack: NavPathStack;
+  @Local psgId: number = 0;
+  @Local isModify: boolean = false;
+  @Local guestName: string = '';
+  @Local phoneNo: string = '';
+  @Local cardNo: string = '';
+  @Local windowBottomHeight: number = AppStorage.get('windowBottomHeight') as number || 28;
+  @Consumer('mainPathStack') mainPathStack: NavPathStack = new NavPathStack();
 
   build() {
     NavDestination() {

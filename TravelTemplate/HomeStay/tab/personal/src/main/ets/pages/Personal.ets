@@ -1,27 +1,32 @@
+import { common } from '@kit.AbilityKit';
 import { Constants, NavPathName, OrderTextModel, OtherTabNavModel } from 'constant';
-import { OrderParam } from 'type';
-import { AccountUtil } from 'account';
-import { PersonalInfoVM } from '../viewmodel/PersonalInfoVM';
+import { OrderParam, PersonalInfo } from 'type';
 import { TitleBar } from 'component';
+import { AccountUtil } from 'util';
+import { PersonalInfoVM } from '../viewmodel/PersonalInfoVM';
 
 @Builder
 export function PersonalBuilder() {
   Personal();
 }
 
-@Component
+@ComponentV2
 export struct Personal {
   vm: PersonalInfoVM = PersonalInfoVM.instance;
-  @State avatar: ResourceStr = $r('app.media.avatar');
-  @State nickname: string = '华为用户';
-  @StorageLink('currentUser') currentUser: string | undefined = AccountUtil.getCurrentUser();
-  @State windowTopHeight: number = AppStorage.get('windowTopHeight') as number || 38.77;
+  @Local personalInfo: PersonalInfo = AccountUtil.getPersonalInfo();
+  @Local userId: string = AccountUtil.getUserId();
+  @Local windowTopHeight: number = AppStorage.get('windowTopHeight') as number || 38.77;
   controller: TabsController = new TabsController();
-  @Consume('mainPathStack') mainPathStack: NavPathStack;
+  private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+  @Consumer('mainPathStack') mainPathStack: NavPathStack = new NavPathStack();
 
   routeByIndex(value: number) {
     const navItem = Constants.OTHER_NAV_TABLE.find((item: OtherTabNavModel) => item.index === value);
     this.mainPathStack.pushPathByName(navItem?.page, null);
+  }
+
+  aboutToDisappear(): void {
+    this.context.eventHub.off('reLogin');
   }
 
   build() {
@@ -38,22 +43,22 @@ export struct Personal {
           }.height(120).width(Constants.FULL_SCREEN).backgroundColor('#5c6383');
 
           Row() {
-            Image(this.currentUser ? this.avatar : $r('app.media.default_avatar'))
+            Image(this.userId ? this.personalInfo.avatar : $r('app.media.default_avatar'))
               .width(52)
               .height(52)
               .borderRadius(26)
               .aspectRatio(1);
-            Text(this.currentUser ? this.nickname : '立即登录')
+            Text(this.userId ? this.personalInfo.nickName : '立即登录')
               .fontSize(15)
               .fontColor(Color.White)
               .margin({ left: 12 })
               .fontWeight(600);
           }.padding(16).width(Constants.FULL_SCREEN).justifyContent(FlexAlign.Start).onClick(() => {
-            if (!this.currentUser) {
+            if (!this.userId) {
               this.mainPathStack.pushPathByName(NavPathName.QUICK_LOGIN_PAGE, null, (popInfo: ESObject) => {
-                this.avatar = $r('app.media.avatar');
-                this.nickname = '华为用户';
-                this.currentUser = popInfo.result;
+                this.personalInfo.avatar = this.personalInfo.avatar ? this.personalInfo.avatar : $r('app.media.avatar');
+                this.personalInfo.nickName = this.personalInfo.nickName ? this.personalInfo.nickName : '华为用户';
+                this.userId = popInfo.result;
               });
             }
           });
@@ -111,7 +116,7 @@ export struct Personal {
                     this.routeByIndex(item.value);
                   });
                 }, (item: OrderTextModel) => item.title);
-              if (this.currentUser) {
+              if (this.userId) {
                 GridItem() {
                   Column() {
                     Image($r('app.media.icon_my_center')).size({ width: 24, height: 24 }).objectFit(ImageFit.Contain);
@@ -120,9 +125,18 @@ export struct Personal {
                   };
                 }.onClick(() => {
                   this.mainPathStack.pushPathByName(NavPathName.PERSONAL_INFO, null, (popInfo: ESObject) => {
-                    this.avatar = popInfo.result.avatar;
-                    this.nickname = popInfo.result.nickname;
-                    this.currentUser = (popInfo.result.type === 0 ? AccountUtil.getCurrentUser() : '');
+                    this.personalInfo.avatar = popInfo.result.avatar ? popInfo.result.avatar : this.personalInfo.avatar;
+                    this.personalInfo.nickName =
+                      popInfo.result.nickname ? popInfo.result.nickname : this.personalInfo.nickName;
+                    this.userId = (popInfo.result.type === 0 ? this.userId : '');
+                    this.context.eventHub.on('reLogin',
+                      (uid: string) => {
+                        this.userId = uid;
+                        if (!this.personalInfo.avatar) {
+                          AccountUtil.setAvatar($r('app.media.avatar'));
+                          AccountUtil.setNickName('华为用户');
+                        }
+                      });
                   });
                 });
               }
@@ -133,7 +147,7 @@ export struct Personal {
             .width(Constants.FULL_SCREEN)
             .margin({ top: 16 });
           }
-          .height(this.currentUser ? 172 : 120)
+          .height(this.userId ? 172 : 120)
           .margin({ top: 16 })
           .padding(16)
           .backgroundColor(Color.White)

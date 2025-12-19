@@ -1,13 +1,11 @@
 import { Constants } from 'constant';
 import { TabBarData, TabBarType, tabsInfo } from '../model/TabBarModel';
 
-@Component
+@ComponentV2
 export struct CustomTabBar {
-  @Link homeTabIndex: TabBarType;
-
-  onChange(index: TabBarType): void {
-    this.homeTabIndex = index;
-  }
+  @Param @Require homeTabIndex: TabBarType;
+  @Event changeIndex: (index: number) => void = () => {
+  };
 
   build() {
     Flex({
@@ -18,7 +16,7 @@ export struct CustomTabBar {
         TabItem({
           index: item.id,
           selectedIndex: this.homeTabIndex,
-          onChange: (index: number) => this.onChange(index)
+          onChange: (index: number) => this.changeIndex(index)
         })
       }, (item: TabBarData) => item.id.toString())
     }
@@ -32,12 +30,12 @@ export struct CustomTabBar {
   }
 }
 
-@Component
+@ComponentV2
 struct TabItem {
-  @Prop index: number
-  @Prop selectedIndex: number;
-  @State showAnimation: boolean = false;
-  onChange: (index: number) => void = () => {
+  @Param @Require index: number
+  @Param @Require selectedIndex: number;
+  @Local showAnimation: boolean = false;
+  @Event onChange: (index: number) => void = () => {
   };
 
   build() {

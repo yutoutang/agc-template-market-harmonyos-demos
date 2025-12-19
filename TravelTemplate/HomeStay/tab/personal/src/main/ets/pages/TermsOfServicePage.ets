@@ -6,9 +6,9 @@ export function TermsOfServicePageBuilder() {
   TermsOfServicePage();
 }
 
-@Component
+@ComponentV2
 export struct TermsOfServicePage {
-  @Consume('mainPathStack') mainPathStack: NavPathStack;
+  @Consumer('mainPathStack') mainPathStack: NavPathStack = new NavPathStack();
 
   build() {
     NavDestination() {

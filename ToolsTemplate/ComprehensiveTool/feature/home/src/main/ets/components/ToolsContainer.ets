@@ -49,7 +49,6 @@ export struct ToolsContainer {
       for (let i = 0; i < res.permissions.length; i++) {
         if ('ohos.permission.CAMERA' === res.permissions[i] && res.authResults[i] === 0) {
           this.vm.hasPermission = true;
-          this.vm.pathStack.clear();
           this.vm.pathStack.pushDestinationByName('ARMeasure', null);
         }
       }

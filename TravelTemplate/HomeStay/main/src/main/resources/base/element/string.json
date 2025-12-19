@@ -10,7 +10,7 @@
     },
     {
       "name": "EntryAbility_label",
-      "value": "原舍望山民宿"
+      "value": "一间民宿"
     },
     {
       "name": "reason",
@@ -27,6 +27,10 @@
     {
       "name": "about",
       "value": "关于民宿"
+    },
+    {
+      "name": "agcit_huawei_home_stay",
+      "value": "1.0.4"
     }
   ]
 }

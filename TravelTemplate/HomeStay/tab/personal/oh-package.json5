@@ -8,9 +8,8 @@
   "packageType": "InterfaceHar",
   "dependencies": {
     "calendar_select": "file:../../components/calendar_select",
-    "account": "file:../../function/account",
     "util": "file:../../common/util",
-    "network": "file:../../function/network",
+    "network": "file:../../common/network",
     "constant": "file:../../common/constant",
     "type": "file:../../common/type",
     "component": "file:../../common/component"

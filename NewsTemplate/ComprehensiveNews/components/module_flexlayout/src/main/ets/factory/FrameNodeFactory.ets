@@ -1,9 +1,8 @@
 import { BuilderNode, FrameNode, NodeController, typeNode } from '@kit.ArkUI';
-import { FrameNodeParams, JSONObject, LayoutSetting } from '../model/Model';
+import { JSONObject, LayoutSetting } from '../model/Model';
 import { ScrollNodeBuilder } from '../builder/scrollNodeBuild/ScrollNodeBuilder';
 import { ListNodeBuilder } from '../builder/listNodeBuilder/ListNodeBuilder';
-
-import { getNativeNodeController, NodeControllerFactory } from './NativeNodeFactory';
+import { FrameNodeParams, getNativeNodeController, NodeControllerFactory } from './NativeNodeFactory';
 import { transformLayout } from '../utils/Utils';
 
 export const nodeMap: Map<string | number, BuilderNode<[FrameNodeParams]> | undefined> = new Map();

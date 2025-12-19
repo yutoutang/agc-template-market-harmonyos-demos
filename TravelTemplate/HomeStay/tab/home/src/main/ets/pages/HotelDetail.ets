@@ -1,3 +1,4 @@
+import { common } from '@kit.AbilityKit';
 import { Constants, NavPathName } from 'constant';
 import { TitleBar } from 'component';
 import { CalendarUtil, DateInfo, DateModel, Price } from 'calendar_select';
@@ -6,8 +7,7 @@ import { Foundations } from '../components/Foundations';
 import { Reservation } from '../components/Reservation';
 import { Checkout } from '../components/Checkout';
 import { EnhancedSource } from '../model/Index';
-import { AccountUtil } from 'account';
-import { Logger } from 'util';
+import { Logger, AccountUtil } from 'util';
 import { HomePageVM } from '../viewmodel/HomePageVM';
 
 @Builder
@@ -15,20 +15,35 @@ export function HotelDetailBuilder() {
   HotelDetail();
 }
 
-@Component
+@ComponentV2
 export struct HotelDetail {
   vm: HomePageVM = HomePageVM.instance;
-  @Consume('mainPathStack') mainPathStack: NavPathStack;
   detailScroller = new Scroller();
   scroller = new Scroller();
-  @State roomType: RoomType = new RoomType();
-  @State scrollIndex: number = 0;
-  @State activeIndex: number = 0;
-  @StorageLink('startDate') startDate: DateModel | undefined = CalendarUtil.getStartDate();
-  @StorageLink('endDate') endDate: DateModel | undefined = CalendarUtil.getEndDate();
-  @StorageLink('night') night: number = CalendarUtil.getNight() ?? 1;
-  @State priceList: Price[] = [];
-  @StorageLink('currentUser') currentUser: string | undefined = AccountUtil.getCurrentUser();
+  @Local roomType: RoomType = new RoomType();
+  @Local scrollIndex: number = 0;
+  @Local activeIndex: number = 0;
+  @Local startDate: DateModel | undefined = CalendarUtil.getStartDate();
+  @Local endDate: DateModel | undefined = CalendarUtil.getEndDate();
+  @Local night: number = CalendarUtil.getNight() ?? 1;
+  @Local priceList: Price[] = [];
+  @Local currentUser: string | undefined = AccountUtil.getUserId();
+  @Consumer('mainPathStack') mainPathStack: NavPathStack = new NavPathStack();
+
+  aboutToAppear(): void {
+    (getContext(this) as common.UIAbilityContext).eventHub.on('reLogin',
+      (uid: string) => {
+        AccountUtil.setUserId(uid);
+        if (!AccountUtil.getAvatar()) {
+          AccountUtil.setAvatar($r('app.media.avatar'));
+          AccountUtil.setNickName('华为用户');
+        }
+      });
+  }
+
+  aboutToDisappear(): void {
+    (getContext(this) as common.UIAbilityContext).eventHub.off('reLogin');
+  }
 
   build() {
     NavDestination() {
@@ -65,12 +80,8 @@ export struct HotelDetail {
                   Column({ space: 16 }) {
                     DateInfo(
                       {
-                        startDate: this.startDate,
-                        endDate: this.endDate,
-                        night: this.night,
-                        isShowPrice: true,
                         priceList: this.priceList,
-                      },
+                      }
                     )
                       .backgroundColor('#F5F6FA').borderRadius(8);
                   }.padding({ left: 16, right: 16 }).alignItems(HorizontalAlign.Start).margin({ top: 16 });
@@ -117,6 +128,9 @@ export struct HotelDetail {
               if (!this.currentUser) {
                 this.mainPathStack.pushPathByName(NavPathName.QUICK_LOGIN_PAGE, null, (popInfo: ESObject) => {
                   this.currentUser = popInfo.result;
+                  AccountUtil.setUserId(popInfo.result);
+                  (getContext(this) as common.UIAbilityContext).eventHub.emit('reLogin',
+                    popInfo.result);
                   Logger.info('quick login success');
                 });
               } else {
@@ -142,6 +156,6 @@ export struct HotelDetail {
     }.hideTitleBar(true).onReady((context: NavDestinationContext) => {
       this.roomType = context.pathInfo.param as RoomType;
       this.priceList = this.vm.getPriceList(this.roomType.roomTypePriceList);
-    });
+    })
   }
 }

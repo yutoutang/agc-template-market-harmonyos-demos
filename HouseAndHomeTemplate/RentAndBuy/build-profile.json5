@@ -1,25 +1,24 @@
 {
   "app": {
-    "signingConfigs": [
-      // todo 请配置您的手动签名信息
-    ],
+    "signingConfigs": [],
     "products": [
       {
         "name": "default",
         "signingConfig": "default",
+        "targetSdkVersion": "5.0.5(17)",
         "compatibleSdkVersion": "5.0.5(17)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
           "strictMode": {
             "caseSensitiveCheck": true,
-            "useNormalizedOHMUrl": true,
+            "useNormalizedOHMUrl": true
           }
         }
       }
     ],
     "buildModeSet": [
       {
-        "name": "debug",
+        "name": "debug"
       },
       {
         "name": "release"
@@ -69,11 +68,11 @@
     },
     {
       "name": "surround_facility",
-      "srcPath": "./components/surround_facility",
+      "srcPath": "./components/surround_facility"
     },
     {
       "name": "aggregated_login",
-      "srcPath": "./components/aggregated_login",
+      "srcPath": "./components/aggregated_login"
     },
     {
       "name": "aggregated_swiper",
@@ -85,11 +84,11 @@
     },
     {
       "name": "house_map",
-      "srcPath": "./components/house_map",
+      "srcPath": "./components/house_map"
     },
     {
       "name": "module_base",
-      "srcPath": "./components/module_base",
+      "srcPath": "./components/module_base"
     }
   ]
 }

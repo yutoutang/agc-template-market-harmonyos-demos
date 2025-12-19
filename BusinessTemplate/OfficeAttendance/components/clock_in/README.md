@@ -4,7 +4,7 @@
 
 - [简介](#简介)
 - [约束与限制](#约束与限制)
-- [快速入门](#快速入门)
+- [使用](#使用)
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
@@ -21,8 +21,12 @@
 * 设备类型：华为手机（包括双折叠和阔折叠）
 * 系统版本：HarmonyOS 5.0.3(15)及以上
 
+### 权限
+* 获取位置权限：ohos.permission.APPROXIMATELY_LOCATION、ohos.permission.LOCATION
+* 网络权限：ohos.permission.INTERNET
+* 震动权限：ohos.permission.VIBRATE
 
-## 快速入门
+## 使用
 
 1. 安装组件。
 

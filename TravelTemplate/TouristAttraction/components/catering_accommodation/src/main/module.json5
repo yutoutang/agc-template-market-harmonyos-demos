@@ -3,7 +3,8 @@
     "name": "catering_accommodation",
     "type": "har",
     "deviceTypes": [
-      "default"
+      "default",
+      "tablet"
     ],
     "routerMap": "$profile:router_map"
   }

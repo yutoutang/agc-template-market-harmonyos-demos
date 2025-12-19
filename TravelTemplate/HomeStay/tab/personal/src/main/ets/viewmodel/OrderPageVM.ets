@@ -1,4 +1,4 @@
-import { AccountUtil } from 'account';
+import { AccountUtil } from 'util';
 import { https, Mock } from 'network';
 import { Order, Passenger } from 'type';
 import { Constants, OrderTabBarType } from 'constant';
@@ -6,7 +6,7 @@ import { CalendarUtil, DateModel } from 'calendar_select';
 
 @ObservedV2
 export class OrderPageVM {
-  @Trace openId: string | undefined = AccountUtil.getOpenId();
+  @Trace openId: string= '';
   @Trace orderList: Order[] = [];
   @Trace orders: Order[] = [];
   private static _instance: OrderPageVM;

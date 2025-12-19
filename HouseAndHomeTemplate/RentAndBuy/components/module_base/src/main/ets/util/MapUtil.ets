@@ -26,7 +26,7 @@ export class MapUtil {
   hasDrawMaker: boolean = false;
   stack: NavPathStack = new NavPathStack();
   makerMap: Map<string, (string | HouseType)[]> = new Map();
-  private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+  private context?: common.UIAbilityContext;;
 
   public static get instance() {
     if (!MapUtil._instance) {
@@ -39,7 +39,8 @@ export class MapUtil {
     this.houseMakers = makers;
   }
 
-  initMap(latitude: number, longitude: number, zoom?: number, stack?: NavPathStack) {
+  initMap(latitude: number, longitude: number, context: Context, zoom?: number, stack?: NavPathStack,) {
+    this.context = context as common.UIAbilityContext;
     this.context.eventHub.on(EventEmitName.CLEAR_MAKER_STATUS,
       () => {
         this.hasDrawMaker = false;
@@ -213,7 +214,7 @@ export class MapUtil {
       let pointAnnotation = await this.mapController?.addPointAnnotation(pointAnnotationOptions);
       this.pointIds.push(pointAnnotation?.getId() ?? '');
       this.mapController.on('pointAnnotationClick', (pointAnnotation: map.PointAnnotation) => {
-        (getContext() as common.UIAbilityContext).eventHub.emit('point-click');
+        this.context!.eventHub.emit('point-click');
         hilog.info(0xff00, 'MapUtil', `on-PointAnnotationClick position = ${JSON.stringify(pointAnnotation)}`);
       });
     });

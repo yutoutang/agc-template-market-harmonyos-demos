@@ -8,7 +8,7 @@ export default class EntryAbility extends UIAbility {
   public onCreate(want: Want): void {
     this.context
       .getApplicationContext()
-      .setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
+      .setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT);
     this.handleWantInfo(want);
   }
 

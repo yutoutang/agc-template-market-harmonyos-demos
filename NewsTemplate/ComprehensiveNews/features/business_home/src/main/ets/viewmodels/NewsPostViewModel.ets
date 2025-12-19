@@ -1,5 +1,5 @@
 import { BreakpointModel, BreakpointNameEnum, CoverUri, RouterMap, RouterUtils, UserInfoModel } from 'lib_common'
-import { NewsStyleEnum, newsStyleList, videoSetting } from '../constants/NewsConstants'
+import { Constants, NewsStyleEnum, newsStyleList, videoSetting } from '../constants/NewsConstants'
 import { AppStorageV2, promptAction } from '@kit.ArkUI'
 import { ArticleServiceApi, PostImgList } from 'lib_news_api'
 import { emitter } from '@kit.BasicServicesKit'
@@ -16,6 +16,20 @@ export class NewsPostViewModel extends UserInfoModel {
   @Computed
   get isSmDevice() {
     return this.breakpointModel.currentBreakpoint === BreakpointNameEnum.SM
+  }
+
+  @Computed
+  get isLgDevice() {
+    return this.breakpointModel.currentBreakpoint === BreakpointNameEnum.LG
+  }
+
+
+  public getPostVideoWidth() {
+    return this.isSmDevice || this.isLgDevice ? Constants.VIDEO_SIZE_SM_W : Constants.VIDEO_SIZE_LG_W
+  }
+
+  public getPostVideoHeight() {
+    return this.isSmDevice || this.isLgDevice ? Constants.VIDEO_SIZE_SM_H : Constants.VIDEO_SIZE_LG_H
   }
 
   public async publishNews() {

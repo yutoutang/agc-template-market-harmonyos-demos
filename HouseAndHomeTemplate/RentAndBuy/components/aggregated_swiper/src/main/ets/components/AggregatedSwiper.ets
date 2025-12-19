@@ -34,15 +34,21 @@ export struct AggregatedSwiper {
   @Builder
   content(item: SwiperContent) {
     if (item.type === SwiperContentType.IMAGE) {
-      Image(CommonUtils.handleImgUrl(item.content)).objectFit(ImageFit.Cover).width('100%');
+      Image(CommonUtils.handleImgUrl(item.content, this.getUIContext().getHostContext()!))
+        .objectFit(ImageFit.Cover)
+        .width('100%');
     } else if (item.type === SwiperContentType.VIDEO) {
       Stack() {
-        Image(CommonUtils.handleImgUrl(item?.preview ?? '')).objectFit(ImageFit.Cover).width('100%');
+        Image(CommonUtils.handleImgUrl(item?.preview ?? '', this.getUIContext().getHostContext()!))
+          .objectFit(ImageFit.Cover)
+          .width('100%');
         Image($r('app.media.play')).size({ width: 48, height: 48 });
       };
     } else {
       Stack() {
-        Image(CommonUtils.handleImgUrl(item?.preview ?? '')).objectFit(ImageFit.Cover).width('100%');
+        Image(CommonUtils.handleImgUrl(item?.preview ?? '', this.getUIContext().getHostContext()!))
+          .objectFit(ImageFit.Cover)
+          .width('100%');
         Image($r('app.media.vr')).size({ width: 48, height: 48 });
       };
     }
@@ -55,7 +61,7 @@ export struct AggregatedSwiper {
     }.onClick(() => {
       this.isShow = !this.isShow;
     }).bindContentCover($$this.isShow, this.fullContentBuilder(this.vm.contents[this.vm.swiperAnimateIndex]), {
-      modalTransition: ModalTransition.NONE,
+      modalTransition: ModalTransition.DEFAULT,
       onWillDismiss: ((action: DismissSheetAction) => {
         // 滑动不准情况的修正
         if (!this.vm.contents[this.vm.swiperAnimateIndex]) {
@@ -77,7 +83,7 @@ export struct AggregatedSwiper {
     Column() {
       Video({
         src: item.content,
-        previewUri: CommonUtils.handleImgUrl(item.preview),
+        previewUri: CommonUtils.handleImgUrl(item.preview, this.getUIContext().getHostContext()!),
         controller: this.controller,
       })
         .objectFit(ImageFit.Contain)
@@ -128,22 +134,34 @@ export struct AggregatedSwiper {
 
   @Builder
   fullContentBuilder(item: SwiperContent) {
-    Column() {
-      if (item?.type === SwiperContentType.IMAGE) {
-        Image(CommonUtils.handleImgUrl(item.content)).width('100%').objectFit(ImageFit.Contain);
-      } else if (item?.type === SwiperContentType.VIDEO) {
-        this.customVideoBuilder(item);
-      } else if (item?.type === SwiperContentType.WEB) {
-        Web({ src: item.content, controller: this.webViewController, incognitoMode: true })
-          .geolocationAccess(false).height('calc(100% - 20vp)')
-          .fileAccess(false);
-      } else {
-        Text('暂无可预览内容').fontSize(12).fontColor($r('sys.color.white'));
+    Stack({ alignContent: Alignment.TopStart }) {
+      Column() {
+        if (item?.type === SwiperContentType.IMAGE) {
+          Image(CommonUtils.handleImgUrl(item.content, this.getUIContext().getHostContext()!))
+            .width('100%')
+            .objectFit(ImageFit.Contain);
+        } else if (item?.type === SwiperContentType.VIDEO) {
+          this.customVideoBuilder(item);
+        } else if (item?.type === SwiperContentType.WEB) {
+          Web({ src: item.content, controller: this.webViewController, incognitoMode: true })
+            .geolocationAccess(false).height('calc(100% - 20vp)')
+            .fileAccess(false);
+        } else {
+          Text('暂无可预览内容').fontSize(12).fontColor($r('sys.color.white'));
+        }
       }
-    }
-    .size({ height: '100%', width: '100%' })
-    .backgroundColor($r('sys.color.black'))
-    .justifyContent(FlexAlign.Center);
+      .size({ height: '100%', width: '100%' })
+      .backgroundColor($r('sys.color.black'))
+      .justifyContent(FlexAlign.Center)
+      .transition(TransitionEffect.translate({ y: '100%' }).animation({ duration: 300 }));
+
+      Image($r('app.media.chevron_backward'))
+        .size({ width: 24, height: 24 })
+        .margin({ top: 28 })
+        .onClick(() => {
+          this.isShow = false;
+        });
+    };
   }
 
   build() {

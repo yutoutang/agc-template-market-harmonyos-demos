@@ -57,7 +57,7 @@ export struct UserProfile {
       Button('确定')
         .width('calc(100% - 48vp)')
         .backgroundColor('#64BB5C')
-        .fontColor($r('sys.color.white'))
+        .fontColor($r('sys.color.font_on_primary'))
         .margin({ bottom: AvoidAreaUtil.getTopHeight() })
         .fontWeight(FontWeight.Medium)
         .onClick(() => {
@@ -99,7 +99,7 @@ export struct UserProfile {
                       if (error.code === AvatarFunctionButtonErrCode.ACCOUNT_NOT_LOGIN) {
                         msg = '请在设置中打开华为账号后重试';
                       }
-                      promptAction.showToast({
+                      this.getUIContext().getPromptAction().showToast({
                         message: msg,
                         duration: 1000,
                       });
@@ -107,7 +107,8 @@ export struct UserProfile {
                     }
                     let avatarFile: fs.File = fs.openSync(data.avatarUri!, fs.OpenMode.READ_ONLY);
                     try {
-                      let newPath: string = getContext().cacheDir + `/${util.generateRandomUUID(false)}.png`;
+                      let newPath: string = (this.getUIContext().getHostContext() as common.UIAbilityContext).cacheDir +
+                        `/${util.generateRandomUUID(false)}.png`;
                       fs.copyFileSync(avatarFile.fd, newPath);
                       this.cloneAvatar = 'file://' + newPath;
                     } catch (err) {
@@ -138,7 +139,7 @@ export struct UserProfile {
                 });
               };
             }.profileRow().height(58).bindSheet($$this.isShow, this.modifyNickNameBuilder(),
-              { title: { title: '设置昵称' }, height: 420 });
+              { title: { title: '设置昵称' }, height: 420, preferType: SheetType.CENTER });
           }.padding(16);
         };
 
@@ -151,7 +152,8 @@ export struct UserProfile {
           .padding({ left: 28, right: 28 })
           .onClick(() => {
             AppStorageBank.setUserInfo(this.cloneNickName, this.cloneAvatar, this.userInfo.phone, this.userInfo.uid);
-            (getContext() as common.UIAbilityContext).eventHub.emit(EventEmitName.UPDATE_AVATAR);
+            (this.getUIContext()
+              .getHostContext() as common.UIAbilityContext).eventHub.emit(EventEmitName.UPDATE_AVATAR);
             RouterModule.pop();
           });
       }.backgroundColor('#F1F3F5').height(Constant.FULL_PERCENT).justifyContent(FlexAlign.SpaceBetween);

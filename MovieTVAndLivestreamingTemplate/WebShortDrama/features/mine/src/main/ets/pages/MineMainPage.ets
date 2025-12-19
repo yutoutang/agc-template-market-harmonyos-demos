@@ -38,7 +38,7 @@ export struct MineMainPage {
   ]
   @Local commonServicesContents_2: Array<ListItemModel> = [
     new ListItemModel(getString('app.string.my_feedback'), getMedia('app.media.icon_feedback')).setHandle(() => {
-      this.goToPage(NAV_PAGE_NAME.FeedbackPage.name)
+      this.goToPage(NAV_PAGE_NAME.FeedbackSubmitPage.name)
     }),
     new ListItemModel(getString('app.string.my_customer_service'),
       getMedia('app.media.icon_customer_service')).setHandle(() => {
@@ -143,8 +143,7 @@ export struct MineMainPage {
               .objectFit(ImageFit.Contain)
               .margin({ right: 5 })
             Text('一键拨号')
-              .fontSize(15)
-              .fontColor(Color.White)
+              .fontColor($r('sys.color.font_on_primary'))
               .fontWeight(600)
           }
         }
@@ -152,7 +151,7 @@ export struct MineMainPage {
         .height(45)
         .type(ButtonType.Normal)
         .backgroundColor($r('sys.color.alert'))
-        .borderRadius(21)
+        .borderRadius($r('sys.float.corner_radius_level10'))
         .onClick(() => {
           if (canIUse('SystemCapability.Applications.Contacts')) {
             call.makeCall('0000-00000000');
@@ -162,8 +161,7 @@ export struct MineMainPage {
 
         Button() {
           Text('取消')
-            .fontSize(15)
-            .fontColor($r('sys.color.mask_secondary'))
+            .fontColor($r('sys.color.font_tertiary'))
             .fontWeight(600)
         }
         .width('100%')

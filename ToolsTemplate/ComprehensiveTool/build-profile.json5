@@ -185,6 +185,10 @@
     {
       "name": "clone",
       "srcPath": "./components/clone"
+    },
+    {
+      "name": "cast_tool",
+      "srcPath": "./components/cast_tool"
     }
   ]
 }

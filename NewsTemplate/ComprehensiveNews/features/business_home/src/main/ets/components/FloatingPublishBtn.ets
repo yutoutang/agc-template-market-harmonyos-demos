@@ -90,7 +90,7 @@ export struct FloatingPublishBtn {
         curTop = Math.max(0, curTop)
         //限制悬浮球不能移除屏幕下边
         this.positionY =
-          Math.min(this.winHeight * this.imageSize - this.bottomAvoidAreaHeight - this.statusHeight, curTop)
+          Math.min(this.winHeight - this.imageSize - this.bottomAvoidAreaHeight - this.statusHeight, curTop)
       } else if (event.type === TouchType.Up) {
         if (this.positionX < (this.winWidth / 2)) {
           // 小球固定到左边

@@ -10,7 +10,7 @@
 
 ## 简介
 
-本组件提供一下几种形式的账单图表：
+本组件提供以下几种形式的账单图表：
 
 - BillBarChart 提供了根据传入数据，展示账单柱状图的能力。支持设置图表高度、颜色、标记样式等参数，支持自定义 UI 信息和交互逻辑。
 
@@ -37,12 +37,16 @@
 * 设备类型：华为手机（包括双折叠和阔折叠）
 * 系统版本：HarmonyOS 5.0.2(14)及以上
 
+### 权限
+
+无
+
 
 ## 快速入门
 
 1. 安装组件。
 
-   如果是在DevEvo Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
+   如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
 
    如果是从生态市场下载组件，请参考以下步骤安装组件。
 
@@ -268,11 +272,21 @@
 
 ### 示例1（账单图表的显示与切换）
 
-```TS
-// MockData.ets
-import { BillBarItem, BillPieChartItem, ReportTableItem } from 'bill_chart';
+```ts
+import {
+  BillBarItem,
+  BillPieChart,
+  BillPieChartItem,
+  BillRanking,
+  BillBarChart,
+  BillReportTable,
+  BillCalendar,
+  BillBarChartData,
+  CalendarBillSummaryModel,
+  ReportTableItem,
+} from 'bill_chart';
 
-export const MOCK_BAR_CHART_LIST: BillBarItem[] = [
+const MOCK_BAR_CHART_LIST: BillBarItem[] = [
   {
     date: '05-01',
     value: 400.5,
@@ -291,7 +305,7 @@ export const MOCK_BAR_CHART_LIST: BillBarItem[] = [
   },
 ];
 
-export const MOCK_BAR_CHART_LIST2: BillBarItem[] = [
+const MOCK_BAR_CHART_LIST2: BillBarItem[] = [
   {
     date: '05-06',
     value: 100,
@@ -306,15 +320,15 @@ export const MOCK_BAR_CHART_LIST2: BillBarItem[] = [
   },
 ];
 
-export const MOCK_COLOR_LIST: number[] = [
+const MOCK_COLOR_LIST: number[] = [
   0x638750, 0x7ea568, 0x94b982, 0xabd39c, 0xc6e5b9, 0xdff3d7, 0xf2fdee,
 ];
 
-export const MOCK_COLOR_LIST2: number[] = [
+const MOCK_COLOR_LIST2: number[] = [
   0xd77525, 0xf2992c, 0xfbb935, 0xffce52, 0xffe38e, 0xfff1ca, 0xfffbef,
 ];
 
-export const MOCK_PIE_CHART_LIST: BillPieChartItem[] = [
+const MOCK_PIE_CHART_LIST: BillPieChartItem[] = [
   {
     label: '购物',
     value: 400.5,
@@ -332,7 +346,7 @@ export const MOCK_PIE_CHART_LIST: BillPieChartItem[] = [
   },
 ];
 
-export const MOCK_PIE_CHART_LIST2: BillPieChartItem[] = [
+const MOCK_PIE_CHART_LIST2: BillPieChartItem[] = [
   {
     label: '工资',
     value: 3000,
@@ -345,7 +359,7 @@ export const MOCK_PIE_CHART_LIST2: BillPieChartItem[] = [
   },
 ];
 
-export const MOCK_TABLE_DATA: ReportTableItem[] = [
+const MOCK_TABLE_DATA: ReportTableItem[] = [
   {
     date: '05-01',
     totalIncome: 0,
@@ -362,28 +376,6 @@ export const MOCK_TABLE_DATA: ReportTableItem[] = [
     totalExpense: 1000,
   },
 ];
-
-```
-
-```ts
-import {
-  MOCK_PIE_CHART_LIST,
-  MOCK_PIE_CHART_LIST2,
-  MOCK_BAR_CHART_LIST,
-  MOCK_BAR_CHART_LIST2,
-  MOCK_COLOR_LIST,
-  MOCK_COLOR_LIST2,
-  MOCK_TABLE_DATA,
-} from './Mockdata';
-import {
-    BillPieChart,
-    BillRanking,
-    BillBarChart,
-    BillReportTable,
-    BillCalendar,
-    BillBarChartData,
-    CalendarBillSummaryModel
-} from 'bill_chart';
 
 
 @Entry

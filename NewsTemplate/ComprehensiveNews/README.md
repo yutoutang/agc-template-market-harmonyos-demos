@@ -221,10 +221,12 @@ ComprehensiveNews
 │           └──NewsSearchTransition.ets                   // 搜索动画
 │
 ├──components
-│  ├──module_advertisement                                // 广告组件                     
+│  ├──module_advertisement                                // 广告组件   
+│  ├──module_articlepost                                  // 富文本发帖组件                   
 │  ├──module_channeledit                                  // 频道编辑组件
 │  ├──module_feedback                                     // 意见反馈组件 
 │  ├──module_feedcomment                                  // 评论组件
+│  ├──module_flexlayout                                   // 动态布局渲染组件 
 │  ├──module_highlight                                    // 高亮组件
 │  ├──module_imagepreview                                 // 图片预览组件
 │  ├──module_newsfeed                                     // 动态卡片组件
@@ -233,8 +235,7 @@ ComprehensiveNews
 │  ├──module_share                                        // 分享组件
 │  ├──module_swipeplayer                                  // 视频组件
 │  ├──module_text_reader                                  // 朗读组件
-│  └──module_transition                                   // 动画组件
-│  └──module_flexlayout                                   // 动态布局渲染组件             
+│  └──module_transition                                   // 一镜到底组件             
 │      
 ├──features
 │  ├──business_home/src/main/ets                          // 首页模块             

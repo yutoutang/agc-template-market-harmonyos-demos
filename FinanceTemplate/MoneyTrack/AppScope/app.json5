@@ -1,5 +1,6 @@
 {
   "app": {
+// todo: 修改包名
     "bundleName": "jzyy.1.xxxxxx",
     "vendor": "example",
     "versionCode": 1000000,

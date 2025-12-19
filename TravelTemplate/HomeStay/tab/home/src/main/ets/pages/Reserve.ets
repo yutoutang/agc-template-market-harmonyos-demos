@@ -7,9 +7,8 @@ import { EnhancedSource, Source } from '../model/Index';
 import { Passenger } from '../model/Passengers';
 import { RoomType } from 'type';
 import { CalendarUtil, DateModel } from 'calendar_select';
-import { AccountUtil } from 'account';
 import { getRoomOrderAmount } from '../viewmodel/ReservePageVM';
-import { doRandBySync, getCurrentTime, checkPsgInfo, hasPassenger, isValidPhoneNo, Logger } from 'util';
+import { doRandBySync, getCurrentTime, checkPsgInfo, hasPassenger, isValidPhoneNo, Logger, AccountUtil } from 'util';
 import { AddOrModifyPassengerRequest, CreateOrderRequest, https, UpdateOrderRequest } from 'network';
 import { TitleBar } from 'component';
 
@@ -20,21 +19,21 @@ export function ReserveBuilder() {
   Reserve();
 }
 
-@Component
+@ComponentV2
 export struct Reserve {
-  @State guest: string = '';
-  @State phone: string = '';
-  @State remark: string = '';
-  @State amount: number = 0;
-  @State count: number = 1;
-  @State startDate: DateModel | undefined = CalendarUtil.getStartDate();
-  @State endDate: DateModel | undefined = CalendarUtil.getEndDate();
-  @State openId: string | undefined = AccountUtil.getOpenId();
-  @State roomTypeItem: RoomType = new RoomType();
-  @State selectPassenger: Passenger = new Passenger();
+  @Local guest: string = '';
+  @Local phone: string = '';
+  @Local remark: string = '';
+  @Local amount: number = 0;
+  @Local count: number = 1;
+  @Local startDate: DateModel | undefined = CalendarUtil.getStartDate();
+  @Local endDate: DateModel | undefined = CalendarUtil.getEndDate();
+  @Local openId: string = '';
+  @Local roomTypeItem: RoomType = new RoomType();
+  @Local selectPassenger: Passenger = new Passenger();
   controller: TextInputController = new TextInputController();
   context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
-  @Consume('mainPathStack') mainPathStack: NavPathStack;
+  @Consumer('mainPathStack') mainPathStack: NavPathStack = new NavPathStack();
   private passengerId: number = 0;
 
   build() {
@@ -129,8 +128,9 @@ export struct Reserve {
 
             Row() {
               Text(`备注`).fontSize(14).width(60).opacity(0.6);
-              TextInput({ text: this.remark, placeholder: '请输入备注信息', controller: this.controller })
+              TextInput({ text: this.remark, placeholder: '请输入备注信息，10字以内', controller: this.controller })
                 .placeholderColor(Color.Gray)
+                .maxLength(10)
                 .backgroundColor(Color.White)
                 .placeholderFont({ size: 14 })
                 .onChange((value: string) => {
@@ -254,21 +254,26 @@ export struct Reserve {
     if (res.code === 200) {
       //拉起支付
       let payStr = '';
-      paymentService.requestPayment(getContext(this) as common.UIAbilityContext, res.data).then(() => {
-        payStr = '支付成功';
-      }).catch(async (error: BusinessError) => {
-        this.updateOrder(data.orderSn)
-        if (error.code === 1001930000) {
-          payStr = '取消支付';
-        } else if (error.code === 1001930001) {
-          payStr = '参数错误';
-        } else if (error.code === 1001930011) {
-          payStr = '网络链接异常';
-        } else if (error.code === 1001930010) {
-          payStr = '重复请求';
-        }
-        Logger.info('pay fail with reason ' + payStr);
-      });
+      try {
+        paymentService.requestPayment(getContext(this) as common.UIAbilityContext, res.data).then(() => {
+          payStr = '支付成功';
+        }).catch(async (error: BusinessError) => {
+          this.updateOrder(data.orderSn);
+          if (error.code === 1001930000) {
+            payStr = '取消支付';
+          } else if (error.code === 1001930001) {
+            payStr = '参数错误';
+          } else if (error.code === 1001930011) {
+            payStr = '网络链接异常';
+          } else if (error.code === 1001930010) {
+            payStr = '重复请求';
+          }
+          Logger.info('pay fail with reason ' + payStr);
+        });
+      } catch (e) {
+        this.updateOrder(data.orderSn);
+        Logger.info('pay fail with reason ' + JSON.stringify(e));
+      }
 
       const psgData = {
         passengerId: this.passengerId,

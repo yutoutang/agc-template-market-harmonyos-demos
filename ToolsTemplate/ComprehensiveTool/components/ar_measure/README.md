@@ -79,7 +79,7 @@
         for (let i = 0; i < res.permissions.length; i++) {
           if ('ohos.permission.CAMERA' === res.permissions[i] && res.authResults[i] === 0) {
             this.pageInfo.clear();
-            // ARMeasure为视频剪辑路由入口页面名称
+            // ARMeasure为AR测量路由入口页面名称
             this.pageInfo.pushPathByName('ARMeasure', null);
           }
         }
@@ -102,15 +102,15 @@ struct Index {
    async requestPermissionsFn(): Promise<void> {
       let atManager = abilityAccessCtrl.createAtManager();
       if (this.context) {
-      let res = await atManager.requestPermissionsFromUser(this.context, ['ohos.permission.CAMERA']);
-      for (let i = 0; i < res.permissions.length; i++) {
-      if ('ohos.permission.CAMERA' === res.permissions[i] && res.authResults[i] === 0) {
-      this.pageInfo.clear();
-      // ARMeasure为视频剪辑路由入口页面名称
-      this.pageInfo.pushPathByName('ARMeasure', null);
-   }
-}
-}
+        let res = await atManager.requestPermissionsFromUser(this.context, ['ohos.permission.CAMERA']);
+        for (let i = 0; i < res.permissions.length; i++) {
+          if ('ohos.permission.CAMERA' === res.permissions[i] && res.authResults[i] === 0) {
+          this.pageInfo.clear();
+          // ARMeasure为AR测量路由入口页面名称
+          this.pageInfo.pushPathByName('ARMeasure', null);
+      }
+    }
+  }
 }
 
 build() {

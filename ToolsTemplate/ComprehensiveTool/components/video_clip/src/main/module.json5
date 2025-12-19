@@ -14,13 +14,6 @@
           "when": "inuse"
         }
       },
-      {
-        "name":"ohos.permission.WRITE_MEDIA",
-        "reason":"$string:media_request_reason",
-        "usedScene": {
-          "when": "inuse"
-        }
-      }
     ]
   }
 }

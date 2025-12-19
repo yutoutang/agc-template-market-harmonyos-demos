@@ -28,8 +28,8 @@ export class HouseMapVM {
     return HouseMapVM._instance;
   }
 
-  applyLocationPermission() {
-    SystemUtil.applyLocationPermission().then((isGranted) => {
+  applyLocationPermission(uiContext: UIContext) {
+    SystemUtil.applyLocationPermission(uiContext.getHostContext()!).then((isGranted) => {
       if (isGranted) {
         SystemUtil.getCurrentCityInfo().then((addressInfo: CurrentAddressInfo) => {
           if (addressInfo.city) {
@@ -38,7 +38,7 @@ export class HouseMapVM {
           }
         });
       } else {
-        promptAction.showToast({
+        uiContext.getPromptAction().showToast({
           message: '请前往设置-应用和元服务中打开此应用的位置服务开关',
           duration: 2000,
         });
@@ -46,13 +46,14 @@ export class HouseMapVM {
     });
   }
 
-  initMap() {
+  initMap(uiContext: UIContext) {
     let latitude = AppStorageBank.getCurrentLocation()[0];
     if (latitude) {
-      this.mu.initMap(AppStorageBank.getCurrentLocation()[0], AppStorageBank.getCurrentLocation()[1], 10, this.stack);
+      this.mu.initMap(AppStorageBank.getCurrentLocation()[0], AppStorageBank.getCurrentLocation()[1],
+        uiContext.getHostContext()!, 10, this.stack);
     } else {
       // 询问申请位置权限
-      this.applyLocationPermission();
+      this.applyLocationPermission(uiContext);
     }
   }
 

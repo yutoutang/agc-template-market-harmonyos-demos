@@ -1,1 +1,0 @@
-export{ AccountUtil, HUAWEIAccountModel } from './src/main/ets/AccountUtil/Index'

@@ -45,7 +45,7 @@ export struct Layouts {
           ListItem() {
             Stack({ alignContent: Alignment.TopStart }) {
               Column({ space: 8 }) {
-                Image(CommonUtils.handleImgUrl(item.image))
+                Image(CommonUtils.handleImgUrl(item.image, this.getUIContext().getHostContext()!))
                   .size({ height: 124, width: 184 })
                   .border({ width: 1, color: 'rgba(0,0,0,0.20)', radius: 8 })
                   .padding({

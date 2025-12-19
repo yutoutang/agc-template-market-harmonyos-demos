@@ -19,12 +19,12 @@
 * DevEco Studio版本：DevEco Studio 5.0.5 Release及以上
 * HarmonyOS SDK版本：HarmonyOS 5.0.5 Release SDK及以上
 * 设备类型：华为手机（直板机）
-* HarmonyOS版本：HarmonyOS 5.0.1 Release及以上
+* HarmonyOS版本：HarmonyOS 5.0.5(17)及以上
 
 ## 快速入门
 1. 安装组件。
 
-   如果是在DevEvo Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
+   如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
 
    如果是从生态市场下载组件，请参考以下步骤安装组件。
 
@@ -123,12 +123,12 @@ LoginService(icon:ResourceStr,loginTypes:Channel[],loginBtnBgColor:ResourceStr,p
 
 **参数：**
 
-| 参数名           | 类型                                                                                                            | 是否必填 | 说明                                                                                                                              |
-|:--------------|:--------------------------------------------------------------------------------------------------------------|:---|:--------------------------------------------------------------------------------------------------------------------------------|
-| icon   | [ResourceStr](https://developer.huawei.com/consumer/cn/doc/harmonyos-references-V14/ts-types-V14#resourcestr) | 是  | 应用图标，参考[UX设计规范](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-phone-unionid-login#section2558741102912) |
-| loginTypes          | [Channel](#Channeld对象说明)                                                                                      | 是  | 登录渠道信息                                                                                                                          |
-| loginBtnBgColor        | string                                                                                                        | 是  | 一键登录按钮背景色                                                                                                                       |
-| pathInfos         | NavPathStack                                                                                                        | 否  | 应用路由栈                                                                                                                           |
+| 参数名           | 类型                                                                                                                 | 是否必填 | 说明                                                                                                                              |
+|:--------------|:-------------------------------------------------------------------------------------------------------------------|:---|:--------------------------------------------------------------------------------------------------------------------------------|
+| icon   | [ResourceStr](https://developer.huawei.com/consumer/cn/doc/harmonyos-references-V14/ts-types-V14#resourcestr)      | 是  | 应用图标，参考[UX设计规范](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-phone-unionid-login#section2558741102912) |
+| loginTypes          | [Channel](#Channel对象说明)                                                                                            | 是  | 登录渠道信息                                                                                                                          |
+| loginBtnBgColor        | string                                                                                                             | 是  | 一键登录按钮背景色                                                                                                                       |
+| pathInfos         | NavPathStack                                                                                                       | 否  | 应用路由栈                                                                                                                           |
 
 #### Channel对象说明
 

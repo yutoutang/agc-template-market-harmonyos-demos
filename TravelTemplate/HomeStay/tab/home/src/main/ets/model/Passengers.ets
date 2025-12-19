@@ -1,10 +1,10 @@
-@Observed
+@ObservedV2
 export class Passenger {
-  id: string;
-  name?: string;
-  phone?: string;
-  cardType?: number;
-  cardNo?: string;
+  @Trace id: string;
+  @Trace name?: string;
+  @Trace phone?: string;
+  @Trace cardType?: number;
+  @Trace cardNo?: string;
 
   constructor(
     id: string = '1',

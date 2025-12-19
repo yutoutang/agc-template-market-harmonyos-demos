@@ -1,7 +1,7 @@
 @ComponentV2
 export struct CommonDivider {
-  @Param color: ResourceColor = $r('app.color.system_color_divider');
-  @Param strokeWidth: string | number = 1;
+  @Param color: ResourceColor = $r('sys.color.comp_divider');
+  @Param strokeWidth: string | number = '1px';
   @Param gap: Length = $r('app.string.margin_m');
 
   build() {

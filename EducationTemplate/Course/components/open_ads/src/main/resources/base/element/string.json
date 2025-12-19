@@ -9,12 +9,8 @@
       "value": "rgba(0,0,0,0.3)"
     },
     {
-      "name": "agcit_huawei_common_advertisement",
-      "value": "1.0.0"
-    },
-    {
-      "name": "agcittype_huawei_common_advertisement",
-      "value": "serviceComponent"
+      "name": "agcit_huawei_course_service",
+      "value": "1.0.2"
     }
   ]
 }

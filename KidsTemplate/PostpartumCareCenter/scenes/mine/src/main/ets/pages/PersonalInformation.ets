@@ -61,6 +61,7 @@ export struct PersonalInformationPage {
           TextInput({
             text: this.vm.userInfo.nickname,
           })
+            .maxLength(12)
             .textAlign(TextAlign.End)
             .fontSize(14)
             .layoutWeight(1)
@@ -83,8 +84,8 @@ export struct PersonalInformationPage {
 
         Row() {
           Button($r('app.string.log_out'))
-            .fontColor($r('sys.color.black'))
-            .fontSize(16)
+            .fontColor($r('sys.color.font_primary'))
+            .fontSize($r('sys.float.Body_L'))
             .backgroundColor('rgba(0, 0, 0, 0.05)')
             .width('100%')
             .onClick(() => {

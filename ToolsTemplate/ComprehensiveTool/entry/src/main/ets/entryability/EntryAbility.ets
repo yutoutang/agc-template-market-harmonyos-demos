@@ -1,9 +1,9 @@
 import { AbilityConstant, common, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import { window } from '@kit.ArkUI';
-import { appDB, initNFC } from 'mobile_nfc';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { sensor } from '@kit.SensorServiceKit';
+import { window } from '@kit.ArkUI';
+import { appDB, initNFC } from 'mobile_nfc';
 
 const DOMAIN = 0x0000;
 
@@ -12,8 +12,8 @@ export default class EntryAbility extends UIAbility {
     this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');
     this.setColorMode(this.context);
-    appDB.initDb(this.context)
-    initNFC(want)
+    appDB.initDb(this.context);
+    initNFC(want);
   }
 
   private setColorMode(context: common.UIAbilityContext) {

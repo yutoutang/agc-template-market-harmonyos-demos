@@ -2,10 +2,10 @@ import { Constants } from 'constant';
 import { Tag } from 'type';
 import { HomePageVM } from '../viewmodel/HomePageVM';
 
-@Component
+@ComponentV2
 export struct Reservation {
   vm: HomePageVM = HomePageVM.instance;
-  @Prop reservation: Array<Tag>;
+  @Param @Require reservation: Tag[];
 
   build() {
     Column({ space: 16 }) {

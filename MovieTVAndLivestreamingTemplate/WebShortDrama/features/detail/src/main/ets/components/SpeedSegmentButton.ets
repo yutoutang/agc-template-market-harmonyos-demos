@@ -12,10 +12,10 @@ export struct SpeedSegmentButton {
         Button(item)
           .width('20%')
           .height(36)
-          .fontSize(14)
+          .fontSize($r('sys.float.Body_M'))
           .padding('2px 8px 8px 2px')
           .borderRadius('18px')
-          .fontColor(this.storage.selectSpeed === item ? '#000' : '#9000')
+          .fontColor(this.storage.selectSpeed === item ? $r('sys.color.font_primary') : $r('sys.color.font_tertiary'))
           .backgroundColor(this.storage.selectSpeed === item ? '#fff' : 'transparent')
           .shadow(this.storage.selectSpeed === item ? { color:'#3000', radius:3 } : { color:'transparent', radius:0 })
           .onClick(() => {

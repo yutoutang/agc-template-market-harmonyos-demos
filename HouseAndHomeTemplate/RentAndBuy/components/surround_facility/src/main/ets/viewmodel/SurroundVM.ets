@@ -17,7 +17,7 @@ export class SurroundVM {
   @Trace list: site.Site[] = [];
   @Trace keyIndex: number = 0;
   mapUtil: MapUtil = MapUtil.instance;
-  stack: NavPathStack = new NavPathStack()
+  stack: NavPathStack = new NavPathStack();
 
   public static get instance() {
     if (!SurroundVM._instance) {
@@ -26,9 +26,9 @@ export class SurroundVM {
     return SurroundVM._instance;
   }
 
-  getFullSurroundFacilityList() {
+  getFullSurroundFacilityList(context: Context) {
     // 增大缩放比例
-    this.mapUtil.initMap(this.latitude, this.longitude, 12);
+    this.mapUtil.initMap(this.latitude, this.longitude, context, 12);
     let promises: Promise<site.SearchByTextResult>[] =
       ADDITIONAL_FACILITY_TYPES.map((item): Promise<site.SearchByTextResult> => {
         return this.getPoiListByText(item.keyword, this.latitude, this.longitude, 5000);

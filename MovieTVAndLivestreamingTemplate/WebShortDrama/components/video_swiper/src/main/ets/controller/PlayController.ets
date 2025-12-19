@@ -166,7 +166,7 @@ export class PlayController {
 
   // 播放指定索引的剧集
   public changeIndex(index: number) {
-    this.curentIndex === index
-    this.swiperController?.changeIndex(index)
+    this.curentIndex = index
+    this.swiperController?.changeIndex(index,true)
   }
 }

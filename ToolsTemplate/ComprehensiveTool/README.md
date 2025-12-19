@@ -14,43 +14,44 @@
 
 此模板提供如下组件，所有组件存放在工程根目录的components下，如果您仅需使用组件，可参考对应组件的指导链接；如果您使用此模板，请参考本文档。
 
-| 组件                                 | 描述                                       | 使用指导                                                   |
-|------------------------------------|------------------------------------------|--------------------------------------------------------|
-| 黄历（almanac）                        | 提供了查看黄历和白话文的功能。                          | [使用指导](./components/almanac/README.md)                 |
-| 基础计算器（basic_calculator）            | 提供了基础计算的功能。                              | [使用指导](./components/basic_calculator/README.md)        |
-| 热量计算（calories_calculate）           | 提供了按日和按周根据摄入计算热量的功能。                     | [使用指导](./components/calories_calculate/README.md)      |
-| 日期计算（date_calculate）               | 提供了日期计算和日期间隔计算的功能。                       | [使用指导](./components/date_calculate/README.md)          |
-| 汇率计算器（exchange_calculator）         | 提供了多种币种之间实时汇率计算的功能。                      | [使用指导](./components/exchange_calculator/README.md)     |
-| 个税计算器（income_calculator）           | 提供了工资、劳动报酬等收入个税计算的功能。                    | [使用指导](./components/income_calculator/README.md)       |
-| 房贷计算器（mortgage_calculator）         | 提供了商业贷款、公积金贷款和组合贷款的还款计划计算功能。             | [使用指导](./components/mortgage_calculator/README.md)     |
-| 万能空调遥控器（remote_control）            | 提供了空调遥控器创建，删除及以发射红外信号控制对应空调等功能。          | [使用指导](./components/remote_control/README.md)          |
-| 科学计算器（science_calculator）          | 提供了多种科学计算方法的计算的功能。                       | [使用指导](./components/science_calculator/README.md)      |
-| 日程提醒（calendar_events）              | 提供了新增以及编辑日历、生日、纪念日、待办，并将日程添加到系统日历提醒中的功能。 | [使用指导](./components/calendar_events/README.md)         |
-| 敲木鱼（decompression_tool）            | 提供了敲木鱼解压的功能。                             | [使用指导](./components/decompression_tool/README.md)      |
-| 记账（money_track）                    | 提供了记账、查看账单列表和统计图表的功能。                    | [使用指导](./components/money_track/README.md)             |
-| 隐私笔记（personal_notes）               | 提供了写笔记、编辑笔记、删除笔记、笔记分类，搜索，多选，排序，分享、复制功能。  | [使用指导](./components/personal_notes/README.md)          |
-| 图片水印（picture_watermark）            | 提供了图片添加水印、下载保存相册、历史添加缓存等功能。              | [使用指导](./components/picture_watermark/README.md)       |
-| 手机NFC（mobile_nfc）                  | 提供了门禁卡、公交卡和银行卡的读取和克隆功能。                  | [使用指导](./components/mobile_nfc/README.md)              |
-| 罗盘（compass）                        | 提供了罗盘方向的指引功能。                            | [使用指导](./components/compass/README.md)                 |
-| 日记（diary）                          | 提供写日记的功能                                 | [使用指导](./components/diary/README.md)                   |
-| 网络测速（internet_speed_measure）       | 提供了网络实时测速的功能。                            | [使用指导](./components/internet_speed_measure/README.md)  |
-| 修图神器（photo_editing）                | 提供了滤镜相机、图片拼接、图片编辑的功能。                    | [使用指导](./components/photo_editing/README.md)           |
-| BMI计算（bmi_calculator）              | 提供了BMI指标计算的功能。                           | [使用指导](./components/bmi_calculator/README.md)          |
-| 绘画（draw_board）                     | 提供了自由绘画的功能。                              | [使用指导](./components/draw_board/README.md)              |
-| 录音专家（simple_recorder）              | 提供了录音、音频格式转换、音频转文字、音频编辑等功能。              | [使用指导](./components/simple_recorder/README.md)         |
-| 解压缩（zip_tool）                      | 提供了解压、压缩等功能。                             | [使用指导](./components/zip_tool/README.md)                |
-| 吉他调音器（guitar_tuning）               | 提供了吉他调音功能。                               | [使用指导](./components/guitar_tuning/README.md)           |
-| 视频剪辑（video_clip）                   | 提供了视频剪辑及草稿管理功能。                          | [使用指导](./components/video_clip/README.md)              |
-| 克隆工具（clone）                        | 提供了克隆、隔空投送等功能                            | [使用指导](./components/clone/README.md)                   |
-| 手持弹幕（handheld_bullet）              | 提供了手持弹幕、荧光棒及历史记录管理功能。                    | [使用指导](./components/handheld_bullet/README.md)         |
-| 图文识别（image_recognition）            | 提供图文识别等功能。                               | [使用指导](./components/image_recognition/README.md)       |
-| 理财计算器（financial_calculator）        | 提供了银行理财、复利理财、定投理财功能。                     | [使用指导](./components/financial_calculator/README.md)    |
-| 养老金计算器（pension_calculator）         | 提供了养老金计算功能。                              | [使用指导](./components/pension_calculator/README.md)      |
-| 亲属称呼换算器（kinship_calculator）        | 提供了亲属称呼换算功能。                             | [使用指导](./components/kinship_calculator/README.md)      |
+| 组件                               | 描述                                       | 使用指导                                                   |
+|----------------------------------|------------------------------------------|--------------------------------------------------------|
+| 黄历（almanac）                      | 提供了查看黄历和白话文的功能。                          | [使用指导](./components/almanac/README.md)                 |
+| 基础计算器（basic_calculator）          | 提供了基础计算的功能。                              | [使用指导](./components/basic_calculator/README.md)        |
+| 热量计算（calories_calculate）         | 提供了按日和按周根据摄入计算热量的功能。                     | [使用指导](./components/calories_calculate/README.md)      |
+| 日期计算（date_calculate）             | 提供了日期计算和日期间隔计算的功能。                       | [使用指导](./components/date_calculate/README.md)          |
+| 汇率计算器（exchange_calculator）       | 提供了多种币种之间实时汇率计算的功能。                      | [使用指导](./components/exchange_calculator/README.md)     |
+| 个税计算器（income_calculator）         | 提供了工资、劳动报酬等收入个税计算的功能。                    | [使用指导](./components/income_calculator/README.md)       |
+| 房贷计算器（mortgage_calculator）       | 提供了商业贷款、公积金贷款和组合贷款的还款计划计算功能。             | [使用指导](./components/mortgage_calculator/README.md)     |
+| 万能空调遥控器（remote_control）          | 提供了空调遥控器创建，删除及以发射红外信号控制对应空调等功能。          | [使用指导](./components/remote_control/README.md)          |
+| 科学计算器（science_calculator）        | 提供了多种科学计算方法的计算的功能。                       | [使用指导](./components/science_calculator/README.md)      |
+| 日程提醒（calendar_events）            | 提供了新增以及编辑日历、生日、纪念日、待办，并将日程添加到系统日历提醒中的功能。 | [使用指导](./components/calendar_events/README.md)         |
+| 敲木鱼（decompression_tool）          | 提供了敲木鱼解压的功能。                             | [使用指导](./components/decompression_tool/README.md)      |
+| 记账（money_track）                  | 提供了记账、查看账单列表和统计图表的功能。                    | [使用指导](./components/money_track/README.md)             |
+| 隐私笔记（personal_notes）             | 提供了写笔记、编辑笔记、删除笔记、笔记分类，搜索，多选，排序，分享、复制功能。  | [使用指导](./components/personal_notes/README.md)          |
+| 图片水印（picture_watermark）          | 提供了图片添加水印、下载保存相册、历史添加缓存等功能。              | [使用指导](./components/picture_watermark/README.md)       |
+| 手机NFC（mobile_nfc）                | 提供了门禁卡、公交卡和银行卡的读取和克隆功能。                  | [使用指导](./components/mobile_nfc/README.md)              |
+| 罗盘（compass）                      | 提供了罗盘方向的指引功能。                            | [使用指导](./components/compass/README.md)                 |
+| 日记（diary）                        | 提供写日记的功能                                 | [使用指导](./components/diary/README.md)                   |
+| 网络测速（internet_speed_measure）     | 提供了网络实时测速的功能。                            | [使用指导](./components/internet_speed_measure/README.md)  |
+| 修图神器（photo_editing）              | 提供了滤镜相机、图片拼接、图片编辑的功能。                    | [使用指导](./components/photo_editing/README.md)           |
+| BMI计算（bmi_calculator）            | 提供了BMI指标计算的功能。                           | [使用指导](./components/bmi_calculator/README.md)          |
+| 绘画（draw_board）                   | 提供了自由绘画的功能。                              | [使用指导](./components/draw_board/README.md)              |
+| 录音专家（simple_recorder）            | 提供了录音、音频格式转换、音频转文字、音频编辑等功能。              | [使用指导](./components/simple_recorder/README.md)         |
+| 解压缩（zip_tool）                    | 提供了解压、压缩等功能。                             | [使用指导](./components/zip_tool/README.md)                |
+| 吉他调音器（guitar_tuning）             | 提供了吉他调音功能。                               | [使用指导](./components/guitar_tuning/README.md)           |
+| 视频剪辑（video_clip）                 | 提供了视频剪辑及草稿管理功能。                          | [使用指导](./components/video_clip/README.md)              |
+| 克隆工具（clone）                      | 提供了克隆、隔空投送等功能                            | [使用指导](./components/clone/README.md)                   |
+| 手持弹幕（handheld_bullet）            | 提供了手持弹幕、荧光棒及历史记录管理功能。                    | [使用指导](./components/handheld_bullet/README.md)         |
+| 图文识别（image_recognition）          | 提供图文识别等功能。                               | [使用指导](./components/image_recognition/README.md)       |
+| 理财计算器（financial_calculator）      | 提供了银行理财、复利理财、定投理财功能。                     | [使用指导](./components/financial_calculator/README.md)    |
+| 养老金计算器（pension_calculator）       | 提供了养老金计算功能。                              | [使用指导](./components/pension_calculator/README.md)      |
+| 亲属称呼换算器（kinship_calculator）      | 提供了亲属称呼换算功能。                             | [使用指导](./components/kinship_calculator/README.md)      |
 | 退休年龄计算器（retirement_age_calculator） | 提供了退休年龄计算功能。                             | [使用指导](./components/retirement_age_calculator/README.md) |
-| 证件照（credentials_photo）             | 提供证件照生成功能。                               | [使用指导](./components/credentials_photo/README.md)       |
-| AR测量（ar_measure）                   | 提供AR体积测量及空间测量组件。                         | [使用指导](./components/ar_measure/README.md)                        |
-| 翻译（translator）                     | 提供文本翻译、语音翻译组件。                           | [使用指导](./components/translator/README.md)                        |
+| 证件照（credentials_photo）           | 提供证件照生成功能。                               | [使用指导](./components/credentials_photo/README.md)       |
+| AR测量（ar_measure）                 | 提供AR体积测量及空间测量组件。                         | [使用指导](./components/ar_measure/README.md)                        |
+| 翻译（translator）                   | 提供文本翻译、语音翻译组件。                           | [使用指导](./components/translator/README.md)                        |
+| 投屏（cast_tool）                   | 提供音频投屏、视频投屏功能。                           | [使用指导](./components/cast_tool/README.md)                        |
 
 本模板为工具类应用提供了常用功能的开发样例，模板主要分首页、我的两大模块：
 
@@ -141,6 +142,7 @@
  |    |-- 证件照 
  |    |-- AR测量 
  |    |-- 翻译 
+ |    |-- 投屏 
  └-- 我的
       |-- 问题反馈
       |    └-- 提交反馈
@@ -202,6 +204,7 @@ ComprehensiveTool
   |   |- credentials_photo/src/main/ets                    // 证件照(har)
   |   |- ar_measure/src/main/ets                           // AR测量(har)
   |   |- translator/src/main/ets                           // 翻译(har)
+  |   |- cast_tool/src/main/ets                            // 投屏(har)
   |
   |   |- entry/src/main/ets    
   |   |    |- apis                                         // 模块接口  
@@ -231,7 +234,6 @@ ComprehensiveTool
 * 麦克风权限：ohos.permission.MICROPHONE
 * 获取相机权限：ohos.permission.CAMERA
 * 获取网络权限：ohos.permission.INTERNET、ohos.permission.GET_NETWORK_INFO
-* 媒体写入权限：ohos.permission.WRITE_MEDIA
 * 读取联系人权限：ohos.permission.READ_CONTACTS
 * 写入联系人权限：ohos.permission.WRITE_CONTACTS
 * 读取图片视频权限：ohos.permission.READ_IMAGEVIDEO

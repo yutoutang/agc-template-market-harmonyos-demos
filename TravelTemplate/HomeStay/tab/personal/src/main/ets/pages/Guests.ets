@@ -1,10 +1,10 @@
 import { Constants, NavPathName } from 'constant';
+import { DeleteConfirmDialog, TitleBar } from 'component';
+import { GetInfoRequest, https } from 'network';
+import { AccountUtil } from 'util';
 import { Source } from '../model/Index';
 import { Passenger } from 'type';
 import { GuestPageVM } from '../viewmodel/GuestPageVM';
-import { GetInfoRequest, https } from 'network';
-import { AccountUtil } from 'account';
-import { TitleBar } from 'component';
 
 @Builder
 export function GuestsBuilder() {
@@ -16,13 +16,24 @@ function operationImage() {
   .size({ width: 24, height: 24 }).opacity(0.2);
 }
 
-@Component
+@ComponentV2
 export struct Guests {
   vm: GuestPageVM = GuestPageVM.instance;
-  @State source: string = '';
-  @State openId: string | undefined = AccountUtil.getOpenId();
-  @Consume('mainPathStack') mainPathStack: NavPathStack;
-  @State windowBottomHeight: number = AppStorage.get('windowBottomHeight') as number || 28;
+  @Local passengerId: number = 0;
+  @Local source: string = '';
+  @Local openId: string = '';
+  @Consumer('mainPathStack') mainPathStack: NavPathStack = new NavPathStack();
+  @Local windowBottomHeight: number = AppStorage.get('windowBottomHeight') as number || 28;
+  dialogController: CustomDialogController | null = new CustomDialogController({
+    builder: DeleteConfirmDialog({
+      delete: () => {
+        this.vm.deleteGuest(this.passengerId);
+      },
+    }),
+    customStyle: false,
+    autoCancel: true,
+    backgroundColor: $r('sys.color.ohos_id_blur_style_component_ultra_thick_color'),
+  });
 
   async aboutToAppear(): Promise<void> {
     const data: GetInfoRequest = {
@@ -83,7 +94,10 @@ export struct Guests {
                         });
 
                         Image($r('app.media.delete')).operationImage().onClick(() => {
-                          this.vm.deleteGuest(item.passengerId);
+                          this.passengerId = item.passengerId;
+                          if (this.dialogController != null) {
+                            this.dialogController.open();
+                          }
                         });
                       };
                     }

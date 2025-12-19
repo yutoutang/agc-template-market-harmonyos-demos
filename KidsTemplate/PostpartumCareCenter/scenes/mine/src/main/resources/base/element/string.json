@@ -81,6 +81,14 @@
       "value": "title_mine"
     },
     {
+      "name": "agcit_huawei_postpartum_care_center_mine",
+      "value": "1.0.0"
+    },
+    {
+      "name": "agcitkid_huawei_postpartum_care_center_mine",
+      "value": "agcit_huawei_postpartum_care_center_components/1.0.0,agcit_huawei_postpartum_care_center_utils/1.0.0"
+    },
+    {
       "name": "app_user_agreement",
       "value": "app_user_agreement"
     },

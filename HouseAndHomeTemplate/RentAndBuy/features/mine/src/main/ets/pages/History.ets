@@ -172,11 +172,11 @@ export struct History {
             Text('删除记录').fontSize(12).fontColor($r('sys.color.white'));
           }.backgroundColor($r('sys.color.ohos_id_color_badge_red')).padding(8).borderRadius(8).onClick(() => {
             if (!this.vm.checkedHouses.length) {
-              promptAction.showToast({ message: '请选择至少一条浏览记录', duration: 1000 });
+              this.getUIContext().getPromptAction().showToast({ message: '请选择至少一条浏览记录', duration: 1000 });
               return;
             }
             this.vm.deleteHistory(this.vm.checkedHouses);
-            this.vm.deleteRemoteHistory(this.vm.houseTypeIndex + 1, this.vm.checkedHouses);
+            this.vm.deleteRemoteHistory(this.vm.houseTypeIndex + 1, this.vm.checkedHouses, this.getUIContext());
             // 清空勾选记录
             this.vm.checkedHouses = [];
             this.inEdit = false;

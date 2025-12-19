@@ -1,5 +1,4 @@
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import { abilityAccessCtrl, bundleManager, common, Permissions } from '@kit.AbilityKit';
 import { BusinessError } from '@ohos.base';
 import { fileIo as fs } from '@kit.CoreFileKit';
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
@@ -32,52 +31,6 @@ export class VideoManageVM {
       VideoManageVM._instance = new VideoManageVM();
     }
     return VideoManageVM._instance;
-  }
-
-  async requestPermission(context: Context, permissionList: Array<Permissions>): Promise<void> {
-    let atManager = abilityAccessCtrl.createAtManager();
-    return new Promise<void>(async (resolve, reject) => {
-      let data = await atManager.requestPermissionsFromUser(context, permissionList);
-      if (data && data.authResults) {
-        let result = 0;
-        for (let i = 0; i < data.authResults.length; i++) {
-          result += data.authResults[i];
-        }
-        if (result === 0) {
-          this.isAccept = true;
-          resolve();
-        } else {
-          this.isAccept = false;
-          hilog.error(0xFF00, 'VideoClip', `用户拒绝申请`);
-          reject();
-        }
-      } else {
-        hilog.error(0xFF00, 'VideoClip', `申请权限失败`);
-        reject();
-      }
-    });
-  }
-
-  async checkWritePermission(): Promise<boolean> {
-    let atManager = abilityAccessCtrl.createAtManager();
-    let bundleInfo =
-      await bundleManager.getBundleInfoForSelf(bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_APPLICATION);
-    let grantWriteStatus =
-      await atManager.checkAccessToken(bundleInfo.appInfo.accessTokenId, 'ohos.permission.WRITE_MEDIA');
-    if (grantWriteStatus === abilityAccessCtrl.GrantStatus.PERMISSION_GRANTED) {
-      return true;
-    } else {
-      try {
-        let context = getContext() as common.UIAbilityContext;
-        await this.requestPermission(context, ['ohos.permission.WRITE_MEDIA']);
-        let newGrantWriteStatus =
-          await atManager.checkAccessToken(bundleInfo.appInfo.accessTokenId, 'ohos.permission.WRITE_MEDIA');
-        return newGrantWriteStatus === abilityAccessCtrl.GrantStatus.PERMISSION_GRANTED;
-      } catch (err) {
-        hilog.error(0xFF00, 'VideoClip', `申请权限失败`);
-        return false;
-      }
-    }
   }
 
   handleDraftClickEvent(video: EditVideo) {

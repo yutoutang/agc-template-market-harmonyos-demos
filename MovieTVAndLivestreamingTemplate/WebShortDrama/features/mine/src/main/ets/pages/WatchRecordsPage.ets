@@ -19,6 +19,7 @@ export struct WatchRecordsPage {
   @Local selectCount: number = 0
   @Local selectedIds: string[] = []
   @Local deletePromptMsg: string | Resource = '此条'
+  @Local isFirstTime:boolean = AppStorage.get('isFirstTime')!
   deleteDialogController: CustomDialogController = new CustomDialogController({
     builder: AlertDialog({
       content: getString('app.string.delete_watched_prompt', this.deletePromptMsg.toString()),
@@ -49,7 +50,21 @@ export struct WatchRecordsPage {
   })
 
   aboutToAppear(): void {
-    this.updateWatchedRecords()
+    if(this.isFirstTime){
+      container.resolve(RequestAPI).getMyWatchRecord({
+        pageSize: 1,
+        pageNum: 20
+      }).then((res) => {
+        this.myWatchRecordRes = new MyWatchRecordRes(res.getBody());
+        this.myWatchRecordRes.myWatchRecord.forEach((item) => {
+          container.resolve(RequestAPI).unsetMyWatchRecord(item.id)
+        })
+        AppStorage.set('isFirstTime',false)
+        this.updateWatchedRecords()
+      })
+    }else{
+      this.updateWatchedRecords()
+    }
   }
 
   build() {
@@ -90,36 +105,34 @@ export struct WatchRecordsPage {
     Grid() {
       Repeat<MyWatchRecordData>(this.myWatchRecordRes.myWatchRecord)
         .each((ri: RepeatItem<MyWatchRecordData>) => {
-          if(ri.item){
-            GridItem() {
-              VideoSeries({
-                title: ri.item.name,
-                currentEpisode: ri.item.currentWatch + 1,
-                totalCount: ri.item.totalCount,
-                isDeleting: this.isDeleting,
-                likeCount: ri.item.likeCount,
-                isLike: false,
-                isSelectBack: (isSelect) => {
-                  ri.item.isSelect = isSelect
-                  this.getSelectedIds()
-                },
-                cover: ri.item.coverUrl,
-                isVip: ri.item.isVip,
-                onContinueWatch: () => {
-                  if (!this.isDeleting) {
-                    jumpDetailPage(ri.item, ri.item.currentWatch, 0, (params) => {
-                      WindowManager.setWindowSystemBarProperties({ statusBarContentColor: '#e6000000' })
-                      const paramsInfo = params.result as ParamsModel
-                      const drama = getDramaInfo(paramsInfo.id)
-                      drama.curIndex = paramsInfo.curIndex
-                      unsetMyWatchRecord(drama.id)
-                      setMyWatchRecord(drama)
-                      this.updateWatchedRecords()
-                    })
-                  }
+          GridItem() {
+            VideoSeries({
+              title: ri.item.name,
+              currentEpisode: ri.item.currentWatch + 1,
+              totalCount: ri.item.totalCount,
+              isDeleting: this.isDeleting,
+              likeCount: ri.item.likeCount,
+              isLike: false,
+              isSelectBack: (isSelect) => {
+                ri.item.isSelect = isSelect
+                this.getSelectedIds()
+              },
+              cover: ri.item.coverUrl,
+              isVip: ri.item.isVip,
+              onContinueWatch: () => {
+                if (!this.isDeleting) {
+                  jumpDetailPage(ri.item, ri.item.currentWatch, 0, (params) => {
+                    WindowManager.setWindowSystemBarProperties({ statusBarContentColor: '#e6000000' })
+                    const paramsInfo = params.result as ParamsModel
+                    const drama = getDramaInfo(paramsInfo.id)
+                    drama.curIndex = paramsInfo.curIndex
+                    unsetMyWatchRecord(drama.id)
+                    setMyWatchRecord(drama)
+                    this.updateWatchedRecords()
+                  })
                 }
-              })
-            }
+              }
+            })
           }
         })
         .key((item: MyWatchRecordData, index: number): string => item.id)// 键值生成函数
@@ -196,7 +209,6 @@ export struct WatchRecordsPage {
         .margin({ left: 8 })
         .height(40)
         .borderRadius(20)
-        .fontSize(16)
         .fontColor($r('sys.color.font_primary'))
         .backgroundColor($r('sys.color.comp_background_tertiary'))
         .onClick(() => {

@@ -1,0 +1,20 @@
+const TAG: string = '[FormatUtil]';
+
+export class FormatUtil {
+  public static formatDate(date: Date): string {
+    const pad = (n: number) => (n < 10 ? '0' + n : n.toString());
+
+    const year = date.getFullYear();
+    const month = pad(date.getMonth() + 1);
+    const day = pad(date.getDate());
+    const hours = pad(date.getHours());
+    const minutes = pad(date.getMinutes());
+    const seconds = pad(date.getSeconds());
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  }
+
+  public static maskPhoneNumber(phoneNumber: string): string {
+    return phoneNumber.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2');
+  }
+}

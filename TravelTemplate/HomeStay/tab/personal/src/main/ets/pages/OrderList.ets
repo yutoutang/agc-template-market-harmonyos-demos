@@ -1,26 +1,24 @@
-import { AccountUtil } from 'account';
 import { https, UpdateOrderRequest } from 'network';
 import { Constants, NavPathName, OrderTabBarType } from 'constant';
+import { CommonBlank, TitleBar } from 'component';
+import { Logger } from 'util';
 import { OrderPageVM } from '../viewmodel/OrderPageVM';
 import { Order, OrderParam } from 'type';
 import { OrderTabBar, OrderTypesTabBar, ORDER_TABS_INFO, ORDER_TYPES, ORDER_TYPES_INFO } from '../model/OrderTabInfo';
-import { CommonBlank, TitleBar } from 'component';
-import { Logger } from 'util';
 
 @Builder
 export function OrderListBuilder() {
   OrderList();
 }
 
-@Component
+@ComponentV2
 export struct OrderList {
   vm: OrderPageVM = OrderPageVM.instance;
-  @Consume('orderTabIndex') orderTabIndex: number;
-  @State orderTypeTabIndex: number = 0;
-  @State index: number = 0;
+  @Consumer('orderTabIndex') orderTabIndex: number = 0;
+  @Local orderTypeTabIndex: number = 0;
+  @Local index: number = 0;
   controller: TabsController = new TabsController();
-  @State openId: string | undefined = AccountUtil.getOpenId();
-  @Consume('mainPathStack') mainPathStack: NavPathStack;
+  @Consumer('mainPathStack') mainPathStack: NavPathStack = new NavPathStack();
 
   aboutToAppear() {
     this.vm.getOrderList();
@@ -56,7 +54,7 @@ export struct OrderList {
           Column({ space: 18 }) {
             Text(orderItem.orderName)
               .fontSize(14)
-              .width(200)
+              .width('50%')
               .textOverflow({ overflow: TextOverflow.Ellipsis })
               .maxLines(1);
 

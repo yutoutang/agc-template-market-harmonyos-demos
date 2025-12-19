@@ -22,7 +22,9 @@ import {
 } from '@agctemplate/utils';
 import { DramaInfo, MyWatchRecordRes, RequestAPI } from '@agctemplate/server';
 import { MyStorage } from '../models/SpeedData';
-import { getDramaInfo } from '@agctemplate/server/src/main/ets/api/mock/mockData/mockDramaFactory';
+import { getDramaInfo,
+  setMyWatchRecord,
+  unsetMyWatchRecord } from '@agctemplate/server/src/main/ets/api/mock/mockData/mockDramaFactory';
 import { emitter } from '@kit.BasicServicesKit';
 import { CastListenerImpl } from '../listener/CastListenerImpl';
 import { CastService, CastStatusModel } from 'module_cast';
@@ -268,16 +270,18 @@ export struct ShortDramaDetailPage {
       PreferenceUtil.getInstance(getContext()).get(PreferConstant.PLAY_SPEED_SETTINGS, '1.0x') as string
     // 观看记录
     let isWatched: boolean = false
+    let isWatchedId: string = ''
     this.myWatchRecordRes.myWatchRecord.forEach((item) => {
-      if (item.id === this.vm.dramaInfo.id) {
+      if (item.name === this.vm.dramaInfo.name) {
         isWatched = true
+        isWatchedId = item.id
       }
     })
     const drama = getDramaInfo(this.vm.dramaInfo.id)
     drama.curIndex = this.playController.curentIndex
     if (isWatched) {
-      // container.resolve(RequestAPI).unsetMyWatchRecord(this.vm.dramaInfo.id)
-      container.resolve(RequestAPI).setMyWatchRecord(drama)
+      container.resolve(RequestAPI).unsetMyWatchRecord(isWatchedId)
+      container.resolve(RequestAPI).setMyWatchRecord(this.vm.dramaInfo)
     } else {
       container.resolve(RequestAPI).setMyWatchRecord(drama)
     }

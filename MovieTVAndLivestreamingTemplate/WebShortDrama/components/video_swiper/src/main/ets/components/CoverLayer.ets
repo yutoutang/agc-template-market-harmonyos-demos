@@ -20,8 +20,7 @@ export struct CoverLayer {
       if (this.curIndex === this.index && this.avPlayer.isBufferUpdate) {
         Column() {
           LoadingProgress()
-            .width(50)
-            .height(50)
+            .size({ width:40, height:40 })
             .color(Color.White);
           Text('加载中...')
             .fontSize(14)

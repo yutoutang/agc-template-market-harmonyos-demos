@@ -1,0 +1,20 @@
+{
+  "string": [
+    {
+      "name": "shared_desc",
+      "value": "description"
+    },
+    {
+      "name": "agcit_huawei_postpartum_care_center_double_layer_tabs",
+      "value": "1.0.0"
+    },
+    {
+      "name": "agcittype_huawei_postpartum_care_center_activity_list",
+      "value": "serviceComponent"
+    },
+    {
+      "name": "agcittype_huawei_postpartum_care_center_double_layer_tabs",
+      "value": "serviceComponent"
+    }
+  ]
+}

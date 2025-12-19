@@ -17,13 +17,13 @@ export struct AccommodationDetail {
   build() {
     NavDestination() {
       Column() {
-        CustomTitle({
-          isShowBack: true, title: this.detailInfo.name, clickEvent: () => {
-            this.mainPathStack.pop();
-          },
-        });
+        Column() {
+          CustomTitle({
+            isShowBack: true, title: this.detailInfo.name, clickEvent: () => {
+              this.mainPathStack.pop();
+            },
+          });
 
-        Stack({ alignContent: Alignment.End }) {
           Scroll() {
             Column() {
               Swiper() {
@@ -88,21 +88,19 @@ export struct AccommodationDetail {
                 }, (item: ResourceStr) => JSON.stringify(item));
               }.padding(12);
             };
-          }.edgeEffect(EdgeEffect.Spring).height('100%').align(Alignment.Top).scrollBar(BarState.Off);
+          }.edgeEffect(EdgeEffect.Spring).height('80%').align(Alignment.Top).scrollBar(BarState.Off);
+        };
 
-          Row() {
-            Button('马上预约').width('100%').backgroundColor('#64BB5C').borderRadius(20).onClick(() => {
-              SystemUtil.triggerForCall('12345678911');
-            });
-          }
-          .justifyContent(FlexAlign.SpaceBetween)
-          .width('100%')
-          .height('10%')
-          .padding({ left: 12, right: 12 })
-          .backgroundColor($r('sys.color.font_on_primary'))
-          .position({ y: '90%' });
-        }.height('90%');
-      };
+        Row() {
+          Button('马上预约').width('100%').backgroundColor('#64BB5C').borderRadius(20).onClick(() => {
+            SystemUtil.triggerForCall('12345678911');
+          });
+        }
+        .justifyContent(FlexAlign.SpaceBetween)
+        .width('100%')
+        .padding({ left: 12, right: 12 })
+        .backgroundColor($r('sys.color.font_on_primary'))
+      }.height('100%').justifyContent(FlexAlign.SpaceBetween)
     }.title(this.detailInfo.name).hideTitleBar(true).onReady((context: NavDestinationContext) => {
       this.detailInfo = context.pathInfo.param as AccommodationInfo;
       this.banners.pushArrayData(this.detailInfo.banners);

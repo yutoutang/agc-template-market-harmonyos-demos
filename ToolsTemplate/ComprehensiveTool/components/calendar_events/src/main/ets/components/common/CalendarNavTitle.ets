@@ -13,7 +13,7 @@ export struct CalendarNavTitle {
     Flex({ justifyContent: FlexAlign.SpaceBetween }) {
       Row({ space: 8 }) {
         Row() {
-          Image($r('app.media.back_left')).width(40).height(40)
+          Image($r('app.media.calendar_back')).width(40).height(40)
         }
         .width(40)
         .justifyContent(FlexAlign.Center)

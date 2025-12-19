@@ -21,6 +21,10 @@ export function copyText(orderNo: string) {
 }
 
 export function isValidPhoneNo(phone: string) {
+  // 手机号不必填
+  if (!phone.length) {
+    return true;
+  }
   const phoneReg = /^1(3|4|5|7|8|9)\d{9}$/;
   return phoneReg.test(phone);
 }
@@ -38,22 +42,19 @@ export function consult(phoneNo: string) {
   }
 }
 
-export async function requestAndUploadPic(context: common.UIAbilityContext):
-  Promise<photoAccessHelper.PhotoSelectResult> {
-  let result: Promise<photoAccessHelper.PhotoSelectResult>;
-  let atManager: abilityAccessCtrl.AtManager = abilityAccessCtrl.createAtManager();
-  let requestResult = await atManager.requestPermissionsFromUser(context, ['ohos.permission.READ_MEDIA']);
-
-  if (requestResult.authResults[0] !== -1) {
-    let photoPicker = new photoAccessHelper.PhotoViewPicker();
-    result = photoPicker.select({
-      MIMEType: photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE,
-      maxSelectNumber: 1,
+export async function requestAndUploadPic(): Promise<photoAccessHelper.PhotoSelectResult | void> {
+  let photoViewPicker: photoAccessHelper.PhotoViewPicker = new photoAccessHelper.PhotoViewPicker();
+  return photoViewPicker.select({
+    MIMEType: photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE,
+    isEditSupported: false,
+    maxSelectNumber: 1
+  } as photoAccessHelper.PhotoSelectOptions)
+    .then((result: photoAccessHelper.PhotoSelectResult) => {
+      return result
+    })
+    .catch((err: BusinessError) => {
+      console.error(`PhotoViewPicker.select failed with err: ${err.code}, ${err.message}`);
     });
-    return result;
-  }
-
-  return new photoAccessHelper.PhotoSelectResult();
 }
 
 export function getCurrentTime() {

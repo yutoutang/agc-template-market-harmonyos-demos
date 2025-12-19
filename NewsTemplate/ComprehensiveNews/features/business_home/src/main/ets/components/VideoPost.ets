@@ -10,8 +10,7 @@ export struct VideoPost {
   @Local videoUri: string = ''
   @Local surfaceUrl: string = ''
   @Local body: string = ''
-  @Event onValidate: (isCanBack: boolean) => void = () => {
-  }
+  @Event onValidate: (isCanBack: boolean) => void = () => {}
 
   @Computed
   get isCanBack() {
@@ -47,8 +46,8 @@ export struct VideoPost {
           })
       }
 
-      .width(this.newsPostViewModel.isSmDevice ? Constants.VIDEO_SIZE_SM_W : Constants.VIDEO_SIZE_LG_W)
-      .height(this.newsPostViewModel.isSmDevice ? Constants.VIDEO_SIZE_SM_H : Constants.VIDEO_SIZE_LG_H)
+      .width(this.newsPostViewModel.getPostVideoWidth())
+      .height(this.newsPostViewModel.getPostVideoHeight())
       .alignContent(Alignment.TopEnd)
 
       Image($r('app.media.ic_video_flag'))
@@ -58,8 +57,8 @@ export struct VideoPost {
     .onClick(() => {
       RouterUtils.pushPathByName(RouterMap.Video_PREVIEW,this.videoUri)
     })
-    .width(this.newsPostViewModel.isSmDevice ? Constants.VIDEO_SIZE_SM_W : Constants.VIDEO_SIZE_LG_W)
-    .height(this.newsPostViewModel.isSmDevice ? Constants.VIDEO_SIZE_SM_H : Constants.VIDEO_SIZE_LG_H)
+    .width(this.newsPostViewModel.getPostVideoWidth())
+    .height(this.newsPostViewModel.getPostVideoHeight())
     .borderRadius(16)
 
   }
@@ -94,14 +93,16 @@ export struct VideoPost {
             this.plusBtnClick()
           })
           .justifyContent(FlexAlign.Center)
-          .width(this.newsPostViewModel.isSmDevice ? Constants.VIDEO_SIZE_SM_W : Constants.VIDEO_SIZE_LG_W)
-          .height(this.newsPostViewModel.isSmDevice ? Constants.VIDEO_SIZE_SM_H : Constants.VIDEO_SIZE_LG_H)
+          .width(this.newsPostViewModel.getPostVideoWidth())
+          .height(this.newsPostViewModel.getPostVideoHeight())
           .borderRadius(8)
         }
       }
       .backgroundColor($r('sys.color.comp_background_tertiary'))
       .borderRadius(8)
       .clip(true)
+      .width(this.newsPostViewModel.getPostVideoWidth())
+      .height(this.newsPostViewModel.getPostVideoHeight())
 
       Column({ space: 16 }) {
         TextArea({

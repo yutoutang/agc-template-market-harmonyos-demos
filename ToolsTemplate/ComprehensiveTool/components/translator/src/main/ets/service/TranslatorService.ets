@@ -3,19 +3,20 @@ import { buffer, util } from '@kit.ArkTS';
 import CryptoJS from '@ohos/crypto-js';
 import axios, { AxiosRequestConfig, AxiosResponse } from '@ohos/axios';
 import { TranLogger } from '../util/TranLogger';
+import { promptAction } from '@kit.ArkUI'
 
 export class TranslatorService {
-  // TODO 添加文本翻译对应的Websocket服务接口认证信息
+  // TODO 添加文本翻译对应的Websocket服务接口认证信息(appid、apiSecret、apiKey)
   private static config: XFConfig = {
     // 请求地址
     hostUrl: 'https://itrans.xfyun.cn/v2/its',
     host: 'itrans.xfyun.cn',
     //在控制台-我的应用-机器翻译获取
-    appid: 'dd674b07',
+    appid: 'xxx',
     //在控制台-我的应用-机器翻译获取
-    apiSecret: 'ZmZmYzBhNjM5ZTAxY2IzNzc4MGJkMGNj',
+    apiSecret: 'xxx',
     //在控制台-我的应用-机器翻译获取
-    apiKey: 'bf6949ea0abbd9dd17b5fed25002525b',
+    apiKey: 'xxx',
     uri: '/v2/its',
   }
 
@@ -86,6 +87,13 @@ export class TranslatorService {
       return response.data.data.result.trans_result.dst as string
     } catch (e) {
       TranLogger.info(JSON.stringify(e))
+      if (e.code && e.code === 'ERR_BAD_REQUEST') {
+        promptAction.showToast({
+          message: '请配置文本翻译对应的Websocket服务接口认证信息',
+        })
+      } else {
+        promptAction.showToast({ message: '暂不支持！' })
+      }
     }
     return ''
   }

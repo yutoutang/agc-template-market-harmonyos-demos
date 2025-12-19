@@ -13,10 +13,25 @@ import { emitter } from '@kit.BasicServicesKit';
 import { CastService } from 'module_cast';
 import { PipManager } from 'module_pip';
 import { Preferences } from '@agctemplate/detail'
+import { WXLoginService } from 'aggregated_login';
+import { ShareService } from 'aggregated_share';
 
 const TAG = 'EntryAbility'
 
 export default class EntryAbility extends UIAbility {
+  // 实例化分享服务
+  private shareServiceImpl: ShareService =
+    ShareService.create()
+    // todo 填写微信开放平台配置的应用AppID
+      .initWX('wxc92d9d6570127a32')
+      // todo 填写QQ互联平台配置的应用AppID
+      .initQQ(102061317);
+
+  // 实例化登录服务
+  private loginServiceImpl: WXLoginService =
+    WXLoginService.create()
+    // todo 填写微信开放平台配置的应用AppID
+      .initWX('wxc92d9d6570127a32')
   private curBp: BreakPointValue = BreakPointValue.SM;
   private breakPoint = AppStorageV2.connect(BreakPoint, AppStorageKeys.CURRENT_BREAK_POINT,
     () => new BreakPoint(this.curBp))!;
@@ -25,7 +40,18 @@ export default class EntryAbility extends UIAbility {
   private aiBarHeight = AppStorageV2.connect(AiBarHeight, AppStorageKeys.AI_BAR_HEIGHT,
     () => new AiBarHeight(0))!;
 
+  onNewWant(want: Want): void {
+    this.loginServiceImpl.handleWant(want);
+    this.shareServiceImpl.handleWant(want, this.context);
+  }
+
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
+    this.loginServiceImpl.handleWant(want);
+    this.shareServiceImpl.handleWant(want, this.context);
+    const bundleName = this.context.abilityInfo.bundleName
+    AppStorage.setOrCreate('bundleName',bundleName)
+    let isFirstTime:boolean = true
+    AppStorage.setOrCreate('isFirstTime',isFirstTime)
     Logger.info(TAG, 'Ability onCreate');
     let applicationContext = this.context.getApplicationContext();
     applicationContext.setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT);

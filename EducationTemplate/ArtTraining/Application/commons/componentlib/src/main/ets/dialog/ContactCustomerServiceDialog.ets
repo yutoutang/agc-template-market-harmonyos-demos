@@ -46,11 +46,11 @@ export struct ContactCustomerServiceDialog {
 
             Button() {
               Row() {
-                Image($r('app.media.ic_tel_filled'))
-                  .width($r('app.integer.icon_size_24'))
+                SymbolGlyph($r('sys.symbol.phone_fill'))
+                  .fontSize($r('app.integer.icon_size_24'))
                   .margin({ right: $r('app.string.margin_m') });
                 Text('一键拨号')
-                  .fontColor($r('app.color.font_color_level1_invert'))
+                  .fontColor($r('sys.color.font_on_primary'))
                   .fontWeight(FontWeight.Medium);
               };
             }
@@ -65,7 +65,7 @@ export struct ContactCustomerServiceDialog {
 
             Button('取消')
               .backgroundColor($r('app.color.system_color_background_grey_level2'))
-              .fontColor($r('app.color.font_color_level2'))
+              .fontColor($r('sys.color.font_tertiary'))
               .fontWeight(FontWeight.Medium)
               .height(40)
               .width($r('app.string.width_percent_full'))

@@ -6,10 +6,10 @@ import { DramaDesLayer } from './DramaDesLayer';
 import { getMedia, NAV_PAGE_NAME } from '@agctemplate/resources';
 import { commentBuilder, CommentParam } from './CommentComp';
 import { appRouter, container, Logger, WindowManager } from '@agctemplate/utils';
-import { AppStorageV2, ComponentContent } from '@kit.ArkUI';
+import { AppStorageV2, ComponentContent, display, window } from '@kit.ArkUI';
 import { UserInfoModel } from '@agctemplate/widgets';
-import { Share } from '@agctemplate/module_share';
-import { emitter } from '@kit.BasicServicesKit';
+import { QQShareData, SharePicker } from 'aggregated_share';
+import { emitter, deviceInfo } from '@kit.BasicServicesKit';
 import { ProcessController } from 'video_swiper/src/main/ets/view/ProcessController';
 import { AVPlayerListener } from 'video_swiper/src/main/ets/controller/AvPlayerListener';
 
@@ -36,9 +36,24 @@ export struct HomeDramaDes {
   @Local isShowShareSheet: boolean = false
   @Consumer('curTabIndex') curTabIndex: number = 0;
   @Local processController: ProcessController | undefined = undefined
+  @Local isTabletLandScape: boolean = deviceInfo.deviceType === 'tablet' &&
+    display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE
+  callback: Callback<number> = (data: number) => {
+    if (deviceInfo.deviceType === 'tablet' &&
+      display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE) {
+      this.isTabletLandScape = true
+    } else {
+      this.isTabletLandScape = false
+    }
+    this.closeCommentDialog()
+  }
+  windowStage: window.WindowStage = AppStorage.get('windowStage') as window.WindowStage;
+  // 获取主窗口的方式
+  mainWin: window.Window = this.windowStage.getMainWindowSync();
   avPlayerListener: AVPlayerListener = {
     onEnded: () => {
       Logger.info(TAG, 'onEnded')
+      this.closeCommentDialog()
       this.playerSession.avPlayer?.pause()
       this.unEmitter()
       this.playerSession.unregisterListener(this.avPlayerListener)
@@ -74,10 +89,12 @@ export struct HomeDramaDes {
           dismissDialogAction.dismiss()
         }
       },
-      alignment: DialogAlignment.Bottom,
+      alignment: this.isTabletLandScape ? DialogAlignment.CenterEnd :
+        DialogAlignment.Bottom,
       onWillDisappear: () => {
         this.isShowCommentSheet = false
         this.playControl.setPlayerHeight(`100%`)
+        this.playControl.setPlayerPositionX(0)
       }
     })
   }
@@ -87,6 +104,7 @@ export struct HomeDramaDes {
   }
 
   aboutToAppear(): void {
+    display.on('change', this.callback)
     this.playerSession.registerListener(this.avPlayerListener)
     this.getDeleteEmitter()
     this.getDetailInfoFavoriteEmitter()
@@ -102,6 +120,10 @@ export struct HomeDramaDes {
       this.commentCount = res.getBody().commentList.length
     })
     this.registerEmitter()
+  }
+
+  aboutToDisappear(): void {
+    display.off('change', this.callback)
   }
 
   registerEmitter() {
@@ -246,7 +268,11 @@ export struct HomeDramaDes {
         .height(40)
         .onClick(() => {
           this.isShowCommentSheet = !this.isShowCommentSheet
-          this.playControl.setPlayerHeight('40%')
+          if(this.isTabletLandScape){
+            this.playControl.setPlayerPositionX('-15%')
+          }else{
+            this.playControl.setPlayerHeight(`60%`)
+          }
           this.openCommentDialog()
         })
 
@@ -280,7 +306,7 @@ export struct HomeDramaDes {
         .width(40)
         .height(40)
 
-        this.shareBuilder()
+        this.shareCommentBuilder()
 
       }
       .width(40)
@@ -313,26 +339,27 @@ export struct HomeDramaDes {
         .fontSize(10)
         .fontColor($r('sys.color.font_on_primary'))
     }
-  }
-
-  @Builder
-  shareBuilder() {
-    Share({
-      qrCodeInfo: {
-        id: this.dramaInfo.id,
-        type: 2,
+    .onClick(() => {
+      const picker: SharePicker = new SharePicker({
         title: this.dramaInfo.name,
-        createTime: '',
+        subTitle: '微短剧应用模板',
         coverUrl: this.dramaInfo.coverUrl,
-        isVideo: false,
-        articleFrom: this.dramaInfo.category[0] + '/' + this.dramaInfo.category[1]
-      },
-      shareRenderBuilder: () => {
-        this.shareCommentBuilder()
-      },
-      onClose: () => {
-        this.isShowShareSheet = !this.isShowShareSheet
-      }
+        createTime: new Date('2025/09-15 08:00:00').getTime(),
+        thumbUrl: this.dramaInfo.coverUrl
+      });
+
+      picker.setSignQQShareDataCB((shareJson: string) => {
+        const signData = new QQShareData();
+        signData.shareJson = shareJson;
+        signData.timestamp = Date.parse(new Date().toString()) / 1000;
+        signData.nonce = 62695688;
+        signData.shareJsonSign = 'Hsvqs0IpjiN6DfFfhboGp+r3XzQ=';
+        return Promise.resolve(signData);
+      })
+
+      picker.show({
+        autoClose: true,
+      });
     })
   }
 

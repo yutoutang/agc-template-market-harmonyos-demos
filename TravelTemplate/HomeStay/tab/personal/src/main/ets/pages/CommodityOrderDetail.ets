@@ -11,14 +11,14 @@ export function CommodityOrderDetailBuilder() {
   CommodityOrderDetail();
 }
 
-@Component
+@ComponentV2
 export struct CommodityOrderDetail {
-  @State order: Order = new Order();
-  @State orderNo: string = '';
-  @State tenantInfo: TenantInfo | undefined = AppStorage.get('tenantInfo');
-  @Consume('orderTabIndex') orderTabIndex: number;
-  @Consume('mainPathStack') mainPathStack: NavPathStack;
-  @State windowBottomHeight: number = AppStorage.get('windowBottomHeight') as number || 28;
+  @Local order: Order = new Order();
+  @Local orderNo: string = '';
+  @Local tenantInfo: TenantInfo | undefined = AppStorage.get('tenantInfo');
+  @Consumer('orderTabIndex') orderTabIndex: number = 0;
+  @Consumer('mainPathStack') mainPathStack: NavPathStack = new NavPathStack();
+  @Local windowBottomHeight: number = AppStorage.get('windowBottomHeight') as number || 28;
   dialogController: CustomDialogController | null = new CustomDialogController({
     builder: ConfirmDialog({
       call: () => {

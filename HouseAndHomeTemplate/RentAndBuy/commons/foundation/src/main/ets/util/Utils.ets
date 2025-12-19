@@ -64,7 +64,7 @@ export class CommonUtils {
    * @param url
    * @returns
    */
-  static handleImgUrl(url: string): string {
+  static handleImgUrl(url: string, context: Context): string {
     if (!url) {
       return '';
     }
@@ -82,7 +82,7 @@ export class CommonUtils {
     if (url.startsWith('resourceImage://')) {
       const resourceName = url.split('//')[1];
       try {
-        const resource = getContext().resourceManager.getMediaBase64ByNameSync(resourceName);
+        const resource = context.resourceManager.getMediaBase64ByNameSync(resourceName);
         return resource;
       } catch (err) {
         Logger.error(`get image resource failed, ${err}, ${resourceName}`);
@@ -99,18 +99,7 @@ export class CommonUtils {
  */
 export class SystemUtils {
   static isApplyLocPermAgain: boolean = false;
-  static context: Context = getContext() as common.UIAbilityContext;
-
-  static customServiceCall(phone: string) {
-    call.makeCall(phone, (err) => {
-      if (err) {
-        Logger.error('make call success');
-        promptAction.showToast({ message: '拨打号码失败' });
-      } else {
-        Logger.info('make call success');
-      }
-    });
-  }
+  static context: Context;
 
   /**
    * 系统拨号
@@ -120,8 +109,7 @@ export class SystemUtils {
   static consult(phoneNo: string) {
     call.makeCall(phoneNo, (err) => {
       if (err) {
-        Logger.error('make call success');
-        promptAction.showToast({ message: '拨打号码失败' });
+        Logger.error('make call failed');
       } else {
         Logger.info('make call success');
       }
@@ -166,7 +154,8 @@ export class SystemUtils {
    * 向用户申请位置权限
    * @returns
    */
-  static async applyLocationPermission(): Promise<boolean> {
+  static async applyLocationPermission(context: Context): Promise<boolean> {
+    SystemUtils.context = context;
     const permissions: Permissions[] = [
       'ohos.permission.APPROXIMATELY_LOCATION',
     ];
@@ -176,9 +165,6 @@ export class SystemUtils {
     if (isGrantedAppLo) {
       Logger.info('already granted location and approximate location permissions');
       return true;
-    }
-    if (!SystemUtils.context) {
-      SystemUtils.context = getContext() as common.UIAbilityContext;
     }
     // 向用户申请
     const atManager = abilityAccessCtrl.createAtManager();

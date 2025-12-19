@@ -6,7 +6,7 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "dayjs": "^1.11.13",
-    "@hw-agconnect/petal-aegis": "^1.4.11-300"
+    "dayjs": "1.11.13",
+    "@hw-agconnect/petal-aegis": "1.4.11-300"
   }
 }

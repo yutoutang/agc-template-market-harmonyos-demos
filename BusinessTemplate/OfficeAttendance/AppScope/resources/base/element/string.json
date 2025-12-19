@@ -6,7 +6,7 @@
     },
     {
       "name": "agcit_huawei_office_attendance",
-      "value": "1.0.1"
+      "value": "1.0.2"
     },
     {
       "name": "agcittype_huawei_office_attendance",
@@ -14,7 +14,7 @@
     },
     {
       "name": "agcitkid_huawei_office_attendance",
-      "value": "agcit_huawei_office_attendance_area_calculate/1.0.0,agcit_huawei_office_attendance_clock_in/1.0.0,agcit_huawei_office_attendance_protractor/1.0.0,agcit_huawei_office_attendance_ruler/1.0.0"
+      "value": "agcit_huawei_office_attendance_area_calculate/1.0.1,agcit_huawei_office_attendance_clock_in/1.0.1,agcit_huawei_office_attendance_protractor/1.0.1,agcit_huawei_office_attendance_ruler/1.0.1"
     }
   ]
 }

@@ -25,10 +25,10 @@ export struct HouseMap {
     }.hideTitleBar(true).onReady((context: NavDestinationContext) => {
       this.vm.stack = context.pathStack;
       this.vm.fetchHousePromise = context.pathInfo.param as Promise<BaseResponse<IBasicHouse[]>>[];
-      this.vm.initMap();
+      this.vm.initMap(this.getUIContext());
       this.vm.drawMap();
-    }).onWillDisappear(()=> {
-      (getContext() as common.UIAbilityContext).eventHub.emit(EventEmitName.CLEAR_MAKER_STATUS);
-    })
+    }).onWillDisappear(() => {
+      (this.getUIContext().getHostContext() as common.UIAbilityContext).eventHub.emit(EventEmitName.CLEAR_MAKER_STATUS);
+    });
   }
 }

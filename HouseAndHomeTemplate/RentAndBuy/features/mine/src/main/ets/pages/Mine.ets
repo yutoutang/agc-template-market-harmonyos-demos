@@ -29,7 +29,7 @@ function settingRow() {
 export struct Mine {
   @Local avatar: ResourceStr = $r('app.media.avatar');
   @Local userInfo: UserInfo = AppStorageV2.connect(UserInfo, 'UserInfo', () => new UserInfo())!;
-  private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+  private context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
 
   aboutToAppear(): void {
     this.context.eventHub.on(EventEmitName.UPDATE_AVATAR, () => {

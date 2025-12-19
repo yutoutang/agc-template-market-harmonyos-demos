@@ -1,14 +1,15 @@
 import { MainEntryVM, StoreCard, StoreModel } from '@ohos_agcit/postpartum_care_center_uicomponents';
 import { Logger } from '@ohos_agcit/postpartum_care_center_utils';
+import { curves } from '@kit.ArkUI';
 
 const STORE_SHOWN_NUM: number = 2;
 
-@Preview
 @ComponentV2
 export struct NearbyStores {
   vm: MainEntryVM = MainEntryVM.instance;
   @Local currentIndex: number = 0;
   @Local panTranslateX: number = 0; // X轴偏移量
+  uiContext: UIContext = this.getUIContext() as UIContext;
 
   build() {
     Column() {
@@ -40,23 +41,16 @@ export struct NearbyStores {
                   const distanceThreshold = 100; // 设置距离阈值
                   if (this.panTranslateX > distanceThreshold) {
                     // 如果向右拖动的距离超过阈值，设置消失动画
-                    animateTo({
+                    this.uiContext.animateTo({
                       duration: 200,
                       curve: Curve.EaseOut,
                       onFinish: () => {
                         item.translateX = 0;
                         item.translateY = 0;
-                        const storeList: Array<StoreModel> = [];
-                        for (let i = 0; i < this.vm.storeListNearby.storeList.length; i++) {
-                          storeList.push(this.vm.storeListNearby.storeList[i]);
-                        }
-                        const firstStore = storeList[0];
-                        storeList.push(firstStore);
-                        const storeListNew: Array<StoreModel> = [];
-                        for (let i = 1; i < storeList.length; i++) {
-                          storeListNew.push(storeList[i]);
-                        }
-                        this.vm.storeListNearby.storeList = storeListNew;
+
+                        const firstStore = this.vm.storeListNearby.storeList.splice(0, 1)[0]; // 移除第一个元素
+                        this.vm.storeListNearby.storeList.push(firstStore)
+                        
                         this.vm.storeListNearby.needSortStore = false;
                         Logger.debug('testTag', 'onFinish');
                       },

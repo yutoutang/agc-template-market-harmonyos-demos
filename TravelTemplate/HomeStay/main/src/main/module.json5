@@ -5,8 +5,7 @@
     "description": "$string:module_desc",
     "mainElement": "EntryAbility",
     "deviceTypes": [
-      "phone",
-      "tablet"
+      "phone"
     ],
     "deliveryWithInstall": true,
     "installationFree": false,
@@ -17,8 +16,10 @@
         "name": "EntryAbility",
         "srcEntry": "./ets/entryability/EntryAbility.ets",
         "description": "$string:EntryAbility_desc",
-        "supportWindowMode": ["fullscreen"],
-        "icon": "$media:icon",
+        "supportWindowMode": [
+          "fullscreen"
+        ],
+        "icon": "$media:layered_image",
         "label": "$string:EntryAbility_label",
         "startWindowIcon": "$media:startIcon",
         "startWindowBackground": "$color:start_window_background",
@@ -33,7 +34,7 @@
             ]
           }
         ]
-      },
+      }
     ],
     "requestPermissions": [
       {
@@ -79,10 +80,10 @@
     ],
     "metadata": [
       {
+// todo 替换为您的应用的client_id值
         "name": "client_id",
-        // todo 替换为您的应用的client_id值
-        "value": "xxx"
-      },
-    ],
+        "value": "******"
+      }
+    ]
   }
 }

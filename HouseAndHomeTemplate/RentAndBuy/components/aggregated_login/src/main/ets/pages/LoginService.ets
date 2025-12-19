@@ -43,7 +43,7 @@ export struct LoginService {
    * 路由栈
    */
   @Param pathInfos: NavPathStack = new NavPathStack();
-  context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+  context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
   logTag: string = 'QuickLoginButtonComponent';
   domainId: number = 0x0000;
   loginData: Record<string, Object> = {
@@ -134,7 +134,7 @@ export struct LoginService {
         `Failed to click LoginWithHuaweiIDButton. Code is ${error.code}, message is ${error.message}`);
       this.error = error;
       if (error.code === LoginErrorCode.ERROR_CODE_NETWORK_ERROR) {
-        AlertDialog.show(
+        this.getUIContext().showAlertDialog(
           {
             message: 'No Internet connection. Check your network settings. ',
             offset: { dx: 0, dy: -12 },
@@ -206,7 +206,7 @@ export struct LoginService {
 
   showToast(resource: Resource) {
     try {
-      promptAction.showToast({
+      this.getUIContext().getPromptAction().showToast({
         message: resource,
         duration: 2000,
       });
@@ -226,7 +226,7 @@ export struct LoginService {
         ForEach(this.channelInfo, (item: Channel) => {
           Image(item.icon).size({ width: 36, height: 36 }).borderRadius(18).onClick(() => {
             if (item.type === LoginType.WECHAT) {
-              this.vm.wxLogin(item.extraInfo);
+              this.vm.wxLogin(item.extraInfo, this.getUIContext().getHostContext()!);
               this.isShow = false;
             }
           });
@@ -286,7 +286,7 @@ export struct LoginService {
   build() {
     if (this.loading) {
       Column() {
-        LoadingProgress().width(30).height(30);
+        LoadingProgress().width(32).height(32);
       }
       .justifyContent(FlexAlign.Center)
       .width('100%')
@@ -388,7 +388,7 @@ export struct LoginService {
               this.isShow = true;
             })
             .bindSheet($$this.isShow, this.loginTypeSheet(),
-              { showClose: false, height: '20%' });
+              { showClose: false, height: '20%', preferType: SheetType.CENTER });
           }.margin({ top: 16 });
         };
 

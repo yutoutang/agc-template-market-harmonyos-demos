@@ -4,7 +4,7 @@
 
 - [简介](#简介)
 - [约束与限制](#约束与限制)
-- [快速入门](#快速入门)
+- [使用](#使用)
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
@@ -25,7 +25,7 @@
 * 网络权限：ohos.permission.INTERNET
 * 获取位置权限：ohos.permission.APPROXIMATELY_LOCATION、ohos.permission.LOCATION。
 
-## 快速入门
+## 使用
 1. 安装组件。
    如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
 
@@ -181,7 +181,7 @@ struct Index {
             location: [22.92, 113.86],
             initAttractionInfo: this.attractionsInfo,
          }).height('90%');
-      }.title('景区导览');
+      }.title('景区导览').mode(NavigationMode.Stack);
    }
 }
 ```

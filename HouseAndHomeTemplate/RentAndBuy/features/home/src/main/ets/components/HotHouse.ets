@@ -46,7 +46,8 @@ export struct HotHouse {
         GridItem() {
           Column() {
             Stack({ alignContent: Alignment.BottomStart }) {
-              Image(CommonUtils.handleImgUrl(item.thumbnail)).borderRadius({ topLeft: 16, topRight: 16 });
+              Image(CommonUtils.handleImgUrl(item.thumbnail, this.getUIContext().getHostContext()!))
+                .borderRadius({ topLeft: 16, topRight: 16 });
               Row({ space: 4 }) {
                 Image($r('app.media.location')).size({ height: 12, width: 8 });
                 Text(item.cell).fontSize(10).opacity(0.9).fontColor($r('sys.color.white'));
@@ -106,7 +107,7 @@ export struct HotHouse {
             }.padding(12).alignItems(HorizontalAlign.Start);
           }.backgroundColor($r('sys.color.white')).borderRadius(16);
         }.onClick(() => {
-          (getContext(this) as common.UIAbilityContext).eventHub.emit(EventEmitName.INIT_MAP,
+          (this.getUIContext().getHostContext() as common.UIAbilityContext).eventHub.emit(EventEmitName.INIT_MAP,
             item.latitude, item.longitude);
           this.recordHistory(item.houseId, item.type);
           RouterModule.push({

@@ -1,8 +1,8 @@
 import { getMedia, NAV_PAGE_NAME } from '@agctemplate/resources'
 import { UserInfoModel } from '@agctemplate/widgets';
-import { AppStorageV2, ComponentContent } from '@kit.ArkUI'
+import { AppStorageV2, ComponentContent, display } from '@kit.ArkUI'
 import { commentInputDialogBuilder } from './CommentInputDialog'
-import { BusinessError } from '@kit.BasicServicesKit';
+import { BusinessError, deviceInfo } from '@kit.BasicServicesKit';
 import { appRouter, container, Logger, WindowManager } from '@agctemplate/utils';
 import { CommentInfo, CommentListRes, DramaInfo, ReplyInfo, RequestAPI } from '@agctemplate/server';
 import { CommentData, Reply } from '../models/CommentData';
@@ -27,12 +27,21 @@ export struct CommentComp {
   @Local replyPerson: string = ''
   @Local replyContent: string = ''
   @Local myMessageStorage: MyMessageStorage = MyMessageStorage.instance()
+  @Local isTabletLandScape: boolean = deviceInfo.deviceType === 'tablet' &&
+    display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE
   private scroller: Scroller = new Scroller()
   @Event commentNum: Function = () => {
   }
   @Event closeSheet: Function = () => {
   }
-
+  callback:Callback<number> = (data:number) =>{
+    if(deviceInfo.deviceType === 'tablet' &&
+      display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE){
+      this.isTabletLandScape = true
+    }else{
+      this.isTabletLandScape = false
+    }
+  }
   // 发布评论
   publishComment(textComment: string): void {
     if (this.contentNode !== null) {
@@ -109,6 +118,7 @@ export struct CommentComp {
   }
 
   aboutToAppear(): void {
+    display.on('change',this.callback)
     container.resolve(RequestAPI).getCommentList({
       pageSize: 1,
       pageNum: 20
@@ -140,6 +150,7 @@ export struct CommentComp {
   }
 
   aboutToDisappear(): void {
+    display.off('change',this.callback)
     this.myMessageStorage.scrollIndex = 0
     for (let i = 0; i < this.myMessageStorage.moreList.length; i++) {
       this.myMessageStorage.moreList[i] = 0
@@ -289,7 +300,7 @@ export struct CommentComp {
               if (this.myMessageStorage.moreList[index] > 0) {
                 ForEach(
                   this.myMessageStorage.moreList[index] <= item.replyList.length ?
-                  item.replyList.slice(0, this.myMessageStorage.moreList[index]) : item.replyList,
+                    item.replyList.slice(0, this.myMessageStorage.moreList[index]) : item.replyList,
                   (each: Reply, replyIndex: number) => {
                     ListItem() {
                       Column() {
@@ -344,15 +355,17 @@ export struct CommentComp {
                                       this.openReplyDialog()
                                     } else {
                                       this.closeSheet()
-                                      appRouter.push({ builderName: NAV_PAGE_NAME.LoginPage.name,
-                                        params: { isChange: true } })
+                                      appRouter.push({
+                                        builderName: NAV_PAGE_NAME.LoginPage.name,
+                                        params: { isChange: true }
+                                      })
                                     }
                                   })
                               }
 
                               Row({ space: 4 }) {
                                 Image(each.replyIsLike ? getMedia('app.media.thumb_select') :
-                                getMedia('app.media.hand_thumbsup'))
+                                  getMedia('app.media.hand_thumbsup'))
                                   .width(16)
                                   .height(16)
                                 Text(`${each.replyLikeCount}`)
@@ -441,8 +454,8 @@ export struct CommentComp {
         }
       })
     }
-    .width('100%')
-    .height(468)
+    .width(this.isTabletLandScape ? '40%' : '100%')
+    .height(this.isTabletLandScape ? '90%' : '40%')
     .padding({ left: 16, top: 8, right: 16 })
     .backgroundColor('#F1F3F5')
   }

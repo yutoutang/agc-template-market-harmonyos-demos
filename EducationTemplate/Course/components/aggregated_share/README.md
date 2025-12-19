@@ -93,14 +93,14 @@
    @ComponentV2
    export struct Index {
      build() {
-       Column(){
-       Button('打开分享面板')
-         onClick(() => {
-          const picker: SharePicker = new SharePicker({
-            title: 'HarmonyOS官方模板集成创新活动',
-          });
-          picker.show();
-         )
+       Column() {
+         Button('打开分享面板')
+           .onClick(() => {
+             const picker: SharePicker = new SharePicker({
+               title: 'HarmonyOS官方模板集成创新活动',
+             });
+             picker.show();
+           })
        }
      }
    }

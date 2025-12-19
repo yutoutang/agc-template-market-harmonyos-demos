@@ -25,12 +25,6 @@
   "ChangePage": {
     "name": "ChangePage"
   },
-  "FeedbackPage": {
-    "name": "FeedbackPage"
-  },
-  "FeedbackRecordPage": {
-    "name": "FeedbackRecordPage"
-  },
   "SetUpPage": {
     "name": "SetUpPage"
   },
@@ -72,5 +66,11 @@
   },
   "DramaDetailInfoPage": {
     "name": "DramaDetailInfoPage"
+  },
+  "FeedbackSubmitPage": {
+    "name": "FeedbackSubmitPage"
+  },
+  "FeedbackHistoryPage": {
+    "name": "FeedbackHistoryPage"
   }
 }

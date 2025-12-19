@@ -1,16 +1,16 @@
 import { Constants, OrderTabBarType } from 'constant';
 import { Order } from 'type';
-import { Logger, updateOrder } from 'util';
+import { AppStorageBank, Logger } from 'util';
 import { OrderType, ORDER_TYPES } from '../model/OrderTabInfo';
 import { OrderPageVM } from '../viewmodel/OrderPageVM';
 
-@Component
+@ComponentV2
 export struct OrderHeader {
   vm: OrderPageVM = OrderPageVM.instance;
-  @Link order: Order;
-  @Provide('count') count: number = 0;
+  @Param@ Require order: Order;
+  @Provider('count') count: number = 0;
   textTimerController: TextTimerController = new TextTimerController();
-  @State format: string = 'HH:mm:ss';
+  @Local format: string = 'HH:mm:ss';
 
   getOrderRsr(): OrderType | undefined {
     let orderType = ORDER_TYPES.find((item) => item.status === this.order.orderStatus);
@@ -24,7 +24,7 @@ export struct OrderHeader {
         this.order.orderStatus = OrderTabBarType.CANCEL;
         item.orderStatus = OrderTabBarType.CANCEL;
         //更新本地持久化数据
-        updateOrder(this.vm.orderList);
+        AppStorageBank.updateOrder(this.vm.orderList);
       }
     }));
   }

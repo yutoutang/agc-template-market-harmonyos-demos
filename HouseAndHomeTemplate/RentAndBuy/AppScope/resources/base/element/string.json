@@ -6,7 +6,7 @@
     },
     {
       "name": "agcit_huawei_rent_and_buy",
-      "value": "1.0.0"
+      "value": "1.0.1"
     },
     {
       "name": "agcittype_huawei_rent_and_buy",
@@ -14,7 +14,7 @@
     },
     {
       "name": "agcitkid_huawei_rent_and_buy",
-      "value": "agcit_huawei_rent_and_buy_aggregated_login/1.0.0,agcit_huawei_rent_and_buy_city_select/1.0.0,agcit_huawei_rent_and_buy_aggregated_swiper/1.0.0,agcit_huawei_rent_and_buy_house_map/1.0.0,agcit_huawei_rent_and_buy_surround_facility/1.0.0"
+      "value": "agcit_huawei_rent_and_buy_aggregated_login/1.0.0,agcit_huawei_rent_and_buy_city_select/1.0.0,agcit_huawei_rent_and_buy_aggregated_swiper/1.0.1,agcit_huawei_rent_and_buy_house_map/1.0.1,agcit_huawei_rent_and_buy_surround_facility/1.0.1"
     }
   ]
 }

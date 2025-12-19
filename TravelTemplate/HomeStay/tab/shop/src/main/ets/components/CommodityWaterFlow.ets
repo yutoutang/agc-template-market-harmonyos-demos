@@ -9,10 +9,10 @@ export function CommodityWaterFlowBuilder() {
   CommodityWaterFlow();
 }
 
-@Component
+@ComponentV2
 export struct CommodityWaterFlow {
   vm: ShopPageVM = ShopPageVM.instance;
-  @Consume('mainPathStack') mainPathStack: NavPathStack;
+  @Consumer('mainPathStack') mainPathStack: NavPathStack = new NavPathStack();
 
   build() {
     if (this.vm.commodityList.length !== 0) {

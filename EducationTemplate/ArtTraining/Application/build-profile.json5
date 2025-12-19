@@ -1,7 +1,6 @@
 {
   "app": {
-    "signingConfigs": [
-    ],
+    "signingConfigs": [],
     "products": [
       {
         "name": "default",
@@ -13,12 +12,13 @@
             "caseSensitiveCheck": true,
             "useNormalizedOHMUrl": true
           }
-        }
+        },
+        "targetSdkVersion": "5.0.2(14)"
       }
     ],
     "buildModeSet": [
       {
-        "name": "debug",
+        "name": "debug"
       },
       {
         "name": "release"
@@ -48,11 +48,11 @@
     },
     {
       "name": "network",
-      "srcPath": "./commons/network",
+      "srcPath": "./commons/network"
     },
     {
       "name": "courses",
-      "srcPath": "./feature/courses",
+      "srcPath": "./feature/courses"
     },
     {
       "name": "checkin",
@@ -60,11 +60,11 @@
     },
     {
       "name": "mine",
-      "srcPath": "./feature/mine",
+      "srcPath": "./feature/mine"
     },
     {
       "name": "home",
-      "srcPath": "./feature/home",
+      "srcPath": "./feature/home"
     },
     {
       "name": "module_check_in",
@@ -72,15 +72,15 @@
     },
     {
       "name": "module_ui_base",
-      "srcPath": "./components/module_ui_base",
+      "srcPath": "./components/module_ui_base"
     },
     {
       "name": "module_course_list",
-      "srcPath": "./components/module_course_list",
+      "srcPath": "./components/module_course_list"
     },
     {
       "name": "module_store_map",
-      "srcPath": "./components/module_store_map",
+      "srcPath": "./components/module_store_map"
     }
   ]
 }

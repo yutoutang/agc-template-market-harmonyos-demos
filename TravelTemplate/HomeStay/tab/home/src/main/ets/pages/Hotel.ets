@@ -22,14 +22,14 @@ export function HotelBuilder() {
   Hotel();
 }
 
-@Component
+@ComponentV2
 export struct Hotel {
-  @State isShow: boolean = false;
-  @State index: number = 0;
-  @State activeIndex: number = 0;
+  @Local isShow: boolean = false;
+  @Local index: number = 0;
+  @Local activeIndex: number = 0;
   vm: HomePageVM = HomePageVM.instance;
-  @State tenantInfo: TenantInfo | undefined = AppStorage.get('tenantInfo');
-  @Consume('mainPathStack') mainPathStack: NavPathStack;
+  @Local tenantInfo: TenantInfo | undefined = AppStorage.get('tenantInfo');
+  @Consumer('mainPathStack') mainPathStack: NavPathStack = new NavPathStack();
   scroller = new Scroller();
 
   @Builder

@@ -1,40 +1,36 @@
+import { common } from '@kit.AbilityKit';
 import { Constants } from '../constant/Constants';
 import { DateModel, Price } from '../model/DateModel';
-import { CustomCalendarPickerDialog } from '../components/CustomCalendarPickerDialog';
+import { CustomCalendarPickerDialog } from './CustomCalendarPickerDialog';
 import { CalendarUtil } from '../utils/CalendarUtil';
 
-@Component
+@ComponentV2
 export struct DateInfo {
-  @Prop startDate: DateModel | undefined;
-  @Prop endDate: DateModel | undefined;
-  @Prop night: number;
-  @Prop isShowPrice: boolean;
-  @Prop priceList: Price[] = [];
-  @State readyCloseDialog: boolean = false;
-  @State currentMonth: number | undefined = CalendarUtil.getCurrentDate()?.month;
-  @State currentDay: number | undefined = CalendarUtil.getCurrentDate()?.day;
-  @State currentYear: number | undefined = CalendarUtil.getCurrentDate()?.year;
+  @Param @Require priceList: Price[] = [];
+  @Local startMonth: number = CalendarUtil.getStartDate().month;
+  @Local startDay: number = CalendarUtil.getStartDate().day;
+  @Local endMonth: number = CalendarUtil.getEndDate().month;
+  @Local endDay: number = CalendarUtil.getEndDate().day;
   dialogController: CustomDialogController = new CustomDialogController({
     builder: CustomCalendarPickerDialog({
-      currentMonth: this.currentMonth,
-      currentDay: this.currentDay,
-      currentYear: this.currentYear,
-      startDate: this.startDate,
-      endDate: this.endDate,
-      night: this.night,
-      isShowPrice: this.isShowPrice,
-      readyCloseDialog: this.readyCloseDialog,
       priceList: this.priceList,
     }),
     alignment: DialogAlignment.Bottom,
     customStyle: true,
     onWillDismiss: () => {
-      this.readyCloseDialog = true;
-      setTimeout(() => {
-        this.readyCloseDialog = false;
-      }, Constants.TRANSITION_DURATION);
+      this.dialogController.close();
     },
   });
+  private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+
+  aboutToAppear(): void {
+    this.context.eventHub.on('update_date', (startDate: DateModel, endDate: DateModel) => {
+      this.startMonth = startDate.month;
+      this.startDay = startDate.day;
+      this.endMonth = endDate.month;
+      this.endDay = endDate.day;
+    });
+  }
 
   build() {
     Row() {
@@ -42,13 +38,13 @@ export struct DateInfo {
         Text('入住日期')
           .fontColor(Color.Gray)
           .fontSize(12);
-        Text(`${this.startDate?.month}月${this.startDate?.day}日`)
+        Text(`${this.startMonth}月${this.startDay}日`)
           .margin(6)
           .fontSize(18);
       };
 
       Column() {
-        Button(`${this.night}晚`)
+        Button(`${CalendarUtil.getNight()}晚`)
           .height(24)
           .fontSize(12)
           .backgroundColor(Color.White)
@@ -66,7 +62,7 @@ export struct DateInfo {
         Text('离店日期')
           .fontColor(Color.Gray)
           .fontSize(12);
-        Text(`${this.endDate?.month}月${this.endDate?.day}日`)
+        Text(`${this.endMonth}月${this.endDay}日`)
           .margin(6)
           .fontSize(18);
       };

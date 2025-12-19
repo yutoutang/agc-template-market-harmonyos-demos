@@ -1,30 +1,9 @@
-import { NodeControllerFactory } from '../factory/NativeNodeFactory'
-
 export class LayoutSetting {
   type: string = ''
   style: Record<string, string | number> = {}
   showType: string = ''
   children: LayoutSetting[] = []
 }
-
-export class FrameNodeParams {
-  viewLayout: LayoutSetting
-  articles: JSONObject[]
-  extraInfo?: Record<string, number | string | boolean | Record<string, string | boolean>[]>
-  style: Record<string, string | number>
-  nodeControllerFactory?: NodeControllerFactory
-
-  constructor(viewLayout: LayoutSetting, articles: JSONObject[], style: Record<string, string | number>,
-    extraInfo?: Record<string, number | string | boolean | Record<string, string | boolean>[]>,
-    nodeControllerFactory?: NodeControllerFactory) {
-    this.viewLayout = viewLayout
-    this.articles = articles
-    this.style = style
-    this.extraInfo = extraInfo
-    this.nodeControllerFactory = nodeControllerFactory
-  }
-}
-
 
 export class LayoutParams {
   nativeCardData: JSONObject

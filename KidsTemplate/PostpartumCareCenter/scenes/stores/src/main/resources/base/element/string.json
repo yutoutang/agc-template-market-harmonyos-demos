@@ -7,6 +7,14 @@
     {
       "name": "title_store",
       "value": "title_store"
+    },
+    {
+      "name": "agcit_huawei_postpartum_care_center_stores",
+      "value": "1.0.0"
+    },
+    {
+      "name": "agcitkid_huawei_postpartum_care_center_stores",
+      "value": "agcit_huawei_postpartum_care_center_components/1.0.0,agcit_huawei_postpartum_care_center_utils/1.0.0"
     }
   ]
 }

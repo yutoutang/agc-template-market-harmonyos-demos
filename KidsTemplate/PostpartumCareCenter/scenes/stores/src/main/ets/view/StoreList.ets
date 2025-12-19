@@ -1,6 +1,5 @@
 import { MainEntryVM, StoreCard, StoreModel } from '@ohos_agcit/postpartum_care_center_uicomponents';
 
-@Preview
 @ComponentV2
 export struct StoreList {
   @Param cityName: string = '';

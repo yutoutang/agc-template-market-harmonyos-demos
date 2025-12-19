@@ -107,36 +107,36 @@
       "srcPath": "./features/home"
     },
     {
-      "name": "attraction_live",
-      "srcPath": "./components/attraction_live"
-    },
-    {
       "name": "service_hotline",
       "srcPath": "./components/service_hotline"
-    },
-    {
-      "name": "catering_accommodation",
-      "srcPath": "./components/catering_accommodation"
-    },
-    {
-      "name": "module_base",
-      "srcPath": "./components/module_base"
     },
     {
       "name": "tourist_management",
       "srcPath": "./components/tourist_management"
     },
     {
-      "name": "attraction_announcement",
-      "srcPath": "./components/attraction_announcement"
-    },
-    {
       "name": "attraction_guide",
       "srcPath": "./components/attraction_guide"
     },
     {
+      "name": "module_base",
+      "srcPath": "./components/module_base"
+    },
+    {
+      "name": "catering_accommodation",
+      "srcPath": "./components/catering_accommodation"
+    },
+    {
       "name": "attraction_note",
       "srcPath": "./components/attraction_note"
+    },
+    {
+      "name": "attraction_live",
+      "srcPath": "./components/attraction_live"
+    },
+    {
+      "name": "attraction_announcement",
+      "srcPath": "./components/attraction_announcement"
     }
   ]
 }

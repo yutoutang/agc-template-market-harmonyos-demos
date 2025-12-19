@@ -27,7 +27,7 @@
 ## 快速入门
 
 1. 安装组件。
-   如果是在DevEvo Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
+   如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
 
    如果是从生态市场下载组件，请参考以下步骤安装组件。
 
@@ -58,28 +58,15 @@
 ## API参考
 
 ### 接口
-DateInfo(startDate:DateModel,endDate:DateModel,night:number,isShowPrice:boolean,priceList:Price)
+DateInfo(priceList:Price[])
 
 日历组件。
 
 #### 参数说明
 
-| 参数名         | 类型                          | 是否必填 | 说明       |
-|:------------|:----------------------------|:---|:---------|
-| startDate   | [DateModel](#DateModel对象说明) | 是  | 初始开始日期   |
-| endDate     | [DateModel](#DateModel对象说明) | 是  | 初始结束日期   |
-| night       | number                      | 是  | 晚数       |
-| isShowPrice | boolean                     | 是  | 是否展示价格日历 |
-| priceList   | [Price](#Price对象说明)       | 是  | 价格日历     |
-
-#### DateModel对象说明
-
-| 参数名       | 类型     | 是否必填 | 说明   |
-|:----------|:-------|:---|:-----|
-| day      | number | 是  | 天数   |
-| week | number | 是  | 起始时间 |
-| month   | number | 是  | 结束时间 |
-| year   | number | 是  | 结束时间 |
+| 参数名         | 类型                    | 是否必填 | 说明       |
+|:------------|:----------------------|:---|:---------|
+| priceList   | [Price](#Price对象说明)[] | 是  | 价格日历     |
 
 #### Price对象说明
 
@@ -95,23 +82,20 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import { CalendarUtil, DateInfo, DateModel, getLastDayOfMonth, getRealTimeDate } from 'calendar_select';
 
 @Entry
-@Component
+@ComponentV2
 export struct Home {
-  @StorageLink('night') night: number = CalendarUtil.getNight() ?? 1;
-  @StorageLink('startDate') startDate: DateModel | undefined = CalendarUtil.getStartDate();
-  @StorageLink('endDate') endDate: DateModel | undefined = CalendarUtil.getEndDate();
-  @State currentMonth: number | undefined = CalendarUtil.getCurrentDate()?.month;
-  @State currentDay: number | undefined = CalendarUtil.getCurrentDate()?.day;
-  @State currentYear: number | undefined = CalendarUtil.getCurrentDate()?.year;
-  
+  @Local night: number = CalendarUtil.getNight() ?? 1;
+  @Local startDate: DateModel = CalendarUtil.getStartDate();
+  @Local endDate: DateModel = CalendarUtil.getEndDate();
+
   aboutToAppear(): void {
     // 首次初始化
     let dates: Promise<undefined> = new Promise(() => {
       if (!AppStorage.get('startDate') && !AppStorage.get('endDate')) {
         this.startDate = getRealTimeDate();
         let date = new Date();
-        let days = getLastDayOfMonth(this.currentYear ?? date.getFullYear(),
-          this.currentMonth ?? date.getMonth());
+        let days = getLastDayOfMonth(date.getFullYear(),
+          date.getMonth());
         if (this.startDate.day >= days) {
           this.endDate =
             new DateModel(this.startDate.day - days + 1, this.startDate.week, this.startDate.month + 1,
@@ -121,9 +105,9 @@ export struct Home {
             new DateModel(this.startDate.day + 1, this.startDate.week, this.startDate.month, this.startDate.year);
         }
 
-        AppStorage.setOrCreate('currentDate', this.startDate);
-        AppStorage.setOrCreate('startDate', this.startDate);
-        AppStorage.setOrCreate('endDate', this.endDate);
+        CalendarUtil.setStartDate(this.startDate);
+        CalendarUtil.setCurrentDate(this.startDate);
+        CalendarUtil.setEndDate(this.endDate);
       }
     });
 
@@ -136,10 +120,6 @@ export struct Home {
     Column() {
       DateInfo(
         {
-          startDate: this.startDate,
-          endDate: this.endDate,
-          night: this.night,
-          isShowPrice: false,
           priceList: [],
         },
       )

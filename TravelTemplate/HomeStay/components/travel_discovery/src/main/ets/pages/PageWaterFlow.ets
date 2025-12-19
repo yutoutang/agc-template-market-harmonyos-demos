@@ -11,14 +11,14 @@ import './PageDetail';
 import './PageSearch';
 import { QueryTravelogueListRequest } from '../model/IRequest';
 
-@Component
+@ComponentV2
 export struct PageGround {
-  @State isLoading: boolean = false;
-  @State currentIndex: number = 0;
-  @State curPageNum: number = 1;
-  @State list: CardDataSource = new CardDataSource();
-  @State windowTopHeight: number = AppStorage.get('windowTopHeight') as number || 38.77;
-  @Prop isShowBack: boolean;
+  @Local isLoading: boolean = false;
+  @Local currentIndex: number = 0;
+  @Local curPageNum: number = 1;
+  @Local list: CardDataSource = new CardDataSource();
+  @Local windowTopHeight: number = AppStorage.get('windowTopHeight') as number || 38.77;
+  @Param @Require isShowBack: boolean;
   private scroller: Scroller = new Scroller();
   private pullConfig: PullToRefreshConfigurator = new PullToRefreshConfigurator();
 

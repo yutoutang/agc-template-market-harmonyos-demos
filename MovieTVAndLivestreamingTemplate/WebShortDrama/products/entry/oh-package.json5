@@ -19,7 +19,9 @@
     "@agctemplate/open_ads": "1.0.0",
     "@agctemplate/favor": "1.0.0",
     'module_cast': "file:../../components/module_cast",
-    'module_pip': 'file:../../components/module_pip'
+    'module_pip': 'file:../../components/module_pip',
+    "aggregated_login": "file:../../components/aggregated_login",
+    "aggregated_share": "file:../../components/aggregated_share"
   }
 }
 

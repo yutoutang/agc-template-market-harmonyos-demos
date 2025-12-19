@@ -6,11 +6,11 @@ export function CustomerBuilder() {
   Customer();
 }
 
-@Component
+@ComponentV2
 export struct Customer {
-  @State status: Array<boolean> = [];
-  @Consume('mainPathStack') mainPathStack: NavPathStack;
-  @State answerList: Array<CustomerServiceModel> = [
+  @Local status: Array<boolean> = [];
+  @Consumer('mainPathStack') mainPathStack: NavPathStack = new NavPathStack();
+  @Local answerList: Array<CustomerServiceModel> = [
     {
       key: 0,
       ask: '我预订的房间可以退款吗？',

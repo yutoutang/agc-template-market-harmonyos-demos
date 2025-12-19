@@ -194,14 +194,14 @@ export struct UICitySelect {
 
         Blank()
         if (this.isLoading) {
-          LoadingProgress().width(24).height(24).color($r('app.color.common_theme_color')).margin({ left: 10 })
+          LoadingProgress().width(32).height(32).margin({ left: 10 })
         } else {
           Text('重新定位')
             .fontSize(14)
             .fontColor($r('app.color.common_theme_color'))
             .onClick(() => {
               this.isLoading = true;
-              Utils.applyLocationPermission().then((cityLoc: string) => {
+              Utils.applyLocationPermission(this.getUIContext().getHostContext()!).then((cityLoc: string) => {
                 this.isLoading = false;
                 this.emitUpdateCityLocation(cityLoc);
               });

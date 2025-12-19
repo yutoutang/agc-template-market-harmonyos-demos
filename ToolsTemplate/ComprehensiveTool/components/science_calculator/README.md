@@ -90,13 +90,27 @@ science_calculator/src/main/ets                   // 科学计算器(har)
 
 ```typescript
 // EntryAbility.ets
-import { AbilityConstant, common, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
+import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 
+const DOMAIN = 0x0000;
+
 export default class EntryAbility extends UIAbility {
-   // ...此处省略上下文
+   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
+      try {
+         this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
+      } catch (err) {
+         hilog.error(DOMAIN, 'testTag', 'Failed to set colorMode. Cause: %{public}s', JSON.stringify(err));
+      }
+      hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');
+   }
+
+   onDestroy(): void {
+      hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onDestroy');
+   }
+
    async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
       // ...此处省略上下文
       let windowClass: window.Window | undefined = undefined;
@@ -113,7 +127,8 @@ export default class EntryAbility extends UIAbility {
                   AppStorage.setOrCreate('height', px2vp(data.height));
                });
             } catch (exception) {
-               hilog.error(DOMAIN, 'testTag', 'Failed to listen windowSizeChange. Cause: %{public}s', JSON.stringify(exception));
+               hilog.error(DOMAIN, 'testTag', 'Failed to listen windowSizeChange. Cause: %{public}s',
+                  JSON.stringify(exception));
             }
          });
       } catch (exception) {

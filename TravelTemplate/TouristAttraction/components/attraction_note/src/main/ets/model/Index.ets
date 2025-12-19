@@ -87,7 +87,7 @@ export class PostCardModel implements ITravelogue {
   // 收藏数
   @Trace collectNum: number = 0;
   // 评论数
-  @Trace commentNum: number = 0;
+  commentNum: number = 0;
   // 当前用户点赞状态（Y是，N否）
   @Trace currentUserLikeStatus: StatusFLAG = StatusFLAG.NO;
   // 当前用户收藏状态（Y是，N否）

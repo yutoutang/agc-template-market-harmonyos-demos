@@ -244,6 +244,7 @@ office_attendance
 * 震动权限：ohos.permission.VIBRATE
 * 后台任务权限：ohos.permission.KEEP_BACKGROUND_RUNNING
 * 隐私窗口权限：ohos.permission.PRIVACY_WINDOW
+* 获取相机权限：ohos.permission.CAMERA
 
 ## 快速入门
 

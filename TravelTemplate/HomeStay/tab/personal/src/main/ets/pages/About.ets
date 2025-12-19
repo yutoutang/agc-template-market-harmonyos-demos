@@ -7,10 +7,10 @@ export function AboutBuilder() {
   About();
 }
 
-@Component
+@ComponentV2
 export struct About {
-  @State tenantInfo: TenantInfo | undefined = AppStorage.get('tenantInfo');
-  @Consume('mainPathStack') mainPathStack: NavPathStack;
+  @Local tenantInfo: TenantInfo | undefined = AppStorage.get('tenantInfo');
+  @Consumer('mainPathStack') mainPathStack: NavPathStack = new NavPathStack();
 
   build() {
     NavDestination() {

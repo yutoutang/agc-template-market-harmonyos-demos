@@ -6,7 +6,7 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "dayjs": "^1.11.13",
+    "dayjs": "1.11.13",
     "lib_news_api": "file:../lib_news_api",
     "lib_common": "file:../lib_common",
     "lib_widget": "file:../lib_widget",

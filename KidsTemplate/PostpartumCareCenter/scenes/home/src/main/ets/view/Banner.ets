@@ -1,6 +1,5 @@
 import { BANNER_LIST } from '../constants/Constants';
 
-@Preview
 @ComponentV2
 export struct Banner {
   build() {
@@ -16,12 +15,12 @@ export struct Banner {
     }
     .indicator(
       Indicator.dot()
-        .selectedColor('#FFFFFF')
+        .selectedColor($r('sys.color.comp_background_emphasize'))
         .selectedItemWidth(12)
-        .selectedItemHeight(8)
-        .itemWidth(8)
-        .itemHeight(8)
-        .color('rgba(0,0,0,0.10)')
+        .selectedItemHeight('6vp')
+        .itemWidth('6vp')
+        .itemHeight('6vp')
+        .color($r('sys.color.comp_background_secondary'))
     )
     .clip(false)
     .autoPlay(true)

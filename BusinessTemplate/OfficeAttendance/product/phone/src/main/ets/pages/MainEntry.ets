@@ -36,7 +36,7 @@ struct MainEntry {
           ClockInView({
             latitude:31.978252425174848,
             longitude:118.76696853313138,
-            distance: 50,
+            distance: 9000000,
             onSuccess:(address:AddressParam) => {
               console.log('打卡成功', JSON.stringify(address))
             },

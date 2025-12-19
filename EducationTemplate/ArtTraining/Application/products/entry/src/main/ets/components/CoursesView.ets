@@ -80,10 +80,8 @@ export struct CoursesView {
         });
       TextInput({ text: this.vm.keyword, placeholder: '请输入课程名称' })
         .enterKeyType(EnterKeyType.Search)
-        .placeholderColor($r('app.color.font_color_level2'))
-        .placeholderFont({ size: $r('app.string.font_size_14') })
+        .placeholderColor($r('sys.color.font_secondary'))
         .fontColor($r('app.color.font_color_level1'))
-        .fontSize($r('app.string.font_size_14'))
         .backgroundColor($r('app.color.system_color_grey'))
         .margin(0)
         .padding({

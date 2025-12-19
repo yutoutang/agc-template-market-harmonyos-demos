@@ -63,7 +63,7 @@ export struct VideoDesLayer {
 
           }), {
             detents: [SheetSize.MEDIUM, SheetSize.LARGE, 600],
-            preferType: SheetType.BOTTOM,
+            preferType: SheetType.CENTER,
             showClose: false,
             backgroundColor: Color.White
           })

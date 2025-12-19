@@ -1,12 +1,12 @@
 {
   "app": {
-    "signingConfigs": [
-    ],
+    "signingConfigs": [],
     "products": [
       {
         "name": "default",
         "signingConfig": "default",
-        "compatibleSdkVersion": "5.0.1(13)",
+        "compatibleSdkVersion": "5.0.3(15)",
+        "targetSdkVersion": "5.0.3(15)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
           "strictMode": {
@@ -18,7 +18,7 @@
     ],
     "buildModeSet": [
       {
-        "name": "debug",
+        "name": "debug"
       },
       {
         "name": "release"
@@ -44,23 +44,35 @@
     },
     {
       "name": "stores",
-      "srcPath": "./scenes/stores",
+      "srcPath": "./scenes/stores"
     },
     {
       "name": "mine",
-      "srcPath": "./scenes/mine",
+      "srcPath": "./scenes/mine"
     },
     {
       "name": "uicomponents",
-      "srcPath": "./components/uicomponents",
+      "srcPath": "./commons/uicomponents"
     },
     {
       "name": "utils",
-      "srcPath": "./components/utils",
+      "srcPath": "./commons/utils"
     },
     {
       "name": "activities",
-      "srcPath": "./scenes/activities",
+      "srcPath": "./scenes/activities"
+    },
+    {
+      "name": "double_layer_tabs",
+      "srcPath": "./components/double_layer_tabs",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
     }
   ]
 }

@@ -1,9 +1,9 @@
-import { AccountUtil } from 'account';
+import { common } from '@kit.AbilityKit';
 import { CalendarUtil, CustomCalendarPickerDialog, DateInfo, DateModel, Price } from 'calendar_select';
 import { TitleBar } from 'component';
 import { Constants, NavPathName } from 'constant';
 import { RoomType } from 'type';
-import { Logger } from 'util';
+import { Logger, AccountUtil } from 'util';
 import { EnhancedSource } from '../model/Index';
 import { HomePageVM } from '../viewmodel/HomePageVM';
 
@@ -24,43 +24,46 @@ function operateButton() {
   });
 }
 
-@Component
+@ComponentV2
 export struct Rooms {
   vm: HomePageVM = HomePageVM.instance;
-  @StorageLink('night') night: number = CalendarUtil.getNight() ?? 1;
-  @State isShowPrice: boolean = true;
-  @State readyCloseDialog: boolean = false;
-  @StorageLink('currentUser') currentUser: string | undefined = AccountUtil.getCurrentUser();
-  @State priceList: Price[] = [];
-  @State currentMonthDay: number[] = [];
-  @State currentMonth: number | undefined = CalendarUtil.getCurrentDate()?.month;
-  @State currentDay: number | undefined = CalendarUtil.getCurrentDate()?.day;
-  @State currentYear: number | undefined = CalendarUtil.getCurrentDate()?.year;
-  @StorageLink('startDate') startDate: DateModel | undefined = CalendarUtil.getStartDate();
-  @StorageLink('endDate') endDate: DateModel | undefined = CalendarUtil.getEndDate();
-  @State windowBottomHeight: number = AppStorage.get('windowBottomHeight') as number || 28;
-  @Consume('mainPathStack') mainPathStack: NavPathStack;
+  @Local night: number = CalendarUtil.getNight() ?? 1;
+  @Local isShowPrice: boolean = true;
+  @Local currentUser: string | undefined = AccountUtil.getUserId();
+  @Local priceList: Price[] = [];
+  @Local currentMonthDay: number[] = [];
+  @Local currentMonth: number = CalendarUtil.getCurrentDate().month;
+  @Local currentDay: number = CalendarUtil.getCurrentDate().day;
+  @Local currentYear: number = CalendarUtil.getCurrentDate().year;
+  @Local startDate: DateModel = CalendarUtil.getStartDate();
+  @Local endDate: DateModel = CalendarUtil.getEndDate();
+  @Local windowBottomHeight: number = AppStorage.get('windowBottomHeight') as number || 28;
+  @Consumer('mainPathStack') mainPathStack: NavPathStack = new NavPathStack();
   dialogController: CustomDialogController = new CustomDialogController({
     builder: CustomCalendarPickerDialog({
-      currentMonth: this.currentMonth,
-      currentDay: this.currentDay,
-      currentYear: this.currentYear,
-      startDate: this.startDate,
-      endDate: this.endDate,
-      night: this.night,
-      isShowPrice: this.isShowPrice,
-      readyCloseDialog: this.readyCloseDialog,
       priceList: this.priceList,
     }),
     alignment: DialogAlignment.Bottom,
     customStyle: true,
     onWillDismiss: () => {
-      this.readyCloseDialog = true;
-      setTimeout(() => {
-        this.readyCloseDialog = false;
-      }, Constants.TRANSITION_DURATION);
+      this.dialogController.close();
     },
   });
+
+  aboutToAppear(): void {
+    (getContext(this) as common.UIAbilityContext).eventHub.on('reLogin',
+      (uid: string) => {
+        AccountUtil.setUserId(uid);
+        if (!AccountUtil.getAvatar()) {
+          AccountUtil.setAvatar($r('app.media.avatar'));
+          AccountUtil.setNickName('华为用户');
+        }
+      });
+  }
+
+  aboutToDisappear(): void {
+    (getContext(this) as common.UIAbilityContext).eventHub.off('reLogin');
+  }
 
   reserveRoom(roomTypeItem: RoomType) {
     this.mainPathStack.pushPathByName(NavPathName.RESERVE, {
@@ -116,6 +119,9 @@ export struct Rooms {
                       if (!this.currentUser) {
                         this.mainPathStack.pushPathByName(NavPathName.QUICK_LOGIN_PAGE, null, (popInfo: ESObject) => {
                           this.currentUser = popInfo.result;
+                          AccountUtil.setUserId(popInfo.result);
+                          (getContext(this) as common.UIAbilityContext).eventHub.emit('reLogin',
+                            popInfo.result);
                           Logger.info('quick login success');
                         });
                       } else {
@@ -134,7 +140,7 @@ export struct Rooms {
           });
         };
       }, (roomTypeItem: RoomType) => roomTypeItem.roomTypeName);
-    }.height('80%')
+    }.height('calc(100% - 172vp)')
     .scrollBar(BarState.Off);
   }
 
@@ -142,10 +148,6 @@ export struct Rooms {
   DateAreaBuilder() {
     DateInfo(
       {
-        startDate: this.startDate,
-        endDate: this.endDate,
-        night: this.night,
-        isShowPrice: false,
         priceList: [],
       },
     )

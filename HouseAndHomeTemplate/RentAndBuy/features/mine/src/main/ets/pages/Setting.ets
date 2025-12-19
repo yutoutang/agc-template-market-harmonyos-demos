@@ -19,7 +19,7 @@ export function SettingBuilder() {
 export struct Setting {
   logout() {
     AppStorageBank.setUserInfo(AppStorageBank.getUserInfo().nickName, AppStorageBank.getUserInfo().avatar, '', '');
-    (getContext() as common.UIAbilityContext).eventHub.emit(EventEmitName.UPDATE_AVATAR);
+    (this.getUIContext().getHostContext() as common.UIAbilityContext).eventHub.emit(EventEmitName.UPDATE_AVATAR);
     RouterModule.stack.pop();
   }
 

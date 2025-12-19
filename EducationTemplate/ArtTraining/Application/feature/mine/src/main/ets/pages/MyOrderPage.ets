@@ -110,16 +110,15 @@ export struct MyOrderPage {
     Column() {
       Text(name)
         .fontColor(this.vm.currentIndex === index ? $r('app.color.system_theme_color') :
-        $r('app.color.font_color_level1'))
+          $r('app.color.font_color_level1'))
         .fontSize($r('app.string.font_size_14'))
         .fontWeight(400)
         .lineHeight(22)
         .margin({ top: $r('app.string.margin_s'), bottom: $r('app.string.margin_s') });
-      Divider()
-        .strokeWidth(2)
+      Row()
+        .height(2)
         .width(20)
-        .color($r('app.color.system_theme_color'))
-        .borderRadius($r('app.string.border_radius_capsule'))
+        .backgroundColor($r('app.color.system_theme_color'))
         .opacity(this.vm.currentIndex === index ? 1 : 0);
     }
     .backgroundColor($r('app.color.system_color_background_white'))
@@ -177,7 +176,7 @@ export struct MyOrderPage {
               Text(button.label)
                 .fontSize($r('app.string.font_size_12'))
                 .fontColor(button.style === OrderButtonStyleMap.OUTLINE ? $r('app.color.font_color_level2') :
-                $r('app.color.font_color_level1_invert'));
+                  $r('app.color.font_color_level1_invert'));
             }
             .padding({
               top: $r('app.string.padding_s'),
@@ -189,9 +188,9 @@ export struct MyOrderPage {
             .borderWidth(1)
             .borderRadius($r('app.string.border_radius_capsule'))
             .backgroundColor(button.style === OrderButtonStyleMap.OUTLINE ?
-            $r('app.color.system_color_background_white') : $r('app.color.system_theme_color'))
+              $r('app.color.system_color_background_white') : $r('app.color.system_theme_color'))
             .borderColor(button.style === OrderButtonStyleMap.OUTLINE ? $r('app.color.icon_color_level2') :
-            $r('app.color.system_theme_color'))
+              $r('app.color.system_theme_color'))
             .onClick(() => {
               this.vm.handleOrderOperation(item, button.action);
             });

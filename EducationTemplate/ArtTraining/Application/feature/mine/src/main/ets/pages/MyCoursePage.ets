@@ -109,10 +109,10 @@ export struct MyCoursePage {
         .fontWeight(400)
         .lineHeight(22)
         .margin({ top: $r('app.string.margin_s'), bottom: $r('app.string.margin_s') });
-      Divider()
-        .strokeWidth(2)
+      Row()
+        .height(2)
         .width(20)
-        .color($r('app.color.system_theme_color'))
+        .backgroundColor($r('app.color.system_theme_color'))
         .opacity(this.vm.currentIndex === index ? 1 : 0);
     }
     .backgroundColor($r('app.color.system_color_background_white'))

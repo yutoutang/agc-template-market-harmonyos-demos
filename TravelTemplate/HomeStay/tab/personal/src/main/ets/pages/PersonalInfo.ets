@@ -1,10 +1,9 @@
 import { promptAction } from '@kit.ArkUI';
 import fs from '@ohos.file.fs';
 import { Constants } from 'constant';
-import { AccountUtil } from 'account';
+import { AccountUtil, Logger } from 'util';
 import { GetInfoRequest, https } from 'network';
 import { PersonalInfoVM } from '../viewmodel/PersonalInfoVM';
-import { Logger } from 'util/Index';
 import { FunctionalButton, functionalButtonComponentManager } from '@kit.ScenarioFusionKit';
 import { util } from '@kit.ArkTS';
 import { TitleBar } from 'component';
@@ -16,20 +15,19 @@ export function PersonalInfoBuilder() {
   PersonalInfo();
 }
 
-@Component
+@ComponentV2
 struct PersonalInfo {
   vm: PersonalInfoVM = PersonalInfoVM.instance;
-  @State nickName: string = '';
-  @State gender: number = 0;
-  @State phoneNo: string = '';
-  @State isShow: boolean = false;
-  @State currentDate: string = '';
-  @State genderSelected: number = 0;
-  @State isSelected: boolean = false;
-  @State localImgUri: ResourceStr = '';
-  @State openId: string | undefined = AccountUtil.getOpenId();
+  @Local nickName: string = '';
+  @Local gender: number = 0;
+  @Local phoneNo: string = '';
+  @Local isShow: boolean = false;
+  @Local currentDate: string = '';
+  @Local genderSelected: number = 0;
+  @Local isSelected: boolean = false;
+  @Local openId: string = '';
   controller: TextInputController = new TextInputController();
-  @Consume('mainPathStack') mainPathStack: NavPathStack;
+  @Consumer('mainPathStack') mainPathStack: NavPathStack = new NavPathStack();
 
   async aboutToAppear(): Promise<void> {
     const data: GetInfoRequest = {
@@ -46,7 +44,6 @@ struct PersonalInfo {
       this.gender = res.data.gender;
       this.currentDate = res.data.birthday;
       this.phoneNo = res.data.phone;
-      this.localImgUri = res.data.avatar;
     }
   }
 
@@ -87,7 +84,7 @@ struct PersonalInfo {
                 styleOption: {
                   styleConfig: new functionalButtonComponentManager.ButtonConfig()
                     .type(ButtonType.Circle)
-                    .backgroundImage(this.localImgUri ? this.localImgUri : $r('app.media.avatar'))
+                    .backgroundImage(this.vm.userInfo.avatar ? this.vm.userInfo.avatar : $r('app.media.avatar'))
                     .backgroundImageSize(ImageSize.Contain)
                     .width(106)
                     .height(106)
@@ -103,7 +100,7 @@ struct PersonalInfo {
                 try {
                   let newPath: string = getContext().cacheDir + `/${util.generateRandomUUID(false)}.png`;
                   fs.copyFileSync(avatarFile.fd, newPath);
-                  this.localImgUri = 'file://' + newPath;
+                  this.vm.userInfo.avatar = 'file://' + newPath;
                 } catch (err) {
                   Logger.error('choose avatar fail' + JSON.stringify(err));
                 } finally {
@@ -116,8 +113,9 @@ struct PersonalInfo {
 
           Row() {
             Text('昵称').fontSize(14).width(72);
-            TextInput({ text: this.nickName, placeholder: '请输入昵称' })
+            TextInput({ text: this.nickName, placeholder: '请输入昵称，10字以内' })
               .fontSize(14)
+              .maxLength(10)
               .backgroundColor(Color.White)
               .placeholderFont({ size: $r('sys.float.Body_M') })
               .onChange((value: string) => {
@@ -214,11 +212,6 @@ struct PersonalInfo {
 
   async logout() {
     // 用户信息清空
-    this.vm.userInfo.nickName = '';
-    this.vm.userInfo.gender = 1;
-    this.vm.userInfo.birthday = getFormatDate(new Date());
-    this.vm.userInfo.phone = '';
-    this.vm.userInfo.avatar = $r('app.media.default_avatar');
     AppStorage.setOrCreate('currentUser', '');
     AppStorage.setOrCreate('openID', '');
     const res = await this.vm.updatePersonInfo();
@@ -226,8 +219,8 @@ struct PersonalInfo {
       promptAction.showToast({ message: '退出登录成功', duration: 1000 });
       this.mainPathStack.pop({
         type: 1,
-        avatar: $r('app.media.default_avatar'),
-        nickname: '立即登录',
+        avatar: '',
+        nickname: '',
       } as PersonalPopInfo);
     }
   }
@@ -238,7 +231,6 @@ struct PersonalInfo {
     this.vm.userInfo.gender = this.gender;
     this.vm.userInfo.birthday = this.currentDate;
     this.vm.userInfo.phone = this.phoneNo;
-    this.vm.userInfo.avatar = this.localImgUri;
     const res = await this.vm.saveUserInfo();
     if (res?.code === 200) {
       promptAction.showToast({ message: '保存成功', duration: 1000 });

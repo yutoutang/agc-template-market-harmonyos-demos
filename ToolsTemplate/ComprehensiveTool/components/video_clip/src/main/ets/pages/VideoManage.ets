@@ -14,17 +14,6 @@ export function VideoManageBuilder() {
 struct VideoManage {
   vm: VideoManageVM = VideoManageVM.instance;
   @Local bottomHeight: number = 0;
-  private context: common.UIAbilityContext = getContext() as common.UIAbilityContext;
-
-  async aboutToAppear(): Promise<void> {
-    this.context = getContext() as common.UIAbilityContext;
-    this.handlePermission();
-  }
-
-  handlePermission() {
-    this.vm.checkWritePermission();
-    this.vm.requestPermission(this.context, ['ohos.permission.WRITE_MEDIA']);
-  }
 
   @Computed
   get isShowEdit() {
@@ -46,11 +35,6 @@ struct VideoManage {
       .borderRadius(16)
       .onClick(() => {
         try {
-          if (!this.vm.isAccept) {
-            promptAction.showToast({ message: '请在“设置-应用和元服务”中打开应用的文件写入权限' });
-            this.handlePermission();
-            return;
-          }
           sdk.InitEditor();
           this.vm.selectVideo();
         } catch (err) {

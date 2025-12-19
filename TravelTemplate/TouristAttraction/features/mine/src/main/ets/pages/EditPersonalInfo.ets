@@ -1,5 +1,6 @@
 import { FunctionalButton, functionalButtonComponentManager } from '@kit.ScenarioFusionKit';
 import { util } from '@kit.ArkTS';
+import { promptAction } from '@kit.ArkUI';
 import fs from '@ohos.file.fs';
 import { Constant, CommonUtil, Logger, AccountUtil } from 'common';
 import { NickNameDialog, TitleBar } from 'uicomponents';
@@ -118,15 +119,22 @@ export struct EditPersonalInfo {
             if (error) {
               return;
             }
-            let avatarFile: fs.File = fs.openSync(data.avatarUri!, fs.OpenMode.READ_ONLY);
+            if (data.avatarUri === undefined || data.avatarUri === '') {
+              promptAction.showToast({ message: '获取头像失败，请重试！' });
+            }
+            let avatarFile: fs.File | undefined = undefined;
             try {
+              avatarFile = fs.openSync(data.avatarUri, fs.OpenMode.READ_ONLY);
               let newPath: string = getContext().cacheDir + `/${util.generateRandomUUID(false)}.png`;
               fs.copyFileSync(avatarFile.fd, newPath);
               this.userInfo.avatar = 'file://' + newPath;
             } catch (err) {
+              promptAction.showToast({ message: '获取头像失败，请重试！' });
               Logger.error('choose avatar fail' + JSON.stringify(err));
             } finally {
-              fs.close(avatarFile);
+              if (avatarFile) {
+                fs.close(avatarFile);
+              }
             }
           }),
         });

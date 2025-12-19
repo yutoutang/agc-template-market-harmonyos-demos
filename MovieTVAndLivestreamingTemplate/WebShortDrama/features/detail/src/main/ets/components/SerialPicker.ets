@@ -235,7 +235,6 @@ export struct SerialPicker {
                 }
 
               }
-              .maxCount(6)
               .columnsGap(8)
               .rowsGap(8)
             }

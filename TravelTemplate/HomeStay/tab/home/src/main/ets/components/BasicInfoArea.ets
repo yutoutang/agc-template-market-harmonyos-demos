@@ -4,11 +4,11 @@ import { Constants, NavPathName } from 'constant';
 import { consult, routeToPetal } from 'util';
 import { HomePageVM } from '../viewmodel/HomePageVM';
 
-@Component
+@ComponentV2
 export struct BasicInfoArea {
-  @Prop isHome: boolean = false;
+  @Param isHome: boolean = false;
   vm: HomePageVM = HomePageVM.instance;
-  @Consume('mainPathStack') mainPathStack: NavPathStack;
+  @Consumer('mainPathStack') mainPathStack: NavPathStack = new NavPathStack();
   dialogController: CustomDialogController | null = new CustomDialogController({
     builder: ConfirmDialog({
       call: () => {
@@ -27,45 +27,44 @@ export struct BasicInfoArea {
   }
 
   build() {
-    Row({ space: 8 }) {
-      Image($r('app.media.brand')).size({ width: 60, height: 60 }).borderRadius(8).onClick(() => {
-        this.jumpToInfo();
-      });
+    Row() {
+      Row({ space: 8 }) {
+        Image($r('app.media.brand')).size({ width: 60, height: 60 }).borderRadius(8).onClick(() => {
+          this.jumpToInfo();
+        });
 
-      Column({ space: 6 }) {
-        Row() {
+        Column({ space: 6 }) {
           Text(this.vm.hotelInfo.appInfo.appName)
             .fontSize(20)
             .fontWeight(500)
             .fontColor('#111111')
-            .width(200)
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
             .onClick(() => {
               this.jumpToInfo();
             });
 
-          Row() {
-            Image($r('app.media.navigating')).size({ height: 24, width: 24 }).onClick(() => {
-              routeToPetal(getContext(this) as common.UIAbilityContext, this.vm.hotelInfo.appInfo.appName);
-            });
-            Image($r('app.media.phone'))
-              .size({ height: 24, width: 24 })
-              .onClick(() => {
-                if (this.dialogController !== null) {
-                  this.dialogController.open();
-                }
-              });
+          Row({ space: 4 }) {
+            Image($r('app.media.icon_position')).size({ height: 12, width: 12 });
+            Text(this.vm.hotelInfo.appInfo.address).fontSize(12).onClick(() => {
+              this.jumpToInfo();
+            }).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis });
           };
-        }.justifyContent(FlexAlign.SpaceBetween).width(Constants.FULL_SCREEN);
+        }.width('50%').alignItems(HorizontalAlign.Start);
+      };
 
-        Row({ space: 4 }) {
-          Image($r('app.media.icon_position')).size({ height: 12, width: 12 });
-          Text(this.vm.hotelInfo.appInfo.address).fontSize(12).onClick(() => {
-            this.jumpToInfo();
+      Row({ space: 12 }) {
+        Image($r('app.media.navigating')).size({ height: 24, width: 24 }).onClick(() => {
+          routeToPetal(getContext(this) as common.UIAbilityContext, this.vm.hotelInfo.appInfo.appName);
+        });
+        Image($r('app.media.phone'))
+          .size({ height: 24, width: 24 })
+          .onClick(() => {
+            if (this.dialogController !== null) {
+              this.dialogController.open();
+            }
           });
-        }.alignSelf(ItemAlign.Start);
-      }.width('80%');
-    }.width(Constants.FULL_SCREEN).justifyContent(FlexAlign.Start);
+      }.height(Constants.FULL_SCREEN).alignItems(VerticalAlign.Top).padding({ top: 8 });
+    }.width(Constants.FULL_SCREEN).justifyContent(FlexAlign.SpaceBetween).height(60);
   }
 }

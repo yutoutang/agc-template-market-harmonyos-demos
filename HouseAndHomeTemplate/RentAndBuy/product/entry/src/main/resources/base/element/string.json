@@ -11,6 +11,10 @@
     {
       "name": "EntryAbility_label",
       "value": "租房找房"
+    },
+    {
+      "name": "agcit_huawei_rent_and_buy",
+      "value": "1.0.0"
     }
   ]
 }

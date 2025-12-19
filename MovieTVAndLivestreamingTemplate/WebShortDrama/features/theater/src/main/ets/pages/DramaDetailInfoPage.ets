@@ -411,83 +411,94 @@ export struct DramaDetailInfoPage {
                 Tabs({ index: this.currentTabIndex, controller: this.controller }) {
                   ForEach(this.tabArray, (item: string, index: number) => {
                     TabContent() {
-                      Row({ space: 8 }) {
+                      Grid() {
                         if (index === this.totalTabIndex - 1) {
-                          ForEach(this.tailIndexArray.slice(0, 6), (item: number, indexIndex: number) => {
-                            Stack({ alignContent: Alignment.TopEnd }) {
-                              Stack({ alignContent: Alignment.BottomEnd }) {
-                                Text(`${(index) * this.spliceNum + indexIndex + 1}`)
-                                  .textAlign(TextAlign.Center)
-                                  .width(48)
-                                  .height(48)
-                                  .fontColor(this.currentIndex === (index * this.spliceNum + indexIndex) ? '#EC6E45' :
-                                    $r('sys.color.font_primary'))
-                                  .fontSize($r('sys.float.Body_M'))
-                                  .backgroundColor(this.currentIndex === (index * this.spliceNum + indexIndex) ?
-                                    'rgba(236, 110, 69, 0.05)' : $r('sys.color.background_secondary'))
-                                if (this.currentIndex === (index * this.spliceNum + indexIndex)) {
-                                  Image(getMedia('app.media.playing'))
-                                    .width(10)
-                                    .height(8)
-                                    .margin({ bottom: 3, right: 3 })
+                          ForEach(this.tailIndexArray, (item: number, indexIndex: number) => {
+                            GridItem() {
+                              Stack({ alignContent: Alignment.TopEnd }) {
+                                Stack({ alignContent: Alignment.BottomEnd }) {
+                                  Text(`${(index) * this.spliceNum + indexIndex + 1}`)
+                                    .textAlign(TextAlign.Center)
+                                    .width(48)
+                                    .height(48)
+                                    .fontColor(this.currentIndex === (index * this.spliceNum + indexIndex) ? '#EC6E45' :
+                                      $r('sys.color.font_primary'))
+                                    .fontSize($r('sys.float.Body_M'))
+                                    .backgroundColor(this.currentIndex === (index * this.spliceNum + indexIndex) ?
+                                      'rgba(236, 110, 69, 0.05)' : $r('sys.color.background_secondary'))
+                                  if (this.currentIndex === (index * this.spliceNum + indexIndex)) {
+                                    Image(getMedia('app.media.playing'))
+                                      .width(10)
+                                      .height(8)
+                                      .margin({ bottom: 3, right: 3 })
+                                  }
+                                }
+
+                                if (indexIndex > 10 && index === 0 || index > 0) {
+                                  Text('VIP')
+                                    .textAlign(TextAlign.Center)
+                                    .fontSize(6)
+                                    .width(13)
+                                    .height(11)
+                                    .backgroundColor('rgba(255,215,0,0.36)')
                                 }
                               }
-
-                              if (indexIndex > 10 && index === 0 || index > 0) {
-                                Text('VIP')
-                                  .textAlign(TextAlign.Center)
-                                  .fontSize(6)
-                                  .width(13)
-                                  .height(11)
-                                  .backgroundColor('rgba(255,215,0,0.36)')
-                              }
+                              .onClick(() => {
+                                this.isShowSerialPickerSheet = false
+                                WindowManager.setWindowSystemBarProperties({ statusBarContentColor: '#e6ffffff' })
+                                appRouter.back(true)
+                                this.changeIndex(index * this.spliceNum + indexIndex)
+                              })
                             }
-                            .onClick(() => {
-                              this.isShowSerialPickerSheet = false
-                              WindowManager.setWindowSystemBarProperties({ statusBarContentColor: '#e6ffffff' })
-                              appRouter.back(true)
-                              this.changeIndex(index * this.spliceNum + indexIndex)
-                            })
                           }, (item: number) => item.toString())
                         } else {
-                          ForEach(this.fullIndexArray.slice(0, 6), (item: number, indexIndex: number) => {
-                            Stack({ alignContent: Alignment.TopEnd }) {
-                              Stack({ alignContent: Alignment.BottomEnd }) {
-                                Text(`${(index) * this.spliceNum + indexIndex + 1}`)
-                                  .textAlign(TextAlign.Center)
-                                  .width(48)
-                                  .height(48)
-                                  .fontColor(this.currentIndex === (index * this.spliceNum + indexIndex) ? '#EC6E45' :
-                                    $r('sys.color.font_primary'))
-                                  .fontSize($r('sys.float.Body_M'))
-                                  .backgroundColor(this.currentIndex === (index * this.spliceNum + indexIndex) ?
-                                    'rgba(236, 110, 69, 0.05)' : $r('sys.color.background_secondary'))
-                                if (this.currentIndex === (index * this.spliceNum + indexIndex)) {
-                                  Image(getMedia('app.media.playing'))
-                                    .width(10)
-                                    .height(8)
-                                    .margin({ bottom: 3, right: 3 })
+                          ForEach(this.fullIndexArray, (item: number, indexIndex: number) => {
+                            GridItem() {
+                              Stack({ alignContent: Alignment.TopEnd }) {
+                                Stack({ alignContent: Alignment.BottomEnd }) {
+                                  Text(`${(index) * this.spliceNum + indexIndex + 1}`)
+                                    .textAlign(TextAlign.Center)
+                                    .width(48)
+                                    .height(48)
+                                    .fontColor(this.currentIndex === (index * this.spliceNum + indexIndex) ? '#EC6E45' :
+                                      $r('sys.color.font_primary'))
+                                    .fontSize($r('sys.float.Body_M'))
+                                    .backgroundColor(this.currentIndex === (index * this.spliceNum + indexIndex) ?
+                                      'rgba(236, 110, 69, 0.05)' : $r('sys.color.background_secondary'))
+                                  if (this.currentIndex === (index * this.spliceNum + indexIndex)) {
+                                    Image(getMedia('app.media.playing'))
+                                      .width(10)
+                                      .height(8)
+                                      .margin({ bottom: 3, right: 3 })
+                                  }
+                                }
+
+                                if (indexIndex > 10 && index === 0 || index > 0) {
+                                  Text('VIP')
+                                    .textAlign(TextAlign.Center)
+                                    .fontSize(6)
+                                    .width(13)
+                                    .height(11)
+                                    .backgroundColor('rgba(255,215,0,0.36)')
                                 }
                               }
-
-                              if (indexIndex > 10 && index === 0 || index > 0) {
-                                Text('VIP')
-                                  .textAlign(TextAlign.Center)
-                                  .fontSize(6)
-                                  .width(13)
-                                  .height(11)
-                                  .backgroundColor('rgba(255,215,0,0.36)')
-                              }
+                              .onClick(() => {
+                                this.isShowSerialPickerSheet = false
+                                WindowManager.setWindowSystemBarProperties({ statusBarContentColor: '#e6ffffff' })
+                                appRouter.back(true)
+                                this.changeIndex(index * this.spliceNum + indexIndex)
+                              })
                             }
-                            .onClick(() => {
-                              this.isShowSerialPickerSheet = false
-                              WindowManager.setWindowSystemBarProperties({ statusBarContentColor: '#e6ffffff' })
-                              appRouter.back(true)
-                              this.changeIndex(index * this.spliceNum + indexIndex)
-                            })
                           }, (item: number) => item.toString())
                         }
                       }
+                      .nestedScroll({
+                        scrollForward: NestedScrollMode.SELF_FIRST,
+                        scrollBackward: NestedScrollMode.SELF_FIRST
+                      })
+                      .scrollBar(BarState.Off)
+                      .rowsTemplate('1fr')
+                      .columnsGap(8)
                       .width('100%')
                       .height(48)
                     }
@@ -664,8 +675,8 @@ struct RecommendView {
       .scrollBar(BarState.Off)
     }
     .width('100%')
-    .onVisibleAreaChange([0],(isExpanding: boolean, currentRatio: number)=>{
-      if(isExpanding){
+    .onVisibleAreaChange([0], (isExpanding: boolean, currentRatio: number) => {
+      if (isExpanding) {
         let sysBarProps: window.SystemBarProperties = {
           statusBarContentColor: '#000000'
         };

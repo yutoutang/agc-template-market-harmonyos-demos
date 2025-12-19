@@ -9,11 +9,11 @@ export function ShopBuilder() {
   Shop();
 }
 
-@Component
+@ComponentV2
 export struct Shop {
   vm: ShopPageVM = ShopPageVM.instance;
   private swiperController: SwiperController = new SwiperController();
-  @Consume('mainPathStack') mainPathStack: NavPathStack;
+  @Consumer('mainPathStack') mainPathStack: NavPathStack = new NavPathStack();
 
   build() {
     NavDestination() {
@@ -81,7 +81,7 @@ export struct Shop {
                       this.mainPathStack.pushPathByName(NavPathName.COMMODITY_DETAIL, item);
                     });
                   }, (item: Commodity) => item.id.toString());
-                }.listDirection(Axis.Horizontal).margin({ top: 12 }).scrollBar(BarState.Off);
+                }.listDirection(Axis.Horizontal).margin({ top: 12 }).scrollBar(BarState.Off).alignListItem(ListItemAlign.Start).width('100%');
               } else {
                 CommonBlank();
               }

@@ -9,6 +9,7 @@ export default class EntryAbility extends UIAbility {
 
   onDestroy(): void {
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onDestroy');
+    this.context.eventHub.off('update_date');
   }
 
   async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
@@ -25,7 +26,7 @@ export default class EntryAbility extends UIAbility {
     let windowBottomHeight = px2vp(avoidArea.bottomRect.height);
     AppStorage.setOrCreate('windowBottomHeight', windowBottomHeight);
 
-    windowStage.loadContent('pages/Main', (err) => {
+    windowStage.loadContent('pages/Index', (err) => {
       if (err.code) {
         hilog.error(0x0000, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');
         return;

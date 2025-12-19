@@ -2,6 +2,8 @@ import { common } from '@kit.AbilityKit';
 import { systemShare } from '@kit.ShareKit';
 import { uniformTypeDescriptor as utd } from '@kit.ArkData';
 import { image } from '@kit.ImageKit';
+import { CircleShape } from '@kit.ArkUI';
+import { http } from '@kit.NetworkKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { StatusFLAG } from '../constant/Index';
 import { CommonConstant, EventEmitName, PageRouteName } from '../constant/Index';
@@ -16,31 +18,35 @@ import {
   cancelFavorTravelogue,
   commentTravelogue,
 } from '../utils/ApiManage';
-import { CircleShape } from '@kit.ArkUI';
-import { http } from '@kit.NetworkKit';
 
 const COMMENT_AREA_ID = 'CommentArea';
 const ASPECT_RADIO_DEFAULT = 3 / 4;
 
 @Entry({ routeName: PageRouteName.PAGE_DETAIL })
-@Component
+@ComponentV2
 export struct PageDetail {
   // 游记ID
-  @State travelId: number = 0;
-  @State data: PostDetailModel = new PostDetailModel();
-  @State isEditComment: boolean = false;
-  @State commentEditValue: string = '';
-  @State commentEditValueCopy: string = '';
-  @State aspectRatioSwiper: number = ASPECT_RADIO_DEFAULT;
-  @State @Watch('onListChange') imgAspectRadioList: number[] = [];
-  @State windowTopHeight: number = AppStorage.get('windowTopHeight') as number || 38.77;
-  @State windowBottomHeight: number = AppStorage.get('windowBottomHeight') as number || 28;
+  @Local travelId: number = 0;
+  @Local data: PostDetailModel = new PostDetailModel();
+  @Local isEditComment: boolean = false;
+  @Local commentEditValue: string = '';
+  @Local commentEditValueCopy: string = '';
+  @Local aspectRatioSwiper: number = ASPECT_RADIO_DEFAULT;
+  @Local imgAspectRadioList: number[] = [];
+  @Local windowTopHeight: number = AppStorage.get('windowTopHeight') as number || 38.77;
+  @Local windowBottomHeight: number = AppStorage.get('windowBottomHeight') as number || 28;
   private scroller: Scroller = new Scroller();
   private contentH: number = 0;
   private firstImgBuffer: ArrayBuffer | null = null;
   changeLiked: () => void = () => {
     (getContext(this) as common.UIAbilityContext).eventHub.emit(EventEmitName.CHANGE_LIKED, this.data);
   };
+
+  @Monitor('data.travelogueEvaluateList')
+  onValueChange(monitor: IMonitor) {
+    let curValue: CommentModel[] = monitor.value()?.now as CommentModel[];
+    this.data.travelogueEvaluateList = curValue;
+  }
 
   async aboutToAppear() {
     const params: ESObject = this.getUIContext().getRouter().getParams();
@@ -239,8 +245,8 @@ export struct PageDetail {
     Column({ space: 10 }) {
       // 帖子图片
       Swiper() {
-        ForEach(this.data.images as string[], (v: string) => {
-          Image(handleImgSrc(v))
+        Repeat<string>(this.data.images as string[]).each((repeatItem: RepeatItem<string>) => {
+          Image(handleImgSrc(repeatItem.item))
             .height(CommonConstant.FULL_PERCENT)
             .width(CommonConstant.FULL_PERCENT)
             .margin({ bottom: 30 })
@@ -253,8 +259,9 @@ export struct PageDetail {
                 this.imgAspectRadioList.push(event.width / event.height);
               }
             });
-        }, (v: string) => v);
+        }).key((item: string, index: number) => item).virtualScroll();
       }
+      .cachedCount(3)
       .width(CommonConstant.FULL_PERCENT)
       .aspectRatio(this.aspectRatioSwiper)
       .autoPlay(false)
@@ -418,6 +425,7 @@ export struct PageDetail {
             this.isEditComment = true;
           })
           .bindSheet($$this.isEditComment, this.buildInputSheet(), {
+            preferType: SheetType.CENTER,
             height: SheetSize.FIT_CONTENT,
             showClose: false,
           });

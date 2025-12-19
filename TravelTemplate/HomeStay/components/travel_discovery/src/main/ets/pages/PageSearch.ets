@@ -1,24 +1,24 @@
 import { PullToRefresh, PullToRefreshConfigurator } from '@ohos/pulltorefresh';
-import { LengthMetrics, router } from '@kit.ArkUI';
+import { AppStorageV2, LengthMetrics, router } from '@kit.ArkUI';
 import { QueryTravelogueListType } from '../constant/Index';
-import { CommonConstant, PageRouteName, } from '../constant/Index';
-import { CardDataSource, PostCardModel } from '../model/Index';
+import { CommonConstant, PageRouteName } from '../constant/Index';
+import { CardDataSource, HistoryList, PostCardModel } from '../model/Index';
 import { queryTravelogueList } from '../utils/ApiManage';
 import { ContentCard } from '../components/ContentCard';
 import { QueryTravelogueListRequest } from '../model/IRequest';
 import { trimStart } from '../utils/Index';
 
 @Entry({ routeName: PageRouteName.PAGE_SEARCH })
-@Component
+@ComponentV2
 export struct PageSearch {
-  @State curPageNum: number = 1;
-  @State searchValue: string = '';
-  @StorageLink('SearchHistoryList') historyList: string[] = [];
-  @State list: CardDataSource = new CardDataSource();
-  @State withSearchResp: boolean = false;
-  @State listNum: number = 0;
-  @State isLoading: boolean = false;
-  @State windowTopHeight: number = AppStorage.get('windowTopHeight') as number || 38.77;
+  @Local curPageNum: number = 1;
+  @Local searchValue: string = '';
+  @Local historyList: HistoryList = AppStorageV2.connect(HistoryList, 'HistoryList', () => new HistoryList())!;
+  @Local list: CardDataSource = new CardDataSource();
+  @Local withSearchResp: boolean = false;
+  @Local listNum: number = 0;
+  @Local isLoading: boolean = false;
+  @Local windowTopHeight: number = AppStorage.get('windowTopHeight') as number || 38.77;
   private searchController: SearchController = new SearchController();
   private scroller: Scroller = new Scroller();
   private pullConfig: PullToRefreshConfigurator = new PullToRefreshConfigurator();
@@ -75,11 +75,11 @@ export struct PageSearch {
     }
     this.searchController.stopEditing();
     this.withSearchResp = true;
-    const existIndex = this.historyList.findIndex(v => v === this.searchValue);
+    const existIndex = this.historyList.historyList.findIndex(v => v === this.searchValue);
     if (existIndex !== -1) {
-      this.historyList.splice(existIndex, 1);
+      this.historyList.historyList.splice(existIndex, 1);
     }
-    this.historyList.splice(0, 0, this.searchValue);
+    this.historyList.historyList.splice(0, 0, this.searchValue);
     this.callInterface();
   }
 
@@ -176,9 +176,9 @@ export struct PageSearch {
         .fontSize(12)
         .fontColor($r('app.color.grey_level_9'))
         .fontWeight(500);
-      if (this.historyList.length) {
+      if (this.historyList.historyList.length) {
         Flex({ wrap: FlexWrap.Wrap, space: { main: LengthMetrics.vp(12), cross: LengthMetrics.vp(10) } }) {
-          ForEach(this.historyList.slice(0, 10), (item: string) => {
+          ForEach(this.historyList.historyList.slice(0, 10), (item: string) => {
             this.buildTag(item);
           }, (item: string) => item);
         };

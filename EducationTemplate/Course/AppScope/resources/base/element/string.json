@@ -6,7 +6,7 @@
     },
     {
       "name": "agcit_huawei_course_service",
-      "value": "1.0.1"
+      "value": "1.0.2"
     },
     {
       "name": "agcittype_huawei_course_service",
@@ -14,7 +14,7 @@
     },
     {
       "name": "agcitkid_huawei_course_service",
-      "value": "agcit_huawei_common_advertisement/1.0.0,agcit_huawei_common_login/1.0.0,agcit_huawei_course_recorded_player/1.0.1,agcit_huawei_common_feedback/1.0.0,agcit_huawei_common_payment/1.0.0,agcit_huawei_common_share/1.0.0,agcit_huawei_course_classification/1.0.0,agcit_huawei_common_search/1.0.0,agcit_huawei_live_streaming/1.0.0"
+      "value": "agcit_huawei_common_login/1.0.0,agcit_huawei_course_recorded_player/1.0.2,agcit_huawei_common_feedback/1.0.0,agcit_huawei_common_payment/1.0.0,agcit_huawei_common_share/1.0.1"
     }
   ]
 }

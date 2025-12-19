@@ -15,6 +15,10 @@
     {
       "name": "apply_write_calendar_reason",
       "value": "申请写入日程权限"
+    },
+    {
+      "name": "agcit_huawei_art_training",
+      "value": "1.0.1"
     }
   ]
 }

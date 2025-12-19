@@ -2,10 +2,10 @@ import { Constants } from 'constant';
 import { Tag } from 'type';
 import { HomePageVM } from '../viewmodel/HomePageVM';
 
-@Component
+@ComponentV2
 export struct Foundations {
   vm: HomePageVM = HomePageVM.instance;
-  @Prop foundations: Array<Tag>;
+  @Param @Require foundations: Tag[];
 
   build() {
     Column({ space: 16 }) {

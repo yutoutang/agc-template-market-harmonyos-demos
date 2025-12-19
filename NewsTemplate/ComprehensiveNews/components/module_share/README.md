@@ -4,7 +4,7 @@
 
 - [简介](#简介)
 - [约束与限制](#约束与限制)
-- [快速入门](#快速入门)
+- [使用](#使用)
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
@@ -27,7 +27,7 @@
 
 - 网络权限：ohos.permission.INTERNET
 
-## 快速入门
+## 使用
 
 1. 安装组件。
 
@@ -102,21 +102,18 @@
 
 6. 调用组件，详细组件调用参见[示例代码](#示例代码)。
 
-```ts
-import { Share } from 'module_share';
-
-@Entry
-@ComponentV2
-export struct Index {
-  build() {
-    Column(){
-      Share({
-        ...
-      })
-    }
-  }
-}
-```
+   ```ts
+   @ComponentV2
+   export struct Index {
+     build() {
+       Column(){
+         Share({
+           ...
+         })
+       }
+     }
+   }
+   ```
 
 ## API参考
 
@@ -178,7 +175,7 @@ export struct Index {
   @Builder
   shareCommentBuilder() {
     Column({ space: 5 }) {
-      Image($r('app.media.app_background'))
+      Image($r('app.media.share_active'))
         .width(21)
         .height(21)
       Text('2000')

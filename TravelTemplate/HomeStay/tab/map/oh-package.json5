@@ -7,8 +7,7 @@
   "license": "Apache-2.0",
   "packageType": "InterfaceHar",
   "dependencies": {
-    "network": "file:../../function/network",
-    "account": "file:../../function/account",
+    "network": "file:../../common/network",
     "home": "file:../home",
     "personal": "file:../personal",
     "type": "file:../../common/type",

@@ -43,7 +43,8 @@
     "retirement_age_calculator": "file:../components/retirement_age_calculator",
     "credentials_photo": "file:../components/credentials_photo",
     "ar_measure": "file:../components/ar_measure",
-    "translator": "file:../components/translator"
+    "translator": "file:../components/translator",
+    "cast_tool": "file:../components/cast_tool"
   }
 }
 

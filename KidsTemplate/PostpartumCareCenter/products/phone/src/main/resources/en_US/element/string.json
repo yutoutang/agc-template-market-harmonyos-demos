@@ -39,6 +39,10 @@
     {
       "name": "PhoneFormAbility_label",
       "value": "PhoneFormAbility_label"
+    },
+    {
+      "name": "agcit_huawei_postpartum_care_center",
+      "value": "1.0.1"
     }
   ]
 }

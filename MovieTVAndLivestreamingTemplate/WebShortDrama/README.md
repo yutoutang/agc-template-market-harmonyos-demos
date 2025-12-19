@@ -99,8 +99,8 @@ WebShortDrama
   |
   |- components                                    // 组件   
   |   |- base_apis                                 // 集成能力组件   
-  |   |- feed_back                                 // 意见反馈组件   
-  |   |- module_share                              // 分享组件   
+  |   |- feedback                                  // 意见反馈组件   
+  |   |- aggregated_share                          // 分享组件   
   |   |- open_ads                                  // 广告组件   
   |   |- video_swiper                              // 滑动视频组件     
   |   |- module_cast                               // 视频投屏组件     
@@ -190,10 +190,10 @@ WebShortDrama
 
 ### 环境
 
-- DevEco Studio版本：DevEco Studio 5.0.3 Release及以上
-- HarmonyOS SDK版本：HarmonyOS 5.0.3 Release SDK及以上
+- DevEco Studio版本：DevEco Studio 5.0.5 Release及以上
+- HarmonyOS SDK版本：HarmonyOS 5.0.5 Release SDK及以上
 - 设备类型：华为手机（包括双折叠和阔折叠）
-- 系统版本：HarmonyOS 5.0.1(13)及以上
+- 系统版本：HarmonyOS 5.0.3(15)及以上
 
 ### 权限
 

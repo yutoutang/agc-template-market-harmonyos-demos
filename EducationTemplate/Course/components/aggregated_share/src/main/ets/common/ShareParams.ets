@@ -114,10 +114,10 @@ export class QQShareData extends ShareData {
  * QQ分享内容结构体
  */
 export interface QQShareContent {
-  msgStyle: number;
+  msg_style: number;
   title: string;
   summary: string
   brief: string
   url: string;
-  pictureUrl: ResourceStr;
+  picture_url: ResourceStr;
 }

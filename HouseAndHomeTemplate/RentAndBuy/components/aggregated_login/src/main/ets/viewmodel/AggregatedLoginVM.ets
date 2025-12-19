@@ -23,7 +23,7 @@ export class AggregatedLoginVM {
     });
   }
 
-  async wxLogin(extraInfo: ExtraInfo) {
+  async wxLogin(extraInfo: ExtraInfo, context: Context) {
     let wxApi = wxopensdk.WXAPIFactory.createWXAPI(extraInfo.appId);
     let req = new wxopensdk.SendAuthReq;
     req.isOption1 = false;
@@ -32,6 +32,6 @@ export class AggregatedLoginVM {
     req.state = extraInfo.state;
     req.transaction = extraInfo.transaction;
 
-    let finished = await wxApi.sendReq(getContext(this) as common.UIAbilityContext, req);
+    let finished = await wxApi.sendReq(context as common.UIAbilityContext, req);
   }
 }

@@ -1,12 +1,12 @@
 {
   "app": {
-    // todo: 包名配置
-    "bundleName": "com.atomicservice.xxx",
+// todo: 包名配置
+    "bundleName": "com.atomicservice.xxxxxx",
     "bundleType": "atomicService",
     "vendor": "example",
     "versionCode": 1000000,
     "versionName": "1.0.0",
-    "icon": "$media:app_icon",
+    "icon": "$media:startIcon",
     "label": "$string:app_name"
   }
 }

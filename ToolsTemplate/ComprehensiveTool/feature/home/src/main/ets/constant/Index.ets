@@ -270,4 +270,11 @@ export const TOOL_TYPE_MODULES: ToolTypeModule[] = [
     icon: $r('app.media.translator'),
     url: 'TranslatorPage',
   },
+  {
+    id: ToolType.CAST_TOOL,
+    title: '投屏',
+    category: Category.LIFE,
+    icon: $r('app.media.cast'),
+    url: 'CastPage',
+  },
 ];

@@ -1,9 +1,9 @@
-import { Commodity } from 'type';
 import { Constants } from 'constant';
+import { Commodity } from 'type';
 
-@Component
+@ComponentV2
 export struct ContentCard {
-  @Prop data: Commodity;
+  @Param @Require data: Commodity;
 
   build() {
     Column({ space: 8 }) {

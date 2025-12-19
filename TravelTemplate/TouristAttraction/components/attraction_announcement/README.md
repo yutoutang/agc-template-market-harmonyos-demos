@@ -4,7 +4,7 @@
 
 - [简介](#简介)
 - [约束与限制](#约束与限制)
-- [快速入门](#快速入门)
+- [使用](#使用)
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
@@ -16,12 +16,17 @@
 
 ## 约束与限制
 ### 环境
+
 * DevEco Studio版本：DevEco Studio 5.0.3 Release及以上
 * HarmonyOS SDK版本：HarmonyOS 5.0.3 Release SDK及以上
 * 设备类型：华为手机（包括双折叠和阔折叠）
 * HarmonyOS版本：HarmonyOS 5.0.3(15)及以上
 
-## 快速入门
+### 权限
+
+* 获取网络权限：ohos.permission.INTERNET、ohos.permission.GET_NETWORK_INFO。
+
+## 使用
 1. 安装组件。
    如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
 
@@ -98,10 +103,10 @@ struct Index {
             title: '松山湖景区',
             imageUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/scenic-i0v1l/common%2FHeidelberg_B.png?token=66ceba4d-be1d-4c87-a01b-98ed7002c2de',
             panelName: '松山湖景区',
-            panelIcon: $r('app.media.app_icon')
+            panelIcon: $r('app.media.startIcon')
          } as PlayInfo,
       });
-    };
+    }.width('100%').alignItems(HorizontalAlign.Center);
   }
 }
 ```

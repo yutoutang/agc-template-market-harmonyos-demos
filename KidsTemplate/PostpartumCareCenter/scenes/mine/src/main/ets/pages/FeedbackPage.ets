@@ -10,6 +10,7 @@ export function FeedbackPageBuilder() {
 @ComponentV2
 export struct FeedbackPage {
   vm: MainEntryVM = MainEntryVM.instance;
+  uiContext: UIContext = this.getUIContext() as UIContext;
   @Local feedbackContent: string = '';
   @Local phone: string = '';
 
@@ -41,7 +42,7 @@ export struct FeedbackPage {
             .fontFamily('HarmonyHeiTi')
             .fontWeight(FontWeight.Regular)
             .fontColor('rgba(0,0,0,0.90)')
-            .placeholderColor('rgba(0,0,0,0.40)')
+            .placeholderColor($r('sys.color.font_secondary'))
             .placeholderFont({
               size: $r('app.string.font_size_14'),
               family: 'HarmonyHeiTi',
@@ -70,13 +71,13 @@ export struct FeedbackPage {
           TextInput({
             placeholder: '请输入（选填）',
           })
-            .fontSize($r('app.string.font_size_16'))
+            .fontSize($r('sys.float.Body_L'))
             .fontFamily('HarmonyHeiTi')
             .fontWeight(FontWeight.Regular)
             .fontColor('rgba(0,0,0,0.90)')
-            .placeholderColor('rgba(0,0,0,0.40)')
+            .placeholderColor($r('sys.color.font_secondary'))
             .placeholderFont({
-              size: $r('app.string.font_size_16'),
+              size: $r('sys.float.Body_L'),
               family: 'HarmonyHeiTi',
               weight: FontWeight.Regular,
             })
@@ -92,14 +93,14 @@ export struct FeedbackPage {
 
           Divider()
             .padding({ left: $r('app.string.padding_6'), right: $r('app.string.padding_6') })
-            .color('rgba(0,0,0,0.20)')
-            .strokeWidth(1);
+            .color($r('sys.color.comp_divider'))
+            .strokeWidth('1px');
         }
         .padding($r('app.string.padding_3'));
 
         Button({ type: ButtonType.Normal, stateEffect: true }) {
           Text($r('app.string.submit_immediately'))
-            .fontSize($r('app.string.font_size_16'))// 设置字号为16
+            .fontSize($r('sys.float.Body_L'))// 设置字号为16
             .fontFamily('HarmonyHeiTi')
             .fontWeight(FontWeight.Medium)
             .fontColor('#FFFFFF');
@@ -109,12 +110,12 @@ export struct FeedbackPage {
           top: $r('app.string.padding_10'),
           bottom: $r('app.string.padding_9'),
         }) // 设置文字内边距
-        .borderRadius($r('app.string.border_radius_20'))
+        .borderRadius($r('sys.float.corner_radius_level10'))
         .width('100%')
         .margin({ top: $r('app.string.margin_xl') })
         .onClick(() => {
           if (!CommonUtil.isStringValid(this.feedbackContent)) {
-            promptAction.showToast({ message: '请输入反馈内容', alignment: Alignment.Center });
+            this.uiContext.getPromptAction().showToast({ message: '请输入反馈内容', alignment: Alignment.Center });
             return;
           }
           this.vm.navStack.pushPathByName('SubmitSuccessPage', null);

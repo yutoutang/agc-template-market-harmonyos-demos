@@ -1,12 +1,13 @@
 import { ComponentContent, LevelMode, promptAction } from '@kit.ArkUI';
 import { fileIo as fs } from '@kit.CoreFileKit';
+import { BusinessError } from '@ohos.base';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import sdk from 'libveditor.so';
 import { Sticker } from '../model/Sticker';
 import { StickerManage } from '../components/StickerManage';
 import { TextInputCanvas } from '../components/TextInputCavas';
 import { VideoEditVM } from '../viewmodel/VideoEditVM';
-import { Point, VideoAsset } from '../model/Index';
+import { VideoAsset } from '../model/Index';
 import { PromptActionUtil } from '../util/PromptActionUtil';
 import { VideoManageVM } from '../viewmodel/VideoManageVM';
 import { OperationComponent } from '../components/OperationComponent';
@@ -163,6 +164,25 @@ struct VideoEdit {
     };
   }
 
+  handleSaveButtonClick: SaveButtonCallback =
+    async (event: ClickEvent, result: SaveButtonOnClickResult, error?: BusinessError) => {
+      if (result === SaveButtonOnClickResult.SUCCESS) {
+        try {
+          this.vm.showExportingBindCover = true;
+          this.vm.exportProgress = 0;
+          sdk.Export(this.vm.totalOutputVideoFilePath,
+            (progress: number) => {
+              this.vm.exportProgress = progress;
+            }, this.completeCallback(),
+          );
+        } catch (error) {
+          hilog.error(0xFF00, 'VideoClip', `errCode: ${error.code}, errMessage: ${error.message}`);
+        }
+      } else if (result === SaveButtonOnClickResult.TEMPORARY_AUTHORIZATION_FAILED) {
+        hilog.error(0xFF00, 'VideoClip', 'errCode: ' + error?.code);
+      }
+    };
+
   build() {
     NavDestination() {
       Stack() {
@@ -209,31 +229,22 @@ struct VideoEdit {
         this.manageVM.pathStack.pop();
       });
 
-      Button('导出')
-        .size({ height: 28, width: 64 })
-        .fontColor($r('sys.color.font_on_primary'))
-        .backgroundColor($r('sys.color.font_emphasize'))
-        .type(ButtonType.Capsule)
-        .onClick(() => {
-          this.vm.showExportingBindCover = true;
-          this.vm.exportProgress = 0;
-          sdk.Export(this.vm.totalOutputVideoFilePath,
-            (progress: number) => {
-              this.vm.exportProgress = progress;
-            }, this.completeCallback(),
-          );
-        })
-        .bindContentCover($$this.vm.showExportingBindCover, this.FullExportBuilder(), {
-          onWillDismiss: (() => {
-            if (this.vm.exportProgress) {
-              promptAction.showToast({ message: '视频导出过程中请勿退出', duration: 1000 });
-            } else {
-              // 进度为0，允许退出
-              this.showNodeContent(stopContentNode, LevelMode.OVERLAY);
-            }
-          }),
-        });
-    }.width('100%').justifyContent(FlexAlign.SpaceBetween).margin({ bottom: 16 }).padding({ left: 16, right: 16 });
+      SaveButton({ text: SaveDescription.EXPORT_TO_GALLERY }).onClick((this.handleSaveButtonClick));
+    }
+    .width('100%')
+    .justifyContent(FlexAlign.SpaceBetween)
+    .margin({ bottom: 16 })
+    .padding({ left: 16, right: 16 })
+    .bindContentCover($$this.vm.showExportingBindCover, this.FullExportBuilder(), {
+      onWillDismiss: (() => {
+        if (this.vm.exportProgress) {
+          promptAction.showToast({ message: '视频导出过程中请勿退出', duration: 1000 });
+        } else {
+          // 进度为0，允许退出
+          this.showNodeContent(stopContentNode, LevelMode.OVERLAY);
+        }
+      }),
+    });
   }
 
   @Builder

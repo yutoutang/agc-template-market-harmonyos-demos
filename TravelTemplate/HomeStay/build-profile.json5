@@ -1,8 +1,6 @@
 {
   "app": {
-    "signingConfigs": [
-      // todo 请配置您的手动签名信息
-    ],
+    "signingConfigs": [],
     "products": [
       {
         "name": "default",
@@ -20,7 +18,7 @@
     ],
     "buildModeSet": [
       {
-        "name": "debug",
+        "name": "debug"
       },
       {
         "name": "release"
@@ -101,18 +99,6 @@
       ]
     },
     {
-      "name": "account",
-      "srcPath": "./function/account",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
-    },
-    {
       "name": "util",
       "srcPath": "./common/util",
       "targets": [
@@ -126,7 +112,7 @@
     },
     {
       "name": "network",
-      "srcPath": "./function/network",
+      "srcPath": "./common/network",
       "targets": [
         {
           "name": "default",
@@ -174,11 +160,11 @@
     },
     {
       "name": "calendar_select",
-      "srcPath": "./components/calendar_select",
+      "srcPath": "./components/calendar_select"
     },
     {
       "name": "travel_map",
-      "srcPath": "./components/travel_map",
+      "srcPath": "./components/travel_map"
     }
-  ],
+  ]
 }

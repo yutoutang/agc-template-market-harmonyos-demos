@@ -8,9 +8,9 @@ import { handleCount, handleImgSrc } from '../utils/Index';
 import { CommonConstant, EventEmitName, PageRouteName, StatusFLAG } from '../constant/Index';
 import { cancelLikeTravelogue, likeTravelogue } from '../utils/ApiManage';
 
-@Component
+@ComponentV2
 export struct ContentCard {
-  @ObjectLink data: PostCardModel;
+  @Param @Require data: PostCardModel;
 
   aboutToAppear(): void {
     (getContext(this) as common.UIAbilityContext).eventHub.on(EventEmitName.CHANGE_LIKED, (v: PostCardModel) => {

@@ -2,19 +2,21 @@ import { authentication, loginComponentManager, LoginWithHuaweiIDButton } from '
 import { util } from '@kit.ArkTS';
 import promptAction from '@ohos.promptAction';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { LoginErrorCode } from '../model/Index';
-import { AgreementDialog, TitleBar } from 'component';
-import { Logger } from 'util';
-import { AccountUtil } from 'account';
+import { TitleBar } from 'component';
+import { Logger, AccountUtil } from 'util';
 import { Constants, NavPathName } from 'constant';
+import { LoginErrorCode } from '../model/Index';
+import { PersonalInfoVM } from '../viewmodel/PersonalInfoVM';
+import { AgreementDialog } from '../components/AgreementDialog';
 
 @Builder
 export function QuickLoginPageBuilder() {
   QuickLoginPage();
 }
 
-@Component
+@ComponentV2
 export struct QuickLoginPage {
+  vm: PersonalInfoVM = PersonalInfoVM.instance;
   logTag: string = 'QuickLoginButtonComponent';
   domainId: number = 0x0000;
   loginData: Record<string, Object> = {
@@ -22,17 +24,17 @@ export struct QuickLoginPage {
     'show': '',
     'hint': '',
   };
-  @State unionID: string = '';
-  @State openID: string = '';
+  @Local unionID: string = '';
+  @Local openID: string = '';
   // 是否勾选协议
-  @State isSelected: boolean = false;
+  @Local isSelected: boolean = false;
   // 弹窗是否已开启
   private customerDiaLogOpen: boolean = false;
   error?: BusinessError;
   response: loginComponentManager.HuaweiIDCredential = {} as loginComponentManager.HuaweiIDCredential;
   // 控制登录中不可点击协议和复选框的状态变量
-  @State enableStatus: boolean = true;
-  @State anonymousPhone: string = '';
+  @Local enableStatus: boolean = true;
+  @Local anonymousPhone: string = '';
   privacyText: loginComponentManager.PrivacyText[] = [{
     text: '已同意并阅读 ',
     type: loginComponentManager.TextType.PLAIN_TEXT,
@@ -84,7 +86,7 @@ export struct QuickLoginPage {
     autoCancel: false,
     alignment: DialogAlignment.Center,
   });
-  @Consume('mainPathStack') mainPathStack: NavPathStack;
+  @Consumer('mainPathStack') mainPathStack: NavPathStack = new NavPathStack();
 
   aboutToAppear(): void {
     this.getQuickLoginAnonymousPhone();
@@ -141,9 +143,8 @@ export struct QuickLoginPage {
           this.response = response;
         }
         // 模拟登录
-        AppStorage.setOrCreate('currentUser', this.unionID);
-        AppStorage.setOrCreate('openID', this.openID);
-        this.mainPathStack.pop(AccountUtil.getCurrentUser());
+        AccountUtil.setUserId(this.unionID);
+        this.mainPathStack.pop(this.unionID);
       } else {
         this.agreementDialog.open();
         this.customerDiaLogOpen = true;
@@ -312,7 +313,7 @@ export struct QuickLoginPage {
                       this.controller.setAgreementStatus(loginComponentManager.AgreementStatus.NOT_ACCEPTED);
                     }
                   });
-              }
+              };
 
               Row() {
                 Text() {
@@ -332,7 +333,7 @@ export struct QuickLoginPage {
                     this.BuildSpan(this.privacyText[4].text, $r('sys.color.ohos_id_color_text_secondary'),
                       $r('sys.string.ohos_id_text_font_family_regular'), FontWeight.Regular, 4);
                   }
-                }
+                };
               }
               .constraintSize({ minHeight: 24 });
             }
@@ -350,12 +351,15 @@ export struct QuickLoginPage {
             right: 16,
           });
         }.backgroundColor('#F1F3F5').edgeEffect(EdgeEffect.Spring).height('90%');
-      }
+      };
     }
     .hideTitleBar(true)
     .width('100%')
     .height('100%')
-    .backgroundColor('#F1F3F5');
+    .backgroundColor('#F1F3F5')
+    .onReady((ctx) => {
+      this.vm.pathStack = ctx.pathStack;
+    });
   }
 
   getQuickLoginAnonymousPhone() {

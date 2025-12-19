@@ -16,14 +16,14 @@
 @ComponentV2
 export struct SingleBtn {
   @Param city: string = '';
-  @Param fgColor: ResourceColor = Color.Black;
+  @Param fgColor: ResourceColor = $r('sys.color.font_primary');
   @Event onClickEvent: () => void = () => {
   };
 
   build() {
     Button() {
       Text(this.city)
-        .fontSize(14)
+        .fontSize($r('sys.float.Body_M'))
         .fontColor(this.fgColor)
         .fontWeight(500)
         .textAlign(TextAlign.Center)

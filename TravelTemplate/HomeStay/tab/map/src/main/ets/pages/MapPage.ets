@@ -3,13 +3,12 @@ import { common, Want } from '@kit.AbilityKit';
 import { TenantInfo } from 'type';
 import { CommonMap } from 'travel_map';
 
-@Component
+@ComponentV2
 export struct MapPage {
-  @State isShow: boolean = true;
-  @State tenantInfo: TenantInfo | undefined = AppStorage.get('tenantInfo');
-  @State tiltGesturesEnabled: boolean = false;
-  @Link homeTabIndex: number;
-  @Consume('mainPathStack') mainPathStack: NavPathStack;
+  @Local isShow: boolean = true;
+  @Local tenantInfo: TenantInfo | undefined = AppStorage.get('tenantInfo');
+  @Local tiltGesturesEnabled: boolean = false;
+  @Consumer('mainPathStack') mainPathStack: NavPathStack = new NavPathStack();
 
   build() {
     NavDestination() {
@@ -18,7 +17,7 @@ export struct MapPage {
           {
             travelMapOptions: {
               location: {
-                latitude: Number(this.tenantInfo?.position[1]) ,
+                latitude: Number(this.tenantInfo?.position[1]),
                 longitude: Number(this.tenantInfo?.position[0]),
               },
               icon: $r('app.media.point'),
@@ -29,11 +28,11 @@ export struct MapPage {
               cameraSpeed: 1000,
               zoom: 10,
               height: '100%',
-              pointClickCallBack: ()=> {
+              pointClickCallBack: () => {
                 this.isShow = true;
-              }
+              },
             },
-          }
+          },
         );
 
         if (this.isShow) {
@@ -49,11 +48,11 @@ export struct MapPage {
               .maxLines(3)
               .textOverflow({ overflow: TextOverflow.Ellipsis });
 
-            Row() {
+            Row({ space: 12 }) {
               Button('民宿详情', { type: ButtonType.Normal })
                 .backgroundColor('#007DFF')
+                .layoutWeight(1)
                 .fontColor($r('sys.color.font_on_primary'))
-                .width(160)
                 .borderRadius($r('sys.float.corner_radius_level4'))
                 .fontSize($r('sys.float.Body_L'))
                 .onClick(() => {
@@ -63,8 +62,8 @@ export struct MapPage {
               Button('导航', { type: ButtonType.Normal })
                 .backgroundColor(Color.White)
                 .fontColor(Color.Black)
+                .layoutWeight(1)
                 .fontSize($r('sys.float.Body_L'))
-                .width(160)
                 .border({ width: 1, color: Color.Black, radius: $r('sys.float.corner_radius_level4') })
                 .onClick(() => {
                   // 跳转到花瓣地图导航

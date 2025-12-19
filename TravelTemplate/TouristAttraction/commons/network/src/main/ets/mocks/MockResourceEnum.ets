@@ -11,7 +11,7 @@ export const enum MockResourceEnum {
   HEIDELBERG_I = 'common%2FHeidelberg_I.png?token=75fb65ee-9519-40aa-8ac5-4681c1e4a278',
   HEIDELBERG_B = 'common%2FHeidelberg_B.png?token=66ceba4d-be1d-4c87-a01b-98ed7002c2de',
   HEIDELBERG_L = 'common%2FHeidelberg_L.png?token=44e7920f-4b73-4e0a-9c3c-941496447f58',
-  SWIPER = 'common%2Fswiper.jpg?token=cecbc689-1940-422d-ab95-a58740c481a6',
+  SWIPER = 'network%2Fswiper1.png?token=4685465d-c29d-4392-8dc4-e322b3c70e9c',
   GUIDE_SCENIC = 'guide%2Fguide_scenic.svg?token=8ed22e9b-d376-4bcb-9408-77179a69205b',
   AUDIO = 'phone%2FDelacey%20-%20Dream%20It%20Possible.flac?token=0252b0cb-b617-4708-86dc-5b0d052529ab',
   ACCOMMODATION = 'network%2Faccommodation.png?token=ae858a2f-ce50-4a1e-9f26-26668227a9f4',

@@ -1,13 +1,14 @@
-import { AppStorageV2, ComponentContent, promptAction } from '@kit.ArkUI';
+import { AppStorageV2, ComponentContent, display, promptAction, window } from '@kit.ArkUI';
 import { ShortDramaDetailItemVM } from '../viewmodels/ShortDramaDetailItemVM';
 import { PlayController } from 'video_swiper';
 import { getMedia, NAV_PAGE_NAME } from '@agctemplate/resources';
 import { UserInfoModel } from '@agctemplate/widgets';
 import { commentBuilder, CommentParam } from './CommentComp';
-import { Share } from '@agctemplate/module_share';
+import { QQShareData, SharePicker } from 'aggregated_share';
 import { appRouter, Logger, WindowManager } from '@agctemplate/utils';
 import { MyMessageStorage } from '../models/MyMessageStorage';
 import { emitter } from '@kit.BasicServicesKit';
+import { deviceInfo } from '@kit.BasicServicesKit';
 
 const TAG: string = '[Side]'
 
@@ -24,6 +25,20 @@ export struct Side {
   @Local myMessageStorage: MyMessageStorage = MyMessageStorage.instance()
   @Local isShowShareSheet: boolean = false
   @Local commentShow: boolean = false
+  @Local isTabletLandScape: boolean = deviceInfo.deviceType === 'tablet' &&
+    display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE
+  callback: Callback<number> = (data: number) => {
+    if (deviceInfo.deviceType === 'tablet' &&
+      display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE) {
+      this.isTabletLandScape = true
+    } else {
+      this.isTabletLandScape = false
+    }
+    this.closeCommentDialog()
+  }
+  windowStage: window.WindowStage = AppStorage.get('windowStage') as window.WindowStage;
+  // 获取主窗口的方式
+  mainWin: window.Window = this.windowStage.getMainWindowSync();
   private commentNode: ComponentContent<CommentParam> = new ComponentContent(
     this.getUIContext(),
     wrapBuilder<[CommentParam]>(commentBuilder),
@@ -50,12 +65,14 @@ export struct Side {
           dismissDialogAction.dismiss()
         }
       },
-      alignment: DialogAlignment.Bottom,
+      alignment: this.isTabletLandScape ? DialogAlignment.CenterEnd :
+        DialogAlignment.Bottom,
       onWillDisappear: () => {
         this.commentShow = false
         this.myMessageStorage.showFlag = false
         this.myMessageStorage.isShowCommentSheet = false
         this.playControl.setPlayerHeight(`100%`)
+        this.playControl.setPlayerPositionX(0)
       }
     })
   }
@@ -111,6 +128,7 @@ export struct Side {
   }
 
   aboutToAppear(): void {
+    display.on('change', this.callback)
     if (this.myMessageStorage.showFlag) {
       return
     } else {
@@ -120,6 +138,10 @@ export struct Side {
         this.myMessageStorage.showFlag = true
       }
     }
+  }
+
+  aboutToDisappear(): void {
+    display.off('change', this.callback)
   }
 
   sideSendFavoriteEmitter() {
@@ -175,7 +197,11 @@ export struct Side {
       .height(40)
       .id('comment_button')
       .onClick(() => {
-        this.playControl.setPlayerHeight(`48%`)
+        if(this.isTabletLandScape){
+          this.playControl.setPlayerPositionX('-15%')
+        }else{
+          this.playControl.setPlayerHeight(`60%`)
+        }
         this.commentShow = true
         this.openCommentDialog()
       })
@@ -205,7 +231,7 @@ export struct Side {
       .height(40)
       .id('favoriteButton')
 
-      this.shareBuilder()
+      this.shareCommentBuilder()
 
     }
     .width(40)
@@ -222,26 +248,27 @@ export struct Side {
         .fontSize(10)
         .fontColor($r('sys.color.font_on_primary'))
     }
-  }
-
-  @Builder
-  shareBuilder() {
-    Share({
-      qrCodeInfo: {
-        id: this.videoDes.dramaInfo.id,
-        type: 2,
+    .onClick(() => {
+      const picker: SharePicker = new SharePicker({
         title: this.videoDes.dramaInfo.name,
-        createTime: '',
+        subTitle: '微短剧应用模板',
         coverUrl: this.videoDes.dramaInfo.coverUrl,
-        isVideo: false,
-        articleFrom: this.videoDes.dramaInfo.category[0] + '/' + this.videoDes.dramaInfo.category[1]
-      },
-      shareRenderBuilder: () => {
-        this.shareCommentBuilder()
-      },
-      onClose: () => {
-        this.isShowShareSheet = !this.isShowShareSheet
-      }
+        createTime: new Date('2025/09-15 08:00:00').getTime(),
+        thumbUrl: this.videoDes.dramaInfo.coverUrl
+      });
+
+      picker.setSignQQShareDataCB((shareJson: string) => {
+        const signData = new QQShareData();
+        signData.shareJson = shareJson;
+        signData.timestamp = Date.parse(new Date().toString()) / 1000;
+        signData.nonce = 62695688;
+        signData.shareJsonSign = 'Hsvqs0IpjiN6DfFfhboGp+r3XzQ=';
+        return Promise.resolve(signData);
+      })
+
+      picker.show({
+        autoClose: true,
+      });
     })
   }
 }

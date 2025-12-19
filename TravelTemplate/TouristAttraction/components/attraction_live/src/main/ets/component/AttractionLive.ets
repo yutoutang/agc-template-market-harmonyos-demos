@@ -149,6 +149,7 @@ export struct AttractionLive {
             this.isShow = true;
           }).bindSheet($$this.isShow, this.RealTimeInfoDetailBuilder(), {
             height: '40%', title: { title: this.attractionLiveInfo.name ?? '' },
+            preferType: SheetType.CENTER
           });
         }.realTimeRow();
 

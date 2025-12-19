@@ -31,6 +31,10 @@
     {
       "name": "not_login_in",
       "value": "You have not logged in with your Huawei ID. Please try again."
+    },
+    {
+      "name": "agcit_huawei_home_stay",
+      "value": "1.0.4"
     }
   ]
 }

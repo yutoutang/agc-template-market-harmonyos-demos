@@ -1,13 +1,11 @@
 import { callDialog, callPhone, MainEntryVM } from '@ohos_agcit/postpartum_care_center_uicomponents';
-import { BusinessError } from '@kit.BasicServicesKit';
-import { call } from '@kit.TelephonyKit';
 import {
   ActivityBookingRecordModel,
   ActivityBookingStates,
   Logger,
   PromptActionClass,
 } from '@ohos_agcit/postpartum_care_center_utils';
-import { ComponentContent, promptAction } from '@kit.ArkUI';
+import { ComponentContent } from '@kit.ArkUI';
 import { cancelledImage } from '../view/CommonView';
 
 @Builder
@@ -20,6 +18,7 @@ const TAG: string = '[ActivityBookingDetailPage]';
 @ComponentV2
 export struct ActivityBookingDetailPage {
   vm: MainEntryVM = MainEntryVM.instance;
+  uiContext: UIContext = this.getUIContext() as UIContext;
   @Local activityBookingRec: ActivityBookingRecordModel = ActivityBookingRecordModel.createEmptyRec();
   private contentNode: ComponentContent<object> =
     new ComponentContent(this.getUIContext(), wrapBuilder(callDialog), callPhone);
@@ -126,7 +125,7 @@ export struct ActivityBookingDetailPage {
             .width('75%')
             .onClick(() => {
               Logger.debug(TAG, this.activityBookingRec.activity?.supportStoreName!);
-              this.vm.queryLocation(
+              this.vm.queryLocation(this.uiContext,
                 this.vm.storeList.storeList.find(
                   store => store.name === this.activityBookingRec.activity?.supportStoreName)!);
             });
@@ -162,8 +161,8 @@ export struct ActivityBookingDetailPage {
 
           Button({ type: ButtonType.Normal, stateEffect: true }) {
             Text(this.activityBookingRec.state === ActivityBookingStates.BOOKING_SUCCESS ?
-            $r('app.string.booking_cancel_button') : $r('app.string.back'))
-              .fontSize($r('app.string.font_size_16'))
+              $r('app.string.booking_cancel_button') : $r('app.string.back'))
+              .fontSize($r('sys.float.Body_L'))
               .fontFamily('HarmonyHeiTi')
               .fontWeight(FontWeight.Medium)
               .fontColor('rgba(0,0,0,0.90)');
@@ -172,7 +171,7 @@ export struct ActivityBookingDetailPage {
             top: $r('app.string.padding_10'),
             bottom: $r('app.string.padding_9'),
           })
-          .borderRadius($r('app.string.border_radius_20'))
+          .borderRadius($r('sys.float.corner_radius_level10'))
           .backgroundColor('rgba(0,0,0,0.05)')
           .width('100%')
           .onClick(() => {
@@ -184,7 +183,7 @@ export struct ActivityBookingDetailPage {
             if (index > -1) {
               this.vm.activityBookingList[index].state = ActivityBookingStates.CANCELED;
               this.vm.navStack.pop();
-              promptAction.showToast({ message: '预约取消成功' });
+              this.uiContext.getPromptAction().showToast({ message: '预约取消成功' });
             } else {
               this.vm.navStack.pop();
             }

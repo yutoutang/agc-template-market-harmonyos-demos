@@ -7,7 +7,6 @@ export function ActivityBookingSuccessBuilder() {
 } // 全局自定义构建函数
 
 
-@Preview
 @ComponentV2
 struct ActivityBookingSuccess {
   vm: MainEntryVM = MainEntryVM.instance;
@@ -27,7 +26,7 @@ struct ActivityBookingSuccess {
 
           Text($r('app.string.activity_booking_success'))
             .width('100%')
-            .fontSize($r('app.string.font_size_16'))
+            .fontSize($r('sys.float.Body_L'))
             .fontFamily('HarmonyHeiTi')
             .fontWeight(FontWeight.Medium)
             .fontColor('rgba(0,0,0,0.90)')
@@ -51,7 +50,7 @@ struct ActivityBookingSuccess {
           top: $r('app.string.padding_10'),
           bottom: $r('app.string.padding_9'),
         }) // 设置文字内边距
-        .borderRadius($r('app.string.border_radius_20'))
+        .borderRadius($r('sys.float.corner_radius_level10'))
         .backgroundColor('rgba(0,0,0,0.05)')
         .width('100%');
       }

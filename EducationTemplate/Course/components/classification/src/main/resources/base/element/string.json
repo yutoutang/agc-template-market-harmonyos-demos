@@ -5,12 +5,8 @@
       "value": "page from package"
     },
     {
-      "name": "agcit_huawei_course_classification",
-      "value": "1.0.0"
-    },
-    {
-      "name": "agcittype_huawei_course_classification",
-      "value": "serviceComponent"
+      "name": "agcit_huawei_course_service",
+      "value": "1.0.2"
     }
   ]
 }

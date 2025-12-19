@@ -1,12 +1,11 @@
-import { AccountUtil } from 'account';
+import { promptAction } from '@kit.ArkUI';
+import { AccountUtil } from 'util'
 import { https } from 'network';
 import { Passenger } from 'type';
-import { LazyDataSource } from 'util';
-import { promptAction } from '@kit.ArkUI';
 
 @ObservedV2
 export class GuestPageVM {
-  @Trace openId: string | undefined = AccountUtil.getOpenId();
+  @Trace openId: string = '';
   @Trace passengers: Passenger[] = [];
   @Trace passenger: Passenger = new Passenger();
   private static _instance: GuestPageVM;

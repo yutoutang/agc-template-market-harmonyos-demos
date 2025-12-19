@@ -5,7 +5,6 @@
     "description": "$string:shared_desc",
     "deviceTypes": [
       "phone",
-      "tablet"
     ],
     "installationFree": false,
     "routerMap": "$profile:router_map"

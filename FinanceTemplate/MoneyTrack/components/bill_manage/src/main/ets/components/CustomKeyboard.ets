@@ -64,6 +64,7 @@ export struct CustomKeyboard {
       this.keyboardBuilder();
     }.bindSheet($$this.showDateDialog, this.dateDialogBuilder(), {
       height: 380,
+      preferType: SheetType.CENTER,
       title: {
         title: '选择日期',
       },
@@ -134,7 +135,7 @@ export struct CustomKeyboard {
               } else {
                 Text(item.text)
                   .fontSize(item.type === CustomKeyboardButtonType.NUMBER ? BillConstants.FONT_SIZE_18 :
-                  BillConstants.FONT_SIZE_16)
+                    BillConstants.FONT_SIZE_16)
                   .fontColor(item.fontColor ? item.fontColor : BillConstants.FONT_COLOR_LEVEL1);
               }
             }

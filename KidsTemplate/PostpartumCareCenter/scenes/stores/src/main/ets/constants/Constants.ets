@@ -1,4 +1,4 @@
-import { CityItem } from '@ohos_agcit/postpartum_care_center_uicomponents';
+import { CityItem } from 'double_layer_tabs';
 
 export const CITY_LIST: CityItem[] = [
   { id: 0, name: '附近' },

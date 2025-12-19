@@ -111,7 +111,7 @@
    @ObservedV2
    class CastSessionListenerImpl implements CastSessionListener {
      @Trace isPlay: boolean = false
-     public currentIndex: number = 0
+     @Trace public currentIndex: number = 0
      public videoList: VideoData[] = [{
        index: 1,
        url: 'https://consumer.huawei.com/content/dam/huawei-cbg-site/cn/mkt/pdp/phones/ah-ultra/video/kv-intro-pop.mp4',
@@ -344,7 +344,7 @@ import { CastingLayer, CastPicker, CastService, CastSessionListener, VideoData }
    @ObservedV2
    class CastSessionListenerImpl implements CastSessionListener {
      @Trace isPlay: boolean = false
-     public currentIndex: number = 0
+     @Trace public currentIndex: number = 0
      public videoList: VideoData[] = [{
        index: 1,
        url: 'https://consumer.huawei.com/content/dam/huawei-cbg-site/cn/mkt/pdp/phones/ah-ultra/video/kv-intro-pop.mp4',

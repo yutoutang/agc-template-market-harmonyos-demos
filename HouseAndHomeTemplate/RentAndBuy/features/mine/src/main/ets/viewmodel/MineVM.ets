@@ -100,14 +100,14 @@ export class MineVM {
     });
   }
 
-  deleteRemoteHistory(type: number, records: Record[]) {
+  deleteRemoteHistory(type: number, records: Record[], uiContext: UIContext) {
     let param: IHistoryDeleteRequest = {
       type: type,
       records: records,
     };
     https.deleteHistory(param).then((res) => {
       if (res.code === 0) {
-        promptAction.showToast({ message: '删除成功', duration: 1000 });
+        uiContext.getPromptAction().showToast({ message: '删除成功', duration: 1000 });
         this.loading = true;
         this.getHistoryList();
       }

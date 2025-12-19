@@ -4,7 +4,6 @@ export function InfoSharingListPageBuilder() {
 }
 
 @ComponentV2
-@Preview
 export struct InfoSharingListPage {
   build() {
     NavDestination() {

@@ -6,7 +6,7 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "@ohos_agcit/postpartum_care_center_utils": "file:../../components/utils",
-    "@ohos_agcit/postpartum_care_center_uicomponents": "file:../../components/uicomponents"
+    "@ohos_agcit/postpartum_care_center_utils": "file:../../commons/utils",
+    "@ohos_agcit/postpartum_care_center_uicomponents": "file:../../commons/uicomponents"
   }
 }

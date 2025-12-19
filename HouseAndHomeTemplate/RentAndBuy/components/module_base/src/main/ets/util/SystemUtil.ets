@@ -10,7 +10,7 @@ import { BusinessError } from '@kit.BasicServicesKit';
  */
 export class SystemUtil {
   static isApplyLocPermAgain: boolean = false;
-  static context: Context = getContext() as common.UIAbilityContext;
+  static context: Context;
 
   /**
    * 获取当前所在城市位置
@@ -50,7 +50,8 @@ export class SystemUtil {
    * 向用户申请位置权限
    * @returns
    */
-  static async applyLocationPermission(): Promise<boolean> {
+  static async applyLocationPermission(context: Context): Promise<boolean> {
+    SystemUtil.context = context as common.UIAbilityContext
     const permissions: Permissions[] = [
       'ohos.permission.APPROXIMATELY_LOCATION',
     ];
@@ -60,9 +61,6 @@ export class SystemUtil {
     if (isGrantedAppLo) {
       hilog.info(0xff00, 'SystemUtil', 'already granted location and approximate location permission');
       return true;
-    }
-    if (!SystemUtil.context) {
-      SystemUtil.context = getContext() as common.UIAbilityContext;
     }
     // 向用户申请
     const atManager = abilityAccessCtrl.createAtManager();

@@ -1,20 +1,18 @@
-@Observed
-export class CalendarOption {
-  @Track start: DateModel | undefined = undefined
-  @Track end: DateModel | undefined = undefined
-  @Track night: number = 0
-  @Track isShowPrice: boolean = false
-  @Track priceList: Price[] = []
+@ObservedV2
+export class CheckInInfo {
+  @Trace startDate: DateModel = new DateModel()
+  @Trace endDate: DateModel = new DateModel()
+  @Trace currentDate: DateModel = new DateModel()
+  @Trace night: number = 1
 }
 
-@Observed
 export class DateModel {
-  @Track day: number;
-  @Track week: number;
-  @Track month: number;
-  @Track year: number;
+  day: number;
+  week: number;
+  month: number;
+  year: number;
 
-  constructor(day: number, week: number, month: number, year: number) {
+  constructor(day: number = 1, week: number = 1 , month: number = 1, year: number = 2025) {
     this.day = day;
     this.week = week;
     this.month = month;
@@ -38,7 +36,6 @@ export interface Price {
   price: number
 }
 
-
 export interface DateItemModel {
   curMonthStartDate: Date,
   curMonthEndDate: Date,
@@ -46,7 +43,6 @@ export interface DateItemModel {
   nextMonthEndDate: Date,
 }
 
-@Observed
 export class Month {
   month: string = '';
   num: number = 0;
@@ -61,10 +57,10 @@ export class Month {
   }
 }
 
-@Observed
+@ObservedV2
 export class DayInfo {
-  day: number = 0;
-  price: number = 0;
+  @Trace day: number = 0;
+  @Trace price: number = 0;
 
   constructor(day = 0, price = 0) {
     this.day = day;

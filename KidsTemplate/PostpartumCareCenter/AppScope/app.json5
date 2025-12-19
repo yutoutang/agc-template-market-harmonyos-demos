@@ -1,10 +1,13 @@
 {
   "app": {
-    "bundleName": "xx.xxx.xxx.xxx",
+/**
+     * todo
+     */
+    "bundleName": "yzzx.1.xxxxxx",
     "vendor": "example",
     "versionCode": 1000001,
     "versionName": "1.0.0",
-    "icon": "$media:app_icon",
+    "icon": "$media:layered_image",
     "label": "$string:app_name"
   }
 }
