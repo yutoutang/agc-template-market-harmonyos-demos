@@ -1,0 +1,29 @@
+{
+  "routerMap": [
+    {
+      "name": "HomePage",
+      "pageSourceFile": "src/main/ets/pages/HomePage.ets",
+      "buildFunction": "HomePageBuilder"
+    },
+    {
+      "name": "StoreSearch",
+      "pageSourceFile": "src/main/ets/components/StoreSearch.ets",
+      "buildFunction": "StoreSearchBuilder"
+    },
+    {
+      "name": "StoreCategoryPage",
+      "pageSourceFile": "src/main/ets/pages/StoreCategoryPage.ets",
+      "buildFunction": "StoreCategoryPageBuilder"
+    },
+    {
+      "name": "AddressSearchPage",
+      "pageSourceFile": "src/main/ets/pages/AddressSearchPage.ets",
+      "buildFunction": "AddressSearchPageBuilder"
+    },
+    {
+      "name": "MyAddressSearchPage",
+      "pageSourceFile": "src/main/ets/pages/MyAddressSearchPage.ets",
+      "buildFunction": "MyAddressSearchPageBuilder"
+    }
+  ]
+}

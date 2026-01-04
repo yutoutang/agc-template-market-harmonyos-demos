@@ -1,0 +1,20 @@
+{
+  "string": [
+    {
+      "name": "page_show",
+      "value": "page from package"
+    },
+    {
+      "name": "location_reason",
+      "value": "定位当前设备精准位置，获取相对距离"
+    },
+    {
+      "name": "approximately_location_reason",
+      "value": "定位当前设备大致位置，获取相对距离"
+    },
+    {
+      "name": "agcit_huawei_takeaway_service",
+      "value": "1.0.0"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "string": [
+    {
+      "name": "app_name",
+      "value": "外卖模板"
+    },
+    {
+      "name": "agcit_huawei_takeaway_service",
+      "value": "1.0.0"
+    },
+    {
+      "name": "agcittype_huawei_takeaway_service",
+      "value": "industryTemplate"
+    },
+    {
+      "name": "agcitkid_huawei_takeaway_service",
+      "value": "agcit_huawei_common_payment/1.0.0,agcit_huawei_parking_module_address_search/1.0.0,agcit_huawei_common_feedback/1.0.0,agcit_huawei_comprehensive_news_module_imagepreview/1.0.0,agcit_huawei_full_service_hotel_module_comments/1.0.0,agcit_huawei_art_training_module_store_map/1.0.0"
+    }
+  ]
+}

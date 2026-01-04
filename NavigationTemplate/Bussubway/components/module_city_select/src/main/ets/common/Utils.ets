@@ -1,0 +1,191 @@
+/*
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import {
+  abilityAccessCtrl,
+  bundleManager,
+  common,
+  Context,
+  PermissionRequestResult,
+  Permissions
+} from '@kit.AbilityKit';
+import { BusinessError } from '@kit.BasicServicesKit';
+import { geoLocationManager } from '@kit.LocationKit';
+import { site } from '@kit.MapKit';
+import { hilog } from '@kit.PerformanceAnalysisKit';
+import { ICityGroup } from './Model';
+
+const TAG = '[Utils]';
+
+/**
+ * 日志类
+ */
+export class SelectCityLogger {
+  private static domain: number = 0xFF00;
+  private static format: string = '%{public}s, %{public}s';
+  private static prefix: string = '[ModuleCitySelect]';
+
+  static info(...args: Object[]): void {
+    hilog.info(SelectCityLogger.domain, SelectCityLogger.prefix, SelectCityLogger.format, args);
+  }
+
+  static debug(...args: Object[]): void {
+    hilog.debug(SelectCityLogger.domain, SelectCityLogger.prefix, SelectCityLogger.format, args);
+  }
+
+  static warn(...args: Object[]): void {
+    hilog.warn(SelectCityLogger.domain, SelectCityLogger.prefix, SelectCityLogger.format, args);
+  }
+
+  static error(...args: Object[]): void {
+    hilog.error(SelectCityLogger.domain, SelectCityLogger.prefix, SelectCityLogger.format, args);
+  }
+}
+
+/**
+ * 工具类
+ */
+export class Utils {
+  static generateAlphaList(cityGroupList: ICityGroup[]) {
+    return cityGroupList.map(v => v.name);
+  }
+
+  static applyLocationPermission(): Promise<string> {
+    return new Promise((resolve) => {
+      SystemSceneUtils.applyLocationPermission().then((isGranted) => {
+        if (isGranted) {
+          SystemSceneUtils.getCurrentCityInfo().then((city: string) => {
+            resolve(city);
+          })
+        } else {
+          resolve('');
+        }
+      })
+    })
+  }
+
+  static applyLocationGlobal(context: Context): Promise<boolean> {
+    return new Promise((resolve) => {
+      let atManager = abilityAccessCtrl.createAtManager();
+      let isLocationEnabled = geoLocationManager.isLocationEnabled();
+      if (!isLocationEnabled) {
+        atManager.requestGlobalSwitch(context, abilityAccessCtrl.SwitchType.LOCATION).then((data: boolean) => {
+          if (data) {
+            resolve(true)
+          } else {
+            resolve(false)
+          }
+        }).catch((err: BusinessError) => {
+          hilog.error(0x0000, 'Index', 'data:' + JSON.stringify(err));
+        });
+      } else {
+        resolve(true)
+      }
+    })
+
+  }
+}
+
+/**
+ * 系统Utils
+ */
+export class SystemSceneUtils {
+  static isApplyLocPermAgain: boolean = false;
+  static context: Context = getContext() as common.UIAbilityContext;
+
+  /**
+   * 检查用户是否授权
+   * @param permission
+   * @returns
+   */
+  static async checkPermissionGrant(permission: Permissions): Promise<boolean> {
+    let atManager: abilityAccessCtrl.AtManager = abilityAccessCtrl.createAtManager();
+    let grantStatus: abilityAccessCtrl.GrantStatus = abilityAccessCtrl.GrantStatus.PERMISSION_DENIED;
+
+    // 获取应用程序的accessTokenID
+    let tokenId: number = 0;
+    try {
+      let bundleInfo: bundleManager.BundleInfo =
+        await bundleManager.getBundleInfoForSelf(bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_APPLICATION);
+      tokenId = bundleInfo.appInfo.accessTokenId;
+    } catch (error) {
+      const err: BusinessError = error as BusinessError;
+      SelectCityLogger.error(TAG, `Failed to get bundle info for self. Code is ${err.code}, message is ${err.message}`);
+    }
+
+    // 校验应用是否被授予权限
+    try {
+      grantStatus = await atManager.checkAccessToken(tokenId, permission);
+    } catch (error) {
+      const err: BusinessError = error as BusinessError;
+      SelectCityLogger.error(TAG, `Failed to check access token. Code is ${err.code}, message is ${err.message}`);
+    }
+
+    return grantStatus === abilityAccessCtrl.GrantStatus.PERMISSION_GRANTED;
+  }
+
+  /**
+   * 向用户申请位置权限
+   * @returns
+   */
+  static async applyLocationPermission(): Promise<boolean> {
+    const permissions: Permissions[] = [
+      'ohos.permission.APPROXIMATELY_LOCATION',
+      'ohos.permission.LOCATION'
+    ];
+
+    if (!SystemSceneUtils.context) {
+      SystemSceneUtils.context = getContext() as common.UIAbilityContext;
+    }
+    // 向用户申请
+    const atManager = abilityAccessCtrl.createAtManager();
+    return atManager.requestPermissionsFromUser(SystemSceneUtils.context, permissions)
+      .then(async (result: PermissionRequestResult) => {
+        if (result.authResults.every(v => v === 0)) {
+          return true;
+        }
+        // 二次向用户申请
+        else if (result.dialogShownResults && result.dialogShownResults.every(v => v === false)) {
+          const resp = await atManager.requestPermissionOnSetting(SystemSceneUtils.context, permissions);
+          return resp.every(v => v === abilityAccessCtrl.GrantStatus.PERMISSION_GRANTED);
+        }
+        return false;
+      });
+  }
+
+  /**
+   * 获取当前所在城市位置
+   * @returns
+   */
+  static async getCurrentCityInfo(): Promise<string> {
+    try {
+      const requestInfo: geoLocationManager.CurrentLocationRequest = {
+        priority: geoLocationManager.LocationRequestPriority.FIRST_FIX,
+        timeoutMs: 10000,
+      };
+      const currentLocation = await geoLocationManager.getCurrentLocation(requestInfo);
+      SelectCityLogger.info(TAG, 'getCurrentLocation=' + JSON.stringify(currentLocation));
+      const reverseGeoCodeReq: site.ReverseGeocodeParams = {
+        location: currentLocation,
+        language: 'zh_CN',
+      };
+      const reverseGeocodeResult = await site.reverseGeocode(reverseGeoCodeReq);
+      SelectCityLogger.info(TAG, 'reverseGeocodeResult=' + JSON.stringify(reverseGeocodeResult));
+      return reverseGeocodeResult.addressComponent.city?.cityName ?? '';
+    } catch (e) {
+      SelectCityLogger.error(TAG, 'getCurrentCityInfo fail, error: ' + JSON.stringify(e));
+      return '';
+    }
+  }
+}

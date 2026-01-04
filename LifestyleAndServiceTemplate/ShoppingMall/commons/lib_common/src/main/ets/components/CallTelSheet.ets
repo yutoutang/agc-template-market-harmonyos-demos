@@ -8,13 +8,17 @@ const TAG = '[CallTelSheet]';
 
 export function callPhone(tel: string) {
   if (canIUse('SystemCapability.Applications.Contacts')) {
-    call.makeCall(tel, (err: BusinessError) => {
-      if (!err) {
-        Logger.info(TAG, 'make call success.');
-      } else {
-        Logger.info(TAG, 'make call fail, err is:' + JSON.stringify(err));
-      }
-    });
+    try {
+      call.makeCall(tel, (err: BusinessError) => {
+        if (!err) {
+          Logger.info(TAG, 'make call success.');
+        } else {
+          Logger.info(TAG, 'make call fail, err is:' + JSON.stringify(err));
+        }
+      });
+    } catch (e) {
+      Logger.error(TAG, `call.makeCall fail. Code: ${e.code}, message: ${e.message}`);
+    }
   } else {
     Logger.error(TAG, 'Contacts not available by this device.');
   }
@@ -67,7 +71,7 @@ export function CallTelSheetBuilder(tel: string, close: () => void) {
       top: 24,
       bottom: 20,
       left: 24,
-      right: 24
+      right: 24,
     })
   }
   .width(Constants.FULL_SIZE)

@@ -1,0 +1,22 @@
+{
+  "name": "business_mine",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@hw-agconnect/fast-web": "1.0.1",
+    "lib_common": "file:../../commons/lib_common",
+    "lib_widget": "file:../../commons/lib_widget",
+    "lib_account": "file:../../commons/lib_account",
+    "lib_wallpaper_api": "file:../../commons/lib_wallpaper_api",
+    "vip_center": "file:../../components/vip_center",
+    "module_feedback": "file:../../components/module_feedback",
+    "module_imagepreview": "file:../../components/module_imagepreview",
+    "business_setting": "file:../business_setting",
+    "business_home": "file:../business_home",
+    "module_wallpaper_details": "file:../../components/module_wallpaper_details",
+    "upload_recipe": "file:../../components/upload_recipe"
+  }
+}

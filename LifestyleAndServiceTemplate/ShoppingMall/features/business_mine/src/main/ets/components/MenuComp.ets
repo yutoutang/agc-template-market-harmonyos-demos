@@ -63,8 +63,8 @@ export struct MenuComp {
       this.vm.closeTelSheet()
     }), {
       height: SheetSize.FIT_CONTENT,
-      blurStyle: BlurStyle.Thick,
       showClose: false,
+      preferType: SheetType.CENTER,
     });
   }
 }

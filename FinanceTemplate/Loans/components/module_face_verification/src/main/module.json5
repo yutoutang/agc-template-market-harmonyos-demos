@@ -1,0 +1,16 @@
+{
+  "module": {
+    "name": "module_face_verification",
+    "type": "har",
+    "deviceTypes": [
+      "default"
+    ],
+    "requestPermissions": [
+      {
+        "name": 'ohos.permission.CAMERA',
+        "reason": '$string:camera_reason',
+
+      }
+    ]
+  }
+}

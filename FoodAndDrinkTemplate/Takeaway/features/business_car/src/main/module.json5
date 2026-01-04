@@ -1,0 +1,9 @@
+{
+  "module": {
+    "name": "business_car",
+    "type": "har",
+    "deviceTypes": [
+      "default"
+    ]
+  }
+}

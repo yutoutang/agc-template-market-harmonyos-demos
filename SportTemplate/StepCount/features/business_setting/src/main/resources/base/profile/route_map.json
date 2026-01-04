@@ -1,0 +1,64 @@
+{
+  "routerMap": [
+    {
+      "name": "SettingPage",
+      "pageSourceFile": "src/main/ets/pages/SettingPage.ets",
+      "buildFunction": "SettingPageBuilder"
+    },
+    {
+      "name": "SettingFont",
+      "pageSourceFile": "src/main/ets/pages/SettingFont.ets",
+      "buildFunction": "SettingFontBuilder"
+    },
+    {
+      "name": "SettingPersonal",
+      "pageSourceFile": "src/main/ets/pages/SettingPersonal.ets",
+      "buildFunction": "SettingPersonalBuilder"
+    },
+    {
+      "name": "SettingPrivacy",
+      "pageSourceFile": "src/main/ets/pages/SettingPrivacy.ets",
+      "buildFunction": "SettingPrivacyBuilder"
+    },
+    {
+      "name": "SettingNetwork",
+      "pageSourceFile": "src/main/ets/pages/SettingNetwork.ets",
+      "buildFunction": "SettingNetworkBuilder"
+    },
+    {
+      "name": "SettingNotice",
+      "pageSourceFile": "src/main/ets/pages/SettingNotice.ets",
+      "buildFunction": "SettingNoticeBuilder"
+    },
+    {
+      "name": "SettingAuthorization",
+      "pageSourceFile": "src/main/ets/pages/SettingAuthorization.ets",
+      "buildFunction": "SettingAuthorizationBuilder"
+    },
+    {
+      "name": "SettingAutoSportRecord",
+      "pageSourceFile": "src/main/ets/pages/SettingAutoSportRecord.ets",
+      "buildFunction": "SettingAutoSportRecordBuilder"
+    },
+    {
+      "name": "SettingH5",
+      "pageSourceFile": "src/main/ets/pages/SettingH5.ets",
+      "buildFunction": "SettingH5Builder"
+    },
+    {
+      "name": "SettingAbout",
+      "pageSourceFile": "src/main/ets/pages/SettingAbout.ets",
+      "buildFunction": "SettingAboutBuilder"
+    },
+    {
+      "name": "VersionUpdate",
+      "pageSourceFile": "src/main/ets/pages/VersionUpdate.ets",
+      "buildFunction": "versionUpdateBuilder"
+    },
+    {
+      "name": "SettingVoiceTipPage",
+      "pageSourceFile": "src/main/ets/pages/SettingVoiceTipPage.ets",
+      "buildFunction": "SettingVoiceTipPageBuilder"
+    }
+  ]
+}

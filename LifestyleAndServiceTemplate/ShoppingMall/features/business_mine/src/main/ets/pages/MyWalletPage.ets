@@ -69,7 +69,7 @@ struct MyWalletPage {
           .bindSheet($$this.vm.datePickerSheet,
             this.DatePickerSheet(), {
               height: 336,
-              blurStyle: BlurStyle.Thick,
+              preferType: SheetType.CENTER,
               showClose: false,
             })
 

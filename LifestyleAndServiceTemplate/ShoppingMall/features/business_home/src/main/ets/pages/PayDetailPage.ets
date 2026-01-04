@@ -11,7 +11,7 @@ export function PayDetailPageBuilder() {
 @ComponentV2
 struct PayDetailPage {
   @Local vm: PayDetailViewModel = new PayDetailViewModel()
-  context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+  context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
 
   aboutToAppear(): void {
     this.vm.getParams()
@@ -35,7 +35,7 @@ struct PayDetailPage {
             })
             .bindSheet($$this.vm.showPayIntroSheet, this.payIntroduceBuilder(), {
               height: SheetSize.FIT_CONTENT,
-              blurStyle: BlurStyle.Thick,
+              preferType: SheetType.CENTER,
               showClose: false,
             });
 
@@ -139,7 +139,7 @@ struct PayDetailPage {
           })
           .bindSheet($$this.vm.showCouponSheet, this.selectCouponSheet(), {
             detents: [500, 750],
-            blurStyle: BlurStyle.Thick,
+            preferType: SheetType.CENTER,
             scrollSizeMode: ScrollSizeMode.CONTINUOUS,
             showClose: false,
             backgroundColor: $r('sys.color.background_secondary'),
@@ -172,7 +172,7 @@ struct PayDetailPage {
           })
           .bindSheet($$this.vm.showPointSheet, this.selectPointSheet(), {
             height: SheetSize.FIT_CONTENT,
-            blurStyle: BlurStyle.Thick,
+            preferType: SheetType.CENTER,
             showClose: false,
           });
         }

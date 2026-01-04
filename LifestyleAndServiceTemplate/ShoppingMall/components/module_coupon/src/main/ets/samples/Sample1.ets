@@ -1,3 +1,4 @@
+import { hilog } from '@kit.PerformanceAnalysisKit';
 import { MyCoupons } from '../pages/MyCouponsPage';
 
 @Entry
@@ -8,7 +9,11 @@ struct Sample1 {
       Column() {
         MyCoupons({
           clickUseNow: () => {
-            this.getUIContext().getPromptAction().showToast({ message: '点击了立即使用' });
+            try {
+              this.getUIContext().getPromptAction().showToast({ message: '点击了立即使用' });
+            } catch {
+              hilog.error(0, 'test', 'showToast fail');
+            }
           },
         })
       }

@@ -5,6 +5,8 @@ import { getWindowWidth } from './Utils';
 import { Logger, UIBase } from '@hw-agconnect/ui-base';
 import { DEFAULT_MAX_DESIGN_WIDTH, HALF_HEIGHT } from './Constant';
 
+const TAG = '[UILicensePlate]';
+
 @ComponentV2
 export struct UILicensePlate {
   @Param intFocus: boolean = false;
@@ -57,7 +59,7 @@ export struct UILicensePlate {
   forbiddenArr3: string[] = ['O'];
 
   // 监听8个输入框对应的值的变化
-  @Monitor('inputValue.0', 'inputValue.1', 'inputValue.2', 'inputValue.3', 'inputValue.4', 'inputValue.5', 'inputValue.6', 'inputValue.7')
+  @Monitor('inputValue.0','inputValue.1','inputValue.2','inputValue.3','inputValue.4','inputValue.5','inputValue.6','inputValue.7')
   onInputValueChange(monitor: IMonitor) {
     let isComplete = true;
     this.inputValue.forEach((item: string, index) => {
@@ -132,8 +134,8 @@ export struct UILicensePlate {
   // 初始化输入框宽高及避让区域尺寸
   intSize(): void {
     // 获取当前窗口的宽度
-    if (getWindowWidth()) {
-      this.windowWidth = getWindowWidth();
+    if (getWindowWidth(this.getUIContext())) {
+      this.windowWidth = getWindowWidth(this.getUIContext());
     }
     // 根据窗口宽度计算输入框宽高
     if (this.windowWidth <= DEFAULT_MAX_DESIGN_WIDTH) {
@@ -142,14 +144,18 @@ export struct UILicensePlate {
       this.inputWidth = (DEFAULT_MAX_DESIGN_WIDTH - 40 - 6) / 8;
     }
     this.inputHeight = this.inputWidth * 1.3;
-    window.getLastWindow(getContext(this)).then((data) => {
-      // 获取导航条区域
-      const avoidArea = data.getWindowAvoidArea(window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR);
-      // 获取到导航条区域的高度
-      const indicatorHeight = avoidArea.bottomRect.height;
-      this.avoidAreaHeight = px2vp(indicatorHeight);
+    window.getLastWindow(this.getUIContext().getHostContext()).then((data) => {
+      try {
+        // 获取导航条区域
+        const avoidArea = data.getWindowAvoidArea(window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR);
+        // 获取到导航条区域的高度
+        const indicatorHeight = avoidArea.bottomRect.height;
+        this.avoidAreaHeight = this.getUIContext().px2vp(indicatorHeight);
+      } catch (e) {
+        Logger.error(TAG, `getWindowAvoidArea fail. Code: ${e.code}, message: ${e.message}`);
+      }
     }).catch((err: BusinessError) => {
-      Logger.error(`Failed to obtain the window. Cause: ${JSON.stringify(err)}`);
+      Logger.error(TAG, `Failed to obtain the window. Cause: ${JSON.stringify(err)}`);
     });
   }
 
@@ -271,7 +277,11 @@ export struct UILicensePlate {
           }
           .backgroundColor(item.key === '删' ? $r('app.color.del_background') : $r('app.color.key_background'))
           .borderRadius(6)
-          .shadow({ radius: vp2px(0.6), color: $r('app.color.key_shadow'), offsetY: vp2px(1.2) });
+          .shadow({
+            radius: this.getUIContext().vp2px(0.6),
+            color: $r('app.color.key_shadow'),
+            offsetY: this.getUIContext().vp2px(1.2),
+          });
 
         }, (item: CustomKeyItem, index: number) => {
           return item.key + index;
@@ -307,7 +317,11 @@ export struct UILicensePlate {
               .justifyContent(FlexAlign.Center)
               .height(this.isSmallHeight ? 30 : 46)
               .backgroundColor($r('app.color.del_background'))
-              .shadow({ radius: vp2px(0.6), color: $r('app.color.key_shadow'), offsetY: vp2px(1.2) })
+              .shadow({
+                radius: this.getUIContext().vp2px(0.6),
+                color: $r('app.color.key_shadow'),
+                offsetY: this.getUIContext().vp2px(1.2),
+              })
               .borderRadius(6)
               .onClick(() => {
                 this.inputValue[0] = '';
@@ -323,7 +337,11 @@ export struct UILicensePlate {
                 .textAlign(TextAlign.Center)
                 .height(this.isSmallHeight ? 30 : 46)
                 .backgroundColor($r('app.color.key_background'))
-                .shadow({ radius: vp2px(0.6), color: $r('app.color.key_shadow'), offsetY: vp2px(1.2) })
+                .shadow({
+                  radius: this.getUIContext().vp2px(0.6),
+                  color: $r('app.color.key_shadow'),
+                  offsetY: this.getUIContext().vp2px(1.2),
+                })
                 .borderRadius(6)
                 .onClick(() => {
                   this.inputValue[0] = item;
@@ -372,7 +390,7 @@ export struct UILicensePlate {
               Text(item ? item : $r('app.string.new_energy'))
                 .fontColor(item ? $r('sys.color.ohos_id_color_connected') : $r('sys.color.ohos_id_color_palette4'))
                 .fontSize(item ? $r('sys.float.ohos_id_text_size_headline8') :
-                $r('sys.float.ohos_id_text_size_caption'))
+                  $r('sys.float.ohos_id_text_size_caption'))
                 .fontFamily($r('sys.string.ohos_id_text_font_family_regular'))
                 .width('100%')
                 .height('100%')
@@ -403,7 +421,7 @@ export struct UILicensePlate {
             Row() {
               Text(item)
                 .fontColor(this.focusMark[index] ? $r('sys.color.ohos_id_color_text_primary_activated') :
-                $r('sys.color.ohos_id_color_text_primary'))
+                  $r('sys.color.ohos_id_color_text_primary'))
                 .fontSize($r('sys.float.ohos_id_text_size_headline8'))
                 .fontFamily(this.focusMark[index] ? $r('sys.string.ohos_id_text_font_family_medium') : '')
                 .width('100%')
@@ -441,8 +459,8 @@ export struct UILicensePlate {
 
   //判断目前窗口的宽高,进行适配
   private handleView: () => void = () => {
-    const windowWidth = px2vp(UIBase.getWindowProperties()?.windowRect?.width);
-    const windowHeight = px2vp(UIBase.getWindowProperties()?.windowRect?.height);
+    const windowWidth = this.getUIContext().px2vp(UIBase.getWindowProperties()?.windowRect?.width);
+    const windowHeight = this.getUIContext().px2vp(UIBase.getWindowProperties()?.windowRect?.height);
     if (windowWidth > DEFAULT_MAX_DESIGN_WIDTH) {
       this.isLargeWidth = true;
     } else {

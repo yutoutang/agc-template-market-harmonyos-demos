@@ -1,0 +1,38 @@
+{
+  "color": [
+    {
+      "name": "index_background",
+      "value": "#F5F5F5"
+    },
+    {
+      "name": "widget_background",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "text_primary",
+      "value": "#000000"
+    },
+    {
+      "name": "text_secondary",
+      "value": "#666666"
+    },
+    {
+      "name": "text_tertiary",
+      "value": "#999999"
+    },
+    {
+      "name": "button_background",
+      "value": "#F5F5F5"
+    },
+    {
+      "name": "line_color_primary",
+      "value": "#0A59F7"
+    },
+    {
+      "name": "divider_color",
+      "value": "#E0E0E0"
+    }
+  ]
+}
+
+

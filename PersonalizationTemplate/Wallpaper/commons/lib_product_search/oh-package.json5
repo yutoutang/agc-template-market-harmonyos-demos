@@ -1,0 +1,15 @@
+{
+  "name": "lib_product_search",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "lib_widget": "file:../lib_widget",
+    "lib_common": "file:../lib_common",
+    "lib_wallpaper_api": "file:../lib_wallpaper_api",
+    "module_waterflow": "file:../../components/module_waterflow",
+    "module_wallpaper_details": "file:../../components/module_wallpaper_details"
+  }
+}

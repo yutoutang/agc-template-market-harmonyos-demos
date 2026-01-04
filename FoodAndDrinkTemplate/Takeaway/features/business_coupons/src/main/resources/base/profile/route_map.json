@@ -1,0 +1,9 @@
+{
+  "routerMap": [
+    {
+      "name": "CouponsPage",
+      "pageSourceFile": "src/main/ets/pages/MyCouponsPage.ets",
+      "buildFunction": "MyCouponsPageBuilder"
+    }
+  ]
+}

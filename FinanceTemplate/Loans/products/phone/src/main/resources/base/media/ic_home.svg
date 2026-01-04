@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="25px" height="24px" viewBox="0 0 25 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>tab/ic_备份 68</title>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="24" height="24"></rect>
+    </defs>
+    <g id="tab/ic_备份-68" stroke="none" fill="none" transform="translate(0.9091, 0)" fill-rule="evenodd" stroke-width="1">
+        <g id="Created-with-Pixso.">
+            <mask id="mask-2" fill="white">
+                <use xlink:href="#path-1"></use>
+            </mask>
+            <g id="svg"></g>
+            <g id="编组" mask="url(#mask-2)">
+                <g transform="translate(2, 2)">
+                    <rect id="矩形-4" fill="none" x="0" y="0" width="20" height="20"></rect>
+                    <path d="M9.33284837,0.0219016355 L9.333,5.833 L5,5.83333333 L5,14.1666667 L9.333,14.166 L9.33284837,19.9780984 C4.12105647,19.6348039 0,15.2986641 0,10 C0,4.70133588 4.12105647,0.36519608 9.33284837,0.0219016355 Z M10.6671516,0.0219016355 C15.8789435,0.36519608 20,4.70133588 20,10 C20,15.2986641 15.8789435,19.6348039 10.6671516,19.9780984 L10.666,14.166 L15,14.1666667 L15,5.83333333 L10.666,5.833 Z" id="形状结合" fill-opacity="0.3" fill="#000000" fill-rule="evenodd"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

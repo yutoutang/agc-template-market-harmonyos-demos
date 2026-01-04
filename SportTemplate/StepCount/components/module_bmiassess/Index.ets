@@ -1,0 +1,1 @@
+export { BMIPage } from './src/main/ets/components/BMIPage';

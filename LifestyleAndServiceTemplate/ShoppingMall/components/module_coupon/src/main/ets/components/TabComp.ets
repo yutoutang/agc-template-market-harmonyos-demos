@@ -128,7 +128,7 @@ export struct TabComp {
 
   private startAnimateTo(duration: number, leftMargin: number, width: number) {
     this.isStartAnimateTo = true;
-    animateTo({
+    this.getUIContext().animateTo({
       duration: duration,
       curve: Curve.Linear,
       iterations: 1,

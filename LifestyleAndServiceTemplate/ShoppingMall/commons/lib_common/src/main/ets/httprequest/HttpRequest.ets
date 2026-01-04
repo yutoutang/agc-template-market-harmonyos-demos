@@ -1,5 +1,4 @@
 import { BusinessError } from '@kit.BasicServicesKit';
-import { promptAction } from '@kit.ArkUI';
 import { paymentService } from '@kit.PaymentKit';
 import { common } from '@kit.AbilityKit';
 import * as HttpRequestApi from './HttpRequestApi';
@@ -14,6 +13,7 @@ import {
   Wallet,
 } from '../models/ResponseModel';
 import { Logger } from '../utils/Logger';
+import { ContextUtils } from '../utils/ContextUtils';
 
 const TAG = '[HttpRequestUtils]';
 
@@ -177,7 +177,7 @@ export function getPurchase(context: common.UIAbilityContext): Promise<boolean> 
     paymentService.requestPayment(context, orderStr).then(() => {
       Logger.info(TAG, 'pay succeed');
       resolve(true)
-      promptAction.showToast({
+      ContextUtils.showToast({
         message: '支付成功',
         duration: 1000,
       })

@@ -1,0 +1,32 @@
+{
+  "string": [
+    {
+      "name": "page_show",
+      "value": "page from package"
+    },
+    {
+      "name": "location_permission",
+      "value": "允许应用根据定位获取你的位置信息"
+    },
+    {
+      "name": "fuzzy_location_permission",
+      "value": "允许应用获取设备模糊位置信息"
+    },
+    {
+      "name": "location_background",
+      "value": "允许应用在后台获取定位信息"
+    },
+    {
+      "name": "running_background",
+      "value": "允许应用在后台执行长时任务获取定位信息"
+    },
+    {
+      "name": "get_network_info",
+      "value": "允许应用获取设备网络连接信息"
+    },
+    {
+      "name": "permission_reason_camera",
+      "value": "应用获取相机能力"
+    }
+  ]
+}

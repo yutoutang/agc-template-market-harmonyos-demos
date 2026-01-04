@@ -1,0 +1,119 @@
+{
+  "app": {
+/**todo: 配置手动签名 */
+    "signingConfigs": [],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+        "compatibleSdkVersion": "5.0.5(17)",
+        "targetSdkVersion": "5.0.5(17)",
+        "runtimeOS": "HarmonyOS",
+        "buildOption": {
+          "strictMode": {
+            "caseSensitiveCheck": true,
+            "useNormalizedOHMUrl": true
+          }
+        }
+      }
+    ],
+    "buildModeSet": [
+      {
+        "name": "debug"
+      },
+      {
+        "name": "release"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "phone",
+      "srcPath": "./products/phone",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "business_home",
+      "srcPath": "./features/business_home"
+    },
+    {
+      "name": "business_mine",
+      "srcPath": "./features/business_mine"
+    },
+    {
+      "name": "business_setting",
+      "srcPath": "./features/business_setting"
+    },
+    {
+      "name": "lib_common",
+      "srcPath": "./commons/lib_common"
+    },
+    {
+      "name": "lib_widget",
+      "srcPath": "./commons/lib_widget"
+    },
+    {
+      "name": "lib_account",
+      "srcPath": "./commons/lib_account"
+    },
+    {
+      "name": "lib_sport_api",
+      "srcPath": "./commons/lib_sport_api"
+    },
+    {
+      "name": "business_sport",
+      "srcPath": "./features/business_sport"
+    },
+    {
+      "name": "ui_base",
+      "srcPath": "./commons/ui_base"
+    },
+    {
+      "name": "module_moveratio",
+      "srcPath": "./components/module_moveratio"
+    },
+    {
+      "name": "module_datechart",
+      "srcPath": "./components/module_datechart"
+    },
+    {
+      "name": "module_bmiassess",
+      "srcPath": "./components/module_bmiassess"
+    },
+    {
+      "name": "module_trajectory",
+      "srcPath": "./components/module_trajectory"
+    },
+    {
+      "name": "module_timer",
+      "srcPath": "./components/module_timer"
+    },
+    {
+      "name": "module_target",
+      "srcPath": "./components/module_target"
+    },
+    {
+      "name": "module_running",
+      "srcPath": "./components/module_running"
+    },
+    {
+      "name": "module_daily",
+      "srcPath": "./components/module_daily"
+    },
+    {
+      "name": "module_feedback",
+      "srcPath": "./components/module_feedback"
+    },
+    {
+      "name": "module_imagepreview",
+      "srcPath": "./components/module_imagepreview"
+    }
+  ]
+}

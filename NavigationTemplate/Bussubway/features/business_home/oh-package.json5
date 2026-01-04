@@ -1,0 +1,17 @@
+{
+  "name": "business_home",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "lib_common": "file:../../commons/lib_common",
+    "lib_widget": "file:../../commons/lib_widget",
+    "lib_account": "file:../../commons/lib_account",
+    "lib_api": "file:../../commons/lib_api",
+    "module_city_select": "file:../../components/module_city_select",
+    "lib_native_components": "file:../../commons/lib_native_components",
+    "module_station_line_detail": "file:../../components/module_station_line_detail"
+  }
+}

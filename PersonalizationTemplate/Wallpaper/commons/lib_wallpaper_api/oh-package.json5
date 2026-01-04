@@ -1,0 +1,12 @@
+{
+  "name": "lib_wallpaper_api",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "upload_recipe": "file:../../components/upload_recipe",
+    "module_wallpaper_details": "file:../../components/module_wallpaper_details",
+  }
+}

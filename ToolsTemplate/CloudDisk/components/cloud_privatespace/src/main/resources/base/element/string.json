@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "cloud_privatespace",
+      "value": "隐私空间"
+    },
+    {
+      "name": "agcit_huawei_cloud_privatespace",
+      "value": "1.0.0"
+    },
+    {
+      "name": "agcittype_huawei_cloud_privatespace",
+      "value": "serviceComponent"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "routerMap": [
+    {
+      "name": "TrackMapPage",
+      "pageSourceFile": "src/main/ets/pages/TrackMapPage.ets",
+      "buildFunction": "TrackMapPageBuilder"
+    }
+  ]
+}

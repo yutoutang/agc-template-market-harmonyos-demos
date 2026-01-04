@@ -1,5 +1,4 @@
-import { promptAction } from '@kit.ArkUI';
-import { Constants, FileUtils, NavHeaderBar, RouterMap, RouterUtil } from 'lib_common';
+import { Constants, NavHeaderBar, RouterMap, RouterUtil } from 'lib_common';
 import { SettingPageViewModel } from '../viewmodel/SettingPageViewModel';
 
 @Builder
@@ -45,7 +44,7 @@ struct SettingPage {
           if (this.vm.userInfo.isRelative) {
             RouterUtil.pushPathByName(RouterMap.USER_INFO_PAGE)
           } else {
-            promptAction.showToast({ message: $r('app.string.no_relative_account_msg') })
+            this.getUIContext().getPromptAction().showToast({ message: $r('app.string.no_relative_account_msg') });
           }
         })
 

@@ -1,0 +1,44 @@
+{
+  "routerMap": [
+    {
+      "name": "HomePage",
+      "pageSourceFile": "src/main/ets/pages/HomePage.ets",
+      "buildFunction": "HomePageBuilder"
+    },
+    {
+      "name": "SearchPage",
+      "pageSourceFile": "src/main/ets/pages/SearchPage.ets",
+      "buildFunction": "SearchPageBuilder"
+    },
+    {
+      "name": "Popular",
+      "pageSourceFile": "src/main/ets/pages/Popular.ets",
+      "buildFunction": "PopularBuilder"
+    },
+    {
+      "name": "LatestPage",
+      "pageSourceFile": "src/main/ets/pages/Latest.ets",
+      "buildFunction": "LatestPageBuilder"
+    },
+    {
+      "name": "FreePage",
+      "pageSourceFile": "src/main/ets/pages/Free.ets",
+      "buildFunction": "FreePageBuilder"
+    },
+    {
+      "name": "NewWallpaperDetailPage",
+      "pageSourceFile": "src/main/ets/pages/NewWallpaperDetailPage.ets",
+      "buildFunction": "WallpaperDetailPageBuilder"
+    },
+    {
+      "name": "NewUpLoadPage",
+      "pageSourceFile": "src/main/ets/pages/NewUpLoadPage.ets",
+      "buildFunction": "NewUpLoadPageBuilder"
+    },
+    {
+      "name": "NewUploadRecord",
+      "pageSourceFile": "src/main/ets/pages/NewUploadRecord.ets",
+      "buildFunction": "NewUploadRecordPageBuilder"
+    }
+  ]
+}

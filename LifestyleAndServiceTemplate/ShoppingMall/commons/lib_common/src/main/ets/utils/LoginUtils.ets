@@ -1,6 +1,6 @@
 import { authentication } from '@kit.AccountKit';
 import { util } from '@kit.ArkTS';
-import { AppStorageV2, promptAction } from '@kit.ArkUI';
+import { AppStorageV2 } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { LoadingDialogUtil } from '../components/LoadingDialog';
 import { HttpCode } from '../constants/Common';
@@ -8,6 +8,7 @@ import * as HttpRequestApi from '../httprequest/HttpRequestApi';
 import { UserInfoModel } from '../models/StorageModel';
 import * as HttpRequest from '../httprequest/HttpRequest';
 import { Logger } from './Logger';
+import { ContextUtils } from './ContextUtils';
 
 const TAG = '[LoginUtils]';
 
@@ -28,10 +29,10 @@ export class LoginUtils {
           callback();
         }
       } else {
-        promptAction.showToast({ message: '账号关联失败，请重试~' })
+        ContextUtils.showToast({ message: '账号关联失败，请重试~' })
       }
     }).catch(() => {
-      promptAction.showToast({ message: '账号关联失败' })
+      ContextUtils.showToast({ message: '账号关联失败' })
     }).finally(() => {
       LoadingDialogUtil.close()
     })
@@ -42,29 +43,33 @@ export class LoginUtils {
    * @param callback
    */
   static onBindFail(callback?: () => void) {
-    promptAction.showDialog({
-      title: '提示',
-      message: '元服务未获取phone权限或用户授权，点击确定创建一个mock账号。',
-      buttons: [
-        {
-          text: '取消',
-          color: '#0A59F7'
-        },
-        {
-          text: '确定',
-          color: '#0A59F7'
+    try {
+      ContextUtils.globalUIContext.getPromptAction().showDialog({
+        title: '提示',
+        message: '元服务未获取phone权限或用户授权，点击确定创建一个mock账号。',
+        buttons: [
+          {
+            text: '取消',
+            color: '#0A59F7',
+          },
+          {
+            text: '确定',
+            color: '#0A59F7',
+          },
+        ],
+      }, (err, data) => {
+        if (err) {
+          return;
         }
-      ]
-    }, (err, data) => {
-      if (err) {
-        return;
-      }
-      if (data.index === 1) {
-        LoginUtils.onBindSuccess('123', callback);
-      } else {
-        LoadingDialogUtil.close();
-      }
-    });
+        if (data.index === 1) {
+          LoginUtils.onBindSuccess('123', callback);
+        } else {
+          LoadingDialogUtil.close();
+        }
+      });
+    } catch (e) {
+      Logger.error(TAG, `showDialog fail. Code: ${e.code}, message: ${e.message}`);
+    }
   };
 
   /**
@@ -78,7 +83,7 @@ export class LoginUtils {
 
     // 执行取消授权请求，并处理结果
     try {
-      const controller = new authentication.AuthenticationController(getContext());
+      const controller = new authentication.AuthenticationController(ContextUtils.globalContext);
       controller.executeRequest(cancelRequest, (error: BusinessError<Object>, data) => {
         if (error) {
           LoginUtils.onCancelSuccess();

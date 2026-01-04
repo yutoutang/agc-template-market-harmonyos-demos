@@ -1,0 +1,36 @@
+{
+  "string": [
+    {
+      "name": "page_show",
+      "value": "page from package"
+    },
+    {
+      "name": "sales_more",
+      "value": "月售100+"
+    },
+    {
+      "name": "month_sale",
+      "value": "月售%s"
+    },
+    {
+      "name": "currency_symbol",
+      "value": "￥"
+    },
+    {
+      "name": "discount",
+      "value": "%s折"
+    },
+    {
+      "name": "currency_symbol_post_params",
+      "value": "￥%d"
+    },
+    {
+      "name": "clear_car",
+      "value": "清空"
+    },
+    {
+      "name": "agcit_huawei_takeaway_service",
+      "value": "1.0.0"
+    }
+  ]
+}

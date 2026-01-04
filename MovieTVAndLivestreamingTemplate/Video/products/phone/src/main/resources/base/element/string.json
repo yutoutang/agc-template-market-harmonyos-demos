@@ -1,0 +1,28 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "视频模板"
+    },
+    {
+      "name": "PhoneAbility_desc",
+      "value": "视频模板"
+    },
+    {
+      "name": "PhoneAbility_label",
+      "value": "视频模板"
+    },
+    {
+      "name": "PhoneFormAbility_desc",
+      "value": "form_description"
+    },
+    {
+      "name": "PhoneFormAbility_label",
+      "value": "form_label"
+    },
+    {
+      "name": "agcit_huawei_video_service",
+      "value": "1.0.0"
+    }
+  ]
+}

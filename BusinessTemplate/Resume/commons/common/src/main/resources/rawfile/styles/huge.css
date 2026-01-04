@@ -1,0 +1,164 @@
+/* 主容器 */
+.resume-container {
+  display: flex;
+  max-width: 100%;
+  width: 100%;
+  min-height: calc(100vw * 1.414);
+  background-color: #FFFFFF;
+  margin: 0;
+  padding: 0;
+}
+
+/* 左侧蓝色区域 */
+.left-panel {
+  width: 1.26rem;
+  background-color: #455C7B;
+  color: white;
+  padding: 0.07rem 0 0.07rem 0;
+  opacity: 0;
+}
+.avatar-div{
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+/* 头像 */
+.avatar {
+  width: 1rem;
+  height: 1.33rem;
+  object-fit: cover;
+}
+
+/* 姓名 */
+.name {
+  font-size: 0.15rem;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 0.12rem;
+  width: 100%;
+}
+.left-content{
+  padding-left: 0.12rem;
+  padding-right: 0.12rem;
+}
+/* 左侧信息项 */
+.info-item {
+  width: 100%;
+  font-size: 0.05rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 0.06rem;
+}
+.info-item-edu{
+  flex-wrap: wrap;
+  display: block;
+  align-items: center;
+  line-height: 0.12rem;
+}
+.info-name{
+  flex: 1;
+  word-break: break-all;
+  margin-left: 5px;
+}
+
+.certification-item {
+  font-weight: 400;
+  font-size: 0.06rem;
+  line-height: 0.12rem;
+  color: rgba(255,255,255,0.6);
+}
+.left-title-out{
+  padding: 0.12rem 0 0.05rem 0;
+
+}
+.edu-left{
+  font-size: 0.07rem;
+  color: #FFFFFF;
+  line-height: 0.12rem;
+  margin-right: 0.02rem;
+}
+/* 左侧标题 */
+.left-title {
+  font-size: 0.1rem;
+  font-weight: bold;
+  width: 100%;
+  border-top: 0.01rem solid rgba(255,255,255,0.1);;
+  padding-top: 0.12rem;
+}
+
+/* 右侧内容区域 */
+.right-panel {
+  font-size: 0.12rem;
+  flex: 1;
+  color: rgba(0,0,0,0.6);
+  padding: 0.06rem 0.24rem 0.24rem 0.12rem;
+  opacity: 0;
+}
+.show-page{
+  opacity: 1;
+}
+/* 右侧标题 */
+.right-title {
+  font-size: 0.1rem;
+  font-weight: bold;
+  color: #ffffff;
+  background: linear-gradient(to right, #455C7B 0%, rgba(69,92,123,0) 100%);
+  border-radius: 0.02rem;
+  padding: 0.01rem 0.12rem;
+  margin: 0.18rem 0 0.06rem 0;
+
+}
+.self-eva{
+  line-height: 0.12rem;
+  font-size: 0.06rem;
+  white-space: pre-wrap;
+}
+
+
+
+/* 经验项 */
+.experience-item {
+  font-size: 0.07rem;
+}
+
+.experience-header {
+  color: #000000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.06rem;
+  font-weight: 600;
+}
+
+.experience-company {
+  display: flex;
+  align-items: center;
+  font-size: 0.08rem;
+
+}
+
+.experience-period {
+  margin: 0 0.05rem;
+  color: rgba(0,0,0,0.5);
+}
+
+
+
+.experience-description {
+  color: #555;
+  line-height: 0.12rem;
+  margin-bottom: 0.12rem ;
+  white-space: pre-wrap;
+}
+.skills-content{
+  line-height: 0.12rem;
+  font-size: 0.06rem;
+  white-space: pre-wrap;
+}
+
+
+

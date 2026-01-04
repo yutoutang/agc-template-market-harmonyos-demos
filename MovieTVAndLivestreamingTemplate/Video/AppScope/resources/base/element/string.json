@@ -1,0 +1,20 @@
+{
+  "string": [
+    {
+      "name": "app_name",
+      "value": "视频模板"
+    },
+    {
+      "name": "agcit_huawei_video_service",
+      "value": "1.0.0"
+    },
+    {
+      "name": "agcittype_huawei_video_service",
+      "value": "industryTemplate"
+    },
+    {
+      "name": "agcitkid_huawei_video_service",
+      "value": "agcit_huawei_recipes_aggregated_ads/1.0.2,agcit_huawei_video_module_cast/1.0.0,agcit_huawei_common_feedback/1.0.0,agcit_huawei_comprehensive_news_module_highlight/1.0.0,agcit_huawei_comprehensive_news_module_imagepreview/1.0.0,agcit_huawei_common_share/1.0.0,agcit_huawei_course_recorded_player/1.0.0,agcit_huawei_video_interaction/1.0.0"
+    }
+  ]
+}

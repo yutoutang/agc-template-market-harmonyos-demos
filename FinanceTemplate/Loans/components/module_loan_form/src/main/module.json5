@@ -1,0 +1,9 @@
+{
+  "module": {
+    "name": "module_loan_form",
+    "type": "har",
+    "deviceTypes": [
+      "default"
+    ]
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "string": [
+    {
+      "name": "page_show",
+      "value": "page from package"
+    },
+    {
+      "name": "KM",
+      "value": "公里"
+    },
+    {
+      "name": "navigation",
+      "value": "导航"
+    },
+    {
+      "name": "fromYou",
+      "value": "距您"
+    },
+    {
+      "name": "startRun",
+      "value": "开始运动"
+    },
+    {
+      "name": "inputRoute",
+      "value": "导入路线"
+    },
+    {
+      "name": "delete",
+      "value": "删除"
+    },
+    {
+      "name": "LOCATION",
+      "value": "位置"
+    },
+    {
+      "name": "route",
+      "value": "路线"
+    },
+    {
+      "name": "saveMyRoute",
+      "value": "保存到“我的路线”"
+    },
+    {
+      "name": "outRouteFile",
+      "value": "导出路线文件"
+    },
+    {
+      "name": "cancel",
+      "value": "取消"
+    },
+    {
+      "name": "enter",
+      "value": "确认"
+    },
+    {
+      "name": "APPROXIMATELY_LOCATION",
+      "value": "详细位置位置"
+    },
+    {
+      "name": "select",
+      "value": "请选择保存方式"
+    },
+    {
+      "name": "inRoute",
+      "value": "您已经入选中路线"
+    },
+    {
+      "name": "jumpFlower",
+      "value": "正在跳转花瓣地图"
+    },
+    {
+      "name": "shortTip",
+      "value": "本次运动距离过短，将不会记录数据，是否结束？"
+    },
+    {
+      "name": "ContinueExercising",
+      "value": "继续运动"
+    },
+    {
+      "name": "EndExercising",
+      "value": "结束运动"
+    },
+    {
+      "name": "locationTip",
+      "value": "您可以导入本地路线文件，或在运动记录中导入路线支持GPX格式的路线文件"
+    },
+    {
+      "name": "noData",
+      "value": "暂无数据"
+    },
+    {
+      "name": "agcit_huawei_stepcount_module_trajectory",
+      "value": "1.0.0"
+    },
+    {
+      "name": "agcittype_huawei_stepcount_module_trajectory",
+      "value": "serviceComponent"
+    }
+  ]
+}

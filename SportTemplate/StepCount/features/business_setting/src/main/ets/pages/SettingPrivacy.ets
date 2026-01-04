@@ -1,0 +1,42 @@
+import { CommonConstants } from 'lib_common';
+import { NavHeaderBar } from 'lib_widget';
+import { SettingCard } from '../components/SettingCard';
+import { SettingPrivacyVM } from '../viewmodels/SettingPrivacyVM';
+
+@Builder
+export function SettingPrivacyBuilder() {
+  SettingPrivacy()
+}
+
+@ComponentV2
+struct SettingPrivacy {
+  @Local vm: SettingPrivacyVM = new SettingPrivacyVM();
+
+  build() {
+    NavDestination() {
+      Column() {
+        NavHeaderBar({
+          title: '隐私政策',
+        })
+        Scroll() {
+          Column({ space: CommonConstants.SPACE_M }) {
+            SettingCard({ list: this.vm.list1 })
+          }
+          .padding({
+            left: CommonConstants.PADDING_PAGE,
+            right: CommonConstants.PADDING_PAGE,
+            top: CommonConstants.PADDING_M,
+          })
+        }
+        .layoutWeight(1)
+        .scrollBar(BarState.Off)
+        .align(Alignment.Top)
+        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+      }
+      .width(CommonConstants.FULL_PERCENT)
+      .height(CommonConstants.FULL_PERCENT)
+    }
+    .hideTitleBar(true)
+    .backgroundColor($r('sys.color.background_secondary'))
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "app": {
+/**todo: 配置手动签名 */
+    "signingConfigs": [],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+        "compatibleSdkVersion": "5.0.5(17)",
+        "targetSdkVersion": "5.0.5(17)",
+        "runtimeOS": "HarmonyOS",
+        "buildOption": {
+          "strictMode": {
+            "caseSensitiveCheck": true,
+            "useNormalizedOHMUrl": true
+          }
+        }
+      }
+    ],
+    "buildModeSet": [
+      {
+        "name": "debug"
+      },
+      {
+        "name": "release"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "upload_recipe",
+      "srcPath": "./components/upload_recipe"
+    },
+    {
+      "name": "lib_product_search",
+      "srcPath": "./commons/lib_product_search"
+    },
+    {
+      "name": "phone",
+      "srcPath": "./products/phone",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "business_home",
+      "srcPath": "./features/business_home"
+    },
+    {
+      "name": "business_mine",
+      "srcPath": "./features/business_mine"
+    },
+    {
+      "name": "business_setting",
+      "srcPath": "./features/business_setting"
+    },
+    {
+      "name": "lib_common",
+      "srcPath": "./commons/lib_common"
+    },
+    {
+      "name": "lib_widget",
+      "srcPath": "./commons/lib_widget"
+    },
+    {
+      "name": "lib_account",
+      "srcPath": "./commons/lib_account"
+    },
+    {
+      "name": "lib_wallpaper_api",
+      "srcPath": "./commons/lib_wallpaper_api"
+    },
+    {
+      "name": "module_waterflow",
+      "srcPath": "./components/module_waterflow"
+    },
+    {
+      "name": "business_desktop",
+      "srcPath": "./features/business_desktop"
+    },
+    {
+      "name": "module_wallpaper_details",
+      "srcPath": "./components/module_wallpaper_details"
+    },
+    {
+      "name": "module_city_manage",
+      "srcPath": "./components/module_city_manage"
+    },
+    {
+      "name": "module_weather_core",
+      "srcPath": "./components/module_weather_core"
+    },
+    {
+      "name": "vip_center",
+      "srcPath": "./components/vip_center"
+    },
+    {
+      "name": "base_apis",
+      "srcPath": "./components/base_apis"
+    },
+    {
+      "name": "aggregated_payment",
+      "srcPath": "./components/aggregated_payment"
+    },
+    {
+      "name": "module_feedback",
+      "srcPath": "./components/module_feedback"
+    },
+    {
+      "name": "module_imagepreview",
+      "srcPath": "./components/module_imagepreview"
+    }
+  ]
+}

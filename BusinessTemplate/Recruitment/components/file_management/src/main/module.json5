@@ -1,0 +1,9 @@
+{
+  "module": {
+    "name": "file_management",
+    "type": "har",
+    "deviceTypes": [
+      "phone"
+    ],
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "module": {
+    "name": "phone",
+    "type": "entry",
+    "description": "$string:module_desc",
+    "mainElement": "PhoneAbility",
+    "deviceTypes": [
+      "phone"
+    ],
+    "querySchemes": [
+      "weixin",
+      "wxopensdk"
+    ],
+    "deliveryWithInstall": true,
+    "installationFree": false,
+    "compressNativeLibs": true,
+    "pages": "$profile:main_pages",
+    "routerMap": "$profile:route_map",
+    "abilities": [
+      {
+        "name": "PhoneAbility",
+        "icon": "$media:layered_image",
+        "label": "$string:PhoneAbility_label",
+        "srcEntry": "./ets/phoneability/PhoneAbility.ets",
+        "description": "$string:PhoneAbility_desc",
+        "startWindowIcon": "$media:startIcon11",
+        "startWindowBackground": "$color:start_window_background",
+        "supportWindowMode": [
+          "fullscreen",
+          "floating"
+        ],
+        "exported": true,
+        "skills": [
+          {
+            "entities": [
+              "entity.system.home"
+            ],
+            "actions": [
+              "action.system.home",
+              "wxentity.action.open"
+            ]
+          }
+        ]
+      }
+    ],
+    "extensionAbilities": [
+      {
+        "name": "PhoneBackupAbility",
+        "srcEntry": "./ets/phonebackupability/PhoneBackupAbility.ets",
+        "type": "backup",
+        "exported": false,
+        "metadata": [
+          {
+            "name": "ohos.extension.backup",
+            "resource": "$profile:backup_config"
+          }
+        ]
+      },
+      {
+        "name": "PhoneFormAbility",
+        "srcEntry": "./ets/phoneformability/PhoneFormAbility.ets",
+        "label": "$string:PhoneFormAbility_label",
+        "description": "$string:PhoneFormAbility_desc",
+        "type": "form",
+        "metadata": [
+          {
+            "name": "ohos.extension.form",
+            "resource": "$profile:form_config"
+          }
+        ]
+      }
+    ],
+    "requestPermissions": [
+      {
+        "name": "ohos.permission.INTERNET"
+      },
+      {
+        "name": "ohos.permission.GET_NETWORK_INFO"
+      },
+      {
+        "name": "ohos.permission.GET_WIFI_INFO"
+      },
+      {
+        "name": "ohos.permission.KEEP_BACKGROUND_RUNNING"
+      }
+    ],
+    "metadata": [
+      {
+/*
+        * todo: 替换应用的Client ID
+        */
+        "name": "client_id",
+        "value": "******"
+      }
+    ]
+  }
+}

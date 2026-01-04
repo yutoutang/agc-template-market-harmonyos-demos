@@ -1,0 +1,44 @@
+{
+  "float": [
+    {
+      "name": "page_text_font_size",
+      "value": "50fp"
+    },
+    {
+      "name": "font_16",
+      "value": "16vp"
+    },
+    {
+      "name": "font_18",
+      "value": "18vp"
+    },
+    {
+      "name": "font_20",
+      "value": "20vp"
+    },
+    {
+      "name": "margin_8",
+      "value": "8vp"
+    },
+    {
+      "name": "margin_24",
+      "value": "24vp"
+    },
+    {
+      "name": "margin_32",
+      "value": "32vp"
+    },
+    {
+      "name": "padding_64",
+      "value": "64vp"
+    },
+    {
+      "name": "width_104",
+      "value": "104vp"
+    },
+    {
+      "name": "height_229",
+      "value": "229vp"
+    }
+  ]
+}

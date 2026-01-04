@@ -1,0 +1,16 @@
+{
+  "name": "business_play",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "lib_common": "file:../../commons/lib_common",
+    "lib_account": "file:../../commons/lib_account",
+    "lib_video_api": "file:../../commons/lib_video_api",
+    "video_interaction": "file:../../components/video_interaction",
+    "recorded_player": "file:../../components/recorded_player",
+    "module_cast": "file:../../components/module_cast"
+  }
+}

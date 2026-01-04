@@ -1,0 +1,32 @@
+{
+  "string": [
+    {
+      "name": "please_select_time",
+      "value": "请选择时间"
+    },
+    {
+      "name": "Hour",
+      "value": "时"
+    },
+    {
+      "name": "Minute",
+      "value": "分"
+    },
+    {
+      "name": "Second",
+      "value": "秒"
+    },
+    {
+      "name": "colon",
+      "value": ":"
+    },
+    {
+      "name": "agcit_huawei_stepcount_module_timer",
+      "value": "1.0.0"
+    },
+    {
+      "name": "agcittype_huawei_stepcount_module_timer",
+      "value": "serviceComponent"
+    }
+  ]
+}

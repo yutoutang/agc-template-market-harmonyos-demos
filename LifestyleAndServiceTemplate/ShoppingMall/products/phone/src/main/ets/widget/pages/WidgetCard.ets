@@ -24,12 +24,7 @@ struct WidgetCard {
   readonly fullHeightPercent: string = '100%';
 
   rotateIcon() {
-    animateTo({
-      curve: Curve.EaseInOut,
-      duration: 200,
-    }, () => {
-      this.angle += 360;
-    })
+    this.angle += 360;
   }
 
   build() {
@@ -54,7 +49,10 @@ struct WidgetCard {
             Text('商场模板').fontSize(14).fontColor($r('sys.color.font_primary')).margin({ left: 6 })
           }
 
-          Image($r('app.media.icon_refresh')).width(20).height(20).rotate({ angle: this.angle })
+          Image($r('app.media.icon_refresh')).width(20).height(20).rotate({ angle: this.angle }).animation({
+            curve: Curve.EaseInOut,
+            duration: 200,
+          })
         }
         .width(this.fullWidthPercent)
         .padding({ top: 12 })
@@ -63,7 +61,7 @@ struct WidgetCard {
           this.rotateIcon();
           postCardAction(this, {
             action: 'message',
-            params: { msgTest: 'messageEvent' }
+            params: { msgTest: 'messageEvent' },
           });
         })
 

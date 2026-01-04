@@ -1,0 +1,18 @@
+{
+  "name": "business_map",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "lib_common": "file:../../commons/lib_common",
+    "lib_widget": "file:../../commons/lib_widget",
+    "lib_account": "file:../../commons/lib_account",
+    "lib_api": "file:../../commons/lib_api",
+    "business_home": "file:../business_home",
+    "module_station_line_detail": "file:../../components/module_station_line_detail",
+    "module_map_detail": "file:../../components/module_map_detail",
+    "module_city_select": "file:../../components/module_city_select"
+  }
+}

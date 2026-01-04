@@ -1,0 +1,9 @@
+{
+  "routerMap": [
+    {
+      "name": "TotalCommentCopy",
+      "pageSourceFile": "src/main/ets/components/TotalCommentCopy.ets",
+      "buildFunction": "TotalCommentCopyBuilder"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "module": {
+    "name": "file_management_test",
+    "type": "feature",
+    "deviceTypes": [
+      "phone"
+    ],
+    "deliveryWithInstall": true,
+    "installationFree": false
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "module": {
+    "name": "lib_product_waterflow",
+    "type": "har",
+    "deviceTypes": [
+      "phone",
+      "tablet",
+      "2in1"
+    ]
+  }
+}

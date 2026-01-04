@@ -1,6 +1,5 @@
-import { Constants, EmptyComp, NavHeaderBar, PayRecord, PAY_STATUE, RouterMap, RouterUtil, Utils } from 'lib_common';
+import { Constants, EmptyComp, NavHeaderBar, PayRecord, PAY_STATUE, Utils } from 'lib_common';
 import { PayRecordViewModel } from '../viewmodel/PayRecordViewModel';
-import utils from '@arkts.utils';
 
 @Builder
 export function PayRecordPageBuilder() {
@@ -37,7 +36,7 @@ struct PayRecordPage {
       .margin({
         left: Constants.BORDER_WIDTH,
         right: Constants.BORDER_WIDTH,
-        bottom: this.vm.windowModel.getWindowBottomHeight()
+        bottom: this.vm.windowModel.getWindowBottomHeight(),
       })
     }
     .backgroundColor($r('sys.color.background_secondary'))

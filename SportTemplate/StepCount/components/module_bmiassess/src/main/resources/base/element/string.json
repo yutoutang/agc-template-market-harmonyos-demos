@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "your_weight",
+      "value": "你的体重"
+    },
+    {
+      "name": "agcit_huawei_stepcount_module_bmiassess",
+      "value": "1.0.1"
+    },
+    {
+      "name": "agcittype_huawei_stepcount_module_bmiassess",
+      "value": "serviceComponent"
+    }
+  ]
+}

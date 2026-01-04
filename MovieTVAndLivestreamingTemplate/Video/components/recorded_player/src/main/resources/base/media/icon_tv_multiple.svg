@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>icon_投屏_multiple_w</title>
+    <defs>
+        <path d="M0,0 L24,0 L24,24 L0,24 L0,0 Z" id="path-1"></path>
+        <rect id="path-2" x="0" y="0" width="24" height="24"></rect>
+        <path d="M20,2 C21.6568542,2 23,3.34314575 23,5 L23,16 C23,17.6568542 21.6568542,19 20,19 L4,19 C2.34314575,19 1,17.6568542 1,16 L1,5 C1,3.34314575 2.34314575,2 4,2 L20,2 Z M20,3.6 L4,3.6 C3.22680135,3.6 2.6,4.22680135 2.6,5 L2.6,16 C2.6,16.7731986 3.22680135,17.4 4,17.4 L20,17.4 C20.7731986,17.4 21.4,16.7731986 21.4,16 L21.4,5 C21.4,4.22680135 20.7731986,3.6 20,3.6 Z M18,20.7 C18.4418278,20.7 18.8,21.0581722 18.8,21.5 C18.8,21.9418278 18.4418278,22.3 18,22.3 L6,22.3 C5.5581722,22.3 5.2,21.9418278 5.2,21.5 C5.2,21.0581722 5.5581722,20.7 6,20.7 L18,20.7 Z M13.069,7.5 L14.74,12.46 L16.41,7.5 L17.999,7.5 L15.53,14.46 L13.949,14.46 L11.94,8.819 L9.62,8.797 L9.62,14.46 L8.15,14.46 L8.15,8.797 L6,8.797 L6,7.5 L13.069,7.5 Z"
+              id="path-4"></path>
+    </defs>
+    <g id="icon_投屏_multiple_w" stroke="none" fill="none" xlink:href="#path-1">
+        <mask id="mask-3" fill="white">
+            <use xlink:href="#path-2"></use>
+        </mask>
+        <g id="icon_speed_multiple_w"></g>
+        <g id="形状结合" fill-rule="nonzero" mask="url(#mask-3)">
+            <use fill-opacity="0.901960784" fill="#000000" xlink:href="#path-4"></use>
+            <use fill="#FFFFFF" xlink:href="#path-4"></use>
+        </g>
+    </g>
+</svg>

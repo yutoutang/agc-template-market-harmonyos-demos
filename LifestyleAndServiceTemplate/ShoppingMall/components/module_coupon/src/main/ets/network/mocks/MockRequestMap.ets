@@ -1,5 +1,4 @@
 import { httpsMock } from './HttpRequestApiMock';
-import { promptAction } from '@kit.ArkUI';
 import { FullLoading, Logger } from '../../commonlib/Index';
 import { BaseSuccessResponse } from '../types/BaseSuccessResponse';
 
@@ -23,7 +22,6 @@ function simulateDelay<T>(data: T, delay: number): Promise<T> {
 function mockErrorHandler(msg?: string): Promise<string> {
   const errMsg: string = 'replace mock data failed!';
   FullLoading.hideLoading();
-  promptAction.showToast({ message: errMsg });
   Logger.error('[MockRequest]', msg ?? '', errMsg);
   return Promise.reject(errMsg);
 }

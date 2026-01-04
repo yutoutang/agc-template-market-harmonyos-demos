@@ -37,25 +37,29 @@ struct ServiceDetailPage {
   build() {
     NavDestination() {
       NavHeaderBar({ title: this.vm.pageTitle, hasBgColor: false })
-      Column() {
-        this.buildContent()
+      Scroll() {
+        Column() {
+          this.buildContent()
+        }
+        .width(Constants.FULL_SIZE)
+        .padding({
+          top: 12,
+          left: Constants.BORDER_WIDTH,
+          right: Constants.BORDER_WIDTH,
+          bottom: this.vm.getWindowBottomHeight()
+        })
+        .bindSheet($$this.vm.showCallSheet, CallTelSheetBuilder(this.mallModel.shoppingMall.tel, () => {
+          this.vm.showCallSheet = false;
+        }), {
+          height: SheetSize.FIT_CONTENT,
+          showClose: false,
+          preferType: SheetType.CENTER,
+        })
       }
-      .width(Constants.FULL_SIZE)
+      .align(Alignment.Top)
+      .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring)
       .layoutWeight(1)
-      .padding({
-        top: 12,
-        left: Constants.BORDER_WIDTH,
-        right: Constants.BORDER_WIDTH,
-        bottom: this.vm.getWindowBottomHeight()
-      })
-      .bindSheet($$this.vm.showCallSheet, CallTelSheetBuilder(this.mallModel.shoppingMall.tel, () => {
-        this.vm.showCallSheet = false;
-      }), {
-        height: SheetSize.FIT_CONTENT,
-        blurStyle: BlurStyle.Thick,
-        showClose: false,
-      })
-
     }
     .hideTitleBar(true)
     .backgroundImage($r('app.media.member_service_bg'))
@@ -85,6 +89,9 @@ struct ServiceDetailPage {
       Image(`${CommonUrl.CLOUD_STORAGE_URL}ShoppingMall/service_babycare.png`)
         .width('100%')
         .borderRadius(16)
+        .constraintSize({
+          maxHeight: '35%',
+        })
       Text('母婴室使用说明：').fontSize(16).fontWeight(500).margin({ top: 16 })
       Text('母婴室提供妈妈哺乳及日常婴幼儿护理\n' +
         '提供温奶器、湿巾加热器、直饮机、纸尿裤等服务\n' +
@@ -129,7 +136,12 @@ struct ServiceDetailPage {
 
       Scroll() {
         Column() {
-          Image(`${CommonUrl.CLOUD_STORAGE_URL}ShoppingMall/service_lost.png`).width('100%').borderRadius(16)
+          Image(`${CommonUrl.CLOUD_STORAGE_URL}ShoppingMall/service_lost.png`)
+            .width('100%')
+            .borderRadius(16)
+            .constraintSize({
+              maxHeight: '35%',
+            })
           if (this.vm.lostType === 0) {
             Column({ space: 12 }) {
               Text('位置').fontSize(16).fontWeight(500).margin({ top: 16 })
@@ -203,7 +215,12 @@ struct ServiceDetailPage {
   @Builder
   medicalBuilder() {
     Column() {
-      Image(`${CommonUrl.CLOUD_STORAGE_URL}ShoppingMall/service_medical.png`).width('100%').borderRadius(16)
+      Image(`${CommonUrl.CLOUD_STORAGE_URL}ShoppingMall/service_medical.png`)
+        .width('100%')
+        .borderRadius(16)
+        .constraintSize({
+          maxHeight: '35%',
+        })
       Text('急救药箱提供：').fontSize(16).fontWeight(500).margin({ top: 16 })
       TextDescComp({
         text: '商场顾客服务中心配备急救药品，供顾客应急之用。'
@@ -226,7 +243,12 @@ struct ServiceDetailPage {
   @Builder
   giftBuilder() {
     Column({ space: 12 }) {
-      Image(`${CommonUrl.CLOUD_STORAGE_URL}ShoppingMall/service_gift.png`).width('100%').borderRadius(16)
+      Image(`${CommonUrl.CLOUD_STORAGE_URL}ShoppingMall/service_gift.png`)
+        .width('100%')
+        .borderRadius(16)
+        .constraintSize({
+          maxHeight: '35%',
+        })
       Text('礼品包装：').fontSize(16).fontWeight(500).margin({ top: 4 })
       TextDescComp({
         text: '为客户提供礼品包装，收取工本费'
@@ -239,7 +261,12 @@ struct ServiceDetailPage {
   @Builder
   parkBuilder() {
     Column({ space: 12 }) {
-      Image(`${CommonUrl.CLOUD_STORAGE_URL}ShoppingMall/service_park.png`).width('100%').borderRadius(16)
+      Image(`${CommonUrl.CLOUD_STORAGE_URL}ShoppingMall/service_park.png`)
+        .width('100%')
+        .borderRadius(16)
+        .constraintSize({
+          maxHeight: '35%',
+        })
       Text('停车优惠：').fontSize(16).fontWeight(500).margin({ top: 4 })
       TextDescComp({
         text: '会员消费积分享受优惠停车服务'

@@ -1,0 +1,9 @@
+{
+  "name": "valuation_information",
+  "version": "1.0.0",
+  "description": "Valuation information component",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {}
+}

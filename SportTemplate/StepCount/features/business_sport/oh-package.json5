@@ -1,0 +1,21 @@
+{
+  "name": "business_sport",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "lib_common": "file:../../commons/lib_common",
+    "lib_sport_api": "file:../../commons/lib_sport_api",
+    "lib_widget": "file:../../commons/lib_widget",
+    "lib_account": "file:../../commons/lib_account",
+    "ui_base": "file:../../commons/ui_base",
+    "module_trajectory": "file:../../components/module_trajectory",
+    "module_timer": "file:../../components/module_timer",
+    "module_datechart": "file:../../components/module_datechart",
+    "module_target": "file:../../components/module_target",
+    "module_running": "file:../../components/module_running",
+    "module_daily": "file:../../components/module_daily"
+  }
+}

@@ -1,7 +1,7 @@
-import { i18n, intl } from '@kit.LocalizationKit'
+import { i18n } from '@kit.LocalizationKit'
 
 export class CommonUtil {
-  private static isRTL: boolean = i18n.isRTL((new intl.Locale()).language)
+  private static isRTL: boolean = i18n.isRTL(new Intl.Locale('zh-CN').language)
 
   public static setIsRTL(isRTL: boolean): void {
     CommonUtil.isRTL = isRTL

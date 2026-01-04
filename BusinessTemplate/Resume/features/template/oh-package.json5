@@ -1,0 +1,15 @@
+{
+  "name": "template",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "oh_router": "file:../../commons/oh_router",
+    "common": "file:../../commons/common",
+    "resume": "file:../resume",
+    "@hw-agconnect/ui-base": "1.0.1",
+    "@hw-agconnect/ui-scale-view": "1.0.0"
+  }
+}

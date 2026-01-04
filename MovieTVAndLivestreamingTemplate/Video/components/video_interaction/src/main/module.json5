@@ -1,0 +1,10 @@
+{
+  "module": {
+    "name": "video_interaction",
+    "type": "har",
+    "routerMap": "$profile:route_map",
+    "deviceTypes": [
+      "default"
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "module description"
+    },
+    {
+      "name": "Business_memberAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "Business_memberAbility_label",
+      "value": "label"
+    },
+    {
+      "name": "agcit_huawei_takeaway_service",
+      "value": "1.0.0"
+    }
+  ]
+}

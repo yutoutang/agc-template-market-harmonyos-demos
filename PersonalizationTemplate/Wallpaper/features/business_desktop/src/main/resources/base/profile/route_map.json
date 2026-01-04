@@ -1,0 +1,24 @@
+{
+  "routerMap": [
+    {
+      "name": "DesktopComponentsPage",
+      "pageSourceFile": "src/main/ets/pages/DesktopComponentsPage.ets",
+      "buildFunction": "DesktopComponentsPageBuilder"
+    },
+    {
+      "name": "TutorialPage",
+      "pageSourceFile": "src/main/ets/pages/TutorialPage.ets",
+      "buildFunction": "TutorialPageBuilder"
+    },
+    {
+      "name": "MyComponentPage",
+      "pageSourceFile": "src/main/ets/pages/MyComponentPage.ets",
+      "buildFunction": "MyComponentPageBuilder"
+    },
+    {
+      "name": "ComponentDetailPage",
+      "pageSourceFile": "src/main/ets/pages/ComponentDetailPage.ets",
+      "buildFunction": "ComponentDetailPageBuilder"
+    }
+  ]
+}

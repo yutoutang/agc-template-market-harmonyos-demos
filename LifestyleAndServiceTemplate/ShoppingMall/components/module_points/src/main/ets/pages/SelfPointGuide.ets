@@ -1,3 +1,4 @@
+import { ContextUtils } from '../libcommon/ContextUtils';
 import { NavHeaderBar } from '../libcommon/Index';
 
 @Builder
@@ -9,12 +10,22 @@ export function SelfPointGuideBuilder() {
 struct SelfPointGuide {
   @Provider() pathStack: NavPathStack = new NavPathStack();
 
+  aboutToAppear(): void {
+    ContextUtils.setUIContext(this.getUIContext());
+  }
+
   build() {
     NavDestination() {
       NavHeaderBar({ title: '自助积分指南', hasBgColor: false })
       Scroll() {
         Column() {
-          Image($r('app.media.point_banner')).width('100%').borderRadius(16).margin({ top: 12 })
+          Image($r('app.media.point_banner'))
+            .width('100%')
+            .borderRadius(16)
+            .margin({ top: 12 })
+            .constraintSize({
+              maxHeight: '35%',
+            })
 
           Column({ space: 8 }) {
             Text('操作指引').fontSize(16).fontWeight(500)
@@ -43,11 +54,13 @@ struct SelfPointGuide {
           }
           .alignItems(HorizontalAlign.Start)
         }
-        .padding({ left: 16, right: 16 })
+        .alignItems(HorizontalAlign.Start)
+        .padding({ left: 16, right: 16, bottom: 28 })
       }
       .layoutWeight(1)
       .scrollBar(BarState.Off)
       .align(Alignment.Top)
+      .edgeEffect(EdgeEffect.Spring)
     }
     .hideTitleBar(true)
     .onReady((context) => {

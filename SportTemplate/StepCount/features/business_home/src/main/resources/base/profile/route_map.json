@@ -1,0 +1,24 @@
+{
+  "routerMap": [
+    {
+      "name": "HomePage",
+      "pageSourceFile": "src/main/ets/pages/HomePage.ets",
+      "buildFunction": "homePageBuilder"
+    },
+    {
+      "name": "DrinkPage",
+      "pageSourceFile": "src/main/ets/pages/DrinkPage.ets",
+      "buildFunction": "drinkPageBuilder"
+    },
+    {
+      "name": "DrinkWarnPage",
+      "pageSourceFile": "src/main/ets/pages/DrinkWarnPage.ets",
+      "buildFunction": "drinkWarnPageBuilder"
+    },
+    {
+      "name": "SetNewTimeDialog",
+      "pageSourceFile": "src/main/ets/dialog/SetNewTimeDialog.ets",
+      "buildFunction": "setNewTimeDialogBuilder"
+    }
+  ]
+}

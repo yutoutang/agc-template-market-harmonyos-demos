@@ -4,7 +4,6 @@
     "type": "feature",
     "deviceTypes": [
       "phone",
-
     ],
     "deliveryWithInstall": true,
     "installationFree": true

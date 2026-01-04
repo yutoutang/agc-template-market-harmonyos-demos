@@ -1,5 +1,5 @@
-import { promptAction, AlertDialog } from '@kit.ArkUI';
-import { Constants, Logger, LoginButtonText, LoginUtils, RouterMap, RouterUtil } from 'lib_common';
+import { AlertDialog } from '@kit.ArkUI';
+import { Constants, ContextUtils, Logger, LoginButtonText, LoginUtils, RouterMap, RouterUtil } from 'lib_common';
 import { MinePageViewModel } from '../viewmodel/MinePageViewModel';
 
 const TAG = '[UserInfoComp]';
@@ -29,7 +29,7 @@ export struct UserInfoComp {
 
   @Computed
   get avatarUri(): string {
-    return `file://${getContext().filesDir}/${this.vm.userIconInfo.userIconPath}`
+    return `file://${ContextUtils.globalContext.filesDir}/${this.vm.userIconInfo.userIconPath}`
   }
 
   build() {
@@ -78,7 +78,7 @@ export struct UserInfoComp {
         if (this.vm.userInfo.isRelative) {
           RouterUtil.pushPathByName(RouterMap.USER_INFO_PAGE)
         } else {
-          promptAction.showToast({ message: $r('app.string.no_relative_account_msg') })
+          ContextUtils.showToast({ message: $r('app.string.no_relative_account_msg') });
         }
       })
 

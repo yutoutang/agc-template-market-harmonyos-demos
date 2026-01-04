@@ -1,0 +1,9 @@
+{
+  "module": {
+    "name": "search_box",
+    "type": "har",
+    "deviceTypes": [
+      "phone"
+    ],
+  }
+}

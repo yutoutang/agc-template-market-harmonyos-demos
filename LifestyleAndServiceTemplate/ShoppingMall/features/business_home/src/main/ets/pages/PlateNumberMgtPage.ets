@@ -27,106 +27,119 @@ struct PlateNumberMgtPage {
   build() {
     NavDestination() {
       NavHeaderBar({ title: $r('app.string.my_car'), hasBgColor: false })
-      Column() {
-        Image($r('app.media.parking_banner')).width(Constants.FULL_SIZE).borderRadius(12)
+      Scroll() {
         Column() {
-          List({ space: 16, scroller: this.scroller }) {
-            ForEach(this.myPlates, (item: PlateNumber) => {
-              ListItem() {
-                Row() {
-                  Row() {
-                    Stack() {
-                      Circle().width(32).height(32).fill(Color.White)
-                      Image(this.getIcon(item))
-                        .width(20)// .height(16)
-                        .fillColor(this.getIconFg(item))
-                    }
-                    .alignContent(Alignment.Center)
-
-                    Text(`${item.plate.slice(0, 2)}-${item.plate.slice(2)}`)
-                      .fontSize(18)
-                      .fontColor(Color.White)
-                      .fontWeight(FontWeight.Bold)
-                      .margin({ left: 12 })
-                      .fontColor($r('sys.color.font_primary'))
-                  }
-
-                  Image($r('app.media.ic_delete')).width(24).onClick(() => {
-                    HttpRequest.deletePlateNumber(item.id).then(() => {
-                      this.getPlateNumber()
-                    })
-                  })
-                }
-                .width(Constants.FULL_SIZE)
-                .justifyContent(FlexAlign.SpaceBetween)
-                .borderRadius(16)
-                .padding({
-                  left: 16,
-                  right: 16,
-                  top: 24,
-                  bottom: 24,
-                })
-                .backgroundImage(this.getPlateBg(item.type))
-                .backgroundImageSize(ImageSize.Cover)
-              }
-            }, (item: PlateNumber) => item.id)
-          }
-          .layoutWeight(1)
-          .visibility(this.myPlates.length ? Visibility.Visible : Visibility.None)
-          .margin({ top: 12, bottom: 20 })
-          .scrollBar(BarState.Off)
-
-          Column() {
-            Button({ type: ButtonType.Normal }) {
-              Row() {
-                SymbolGlyph($r('sys.symbol.plus'))
-                  .fontColor([$r('sys.color.font_on_primary')])
-                  .fontWeight(FontWeight.Normal)
-                  .fontSize(24)
-                Text('新增车牌')
-                  .fontSize(18)
-                  .fontWeight(FontWeight.Medium)
-                  .fontColor($r('sys.color.font_on_primary'))
-                  .margin({ left: 12 })
-              }
-            }
+          Image($r('app.media.parking_banner'))
             .width(Constants.FULL_SIZE)
-            .backgroundColor($r('app.color.app_theme'))
-            .borderRadius($r('sys.float.corner_radius_level7'))
-            .padding({
-              top: 16,
-              bottom: 16,
+            .borderRadius(12)
+            .constraintSize({
+              maxHeight: '35%',
             })
-            .onClick(() => {
-              this.addPlateFlag = true
+          Column() {
+            List({ space: 16, scroller: this.scroller }) {
+              ForEach(this.myPlates, (item: PlateNumber) => {
+                ListItem() {
+                  Row() {
+                    Row() {
+                      Stack() {
+                        Circle().width(32).height(32).fill(Color.White)
+                        Image(this.getIcon(item))
+                          .width(20)
+                          .fillColor(this.getIconFg(item))
+                      }
+                      .alignContent(Alignment.Center)
+
+                      Text(`${item.plate.slice(0, 2)}-${item.plate.slice(2)}`)
+                        .fontSize(18)
+                        .fontColor(Color.White)
+                        .fontWeight(FontWeight.Bold)
+                        .margin({ left: 12 })
+                        .fontColor($r('sys.color.font_primary'))
+                    }
+
+                    Image($r('app.media.ic_delete')).width(24).onClick(() => {
+                      HttpRequest.deletePlateNumber(item.id).then(() => {
+                        this.getPlateNumber()
+                      })
+                    })
+                  }
+                  .width(Constants.FULL_SIZE)
+                  .justifyContent(FlexAlign.SpaceBetween)
+                  .borderRadius(16)
+                  .padding({
+                    left: 16,
+                    right: 16,
+                    top: 24,
+                    bottom: 24,
+                  })
+                  .backgroundImage(this.getPlateBg(item.type))
+                  .backgroundImageSize(ImageSize.Cover)
+                }
+              }, (item: PlateNumber) => item.id)
+            }
+            .layoutWeight(1)
+            .visibility(this.myPlates.length ? Visibility.Visible : Visibility.None)
+            .margin({ top: 12, bottom: 12 })
+            .scrollBar(BarState.Off)
+            .nestedScroll({
+              scrollForward: NestedScrollMode.PARENT_FIRST,
+              scrollBackward: NestedScrollMode.SELF_FIRST,
             })
+
+            Column() {
+              Button({ type: ButtonType.Normal }) {
+                Row() {
+                  SymbolGlyph($r('sys.symbol.plus'))
+                    .fontColor([$r('sys.color.font_on_primary')])
+                    .fontWeight(FontWeight.Normal)
+                    .fontSize(24)
+                  Text('新增车牌')
+                    .fontSize(18)
+                    .fontWeight(FontWeight.Medium)
+                    .fontColor($r('sys.color.font_on_primary'))
+                    .margin({ left: 12 })
+                }
+              }
+              .width(Constants.FULL_SIZE)
+              .backgroundColor($r('app.color.app_theme'))
+              .borderRadius($r('sys.float.corner_radius_level7'))
+              .padding({
+                top: 16,
+                bottom: 16,
+              })
+              .onClick(() => {
+                this.addPlateFlag = true
+              })
+            }
+            .padding({ top: 16 })
           }
-          .padding({ top: 24 })
+          .layoutWeight(this.myPlates.length ? 1 : 0).justifyContent(FlexAlign.SpaceBetween)
 
-        }.layoutWeight(this.myPlates.length ? 1 : 0).justifyContent(FlexAlign.SpaceBetween)
-
-        if (!this.myPlates.length) {
-          EmptyComp({ text: '暂无车辆' }).margin({ top: 56 })
+          if (!this.myPlates.length) {
+            EmptyComp({ text: '暂无车辆' }).margin({ top: 56 })
+          }
         }
+        .width(Constants.FULL_SIZE)
+        .alignItems(HorizontalAlign.Start)
+        .padding({
+          top: 12,
+          left: Constants.BORDER_WIDTH,
+          right: Constants.BORDER_WIDTH,
+          bottom: this.windowModel.getWindowBottomHeight(),
+        })
+        .bindSheet($$this.addPlateFlag, this.addPlateSheet(), {
+          detents: [740, SheetSize.LARGE],
+          backgroundColor: $r('sys.color.background_primary'),
+          showClose: false,
+          preferType: SheetType.CENTER,
+          onWillDisappear: () => {
+            this.plateController.stopEditing();
+          },
+        })
       }
-      .width(Constants.FULL_SIZE)
+      .align(Alignment.Top)
+      .scrollBar(BarState.Off)
       .layoutWeight(1)
-      .alignItems(HorizontalAlign.Start)
-      .padding({
-        top: 12,
-        left: Constants.BORDER_WIDTH,
-        right: Constants.BORDER_WIDTH,
-        bottom: this.windowModel.getWindowBottomHeight(),
-      })
-      .bindSheet($$this.addPlateFlag, this.addPlateSheet(), {
-        detents: [740, SheetSize.LARGE],
-        blurStyle: BlurStyle.Thick,
-        backgroundColor: $r('sys.color.background_primary'),
-        showClose: false,
-        onWillDisappear: () => {
-          this.plateController.stopEditing();
-        },
-      });
     }
     .onShown(() => {
       this.getPlateNumber()

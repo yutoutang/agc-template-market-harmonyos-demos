@@ -1,0 +1,11 @@
+{
+  "name": "module_map_detail",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "module_station_line_detail": "file:../module_station_line_detail"
+  }
+}

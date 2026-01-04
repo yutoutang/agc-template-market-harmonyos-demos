@@ -1,0 +1,18 @@
+{
+  "name": "entry",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "",
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "common": "file:../../commons/common",
+    "person": "file:../../features/person",
+    "journey": "file:../../features/journey",
+    "oh_router": "file:../../commons/oh_router",
+    "homepage": "file:../../features/homepage",
+    "message": "file:../../features/message",
+    "travel_planning": "file:../../components/travel_planning"
+  }
+}
+

@@ -1,0 +1,12 @@
+{
+  "color": [
+    {
+      "name": "title_color",
+      "value": "#E6000000"
+    },
+    {
+      "name": "widget_title_bg",
+      "value": "#F1F4FB"
+    }
+  ]
+}

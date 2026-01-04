@@ -1,0 +1,15 @@
+{
+  "name": "business_coupons",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "Index.ets",
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "lib_takeaway_api": "file:../../commons/lib_takeaway_api",
+    "lib_widget": "file:../../commons/lib_widget",
+    "lib_common": "file:../../commons/lib_common",
+    "lib_native_components": "file:../../commons/lib_native_components"
+  }
+}
+

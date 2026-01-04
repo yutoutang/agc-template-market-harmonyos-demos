@@ -28,6 +28,9 @@ struct StoreGuideDetailPage {
         Column() {
           Image(`${CommonUrl.CLOUD_STORAGE_URL}${this.vm.storeGuide.bigImage}`)
             .width(Constants.FULL_SIZE)
+            .constraintSize({
+              maxHeight: '40%',
+            })
           Column({ space: 12 }) {
             Column({ space: 12 }) {
               Image(`${CommonUrl.CLOUD_STORAGE_URL}${this.vm.storeGuide.logo}`).width(64).height(64).borderRadius(16)
@@ -86,8 +89,8 @@ struct StoreGuideDetailPage {
                 this.vm.showCallSheet = false;
               }), {
                 height: SheetSize.FIT_CONTENT,
-                blurStyle: BlurStyle.Thick,
                 showClose: false,
+                preferType: SheetType.CENTER,
               })
             }.width(Constants.FULL_SIZE).alignItems(HorizontalAlign.Start)
 
@@ -117,13 +120,14 @@ struct StoreGuideDetailPage {
             top: 12,
             left: Constants.BORDER_WIDTH,
             right: Constants.BORDER_WIDTH,
-            bottom: this.vm.getWindowBottomHeight() + 12
+            bottom: this.vm.getWindowBottomHeight() + 12,
           })
         }
       }
       .layoutWeight(1)
       .align(Alignment.Top)
       .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring)
     }.hideTitleBar(true)
   }
 }

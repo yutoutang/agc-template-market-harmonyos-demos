@@ -112,7 +112,9 @@ ShoppingMall
 │       │   ├── StorageModel.ets                         // 状态变量模型          
 │       │   └── TabBarModel.ets                          // Tab模型                    
 │       │         
-│       ├─utils 
+│       ├─utils
+│       │   ├── AppPrivacyUtils.ets                      // 隐私协议方法类 
+│       │   ├── ContextUtils.ets                         // Context方法类 
 │       │   ├── EmitUtils.ets                            // 全局事件方法类
 │       │   ├── FileUtils.ets                            // 文件处理方法类          
 │       │   ├── FormatUtils.ets                          // 格式化方法类
@@ -202,10 +204,10 @@ ShoppingMall
 
 ### 环境
 
-* DevEco Studio版本：DevEco Studio 5.0.0 Release及以上
-* HarmonyOS SDK版本：HarmonyOS 5.0.0 Release SDK及以上
-* 设备类型：华为手机（包括双折叠和阔折叠）
-* 系统版本：HarmonyOS 5.0.0(12)及以上
+- DevEco Studio版本：DevEco Studio 6.0.1 Release及以上
+- HarmonyOS SDK版本：HarmonyOS 6.0.1 Release SDK及以上
+- 设备类型：华为手机（包括双折叠和阔折叠）
+- 系统版本：HarmonyOS 5.0.3(15)及以上
 
 ### 权限
 

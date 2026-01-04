@@ -1,0 +1,9 @@
+{
+  "name": "ui_base",
+  "version": "1.0.1",
+  "description": "AppGalleryConnectSDK ui component base for OpenHarmony.",
+  "main": "Index.ets",
+  "author": "hms",
+  "license": "ISC",
+  "dependencies": {}
+}

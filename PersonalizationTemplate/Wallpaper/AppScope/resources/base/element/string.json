@@ -1,0 +1,20 @@
+{
+  "string": [
+    {
+      "name": "app_name",
+      "value": "壁纸模板"
+    },
+    {
+      "name": "agcit_huawei_wallpaper_service",
+      "value": "1.0.1"
+    },
+    {
+      "name": "agcittype_huawei_wallpaper_service",
+      "value": "industryTemplate"
+    },
+    {
+      "name": "agcitkid_huawei_wallpaper_service",
+      "value": "agcit_huawei_module_wallpaper_details/1.0.0,agcit_huawei_weather_module_city_manage/1.0.0,agcit_huawei_comprehensive_news_module_imagepreview/1.0.0,agcit_huawei_recipes_upload_recipe/1.0.1,agcit_huawei_calendar_vip_center/1.0.1,agcit_huawei_weather_module_weather_core/1.0.0"
+    }
+  ]
+}

@@ -1,0 +1,200 @@
+{
+  "float": [
+    {
+      "name": "page_text_font_size",
+      "value": "50fp"
+    },
+    {
+      "name": "vp_20",
+      "value": "20vp"
+    },
+    {
+      "name": "vp_12",
+      "value": "12vp"
+    },
+    {
+      "name": "vp_18",
+      "value": "18vp"
+    },
+    {
+      "name": "vp_10",
+      "value": "10vp"
+    },
+    {
+      "name": "vp_180",
+      "value": "180vp"
+    },
+    {
+      "name": "vp_36",
+      "value": "36vp"
+    },
+    {
+      "name": "fp_16",
+      "value": "16fp"
+    },
+    {
+      "name": "fp_28",
+      "value": "28fp"
+    },
+    {
+      "name": "vp_16",
+      "value": "16vp"
+    },
+    {
+      "name": "vp_4",
+      "value": "4vp"
+    },
+    {
+      "name": "vp_30",
+      "value": "30vp"
+    },
+    {
+      "name": "vp_40",
+      "value": "40vp"
+    },
+    {
+      "name": "vp_50",
+      "value": "50vp"
+    },
+    {
+      "name": "fp_14",
+      "value": "14fp"
+    },
+    {
+      "name": "vp_1",
+      "value": "1vp"
+    },
+    {
+      "name": "vp_6",
+      "value": "6vp"
+    },
+    {
+      "name": "vp_7",
+      "value": "7vp"
+    },
+    {
+      "name": "vp_14",
+      "value": "14vp"
+    },
+    {
+      "name": "fp_12",
+      "value": "12fp"
+    },
+    {
+      "name": "vp_26",
+      "value": "26"
+    },
+    {
+      "name": "vp_13",
+      "value": "13vp"
+    },
+    {
+      "name": "fp_22",
+      "value": "22fp"
+    },
+    {
+      "name": "vp_5",
+      "value": "5vp"
+    },
+    {
+      "name": "vp_9",
+      "value": "9vp"
+    },
+    {
+      "name": "fp_15",
+      "value": "15fp"
+    },
+    {
+      "name": "vp_138",
+      "value": "138vp"
+    },
+    {
+      "name": "fp_32",
+      "value": "32vp"
+    },
+    {
+      "name": "fp_36",
+      "value": "36vp"
+    },
+    {
+      "name": "vp_150",
+      "value": "150vp"
+    },
+    {
+      "name": "vp_184",
+      "value": "200vp"
+    },
+    {
+      "name": "vp_24",
+      "value": "24vp"
+    },
+    {
+      "name": "fp_18",
+      "value": "18fp"
+    },
+    {
+      "name": "vp_22",
+      "value": "22vp"
+    },
+    {
+      "name": "fp_10",
+      "value": "10fp"
+    },
+    {
+      "name": "vp_8",
+      "value": "8vp"
+    },
+    {
+      "name": "vp_62",
+      "value": "62vp"
+    },
+    {
+      "name": "vp_60",
+      "value": "60vp"
+    },
+    {
+      "name": "fp_55",
+      "value": "55fp"
+    },
+    {
+      "name": "vp_38",
+      "value": "38vp"
+    },
+    {
+      "name": "vp_2",
+      "value": "2vp"
+    },
+    {
+      "name": "vp_100",
+      "value": "100vp"
+    },
+    {
+      "name": "vp_120",
+      "value": "120"
+    },
+    {
+      "name": "vp_90",
+      "value": "90vp"
+    },
+    {
+      "name": "vp_200",
+      "value": "200vp"
+    },
+    {
+      "name": "vp_260",
+      "value": "260vp"
+    },
+    {
+      "name": "vp_300",
+      "value": "300vp"
+    },
+    {
+      "name": "vp_108",
+      "value": "108vp"
+    },
+    {
+      "name": "vp_148",
+      "value": "148vp"
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+{
+  "string": [
+    {
+      "name": "APPROXIMATELY_LOCATION",
+      "value": "详细位置位置"
+    },
+    {
+      "name": "run_heath",
+      "value": "健康运动"
+    },
+    {
+      "name": "running_target_kilometer",
+      "value": "距离目标："
+    },
+    {
+      "name": "mileage",
+      "value": "公里"
+    },
+    {
+      "name": "running_time",
+      "value": "用时"
+    },
+    {
+      "name": "running_finish",
+      "value": "已完成"
+    },
+    {
+      "name": "target",
+      "value": "%s目标：%s"
+    },
+    {
+      "name": "running_percent",
+      "value": "%"
+    },
+    {
+      "name": "running_distance",
+      "value": "距离"
+    },
+    {
+      "name": "running_calorie",
+      "value": "总消耗热量(千卡)"
+    },
+    {
+      "name": "calorie_unit",
+      "value": "千卡"
+    },
+    {
+      "name": "running_speed",
+      "value": "配速"
+    },
+    {
+      "name": "running_step",
+      "value": "步数"
+    },
+    {
+      "name": "running_finish_progress",
+      "value": "已完成目标的%d%%"
+    },
+    {
+      "name": "running_back_pressed_lock",
+      "value": "请长按解锁按钮，再做操作"
+    },
+    {
+      "name": "running_back_pressed_start",
+      "value": "点击暂停按钮，再结束运动"
+    },
+    {
+      "name": "running_back_pressed_end",
+      "value": "退出请长按结束按钮"
+    },
+    {
+      "name": "running_settings",
+      "value": "运动设置"
+    },
+    {
+      "name": "running_settings_description",
+      "value": "完成目标的30%,50%,80%,100%语音提示"
+    },
+    {
+      "name": "running_voice_broadcast",
+      "value": "语音播报"
+    },
+    {
+      "name": "location_rights",
+      "value": "位置权限"
+    },
+    {
+      "name": "running_pressed_unlock",
+      "value": "长按解锁"
+    },
+    {
+      "name": "running_pressed_end",
+      "value": "长按结束"
+    },
+    {
+      "name": "running_pressed_continue",
+      "value": "继续"
+    },
+    {
+      "name": "running_total_distance",
+      "value": "总距离"
+    },
+    {
+      "name": "running_total_time",
+      "value": "总时长"
+    },
+    {
+      "name": "agcit_huawei_stepcount_module_running",
+      "value": "1.0.0"
+    },
+    {
+      "name": "agcittype_huawei_stepcount_module_running",
+      "value": "serviceComponent"
+    }
+  ]
+}

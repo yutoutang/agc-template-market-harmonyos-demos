@@ -1,0 +1,34 @@
+{
+  "routerMap": [
+    {
+      "name": "IndexPage",
+      "pageSourceFile": "src/main/ets/pages/IndexPage.ets",
+      "buildFunction": "IndexPageBuilder"
+    },
+    {
+      "name": "SafePage",
+      "pageSourceFile": "src/main/ets/pages/SafePage.ets",
+      "buildFunction": "SafePageBuilder"
+    },
+    {
+      "name": "PrivacyPage",
+      "pageSourceFile": "src/main/ets/pages/PrivacyPage.ets",
+      "buildFunction": "PrivacyPageBuilder"
+    },
+    {
+      "name": "AgreePrivacyPage",
+      "pageSourceFile": "src/main/ets/pages/AgreeDialogPage.ets",
+      "buildFunction": "AgreePrivacyPageBuilder"
+    },
+    {
+      "name": "SplashPage",
+      "pageSourceFile": "src/main/ets/pages/SplashPage.ets",
+      "buildFunction": "SplashPageBuilder"
+    },
+    {
+      "name": "StartPage",
+      "pageSourceFile": "src/main/ets/pages/StartPage.ets",
+      "buildFunction": "StartPageBuilder"
+    }
+  ]
+}

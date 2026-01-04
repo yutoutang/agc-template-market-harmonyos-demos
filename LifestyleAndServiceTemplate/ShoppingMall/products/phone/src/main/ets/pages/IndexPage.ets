@@ -16,7 +16,7 @@ struct IndexPage {
   @Provider('currentIndex') currentIndex: TabBarType = TabBarType.HOME_PAGE;
   @Local formCardJump: FormCardJump = AppStorageV2.connect(FormCardJump, () => new FormCardJump())!;
 
-  @Monitor('formCardJump.form.id', 'formCardJump.form.url')
+  @Monitor('formCardJump.form.id','formCardJump.form.url')
   formChange(monitor: IMonitor) {
     Logger.info(TAG, 'Monitor formCardJump.form.url:' + monitor.value('formCardJump.form.url')?.now)
     if (monitor.value('formCardJump.form.url')?.now) {
@@ -40,23 +40,23 @@ struct IndexPage {
           Tabs({ index: this.currentIndex }) {
             TabContent() {
               wrapBuilder(HomePageBuilder).builder()
-            };
+            }
 
             TabContent() {
-            };
+            }
 
             TabContent() {
               wrapBuilder(MinePageBuilder).builder()
-            };
+            }
           }
           .layoutWeight(1)
           .barHeight(0)
           .scrollable(false)
           .onChange((index) => {
             this.currentIndex = index;
-          });
+          })
 
-          CustomTabBar();
+          CustomTabBar()
         }
         .width(Constants.FULL_SIZE)
         .height(Constants.FULL_SIZE);

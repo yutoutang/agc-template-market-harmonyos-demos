@@ -4,6 +4,8 @@ import { authentication } from '@kit.AccountKit';
 import { MyWalletViewModel } from 'business_mine';
 import {
   AppInfoModel,
+  AppPrivacyUtils,
+  ContextUtils,
   EmitUtils,
   HttpRequest,
   HuaweiIDResp,
@@ -11,7 +13,7 @@ import {
   MallModel,
   RouterMap,
   RouterUtil,
-  UserInfoModel
+  UserInfoModel,
 } from 'lib_common';
 import { WidgetUtil } from '../utils/WidgetUtil';
 
@@ -20,28 +22,42 @@ const TAG = '[IndexViewModel]';
 @ObservedV2
 export class IndexViewModel {
   @Trace pageStack: NavPathStack = RouterUtil.navPathStack
-  @Trace appInfo: AppInfoModel = AppStorageV2.connect(AppInfoModel)!;
+  @Trace appInfo: AppInfoModel = AppStorageV2.connect(AppInfoModel, () => new AppInfoModel())!;
   @Trace userInfo: UserInfoModel = AppStorageV2.connect(UserInfoModel, () => new UserInfoModel())!;
   @Trace mallModel: MallModel = AppStorageV2.connect(MallModel, () => new MallModel()) as MallModel;
   @Trace walletVM: MyWalletViewModel = MyWalletViewModel.instance
+  @Trace privacyImpl: AppPrivacyUtils = AppPrivacyUtils.instance;
+
+  // 监听协议签署结果
+  @Monitor('privacyImpl.agreeFlag')
+  agreeFlagChange() {
+    if (this.privacyImpl.agreeFlag) {
+      // 签署协议后，执行静默登录
+      this.silentLogin();
+    }
+  }
 
   init() {
-    Promise.all([HttpRequest.getShoppingMallInfo(), this.loginWithHuaweiID()]).then(resp => {
+    this.agreeFlagChange();
+    Promise.all([HttpRequest.getShoppingMallInfo()]).then(resp => {
       if (resp[0]) {
         this.mallModel.shoppingMall = resp[0]
       }
-      this.userInfo.openId = resp[1].openId
-      this.userInfo.unionId = resp[1].unionId
-      // 查询用户信息
-      HttpRequest.getUserInfo(resp[1].openId, resp[1].unionId).then((resp) => {
-        this.userInfo.userInfo = resp;
-        this.pageStack.replacePathByName(RouterMap.INDEX_PAGE, null);
-        WidgetUtil.updateWidgetsWhenChange();
-      });
+      this.pageStack.replacePathByName(RouterMap.INDEX_PAGE, null);
+      WidgetUtil.updateWidgetsWhenChange(ContextUtils.globalContext);
     })
+    this.onPrivacyChange();
     this.onConsumeWallet();
-    WidgetUtil.subscribeFormId(getContext());
-    WidgetUtil.subscribeFormClick(getContext());
+    WidgetUtil.subscribeFormId(ContextUtils.globalContext);
+    WidgetUtil.subscribeFormClick();
+  }
+
+  onPrivacyChange() {
+    this.privacyImpl.subscribe();
+  }
+
+  offPrivacyChange() {
+    this.privacyImpl.unSubscribe();
   }
 
   onConsumeWallet() {
@@ -52,6 +68,17 @@ export class IndexViewModel {
 
   offConsumeWallet() {
     EmitUtils.offEmit('onConsumeWallet');
+  }
+
+  private silentLogin() {
+    this.loginWithHuaweiID().then((resp) => {
+      this.userInfo.openId = resp.openId
+      this.userInfo.unionId = resp.unionId
+      // 查询用户信息
+      HttpRequest.getUserInfo(resp.openId, resp.unionId).then((resp) => {
+        this.userInfo.userInfo = resp;
+      });
+    })
   }
 
   private loginWithHuaweiID(): Promise<HuaweiIDResp> {
@@ -67,6 +94,7 @@ export class IndexViewModel {
         let authCode = loginWithHuaweiIDResponse.data?.authorizationCode;
         let openId = loginWithHuaweiIDResponse.data?.openID;
         let unionId = loginWithHuaweiIDResponse.data?.unionID;
+        Logger.info(TAG, 'loginWithHuaweiID result: ' + JSON.stringify(data));
         resolve({ openId, unionId, authCode } as HuaweiIDResp);
       }).catch((error: BusinessError) => {
         Logger.error(TAG, 'loginWithHuaweiID error: ' + JSON.stringify(error));

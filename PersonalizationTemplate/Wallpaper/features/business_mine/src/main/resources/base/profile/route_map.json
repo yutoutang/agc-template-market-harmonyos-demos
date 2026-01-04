@@ -1,0 +1,24 @@
+{
+  "routerMap": [
+    {
+      "name": "MinePage",
+      "pageSourceFile": "src/main/ets/pages/MinePage.ets",
+      "buildFunction": "MinePageBuilder"
+    },
+    {
+      "name": "Personal",
+      "pageSourceFile": "src/main/ets/pages/Personal.ets",
+      "buildFunction": "PersonalBuilder"
+    },
+    {
+      "name": "NewMarkPage",
+      "pageSourceFile": "src/main/ets/pages/NewMarkPage.ets",
+      "buildFunction": "NewMarkPageBuilder"
+    },
+    {
+      "name": "VipCenterPage",
+      "pageSourceFile": "src/main/ets/pages/VipCenterPage.ets",
+      "buildFunction": "VipCenterPageBuilder"
+    }
+  ]
+}

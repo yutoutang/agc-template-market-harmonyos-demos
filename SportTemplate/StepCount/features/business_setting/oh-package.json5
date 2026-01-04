@@ -1,0 +1,17 @@
+{
+  "name": "business_setting",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "lib_common": "file:../../commons/lib_common",
+    "lib_widget": "file:../../commons/lib_widget",
+    "lib_account": "file:../../commons/lib_account",
+    "lib_sport_api": "file:../../commons/lib_sport_api",
+    "module_feedback": "file:../../components/module_feedback",
+    "business_sport": "file:../business_sport"
+
+  }
+}

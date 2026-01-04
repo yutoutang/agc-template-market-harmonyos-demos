@@ -1,0 +1,9 @@
+{
+  "module": {
+    "name": "module_card_verification",
+    "type": "har",
+    "deviceTypes": [
+      "default"
+    ]
+  }
+}

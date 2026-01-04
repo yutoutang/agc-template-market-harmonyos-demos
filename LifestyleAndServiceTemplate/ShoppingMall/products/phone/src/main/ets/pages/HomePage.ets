@@ -73,16 +73,22 @@ struct HomePage {
             title: '首页',
             isMainPage: true,
             hasBackButton: false,
-            hasBgColor: false
+            hasBgColor: false,
           })
           Scroll(this.scroller) {
             Column() {
               Swiper() {
                 ForEach(this.bannerList, (item: ResourceStr) => {
                   Row() {
-                    Image(item).width(Constants.FULL_SIZE).borderRadius(16).onClick(() => {
-                      RouterUtil.pushPathByName(RouterMap.INTRODUCE_PAGE);
-                    })
+                    Image(item)
+                      .width(Constants.FULL_SIZE)
+                      .borderRadius(16)
+                      .constraintSize({
+                        maxHeight: '35%',
+                      })
+                      .onClick(() => {
+                        RouterUtil.pushPathByName(RouterMap.INTRODUCE_PAGE);
+                      })
                   };
                 }, (item: ResourceStr) => (JSON.stringify(item)),
                 );
@@ -92,13 +98,7 @@ struct HomePage {
               .autoPlay(true)
               .interval(2000)
               .vertical(false)
-              .indicator(new DotIndicator()
-                .itemWidth(8)
-                .itemHeight(8)
-                .selectedItemWidth(12)
-                .selectedItemHeight(8)
-                .color($r('sys.color.comp_background_secondary'))
-                .selectedColor($r('app.color.app_theme')))
+              .indicator(new DotIndicator().color($r('sys.color.comp_background_secondary')))
               .onChange((index) => {
                 this.swiperIndex = index;
               })
@@ -168,7 +168,12 @@ struct HomePage {
                 Text($r('app.string.footer_line')).fontSize(10).fontColor($r('sys.color.font_secondary'))
               }
               .width(Constants.FULL_SIZE)
-              .margin({ left: 10, right: 10, top: 16 })
+              .margin({
+                left: 10,
+                right: 10,
+                top: 16,
+                bottom: 16,
+              })
             }
           }
           .layoutWeight(1)
@@ -183,7 +188,6 @@ struct HomePage {
     .width('100%')
     .height(Constants.FULL_SIZE)
     .backgroundColor('#F1F3F5')
-    .padding({ bottom: this.windowModel.getWindowBottomHeight() })
   }
 
   @Builder

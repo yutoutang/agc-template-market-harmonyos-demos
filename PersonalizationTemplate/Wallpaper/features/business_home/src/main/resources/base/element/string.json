@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "reason_read_imagevideo",
+      "value": "需要访问您的相册以选择壁纸图片"
+    },
+    {
+      "name": "page_show",
+      "value": "page from package"
+    },
+    {
+      "name": "reason",
+      "value": "需要访问媒体文件以保存壁纸到相册"
+    }
+  ]
+}

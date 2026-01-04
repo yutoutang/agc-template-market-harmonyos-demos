@@ -1,0 +1,20 @@
+{
+  "string": [
+    {
+      "name": "app_name",
+      "value": "贷款模板"
+    },
+    {
+      "name": "agcit_huawei_loans_service",
+      "value": "1.0.1"
+    },
+    {
+      "name": "agcittype_huawei_loans_service",
+      "value": "industryTemplate"
+    },
+    {
+      "name": "agcitkid_huawei_loans_service",
+      "value": "agcit_huawei_module_customer_service/1.0.1,agcit_huawei_module_face_verification/1.0.1,agcit_huawei_comprehensive_news_module_imagepreview/1.0.0,agcit_huawei_module_loan_form/1.0.1"
+    }
+  ]
+}

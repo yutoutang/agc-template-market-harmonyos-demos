@@ -13,20 +13,20 @@
  * limitations under the License.
  */
 import { ComponentContent, promptAction } from '@kit.ArkUI';
-import { common } from '@kit.AbilityKit';
+import { BusinessError } from '@kit.BasicServicesKit';
+import { ContextUtils } from './ContextUtils';
+import { Logger } from './Utils';
 
 export enum PopViewShowType {
   OPEN
-}
-
-async function getUIContext() {
-  return (await (getContext() as common.UIAbilityContext).windowStage.getMainWindow()).getUIContext()
 }
 
 interface PopViewModel {
   com: ComponentContent<object>;
   popType: PopViewShowType;
 }
+
+const TAG = '[PointsPopViewUtils]';
 
 export class PopViewUtils {
   private static popShare: PopViewUtils;
@@ -44,7 +44,7 @@ export class PopViewUtils {
     contentView: WrappedBuilder<[T]> | WrappedBuilder<[]>, args?: T,
     options?: promptAction.BaseDialogOptions): Promise<void> {
     if (!PopViewUtils.uiContext) {
-      PopViewUtils.uiContext = await getUIContext();
+      PopViewUtils.uiContext = ContextUtils.globalUIContext;
     }
     if (PopViewUtils.uiContext) {
       let prompt = PopViewUtils.uiContext.getPromptAction();
@@ -64,19 +64,24 @@ export class PopViewUtils {
           }
         },
       };
-      prompt.openCustomDialog(componentContent, customOptions);
-      let infoList = PopViewUtils.shareInstance().infoList;
-      let info: PopViewModel = {
-        com: componentContent,
-        popType: type,
-      };
-      infoList[0] = info;
+      prompt.openCustomDialog(componentContent, customOptions).then(() => {
+        if (componentContent) {
+          let infoList = PopViewUtils.shareInstance().infoList;
+          let info: PopViewModel = {
+            com: componentContent,
+            popType: type,
+          };
+          infoList[0] = info;
+        }
+      }).catch((e: BusinessError) => {
+        Logger.error(TAG, `openCustomDialog fail. Code: ${e.code}, message: ${e.message}`);
+      });
     }
   }
 
   static async closeDialog(type: PopViewShowType): Promise<void> {
     if (!PopViewUtils.uiContext) {
-      PopViewUtils.uiContext = await getUIContext();
+      PopViewUtils.uiContext = ContextUtils.globalUIContext;
     }
     if (PopViewUtils.uiContext) {
       let prompt = PopViewUtils.uiContext.getPromptAction();
@@ -88,7 +93,9 @@ export class PopViewUtils {
         PopViewUtils.shareInstance().infoList = PopViewUtils.shareInstance().infoList.filter((model) => {
           return model.com !== info.com;
         })
-        prompt.closeCustomDialog(info.com);
+        prompt.closeCustomDialog(info.com).catch((e: BusinessError) => {
+          Logger.error(TAG, `closeCustomDialog fail. Code: ${e.code}, message: ${e.message}`);
+        });
       }
     }
   }

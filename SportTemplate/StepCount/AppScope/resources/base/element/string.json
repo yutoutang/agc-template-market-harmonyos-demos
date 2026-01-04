@@ -1,0 +1,40 @@
+{
+  "string": [
+    {
+      "name": "app_name",
+      "value": "计步器模板"
+    },
+    {
+      "name": "module_desc",
+      "value": "module description"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "label"
+    },
+    {
+      "name": "fuzzy_location_permission",
+      "value": "允许应用获取设备模糊位置信息"
+    },
+    {
+      "name": "location_permission",
+      "value": "允许应用在前台运行时获取位置信息"
+    },
+    {
+      "name": "agcit_huawei_stepcount_service",
+      "value": "1.0.1"
+    },
+    {
+      "name": "agcittype_huawei_stepcount_service",
+      "value": "industryTemplate"
+    },
+    {
+      "name": "agcitkid_huawei_stepcount_service",
+      "value": "agcit_huawei_stepcount_module_bmiassess/1.0.1,agcit_huawei_stepcount_module_daily/1.0.0,agcit_huawei_stepcount_module_datechart/1.0.1,agcit_huawei_stepcount_module_imagepreview/1.0.0,agcit_huawei_stepcount_module_moveratio/1.0.0,agcit_huawei_stepcount_module_running/1.0.0,agcit_huawei_stepcount_module_target/1.0.0,agcit_huawei_stepcount_module_timer/1.0.0,agcit_huawei_stepcount_module_trajectory/1.0.0"
+    }
+  ]
+}

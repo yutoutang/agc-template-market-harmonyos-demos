@@ -3,7 +3,7 @@
     "name": "module_coupon",
     "type": "har",
     "deviceTypes": [
-      "phone"
+      "phone",
     ]
   }
 }

@@ -1,0 +1,67 @@
+{
+  "forms": [
+    {
+      "name": "trumpet",
+      "displayName": "$string:trumpet_display_name",
+      "description": "$string:trumpet_desc",
+      "src": "./ets/widget/trumpet/pages/TrumpetCard.ets",
+      "uiSyntax": "arkts",
+      "window": {
+        "designWidth": 720,
+        "autoDesignWidth": true
+      },
+      "colorMode": "auto",
+      "isDynamic": true,
+      "isDefault": true,
+      "updateEnabled": false,
+      "scheduledUpdateTime": "10:30",
+      "updateDuration": 1,
+      "defaultDimension": "2*2",
+      "supportDimensions": [
+        "2*2"
+      ]
+    },
+    {
+      "name": "medium",
+      "displayName": "$string:medium_display_name",
+      "description": "$string:medium_desc",
+      "src": "./ets/widget/medium/pages/MediumCard.ets",
+      "uiSyntax": "arkts",
+      "window": {
+        "designWidth": 720,
+        "autoDesignWidth": true
+      },
+      "colorMode": "auto",
+      "isDynamic": true,
+      "isDefault": false,
+      "updateEnabled": false,
+      "scheduledUpdateTime": "10:30",
+      "updateDuration": 1,
+      "defaultDimension": "2*4",
+      "supportDimensions": [
+        "2*4"
+      ]
+    },
+    {
+      "name": "large",
+      "displayName": "$string:large_display_name",
+      "description": "$string:large_desc",
+      "src": "./ets/widget/large/pages/LargeCard.ets",
+      "uiSyntax": "arkts",
+      "window": {
+        "designWidth": 720,
+        "autoDesignWidth": true
+      },
+      "colorMode": "auto",
+      "isDynamic": true,
+      "isDefault": false,
+      "updateEnabled": false,
+      "scheduledUpdateTime": "10:30",
+      "updateDuration": 1,
+      "defaultDimension": "4*4",
+      "supportDimensions": [
+        "4*4"
+      ]
+    }
+  ]
+}

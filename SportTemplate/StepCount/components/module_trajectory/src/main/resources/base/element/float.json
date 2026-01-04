@@ -1,0 +1,88 @@
+{
+  "float": [
+    {
+      "name": "page_text_font_size",
+      "value": "180fp"
+    },
+    {
+      "name": "head_icon_width",
+      "value": "40vp"
+    },
+    {
+      "name": "marshalling_size",
+      "value": "15fp"
+    },
+    {
+      "name": "vp_8",
+      "value": "8vp"
+    },
+    {
+      "name": "vp_15",
+      "value": "15vp"
+    },
+    {
+      "name": "vp_17",
+      "value": "17vp"
+    },
+    {
+      "name": "vp_20",
+      "value": "20vp"
+    },
+    {
+      "name": "vp_25",
+      "value": "25vp"
+    },
+    {
+      "name": "vp_35",
+      "value": "35vp"
+    },
+    {
+      "name": "vp_39",
+      "value": "39vp"
+    },
+    {
+      "name": "vp_40",
+      "value": "40vp"
+    },
+    {
+      "name": "vp_50",
+      "value": "50vp"
+    },
+    {
+      "name": "vp_60",
+      "value": "60vp"
+    },
+    {
+      "name": "vp_70",
+      "value": "70vp"
+    },
+    {
+      "name": "vp_140",
+      "value": "140vp"
+    },
+    {
+      "name": "vp_160",
+      "value": "160vp"
+    },
+    {
+      "name": "vp_180",
+      "value": "180vp"
+    },
+    {
+      "name": "vp_190",
+      "value": "190vp"
+    },
+    {
+      "name": "number_5",
+      "value": "5"
+    },
+    {
+      "name": "number_10",
+      "value": "10"
+    },
+    {
+      "name": "number_20",
+      "value": "20"
+    }
+  ]
+}

@@ -1,5 +1,4 @@
-import { promptAction } from '@kit.ArkUI'
-import { Constants, HttpRequest, PLATE_COLOR_TYPE, PLATE_TYPE, SheetHeaderComp } from 'lib_common'
+import { Constants, HttpRequest, PLATE_COLOR_TYPE, PLATE_TYPE, SheetHeaderComp, ContextUtils } from 'lib_common'
 import { UILicensePlate } from 'module_keyboard';
 
 @ComponentV2
@@ -128,7 +127,7 @@ export struct AddPlateComp {
           .margin({ top: 160, left: 12, right: 12 })
           .onClick(() => {
             if (!this.plate) {
-              promptAction.showToast({ message: '请输入正确的车牌' })
+              ContextUtils.showToast({ message: '请输入正确的车牌' });
               return
             }
             if (this.plate.length === 8 && this.plateColorType === PLATE_COLOR_TYPE.BLUE) {
@@ -138,7 +137,7 @@ export struct AddPlateComp {
               this.plateController.stopEditing();
               this.onSuccess();
             }).catch((e: string) => {
-              promptAction.showToast({ message: e })
+              ContextUtils.showToast({ message: e });
             })
           })
       }

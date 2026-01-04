@@ -1,0 +1,7 @@
+export { WorkItem, WorkExperienceModel } from './viewsmodel/WorkExperienceModel'
+export { ProjectItem, ProjectExperienceModel } from './viewsmodel/ProjectExperienceModel'
+export { CertificateItem, QualificationCertificateModel } from './viewsmodel/QualificationCertificateModel'
+export { EducationItem, EducationalBackgroundModel } from './viewsmodel/EducationalBackgroundModel'
+export { VocationalSkillModel } from './viewsmodel/VocationalSkillModel'
+export { PersonalInformationModel, PersonalInfo } from './viewsmodel/BasicalInformationModel'
+export { SelfEvaluationModel } from './viewsmodel/SelfEvaluationModel'

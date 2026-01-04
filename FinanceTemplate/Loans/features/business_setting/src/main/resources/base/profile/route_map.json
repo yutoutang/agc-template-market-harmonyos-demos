@@ -1,0 +1,54 @@
+{
+  "routerMap": [
+    {
+      "name": "SettingPersonal",
+      "pageSourceFile": "src/main/ets/pages/SettingPersonal.ets",
+      "buildFunction": "SettingPersonalBuilder"
+    },
+    {
+      "name": "SettingAccountSecurity",
+      "pageSourceFile": "src/main/ets/pages/SettingAccountSecurity.ets",
+      "buildFunction": "SettingAccountSecurityBuilder"
+    },
+    {
+      "name": "SettingChangePhone",
+      "pageSourceFile": "src/main/ets/pages/SettingChangePhone.ets",
+      "buildFunction": "SettingChangePhoneBuilder"
+    },
+    {
+      "name": "SettingChangePhoneNext",
+      "pageSourceFile": "src/main/ets/pages/SettingChangePhoneNext.ets",
+      "buildFunction": "SettingChangePhoneNextBuilder"
+    },
+    {
+      "name": "DeleteAccount",
+      "pageSourceFile": "src/main/ets/pages/DeleteAccount.ets",
+      "buildFunction": "DeleteAccountBuilder"
+    },
+    {
+      "name": "ContactPage",
+      "pageSourceFile": "src/main/ets/pages/ContactPage.ets",
+      "buildFunction": "ContactPageBuilder"
+    },
+    {
+      "name": "CustomerService",
+      "pageSourceFile": "src/main/ets/pages/CustomerService.ets",
+      "buildFunction": "CustomerServiceBuilder"
+    },
+    {
+      "name": "FraudReportPage",
+      "pageSourceFile": "src/main/ets/pages/FraudReportPage.ets",
+      "buildFunction": "FraudReportPageBuilder"
+    },
+    {
+      "name": "ProblemDetails",
+      "pageSourceFile": "src/main/ets/pages/ProblemDetails.ets",
+      "buildFunction": "ProblemDetailsBuilder"
+    },
+    {
+      "name": "ConfirmCancellation",
+      "pageSourceFile": "src/main/ets/pages/ConfirmCancellation.ets",
+      "buildFunction": "ConfirmCancellationBuilder"
+    }
+  ]
+}

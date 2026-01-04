@@ -1,5 +1,5 @@
 import { AppStorageV2 } from '@kit.ArkUI';
-import { Constants, UserInfoModel, NavHeaderBar, PageHeaderComp } from 'lib_common';
+import { Constants, UserInfoModel, NavHeaderBar, PageHeaderComp, ContextUtils } from 'lib_common';
 import { GlobalPointUtils } from 'module_points';
 
 @Builder
@@ -102,12 +102,12 @@ struct MemberShipPage {
       .onClick(() => {
         this.globalPointInfo.isCheckIn = true;
         this.globalPointInfo.myPoints += 10;
-        this.getUIContext().getPromptAction().showToast({ message: '签到成功~' });
+        ContextUtils.showToast({ message: '签到成功~' });
       })
   }
 
   rotateRefreshIcon() {
-    animateTo({
+    this.getUIContext().animateTo({
       curve: Curve.EaseInOut,
       duration: 200,
     }, () => {

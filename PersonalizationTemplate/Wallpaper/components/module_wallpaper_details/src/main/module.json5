@@ -1,0 +1,16 @@
+{
+  "module": {
+    "name": "module_wallpaper_details",
+    "type": "har",
+    "deviceTypes": [
+      "default",
+      "tablet",
+      "2in1"
+    ],
+    "requestPermissions": [
+      {
+        "name": "ohos.permission.INTERNET",
+      }
+    ]
+  }
+}

@@ -1,0 +1,120 @@
+{
+  "color": [
+    {
+      "name": "common_main_background",
+      "value": "#F5F6FA"
+    },
+    {
+      "name": "common_block_background",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "common_title_font",
+      "value": "#242942"
+    },
+    {
+      "name": "common_black_white",
+      "value": "#000000"
+    },
+    {
+      "name": "common_white_black",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "common_line_background",
+      "value": "#0D000000"
+    },
+    {
+      "name": "common_text_main",
+      "value": "#242942"
+    },
+    {
+      "name": "common_text_main_70_percent",
+      "value": "#B2242942"
+    },
+    {
+      "name": "common_text_sub",
+      "value": "#8C8C8E"
+    },
+    {
+      "name": "common_swiper_selected",
+      "value": "#808C8C8E"
+    },
+    {
+      "name": "menu_background",
+      "value": "#464646"
+    },
+    {
+      "name": "text_black",
+      "value": "#000000"
+    },
+    {
+      "name": "text_gray",
+      "value": "#696969"
+    },
+    {
+      "name": "text_orange",
+      "value": "#FD8E50"
+    },
+    {
+      "name": "border_color",
+      "value": "#E6E6E6"
+    },
+    {
+      "name": "tab_bg",
+      "value": "#0F8C8C8E"
+    },
+    {
+      "name": "tab_select_color",
+      "value": "#4075FF"
+    },
+    {
+      "name": "tab_select_bg",
+      "value": "#0F4075FF"
+    },
+    {
+      "name": "border_line",
+      "value": "#c8c8c8"
+    },
+    {
+      "name": "label_bg",
+      "value": "#F2F2F4"
+    },
+    {
+      "name": "label_title",
+      "value": "#242A41"
+    },
+    {
+      "name": "follow_text",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "review_bg",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "app_theme",
+      "value": "#FD603E"
+    },
+    {
+      "name": "gradient_start",
+      "value": "#DFE8FB"
+    },
+    {
+      "name": "common_page_bg",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "comment_input_bg",
+      "value": "#0D000000"
+    },
+    {
+      "name": "home_linear",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "action_linear",
+      "value": "#F1F3F5"
+    }
+  ]
+}

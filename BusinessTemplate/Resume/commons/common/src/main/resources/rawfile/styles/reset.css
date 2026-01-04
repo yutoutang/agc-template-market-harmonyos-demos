@@ -1,0 +1,54 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  margin: 0;
+  padding: 0;
+  -webkit-text-size-adjust:100%;
+  background: #FFFFFF;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #FFFFFF;
+}
+
+ul li {
+  list-style: none;
+}
+
+
+.clf:after {
+  clear: both;
+  content: ".";
+  display: block;
+  font-size: 0;
+  height: 0;
+  visibility: hidden;
+  _zoom: 1;
+}
+
+textarea,
+input,
+button {
+  border: none;
+  outline: none;
+}
+
+textarea {
+  resize: none;
+}
+
+img {
+  border: none;
+  display: block;
+}
+
+a {
+  text-decoration: none;
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+}

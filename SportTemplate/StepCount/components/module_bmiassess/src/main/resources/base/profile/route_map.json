@@ -1,0 +1,9 @@
+{
+  "routerMap": [
+    {
+      "name": "EditUserInfo",
+      "pageSourceFile": "src/main/ets/components/EditUserInfo.ets",
+      "buildFunction": "EditUserInfoBuilder"
+    }
+  ]
+}

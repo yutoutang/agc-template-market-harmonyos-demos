@@ -4,7 +4,7 @@
     "type": "har",
     "routerMap": "$profile:route_map_point",
     "deviceTypes": [
-      "phone"
+      "phone",
     ]
   }
 }

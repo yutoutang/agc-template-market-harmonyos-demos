@@ -1,0 +1,44 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "外卖模板"
+    },
+    {
+      "name": "PhoneAbility_desc",
+      "value": "外卖模板"
+    },
+    {
+      "name": "PhoneAbility_label",
+      "value": "外卖模板"
+    },
+    {
+      "name": "PhoneFormAbility_desc",
+      "value": "form_description"
+    },
+    {
+      "name": "PhoneFormAbility_label",
+      "value": "form_label"
+    },
+    {
+      "name": "widget_desc",
+      "value": "外卖模板"
+    },
+    {
+      "name": "widget_display_name",
+      "value": "外卖模板"
+    },
+    {
+      "name": "location_permission",
+      "value": "一个权限申请定位"
+    },
+    {
+      "name": "fuzzy_location_permission",
+      "value": "一个权限申请模糊定位"
+    },
+    {
+      "name": "agcit_huawei_takeaway_service",
+      "value": "1.0.0"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "string": [
+    {
+      "name": "page_show",
+      "value": "page from package"
+    },
+    {
+      "name": "camera_reason",
+      "value": "使用相机权限进行人脸识别与验证"
+    },
+    {
+      "name": "agcit_huawei_module_face_verification",
+      "value": "1.0.1"
+    },
+    {
+      "name": "agcittype_huawei_module_face_verification",
+      "value": "serviceComponent"
+    }
+  ]
+}

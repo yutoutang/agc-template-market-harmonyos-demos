@@ -1,0 +1,48 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "计步器模板"
+    },
+    {
+      "name": "PhoneAbility_desc",
+      "value": "计步器模板"
+    },
+    {
+      "name": "PhoneAbility_label",
+      "value": "计步器模板"
+    },
+    {
+      "name": "PhoneFormAbility_desc",
+      "value": "form_description"
+    },
+    {
+      "name": "PhoneFormAbility_label",
+      "value": "form_label"
+    },
+    {
+      "name": "widget_desc",
+      "value": "计步器"
+    },
+    {
+      "name": "widget_display_name",
+      "value": "计步器"
+    },
+    {
+      "name": "fuzzy_location_permission",
+      "value": "允许应用获取设备模糊位置信息"
+    },
+    {
+      "name": "location_permission",
+      "value": "允许应用在前台运行时获取位置信息"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "label"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "description"
+    }
+  ]
+}

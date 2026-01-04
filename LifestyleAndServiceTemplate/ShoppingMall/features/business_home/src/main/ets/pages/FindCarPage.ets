@@ -1,4 +1,4 @@
-import { NavHeaderBar, PaymentRouter, RouterMap, RouterUtil } from 'lib_common';
+import { NavHeaderBar, PaymentRouter, RouterMap, RouterUtil, ContextUtils } from 'lib_common';
 import { UILicensePlate } from 'module_keyboard';
 
 @Builder
@@ -44,7 +44,7 @@ struct FindCarPage {
           .margin({ top: 12 })
           .onClick(() => {
             if (!this.plate || this.plate.length < 7) {
-              this.getUIContext().getPromptAction().showToast({ message: '请输入完整的车牌' });
+              ContextUtils.showToast({ message: '请输入完整的车牌' });
               return;
             }
             this.controller.stopEditing();

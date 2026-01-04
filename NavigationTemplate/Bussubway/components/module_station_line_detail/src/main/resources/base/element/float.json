@@ -1,0 +1,48 @@
+{
+  "float": [
+    {
+      "name": "detail_panel_height",
+      "value": "350vp"
+    },
+    {
+      "name": "nav_header_height",
+      "value": "56vp"
+    },
+    {
+      "name": "button_height",
+      "value": "30vp"
+    },
+    {
+      "name": "border_radius",
+      "value": "16vp"
+    },
+    {
+      "name": "icon_size_small",
+      "value": "12vp"
+    },
+    {
+      "name": "icon_size_medium",
+      "value": "14vp"
+    },
+    {
+      "name": "icon_size_large",
+      "value": "24vp"
+    },
+    {
+      "name": "page_text_font_size",
+      "value": "50fp"
+    },
+    {
+      "name": "head_icon_width",
+      "value": "40vp"
+    },
+    {
+      "name": "widget_vertical_space",
+      "value": "8vp"
+    },
+    {
+      "name": "widget_common_padding",
+      "value": "12vp"
+    }
+  ]
+}

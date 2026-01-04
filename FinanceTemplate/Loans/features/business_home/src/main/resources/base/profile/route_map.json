@@ -1,0 +1,19 @@
+{
+  "routerMap": [
+    {
+      "name": "HomePage",
+      "pageSourceFile": "src/main/ets/pages/HomePage.ets",
+      "buildFunction": "HomePageBuilder"
+    },
+    {
+      "name": "LearnMorePage",
+      "pageSourceFile": "src/main/ets/pages/LearnMorePage.ets",
+      "buildFunction": "LearnMorePageBuilder"
+    },
+    {
+      "name": "VerifyPage",
+      "pageSourceFile": "src/main/ets/pages/VerifyPage.ets",
+      "buildFunction": "VerifyPageBuilder"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "module": {
+    "name": "cloud_privatespace",
+    "type": "har",
+    "deviceTypes": [
+      "default",
+      "tablet",
+      "2in1"
+    ],
+    "routerMap": "$profile:route_map"
+  }
+}

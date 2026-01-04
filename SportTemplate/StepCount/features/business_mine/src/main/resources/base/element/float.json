@@ -1,0 +1,36 @@
+{
+  "float": [
+    {
+      "name": "page_text_font_size",
+      "value": "50fp"
+    },
+    {
+      "name": "user_icon_width",
+      "value": "48vp"
+    },
+    {
+      "name": "grid_icon_width",
+      "value": "40vp"
+    },
+    {
+      "name": "menu_icon_width",
+      "value": "48vp"
+    },
+    {
+      "name": "user_icon_width_small",
+      "value": "40vp"
+    },
+    {
+      "name": "vp_40",
+      "value": "40vp"
+    },
+    {
+      "name": "vp_20",
+      "value": "20vp"
+    },
+    {
+      "name": "vp_8",
+      "value": "8vp"
+    }
+  ]
+}

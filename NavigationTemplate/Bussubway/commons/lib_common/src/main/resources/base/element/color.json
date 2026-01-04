@@ -1,0 +1,32 @@
+{
+  "color": [
+    {
+      "name": "app_theme",
+      "value": "#ff0a59f7"
+    },
+    {
+      "name": "gradient_start",
+      "value": "#DFE8FB"
+    },
+    {
+      "name": "common_page_bg",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "comment_input_bg",
+      "value": "#0D000000"
+    },
+    {
+      "name": "home_linear",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "action_linear",
+      "value": "#F1F3F5"
+    },
+    {
+      "name": "app_cancel",
+      "value": "#99000000"
+    }
+  ]
+}

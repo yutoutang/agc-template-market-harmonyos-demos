@@ -1,0 +1,15 @@
+{
+  "module": {
+    "name": "business_home",
+    "type": "har",
+    "routerMap": "$profile:route_map",
+    "deviceTypes": [
+      "default"
+    ],
+    "requestPermissions": [
+      {
+        "name": "ohos.permission.PUBLISH_AGENT_REMINDER",
+      }
+    ]
+  }
+}

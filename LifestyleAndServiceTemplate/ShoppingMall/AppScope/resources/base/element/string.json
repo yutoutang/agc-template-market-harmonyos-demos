@@ -2,7 +2,7 @@
   "string": [
     {
       "name": "agcit_huawei_shopping_mall",
-      "value": "1.0.1"
+      "value": "1.0.2"
     },
     {
       "name": "agcittype_huawei_shopping_mall",
@@ -14,7 +14,7 @@
     },
     {
       "name": "agcitkid_huawei_shopping_mall",
-      "value": "agcit_huawei_shopping_mall_module_coupon/1.0.1,agcit_huawei_shopping_mall_module_keyboard/1.0.1,agcit_huawei_shopping_mall_module_points/1.0.1"
+      "value": "agcit_huawei_shopping_mall_module_coupon/1.0.2,agcit_huawei_shopping_mall_module_keyboard/1.0.2,agcit_huawei_shopping_mall_module_points/1.0.2"
     }
   ]
 }

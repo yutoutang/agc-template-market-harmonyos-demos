@@ -1,9 +1,10 @@
 import { common } from '@kit.AbilityKit';
-import { AppStorageV2, promptAction } from '@kit.ArkUI';
+import { AppStorageV2 } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import {
   BaseResponse,
   CAR_STATUE,
+  ContextUtils,
   EmitUtils,
   FormatUtils,
   GlobalUtils,
@@ -147,7 +148,7 @@ export class PayDetailViewModel extends WindowModel {
   }
 
   handleSuccess() {
-    promptAction.showToast({ message: '模拟支付成功~' });
+    ContextUtils.showToast({ message: '模拟支付成功~' });
     const actualPayRecord = new PayRecord();
     actualPayRecord.plate = this.plate
     actualPayRecord.address = '商场停车场'
@@ -167,7 +168,7 @@ export class PayDetailViewModel extends WindowModel {
         this.handleSuccess();
       }).catch((e: BusinessError) => {
         Logger.error(TAG, `getHuaweiPayInfo error: ${JSON.stringify(e)}.`);
-        promptAction.showToast({ message: $r('app.string.pay_failed_msg', JSON.stringify(e)) })
+        ContextUtils.showToast({ message: $r('app.string.pay_failed_msg', JSON.stringify(e)) })
       })
     })
   }

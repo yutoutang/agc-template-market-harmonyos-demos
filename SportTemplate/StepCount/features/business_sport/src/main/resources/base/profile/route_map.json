@@ -1,0 +1,49 @@
+{
+  "routerMap": [
+    {
+      "name": "SportPage",
+      "pageSourceFile": "src/main/ets/pages/SportPage.ets",
+      "buildFunction": "SportPageBuilder"
+    },
+    {
+      "name": "StepCountPage",
+      "pageSourceFile": "src/main/ets/pages/StepCountPage.ets",
+      "buildFunction": "stepCountPageBuilder"
+    },
+    {
+      "name": "StepDetailPage",
+      "pageSourceFile": "src/main/ets/pages/StepDetailPage.ets",
+      "buildFunction": "stepDetailPageBuilder"
+    },
+    {
+      "name": "AllSportRecordsPage",
+      "pageSourceFile": "src/main/ets/pages/AllSportRecordsPage.ets",
+      "buildFunction": "allSportRecordsPageBuilder"
+    },
+    {
+      "name": "SportRecordDetailPage",
+      "pageSourceFile": "src/main/ets/pages/SportRecordDetailPage.ets",
+      "buildFunction": "sportRecordDetailPageBuilder"
+    },
+    {
+      "name": "MyRouteMap",
+      "pageSourceFile": "src/main/ets/pages/MyRouteMap.ets",
+      "buildFunction": "MyRouteMapBuilder"
+    },
+    {
+      "name": "AttendanceRecordPage",
+      "pageSourceFile": "src/main/ets/pages/AttendanceRecordPage.ets",
+      "buildFunction": "AttendanceRecordPageBuilder"
+    },
+    {
+      "name": "ApplyLocationRights",
+      "pageSourceFile": "src/main/ets/components/ApplyLocationRights.ets",
+      "buildFunction": "ApplyLocationRightsBuilder"
+    },
+    {
+      "name": "RealTimeMotionPage",
+      "pageSourceFile": "src/main/ets/pages/RealTimeMotionPage.ets",
+      "buildFunction": "RealTimeMotionPageBuilder"
+    }
+  ]
+}

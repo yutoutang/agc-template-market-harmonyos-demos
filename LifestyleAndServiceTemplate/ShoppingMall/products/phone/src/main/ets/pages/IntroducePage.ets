@@ -15,7 +15,12 @@ struct IntroducePage {
       NavHeaderBar({ title: '商场介绍', hasBgColor: false })
       Scroll() {
         Column({ space: 16 }) {
-          Image($r('app.media.banner_1')).width('100%').borderRadius(16)
+          Image($r('app.media.banner_1'))
+            .width('100%')
+            .borderRadius(16)
+            .constraintSize({
+              maxHeight: '35%',
+            })
           Column({ space: 16 }) {
             Row({ space: 8 }) {
               Text('开盒山').fontSize($r('sys.float.Subtitle_M')).fontWeight(FontWeight.Medium)
@@ -43,7 +48,7 @@ struct IntroducePage {
               top: 10,
               bottom: 10,
               left: 12,
-              right: 12
+              right: 12,
             })
             .backgroundColor(Color.White)
             .borderRadius(12)
@@ -81,7 +86,7 @@ struct IntroducePage {
         left: 16,
         right: 16,
         top: 12,
-        bottom: 40
+        bottom: 40,
       })
     }
     .hideTitleBar(true)

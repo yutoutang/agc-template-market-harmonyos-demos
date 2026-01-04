@@ -1,0 +1,93 @@
+{
+  "app": {
+    "signingConfigs": [],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+        "compatibleSdkVersion": "5.0.1(13)",
+        "runtimeOS": "HarmonyOS",
+        "buildOption": {
+          "strictMode": {
+            "caseSensitiveCheck": true,
+            "useNormalizedOHMUrl": true
+          }
+        }
+      }
+    ],
+    "buildModeSet": [
+      {
+        "name": "debug"
+      },
+      {
+        "name": "release"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "entry",
+      "srcPath": "./product/entry",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "homePage",
+      "srcPath": "./features/homePage"
+    },
+    {
+      "name": "minePage",
+      "srcPath": "./features/minePage"
+    },
+    {
+      "name": "topicPage",
+      "srcPath": "./features/topicPage"
+    },
+    {
+      "name": "commonLib",
+      "srcPath": "./commons/commonLib"
+    },
+    {
+      "name": "base_select",
+      "srcPath": "./components/base_select"
+    },
+    {
+      "name": "select_category",
+      "srcPath": "./components/select_category"
+    },
+    {
+      "name": "answer_questions",
+      "srcPath": "./components/answer_questions"
+    },
+    {
+      "name": "login_info",
+      "srcPath": "./components/login_info"
+    },
+    {
+      "name": "aggregated_payment",
+      "srcPath": "./components/aggregated_payment"
+    },
+    {
+      "name": "router_module",
+      "srcPath": "./commons/router_module"
+    },
+    {
+      "name": "feed_back",
+      "srcPath": "./components/feed_back"
+    },
+    {
+      "name": "search",
+      "srcPath": "./components/search"
+    },
+    {
+      "name": "search_question",
+      "srcPath": "./components/search_question"
+    }
+  ]
+}

@@ -183,6 +183,7 @@ struct Sample2 {
           })
           .bindSheet($$this.showCouponSheet, this.selectCouponBuilder(), {
             height: SheetSize.MEDIUM,
+            preferType: SheetType.CENTER,
             title: {
               title: '选择优惠券',
             },

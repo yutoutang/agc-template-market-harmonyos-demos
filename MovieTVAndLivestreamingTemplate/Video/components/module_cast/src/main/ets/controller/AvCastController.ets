@@ -1,0 +1,185 @@
+import { avSession } from '@kit.AVSessionKit';
+import { AvSessionController } from './AvSessionController';
+import { hilog } from '@kit.PerformanceAnalysisKit';
+import { CommonConstants } from '../common/CommonConstants';
+import { CastService, CastSessionListener } from '../service/CastService';
+
+interface CastListener {
+  onPlay(): void
+
+  onPause(): void
+
+  onPlayNext(): void
+
+  onPlayPrevious(): void
+
+  onError(): void
+}
+
+const TAG = '[AvCastController]'
+const DOMAIN = 0x000
+
+@ObservedV2
+export class AvCastController {
+  castController: avSession.AVCastController | undefined = undefined;
+  castListener?: CastSessionListener
+  castItem?: avSession.AVQueueItem
+  private curVolume: number = 0
+  maxVolume: number = 0
+
+  public registerCastListener(castListener: CastSessionListener) {
+    this.castListener = castListener
+  }
+
+  public unregisterCastListener() {
+    this.castListener = undefined
+  }
+
+  constructor(castController: avSession.AVCastController) {
+    this.castController = castController
+  }
+
+  public async startCasting(castItem: avSession.AVQueueItem) {
+    hilog.debug(DOMAIN, TAG, 'startCasting')
+    this.castItem = castItem
+    this.castController = await AvSessionController.getInstance().getAvSession()?.getAVCastController();
+    this.setPlaybackStateChangeListener();
+    this.prepare();
+    CastService.getInstance().isCasting = true
+    CastService.getInstance().isCastPlaying = true
+    hilog.debug(DOMAIN, TAG, 'startCasting end')
+  }
+
+  public endCasting() {
+    hilog.debug(DOMAIN, TAG, 'endCasting')
+    AvSessionController.getInstance().getAvSession()?.stopCasting();
+    this.stopCast();
+    CastService.getInstance().isCasting = false
+    CastService.getInstance().isCastPlaying = false
+    hilog.debug(DOMAIN, TAG, 'endCasting end')
+  }
+
+  public seekCasting(seekTime: number) {
+    hilog.debug(DOMAIN, TAG, 'seekCasting')
+    this.castController?.sendControlCommand({ command: 'seek', parameter: seekTime });
+    hilog.debug(DOMAIN, TAG, 'seekCasting end')
+  }
+
+  public async stopCast() {
+    try {
+      this.castController?.off('playbackStateChange');
+      this.castController?.off('endOfStream');
+      this.castController?.off('playNext');
+      this.castController?.off('playPrevious');
+      this.castController?.off('error');
+    } catch (error) {
+      hilog.error(DOMAIN, TAG, 'Failed to setAVCastController. code: ${error.code}, message: ${error.message}');
+    }
+  }
+
+  private setPlaybackStateChangeListener(): void {
+    this.castController?.on('playbackStateChange', 'all', this.castPlaybackStateChangeListener);
+    this.castController?.on('endOfStream', this.reloadCasting);
+    this.castController?.on('playNext', this.castPlayNextCallback);
+    this.castController?.on('playPrevious', this.castPlayPreviousCallback);
+    this.castController?.on('error', this.errorCallback);
+  }
+
+  private async prepare() {
+    await this.castController?.prepare(this.castItem);
+    await this.castController?.start(this.castItem);
+  }
+
+  private castPlaybackStateChangeListener = (playbackState: avSession.AVPlaybackState) => {
+    const duration = playbackState?.extras?.duration;
+    if (typeof duration === 'number') {
+      CastService.getInstance().castDuration = duration as number
+    }
+
+    if (typeof playbackState?.position?.elapsedTime !== 'undefined') {
+      CastService.getInstance().castCurrentTime = playbackState?.position?.elapsedTime
+    }
+    if (playbackState.extras?.maxCastVolume) {
+      this.maxVolume = playbackState.extras?.maxCastVolume as number
+      CastService.getInstance().castMaxVolume = this.maxVolume
+      hilog.debug(DOMAIN, TAG, `Casting maxCastVolume ${this.maxVolume}`)
+    }
+    if (playbackState.state === CommonConstants.PLAYBACK_STATE_PAUSE ||
+      playbackState.state === CommonConstants.PLAYBACK_STATE_STOP ||
+      playbackState.state === CommonConstants.PLAYBACK_STATE_PREPARE ||
+      playbackState.state === CommonConstants.PLAYBACK_STATE_INITIAL) {
+      hilog.debug(DOMAIN, TAG, 'Casting not playing')
+      CastService.getInstance().isCastPlaying = false
+    }
+
+    if (playbackState.state === CommonConstants.PLAYBACK_STATE_PLAY) {
+      hilog.debug(DOMAIN, TAG, 'Casting playing')
+      CastService.getInstance().isCastPlaying = true
+    }
+
+    if (playbackState?.volume) {
+      this.curVolume = playbackState?.volume
+      CastService.getInstance().castVolume = playbackState?.volume
+      hilog.info(DOMAIN, TAG, `Casting Volume:${this.curVolume}`)
+    }
+  };
+  private reloadCasting = async () => {
+    this.castItem!.description!.startPosition = 0
+    this.prepare();
+    CastService.getInstance().isCastPlaying = true
+  };
+  public castPlayNextCallback = (): void => {
+    hilog.debug(DOMAIN, TAG, 'castPlayNextCallback')
+    this.castListener?.onPlayNext()
+  };
+  public castPlayPreviousCallback = (): void => {
+    hilog.debug(DOMAIN, TAG, 'castPlayPreviousCallback')
+    this.castListener?.onPlayPre()
+  };
+
+  private errorCallback() {
+    hilog.debug(DOMAIN, TAG, 'errorCallback')
+  }
+
+  public setVolume(value: number) {
+    hilog.debug(DOMAIN, TAG, `setVolume Volume:${value}`)
+    let avCommand: avSession.AVCastControlCommand = {
+      command: 'setVolume',
+      parameter: value
+    };
+    this.castController?.sendControlCommand(avCommand);
+    hilog.debug(DOMAIN, TAG, `setVolume Volume:${value} end`)
+  }
+
+  public setVolumeByOffset(value: number) {
+    hilog.debug(DOMAIN, TAG, `setVolumeByOffset Volume:${value}`)
+    value = value * Math.ceil(100 / this.maxVolume) + value
+    this.curVolume = this.curVolume + value
+    if (this.curVolume < 0) {
+      this.curVolume = 0
+    }
+    if (this.curVolume > 100) {
+      this.curVolume = 100
+    }
+    let avCommand: avSession.AVCastControlCommand = {
+      command: 'setVolume',
+      parameter: this.curVolume
+    };
+    this.castController?.sendControlCommand(avCommand);
+    hilog.debug(DOMAIN, TAG, `setVolumeByOffset Volume:${this.curVolume}`)
+  }
+
+  public async play() {
+    let avCommand: avSession.AVCastControlCommand = {
+      command: 'play',
+    };
+    await this.castController?.sendControlCommand(avCommand);
+  }
+
+  public pause() {
+    let avCommand: avSession.AVCastControlCommand = {
+      command: 'pause',
+    };
+    this.castController?.sendControlCommand(avCommand);
+  }
+}

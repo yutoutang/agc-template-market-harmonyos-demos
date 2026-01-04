@@ -1,0 +1,9 @@
+{
+  "module": {
+    "name": "lib_wallpaper_api",
+    "type": "har",
+    "deviceTypes": [
+      "default"
+    ]
+  }
+}

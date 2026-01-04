@@ -1,0 +1,32 @@
+{
+  "module": {
+    "name": "business_mine",
+    "type": "har",
+    "routerMap": "$profile:route_map",
+    "deviceTypes": [
+      "default"
+    ],
+    "requestPermissions": [
+      {
+        "name": "ohos.permission.LOCATION",
+        "reason": "$string:location_reason",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "always"
+        }
+      },
+      {
+        "name": "ohos.permission.APPROXIMATELY_LOCATION",
+        "reason": "$string:approximately_location_reason",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "always"
+        }
+      }
+    ]
+  }
+}

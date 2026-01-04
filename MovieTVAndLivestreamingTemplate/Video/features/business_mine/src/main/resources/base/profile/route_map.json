@@ -1,0 +1,59 @@
+{
+  "routerMap": [
+    {
+      "name": "MinePage",
+      "pageSourceFile": "src/main/ets/pages/MinePage.ets",
+      "buildFunction": "MinePageBuilder"
+    },
+    {
+      "name": "HistoryPage",
+      "pageSourceFile": "src/main/ets/pages/HistoryPage.ets",
+      "buildFunction": "HistoryPageBuilder"
+    },
+    {
+      "name": "MarkPage",
+      "pageSourceFile": "src/main/ets/pages/MarkPage.ets",
+      "buildFunction": "MarkPageBuilder"
+    },
+    {
+      "name": "LikePage",
+      "pageSourceFile": "src/main/ets/pages/LikePage.ets",
+      "buildFunction": "LikePageBuilder"
+    },
+    {
+      "name": "MyComment",
+      "pageSourceFile": "src/main/ets/pages/MyComment.ets",
+      "buildFunction": "MyCommentBuilder"
+    },
+    {
+      "name": "MessageSingleCommentList",
+      "pageSourceFile": "src/main/ets/pages/MessageSingleCommentList.ets",
+      "buildFunction": "MsgSingleCommentListBuilder"
+    },
+    {
+      "name": "MessageIMChatPage",
+      "pageSourceFile": "src/main/ets/pages/MessageIMChatPage.ets",
+      "buildFunction": "MsgIMChatPageBuilder"
+    },
+    {
+      "name": "MessageSystemPage",
+      "pageSourceFile": "src/main/ets/pages/MessageSystemPage.ets",
+      "buildFunction": "MsgSystemPageBuilder"
+    },
+    {
+      "name": "MyCachePage",
+      "pageSourceFile": "src/main/ets/pages/MyCachePage.ets",
+      "buildFunction": "MyCachePageBuilder"
+    },
+    {
+      "name": "CachedPage",
+      "pageSourceFile": "src/main/ets/pages/CachedPage.ets",
+      "buildFunction": "CachedPageBuilder"
+    },
+    {
+      "name": "CachingPage",
+      "pageSourceFile": "src/main/ets/pages/CachingPage.ets",
+      "buildFunction": "CachingPageBuilder"
+    }
+  ]
+}

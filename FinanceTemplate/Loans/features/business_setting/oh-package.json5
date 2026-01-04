@@ -1,0 +1,18 @@
+{
+  "name": "business_setting",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "lib_common": "file:../../commons/lib_common",
+    "lib_widget": "file:../../commons/lib_widget",
+    "lib_account": "file:../../commons/lib_account",
+    "lib_loan_api": "file:../../commons/lib_loan_api",
+    "module_imagepreview": "file:../../components/module_imagepreview",
+    "module_feedback": "file:../../components/module_feedback",
+    "module_ui_base": "file:../../components/module_ui_base",
+    "module_customer_service": "file:../../components/module_customer_service"
+  }
+}

@@ -1,0 +1,115 @@
+{
+  "app": {
+/**todo: 配置手动签名 */
+    "signingConfigs": [],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+        "compatibleSdkVersion": "5.0.5(17)",
+        "runtimeOS": "HarmonyOS",
+        "buildOption": {
+          "strictMode": {
+            "caseSensitiveCheck": true,
+            "useNormalizedOHMUrl": true
+          }
+        },
+        "targetSdkVersion": "5.0.5(17)"
+      }
+    ],
+    "buildModeSet": [
+      {
+        "name": "debug"
+      },
+      {
+        "name": "release"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "phone",
+      "srcPath": "./products/phone",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "business_home",
+      "srcPath": "./features/business_home"
+    },
+    {
+      "name": "business_mine",
+      "srcPath": "./features/business_mine"
+    },
+    {
+      "name": "business_setting",
+      "srcPath": "./features/business_setting"
+    },
+    {
+      "name": "lib_common",
+      "srcPath": "./commons/lib_common"
+    },
+    {
+      "name": "lib_widget",
+      "srcPath": "./commons/lib_widget"
+    },
+    {
+      "name": "lib_account",
+      "srcPath": "./commons/lib_account"
+    },
+    {
+      "name": "lib_api",
+      "srcPath": "./commons/lib_api"
+    },
+    {
+      "name": "lib_native_components",
+      "srcPath": "./commons/lib_native_components"
+    },
+    {
+      "name": "module_imagepreview",
+      "srcPath": "./components/module_imagepreview"
+    },
+    {
+      "name": "module_feedback",
+      "srcPath": "./components/module_feedback"
+    },
+    {
+      "name": "module_advertisement",
+      "srcPath": "./components/module_advertisement"
+    },
+    {
+      "name": "module_city_select",
+      "srcPath": "./components/module_city_select"
+    },
+    {
+      "name": "business_map",
+      "srcPath": "./features/business_map"
+    },
+    {
+      "name": "module_station_line_detail",
+      "srcPath": "./components/module_station_line_detail"
+    },
+    {
+      "name": "module_map_detail",
+      "srcPath": "./components/module_map_detail"
+    },
+    {
+      "name": "base_apis",
+      "srcPath": "./components/base_apis"
+    },
+    {
+      "name": "vip_center",
+      "srcPath": "./components/vip_center"
+    },
+    {
+      "name": "aggregated_payment",
+      "srcPath": "./components/aggregated_payment"
+    }
+  ]
+}

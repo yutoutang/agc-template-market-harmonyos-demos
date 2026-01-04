@@ -1,0 +1,49 @@
+{
+  "routerMap": [
+    {
+      "name": "AccountSecurity",
+      "pageSourceFile": "src/main/ets/pages/AccountSecurity.ets",
+      "buildFunction": "AccountSecurityBuilder"
+    },
+    {
+      "name": "SettingPage",
+      "pageSourceFile": "src/main/ets/pages/SettingPage.ets",
+      "buildFunction": "SettingPageBuilder"
+    },
+    {
+      "name": "LoginPassword",
+      "pageSourceFile": "src/main/ets/pages/LoginPassword.ets",
+      "buildFunction": "LoginPasswordBuilder"
+    },
+    {
+      "name": "SettingPersonal",
+      "pageSourceFile": "src/main/ets/pages/SettingPersonal.ets",
+      "buildFunction": "SettingPersonalBuilder"
+    },
+    {
+      "name": "SettingPhone",
+      "pageSourceFile": "src/main/ets/pages/SettingPhone.ets",
+      "buildFunction": "SettingPhoneBuilder"
+    },
+    {
+      "name": "SettingPrivacy",
+      "pageSourceFile": "src/main/ets/pages/SettingPrivacy.ets",
+      "buildFunction": "SettingPrivacyBuilder"
+    },
+    {
+      "name": "NotificationSettings",
+      "pageSourceFile": "src/main/ets/pages/NotificationSettings.ets",
+      "buildFunction": "NotificationSettingsBuilder"
+    },
+    {
+      "name": "SettingH5",
+      "pageSourceFile": "src/main/ets/pages/SettingH5.ets",
+      "buildFunction": "SettingH5Builder"
+    },
+    {
+      "name": "SettingAbout",
+      "pageSourceFile": "src/main/ets/pages/SettingAbout.ets",
+      "buildFunction": "SettingAboutBuilder"
+    }
+  ]
+}

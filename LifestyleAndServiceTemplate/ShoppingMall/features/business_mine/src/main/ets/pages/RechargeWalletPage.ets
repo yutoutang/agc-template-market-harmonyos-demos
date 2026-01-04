@@ -1,4 +1,4 @@
-import { Constants, NavHeaderBar, RouterUtil } from 'lib_common';
+import { Constants, NavHeaderBar, RouterUtil, ContextUtils } from 'lib_common';
 import { RechargeWalletViewModel } from '../viewmodel/RechargeWalletViewModel';
 
 @Builder
@@ -12,11 +12,11 @@ struct RechargeWalletPage {
 
   validateInput() {
     if (!this.vm.serialNumber) {
-      this.getUIContext().getPromptAction().showToast({ message: '序列号不能为空' });
+      ContextUtils.showToast({ message: '序列号不能为空' });
       return false;
     }
     if (!this.vm.key) {
-      this.getUIContext().getPromptAction().showToast({ message: '密钥不能为空' });
+      ContextUtils.showToast({ message: '密钥不能为空' });
       return false;
     }
     return true;

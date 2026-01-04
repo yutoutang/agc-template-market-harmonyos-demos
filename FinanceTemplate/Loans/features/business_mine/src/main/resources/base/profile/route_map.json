@@ -1,0 +1,34 @@
+{
+  "routerMap": [
+    {
+      "name": "MinePage",
+      "pageSourceFile": "src/main/ets/pages/MinePage.ets",
+      "buildFunction": "MinePageBuilder"
+    },
+    {
+      "name": "LoanRecordPage",
+      "pageSourceFile": "src/main/ets/pages/LoanRecordPage.ets",
+      "buildFunction": "LoanRecordPageBuilder"
+    },
+    {
+      "name": "LoanDetailsPage",
+      "pageSourceFile": "src/main/ets/pages/LoanDetailsPage.ets",
+      "buildFunction": "LoanDetailsPageBuilder"
+    },
+    {
+      "name": "RepaymentPage",
+      "pageSourceFile": "src/main/ets/pages/RepaymentPage.ets",
+      "buildFunction": "RepaymentPageBuilder"
+    },
+    {
+      "name": "PendingRepayment",
+      "pageSourceFile": "src/main/ets/pages/PendingRepayment.ets",
+      "buildFunction": "PendingRepaymentBuilder"
+    },
+    {
+      "name": "BillingDetailsPage",
+      "pageSourceFile": "src/main/ets/pages/BillingDetailsPage.ets",
+      "buildFunction": "BillingDetailsBuilder"
+    }
+  ]
+}

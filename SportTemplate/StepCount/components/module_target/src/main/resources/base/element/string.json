@@ -1,0 +1,164 @@
+{
+  "string": [
+    {
+      "name": "Steps_remind",
+      "value": "只能输入整数(1000-50000步)"
+    },
+    {
+      "name": "Distance_remind",
+      "value": "可输入0.1-100公里"
+    },
+    {
+      "name": "Heat_remind",
+      "value": "只能输入整数(100-5000千卡)"
+    },
+    {
+      "name": "Duration_remind",
+      "value": "只能输入整数(10-600分钟)"
+    },
+    {
+      "name": "Pace_remind",
+      "value": "可输入3′00″/公里-40′00″/公里"
+    },
+    {
+      "name": "Enter_valid_digits",
+      "value": "输入有效数字"
+    },
+    {
+      "name": "less_than_100",
+      "value": "输入值不能小于100"
+    },
+    {
+      "name": "exceed_10000",
+      "value": "输入值不能大于10000"
+    },
+    {
+      "name": "set_target",
+      "value": "设置目标"
+    },
+    {
+      "name": "targets",
+      "value": "目标：%s"
+    },
+    {
+      "name": "target_set",
+      "value": "目标设置"
+    },
+    {
+      "name": "save",
+      "value": "保存"
+    },
+    {
+      "name": "Cancel",
+      "value": "取消"
+    },
+    {
+      "name": "Confirm",
+      "value": "确认"
+    },
+    {
+      "name": "open_service",
+      "value": "开启服务"
+    },
+    {
+      "name": "water_intake",
+      "value": "喝水量"
+    },
+    {
+      "name": "drink_water",
+      "value": "喝水"
+    },
+    {
+      "name": "my_cup",
+      "value": "我的水杯"
+    },
+    {
+      "name": "my_goal",
+      "value": "我的目标"
+    },
+    {
+      "name": "drink_record",
+      "value": "喝水记录"
+    },
+    {
+      "name": "goal",
+      "value": "目标"
+    },
+    {
+      "name": "cup",
+      "value": "水杯"
+    },
+    {
+      "name": "water",
+      "value": "水"
+    },
+    {
+      "name": "sport_pedometer",
+      "value": "运动计步器"
+    },
+    {
+      "name": "heat_exhaustion",
+      "value": "热量消耗"
+    },
+    {
+      "name": "kilometr",
+      "value": "公里"
+    },
+    {
+      "name": "today",
+      "value": "今日"
+    },
+    {
+      "name": "walking_distance",
+      "value": "走路距离"
+    },
+    {
+      "name": "management_by_objectives",
+      "value": "目标管理"
+    },
+    {
+      "name": "today_data",
+      "value": "今日数据"
+    },
+    {
+      "name": "calorie",
+      "value": "卡路里"
+    },
+    {
+      "name": "all_sports_records",
+      "value": "所有运动记录"
+    },
+    {
+      "name": "distance",
+      "value": "距离"
+    },
+    {
+      "name": "alert_prompt",
+      "value": "闹钟提醒"
+    },
+    {
+      "name": "push_notification",
+      "value": "推送通知"
+    },
+    {
+      "name": "popup_notification_for_timely_reminders",
+      "value": "通过华为闹钟"
+    },
+    {
+      "name": "notification_from_Huawei",
+      "value": "通过华为通知"
+    },
+    {
+      "name": "steps",
+      "value": "步数"
+    },
+    {
+      "name": "agcit_huawei_stepcount_module_target",
+      "value": "1.0.0"
+    },
+    {
+      "name": "agcittype_huawei_stepcount_module_target",
+      "value": "serviceComponent"
+    }
+  ]
+}

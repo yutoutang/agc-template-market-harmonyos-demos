@@ -1,0 +1,9 @@
+{
+  "routerMap": [
+    {
+      "name": "CarPage",
+      "pageSourceFile": "src/main/ets/pages/CarPage.ets",
+      "buildFunction": "CarPageBuilder"
+    }
+  ]
+}

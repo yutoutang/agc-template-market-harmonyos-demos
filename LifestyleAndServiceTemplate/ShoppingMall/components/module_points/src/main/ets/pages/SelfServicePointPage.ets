@@ -5,6 +5,7 @@ import { Constants, MenuModel, NavHeaderBar, RouterMap } from '../libcommon/Inde
 import { SelfPointRecordViewModel } from '../viewmodels/SelfPointRecordViewModel'
 import { PointType } from '../constants/PointConstants'
 import { Logger } from '../libcommon/Utils'
+import { ContextUtils } from '../libcommon/ContextUtils'
 
 const TAG = '[SelfServicePointPage]';
 
@@ -18,17 +19,26 @@ struct SelfServicePointPage {
   @Local menuList: Array<MenuModel> = [
     new MenuModel($r('app.media.ic_self_icon1'), '自助积分记录', RouterMap.SELF_POINT_RECORD_PAGE),
     new MenuModel($r('app.media.ic_self_icon2'), '积分规则', RouterMap.SELF_POINT_RULE),
-    new MenuModel($r('app.media.ic_self_icon3'), '自助积分指南', RouterMap.SELF_POINT_GUIDE)
+    new MenuModel($r('app.media.ic_self_icon3'), '自助积分指南', RouterMap.SELF_POINT_GUIDE),
   ];
   @Local vm: SelfPointRecordViewModel = new SelfPointRecordViewModel();
   @Provider() pathStack: NavPathStack = new NavPathStack();
+
+  aboutToAppear(): void {
+    ContextUtils.setUIContext(this.getUIContext());
+  }
 
   build() {
     NavDestination() {
       NavHeaderBar({ title: '自助积分', hasBgColor: false })
       Scroll() {
         Column({ space: 12 }) {
-          Image($r('app.media.point_banner')).width(Constants.FULL_SIZE).borderRadius(16)
+          Image($r('app.media.point_banner'))
+            .width(Constants.FULL_SIZE)
+            .borderRadius(16)
+            .constraintSize({
+              maxHeight: '35%',
+            })
           Column() {
             Row() {
               Column() {
@@ -53,7 +63,7 @@ struct SelfServicePointPage {
                 .enabled(!this.vm.globalPointInfo.isCheckIn)
                 .onClick(() => {
                   this.vm.checkIn();
-                  this.getUIContext().getPromptAction().showToast({ message: '签到成功~' });
+                  ContextUtils.showToast({ message: '签到成功~' });
                 })
             }.width(Constants.FULL_SIZE).justifyContent(FlexAlign.SpaceBetween)
 
@@ -98,13 +108,14 @@ struct SelfServicePointPage {
                   enableAlbum: true,
                 };
                 try {
-                  // 可调用getContext接口获取当前页面关联的UIAbilityContext
-                  scanBarcode.startScanForResult(getContext(this), options).then((result: scanBarcode.ScanResult) => {
-                    Logger.info(TAG, `Succeeded in getting ScanResult, result is ${JSON.stringify(result)}`);
-                    this.vm.showPointSubmitConfirm(PointType.SCAN, result.originalValue);
-                  }).catch((error: BusinessError) => {
-                    Logger.error(TAG, `Failed to get ScanResult. Code:${error.code}, message: ${error.message}`);
-                  });
+                  scanBarcode.startScanForResult(ContextUtils.globalContext, options)
+                    .then((result: scanBarcode.ScanResult) => {
+                      Logger.info(TAG, `Succeeded in getting ScanResult, result is ${JSON.stringify(result)}`);
+                      this.vm.showPointSubmitConfirm(PointType.SCAN, result.originalValue);
+                    })
+                    .catch((error: BusinessError) => {
+                      Logger.error(TAG, `Failed to get ScanResult. Code:${error.code}, message: ${error.message}`);
+                    });
                 } catch (error) {
                   Logger.error(TAG,
                     `Failed to start the scanning service. Code:${error.code}, message: ${error.message}`);
@@ -203,12 +214,13 @@ struct SelfServicePointPage {
           top: 12,
           bottom: 16,
           left: Constants.BORDER_WIDTH,
-          right: Constants.BORDER_WIDTH
+          right: Constants.BORDER_WIDTH,
         })
       }
       .layoutWeight(1)
       .scrollBar(BarState.Off)
       .align(Alignment.Top)
+      .edgeEffect(EdgeEffect.Spring)
     }
     .hideTitleBar(true)
     .backgroundColor($r('sys.color.background_secondary'))

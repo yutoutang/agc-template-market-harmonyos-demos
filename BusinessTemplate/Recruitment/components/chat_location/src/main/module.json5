@@ -1,0 +1,11 @@
+{
+  "module": {
+    "name": "chat_location",
+    "type": "har",
+    "deviceTypes": [
+      "phone"
+    ],
+    "requestPermissions": [
+    ]
+  }
+}

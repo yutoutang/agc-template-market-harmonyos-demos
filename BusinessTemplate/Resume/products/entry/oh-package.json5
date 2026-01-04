@@ -1,0 +1,16 @@
+{
+  "name": "entry",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "",
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "common": "file:../../commons/common",
+    "template": "file:../../features/template",
+    "resume": "file:../../features/resume",
+    "person": "file:../../features/person",
+    "oh_router": "file:../../commons/oh_router"
+  }
+}
+

@@ -1,0 +1,12 @@
+{
+  "string": [
+    {
+      "name": "expand",
+      "value": "展开"
+    },
+    {
+      "name": "collapse",
+      "value": "收起"
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import { AppStorageV2 } from '@kit.ArkUI';
 import {
   CommonUrl,
   Constants,
@@ -7,10 +8,10 @@ import {
   RouterMap,
   RouterUtil,
   StoreGuide,
-  WindowModel
+  WindowModel,
 } from 'lib_common'
 import { StoreGuideViewModel } from '../viewmodel/StoreGuideViewModel'
-import { AppStorageV2 } from '@kit.ArkUI';
+
 
 @ComponentV2
 export struct GuideListComp {
@@ -54,17 +55,17 @@ export struct GuideListComp {
               Text(item.name)
                 .fontSize(12)
                 .fontColor(this.vm.searchTag === item.name ? $r('sys.color.font_on_primary') :
-                $r('sys.color.font_primary'))
+                  $r('sys.color.font_primary'))
               Text(item.num.toString())
                 .fontSize(12)
                 .fontColor(this.vm.searchTag === item.name ? $r('sys.color.font_on_primary') :
-                $r('sys.color.font_primary'))
+                  $r('sys.color.font_primary'))
                 .margin({ top: 4 })
             }
             .width(40)
             .borderRadius(8)
             .backgroundColor(this.vm.searchTag === item.name ? $r('app.color.app_theme') :
-            $r('sys.color.comp_background_tertiary'))
+              $r('sys.color.comp_background_tertiary'))
             .padding({ top: 4, bottom: 4 })
             .onClick(() => {
               this.vm.searchTag = item.name
@@ -125,8 +126,12 @@ export struct GuideListComp {
           .columnsTemplate('1fr 1fr 1fr')
           .scrollBar(BarState.Off)
           .edgeEffect(EdgeEffect.Spring)
+          .nestedScroll({
+            scrollForward: NestedScrollMode.PARENT_FIRST,
+            scrollBackward: NestedScrollMode.SELF_FIRST,
+          })
           .padding({
-            bottom: this.windowModel.getWindowBottomHeight()
+            bottom: this.windowModel.getWindowBottomHeight(),
           })
         } else {
           Column() {
@@ -139,7 +144,7 @@ export struct GuideListComp {
         }
 
       }
-      .layoutWeight(1)
+      .height('50%')
       .alignItems(VerticalAlign.Top)
 
     }.margin({ left: Constants.BORDER_WIDTH, right: Constants.BORDER_WIDTH })

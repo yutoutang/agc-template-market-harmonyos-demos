@@ -1,0 +1,36 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "贷款模板"
+    },
+    {
+      "name": "PhoneAbility_desc",
+      "value": "贷款模板"
+    },
+    {
+      "name": "PhoneAbility_label",
+      "value": "贷款模板"
+    },
+    {
+      "name": "PhoneFormAbility_desc",
+      "value": "form_description"
+    },
+    {
+      "name": "PhoneFormAbility_label",
+      "value": "form_label"
+    },
+    {
+      "name": "widget_desc",
+      "value": "贷款模板"
+    },
+    {
+      "name": "widget_display_name",
+      "value": "贷款模板"
+    },
+    {
+      "name": "camera_reason",
+      "value": "使用相机权限进行人脸识别与验证"
+    }
+  ]
+}

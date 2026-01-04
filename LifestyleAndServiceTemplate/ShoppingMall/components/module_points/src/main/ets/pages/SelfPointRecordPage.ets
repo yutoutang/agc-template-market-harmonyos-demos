@@ -9,6 +9,7 @@ import {
 } from '../libcommon/Index';
 import { PointConstants, PointItem, PointStatus } from '../constants/PointConstants';
 import { SelfPointRecordViewModel } from '../viewmodels/SelfPointRecordViewModel';
+import { ContextUtils } from '../libcommon/ContextUtils';
 
 @Builder
 export function SelfPointRecordPageBuilder() {
@@ -20,6 +21,10 @@ struct SelfPointRecordPage {
   @Local vm: SelfPointRecordViewModel = new SelfPointRecordViewModel();
   windowModel: WindowModel = AppStorageV2.connect(WindowModel, () => new WindowModel())!;
   @Provider() pathStack: NavPathStack = new NavPathStack();
+
+  aboutToAppear(): void {
+    ContextUtils.setUIContext(this.getUIContext());
+  }
 
   build() {
     NavDestination() {
@@ -144,7 +149,7 @@ struct SelfPointRecordPage {
     .bindSheet($$this.vm.datePickerSheet,
       this.DatePickerSheet(), {
         height: 336,
-        blurStyle: BlurStyle.Thick,
+        preferType: SheetType.CENTER,
         showClose: false,
       })
 
@@ -345,8 +350,8 @@ struct SelfPointRecordPage {
         this.vm.showCallSheet = false;
       }), {
         height: SheetSize.FIT_CONTENT,
-        blurStyle: BlurStyle.Thick,
         showClose: false,
+        preferType: SheetType.CENTER,
       })
     } else {
       this.emptyList('暂无积分记录')

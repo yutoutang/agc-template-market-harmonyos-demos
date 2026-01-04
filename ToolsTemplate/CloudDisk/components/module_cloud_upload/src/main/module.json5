@@ -1,0 +1,11 @@
+{
+  "module": {
+    "name": "module_cloud_upload",
+    "type": "har",
+    "deviceTypes": [
+      "default",
+      "tablet",
+      "2in1"
+    ]
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "float": [
+    {
+      "name": "page_text_font_size",
+      "value": "50fp"
+    },
+    {
+      "name": "wallpaper_item_row_gap",
+      "value": "8vp"
+    },
+    {
+      "name": "wallpaper_item_columns_gap",
+      "value": "8vp"
+    }
+  ]
+}

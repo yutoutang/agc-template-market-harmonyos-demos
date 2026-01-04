@@ -1,0 +1,14 @@
+{
+  "name": "chat_window",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "chat_base": "file:../chat_base",
+    "oh_router": "file:../../commons/oh_router",
+    "common": "file:../../commons/common",
+    "resume": "file:../../components/resume"
+  }
+}

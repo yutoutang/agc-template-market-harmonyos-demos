@@ -22,6 +22,7 @@ export struct LoginButtonIcon {
               .size({ width: 48, height: 48 })
               .backgroundImage($r('app.media.ic_tab_code_pass'))
               .backgroundImageSize(ImageSize.Cover)
+              .borderRadius('50%')
           },
         },
         controller: new functionalButtonComponentManager.FunctionalButtonController()
@@ -60,7 +61,7 @@ export struct LoginButtonText {
             plain: true,
             styleConfig: new functionalButtonComponentManager
               .ButtonConfig()
-              .fontSize($r('sys.float.Body_M'))
+              .fontSize(14)
               .fontColor($r('sys.color.font_primary'))
               .fontWeight(FontWeight.Regular)
               .backgroundColor(Color.Transparent)

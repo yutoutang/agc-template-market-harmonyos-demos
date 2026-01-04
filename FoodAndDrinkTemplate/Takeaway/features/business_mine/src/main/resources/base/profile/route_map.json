@@ -1,0 +1,39 @@
+{
+  "routerMap": [
+    {
+      "name": "MinePage",
+      "pageSourceFile": "src/main/ets/pages/MinePage.ets",
+      "buildFunction": "MinePageBuilder"
+    },
+    {
+      "name": "FollowPage",
+      "pageSourceFile": "src/main/ets/pages/FollowPage.ets",
+      "buildFunction": "FollowPageBuilder"
+    },
+    {
+      "name": "BrowsingHistoryPage",
+      "pageSourceFile": "src/main/ets/pages/BrowsingHistoryPage.ets",
+      "buildFunction": "BrowsingHistoryBuilder"
+    },
+    {
+      "name": "MineCustomerServicePage",
+      "pageSourceFile": "src/main/ets/pages/MineCustomerServicePage.ets",
+      "buildFunction": "MineCustomerServicePageBuilder"
+    },
+    {
+      "name": "MineCustomerServiceDetailPage",
+      "pageSourceFile": "src/main/ets/pages/MineCustomerServiceDetailPage.ets",
+      "buildFunction": "MineCustomerServiceDetailPageBuilder"
+    },
+    {
+      "name": "AddressPage",
+      "pageSourceFile": "src/main/ets/pages/AddressPage.ets",
+      "buildFunction": "AddressPageBuilder"
+    },
+    {
+      "name": "EditAddressPage",
+      "pageSourceFile": "src/main/ets/pages/EditAddressPage.ets",
+      "buildFunction": "EditAddressPageBuilder"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "string": [
+    {
+      "name": "page_show",
+      "value": "page from package"
+    },
+    {
+      "name": "search_placeholder",
+      "value": "搜索提示词"
+    },
+    {
+      "name": "position_tab",
+      "value": "职位"
+    },
+    {
+      "name": "message_tab",
+      "value": "消息"
+    },
+    {
+      "name": "person_tab",
+      "value": "我的"
+    },
+    {
+      "name": "delete_message_prompt",
+      "value": "是否删除%s消息 ？"
+    },
+    {
+      "name": "mock_account_title",
+      "value": "选择模拟账户"
+    },
+    {
+      "name": "dialog_confirm",
+      "value": "确定"
+    }
+  ]
+}

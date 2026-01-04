@@ -1,4 +1,4 @@
-import { AppStorageV2, promptAction } from '@kit.ArkUI';
+import { AppStorageV2 } from '@kit.ArkUI';
 import { Constants, Point, PopViewUtils, RouterMap } from '../libcommon/Index';
 import {
   photoPointConfirmBuilder,
@@ -8,6 +8,7 @@ import {
 import { PointRouteParam, PointStatus } from '../constants/PointConstants';
 import { GlobalPointUtils } from '../utils/GlobalPointUtils'
 import { SelfPointRecordModel } from '../models/SelfPointRecordModel';
+import { ContextUtils } from '../libcommon/ContextUtils';
 
 @ObservedV2
 export class SelfPointRecordViewModel {
@@ -92,7 +93,7 @@ export class SelfPointRecordViewModel {
     }
     param.confirm = () => {
       SelfPointRecordModel.submitPoint(type, content, this.resubmitId);
-      promptAction.showToast({ message: '已提交审核' });
+      ContextUtils.showToast({ message: '已提交审核' });
       PopViewUtils.closePopView();
       this.pathStack.pushPathByName(RouterMap.SELF_POINT_RECORD_PAGE, null);
     }

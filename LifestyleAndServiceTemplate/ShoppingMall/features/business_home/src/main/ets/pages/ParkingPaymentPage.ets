@@ -32,7 +32,13 @@ struct ParkingPaymentPage {
       NavHeaderBar({ title: '停车缴费', hasBgColor: false })
       Scroll() {
         Column({ space: 12 }) {
-          Image($r('app.media.parking_banner')).width('100%').borderRadius(12).margin({ top: 12 })
+          Image($r('app.media.parking_banner'))
+            .width('100%')
+            .borderRadius(12)
+            .margin({ top: 12 })
+            .constraintSize({
+              maxHeight: '35%',
+            })
           PageHeaderComp()
 
           Row({ space: 80 }) {
@@ -108,6 +114,7 @@ struct ParkingPaymentPage {
       .layoutWeight(1)
       .scrollBar(BarState.Off)
       .align(Alignment.Top)
+      .edgeEffect(EdgeEffect.Spring)
     }
     .hideTitleBar(true)
     .backgroundColor($r('sys.color.background_secondary'))

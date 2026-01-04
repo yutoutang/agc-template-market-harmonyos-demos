@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "page_show",
+      "value": "page from package"
+    },
+    {
+      "name": "reason_background",
+      "value": "允许应用在播放视频场景使用保持在后台运行的能力。"
+    },
+    {
+      "name": "agcit_huawei_video_service",
+      "value": "1.0.0"
+    }
+  ]
+}

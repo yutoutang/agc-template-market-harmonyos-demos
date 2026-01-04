@@ -1,4 +1,3 @@
-import { promptAction } from '@kit.ArkUI';
 import {
   Constants,
   HttpRequest,
@@ -9,6 +8,7 @@ import {
   PlateNumber,
   RouterMap,
   RouterUtil,
+  ContextUtils,
 } from 'lib_common';
 import { UILicensePlate } from 'module_keyboard';
 import { AddPlateComp } from '../components/AddPlateComp';
@@ -37,7 +37,7 @@ struct PlateNumberPage {
             .fontSize(14)
             .fontWeight(FontWeight.Medium)
             .fontColor(this.plateType === PLATE_TYPE.NORMAL ? $r('sys.color.font_on_primary') :
-            $r('sys.color.font_secondary'))
+              $r('sys.color.font_secondary'))
             .borderRadius(18)
             .backgroundColor(this.plateType === PLATE_TYPE.NORMAL ? $r('app.color.app_theme') :
               '#00000000')
@@ -47,6 +47,7 @@ struct PlateNumberPage {
               right: 60,
               bottom: 8,
             })
+            .layoutWeight(1)
             .onClick(() => {
               this.plateType = PLATE_TYPE.NORMAL
             })
@@ -54,7 +55,7 @@ struct PlateNumberPage {
             .fontSize(14)
             .fontWeight(FontWeight.Medium)
             .fontColor(this.plateType === PLATE_TYPE.SPECIAL ? $r('sys.color.font_on_primary') :
-            $r('sys.color.font_secondary'))
+              $r('sys.color.font_secondary'))
             .borderRadius(18)
             .backgroundColor(this.plateType === PLATE_TYPE.SPECIAL ? $r('app.color.app_theme') :
               '#00000000')
@@ -64,10 +65,12 @@ struct PlateNumberPage {
               right: 60,
               bottom: 8,
             })
+            .layoutWeight(1)
             .onClick(() => {
               this.plateType = PLATE_TYPE.SPECIAL
             })
         }
+        .width('100%')
         .padding(2)
         .backgroundColor($r('sys.color.comp_background_tertiary'))
         .borderRadius(20)
@@ -120,7 +123,7 @@ struct PlateNumberPage {
           })
           .bindSheet($$this.addPlateFlag, this.addPlateSheet(), {
             detents: [740, SheetSize.LARGE],
-            blurStyle: BlurStyle.Thick,
+            preferType: SheetType.CENTER,
             backgroundColor: $r('sys.color.background_primary'),
             showClose: false,
             onWillDisappear: () => {
@@ -150,7 +153,9 @@ struct PlateNumberPage {
                 this.selectPlate = item.plate
               })
           }, (v: PlateNumber) => JSON.stringify(v))
-        }.margin({ top: 20 })
+        }
+        .width('100%')
+        .margin({ top: 20 })
 
         Button('查询费用')
           .fontColor($r('sys.color.font_on_primary'))
@@ -160,7 +165,7 @@ struct PlateNumberPage {
           .margin({ top: 32, bottom: 16 })
           .onClick(() => {
             if (!this.plate || this.plate.length < 7) {
-              promptAction.showToast({ message: '请输入完整的车牌' })
+              ContextUtils.showToast({ message: '请输入完整的车牌' });
               return
             }
             RouterUtil.pushPathByName(RouterMap.PAY_DETAIL_PAGE, { plate: this.plate } as PaymentRouter)
@@ -168,7 +173,6 @@ struct PlateNumberPage {
       }
       .width(Constants.FULL_SIZE)
       .layoutWeight(1)
-      .alignItems(HorizontalAlign.Start)
       .padding({ top: 12, left: Constants.BORDER_WIDTH, right: Constants.BORDER_WIDTH })
     }
     .onShown(() => {

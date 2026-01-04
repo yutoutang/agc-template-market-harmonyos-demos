@@ -1,0 +1,9 @@
+{
+  "routerMap": [
+    {
+      "name": "MessageInfoPage",
+      "pageSourceFile": "src/main/ets/pages/MessageInfoPage.ets",
+      "buildFunction": "MessageInfoPageBuilder"
+    }
+  ]
+}

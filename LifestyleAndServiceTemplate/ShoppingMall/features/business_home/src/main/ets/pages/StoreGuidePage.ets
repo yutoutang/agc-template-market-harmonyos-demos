@@ -17,12 +17,17 @@ struct StoreGuidePage {
 
   build() {
     NavDestination() {
-      Stack() {
+      NavHeaderBar({ title: '', hasBgColor: true })
+      Scroll() {
         Column() {
           Swiper() {
             ForEach(this.vm.floorImages, (item: Floor) => {
               Stack() {
-                Image(item.img).width(Constants.FULL_SIZE)
+                Image(item.img)
+                  .width(Constants.FULL_SIZE)
+                  .constraintSize({
+                    maxHeight: '50%',
+                  })
                 Row() {
                   Image($r('app.media.ic_location')).width(16).height(16)
                   Text(item.text).fontSize(12).fontColor($r('sys.color.font_primary')).margin({ left: 4 })
@@ -49,24 +54,20 @@ struct StoreGuidePage {
           .autoPlay(false)
           .vertical(false)
           .interval(2000)
-          .indicator(new DotIndicator()
-            .itemWidth(8)
-            .itemHeight(8)
-            .selectedItemWidth(12)
-            .selectedItemHeight(8)
-            .color($r('sys.color.comp_background_secondary'))
-            .selectedColor($r('app.color.app_theme')))
+          .indicator(new DotIndicator().color($r('sys.color.comp_background_secondary')))
+          .nestedScroll(SwiperNestedScrollMode.SELF_FIRST)
           .onChange((index) => {
             this.vm.swiperIndex = index;
           })
 
-          GuideListComp({ vm: this.vm }).layoutWeight(1)
+          GuideListComp({ vm: this.vm })
         }
-
-        NavHeaderBar({ title: '', hasBgColor: false })
       }
-      .alignContent(Alignment.TopStart)
-      .width(Constants.FULL_SIZE)
+      .align(Alignment.Top)
+      .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring)
+      .layoutWeight(1)
+
     }
     .hideTitleBar(true)
   }

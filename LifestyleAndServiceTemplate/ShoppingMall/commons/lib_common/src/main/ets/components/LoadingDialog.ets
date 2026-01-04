@@ -1,12 +1,8 @@
-import { common } from '@kit.AbilityKit';
 import { ComponentContent, promptAction } from '@kit.ArkUI';
+import { ContextUtils } from '../utils/ContextUtils';
 import { Logger } from '../utils/Logger';
 
 const TAG = '[LoadingDialogUtil]';
-
-async function getUIContext() {
-  return (await (getContext() as common.UIAbilityContext).windowStage.getMainWindow()).getUIContext()
-}
 
 @Builder
 export function LoadingDialogBuilder() {
@@ -23,7 +19,7 @@ export function LoadingDialogBuilder() {
   .justifyContent(FlexAlign.Center)
   .alignItems(HorizontalAlign.Center)
   .constraintSize({
-    minWidth: 150
+    minWidth: 150,
   })
   .padding(12)
   .margin(30)
@@ -50,7 +46,7 @@ export class LoadingDialogUtil {
 
     try {
       if (!LoadingDialogUtil.uiContext) {
-        LoadingDialogUtil.uiContext = await getUIContext()
+        LoadingDialogUtil.uiContext = ContextUtils.globalUIContext
         LoadingDialogUtil.contentNode =
           new ComponentContent(LoadingDialogUtil.uiContext, wrapBuilder(LoadingDialogBuilder))
       }
@@ -73,7 +69,7 @@ export class LoadingDialogUtil {
       }
 
       const promptAction = LoadingDialogUtil.uiContext.getPromptAction()
-      promptAction.openCustomDialog(LoadingDialogUtil.contentNode, options)
+      await promptAction.openCustomDialog(LoadingDialogUtil.contentNode, options)
     } catch (error) {
       Logger.error(TAG, ` closeCustomDialog error = ${JSON.stringify(error)}`)
     }
@@ -84,7 +80,7 @@ export class LoadingDialogUtil {
 
     try {
       const promptAction = LoadingDialogUtil.uiContext.getPromptAction()
-      promptAction.closeCustomDialog(LoadingDialogUtil.contentNode)
+      await promptAction.closeCustomDialog(LoadingDialogUtil.contentNode)
     } catch (error) {
       Logger.error(TAG, ` closeCustomDialog error = ${JSON.stringify(error)}`)
     }

@@ -1,0 +1,48 @@
+{
+  "string": [
+    {
+      "name": "page_show",
+      "value": "page from package"
+    },
+    {
+      "name": "step_count",
+      "value": "步数"
+    },
+    {
+      "name": "step_unit",
+      "value": "步"
+    },
+    {
+      "name": "time_length",
+      "value": "时长"
+    },
+    {
+      "name": "time_length_unit",
+      "value": "分钟"
+    },
+    {
+      "name": "deplete",
+      "value": "消耗"
+    },
+    {
+      "name": "deplete_unit",
+      "value": "千卡"
+    },
+    {
+      "name": "distance_count",
+      "value": "距离"
+    },
+    {
+      "name": "distance_unit",
+      "value": "公里"
+    },
+    {
+      "name": "agcit_huawei_stepcount_module_datechart",
+      "value": "1.0.1"
+    },
+    {
+      "name": "agcittype_huawei_stepcount_module_datechart",
+      "value": "serviceComponent"
+    }
+  ]
+}

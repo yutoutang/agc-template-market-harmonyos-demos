@@ -1,0 +1,68 @@
+{
+  "module": {
+    "name": "business_map",
+    "type": "har",
+    "routerMap": "$profile:route_map",
+    "deviceTypes": [
+      "default"
+    ],
+    "requestPermissions": [
+      {
+        "name": "ohos.permission.INTERNET",
+      },
+      {
+        "name": "ohos.permission.GET_NETWORK_INFO",
+      },
+      {
+        "name": "ohos.permission.GET_WIFI_INFO",
+      },
+      {
+        "name": "ohos.permission.ACCELEROMETER",
+      },
+      {
+        "name": "ohos.permission.LOCATION",
+        "reason": "$string:location_permission",
+        "usedScene": {
+          "when": "inuse"
+        }
+      },
+      {
+        "name": "ohos.permission.APPROXIMATELY_LOCATION",
+        "reason": "$string:fuzzy_location_permission",
+        "usedScene": {
+          "when": "inuse"
+        },
+      },
+      {
+        "name": "ohos.permission.LOCATION_IN_BACKGROUND",
+        "reason": "$string:location_background",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "always"
+        }
+      },
+      {
+        "name": "ohos.permission.KEEP_BACKGROUND_RUNNING",
+        "reason": "$string:running_background",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "always"
+        }
+      },
+      {
+        "name": "ohos.permission.CAMERA",
+        "reason": "$string:permission_reason_camera",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "always"
+        }
+      }
+    ]
+  }
+}

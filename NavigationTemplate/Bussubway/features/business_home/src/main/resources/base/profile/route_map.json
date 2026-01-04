@@ -1,0 +1,44 @@
+{
+  "routerMap": [
+    {
+      "name": "HomePage",
+      "pageSourceFile": "src/main/ets/pages/HomePage.ets",
+      "buildFunction": "HomePageBuilder"
+    },
+    {
+      "name": "LineDetailPage",
+      "pageSourceFile": "src/main/ets/pages/LineDetailPage.ets",
+      "buildFunction": "LineDetailPageBuilder"
+    },
+    {
+      "name": "CityPage",
+      "pageSourceFile": "src/main/ets/pages/CityPage.ets",
+      "buildFunction": "CityPageBuilder"
+    },
+    {
+      "name": "MoreNewsPage",
+      "pageSourceFile": "src/main/ets/pages/MoreNewsPage.ets",
+      "buildFunction": "MoreNewsPageBuilder"
+    },
+    {
+      "name": "NewsDetailPage",
+      "pageSourceFile": "src/main/ets/pages/NewsDetailPage.ets",
+      "buildFunction": "NewsDetailPageBuilder"
+    },
+    {
+      "name": "SearchPage",
+      "pageSourceFile": "src/main/ets/pages/SearchPage.ets",
+      "buildFunction": "SearchPageBuilder"
+    },
+    {
+      "name": "SubwayPage",
+      "pageSourceFile": "src/main/ets/pages/SubwayPage.ets",
+      "buildFunction": "SubwayPageBuilder"
+    },
+    {
+      "name": "StopDetailPage",
+      "pageSourceFile": "src/main/ets/pages/StopDetailPage.ets",
+      "buildFunction": "StopDetailPageBuilder"
+    }
+  ]
+}

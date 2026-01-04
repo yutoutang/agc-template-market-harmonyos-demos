@@ -1,0 +1,147 @@
+{
+  "app": {
+/**todo: 配置手动签名 */
+    "signingConfigs": [],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+        "compatibleSdkVersion": "5.0.5(17)",
+        "targetSdkVersion": "5.0.5(17)",
+        "runtimeOS": "HarmonyOS",
+        "buildOption": {
+          "strictMode": {
+            "caseSensitiveCheck": true,
+            "useNormalizedOHMUrl": true
+          }
+        }
+      }
+    ],
+    "buildModeSet": [
+      {
+        "name": "default"
+      },
+      {
+        "name": "release"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "phone",
+      "srcPath": "./products/phone",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "business_home",
+      "srcPath": "./features/business_home"
+    },
+    {
+      "name": "business_mine",
+      "srcPath": "./features/business_mine"
+    },
+    {
+      "name": "business_setting",
+      "srcPath": "./features/business_setting"
+    },
+    {
+      "name": "lib_common",
+      "srcPath": "./commons/lib_common"
+    },
+    {
+      "name": "lib_widget",
+      "srcPath": "./commons/lib_widget"
+    },
+    {
+      "name": "lib_account",
+      "srcPath": "./commons/lib_account"
+    },
+    {
+      "name": "lib_takeaway_api",
+      "srcPath": "./commons/lib_takeaway_api"
+    },
+    {
+      "name": "lib_native_components",
+      "srcPath": "./commons/lib_native_components"
+    },
+    {
+      "name": "module_imagepreview",
+      "srcPath": "./components/module_imagepreview"
+    },
+    {
+      "name": "module_feedback",
+      "srcPath": "./components/module_feedback"
+    },
+    {
+      "name": "business_member",
+      "srcPath": "./features/business_member",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "business_order",
+      "srcPath": "./features/business_order"
+    },
+    {
+      "name": "module_ui_base",
+      "srcPath": "./components/module_ui_base"
+    },
+    {
+      "name": "module_store_comments",
+      "srcPath": "./components/module_store_comments"
+    },
+    {
+      "name": "lib_product_waterflow",
+      "srcPath": "./commons/lib_product_waterflow"
+    },
+    {
+      "name": "business_store",
+      "srcPath": "./features/business_store"
+    },
+    {
+      "name": "business_coupons",
+      "srcPath": "./features/business_coupons",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "business_message",
+      "srcPath": "./features/business_message"
+    },
+    {
+      "name": "module_address_search",
+      "srcPath": "./components/module_address_search"
+    },
+    {
+      "name": "business_car",
+      "srcPath": "./features/business_car"
+    },
+    {
+      "name": "module_store_map",
+      "srcPath": "./components/module_store_map"
+    },
+    {
+      "name": "aggregated_payment",
+      "srcPath": "./components/aggregated_payment"
+    }
+  ]
+}

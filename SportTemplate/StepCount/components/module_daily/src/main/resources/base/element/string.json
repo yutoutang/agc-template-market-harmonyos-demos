@@ -1,0 +1,64 @@
+{
+  "string": [
+    {
+      "name": "attendance_record",
+      "value": "打卡记录"
+    },
+    {
+      "name": "attendance_record_step",
+      "value": "步/%d步"
+    },
+    {
+      "name": "attendance_record_calories",
+      "value": "千卡/%d千卡"
+    },
+    {
+      "name": "attendance_record_distance",
+      "value": "公里/%d公里"
+    },
+    {
+      "name": "calories",
+      "value": "卡路里"
+    },
+    {
+      "name": "unfinished_item",
+      "value": "未达到今日目标："
+    },
+    {
+      "name": "all_running_record_btn",
+      "value": "所有运动记录"
+    },
+    {
+      "name": "step_unit",
+      "value": "步"
+    },
+    {
+      "name": "distance_count",
+      "value": "距离"
+    },
+    {
+      "name": "distance_unit",
+      "value": "公里"
+    },
+    {
+      "name": "startRun",
+      "value": "开始运动"
+    },
+    {
+      "name": "continueRun",
+      "value": "继续运动"
+    },
+    {
+      "name": "step_count",
+      "value": "步数"
+    },
+    {
+      "name": "agcit_huawei_stepcount_module_daily",
+      "value": "1.0.0"
+    },
+    {
+      "name": "agcittype_huawei_stepcount_module_daily",
+      "value": "serviceComponent"
+    }
+  ]
+}

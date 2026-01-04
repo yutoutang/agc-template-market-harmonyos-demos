@@ -1,0 +1,554 @@
+{
+  "string": [
+    {
+      "name": "page_show",
+      "value": "page from package"
+    },
+    {
+      "name": "confirm",
+      "value": "Confirm",
+      "attr": {
+        "priority": "translate"
+      }
+    },
+    {
+      "name": "select_placeholder",
+      "value": "Select",
+      "attr": {
+        "priority": "LT"
+      }
+    },
+    {
+      "name": "disable_day_label",
+      "value": "Unavailable",
+      "attr": {
+        "priority": "translate"
+      }
+    },
+    {
+      "name": "title_date",
+      "value": "Select date",
+      "attr": {
+        "priority": "translate"
+      }
+    },
+    {
+      "name": "title_datetime",
+      "value": "Select date and time",
+      "attr": {
+        "priority": "translate"
+      }
+    },
+    {
+      "name": "show_time_label",
+      "value": "Now",
+      "attr": {
+        "priority": "translate"
+      }
+    },
+    {
+      "name": "select_date",
+      "value": "选择时间"
+    },
+    {
+      "name": "back_today",
+      "value": "回到今天"
+    },
+    {
+      "name": "month_reached",
+      "value": "已达标%d/%d天"
+    },
+    {
+      "name": "step_count",
+      "value": "步数"
+    },
+    {
+      "name": "total_step_count",
+      "value": "总步数"
+    },
+    {
+      "name": "day",
+      "value": "日"
+    },
+    {
+      "name": "week",
+      "value": "周"
+    },
+    {
+      "name": "month",
+      "value": "月"
+    },
+    {
+      "name": "week_style_sec",
+      "value": "星期"
+    },
+    {
+      "name": "step",
+      "value": "步"
+    },
+    {
+      "name": "target_process",
+      "value": "目标进度"
+    },
+    {
+      "name": "step_unit",
+      "value": "步"
+    },
+    {
+      "name": "distance_count",
+      "value": "距离"
+    },
+    {
+      "name": "distance_unit",
+      "value": "公里"
+    },
+    {
+      "name": "distance_unitKM",
+      "value": "km"
+    },
+    {
+      "name": "sport_deplete",
+      "value": "运动消耗"
+    },
+    {
+      "name": "deplete",
+      "value": "消耗"
+    },
+    {
+      "name": "total_deplete",
+      "value": "总消耗"
+    },
+    {
+      "name": "total_heat_deplete",
+      "value": "总消耗热量"
+    },
+    {
+      "name": "deplete_unit",
+      "value": "千卡"
+    },
+    {
+      "name": "sport_time_length",
+      "value": "锻炼时长"
+    },
+    {
+      "name": "sport_use_time_length",
+      "value": "运动用时"
+    },
+    {
+      "name": "sport_time_length_2",
+      "value": "运动时长"
+    },
+    {
+      "name": "time_length_unit",
+      "value": "分钟"
+    },
+    {
+      "name": "total_step",
+      "value": "总步数"
+    },
+    {
+      "name": "average_step",
+      "value": "平均步数"
+    },
+    {
+      "name": "deplete_desc",
+      "value": "相当于消耗%s个汉堡"
+    },
+    {
+      "name": "distance_desc",
+      "value": "相当于走了%s圈标准操场"
+    },
+    {
+      "name": "step_trend",
+      "value": "步数趋势"
+    },
+    {
+      "name": "step_cout_trend",
+      "value": "步数趋势"
+    },
+    {
+      "name": "step_count_process",
+      "value": "步数达标"
+    },
+    {
+      "name": "sport_distance",
+      "value": "活动距离"
+    },
+    {
+      "name": "average_step_add",
+      "value": "日均步数增多 %d 步"
+    },
+    {
+      "name": "average_step_decrease",
+      "value": "日均步数减少 %d 步"
+    },
+    {
+      "name": "month_step_count_desc",
+      "value": "本月共走了 %d 步，日均步数 %d 步"
+    },
+    {
+      "name": "week_step_count_desc",
+      "value": "本周共走了 %d 步，日均步数 %d 步"
+    },
+    {
+      "name": "cur_week",
+      "value": "本周"
+    },
+    {
+      "name": "last_week",
+      "value": "上周"
+    },
+    {
+      "name": "cur_month",
+      "value": "本月"
+    },
+    {
+      "name": "last_month",
+      "value": "上月"
+    },
+    {
+      "name": "cur_day",
+      "value": "今日"
+    },
+    {
+      "name": "last_day",
+      "value": "昨日"
+    },
+    {
+      "name": "step_complete_add",
+      "value": "达标天数增加 %d 天 "
+    },
+    {
+      "name": "step_complete_decrease",
+      "value": "达标天数减少 %d 天 "
+    },
+    {
+      "name": "week_step_complete",
+      "value": "本周共达标 %d 天"
+    },
+    {
+      "name": "month_step_complete",
+      "value": "本月共达标 %d 天"
+    },
+    {
+      "name": "sport_distance_add",
+      "value": "活动距离增加 %d 公里"
+    },
+    {
+      "name": "sport_distance_decrease",
+      "value": "活动距离减少 %d 公里"
+    },
+    {
+      "name": "week_sport_distance",
+      "value": "本周活动距离 %d 公里，日均活动距离 %d 公里"
+    },
+    {
+      "name": "month_sport_distance",
+      "value": "本月活动距离 %d 公里，日均活动距离 %d 公里"
+    },
+    {
+      "name": "sport_time_length_add",
+      "value": "运动时长增加 %d 分钟"
+    },
+    {
+      "name": "sport_time_length_decrease",
+      "value": "运动时长减少 %d 分钟 "
+    },
+    {
+      "name": "sport_deplete_add",
+      "value": "运动消耗增加 %d 千卡 "
+    },
+    {
+      "name": "sport_deplete_decrease",
+      "value": "运动消耗减少 %d 千卡 "
+    },
+    {
+      "name": "distance",
+      "value": "距离"
+    },
+    {
+      "name": "total_distance",
+      "value": "总距离"
+    },
+    {
+      "name": "step_target",
+      "value": "步数目标"
+    },
+    {
+      "name": "step_target_process",
+      "value": "完成目标步数的%d%"
+    },
+    {
+      "name": "continue_sport",
+      "value": "继续运动"
+    },
+    {
+      "name": "walking",
+      "value": "步行"
+    },
+    {
+      "name": "jogging",
+      "value": "跑步"
+    },
+    {
+      "name": "jogging_num",
+      "value": "跑步（公里）"
+    },
+    {
+      "name": "cycling",
+      "value": "骑行"
+    },
+    {
+      "name": "all_sport",
+      "value": "所有运动"
+    },
+    {
+      "name": "sport_overview",
+      "value": "%d年运动概览"
+    },
+    {
+      "name": "overview_time_length",
+      "value": "时长（小时）"
+    },
+    {
+      "name": "overview_count",
+      "value": "次数"
+    },
+    {
+      "name": "overview_deplete",
+      "value": "总消耗（千卡）"
+    },
+    {
+      "name": "year_month",
+      "value": "%d年%d月"
+    },
+    {
+      "name": "distance_num",
+      "value": "%s公里"
+    },
+    {
+      "name": "time_length_num",
+      "value": "%d分%d秒"
+    },
+    {
+      "name": "count_num",
+      "value": "%s次"
+    },
+    {
+      "name": "deplete_num",
+      "value": "总消耗%s千卡"
+    },
+    {
+      "name": "walking_num",
+      "value": "步行（公里）"
+    },
+    {
+      "name": "cycling_num",
+      "value": "骑行（公里）"
+    },
+    {
+      "name": "sport_detail",
+      "value": "运动详情"
+    },
+    {
+      "name": "date_formater",
+      "value": "%d月%d日 %s:%s"
+    },
+    {
+      "name": "speed_distance",
+      "value": "%s/公里"
+    },
+    {
+      "name": "target_complete",
+      "value": "达标"
+    },
+    {
+      "name": "target_not_complete",
+      "value": "未达标"
+    },
+    {
+      "name": "activity_deplete",
+      "value": "活动热量"
+    },
+    {
+      "name": "average_speed",
+      "value": "平均速度"
+    },
+    {
+      "name": "average_pace",
+      "value": "平均配速"
+    },
+    {
+      "name": "speed_form_hour",
+      "value": "公里/小时"
+    },
+    {
+      "name": "average_step_frequency",
+      "value": "平均步频"
+    },
+    {
+      "name": "average_step_frequency_unit",
+      "value": "步/分钟"
+    },
+    {
+      "name": "average_step_size",
+      "value": "平均步幅"
+    },
+    {
+      "name": "average_step_size_unit",
+      "value": "厘米"
+    },
+    {
+      "name": "distance_target_complete",
+      "value": "达到%s公里目标"
+    },
+    {
+      "name": "distance_target_not_complete",
+      "value": "未达到%s公里目标"
+    },
+    {
+      "name": "deplete_target_complete",
+      "value": "达到%d千卡目标"
+    },
+    {
+      "name": "deplete_target_not_complete",
+      "value": "未达到%d千卡目标"
+    },
+    {
+      "name": "time_length_target_complete",
+      "value": "达到%d分钟目标"
+    },
+    {
+      "name": "time_length_target_not_complete",
+      "value": "未达到%d分钟目标"
+    },
+    {
+      "name": "pace_target_complete",
+      "value": "达到%s配速目标"
+    },
+    {
+      "name": "pace_target_not_complete",
+      "value": "未达到%s配速目标"
+    },
+    {
+      "name": "free_walking",
+      "value": "自由走"
+    },
+    {
+      "name": "target_walking",
+      "value": "目标走"
+    },
+    {
+      "name": "dog_walking",
+      "value": "遛狗"
+    },
+    {
+      "name": "free_jogging",
+      "value": "自由跑"
+    },
+    {
+      "name": "target_jogging",
+      "value": "目标跑"
+    },
+    {
+      "name": "free_cycling",
+      "value": "自由骑"
+    },
+    {
+      "name": "target_cycling",
+      "value": "目标骑"
+    },
+    {
+      "name": "target_walk",
+      "value": "健走"
+    },
+    {
+      "name": "target_running",
+      "value": "跑步"
+    },
+    {
+      "name": "target_cyc",
+      "value": "骑行"
+    },
+    {
+      "name": "open_location_rights",
+      "value": "开启位置权限"
+    },
+    {
+      "name": "visit_your_location_infomation",
+      "value": "使用运动轨迹、地图相关功能,需开启手机「定位」服务"
+    },
+    {
+      "name": "begin_set",
+      "value": "去设置"
+    },
+    {
+      "name": "require_open_location_service",
+      "value": "使用运动轨迹、地图相关功能，需开启手机「定位」服务"
+    },
+    {
+      "name": "clock",
+      "value": "连续打卡："
+    },
+    {
+      "name": "time_length",
+      "value": "时长"
+    },
+    {
+      "name": "total_data_tips",
+      "value": "以上数据由步数换算而成"
+    },
+    {
+      "name": "step_desc",
+      "value": "%s达标 %d 天、对比%s步数%s %d 步%s"
+    },
+    {
+      "name": "step_desc_per",
+      "value": "，%s %s%"
+    },
+    {
+      "name": "add",
+      "value": "增加"
+    },
+    {
+      "name": "decrease",
+      "value": "减少"
+    },
+    {
+      "name": "up",
+      "value": "上升"
+    },
+    {
+      "name": "down",
+      "value": "降低"
+    },
+    {
+      "name": "time_length_desc",
+      "value": "对比%s%s %d 分钟%s"
+    },
+    {
+      "name": "time_length_desc_ave",
+      "value": "，平均每次 %s 分钟"
+    },
+    {
+      "name": "chart_deplete_desc",
+      "value": "对比%s%s消耗了 %d 千卡"
+    },
+    {
+      "name": "add_new",
+      "value": "多"
+    },
+    {
+      "name": "decrease_new",
+      "value": "少"
+    },
+    {
+      "name": "timing_sport",
+      "value": "计时运动"
+    },
+    {
+      "name": "continuous_checkin",
+      "value": "连续打卡%d天"
+    }
+  ]
+}

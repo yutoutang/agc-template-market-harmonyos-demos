@@ -1,0 +1,1 @@
+export const WX_APPID = '' // todo替换自己申请的微信appid

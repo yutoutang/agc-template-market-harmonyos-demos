@@ -1,0 +1,12 @@
+{
+  "string": [
+    {
+      "name": "agcit_huawei_parking_module_address_search",
+      "value": "1.0.0"
+    },
+    {
+      "name": "agcittype_huawei_parking_module_address_search",
+      "value": "serviceComponent"
+    }
+  ]
+}

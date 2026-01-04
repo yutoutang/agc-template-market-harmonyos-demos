@@ -36,6 +36,10 @@ export { FileUtils } from './src/main/ets/utils/FileUtils'
 
 export { FormatUtils } from './src/main/ets/utils/FormatUtils'
 
+export { AppPrivacyUtils } from './src/main/ets/utils/AppPrivacyUtils'
+
+export { ContextUtils } from './src/main/ets/utils/ContextUtils'
+
 export { Logger } from './src/main/ets/utils/Logger'
 
 // components

@@ -1,0 +1,9 @@
+{
+  "module": {
+    "name": "module_station_line_detail",
+    "type": "har",
+    "deviceTypes": [
+      "phone"
+    ]
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "color": [
+    {
+      "name": "video_bg",
+      "value": "#C4C4C4"
+    },
+    {
+      "name": "video_duration_bg",
+      "value": "#999999"
+    },
+    {
+      "name": "my_instant_reply_bg",
+      "value": "#F7F6FF"
+    },
+    {
+      "name": "app_theme",
+      "value": "#FF1949"
+    },
+    {
+      "name": "qa_default_0",
+      "value": "#000000"
+    },
+    {
+      "name": "qa_default_1",
+      "value": "#90000000"
+    },
+    {
+      "name": "qa_default_2",
+      "value": "#20000000"
+    },
+    {
+      "name": "qa_yellow",
+      "value": "#FBB535"
+    },
+    {
+      "name": "font_color_gray",
+      "value": "#99000000"
+    },
+    {
+      "name": "background_color_cancel",
+      "value": "#0D000000"
+    },
+    {
+      "name": "phone_background_color",
+      "value": "#F1F3F5"
+    }
+  ]
+}

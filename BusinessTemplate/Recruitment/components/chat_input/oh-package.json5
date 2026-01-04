@@ -1,0 +1,14 @@
+{
+  "name": "chat_input",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "chat_base": "file:../chat_base",
+    "chat_location": "file:../../components/chat_location",
+    "file_management": "file:../../components/file_management",
+    "common": "file:../../commons/common"
+  }
+}

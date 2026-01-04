@@ -44,6 +44,7 @@ struct PrivacyPage {
       .layoutWeight(1)
       .scrollBar(BarState.Off)
       .align(Alignment.Top)
+      .edgeEffect(EdgeEffect.Spring)
 
     }.hideTitleBar(true)
   }

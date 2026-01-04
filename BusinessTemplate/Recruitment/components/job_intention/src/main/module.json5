@@ -1,0 +1,10 @@
+{
+  "module": {
+    "name": "job_intention",
+    "type": "har",
+    "deviceTypes": [
+      "phone"
+    ],
+    "routerMap": "$profile:route_map"
+  }
+}

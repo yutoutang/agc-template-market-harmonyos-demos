@@ -1,0 +1,20 @@
+{
+  "name": "phone",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "",
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "ui_base": "file:../../commons/ui_base",
+    "lib_common": "file:../../commons/lib_common",
+    "lib_widget": "file:../../commons/lib_widget",
+    "lib_account": "file:../../commons/lib_account",
+    "lib_sport_api": "file:../../commons/lib_sport_api",
+    "business_home": "file:../../features/business_home",
+    "business_mine": "file:../../features/business_mine",
+    "business_setting": "file:../../features/business_setting",
+    "business_sport": "file:../../features/business_sport"
+  }
+}
+

@@ -1,0 +1,19 @@
+{
+  "module": {
+    "name": "module_city_manage",
+    "type": "har",
+    "deviceTypes": [
+      "default"
+    ],
+    "routerMap": "$profile:route_map",
+    "requestPermissions": [
+      {
+        "name": "ohos.permission.APPROXIMATELY_LOCATION",
+        "reason": "$string:apply_location_reason",
+        "usedScene": {
+          "when": "inuse"
+        }
+      }
+    ]
+  }
+}

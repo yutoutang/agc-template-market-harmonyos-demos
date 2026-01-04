@@ -1,3 +1,4 @@
+import { ContextUtils } from '../libcommon/ContextUtils';
 import { NavHeaderBar } from '../libcommon/Index';
 
 @Builder
@@ -9,12 +10,22 @@ export function SelfPointRuleBuilder() {
 struct SelfPointRule {
   @Provider() pathStack: NavPathStack = new NavPathStack();
 
+  aboutToAppear(): void {
+    ContextUtils.setUIContext(this.getUIContext());
+  }
+
   build() {
     NavDestination() {
       NavHeaderBar({ title: '积分规则', hasBgColor: false })
       Scroll() {
         Column() {
-          Image($r('app.media.point_banner')).width('100%').borderRadius(16).margin({ top: 12 })
+          Image($r('app.media.point_banner'))
+            .width('100%')
+            .borderRadius(16)
+            .margin({ top: 12 })
+            .constraintSize({
+              maxHeight: '35%',
+            })
           Column({ space: 8 }) {
             Row({ space: 8 }) {
               Image($r('app.media.ic_question')).width(24)
@@ -49,13 +60,15 @@ struct SelfPointRule {
                 '会员可以在商场柜台直接兑换，也可以通过终端设备应用程序进行兑换。').fontSize(12)
             }
           }
+          .width('100%')
           .alignItems(HorizontalAlign.Start)
         }
-        .padding({ left: 16, right: 16 })
+        .padding({ left: 16, right: 16, bottom: 28 })
       }
       .layoutWeight(1)
       .scrollBar(BarState.Off)
       .align(Alignment.Top)
+      .edgeEffect(EdgeEffect.Spring)
     }
     .hideTitleBar(true)
     .onReady((context) => {

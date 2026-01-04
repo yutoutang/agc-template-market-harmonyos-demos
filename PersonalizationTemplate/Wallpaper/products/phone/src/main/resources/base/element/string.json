@@ -1,0 +1,56 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "壁纸模板"
+    },
+    {
+      "name": "PhoneAbility_desc",
+      "value": "壁纸模板"
+    },
+    {
+      "name": "PhoneAbility_label",
+      "value": "壁纸模板"
+    },
+    {
+      "name": "PhoneFormAbility_desc",
+      "value": "form_description"
+    },
+    {
+      "name": "PhoneFormAbility_label",
+      "value": "form_label"
+    },
+    {
+      "name": "widget_desc",
+      "value": "壁纸模板"
+    },
+    {
+      "name": "widget_display_name",
+      "value": "壁纸模板"
+    },
+    {
+      "name": "trumpet_desc",
+      "value": "添加到桌面后点击小组件进行编辑"
+    },
+    {
+      "name": "trumpet_display_name",
+      "value": "小号组件"
+    },
+    {
+      "name": "medium_desc",
+      "value": "添加到桌面后点击小组件进行编辑"
+    },
+    {
+      "name": "medium_display_name",
+      "value": "中号组件"
+    },
+    {
+      "name": "large_desc",
+      "value": "添加到桌面后点击小组件进行编辑"
+    },
+    {
+      "name": "large_display_name",
+      "value": "大号组件"
+    }
+  ]
+}

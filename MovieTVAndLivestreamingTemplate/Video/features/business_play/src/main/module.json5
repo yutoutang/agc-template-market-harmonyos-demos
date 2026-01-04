@@ -1,0 +1,22 @@
+{
+  "module": {
+    "name": "business_play",
+    "type": "har",
+    "routerMap": "$profile:route_map",
+    "deviceTypes": [
+      "default"
+    ],
+    "requestPermissions": [
+      {
+        "name": "ohos.permission.KEEP_BACKGROUND_RUNNING",
+        "reason": "$string:reason_background",
+        "usedScene": {
+          "abilities": [
+            "PhoneAbility"
+          ],
+          "when": "always"
+        }
+      }
+    ]
+  }
+}

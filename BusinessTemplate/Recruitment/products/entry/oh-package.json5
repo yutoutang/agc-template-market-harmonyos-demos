@@ -1,0 +1,19 @@
+{
+  "name": "entry",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "",
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "common": "file:../../commons/common",
+    "oh_router": "file:../../commons/oh_router",
+    "person": "file:../../features/person",
+    "position": "file:../../features/position",
+    "instant_messaging": "file:../../sdk/instant_messaging",
+    "chat_base": "file:../../components/chat_base",
+    "message": "file:../../features/message",
+    "aggregated_login": "file:../../components/aggregated_login"
+  }
+}
+

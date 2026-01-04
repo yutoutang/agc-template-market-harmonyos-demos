@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "recent_seven_day",
+      "value": "近7日"
+    },
+    {
+      "name": "agcit_huawei_stepcount_module_moveratio",
+      "value": "1.0.0"
+    },
+    {
+      "name": "agcittype_huawei_stepcount_module_moveratio",
+      "value": "serviceComponent"
+    }
+  ]
+}

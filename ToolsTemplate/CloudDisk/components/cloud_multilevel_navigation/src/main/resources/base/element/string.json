@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "multilevel_myclouddisk",
+      "value": "我的云盘"
+    },
+    {
+      "name": "agcit_huawei_cloud_multilevel_navigation",
+      "value": "1.0.0"
+    },
+    {
+      "name": "agcittype_huawei_cloud_multilevel_navigation",
+      "value": "serviceComponent"
+    }
+  ]
+}

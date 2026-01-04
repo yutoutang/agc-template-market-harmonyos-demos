@@ -1,0 +1,20 @@
+{
+  "routerMap": [
+    {
+      "name": "ManagedCity",
+      "pageSourceFile": "src/main/ets/pages/ManagedCityPage.ets",
+      "buildFunction": "managedCityPageBuilder",
+      "data": {
+        "description": "已选城市页面"
+      }
+    },
+    {
+      "name": "SearchCity",
+      "pageSourceFile": "src/main/ets/pages/SearchCityPage.ets",
+      "buildFunction": "searchCityPageBuilder",
+      "data": {
+        "description": "城市搜索页面"
+      }
+    }
+  ]
+}

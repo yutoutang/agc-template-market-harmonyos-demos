@@ -1,0 +1,61 @@
+import { BaseViewModel, RouterMap } from 'lib_common';
+import { SettingItem } from '../types/Types';
+
+@ObservedV2
+export class SettingPrivacyVM extends BaseViewModel {
+  @Trace list1: SettingItem[] = [
+    new SettingItem({
+      label: '个性化推荐',
+      subLabel: '推荐符合我的个性化内容',
+      typeSwitch: true,
+      switchV: this.settingInfo.personalizedPush,
+      onClick: (isOn) => {
+        this.settingInfo.personalizedPush = isOn as boolean;
+      },
+    }),
+  ];
+  @Trace list2: SettingItem[] = [
+    new SettingItem({
+      label: '用户协议',
+      routerName: RouterMap.SETTING_H5,
+      routerParams: 1,
+    }),
+    new SettingItem({
+      label: '隐私政策',
+      routerName: RouterMap.SETTING_H5,
+      routerParams: 2,
+    }),
+  ];
+  @Trace list3: SettingItem[] = [
+    new SettingItem({
+      label: '第三方信息共享清单',
+      routerName: RouterMap.SETTING_H5,
+      routerParams: 3,
+    }),
+    new SettingItem({
+      label: '个人信息收集清单',
+      routerName: RouterMap.SETTING_H5,
+      routerParams: 4,
+    }),
+  ];
+  @Trace list4: SettingItem[] = [
+    new SettingItem({
+      label: '允许新消息通知',
+      switchV: this.settingInfo.newMessagePush,
+      typeSwitch: true,
+      onClick: (isOn) => {
+
+        this.settingInfo.newMessagePush = isOn as boolean;
+      },
+    }),
+    new SettingItem({
+      label: '允许推送通知',
+      switchV: this.settingInfo.pushNotification,
+      typeSwitch: true,
+      onClick: (isOn) => {
+
+        this.settingInfo.pushNotification = isOn as boolean;
+      },
+    }),
+  ];
+}

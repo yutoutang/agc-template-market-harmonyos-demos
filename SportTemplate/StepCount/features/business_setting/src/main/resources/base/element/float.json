@@ -1,0 +1,32 @@
+{
+  "float": [
+    {
+      "name": "page_text_font_size",
+      "value": "50fp"
+    },
+    {
+      "name": "vp_24",
+      "value": "24vp"
+    },
+    {
+      "name": "vp_40",
+      "value": "40vp"
+    },
+    {
+      "name": "vp_20",
+      "value": "20vp"
+    },
+    {
+      "name": "vp_16",
+      "value": "16vp"
+    },
+    {
+      "name": "vp_32",
+      "value": "32vp"
+    },
+    {
+      "name": "vp_60",
+      "value": "60vp"
+    }
+  ]
+}

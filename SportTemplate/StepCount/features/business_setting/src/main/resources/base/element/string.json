@@ -1,0 +1,36 @@
+{
+  "string": [
+    {
+      "name": "voice_settings",
+      "value": "语音设置"
+    },
+    {
+      "name": "voice_settings_description",
+      "value": "完成目标的30%,50%,80%,100%语音提示"
+    },
+    {
+      "name": "voice_broadcast",
+      "value": "语音播报"
+    },
+    {
+      "name": "phone_edit",
+      "value": "更换登录手机号"
+    },
+    {
+      "name": "phone_edit_desc",
+      "value": "登录手机号仅用于登录当前账号"
+    },
+    {
+      "name": "please_input_old_phone_number",
+      "value": "请输入旧手机号"
+    },
+    {
+      "name": "please_input_new_phone_number",
+      "value": "请输入新手机号"
+    },
+    {
+      "name": "please_input_verify_code",
+      "value": "请输入验证码"
+    }
+  ]
+}
