@@ -1,20 +1,25 @@
-import { promptAction } from '@kit.ArkUI';
-import { BaseViewModel, CommonConfirmDialog } from 'lib_common';
-import { MineServiceApi, NewsModel } from 'lib_news_api';
+import { BaseViewModel, CommonConfirmDialog, LoadingModel } from 'lib_common';
+import { MineServiceApi, NewsModel, NewsResponse } from 'lib_news_api';
 
 @ObservedV2
 export class HistoryViewModel extends BaseViewModel {
   @Trace isEditMode: boolean = false;
   @Trace toDeleteList: string[] = [];
   @Trace list: NewsModel[] = [];
+  @Trace loadingModel: LoadingModel<NewsResponse[]> = new LoadingModel(MineServiceApi.queryMyHistory);
 
   constructor() {
     super();
     this.queryList();
   }
 
-  queryList() {
-    this.list = MineServiceApi.queryMyHistory().map(v => new NewsModel(v));
+  queryList(showLoading: boolean = true) {
+    this.loadingModel.callApi({
+      pageLoading: showLoading,
+      dialogLoading: false,
+    }).then((list) => {
+      this.list = list.map(v => new NewsModel(v));
+    })
   }
 
   callDeleteApi(isDelAll: boolean, toDeleteList: string[]) {
@@ -51,8 +56,8 @@ export class HistoryViewModel extends BaseViewModel {
       confirm: () => {
         this.callDeleteApi(true, []);
         this.quitEdit();
-        this.queryList();
-        promptAction.showToast({ message: '已清空' });
+        this.queryList(false);
+        this.contextModel.showToast({ message: '已清空' });
       },
     })
   }
@@ -69,8 +74,8 @@ export class HistoryViewModel extends BaseViewModel {
       confirm: () => {
         this.callDeleteApi(false, this.toDeleteList);
         this.quitEdit();
-        this.queryList();
-        promptAction.showToast({ message: '已删除' });
+        this.queryList(false);
+        this.contextModel.showToast({ message: '已删除' });
       },
     })
   }

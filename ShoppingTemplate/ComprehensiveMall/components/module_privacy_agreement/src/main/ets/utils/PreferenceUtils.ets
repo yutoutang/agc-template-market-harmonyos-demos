@@ -1,3 +1,4 @@
+import { Context } from '@kit.AbilityKit';
 import { preferences } from '@kit.ArkData';
 import { Logger } from 'module_ui_base';
 
@@ -11,21 +12,25 @@ export class PreferenceUtils {
   private dataPreferences: preferences.Preferences | null = null;
 
   private constructor(context: Context, fileName: string) {
-    preferences.removePreferencesFromCacheSync(context, fileName);
-    this.dataPreferences = preferences.getPreferencesSync(context, {
-      name: fileName,
-    });
-    Logger.info(
-      TAG,
-      `PreferenceUtil: ${fileName} init: ${this.dataPreferences !== null}`,
-    );
+    try {
+      preferences.removePreferencesFromCacheSync(context, fileName);
+      this.dataPreferences = preferences.getPreferencesSync(context, {
+        name: fileName,
+      });
+      Logger.info(
+        TAG,
+        `PreferenceUtil: ${fileName} init: ${this.dataPreferences !== null}`,
+      );
+    } catch (err) {
+      Logger.error(TAG, 'init preference utils failed. error:' + JSON.stringify(err))
+    }
   }
 
-  public static getInstance(context?: Context, fileName: string = 'default') {
+  public static getInstance(context: Context, fileName: string = 'default') {
     if (PreferenceUtils.preferenceRecord.has(fileName)) {
       return PreferenceUtils.preferenceRecord.get(fileName)!!;
     }
-    let ctx = context || getContext();
+    let ctx = context;
     let preferenceUtil: PreferenceUtils = new PreferenceUtils(ctx, fileName);
     PreferenceUtils.preferenceRecord.set(fileName, preferenceUtil);
     return preferenceUtil;
@@ -43,7 +48,7 @@ export class PreferenceUtils {
         `PreferenceUtil: put: ${key} = ${JSON.stringify(value)}`,
       );
     } catch (e) {
-      Logger.info(TAG, `PreferenceUtil: put error: ${JSON.stringify(e)}`);
+      Logger.error(TAG, `PreferenceUtil: put error: ${JSON.stringify(e)}`);
     }
   }
 

@@ -2,8 +2,8 @@ import { AppStorageV2 } from '@kit.ArkUI';
 import { CommonConstants } from '../constants/CommonConstants';
 import { CustomConfigModel } from '../models/CustomConfigModel';
 import { GridRowColSetting } from '../common/GridRowColSetting';
-import { PopViewUtils } from '../common/PopViewUtils';
 import { FontModel } from '../models/FontModel';
+import { PopViewUtil } from 'module_ui_base';
 
 /**
  * 通用确认弹窗
@@ -14,7 +14,7 @@ export class CommonConfirmDialog {
    * @param param
    */
   public static show(param: IConfirmDialogParams) {
-    PopViewUtils.showPopView<ConfirmDialogParams>(wrapBuilder(confirmDialogBuilder), {},
+    PopViewUtil.openDialog<ConfirmDialogParams>(wrapBuilder(confirmDialogBuilder), {},
       new ConfirmDialogParams(param));
   }
 }
@@ -138,7 +138,7 @@ struct ConfirmDialog {
           .layoutWeight(1)
           .padding({ top: CommonConstants.PADDING_M, bottom: CommonConstants.PADDING_M })
           .onClick(() => {
-            PopViewUtils.closePopView();
+            PopViewUtil.closeDialog();
             this.data.cancel();
           })
 
@@ -157,7 +157,7 @@ struct ConfirmDialog {
           .layoutWeight(1)
           .padding({ top: CommonConstants.PADDING_M, bottom: CommonConstants.PADDING_M })
           .onClick(() => {
-            PopViewUtils.closePopView();
+            PopViewUtil.closeDialog();
             this.data.confirm();
           })
         }

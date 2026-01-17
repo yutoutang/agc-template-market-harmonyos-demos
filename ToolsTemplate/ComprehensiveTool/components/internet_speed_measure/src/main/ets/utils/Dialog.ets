@@ -1,7 +1,7 @@
 import { Logger } from './Logger';
 
-export function alert(title: string, message: string) {
-  AlertDialog.show({
+export function alert(title: string, message: string,uiContext:UIContext) {
+  uiContext.showAlertDialog({
     title: title,
     message: message,
     alignment: DialogAlignment.Center,
@@ -10,5 +10,5 @@ export function alert(title: string, message: string) {
         Logger.info('确定');
       },
     }],
-  });
+  })
 }

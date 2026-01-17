@@ -3,7 +3,7 @@
 ## 目录
 - [简介](#简介)
 - [约束与限制](#约束与限制)
-- [快速入门](#快速入门)
+- [使用](#使用)
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
@@ -22,12 +22,12 @@
 * 设备类型：华为手机（包括双折叠和阔折叠）
 * 系统版本：HarmonyOS 5.0.4(16)及以上
 
-### 权限要求
+### 权限
 
 - 获取位置权限：ohos.permission.APPROXIMATELY_LOCATION、ohos.permission.LOCATION
 - 网络权限：ohos.permission.INTERNET
 
-## 快速入门
+## 使用
 
 1. 安装组件。  
    如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
@@ -35,8 +35,12 @@
    a. 解压下载的组件包，将包中所有文件夹拷贝至您工程根目录的xxx目录下。  
    b. 在项目根目录build-profile.json5并添加select_store和base_ui模块。
    ```typescript
-   // 在项目根目录的build-profile.json5填写select_store和base_ui路径。其中xxx为组件存在的目录名
+   // 在项目根目录的build-profile.json5填写search、select_store和base_ui路径。其中xxx为组件存在的目录名
    "modules": [
+     {
+       "name": "search",
+       "srcPath": "./xxx/search",
+     },
      {
        "name": "select_store",
        "srcPath": "./xxx/select_store",
@@ -51,6 +55,7 @@
    ```typescript
    // xxx为组件存放的目录名称
    "dependencies": {
+     "search": "file:./xxx/search",
      "select_store": "file:./xxx/select_store"
    }
    ```
@@ -104,6 +109,7 @@
 
    ```typescript
    SelectStore({
+     routerStack: RouterModule.getStack(),
      storeInfoList: this.storeInfoList,
      storeId: this.storeModel.storeId,
      packageName: this.appInfoModel.packageName,
@@ -129,13 +135,14 @@ SelectStore(options?: SelectStoreOptions)
 
 ### SelectStoreOptions对象说明
 
-| 名称            | 类型                            | 是否必填 | 说明    |
-|---------------|-------------------------------|------|-------|
-| storeInfoList | [storeInfo](#storeInfo对象说明)[] | 是    | 店铺列表  |
-| storeId       | string                        | 是    | 选中的店铺 |
-| packageName   | string                        | 是    | 应用包名  |
+| 名称            | 类型                                                                                                                              | 是否必填 | 说明              |
+|---------------|---------------------------------------------------------------------------------------------------------------------------------|------|-----------------|
+| routerStack   | [NavPathStack](https://developer.huawei.com/consumer/cn/doc/harmonyos-references/ts-basic-components-navigation#navpathstack10) | 是    | Navigation导航控制器 |
+| storeInfoList | [StoreInfo](#StoreInfo对象说明)[]                                                                                                   | 是    | 店铺列表            |
+| storeId       | string                                                                                                                          | 是    | 选中的店铺           |
+| packageName   | string                                                                                                                          | 是    | 应用包名            |
 
-### storeInfo对象说明
+### StoreInfo对象说明
 
 | 名称             | 类型      | 是否必填 | 说明       |
 |----------------|---------|------|----------|
@@ -162,29 +169,64 @@ selectedStore(callback: (storeId: string) => void)
 
 ## 示例代码
 
+说明：Index.ets和Index2.ets文件需要放在同一目录
 ```typescript
-import { promptAction } from '@kit.ArkUI';
+// Index.ets
 import { abilityAccessCtrl, common } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { SelectStore, StoreInfo } from 'select_store';
+import { StoreInfo } from 'search';
+import { Index2 } from './Index2';
 
 @Entry
 @ComponentV2
 struct Index {
+   @Provider('routerStack') routerStack: NavPathStack = new NavPathStack();
    @Local storeInfoList: StoreInfo[] = [];
 
    aboutToAppear(): void {
       let atManager: abilityAccessCtrl.AtManager = abilityAccessCtrl.createAtManager();
-      atManager.requestPermissionsFromUser(getContext() as common.UIAbilityContext,
+      atManager.requestPermissionsFromUser(this.getUIContext().getHostContext() as common.UIAbilityContext,
       ['ohos.permission.LOCATION', 'ohos.permission.APPROXIMATELY_LOCATION'])
       .then((data) => {
          let grantStatus: Array<number> = data.authResults;
          if (grantStatus.every(item => item === 0)) {
-            // 授权成功
+         // 授权成功
+            this.routerStack.replacePath({ name: 'Index2' })
          }
       }).catch((err: BusinessError) => {
          console.error(`Failed to request permissions from user. Code is ${err.code}, message is ${err.message}`);
       });
+   }
+   
+   @Builder
+   pageMap(name: string) {
+      if (name === 'Index2') {
+         Index2();
+      }
+   }
+   
+   build() {
+      Navigation(this.routerStack) {
+      }
+      .hideTitleBar(true)
+      .navDestination(this.pageMap)
+      .mode(NavigationMode.Stack)
+      .height('100%')
+      .width('100%');
+   }
+}
+```
+```typescript
+// Index2.ets
+import { StoreInfo } from 'search';
+import { SelectStore } from 'select_store';
+
+@ComponentV2
+export struct Index2 {
+   @Consumer('routerStack') routerStack: NavPathStack = new NavPathStack();
+   @Local storeInfoList: StoreInfo[] = [];
+
+   aboutToAppear(): void {
       for (let index = 0; index < 3; index++) {
          let store = new StoreInfo()
          store.id = `${index}`
@@ -203,19 +245,25 @@ struct Index {
    }
    
    build() {
-      RelativeContainer() {
-         SelectStore({
-            storeInfoList: this.storeInfoList,
-            storeId: this.storeInfoList[0].id,
-            packageName: 'test',
-            selectedStore: (storeId: string) => {
-               // 选择店铺后跳转页面
-               promptAction.showToast({ message: '选择店铺' })
-            },
-         })
+      NavDestination() {
+         RelativeContainer() {
+            SelectStore({
+               routerStack: this.routerStack,
+               storeInfoList: this.storeInfoList,
+               storeId: this.storeInfoList[0].id,
+               packageName: 'test',
+               selectedStore: (storeId: string) => {
+                  // 选择店铺后跳转页面
+                  this.getUIContext().getPromptAction().showToast({ message: `选择店铺:${storeId}` })
+               },
+            })
+         }.height('100%')
+         .width('100%')
+         .padding({ top: 45 })
       }
+      .hideTitleBar(true)
       .height('100%')
-      .width('100%')
+      .width('100%');
    }
 }
 ```

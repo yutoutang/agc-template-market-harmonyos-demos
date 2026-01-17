@@ -66,7 +66,8 @@ export struct QuickLoginPage {
             AccountUtil.getAccountInfo().unionID = '1';
             AccountUtil.getAccountInfo().idToken = '1';
             AccountUtil.getAccountInfo().authorizationCode = '1';
-            AccountUtil.getUserInfo().nickname = $r('app.string.huawei_user')
+            AccountUtil.getUserInfo().nickname = $r('app.string.huawei_user');
+            AccountUtil.getUserInfo().phone = this.quickLoginAnonymousPhone;
             this.vm.navStack.pop();
           } else {
             // If the agreements are not accepted, a pop-up message is displayed.
@@ -101,7 +102,7 @@ export struct QuickLoginPage {
         // If the agreements are not accepted, a pop-up message is displayed.
         this.showPopUp = true;
       } else {
-        showToast(error);
+        showToast(error, this.getUIContext());
       }
       this.enableStatus = true;
       return;
@@ -119,6 +120,7 @@ export struct QuickLoginPage {
           AccountUtil.getAccountInfo().idToken = idToken;
           AccountUtil.getAccountInfo().authorizationCode = authCode;
           AccountUtil.getUserInfo().nickname = $r('app.string.huawei_user')
+          AccountUtil.getUserInfo().phone = this.quickLoginAnonymousPhone;
           // todo 待实现
           this.vm.navStack.pop();
         }
@@ -129,7 +131,7 @@ export struct QuickLoginPage {
     } catch (error) {
       hilog.error(this.domainId, this.logTag,
         `Failed to login with LoginWithHuaweiIDButton. errCode is ${error.code}, errMessage is ${error.message}`);
-      showToast(error as BusinessError);
+      showToast(error as BusinessError, this.getUIContext());
     } finally {
       this.enableStatus = true;
     }
@@ -147,13 +149,13 @@ export struct QuickLoginPage {
     }
     const hasNet: boolean = connection.hasDefaultNetSync();
     if (!hasNet) {
-      const hint: string = getContext().resourceManager.getStringSync($r('app.string.hwid_no_internet_connect'));
-      showToast(hint);
+      const hint: string = (this.getUIContext().getHostContext() as Context).resourceManager.getStringSync($r('app.string.hwid_no_internet_connect').id);
+      showToast(hint, this.getUIContext());
       return;
     }
     if (privacyText.tag && privacyText.tag !== '') {
       // Obtain the multi-language environment information of the system.
-      const systemLanguage: string = (getContext() as common.UIExtensionContext).config.language ?? '';
+      const systemLanguage: string = (this.getUIContext().getHostContext() as common.UIExtensionContext).config.language ?? '';
       hilog.info(this.domainId, this.logTag, `systemLanguage is ${systemLanguage}`);
       const params: Record<string, Object> = { 'protocolUrl': privacyText.tag + systemLanguage };
       // Concatenate link parameters.
@@ -165,7 +167,8 @@ export struct QuickLoginPage {
   getProtocolUrl(privacyUrl: string): string {
     try {
       // Read files from /AppScope/resources/rawfile.
-      const value: Uint8Array = getContext().resourceManager.getRawFileContentSync(this.srcPath);
+      const context = this.getUIContext().getHostContext() as Context;
+      const value: Uint8Array = context.resourceManager.getRawFileContentSync(this.srcPath);
       // Return the link to the HUAWEI ID User Authentication Agreement.
       return JSON.parse(buffer.from(value.buffer).toString())[privacyUrl] as string;
     } catch (error) {
@@ -234,16 +237,19 @@ export struct QuickLoginPage {
           Column() {
             LoginWithHuaweiIDButton({
               params: {
-                style: loginComponentManager.Style.BUTTON_RED,
+                style: loginComponentManager.Style.BUTTON_CUSTOM,
                 extraStyle: {
                   buttonStyle: new loginComponentManager.ButtonStyle().loadingStyle({
                     show: true,
-                  }),
+                  }).backgroundColor('rgba(100, 187, 92, 1)'),
                 },
                 loginType: loginComponentManager.LoginType.QUICK_LOGIN,
+                customButtonParams:{
+                  backgroundColor: 'rgba(100, 187, 92, 1)'
+                }
               },
               controller: this.controller,
-            }).id('login_with_huaweiId_button');
+            }).id('login_with_huaweiId_button')
           }
           .height(40)
           .width(CommonConstants.FULL_PERCENT)
@@ -280,7 +286,7 @@ export struct QuickLoginPage {
             }
             .padding({ right: 12 })
             .bindPopup(this.showPopUp, {
-              message: getContext().resourceManager.getStringSync($r('app.string.read_and_agree_protocol')),
+              message: (this.getUIContext().getHostContext() as Context).resourceManager.getStringSync($r('app.string.read_and_agree_protocol').id),
               onStateChange: (event) => {
                 this.showPopUp = event.isVisible;
               },

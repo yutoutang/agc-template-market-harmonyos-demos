@@ -1,4 +1,3 @@
-import { promptAction } from '@kit.ArkUI';
 import { BalanceChangeType, RouterMap, DialogMap } from '../commons/Enums';
 import { BillCardItemModel } from '../commons/Models';
 import { BillCardItem, ConfirmDialogOption, ConfirmParam, DialogInfo } from '../commons/Types';
@@ -8,6 +7,7 @@ import { BillManageUtil } from '../utils/BillManageUtil';
 import { EventBus, EventKey } from '../utils/EventBus';
 import { Logger } from '../utils/Logger';
 import { ResourceUtil } from '../utils/ResourceUtil';
+import { toastUtil } from '../utils/ToastUtil';
 
 const TAG = '[BillDetailVM]';
 
@@ -48,7 +48,7 @@ export class BillDetailVM {
         const result = value.result as DialogInfo<ConfirmParam>;
         if (result.param?.isConfirm && this.bill) {
           await AccountingDB.deleteTransactions(this.bill.transactionId);
-          promptAction.showToast({ message: '账单删除成功~' });
+          toastUtil.showToast('账单删除成功~');
           EventBus.instance.emit(EventKey.GLOBAL_REFRESH_EVENT);
           this.stack.pop(1)
         }

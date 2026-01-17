@@ -1,9 +1,0 @@
-{
-  "module": {
-    "name": "module_product_share",
-    "type": "har",
-    "deviceTypes": [
-      "phone"
-    ]
-  }
-}

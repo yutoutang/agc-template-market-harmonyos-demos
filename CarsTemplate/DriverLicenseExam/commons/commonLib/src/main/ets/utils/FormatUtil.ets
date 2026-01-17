@@ -15,20 +15,4 @@ export class FormatUtil {
 
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   }
-
-  public static formatImgResource(str: string): string {
-    if (!str.length) {
-      return '';
-    }
-    if (str.startsWith('mockImage://')) {
-      const resourceName = str.split('//')[1];
-      try {
-        const resource = getContext().resourceManager.getMediaBase64ByNameSync(resourceName);
-        return resource;
-      } catch (err) {
-        Logger.error(TAG, 'get image resource failed', err);
-      }
-    }
-    return str;
-  }
 }

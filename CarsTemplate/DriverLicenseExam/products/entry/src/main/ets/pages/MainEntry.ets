@@ -5,6 +5,9 @@ import { TabListItem } from '../types/Types';
 import { CommonModel, CommonConstants } from '@ohos_agcit/driver_license_exam_commonlib';
 import { GuideService } from '@ohos_agcit/driver_license_exam_guide';
 import { ExamService } from '@ohos_agcit/driver_license_exam_datasource'
+import { notificationManager } from '@kit.NotificationKit';
+import { PushUtils , PushActionParams } from '@ohos_agcit/driver_license_exam_commonlib'
+import common from '@ohos.app.ability.common';
 
 @Entry
 @ComponentV2
@@ -12,7 +15,7 @@ struct MainEntry {
   vm: CommonModel = CommonModel.instance;
   bottomRectHeight: number = 0;
   guideService: GuideService = GuideService.instance;
-  examService: ExamService = ExamService.instance;
+  examService: ExamService = ExamService.instance(this.getUIContext().getHostContext() as Context);
   @Local totalCount:number = 0;
   @Local didCount: number = 0;
   @Local accuracyRate: number = 0;
@@ -20,8 +23,23 @@ struct MainEntry {
 
   aboutToAppear(): void {
     this.bottomRectHeight = AppStorage.get('bottomRectHeight') || 0;
-    if (!this.guideService.isCompleteGuidance()) {
-      this.vm.navStack.pushPathByName('guidePage', true)
+    this.vm.navStack.pushPathByName('splashPage', true);
+    this.sendPushNotice();
+  }
+
+  sendPushMessage() {
+    let pushArticle:PushActionParams = {
+      picVideoUrl: '',
+      title: '驾考模板',
+      id: '3445749589458989'
+    }
+    PushUtils.randomPushMessage(pushArticle, this.getUIContext().getHostContext() as Context)
+  }
+
+  sendPushNotice() {
+    const isOn = notificationManager.isNotificationEnabledSync();
+    if (isOn) {
+      this.sendPushMessage();
     }
   }
 
@@ -57,7 +75,7 @@ struct MainEntry {
         }
         .backgroundColor(Color.White)
         .padding({
-          bottom: px2vp(this.bottomRectHeight)
+          bottom: this.getUIContext().px2vp(this.bottomRectHeight)
         })
       }
 

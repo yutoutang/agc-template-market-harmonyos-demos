@@ -1,7 +1,8 @@
+import { contextUtil } from './ContextUtil';
 import { Logger } from './Logger';
 
 export function alertToConfirm(message: string, confirm: () => Promise<void>) {
-  AlertDialog.show({
+  contextUtil.getUiContext()?.showAlertDialog({
     message: message,
     alignment: DialogAlignment.Center,
     height: 125,

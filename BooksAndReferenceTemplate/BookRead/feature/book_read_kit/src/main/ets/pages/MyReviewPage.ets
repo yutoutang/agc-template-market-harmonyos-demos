@@ -1,4 +1,4 @@
-import { Constants, NavHeaderBar, TCRouter } from 'common';
+import { BreakpointStorage, BreakpointSystem, BreakpointTypeEnum, Constants, NavHeaderBar, TCRouter } from 'common';
 import { ReviewInfo } from '../model/ReviewModels';
 import { ReviewDataUtil } from '../utils/ReviewDataUtil';
 import { ExpandableText } from '../components/ExpandableText';
@@ -7,18 +7,23 @@ import { emitter } from '@kit.BasicServicesKit';
 @ComponentV2
 export struct MyReviewPage {
   @Local myReviewList: ReviewInfo[] = [];
-
+  @Local curBreakpoint: BreakpointStorage = BreakpointSystem.currentBreakpoint
   aboutToAppear(): void {
     // 初始化评论系统，确保用户信息同步
     ReviewDataUtil.initialize();
 
     this.loadMyReviews();
 
-    // 监听用户信息变更事件
-    emitter.on(Constants.LOGIN_CHANGE, () => {
-      ReviewDataUtil.updateCurrentUserReviews();
-      this.loadMyReviews();
-    });
+    try {
+      // 监听用户信息变更事件
+      emitter.on(Constants.LOGIN_CHANGE, () => {
+        ReviewDataUtil.updateCurrentUserReviews();
+        this.loadMyReviews();
+      });
+    } catch (e) {
+      console.error('Failed to emitter on login change. Cause: ' + JSON.stringify(e));
+    }
+
   }
 
   onPageShow(): void {
@@ -50,7 +55,7 @@ export struct MyReviewPage {
           .height(16)
           .margin({ right: 4 })
           .fillColor(star <= rating ? '#FFD700' : '#E0E0E0')
-      })
+      }, (item: string) => JSON.stringify(item))
     }
   }
 
@@ -140,8 +145,6 @@ export struct MyReviewPage {
       // 分割线（最后一项不显示）
       if (index < this.myReviewList.length - 1) {
         Divider()
-          .strokeWidth(1)
-          .color($r('sys.color.ohos_id_color_list_separator'))
           .margin({ top: 16, bottom: 20 })
       } else {
         // 最后一项增加额外的底部间距
@@ -172,10 +175,12 @@ export struct MyReviewPage {
                 this.buildMyReviewItem(review, index);
               }, (review: ReviewInfo) => review.id)
             }
-            .width('100%')
+            .width(this.curBreakpoint.value === BreakpointTypeEnum.LG ? '70%' : Constants.FULL_SIZE)
           }
+          .align(Alignment.Top)
           .layoutWeight(1)
           .scrollable(ScrollDirection.Vertical)
+          .scrollBar(BarState.Off)
           .edgeEffect(EdgeEffect.Spring)
           .padding({ bottom: 40 })
         } else {

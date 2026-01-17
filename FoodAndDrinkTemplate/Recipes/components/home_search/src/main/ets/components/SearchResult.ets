@@ -1,4 +1,6 @@
+import { BreakpointModel, BreakpointType } from 'base_ui';
 import { RecipeBriefInfo, SortType, TabItem } from '../types/Index';
+import { AppStorageV2 } from '@kit.ArkUI';
 
 @ComponentV2
 export struct SearchResult {
@@ -10,6 +12,19 @@ export struct SearchResult {
   @Event changeIndex: (index: number) => void = () => {
   }
   @Event goRecipeDetail: (id: number) => void = () => {
+  }
+  @Local breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
+  columnOptions: BreakpointType<number> = new BreakpointType<number>({
+    sm: 1,
+    md: 2,
+    lg: 2,
+    xl: 2,
+  });
+
+  @Computed
+  get getLanes() {
+    let lanes = this.columnOptions.getValue(this.breakPointModel.currentBreakpoint);
+    return lanes;
   }
 
   build() {
@@ -70,11 +85,17 @@ export struct SearchResult {
                 .justifyContent(FlexAlign.SpaceBetween)
                 .height(120);
               };
-            }.onClick(() => {
+            }
+            .onClick(() => {
               this.goRecipeDetail(item.id);
             });
           }, (item: RecipeBriefInfo) => item.id.toString());
-        }.height('calc(100% - 49vp)').scrollBar(BarState.Off).padding({ bottom: 20 }).layoutWeight(1);
+        }
+        .height('calc(100% - 49vp)')
+        .scrollBar(BarState.Off)
+        .padding({ bottom: 20 })
+        .layoutWeight(1)
+        .lanes(this.getLanes)
       }
     }
   }

@@ -1,22 +1,28 @@
 import { preferences } from '@kit.ArkData';
 import { common } from '@kit.AbilityKit';
 import { Logger } from './Logger';
+import { GlobalContextUtils } from './ContextUtils';
 
 export class PreferenceUtil {
   private static preferenceRecord: Map<string, PreferenceUtil> = new Map()
   private dataPreferences: preferences.Preferences | null = null
 
   private constructor(context: Context, fileName: string) {
-    preferences.removePreferencesFromCacheSync(context, fileName)
-    this.dataPreferences = preferences.getPreferencesSync(context, { name: fileName })
-    Logger.info(`PreferenceUtil: ${fileName} init: ${this.dataPreferences != null}`)
+    try {
+      preferences.removePreferencesFromCacheSync(context, fileName)
+      this.dataPreferences = preferences.getPreferencesSync(context, { name: fileName })
+      Logger.info(`PreferenceUtil: ${fileName} init: ${this.dataPreferences != null}`)
+    } catch (e) {
+      Logger.error(`PreferenceUtils init fail. Code: ${e.code}, message: ${e.message}`);
+    }
+
   }
 
   public static getInstance(context?: Context, fileName: string = 'default') {
     if (PreferenceUtil.preferenceRecord.has(fileName)) {
       return PreferenceUtil.preferenceRecord.get(fileName)!!
     }
-    let ctx = context || getContext() as common.UIAbilityContext
+    let ctx = context || GlobalContextUtils.globalContext;
     let preferenceUtil: PreferenceUtil = new PreferenceUtil(ctx, fileName);
     PreferenceUtil.preferenceRecord.set(fileName, preferenceUtil)
     return preferenceUtil

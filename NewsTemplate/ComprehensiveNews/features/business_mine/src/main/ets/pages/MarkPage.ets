@@ -12,6 +12,10 @@ export function MarkPageBuilder() {
 struct MarkPage {
   @Local vm: MarkViewModel = new MarkViewModel();
 
+  aboutToAppear(): void {
+    this.vm.queryList();
+  }
+
   build() {
     NavDestination() {
       Column() {
@@ -27,7 +31,7 @@ struct MarkPage {
     }
     .hideTitleBar(true)
     .onShown(() => {
-      this.vm.queryList();
+      this.vm.queryList(false);
     })
   }
 }

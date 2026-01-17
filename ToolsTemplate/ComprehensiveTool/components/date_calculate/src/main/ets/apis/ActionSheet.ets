@@ -1,3 +1,4 @@
+import { UtilLog } from '@hw-agconnect/util-log';
 import { ComponentContent, window } from '@kit.ArkUI';
 import { cryptoFramework } from '@kit.CryptoArchitectureKit';
 
@@ -94,16 +95,22 @@ class ActionSheet {
   private uiContext: UIContext | null = null;
   private contentNodeMap: Map<string, contentNodeMapVal> = new Map();
 
-  public async show(option: ActionSheetOption) {
+  public async show(option: ActionSheetOption, uiContext: UIContext) {
     let key = option.id ?? await this.getUniKey();
     if (this.uiContext === null) {
-      let windowClass: window.Window = await window.getLastWindow(getContext());
-      this.uiContext = windowClass.getUIContext();
+      let windowClass: window.Window | null = null
+      try {
+        windowClass = await window.getLastWindow(uiContext.getHostContext()!);
+      } catch (e) {
+        UtilLog.error(`show dialog failed with error ${JSON.stringify(e)}`);
+      }
+
+      this.uiContext = windowClass!.getUIContext();
     }
     let params = new ActionSheetParams(option);
     params.id = key;
     params.close = (id: string): Promise<void> => this.close(id);
-    let contentNode = new ComponentContent(this.uiContext, wrapBuilder(defaultBuilder), params);
+    let contentNode = new ComponentContent(this.uiContext!, wrapBuilder(defaultBuilder), params);
     let sheetOption: SheetOptions = {
       keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
       height: params.height,
@@ -139,7 +146,7 @@ class ActionSheet {
       content: contentNode,
       params: params,
     });
-    await this.uiContext.openBindSheet(contentNode, sheetOption);
+    await this.uiContext?.openBindSheet(contentNode, sheetOption);
     params.onOpen?.();
     return key;
   }

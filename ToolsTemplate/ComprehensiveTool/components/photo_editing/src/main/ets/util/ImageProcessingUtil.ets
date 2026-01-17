@@ -1,11 +1,10 @@
 import { image } from '@kit.ImageKit';
 import { effectKit } from '@kit.ArkGraphics2D';
 import { fileIo as fs } from '@kit.CoreFileKit';
-import { common } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { CustomFilter } from '../model/CustomFilter';
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
-import { promptAction } from '@kit.ArkUI';
+import { CustomFilter } from '../model/CustomFilter';
+import { UtilLog } from '@hw-agconnect/util-log';
 
 export class ImageProcessingUtil {
   static saveToAlbum(id: string, uiContext: UIContext, format?: string) {
@@ -16,14 +15,14 @@ export class ImageProcessingUtil {
       let imagePackerApi = image.createImagePacker();
       let packOpts: image.PackingOption = { format: format ? format : 'image/jpeg', quality: 98 };
       let file: fs.File = null!;
-      imagePackerApi.packing(pixmap, packOpts).then(async (buffer: ArrayBuffer) => {
+      imagePackerApi.packToData(pixmap, packOpts).then(async (buffer: ArrayBuffer) => {
         try {
           let helper = photoAccessHelper.getPhotoAccessHelper(uiContext.getHostContext());
           let uri = await helper.createAsset(photoAccessHelper.PhotoType.IMAGE, 'png');
           file = await fs.open(uri, fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE);
           // 写入文件
           await fs.write(file.fd, buffer);
-          promptAction.showToast({ message: '已保存至相册~' });
+          uiContext.getPromptAction().showToast({ message: '已保存至相册~' });
         } catch (error) {
           console.error('error is ' + JSON.stringify(error));
         } finally {
@@ -94,7 +93,13 @@ export class ImageProcessingUtil {
     let color: ArrayBuffer = uint8BufferTemp.buffer as ArrayBuffer;
     let opts: image.InitializationOptions =
       { editable: true, pixelFormat: imageInfo.pixelFormat, size: { height: height, width: width } };
-    let pixelMapTemp: image.PixelMap = image.createPixelMapSync(color, opts);
+
+    let pixelMapTemp: image.PixelMap | undefined = undefined
+    try {
+      pixelMapTemp = image.createPixelMapSync(color, opts);
+    } catch (e) {
+      UtilLog.error(`getRectanglePixelMap failed: ${JSON.stringify(e)}`);
+    }
     return pixelMapTemp;
   }
 }

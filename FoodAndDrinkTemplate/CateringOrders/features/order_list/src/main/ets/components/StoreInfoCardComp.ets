@@ -1,76 +1,65 @@
-import { CommonUrl, Constants, HwMapModel, RouterMap, RouterModule, StoreInfoModel } from 'common/Index';
-import { AppStorageV2, promptAction } from '@kit.ArkUI';
 import { callTelSheetBuilder } from 'base_ui';
+import { CommonUrl, Constants } from 'common/Index';
+import { MyOrderInfo } from '../models/Index';
 
 /*
  * 购买商品列表
  * */
 @ComponentV2
 export struct StoreInfoCard {
-  @Local storeModel: StoreInfoModel = AppStorageV2.connect(StoreInfoModel, () => new StoreInfoModel())!;
-  @Local tel: string = ''
+  @Param @Require orderDetail: MyOrderInfo
   @Local callTelSheet: boolean = false
 
-  aboutToAppear(): void {
-    this.tel = this.storeModel.storeInfo?.tel ?? ''
-  }
-
   build() {
-    Row() {
+    Column({ space: 4 }) {
       Row() {
-        Image(`${CommonUrl.CLOUD_STORAGE_URL}${this.storeModel.storeInfo.logo}`).width(40).height(40)
-        Column() {
-          Text(`${this.storeModel.storeInfo.name}`)
-            .fontSize(18)
+        Row() {
+          Image(`${CommonUrl.CLOUD_STORAGE_URL}${this.orderDetail.order.storeLogo}`)
+            .width(40)
+            .height(40)
+            .borderRadius(20)
+          Text(`${this.orderDetail.order.storeName}`)
+            .fontSize($r('sys.float.Subtitle_L'))
             .fontColor($r('sys.color.font_primary'))
             .fontWeight(FontWeight.Medium)
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
-          Text(`${this.storeModel.storeInfo.address}`)
-            .fontSize($r('sys.float.Body_S'))
-            .fontColor($r('sys.color.font_secondary'))
-            .fontWeight(400)
-            .margin({ top: 5 })
-            .maxLines(1)
-            .textOverflow({ overflow: TextOverflow.Ellipsis })
-        }.alignItems(HorizontalAlign.Start).layoutWeight(1).margin({ left: 8 })
-      }.layoutWeight(1)
+            .constraintSize({ maxWidth: '90%' })
+            .margin({ left: 4 })
+        }.layoutWeight(1)
 
-      Text() {
-        ImageSpan($r('app.media.phone_icon')).width(24).height(24).margin({ right: 12 }).onClick(() => {
-          // 拨打商家电话
-          this.callTelSheet = true
-        })
-        ImageSpan($r('app.media.position_icon')).width(24).height(24).onClick(() => {
-          let coordinates = this.storeModel.storeInfo?.coordinates?.split(',')
-          if (coordinates?.length === 2) {
-            let latitude: number = Number(coordinates[0])
-            let longitude: number = Number(coordinates[1])
-            RouterModule.push(RouterMap.HW_MAP_PAGE, { latitude, longitude } as HwMapModel)
-          } else {
-            promptAction.showToast({ message: $r('app.string.store_address_error') })
-          }
-        })
-      }.margin({ left: 8 })
-      .bindSheet($$this.callTelSheet, callTelSheetBuilder(this.tel, () => {
-        this.callTelSheet = false
-      }), {
-        height: 309,
-        blurStyle: BlurStyle.Thick,
-        showClose: false,
-      });
+        Image($r('app.media.phone_icon')).width(24).height(24)
+          .onClick(() => {
+            // 拨打商家电话
+            this.callTelSheet = true
+          })
+          .bindSheet($$this.callTelSheet, callTelSheetBuilder(this.orderDetail.order.storeTel, () => {
+            this.callTelSheet = false
+          }), {
+            detents: [309, 310],
+            backgroundColor: $r('sys.color.background_fourth'),
+            blurStyle: BlurStyle.Thick,
+            preferType: SheetType.CENTER,
+            title: { title: $r('app.string.contact_us') },
+          });
+      }.justifyContent(FlexAlign.SpaceBetween)
+
+      Row({ space: 2 }) {
+        Image($r('app.media.ic_public_position')).width(12)
+        Text(`${this.orderDetail.order.storeAddress}`)
+          .fontSize($r('sys.float.Body_S'))
+          .fontColor($r('sys.color.font_secondary'))
+          .fontWeight(400)
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .layoutWeight(1)
+      }
     }
     .width(Constants.FULL_SIZE)
-    .justifyContent(FlexAlign.SpaceBetween)
-    .alignItems(VerticalAlign.Center)
-    .constraintSize({ maxWidth: Constants.FULL_SIZE })
+    .alignItems(HorizontalAlign.Start)
     .backgroundColor($r('sys.color.background_primary'))
     .borderRadius(16)
-    .padding({
-      left: 12,
-      right: 12,
-      top: 16,
-      bottom: 16,
-    })
+    .padding(12)
+
   }
 }

@@ -4,7 +4,7 @@ export { BorrowPage } from './src/main/ets/views/BorrowPage';
 
 export { LibraryPage } from './src/main/ets/views/LibraryPage';
 
-export { PersonPage } from './src/main/ets/views/PersonPage';
+export { PersonPage, PersonPageBuilder } from './src/main/ets/views/PersonPage';
 
 export { AccountPage } from './src/main/ets/views/AccountPage';
 

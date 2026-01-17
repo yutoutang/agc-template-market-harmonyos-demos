@@ -1,1 +1,1 @@
-export { BookSortPage } from './src/main/ets/pages/BookSortPage';
+export { BookSortPage, BookSortPageBuilder } from './src/main/ets/pages/BookSortPage';

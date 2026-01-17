@@ -12,7 +12,7 @@ struct EmptyPage {
   aboutToAppear(): void {
     const uiContext = this.getUIContext()
     BreakpointSystem.register(uiContext)
-    WindowUtil.initWindowUtil(uiContext)
+    WindowUtil.setUIContext('EntryAbility', uiContext)
     routerStack.pushPath({
       name: RouterMap.SAFE_PAGE,
     }, false)

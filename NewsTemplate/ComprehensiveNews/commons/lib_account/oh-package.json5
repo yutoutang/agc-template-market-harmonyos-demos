@@ -6,9 +6,8 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "@tencent/wechat_open_sdk": "1.0.15",
     "lib_common": "file:../lib_common",
-    "lib_widget": "file:../lib_widget",
     "lib_news_api": "file:../lib_news_api",
+    "module_login": "file:../../components/module_login",
   }
 }

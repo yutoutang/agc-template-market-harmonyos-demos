@@ -2,6 +2,7 @@ import { harmonyShare, systemShare } from '@kit.ShareKit';
 import { uniformTypeDescriptor } from '@kit.ArkData';
 import { FileVo } from '../model/FileVo';
 import { FileUtil } from '../utils/FileUtil';
+import { UtilLog } from '@hw-agconnect/util-log';
 
 // 碰一碰分享
 class KnockFileShareService {
@@ -55,15 +56,23 @@ const knockFileShareService: KnockFileShareService = new KnockFileShareService()
 
 export function onKnockShareStart() {
   if (canIUse('SystemCapability.Collaboration.HarmonyShare')) {
-    harmonyShare.on('knockShare', async (target: harmonyShare.SharableTarget) => {
-      knockFileShareService.shareDataCallback(target);
-    });
+    try {
+      harmonyShare.on('knockShare', async (target: harmonyShare.SharableTarget) => {
+        knockFileShareService.shareDataCallback(target);
+      });
+    } catch (e) {
+      UtilLog.error(`onKnockShareStart failed: ${JSON.stringify(e)}`);
+    }
   }
 }
 
 export function onKnockShareEnd() {
   if (canIUse('SystemCapability.Collaboration.HarmonyShare')) {
-    harmonyShare.off('knockShare');
+    try {
+      harmonyShare.off('knockShare');
+    } catch (e) {
+      UtilLog.error(`onKnockShareEnd failed ${JSON.stringify(e)}`)
+    }
   }
 }
 

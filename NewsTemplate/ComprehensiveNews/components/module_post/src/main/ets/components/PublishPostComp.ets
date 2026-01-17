@@ -1,4 +1,6 @@
-import { KeyboardAvoidMode, window } from '@kit.ArkUI';
+import { KeyboardAvoidMode, promptAction } from '@kit.ArkUI';
+import { common } from '@kit.AbilityKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { ImagePreview, PreviewVerticalAlign } from 'module_imagepreview';
 import {
   Constants,
@@ -15,6 +17,8 @@ import { MediaUtils } from '../utils/MediaUtils';
 import { FileUtils } from '../utils/FileUtils';
 import { getPageMargin } from '../utils/Common';
 
+const TAG = '[PublishPostComp]';
+
 @ComponentV2
 export struct PublishPostComp {
   // 字体大小比例
@@ -23,6 +27,8 @@ export struct PublishPostComp {
   @Param imageParams: MediaParams = DEFAULT_IMAGE_PARAM;
   // 视频参数
   @Param videoParams: MediaParams = DEFAULT_VIDEO_PARAM;
+  // TextArea控制器
+  @Param controller: TextAreaController = new TextAreaController();
   // 图文变化的回调
   @Event onChange: (body: string, mediaList: PostImgVideoItem[]) => void = () => {
   };
@@ -36,14 +42,18 @@ export struct PublishPostComp {
   @Local breakpoint: string = 'sm';
 
   @Monitor('body', 'imgList.length', 'videoList.length')
-  onContentChange(monitor: IMonitor) {
+  onContentChange() {
     this.onChange(this.body, [...this.imgList, ...this.videoList]);
   }
 
   aboutToAppear(): void {
-    window.getLastWindow(getContext(this)).then(currentWindow => {
-      currentWindow.on('keyboardHeightChange', this.onKeyBoardCB);
-    })
+    try {
+      let context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+      let windowClass = (context as common.UIAbilityContext).windowStage.getMainWindowSync();
+      windowClass.on('keyboardHeightChange', this.onKeyBoardCB);
+    } catch (e) {
+      UtilLog.error(TAG, 'getMainWindowSync fail, error: ' + JSON.stringify(e));
+    }
   }
 
   build() {
@@ -94,11 +104,28 @@ export struct PublishPostComp {
     })
   }
 
+  @Computed
+  get imageTip() {
+    if (this.imageParams.maxSize) {
+      return `图片大小不超过${this.imageParams.maxSize}MB，最多支持上传${this.imageParams.maxLimit}张图片`;
+    }
+    return `最多支持上传${this.imageParams.maxLimit}张图片`;
+  }
+
+  @Computed
+  get videoTip() {
+    if (this.videoParams.maxSize) {
+      return `视频大小不超过${this.videoParams.maxSize}MB，最多支持上传${this.videoParams.maxLimit}个视频`;
+    }
+    return `最多支持上传${this.videoParams.maxLimit}个视频`;
+  }
+
   @Builder
   textArea() {
     TextArea({
       placeholder: '畅所欲言，发表你的想法',
       text: $$this.body,
+      controller: this.controller,
     })
       .fontSize(16 * this.fontRatio)
       .placeholderColor($r('sys.color.font_tertiary'))
@@ -124,13 +151,13 @@ export struct PublishPostComp {
           GridItem() {
             this.imageBox(v.picVideoUrl, index)
           }
-        }, (v: PostImgVideoItem) => v.picVideoUrl)
+        }, (v: PostImgVideoItem, _index: number) => v.picVideoUrl + v.id)
 
         ForEach(this.videoList, (v: PostImgVideoItem, index: number) => {
           GridItem() {
             this.videoBox(v.surfaceUrl, index)
           }
-        }, (v: PostImgVideoItem) => v.picVideoUrl)
+        }, (v: PostImgVideoItem, _index: number) => v.picVideoUrl + v.id)
       }
       .columnsTemplate(this.getColumnsTemplate)
       .columnsGap(12)
@@ -138,8 +165,7 @@ export struct PublishPostComp {
       .maxCount(this.getMaxCount)
       .scrollBar(BarState.Off)
 
-      Text(this.isImageType ? `图片格式jpg/png，最多支持上传${this.imageParams.maxLimit}张图片` :
-        `视频大小不超过${this.videoParams.maxSize ?? DEFAULT_VIDEO_PARAM.maxSize}MB，且一次只可上传一个视频`)
+      Text(this.isImageType ? this.imageTip : this.videoTip)
         .fontSize($r('sys.float.Caption_L'))
         .fontColor($r('sys.color.font_tertiary'))
         .visibility((this.imgList.length || this.videoList.length) > 0 ? Visibility.Visible : Visibility.Hidden)
@@ -212,6 +238,7 @@ export struct PublishPostComp {
         .width(Constants.FULL_PERCENT)
         .aspectRatio(1)
         .draggable(false)
+        .autoResize(true)
       Image($r('app.media.ic_public_close_circle'))
         .width(Constants.ICON_WIDTH)
         .aspectRatio(1)
@@ -229,7 +256,7 @@ export struct PublishPostComp {
     .alignContent(Alignment.TopEnd)
     .clip(true)
     .onClick(() => {
-      ImagePreview.show(this.imgList.map(v => v.picVideoUrl), {
+      ImagePreview.show(this.getUIContext(), this.imgList.map(v => v.picVideoUrl), {
         startIndex: index,
         showIndex: true,
         loop: false,
@@ -247,6 +274,7 @@ export struct PublishPostComp {
           .width(Constants.FULL_PERCENT)
           .aspectRatio(1)
           .draggable(false)
+          .autoResize(true)
         Row()
           .width(Constants.FULL_PERCENT)
           .aspectRatio(1)
@@ -275,16 +303,24 @@ export struct PublishPostComp {
     .clip(true)
   }
 
+  showToast(options: promptAction.ShowToastOptions) {
+    try {
+      this.getUIContext().getPromptAction().showToast(options);
+    } catch (e) {
+      UtilLog.error(TAG, 'showToast fail, error: ' + JSON.stringify(e));
+    }
+  }
+
   uploadImage() {
     if (this.videoList.length) {
-      this.getUIContext().getPromptAction().showToast({
+      this.showToast({
         message: '图片与视频一次只可上传一种',
         bottom: this.toastMarginBottom,
       });
       return;
     }
     if (this.imgList.length >= this.imageParams.maxLimit) {
-      this.getUIContext().getPromptAction().showToast({
+      this.showToast({
         message: '已添加的图片数量已达上限',
         bottom: this.toastMarginBottom,
       });
@@ -295,14 +331,14 @@ export struct PublishPostComp {
 
   uploadVideo() {
     if (this.imgList.length) {
-      this.getUIContext().getPromptAction().showToast({
+      this.showToast({
         message: '图片与视频一次只可上传一种',
         bottom: this.toastMarginBottom,
       });
       return;
     }
     if (this.videoList.length >= this.videoParams.maxLimit) {
-      this.getUIContext().getPromptAction().showToast({
+      this.showToast({
         message: '已添加的视频数量已达上限',
         bottom: this.toastMarginBottom,
       });
@@ -330,10 +366,11 @@ export struct PublishPostComp {
     });
     uriList.forEach(async (v: string) => {
       const item = new PostImgVideoItem();
-      item.picVideoUrl = FileUtils.handleUri(v, isUploadImage ? 'png' : 'mp4');
+      item.id = new Date().getTime();
+      item.picVideoUrl = v;
       if (!isUploadImage) {
         const thumbnail = await MediaUtils.getVideoThumbnail(v);
-        item.surfaceUrl = await FileUtils.writePixelMap(thumbnail);
+        item.surfaceUrl = await FileUtils.writePixelMap(this.getUIContext(), thumbnail);
       }
       list.push(item);
     })
@@ -345,7 +382,7 @@ export struct PublishPostComp {
   }
 
   onKeyBoardCB: (height: number) => void = (height: number) => {
-    animateTo({
+    this.getUIContext().animateTo({
       duration: 200,
       curve: Curve.EaseInOut,
     }, () => {

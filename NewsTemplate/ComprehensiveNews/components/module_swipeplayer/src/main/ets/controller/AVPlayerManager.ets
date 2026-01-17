@@ -17,19 +17,6 @@ export class AVPlayerManager {
     return AVPlayerManager.instance
   }
 
-  public async createAVPlayer(): Promise<media.AVPlayer | undefined> {
-    try {
-      const avPlayer = await media.createAVPlayer();
-      if (avPlayer) {
-        return avPlayer;
-      } else {
-        return undefined;
-      }
-    } catch (err) {
-      return undefined;
-    }
-  }
-
   public getAVPlayer(index: number): media.AVPlayer | undefined {
     let playerId = this.playerConnectMap.get(index);
     return this.playerSessionCache.get(playerId!)?.avPlayer;
@@ -215,6 +202,22 @@ export class AVPlayerSession {
       Logger.debug(TAG, 'pause error! avPlayer undefined!');
     }
   }
+
+  seek(seekTime:number) {
+    if (!this.avPlayer) {
+      return;
+    }
+    if (this.avPlayer.state !== AVPlayerState.PREPARED) {
+      return;
+    }
+
+    try {
+      this.avPlayer.seek(seekTime, media.SeekMode.SEEK_PREV_SYNC);
+    } catch (err) {
+      Logger.debug(TAG, 'seek error! avPlayer undefined!');
+    }
+  }
+
 }
 
 export function registerAVPlayerCallback(

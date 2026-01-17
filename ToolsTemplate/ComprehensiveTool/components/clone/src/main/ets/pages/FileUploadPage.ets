@@ -19,7 +19,7 @@ export struct FileUploadPage {
     this.vm.clear()
     this.vm.context = this.context
     fileSaveService.getCloneFile(this.context)
-    this.vm.getCloneFiles()
+    this.vm.getCloneFiles(this.getUIContext())
     fileSaveService.onCloneFile = (cloneFile: CloneFile) => {
       this.vm.image.list = cloneFile.image.list
       this.vm.image.size = cloneFile.image.size

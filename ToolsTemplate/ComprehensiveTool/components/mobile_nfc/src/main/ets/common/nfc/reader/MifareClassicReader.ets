@@ -1,9 +1,11 @@
+import { UtilLog } from '@hw-agconnect/util-log';
 import { tag } from '@kit.ConnectivityKit';
 import { JSON, PlainArray } from '@kit.ArkTS';
 import Common from '../Common';
 import Util from '../../Util';
 import { NfcInfo } from '../../../db/NfcCardInfo';
 import { KEY_MAP } from '../../Constant';
+import NFC from '../Nfc';
 
 const NO_KEY = '------------';
 const NO_DATA = '--------------------------------';
@@ -24,7 +26,8 @@ export default class MifareClassicReader {
       for (let i = 0; i < sectorCount; i++) {
         blockCount += this.mMFC.getBlockCountInSector(i);
       }
-      let id = this.mMFC.getTagInfo().uid;
+
+      let id = tag.getTagInfo(NFC.startWant).uid
 
       let keyMap: PlainArray<number[][]> = await MifareClassicReader.getKeyMap(this.mMFC, sectorCount);
 
@@ -38,9 +41,17 @@ export default class MifareClassicReader {
           }
         }
       }
-      return new NfcInfo(undefined, Util.toHexString(id),
-        await Util.getCardName(nfcType), nfcType, size, sectorCount, blockCount, JSON.stringify(sectors), -1, undefined,
-        undefined, undefined, undefined, new Date().getTime(), false, false);
+      let nfcInfo: NfcInfo = new NfcInfo();
+      try {
+        nfcInfo = new NfcInfo(undefined, Util.toHexString(id),
+          await Util.getCardName(nfcType), nfcType, size, sectorCount, blockCount, JSON.stringify(sectors), -1,
+          undefined,
+          undefined, undefined, undefined, new Date().getTime(), false, false);
+      } catch (e) {
+        UtilLog.error(`onKnockShareStart failed: ${e}`);
+      }
+
+      return nfcInfo;
     }
     throw new Error();
   }

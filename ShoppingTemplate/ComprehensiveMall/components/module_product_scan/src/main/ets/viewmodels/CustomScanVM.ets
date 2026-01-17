@@ -4,7 +4,7 @@ import { image } from '@kit.ImageKit';
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
 import { customScan, detectBarcode, scanBarcode, scanCore } from '@kit.ScanKit';
 import { Logger } from 'module_ui_base';
-import { TabIndexMap } from '../commons/Enums';
+import { TabIndexMap } from '../commons/Constants';
 import { CustomScanOptions } from '../commons/Types';
 import { AlbumUtil } from '../utils/AlbumUtil';
 import { CameraUtil } from '../utils/CameraUtil';

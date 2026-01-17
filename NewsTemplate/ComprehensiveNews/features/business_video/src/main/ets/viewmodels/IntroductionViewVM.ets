@@ -17,8 +17,8 @@ export class IntroductionViewVM extends BaseViewModel {
     this.loopAddMockData()
   }
 
-  queryIntroductionList() {
-    const list = BaseNewsServiceApi.queryAuthorPosts('author_5');
+  async queryIntroductionList() {
+    const list = await BaseNewsServiceApi.queryAuthorPosts('author_5');
     list.forEach((item) => {
       item.extraInfo.showUserBar = false;
       item.extraInfo.showTimeBottom = false;
@@ -39,8 +39,8 @@ export class IntroductionViewVM extends BaseViewModel {
       '人生就像一场马拉松，不是比谁跑得快，而是比谁能坚持到最后。别被眼前的困难吓倒，每一次跌倒都是积蓄力量的过程。' +
         '慢下来，整理呼吸，调整步伐，你会发现风景依然在前方等你。坚持，是给自己最好的礼物。',
     ]
-    this.timer = setInterval(() => {
-      const list = BaseNewsServiceApi.queryAuthorPosts('author_5');
+    this.timer = setInterval(async () => {
+      const list = await BaseNewsServiceApi.queryAuthorPosts('author_5');
       let item = list[0];
       if (item) {
         item.extraInfo.showUserBar = false;

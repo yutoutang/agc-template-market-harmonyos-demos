@@ -1,7 +1,7 @@
 import { webview } from '@kit.ArkWeb';
 import { controllerMap, updateWeb, webOptionMap } from '@hw-agconnect/fast-web';
 import { ImagePreview, PreviewVerticalAlign } from 'module_imagepreview';
-import { BaseViewModel, FileUtils, Logger, RouterMap, RouterUtils } from 'lib_common';
+import { BaseViewModel, FileUtils, GlobalContextUtils, Logger, RouterMap, RouterUtils } from 'lib_common';
 import { AuthorModel, ChatInfoDetailResponse, MessageServiceApi, SendMessageRequest } from 'lib_news_api';
 import { ChatInfoDetailModel } from '../common/ObservedModel';
 import { WebIdMap } from '../constants/Constants';
@@ -12,7 +12,7 @@ export interface ChatModel {
   messages: ChatInfoDetailResponse[]
 }
 
-const TAG = 'MsgIMChatViewModel';
+const TAG = '[MsgIMChatViewModel]';
 
 @ObservedV2
 export class MsgIMChatViewModel extends BaseViewModel {
@@ -68,7 +68,7 @@ export class MsgIMChatViewModel extends BaseViewModel {
     if (index === -1) {
       index = 0;
     }
-    ImagePreview.show(this.imageList.map(v => v.content), {
+    ImagePreview.show(GlobalContextUtils.globalUIContext, this.imageList.map(v => v.content), {
       startIndex: index,
       showIndex: false,
       loop: false,

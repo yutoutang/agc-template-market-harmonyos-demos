@@ -1,3 +1,4 @@
+import { common } from '@kit.AbilityKit'
 import { CommonConstants, RouterUtils } from 'lib_common'
 import { NavHeaderBar } from 'lib_widget'
 import { PostImgVideoItem, PublishPostComp } from 'module_post'
@@ -13,11 +14,11 @@ export struct PublishPostPage {
   vm: PublishPostViewModel = new PublishPostViewModel();
 
   aboutToAppear(): void {
-    this.vm.onKeyBoard();
+    this.vm.onKeyBoard(this.getUIContext().getHostContext() as common.UIAbilityContext);
   }
 
   aboutToDisappear(): void {
-    this.vm.offKeyBoard();
+    this.vm.offKeyBoard(this.getUIContext().getHostContext() as common.UIAbilityContext);
   }
 
   build() {
@@ -37,6 +38,7 @@ export struct PublishPostPage {
       Column() {
         PublishPostComp({
           fontRatio: this.vm.settingInfo.fontSizeRatio,
+          controller: this.vm.controller,
           onChange: (body: string, mediaList: PostImgVideoItem[]) => {
             this.vm.body = body;
             this.vm.mediaList = mediaList;

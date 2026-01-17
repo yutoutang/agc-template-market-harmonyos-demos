@@ -1,5 +1,6 @@
 import { window } from '@kit.ArkUI';
 
+@ObservedV2
 export class WindowUtils {
   private static windowHeight: number = 0;
   private static windowWidth: number = 0;
@@ -14,24 +15,41 @@ export class WindowUtils {
     let type = window.AvoidAreaType.TYPE_SYSTEM; // 以状态栏避让为例
     let avoidArea = w.getWindowAvoidArea(type);
     let topRectHeight = avoidArea.topRect.height; // 获取状态栏区域高度
-    AppStorage.setOrCreate('windowTopHeight', px2vp(topRectHeight));
+    AppStorage.setOrCreate('windowTopHeight', w.getUIContext().px2vp(topRectHeight));
 
     type = window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR;
     avoidArea = w.getWindowAvoidArea(type);
     let bottomRectHeight = avoidArea.bottomRect.height; // 获取到导航区域的高度
-    AppStorage.setOrCreate('bottomRectHeight', px2vp(bottomRectHeight));
+    AppStorage.setOrCreate('bottomRectHeight', w.getUIContext().px2vp(bottomRectHeight));
     WindowUtils.w = w;
 
     // 3. 注册监听函数，动态获取避让区域数据
     w.on('avoidAreaChange', (data) => {
       if (data.type === window.AvoidAreaType.TYPE_SYSTEM) {
         let topRectHeight = data.area.topRect.height;
-        AppStorage.setOrCreate('windowTopHeight', px2vp(topRectHeight));
+        AppStorage.setOrCreate('windowTopHeight', w.getUIContext().px2vp(topRectHeight));
       } else if (data.type === window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR) {
         let bottomRectHeight = data.area.bottomRect.height;
-        AppStorage.setOrCreate('bottomRectHeight', px2vp(bottomRectHeight));
+        AppStorage.setOrCreate('bottomRectHeight', w.getUIContext().px2vp(bottomRectHeight));
       }
     });
+    WindowUtils.onWindowSizeChange()
+  }
+
+  public static onWindowSizeChange(callback?: () => void): void {
+    if (!WindowUtils.w) {
+      return;
+    }
+    WindowUtils.w?.on('windowSizeChange', (data) => {
+      let properties = data
+      WindowUtils.windowWidth = properties.width
+      WindowUtils.windowHeight = properties.height
+      callback?.();
+    });
+  }
+
+  public static onWindowSizeOff() {
+    WindowUtils.w?.off('windowSizeChange')
   }
 
   public static getWindowHeight(): number {
@@ -40,6 +58,14 @@ export class WindowUtils {
 
   public static getWindowWidth(): number {
     return WindowUtils.windowWidth;
+  }
+
+  public static setWindowWidth(windowWidth: number) {
+    WindowUtils.windowWidth = windowWidth
+  }
+
+  public static setWindowHeight(windowHeight: number) {
+    WindowUtils.windowHeight = windowHeight
   }
 
   public static async setWindowBright(light: number) {

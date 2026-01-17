@@ -48,7 +48,7 @@ export const queryMyRecipeList = (): Promise<AxiosResponse<Array<RecipeBriefInfo
   return axiosInstance.get(url);
 };
 
-// 查询我的菜谱
+// 上传我的菜谱
 export const uploadMyRecipe = (data: UploadRecipeBody): Promise<AxiosResponse<void, UploadRecipeBody>> => {
   const url = '/recipe/upload';
   return axiosInstance.post(url, data);

@@ -5,7 +5,8 @@
       {
         "name": "default",
         "signingConfig": "default",
-        "compatibleSdkVersion": "5.0.4(16)",
+        "compatibleSdkVersion": "6.0.0(20)",
+        "targetSdkVersion": "6.0.0(20)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
           "strictMode": {
@@ -24,6 +25,18 @@
     ]
   },
   "modules": [
+    {
+      "name": "home",
+      "srcPath": "./features/home",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
     {
       "name": "order_list",
       "srcPath": "./features/order_list",
@@ -115,6 +128,14 @@
     {
       "name": "goods_detail",
       "srcPath": "./components/goods_detail"
+    },
+    {
+      "name": "module_city_select",
+      "srcPath": "./components/module_city_select"
+    },
+    {
+      "name": "search",
+      "srcPath": "./components/search"
     }
   ]
 }

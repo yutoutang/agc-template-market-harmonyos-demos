@@ -27,12 +27,18 @@ export const SETTING_TYPE_MODULES: SettingModule[] = [
     id: SettingType.TERMS_OF_SERVICE,
     title: '用户协议',
     icon: $r('app.media.service'),
-    url:'TermsOfServicePage',
+    url: 'TermsOfServicePage',
   },
   {
     id: SettingType.PRIVACY_POLICY,
     title: '隐私政策',
     icon: $r('app.media.privacy'),
-    url:'PrivacyPolicyPage',
+    url: 'PrivacyPolicyPage',
+  },
+  {
+    id: SettingType.SETTING,
+    title: '设置',
+    icon: $r('app.media.setting'),
+    url: 'SettingPage',
   },
 ];

@@ -1,4 +1,4 @@
-import { hilog } from '@kit.PerformanceAnalysisKit'
+import { UtilLog } from '@hw-agconnect/util-log';
 
 export const LENGTH_TRANSFER_HEADER = 5
 
@@ -138,19 +138,19 @@ class Logger {
   }
 
   debug(...args: string[]) {
-    hilog.debug(this.domain, this.prefix, this.format, args);
+    UtilLog.debug(this.domain, this.prefix, this.format, args);
   }
 
   info(...args: string[]) {
-    hilog.info(this.domain, this.prefix, this.format, args);
+    UtilLog.info(this.domain, this.prefix, this.format, args);
   }
 
   warn(...args: string[]) {
-    hilog.warn(this.domain, this.prefix, this.format, args);
+    UtilLog.warn(this.domain, this.prefix, this.format, args);
   }
 
   error(...args: string[]) {
-    hilog.error(this.domain, this.prefix, this.format, args);
+    UtilLog.error(this.domain, this.prefix, this.format, args);
   }
 }
 

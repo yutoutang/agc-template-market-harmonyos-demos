@@ -1,11 +1,15 @@
-import { promptAction, KeyboardAvoidMode, LengthMetrics } from '@kit.ArkUI';
-import { IFormData } from '../common/Type';
+import { LengthMetrics } from '@kit.ArkUI';
+import { IFormData, StoreInfo } from '../common/Type';
 import { ConstantsHome, PHONE_REG } from '../common/Constant';
 import { DayModel, get7Days, getAllowTimes } from '../common/TimeUtils';
 import { getColorWithOpacity } from '../common/ColorUtils';
+import { PopViewUtils } from '../common/PopViewUtils';
+import { StoreListPopSheetBuilder, StoreSheetBuilderParam } from './StoreListView';
 
 @ComponentV2
 export struct ReservationForm {
+  // 预约门店列表数据
+  @Param storeList: StoreInfo[] = [];
   // 预约项目名称
   @Param projectName: string = '';
   // 主题色，十六进制，带#
@@ -17,6 +21,7 @@ export struct ReservationForm {
   // 提交表单信息
   @Event submitForm: (formData: IFormData) => void = () => {
   };
+  @Local selectStoreId: string = '1';
   @Local dates: DayModel[] = [];
   @Local times: string[] = [];
   @Local selectDateIndex: number = 0;
@@ -29,14 +34,25 @@ export struct ReservationForm {
   private scroller: Scroller = new Scroller();
 
   aboutToAppear(): void {
+    PopViewUtils.init(this.getUIContext())
     this.opacityThemeColor = getColorWithOpacity(this.themeColor, 8);
     this.dates = get7Days();
     this.getTodayTimes();
   }
 
+  @Computed
+  get selectedStoreInfo() {
+    const storeInfo = this.storeList.find((item) => item.id === this.selectStoreId);
+    return storeInfo ?? this.storeList[0]
+  }
+
   build() {
     Column() {
-      List({ scroller: this.scroller, space: 10 }) {
+      List({ scroller: this.scroller, space: 16 }) {
+        ListItem() {
+          // 预约门店
+          this.SelectStore()
+        }
         ListItem() {
           // 预约时间卡片
           this.SelectDateTime()
@@ -54,11 +70,7 @@ export struct ReservationForm {
       .edgeEffect(EdgeEffect.Spring)
       .padding({ bottom: 10 })
 
-      Column() {
-        Text($r('app.string.book_good_tip'))
-          .fontSize(12)
-          .fontColor(this.themeColor)
-          .lineHeight(16)
+      Column({space: 8}) {
         Button(this.btnLabel)
           .width('100%')
           .height(40)
@@ -69,20 +81,6 @@ export struct ReservationForm {
     }
     .width('100%')
     .height('100%')
-    .onAppear(() => {
-      this.setKeyBoard();
-    })
-    .onDisAppear(() => {
-      this.cancelSetKeyBoard();
-    })
-  }
-
-  setKeyBoard() {
-    this.getUIContext().setKeyboardAvoidMode(KeyboardAvoidMode.RESIZE);
-  }
-
-  cancelSetKeyBoard() {
-    this.getUIContext().setKeyboardAvoidMode(KeyboardAvoidMode.OFFSET);
   }
 
   getTodayTimes() {
@@ -116,6 +114,7 @@ export struct ReservationForm {
   }
 
   isInValid(): boolean {
+    const promptAction = this.getUIContext().getPromptAction()
     // 当天无可选时间
     if (this.selectTimeIndex === -1) {
       promptAction.showToast({ message: $r('app.string.book_good_toast_time') });
@@ -160,6 +159,8 @@ export struct ReservationForm {
       remarks: this.remark,
       // 预约人数
       numbers: this.inputNum.toString(),
+      // 预约门店Id
+      storeId: this.selectStoreId,
     };
     return data;
   }
@@ -204,6 +205,73 @@ export struct ReservationForm {
 
   timeBgColor(index: number) {
     return this.selectTimeIndex === index ? this.opacityThemeColor : '#F7F7F9';
+  }
+
+  openStoreSheet() {
+    const builderParam: StoreSheetBuilderParam= {
+      storeList: this.storeList,
+      currentStoreId: this.selectStoreId,
+      onSelect: (id: string) => {
+        this.selectStoreId = id;
+        PopViewUtils.closeSheet();
+      }
+    }
+    PopViewUtils.showSheet(wrapBuilder(StoreListPopSheetBuilder), {
+      title: { title: '适用门店' },
+      showClose: true,
+      preferType: SheetType.CENTER,
+      height: SheetSize.MEDIUM,
+    }, builderParam)
+  }
+
+  @Builder
+  SelectStore() {
+    Column() {
+      Text($r('app.string.book_good_store')).subTitle()
+
+      Row() {
+        Image($r('app.media.ic_appIcon')).width(40).height(40).borderRadius(20)
+        Row() {
+          Text(this.selectedStoreInfo.storeName).fontSize(18).fontWeight(500)
+            .margin({left: 4 })
+            .maxLines(1)
+            .constraintSize({maxWidth: 'calc(100% - 24vp)'})
+            .textOverflow({overflow: TextOverflow.Ellipsis})
+          SymbolGlyph($r('sys.symbol.chevron_right')).fontSize(18).fontColor([$r('sys.color.icon_primary')])
+            .margin({left: 8 })
+        }
+        .layoutWeight(1)
+
+        Blank()
+
+        Text() {
+          Span('距您').fontColor($r('sys.color.font_secondary'))
+          Span(this.selectedStoreInfo.distance ?? '0m').fontColor($r('sys.color.multi_color_07'))
+        }
+        .fontSize(12).fontWeight(400)
+      }
+      .width('100%')
+      .margin({top: 20})
+      .onClick(() => {
+        this.openStoreSheet()
+      })
+
+      Row({space: 4}) {
+        SymbolGlyph($r('sys.symbol.local')).fontSize(16).fontColor([$r('sys.color.icon_primary')])
+        Text(this.selectedStoreInfo.address).fontSize(12).fontWeight(400)
+      }
+      .margin({top: 10})
+    }
+    .width('100%')
+    .alignItems(HorizontalAlign.Start)
+    .backgroundColor($r('sys.color.comp_background_list_card'))
+    .padding({
+      top: 24,
+      bottom: 12,
+      left: 12,
+      right: 12,
+    })
+    .borderRadius(16)
   }
 
   @Builder
@@ -283,12 +351,12 @@ export struct ReservationForm {
     }
     .backgroundColor($r('sys.color.comp_background_list_card'))
     .padding({
-      top: 10,
-      bottom: 10,
-      left: 10,
-      right: 10,
+      top: 24,
+      bottom: 12,
+      left: 12,
+      right: 12,
     })
-    .borderRadius(9)
+    .borderRadius(16)
   }
 
   @Builder
@@ -321,10 +389,12 @@ export struct ReservationForm {
 
         TextInput({ placeholder: $r('app.string.book_contact_name_place'), text: $$this.contactUserName })
           .id('userNameId')
+          .fontSize($r('sys.float.Body_L'))
+          .placeholderFont({size: $r('sys.float.Body_L')})
           .inputItem()
           .onFocus(() => {
             setTimeout(() => {
-              this.scroller.scrollToIndex(1, true, ScrollAlign.START, { extraOffset: LengthMetrics.vp(76) });
+              this.scroller.scrollToIndex(2, true, ScrollAlign.START, { extraOffset: LengthMetrics.vp(76) });
             }, 100)
           })
           .onWillInsert(() => {
@@ -352,51 +422,17 @@ export struct ReservationForm {
         TextInput({ placeholder: $r('app.string.book_phone_place'), text: $$this.contactPhone })
           .id('phoneInputId')
           .type(InputType.PhoneNumber)
+          .maxLength(11)
+          .fontSize($r('sys.float.Body_L'))
+          .placeholderFont({size: $r('sys.float.Body_L')})
           .inputItem()
           .onFocus(() => {
             setTimeout(() => {
-              this.scroller.scrollToIndex(1, true, ScrollAlign.START, { extraOffset: LengthMetrics.vp(76) });
+              this.scroller.scrollToIndex(2, true, ScrollAlign.START, { extraOffset: LengthMetrics.vp(76) });
             }, 100)
           })
       }
       .id('phoneId')
-      .itemContainer()
-
-      customDivider()
-
-      Row() {
-        Text($r('app.string.book_good_appoint_nums')).fontSize(16).fontColor('#212121')
-        Row({ space: 10 }) {
-          Button() {
-            SymbolGlyph($r('sys.symbol.minus'))
-              .fontColor([$r('sys.color.font_primary')])
-              .fontWeight(FontWeight.Normal)
-              .fontSize(14)
-          }
-          .buttonCircle()
-          .enabled(this.inputNum >= ConstantsHome.MIN_NUMS + 1)
-          .onClick(() => {
-            this.inputNum -= 1;
-          })
-
-          Text(this.inputNum.toString())
-            .fontSize(16)
-            .fontColor('#212121')
-            .fontWeight(FontWeight.Bold)
-
-          Button() {
-            SymbolGlyph($r('sys.symbol.plus'))
-              .fontColor([$r('sys.color.font_primary')])
-              .fontWeight(FontWeight.Normal)
-              .fontSize(14)
-          }
-          .buttonCircle()
-          .enabled(this.inputNum <= ConstantsHome.MAX_NUMS - 1)
-          .onClick(() => {
-            this.inputNum += 1;
-          })
-        }
-      }
       .itemContainer()
 
       customDivider()
@@ -410,6 +446,8 @@ export struct ReservationForm {
           .id('remarkId')
           .maxLines(3)
           .height(70)
+          .fontSize($r('sys.float.Body_L'))
+          .placeholderFont({size: $r('sys.float.Body_L')})
           .placeholderColor('#C7C7C7')
           .maxLength(ConstantsHome.MAX_REMARK_LENGTH)
           .showCounter(true, { highlightBorder: false })
@@ -427,18 +465,18 @@ export struct ReservationForm {
     }
     .backgroundColor($r('sys.color.comp_background_list_card'))
     .padding({
-      top: 15,
-      bottom: 10,
-      left: 10,
-      right: 10,
+      top: 24,
+      bottom: 12,
+      left: 12,
+      right: 12,
     })
-    .borderRadius(8)
+    .borderRadius(16)
   }
 }
 
 @Extend(Text)
 function subTitle() {
-  .fontSize(14)
+  .fontSize(18)
   .fontColor('#212121')
   .fontWeight(FontWeight.Bold)
   .alignSelf(ItemAlign.Start)

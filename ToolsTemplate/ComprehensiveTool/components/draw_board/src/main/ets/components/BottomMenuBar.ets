@@ -89,7 +89,7 @@ export struct BottomMenuBar {
                 this.drawBoardVM.tabCurrentIndex = 0
               }
             }
-          })
+          },this.getUIContext())
         })
       }, (item: ToolsItem) => item.id)
     }

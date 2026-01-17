@@ -49,7 +49,7 @@ export struct BirthdayRememberDetails {
         baseActionSheet.close('BirthdayRememberDetails')
       },
       onConfirm: () => {
-        this.calendarEventVM.updateUserEventInfo().then(resp => {
+        this.calendarEventVM.updateUserEventInfo(this.getUIContext()).then(resp => {
           if (resp) {
             baseActionSheet.close('BirthdayRememberDetails')
           }
@@ -77,7 +77,7 @@ export struct BirthdayRememberDetails {
 
         CalendarEventFooter({
           onDelete: () => {
-            this.calendarEventVM.deleteUserEventInfo(this.userEventInfo, () => {
+            this.calendarEventVM.deleteUserEventInfo(this.userEventInfo, this.getUIContext(), () => {
               this.calendarEventVM.getPageInfo()?.pop()
             })
           },
@@ -93,7 +93,7 @@ export struct BirthdayRememberDetails {
               customContent: () => {
                 this.CalendarScheduleEdit()
               },
-            })
+            },this.getUIContext())
           },
         })
       }

@@ -1,4 +1,5 @@
 import { buffer, util } from '@kit.ArkTS';
+import { UtilLog } from '@hw-agconnect/util-log';
 
 export class StringUtil {
   /**
@@ -203,7 +204,14 @@ export class StringUtil {
    * @returns
    */
   static strToHex(hexStr: string): Uint8Array {
-    return new Uint8Array(buffer.from(hexStr, 'hex').buffer);
+    let buf = new Uint8Array();
+    try {
+      buf = new Uint8Array(buffer.from(hexStr, 'hex').buffer);
+    } catch (e) {
+      UtilLog.error(`strToHex failed with error ${JSON.stringify(e)}`);
+    }
+
+    return buf;
   }
 
   /**
@@ -212,7 +220,13 @@ export class StringUtil {
    * @returns
    */
   static hexToStr(arr: Uint8Array): string {
-    return buffer.from(arr).toString('hex');
+    let hexBuf: string = '';
+    try {
+      hexBuf =  buffer.from(arr).toString('hex');
+    } catch (e) {
+      UtilLog.error(`hexToStr failed with error ${e}`)
+    }
+    return hexBuf;
   }
 
 
@@ -248,9 +262,15 @@ export class StringUtil {
    * @param str
    * @returns
    */
-  static strToBuffer(src: string, encoding: buffer.BufferEncoding = 'utf-8'): ArrayBuffer {
-    const buf = buffer.from(src, encoding);
-    return buf.buffer;
+  static strToBuffer(src: string, encoding: buffer.BufferEncoding = 'utf-8'): ArrayBuffer | undefined {
+    let buf: buffer.Buffer | null = null;
+    try {
+      buf = buffer.from(src, encoding);
+    } catch (e) {
+      UtilLog.error(`strToBuffer failed with error ${JSON.stringify(e)}`);
+    }
+
+    return buf?.buffer;
   }
 
   /**
@@ -259,9 +279,14 @@ export class StringUtil {
    * @returns
    */
   static bufferToStr(src: ArrayBuffer, encoding: buffer.BufferEncoding = 'utf-8'): string {
-    const buf = buffer.from(src);
-    const result = buf.toString(encoding);
-    return result;
+    let bufStr = '';
+    try {
+      const buf = buffer.from(src);
+      bufStr = buf.toString(encoding);
+    } catch (e) {
+      UtilLog.error(`bufferToStr failed with error ${JSON.stringify(e)}`);
+    }
+    return bufStr;
   }
 
 

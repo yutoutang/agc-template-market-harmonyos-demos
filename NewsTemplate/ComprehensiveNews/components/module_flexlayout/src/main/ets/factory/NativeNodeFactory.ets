@@ -1,5 +1,5 @@
 import { BuilderNode, FrameNode, NodeController } from '@kit.ArkUI';
-import { JSONObject, LayoutParams, LayoutSetting } from '../model/Model';
+import { JSONObject, LayoutParams, LayoutSetting } from '../model/CommonModel';
 import { NodeBuilderRegister } from '../utils/NodeBuilderConfig';
 
 export interface NodeParams {
@@ -8,24 +8,6 @@ export interface NodeParams {
   scrollIndex?: number
   extraInfo?: Record<string, number | string | boolean | Record<string, string | boolean>[]>
   layout: LayoutSetting
-}
-
-export class FrameNodeParams {
-  viewLayout: LayoutSetting
-  articles: JSONObject[]
-  extraInfo?: Record<string, number | string | boolean | Record<string, string | boolean>[]>
-  style: Record<string, string | number>
-  nodeControllerFactory?: NodeControllerFactory
-
-  constructor(viewLayout: LayoutSetting, articles: JSONObject[], style: Record<string, string | number>,
-    extraInfo?: Record<string, number | string | boolean | Record<string, string | boolean>[]>,
-    nodeControllerFactory?: NodeControllerFactory) {
-    this.viewLayout = viewLayout
-    this.articles = articles
-    this.style = style
-    this.extraInfo = extraInfo
-    this.nodeControllerFactory = nodeControllerFactory
-  }
 }
 
 export const nodeMap: Map<string, NodeControllerFactory | undefined> = new Map();

@@ -5,6 +5,7 @@ import { BookInfo, BorrowInfo, BorrowStatus, Constants, DHMS, NavHeaderBar, TCRo
 export struct BorrowDetailInfoPage {
   @Local borrowInfo: BorrowInfo | undefined = undefined;
   @Local time: DHMS | undefined = undefined;
+  private context: Context = this.getUIContext().getHostContext() as Context;
 
   aboutToAppear(): void {
     this.borrowInfo = TCRouter.getParams<BorrowInfo>(Constants.BORROW_DETAIL_ROUTE);
@@ -75,8 +76,7 @@ export struct BorrowDetailInfoPage {
       .justifyContent(FlexAlign.Center)
 
       Row() {
-        Text(`${getContext()
-          .resourceManager
+        Text(`${this.context.resourceManager
           .getStringByNameSync('borrow_time')}: ${TimeUtils.timestamp2YMD(info.borrowBegin)}`)
           .fontSize($r('sys.float.Body_L'))
           .fontColor($r('sys.color.font_primary'))
@@ -87,8 +87,7 @@ export struct BorrowDetailInfoPage {
 
       if (info.status === BorrowStatus.RETURNED) {
         Row() {
-          Text(`${getContext()
-            .resourceManager
+          Text(`${this.context.resourceManager
             .getStringByNameSync('borrow_return_time')}: ${TimeUtils.timestamp2YMD(info.borrowEnd)}`)
             .fontSize($r('sys.float.Body_L'))
             .fontColor($r('sys.color.font_primary'))
@@ -140,7 +139,7 @@ export struct BorrowDetailInfoPage {
                 top: 10,
                 bottom: 10,
               })
-            Text(`${getContext().resourceManager.getStringByNameSync('author')}: ${book.author}`)
+            Text(`${this.context.resourceManager.getStringByNameSync('author')}: ${book.author}`)
               .fontSize($r('sys.float.Body_L'))
               .fontColor($r('sys.color.font_secondary'))
               .padding({

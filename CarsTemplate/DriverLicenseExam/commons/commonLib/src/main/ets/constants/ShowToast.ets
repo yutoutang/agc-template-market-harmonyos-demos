@@ -17,9 +17,9 @@ function getErrorHint(error: BusinessError): string {
  * Display the toast message based on the prompt character string or BusinessError.
  * @param error Prompt character string or BusinessError.
  */
-export function showToast(error: BusinessError | string) {
+export function showToast(error: BusinessError | string, uiContext:UIContext) {
   const message: string = typeof error === 'string' ? error : getErrorHint(error);
-  promptAction.showToast({
+  uiContext.getPromptAction().showToast({
     message,
     duration: 2000
   });

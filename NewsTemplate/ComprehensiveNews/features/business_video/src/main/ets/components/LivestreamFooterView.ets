@@ -1,8 +1,8 @@
-import { CommonConstants, CommonDataSource, FormatCount, TimeUtils } from 'lib_common';
+import { CommonConstants, CommonDataSource, FormatCount, NewsEnum } from 'lib_common';
 import { MineServiceApi, NewsResponse, PublishCommentRequest } from 'lib_news_api';
 import { MakeObCommentServed, CommentInfo } from 'lib_news_feed_details';
+import { Share } from 'lib_widget';
 import { CommentUtils } from 'module_feedcomment';
-import { Share } from 'module_share';
 import { LivestreamFooterViewVM } from '../viewmodels/LivestreamFooterViewVM';
 import { LivestreamCommentListScroller } from '../views/LiveCommentView';
 
@@ -58,14 +58,13 @@ export struct LivestreamFooterView {
 
       Row() {
         Share({
-          qrCodeInfo: {
-            id: this.vm.livestreamInfo.id,
-            type: this.vm.livestreamInfo.type,
+          shareData: {
+            recordId: this.vm.livestreamInfo.id,
             title: this.vm.livestreamInfo.title,
-            articleFrom: this.vm.livestreamInfo.articleFrom,
-            createTime: TimeUtils.formatDate(this.vm.livestreamInfo.createTime),
+            subTitle: this.vm.livestreamInfo.articleFrom,
+            createTime: this.vm.livestreamInfo.createTime,
             coverUrl: this.vm.handlerCoverImage(this.vm.livestreamInfo),
-            isVideo: true,
+            type: NewsEnum.Video,
           },
           shareRenderBuilder: () => {
             this.shareBuilder()
@@ -77,7 +76,7 @@ export struct LivestreamFooterView {
             .width(22)
             .height(20)
             .fillColor(
-              this.vm.livestreamInfo.isLiked ? $r('sys.color.warning') : $r('sys.color.font_primary')
+              this.vm.livestreamInfo.isLiked ? $r('sys.color.warning') : $r('sys.color.font_primary'),
             )
 
           Text(FormatCount.formatNumberToW(this.vm.livestreamInfo.likeCount))
@@ -96,7 +95,7 @@ export struct LivestreamFooterView {
       top: CommonConstants.PADDING_S,
       left: this.vm.breakPointModel.pagePadding,
       right: this.vm.breakPointModel.pagePadding,
-      bottom: this.vm.windowModel.windowBottomPadding
+      bottom: this.vm.windowModel.windowBottomPadding,
     })
   }
 

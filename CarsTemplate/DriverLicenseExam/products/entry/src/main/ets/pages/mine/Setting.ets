@@ -138,7 +138,7 @@ export struct SettingPage {
   getProtocolUrl(privacyUrl: string): string {
     try {
       // Read files from /AppScope/resources/rawfile.
-      const value: Uint8Array = getContext().resourceManager.getRawFileContentSync('data.json');
+      const value: Uint8Array = (this.getUIContext().getHostContext() as Context).resourceManager.getRawFileContentSync('data.json');
       // Return the link to the HUAWEI ID User Authentication Agreement.
       return JSON.parse(buffer.from(value.buffer).toString())[privacyUrl] as string;
     } catch (error) {

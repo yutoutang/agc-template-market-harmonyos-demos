@@ -30,7 +30,7 @@ export class PermissionUtil {
       return permissive;
     }
     if (!PermissionUtil._context) {
-      PermissionUtil._context = getContext() as common.UIAbilityContext;
+      PermissionUtil._context = PermissionUtil._context as common.UIAbilityContext;
     }
     // 向用户申请授权
     const data = await PermissionUtil._atManager.requestPermissionsFromUser(PermissionUtil._context, needAuthorized)

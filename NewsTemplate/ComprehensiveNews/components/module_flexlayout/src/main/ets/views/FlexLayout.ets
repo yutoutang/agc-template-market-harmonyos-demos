@@ -1,5 +1,5 @@
+import { LayoutSetting } from '../model/CommonModel'
 import { FlexLayoutBreakPointVM } from '../model/FlexLayoutBreakPointVM'
-import { LayoutSetting } from '../model/Model'
 import { FlexLayoutEngine } from '../viewmodel/FlexLayoutEngine'
 
 /*

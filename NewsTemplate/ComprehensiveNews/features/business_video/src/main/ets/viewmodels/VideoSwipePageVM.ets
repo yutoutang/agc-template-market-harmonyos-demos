@@ -50,28 +50,28 @@ export class VideoSwipePageVM extends BaseViewModel {
     return 0;
   }
 
-  initVideoDataSource() {
+  async initVideoDataSource() {
     let videoList: VideoNewsData[] = []
     // 关注 tab
     if (this.pageType === TabPageType.FOLLOW) {
-      videoList = VideoService.queryFollowedUserVideoList(this.userInfoModel.authorId)
+      videoList = await VideoService.queryFollowedUserVideoList(this.userInfoModel.authorId)
     } else {
-      videoList = VideoService.queryVideoList();
+      videoList = await VideoService.queryVideoList();
     }
     this.videoDataSources.setData(videoList);
   }
 
   // 处理swiper动画开始事件
-  handleSwiperAnimationStart(index: number, targetIndex: number) {
+  async handleSwiperAnimationStart(index: number, targetIndex: number) {
     this.preIndex = index;
     // 加载更多，无限上滑
     let totalNum = this.videoDataSources.totalCount();
     if (totalNum - targetIndex <= 5) {
       let videoList: VideoNewsData[] = []
       if (this.pageType === TabPageType.FOLLOW) {
-        videoList = VideoService.queryFollowedUserVideoList(this.userInfoModel.authorId)
+        videoList = await VideoService.queryFollowedUserVideoList(this.userInfoModel.authorId)
       } else {
-        videoList = VideoService.queryVideoList();
+        videoList = await VideoService.queryVideoList();
       }
       this.videoDataSources.pushDataArray(...videoList);
     }
@@ -83,13 +83,10 @@ export class VideoSwipePageVM extends BaseViewModel {
     Logger.debug(TAG, 'get tab bar is visible: ' + this.tabModel.showTabBar)
   }
 
-  refreshList() {
-    // 模拟数据拉下刷新
-    setTimeout(() => {
-      this.swipePlayerController.getAVPlayerMgr()?.clear()
-      this.initVideoDataSource();
-      this.isRefreshing = false;
-    }, 500);
+  async refreshList() {
+    this.swipePlayerController.getAVPlayerMgr()?.clear()
+    await this.initVideoDataSource();
+    this.isRefreshing = false;
   }
 
   offsetChanged(offset: number) {

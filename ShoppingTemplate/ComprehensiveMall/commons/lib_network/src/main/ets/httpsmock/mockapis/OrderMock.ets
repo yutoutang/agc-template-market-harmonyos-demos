@@ -1,5 +1,5 @@
-import AxiosMockAdapter from '@hw-agconnect/axios-mock-adapter';
 import { AxiosRequestConfig, HttpStatusCode } from '@ohos/axios';
+import AxiosMockAdapter from '@hw-agconnect/axios-mock-adapter';
 import { RequestUrlMap } from '../../constants/Enums';
 import {
   OrderCreateReq, OrderReviewReq, OrderUpdateReq, PreOrderInfoReq,
@@ -40,6 +40,7 @@ export class OrderMockApis {
               skuCode: skuItem.skuCode,
               skuDesc: skuItem.skuDesc,
               count: item.count,
+              stock: skuItem.stock,
               banner: skuItem.banner,
               title: skuItem.title,
               serviceDesc: skuItem.serviceDesc,
@@ -49,14 +50,14 @@ export class OrderMockApis {
             skuList.push(orderSku);
           }
         });
-        const totalPrice = skuList.reduce(
-          (pre, cur) => pre + cur.price * cur.count,
+        const totalPriceTemp = skuList.reduce(
+          (pre, cur) => pre + cur.price * cur.count * 100,
           0,
         );
         const res: PreOrderResp = {
           code: 0,
           skuList,
-          totalPrice,
+          totalPrice: totalPriceTemp / 100,
         };
         return [HttpStatusCode.Ok, res];
       });

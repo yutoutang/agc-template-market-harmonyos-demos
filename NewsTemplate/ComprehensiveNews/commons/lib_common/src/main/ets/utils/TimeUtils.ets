@@ -2,36 +2,20 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import isToday from 'dayjs/plugin/isToday';
 import isYesterday from 'dayjs/plugin/isYesterday';
+
 dayjs.extend(relativeTime);
 dayjs.extend(isToday);
 dayjs.extend(isYesterday);
+
 export class TimeUtils {
-  static formatDate(date: number | string | Date | undefined, format = 'YYYY-MM-DD HH:mm'): string {
-    if (!date) {
-      return ''
-    }
-    let targetDate = date instanceof Date ? date : new Date(date);
-    const pad = (num: number) => num.toString().padStart(2, '0');
-
-    const month = targetDate.getMonth();
-
-    const formats: Record<string, string | number> = {
-      // 年份
-      'YYYY': targetDate.getFullYear(),
-      'YY': targetDate.getFullYear().toString().slice(-2),
-      // 月份
-      'MM': pad(month + 1),
-      // 日期
-      'DD': pad(targetDate.getDate()),
-
-      // 时间
-      'HH': pad(targetDate.getHours()),
-      'hh': pad(targetDate.getHours() % 12 || 12),
-      'mm': pad(targetDate.getMinutes()),
-      'ss': pad(targetDate.getSeconds()),
-    }
-    return format.replace(/\[([^\]]+)]|Y{2,4}|M{1,4}|D{1,2}|H{1,2}|h{1,2}|m{1,2}|s{1,2}/g,
-      (match: string, escaped: string): string => escaped || formats[match].toString())
+  /**
+   * 格式化日期时间
+   * @param date
+   * @param format
+   * @returns
+   */
+  static formatDate(date: string | number | Date | null | undefined, format: string = 'YYYY-MM-DD HH:mm'): string {
+    return dayjs(date).format(format);
   }
 
   /**

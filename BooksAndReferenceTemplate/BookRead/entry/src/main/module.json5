@@ -5,7 +5,8 @@
     "description": "$string:module_desc",
     "mainElement": "EntryAbility",
     "deviceTypes": [
-      "phone"
+      "phone",
+      "tablet"
     ],
     "deliveryWithInstall": true,
     "installationFree": false,
@@ -39,13 +40,13 @@
           }
         ],
         "launchType": "singleton"
-      },
+      }
     ],
     "metadata": [
       {
         "name": "client_id",
-        // todo 替换client_id值,
-        "value": "xxx"
+// todo 替换client_id值,
+        "value": "******"
       }
     ],
     "extensionAbilities": [

@@ -1,6 +1,8 @@
 import { webview } from '@kit.ArkWeb';
-import { SettingPageEnum } from '../types/SettingType';
+import { Logger } from 'module_ui_base';
+import { LOG_TAG } from '../constants/CommonConstants';
 import { BaseViewModel } from '../models/BaseViewModel';
+import { SettingPageEnum } from '../types/SettingType';
 
 @ObservedV2
 export class SettingH5VM extends BaseViewModel {
@@ -19,7 +21,11 @@ export class SettingH5VM extends BaseViewModel {
   }
 
   onControllerAttached() {
-    this.webViewController.loadUrl(this.content);
+    try {
+      this.webViewController.loadUrl(this.content);
+    } catch (error) {
+      Logger.error(LOG_TAG, 'load url failed. error: ' + JSON.stringify(error))
+    }
   }
 
   @Computed

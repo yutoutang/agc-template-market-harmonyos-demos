@@ -1,6 +1,6 @@
-import { call } from '@kit.TelephonyKit';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { Logger } from './Logger';
+import { call } from '@kit.TelephonyKit';
+import { Logger } from 'module_ui_base';
 
 const TAG = '[TelephoneUtils]';
 
@@ -11,13 +11,13 @@ export class TelephoneUtils {
    */
   public static callPhone(tel: string) {
     if (canIUse('SystemCapability.Applications.Contacts')) {
-      call.makeCall(tel, (err: BusinessError) => {
-        if (!err) {
+      call.makeCall(tel)
+        .then(() => {
           Logger.info(TAG, 'make call success.');
-        } else {
-          Logger.error(TAG, 'make call fail, err is:' + JSON.stringify(err));
-        }
-      });
+        })
+        .catch((err: BusinessError) => {
+          Logger.error(TAG, 'make call fail, err is:' + err.code);
+        })
     } else {
       Logger.error(TAG, 'Contacts not available by this device.');
     }

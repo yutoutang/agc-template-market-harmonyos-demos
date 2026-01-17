@@ -15,18 +15,19 @@ export async function parseWavePCM(pcmPath: string): Promise<number[]> {
     fileIo.readSync(file.fd, buffer);
     fileIo.closeSync(file);
 
+    // 降采样：若数据量过大（如长音频），每隔N个点取一个值，减少绘制压力
+    const downSampleRatio = 160 * 4; // 降采样比例（根据需求调整)
+
+
     // 解析每个采样点的振幅值（16位小端有符号整数）
     const dataView = new DataView(buffer);
-    for (let i = 0; i < buffer.byteLength; i += bytesPerSample) {
+    for (let i = 0; i < buffer.byteLength; i += bytesPerSample*downSampleRatio) {
       // 读取振幅值（范围：-32768 ~ 32767）
       const amplitude = dataView.getInt16(i, true); // true表示小端序
       waveData.push(amplitude);
     }
 
-    // 降采样：若数据量过大（如长音频），每隔N个点取一个值，减少绘制压力
-    const downSampleRatio = 160 * 4; // 降采样比例（根据需求调整)
-    const downSampledData = waveData.filter((_, index) => index % downSampleRatio === 0);
-    return downSampledData;
+    return waveData;
   } catch (e) {
     Logger.error('解析PCM时域数据失败：', JSON.stringify(e));
     return [];

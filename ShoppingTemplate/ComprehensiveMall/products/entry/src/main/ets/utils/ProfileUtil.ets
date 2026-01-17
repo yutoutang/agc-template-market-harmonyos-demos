@@ -1,6 +1,7 @@
+import { AddressManageUtil} from 'address_management';
+import { FeedbackRouteMap } from 'feedback';
 import { iData, RouterMap, routerStack } from 'lib_foundation';
 import { CustomServiceSheet } from 'lib_widget';
-import { FeedbackRouteMap } from 'module_feedback';
 import { NoticeRouterMap } from 'module_notice_center';
 import { MainMenuOption, SubMenuOption } from '../commons/Enums';
 import { MainMenuItem, SubMenuItem } from '../commons/Types';
@@ -67,6 +68,9 @@ export class ProfileUtil {
       case MainMenuOption.MESSAGE:
         routerStack.pushPath({ name: NoticeRouterMap.NOTICE_CENTER });
         break;
+      case MainMenuOption.ADDRESS:
+        AddressManageUtil.goToAddressListPage(routerStack);
+        break;
       default:
         break;
     }
@@ -93,5 +97,9 @@ export class ProfileUtil {
       default:
         break;
     }
+  }
+
+  public static login() {
+    routerStack.pushPath({ name: RouterMap.USER_LOGIN });
   }
 }

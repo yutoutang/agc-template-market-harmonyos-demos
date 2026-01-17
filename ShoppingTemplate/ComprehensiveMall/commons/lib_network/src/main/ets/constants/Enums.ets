@@ -26,10 +26,17 @@ export enum RequestUrlMap {
   ORDER_ADD_COMMENT = 'order/comment',
   ORDER_PREPAY = 'order/prepay',
   /**
-   * 会员
+   * 用户相关
    */
+  USER_LOGIN = 'user/login',
+  USER_LOGOUT = 'user/logout',
+  USER_INFO = 'user/info',
   USER_POINTS = 'user/points',
   USER_POINTS_DETAIL = 'user/points-detail',
   USER_POINTS_PRODUCT = 'user/points/product-list',
-  USER_POINTS_REDEMPTION = 'user/points/product-redemption'
+  USER_POINTS_REDEMPTION = 'user/points/product-redemption',
+  USER_MEMBERSHIP = 'user/membership'
 }
+
+export const CLOUD_STORAGE_DOMAIN: string =
+  'https://agc-storage-drcn.platform.dbankcloud.cn/v0/default-bucket-ta7go/comprehensive-mall%2F'

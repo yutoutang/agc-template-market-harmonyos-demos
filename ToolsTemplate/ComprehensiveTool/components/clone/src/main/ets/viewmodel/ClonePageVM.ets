@@ -7,7 +7,7 @@ import { abilityAccessCtrl, PermissionRequestResult, Permissions } from '@kit.Ab
 import { BusinessError } from '@kit.BasicServicesKit';
 import Logger from '../common/Constant'
 import { checkAccessToken } from '../utils/Permission';
-import { promptAction } from '@kit.ArkUI';
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
 
 @ObservedV2
 export class ClonePageVM {

@@ -1,5 +1,5 @@
 import { ComponentContent, LevelMode } from '@kit.ArkUI';
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { CanvasTextItem } from '../model/BeautificationParam';
 import { textEditDialog } from './TextEditDialog';
@@ -52,16 +52,16 @@ export struct AddTextComponent {
                 uiContext.getPromptAction().openCustomDialog(textEditContentNode, {
                   levelMode: LevelMode.EMBEDDED,
                   onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
-                    hilog.info(0xFF00, 'TextEditDialog', JSON.stringify(dismissDialogAction.reason));
+                    UtilLog.info(0xFF00, 'TextEditDialog', JSON.stringify(dismissDialogAction.reason));
                   },
                 })
                   .then(() => {
-                    hilog.info(0xFF00, 'TAG', 'OpenCustomDialog complete');
+                    UtilLog.info('OpenCustomDialog complete');
                   })
                   .catch((error: BusinessError) => {
                     let message = (error as BusinessError).message;
                     let code = (error as BusinessError).code;
-                    hilog.info(0xFF00, 'TAG', `OpenCustomDialog args error code is ${code}, message is ${message}`);
+                    UtilLog.info(`OpenCustomDialog args error code is ${code}, message is ${message}`);
                   });
               }
             }),

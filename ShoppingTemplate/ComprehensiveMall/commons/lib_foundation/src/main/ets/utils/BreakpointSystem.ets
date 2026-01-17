@@ -1,5 +1,6 @@
 import { AppStorageV2, window } from '@kit.ArkUI';
-import { Logger } from './Logger';
+import { BusinessError } from '@kit.BasicServicesKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 
 export enum BreakpointTypeEnum {
   SM = 'sm',
@@ -50,12 +51,11 @@ class BreakpointSystem {
     BreakpointStorage,
     () => new BreakpointStorage(),
   )!;
-
   private _uiContext: UIContext | undefined;
   private _windowClass: window.Window | undefined;
 
   @Computed
-  get isTablet(){
+  get isTablet() {
     return this.currentBreakpoint.value === BreakpointTypeEnum.LG;
   }
 
@@ -63,12 +63,16 @@ class BreakpointSystem {
     this._uiContext = uiContext;
     if (this._uiContext) {
       this.updateBreakpoint();
-      window.getLastWindow(this._uiContext.getHostContext()).then((win) => {
-        this._windowClass = win;
-        this._windowClass.on('windowSizeChange', () => {
-          this.updateBreakpoint();
-        });
-      });
+      window.getLastWindow(this._uiContext.getHostContext())
+        .then((win) => {
+          this._windowClass = win;
+          this._windowClass.on('windowSizeChange', () => {
+            this.updateBreakpoint();
+          });
+        })
+        .catch((err: BusinessError) => {
+          UtilLog.error(TAG, 'get last window failed. error: ' + JSON.stringify(err))
+        })
     }
   }
 
@@ -83,7 +87,7 @@ class BreakpointSystem {
     const curBreakPoint = this._uiContext!.getWindowWidthBreakpoint();
     if (
       curBreakPoint === WidthBreakpoint.WIDTH_XS ||
-      curBreakPoint === WidthBreakpoint.WIDTH_SM
+        curBreakPoint === WidthBreakpoint.WIDTH_SM
     ) {
       temp = BreakpointTypeEnum.SM;
     } else if (curBreakPoint === WidthBreakpoint.WIDTH_MD) {
@@ -92,7 +96,7 @@ class BreakpointSystem {
       temp = BreakpointTypeEnum.LG;
     }
     this.currentBreakpoint.value = temp;
-    Logger.info(TAG, 'set breakpoint success, result:' + temp);
+    UtilLog.info(TAG, 'set breakpoint success, result:' + temp);
   }
 }
 

@@ -1,4 +1,6 @@
+import { UtilLog } from '@hw-agconnect/util-log';
 import { image } from '@kit.ImageKit';
+import { WindowUtil } from './WindowUtil';
 
 export class ImageUtils {
   /**
@@ -27,10 +29,10 @@ export class ImageUtils {
       if (listHeight - realScrollHeight > 0) {
         let cropRegion: image.Region = {
           x: 0,
-          y: vp2px(listHeight - realScrollHeight),
+          y: WindowUtil.uiContext.vp2px(listHeight - realScrollHeight),
           size: {
-            height: vp2px(realScrollHeight),
-            width: vp2px(listWidth)
+            height: WindowUtil.uiContext.vp2px(realScrollHeight),
+            width: WindowUtil.uiContext.vp2px(listWidth)
           }
         };
         // Crop roll area
@@ -69,38 +71,44 @@ export class ImageUtils {
    */
   // [Start merge_image]
   static async mergeImage(areaArray: image.PositionArea[], lastOffsetY: number, listWidth: number,
-    listHeight: number): Promise<PixelMap> {
+    listHeight: number): Promise<PixelMap | undefined> {
     // Create a long screenshot PixelMap
     let opts: image.InitializationOptions = {
       editable: true,
       pixelFormat: 4,
       size: {
-        width: vp2px(listWidth),
-        height: vp2px(lastOffsetY + listHeight)
+        width: WindowUtil.uiContext.vp2px(listWidth),
+        height: WindowUtil.uiContext.vp2px(lastOffsetY + listHeight)
       }
     };
-    let longPixelMap = image.createPixelMapSync(opts);
-    let imgPosition: number = 0;
 
-    for (let i = 0; i < areaArray.length; i++) {
-      let readArea = areaArray[i];
-      let area: image.PositionArea = {
-        pixels: readArea.pixels,
-        offset: 0,
-        stride: readArea.stride,
-        region: {
-          size: {
-            width: readArea.region.size.width,
-            height: readArea.region.size.height
-          },
-          x: 0,
-          y: imgPosition
+    try {
+      let longPixelMap = image.createPixelMapSync(opts);
+      let imgPosition: number = 0;
+
+      for (let i = 0; i < areaArray.length; i++) {
+        let readArea = areaArray[i];
+        let area: image.PositionArea = {
+          pixels: readArea.pixels,
+          offset: 0,
+          stride: readArea.stride,
+          region: {
+            size: {
+              width: readArea.region.size.width,
+              height: readArea.region.size.height
+            },
+            x: 0,
+            y: imgPosition
+          }
         }
+        imgPosition += readArea.region.size.height;
+        longPixelMap.writePixelsSync(area);
       }
-      imgPosition += readArea.region.size.height;
-      longPixelMap.writePixelsSync(area);
+      return longPixelMap;
+    } catch (e) {
+      UtilLog.error(`mergeImage failed with error ${JSON.stringify(e)}`)
+      return undefined;
     }
-    return longPixelMap;
   }
   // [End merge_image]
 }

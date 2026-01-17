@@ -13,12 +13,13 @@
       "colorMode": "auto",
       "isDynamic": true,
       "isDefault": true,
-      "updateEnabled": false,
-      "scheduledUpdateTime": "10:30",
-      "updateDuration": 1,
+      "updateEnabled": true,
+      "scheduledUpdateTime": "00:30",
+      "updateDuration": 0,
       "defaultDimension": "2*2",
       "supportDimensions": [
-        "2*2"
+        "2*2",
+        "2*4"
       ],
       "dataProxyEnabled": true
     }

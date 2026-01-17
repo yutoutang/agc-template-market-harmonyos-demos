@@ -43,10 +43,10 @@ struct ClassificationPage {
       .justifyContent(FlexAlign.SpaceBetween)
       .margin({ left: 16, right: 16 })
       .constraintSize({ maxWidth: '100%' })
-
       LinkCategory({
         recipeCategoryList: this.vm.recipeCategoryList,
         currentIndex: this.vm.currentIndex,
+        gridCount: this.vm.gridCount,
         onRecipeClick: (listItem) => {
           RouterModule.push(RouterMap.DISHES, { 'id': listItem.id } as Record<string, number>)
         },

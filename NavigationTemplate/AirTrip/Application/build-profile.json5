@@ -1,12 +1,12 @@
 {
   "app": {
-    "signingConfigs": [
-    ],
+    "signingConfigs": [],
     "products": [
       {
         "name": "default",
         "signingConfig": "default",
-        "compatibleSdkVersion": "5.0.0(12)",
+        "targetSdkVersion": "6.0.0(20)",
+        "compatibleSdkVersion": "6.0.0(20)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
           "strictMode": {
@@ -18,7 +18,7 @@
     ],
     "buildModeSet": [
       {
-        "name": "debug",
+        "name": "debug"
       },
       {
         "name": "release"
@@ -40,27 +40,27 @@
     },
     {
       "name": "common",
-      "srcPath": "./commons/common",
+      "srcPath": "./commons/common"
     },
     {
       "name": "home",
-      "srcPath": "./features/home",
+      "srcPath": "./features/home"
     },
     {
       "name": "itinerary",
-      "srcPath": "./features/itinerary",
+      "srcPath": "./features/itinerary"
     },
     {
       "name": "mine",
-      "srcPath": "./features/mine",
+      "srcPath": "./features/mine"
     },
     {
       "name": "flight",
-      "srcPath": "./features/flight",
+      "srcPath": "./features/flight"
     },
     {
       "name": "components",
-      "srcPath": "./commons/components",
+      "srcPath": "./commons/components"
     }
   ]
 }

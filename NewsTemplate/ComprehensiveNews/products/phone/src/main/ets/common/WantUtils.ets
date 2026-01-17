@@ -1,7 +1,6 @@
 import { AbilityConstant, Want } from '@kit.AbilityKit';
 import { AppStorageV2 } from '@kit.ArkUI';
 import { BreakpointNameEnum, ContinueModel, Logger, PushActionParams, PushUtils, RouterToNews } from 'lib_common';
-import { WXApi, WXEventHandler } from 'lib_account';
 import { SOURCE_FORM_CARD } from './Constants';
 import { FormCardRouter } from './Types';
 
@@ -35,14 +34,6 @@ export class WantUtils {
       let articleId = articleInfo?.articleId;
       RouterToNews.routerToNewsById(articleId);
     }
-  }
-
-  /**
-   * 微信回调事件处理
-   * @param want
-   */
-  public static handleWeChatCallIfNeed(want: Want) {
-    WXApi.handleWant(want, WXEventHandler);
   }
 
   /**

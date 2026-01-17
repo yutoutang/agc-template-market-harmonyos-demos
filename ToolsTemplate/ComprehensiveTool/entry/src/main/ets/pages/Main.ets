@@ -1,12 +1,39 @@
+import { AppStorageV2 } from '@kit.ArkUI';
+import { BusinessError } from '@kit.BasicServicesKit';
+import { notificationManager } from '@kit.NotificationKit';
+import { common } from '@kit.AbilityKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { Home } from 'home';
 import { Mine } from 'mine';
-import { TabBarType } from '../model/Index';
+import { PushActionParams, TabBarType } from '../model/Index';
+import { RouterUtils } from '../utils/RouterUtils';
 
-@Entry
+@Builder
+export function MainBuilder() {
+  Main();
+}
+
 @ComponentV2
-struct Main {
+export struct Main {
+  @Local pushActionParams: PushActionParams = AppStorageV2.connect(PushActionParams, () => new PushActionParams())!;
   @Local homeTabIndex: number = 0;
-  @Local stack: NavPathStack = new NavPathStack();
+
+  requestForNotificationPermission() {
+    notificationManager.requestEnableNotification(this.getUIContext().getHostContext() as common.UIAbilityContext)
+      .then(() => {
+        UtilLog.info(`requestEnableNotification success`);
+      })
+      .catch((err: BusinessError) => {
+        UtilLog.error(`requestEnableNotification failed, code is ${err.code}, message is ${err.message}`);
+      });
+  }
+
+  aboutToAppear(): void {
+    this.requestForNotificationPermission();
+    if (this.pushActionParams.name?.length) {
+      RouterUtils.pushPathByName(this.pushActionParams.name, null);
+    }
+  }
 
   @Builder
   mainTabBar(title: ResourceStr, targetIndex: number, selectedImg: ResourceStr, normalImg: ResourceStr) {
@@ -28,17 +55,17 @@ struct Main {
   }
 
   build() {
-    Navigation(this.stack) {
+    NavDestination() {
       Tabs({ index: this.homeTabIndex }) {
         TabContent() {
-          Home({ pathStack: this.stack });
+          Home({ pathStack: RouterUtils.getStack() });
         }
-        .tabBar(this.mainTabBar('棣栭〉', TabBarType.HOME, $r('app.media.home_active'), $r('app.media.home_inactive')));
+        .tabBar(this.mainTabBar('首页', TabBarType.HOME, $r('app.media.home_active'), $r('app.media.home_inactive')));
 
         TabContent() {
-          Mine({ pathStack: this.stack });
+          Mine({ pathStack: RouterUtils.getStack() });
         }.expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
-        .tabBar(this.mainTabBar('鎴戠殑', TabBarType.MINE, $r('app.media.mine_active'), $r('app.media.mine_inactive')));
+        .tabBar(this.mainTabBar('我的', TabBarType.MINE, $r('app.media.mine_active'), $r('app.media.mine_inactive')));
       }
       .clip(true)
       .barMode(BarMode.Fixed)
@@ -51,6 +78,6 @@ struct Main {
       .onChange((value: number) => {
         this.homeTabIndex = value;
       });
-    }.hideTitleBar(true).mode(NavigationMode.Stack);
+    }.hideTitleBar(true);
   }
 }

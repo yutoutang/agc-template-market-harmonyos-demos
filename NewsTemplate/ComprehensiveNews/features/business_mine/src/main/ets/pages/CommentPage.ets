@@ -1,5 +1,5 @@
 import { CircleShape } from '@kit.ArkUI';
-import { CommonConstants, TimeUtils } from 'lib_common';
+import { CommonConstants, loadingPage, TimeUtils } from 'lib_common';
 import { emptyBuilder, NavHeaderBar } from 'lib_widget';
 import { UniformNewsCard } from '../components/UniformNewsCard';
 import { CommentViewModel } from '../viewmodels/CommentVM';
@@ -24,48 +24,50 @@ struct CommentPage {
             this.rightPartBuilder()
           },
         })
-        Column() {
-          List({ space: CommonConstants.SPACE_M }) {
-            ForEach(this.vm.list, (v: AggregateNewsCommentModel) => {
-              ListItem() {
-                Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center }) {
-                  EditCheckbox({
-                    isEditMode: this.vm.isEditMode,
-                    onChange: (value) => {
-                      this.vm.onChange(value, v);
-                    },
-                  })
-
-                  this.contentItemBuilder(v)
-                }
-              }
-            }, (v: AggregateNewsCommentModel) => v.commentId)
+        if (this.vm.loadingModel.loading) {
+          loadingPage()
+        } else if (this.vm.list.length <= 0) {
+          Column() {
+            emptyBuilder({
+              fontSizeRatio: this.vm.settingInfo.fontSizeRatio,
+            })
           }
-          .width(CommonConstants.FULL_PERCENT)
           .layoutWeight(1)
-          .scrollBar(BarState.Off)
-          .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
-          .padding({
-            left: this.vm.breakPointModel.pagePadding,
-            right: this.vm.breakPointModel.pagePadding,
-            top: CommonConstants.SPACE_M,
-            bottom: CommonConstants.SPACE_M,
-          })
+        } else {
+          Column() {
+            List({ space: CommonConstants.SPACE_M }) {
+              ForEach(this.vm.list, (v: AggregateNewsCommentModel) => {
+                ListItem() {
+                  Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center }) {
+                    EditCheckbox({
+                      isEditMode: this.vm.isEditMode,
+                      onChange: (value) => {
+                        this.vm.onChange(value, v);
+                      },
+                    })
 
-          if (this.vm.isEditMode) {
-            this.toolBarBuilder()
+                    this.contentItemBuilder(v)
+                  }
+                }
+              }, (v: AggregateNewsCommentModel) => v.commentId)
+            }
+            .width(CommonConstants.FULL_PERCENT)
+            .layoutWeight(1)
+            .scrollBar(BarState.Off)
+            .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+            .padding({
+              left: this.vm.breakPointModel.pagePadding,
+              right: this.vm.breakPointModel.pagePadding,
+              top: CommonConstants.SPACE_M,
+              bottom: CommonConstants.SPACE_M,
+            })
+
+            if (this.vm.isEditMode) {
+              this.toolBarBuilder()
+            }
           }
+          .layoutWeight(1)
         }
-        .layoutWeight(1)
-        .visibility(this.vm.list.length ? Visibility.Visible : Visibility.None)
-
-        Column() {
-          emptyBuilder({
-            fontSizeRatio: this.vm.settingInfo.fontSizeRatio,
-          })
-        }
-        .layoutWeight(1)
-        .visibility(this.vm.list.length ? Visibility.None : Visibility.Visible)
       }
       .width(CommonConstants.FULL_PERCENT)
       .height(CommonConstants.FULL_PERCENT)

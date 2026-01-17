@@ -45,7 +45,7 @@ export struct CanvasSaveList {
             this.drawHistory.drawInfoList.splice(index, 1)
             PersistenceV2.save(DrawHistory)
           },
-        });
+        }, this.getUIContext());
 
       })
       .justifyContent(FlexAlign.Center)
@@ -66,7 +66,7 @@ export struct CanvasSaveList {
             this.drawTitle(index)
           },
           confirmAction: () => {
-            if (this.drawBoardVM.validate()) {
+            if (this.drawBoardVM.validate(this.getUIContext())) {
               this.drawHistory.drawInfoList[index].title =  this.drawBoardVM.title
               PersistenceV2.save(DrawHistory)
               this.drawBoardVM.title = ''
@@ -76,7 +76,7 @@ export struct CanvasSaveList {
           cancelAction: () => {
             this.drawBoardVM.title = ''
           },
-        });
+        }, this.getUIContext());
       })
       .justifyContent(FlexAlign.Center)
       .width(40)

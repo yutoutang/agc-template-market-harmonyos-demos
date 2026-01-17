@@ -4,8 +4,8 @@ import {
 import { OrderApis, OrderItem } from 'lib_network';
 import { ORDER_TAB_LIST } from '../common/Constants';
 import { OrderActionMap, OrderStatusMap, OrderTabsMap } from '../common/Enums';
-import { UpdateAddressSheetOptions } from '../views/UpdateAddressSheet';
 import { OrderUtil } from '../utils/OrderUtil';
+import { UpdateAddressSheetOptions } from '../views/UpdateAddressSheet';
 
 @ObservedV2
 export class OrderListPageVM {

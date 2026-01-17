@@ -14,6 +14,11 @@
       "name": "RedemptionSubmitPage",
       "pageSourceFile": "src/main/ets/views/RedemptionSubmitPage.ets",
       "buildFunction": "buildRedemptionSubmitPage"
+    },
+    {
+      "name": "MemberSubscriptionPage",
+      "pageSourceFile": "src/main/ets/views/MemberSubscriptionPage.ets",
+      "buildFunction": "buildMemberSubscriptionPage"
     }
   ]
 }

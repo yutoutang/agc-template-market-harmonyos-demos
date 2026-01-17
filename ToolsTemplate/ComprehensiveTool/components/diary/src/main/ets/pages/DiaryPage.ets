@@ -3,6 +3,7 @@ import { DiaryItemCard } from '../components/DiaryItemCard';
 import { Diary } from '../models/Diary';
 import { DiaryPageVM } from '../viewmodel/DiaryPageVM';
 import { MoreMenuView } from '../components/MoreMenuView';
+import { WindowUtil } from '../utils/WindowUtil';
 
 @Builder
 export function DiaryPageBuilder() {
@@ -12,6 +13,10 @@ export function DiaryPageBuilder() {
 @ComponentV2
 export struct DiaryPage {
   vm: DiaryPageVM = new DiaryPageVM(this.getUIContext());
+
+  aboutToAppear(): void {
+    WindowUtil.init(this.getUIContext());
+  }
 
   build() {
     NavDestination() {

@@ -7,23 +7,28 @@
     },
     {
       "name": "NewsSearch",
-      "pageSourceFile": "src/main/ets/components/NewsSearch.ets",
+      "pageSourceFile": "src/main/ets/pages/NewsSearch.ets",
       "buildFunction": "NewsSearchBuilder"
     },
     {
       "name": "NewsPost",
-      "pageSourceFile": "src/main/ets/components/NewsPost.ets",
+      "pageSourceFile": "src/main/ets/pages/NewsPost.ets",
       "buildFunction": "NewsPostBuilder"
     },
     {
       "name": "NewsPublishSelect",
-      "pageSourceFile": "src/main/ets/components/NewsPublishSelect.ets",
+      "pageSourceFile": "src/main/ets/pages/NewsPublishSelect.ets",
       "buildFunction": "NewsPublishSelectBuilder"
     },
     {
       "name": "VideoPreview",
-      "pageSourceFile": "src/main/ets/components/VideoPreview.ets",
+      "pageSourceFile": "src/main/ets/pages/VideoPreview.ets",
       "buildFunction": "VideoPreviewBuilder"
+    },
+    {
+      "name": "ENewsPage",
+      "pageSourceFile": "src/main/ets/pages/ENewsPage.ets",
+      "buildFunction": "ENewsPageBuilder"
     }
   ]
 }

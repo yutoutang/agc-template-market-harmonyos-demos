@@ -1,7 +1,7 @@
-import { common } from '@kit.AbilityKit';
-import { promptAction } from '@kit.ArkUI';
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { UtilLog } from '@hw-agconnect/util-log';
+import { LoginSheetUtils } from 'aggregated_login';
 import sdk from 'libveditor.so';
+import { LoginManageUtil, MAX_FREE_USE_TIME, MemberHint, MemberManageUtil, UPDATE_MEMBER_STATUS } from 'module_base';
 import { EditVideo } from '../model/Index';
 import { VideoManageVM } from '../viewmodel/VideoManageVM';
 
@@ -14,11 +14,45 @@ export function VideoManageBuilder() {
 struct VideoManage {
   vm: VideoManageVM = VideoManageVM.instance;
   @Local bottomHeight: number = 0;
+  @Local loginManageUtil: LoginManageUtil = new LoginManageUtil(this.getUIContext());
 
   @Computed
   get isShowEdit() {
-    return ((this.vm.draftTabIndex === 0 && this.vm.drafts.length) ||
-      (this.vm.draftTabIndex === 1 && this.vm.recycles.length));
+    return ((this.vm.draftTabIndex === 0 && this.vm.drafts.list.length) ||
+      (this.vm.draftTabIndex === 1 && this.vm.recycles.list.length));
+  }
+
+  async aboutToAppear(): Promise<void> {
+    this.vm.isMember = await MemberManageUtil.queryMemberStatus(this.getUIContext());
+    this.getUIContext().getHostContext()!.eventHub.on(UPDATE_MEMBER_STATUS, (status: boolean) => {
+      this.vm.isMember = status;
+    });
+  }
+
+  aboutToDisappear(): void {
+    this.getUIContext().getHostContext()!.eventHub.off(UPDATE_MEMBER_STATUS);
+  }
+
+  @Computed
+  get isCanUse() {
+    return this.vm.isMember || (!this.vm.isMember && this.vm.usedCount.count < MAX_FREE_USE_TIME);
+  }
+
+  @Computed
+  get isShowHint() {
+    // 非会员且使用次数超过最大免费次数
+    if (!this.loginManageUtil.userInfoModel.isLogin) {
+      return true;
+    } else {
+      return this.vm.isMember === false;
+    }
+  }
+
+  @Builder
+  MemberLimit() {
+    Column() {
+      MemberHint({ count: this.vm.usedCount.count >= MAX_FREE_USE_TIME ? MAX_FREE_USE_TIME : this.vm.usedCount.count });
+    }.padding({ left: 16, right: 16 });
   }
 
   @Builder
@@ -34,12 +68,20 @@ struct VideoManage {
       .width('100%')
       .borderRadius(16)
       .onClick(() => {
-        try {
-          sdk.InitEditor();
-          this.vm.selectVideo();
-        } catch (err) {
-          promptAction.showToast({ message: '当前设备不支持剪辑，请使用真机使用~' });
-          hilog.error(0xFF00, 'VideoClip', JSON.stringify(err));
+        if (!this.loginManageUtil.userInfoModel.isLogin) {
+          LoginSheetUtils.open(this.loginManageUtil.params, this.getUIContext());
+        } else {
+          if (this.isCanUse) {
+            try {
+              sdk.InitEditor();
+              this.vm.selectVideo(this.getUIContext());
+            } catch (err) {
+              this.getUIContext().getPromptAction().showToast({ message: '当前设备不支持剪辑，请使用真机使用~' });
+              UtilLog.error(0xFF00, 'VideoClip', JSON.stringify(err));
+            }
+          } else {
+            this.vm.showMemberSubscribeDialog(this.getUIContext());
+          }
         }
       })
       .linearGradient({
@@ -68,7 +110,7 @@ struct VideoManage {
 
         Row({ space: 8 }) {
           ForEach(this.vm.draftCategory, (item: string, index: number) => {
-            Text(`${item} ${index === 0 ? this.vm.drafts.length : this.vm.recycles.length}`)
+            Text(`${item} ${index === 0 ? this.vm.drafts.list.length : this.vm.recycles.list.length}`)
               .fontColor(this.vm.draftTabIndex === index ? $r('sys.color.font_on_primary') :
                 $r('sys.color.font_primary'))
               .backgroundColor(this.vm.draftTabIndex === index ? $r('sys.color.comp_background_emphasize') :
@@ -88,24 +130,29 @@ struct VideoManage {
 
         if (this.isShowEdit) {
           Grid() {
-            ForEach(this.vm.draftTabIndex === 0 ? this.vm.drafts : this.vm.recycles, (item: EditVideo) => {
-              GridItem() {
-                Column({ space: 4 }) {
-                  Stack({ alignContent: Alignment.TopEnd }) {
-                    Image(item.previewUri).borderRadius(16);
-                    Checkbox().select(item.isSelect).onChange((value: boolean) => {
-                      this.vm.draftTabIndex === 0 ? this.vm.selectDraft(item, value) :
-                        this.vm.selectRecycle(item, value);
-                    }).visibility(this.vm.isEdit ? Visibility.Visible : Visibility.None);
-                  };
+            ForEach(this.vm.draftTabIndex === 0 ? this.vm.drafts.list : this.vm.recycles.list,
+              (item: EditVideo) => {
+                GridItem() {
+                  Column({ space: 4 }) {
+                    Stack({ alignContent: Alignment.TopEnd }) {
+                      Image(item.previewUri).borderRadius(16);
+                      Checkbox().select(item.isSelect).onChange((value: boolean) => {
+                        this.vm.draftTabIndex === 0 ? this.vm.selectDraft(item, value) :
+                          this.vm.selectRecycle(item, value);
+                      }).visibility(this.vm.isEdit ? Visibility.Visible : Visibility.None);
+                    };
 
-                  Text(`${item.size} | ${item.duration}`).fontSize(10).opacity(0.6);
-                }.alignItems(HorizontalAlign.Start).onClick(() => {
-                  sdk.InitEditor();
-                  this.vm.handleDraftClickEvent(item);
-                });
-              };
-            }, (item: EditVideo) => item.videoId);
+                    Text(`${item.size} | ${item.duration}`).fontSize(10).opacity(0.6);
+                  }.alignItems(HorizontalAlign.Start).onClick(() => {
+                    if (this.isCanUse) {
+                      sdk.InitEditor();
+                      this.vm.handleDraftClickEvent(this.getUIContext(), this.loginManageUtil, item);
+                    } else {
+                      this.vm.showMemberSubscribeDialog(this.getUIContext());
+                    }
+                  });
+                };
+              }, (item: EditVideo) => item.videoId);
           }
           .columnsTemplate('1fr 1fr 1fr')
           .columnsGap(14)
@@ -145,14 +192,14 @@ struct VideoManage {
       Row() {
         Column({ space: 8 }) {
           Image($r('app.media.restore_history')).size({ width: 24, height: 24 });
-          Text('全部恢复').fontSize(12);
+          Text('恢复').fontSize(12);
         }.onClick(() => {
           this.vm.restoreToDraft();
         });
 
         Column({ space: 8 }) {
           Image($r('app.media.ic_delete_draft')).size({ width: 24, height: 24 });
-          Text('全部永久删除').fontSize(12);
+          Text('永久删除').fontSize(12);
         }.onClick(() => {
           this.vm.deletePermanently();
         });
@@ -169,6 +216,9 @@ struct VideoManage {
   build() {
     NavDestination() {
       Column() {
+        if (this.isShowHint) {
+          this.MemberLimit();
+        }
         this.CreateArea();
         this.OperateArea();
       }

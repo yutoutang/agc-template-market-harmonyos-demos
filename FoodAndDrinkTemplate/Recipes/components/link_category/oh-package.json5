@@ -1,9 +1,11 @@
 {
   "name": "link_category",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Please describe the basic information.",
   "main": "Index.ets",
   "author": "",
   "license": "Apache-2.0",
-  "dependencies": {}
+  "dependencies": {
+    "base_ui": "file:../base_ui"
+  }
 }

@@ -1,11 +1,11 @@
 {
   "routerMap": [
     {
-      "name": "HomePage",
-      "pageSourceFile": "src/main/ets/pages/HomePage.ets",
-      "buildFunction": "HomePageBuilder",
+      "name": "MainIndex",
+      "pageSourceFile": "src/main/ets/pages/MainIndex.ets",
+      "buildFunction": "MainIndexBuilder",
       "data": {
-        "description": "this is HomePageBuilder"
+        "description": "this is MainIndexBuilder"
       }
     }
   ]

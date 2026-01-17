@@ -1,4 +1,4 @@
-import { promptAction } from '@kit.ArkUI';
+import { ToastDialog } from '@hw-agconnect/ui-toast';
 import { Category } from '../models/Category';
 
 export function initCategoryList(): Array<Category>{
@@ -58,10 +58,10 @@ export class CategoryUtil {
   addCategory(category: Category): boolean {
     let sameNameCategory = this.categoryList.find((item) => item.name === category.name);
     if (sameNameCategory) {
-      promptAction.showToast({
+      ToastDialog.showToast({
         message: '已存在相同名称的分类，请重新创建 ~',
         duration: 1500,
-        alignment: Alignment.Center
+        toastAlignment: DialogAlignment.Center
       })
       return false;
     }

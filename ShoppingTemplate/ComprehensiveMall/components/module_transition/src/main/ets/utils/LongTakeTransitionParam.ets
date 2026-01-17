@@ -1,6 +1,6 @@
-import { LongTakeTransitionType } from '../../../../Index';
 import { RectInfoPx } from './ComponentAttrUtils';
 import { LongTakeTransitionOptions } from './Options';
+import { LongTakeTransitionType } from '../../../../Index';
 
 export class LongTakeTransitionParam {
   public componentId: string = '';

@@ -5,11 +5,10 @@ import {
   RouterMap,
   RouterUtils,
   SettingModel,
-  TimeUtils,
   UserInfoModel,
 } from 'lib_common'
+import { Share } from 'lib_widget'
 import { LayoutParams } from 'module_flexlayout'
-import { Share } from 'module_share'
 import { FeedCard } from 'module_newsfeed'
 import { CardViewModel } from '../viewmodel/CardViewModel'
 
@@ -56,14 +55,12 @@ export struct NativeComponent {
   @Builder
   shareBuilder() {
     Share({
-      qrCodeInfo: {
-        id: this.cardData.nativeCardData.id,
-        type: this.cardData.nativeCardData.type,
+      shareData: {
+        recordId: this.cardData.nativeCardData.id,
         title: this.cardData.nativeCardData.title,
-        createTime: TimeUtils.formatDate(this.cardData.nativeCardData.createTime, 'YYYY-MM-DD HH:mm'),
+        createTime: this.cardData.nativeCardData.createTime,
         coverUrl: this.handlerCoverImage(),
-        isVideo: !!this.cardData.nativeCardData.postImgList?.[0]?.surfaceUrl,
-        articleFrom: this.cardData.nativeCardData.articleFrom,
+        subTitle: this.cardData.nativeCardData.articleFrom,
       },
       shareRenderBuilder: () => {
         this.shareCommentBuilder()

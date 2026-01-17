@@ -1,4 +1,5 @@
-import { ComponentContent, promptAction } from '@kit.ArkUI';
+import { ComponentContent } from '@kit.ArkUI';
+import { ToastDialog } from '@hw-agconnect/ui-toast';
 import { SelectedController } from '../controller/SelectedController';
 import { CategoryUtil } from '../utils/CategotyUtil';
 import { NoteUtil } from '../utils/NoteUtil';
@@ -273,10 +274,10 @@ struct EditCategoryDialog {
         .width('50%')
         .onClick(() => {
           if (StringUtil.isBlank(this.newName)) {
-            this.getUIContext().getPromptAction().showToast({
+            ToastDialog.showToast({
               message: '分类名称为空, 请重新填写 ~',
               duration: 1500,
-              alignment: Alignment.Center,
+              toastAlignment: DialogAlignment.Center,
             });
             return;
           }
@@ -328,9 +329,9 @@ struct DeleteCategoryDialog {
 
   deleteCategory() {
     this.categoryUtil.deleteCategoryById(this.params.categoryId);
-    this.getUIContext().getPromptAction().showToast({
+    ToastDialog.showToast({
       message: '删除成功 ~',
-      alignment: Alignment.Center,
+      toastAlignment: DialogAlignment.Center,
       duration: 1500,
     });
     this.params.scroller.closeAllSwipeActions();

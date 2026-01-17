@@ -21,6 +21,10 @@
       "value": "当前日期暂无可预约时间"
     },
     {
+      "name": "book_good_store",
+      "value": "预约门店"
+    },
+    {
       "name": "book_good_appoint_time",
       "value": "预约时间"
     },
@@ -38,7 +42,7 @@
     },
     {
       "name": "book_good_appoint_phone",
-      "value": "手机号"
+      "value": "手机号码"
     },
     {
       "name": "book_good_appoint_nums",
@@ -62,7 +66,7 @@
     },
     {
       "name": "book_contact_name_place",
-      "value": "请输入称呼"
+      "value": "请输入联系人姓名"
     },
     {
       "name": "book_phone_place",

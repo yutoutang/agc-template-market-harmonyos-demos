@@ -1,9 +1,9 @@
 import { tag } from '@kit.ConnectivityKit';
 import { PlainArray } from '@kit.ArkTS';
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
 import MCReader from './MCReader';
 import { RTYPE } from '../Enum';
 import { ResultInfo } from '../../model/Index';
-import { promptAction } from '@kit.ArkUI';
 
 export default class Common {
   private static mKeyMap: PlainArray<number[][]> = new PlainArray();

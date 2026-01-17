@@ -22,6 +22,8 @@ export interface AuthorResponse {
   watchers?: string[]
   // 粉丝id集合
   followers?: string[]
+  // 订阅号
+  subscribe?: string[]
   // 手机号
   authorPhone?: string
 }

@@ -1,3 +1,4 @@
+import { UtilLog } from '@hw-agconnect/util-log';
 import { AppStorageV2 } from '@kit.ArkUI';
 import { media } from '@kit.MediaKit';
 import { BusinessError } from '@kit.BasicServicesKit';
@@ -36,7 +37,7 @@ export class RecorderUtil {
 
   // 创建文件以及设置avConfig.url
   async createAndSetFd(): Promise<void> {
-    const context: Context = getContext(this);
+    const context: Context = AppStorage.get('simple_recorder_context') as Context;
     const fileName: string = `${FormatUtil.formatFullDate(new Date())}_录音.mp3`;
     const path: string = context.filesDir + `/${fileName}`; // 文件沙箱路径，文件后缀名应与封装格式对应
     const audioFile: fs.File = fs.openSync(path, fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE);
@@ -62,23 +63,27 @@ export class RecorderUtil {
   }
 
   // 开始录制对应的流程
-  async startRecordingProcess() {
+  async startRecordingProcess(uiContext:UIContext) {
     if (this.avRecorder !== undefined) {
       await this.avRecorder.release();
       this.avRecorder = undefined;
     }
     // 1.创建录制实例
-    this.avRecorder = await media.createAVRecorder();
+    try {
+      this.avRecorder = await media.createAVRecorder();
+    } catch (e) {
+      UtilLog.error(`startRecordingProcess failed: ${JSON.stringify(e)}`);
+    }
 
     this.setAudioRecorderCallback();
     // 2.获取录制文件fd赋予avConfig里的url；参考FilePicker文档
     await this.createAndSetFd();
     // 3.配置录制参数完成准备工作
-    await this.avRecorder.prepare(this.avConfig);
+    await this.avRecorder?.prepare(this.avConfig);
     // 4.开始录制
-    await this.avRecorder.start();
+    await this.avRecorder?.start();
     // 绘制频谱图
-    this.draw();
+    this.draw(uiContext);
     const fileInfo: FileInfo = {
       filePath: this.filePath,
       fileName: this.fileName,
@@ -128,12 +133,12 @@ export class RecorderUtil {
   }
 
 
-  draw() {
+  draw(uiContext:UIContext) {
     // 录制音频时，设置定时器
     this.intervalId = setInterval(() => {
       this.avRecorder?.getAudioCapturerMaxAmplitude()
         .then((amplitude) => {
-          animateTo({
+          uiContext.animateTo({
             curve: Curve.EaseInOut,
             duration: 200,
           }, () => {

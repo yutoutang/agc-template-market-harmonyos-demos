@@ -1,4 +1,5 @@
 import { common } from '@kit.AbilityKit';
+import { WindowUtil } from 'module_ui_base';
 import { CommonConstants } from '../constants/CommonConstants';
 import { GridRowColSetting } from '../common/GridRowColSetting';
 import { LogoutBtn } from '../components/LogoutBtn';
@@ -26,6 +27,7 @@ export struct SettingView {
   @Local vm: SettingViewModel = new SettingViewModel();
 
   aboutToAppear(): void {
+    WindowUtil.initWindowUtil(this.getUIContext())
     this.initParams();
     this.vm.handleSettingList(this.settingList);
     this.vm.onConfigurationUpdate();

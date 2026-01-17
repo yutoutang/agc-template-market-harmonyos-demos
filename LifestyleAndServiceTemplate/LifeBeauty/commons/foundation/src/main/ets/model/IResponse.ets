@@ -32,6 +32,15 @@ export interface IUserInfo {
   // 手机号码
   mobile?: string;
 
+  // 性别
+  gender?: number;
+
+  // 出生日期
+  birthDate?: string;
+
+  // 姓名
+  fullName?: string;
+
   // 会员卡id
   memberId?: string;
 
@@ -50,7 +59,7 @@ export interface IUserInfo {
  */
 export interface IBaseStore {
   // 门店ID
-  id: number;
+  id: string;
 
   // 店铺名称
   storeName: string;
@@ -84,14 +93,8 @@ export interface IStoreInfo extends IBaseStore {
   // 地区
   region: string;
 
-  // 认证名称
-  certName: string;
-
   // 店铺横幅
   storeBanner: string;
-
-  // 营业执照
-  businessLicense: string;
 
   // 评分
   score: string;
@@ -130,6 +133,9 @@ export interface IGoodInfo {
   // 商品名称
   title: string;
 
+  // 副标题
+  subTitle?: string;
+
   // 所属类目ID
   classId: number;
 
@@ -144,6 +150,9 @@ export interface IGoodInfo {
 
   // 会员价
   vipPrice: number;
+
+  // 服务项目
+  projectNum: number;
 }
 
 /**
@@ -154,7 +163,7 @@ export interface IAppointment {
   id: number;
 
   // 门店ID
-  storeId: number;
+  storeId: string;
 
   // 用户ID
   userId: number;
@@ -182,6 +191,9 @@ export interface IAppointment {
 
   // 预约的项目名称
   itemName: string;
+
+  // 预约的订单号
+  orderNo: string;
 
   // 商品图片
   itemPic: string;

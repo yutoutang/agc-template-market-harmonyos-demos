@@ -1,7 +1,14 @@
-import { Constants, NavHeaderBar, TCRouter, BookInfo } from 'common';
+import {
+  Constants,
+  NavHeaderBar,
+  TCRouter,
+  BookInfo,
+  BreakpointStorage,
+  BreakpointSystem,
+  BreakpointTypeEnum
+} from 'common';
 import { getRatingDescription } from '../model/ReviewModels';
 import { ReviewDataUtil } from '../utils/ReviewDataUtil';
-import { promptAction } from '@kit.ArkUI';
 import { emitter } from '@kit.BasicServicesKit';
 
 interface RouteParams {
@@ -14,6 +21,7 @@ export struct WriteCommentPage {
   @Local commentText: string = '';
   @Local textCount: number = 0;
   @Local currentBookInfo: BookInfo | undefined = undefined;
+  @Local curBreakpoint: BreakpointStorage = BreakpointSystem.currentBreakpoint
   private maxLength: number = 500;
 
   aboutToAppear(): void {
@@ -35,10 +43,14 @@ export struct WriteCommentPage {
       }
     }
 
-    // 监听用户信息变更事件
-    emitter.on(Constants.LOGIN_CHANGE, () => {
-      console.info('用户信息变更，将使用最新的用户信息提交评论');
-    });
+    try {
+      // 监听用户信息变更事件
+      emitter.on(Constants.LOGIN_CHANGE, () => {
+        console.info('用户信息变更，将使用最新的用户信息提交评论');
+      });
+    } catch (e) {
+      console.error('Failed to emitter on login change. Cause: ' + JSON.stringify(e));
+    }
   }
 
   // 构建可点击的星级评分组件
@@ -53,7 +65,7 @@ export struct WriteCommentPage {
             .onClick(() => {
               this.currentRating = star;
             })
-        })
+        }, (item: string) => JSON.stringify(item))
       }
       .margin({ bottom: 16 })
 
@@ -76,7 +88,7 @@ export struct WriteCommentPage {
         placeholder: '请输入您的评论...',
         text: this.commentText
       })
-        .width(328)
+        .width('100%')
         .height(216)
         .borderRadius(16)
         .backgroundColor(Color.White)
@@ -115,6 +127,7 @@ export struct WriteCommentPage {
         .margin({ top: 4 })
       }
     }
+    .width('100%')
     .alignItems(HorizontalAlign.Center)
   }
 
@@ -125,11 +138,10 @@ export struct WriteCommentPage {
       .width(328)
       .height(48)
       .backgroundColor(this.canSubmit() ?
-      $r('sys.color.ohos_id_color_emphasize') : $r('sys.color.ohos_id_color_emphasize_contrary_dark'))
-      .fontColor(Color.White)
-      .fontSize(16)
+        $r('sys.color.ohos_id_color_emphasize') : $r('sys.color.ohos_id_color_emphasize_contrary_dark'))
+      .fontColor($r('sys.color.font_on_primary'))
+      .fontSize($r('sys.float.Body_L'))
       .fontWeight(500)
-      .borderRadius(24)
       .margin({ top: 40, left: 16, right: 16 })
       .enabled(this.canSubmit())
       .onClick(() => {
@@ -146,6 +158,7 @@ export struct WriteCommentPage {
 
   // 提交评论
   private submitComment(): void {
+    let promptAction = this.getUIContext().getPromptAction();
     // 检查评分
     if (this.currentRating <= 0) {
       promptAction.showToast({
@@ -188,7 +201,8 @@ export struct WriteCommentPage {
         duration: 2000
       });
 
-      console.info(`评论提交成功: 评分=${this.currentRating}, 内容长度=${this.commentText.trim().length}, 书籍=${bookInfo?.name || '未知书籍'}`);
+      console.info(`评论提交成功: 评分=${this.currentRating}, 内容长度=${this.commentText.trim()
+        .length}, 书籍=${bookInfo?.name || '未知书籍'}`);
 
       const bookName = bookInfo?.name || '当前书籍';
 
@@ -222,15 +236,14 @@ export struct WriteCommentPage {
           this.buildCommentTextArea()
 
           this.buildSubmitButton()
-
-          Blank()
         }
-        .width('100%')
+        .width(this.curBreakpoint.value === BreakpointTypeEnum.LG ? '70%' : '100%')
         .height('100%')
-        .alignItems(HorizontalAlign.Center)
+
       }
       .width('100%')
       .height('100%')
+      .padding({ left: 12, right: 12 })
       .backgroundColor($r('sys.color.ohos_id_color_sub_background'))
     }
     .hideTitleBar(true)

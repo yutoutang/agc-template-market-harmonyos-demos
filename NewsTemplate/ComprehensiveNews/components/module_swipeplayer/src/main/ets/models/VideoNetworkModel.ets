@@ -30,6 +30,8 @@ export class VideoNetworkSetting {
   @Trace autoPlayNext: boolean = true;
   // 推荐频道自动播放视频
   @Trace autoPlayTabRecommend: boolean = true;
+  // 直播是否启用小窗播放
+  @Trace enableLivePiP: boolean = true;
 }
 
 /**

@@ -1,7 +1,6 @@
 import { Constants } from '../constant/Constants'
 import { TCRouter } from '../comp/TCRouter'
-import { MathUtil } from '../utils/MathUtil'
-import { DialogParams, TSearch } from '../../../../Index';
+import { BreakpointStorage, BreakpointSystem, BreakpointTypeEnum, DialogParams, TSearch } from '../../../../Index';
 import { SymbolGlyphModifier } from '@kit.ArkUI';
 
 function getFreeText(isFree?: string): string | null {
@@ -32,8 +31,7 @@ function getFreeColor(isFree?: string): string | null {
 
 @Builder
 export function BookCover(image?: PixelMap | ResourceStr | DrawableDescriptor, isFree?: string) {
-
-  Stack() {
+  Stack({ alignContent: Alignment.TopEnd }) {
     Image($r(image?.toString()))
       .height(144)
       .width(104)
@@ -49,7 +47,7 @@ export function BookCover(image?: PixelMap | ResourceStr | DrawableDescriptor, i
         .backgroundColor(getFreeColor(isFree))
         .borderRadius(10)
     }
-    .padding({ bottom: 110, left: 45 })
+    .padding(8)
   }
 }
 
@@ -96,10 +94,8 @@ export function BookGroupCover(image?: PixelMap | ResourceStr | DrawableDescript
 export struct ReturnButton {
   build() {
     Button() {
-      Image($r('app.media.ic_arrow_left'))
-        .width(8.68)
-        .height(16.47)
-        .objectFit(ImageFit.Contain)
+      SymbolGlyph($r('sys.symbol.chevron_backward'))
+        .fontSize(24)
     }
     .width(40)
     .height(40)
@@ -129,7 +125,7 @@ export struct NavHeaderBar {
   @Consumer('tabController') tabsController: TabsController = new TabsController();
   @Consumer('currentIndexTab') currentIndexTab: number = 0;
   @Consumer('isHistory') isHistory: boolean = false;
-  // 加上搜索框
+  // 搜索框
   @Param isSearch: boolean = false;
   // 书架页title
   @Param isShelf: boolean = false;
@@ -153,28 +149,33 @@ export struct NavHeaderBar {
     }
     this.isShown = false;
   }
+  @Local gridIconModifier: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.square_grid_2x2'));
+  @Local listIconModifier: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.list_square'));
+  @Local trashIconModifier: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.trash'));
+  @Local curBreakpoint: BreakpointStorage = BreakpointSystem.currentBreakpoint
 
   @Builder
   selectMenu() {
     Menu() {
       MenuItemGroup({ header: '书籍管理' }) {
         MenuItem({
-          startIcon: $r('app.media.ic_grid'),
+          symbolStartIcon: this.gridIconModifier,
           content: '宫格模式',
           builder: this.gridSheet
         })
         MenuItem({
-          startIcon: $r('app.media.ic_list'),
+          symbolStartIcon: this.listIconModifier,
           content: '列表模式',
           builder: this.listSheet
         })
         MenuItem({
-          startIcon: $r('app.media.ic_trash'),
+          symbolStartIcon: this.trashIconModifier,
           content: '删除',
           builder: this.trashSheet
         })
       }
     }
+    .width(224)
   }
 
   build() {
@@ -188,26 +189,30 @@ export struct NavHeaderBar {
               .onClick(() => {
                 TCRouter.pop();
               })
-              .margin({ left: 12 })
+              .margin({ right: 12 })
           }
           Text(this.title)
             .fontColor($r('sys.color.font_primary'))
-            .fontSize(this.isMainPage ? $r('sys.float.Title_M') : $r('sys.float.Title_S'))// .width(Constants.FULL_SIZE)
+            .fontSize(this.isMainPage ? $r('sys.float.Title_M') : $r('sys.float.Title_S'))
             .fontWeight(FontWeight.Medium)
-            .margin({ left: 12 })
         }
 
         if (this.isSearch) {
-          TSearch({ widthLength: '208' })
-            .margin({ left: 24, right: 8 })
-          Image($r('app.media.icon_history'))
-            .height(40)
-            .width(40)
-            .onClick(() => {
-              this.currentIndexTab = 0;
-              this.tabsController.changeIndex(0)
-              this.isHistory = true
-            })
+          Row() {
+            TSearch({ widthLength: '100%' })
+              .margin({ left: 24, right: 8 })
+              .layoutWeight(1)
+            Image($r('app.media.icon_history'))
+              .height(40)
+              .width(40)
+              .onClick(() => {
+                this.currentIndexTab = 0;
+                this.tabsController.changeIndex(0)
+                this.isHistory = true
+              })
+          }
+          .layoutWeight(this.curBreakpoint.value === BreakpointTypeEnum.SM ? 1 : 0)
+          .width(this.curBreakpoint.value === BreakpointTypeEnum.SM ? 'auto' : '50%')
         }
         if (this.isShelf) {
           Row() {
@@ -232,16 +237,20 @@ export struct NavHeaderBar {
 
           }
         }
-      }.height(36)
-      .width('90%')
+      }
+      .width(Constants.FULL_SIZE)
+      .height(Constants.FULL_SIZE)
       .justifyContent(FlexAlign.SpaceBetween)
     }
-    .alignItems(HorizontalAlign.Start)
+    .margin({ top: this.windowTopHeight })
     .padding({
-      top: 16 + this.windowTopHeight,
+      top: 8,
       bottom: 8,
+      left: 16,
+      right: 16
     })
     .width(Constants.FULL_SIZE)
+    .height(56)
     .backgroundColor(this.hasBgColor ? $r('sys.color.background_primary') : '#00000000')
   }
 }
@@ -309,7 +318,7 @@ export function dialogView(params: DialogParams) {
         .onClick(() => {
           if (params.input) {
             params.rightEvent(params.content);
-          } else{
+          } else {
             params.rightEvent();
           }
 

@@ -1,79 +1,84 @@
 import { common } from '@kit.AbilityKit';
 import { paymentService } from '@kit.PaymentKit';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { AppStorageV2, PersistenceV2 } from '@kit.ArkUI';
+import { UtilLog as Logger } from '@hw-agconnect/util-log';
+import { ToastDialog } from '@hw-agconnect/ui-toast';
 import {
+  BreakpointModel,
   CommonUtils,
+  GetUserInfoResp,
   ISubmitOrderRequest,
-  Logger,
-  PHONE_REG,
   preOrder,
   RouterMap,
   RouterModule,
   SimpleGoodInfo,
   SimpleOrderInfo,
+  StoreInfoModel,
   UIOrderPart,
 } from 'foundation';
-import { ConstantsHome } from '../common/Constant';
+import { NumberStepper } from '../components/NumberStepper';
+
 
 @Builder
 export function SubmitOrderBuilder() {
   SubmitOrder()
 }
 
-@Extend(Column)
-function cardContainer() {
-  .width('100%')
-  .padding({
-    top: 9,
-    bottom: 9,
-    left: 12,
-    right: 12,
-  })
-  .borderRadius(8)
-  .backgroundColor(Color.White)
-}
-
 const TAG = '[SubmitOrder]';
 
 @ComponentV2
 export struct SubmitOrder {
-  context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+  context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
   @Local goodInfo: SimpleGoodInfo = new SimpleGoodInfo();
   @Local name: string = '';
   @Local phone: string = '';
   @Local remark: string = '';
-  number: number = 1;
-  // todo: 实际商户条件具备后，修改为false
-  private ignoreRequestPayment: boolean = true;
+  @Local number: number = 1;
+  @Local numStr: string = '1';
+  @Local breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
+  @Local storeModel: StoreInfoModel = AppStorageV2.connect(StoreInfoModel, () => new StoreInfoModel())!;
+  @Local userInfo: GetUserInfoResp = PersistenceV2.connect(GetUserInfoResp, () => new GetUserInfoResp())!;
+  @Local orderNo: string = '';
 
   aboutToAppear(): void {
     const paramList: Array<SimpleGoodInfo> = RouterModule.getNavParam({ url: RouterMap.SUBMIT_ORDER });
     if (paramList.length) {
       this.goodInfo = paramList[paramList.length - 1];
     }
+    this.phone = this.userInfo.mobile;
+  }
+
+  @Computed
+  get totalPrice() {
+    return this.number * this.goodInfo.price;
+  }
+
+  @Computed
+  get totalPay() {
+    return this.number * this.goodInfo.vipPrice;
+  }
+
+  // 优惠
+  @Computed
+  get discount() {
+    const diff = this.goodInfo.price - this.goodInfo.vipPrice;
+    const temp = this.number * diff
+    return CommonUtils.handleCash(temp)
   }
 
   submit() {
-    const isValid = this.validate();
-    if (!isValid) {
-      return;
-    }
     const data = this.buildParam();
-    preOrder(data).then(() => {
+    preOrder(data).then((resp) => {
+      this.orderNo = resp
       this.requestPaymentPromise().then(() => {
-        const param = this.buildRouteParam();
-        RouterModule.push({
-          url: RouterMap.SUCCESS_PAY, param: param,
-        });
+        this.onPayFail()
       });
     });
   }
 
   // 调用华为支付客户端
   requestPaymentPromise(): Promise<void> {
-    if (this.ignoreRequestPayment) {
-      return new Promise((resolve) => resolve());
-    }
     // todo: 补充订购信息
     const orderStr = '{}';
     return paymentService.requestPayment(this.context, orderStr)
@@ -82,27 +87,17 @@ export struct SubmitOrder {
       })
       .catch((error: BusinessError) => {
         Logger.error(TAG, `failed to pay, error.code: ${error.code}, error.message: ${error.message}`);
-        this.getUIContext().getPromptAction().showToast({ message: '拉起支付失败' });
       });
   }
 
-  validate() {
-    if (!this.name) {
-      this.getUIContext().getPromptAction().showToast({ message: '请填写姓名' });
-      return false;
-    }
-
-    if (!this.phone) {
-      this.getUIContext().getPromptAction().showToast({ message: '请填写联系方式' });
-      return false;
-    }
-
-    if (!PHONE_REG.test(this.phone)) {
-      this.getUIContext().getPromptAction().showToast({ message: '电话号码不正确' });
-      return false;
-    }
-
-    return true;
+  onPayFail() {
+    ToastDialog.showToast({
+      message: '元服务的支付服务暂不可用，mock一个支付成功记录。',
+    })
+    const param = this.buildRouteParam();
+    RouterModule.push({
+      url: RouterMap.SUCCESS_PAY, param: param,
+    });
   }
 
   buildParam() {
@@ -114,6 +109,7 @@ export struct SubmitOrder {
       remark: this.remark,
       numbers: this.number,
       actualPay: this.totalPay,
+      groupStoreId: this.storeModel.storeId,
     };
 
     return data;
@@ -121,141 +117,21 @@ export struct SubmitOrder {
 
   buildRouteParam() {
     const param = new SimpleOrderInfo();
+    param.type = this.goodInfo.type;
     param.title = this.goodInfo.title;
     param.subTitle = this.goodInfo.subTitle;
-    param.vipPrice = this.goodInfo.vipPrice;
+    param.vipPrice = this.goodInfo.vipPrice * this.number;
+    param.price = this.goodInfo.price * this.number;
     param.image = this.goodInfo.image;
     param.contactName = this.name;
     param.contactPhone = this.phone;
     param.remark = this.remark;
     param.numbers = this.number;
     param.actualPay = this.totalPay;
+    param.availableNum = (this.goodInfo.availableNum || 0) * this.number;
+    param.goodId = this.goodInfo.id;
+    param.orderNo = this.orderNo;
     return param;
-  }
-
-  @Builder
-  FormCard1() {
-    Column() {
-      Row() {
-        Row({ space: 4 }) {
-          Text('*').fontColor(Color.Red).fontSize(16).fontWeight(500)
-          Text('姓名').fontSize(16).fontWeight(500)
-        }
-
-        Blank()
-        TextInput({ text: $$this.name, placeholder: '请填写姓名' })
-          .padding(0)
-          .borderRadius(0)
-          .backgroundColor(Color.Transparent)
-          .width('70%')
-          .textAlign(TextAlign.End)
-      }.width('100%').height(48)
-
-      Divider().margin({ bottom: 8 })
-
-      Row() {
-        Row({ space: 4 }) {
-          Text('*').fontColor(Color.Red).fontSize(16).fontWeight(500)
-          Text('电话').fontSize(16).fontWeight(500)
-        }
-
-        Blank()
-        TextInput({ text: $$this.phone, placeholder: '请填写联系方式' })
-          .type(InputType.PhoneNumber)
-          .backgroundColor(Color.Transparent)
-          .width('70%')
-          .textAlign(TextAlign.End)
-          .padding(0)
-          .borderRadius(0)
-      }.width('100%').height(48)
-
-    }.cardContainer()
-  }
-
-  @Computed
-  get totalPay() {
-    return this.number * this.goodInfo.vipPrice;
-  }
-
-  @Builder
-  FormCard2() {
-    Row() {
-      UIOrderPart({ goodInfo: this.goodInfo })
-    }
-    .width('100%')
-    .padding({
-      top: 10,
-      bottom: 10,
-      left: 7,
-      right: 10,
-    })
-    .borderRadius(8)
-    .backgroundColor(Color.White)
-  }
-
-  @Builder
-  FormCard3() {
-    Column() {
-      Row() {
-        Text('支付方式').fontSize(16).fontWeight(500)
-        Blank()
-        Row({ space: 6 }) {
-          Image($r('app.media.ic_huawei_pay')).width(16).height(16).borderRadius(4)
-          Text('华为支付')
-        }
-      }.width('100%').height(48)
-
-      Divider().margin({ bottom: 8 })
-
-      Column({ space: 10 }) {
-        Text('备注').fontSize(16).fontWeight(500)
-        TextArea({ placeholder: '请填写备注信息', text: $$this.remark })
-          .maxLines(3)
-          .height(70)
-          .placeholderColor('#C7C7C7')
-          .maxLength(ConstantsHome.MAX_REMARK_LENGTH)
-          .showCounter(true, { highlightBorder: false })
-          .backgroundColor(Color.Transparent)
-          .borderRadius(0)
-          .padding(0)
-      }
-      .width('100%')
-      .alignItems(HorizontalAlign.Start)
-    }.cardContainer()
-  }
-
-  @Builder
-  BottomOperate() {
-    Row() {
-      Row({ space: 8 }) {
-        Text('实付').fontSize(12).fontColor('#565656')
-        Text('￥' + CommonUtils.handleCash(this.totalPay)).fontColor('#E84026').fontSize(20).fontWeight(500)
-      }
-
-      Blank()
-
-      Button('提交订单')
-        .padding({
-          top: 9,
-          bottom: 9,
-          left: 16,
-          right: 16,
-        })
-        .backgroundColor($r('app.color.common_theme_color'))
-        .fontColor($r('sys.color.font_on_primary'))
-        .onClick(() => {
-          this.submit();
-        })
-    }
-    .width('100%')
-    .backgroundColor(Color.White)
-    .padding({
-      left: 10,
-      right: 10,
-      top: 15,
-      bottom: 10,
-    })
-    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
   }
 
   build() {
@@ -270,14 +146,164 @@ export struct SubmitOrder {
         }
         .layoutWeight(1)
         .scrollBar(BarState.Off)
-        .padding(10)
+        .padding({
+          left: this.breakPointModel.pagePadding,
+          right: this.breakPointModel.pagePadding,
+          top: 10,
+          bottom: 10
+        })
         .align(Alignment.Top)
 
         this.BottomOperate()
       }
       .width('100%')
     }
-    .title('下单', { backgroundColor: Color.White })
+    .title('下单')
     .backgroundColor($r('app.color.common_page_bg'))
+  }
+
+  @Builder
+  FormCard1() {
+    Column() {
+      UIOrderPart({ goodInfo: this.goodInfo })
+      Divider().color($r('sys.color.comp_divider')).margin({top: 16})
+      Row() {
+        NumberStepper({
+          value: this.number,
+          min: 1,
+          max: 1000,
+          buttonType: ButtonType.Circle,
+          isBorder: false,
+          onChange: (value) => {
+            if (value <= 0) {
+              return;
+            }
+            if (value > 1000) {
+              return;
+            }
+            this.number = value;
+          },
+        })
+      }
+      .width('100%')
+      .justifyContent(FlexAlign.End)
+      .margin({top: 12})
+    }
+    .width('100%')
+    .padding(12)
+    .borderRadius(16)
+    .backgroundColor(Color.White)
+  }
+
+  @Builder
+  FormCard2() {
+    Column() {
+      Row() {
+        Text('商品总价')
+        Text('(' + this.number + '件)').margin({left: 6}).fontSize(12).fontWeight(400)
+          .fontColor($r('sys.color.font_secondary'))
+        Blank()
+        Text('￥' + CommonUtils.handleCash(this.totalPrice)).fontSize(16).fontWeight(500)
+      }
+      .width('100%')
+      .alignItems(VerticalAlign.Bottom)
+
+      if (this.discount) {
+        Row() {
+          Image($r('app.media.ic_discount_sales')).width(24).height(24)
+          Text('已享优惠').margin({left: 16}).fontSize(16).fontWeight(500)
+
+          Blank()
+          Text('-￥' + this.discount).fontSize(14).fontWeight(500).fontColor($r('sys.color.warning'))
+        }
+        .width('100%')
+        .margin({top: 28})
+
+        Divider().color($r('sys.color.comp_divider')).margin({top: 12, bottom: 12})
+      }
+
+      Row() {
+        Text('小计').fontSize(14).fontWeight(500)
+        Text('￥').fontSize(10).fontWeight(500).fontColor($r('sys.color.warning'))
+        Text('' + CommonUtils.handleCash(this.totalPay))
+          .fontSize(14)
+          .fontWeight(500)
+          .fontColor($r('sys.color.warning'))
+        if (this.goodInfo.availableNum) {
+          Text('/' + (this.number * this.goodInfo.availableNum) + '次')
+            .fontSize(10)
+            .fontWeight(500)
+            .fontColor($r('sys.color.warning'))
+        }
+      }
+      .width('100%')
+      .justifyContent(FlexAlign.End)
+      .alignItems(VerticalAlign.Bottom)
+    }
+    .width('100%')
+    .padding(12)
+    .borderRadius(16)
+    .backgroundColor(Color.White)
+  }
+
+  @Builder
+  FormCard3() {
+    Column() {
+      Text('购买须知').fontSize(18).fontWeight(700).margin({ top: 14, bottom: 10 })
+      Column({space: 12}) {
+        Row({space: 12}) {
+          Image($r('app.media.icon_public_clock')).width(16).height(16)
+
+          Column({space: 4}) {
+            Text('使用时间').fontSize(12).fontWeight(400)
+            Text('营业时间内可用').fontSize(10).fontWeight(400)
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .width('100%')
+        .alignItems(VerticalAlign.Top)
+
+        Divider().color($r('sys.color.comp_divider')).margin({left: 22})
+
+        Row({space: 12}) {
+          Image($r('app.media.icon_public_doc')).width(16).height(16)
+
+          Column({ space: 4 }) {
+            Text('使用规则').fontSize(12).fontWeight(400)
+            Text('1、提前一个小时预约').fontSize(10).fontWeight(400)
+            Text('2、未核销的预约逾期自动返还次数').fontSize(10).fontWeight(400)
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
+        .width('100%')
+        .alignItems(VerticalAlign.Top)
+      }
+      .width('100%')
+      .padding(12)
+      .borderRadius(16)
+      .backgroundColor(Color.White)
+    }
+    .width('100%')
+    .alignItems(HorizontalAlign.Start)
+  }
+
+  @Builder
+  BottomOperate() {
+    Row() {
+      Button('立即支付', { type: ButtonType.Capsule, stateEffect: true })
+        .width('100%')
+        .backgroundColor($r('app.color.common_theme_color'))
+        .fontColor($r('sys.color.font_on_primary'))
+        .onClick(() => {
+          this.submit();
+        })
+    }
+    .width('100%')
+    .padding({
+      left: this.breakPointModel.pagePadding,
+      right: this.breakPointModel.pagePadding,
+      bottom: 12,
+    })
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
   }
 }

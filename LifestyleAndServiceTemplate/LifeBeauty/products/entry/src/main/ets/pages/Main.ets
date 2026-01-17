@@ -1,6 +1,11 @@
-import { CommonConstants } from 'foundation';
+import { CommonConstants, CustomShareModel,
+  getGroupList,
+  getSingleVisitCardList,
+  OrderType, RouterMap, RouterModule,
+} from 'foundation';
 import { Home } from 'home';
 import { Mine } from 'mine';
+import { AppStorageV2 } from '@kit.ArkUI';
 
 class TabItemModel {
   label: ResourceStr = '';
@@ -13,10 +18,52 @@ export function MainBuilder() {
   Main()
 }
 
-@Entry
 @ComponentV2
 struct Main {
   @Local selectedIndex: number = 0;
+  @Local shareRouter: CustomShareModel = AppStorageV2.connect(CustomShareModel, () => new CustomShareModel())!;
+
+  aboutToAppear(): void {
+    if (this.shareRouter.id) {
+      this.formShareChange()
+    }
+  }
+
+  @Monitor('shareRouter.id')
+  formShareChange() {
+    if (this.shareRouter.id) {
+      // 通过this.shareRouter.goodsId查询商品详情，并实现页面跳转
+      this.jumpPage(this.shareRouter.pageName)
+    }
+  }
+
+  async jumpPage(url: string) {
+    let currentName: string[] = RouterModule.getStack().getAllPathName()
+    // 打开首页
+    if (currentName.length && currentName[currentName.length-1] === RouterMap.MAIN &&
+      url === RouterMap.MAIN) {
+      RouterModule.popToName(RouterMap.MAIN);
+    } else if (currentName.length && currentName[currentName.length-1] === url) {
+      // 当前页
+      const params = await this.getParams()
+      RouterModule.replace({ url, param: params });
+    } else {
+      const params = await this.getParams()
+      RouterModule.push({ url, param: params });
+    }
+  }
+
+  async getParams() {
+    const type = this.shareRouter.goodType
+    if (type === OrderType.SINGLE_CARD) {
+      const singleList = await getSingleVisitCardList();
+      const singleData = (singleList ?? []).find(item => item.id === this.shareRouter.goodId);
+      return singleData
+    }
+    const goodList = await getGroupList();
+    const groupInfo = (goodList ?? []).find(item => item.id === this.shareRouter.goodId);
+    return groupInfo
+  }
 
   @Builder
   tabBuilder(index: number, item: TabItemModel) {

@@ -1,7 +1,8 @@
+import { UtilLog as Logger } from '@hw-agconnect/util-log';
 import { CastService } from '../service/CastService';
 import { MediaData, CastSessionListener, MediaType, CastParams } from '../model/Index';
 import { RouterMap, getInstance } from '../util/Route';
-import { Logger } from '../util/MyLog';
+
 
 @ObservedV2
 export class CastControllerPageVM implements CastSessionListener {

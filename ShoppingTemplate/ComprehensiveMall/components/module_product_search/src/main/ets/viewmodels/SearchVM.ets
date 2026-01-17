@@ -1,3 +1,4 @@
+import { ToastDialog } from '@hw-agconnect/ui-toast';
 import { HistorySearchItem, HotSearchItem } from '../commons/Types';
 import { ProductSearchApis } from '../https/Apis';
 
@@ -56,7 +57,7 @@ export class SearchVM {
 
   async submitSearch(keyword: string, callback?: Callback<string>) {
     if (!keyword) {
-      this.uiContext.getPromptAction().showToast({
+      ToastDialog.showToast({
         message: '请输入搜索内容~',
       });
       return;

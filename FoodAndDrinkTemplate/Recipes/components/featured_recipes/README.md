@@ -3,7 +3,7 @@
 ## 目录
 - [简介](#简介)
 - [约束与限制](#约束与限制)
-- [快速入门](#快速入门)
+- [使用](#使用)
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
@@ -22,16 +22,24 @@
 - 设备类型：华为手机（包括双折叠和阔折叠）
 - 系统版本：HarmonyOS 5.0.4(16)及以上
 
-## 快速入门
+### 权限
+
+- 无
+
+## 使用
 
 1. 安装组件。  
    如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
    如果是从生态市场下载组件，请参考以下步骤安装组件。  
    a. 解压下载的组件包，将包中所有文件夹拷贝至您工程根目录的xxx目录下。  
-   b. 在项目根目录build-profile.json5并添加featured_recipes模块。
+   b. 在项目根目录build-profile.json5并添加base_ui和featured_recipes模块。
    ```typescript
-   // 在项目根目录的build-profile.json5填写featured_recipes路径。其中xxx为组件存在的目录名
+   // 在项目根目录的build-profile.json5填写base_ui和featured_recipes路径。其中xxx为组件存在的目录名
    "modules": [
+    {
+       "name": "base_ui",
+       "srcPath": "./xxx/base_ui",
+     },
      {
        "name": "featured_recipes",
        "srcPath": "./xxx/featured_recipes",

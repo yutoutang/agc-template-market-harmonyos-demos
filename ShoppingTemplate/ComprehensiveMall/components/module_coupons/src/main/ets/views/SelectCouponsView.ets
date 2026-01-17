@@ -1,11 +1,13 @@
+import { ComponentContent, window } from '@kit.ArkUI';
+import { BusinessError } from '@kit.BasicServicesKit'
+import { UtilLog } from '@hw-agconnect/util-log';
 import { CouponCardComp } from '../components/CouponCardComp';
 import { TabComp } from '../components/TabComp';
-import { CommonConstants, SELECT_TAB_BAR } from '../constants/Contants';
+import { CommonConstants, LOG_TAG, SELECT_TAB_BAR } from '../constants/Contants';
 import { CouponItem } from '../network/types/responseTypes/GetCouponsResp';
 import { OnPopParams, ScenarioStatus, SelectCouponParams } from '../types/Types';
 import { getCouponList, getReduceAmount, getScenarioStatus } from '../utils/Service';
 import { WindowUtil } from '../utils/WindowUtil';
-import { ComponentContent, window } from '@kit.ArkUI';
 import { FullLoading } from '../utils/FullLoading';
 
 @ComponentV2
@@ -45,11 +47,24 @@ struct SelectCouponView {
     return data;
   }
 
-  aboutToAppear() {
+  async aboutToAppear() {
     this._tabBar = SELECT_TAB_BAR;
     getCouponList().then((res) => {
       this.myCouponsAll = res;
     });
+    try {
+      if (!Coupons.uiContext) {
+        let uiContext = this.getUIContext();
+        let windowClass = await window.getLastWindow(uiContext.getHostContext());
+        Coupons.uiContext = uiContext;
+        FullLoading.init(uiContext);
+        if (windowClass) {
+          WindowUtil.init(windowClass, uiContext);
+        }
+      }
+    } catch (err) {
+      UtilLog.error(LOG_TAG, 'init context failed. error: ' + JSON.stringify(err))
+    }
   }
 
   build() {
@@ -145,7 +160,7 @@ struct SelectCouponView {
     }
     .width(CommonConstants.FULL_WIDTH)
     .height(56)
-    .padding({ top: 12, right: 14 })
+    .padding(16)
     .justifyContent(FlexAlign.End)
     .transition(TransitionEffect.translate({ y: '100%' }).animation({ duration: 100, curve: Curve.Smooth }))
   }
@@ -165,21 +180,23 @@ export class Coupons {
   };
   private static _contentNode: ComponentContent<SelectCouponParams>;
 
-  public static async select(params: SelectCouponParams) {
+  public static initContext(uiContext: UIContext) {
     if (!Coupons.uiContext) {
-      let windowClass: window.Window = await window.getLastWindow(getContext());
-      let uiContext = windowClass.getUIContext();
       Coupons.uiContext = uiContext;
-      FullLoading.init(uiContext);
-      WindowUtil.init(windowClass);
     }
+  }
 
+  public static async select(params: SelectCouponParams) {
     Coupons._contentNode = new ComponentContent(Coupons.uiContext, wrapBuilder(selectCouponViewBuilder), params);
-    Coupons.uiContext.openBindSheet(Coupons._contentNode, Coupons._sheetOption);
+    Coupons.uiContext.openBindSheet(Coupons._contentNode, Coupons._sheetOption).catch((err: BusinessError) => {
+      UtilLog.error(LOG_TAG, 'open bind sheet failed. error: ' + JSON.stringify(err))
+    })
   }
 
   public static close() {
-    Coupons.uiContext.closeBindSheet(Coupons._contentNode);
+    Coupons.uiContext.closeBindSheet(Coupons._contentNode).catch((err: BusinessError) => {
+      UtilLog.error(LOG_TAG, 'close bind sheet failed. error: ' + JSON.stringify(err))
+    })
   }
 }
 

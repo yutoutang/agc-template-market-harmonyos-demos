@@ -119,7 +119,7 @@ export struct DateCalculation {
               customContent: () => {
                 this.datePickerBuilder('start')
               },
-            })
+            }, this.getUIContext())
           });
         }
         .height(48)
@@ -145,7 +145,7 @@ export struct DateCalculation {
               customContent: () => {
                 this.textPickerBuilder()
               },
-            })
+            }, this.getUIContext())
           });
         }.height(48)
 

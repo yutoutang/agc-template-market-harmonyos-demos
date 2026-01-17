@@ -1,3 +1,4 @@
+import { ToastDialog } from '@hw-agconnect/ui-toast';
 import { fp2pxUtil } from '../common/FontUtils';
 import { BaseViewModel } from '../models/BaseViewModel';
 
@@ -9,7 +10,7 @@ export class SettingFontViewModel extends BaseViewModel {
   confirm(ratio: number) {
     this.currentRatio = ratio;
     this.fontModel.fontSizeRatio = ratio;
-    this.uiContext?.getPromptAction().showToast({ message: '字号设置已成功' });
+    ToastDialog.showToast({ message: '字号设置已成功' });
   }
 
   setUIContext(uiContext: UIContext) {

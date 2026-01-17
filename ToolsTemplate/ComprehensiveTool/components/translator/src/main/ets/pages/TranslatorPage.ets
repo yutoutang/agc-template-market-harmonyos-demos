@@ -2,6 +2,7 @@ import { getInstance, setPathStack } from '../common/CommonRoute';
 import { LanguageCheck } from '../components/LanguageCheck';
 import { TitleBar } from '../components/TitleBar';
 import { TranslatorRes } from '../components/TranslatorRes';
+import { contextUtil } from '../util/ContextUtil';
 import { TranslatorPageVM } from '../viewmodel/TranslatorPageVM';
 
 @ComponentV2
@@ -10,6 +11,7 @@ struct TranslatorPage {
   controller: TextAreaController = new TextAreaController();
 
   aboutToAppear(): void {
+    contextUtil.setUiContext(this.getUIContext())
     this.vm.clear()
   }
 

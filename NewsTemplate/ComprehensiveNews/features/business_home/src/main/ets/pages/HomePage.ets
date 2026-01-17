@@ -1,5 +1,11 @@
-import { common } from '@kit.AbilityKit';
-import { CircleButtonModifier, CommonConstants, LinearColumnModifier, NewsScan } from 'lib_common'
+import {
+  CircleButtonModifier,
+  CommonConstants,
+  LinearColumnModifier,
+  NewsScan,
+  RouterMap,
+  RouterUtils,
+} from 'lib_common'
 import { FlexLayout } from 'lib_flex_layout';
 import { NewsSearchTransition } from 'lib_widget';
 import { NavHeaderBar } from 'lib_widget';
@@ -18,7 +24,8 @@ struct HomePage {
   @Local buttonModifier: CircleButtonModifier = new CircleButtonModifier();
 
   aboutToAppear(): void {
-    this.homeViewModel.sendPushNotice(getContext(this) as common.UIAbilityContext)
+    this.homeViewModel.sendPushNotice(this.homeViewModel.contextModel.globalUIAbilityContext);
+    this.homeViewModel.preloadENewsImages();
   }
 
   build() {
@@ -72,6 +79,19 @@ struct HomePage {
       .onClick(() => {
         new NewsScan().scan()
       })
+
+      Button() {
+        SymbolGlyph($r('sys.symbol.doc_text'))
+          .fontColor([$r('sys.color.font_primary')])
+          .fontWeight(FontWeight.Normal)
+          .fontSize(24)
+      }
+      .attributeModifier(this.buttonModifier)
+      .accessibilityText('数字报纸')
+      .onClick(() => {
+        RouterUtils.pushPathByName(RouterMap.DIGITAL_NEWSPAPER, this.homeViewModel.eNewsMap);
+      })
+
     }
     .layoutWeight(1)
     .justifyContent(FlexAlign.End)

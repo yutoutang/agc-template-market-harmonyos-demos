@@ -1,9 +1,10 @@
 import avSession from '@ohos.multimedia.avsession';
+import { UtilLog as Logger } from '@hw-agconnect/util-log';
 import { AvSessionController } from './AvSessionController';
 import { CommonConstants } from '../constant/CommonConstants';
 import { CastSessionListener, CastStatusModel } from '../model/Index';
 import { CastService } from '../service/CastService';
-import { Logger } from '../util/MyLog';
+
 
 const TAG = '[AvCastController]';
 

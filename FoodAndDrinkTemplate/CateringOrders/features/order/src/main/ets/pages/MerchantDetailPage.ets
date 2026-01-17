@@ -1,3 +1,6 @@
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
+import { AppStorageV2 } from '@kit.ArkUI';
+import { callTelSheetBuilder } from 'base_ui';
 import {
   CommonUrl,
   Constants,
@@ -8,8 +11,6 @@ import {
   RouterModule,
   StoreInfoModel,
 } from 'common/Index';
-import { AppStorageV2, promptAction } from '@kit.ArkUI';
-import { callTelSheetBuilder } from 'base_ui';
 
 @Builder
 export function MerchantDetailPageBuilder() {
@@ -79,9 +80,11 @@ struct MerchantDetailPage {
                     .bindSheet($$this.callTelSheet, callTelSheetBuilder(this.storeModel.storeInfo?.tel || '', () => {
                       this.callTelSheet = false
                     }), {
-                      height: 309,
+                      detents: [309, 310],
+                      backgroundColor: $r('sys.color.background_fourth'),
                       blurStyle: BlurStyle.Thick,
-                      showClose: false,
+                      preferType: SheetType.CENTER,
+                      title: { title: $r('app.string.contact_us') },
                     });
                   Image($r('app.media.ic_map')).width(24).margin({ left: 12 })
                     .onClick(() => {
@@ -91,7 +94,7 @@ struct MerchantDetailPage {
                         let longitude: number = Number(coordinates[1])
                         RouterModule.push(RouterMap.HW_MAP_PAGE, { latitude, longitude } as HwMapModel)
                       } else {
-                        promptAction.showToast({ message: $r('app.string.store_address_error') })
+                        promptAction.showToast({ message: '商户地址错误！' })
                       }
 
                     })

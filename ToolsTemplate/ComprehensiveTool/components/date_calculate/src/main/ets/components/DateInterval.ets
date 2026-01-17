@@ -101,7 +101,7 @@ export struct DateInterval {
               customContent: () => {
                 this.datePickerBuilder('start')
               },
-            })
+            }, this.getUIContext())
           });
         }
         .height(48)
@@ -128,7 +128,7 @@ export struct DateInterval {
               customContent: () => {
                 this.datePickerBuilder('end')
               },
-            })
+            }, this.getUIContext())
           })
         }
         .height(48)

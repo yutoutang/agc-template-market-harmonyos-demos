@@ -1,4 +1,3 @@
-import { promptAction } from '@kit.ArkUI';
 import { BaseViewModel, RouterMap, RouterUtils } from 'lib_common';
 import { MessageServiceApi, MineServiceApi, PublishCommentRequest } from 'lib_news_api';
 import { CommentUtils } from 'module_feedcomment';
@@ -43,7 +42,7 @@ export class MsgCommentViewModel extends BaseViewModel {
       parentCommentId: data.commentId,
     };
     MineServiceApi.publishComment(params).then(() => {
-      promptAction.showToast({ message: '评论成功' });
+      this.contextModel.showToast({ message: '评论成功' });
     })
   }
 

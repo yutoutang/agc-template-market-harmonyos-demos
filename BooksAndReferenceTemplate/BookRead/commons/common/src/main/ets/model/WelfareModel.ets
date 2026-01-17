@@ -1,13 +1,13 @@
 import { UserInfo } from 'base_common';
 import { BusinessError, emitter } from '@kit.BasicServicesKit';
 import { Constants } from '../constant/Constants';
-import { promptAction } from '@kit.ArkUI';
 import { IncentiveAdvertising } from 'incentive_ad'
 import { common, Want } from '@kit.AbilityKit';
 
 @ObservedV2
 export class SliderList {
   @Trace sliderList: SliderModel[] = [];
+
   calculateTomorrowDate(date: number) {
     let today = new Date()
     let next = new Date(today)
@@ -19,6 +19,7 @@ export class SliderList {
     let nextDate = `${MONTH}.${DAY}`
     return nextDate;
   }
+
   constructor() {
     this.sliderList = [
       new SliderModel(10, Constants.DATE, false),
@@ -51,35 +52,48 @@ export class TaskList {
   private incentiveAD: IncentiveAdvertising = new IncentiveAdvertising()
 
   constructor() {
-    let userInfo: UserInfo = AppStorage.get('userInfo') as UserInfo
+    let userInfo: UserInfo = AppStorage.get('userInfo') as UserInfo;
+    let uiContext: UIContext = AppStorage.get('uiContext') as UIContext;
     this.taskList =
       [new TaskCoins('天天领书币', '立得100金币', 100, '去领取', '已完成', 0, 1, true, (item: TaskCoins) => {
         if (userInfo?.bookCoins) {
-          userInfo.bookCoins += 100
-          emitter.emit(Constants.COINS_CHANGE)
-          item.finished++;
-          promptAction.showToast({ message: '已领取成功' })
+          try {
+            userInfo.bookCoins += 100
+            emitter.emit(Constants.COINS_CHANGE)
+            item.finished++;
+            uiContext.getPromptAction().showToast({ message: '已领取成功' })
+          } catch (error) {
+            console.error('Failed to emitter emit coins change. Cause: ' + JSON.stringify(error));
+          }
         }
       }), new TaskCoins('看视频赚金币', '每次的5金币，可重复', 5, '去观看', '已完成', 0, 5, true,
         (item: TaskCoins) => {
+        try {
           this.incentiveAD.loadAd()
-          emitter.on(Constants.COINS_AD,()=>{
+          emitter.on(Constants.COINS_AD, () => {
             item.finished = AppStorage.get('bookFinished') as number
           })
+        } catch (e) {
+          console.error('Failed to emitter on coins ad. Cause: ' + JSON.stringify(e));
+        }
         }),
         new TaskCoins('下载菜谱App', '做任务立得100书币', 100, '去下载', '已完成', 0, 1, true, (item: TaskCoins) => {
-          const want: Want = {
-            uri: `store://appgallery.huawei.com/app/`
-          };
-          const context = getContext(this) as common.UIAbilityContext;
-          context.startAbility(want, (err: BusinessError) => {
-            if (err.code) {
-              console.error(`Failed to startAbility. Code: ${err.code}, message: ${err.message}`);
-            }
-          })
-          userInfo.bookCoins += 100
-          emitter.emit(Constants.COINS_CHANGE)
-          item.finished++;
+          try {
+            const want: Want = {
+              uri: `store://appgallery.huawei.com/app/`
+            };
+            const context = uiContext.getHostContext() as common.UIAbilityContext;
+            context.startAbility(want, (err: BusinessError) => {
+              if (err.code) {
+                console.error(`Failed to startAbility. Code: ${err.code}, message: ${err.message}`);
+              }
+            })
+            userInfo.bookCoins += 100
+            emitter.emit(Constants.COINS_CHANGE)
+            item.finished++;
+          } catch (error) {
+            console.error('Failed to emitter emit coins change. Cause: ' + JSON.stringify(error));
+          }
         })]
   }
 }

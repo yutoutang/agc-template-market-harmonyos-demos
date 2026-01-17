@@ -34,9 +34,9 @@
     ],
     "metadata": [
       {
-        // 替换应用的clientID
+// todo:替换client_id值
         "name": "client_id",
-        "value": "xxxx"
+        "value": "******"
       }
     ],
     "requestPermissions": [
@@ -48,7 +48,7 @@
         "reason": "$string:location_reason",
         "usedScene": {
           "abilities": [
-            'EntryAbility'
+            "EntryAbility"
           ],
           "when": "inuse"
         }
@@ -58,7 +58,7 @@
         "reason": "$string:location_reason",
         "usedScene": {
           "abilities": [
-            'EntryAbility'
+            "EntryAbility"
           ],
           "when": "inuse"
         }

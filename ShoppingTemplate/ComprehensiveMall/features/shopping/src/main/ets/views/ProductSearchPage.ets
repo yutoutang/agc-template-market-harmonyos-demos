@@ -1,4 +1,4 @@
-import { cache, iData, RouterMap, routerStack } from 'lib_foundation';
+import { cache, RouterMap, routerStack } from 'lib_foundation';
 import { SearchView } from 'module_product_search';
 import { CardLongTakeDelegate, LongTakeAnimationProperties, LongTakeTransitionParam } from 'module_transition';
 
@@ -55,7 +55,7 @@ struct ProductSearchPage {
         this.defaultSearch = param.defaultSearch as string
       }
     })
-    .onSizeChange((oldValue: SizeOptions, newValue: SizeOptions) => {
+    .onSizeChange((_oldValue: SizeOptions, newValue: SizeOptions) => {
       this.longTakeSession.setNewSize(newValue);
     })
   }

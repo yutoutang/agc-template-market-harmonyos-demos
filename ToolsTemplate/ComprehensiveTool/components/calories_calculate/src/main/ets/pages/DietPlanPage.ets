@@ -12,11 +12,11 @@ export function DietPlanPageBuilder() {
 @ComponentV2
 struct DietPlanPage {
   @Local vm: DietPlanPageVM = new DietPlanPageVM();
-  listener: inspector.ComponentObserver = inspector.createComponentObserver(`sliderOne`);
+  listener: inspector.ComponentObserver = this.getUIContext().getUIInspector().createComponentObserver(`sliderOne`);
 
   aboutToAppear(): void {
     this.listener.on('layout', () => {
-      this.vm.getBarInfo();
+      this.vm.getBarInfo(this.getUIContext());
     });
     this.vm.init();
   }

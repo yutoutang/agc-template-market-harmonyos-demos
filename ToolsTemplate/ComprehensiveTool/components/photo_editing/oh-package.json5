@@ -5,5 +5,10 @@
   "main": "Index.ets",
   "author": "",
   "license": "Apache-2.0",
-  "dependencies": {}
+  "dependencies": {
+    "@hw-agconnect/util-log": "^1.0.0",
+    "module_base": "../module_base",
+    "membership": "../membership",
+    "aggregated_login": "../aggregated_login"
+  }
 }

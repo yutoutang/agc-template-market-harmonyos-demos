@@ -4,7 +4,7 @@
 
 - [简介](#简介)
 - [约束与限制](#约束与限制)
-- [快速入门](#快速入门)
+- [使用](#使用)
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
@@ -31,7 +31,7 @@
 
 如需使用模拟器调试组件，请将DevEco Studio升级至6.0.0 Release及以上版本，模拟器新建设备选择HarmonyOs 6.0.0(20)及以上版本。
 
-## 快速入门
+## 使用
 
 1. 开发者需要前往[鲸鸿动能媒体服务平台](https://developer.huawei.com/consumer/cn/doc/monetize/zhucerenzheng-0000001132395957)注册开发者账号并认证，并参考[展示位创建](https://developer.huawei.com/consumer/cn/doc/monetize/zhanshiweichuangjian-0000001132700049)创建广告展示位用于开发调试。
 2. 安装组件。  

@@ -2,8 +2,8 @@ import { common } from '@kit.AbilityKit';
 import { picker, fileIo as fs } from '@kit.CoreFileKit';
 import { media } from '@kit.MediaKit';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { UtilLog as Logger } from '@hw-agconnect/util-log';
 import { MediaType, CastParams } from '../model/Index';
-import { Logger } from '../util/MyLog';
 import { toastUtil } from '../util/ToastUtil';
 
 @ComponentV2

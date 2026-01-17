@@ -1,3 +1,5 @@
+import { RouterMap } from './RouterMap';
+
 /**
  * Common constants
  */
@@ -16,4 +18,11 @@ export class CommonConstants {
   static readonly SIX_PERCENT: string = '60%';
   static readonly HALF_PERCENT: string = '50%';
   static readonly NAVI_BAR_WIDTH: string = '40%';
+  //todo 支持华为应用内分享的页面
+  static readonly SHARE_PAGES: string[] = [
+    RouterMap.MAIN,
+    RouterMap.GROUP_DETAIL,
+    RouterMap.GOOD_DETAIL,
+    RouterMap.SINGLE_CARD_DETAIL,
+  ]
 }

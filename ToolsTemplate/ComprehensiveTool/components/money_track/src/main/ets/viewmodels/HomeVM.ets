@@ -1,3 +1,4 @@
+import { UtilLog } from '@hw-agconnect/util-log';
 import { promptAction } from '@kit.ArkUI';
 import { emitter } from '@kit.BasicServicesKit';
 import dayjs from 'dayjs';
@@ -155,9 +156,9 @@ export class HomeVM {
     return this.currentResourceItem?.name ?? '全部类型';
   }
 
-  public async initData(stack:NavPathStack) {
+  public async initData(stack:NavPathStack, uiContext: UIContext) {
     this.stack = stack
-    await AccountingDB.initialize(getContext());
+    await AccountingDB.initialize(uiContext.getHostContext()!);
     await this.refreshBill();
     EventBus.instance.on(EventKey.GLOBAL_REFRESH_EVENT, () => {
       this.refreshBill();
@@ -178,10 +179,14 @@ export class HomeVM {
   public async refreshBill() {
     this.listData.getBillReport(this.checkedResource);
     this.chartData.getBillReport()
-    emitter.emit({ eventId: 1 });
+    try {
+      emitter.emit({ eventId: 1 });
+    } catch (e) {
+      UtilLog.error(`refreshBill failed with `)
+    }
   }
 
-  public async deleteBill(id: number) {
+  public async deleteBill(id: number, uiContext: UIContext) {
     this.stack.pushPath({
       name: DialogMap.COMMON_CONFIRM,
       param: {
@@ -191,7 +196,7 @@ export class HomeVM {
         const result = value.result as DialogInfo<ConfirmParam>;
         if (result.param?.isConfirm) {
           await AccountingDB.deleteTransactions(id);
-          promptAction.showToast({ message: '账单删除成功~' });
+          uiContext.getPromptAction().showToast({ message: '账单删除成功~' });
           EventBus.instance.emit(EventKey.GLOBAL_REFRESH_EVENT);
         }
       },

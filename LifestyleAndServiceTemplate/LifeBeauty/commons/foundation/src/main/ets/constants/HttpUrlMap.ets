@@ -21,6 +21,7 @@ export enum HttpUrlMap {
   GET_GROUP_LIST = '/api/metaservice/group/list',
   PRE_ORDER = '/api/metaservice/order',
   GET_MY_SINGLE_VISIT_CARD_LIST = '/api/metaservice/card/list/buy',
+  UPDATE_MY_SINGLE_VISIT_CARD = '/api/metaservice/card/list/update',
   GET_MY_GROUP_LIST = '/api/metaservice/group/list/buy',
   REFUND_GROUP = '/api/metaservice/group/refund',
 }

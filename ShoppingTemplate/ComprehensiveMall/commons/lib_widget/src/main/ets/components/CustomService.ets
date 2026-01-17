@@ -3,6 +3,7 @@ import { CommonSymbol } from './CommonSymbol'
 import { ContainerColumn } from './ContainerColumn'
 import { call } from '@kit.TelephonyKit'
 import { CommonButton } from './CommonButton'
+import { ToastDialog } from '@hw-agconnect/ui-toast'
 
 @Builder
 function buildCustomServiceSheet() {
@@ -70,9 +71,14 @@ export function buildMakeCallComponent() {
         title: '一键拨号',
         handleClick: () => {
           if (canIUse('SystemCapability.Applications.Contacts')) {
-            call.makeCall('01234567890');
+            call.makeCall('01234567890')
+              .catch(() => {
+                ToastDialog.showToast({ message: '跳转拨号界面失败' })
+              })
+              .finally(() => {
+                PopViewUtil.closeAllSheet()
+              })
           }
-          PopViewUtil.closeAllSheet()
         },
       })
 

@@ -8,6 +8,7 @@ import { SearchNoResult } from '../components/SearchNoResult';
 import { SortSheetCard } from '../components/SortSheetCard';
 import { Category } from '../models/Category';
 import { Note } from '../models/Note';
+import { WindowUtil } from '../utils/WindowUtil';
 import { PersonalNotesVM } from '../viewmodel/PersonalNotesVM';
 
 @Builder
@@ -18,6 +19,10 @@ export function PersonalNotesPageBuilder() {
 @ComponentV2
 export struct PersonalNotesPage {
   vm: PersonalNotesVM = new PersonalNotesVM(this.getUIContext());
+
+  aboutToAppear(): void {
+    WindowUtil.init(this.getUIContext());
+  }
 
   build() {
     NavDestination() {

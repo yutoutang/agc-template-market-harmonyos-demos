@@ -12,9 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { LoadingDialog, PersistenceV2, promptAction } from '@kit.ArkUI';
+import {  PersistenceV2 } from '@kit.ArkUI';
 import { util } from '@kit.ArkTS';
 import { fileIo as fs } from '@kit.CoreFileKit';
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
 import { PlayUtil } from '../util/PlayUtil';
 import { createFd, captureAudio, contactAudio, multipleAudio, toneAudio, extractToPCM } from '../util/ConvertUtil';
 import { getInstance, RouterMap } from '../util/Route';

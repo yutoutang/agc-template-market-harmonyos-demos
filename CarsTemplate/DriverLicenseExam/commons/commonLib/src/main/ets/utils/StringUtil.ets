@@ -194,7 +194,12 @@ export class StringUtil {
    * @returns
    */
   static strToHex(hexStr: string): Uint8Array {
-    return new Uint8Array(buffer.from(hexStr, 'hex').buffer);
+    try {
+      return new Uint8Array(buffer.from(hexStr, 'hex').buffer);
+    } catch (err) {
+      console.log(JSON.stringify(err));
+      return new Uint8Array();
+    }
   }
 
   /**
@@ -203,7 +208,12 @@ export class StringUtil {
    * @returns
    */
   static hexToStr(arr: Uint8Array): string {
-    return buffer.from(arr).toString('hex');
+    try {
+      return buffer.from(arr).toString('hex');
+    } catch (err) {
+      console.log(JSON.stringify(err))
+      return ''
+    }
   }
 
 
@@ -240,8 +250,13 @@ export class StringUtil {
    * @returns
    */
   static strToBuffer(src: string, encoding: buffer.BufferEncoding = 'utf-8'): ArrayBuffer {
-    const buf = buffer.from(src, encoding);
-    return buf.buffer;
+    try {
+      const buf = buffer.from(src, encoding);
+      return buf.buffer;
+    } catch (err) {
+      console.log(err);
+      return new ArrayBuffer(0)
+    }
   }
 
   /**
@@ -250,9 +265,15 @@ export class StringUtil {
    * @returns
    */
   static bufferToStr(src: ArrayBuffer, encoding: buffer.BufferEncoding = 'utf-8'): string {
-    const buf = buffer.from(src);
-    const result = buf.toString(encoding);
-    return result;
+    try {
+      const buf = buffer.from(src);
+      const result = buf.toString(encoding);
+      return result;
+    } catch (err) {
+      console.log(JSON.stringify(err))
+      return '';
+    }
+
   }
 
 
@@ -283,5 +304,16 @@ export class StringUtil {
    */
   static getErrnoToString(errno: number): string {
     return util.errnoToString(errno);
+  }
+
+  static getProtocolUrl(urlKey: string, context:Context,  fileName: string = 'data.json'): string {
+    try {
+      // Read files from /AppScope/resources/rawfile.
+      const value: Uint8Array = context.resourceManager.getRawFileContentSync(fileName);
+      // Return the link to the HUAWEI ID User Authentication Agreement.
+      return JSON.parse(buffer.from(value.buffer).toString())[urlKey] as string;
+    } catch (error) {
+      return '';
+    }
   }
 }

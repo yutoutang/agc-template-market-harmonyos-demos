@@ -1,11 +1,11 @@
 import {
+  AppRouter,
   BaseSelectedListItem,
   checkPhoneValid,
+  CommonFuncResult,
   Constants,
   PassengerApi,
   PassengerInfo,
-  CommonFuncResult,
-  AppRouter,
 } from 'common';
 import { MinePageModel } from '../model/MinePageModel';
 import { Decimal } from '@kit.ArkTS';
@@ -41,12 +41,12 @@ export struct AddPassengerPage {
   confirm() {
     // 校验证件号码
     if (!this.checkCardNoValid()) {
-      GlobalDialog.showToast('请填写正确的证件号');
+      GlobalDialog.showToast('请填写正确的证件号', this.getUIContext());
       return;
     }
     // 校验手机号码
     if (!checkPhoneValid(this.phone)) {
-      GlobalDialog.showToast('手机号输入错误');
+      GlobalDialog.showToast('手机号输入错误', this.getUIContext());
       return;
     }
     let param = {
@@ -56,14 +56,14 @@ export struct AddPassengerPage {
       certificateNo: this.cardNo,
       phone: this.phone,
     } as PassengerInfo;
-    GlobalDialog.showLoadingDialog()
+    GlobalDialog.showLoadingDialog(this.getUIContext())
     PassengerApi.addOrEditPassenger(param).then((res) => {
       let result: CommonFuncResult = res.result as CommonFuncResult;
       if (result.ret.code === 0 && (result.result === 0 || result.result === 1)) {
         AppRouter.pop();
       }
     }).finally(() => {
-      GlobalDialog.close()
+      GlobalDialog.close(this.getUIContext())
     })
   }
 
@@ -115,7 +115,7 @@ export struct AddPassengerPage {
 
         List() {
           ListItem() {
-            Column({space: 12}) {
+            Column({ space: 12 }) {
               Row() {
                 BaseTip({
                   text: $r('app.string.add_passenger_tip'),
@@ -136,8 +136,6 @@ export struct AddPassengerPage {
                 Text('姓名').fontWeight(FontWeight.Medium).fontSize(16)
 
                 TextInput({ text: this.name, placeholder: '请与乘机人证件一致' })
-                  .placeholderColor($r('sys.color.ohos_id_blur_style_component_thick_color_dark'))
-                  .placeholderFont({ size: 14, weight: FontWeight.Regular })
                   .maxLength(12)
                   .layoutWeight(1)
                   .contentType(ContentType.PERSON_FULL_NAME)
@@ -202,8 +200,6 @@ export struct AddPassengerPage {
                 Text('证件号码').fontWeight(FontWeight.Medium).fontSize(16)
 
                 TextInput({ text: this.cardNo, placeholder: '请请与乘机人证件一致' })
-                  .placeholderColor($r('sys.color.ohos_id_blur_style_component_thick_color_dark'))
-                  .placeholderFont({ size: 14, weight: FontWeight.Regular })
                   .maxLength(18)
                   .layoutWeight(1)
                   .contentType(this.idType)
@@ -232,15 +228,14 @@ export struct AddPassengerPage {
                   Text('手机号码').fontWeight(FontWeight.Medium).fontSize(16)
                   Text('+86').fontWeight(FontWeight.Regular).fontSize(16)
                   Divider()
-                    .strokeWidth(0.5)
-                    .color($r('sys.color.ohos_id_color_button_divider'))
+                    .color($r('sys.color.comp_divider'))
                     .height(14)
                     .vertical(true);
                 };
 
                 TextInput({ text: this.phone, placeholder: '请输入手机号码' })
                   .placeholderColor($r('sys.color.ohos_id_blur_style_component_thick_color_dark'))
-                  .placeholderFont({ size: 14, weight: FontWeight.Regular })
+                  .placeholderFont({ size: $r('sys.float.Body_L'), weight: FontWeight.Regular })
                   .layoutWeight(1)
                   .maxLength(11)
                   .contentType(ContentType.PHONE_NUMBER)
@@ -263,8 +258,9 @@ export struct AddPassengerPage {
               })
               .borderRadius(16)
             }
-            .margin({bottom: 20})
+            .margin({ bottom: 20 })
           }
+
           ListItem() {
             Button('保存', { type: ButtonType.Capsule, stateEffect: true })
               .width('100%')
@@ -281,7 +277,7 @@ export struct AddPassengerPage {
         }
         .width(Constants.FULL_PERCENT_WIDTH)
         .layoutWeight(1)
-        .padding({ left: 14, right: 14, top: 10})
+        .padding({ left: 14, right: 14, top: 10 })
         .scrollBar(BarState.Off)
         .edgeEffect(EdgeEffect.None)
       }

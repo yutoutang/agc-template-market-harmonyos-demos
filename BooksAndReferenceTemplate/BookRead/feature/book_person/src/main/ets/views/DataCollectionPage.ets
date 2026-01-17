@@ -1,11 +1,11 @@
-import { Constants, NavHeaderBar, ReturnButton } from 'common';
+import { BreakpointStorage, BreakpointSystem, BreakpointTypeEnum, Constants, NavHeaderBar, ReturnButton } from 'common';
 import { webview } from '@kit.ArkWeb';
 
 @ComponentV2
 export struct DataCollectionPage {
   @Local windowTopHeight: number = AppStorage.get('windowTopHeight') as number || 38.77;
-  controller: webview.WebviewController = new webview.WebviewController();
-
+  @Local controller: webview.WebviewController = new webview.WebviewController();
+  @Local curBreakpoint: BreakpointStorage = BreakpointSystem.currentBreakpoint
   build() {
     NavDestination() {
       Column() {
@@ -20,6 +20,7 @@ export struct DataCollectionPage {
             .fileAccess(false)
             .geolocationAccess(false)
         }
+        .width(this.curBreakpoint.value === BreakpointTypeEnum.LG ? '70%' : '100%')
       }
       .width(Constants.FULL_SIZE)
       .height(Constants.FULL_SIZE)

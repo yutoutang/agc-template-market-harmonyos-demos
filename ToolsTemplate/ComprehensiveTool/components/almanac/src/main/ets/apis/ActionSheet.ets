@@ -5,6 +5,7 @@ import { cryptoFramework } from '@kit.CryptoArchitectureKit';
  * ActionSheetOption 类型
  */
 class ActionSheetOption {
+  uiContext: UIContext | null = null;
   /**
    * 模态框id
    */
@@ -93,9 +94,9 @@ class ActionSheet {
    */
   public async show(option: ActionSheetOption) {
     let sheetKey = option.id ?? await this.getUniKey();
+    this.uiContext = option.uiContext
     if (this.uiContext === null) {
-      let windowClass: window.Window = await window.getLastWindow(getContext());
-      this.uiContext = windowClass.getUIContext();
+      return ''
     }
     let params = new ActionSheetParams(option);
     params.id = sheetKey;

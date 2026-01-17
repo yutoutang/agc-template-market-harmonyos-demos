@@ -1,6 +1,6 @@
 import { media } from '@kit.MediaKit';
 import { AVVolumePanel } from '@kit.AudioKit';
-import { emitter } from '@kit.BasicServicesKit';
+import { BusinessError, emitter } from '@kit.BasicServicesKit';
 import { LongTakeAnimationProperties } from 'module_transition';
 import { Battery } from '../components/Battery';
 import { VideoProgressBar } from '../components/VideoProgressBar';
@@ -12,11 +12,14 @@ import { PlayerSpeedRateView } from '../components/PlayerSpeedRateView';
 import { PlayerSlider } from '../components/PlayerSlider';
 import { PlayerSliderModel, SliderType } from '../models/PlayerSliderModel';
 import { BreakpointModel } from '../models/BreakpointModel';
+import { Logger } from '../utils/Logger';
 
 @Builder
 export function LandscapeVideoBuilder() {
   LandscapeVideo()
 }
+
+const TAG = '[LandscapeVideo]';
 
 @ComponentV2
 export struct LandscapeVideo {
@@ -53,7 +56,9 @@ export struct LandscapeVideo {
               if (this.vm.player) {
                 this.vm.player.surfaceId = surfaceId;
               }
-              this.vm.player?.play()
+              this.vm.player?.play().catch((e: BusinessError) => {
+                Logger.error(TAG, 'play fail, error: ' + JSON.stringify(e));
+              });
             })
         }
         .height('100%')
@@ -97,6 +102,7 @@ export struct LandscapeVideo {
                 selectedColor: Color.White,
                 trackColor: $r('app.color.landscape_slide_track_color'),
                 isFullScreen: true,
+                isHideSlide: this.vm.isHideSlide,
                 progressController: this.vm.progressController,
                 onSwitchPlayCallback: () => {
                   this.vm.switchPlayOrPause()
@@ -137,7 +143,7 @@ export struct LandscapeVideo {
                 slideHeight: 14,
               })
             }
-            .visibility(this.vm.isLockScreen ? Visibility.Visible : Visibility.Hidden)
+            .visibility(this.vm.isLockScreen && !this.vm.isHideSlide ? Visibility.Visible : Visibility.Hidden)
             .width(Constants.FULL_PERCENT)
             .padding({ left: Constants.PADDING_L, right: Constants.PADDING_L })
             .alignRules({
@@ -174,9 +180,13 @@ export struct LandscapeVideo {
                 }
               }),
             // 双击暂停或播放
-            TapGesture({count: 2})
+            TapGesture({ count: 2 })
               .onAction((event: GestureEvent) => {
                 if (!event) {
+                  return
+                }
+                // 页面锁住时，不能进行操作
+                if (this.vm.isLockScreen) {
                   return
                 }
                 if (!this.vm.isBuffering) {
@@ -184,7 +194,7 @@ export struct LandscapeVideo {
                 }
               }),
             // 单击显隐外层视图
-            TapGesture({count: 1})
+            TapGesture({ count: 1 })
               .onAction((event: GestureEvent) => {
                 if (event) {
                   this.vm.handleClickScreen()
@@ -207,18 +217,30 @@ export struct LandscapeVideo {
             // 横向滑动更新进度条
             PanGesture({ direction: PanDirection.Horizontal })
               .onActionStart((event?: GestureEvent) => {
+                if (this.vm.isHideSlide) {
+                  return
+                }
                 this.vm.handleProgressStart(event)
               })
               .onActionUpdate((event?: GestureEvent) => {
+                if (this.vm.isHideSlide) {
+                  return
+                }
                 this.vm.handleProgressUpdate(event)
               })
               .onActionCancel(() => {
+                if (this.vm.isHideSlide) {
+                  return
+                }
                 this.vm.handleProgressEnd();
               })
               .onActionEnd(() => {
+                if (this.vm.isHideSlide) {
+                  return
+                }
                 this.vm.handleProgressEnd()
-              })
-          )
+              }),
+          ),
         )
       }
       .enableAnimation(false)
@@ -235,9 +257,11 @@ export struct LandscapeVideo {
       this.vm.videoHeight = param.videoHeight as number
       this.vm.videoTitle = param.videoTitle as string
       this.vm.breakpointModel = param.breakpointModel as BreakpointModel
-
+      this.vm.isMute = param.isMute as boolean
+      this.vm.isHideSlide = param.isHideSlide as boolean
       // 音量初始化
       this.vm.volumeUtil.init()
+      this.vm.setMute()
       // 设置亮度
       this.vm.volumeUtil.updateBrightness(this.getUIContext().getHostContext() as Context)
       // 状态监听
@@ -245,7 +269,7 @@ export struct LandscapeVideo {
         // 横屏时，播放完之后会重头播放，需要保持播放状态
         this.vm.isPlaying = state === AVPlayerState.PLAYING || state === AVPlayerState.COMPLETED
       });
-      this.vm.playerSession?.onEvent('bufferingUpdate', (infoType: media.BufferingInfoType, value: number) => {
+      this.vm.playerSession?.onEvent('bufferingUpdate', (infoType: media.BufferingInfoType) => {
         if (infoType === media.BufferingInfoType.BUFFERING_START) {
           this.vm.isBuffering = true;
         }
@@ -259,13 +283,21 @@ export struct LandscapeVideo {
     .onBackPressed(() => {
       return this.onBackPressed();
     })
-    .onAppear(() => {
-      this.vm.windowClass!.setSpecificSystemBarEnabled('navigationIndicator', false);
-      this.vm.windowClass!.setSpecificSystemBarEnabled('status', false);
+    .onAppear(async () => {
+      try {
+        await this.vm.windowClass!.setSpecificSystemBarEnabled('navigationIndicator', false);
+        await this.vm.windowClass!.setSpecificSystemBarEnabled('status', false);
+      } catch (e) {
+        Logger.error(TAG, 'onAppear setSpecificSystemBarEnabled fail, error: ' + JSON.stringify(e));
+      }
     })
-    .onDisAppear(() => {
-      this.vm.windowClass!.setSpecificSystemBarEnabled('navigationIndicator', true);
-      this.vm.windowClass!.setSpecificSystemBarEnabled('status', true);
+    .onDisAppear(async () => {
+      try {
+        await this.vm.windowClass!.setSpecificSystemBarEnabled('navigationIndicator', true);
+        await this.vm.windowClass!.setSpecificSystemBarEnabled('status', true);
+      } catch (e) {
+        Logger.error(TAG, 'onDisAppear setSpecificSystemBarEnabled fail, error: ' + JSON.stringify(e));
+      }
     })
   }
 
@@ -407,7 +439,7 @@ export struct LandscapeVideo {
     }
     .width('100%')
     .justifyContent(FlexAlign.Center)
-    .offset({top: 80})
+    .offset({ top: 80 })
     .zIndex(2)
   }
 }
@@ -418,7 +450,7 @@ struct VolumePanelView {
   @State volume: number = 0
 
   aboutToAppear(): void {
-    emitter.on('systemVolumeChange',  (eventData: emitter.EventData) => {
+    emitter.on('systemVolumeChange', (eventData: emitter.EventData) => {
       this.volume = eventData.data!.volume * 15
     })
   }
@@ -429,9 +461,9 @@ struct VolumePanelView {
       volumeParameter: {
         position: {
           x: -50,
-          y: 150
-        }
-      }
+          y: 150,
+        },
+      },
     })
       .width(100)
   }

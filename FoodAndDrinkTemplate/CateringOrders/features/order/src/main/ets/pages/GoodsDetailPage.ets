@@ -1,11 +1,24 @@
-import { AppStorageV2, promptAction } from '@kit.ArkUI';
-import { MustGoodsController } from '../models/MustGoodsController';
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
+import { UtilLog } from '@hw-agconnect/util-log';
+import { AppStorageV2 } from '@kit.ArkUI';
+import {
+  Constants,
+  CustomShareParams,
+  GridRowColSetting,
+  MustGoodsController,
+  NavHeaderBar,
+  PackageSpec,
+  RouterMap,
+  RouterModule,
+  WindowModel,
+} from 'common';
+import { GoodsDetail } from 'goods_detail';
 import { GoodsResp, GoodsSpecResp, PackageSpecResp, SpecCatalogResp, SpecItemResp } from 'network';
 import * as API from '../api/Index';
-import { Goods } from '../models/Index';
-import { Constants, NavHeaderBar, PackageSpec, RouterMap, RouterModule, WindowModel } from 'common';
 import { goodsInfoMapper } from '../mapper/Index';
-import { GoodsDetail } from 'goods_detail';
+import { Goods } from '../models/Index';
+
+const TAG = '[GoodsDetailPage]'
 
 @Builder
 export function GoodsDetailPageBuilder() {
@@ -14,19 +27,26 @@ export function GoodsDetailPageBuilder() {
 
 @ComponentV2
 struct GoodsDetailPage {
-  @Consumer('mustGoodsCtrl') mustGoodsCtrl: MustGoodsController = new MustGoodsController();
+  @Local breakpoint: string = '';
+  @Local mustGoodsCtrl: MustGoodsController =
+    AppStorageV2.connect(MustGoodsController, () => new MustGoodsController())!
   @Local goodsInfo: Goods = new Goods();
   @Local goodSpecList: Array<SpecCatalogResp> = [];
   @Local selectSpecArr: Array<PackageSpecResp> = [];
   @Local selectSpecInfo?: GoodsSpecResp = undefined;
   @Local goodSinglePrice: number = 0;
   @Local windowModel: WindowModel = AppStorageV2.connect(WindowModel, () => new WindowModel())!;
+  @Local shareParams: CustomShareParams = AppStorageV2.connect(CustomShareParams, () => new CustomShareParams())!;
   private goodsId: string = '';
 
   aboutToAppear(): void {
     this.getParams();
     API.getGoodInfo(this.goodsId).then((resp: GoodsResp) => {
       this.goodsInfo = goodsInfoMapper(resp);
+      // 分享参数存储
+      this.shareParams.pageName = RouterMap.GOODS_DETAIL_PAGE;
+      this.shareParams.goodsId = this.goodsInfo.id;
+      this.shareParams.goodsName = this.goodsInfo.name;
       if (resp.spec?.length && resp.spec?.length > 0) {
         this.goodSpecList = resp.spec ?? [];
         this.selectSpecArr = this.goodSpecList.map((item: SpecCatalogResp) => {
@@ -44,7 +64,6 @@ struct GoodsDetailPage {
       } else {
         this.goodSinglePrice = Number(resp.money);
       }
-
     });
   }
 
@@ -57,26 +76,33 @@ struct GoodsDetailPage {
 
   build() {
     NavDestination() {
-      Column() {
-        NavHeaderBar({ title: $r('app.string.good_details'), hasBgColor: false })
-          .backgroundImage($r('app.media.background'))
-          .backgroundImageSize(ImageSize.Cover);
-        GoodsDetail({
-          goodsInfo: this.goodsInfo,
-          goodSpecList: this.goodSpecList,
-          goodSinglePrice: this.goodSinglePrice,
-          selectSpecArr: this.selectSpecArr,
-          clickAddCarCb: (goodNum: number) => {
-            this.clickAddCar(goodNum)
-          },
-          getSelectSpec: (item: SpecItemResp, index: number) => {
-            this.getSelectSpec(item, index)
-          },
-        }).layoutWeight(1)
-
-      }.margin({ bottom: this.windowModel.getWindowBottomHeight() });
-
-    }.hideTitleBar(true);
+      GridRow(GridRowColSetting.DEFAULT_GRID_ROW_OPTIONS) {
+        GridCol({ span: GridRowColSetting.GRID_ROW_OPTIONS_COLUMNS }) {
+          Column() {
+            NavHeaderBar({ title: $r('app.string.good_details') })
+            GoodsDetail({
+              breakpoint: this.breakpoint,
+              goodsInfo: this.goodsInfo,
+              goodSpecList: this.goodSpecList,
+              goodSinglePrice: this.goodSinglePrice,
+              selectSpecArr: this.selectSpecArr,
+              clickAddCarCb: (goodNum: number) => {
+                this.clickAddCar(goodNum)
+              },
+              getSelectSpec: (item: SpecItemResp, index: number) => {
+                this.getSelectSpec(item, index)
+              },
+            }).layoutWeight(1)
+          }.margin({ bottom: this.windowModel.getWindowBottomHeight() });
+        }
+      }.onBreakpointChange((bp) => {
+        this.breakpoint = bp;
+      })
+    }.hideTitleBar(true).onWillDisappear(() => {
+      this.shareParams.goodsId = '';
+      this.shareParams.goodsName = '';
+      this.shareParams.pageName = '';
+    });
   }
 
   getSelectSpec(item: SpecItemResp, index: number) {
@@ -94,31 +120,31 @@ struct GoodsDetailPage {
   clickAddCar(goodNum: number) {
     if (this.goodSpecList.length) {
       if (!this.selectSpecInfo) {
-        console.error(`add car selectSpecInfo empty.`);
+        UtilLog.error(TAG, `add car selectSpecInfo empty.`);
         return;
       }
       API.addCarSpec(this.selectSpecInfo, this.goodsInfo?.id ?? '', Number(goodNum)).then(() => {
-        promptAction.showToast({ message: $r('app.string.add_success') });
+        promptAction.showToast({ message: '添加成功！' });
         if (this.goodsInfo?.isMust === Constants.GOODS_MUST) {
           this.mustGoodsCtrl.addIsMust(Number(goodNum));
         }
         RouterModule.pop();
       }).catch(() => {
-        promptAction.showToast({ message: $r('app.string.add_failed') });
+        promptAction.showToast({ message: '添加失败！' });
       });
     } else {
       if (this.goodsInfo) {
         API.addCar(this.goodsInfo, Number(goodNum)).then(() => {
-          promptAction.showToast({ message: $r('app.string.add_success') });
+          promptAction.showToast({ message: '添加成功！' });
           if (this.goodsInfo?.isMust === Constants.GOODS_MUST) {
             this.mustGoodsCtrl.addIsMust(Number(goodNum));
           }
           RouterModule.pop();
         }).catch(() => {
-          promptAction.showToast({ message: $r('app.string.add_failed') });
+          promptAction.showToast({ message: '添加失败！' });
         });
       } else {
-        console.error(`add car goodInfo empty.`);
+        UtilLog.error(TAG, `add car goodInfo empty.`);
       }
 
     }

@@ -1,9 +1,8 @@
-import { promptAction, CustomContentDialog } from '@kit.ArkUI';
+import { CustomContentDialog } from '@kit.ArkUI';
 import { call } from '@kit.TelephonyKit';
-import { BusinessError } from '@kit.BasicServicesKit';
 import { baseActionSheet } from 'base_common';
 import { UserInfo } from 'base_common';
-import { Constants, NavHeaderBar, TCRouter } from 'common';
+import { BreakpointStorage, BreakpointSystem, BreakpointTypeEnum, Constants, NavHeaderBar, TCRouter } from 'common';
 import { AvatarIcon } from '../comp/SelectAvatarCard';
 
 
@@ -16,6 +15,7 @@ export struct AboutPage {
   @Local windowTopHeight: number = AppStorage.get('windowTopHeight') as number || 38.77;
   @Local isLatestVersion: boolean = false
   @Local updateProgress: number = 0
+  @Local curBreakpoint: BreakpointStorage = BreakpointSystem.currentBreakpoint
   timerId?: number
   updateDialogController: CustomDialogController = new CustomDialogController({
     builder: CustomContentDialog({
@@ -166,14 +166,11 @@ export struct AboutPage {
       .borderRadius(20)
       .backgroundColor('#E84026')
       .onClick(() => {
-        call.makeCall('000000',
-          (err: BusinessError) => {
-            if (err) {
-              console.error(`makeCall fail, err->${JSON.stringify(err)}`);
-            } else {
-              console.log(`makeCall success`);
-            }
-          });
+        try {
+          call.makeCall('000000')
+        } catch (err) {
+          console.error(`makeCall fail, err->${JSON.stringify(err)}`);
+        }
       })
 
       Row() {
@@ -216,8 +213,8 @@ export struct AboutPage {
               .textAlign(TextAlign.Start)
             if (!this.isLatestVersion) {
               Image($r('app.media.red_dot'))
-                .width(6)
-                .height(6)
+                .width(8)
+                .height(8)
                 .objectFit(ImageFit.Contain)
             }
           }
@@ -241,7 +238,7 @@ export struct AboutPage {
             .fontColor($r('sys.color.font_secondary'))
           Row(){
             Image($r('app.media.ic_arrow_right'))
-              .width(7)
+              .width(8)
               .height(14)
               .objectFit(ImageFit.Contain)
           }
@@ -259,7 +256,7 @@ export struct AboutPage {
       .justifyContent(FlexAlign.SpaceBetween)
       .onClick(() => {
         if(this.isLatestVersion) {
-          promptAction.showToast({ message: '已是最新版本' })
+          this.getUIContext().getPromptAction().showToast({ message: '已是最新版本' })
         } else {
           this.updateDialogController.open()
         }
@@ -286,7 +283,7 @@ export struct AboutPage {
         Row({space :4}){
           Row(){
             Image($r('app.media.ic_arrow_right'))
-              .width(7)
+              .width(8)
               .height(14)
               .objectFit(ImageFit.Contain)
           }
@@ -323,7 +320,7 @@ export struct AboutPage {
           .textAlign(TextAlign.Start)
         Row(){
           Image($r('app.media.ic_arrow_right'))
-            .width(7)
+            .width(8)
             .height(14)
             .objectFit(ImageFit.Contain)
         }
@@ -353,7 +350,7 @@ export struct AboutPage {
           .textAlign(TextAlign.Start)
         Row(){
           Image($r('app.media.ic_arrow_right'))
-            .width(7)
+            .width(8)
             .height(14)
             .objectFit(ImageFit.Contain)
         }
@@ -392,21 +389,24 @@ export struct AboutPage {
         hasBgColor: false,
         isMainPage: false,
       })
-      Column({space: 77}) {
-        Column({space: 8}){
-          Image($r('app.media.startIcon'))
-            .width(72)
-            .height(72)
-            .borderRadius(16)
-            .objectFit(ImageFit.Contain)
-          Text('阅读模板')
-            .width(328)
-            .height(21)
-            .fontSize(16)
-            .fontWeight(500)
-            .textAlign(TextAlign.Center)
+      Column() {
+        Column({space:70}){
+          Column({space: 8}){
+            Image($r('app.media.startIcon'))
+              .width(72)
+              .height(72)
+              .borderRadius(16)
+              .objectFit(ImageFit.Contain)
+            Text('阅读模板')
+              .width(328)
+              .height(21)
+              .fontSize(16)
+              .fontWeight(500)
+              .textAlign(TextAlign.Center)
+          }
+          this.aboutCardView()
         }
-        this.aboutCardView()
+
         Column(){
           Text('XXXX备xxxxxxxx号-xxxx')
             .fontSize(12)
@@ -418,15 +418,16 @@ export struct AboutPage {
             .fontSize(12)
             .fontColor('#99000000')
         }
-        .margin({top:100})
       }
       .padding({
         left:16,
         right:16,
-        top:24
+        top:24,
+        bottom:40
       })
-      .width(Constants.FULL_SIZE)
-      .height(Constants.FULL_SIZE)
+      .width(this.curBreakpoint.value === BreakpointTypeEnum.LG?'70%':Constants.FULL_SIZE)
+      .layoutWeight(1)
+      .justifyContent(FlexAlign.SpaceBetween)
     }
     .hideTitleBar(true)
     .width(Constants.FULL_SIZE)

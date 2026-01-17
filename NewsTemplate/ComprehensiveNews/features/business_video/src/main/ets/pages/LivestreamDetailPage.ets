@@ -1,8 +1,23 @@
-import { uiObserver, UIUtils, window } from '@kit.ArkUI';
+import { uiObserver, UIUtils, window, AppStorageV2 } from '@kit.ArkUI';
+import { Context } from '@kit.AbilityKit';
 import {
   BreakpointNameEnum,
-  CircleButtonModifier, CommonConstants, CommonDataSource, RouterMap, RouterUtils } from 'lib_common'
-import { VideoCard, VideoCardPlayerController, VideoNetworkModel, VideoNetworkSetting } from 'module_swipeplayer';
+  CircleButtonModifier,
+  CommonConstants,
+  CommonDataSource,
+  RouterMap,
+  RouterUtils,
+  GridRowColSetting,
+} from 'lib_common'
+import { VideoPipViewModel } from 'lib_av_details';
+import {
+  AVPlayerSession,
+  PiPWindowModel,
+  VideoCard,
+  VideoCardPlayerController,
+  VideoNetworkModel,
+  VideoNetworkSetting,
+} from 'module_swipeplayer';
 import { LongTakeAnimationProperties } from 'module_transition';
 import { CommentInfo } from 'module_feedcomment';
 import { TabNav, VideoNewsData } from '../models/VideoModel';
@@ -17,6 +32,8 @@ export function LivestreamDetailPageBuilder() {
   LivestreamDetailPage()
 }
 
+const TAG = '[LivestreamDetailPage]';
+
 @ComponentV2
 export struct LivestreamDetailPage {
   @Local detailData: VideoNewsData | undefined = undefined;
@@ -24,15 +41,16 @@ export struct LivestreamDetailPage {
   // 路由栈
   pathStack = new NavPathStack()
   videoCardPlayerController: VideoCardPlayerController = new VideoCardPlayerController();
-  @Provider() navDestinationUpdateListeners: Map<string, (info: uiObserver.NavDestinationInfo) => void> = new Map();
+  @Local pipWindowModel: PiPWindowModel = AppStorageV2.connect(PiPWindowModel, () => new PiPWindowModel())!;
   // 评论的懒加载数据源
   @Provider() commentListDataSource: CommonDataSource<CommentInfo> = new CommonDataSource<CommentInfo>();
   @Local longTakeSession: LongTakeAnimationProperties = new LongTakeAnimationProperties();
   @Local commentListScroller: LivestreamCommentListScroller = new LivestreamCommentListScroller()
   vm: LivestreamDetailPageVM = new LivestreamDetailPageVM();
   @Local buttonModifier: CircleButtonModifier = new CircleButtonModifier();
+  @Local videoPipModel:VideoPipViewModel = new VideoPipViewModel()
   private landscapeListener = (info: uiObserver.NavDestinationInfo) => {
-    this.navDestinationUpdateListeners.forEach((callback, key) => {
+    this.pipWindowModel.navDestinationUpdateListeners.forEach((callback, key) => {
       if (key === 'landscapeListener') {
         callback(info)
       }
@@ -43,19 +61,37 @@ export struct LivestreamDetailPage {
     const allPathStack = RouterUtils.getStack().getAllPathName()
     const lastPathName = allPathStack[allPathStack.length - 1];
     if (lastPathName === RouterMap.LIVESTREAM_DETAIL_PAGE) {
-      let eventType = window.WindowStageEventType;
-      if (type === eventType.RESUMED || type === eventType.SHOWN) {
-        this.videoCardPlayerController.play()
-      } else if (type === eventType.PAUSED || type === eventType.HIDDEN) {
-        this.videoCardPlayerController.pause()
+      // 不展示画中画时，保持原有逻辑
+      if (!this.vm.settingInfo.network.enableLivePiP) {
+        if (type === window.WindowStageEventType.RESUMED || type === window.WindowStageEventType.SHOWN) {
+          this.videoCardPlayerController.play()
+          this.pipWindowModel.isBackgroundPip = false;
+        } else if (type === window.WindowStageEventType.PAUSED || type === window.WindowStageEventType.HIDDEN) {
+          this.videoCardPlayerController.pause()
+          this.pipWindowModel.isBackgroundPip = true;
+        }
       }
     }
+  }
+
+
+  @Computed
+  get isTablet() {
+    return [BreakpointNameEnum.LG, BreakpointNameEnum.XL].includes(this.vm.breakPointModel.currentBreakpoint);
+  }
+
+  @Computed
+  get videoBoxHeight() {
+    if ([BreakpointNameEnum.LG, BreakpointNameEnum.XL].includes(this.vm.breakPointModel.currentBreakpoint)) {
+      return '100%'
+    }
+    return this.vm.breakPointModel.currentBreakpoint === BreakpointNameEnum.SM ? 200 : 400
   }
 
   aboutToAppear(): void {
     // 无感监听路由变化
     uiObserver.on('navDestinationUpdate', this.landscapeListener);
-
+    this.videoPipModel.setContext(this.getUIContext().getHostContext() as Context)
     this.vm.windowStageModel.windowStageEventListeners.delete('livestreamDetailPage');
     this.vm.windowStageModel.windowStageEventListeners.set('livestreamDetailPage', (type) => {
       this.windowStageEventCallback(type)
@@ -73,97 +109,177 @@ export struct LivestreamDetailPage {
     return $r('sys.color.font_primary')
   }
 
+  onBack() {
+    this.videoPipModel.enableVideoPip(this.detailData!.id)
+    RouterUtils.pop();
+  }
+
   build() {
     NavDestination() {
       // 头部
       this.headerBuilderView();
+      GridRow({
+        columns: GridRowColSetting.GRID_ROW_OPTIONS_COLUMNS
+      }) {
+        GridCol({
+          span: {
+            sm: 4,
+            md: 8,
+            lg: 8,
+          }
+        }) {
+          Column() {
+            Stack({ alignContent: Alignment.TopStart }) {
+              Column() {
+                VideoCard({
+                  currentIndex: 0,
+                  index: 0,
+                  videoData: this.detailData,
+                  isShown: true,
+                  videoNetwork: this.vm.networkModel as VideoNetworkModel,
+                  videoNetworkSetting: this.vm.settingInfo.network as VideoNetworkSetting,
+                  currentBreakpoint: this.vm.breakPointModel.currentBreakpoint,
+                  videoCardPlayerController: this.videoPipModel.getVideoCardPlayerController(),
+                  isFromDetailCard: true,
+                  completedBtnBuilder: this.isLivestream ? wrapBuilder(liveCompletedBtnView) :
+                    wrapBuilder(completedBtnView),
+                  canChangeSlide: !this.isLivestream,
+                  isHideSlide: this.isLivestream,
+                  pathStack: this.pathStack,
+                  xComponentReadyCallback: (controller: XComponentController) => {
+                    this.videoPipModel.setMXComponentController(controller)
+                    this.videoPipModel.handlePip()
+                  },
+                })
+                  .clip(true)
+              }
+              .width('100%')
+              .height(this.videoBoxHeight)
+              .justifyContent(FlexAlign.Center)
+              .alignItems(HorizontalAlign.Center)
+              .backgroundColor(Color.Black)
 
-      Stack({ alignContent: Alignment.TopStart }) {
-        Column() {
-          VideoCard({
-            currentIndex: 0,
-            index: 0,
-            videoData: this.detailData,
-            isShown: true,
-            videoNetwork: this.vm.networkModel as VideoNetworkModel,
-            videoNetworkSetting: this.vm.settingInfo.network as VideoNetworkSetting,
-            currentBreakpoint: this.vm.breakPointModel.currentBreakpoint,
-            videoCardPlayerController: this.videoCardPlayerController,
-            isFromDetailCard: true,
-            canChangeSlide: !this.isLivestream,
-            pathStack: this.pathStack,
-          })
-            .clip(true)
-        }
-        .width('100%')
-        .height(this.vm.breakPointModel.currentBreakpoint === BreakpointNameEnum.SM ? 200 : 400)
-        .justifyContent(FlexAlign.Center)
-        .alignItems(HorizontalAlign.Center)
-        .backgroundColor(Color.Black)
+              Column() {
+                // 头部
+                Row() {
+                  Button() {
+                    SymbolGlyph($r('sys.symbol.chevron_backward'))
+                      .fontColor([$r('sys.color.white')])
+                      .fontWeight(FontWeight.Normal)
+                      .fontSize($r('app.float.normal_img_size'))
+                  }
+                  .attributeModifier(this.buttonModifier)
+                  .accessibilityText('返回')
+                  .onClick(() => {
+                    this.onBack();
+                  })
+                }
+                .height(56)
+                .padding({left: CommonConstants.PADDING_L})
+                .alignItems(VerticalAlign.Center)
+                .visibility(this.isTablet ? Visibility.Visible : Visibility.None)
 
-        Row({ space: CommonConstants.SPACE_S }) {
-          Row({ space: 2 }) {
-            Image(this.isLivestream ? $r('app.media.ic_live') : $r('app.media.ic_playback'))
-              .width(this.isLivestream ? 12 : 11)
-              .height(this.isLivestream ? 12 : 7)
-            Text(this.isLivestream ? '直播中' : '精彩回顾')
-              .fontSize(10)
-              .fontColor(Color.White)
-              .lineHeight(13)
+                Row({ space: CommonConstants.SPACE_S }) {
+                  Row({ space: 2 }) {
+                    Image(this.isLivestream ? $r('app.media.ic_live') : $r('app.media.ic_playback'))
+                      .width(this.isLivestream ? 12 : 11)
+                      .height(this.isLivestream ? 12 : 7)
+                    Text(this.isLivestream ? '直播中' : '精彩回顾')
+                      .fontSize(10)
+                      .fontColor(Color.White)
+                      .lineHeight(13)
+                  }
+                  .padding({
+                    left: 8,
+                    top: 3,
+                    right: 8,
+                    bottom: 3,
+                  })
+                  .borderRadius(4)
+                  .backgroundColor(this.isLivestream ? $r('sys.color.warning') : '#33000000')
+
+                  if (this.isLivestream) {
+                    Text('2078人观看')
+                      .fontSize(10)
+                      .fontColor(Color.White)
+                      .lineHeight(13)
+                      .padding({
+                        left: 8,
+                        top: 3,
+                        right: 8,
+                        bottom: 3,
+                      })
+                      .borderRadius(4)
+                      .backgroundColor('#33000000')
+                  }
+                }
+                .padding({ left: CommonConstants.PADDING_L, top: CommonConstants.PADDING_L })
+              }
+              .width('100%')
+              .alignItems(HorizontalAlign.Start)
+            }
+            .priorityGesture(
+              GestureGroup(GestureMode.Exclusive,
+                // 双击暂停或播放
+                TapGesture({ count: 2 })
+                  .onAction((event: GestureEvent) => {
+                    if (!event) {
+                      return
+                    }
+                    this.videoPipModel.getVideoCardPlayerController().switchPlayPause()
+                  }),
+              ),
+            )
+
+            if (!this.isTablet) {
+              // tab页签
+              this.tabHeaderView()
+              // tab内容
+              this.tanContentView()
+              // 底部区域
+              LivestreamFooterView({
+                livestreamInfo: this.vm.livestreamInfo,
+                commentListScroller: this.commentListScroller,
+              })
+            }
           }
           .padding({
-            left: 8,
-            top: 3,
-            right: 8,
-            bottom: 3,
+            top: this.isTablet ? this.vm.windowModel.windowTopPadding : 0,
+            bottom: this.isTablet ? this.vm.windowModel.windowBottomPadding : 0,
           })
-          .borderRadius(4)
-          .backgroundColor(this.isLivestream ? $r('sys.color.warning') : '#33000000')
-
-          if (this.isLivestream) {
-            Text('2078人观看')
-              .fontSize(10)
-              .fontColor(Color.White)
-              .lineHeight(13)
-              .padding({
-                left: 8,
-                top: 3,
-                right: 8,
-                bottom: 3,
+        }
+        if (this.isTablet) {
+          GridCol({
+            span: {
+              lg: 4,
+            }
+          }) {
+            Column() {
+              // tab页签
+              this.tabHeaderView()
+              // tab内容
+              this.tanContentView()
+              // 底部区域
+              LivestreamFooterView({
+                livestreamInfo: this.vm.livestreamInfo,
+                commentListScroller: this.commentListScroller,
               })
-              .borderRadius(4)
-              .backgroundColor('#33000000')
+            }
+            .padding({
+              top: this.vm.windowModel.windowTopPadding,
+              bottom: this.vm.windowModel.windowBottomPadding,
+            })
+            .backgroundColor($r('sys.color.comp_background_primary'))
           }
         }
-        .padding({ left: CommonConstants.PADDING_L, top: CommonConstants.PADDING_L })
       }
-      .priorityGesture(
-        GestureGroup(GestureMode.Exclusive,
-          // 双击暂停或播放
-          TapGesture({ count: 2 })
-            .onAction((event: GestureEvent) => {
-              if (!event) {
-                return
-              }
-              this.videoCardPlayerController.switchPlayPause()
-            }),
-        ),
-      )
-
-      // tab页签
-      this.tabHeaderView()
-      // tab内容
-      this.tanContentView()
-      // 底部区域
-      LivestreamFooterView({
-        livestreamInfo: this.vm.livestreamInfo,
-        commentListScroller: this.commentListScroller,
-      })
+      .width(CommonConstants.FULL_PERCENT)
+      .layoutWeight(1)
     }
     .hideTitleBar(true)
     .width(CommonConstants.FULL_PERCENT)
     .height(CommonConstants.FULL_PERCENT)
-    .backgroundColor($r('sys.color.comp_background_primary'))
+    .backgroundColor(this.isTablet ? '#000000' : $r('sys.color.comp_background_primary'))
     .onReady((context: NavDestinationContext) => {
       this.pathStack = context.pathStack;
       let param = context.pathInfo?.param as Record<string, boolean | VideoNewsData>
@@ -175,11 +291,22 @@ export struct LivestreamDetailPage {
 
       this.vm.registerCustomTransition(this.longTakeSession, context)
     })
+    .onBackPressed(() => {
+      this.onBack();
+      return true;
+    })
     .onWillShow(() => {
-      setOrientation(window.Orientation.FOLLOW_DESKTOP)
+      this.pipWindowModel.isBackPiP = false;
+      setOrientation(window.Orientation.FOLLOW_DESKTOP);
+    })
+    .onShown(() => {
+      this.videoPipModel.initVideoPip()
     })
     .onWillDisappear(() => {
-      this.videoCardPlayerController.pause();
+      if (!this.vm.settingInfo.network.enableLivePiP) {
+        this.videoPipModel.getVideoCardPlayerController().pause();
+        this.pipWindowModel.pipController?.setAutoStartEnabled(false);
+      }
     })
   }
 
@@ -196,7 +323,7 @@ export struct LivestreamDetailPage {
         .attributeModifier(this.buttonModifier)
         .accessibilityText('返回')
         .onClick(() => {
-          RouterUtils.pop()
+          this.onBack();
         })
 
         Text(this.detailData?.title)
@@ -215,7 +342,8 @@ export struct LivestreamDetailPage {
       top: this.vm.windowModel.windowTopPadding,
     })
     .width(CommonConstants.FULL_PERCENT)
-    .backgroundColor('#00000000')
+    .backgroundColor(Color.Transparent)
+    .visibility(this.isTablet ? Visibility.None : Visibility.Visible)
   }
 
   @Builder
@@ -289,3 +417,50 @@ export struct LivestreamDetailPage {
     })
   }
 }
+
+@Builder
+export function completedBtnView(playerSession: AVPlayerSession) {
+  Row({ space: 8 }) {
+    Image($r('app.media.ic_replay')).width(12).height(12)
+    Text('重新播放')
+      .fontSize(14)
+      .fontColor(Color.White)
+      .lineHeight(20)
+  }
+  .padding({
+    left: 10,
+    right: 10,
+    top: 4,
+    bottom: 4,
+  })
+  .borderRadius(20)
+  .backgroundColor('#1b1a1b')
+  .zIndex(9)
+  .onClick(() => {
+    playerSession.play()
+  })
+}
+
+@Builder
+export function liveCompletedBtnView(playerSession: AVPlayerSession) {
+  Row({ space: 8 }) {
+    Image($r('app.media.ic_replay')).width(12).height(12)
+    Text('查看回放')
+      .fontSize(14)
+      .fontColor(Color.White)
+      .lineHeight(20)
+  }
+  .padding({
+    left: 10,
+    right: 10,
+    top: 4,
+    bottom: 4,
+  })
+  .borderRadius(20)
+  .backgroundColor('#1b1a1b')
+  .zIndex(9)
+  .onClick(() => {
+    playerSession.play()
+  })
+}
+

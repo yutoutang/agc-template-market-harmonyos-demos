@@ -1,4 +1,4 @@
-import { PassengerApi, PassengerInfo, PassengerListResult, CommonFuncResult, AppRouter } from 'common'
+import { AppRouter, CommonFuncResult, PassengerApi, PassengerInfo, PassengerListResult } from 'common'
 import { BaseTitle, GlobalDialog } from 'components'
 import { AddPassengerView } from '../components/AddPassengerView'
 import { PassengerItem } from '../components/PassengerItem'
@@ -16,7 +16,7 @@ export struct SelectPassengerPage {
   @Local selectedPassengers: PassengerInfo[] = []
 
   getPassengerList() {
-    GlobalDialog.showLoadingDialog()
+    GlobalDialog.showLoadingDialog(this.getUIContext())
     PassengerApi.getPassengerList().then((res) => {
       let response: PassengerListResult = res.result as PassengerListResult
       if (response.ret.code === 0) {
@@ -37,7 +37,7 @@ export struct SelectPassengerPage {
         this.passengerList = resList
       }
     }).finally(() => {
-      GlobalDialog.close()
+      GlobalDialog.close(this.getUIContext())
     })
   }
 
@@ -50,14 +50,14 @@ export struct SelectPassengerPage {
       certificateNo: item.certificateNo,
       phone: item.phone,
     } as PassengerInfo
-    GlobalDialog.showLoadingDialog()
+    GlobalDialog.showLoadingDialog(this.getUIContext())
     PassengerApi.deletePassenger(paramData).then((res) => {
       let result = res.result as CommonFuncResult
       if (result.ret.code === 0 && result.result === 1) {
         this.passengerList.splice(index, 1)
       }
     }).finally(() => {
-      GlobalDialog.close()
+      GlobalDialog.close(this.getUIContext())
     })
   }
 
@@ -102,11 +102,12 @@ export struct SelectPassengerPage {
             .swipeAction({
               end: this.ItemEnd(item, index)
             })
-          })
+          },(item: PassengerInfo, index: number)=>index + '__' + JSON.stringify(item))
 
           // 防止按钮遮挡列表数据
           ListItem() {
-            Row(){}.height(50 + px2vp(91))
+            Row() {
+            }.height(50 + this.getUIContext().px2vp(91))
           }
         }
         .width('100%')
@@ -121,9 +122,9 @@ export struct SelectPassengerPage {
             .onClick(() => {
               let selectedPassengers = this.passengerList.filter((passenger: PassengerInfo) => passenger.isChecked)
               if (selectedPassengers.length > 0) {
-                AppRouter.navStack.pop({selectedPassengers: selectedPassengers})
+                AppRouter.navStack.pop({ selectedPassengers: selectedPassengers })
               } else {
-                GlobalDialog.showToast('请先选择乘机人')
+                GlobalDialog.showToast('请先选择乘机人', this.getUIContext())
               }
             })
         }
@@ -132,12 +133,12 @@ export struct SelectPassengerPage {
           left: 16,
           top: 10,
           right: 16,
-          bottom: 10 + px2vp(91)
+          bottom: 10 + this.getUIContext().px2vp(91)
         })
         .backgroundColor(Color.Transparent)
         .borderRadius(6)
         .position({
-          bottom: px2vp(-91),
+          bottom: this.getUIContext().px2vp(-91),
           left: 0
         })
       }
@@ -149,7 +150,7 @@ export struct SelectPassengerPage {
     .onReady((cxt) => {
       this.selectedPassengers = cxt.pathInfo.param as PassengerInfo[]
     })
-    .onWillShow(() =>{
+    .onWillShow(() => {
       // 获取乘机人列表
       this.getPassengerList()
     })
@@ -159,11 +160,11 @@ export struct SelectPassengerPage {
   ItemEnd(item: PassengerInfo, index: number) {
     Row() {
       Button({ type: ButtonType.Circle, stateEffect: true }) {
-        Image($r('app.media.ic_delete')).fillColor($r('sys.color.ohos_id_color_warning')).width(24).height(24)
+        SymbolGlyph($r('sys.symbol.trash')).fontColor([$r('sys.color.ohos_id_color_warning')]).fontSize(24)
       }.width(48).height(48).backgroundColor($r('sys.color.white'))
       .onClick(() => {
         this.deletePassenger(item, index)
       })
-    }.padding({left: 8}).justifyContent(FlexAlign.SpaceEvenly)
+    }.padding({ left: 8 }).justifyContent(FlexAlign.SpaceEvenly)
   }
 }

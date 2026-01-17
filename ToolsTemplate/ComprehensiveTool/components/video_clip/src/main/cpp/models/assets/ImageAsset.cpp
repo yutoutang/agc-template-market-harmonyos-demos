@@ -280,8 +280,6 @@ void ImageAsset::PrepareImage(float originX , float originY)
         m_ImageInfo = std::static_pointer_cast<ImageInfoBase>(imageInfo);
     }
     
-    
-    // imageInfo
     m_isPrepared = true;
 }
 

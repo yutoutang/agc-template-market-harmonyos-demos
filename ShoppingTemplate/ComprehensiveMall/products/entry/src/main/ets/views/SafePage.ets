@@ -20,7 +20,7 @@ struct SafePage {
         stack: routerStack,
         handleConfirm: () => {
           routerStack.replacePath({
-            name: RouterMap.MAIN_ENTRY,
+            name: RouterMap.SPLASH_PAGE,
           })
         },
       })

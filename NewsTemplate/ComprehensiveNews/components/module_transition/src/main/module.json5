@@ -6,8 +6,10 @@
       "phone",
       "tablet"
     ],
-    "requestPermissions": [{
-      "name": "ohos.permission.INTERNET"
-    }]
+    "requestPermissions": [
+      {
+        "name": "ohos.permission.INTERNET"
+      }
+    ]
   }
 }

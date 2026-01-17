@@ -11,6 +11,10 @@
     {
       "name": "plan_trip_label",
       "value": "计划"
+    },
+    {
+      "name": "agcit_huawei_air_trip",
+      "value": "1.0.1"
     }
   ]
 }

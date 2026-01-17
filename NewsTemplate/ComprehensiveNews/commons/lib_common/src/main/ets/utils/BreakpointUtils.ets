@@ -4,7 +4,7 @@ import { BreakpointNameEnum, BreakpointValueEnum } from '../constants/GridRowCol
 import { BreakpointModel } from '../models/BreakpointModel';
 import { Logger } from './Logger';
 
-const TAG = 'BreakpointUtils';
+const TAG = '[BreakpointUtils]';
 
 /**
  * 断点类

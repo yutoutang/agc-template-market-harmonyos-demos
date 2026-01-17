@@ -1,13 +1,14 @@
+import { window } from '@kit.ArkUI';
+import { UtilLog } from '@hw-agconnect/util-log';
+import { Coupons } from './SelectCouponsView';
 import { CouponCardComp } from '../components/CouponCardComp';
 import { TabComp } from '../components/TabComp';
-import { CommonConstants, MY_TAB_BAR } from '../constants/Contants';
+import { CommonConstants, LOG_TAG, MY_TAB_BAR } from '../constants/Contants';
 import { CouponItem } from '../network/types/responseTypes/GetCouponsResp';
-import { ScenarioStatus } from '../types/Types';
 import { getCouponList, getScenarioStatus } from '../utils/Service';
-import { Coupons } from './SelectCouponsView';
-import { window } from '@kit.ArkUI';
 import { FullLoading } from '../utils/FullLoading';
 import { WindowUtil } from '../utils/WindowUtil';
+import { ScenarioStatus } from '../types/Types';
 
 @ComponentV2
 export struct MyCouponsView {
@@ -35,12 +36,18 @@ export struct MyCouponsView {
 
   async aboutToAppear() {
     this._tabBar = MY_TAB_BAR;
-    if (!Coupons.uiContext) {
-      let windowClass: window.Window = await window.getLastWindow(getContext());
-      let uiContext = windowClass.getUIContext();
-      Coupons.uiContext = uiContext;
-      FullLoading.init(uiContext);
-      WindowUtil.init(windowClass);
+    try {
+      if (!Coupons.uiContext) {
+        let uiContext = this.getUIContext();
+        let windowClass = await window.getLastWindow(uiContext.getHostContext());
+        Coupons.uiContext = uiContext;
+        FullLoading.init(uiContext);
+        if (windowClass) {
+          WindowUtil.init(windowClass, uiContext);
+        }
+      }
+    } catch (err) {
+      UtilLog.error(LOG_TAG, 'init context failed. error: ' + JSON.stringify(err))
     }
     const res = await getCouponList();
     this.myCouponsAll = res;

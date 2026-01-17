@@ -1,31 +1,40 @@
+import { UtilLog } from '@hw-agconnect/util-log';
 import { authentication } from '@kit.AccountKit';
+import { AppStorageV2, PersistenceV2 } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import dataPreferences from '@ohos.data.preferences';
+import { BusinessTimeDialog } from 'base_ui';
 import {
+  AppInfoModel,
+  AppPrivacyUtils,
   CardManager,
   Constants,
   FormDataClass,
   HuaweiIDResp,
+  MustGoodsController,
   MyCarModel,
+  OrderTypeEnum,
   RouterMap,
   RouterModule,
   StoreInfoModel,
-  StoreType,
   UserInfoModel,
+  WindowUtil,
 } from 'common/Index';
-import dataPreferences from '@ohos.data.preferences';
-import { AppStorageV2, promptAction } from '@kit.ArkUI';
-import { BusinessTimeDialog } from 'base_ui';
+import { OrderUtil } from 'network';
 import * as API from '../api/Index';
-import { MustGoodsController } from 'order';
+
+const TAG = '[Index]'
 
 @Entry
 @ComponentV2
 struct Index {
+  @Local appInfoModel: AppInfoModel = AppStorageV2.connect(AppInfoModel, () => new AppInfoModel())!;
   @Local storeModel: StoreInfoModel = AppStorageV2.connect(StoreInfoModel, () => new StoreInfoModel())!;
-  @Local userInfoModel: UserInfoModel = AppStorageV2.connect(UserInfoModel, () => new UserInfoModel())!;
+  @Local userInfoModel: UserInfoModel = PersistenceV2.connect(UserInfoModel, () => new UserInfoModel())!;
   @Local myCarModel: MyCarModel = AppStorageV2.connect(MyCarModel, () => new MyCarModel())!
-  @Provider('mustGoodsCtrl') mustGoodsCtrl: MustGoodsController = new MustGoodsController();
+  @Local privacyImpl: AppPrivacyUtils = AppPrivacyUtils.instance;
+  @Local mustGoodsCtrl: MustGoodsController =
+    AppStorageV2.connect(MustGoodsController, () => new MustGoodsController())!
   @Provider('orderId') orderId?: string = undefined;
   @Local openId: string = '';
   @Local unionId: string = '';
@@ -36,26 +45,38 @@ struct Index {
   });
 
   aboutToAppear() {
-    Promise.all([API.getStoreList(), this.loginWithHuaweiID()]).then(res => {
-      this.storeModel.storeList = res[0];
-      this.storeModel.storeId = res[0][0].id;
-      this.openId = res[1].openId;
-      this.unionId = res[1].unionId;
-      this.userInfoModel.authCode = res[1].authCode;
-      if (this.storeModel.preloadFinished) {
-        this.initQuery()
-      }
-    });
+    this.privacyImpl.subscribe();
+    const uiContext = this.getUIContext()
+    WindowUtil.setUIContext('EntryAbility', uiContext)
+    OrderUtil.setContext(WindowUtil.globalContext)
+    if (!this.privacyImpl.agreeFlag) {
+      // 未同意隐私协议，不进入首页
+      return;
+    }
+    this.funcCore();
   }
 
-  @Monitor('storeModel.preloadFinished')
+  aboutToDisappear(): void {
+    this.privacyImpl.unSubscribe();
+  }
+
+  // 监听协议签署结果
+  @Monitor('privacyImpl.agreeFlag')
+  agreeFlagChange() {
+    if (this.privacyImpl.agreeFlag) {
+      // 签署协议后，执行静默登录
+      this.funcCore();
+    }
+  }
+
+  @Monitor('appInfoModel.preloadFinished')
   async initQuery() {
-    if (this.storeModel.preloadFinished) {
-      if (!this.storeModel.storeId) {
+    if (this.privacyImpl.agreeFlag && this.appInfoModel.preloadFinished) {
+      if (!this.appInfoModel.bannerList.length) {
         await this.getPreloadData()
       }
       // 查询用户信息
-      Promise.all([API.getUserInfo(this.storeModel.storeId, this.openId, this.unionId),
+      Promise.all([API.getUserInfo(this.storeModel.storeId, this.unionId, this.userInfoModel.isRelative),
         API.getStoreInfo(this.storeModel.storeId)]).then(res => {
         this.userInfoModel.userInfo.id = res[0].id;
         this.userInfoModel.userInfo.wallet = res[0].wallet;
@@ -77,44 +98,12 @@ struct Index {
         this.storeModel.storeInfo = res[1];
         this.updateFormCard();
         this.storeModel.storeInfo.reductionList = res[1].reductionList;
-        if (this.storeModel.storeType === StoreType.SCAN_TYPE && this.myCarModel.tableId) {
-          this.myCarModel.tableInfo = this.storeModel.tableList.find(item => item.id === this.myCarModel.tableId)!;
+        if (this.storeModel.orderType === OrderTypeEnum.DINE_IN && this.storeModel.tableId) {
+          this.storeModel.tableInfo = this.storeModel.tableList.find(item => item.id === this.storeModel.tableId)!;
         }
-        RouterModule.replace(RouterMap.HOME_PAGE);
+        RouterModule.replace(RouterMap.MAIN_INDEX);
       });
     }
-  }
-
-  getPreloadData(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      Promise.all([API.getAppInfo(), API.getTableList()]).then(res => {
-        if (res[0]) {
-          this.storeModel.storeId = res[0].storeId;
-          this.storeModel.storeType = res[0].storeType;
-        }
-        if (res[1]?.length) {
-          this.storeModel.tableList = res[1];
-        }
-        resolve()
-      }).catch(() => {
-        reject()
-      });
-    })
-  }
-
-  updateFormCard() {
-    dataPreferences.removePreferencesFromCacheSync(getContext(this), { name: CardManager.KEY_CARD_ID })
-    let pref = dataPreferences.getPreferencesSync(getContext(this), { name: CardManager.KEY_CARD_INFO });
-    let dataClass = new FormDataClass();
-    dataClass.storeName = this.storeModel.storeInfo.name || '';
-    pref.putSync(CardManager.KEY_CARD_INFO, dataClass);
-    pref.flush();
-    CardManager.get().updateCard(getContext(this), '', dataClass);
-  }
-
-  getTimeByHour(time: string = '') {
-    let date = new Date(`${new Date().toLocaleDateString()} ${time}`)
-    return date.getTime()
   }
 
   build() {
@@ -130,6 +119,59 @@ struct Index {
     .height(Constants.FULL_SIZE)
     .width(Constants.FULL_SIZE);
 
+  }
+
+  funcCore() {
+    Promise.all([API.getStoreList(), this.loginWithHuaweiID()]).then(res => {
+      this.storeModel.storeList = res[0];
+      this.storeModel.storeId = res[0][0].id;
+      this.openId = res[1].openId;
+      this.unionId = res[1].unionId;
+      this.userInfoModel.authCode = res[1].authCode;
+      if (this.appInfoModel.preloadFinished) {
+        this.initQuery()
+      }
+    });
+  }
+
+  getPreloadData(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      Promise.all([API.getAppInfo(), API.getTableList()]).then(res => {
+        if (res[0]) {
+          this.appInfoModel.bannerList = res[0].bannerList;
+          this.appInfoModel.imgBaseUrl = res[0].imgBaseUrl;
+          this.appInfoModel.telephone = res[0].telephone;
+        }
+        if (res[1]?.length) {
+          this.storeModel.tableList = res[1];
+        }
+        resolve()
+      }).catch(() => {
+        reject()
+      });
+    })
+  }
+
+  updateFormCard() {
+    try {
+      dataPreferences.removePreferencesFromCacheSync(this.getUIContext().getHostContext(),
+        { name: CardManager.KEY_CARD_ID })
+    } catch (e) {
+      UtilLog.error(TAG, `removePreferencesFromCacheSync failed.`, e)
+    }
+
+    let pref =
+      dataPreferences.getPreferencesSync(this.getUIContext().getHostContext(), { name: CardManager.KEY_CARD_INFO });
+    let dataClass = new FormDataClass();
+    dataClass.storeName = this.storeModel.storeInfo.name || '';
+    pref.putSync(CardManager.KEY_CARD_INFO, dataClass);
+    pref.flush();
+    CardManager.get().updateCard(dataClass);
+  }
+
+  getTimeByHour(time: string = '') {
+    let date = new Date(`${new Date().toLocaleDateString()} ${time}`)
+    return date.getTime()
   }
 
   /**
@@ -157,7 +199,7 @@ struct Index {
         // Send authCode to the backend in exchange for unionID, session
 
       }).catch((error: BusinessError) => {
-        hilog.error(0x0000, 'testTag', 'error: %{public}s', JSON.stringify(error));
+        UtilLog.error(TAG, 'error: %{public}s', JSON.stringify(error));
         if (error.code === authentication.AuthenticationErrorCode.ACCOUNT_NOT_LOGGED_IN) {
           // HUAWEI ID is not logged in, it is recommended to jump to the login guide page
         }
@@ -165,6 +207,5 @@ struct Index {
         resolve({ openId: '1', unionId: '1', authCode: '1' } as HuaweiIDResp);
       });
     });
-
   }
 }

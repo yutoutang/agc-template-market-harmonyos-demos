@@ -1,4 +1,4 @@
-import { BookInfo, BookLittleCard, BookLittleCardHome, Constants, TCRouter } from 'common';
+import { BookHomeCard, BookInfo, BookLittleCard, BookLittleCardHome, Constants, TCRouter } from 'common';
 import {LazyDataVM} from 'swiper_card'
 /**
  * 书横卡
@@ -42,7 +42,7 @@ export struct BookViewCard {
       List({ space: 8 }) {
         LazyForEach(this.books, (item: BookInfo) => {
           ListItem() {
-            BookLittleCardHome({ info: item })
+            BookHomeCard({ info: item })
           }
         }, (item: string) => new Date().toString())
       }

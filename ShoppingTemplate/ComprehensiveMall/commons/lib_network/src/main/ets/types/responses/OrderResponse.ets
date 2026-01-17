@@ -56,6 +56,7 @@ export interface AddressInfo {
 
 export interface DiscountItem {
   type: number;
+  label: string;
   discountPrice: number;
 }
 
@@ -64,6 +65,7 @@ export interface OrderSkuItem {
   skuCode: string;
   skuDesc: string;
   count: number;
+  stock: number;
   banner: ResourceStr;
   title: string;
   serviceDesc: string;

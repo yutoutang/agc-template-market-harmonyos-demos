@@ -1,11 +1,10 @@
 import { BusinessError } from '@kit.BasicServicesKit';
-import { promptAction } from '@kit.ArkUI';
-import { Uncompress, Compress, Config7z } from '@ohos/oh7zip'
-import Logger from './ZipLogger';
+import { UtilLog as Logger } from '@hw-agconnect/util-log';
 import { fileIo as fs, picker } from '@kit.CoreFileKit';
 import { CompressedFile } from '../model/ZipModel';
 import { formatBytes, formatTimestamp } from './BaseUtil';
 import { FileType } from '../common/Constant';
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
 
 // 在沙箱中创建一个固定的文件夹保存压缩包
 export function createDirInSandbox(path: string) {
@@ -145,73 +144,29 @@ export function moveFile(type: FileType, name: string, filePath: string, moveToP
   }
 }
 
-// 压缩
-export async function compress(dirPath: string, path: string, format: string) {
-  const inFile = dirPath
-  let outFile = dirPath + `.${format}`
-  // 判断文件是否存在
-  const res = fs.accessSync(outFile)
-  if (res) {
-    outFile = dirPath + `(1).${format}`
-  }
-  try {
-    let compress: Compress = new Compress()
-    let config: Config7z = {
-      src: inFile,
-      dst: outFile,
-      fmt: format,
-    }
-    compress.compressSync(config)
-  } catch (error) {
-    let err: BusinessError = error as BusinessError;
-    Logger.info('compress error = ' + JSON.stringify(err));
-  }
-  fs.rmdirSync(dirPath)
-  return await readCompressedFile(path)
-}
-
-// 解压缩
-export async function decompress(dirPath: string, currentFolderPath: string, name: string) {
-  const inFile = dirPath + `/${decodeURI(name)}`
-  let outFile = dirPath
-  try {
-    let uncompress: Uncompress = new Uncompress()
-    let config: Config7z = {
-      src: inFile,
-      dst: outFile,
-      pwd: 'test_7z',
-    }
-    uncompress.extractSync(config)
-    fs.unlinkSync(inFile)
-  } catch (error) {
-    let err: BusinessError = error as BusinessError;
-    Logger.info('decompress error = ' + JSON.stringify(err));
-  }
-  return await readCompressedFile(currentFolderPath)
-}
-
-// 文件存储到手机
-export async function reSave(path: string, name: string) {
-  let uris: String = ''
+// 获取存储地址
+export async function getStoragePath(name: string) {
+  let uris: string = ''
   try {
     const documentSaveOptions = new picker.DocumentSaveOptions(); // 创建文件管理器保存选项实例
 
     documentSaveOptions.newFileNames = [name]
     const documentViewPicker = new picker.DocumentViewPicker();
-    try {
-      let documentSaveResult = await documentViewPicker.save(documentSaveOptions);
-      if (documentSaveResult !== undefined) {
-        uris = documentSaveResult[0];
-        Logger.info('photoViewPicker.save to file succeed and uris are:' + uris);
-      }
-    } catch (error) {
-      let err: BusinessError = error as BusinessError;
-      Logger.info('[picker] photoViewPickerSave error = ' + JSON.stringify(err));
+    let documentSaveResult = await documentViewPicker.save(documentSaveOptions);
+    if (documentSaveResult !== undefined) {
+      uris = documentSaveResult[0];
+      Logger.info('photoViewPicker.save to file succeed and uris are:' + uris);
     }
   } catch (error) {
     let err: BusinessError = error as BusinessError;
     Logger.info('[picker] photoViewPickerSave error = ' + JSON.stringify(err));
   }
+
+  return uris
+}
+
+// 文件存储到手机
+export async function reSave(path: string, uris: string) {
   let file: fs.File | null = null;
   let file2: fs.File | null = null;
   try {

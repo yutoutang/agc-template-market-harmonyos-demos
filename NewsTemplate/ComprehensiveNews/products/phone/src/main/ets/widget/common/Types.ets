@@ -16,4 +16,9 @@ export class FormItemModel {
   coverUrl: string = ''
   videoDuration: number = 0
   commentCount: number = 0
+
+  constructor(id: string, title: string) {
+    this.id = id;
+    this.title = title;
+  }
 }

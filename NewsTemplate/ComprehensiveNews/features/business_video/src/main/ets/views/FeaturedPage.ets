@@ -6,15 +6,25 @@ export struct FeaturedPage {
   @Param index: number = 1
   // 视频页里面的头部tabIndex
   @Param currentTabIndex: number = 1;
+  @Local isShown: boolean = false;
 
   build() {
     Column() {
       VideoSwiperPage({
         index: this.index,
         currentTabIndex: this.currentTabIndex,
+        isShown: this.isShown
       })
     }
     .width('100%')
     .layoutWeight(1)
+    .onVisibleAreaChange([0.0, 1.0], (isExpanding: boolean, currentRatio: number) => {
+      if (isExpanding && currentRatio >= 1.0) {
+        this.isShown = true;
+      }
+      if (!isExpanding && currentRatio <= 0.0) {
+        this.isShown = false;
+      }
+    })
   }
 }

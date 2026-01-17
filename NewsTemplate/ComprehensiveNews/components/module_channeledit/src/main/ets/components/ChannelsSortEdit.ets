@@ -1,10 +1,9 @@
-import { LengthMetrics, MeasureText } from '@kit.ArkUI';
+import { LengthMetrics } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
-import hilog from '@ohos.hilog';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { ChannelConstants } from '../constants/Constants';
 import { PositionXY, TabInfo } from '../model/Model';
-
 
 @ComponentV2
 export struct ChannelsSortEdit {
@@ -121,7 +120,7 @@ export struct ChannelsSortEdit {
     } catch (exception) {
       let code = (exception as BusinessError).code;
       let message = (exception as BusinessError).message;
-      console.error('Ace',
+      UtilLog.error('Ace',
         `GridObjectSortComponent Faild to init fontsizescale info, code:${code}, message: ${message}`);
     }
     this.calcGridHeight();
@@ -151,7 +150,7 @@ export struct ChannelsSortEdit {
   }
 
   calcTextItemEditHeight() {
-    let sizeOptions: SizeOptions = MeasureText.measureTextSize({
+    let sizeOptions: SizeOptions = this.getUIContext().getMeasureUtils().measureTextSize({
       textContent: this.dataList[0]?.text ?? '',
       fontSize: `${(LengthMetrics.resource($r('sys.float.ohos_id_text_size_button3'))?.value ??
       ChannelConstants.DEFAULT_TEXT_SIZE) * (this.fontSizeScale ?? ChannelConstants.DEFAULT_FONT_SIZE_SCALE)}vp`,
@@ -159,7 +158,7 @@ export struct ChannelsSortEdit {
       maxLines: ChannelConstants.TEXT_MAX_LINES,
     });
     this.textItemEditHeight = this.fontSizeScale === ChannelConstants.DEFAULT_FONT_SIZE_SCALE ?
-    ChannelConstants.GRID_ITEM_HEIGHT_TEXT : px2vp(sizeOptions.height as number);
+      ChannelConstants.GRID_ITEM_HEIGHT_TEXT : this.getUIContext().px2vp(sizeOptions.height as number);
     this.textItemEditHeight = this.textItemEditHeight + ChannelConstants.PADDING_EIGHT * 2;
   }
 
@@ -185,7 +184,7 @@ export struct ChannelsSortEdit {
 
   // component disappear
   aboutToDisappear() {
-    animateTo({
+    this.getUIContext().animateTo({
       duration: ChannelConstants.ENTER_EXIT_ICON_DURATION,
       curve: ChannelConstants.COMMON_BEZIER,
     }, () => {
@@ -218,13 +217,13 @@ export struct ChannelsSortEdit {
     if (this.isStartDrag || this.clickAddBtn || this.clickRemoveBtn) {
       return;
     }
-    animateTo({
+    this.getUIContext().animateTo({
       duration: ChannelConstants.ENTER_EXIT_ICON_DURATION,
       curve: ChannelConstants.LONG_TOUCH_SCALE,
     }, () => {
       this.longScaleOnePointTwo = 1;
     })
-    animateTo({
+    this.getUIContext().animateTo({
       duration: ChannelConstants.ENTER_EXIT_ICON_DURATION,
       curve: ChannelConstants.COMMON_BEZIER,
     }, () => {
@@ -241,7 +240,7 @@ export struct ChannelsSortEdit {
 
   // Enter edit function
   goEdit(): void {
-    animateTo({
+    this.getUIContext().animateTo({
       duration: ChannelConstants.ENTER_EXIT_ICON_DURATION,
       curve: ChannelConstants.COMMON_BEZIER,
     }, () => {
@@ -264,14 +263,14 @@ export struct ChannelsSortEdit {
     if (this.isStartDrag) {
       return;
     }
-    animateTo({
+    this.getUIContext().animateTo({
       duration: ChannelConstants.ENTER_EXIT_ICON_DURATION,
       curve: ChannelConstants.LONG_TOUCH_SCALE,
     }, () => {
       this.longScaleOnePointTwo = 1;
     })
     this.editGridDataLength = this.selected.length;
-    animateTo({
+    this.getUIContext().animateTo({
       duration: ChannelConstants.ENTER_EXIT_ICON_DURATION,
       curve: ChannelConstants.COMMON_BEZIER,
     }, () => {
@@ -329,7 +328,7 @@ export struct ChannelsSortEdit {
     this.content = content;
     this.selectedIndex = currentIndex;
     this.calcGridHeight();
-    animateTo({
+    this.getUIContext().animateTo({
       curve: ChannelConstants.REMOVE_ADD_SPRING, onFinish: () => {
         this.scaleIcon = 1;
         this.selected.splice(currentIndex, 1);
@@ -405,7 +404,7 @@ export struct ChannelsSortEdit {
   imageTextRemoveIcon(select: TabInfo): Resource {
     const clickRemoveIcon: boolean = this.clickRemoveBtn && this.content.id === select.id;
     const icon = clickRemoveIcon ?
-    $r('sys.symbol.plus_circle_fill') : $r('sys.symbol.minus_circle_fill');
+      $r('sys.symbol.plus_circle_fill') : $r('sys.symbol.minus_circle_fill');
     return icon;
   }
 
@@ -663,7 +662,7 @@ export struct ChannelsSortEdit {
     this.arrayUnSelectIsChange = 1;
     this.clickAddBtn = true;
     this.calcGridHeight();
-    animateTo({
+    this.getUIContext().animateTo({
       curve: ChannelConstants.REMOVE_ADD_SPRING,
       onFinish: () => {
         if (!this.selected.some(val => val.id === content.id)) {
@@ -798,7 +797,7 @@ export struct ChannelsSortEdit {
 
   onAddTagLongPressEnd(): void {
     this.addAreaLongPressGesture = false;
-    animateTo({
+    this.getUIContext().animateTo({
       duration: ChannelConstants.ENTER_EXIT_ICON_DURATION,
       curve: ChannelConstants.LONG_TOUCH_SCALE,
     }, () => {
@@ -830,7 +829,7 @@ export struct ChannelsSortEdit {
             LongPressGesture({ repeat: true })
               .onAction((event: GestureEvent) => {
                 if (!this.gridComState) {
-                  animateTo({
+                  this.getUIContext().animateTo({
                     duration: ChannelConstants.ENTER_EXIT_ICON_DURATION,
                     curve: ChannelConstants.COMMON_BEZIER,
                   }, () => {
@@ -842,7 +841,7 @@ export struct ChannelsSortEdit {
                     this.pointToRepeat(ChannelConstants.ADD);
                   }, ChannelConstants.ENTER_EXIT_ICON_DURATION);
                 } else {
-                  animateTo({
+                  this.getUIContext().animateTo({
                     duration: ChannelConstants.ENTER_EXIT_ICON_DURATION,
                     curve: ChannelConstants.LONG_TOUCH_SCALE,
                   }, () => {
@@ -897,7 +896,7 @@ export struct ChannelsSortEdit {
       if (this.addAreaLongPressGesture || Math.abs(this.longScaleOnePointTwo - 1.05) < this.eps) {
         return;
       }
-      animateTo({
+      this.getUIContext().animateTo({
         duration: ChannelConstants.ENTER_EXIT_ICON_DURATION,
         curve: ChannelConstants.COMMON_BEZIER,
       }, () => {
@@ -913,7 +912,7 @@ export struct ChannelsSortEdit {
       this.clickAddBtn = true;
       this.arrayUnSelectIsChange = 1;
       this.calcGridHeight();
-      animateTo({
+      this.getUIContext().animateTo({
         curve: ChannelConstants.REMOVE_ADD_SPRING, onFinish: () => {
           if (!this.selected.some(val => val.id === item.id)) {
             this.scaleIcon = 1;
@@ -927,7 +926,7 @@ export struct ChannelsSortEdit {
             if (!this.gridComState) {
               this.onSaveEdit();
             }
-            animateTo({
+            this.getUIContext().animateTo({
               duration: ChannelConstants.ENTER_EXIT_ICON_DURATION,
               curve: ChannelConstants.COMMON_BEZIER,
             }, () => {
@@ -956,7 +955,7 @@ export struct ChannelsSortEdit {
     if (this.addAreaLongPressGesture || Math.abs(this.longScaleOnePointTwo - 1.05) < this.eps) {
       return;
     }
-    animateTo({
+    this.getUIContext().animateTo({
       duration: ChannelConstants.ENTER_EXIT_ICON_DURATION,
       curve: ChannelConstants.COMMON_BEZIER,
     }, () => {
@@ -972,7 +971,7 @@ export struct ChannelsSortEdit {
     this.clickAddBtn = true;
     this.arrayUnSelectIsChange = 1;
     this.calcGridHeight();
-    animateTo({
+    this.getUIContext().animateTo({
       curve: ChannelConstants.REMOVE_ADD_SPRING, onFinish: () => {
         if (!this.selected.some(val => val.id === item.id)) {
           this.scaleIcon = 1;
@@ -986,7 +985,7 @@ export struct ChannelsSortEdit {
           if (!this.gridComState) {
             this.onSaveEdit();
           }
-          animateTo({
+          this.getUIContext().animateTo({
             duration: ChannelConstants.ENTER_EXIT_ICON_DURATION,
             curve: ChannelConstants.COMMON_BEZIER,
           }, () => {
@@ -1036,7 +1035,7 @@ export struct ChannelsSortEdit {
 
               if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
                 this.isTouchDown = false;
-                animateTo({
+                this.getUIContext().animateTo({
                   duration: ChannelConstants.ENTER_EXIT_ICON_DURATION,
                   curve: ChannelConstants.LONG_TOUCH_SCALE,
                 }, () => {
@@ -1064,7 +1063,7 @@ export struct ChannelsSortEdit {
               return
             }
             if (!this.gridComState) {
-              animateTo({
+              this.getUIContext().animateTo({
                 duration: ChannelConstants.ENTER_EXIT_ICON_DURATION,
                 curve: ChannelConstants.COMMON_BEZIER,
               }, () => {
@@ -1075,7 +1074,7 @@ export struct ChannelsSortEdit {
                 this.pointToRepeat(ChannelConstants.EDIT);
               }, ChannelConstants.ENTER_EXIT_ICON_DURATION);
             } else {
-              animateTo({
+              this.getUIContext().animateTo({
                 duration: ChannelConstants.ENTER_EXIT_ICON_DURATION,
                 curve: ChannelConstants.LONG_TOUCH_SCALE,
               }, () => {
@@ -1150,7 +1149,7 @@ export struct ChannelsSortEdit {
     if (!this.gridComState) {
       return;
     }
-    animateTo({
+    this.getUIContext().animateTo({
       duration: ChannelConstants.ENTER_EXIT_ICON_DURATION,
       curve: ChannelConstants.LONG_TOUCH_SCALE,
     }, () => {
@@ -1249,9 +1248,14 @@ export struct ChannelsSortEdit {
   getStringByResourceToken(value?: string, ...args: Array<string | number>): string {
     if (value) {
       try {
-        return getContext(this).resourceManager.getStringByNameSync(value, ...args);
+        const context = this.getUIContext().getHostContext();
+        if (!context) {
+          return '';
+        }
+        return context.resourceManager.getStringByNameSync(value, ...args);
       } catch (error) {
-        hilog.error(0x3900, 'Ace', `GridObjectSortComponent getStringByResourceToken, error: ${error.toString()}`);
+        UtilLog.error('ChannelsSortEdit',
+          `GridObjectSortComponent getStringByResourceToken, error: ${error.toString()}`);
       }
     }
     return '';

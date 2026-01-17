@@ -23,6 +23,10 @@
     {
       "name": "difficult_question",
       "value": "difficult_question"
+    },
+    {
+      "name": "agcit_huawei_driver_license_exam",
+      "value": "1.0.4"
     }
   ]
 }

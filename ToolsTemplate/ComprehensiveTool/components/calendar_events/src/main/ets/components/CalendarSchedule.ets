@@ -34,7 +34,7 @@ export struct CalendarSchedule {
   }
 
   creatUserEventInfo() {
-    this.calendarEventVM.saveEventData(this.userEventInfo)
+    this.calendarEventVM.saveEventData(this.userEventInfo, this.getUIContext())
   }
 
   @Builder

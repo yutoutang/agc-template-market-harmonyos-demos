@@ -1,3 +1,4 @@
+import { emitter } from '@kit.BasicServicesKit';
 import { Constants } from '../constants/Constants';
 import { AVPlayerSession } from '../controller/AVPlayerManager';
 import { AVPlayerState } from '../type/Index';
@@ -46,6 +47,12 @@ export struct VideoProgressBar {
   @Param progressController: ProgressController = new ProgressController();
   // 切换播放
   @Event onSwitchPlayCallback: () => void;
+  // 全屏自定义图标
+  @Param fullScreenIcon: Resource | undefined = undefined
+  // 静音自定义图标
+  @Param isNeedMuteIcon: boolean = false
+  // 是否隐藏进度条
+  @Param isHideSlide: boolean = false
   // 全屏切换
   @Event onSwitchFullScreenCallback: () => void;
   @Local currentTime: number = 0;
@@ -55,8 +62,15 @@ export struct VideoProgressBar {
   @Local isTimeDisplay: boolean = false;
   @Local trackThicknessSize: number = Constants.TRACK_SIZE_MIN;
   @Local isPlaying: boolean = true;
+  @Param isMute: boolean = false
+  @Event onMute: (value: boolean) => void = () => {};
   private duration: number = 0;
   private isSliderMoving: boolean = false;
+
+  @Monitor('isMute')
+  async muteChange(monitor: IMonitor) {
+    this.playerSession.avPlayer!.setVolume(monitor.value('isMute')?.now ? Constants.VOLUME_LOW : Constants.VOLUME_HIGH)
+  }
 
   aboutToAppear(): void {
     // 绑定滑动事件
@@ -69,8 +83,10 @@ export struct VideoProgressBar {
       this.durationStringTime = secondToTime(Math.floor(this.duration / 1000));
       this.progressController.durationTime = this.durationTime
       Logger.info(TAG, 'player duration is ' + this.duration)
+      if (this.isMute) {
+        avPlayer!.setVolume(Constants.VOLUME_LOW)
+      }
     }
-
     this.playerSession?.onEvent('stateChange', (state: string) => {
       let avPlayer = this.playerSession.getAVPlayer();
       Logger.info(TAG, 'avPlayer state is ' + state)
@@ -79,16 +95,26 @@ export struct VideoProgressBar {
         this.durationTime = this.duration / 1000
         this.durationStringTime = secondToTime(Math.floor(this.duration / 1000));
       }
+      if (this.isNeedMuteIcon) {
+        this.playerSession.avPlayer!.setVolume(Constants.VOLUME_LOW)
+      }
       Logger.info(TAG, 'stateChange player durationTime is ' + this.durationTime)
 
       // 是否播放
-      this.isPlaying = state === AVPlayerState.PLAYING || state === AVPlayerState.COMPLETED;
+      this.isPlaying = state === AVPlayerState.PLAYING;
       // 暂停状态
       if (state === AVPlayerState.PAUSED) {
         this.trackThicknessSize = Constants.TRACK_SIZE_MAX;
       } else {
         this.trackThicknessSize = Constants.TRACK_SIZE_MIN;
       }
+
+      if (this.isPlaying) {
+        this.playerSession.avPlayer!.setVolume(this.isMute ? Constants.VOLUME_LOW : Constants.VOLUME_HIGH)
+      }
+      emitter.on('systemVolumeChange', (eventData: emitter.EventData) => {
+        this.onMute((eventData.data!.volume || Constants.VOLUME_LOW) === Constants.VOLUME_LOW)
+      })
     });
 
     this.playerSession?.onEvent('timeUpdate', (time: number) => {
@@ -180,39 +206,42 @@ export struct VideoProgressBar {
               .fontColor(Color.White)
               .textAlign(TextAlign.Start)
               .lineHeight(13)
+              .visibility(this.isHideSlide ? Visibility.None : Visibility.Visible)
           }
         }
-
-        Slider({
-          value: this.currentTime,
-          step: 0.1,
-          min: 0,
-          max: this.durationTime,
-          style: this.showSlideBlock ? SliderStyle.OutSet : SliderStyle.NONE,
-        })
-          .layoutWeight(1)
-          .height(this.slideHeight)
-          .enabled(this.canChangeSlide)
-          .blockSize({
-            width: this.showSlideBlock ? 4 + (this.trackThicknessSize) : 0,
-            height: this.showSlideBlock ? 4 + (this.trackThicknessSize) : 0,
+        if (this.isHideSlide) {
+          Blank()
+        } else {
+          Slider({
+            value: this.currentTime,
+            step: 0.1,
+            min: 0,
+            max: this.durationTime,
+            style: this.showSlideBlock ? SliderStyle.OutSet : SliderStyle.NONE,
           })
-          .blockColor(this.isTimeDisplay || !this.isPlaying ? '#ffffff' : this.selectedColor)
-          .trackColor(this.trackColor)
-          .selectedColor(this.isTimeDisplay || !this.isPlaying ? '#ffffff' : this.selectedColor)
-          .showSteps(false)
-          .showTips(false)
-          .trackThickness(this.trackThicknessSize)
-          .trackBorderRadius(2)
-          .offset(!this.showSlideBlock ? { top: 6 } : null)
-          .zIndex(3)
-          .onChange((value: number, mode: SliderChangeMode) => {
-            this.sliderOnChange(value, mode);
-          })
-          .onAreaChange((ov: Area, nv: Area) => {
-            this.progressController.progressWidth = nv.width as number
-          })
-
+            .layoutWeight(1)
+            .height(this.slideHeight)
+            .enabled(this.canChangeSlide)
+            .blockSize({
+              width: this.showSlideBlock ? 4 + (this.trackThicknessSize) : 0,
+              height: this.showSlideBlock ? 4 + (this.trackThicknessSize) : 0,
+            })
+            .blockColor(this.isTimeDisplay || !this.isPlaying ? '#ffffff' : this.selectedColor)
+            .trackColor(this.trackColor)
+            .selectedColor(this.isTimeDisplay || !this.isPlaying ? '#ffffff' : this.selectedColor)
+            .showSteps(false)
+            .showTips(false)
+            .trackThickness(this.trackThicknessSize)
+            .trackBorderRadius(2)
+            .offset(!this.showSlideBlock ? { top: 6 } : null)
+            .zIndex(3)
+            .onChange((value: number, mode: SliderChangeMode) => {
+              this.sliderOnChange(value, mode);
+            })
+            .onAreaChange((ov: Area, nv: Area) => {
+              this.progressController.progressWidth = nv.width as number
+            })
+        }
         if (this.showProgressBarRight) {
           Row({ space: Constants.SPACE_L }) {
             Text(this.durationStringTime)
@@ -220,21 +249,45 @@ export struct VideoProgressBar {
               .fontColor(Color.White)
               .textAlign(TextAlign.End)
               .lineHeight(13)
-            Image(this.isFullScreen ? $r('app.media.ic_exit_full_screen') : $r('app.media.ic_expand_full_screen'))
-              .width(16)
-              .height(16)
-              .objectFit(ImageFit.Contain)
-              .accessibilityText(this.isFullScreen ?'退出全屏' : '进入全屏')
-              .onClick(() => {
-                this.onSwitchFullScreenCallback && this.onSwitchFullScreenCallback()
-              })
+              .visibility(this.isHideSlide ? Visibility.None : Visibility.Visible)
+            if (!!this.isNeedMuteIcon) {
+              SymbolGlyph(this.isMute ? $r('sys.symbol.speaker_wave_3_slash') : $r('sys.symbol.speaker_wave_3'))
+                .fontColor([$r('sys.color.font_on_primary')])
+                .fontWeight(FontWeight.Normal)
+                .fontSize(24)
+                .accessibilityText(this.isMute ? '静音' : '取消静音')
+                .onClick(() => {
+                  this.onMute(!this.isMute)
+                })
+            }
+            if (!!this.fullScreenIcon) {
+              SymbolGlyph(this.fullScreenIcon)
+                .fontColor([$r('sys.color.font_on_primary')])
+                .fontWeight(FontWeight.Normal)
+                .fontSize(24)
+                .accessibilityText(this.isFullScreen ? '退出全屏' : '进入全屏')
+                .onClick(() => {
+                  this.onSwitchFullScreenCallback && this.onSwitchFullScreenCallback()
+                })
+            } else {
+              Image(this.isFullScreen ? $r('app.media.ic_exit_full_screen') : $r('app.media.ic_expand_full_screen'))
+                .width(16)
+                .height(16)
+                .objectFit(ImageFit.Contain)
+                .accessibilityText(this.isFullScreen ? '退出全屏' : '进入全屏')
+                .onClick(() => {
+                  this.onSwitchFullScreenCallback && this.onSwitchFullScreenCallback()
+                })
+            }
+
           }
         }
       }
       .padding(this.isProgressFullWidth ? null :
-        { left: Constants.PADDING_PAGE, right: Constants.PADDING_PAGE },
+        { left: Constants.PADDING_PAGE, right: Constants.PADDING_PAGE, bottom: Constants.PADDING_S },
       )
       .justifyContent(FlexAlign.SpaceBetween)
+      .width('100%')
     }
   }
 }

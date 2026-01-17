@@ -90,7 +90,7 @@ export struct TextResultPage {
             .fontWeight(FontWeight.Regular)
             .fontColor($r('sys.color.font_primary'));
         }.padding(4).height('100%').onClick(() => {
-          this.vm.toCopy();
+          this.vm.toCopy(this.getUIContext());
         });
 
       }.width('100%').justifyContent(FlexAlign.Center).height(52);

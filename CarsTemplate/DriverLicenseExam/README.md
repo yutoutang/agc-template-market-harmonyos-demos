@@ -14,12 +14,18 @@
 
 此模板提供如下组件，所有组件存放在工程根目录的components下，如果您仅需使用组件，可参考对应组件的指导链接；如果您使用此模板，请参考本文档。
 
-| 组件                  | 描述                       | 使用指导                                |
-| --------------------- | -------------------------- | --------------------------------------- |
-| 考试（exam）组件      | 展示各类考题，可进行考试   | [使用指导](components/exam/README.md)   |
-| 考试引导（guide）组件 | 首次引导进入对应类型的考试 | [使用指导](components/guide/README.md)  |
-| 搜索（search）组件    | 搜索考题                   | [使用指导](components/search/README.md) |
-
+| 组件                              | 描述                       | 使用指导                                        |
+|---------------------------------| -------------------------- |---------------------------------------------|
+| 考试组件(exam)                      | 展示各类考题，可进行考试   | [使用指导](components/exam/README.md)           |
+| 考试引导组件(guide)                   | 首次引导进入对应类型的考试 | [使用指导](components/guide/README.md)          |
+| 搜索组件(search)                    | 搜索考题                   | [使用指导](components/search/README.md)         |
+| 广告组件(aggregated_ads)            | 展示开屏广告的能力 | [使用指导](components/aggregated_ads/README.md) |
+| 通用分享组件(aggregated_share)        | 分享到微信朋友圈等 | [使用指导](components/aggregated_share/README.md)         |
+| 通用应用内设置组件(app_setting)          | 支持设置开关切换下拉等功能 | [使用指导](components/app_setting/README.md) |
+| 检测应用更新组件(check_app_update)      | 检测应用是否存在新版本 | [使用指导](components/check_app_update/README.md) |
+| 通用个人信息组件(collect_personal_info) | 支持编辑头像、昵称等 | [使用指导](components/collect_personal_info/README.md) |
+| 通用问题反馈组件(feedback)              | 提供意见反馈功能 | [使用指导](components/feedback/README.md) |
+| 会员组件(membership)                | 应用内支付会员开通 | [使用指导](components/membership/README.md) |
 本模板为驾考类应用提供了常用功能的开发样例，模板主要有引导页、考试和我的三大模块：
 
 * 引导页：提供定位、城市选择、驾照类型选择、学车阶段选择功能。
@@ -28,12 +34,12 @@
 
 * 我的：展示用户信息、个人设置及练习统计等功能。
 
-本模板已集成华为账号、定位服务，只需做少量配置和定制即可快速实现华为账号一键登录、定位、城市选择等功能。
+本模板已集成开屏广告、分享、应用内支付、开通会员、推送、华为账号、定位服务，只需做少量配置和定制即可快速实现华为账号一键登录、定位、城市选择等功能。
 
 
-| 引导页                                  | 考试                                    | 我的                              |
-|--------------------------------------|---------------------------------------|---------------------------------|
-| <img src="./picture/guide.PNG" alt="我的" width="300"> | <img src="./picture/exam.PNG" alt="考试" width="300"> | <img src="./picture/mine.PNG" alt="我的" width="300"> |
+| 引导页                                  | 考试                                    | 我的                                                  |
+|--------------------------------------|---------------------------------------|-----------------------------------------------------|
+| <img src="./picture/guide.PNG" alt="我的" width="300"> | <img src="./picture/exam.PNG" alt="考试" width="300"> | <img src="./picture/mine.jpg" alt="我的" width="300"> |
 
 
 | 顺序练习                                   | 练习设置                                     | 专项练习                                        |
@@ -44,6 +50,7 @@
 
 ```ts
 汽车驾考模板
+ |-- 开屏广告
  |-- 引导页
  |    |-- 城市选择
  |    |      |-- 搜索
@@ -76,10 +83,12 @@
  |    |      |-- 广告图片
  |    |      └-- 视频列表
  └-- 我的
-      |-- 用户信息
-      |-- 个人设置
+      |-- 个人信息
+      |-- 会员中心
       |-- 切换题库
-      └-- 练习统计
+      |-- 练习统计
+      |-- 意见反馈
+      └-- 设置
 ```
 
 
@@ -97,6 +106,9 @@ DriverLicenseExam
   |   |    |     ShowToast.ets                     // 错误提示处理工具
   |   |    |- model 
   |   |    |     CommonModel.ets                   // 地理位置获取
+  |   |    |- push
+  |   |    |     Model.ets                         // 推送数据模型
+  |   |    |     PushUtils.ets                     // 推送工具类
   |   |    └- utils 
   |   |          AccountUtil.ets                   // 账号管理工具
   |   |          FormatUtil.ets                    // 日历、图片等格式管理工具
@@ -173,6 +185,15 @@ DriverLicenseExam
   |   |    |
   |   |    └- controller
   |   |          SearchController.ets              // 搜索controller
+  |   |
+  |   |- aggregated_ads                            // 开屏广告组件
+  |   |- aggregated_share                          // 通用分享组件
+  |   |- app_setting                               // 通用应用内设置组件
+  |   |- check_app_update                          // 检测应用更新组件
+  |   |- collect_personal_info                     // 通用个人信息组件
+  |   |- feedback                                  // 通用问题反馈组件
+  |   |- membership                                // 通用会员组件
+  |
   |- products                                      // 入口模块
   |   |- entry/src/main/ets                   
   |   |    |- common                           
@@ -181,47 +202,54 @@ DriverLicenseExam
   |   |    |- constants                               
   |   |    |    Constants.ets                      // 常量配置
   |   |    | 
-  |   |    └- pages
-  |   |         |- collection
-  |   |         |     CollectionView.ets           // 错题收藏页面
-  |   |         |
-  |   |         |- guide
-  |   |         |     GuidePage.ets                // 导引页面
-  |   |         |
-  |   |         |- home
-  |   |         |     HomeView.ets                 // 考试页面
-  |   |         |     SearchPage.ets               // 搜索页面
-  |   |         |
-  |   |         |- mine
-  |   |         |     FeedTitle.ets
-  |   |         |     MineView.ets                 // 我的页面
-  |   |         |     PersonalInfo.ets             // 个人信息页面
-  |   |         |     PrivacyAgreement.ets         // 隐私协议页面
-  |   |         |     QuickLoginPage.ets           // 华为账号一键登录页面
-  |   |         |     Setting.ets                  // 设置
-  |   |         |
-  |   |         |- practice
-  |   |         |     PracticeView.ets             // 练习考试页面
-  |   |         |
-  |   |         |- specialExercises
-  |   |         |     ChapterListView.ets          // 章节练习
-  |   |         |     SpecialExercisesView.ets     // 专项练习
-  |   |         |- video
-  |   |         |     VideoDetailView.ets          // 视频播放页面
-  |   |         |     VideoListView.ets            // 视频列表
-  |   |         |
-  |   |         |- MainEntry.ets                   // 入口文件
-  |   |         └- SelectCityView.ets              // 城市选择页面
-  
+  |   |    |- pages
+  |   |    |     |- collection
+  |   |    |     |     CollectionView.ets           // 错题收藏页面
+  |   |    |     |
+  |   |    |     |- guide
+  |   |    |     |     GuidePage.ets                // 导引页面
+  |   |    |     |
+  |   |    |     |- home
+  |   |    |     |     HomeView.ets                 // 考试页面
+  |   |    |     |     SearchPage.ets               // 搜索页面
+  |   |    |     |
+  |   |    |     |- mine
+  |   |    |     |     FeedBack.ets                 // 意见反馈
+  |   |    |     |     FeedTitle.ets                // 标题箭头组件
+  |   |    |     |     MemberShip.ets               // 会员
+  |   |    |     |     MineView.ets                 // 我的页面
+  |   |    |     |     PersonalInfo.ets             // 个人信息页面
+  |   |    |     |     PersonalSetting.ets          // 个人信息设置
+  |   |    |     |     PrivacyAgreement.ets         // 隐私协议页面
+  |   |    |     |     QuickLoginPage.ets           // 华为账号一键登录页面
+  |   |    |     |     Setting.ets                  // 设置
+  |   |    |     |
+  |   |    |     |- practice
+  |   |    |     |     PracticeView.ets             // 练习考试页面
+  |   |    |     |
+  |   |    |     |- specialExercises
+  |   |    |     |     ChapterListView.ets          // 章节练习
+  |   |    |     |     SpecialExercisesView.ets     // 专项练习
+  |   |    |     |- video
+  |   |    |     |     VideoDetailView.ets          // 视频播放页面
+  |   |    |     |     VideoListView.ets            // 视频列表
+  |   |    |     |
+  |   |    |     |- MainEntry.ets                   // 入口文件
+  |   |    |     |- SelectCityView.ets              // 城市选择页面
+  |   |    |     └- SplashPage.ets                  // 开屏广告
+  |   |    |- types                               
+  |   |    |    Types.ets                          // 公共Type
+  |   |    └- util                               
+  |   |         WantUtils.ets                      // want处理工具类
 ```
 
 
 ## 约束和限制
 ### 环境
-- DevEco Studio版本：DevEco Studio 5.0.1 Release及以上
-- HarmonyOS SDK版本：HarmonyOS 5.0.1 Release SDK及以上
+- DevEco Studio版本：DevEco Studio 5.0.3 Release及以上
+- HarmonyOS SDK版本：HarmonyOS 5.0.3 Release SDK及以上
 - 设备类型：华为手机（包括双折叠和阔折叠）
-- 系统版本：HarmonyOS 5.0.1(13)及以上
+- 系统版本：HarmonyOS 5.0.3(15)及以上
 
 ### 权限
 - 获取位置权限：ohos.permission.APPROXIMATELY_LOCATION，ohos.permission.LOCATION。
@@ -253,9 +281,16 @@ DriverLicenseExam
    b. 添加公钥指纹，如果华为账号服务已配置，可跳过此步骤。
 
    c. [开通地图服务](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/map-config-agc)。
+4. 配置推送服务。
 
-4. 为应用进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing#section297715173233)。
-5. 添加手工签名所用证书对应的公钥指纹，详细参考：[配置应用签名证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-cert-fingerprint-0000002278002933)。
+   a. [开启推送服务](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/push-config-setting)。
+
+   b. 按照需要的权益[申请通知消息自分类权益](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/push-apply-right)。
+
+   c. [端云调试](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/push-server)。
+
+5. 为应用进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing#section297715173233)。
+6. 添加手工签名所用证书对应的公钥指纹，详细参考：[配置应用签名证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-cert-fingerprint-0000002278002933)。
 
 ### 运行调试工程
 1. 用USB线连接调试手机和PC。

@@ -1,12 +1,8 @@
-import { common } from '@kit.AbilityKit';
 import { ComponentContent, promptAction } from '@kit.ArkUI';
-import { Logger } from './Logger';
+import { UtilLog as Logger } from '@hw-agconnect/util-log';
+import { WindowUtil } from './WindowUtil';
 
 const TAG = '[LoadingDialogUtil]';
-
-export async function getUIContext(): Promise<UIContext> {
-  return (await (getContext() as common.UIAbilityContext).windowStage.getMainWindow()).getUIContext()
-}
 
 @Builder
 export function LoadingDialogBuilder() {
@@ -54,7 +50,7 @@ export class LoadingDialogUtil {
 
     try {
       if (!LoadingDialogUtil.uiContext) {
-        LoadingDialogUtil.uiContext = await getUIContext()
+        LoadingDialogUtil.uiContext = WindowUtil.uiContext;
         LoadingDialogUtil.contentNode =
           new ComponentContent(LoadingDialogUtil.uiContext, wrapBuilder(LoadingDialogBuilder))
       }

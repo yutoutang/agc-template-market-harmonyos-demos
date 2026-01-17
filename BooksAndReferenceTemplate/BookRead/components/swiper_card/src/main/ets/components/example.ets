@@ -23,9 +23,7 @@ export struct BookSwiperCard {
         builderList: this.builderList,
         bookList: this.books,
         isLoop: true,
-        isCovered: false,
         onImageClick: (index: number) => {
-
         }
       })
     }

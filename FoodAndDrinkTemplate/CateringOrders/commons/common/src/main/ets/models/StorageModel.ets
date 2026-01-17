@@ -1,11 +1,18 @@
-import { OrderTypeEnum } from '../constants/Common';
 import { Type, window } from '@kit.ArkUI';
+import { CarGoodsInfoResp, MyCarResp, UserInfoResp } from 'network';
+import { Constants, OrderTypeEnum } from '../constants/Common';
 import { getAnonymousTel } from '../utils/Utils';
-import { MyCarResp, UserInfoResp } from 'network';
 
 // 应用信息
+@ObservedV2
 export class AppInfoModel {
+  appId: string = '';
   packageName: string = '';
+  @Trace telephone: string = '';
+  @Trace bannerList: string[] = []
+  @Trace imgBaseUrl: string = ''
+  @Trace localCity: string = Constants.DEFAULT_CITY
+  @Trace preloadFinished: boolean = false
 }
 
 export class TableInfo {
@@ -40,6 +47,14 @@ export class RechargeTier {
   type: number = 0
 }
 
+export class StoreQueueInfo {
+  used: number = 0;
+  min: number = 0;
+  mid: number = 0;
+  max: number = 0;
+  now: number = 0;
+}
+
 @ObservedV2
 export class StoreInfo {
   id: string = ''
@@ -68,9 +83,13 @@ export class StoreInfo {
   @Trace xyhMoney: number = 0
   // 备注口味：多个以;；分隔
   @Trace taste: string = ''
-  @Type(Reduction)
-  @Trace reductionList: Array<Reduction> = []
+  @Type(Reduction) @Trace reductionList: Array<Reduction> = []
   rechargeTier: Array<RechargeTier> = []
+  privateRoom: Array<number> = []
+  diningHall: Array<number> = []
+  maxCount: number = 0
+  needQueue: boolean = false
+  queueInfo: StoreQueueInfo = new StoreQueueInfo()
 
   constructor(id: string = '', name: string = '', address: string = '', time1: string = '', time2: string = '',
     tel: string = '', announcement: string = '', logo: string = '', coordinates: string = '',
@@ -101,18 +120,17 @@ export class StoreInfo {
 @ObservedV2
 export class StoreInfoModel {
   @Trace storeId: string = '';
-  @Trace tel: string = '';
-  @Trace storeType: number = 2;
-  @Trace orderType: number = OrderTypeEnum.PICK_SELF
+  @Trace tableId: string = ''
+  @Trace tableInfo: TableInfo = new TableInfo()
+  @Trace preorderTime: string = '立即就餐'
+  @Trace dinerNum: ResourceStr = ''
+  @Trace orderType: number = OrderTypeEnum.DINE_IN
   @Trace distance: number = 0
   @Trace isRest: boolean = false
   @Trace qrCodeFlag: boolean = false
-  @Trace preloadFinished: boolean = false
-  @Type(TableInfo)
-  @Trace tableList: Array<TableInfo> = [];
+  @Type(TableInfo) @Trace tableList: Array<TableInfo> = [];
   @Trace storeInfo: StoreInfo = new StoreInfo()
-  @Type(StoreInfo)
-  @Trace storeList: Array<StoreInfo> = []
+  @Type(StoreInfo) @Trace storeList: Array<StoreInfo> = []
 }
 
 // 用户头像持久化
@@ -120,13 +138,14 @@ export class StoreInfoModel {
 export class WindowModel {
   @Trace windowTopHeight: number = 38.77;
   @Trace windowBottomHeight: number = 28;
+  @Trace fullScreen: boolean = false;
   @Trace windowStage?: window.WindowStage = undefined;
 
-  getWindowTopHeight() {
+  getWindowTopHeight(): number {
     return this.windowTopHeight || 38.77;
   }
 
-  getWindowBottomHeight() {
+  getWindowBottomHeight(): number {
     return this.windowBottomHeight || 28;
   }
 }
@@ -136,6 +155,7 @@ export class FormCard {
   @Trace id: number = 0
   url: string = ''
   @Trace orderId: string = ''
+  @Trace index: number = 0
   @Trace isOrderJump: boolean = false
 }
 
@@ -143,29 +163,29 @@ export class FormCard {
 @ObservedV2
 export class MyCarModel {
   @Trace myCar: MyCar = new MyCar()
-  @Trace tableId: string = ''
-  @Trace dinerNum: ResourceStr = ''
-  @Trace tableInfo: TableInfo = new TableInfo()
-  @Trace preorderTime: string = '立即就餐'
   @Trace carCheck: Array<string> = []
 }
 
+@ObservedV2
 export class MyCar {
-  boxMoney: number = 0
-  goodsList: Array<CarGoodsInfo> = []
-  num: number = 0
-  money: number = 0
+  @Trace boxMoney: number = 0
+  @Trace goodsList: Array<CarGoodsInfo> = []
+  @Trace num: number = 0
+  @Trace money: number = 0
 
-  constructor(boxMoney: number = 0, goodsList: Array<CarGoodsInfo> = [], num: number = 0, money: number = 0) {
+  constructor(boxMoney: number = 0, num: number = 0, money: number = 0) {
     this.boxMoney = boxMoney
-    this.goodsList = goodsList
     this.num = num
     this.money = money
   }
 
   update(item: MyCarResp) {
     this.boxMoney = item.boxMoney
-    this.goodsList = item.goodsList
+    this.goodsList = item.goodsList.map((item): CarGoodsInfo => {
+      let temp = new CarGoodsInfo()
+      temp.update(item)
+      return temp
+    })
     this.num = item.num
     this.money = item.money
   }
@@ -191,6 +211,22 @@ export class CarGoodsInfo {
   money2: number = 0
   boxMoney: number = 0
   isMust: number = 0
+
+  update(item: CarGoodsInfo | CarGoodsInfoResp) {
+    this.id = item.id;
+    this.goodsId = item.goodsId;
+    this.name = item.name;
+    this.logo = item.logo;
+    this.num = item.num;
+    this.specType = item.specType;
+    this.spec = item.spec;
+    this.combination = item.combination;
+    this.discount = item.discount;
+    this.money = item.money;
+    this.money2 = item.money2;
+    this.boxMoney = item.boxMoney;
+    this.isMust = item.isMust;
+  }
 }
 
 @ObservedV2
@@ -205,8 +241,8 @@ export class UserInfo implements UserInfoResp {
   @Trace wallet: number = 0
   @Trace userTel: string = ''
 
-  constructor(id: string = '', name: string = '', img: string = '', openId: string = '',
-    storeId: string = '', totalScore: number = 0, wallet: number = 0, unionId: string = '') {
+  constructor(id: string = '', name: string = '', img: string = '', openId: string = '', storeId: string = '',
+    totalScore: number = 0, wallet: number = 0, unionId: string = '') {
     this.id = id
     this.name = name
     this.img = img
@@ -242,4 +278,13 @@ export class UserInfoModel {
 export class UserIconModel {
   @Trace isSaved: boolean = false
   @Trace userIconPath: string = 'userImage.jpg'
+}
+
+// 分享参数
+@ObservedV2
+export class CustomShareParams {
+  @Trace id: number = 0;
+  @Trace pageName: string = '';
+  @Trace goodsId: string = '';
+  @Trace goodsName: string = '';
 }

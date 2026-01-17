@@ -32,7 +32,7 @@ export { MathUtil } from './src/main/ets/utils/MathUtil';
 
 export { TimeUtils, DHMS } from './src/main/ets/utils/TimeUtils';
 
-export { WindowUtils } from './src/main/ets/utils/WindowUtils';
+export * from './src/main/ets/utils/WindowUtils';
 
 export { TSearch } from './src/main/ets/ui/TSearch'
 
@@ -47,3 +47,7 @@ export { UserInfoUtil } from './src/main/ets/utils/UserInfoUtil';
 export * from './src/main/ets/model/WelfareModel'
 
 export * from './src/main/ets/utils/DialogUtil'
+
+export * from './src/main/ets/utils/BreakpointSystem'
+
+export { TabInfo } from './src/main/ets/model/TabInfo'

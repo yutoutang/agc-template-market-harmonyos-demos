@@ -4,6 +4,7 @@ import { camera, cameraPicker } from '@kit.CameraKit';
 import { faceDetector, subjectSegmentation } from '@kit.CoreVisionKit';
 import { fileIo as fs } from '@kit.CoreFileKit';
 import { image } from '@kit.ImageKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { Logger } from '../util/MyLog';
 import { toastUtil } from '../util/ToastUtil';
 import { getInstance, RouterMap } from '../util/Route';
@@ -250,11 +251,16 @@ export class CredentialsPageVM {
 
   async detectFace(pixelMap: PixelMap): Promise<faceDetector.Face[]> {
     let res: faceDetector.Face[] = [];
-    if (await faceDetector.init()) { // 初始化faceDetector
-      let visionInfo: faceDetector.VisionInfo = { pixelMap: pixelMap };
-      res = await faceDetector.detect(visionInfo); // 检测人脸
-      await faceDetector.release(); // 完成后释放faceDetector
+    try {
+      if (await faceDetector.init()) { // 初始化faceDetector
+        let visionInfo: faceDetector.VisionInfo = { pixelMap: pixelMap };
+        res = await faceDetector.detect(visionInfo); // 检测人脸
+        await faceDetector.release(); // 完成后释放faceDetector
+      }
+    } catch (e) {
+      UtilLog.error(`createCameraInput failed : ${JSON.stringify(e)}`)
     }
+
     return res;
   }
 

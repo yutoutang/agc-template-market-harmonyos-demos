@@ -37,6 +37,7 @@ export struct CommonConfirmDialog {
           Row({ space: 16 }) {
             Text('取消')
               .fontSize($r('sys.float.Body_L'))
+              .fontWeight(FontWeight.Medium)
               .fontColor($r('sys.color.font_emphasize'))
               .width(120)
               .height(40)
@@ -46,6 +47,7 @@ export struct CommonConfirmDialog {
               });
             Text('确定')
               .fontSize($r('sys.float.Body_L'))
+              .fontWeight(FontWeight.Medium)
               .fontColor($r('sys.color.font_emphasize'))
               .width(120)
               .height(40)

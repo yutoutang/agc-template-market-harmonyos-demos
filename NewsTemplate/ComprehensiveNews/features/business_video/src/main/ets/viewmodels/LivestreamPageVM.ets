@@ -29,26 +29,23 @@ export class LivestreamPageVM extends BaseViewModel {
     xl: 3,
   });
 
-  init() {
+  async init() {
     // 直播预告数据
     this.livestreamPreviewList = [
       '【直播预告】“小白主播”打台球-十堰晚报主播探店DK台球俱乐部专场',
       '【直播预告】果园满园，新疆万亩沙漠葡萄迎丰收'
     ]
     // banner数据
-    let liveBannerList = VideoService.queryLiveBannerList();
+    let liveBannerList = await VideoService.queryLiveBannerList();
     this.liveBannerListDataSource.setData(liveBannerList);
 
     // 精彩回放数据
-    this.liveHighlightsList = VideoService.queryLiveHighlights();
+    this.liveHighlightsList = await VideoService.queryLiveHighlights();
   }
 
-  refreshList() {
-    // 模拟下拉刷新
-    setTimeout(() => {
-      this.init();
-      this.isRefreshing = false;
-    }, 1000);
+  async refreshList() {
+    await this.init();
+    this.isRefreshing = false;
   }
 
   offsetChanged(offset: number) {

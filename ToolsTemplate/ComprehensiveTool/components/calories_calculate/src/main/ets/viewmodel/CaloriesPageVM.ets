@@ -1,4 +1,4 @@
-import { queryDietPlans } from '../apis/APIList';
+import { CaloriesServiceApi } from '../https/apis/CaloriesService';
 import { DietPlans, FoodPlanCalories } from '../model/Index';
 
 @ObservedV2
@@ -12,16 +12,14 @@ export class CaloriesPageVM {
       { color: '#88DB24', offset: 0.85 }, { color: '#88DB23', offset: 1.0 }])
 
   init() {
-    queryDietPlans().then((resp) => {
+    CaloriesServiceApi.queryDietPlans().then((resp) => {
       this.dietPlanList = this.dietPlanList.filter(() => false)
-      if (resp.status === 200) {
-        resp.data.forEach(item => {
-          let dietPlanList =
-            item.foodList.map(food => new FoodPlanCalories(food.id, food.name, food.weight, food.calories))
-          this.dietPlanList.push(new DietPlans(item.id, item.menuId, item.name, item.desc, item.totalCalories,
-            dietPlanList))
-        })
-      }
+      resp.forEach(item => {
+        let dietPlanList =
+          item.foodList.map(food => new FoodPlanCalories(food.id, food.name, food.weight, food.calories))
+        this.dietPlanList.push(new DietPlans(item.id, item.menuId, item.name, item.desc, item.totalCalories,
+          dietPlanList))
+      })
     })
   }
 }

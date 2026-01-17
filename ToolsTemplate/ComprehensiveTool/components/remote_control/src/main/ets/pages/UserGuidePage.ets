@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { promptAction } from '@kit.ArkUI';
 import { emitter } from '@kit.BasicServicesKit';
 import {
   HighLightGuideComponent,
@@ -28,6 +27,7 @@ import { UserGuidePageVM } from '../viewmodel/UserGuidePageVM';
 import { SendUtil } from '../util/Index';
 import { RemoteApi } from '../http/Api';
 import { getInstance } from '../components/RouteModule';
+import { UtilLog } from '@hw-agconnect/util-log';
 
 
 @Builder
@@ -102,7 +102,7 @@ export struct UserGuidePage {
             } else {
               this.vm.isDialogShow = false;
               getInstance().popToName('RemotePage');
-              promptAction.showToast({ message: '当前空调型号暂不支持！' });
+              this.getUIContext().getPromptAction().showToast({ message: '当前空调型号暂不支持！' });
             }
           });
         };
@@ -153,19 +153,31 @@ export struct UserGuidePage {
   private switchClick: OnClickListener = {
     onClick: () => {
       this.vm.isDialogShow = true;
-      emitter.emit('toSwitchClick');
+      try {
+        emitter.emit('toSwitchClick');
+      } catch (e) {
+        UtilLog.error(`switch click emit failed with error ${JSON.stringify(e)}`);
+      }
     },
   };
   private modeClick: OnClickListener = {
     onClick: () => {
       this.vm.isDialogShow = true;
-      emitter.emit('toModeClick');
+      try {
+        emitter.emit('toModeClick');
+      } catch (e) {
+        UtilLog.error(`mode click emit failed with error ${JSON.stringify(e)}`);
+      }
     },
   };
   private speedClick: OnClickListener = {
     onClick: () => {
       this.vm.isDialogShow = true;
-      emitter.emit('toSpeedClick');
+      try {
+        emitter.emit('toSpeedClick');
+      } catch (e) {
+        UtilLog.error(`speed click emit failed with error ${JSON.stringify(e)}`);
+      }
     },
   };
 }

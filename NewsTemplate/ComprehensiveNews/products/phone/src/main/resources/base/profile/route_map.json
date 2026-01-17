@@ -11,16 +11,6 @@
       "buildFunction": "SafePageBuilder"
     },
     {
-      "name": "PrivacyPage",
-      "pageSourceFile": "src/main/ets/pages/PrivacyPage.ets",
-      "buildFunction": "PrivacyPageBuilder"
-    },
-    {
-      "name": "AgreePrivacyPage",
-      "pageSourceFile": "src/main/ets/pages/AgreeDialogPage.ets",
-      "buildFunction": "AgreePrivacyPageBuilder"
-    },
-    {
       "name": "SplashPage",
       "pageSourceFile": "src/main/ets/pages/SplashPage.ets",
       "buildFunction": "SplashPageBuilder"

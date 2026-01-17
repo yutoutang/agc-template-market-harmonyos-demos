@@ -2,8 +2,6 @@ export { cache } from './src/main/ets/utils/Caches';
 
 export { iData, GlobalStateMgr } from './src/main/ets/utils/IData';
 
-export { iResourceMgr } from './src/main/ets/utils/ResManage';
-
 export { routerStack } from './src/main/ets/utils/RouterStack';
 
 export {
@@ -13,8 +11,6 @@ export {
   BreakpointModel,
   BreakpointStorage,
 } from './src/main/ets/utils/BreakpointSystem';
-
-export { Logger } from './src/main/ets/utils/Logger';
 
 export * from './src/main/ets/models/Index';
 
@@ -27,3 +23,9 @@ export { PopViewUtil } from './src/main/ets/utils/PopViewUtil';
 export { UserInfoModel } from './src/main/ets/models/UserInfoModel';
 
 export { Formatter } from './src/main/ets/utils/Formatter'
+
+export { PushUtil } from './src/main/ets/push/PushUtil'
+
+export { PermissionUtil } from './src/main/ets/utils/PermissionUtil'
+
+export { SafeJson } from './src/main/ets/utils/SafeJson'

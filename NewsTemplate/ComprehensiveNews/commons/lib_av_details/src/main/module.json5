@@ -1,0 +1,11 @@
+{
+  "module": {
+    "name": "lib_av_details",
+    'routerMap': '$profile:route_map',
+    "type": "har",
+    "deviceTypes": [
+      "default",
+      "tablet"
+    ]
+  }
+}

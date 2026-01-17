@@ -1,10 +1,15 @@
 import { PersistenceV2, UIUtils } from '@kit.ArkUI';
+import { TextReader } from '@kit.SpeechKit';
+import { Permissions } from '@kit.AbilityKit';
+import emitter from '@ohos.events.emitter';
 import { TabInfo } from 'module_channeledit';
-import { BaseViewModel, CommonDataSource, SettingModel } from 'lib_common';
+import { BaseViewModel, CommonDataSource, LocationUtils, Logger, PermissionUtils, SettingModel } from 'lib_common';
+import { AudioConstants, SubUtils } from 'module_audioplayer';
 import { HomeServiceApi, RequestListData } from 'lib_news_api';
 import { RendNewsInfo } from '../model/Model';
 import { channelList } from '../constants/ChannelList';
 
+const TAG = '[FlexLayoutVM]';
 
 @ObservedV2
 export class FlexLayoutVM extends BaseViewModel {
@@ -16,12 +21,15 @@ export class FlexLayoutVM extends BaseViewModel {
   @Trace tabIndex: number = 1
   @Trace setting: SettingModel = PersistenceV2.connect(SettingModel, () => new SettingModel())!
   @Trace pageIndex: number = 10;
+  @Trace isApplied: boolean = false;
+  @Trace isGranted: boolean = false;
+  @Trace localTabIdx: number = -1;
 
   @Monitor('setting.personalizedPush')
   async switchRecommend() {
     if (this.setting.personalizedPush) {
       let lazyNewsInfoList: CommonDataSource<RequestListData> = new CommonDataSource()
-      let newsInfoList = await HomeServiceApi.queryHomeRecommendList('recommend',this.pageIndex);
+      let newsInfoList = await HomeServiceApi.queryHomeRecommendList('recommend', this.pageIndex);
       lazyNewsInfoList.setData(newsInfoList)
       this.channelsList.splice(1, 0, UIUtils.makeObserved({
         text: '推荐',
@@ -44,29 +52,35 @@ export class FlexLayoutVM extends BaseViewModel {
   indexChange() {
     this.bgColor =
       this.channelsList[this.currentIndex].id === 'follow' ? $r('sys.color.background_secondary') :
-      $r('sys.color.background_primary')
+        $r('sys.color.background_primary')
+
+    // 未获取位置权限且没有申请过授权时，监听tabIndex切换
+    if (!this.isApplied && !this.isGranted && this.currentIndex === this.localTabIdx) {
+      this.requestLocPermission().then((isGranted) => {
+        this.isGranted = isGranted
+        if (this.isGranted) {
+          this.queryCityInfo(true);
+        }
+      })
+    }
   }
 
   tabsController: TabsController = new TabsController();
 
-  @Monitor('networkModel.netAddress')
-  onChangeNetAddress() {
-    // 处理本地tab的名称
-    this.handleLocalTabTitle()
-  }
-
   public init() {
     this.tabIndex = this.currentIndex
     this.channelsList = channelList.map((tab: TabInfo) => UIUtils.makeObserved(tab)).filter(v => Boolean(v))
-    if(!this.setting.personalizedPush) {
+    if (!this.setting.personalizedPush) {
       let recommendIndex = this.channelsList.findIndex(item => item.id === 'recommend')
       if (recommendIndex !== -1) {
         this.channelsList.splice(recommendIndex, 1)
       }
     }
+    // 查询本地Tab的索引
+    this.localTabIdx = this.channelsList.findIndex((tab: TabInfo) => tab.id === 'location');
     this.initNewsDynamicData()
-    // 处理本地tab的名称
-    this.handleLocalTabTitle()
+    // 静默查询本地tab的名称
+    this.silentQueryCity();
   }
 
 
@@ -116,14 +130,44 @@ export class FlexLayoutVM extends BaseViewModel {
     this.syncNewsChannels(this.channelsList, this.rendNewsInfoList)
   }
 
-  public handleLocalTabTitle() {
-    let ip = this.networkModel.netAddress[0];
-    HomeServiceApi.queryCityByIP(ip).then((res) => {
-      const localTabIdx = this.channelsList.findIndex((tab: TabInfo) => tab.id === 'location')
-      if (localTabIdx !== -1 && res) {
-        this.channelsList[localTabIdx].text = res
-      }
-    });
+  public silentQueryCity() {
+    this.isGranted = this.checkLocPermission();
+    if (this.isGranted) {
+      this.queryCityInfo();
+    }
+  }
+
+  public checkLocPermission() {
+    // 声明位置权限
+    const permission: Permissions = 'ohos.permission.APPROXIMATELY_LOCATION';
+    // 判断是否已具备用户授权
+    return PermissionUtils.checkPermissionGrant(permission);
+  }
+
+  public async requestLocPermission() {
+    this.isApplied = true;
+    // 声明位置权限
+    const permission: Permissions = 'ohos.permission.APPROXIMATELY_LOCATION';
+    // 向用户申请授权
+    const result = await PermissionUtils.requestPermissions([permission]);
+    Logger.info(TAG, 'request location permission, result = ' + result);
+    return result;
+  }
+
+  public queryCityInfo(refresh: boolean = false) {
+    LocationUtils.getCurrentCityInfo()
+      .then((resp) => {
+        if (this.localTabIdx !== -1) {
+          const oldV = this.channelsList[this.localTabIdx].text;
+          const newV = resp.cityName ?? '';
+          if (oldV !== newV) {
+            this.channelsList[this.localTabIdx].text = newV;
+            if (refresh) {
+              emitter.emit('local_refresh');
+            }
+          }
+        }
+      })
   }
 
   public tabIndexChange(index: number) {
@@ -133,5 +177,4 @@ export class FlexLayoutVM extends BaseViewModel {
   public currentIndexChange(index: number) {
     this.currentIndex = index
   }
-
 }

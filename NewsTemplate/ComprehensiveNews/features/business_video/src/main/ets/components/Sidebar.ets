@@ -1,13 +1,13 @@
 import { emitter } from '@kit.BasicServicesKit';
 import { UIUtils } from '@kit.ArkUI';
-import { BreakpointNameEnum, RouterMap, RouterUtils, TimeUtils } from 'lib_common';
+import { BreakpointNameEnum, NewsEnum, RouterMap, RouterUtils } from 'lib_common';
+import { Share } from 'lib_widget';
 import { NewsResponse } from 'lib_news_api';
 import { LoginSheetUtils } from 'lib_account';
 import { PlayerLayoutSize } from 'module_swipeplayer';
-import { Share } from 'module_share';
 import { CommentController } from '../controller/CommentController';
 import { SideBarVM } from '../viewmodels/SideBarVM';
-import { CommentSheetUtils } from '../commons/CommentSheetUtil';
+import { CommentSheetParams, CommentSheetUtils } from '../commons/CommentSheetUtil';
 
 @ComponentV2
 export struct Sidebar {
@@ -46,8 +46,8 @@ export struct Sidebar {
     this.playerLayoutSize.updateLayoutSizeChangeFlag(isTrue);
     let eventData: emitter.EventData = {
       data: {
-        showTabHeader: !isTrue
-      }
+        showTabHeader: !isTrue,
+      },
     };
     emitter.emit('showTabHeader', eventData)
   }
@@ -56,18 +56,26 @@ export struct Sidebar {
   handleMultiComment() {
     // 折叠屏展开态，且是MD尺寸
     let foldableAndMd = this.vm.breakPointModel.currentBreakpoint === BreakpointNameEnum.MD &&
-      this.vm.displayModel.isFoldable;
+    this.vm.displayModel.isFoldable;
     // LG尺寸或XL尺寸
     const larges = [BreakpointNameEnum.LG, BreakpointNameEnum.XL];
     let isLGOrXL = larges.includes(this.vm.breakPointModel.currentBreakpoint);
     if (foldableAndMd || isLGOrXL) {
       this.handleCommentState(true)
     } else {
+      let uiContext = this.getUIContext();
+      let uniqueId = this.getUniqueId();
+      let frameNode: FrameNode | null = uiContext.getFrameNodeByUniqueId(uniqueId);
+      let targetId = frameNode?.getFirstChild()?.getUniqueId();
+
       CommentSheetUtils.initParams(
-        this.vm.videoInfo,
-        this.isShowKeyboard,
-        this.playerLayoutSize,
-        this.commentController
+        {
+          videoInfo: this.vm.videoInfo,
+          isShowKeyboard: this.isShowKeyboard,
+          playerLayoutSize: this.playerLayoutSize,
+          commentController: this.commentController,
+          sheetTargetId: targetId,
+        } as CommentSheetParams,
       )
       CommentSheetUtils.open()
     }
@@ -171,14 +179,13 @@ export struct Sidebar {
 
       // 分享
       Share({
-        qrCodeInfo: {
-          id: this.videoInfo.id,
-          type: this.videoInfo.type,
+        shareData: {
+          recordId: this.videoInfo.id,
           title: this.videoInfo.title,
-          articleFrom: this.videoInfo.articleFrom,
-          createTime: TimeUtils.formatDate(this.videoInfo.createTime),
+          subTitle: this.videoInfo.articleFrom,
+          createTime: this.videoInfo.createTime,
           coverUrl: this.vm.handlerCoverImage(this.videoInfo),
-          isVideo: true,
+          type: NewsEnum.Video,
         },
         shareRenderBuilder: () => {
           this.shareCommentBuilder()

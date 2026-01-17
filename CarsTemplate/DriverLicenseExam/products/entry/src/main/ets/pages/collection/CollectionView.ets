@@ -15,7 +15,7 @@ struct CollectionView {
   vm: CommonModel = CommonModel.instance;
   @Local bottomRectHeight: number = 0;
   @Local topRectHeight: number = 0;
-  examService: ExamService = ExamService.instance;
+  examService: ExamService = ExamService.instance(this.getUIContext().getHostContext() as Context);
   @Local chapterList:Chapter[] = this.examService.getChapterListByType(WRONG_COLLECT.WRONG);
   @Local typeStatus: WRONG_COLLECT = WRONG_COLLECT.WRONG;
   @Local totalCount: number = 0;
@@ -48,9 +48,33 @@ struct CollectionView {
     }
   }
 
+  @Builder
+  toolBar() {
+    Row() {
+      Image($r('app.media.clear_btn'))
+        .width(40)
+        .height(40);
+    }
+    .width(50)
+    .height(40)
+    .justifyContent(FlexAlign.Center)
+    .margin({
+      top: 10,
+      right: '4%',
+    })
+    .onClick(() => {
+      if (this.typeStatus === WRONG_COLLECT.WRONG) {
+        this.examService.clearWrongQuestion()
+      } else {
+        this.examService.clearCollectQuestion();
+      }
+      this.toggleWrongOrCollect(this.typeStatus);
+    })
+  }
+
   build() {
     NavDestination(){
-      Column({space:12}) {
+      Column({space:16}) {
         Row() {
           Text('错题本')
             .width(86)
@@ -82,143 +106,135 @@ struct CollectionView {
         .justifyContent(FlexAlign.Start)
 
         Column() {
-          Row() {
-            Text(this.typeStatus === WRONG_COLLECT.WRONG?'错题统计':'收藏统计')
-              .fontSize(16)
-              .fontColor('rgba(0,0,0,0.9)')
+          Text(this.typeStatus === WRONG_COLLECT.WRONG?'错题统计':'收藏统计')
+            .fontSize(14)
+            .fontColor('rgba(0,0,0,0.9)')
+            .width(CommonConstants.FULL_WIDTH)
+            .textAlign(TextAlign.Start)
+            .margin({
+              bottom:8
+            })
+
+          Column() {
             Row() {
-              Image($r('app.media.clear'))
-                .width(24)
-                .height(24)
-              Text('清空')
+              Text(this.typeStatus === WRONG_COLLECT.WRONG?'错题总数':'收藏总数')
                 .fontSize(14)
                 .fontColor('rgba(0,0,0,0.9)')
+
+              Row() {
+                Text(String(this.totalCount))
+                  .fontSize(24)
+                  .fontColor('#64BB5C')
+                  .fontWeight(FontWeight.Bold)
+                  .margin({
+                    right:8
+                  })
+
+                Image($r('app.media.ic_right_arrow_lined'))
+                  .width(16)
+                  .height(16)
+              }
             }
+            .width(CommonConstants.FULL_WIDTH)
+            .justifyContent(FlexAlign.SpaceBetween)
             .onClick(() => {
-                if (this.typeStatus === WRONG_COLLECT.WRONG) {
-                  this.examService.clearWrongQuestion()
-                } else {
-                  this.examService.clearCollectQuestion();
-                }
-                this.toggleWrongOrCollect(this.typeStatus);
+              if (this.totalCount === 0) {
+                this.getUIContext().getPromptAction().showToast({
+                  message: this.typeStatus === WRONG_COLLECT.WRONG?'暂时没有错题':'暂时没有收藏的题目',
+                  duration: 1500,
+                })
+                return;
+              }
+              const param:ROUTE_PARAM = {
+                title: this.typeStatus === WRONG_COLLECT.WRONG?'错题':'收藏',
+                type: this.typeStatus === WRONG_COLLECT.WRONG?EXAM_MANAGER_TYPE.error:EXAM_MANAGER_TYPE.collect
+              }
+              this.vm.navStack.pushPathByName('practiceView', param)
             })
           }
-          .width(CommonConstants.FULL_WIDTH)
-          .justifyContent(FlexAlign.SpaceBetween)
-          .margin({
-            bottom: 12
-          })
-          Divider()
-          Row() {
-            Text(this.typeStatus === WRONG_COLLECT.WRONG?'错题总数':'收藏总数')
-              .fontSize(14)
-              .fontColor('rgba(0,0,0,0.9)')
+          .cardStyle()
 
-            Row() {
-              Text(String(this.totalCount))
-                .fontSize(24)
-                .fontColor('#64BB5C')
-                .fontWeight(FontWeight.Bold)
-                .margin({
-                  right:8
-                })
-
-              Image($r('app.media.ic_right_arrow_lined'))
-                .width(16)
-                .height(16)
-            }
-          }
-          .width(CommonConstants.FULL_WIDTH)
-          .justifyContent(FlexAlign.SpaceBetween)
-          .margin({
-            top: 12
-          })
-          .onClick(() => {
-            if (this.totalCount === 0) {
-              promptAction.showToast({
-                message: this.typeStatus === WRONG_COLLECT.WRONG?'暂时没有错题':'暂时没有收藏的题目',
-                duration: 1500,
-              })
-              return;
-            }
-            const param:ROUTE_PARAM = {
-              title: this.typeStatus === WRONG_COLLECT.WRONG?'错题':'收藏',
-              type: this.typeStatus === WRONG_COLLECT.WRONG?EXAM_MANAGER_TYPE.error:EXAM_MANAGER_TYPE.collect
-            }
-            this.vm.navStack.pushPathByName('practiceView', param)
-          })
         }
-        .cardStyle()
+        .width(CommonConstants.FULL_WIDTH)
 
         Column() {
           Text(this.typeStatus === WRONG_COLLECT.WRONG?'错题分布':'收藏分布')
             .width(CommonConstants.FULL_WIDTH)
             .textAlign(TextAlign.Start)
-            .fontSize(16)
+            .fontSize(14)
             .fontColor('rgba(0,0,0,0.9)')
-          List() {
-            ForEach(this.chapterList, (item: Chapter, index: number) => {
-              ListItem() {
-                Row() {
-                  Row() {
-                    Text(String(index + 1))
-                      .width(16)
-                      .height(16)
-                      .margin({
-                        right:8
-                      })
-                      .fontSize(10)
-                      .fontColor(Color.White)
-                      .borderRadius('50%')
-                      .backgroundColor(item.serialBgColor)
-                      .textAlign(TextAlign.Center)
+            .margin({
+              bottom:8
+            })
 
-                    Text(item.title)
-                      .fontSize(14)
-                      .fontColor('rgba(0,0,0,0.9)')
-                  }
+          if (this.chapterList.length > 0) {
+            Column() {
+              List() {
+                ForEach(this.chapterList, (item: Chapter, index: number) => {
+                  ListItem() {
+                    Row() {
+                      Row() {
+                        Text(String(index + 1))
+                          .width(16)
+                          .height(16)
+                          .margin({
+                            right:8
+                          })
+                          .fontSize(10)
+                          .fontColor(Color.White)
+                          .borderRadius('50%')
+                          .backgroundColor(item.serialBgColor)
+                          .textAlign(TextAlign.Center)
 
-                  Row() {
-                    Text(String(item.examManger.total))
-                      .fontSize(14)
-                      .fontColor('rgba(0,0,0,0.6)')
-                      .margin({
-                        right: 4
-                      })
-                    Image($r('app.media.ic_right_arrow_lined'))
-                      .width(16)
-                      .height(16)
+                        Text(item.title)
+                          .fontSize(14)
+                          .fontColor('rgba(0,0,0,0.9)')
+                      }
 
+                      Row() {
+                        Text(String(item.examManger.total))
+                          .fontSize(14)
+                          .fontColor('rgba(0,0,0,0.6)')
+                          .margin({
+                            right: 4
+                          })
+                        Image($r('app.media.ic_right_arrow_lined'))
+                          .width(16)
+                          .height(16)
+
+                      }
+                    }
+                    .width(CommonConstants.FULL_WIDTH)
+                    .justifyContent(FlexAlign.SpaceBetween)
+                    .margin({
+                      top:12,
+                      bottom: 12
+                    })
+                    .onClick(() => {
+                      const param:ROUTE_PARAM = {
+                        title: item.title,
+                        type: EXAM_MANAGER_TYPE.chapter_name,
+                        wrongOrCollect: this.typeStatus,
+                        keyword: item.title
+                      }
+                      this.vm.navStack.pushPathByName('practiceView', param)
+                    })
                   }
-                }
-                .width(CommonConstants.FULL_WIDTH)
-                .justifyContent(FlexAlign.SpaceBetween)
-                .margin({
-                  top:12,
-                  bottom: 12
-                })
-                .onClick(() => {
-                  const param:ROUTE_PARAM = {
-                    title: item.title,
-                    type: EXAM_MANAGER_TYPE.chapter_name,
-                    wrongOrCollect: this.typeStatus,
-                    keyword: item.title
-                  }
-                  this.vm.navStack.pushPathByName('practiceView', param)
-                })
+                  .width(CommonConstants.FULL_WIDTH)
+                }, (item:Chapter) => JSON.stringify(item))
               }
               .width(CommonConstants.FULL_WIDTH)
-            }, (item:Chapter) => JSON.stringify(item))
+              .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+              .divider({
+                strokeWidth:1,
+                color:'rgba(0,0,0,0.2)'
+              })
+            }
+            .cardStyle()
           }
-          .width(CommonConstants.FULL_WIDTH)
-          .divider({
-            strokeWidth:1,
-            color:'rgba(0,0,0,0.2)'
-          })
+
         }
-        .cardStyle()
-
-
+        .width(CommonConstants.FULL_WIDTH)
       }
       .width(CommonConstants.FULL_WIDTH)
       .height(CommonConstants.FULL_HEIGHT)
@@ -230,11 +246,12 @@ struct CollectionView {
       })
     }
     .title('错题收藏')
+    .menus(this.toolBar())
     .height(CommonConstants.FULL_HEIGHT)
     .width(CommonConstants.FULL_WIDTH)
     .padding({
-      top:px2vp(this.topRectHeight),
-      bottom: px2vp(this.bottomRectHeight)
+      top:this.getUIContext().px2vp(this.topRectHeight),
+      bottom: this.getUIContext().px2vp(this.bottomRectHeight)
     })
     .backgroundColor('#F1F3F5')
   }

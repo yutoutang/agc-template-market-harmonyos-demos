@@ -4,7 +4,7 @@
 
 - [简介](#简介)
 - [约束与限制](#约束与限制)
-- [快速入门](#快速入门)
+- [使用](#使用)
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
@@ -29,7 +29,7 @@
 
 - 网络权限：ohos.permission.INTERNET
 
-## 快速入门
+## 使用
 
 1. 安装组件。  
    如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
@@ -507,7 +507,7 @@ struct Index {
       }
       .height('100%')
       .width('100%')
-      .backgroundColor($r('sys.color.background_secondary'))
+      .padding({ top: 45 })
    }
 
    getSelectSpec(item: SpecItemResp, index: number) {

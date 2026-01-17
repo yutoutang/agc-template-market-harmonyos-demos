@@ -1,6 +1,6 @@
 import { BusinessError } from '@kit.BasicServicesKit';
 import { ComponentContent, promptAction, UIContext } from '@kit.ArkUI';
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 
 export class PromptActionUtil {
   static ctx: UIContext;
@@ -27,12 +27,12 @@ export class PromptActionUtil {
     if (PromptActionUtil.contentNode !== null) {
       PromptActionUtil.ctx.getPromptAction().openCustomDialog(PromptActionUtil.contentNode, PromptActionUtil.options)
         .then(() => {
-          hilog.info(0xFF00, 'TAG', 'OpenCustomDialog completed');
+          UtilLog.info(0xFF00, 'AR_MEASURE', 'OpenCustomDialog completed');
         })
         .catch((error: BusinessError) => {
           let message = (error as BusinessError).message;
           let code = (error as BusinessError).code;
-          hilog.info(0xFF00, 'TAG', `OpenCustomDialog args error code is ${code}, message is ${message}`);
+          UtilLog.info(0xFF00, 'AR_MEASURE', `OpenCustomDialog args error code is ${code}, message is ${message}`);
         })
     }
   }
@@ -41,12 +41,12 @@ export class PromptActionUtil {
     if (PromptActionUtil.contentNode !== null) {
       PromptActionUtil.ctx.getPromptAction().closeCustomDialog(contentNode)
         .then(() => {
-          hilog.info(0xFF00, 'TAG', 'CloseCustomDialog completed');
+          UtilLog.info(0xFF00, 'AR_MEASURE', 'CloseCustomDialog completed');
         })
         .catch((error: BusinessError) => {
           let message = (error as BusinessError).message;
           let code = (error as BusinessError).code;
-          hilog.info(0xFF00, 'TAG', `CloseCustomDialog args error code is ${code}, message is ${message}`);
+          UtilLog.info(0xFF00, 'AR_MEASURE', `CloseCustomDialog args error code is ${code}, message is ${message}`);
         })
     }
   }
@@ -55,12 +55,12 @@ export class PromptActionUtil {
     if (PromptActionUtil.contentNode !== null) {
       PromptActionUtil.ctx.getPromptAction().updateCustomDialog(PromptActionUtil.contentNode, options)
         .then(() => {
-          hilog.info(0xFF00, 'TAG', 'UpdateCustomDialog completed');
+          UtilLog.info(0xFF00, 'AR_MEASURE', 'UpdateCustomDialog completed');
         })
         .catch((error: BusinessError) => {
           let message = (error as BusinessError).message;
           let code = (error as BusinessError).code;
-          hilog.info(0xFF00, 'TAG', `UpdateCustomDialog args error code is ${code}, message is ${message}`);
+          UtilLog.info(0xFF00, 'AR_MEASURE', `UpdateCustomDialog args error code is ${code}, message is ${message}`);
         })
     }
   }

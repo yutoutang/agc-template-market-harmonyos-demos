@@ -1,4 +1,4 @@
-# 投屏组件快速入门
+# 本地影音投屏组件快速入门
 
 ## 目录
 
@@ -16,7 +16,7 @@
 
 本组件工程代码结构如下所示：
 ```ts
-cast_tool/src/main/ets                            // 投屏工具(har)  
+cast_tool/src/main/ets                            // 本地影音投屏(har)  
   |- components                                   // 模块组件
   |- constant                                     // 常量  
   |- controller                                   // 控制器  
@@ -41,7 +41,7 @@ cast_tool/src/main/ets                            // 投屏工具(har)
 * 读取图片视频权限：ohos.permission.READ_IMAGEVIDEO
 
 ### 调试
-本组件的投屏功能不支持使用模拟器调试，请使用真机调试。
+本组件的投屏功能不支持使用模拟器调试，请使用真机调试。远端设备需为HarmonyOS 5.0.0及以上版本的2in1设备、HarmonyOS 3.1及以上版本的华为智慧屏、支持标准DLNA协议的设备。
 
 ## 使用
 1. 安装组件。
@@ -85,7 +85,7 @@ export struct Index {
    build() {
       Navigation(this.pageStack) {
          Button('跳转').onClick(() => {
-            // CastPage为投屏工具路由入口页面名称
+            // CastPage为组件路由入口页面名称
             this.pageStack.pushPathByName('CastPage', null);
          });
       }.hideTitleBar(true).mode(NavigationMode.Stack);

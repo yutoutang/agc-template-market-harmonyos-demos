@@ -1,4 +1,3 @@
-import { promptAction } from '@kit.ArkUI';
 import { HistoryItem, HistoryUtils } from '../utils/HistoryUtils';
 
 @Builder
@@ -42,7 +41,7 @@ export struct HistoryResult {
             if (this.calcHistory.length) {
               this.calcHistory = [];
               HistoryUtils.clearHistoryResult();
-              promptAction.showToast({ message: '历史记录已清空！' });
+              this.getUIContext().getPromptAction().showToast({ message: '历史记录已清空！' });
             }
           });
       };

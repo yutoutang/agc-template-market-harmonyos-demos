@@ -6,6 +6,7 @@ import { AlignmentInfo } from '../commons/Interface';
 import { ChangeDiaryRecord } from '../models/ChangeRecord';
 import { COLOR_LIST } from '../commons/Constant';
 import { TextAlignment } from '../commons/Enum';
+import { UtilLog } from '@hw-agconnect/util-log';
 
 @ObservedV2
 export class RichEditorController {
@@ -391,7 +392,7 @@ export class RichEditorController {
       maxSelectNumber: 1,
     }).then((uris) => {
       let imageUri = uris[0];
-      let pixelMap: image.PixelMap = RichEditorController.loadImage(imageUri);
+      let pixelMap: image.PixelMap | undefined = RichEditorController.loadImage(imageUri);
       if (pixelMap) {
         let imageStyledString = new MutableStyledString(new ImageAttachment({
           value: pixelMap,
@@ -422,11 +423,16 @@ export class RichEditorController {
     }
   }
 
-  private static loadImage(name: string): image.PixelMap {
+  private static loadImage(name: string): image.PixelMap | undefined {
     let imageSource: image.ImageSource;
-    let fileSource = fileIo.openSync(name, fileIo.OpenMode.READ_ONLY);
-    imageSource = image.createImageSource(fileSource.fd);
-    return imageSource.createPixelMapSync();
+    try {
+      let fileSource = fileIo.openSync(name, fileIo.OpenMode.READ_ONLY);
+      imageSource = image.createImageSource(fileSource.fd);
+      return imageSource?.createPixelMapSync();
+    } catch (e) {
+      UtilLog.error(`loadImage failed with error ${JSON.stringify(e)}`)
+      return undefined
+    }
   }
 }
 

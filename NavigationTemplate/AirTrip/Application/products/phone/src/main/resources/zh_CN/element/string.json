@@ -31,6 +31,10 @@
     {
       "name": "location_reason",
       "value": "获取您的位置权限"
+    },
+    {
+      "name": "agcit_huawei_air_trip",
+      "value": "1.0.1"
     }
   ]
 }

@@ -1,9 +1,8 @@
-import { componentSnapshot } from '@kit.ArkUI';
-
 import { image } from '@kit.ImageKit';
 import { CommonUtils } from '../utils/CommonUtils';
 import { ImageUtils } from '../utils/ImageUtils';
 import { PopupUtils } from '../utils/PopupUtils';
+import { WindowUtil } from '../utils/WindowUtil';
 
 
 @ObservedV2
@@ -14,7 +13,6 @@ export class SnapShotController {
   @Trace mergedImage: PixelMap | undefined = undefined;
   @Trace isShowPreview: boolean = false;
   @Trace isLargePreview: boolean = false;
-
   yOffsetBefore: number = 0;
   @Trace curYOffset: number = 0;
   scroller: Scroller;
@@ -26,6 +24,7 @@ export class SnapShotController {
   areaArray: image.PositionArea[] = [];
   scrollHeight: number = 0;
   snapShotId: string;
+
   constructor(snapShotId: string, scroller: Scroller) {
     this.snapShotId = snapShotId;
     this.scroller = scroller;
@@ -48,11 +47,11 @@ export class SnapShotController {
   async beforeSnapshot() {
     this.yOffsetBefore = this.curYOffset;
     // Take a screenshot of the loaded List component as a cover image for the List component
-    this.componentMaskImage = await componentSnapshot.get(this.snapShotId);
+    this.componentMaskImage = await WindowUtil.uiContext.getComponentSnapshot().get(this.snapShotId);
     this.scroller.scrollTo({
       xOffset: 0,
       yOffset: 0,
-      animation: { duration: 200 }
+      animation: { duration: 200 },
     });
     this.snapPopupPosition = PopupUtils.calcPopupCenter(this.screenWidth, this.screenHeight, 100, 200);
     this.isShowPreview = true;
@@ -63,7 +62,7 @@ export class SnapShotController {
   async snapAndMerge() {
     this.scrollYOffsets.push(this.curYOffset);
     // Call the component screenshot interface to obtain the current screenshot
-    const pixelMap = await componentSnapshot.get(this.snapShotId);
+    const pixelMap = await WindowUtil.uiContext.getComponentSnapshot().get(this.snapShotId);
     // Gets the number of bytes per line of image pixels.
     let area: image.PositionArea =
       await ImageUtils.getSnapshotArea(pixelMap, this.scrollYOffsets, this.listComponentWidth,

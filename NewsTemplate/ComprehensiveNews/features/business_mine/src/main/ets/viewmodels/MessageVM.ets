@@ -1,6 +1,5 @@
 import { BaseViewModel } from 'lib_common';
-import { MessageServiceApi } from 'lib_news_api';
-import { BriefMsgInfo } from 'lib_news_api/src/main/ets/params/response/MessageResponse';
+import { MessageServiceApi, BriefMsgInfo } from 'lib_news_api';
 import { messageMenuList } from '../constants/Constants';
 import { MineMsgMenuItem, MineMsgMenuType } from '../types/Types';
 
@@ -68,7 +67,7 @@ export class MessageViewModel extends BaseViewModel {
       })
     } else {
       MessageServiceApi.setSystemRead().then(() => {
-        this.queryBriefMessageInfo();
+        this.queryBriefSystemInfo();
       })
     }
   }

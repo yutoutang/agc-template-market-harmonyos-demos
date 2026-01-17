@@ -1,4 +1,5 @@
 import { BookInfo, Constants, rankListInfo, TCRouter } from 'common';
+import { LengthMetrics } from '@kit.ArkUI';
 
 
 /**
@@ -86,8 +87,8 @@ export struct HotRankCard {
       .layoutWeight(1)
       .backgroundColor('#FFF5F5')
     }
-    .width('75%')
-    .height('90%')
+    .width(300)
+    .layoutWeight(1)
     .borderRadius(10)
     .clip(true)
 
@@ -103,11 +104,14 @@ export struct SearchResultCard {
   @Param info: BookInfo | undefined = undefined;
 
   build() {
-    Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
+    Flex({
+      direction: FlexDirection.Row,
+      alignItems: ItemAlign.Center,
+      justifyContent: FlexAlign.SpaceBetween,
+      space: { main: LengthMetrics.vp(12) }
+    }) {
       BookCover(this.info?.coverUrl);
 
-      Blank()
-        .width(16)
       Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceAround }) {
         Column() {
           Row() {
@@ -128,6 +132,7 @@ export struct SearchResultCard {
             .fontSize($r('sys.float.Body_S'))
             .fontColor($r('sys.color.font_secondary'))
             .fontWeight(FontWeight.Regular)
+            .alignSelf(ItemAlign.Start)
             .padding({ top: 10, bottom: 20 })
         }
 
@@ -150,7 +155,7 @@ export struct SearchResultCard {
         }
         .margin({ top: 20 })
       }
-      .width('65%')
+      .layoutWeight(1)
     }
     .height(150)
     .width(Constants.FULL_SIZE)

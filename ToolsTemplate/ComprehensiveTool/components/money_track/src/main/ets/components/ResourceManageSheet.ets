@@ -1,8 +1,8 @@
-import { promptAction } from '@kit.ArkUI';
 import { BillConstants } from '../commons/Constants';
 import { BalanceChangeType } from '../commons/Enums';
 import { BalanceResourceItem } from '../commons/Types';
 import { BreakpointStorage, BreakpointSystem, BreakpointTypeEnum } from '../utils/BreakpointSystem';
+import { contextUtil } from '../utils/ContextUtil';
 import { ResourceUtil } from '../utils/ResourceUtil';
 import { ResourceManageVM } from '../viewmodels/ResourceManageVM';
 
@@ -110,7 +110,7 @@ export struct ResourceManageSheet {
         }
         .onClick(() => {
           if (item.isCustom) {
-            promptAction.openCustomDialog({
+            contextUtil.getPromptAction()?.openCustomDialog({
               builder: () => this.editCustomDialog(item),
               width: '90%',
               alignment: DialogAlignment.Center,
@@ -188,7 +188,7 @@ export struct ResourceManageSheet {
               this.openSheet = false;
               this.handleAddSuccess?.();
               this.vm.selectedItem = undefined;
-              promptAction.closeCustomDialog(this.dialogId);
+              contextUtil.getPromptAction()?.closeCustomDialog(this.dialogId);
             }
           });
       }
@@ -220,7 +220,7 @@ export struct ResourceManageSheet {
         .dialogTextStyle()
         .fontColor(BillConstants.WARNING_COLOR)
         .onClick(() => {
-          promptAction.showDialog({
+          contextUtil.getPromptAction()?.showDialog({
             message: '删除类型会同时删除该类型下的所有记账数据，并且无法恢复。请确认是否删除？',
             buttons: [
               {
@@ -244,7 +244,7 @@ export struct ResourceManageSheet {
       Text('取消')
         .dialogTextStyle()
         .onClick(() => {
-          promptAction.closeCustomDialog(this.dialogId);
+          contextUtil.getPromptAction()?.closeCustomDialog(this.dialogId);
         });
     }
     .padding(16);

@@ -44,4 +44,12 @@ export class Constants {
    * The surface height.
    */
   static readonly SURFACE_HEIGHT: number = 1920;
+  /**
+   * 静音
+   */
+  static readonly VOLUME_LOW = 0.00
+  /**
+   * 相对音量最高
+   */
+  static readonly VOLUME_HIGH = 1.00
 }

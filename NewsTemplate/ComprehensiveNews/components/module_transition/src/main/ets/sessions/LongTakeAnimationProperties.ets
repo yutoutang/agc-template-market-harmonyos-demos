@@ -1,3 +1,4 @@
+import { UtilLog } from '@hw-agconnect/util-log';
 import { LongTakeTransitionConstants, LongTakeTransitionType } from '../constants/LongTakeTransitionConstants';
 import { LongTakeTransitionParam } from '../utils/LongTakeTransitionParam';
 import { RectInfoPx } from '../utils/ComponentAttrUtils';
@@ -47,89 +48,109 @@ export class LongTakeAnimationProperties {
   @Trace navDestinationId: string = '';
   @Trace navPathStack: NavPathStack = new NavPathStack();
   @Trace transitionParam: LongTakeTransitionParam = new LongTakeTransitionParam(new RectInfoPx());
+  @Trace uiContext: UIContext | undefined = undefined;
 
   private initParams(): void {
-    let postNode = WindowUtils.window.getUIContext().getFrameNodeById(this.postPageSharedComponentId);
-    let stackNode = WindowUtils.window.getUIContext()
-      .getFrameNodeById(this.getNavDestinationId() + LongTakeTransitionConstants.POST_PAGE_STACK_ID);
-    let snapShotStackNode = WindowUtils.window.getUIContext()
-      .getFrameNodeById(this.getNavDestinationId() + LongTakeTransitionConstants.POST_PAGE_SNAPSHOT_STACK_ID);
+    try {
+      this.uiContext = WindowUtils.window.getUIContext();
+      let postNode = this.uiContext.getFrameNodeById(this.postPageSharedComponentId);
+      let stackNode =
+        this.uiContext.getFrameNodeById(this.getNavDestinationId() + LongTakeTransitionConstants.POST_PAGE_STACK_ID);
+      let snapShotStackNode =
+        this.uiContext.getFrameNodeById(this.getNavDestinationId() +
+        LongTakeTransitionConstants.POST_PAGE_SNAPSHOT_STACK_ID);
 
-    let isWindowLayoutFullScreen: boolean = WindowUtils.window.getImmersiveModeEnabledState();
+      let isWindowLayoutFullScreen: boolean = WindowUtils.window.getImmersiveModeEnabledState();
 
-    let stackPositionVp = stackNode?.getPositionToWindowWithTransform();
-    let stackSizePx = stackNode?.getMeasuredSize();
-    let stackCenterXPx = vp2px(stackPositionVp?.x) + (stackSizePx?.width!) / 2;
+      let stackPositionVp = stackNode?.getPositionToWindowWithTransform();
+      let stackSizePx = stackNode?.getMeasuredSize();
+      let stackCenterXPx = this.uiContext.vp2px(stackPositionVp?.x) + (stackSizePx?.width!) / 2;
 
-    if (!this.postPageSharedComponentId || !postNode || !snapShotStackNode || !stackSizePx) {
-      if (!stackSizePx?.width || !stackSizePx?.height) {
-        return;
-      }
+      if (!this.postPageSharedComponentId || !postNode || !snapShotStackNode || !stackSizePx) {
+        if (!stackSizePx?.width || !stackSizePx?.height) {
+          return;
+        }
 
-      let initScaleX = this.cardItemInfoPx.width / stackSizePx?.width!;
-      let initScaleY = this.cardItemInfoPx.height / stackSizePx?.height!;
+        let initScaleX = this.cardItemInfoPx.width / stackSizePx?.width!;
+        let initScaleY = this.cardItemInfoPx.height / stackSizePx?.height!;
 
-      this.initPositionValueY = (stackPositionVp?.y! !== 0) ? 0
-        : (isWindowLayoutFullScreen ? 0 : -px2vp(WindowUtils.topAvoidAreaHeightPx));
+        this.initPositionValueY = (stackPositionVp?.y! !== 0) ? 0
+          : (isWindowLayoutFullScreen ? 0 : -this.uiContext.px2vp(WindowUtils.topAvoidAreaHeightPx));
 
-      if (initScaleX >= initScaleY) {
-        this.initScale = initScaleX;
-        this.initTranslateX = px2vp(this.cardItemInfoPx.left + this.cardItemInfoPx.width / 2 - stackCenterXPx);
-        this.initClipWidth = px2vp(stackSizePx?.width);
-        this.initClipHeight = px2vp((this.cardItemInfoPx.height) / this.initScale);
-        this.snapShotSize = { width: px2vp(stackSizePx?.width) };
-        this.initTranslateY = px2vp(this.cardItemInfoPx.top -
-          ((vp2px(this.initClipHeight) - vp2px(this.initClipHeight) * this.initScale) / 2)) - stackPositionVp?.y!;
+        if (initScaleX >= initScaleY) {
+          this.initScale = initScaleX;
+          this.initTranslateX =
+            this.uiContext.px2vp(this.cardItemInfoPx.left + this.cardItemInfoPx.width / 2 - stackCenterXPx);
+          this.initClipWidth = this.uiContext.px2vp(stackSizePx?.width);
+          this.initClipHeight = this.uiContext.px2vp((this.cardItemInfoPx.height) / this.initScale);
+          this.snapShotSize = { width: this.uiContext.px2vp(stackSizePx?.width) };
+          this.initTranslateY = this.uiContext.px2vp(this.cardItemInfoPx.top -
+            ((this.uiContext.vp2px(this.initClipHeight) - this.uiContext.vp2px(this.initClipHeight) * this.initScale) /
+              2)) -
+            stackPositionVp?.y!;
+        } else {
+          this.initScale = initScaleY;
+          this.initTranslateY =
+            this.uiContext.px2vp(this.cardItemInfoPx.top - (stackSizePx?.height! * (1 - this.initScale) / 2)) -
+              stackPositionVp?.y!;
+          this.initClipHeight = this.uiContext.px2vp(stackSizePx?.height);
+          this.initClipWidth = this.uiContext.px2vp((this.cardItemInfoPx.width) / this.initScale);
+          this.initTranslateX =
+            this.uiContext.px2vp(this.cardItemInfoPx.left + this.cardItemInfoPx.width / 2 - stackCenterXPx);
+          this.snapShotSize = { height: this.uiContext.px2vp(stackSizePx?.height) };
+        }
       } else {
-        this.initScale = initScaleY;
-        this.initTranslateY =
-          px2vp(this.cardItemInfoPx.top - (stackSizePx?.height! * (1 - this.initScale) / 2)) - stackPositionVp?.y!;
-        this.initClipHeight = px2vp(stackSizePx?.height);
-        this.initClipWidth = px2vp((this.cardItemInfoPx.width) / this.initScale);
-        this.initTranslateX = px2vp(this.cardItemInfoPx.left + this.cardItemInfoPx.width / 2 - stackCenterXPx);
-        this.snapShotSize = { height: px2vp(stackSizePx?.height) };
+        let snapShotStackPositionToWindowVp = snapShotStackNode?.getPositionToWindowWithTransform();
+        let postNodePositionXVp = postNode.getPositionToWindowWithTransform().x;
+        let postNodePositionYVp = postNode.getPositionToWindowWithTransform().y;
+        let postNodeWidthPx = postNode.getMeasuredSize().width;
+        let postNodeHeightPx = postNode.getMeasuredSize().height;
+        UtilLog.info(TAG,
+          'the size is ' + postNodeWidthPx + ' and ' + postNodeHeightPx + ' and ' +
+          this.uiContext.vp2px(postNodePositionXVp) +
+            ' and ' + this.uiContext.vp2px(postNodePositionYVp));
+
+        this.initScale = this.cardItemInfoPx.width / postNodeWidthPx;
+        this.initClipHeight = this.uiContext.px2vp(this.cardItemInfoPx.height / this.initScale);
+
+        if (postNodeHeightPx === 0 || this.transitionParam.options?.type === LongTakeTransitionType.ImageLongTake) {
+          postNodeHeightPx = postNodeHeightPx ?? this.cardItemInfoPx.height / this.initScale;
+          this.initPositionValueX = -postNodePositionXVp + stackPositionVp?.x!;
+          this.snapShotPositionY =
+            postNodePositionYVp + this.uiContext.px2vp(postNodeHeightPx) / 2 - this.initClipHeight / 2 -
+              snapShotStackPositionToWindowVp?.y!;
+          this.initPositionValueY =
+            -(postNodePositionYVp + this.uiContext.px2vp(postNodeHeightPx) / 2 - this.initClipHeight / 2 -
+              stackPositionVp?.y!);
+          this.snapShotPositionX = postNodePositionXVp - snapShotStackPositionToWindowVp?.x!;
+          this.initTranslateY =
+            this.uiContext.px2vp(this.cardItemInfoPx.top) - (this.initClipHeight * (1 - this.initScale) / 2) -
+              stackPositionVp?.y!;
+        } else if (!this.transitionParam.options?.type ||
+          this.transitionParam.options?.type === LongTakeTransitionType.CardLongTake) {
+          this.initPositionValueX = -postNodePositionXVp + stackPositionVp?.x!;
+          this.initPositionValueY = -postNodePositionYVp + stackPositionVp?.y!;
+          this.snapShotPositionY = postNodePositionYVp - snapShotStackPositionToWindowVp?.y!;
+          this.snapShotPositionX = postNodePositionXVp - snapShotStackPositionToWindowVp?.x!;
+          this.initTranslateY =
+            this.uiContext.px2vp(this.cardItemInfoPx.top -
+              this.uiContext.vp2px(this.initClipHeight) * (1 - this.initScale) / 2) -
+              stackPositionVp?.y!;
+        }
+
+        this.initClipWidth = this.uiContext.px2vp(postNodeWidthPx);
+        this.snapShotSize = { width: this.uiContext.px2vp(postNodeWidthPx) };
+        this.initTranslateX =
+          this.uiContext.px2vp(this.cardItemInfoPx.left + this.cardItemInfoPx.width / 2 - stackCenterXPx);
       }
-    } else {
-      let snapShotStackPositionToWindowVp = snapShotStackNode?.getPositionToWindowWithTransform();
-      let postNodePositionXVp = postNode.getPositionToWindowWithTransform().x;
-      let postNodePositionYVp = postNode.getPositionToWindowWithTransform().y;
-      let postNodeWidthPx = postNode.getMeasuredSize().width;
-      let postNodeHeightPx = postNode.getMeasuredSize().height;
-      console.info(TAG,
-        'the size is ' + postNodeWidthPx + ' and ' + postNodeHeightPx + ' and ' + vp2px(postNodePositionXVp) +
-          ' and ' + vp2px(postNodePositionYVp));
-
-      this.initScale = this.cardItemInfoPx.width / postNodeWidthPx;
-      this.initClipHeight = px2vp(this.cardItemInfoPx.height / this.initScale);
-
-      if (postNodeHeightPx === 0 || this.transitionParam.options?.type === LongTakeTransitionType.ImageLongTake) {
-        postNodeHeightPx = postNodeHeightPx ?? this.cardItemInfoPx.height / this.initScale;
-        this.initPositionValueX = -postNodePositionXVp + stackPositionVp?.x!;
-        this.snapShotPositionY = postNodePositionYVp + px2vp(postNodeHeightPx) / 2 - this.initClipHeight / 2 -
-          snapShotStackPositionToWindowVp?.y!;
-        this.initPositionValueY =
-          -(postNodePositionYVp + px2vp(postNodeHeightPx) / 2 - this.initClipHeight / 2 - stackPositionVp?.y!);
-        this.snapShotPositionX = postNodePositionXVp - snapShotStackPositionToWindowVp?.x!;
-        this.initTranslateY =
-          px2vp(this.cardItemInfoPx.top) - (this.initClipHeight * (1 - this.initScale) / 2) - stackPositionVp?.y!;
-      } else if (!this.transitionParam.options?.type ||
-        this.transitionParam.options?.type === LongTakeTransitionType.CardLongTake) {
-        this.initPositionValueX = -postNodePositionXVp + stackPositionVp?.x!;
-        this.initPositionValueY = -postNodePositionYVp + stackPositionVp?.y!;
-        this.snapShotPositionY = postNodePositionYVp - snapShotStackPositionToWindowVp?.y!;
-        this.snapShotPositionX = postNodePositionXVp - snapShotStackPositionToWindowVp?.x!;
-        this.initTranslateY =
-          px2vp(this.cardItemInfoPx.top - vp2px(this.initClipHeight) * (1 - this.initScale) / 2) - stackPositionVp?.y!;
-      }
-
-      this.initClipWidth = px2vp(postNodeWidthPx);
-      this.snapShotSize = { width: px2vp(postNodeWidthPx) };
-      this.initTranslateX = px2vp(this.cardItemInfoPx.left + this.cardItemInfoPx.width / 2 - stackCenterXPx);
+      UtilLog.info(TAG,
+        'the value is initScale: ' + this.initScale + ' initTranslateX ' + this.initTranslateX + ' initClipWidth ' +
+        this.initClipWidth + ' initClipHeight ' + this.initClipHeight + ' initTranslateY ' + this.initTranslateY +
+          ' initPositionValue ' + this.initPositionValueY);
+    } catch (error) {
+      UtilLog.error(TAG, 'initParams fail, error: ' + JSON.stringify(error));
+      return;
     }
-    console.info(TAG,
-      'the value is initScale: ' + this.initScale + ' initTranslateX ' + this.initTranslateX + ' initClipWidth ' +
-      this.initClipWidth + ' initClipHeight ' + this.initClipHeight + ' initTranslateY ' + this.initTranslateY +
-        ' initPositionValue ' + this.initPositionValueY);
   }
 
   public doAnimation(isPush: boolean, isExit: boolean, transitionProxy: NavigationTransitionProxy): void {
@@ -157,7 +178,7 @@ export class LongTakeAnimationProperties {
     let animationCount = ++this.animationCount;
 
     // 开始做动画效果
-    animateTo({
+    this.uiContext?.animateTo({
       duration: 250,
       curve: Curve.EaseInOut,
       onFinish: () => {
@@ -182,7 +203,7 @@ export class LongTakeAnimationProperties {
       this.radius = DEFAULT_SCREEN_RADIUS;
     })
 
-    animateTo({
+    this.uiContext?.animateTo({
       delay: 50,
       duration: 75,
       curve: Curve.Sharp,
@@ -190,7 +211,7 @@ export class LongTakeAnimationProperties {
       this.snapShotOpacity = 0;
     })
 
-    animateTo({
+    this.uiContext?.animateTo({
       duration: 100,
       curve: Curve.Sharp,
     }, () => {
@@ -206,7 +227,7 @@ export class LongTakeAnimationProperties {
     this.transitionParam.options?.onBackTransitionStart?.();
 
     if (isChanged) {
-      animateTo({
+      this.uiContext?.animateTo({
         duration: 250,
         curve: Curve.EaseOut,
         onFinish: () => {
@@ -223,21 +244,21 @@ export class LongTakeAnimationProperties {
         this.navDestinationBgColor = INIT_BG_COLOR;
       })
 
-      animateTo({
+      this.uiContext?.animateTo({
         duration: 250,
         curve: Curve.EaseOut,
       }, () => {
         this.snapShotOpacity = 0;
       })
 
-      animateTo({
+      this.uiContext?.animateTo({
         duration: 250,
         curve: Curve.EaseInOut,
       }, () => {
         this.postPageOpacity = 0;
       })
     } else {
-      animateTo({
+      this.uiContext?.animateTo({
         duration: 250,
         curve: Curve.EaseInOut,
         onFinish: () => {
@@ -258,7 +279,7 @@ export class LongTakeAnimationProperties {
         this.navDestinationBgColor = INIT_BG_COLOR;
       })
 
-      animateTo({
+      this.uiContext?.animateTo({
         delay: 80,
         duration: 150,
         curve: Curve.Friction,
@@ -266,7 +287,7 @@ export class LongTakeAnimationProperties {
         this.snapShotOpacity = 1;
       })
 
-      animateTo({
+      this.uiContext?.animateTo({
         delay: 130,
         duration: 100,
         curve: Curve.Friction,
@@ -295,7 +316,7 @@ export class LongTakeAnimationProperties {
   public init(context: NavDestinationContext, param: LongTakeTransitionParam, options: LongTakeSessionOptions): void {
     this.navPathStack = context?.pathStack;
     if (!context || !param || !context.navDestinationId || !param.componentRectInfo || !options) {
-      console.info(TAG, 'init param is invalid!');
+      UtilLog.info(TAG, 'init param is invalid!');
       return;
     }
     if (param.componentRectInfo.width === 0 || param.componentRectInfo.height === 0) {
@@ -318,7 +339,7 @@ export class LongTakeAnimationProperties {
         }, undefined);
       return;
     } catch (e) {
-      console.info(TAG, 'initLongTakeTransition error ' + e);
+      UtilLog.info(TAG, 'initLongTakeTransition error ' + e);
       return;
     }
   }

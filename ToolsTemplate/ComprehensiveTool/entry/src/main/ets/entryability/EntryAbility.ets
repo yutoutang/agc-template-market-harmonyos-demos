@@ -1,19 +1,53 @@
 import { AbilityConstant, common, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
-import { hilog } from '@kit.PerformanceAnalysisKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { sensor } from '@kit.SensorServiceKit';
-import { window } from '@kit.ArkUI';
+import { AppStorageV2, window } from '@kit.ArkUI';
+import { pushService } from '@kit.PushKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { appDB, initNFC } from 'mobile_nfc';
-
-const DOMAIN = 0x0000;
+import { PushActionParams } from '../model/Index';
+import { RouterUtils } from '../utils/RouterUtils';
 
 export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');
+    UtilLog.info('%{public}s', 'Ability onCreate');
     this.setColorMode(this.context);
     appDB.initDb(this.context);
     initNFC(want);
+    this.handlePushCreate(want);
+    this.getPushToken();
+    UtilLog.setGlobalConfig({
+      tag: 'ComprehensiveTool', // 指定日志标识
+      domain: 0xff00, // 日志对应的领域标识
+      open: true,
+      showStack: false,
+    });
+  }
+
+  getPushToken() {
+    pushService.getToken().then(token => {
+      UtilLog.info('Succeeded in getting push token');
+      // todo： 上报Push Token到您的服务端
+    }).catch((err: BusinessError) => {
+      UtilLog.error('Failed to get push token: %{public}d %{public}s', err.code, err.message);
+    });
+  }
+
+  handlePushCreate(want: Want) {
+    UtilLog.info('Succeeded in handle push create');
+    let pushActionParams: PushActionParams = AppStorageV2.connect(PushActionParams, () => new PushActionParams())!;
+    pushActionParams.name = want.parameters?.eventInfo as string;
+  }
+
+  handlePushWant(want: Want) {
+    UtilLog.info('Succeeded in handle push want');
+    let pushActionParams: PushActionParams = AppStorageV2.connect(PushActionParams, () => new PushActionParams())!;
+    let eventInfo: string = want.parameters?.eventInfo as string;
+    if (eventInfo?.length) {
+      pushActionParams.name = want.parameters?.eventInfo as string;
+      RouterUtils.pushPathByName(pushActionParams.name, null);
+    }
   }
 
   private setColorMode(context: common.UIAbilityContext) {
@@ -21,12 +55,12 @@ export default class EntryAbility extends UIAbility {
   }
 
   onDestroy(): void {
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onDestroy');
+    UtilLog.info('%{public}s', 'Ability onDestroy');
   }
 
   async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
     // Main window is created, set main page for this ability
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
+    UtilLog.info('%{public}s', 'Ability onWindowStageCreate');
     AppStorage.setOrCreate('windowStage', windowStage);
     let windowClass: window.Window | undefined = undefined;
 
@@ -40,37 +74,45 @@ export default class EntryAbility extends UIAbility {
         try {
           // 对窗口尺寸大小变化的监听
           windowClass.on('windowSizeChange', (data) => {
-            AppStorage.setOrCreate('height', px2vp(data.height));
+            AppStorage.setOrCreate('height', windowStage.getMainWindowSync().getUIContext().px2vp(data.height));
           });
         } catch (exception) {
-          hilog.error(DOMAIN, 'testTag', 'Failed to listen windowSizeChange. Cause: %{public}s', JSON.stringify(exception));
+          UtilLog.error('Failed to listen windowSizeChange. Cause: %{public}s', JSON.stringify(exception));
         }
       });
     } catch (exception) {
-      hilog.error(DOMAIN, 'testTag', 'Failed to getLastWindow. Cause: %{public}s', JSON.stringify(exception));
+      UtilLog.error('Failed to getLastWindow. Cause: %{public}s', JSON.stringify(exception));
     }
-    windowStage.loadContent('pages/Main', (err) => {
+    windowStage.loadContent('pages/Index', (err) => {
       if (err.code) {
-        hilog.error(DOMAIN, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err));
+        UtilLog.error('Failed to load the content. Cause: %{public}s', JSON.stringify(err));
         return;
       }
-      hilog.info(DOMAIN, 'testTag', 'Succeeded in loading the content.');
+      UtilLog.info('Succeeded in loading the content.');
     });
   }
 
   onWindowStageDestroy(): void {
     // Main window is destroyed, release UI related resources
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageDestroy');
+    UtilLog.info('%{public}s', 'Ability onWindowStageDestroy');
   }
 
   onForeground(): void {
     // Ability has brought to foreground
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onForeground');
+    UtilLog.info('%{public}s', 'Ability onForeground');
   }
 
   onBackground(): void {
     // Ability has back to background
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onBackground');
-    sensor.off(sensor.SensorId.ORIENTATION);
+    UtilLog.info('%{public}s', 'Ability onBackground');
+    try {
+      sensor.off(sensor.SensorId.ORIENTATION);
+    } catch (e) {
+      UtilLog.error(`sensor off error ${JSON.stringify(e)}`);
+    }
+  }
+
+  onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): void {
+    this.handlePushWant(want);
   }
 };

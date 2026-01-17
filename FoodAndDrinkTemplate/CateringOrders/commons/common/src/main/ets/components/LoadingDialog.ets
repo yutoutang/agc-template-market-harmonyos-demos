@@ -1,9 +1,6 @@
-import { common } from '@kit.AbilityKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { ComponentContent, promptAction } from '@kit.ArkUI';
-
-async function getUIContext() {
-  return (await (getContext() as common.UIAbilityContext).windowStage.getMainWindow()).getUIContext()
-}
+import { WindowUtil } from '../utils/WindowUtil';
 
 @Builder
 export function LoadingDialogBuilder() {
@@ -20,7 +17,7 @@ export function LoadingDialogBuilder() {
   .justifyContent(FlexAlign.Center)
   .alignItems(HorizontalAlign.Center)
   .constraintSize({
-    minWidth: 150
+    minWidth: 150,
   })
   .padding(12)
   .margin(30)
@@ -39,7 +36,7 @@ export class LoadingDialogUtil {
 
   static async openLoadingDialog(): Promise<void> {
     if (LoadingDialogUtil.isOpen) {
-      console.info('openLoadingDialog: dialog is already open')
+      UtilLog.info('openLoadingDialog: dialog is already open')
       return
     }
 
@@ -47,7 +44,7 @@ export class LoadingDialogUtil {
 
     try {
       if (!LoadingDialogUtil.uiContext) {
-        LoadingDialogUtil.uiContext = await getUIContext()
+        LoadingDialogUtil.uiContext = WindowUtil.globalUIContext
         LoadingDialogUtil.contentNode =
           new ComponentContent(LoadingDialogUtil.uiContext, wrapBuilder(LoadingDialogBuilder))
       }
@@ -72,7 +69,7 @@ export class LoadingDialogUtil {
       const promptAction = LoadingDialogUtil.uiContext.getPromptAction()
       promptAction.openCustomDialog(LoadingDialogUtil.contentNode, options)
     } catch (error) {
-      console.error('PromptActionUtils', ` closeCustomDialog error = ${JSON.stringify(error)}`)
+      UtilLog.error('PromptActionUtils', ` closeCustomDialog error = ${JSON.stringify(error)}`)
     }
   }
 
@@ -83,7 +80,7 @@ export class LoadingDialogUtil {
       const promptAction = LoadingDialogUtil.uiContext.getPromptAction()
       promptAction.closeCustomDialog(LoadingDialogUtil.contentNode)
     } catch (error) {
-      console.error('PromptActionUtils', ` closeCustomDialog error = ${JSON.stringify(error)}`)
+      UtilLog.error('PromptActionUtils', ` closeCustomDialog error = ${JSON.stringify(error)}`)
     }
   }
 }

@@ -10,7 +10,7 @@ import {
 } from '../common/Constant';
 import { ConnectionVo } from '../model/ConnectionVo';
 import { ProgressInfo, WorkerMessage } from '../model/WorkerMessage';
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { FileVo } from '../model/FileVo';
 import { FileReaderService } from '../service/FileReadService';
 import { TransferUtil } from '../utils/TransferUtil';
@@ -154,38 +154,40 @@ function readFileData(fileVo: FileVo) {
 }
 
 // 发送二进制数据
-function sendBinaryData(data: ArrayBuffer, dataType: BinaryMessageType) {
-  let headerBuffer: ArrayBuffer | null = generateBinaryDataHeader(data.byteLength, dataType);
-  let sendData: ArrayBuffer | null = BufferUtil.mergeArrayBuffer(headerBuffer, data)
-  try {
-    tcpSocket.send({
-      data: sendData,
-    }, (err: BusinessError) => {
-      if (err) {
-        workerPort.postMessage({
-          type: WorkerMessageType.SEND,
-          data: `code: ${err.code}, message: ${err.message}`,
-        } as WorkerMessage);
-      } else {
-        workerPort.postMessage({
-          type: WorkerMessageType.SEND,
-          data: 'tcp send success',
-        } as WorkerMessage);
-        if (dataType === BinaryMessageType.FILE_END || dataType === BinaryMessageType.CONTACT) {
+function sendBinaryData(data: ArrayBuffer | null, dataType: BinaryMessageType) {
+  if (data) {
+    let headerBuffer: ArrayBuffer | null = generateBinaryDataHeader(data.byteLength, dataType);
+    let sendData: ArrayBuffer | null = BufferUtil.mergeArrayBuffer(headerBuffer, data)
+    try {
+      tcpSocket.send({
+        data: sendData,
+      }, (err: BusinessError) => {
+        if (err) {
           workerPort.postMessage({
-            type: WorkerMessageType.END,
-            data: ``,
+            type: WorkerMessageType.SEND,
+            data: `code: ${err.code}, message: ${err.message}`,
           } as WorkerMessage);
+        } else {
+          workerPort.postMessage({
+            type: WorkerMessageType.SEND,
+            data: 'tcp send success',
+          } as WorkerMessage);
+          if (dataType === BinaryMessageType.FILE_END || dataType === BinaryMessageType.CONTACT) {
+            workerPort.postMessage({
+              type: WorkerMessageType.END,
+              data: ``,
+            } as WorkerMessage);
+          }
+          headerBuffer = null
+          sendData = null
         }
-        headerBuffer = null
-        sendData = null
-      }
-    });
-  } catch (error) {
-    workerPort.postMessage({
-      type: WorkerMessageType.SEND,
-      data: `encoding error: ${error}`,
-    } as WorkerMessage);
+      });
+    } catch (error) {
+      workerPort.postMessage({
+        type: WorkerMessageType.SEND,
+        data: `encoding error: ${error}`,
+      } as WorkerMessage);
+    }
   }
 }
 
@@ -201,6 +203,6 @@ function generateBinaryDataHeader(binaryDataLength: number, dataType: BinaryMess
 
 function closeClient() {
   tcpSocket.close(() => {
-    hilog.info(0x0001, 'testTag', '%{public}s', '客户端关闭成功');
+    UtilLog.info('%{public}s', '客户端关闭成功');
   });
 }

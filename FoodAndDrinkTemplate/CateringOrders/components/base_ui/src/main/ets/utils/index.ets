@@ -5,9 +5,6 @@ import { CouponItem } from '../models/Index';
  * 获取优惠减免金额
  */
 export function getReduceAmount(coupon: CouponItem, orderMoney: number) {
-  if (coupon.amountRule.discountType === ReductionTypes.DISCOUNT_REDUCTION) {
-    return (1 - Number(coupon.amountRule.discountCoefficient)) * orderMoney;
-  }
   return Number(coupon.amountRule.discountAmount);
 }
 
@@ -21,8 +18,6 @@ export function getReduceDesc(coupon: CouponItem) {
       return '消费金额达到指定标准,即可享受减免';
     case ReductionTypes.DIRECT_REDUCTION:
       return '消费者直接享受相应减免';
-    case ReductionTypes.DISCOUNT_REDUCTION:
-      return '按指定折扣享受相应减免';
     default:
       return '';
   }

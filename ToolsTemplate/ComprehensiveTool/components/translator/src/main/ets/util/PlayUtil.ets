@@ -1,3 +1,4 @@
+import { UtilLog } from '@hw-agconnect/util-log';
 import { media } from '@kit.MediaKit';
 import { fileIo as fs } from '@kit.CoreFileKit';
 import { BusinessError } from '@kit.BasicServicesKit';
@@ -27,17 +28,21 @@ export class PlayUtil {
 
   // 以下demo为使用fs文件系统打开沙箱地址获取媒体文件地址并通过url属性进行播放示例
   async playerUrlInit(path: string) {
-    // 创建avPlayer实例对象
-    this.avPlayer = await media.createAVPlayer();
-    // 创建状态机变化回调函数
-    this.setAVPlayerCallback(this.avPlayer);
-    let fdPath = 'fd://';
-    // 打开相应的资源文件地址获取fd，并为url赋值触发initialized状态机上报
-    let file = await fs.open(path);
-    // 保存文件路径，实例销毁时关闭
-    this.fd = file.fd
-    fdPath = fdPath + '' + file.fd;
-    this.avPlayer.url = fdPath;
+    try {
+      // 创建avPlayer实例对象
+      this.avPlayer = await media.createAVPlayer();
+      // 创建状态机变化回调函数
+      this.setAVPlayerCallback(this.avPlayer);
+      let fdPath = 'fd://';
+      // 打开相应的资源文件地址获取fd，并为url赋值触发initialized状态机上报
+      let file = await fs.open(path);
+      // 保存文件路径，实例销毁时关闭
+      this.fd = file.fd
+      fdPath = fdPath + '' + file.fd;
+      this.avPlayer.url = fdPath;
+    } catch (e) {
+      UtilLog.error(`playerUrlInit failed: ${JSON.stringify(e)}`);
+    }
   }
 
   play(): void {

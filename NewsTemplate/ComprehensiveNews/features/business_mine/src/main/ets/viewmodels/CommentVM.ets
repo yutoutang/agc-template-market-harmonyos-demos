@@ -1,6 +1,5 @@
-import { promptAction } from '@kit.ArkUI';
-import { BaseViewModel, CommonConfirmDialog } from 'lib_common';
-import { MineServiceApi } from 'lib_news_api';
+import { BaseViewModel, CommonConfirmDialog, LoadingModel } from 'lib_common';
+import { AggregateNewsComment, MineServiceApi } from 'lib_news_api';
 import { AggregateNewsCommentModel } from '../common/ObservedModel';
 
 interface DelItem {
@@ -8,20 +7,25 @@ interface DelItem {
   commentId?: string
 }
 
-
 @ObservedV2
 export class CommentViewModel extends BaseViewModel {
   @Trace isEditMode: boolean = false;
   @Trace toDeleteList: DelItem[] = [];
   @Trace list: AggregateNewsCommentModel[] = [];
+  @Trace loadingModel: LoadingModel<AggregateNewsComment[]> = new LoadingModel(MineServiceApi.queryMineCommentList);
 
   constructor() {
     super();
     this.queryList();
   }
 
-  queryList(): void {
-    this.list = MineServiceApi.queryMineCommentList().map(v => new AggregateNewsCommentModel(v));
+  queryList(showLoading: boolean = true): void {
+    this.loadingModel.callApi({
+      pageLoading: showLoading,
+      dialogLoading: false,
+    }).then((list) => {
+      this.list = list.map(v => new AggregateNewsCommentModel(v));
+    });
   }
 
   callDeleteApi(isDelAll: boolean, toDeleteList: DelItem[]): void {
@@ -69,8 +73,8 @@ export class CommentViewModel extends BaseViewModel {
       confirm: () => {
         this.callDeleteApi(true, []);
         this.quitEdit();
-        this.queryList();
-        promptAction.showToast({ message: '已清空' });
+        this.queryList(false);
+        this.contextModel.showToast({ message: '已清空' });
       },
     })
   }
@@ -87,8 +91,8 @@ export class CommentViewModel extends BaseViewModel {
       confirm: () => {
         this.callDeleteApi(false, this.toDeleteList);
         this.quitEdit();
-        this.queryList();
-        promptAction.showToast({ message: '已删除' });
+        this.queryList(false);
+        this.contextModel.showToast({ message: '已删除' });
       },
     })
   }

@@ -3,9 +3,9 @@ import { OrderApis, OrderItem } from 'lib_network';
 import {
   OrderActionMap, OrderShipmentMap, OrderStatusMap,
 } from '../common/Enums';
-import { UpdateAddressSheetOptions } from '../views/UpdateAddressSheet';
 import { formatTime } from '../utils';
 import { OrderUtil } from '../utils/OrderUtil';
+import { UpdateAddressSheetOptions } from '../views/UpdateAddressSheet';
 
 @ObservedV2
 export class OrderInfoPageVM {

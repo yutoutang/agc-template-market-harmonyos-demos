@@ -1,9 +1,13 @@
 import { BuilderNode, FrameNode, NodeController, typeNode } from '@kit.ArkUI';
-import { JSONObject, LayoutSetting } from '../model/Model';
+import { UtilLog } from '@hw-agconnect/util-log';
+import { FrameNodeParams } from '../model/Model';
 import { ScrollNodeBuilder } from '../builder/scrollNodeBuild/ScrollNodeBuilder';
 import { ListNodeBuilder } from '../builder/listNodeBuilder/ListNodeBuilder';
-import { FrameNodeParams, getNativeNodeController, NodeControllerFactory } from './NativeNodeFactory';
+import { getNativeNodeController, NodeControllerFactory } from './NativeNodeFactory';
 import { transformLayout } from '../utils/Utils';
+import { JSONObject, LayoutSetting } from '../model/CommonModel';
+
+const TAG = '[FrameNodeFactory]';
 
 export const nodeMap: Map<string | number, BuilderNode<[FrameNodeParams]> | undefined> = new Map();
 
@@ -31,57 +35,63 @@ export function FrameNodeFactory(vm: LayoutSetting, articles: JSONObject[],
   extraInfo: Record<string, number | string | boolean | Record<string, string | boolean>[]>,
   context: UIContext): FrameNode | null {
 
-  if (vm.type === 'view') {
-    let node = typeNode.createNode(context, 'Column');
-    setColumnNodeAttr(node, vm.style);
-    vm.children?.forEach(kid => {
-      let child = FrameNodeFactory(kid, articles, extraInfo, context);
-      node.appendChild(child);
-    });
-    return node;
+  try {
+    if (vm.type === 'view') {
+      let node = typeNode.createNode(context, 'Column');
+      setColumnNodeAttr(node, vm.style);
+      vm.children?.forEach(kid => {
+        let child = FrameNodeFactory(kid, articles, extraInfo, context);
+        node.appendChild(child);
+      });
+      return node;
+    }
+    if (vm.type === 'Swiper') {
+      let node = typeNode.createNode(context, 'Swiper');
+      vm.children?.forEach(kid => {
+        let child = FrameNodeFactory(kid, articles, extraInfo, context);
+        node.appendChild(child);
+      });
+      return node;
+    }
+    if (vm.type === 'Scroll') {
+      let node = typeNode.createNode(context, 'Column');
+      setColumnNodeAttr(node, vm.style);
+      let nativeNode: BuilderNode<[FrameNodeParams]> = new BuilderNode(context);
+      nativeNode.build(wrapBuilder<[FrameNodeParams]>(ScrollNodeBuilder),
+        new FrameNodeParams(vm, articles, vm.style, extraInfo, nodeControllerFactory));
+      return nativeNode.getFrameNode()
+    }
+    if (vm.type === 'List') {
+      let node = typeNode.createNode(context, 'Column');
+      setColumnNodeAttr(node, vm.style);
+      let nativeNode: BuilderNode<[FrameNodeParams]> = new BuilderNode(context);
+      // List Scroll Swiper等特殊节点 通过暴露Builder在内部做进一步处理
+      nativeNode.build(wrapBuilder<[FrameNodeParams]>(ListNodeBuilder),
+        new FrameNodeParams(vm, articles, vm.style, extraInfo, nodeControllerFactory));
+      node.appendChild(nativeNode.getFrameNode())
+      // 保存组件的节点信息，方便后续对节点的解除引用以及上下树做处理
+      setNodeMap(extraInfo, nativeNode)
+      return node
+    }
+    if (vm.type === 'native') {
+      let node = typeNode.createNode(context, 'Column');
+      setColumnNodeAttr(node, vm.style);
+      /*
+       * 渲染本地native卡片
+       * */
+      node.appendChild(getNativeNodeController(context, {
+        type: vm.showType,
+        extraInfo: extraInfo,
+        layout: vm,
+        nativeCardData: articles,
+      }, nodeControllerFactory)?.makeNode());
+      return node;
+    }
+    return null;
+  } catch (e) {
+    UtilLog.error(TAG, ' fail, error: ' + JSON.stringify(e));
+    return null;
   }
-  if (vm.type === 'Swiper') {
-    let node = typeNode.createNode(context, 'Swiper');
-    vm.children?.forEach(kid => {
-      let child = FrameNodeFactory(kid, articles, extraInfo, context);
-      node.appendChild(child);
-    });
-    return node;
-  }
-  if (vm.type === 'Scroll') {
-    let node = typeNode.createNode(context, 'Column');
-    setColumnNodeAttr(node, vm.style);
-    let nativeNode: BuilderNode<[FrameNodeParams]> = new BuilderNode(context);
-    nativeNode.build(wrapBuilder<[FrameNodeParams]>(ScrollNodeBuilder),
-      new FrameNodeParams(vm, articles, vm.style, extraInfo, nodeControllerFactory));
-    return nativeNode.getFrameNode()
-  }
-  if (vm.type === 'List') {
-    let node = typeNode.createNode(context, 'Column');
-    setColumnNodeAttr(node, vm.style);
-    let nativeNode: BuilderNode<[FrameNodeParams]> = new BuilderNode(context);
-    // List Scroll Swiper等特殊节点 通过暴露Builder在内部做进一步处理
-    nativeNode.build(wrapBuilder<[FrameNodeParams]>(ListNodeBuilder),
-      new FrameNodeParams(vm, articles, vm.style, extraInfo, nodeControllerFactory));
-    node.appendChild(nativeNode.getFrameNode())
-    // 保存组件的节点信息，方便后续对节点的解除引用以及上下树做处理
-    setNodeMap(extraInfo, nativeNode)
-    return node
-  }
-  if (vm.type === 'native') {
-    let node = typeNode.createNode(context, 'Column');
-    setColumnNodeAttr(node, vm.style);
-    /*
-     * 渲染本地native卡片
-     * */
-    node.appendChild(getNativeNodeController(context, {
-      type: vm.showType,
-      extraInfo: extraInfo,
-      layout: vm,
-    }, nodeControllerFactory)?.makeNode());
-    return node;
-  }
-  return null;
 }
 
 /*

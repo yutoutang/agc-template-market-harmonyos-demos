@@ -1,3 +1,5 @@
+import { StoreInfoResp } from './Store'
+
 export interface SpecItemResp {
   specValId: string
   specValName: string
@@ -109,12 +111,14 @@ export interface OrderInfoResp {
   orderType: number
   tableware: string
   yhqMoney: number
+  redeemedPoint: boolean
   couponId: string
   state: number
   oid: string
-  tel: string
-  name: string
-  address: string
+  storeTel: string
+  storeName: string
+  storeLogo: string
+  storeAddress: string
   lat: string
   lng: string
   rechargeId: string
@@ -225,4 +229,36 @@ export interface OffsetInfo {
   offsetOrder: string
   // 核销状态：0-已核销(活动期间正常使用的优惠券) ; 1-已失效(活动期间商家手动关闭但用户已使用的优惠券)
   couponStatus: string
+}
+
+export interface BookOrderDetail {
+  orderId: number;
+  store: StoreInfoResp;
+  time: string;
+  count: number;
+  room: boolean;
+  name: string;
+  phone: string;
+  decoration: string;
+  tableWares: string[];
+  tips: string;
+}
+
+export interface QueueOrderDetail {
+  orderId: number;
+  store: StoreInfoResp;
+  time: string;
+  count: number;
+  mine: number;
+  now: number;
+  wait: number;
+}
+
+export interface OrderLists {
+  book: BookOrderDetail[];
+  queue: QueueOrderDetail[];
+}
+
+export interface BookOrderModel extends BookOrderDetail {
+  schedule: boolean;
 }

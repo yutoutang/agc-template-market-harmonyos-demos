@@ -3,12 +3,13 @@ import { BaseViewModel, BreakpointUtils, Logger, PreferenceUtils, RouterMap, Rou
 import { LoginSheetUtils } from 'lib_account';
 import { agreePrivacyKey, REQUIRE_LOGIN_PAGE_LIST } from '../common/Constants';
 
-const TAG = 'IndexVM';
+const TAG = '[IndexVM]';
 
 @ObservedV2
 export class IndexVM extends BaseViewModel {
   // todo: 自行调整是否支持开屏广告
   @Trace isShowAd: boolean = false;
+  @Trace isEnabled: boolean = true;
   breakpoint: BreakpointUtils | null = null;
 
   redirect() {
@@ -26,8 +27,8 @@ export class IndexVM extends BaseViewModel {
 
   setInterception() {
     RouterUtils.getStack().setInterception({
-      willShow: (from: NavDestinationContext | NavBar, to: NavDestinationContext | NavBar,
-        operation: NavigationOperation, animated: boolean) => {
+      willShow: (_from: NavDestinationContext | NavBar, to: NavDestinationContext | NavBar,
+        _operation: NavigationOperation, _animated: boolean) => {
         if (typeof to === 'string') {
           Logger.info(TAG, 'target page is navigation home page.');
           return;
@@ -65,21 +66,29 @@ export class IndexVM extends BaseViewModel {
   // 监听WindowStage生命周期变化
   windowStageEventListener() {
     let windowStage = AppStorage.get('windowStage') as window.WindowStage;
-    windowStage.on('windowStageEvent', (type: window.WindowStageEventType) => {
-      this.windowStageModel.windowStageEventListeners.forEach((callback) => {
-        callback(type)
-      })
-    });
+    try {
+      windowStage.on('windowStageEvent', (type: window.WindowStageEventType) => {
+        this.windowStageModel.windowStageEventListeners.forEach((callback) => {
+          callback(type)
+        })
+      });
+    } catch (e) {
+      Logger.error(TAG, 'onWindowStageEvent fail, error: ' + JSON.stringify(e));
+    }
   }
 
   // 监听设备屏幕方向改变
   displayOrientationListener() {
-    this.displayModel.isFoldable = display.isFoldable();
-    display.on('change', (type: number) => {
-      let displayClass = display.getDisplayByIdSync(type);
-      // 横屏
-      let landscapeType = [display.Orientation.LANDSCAPE, display.Orientation.LANDSCAPE_INVERTED]
-      this.displayModel.isLandscape = landscapeType.includes(displayClass.orientation);
-    })
+    try {
+      this.displayModel.isFoldable = display.isFoldable();
+      display.on('change', (type: number) => {
+        let displayClass = display.getDisplayByIdSync(type);
+        // 横屏
+        let landscapeType = [display.Orientation.LANDSCAPE, display.Orientation.LANDSCAPE_INVERTED]
+        this.displayModel.isLandscape = landscapeType.includes(displayClass.orientation);
+      })
+    } catch (e) {
+      Logger.error(TAG, 'displayOrientationListener fail, error: ' + JSON.stringify(e));
+    }
   }
 }

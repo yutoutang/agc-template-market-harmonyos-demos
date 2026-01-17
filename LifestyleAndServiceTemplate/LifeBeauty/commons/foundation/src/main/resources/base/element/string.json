@@ -77,6 +77,10 @@
       "value": "预约"
     },
     {
+      "name": "good_card_purchase_btn",
+      "value": "购买"
+    },
+    {
       "name": "book_good_btn",
       "value": "立即预约"
     }

@@ -1,7 +1,7 @@
+import { UtilLog as Logger } from '@hw-agconnect/util-log';
 import { HistorySearchItem } from '../commons/Types';
 import { LengthMetrics, PromptAction } from '@kit.ArkUI';
 import { Constants } from '../commons/Constants';
-import { Logger } from '../utils/Logger';
 
 const TAG: string = '[HistorySearch]';
 

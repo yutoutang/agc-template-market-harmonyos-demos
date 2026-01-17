@@ -1,3 +1,5 @@
+import { UtilLog } from '@hw-agconnect/util-log';
+import { BreakpointSystem } from 'lib_foundation';
 import { TAB_LIST } from '../commons/Constants';
 import { TabListItem } from '../commons/Types';
 import { MainEntryVM } from '../viewmodels/MainEntryVM';
@@ -19,7 +21,7 @@ struct MainEntry {
   build() {
     NavDestination() {
       Tabs({
-        barPosition: this.vm.isTablet ? BarPosition.Start : BarPosition.End,
+        barPosition: BreakpointSystem.isTablet ? BarPosition.Start : BarPosition.End,
         index: this.vm.curIndex,
         controller: this.controller,
       }) {
@@ -36,24 +38,36 @@ struct MainEntry {
       .height($r('app.string.size_percent_full'))
       .animationDuration(0)
       .divider({ strokeWidth: 0.5, color: $r('app.color.background_color_grey') })
-      .barMode(this.vm.isTablet ? BarMode.Scrollable : BarMode.Fixed)
-      .vertical(this.vm.isTablet)
-      .barWidth(this.vm.isTablet ? 96 : '100%')
+      .barMode(BreakpointSystem.isTablet ? BarMode.Scrollable : BarMode.Fixed)
+      .vertical(BreakpointSystem.isTablet)
+      .barWidth(BreakpointSystem.isTablet ? 96 : '100%')
       .onChange((index: number) => {
         this.vm.curIndex = index;
       })
       .expandSafeArea([SafeAreaType.SYSTEM],
         [SafeAreaEdge.BOTTOM, SafeAreaEdge.TOP, SafeAreaEdge.START, SafeAreaEdge.END])
-      .barBackgroundColor(this.vm.isTablet ?
+      .barBackgroundColor(BreakpointSystem.isTablet ?
         $r('app.color.background_color_grey') :
         $r('app.color.background_color_white'))
     }
     .hideTitleBar(true)
-    .backgroundColor(this.vm.isTablet ?
+    .backgroundColor(BreakpointSystem.isTablet ?
       $r('app.color.background_color_grey') :
       $r('app.color.background_color_transparent'))
     .onBackPressed(() => {
-      return this.vm.handleBackPressed()
+      let nowTime = Date.now();
+      if (nowTime - this.vm.firstBackTime < 1500) {
+        return false;
+      } else {
+        this.vm.firstBackTime = nowTime;
+        try {
+          this.getUIContext().getPromptAction().showToast({ message: '再按一次退出' })
+        } catch (error) {
+          UtilLog.error('interrupt back to desk error.')
+          return false
+        }
+        return true;
+      }
     })
   }
 
@@ -71,6 +85,6 @@ struct MainEntry {
         .margin({ top: $r('app.string.space_xs') });
     }
     .width($r('app.string.size_percent_full'))
-    .height(this.vm.isTablet ? 100 : undefined)
+    .height(BreakpointSystem.isTablet ? 100 : undefined)
   }
 }

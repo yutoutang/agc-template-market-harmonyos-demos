@@ -1,6 +1,6 @@
-import { CommonConstants, GridRowColSetting } from 'lib_common';
+import { CommonConstants, RouterUtils } from 'lib_common';
 import { NavHeaderBar } from 'lib_widget';
-import { SettingCard } from '../components/SettingCard';
+import { SettingView } from 'module_app_setting';
 import { SettingNetworkVM } from '../viewmodels/SettingNetworkVM';
 
 @Builder
@@ -18,37 +18,15 @@ struct SettingNetwork {
         NavHeaderBar({
           title: '播放与网络设置',
         })
-        GridRow(GridRowColSetting.DEFAULT_GRID_ROW_OPTIONS) {
-          GridCol({
-            span: GridRowColSetting.DEFAULT_CENTER_COL_SPAN,
-            offset: GridRowColSetting.DEFAULT_CENTER_COL_OFFSET,
-          }) {
-            Scroll() {
-              Column({ space: CommonConstants.SPACE_M }) {
-                Text('网络设置')
-                  .fontSize(16 * this.vm.settingInfo.fontSizeRatio)
-                  .fontColor($r('sys.color.font_primary'))
-                  .fontWeight(FontWeight.Medium)
-                SettingCard({ list: this.vm.list1 })
-                Text('视频播放设置')
-                  .fontSize(16 * this.vm.settingInfo.fontSizeRatio)
-                  .fontColor($r('sys.color.font_primary'))
-                  .fontWeight(FontWeight.Medium)
-                SettingCard({ list: this.vm.list2 })
-              }
-              .alignItems(HorizontalAlign.Start)
-              .padding({
-                left: this.vm.breakPointModel.pagePadding,
-                right: this.vm.breakPointModel.pagePadding,
-                top: CommonConstants.PADDING_M,
-                bottom: this.vm.windowModel.windowBottomPadding,
-              })
-            }
-            .layoutWeight(1)
-            .scrollBar(BarState.Off)
-            .align(Alignment.Top)
-            .edgeEffect(EdgeEffect.Spring)
-          }
+        Column({ space: CommonConstants.SPACE_M }) {
+          SettingView({
+            pathStack: RouterUtils.getStack(),
+            settingList: [this.vm.group1, this.vm.group2],
+            fontSizeRatio: this.vm.settingInfo.fontSizeRatio,
+            pagePadding: {
+              top: 0,
+            },
+          })
         }
         .layoutWeight(1)
       }

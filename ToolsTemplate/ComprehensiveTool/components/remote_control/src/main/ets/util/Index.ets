@@ -1,5 +1,5 @@
 import { infraredEmitter } from '@kit.InputKit';
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { RemoteConstant } from '../constant/Index';
 
 export class ScheduledUtil {
@@ -61,7 +61,7 @@ export class SendUtil {
     try {
       infraredEmitter.transmitInfrared(infraredFrequency, pattern);
     } catch (error) {
-      hilog.error(0xff00, 'Template', `transmitInfrared failed, error: ${JSON.stringify(error, [`code`, `message`])}`);
+      UtilLog.error(0xff00, 'RemoteControl', `transmitInfrared failed, error: ${JSON.stringify(error, [`code`, `message`])}`);
     }
   }
 }

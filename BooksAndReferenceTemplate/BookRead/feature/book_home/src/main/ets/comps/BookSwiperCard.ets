@@ -14,6 +14,12 @@ export struct BookSwiperCard {
     this.builderList.push(bookSingleSwiperBuilder);
     this.builderList.push(bookSingleSwiperBuilder);
     this.builderList.push(bookSingleSwiperBuilder);
+    this.builderList.push(bookSingleSwiperBuilder);
+    this.builderList.push(bookSingleSwiperBuilder);
+    this.builderList.push(bookSingleSwiperBuilder);
+    this.builderList.push(bookSingleSwiperBuilder);
+    this.builderList.push(bookSingleSwiperBuilder);
+    this.builderList.push(bookSingleSwiperBuilder);
   }
 
   build() {
@@ -24,7 +30,6 @@ export struct BookSwiperCard {
         builderList: this.builderList,
         bookList: this.books,
         isLoop: true,
-        isCovered: false,
         onImageClick: (index: number) => {
           let book = this.books.getData(index);
           TCRouter.pushByLogin(Constants.READ_KIT_ROUTER, book);

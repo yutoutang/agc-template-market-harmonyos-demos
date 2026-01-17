@@ -1,8 +1,11 @@
 import { PersistenceV2, window } from '@kit.ArkUI';
-import { SettingModel, UserInfoModel } from 'lib_common';
+import { BusinessError } from '@kit.BasicServicesKit';
+import { GlobalContextUtils, Logger, SettingModel, UserInfoModel } from 'lib_common';
 import { FeedCardInfoModel } from 'module_newsfeed';
 import { LongTakeAnimationProperties } from 'module_transition';
 import { PostImgList } from 'lib_news_api';
+
+const TAG = '[ImagePreviewVM]';
 
 @ObservedV2
 export class ImagePreviewVM {
@@ -17,7 +20,7 @@ export class ImagePreviewVM {
   public onIndexChange: (index: number) => void = (_index: number) => {
   }
   public backToFirstPage: () => void = () => {
-    animateTo({
+    GlobalContextUtils.globalUIContext.animateTo({
       duration: 200,
       curve: Curve.EaseIn,
     }, () => {
@@ -71,7 +74,7 @@ export class ImagePreviewVM {
   }
 
   public toggleExpand() {
-    animateTo({
+    GlobalContextUtils.globalUIContext.animateTo({
       duration: 500,
       curve: Curve.EaseOut,
       playMode: PlayMode.Normal,
@@ -84,7 +87,7 @@ export class ImagePreviewVM {
     if (this.timer) {
       clearTimeout(this.timer)
     }
-    animateTo({
+    GlobalContextUtils.globalUIContext.animateTo({
       duration: 500,
       curve: Curve.EaseOut,
       playMode: PlayMode.Normal,
@@ -115,19 +118,25 @@ export class ImagePreviewVM {
     this.showImagePreviewLayer = param.showImagePreviewLayer as boolean;
   }
 
-  setSystemBarProperty() {
-    const windowStage = AppStorage.get('windowStage') as window.WindowStage;
-    this.windowClass = windowStage.getMainWindowSync()
-    let systemBarProperty = this.windowClass.getWindowSystemBarProperties()
-    this.statusBarContentColor = systemBarProperty.statusBarContentColor as string
-    this.windowClass.setWindowSystemBarProperties({
-      statusBarContentColor: '#ffffff',
-    })
+  async setSystemBarProperty() {
+    try {
+      const windowStage = AppStorage.get('windowStage') as window.WindowStage;
+      this.windowClass = windowStage.getMainWindowSync()
+      let systemBarProperty = this.windowClass.getWindowSystemBarProperties()
+      this.statusBarContentColor = systemBarProperty.statusBarContentColor as string
+      await this.windowClass.setWindowSystemBarProperties({
+        statusBarContentColor: '#ffffff',
+      })
+    } catch (e) {
+      Logger.error(TAG, 'setSystemBarProperty fail, error: ' + JSON.stringify(e));
+    }
   }
 
   resetSystemBarProperty() {
     this.windowClass?.setWindowSystemBarProperties({
       statusBarContentColor: this.statusBarContentColor ?? '#ffffff',
+    }).catch((e: BusinessError) => {
+      Logger.error(TAG, 'setWindowSystemBarProperties fail, error: ' + JSON.stringify(e));
     })
   }
 }

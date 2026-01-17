@@ -6,6 +6,7 @@ import { BalanceChangeType } from '../commons/Enums';
 import { BalanceResourceItem } from '../commons/Types';
 import { BreakpointStorage, BreakpointSystem, BreakpointTypeEnum } from '../utils/BreakpointSystem';
 import { BillManageModel } from '../commons/Models';
+import { UtilLog } from '@hw-agconnect/util-log';
 
 export class BillManageSheetOptions {
   initBill?: BillManageModel;
@@ -62,17 +63,25 @@ export struct BillManageSheet {
     BreakpointSystem.register(this.getUIContext())
     // 自定义键盘避让
     this.getUIContext().setKeyboardAvoidMode(KeyboardAvoidMode.NONE)
-    window.getLastWindow(this.getUIContext().getHostContext()).then(currentWindow => {
-      currentWindow.on('keyboardHeightChange', this.changeInputBottom.bind(this))
-    })
+    try {
+      window.getLastWindow(this.getUIContext().getHostContext()).then(currentWindow => {
+        currentWindow.on('keyboardHeightChange', this.changeInputBottom.bind(this))
+      })
+    } catch (e) {
+      UtilLog.error(`setKeyboardAvoidMode failed with error ${JSON.stringify(e)}`);
+    }
   }
 
   aboutToDisappear(): void {
     // 恢复默认键盘避让
     this.getUIContext().setKeyboardAvoidMode(KeyboardAvoidMode.OFFSET)
-    window.getLastWindow(this.getUIContext().getHostContext()).then(currentWindow => {
-      currentWindow.off('keyboardHeightChange', this.changeInputBottom)
-    })
+    try {
+      window.getLastWindow(this.getUIContext().getHostContext()).then(currentWindow => {
+        currentWindow.off('keyboardHeightChange', this.changeInputBottom)
+      })
+    } catch (e) {
+      UtilLog.error(`keyboardHeightChangeOff failed with error ${JSON.stringify(e)}`);
+    }
   }
 
   changeInputBottom(data: number) {

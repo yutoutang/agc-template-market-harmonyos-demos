@@ -1,11 +1,12 @@
 import { image } from '@kit.ImageKit';
-import { componentSnapshot, promptAction } from '@kit.ArkUI';
 import { webview } from '@kit.ArkWeb'
+import { BusinessError } from '@kit.BasicServicesKit';
+import { ToastDialog } from '@hw-agconnect/ui-toast';
 import { WEB_ID } from '../commons/Constant';
 import { CommonUtils } from '../utils/CommonUtils';
 import { Logger } from '../utils/Logger';
-import { BusinessError } from '@kit.BasicServicesKit';
 import { PopupUtils } from '../utils/PopupUtils';
+import { WindowUtil } from '../utils/WindowUtil';
 
 const TAG = '[SnapShotWebController]'
 
@@ -71,10 +72,10 @@ export class SnapShotWebController {
       // 这里要分两种情况，1.滚动到底部时，裁剪应该取最后一张除去重复部分以外的底部
       cropLeftover = {
         x: 0,
-        y: vp2px(this.webHeight - leftoverHeight),
+        y: WindowUtil.uiContext.vp2px(this.webHeight - leftoverHeight),
         size: {
-          height: vp2px(leftoverHeight),
-          width: vp2px(this.webWidth)
+          height: WindowUtil.uiContext.vp2px(leftoverHeight),
+          width: WindowUtil.uiContext.vp2px(this.webWidth)
         }
       };
     } else {
@@ -83,15 +84,15 @@ export class SnapShotWebController {
         x: 0,
         y: 0,
         size: {
-          height: vp2px(leftoverHeight),
-          width: vp2px(this.webWidth)
+          height: WindowUtil.uiContext.vp2px(leftoverHeight),
+          width: WindowUtil.uiContext.vp2px(this.webWidth)
         }
       };
     }
 
     // 开始截图
     for (let i = 0; i < snipTimes; i++) {
-      const curSnip = await componentSnapshot.get(WEB_ID);
+      const curSnip = await WindowUtil.uiContext.getComponentSnapshot().get(WEB_ID);
       // 最后一次截图需要特殊处理，去除重复部分
       if (i === lastTime) {
         await curSnip.crop(cropLeftover);
@@ -158,10 +159,10 @@ export class SnapShotWebController {
     this.yOffsetBefore = this.curYOffset;
     this.h5Height = this.curYOffset + Math.ceil(this.webHeight);
     // 使用componentSnapshot.get接口直接获取组件的渲染结果，而不需要将屏幕截图
-    this.webMaskImage = await componentSnapshot.get(WEB_ID);
+    this.webMaskImage = await WindowUtil.uiContext.getComponentSnapshot().get(WEB_ID);
     this.webMaskImageZIndex = 2;
     this.webviewController.scrollTo(0, 0);
-    promptAction.showToast({
+    ToastDialog.showToast({
       message: '正在截图，请勿操作...',
       duration: 2000
     });

@@ -13,6 +13,7 @@
  *  limitations under the License.
  *
  */
+import { UtilLog } from '@hw-agconnect/util-log';
 import { camera } from '@kit.CameraKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { JSON } from '@kit.ArkTS';
@@ -22,9 +23,7 @@ import { getInstance, RouterMap } from '../util/Route';
 import { GlobalContext } from './GlobalContext';
 import { MyLog } from './MyLogUtil';
 
-
 const TAG: string = 'CameraService';
-
 
 export class CameraService {
   private cameraManager: camera.CameraManager | undefined = undefined;
@@ -174,8 +173,7 @@ export class CameraService {
       // 会话进程
       await this.sessionFlowFn(this.cameraManager, this.cameraInput, this.previewOutput, this.photoOutput);
     } catch (error) {
-      let err = error as BusinessError;
-      MyLog.error(TAG, `initCamera fail: ${JSON.stringify(err)}`);
+      UtilLog.error(`initCamera fail: ${error}`)
     }
   }
 
@@ -185,32 +183,28 @@ export class CameraService {
     try {
       await this.previewOutput?.release();
     } catch (error) {
-      let err = error as BusinessError;
-      MyLog.error(TAG, `previewOutput release fail: error: ${JSON.stringify(err)}`);
+      UtilLog.error(`previewOutput release fail: error: ${error}`);
     } finally {
       this.previewOutput = undefined;
     }
     try {
       await this.photoOutput?.release();
     } catch (error) {
-      let err = error as BusinessError;
-      MyLog.error(TAG, `photoOutput release fail: error: ${JSON.stringify(err)}`);
+      UtilLog.error(`photoOutput release fail: error: ${error}`);
     } finally {
       this.photoOutput = undefined;
     }
     try {
       await this.session?.release();
     } catch (error) {
-      let err = error as BusinessError;
-      MyLog.error(TAG, `captureSession release fail: error: ${JSON.stringify(err)}`);
+      UtilLog.error(`session close failed: ${error}`);
     } finally {
       this.session = undefined;
     }
     try {
       await this.cameraInput?.close();
     } catch (error) {
-      let err = error as BusinessError;
-      MyLog.error(TAG, `cameraInput close fail: error: ${JSON.stringify(err)}`);
+      UtilLog.error(`cameraInput close failed: ${error}`);
     } finally {
       this.cameraInput = undefined;
     }
@@ -229,7 +223,7 @@ export class CameraService {
       MyLog.info(TAG, `getCameraManager success: ${cameraManager}`);
     } catch (error) {
       let err = error as BusinessError;
-      MyLog.error(TAG, `getCameraManager failed: ${JSON.stringify(err)}`);
+      MyLog.error(TAG, `getCameraManager failed: ${err}`);
     }
     return cameraManager;
   }
@@ -241,8 +235,7 @@ export class CameraService {
       supportedCameras = cameraManager.getSupportedCameras();
       MyLog.info(TAG, `getSupportedCameras success: ${this.cameras}, length: ${this.cameras?.length}`);
     } catch (error) {
-      let err = error as BusinessError;
-      MyLog.error(TAG, `getSupportedCameras failed: ${JSON.stringify(err)}`);
+      UtilLog.error(`getSupportedCameras failed: ${error}`);
     }
     return supportedCameras;
   }
@@ -256,7 +249,7 @@ export class CameraService {
       MyLog.info(TAG, `createPreviewOutput success: ${previewOutput}`);
     } catch (error) {
       let err = error as BusinessError;
-      MyLog.error(TAG, `createPreviewOutput failed: ${JSON.stringify(err)}`);
+      MyLog.error(TAG, `createPreviewOutput failed: ${err}`);
     }
     return previewOutput;
   }
@@ -268,7 +261,7 @@ export class CameraService {
     try {
       cameraPhotoOutput = cameraManager?.createPhotoOutput(profile);
     } catch (error) {
-      MyLog.error(`Failed to createPhotoOutput. error: ${JSON.stringify(error)}`);
+      UtilLog.error(`Failed to createPhotoOutput. error: ${error}`);
     }
     return cameraPhotoOutput;
   }
@@ -309,7 +302,7 @@ export class CameraService {
       MyLog.info(TAG, 'createCameraInputFn success');
     } catch (error) {
       let err = error as BusinessError;
-      MyLog.error(TAG, `createCameraInputFn failed: ${JSON.stringify(err)}`);
+      MyLog.error(TAG, `createCameraInputFn failed: ${err}`);
     }
     return cameraInput;
   }
@@ -322,8 +315,7 @@ export class CameraService {
       isOpenSuccess = true;
       MyLog.info(TAG, 'cameraInput open success');
     } catch (error) {
-      let err = error as BusinessError;
-      MyLog.error(TAG, `createCameraInput failed : ${JSON.stringify(err)}`);
+      UtilLog.error(`createCameraInput failed : ${error}`)
     }
     return isOpenSuccess;
   }
@@ -350,8 +342,7 @@ export class CameraService {
       await this.session.start();
       MyLog.info(TAG, 'sessionFlowFn success');
     } catch (error) {
-      let err = error as BusinessError;
-      MyLog.error(TAG, `sessionFlowFn fail : ${JSON.stringify(err)}`);
+      UtilLog.error(TAG, `sessionFlowFn fail : ${error}`);
     }
   }
 
@@ -366,7 +357,7 @@ export class CameraService {
         MyLog.info(TAG, 'Preview frame ended');
       });
       previewOutput.on('error', (previewOutputError: BusinessError): void => {
-        MyLog.info(TAG, `Preview output previewOutputError: ${JSON.stringify(previewOutputError)}`);
+        MyLog.info(TAG, `Preview output previewOutputError: ${previewOutputError}`);
       });
     } catch (err) {
       MyLog.error(TAG, 'previewOutputCallBack error');
@@ -428,34 +419,38 @@ export class CameraService {
   }
 
   recognizeText(curImage: image.Image) {
-    curImage.getComponent(image.ComponentType.JPEG, async (err, imgComponent: image.Component) => {
-      if (err || imgComponent === undefined) {
-        MyLog.error(TAG, `getComponent error, error is ${JSON.stringify(err)} or curImage is undefined`);
-        return;
-      }
-      if (imgComponent.byteBuffer as ArrayBuffer) {
-        let imageSource: image.ImageSource = image.createImageSource(imgComponent.byteBuffer);
-        let pixelMap = imageSource.createPixelMapSync();
-        await imageSource.release();
-        let visionInfo: textRecognition.VisionInfo = {
-          pixelMap: pixelMap,
-        };
-        let textConfiguration: textRecognition.TextRecognitionConfiguration = {
-          isDirectionDetectionSupported: true,
-        };
-        textRecognition.recognizeText(visionInfo, textConfiguration)
-          .then((data: textRecognition.TextRecognitionResult) => {
-            // 文字识别成功
-            this.recognizeCallBack();
-            getInstance().pushPathByName(RouterMap.TEXT_RESULT, data.value);
-          }).catch((error: BusinessError) => {
-          MyLog.error(TAG, `Failed to recognize text. Code: ${error.code}, message: ${error.message}`);
-        });
-      } else {
-        return;
-      }
-      curImage.release();
-    });
+    try {
+      curImage.getComponent(image.ComponentType.JPEG, async (err, imgComponent: image.Component) => {
+        if (err || imgComponent === undefined) {
+          MyLog.error(TAG, `getComponent error, error is ${err} or curImage is undefined`);
+          return;
+        }
+        if (imgComponent.byteBuffer as ArrayBuffer) {
+          let imageSource: image.ImageSource = image.createImageSource(imgComponent.byteBuffer);
+          let pixelMap = imageSource.createPixelMapSync();
+          await imageSource.release();
+          let visionInfo: textRecognition.VisionInfo = {
+            pixelMap: pixelMap,
+          };
+          let textConfiguration: textRecognition.TextRecognitionConfiguration = {
+            isDirectionDetectionSupported: true,
+          };
+          textRecognition.recognizeText(visionInfo, textConfiguration)
+            .then((data: textRecognition.TextRecognitionResult) => {
+              // 文字识别成功
+              this.recognizeCallBack();
+              getInstance().pushPathByName(RouterMap.TEXT_RESULT, data.value);
+            }).catch((error: BusinessError) => {
+            MyLog.error(TAG, `Failed to recognize text. Code: ${error.code}, message: ${error.message}`);
+          });
+        } else {
+          return;
+        }
+        curImage.release();
+      });
+    } catch (e) {
+      UtilLog.error(`recognizeText failed with error ${e}`);
+    }
   }
 
   setPhotoCallBack(callBack: Function) {

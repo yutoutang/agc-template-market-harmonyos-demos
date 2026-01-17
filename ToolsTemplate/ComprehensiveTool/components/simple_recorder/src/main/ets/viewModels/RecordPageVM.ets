@@ -12,15 +12,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { AppStorageV2, PersistenceV2, promptAction } from '@kit.ArkUI';
-import { util } from '@kit.ArkTS';
+import { AppStorageV2, PersistenceV2 } from '@kit.ArkUI';
+import { ThreadWorkerPriority, util, worker } from '@kit.ArkTS';
 import { fileIo as fs } from '@kit.CoreFileKit';
 import { cryptoFramework } from '@kit.CryptoArchitectureKit';
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
 import { RecorderUtil } from '../util/RecorderUtil';
-import { extractToPCM, createFd } from '../util/ConvertUtil';
+import { createFd } from '../util/ConvertUtil';
 import { PermissionUtil } from '../util/PermissionUtil';
 import { getInstance, RouterMap } from '../util/Route';
-import { RecordStatus, FileInfo, AudioInfo, MyAudio, SaveType, MyAmplitude, RouteParams } from '../model/Index';
+import {
+  RecordStatus,
+  FileInfo,
+  AudioInfo,
+  MyAudio,
+  SaveType,
+  MyAmplitude,
+  RouteParams,
+  SaveWorkerParm,
+  SaveMessageType,
+} from '../model/Index';
 import { WAVE_BAR_COUNT, AMPLITUDE_MIN_HEIGHT, AMPLITUDE_MAX_HEIGHT } from '../constant/Index';
 
 
@@ -38,6 +49,9 @@ export class RecordPageVM {
   @Trace waveIndex: number[] = new Array(WAVE_BAR_COUNT).fill(0);
   private random: cryptoFramework.Random = cryptoFramework.createRandom();
   private recorderUtil: RecorderUtil = new RecorderUtil();
+  private saveWorker = new worker.ThreadWorker('../workers/SaveWorker', {
+    priority: ThreadWorkerPriority.MEDIUM,
+  });
   private static _instance: RecordPageVM;
 
   public static get instance() {
@@ -56,13 +70,13 @@ export class RecordPageVM {
 
 
   // 开始录制
-  public async start() {
+  public async start(uiContext: UIContext) {
     const res: boolean = await PermissionUtil.requestPermissions(['ohos.permission.MICROPHONE']);
     if (!res) {
       promptAction.showToast({ message: '录音功能需要先开启麦克风权限！' });
       return;
     }
-    this.curFile = await this.recorderUtil.startRecordingProcess();
+    this.curFile = await this.recorderUtil.startRecordingProcess(uiContext);
     this.recordStatus = RecordStatus.PROGRESS;
   }
 
@@ -73,29 +87,45 @@ export class RecordPageVM {
   }
 
   //  保存
-  public async saveAudio(saveType: SaveType) {
+  public async saveAudio(saveType: SaveType, controller: CustomDialogController) {
     if (this.curFile) {
       const pcmPath = createFd('PCM').filePath;
-      await extractToPCM(this.curFile.filePath, pcmPath);
-      const audio: AudioInfo =
-        new AudioInfo(util.generateRandomUUID(false), this.curFile.filePath, this.curFile.fileName, 'MP3', pcmPath);
-      this.myAudio.addAudio(audio);
-      // 保存后将对象置空
-      this.curFile = undefined;
-      if (saveType === SaveType.ONLY_SAVE) {
-        getInstance().popToName(RouterMap.HOME);
-      }
-      if (saveType === SaveType.EDIT_SAVE) {
-        const param: RouteParams = {
-          id: audio.id,
-          isOperation: true,
-        };
-        getInstance().replacePathByName(RouterMap.OPERATION, param);
-      }
-      if (saveType === SaveType.CONVERT_SAVE) {
-        getInstance().replacePathByName(RouterMap.CONVERT, audio.id);
-      }
-      promptAction.showToast({ message: '保存成功' });
+
+      const workData: SaveWorkerParm = {
+        filePath: this.curFile.filePath,
+        pcmPath: pcmPath,
+      };
+      this.saveWorker.postMessage(workData);
+      controller.open();
+      this.saveWorker.onmessage = (messageEvents) => {
+        const res = messageEvents.data as string;
+        if (this.curFile && res === SaveMessageType.SUCCESS) {
+          const audio: AudioInfo =
+            new AudioInfo(util.generateRandomUUID(false), this.curFile.filePath, this.curFile.fileName, 'MP3', pcmPath);
+          this.myAudio.addAudio(audio);
+          // 保存后将对象置空
+          this.curFile = undefined;
+          if (saveType === SaveType.ONLY_SAVE) {
+            getInstance().popToName(RouterMap.HOME);
+          }
+          if (saveType === SaveType.EDIT_SAVE) {
+            const param: RouteParams = {
+              id: audio.id,
+              isOperation: true,
+            };
+            getInstance().replacePathByName(RouterMap.OPERATION, param);
+          }
+          if (saveType === SaveType.CONVERT_SAVE) {
+            getInstance().replacePathByName(RouterMap.CONVERT, audio.id);
+          }
+          controller.close();
+          promptAction.showToast({ message: '保存成功' });
+        } else {
+          controller.close();
+          promptAction.showToast({ message: '保存失败' });
+        }
+
+      };
     }
 
   }

@@ -30,8 +30,8 @@ export struct ArticleTextEllipsis {
   measureTextSize = (context: UIContext, option: MeasureOptions): Size => {
     let measureUtils = context.getMeasureUtils()
     return {
-      width: px2vp(measureUtils.measureTextSize(option).width as number),
-      height: px2vp(measureUtils.measureTextSize(option).height as number),
+      width: context.px2vp(measureUtils.measureTextSize(option).width as number),
+      height: context.px2vp(measureUtils.measureTextSize(option).height as number),
     }
   }
   /**
@@ -43,14 +43,14 @@ export struct ArticleTextEllipsis {
     let comUtils: ComponentUtils = context.getComponentUtils()
     let info: componentUtils.ComponentInfo = comUtils.getRectangleById(key)
     return {
-      width: px2vp(info.size.width),
-      height: px2vp(info.size.height),
-      localLeft: px2vp(info.localOffset.x),
-      localTop: px2vp(info.localOffset.y),
-      screenLeft: px2vp(info.screenOffset.x),
-      screenTop: px2vp(info.screenOffset.y),
-      windowLeft: px2vp(info.windowOffset.x),
-      windowTop: px2vp(info.windowOffset.y),
+      width: context.px2vp(info.size.width),
+      height: context.px2vp(info.size.height),
+      localLeft: context.px2vp(info.localOffset.x),
+      localTop: context.px2vp(info.localOffset.y),
+      screenLeft: context.px2vp(info.screenOffset.x),
+      screenTop: context.px2vp(info.screenOffset.y),
+      windowLeft: context.px2vp(info.windowOffset.x),
+      windowTop: context.px2vp(info.windowOffset.y),
     }
   }
 

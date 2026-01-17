@@ -46,5 +46,22 @@ export { HeaderRefreshBuilder } from './src/main/ets/components/HeaderRefreshBui
 // 下拉刷新
 export { RdbManager } from './src/main/ets/utils/RdbManager'
 
+// 断点
+export {
+  BreakpointTypeOptions,
+  BreakpointType,
+  BreakpointNameEnum,
+  BreakpointValueEnum,
+  GridRowColSetting,
+} from './src/main/ets/constants/GridRowColSetting';
+
+export { BaseViewModel } from './src/main/ets/utils/BaseViewModel';
+
+export { BreakpointUtils } from './src/main/ets/utils/BreakpointUtils';
+
+export { BreakpointModel } from './src/main/ets/models/BreakpointModel';
+
+export { GlobalContextUtils } from './src/main/ets/utils/ContextUtils';
+
 
 

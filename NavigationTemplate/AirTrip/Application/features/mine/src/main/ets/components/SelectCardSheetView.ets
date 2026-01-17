@@ -23,10 +23,10 @@ export struct SelectCardSheetView {
             this.selectCard && this.selectCard(item)
           })
         }
-      })
+      },(item: BaseSelectedListItem, index: number)=>index + '__' + JSON.stringify(item))
     }
     .width('100%')
     .padding({left: 16, right: 16})
-    .divider({ strokeWidth: 0.5, color: $r('sys.color.ohos_id_color_button_divider') })
+    .divider({ strokeWidth: 0.5, color: $r('sys.color.comp_divider') })
   }
 }

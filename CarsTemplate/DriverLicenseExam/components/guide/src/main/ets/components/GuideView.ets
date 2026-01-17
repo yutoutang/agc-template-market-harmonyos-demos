@@ -99,7 +99,7 @@ export struct GuideView {
               .fontSize(24)
               .fontColor('rgba(0,0,0,0.9)')
               .margin({
-                top: px2vp(this.topRectHeight) + 12
+                top: this.getUIContext().px2vp(this.topRectHeight) + 12
               })
             this.titleView($r('app.string.select_city'))
             this.selectCity()
@@ -199,13 +199,13 @@ export struct GuideView {
             .backgroundColor('#64BB5C')
             .textAlign(TextAlign.Center)
             .onClick(() => {
-              this.guideService.changeGuidanceStatus();
+              this.guideService.changeGuidanceStatus(this.getUIContext());
               if (this.guideService.isCompleteGuidance()) {
                 this.completed();
               }
             })
             .margin({
-              bottom:px2vp(this.bottomRectHeight),
+              bottom:this.getUIContext().px2vp(this.bottomRectHeight),
               top:189
             })
         }

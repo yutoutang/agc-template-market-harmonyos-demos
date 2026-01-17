@@ -1,6 +1,6 @@
 import { componentSnapshot } from '@kit.ArkUI';
-import { SnapShotImage } from './SnapShotImage';
 import { LongTakeTransitionParam } from './LongTakeTransitionParam';
+import { SnapShotImage } from './SnapShotImage';
 
 const TAG = 'CustomTransition';
 

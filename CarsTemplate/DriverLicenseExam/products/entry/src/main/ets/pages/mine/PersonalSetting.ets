@@ -1,6 +1,17 @@
 import { CustomContentDialog } from '@kit.ArkUI';
 import { AccountUtil, CommonModel } from '@ohos_agcit/driver_license_exam_commonlib';
 import { CommonConstants } from '@ohos_agcit/driver_license_exam_guide';
+import {
+  AboutModel,
+  SettingItem,
+  SettingGroup,
+  SettingType,
+  SettingView,
+  SupportedSetting,
+  WebModel,
+} from 'app_setting'
+import { checkUpdateAndShowDialog } from 'check_app_update';
+import { common } from '@kit.AbilityKit';
 
 @Builder
 export function PersonalSettingBuilder() {
@@ -10,139 +21,76 @@ export function PersonalSettingBuilder() {
 @Entry
 @ComponentV2
 struct PersonalSetting {
-  @Local isShow: boolean = false;
   topRectHeight: number = AppStorage.get('topRectHeight') || 0;
-  @Consumer('appPathStack') appPathStack: NavPathStack = new NavPathStack();
+  bottomRectHeight: number = AppStorage.get('bottomRectHeight') || 0;
   vm: CommonModel = CommonModel.instance;
 
+  @Local group1: SettingGroup = new SettingGroup()
+    .setList([
+      new SettingItem()
+        .setType(SettingType.ROUTER)
+        .setLabel('个人信息')
+        .setRouterParam({ routerName: 'PersonalInfo' }),
+      new SettingItem()
+        .setType(SettingType.ROUTER)
+        .setLabel('隐私设置')
+        .setRouterParam({ routerName: 'SettingPrivacy' })
+        .setClickEvent(() => {
+          this.vm.navStack.pushPathByName('SettingPrivacy',true);
+        })
+    ])
 
+  @Local group2: SettingGroup = new SettingGroup()
+    .setList([
+      new SettingItem()
+        .setSupportedType(SupportedSetting.PUSH_SWITCH)
+        .setOnChange((isOn) => {
+          // 获取推送开关情况：isOn as boolean
+        }),
+    ])
 
-  // 退出登录对话框
-  logOutDialogController: CustomDialogController = new CustomDialogController({
-    builder: CustomContentDialog({
-      primaryTitle: '账号退出登录',
-      contentBuilder: () => {
-        this.logOutContent();
-      },
-      buttons: [
-        {
-          value: $r('app.string.cancel'),
-          buttonStyle: ButtonStyleMode.TEXTUAL,
-          action: () => {
-            this.logOutDialogController.close();
-          },
-        },
-        {
-          value: $r('app.string.confirm'),
-          buttonStyle: ButtonStyleMode.TEXTUAL,
-          action: () => {
-            AccountUtil.loginOut();
-            this.vm.navStack.pop();
-          },
-        },
-      ],
-    }),
-  });
-
-  // 退出登陆
-  @Builder
-  logOutContent() {
-    Column() {
-      Row() {
-        Text('请确认是否退出当前账户？')
-          .fontSize(14);
-      };
-    }
-    .width('100%')
-    .borderRadius(16)
-    .margin({
-      left: '4%',
-      right: '4%',
-      bottom: 5,
-    });
-  }
-
+  @Local group3: SettingGroup = new SettingGroup()
+    .setList([
+      new SettingItem()
+        .setType(SettingType.ROUTER)
+        .setLabel('检测版本')
+        .setRouterParam({ routerName: 'SettingPrivacy' })
+        .setClickEvent(() => {
+          checkUpdateAndShowDialog(this.getUIContext())
+        }),
+      new SettingItem()
+        .setType(SettingType.ROUTER)
+        .setLabel('关于我们')
+        .setRouterParam({ routerName: 'SettingPrivacy' })
+        .setClickEvent(() => {
+          this.vm.navStack.pushPathByName('SettingAbout',true);
+        })
+    ])
 
 
   build() {
     NavDestination() {
-      Column(){
-        Column({ space: 12 }) {
-          Row() {
-            Text('隐私政策')
-              .fontSize(16)
-              .margin({ left: 18 })
-
-            Blank()
-            Image($r('app.media.dark_triangle'))
-              .width(20)
-              .height(20)
-              .margin({ right: 18 })
+      Column() {
+        SettingView({
+          isLogin: true,
+          pathStack: this.vm.navStack,
+          settingList: [this.group1, this.group3, this.group2],
+          signOutApi:() => {
+            return new Promise(() => {
+              AccountUtil.loginOut();
+              this.vm.navStack.pop();
+            })
           }
-          .onClick(() => {
-            this.vm.navStack.pushPathByName('PrivacyAgreement', undefined)
-          })
-          .width('100%')
-          .height(61)
-          .justifyContent(FlexAlign.SpaceBetween)
-          .alignItems(VerticalAlign.Center)
-          .backgroundColor('#FFFFFF')
-          .borderRadius(16)
-          .padding({ top: 20, bottom: 20 })
-
-          Row() {
-            Text('用户协议')
-              .fontSize(16)
-              .margin({ left: 18 })
-
-            Blank()
-            Image($r('app.media.dark_triangle'))
-              .width(20)
-              .height(20)
-              .margin({ right: 18 })
-          }
-          .onClick(() => {
-            this.vm.navStack.pushPathByName('PrivacyAgreement', undefined)
-          })
-          .width('100%')
-          .height(61)
-          .justifyContent(FlexAlign.SpaceBetween)
-          .alignItems(VerticalAlign.Center)
-          .backgroundColor('#FFFFFF')
-          .borderRadius(16)
-          .padding({ top: 20, bottom: 20 })
-        }
-        .width(CommonConstants.FULL_WIDTH)
-
-        Blank()
-        Row() {
-          Text($r('app.string.log_out'))
-            .fontSize(16)
-            .fontColor(Color.White)
-            .fontWeight(FontWeight.Medium)
-        }
-        .justifyContent(FlexAlign.Center)
-        .width('94%')
-        .height(40)
-        .borderRadius(20)
-        .backgroundColor('#808080')
-        .margin({
-          left: 28,
-          right: 28,
-          bottom: 50
-        })
-        .onClick(() => {
-          this.logOutDialogController.open();
         })
       }
       .width('100%')
       .height('100%')
-      .padding({ top: 12, left: '4%', right: '4%' })
     }
     .backgroundColor('#F1F3F5')
-    .title('个人设置')
+    .title('设置')
     .padding({
-      top: px2vp(this.topRectHeight) + 10,
+      top: this.getUIContext().px2vp(this.topRectHeight) + 10,
+      bottom: this.getUIContext().px2vp(this.bottomRectHeight)
     })
   }
 }

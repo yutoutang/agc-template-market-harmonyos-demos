@@ -1,6 +1,6 @@
-import { common } from '@kit.AbilityKit';
 import { PersistenceV2 } from '@kit.ArkUI';
 import dayjs from 'dayjs';
+import { ToastDialog } from '@hw-agconnect/ui-toast';
 import { TEXT_PICKER_DATA } from '../commons/Constant';
 import { Diary, DiaryExtraInfo } from '../models/Diary';
 import { DiaryUtil } from '../utils/DiaryUtil';
@@ -17,6 +17,7 @@ import { ImageUtils } from '../utils/ImageUtils';
 import { handleTaskPoolDelete } from '../utils/TaskPoolHandle';
 import { EditorController } from '../controller/EditorController';
 import { SnapShotWebController } from '../controller/SnapShotWebController';
+import { WindowUtil } from '../utils/WindowUtil';
 
 
 @ObservedV2
@@ -344,21 +345,9 @@ export class DiaryEditorPageVM {
   }
 
   handleHtmlImgSrc() {
-    const context = this.uiContext!.getHostContext() as common.UIAbilityContext;
     const htmlContent = this.editorController.richTextContent;
     // 处理图片 找出富文本中的图片
-    const imgSrcList: string[] = ImageUtils.findImgSrcList(htmlContent);
-    const newImgSrcList: string[] = []
-    for (let i = 0; i < imgSrcList.length; i++) {
-      const src = imgSrcList[i];
-      if (src.includes('file://media/Photo')) {
-        const imgName = new Date().getTime() + i + '.jpg';
-        const newPath = ImageUtils.saveImgToCache(context, src, imgName);
-        newImgSrcList.push(newPath);
-      } else {
-        newImgSrcList.push(src);
-      }
-    }
+    const newImgSrcList: string[] = ImageUtils.findImgSrcList(htmlContent);
     const firstImg = newImgSrcList[0];
     // 保存第一张图片
     this.currentDiary.firstImage = firstImg ?? '';
@@ -382,7 +371,7 @@ export class DiaryEditorPageVM {
   }
 
   showToast(message: string) {
-    this.uiContext?.getPromptAction().showToast({
+    WindowUtil.uiContext.getPromptAction().showToast({
       message: message,
       alignment: Alignment.Center,
       duration: 1500

@@ -108,7 +108,7 @@ export struct RecognitionHomePage {
   }
 
   aboutToAppear(): void {
-    PermissionUtil.requestPermissions(['ohos.permission.CAMERA']);
+    PermissionUtil.requestPermissions(['ohos.permission.CAMERA'], this.getUIContext().getHostContext() as Context);
   }
 
   build() {
@@ -143,7 +143,7 @@ export struct RecognitionHomePage {
                 this.iconBuilder($r('app.media.ic_photo'), '拍照扫描');
               }.commonItem()
               .onClick(() => {
-                this.vm.toCamera();
+                this.vm.toCamera(this.getUIContext().getHostContext() as Context);
               });
             }.columnsTemplate('1fr 1fr 1fr').columnsGap(8).height(104);
 
@@ -152,14 +152,14 @@ export struct RecognitionHomePage {
                 this.iconBuilder($r('app.media.ic_waveform'), '印刷字扫描');
               }.commonItem()
               .onClick(() => {
-                this.vm.toCamera();
+                this.vm.toCamera(this.getUIContext().getHostContext() as Context);
               });
 
               GridItem() {
                 this.iconBuilder($r('app.media.ic_hand_written'), '手写字扫描');
               }.commonItem()
               .onClick(() => {
-                this.vm.toCamera();
+                this.vm.toCamera(this.getUIContext().getHostContext() as Context);
               });
             }.columnsTemplate('1fr 1fr').columnsGap(8).height(104);
 

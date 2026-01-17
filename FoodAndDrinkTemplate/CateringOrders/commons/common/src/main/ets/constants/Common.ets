@@ -1,3 +1,5 @@
+import { RouterMap } from './RouterMap'
+
 export class Constants {
   // 接口请求超时时间
   static readonly REQUEST_TIME_OUT = 3 * 1000
@@ -15,16 +17,29 @@ export class Constants {
   static readonly GOOD_TYPE_HOT = '1'
   static readonly RICH_TEXT_URI = 'resource://rawfile/richtext.html'
   static readonly MID_DAY_TIME = '12:00'
+  static readonly DEFAULT_CITY = '北京'
+  static readonly YEAR_PICKER =
+    ['2010年', '2011年', '2012年', '2013年', '2014年', '2015年', '2016年', '2017年', '2018年', '2019年', '2020年',
+      '2021年', '2022年', '2023年', '2024年', '2025年', '2026年', '2027年', '2028年', '2029年', '2030年', '2031年',
+      '2032年', '2033年', '2034年', '2035年', '2036年', '2037年', '2038年', '2039年', '2040年',
+      '2000年', '2001年', '2002年', '2003年', '2004年', '2005年', '2006年', '2007年', '2008年', '2009年']
+  static readonly MONTH_PICKER: string[] =
+    ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
+  //todo 积分兑换金额
+  static readonly POINT_REDEEMED_MONEY = 5
+  //todo 每桌预计等待时间（分钟）
+  static readonly QUEUE_TABLE_MIN = 5
+  //todo banner广告信息 广告位ID
+  static readonly AD_INFO = 'testw6vs28auh3'
+  //todo 支持华为应用内分享的页面
+  static readonly SHARE_PAGES: string[] = [RouterMap.MAIN_INDEX, RouterMap.GOODS_DETAIL_PAGE]
+  //todo 卡片跳转参数不封装对象的页面
+  static readonly CARD_JUMP_PARAMS_PAGES: string[] = [RouterMap.BOOK_RES_PAGE, RouterMap.QUEUE_RES_PAGE]
 }
 
 export class CommonUrl {
   // todo mock图片url前缀，真实图片地址可以按业务需求指定
   static readonly CLOUD_STORAGE_URL = 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/test-1pvkp/'
-}
-
-export enum StoreType {
-  SCAN_TYPE = 1,
-  PICK_NUM_TYPE
 }
 
 export enum PayType {
@@ -68,10 +83,10 @@ export enum GoodsSpecEnum {
 
 // 订单类型
 export enum OrderTypeEnum {
-  // 到店自取
-  PICK_SELF = 0,
-  // 外卖配送
-  TAKEAWAY_DELIVERY = 1,
+  // 堂食
+  DINE_IN = 1,
+  // 外带
+  TAKEOUT = 2,
 }
 
 // 订单详情行枚举
@@ -98,43 +113,16 @@ export enum OrderStateEnum {
   AfterSales
 }
 
-export enum RouterMap {
-  //  首页
-  HOME_PAGE = 'HomePage',
-  // 点餐页面
-  ORDER_PAGE = 'OrderPage',
-  // 商户信息
-  MERCHANT_DETAIL_PAGE = 'MerchantDetailPage',
-  //  菜品详情
-  GOODS_DETAIL_PAGE = 'GoodsDetailPage',
-  // 确认订单
-  CONFIRM_ORDER_PAGE = 'ConfirmOrderPage',
-  // 常见问题
-  FREQUENT_QUESTION_PAGE = 'FrequentQuestionPage',
-  // 订单详情
-  ORDER_DETAIL_PAGE = 'OrderDetailPage',
-  // 商户位置地图
-  HW_MAP_PAGE = 'HwMapPage',
-  // 问题详情
-  ANSWER_PAGE = 'AnswerPage',
-  // 选择优惠券
-  SELECT_COUPON_PAGE = 'SelectCouponPage',
-  // 我的优惠券
-  MY_COUPONS_PAGE = 'MyCouponsPage',
-  // 订单备注页面
-  REMARKS_PAGE = 'RemarksPage',
-  // 图片预览
-  PREVIEW_IMAGE_PAGE = 'PreviewImagePage',
-  // 选择商户
-  SELECT_STORE_PAGE = 'SelectStorePage',
-  // 超值加购
-  SNACK_SIZED_DEAL_PAGE = 'SnackSizedDealPage',
-  // 我的钱包
-  MY_WALLET_PAGE = 'MyWalletPage',
-  // 超值加购
-  RECHARGE_RECORD_PAGE = 'RechargeRecordPage',
-  // 储值协议
-  WALLET_TERMS_PAGE = 'WalletTermsPage',
-  // 确认弹窗
-  CONFIRM_DIALOG = 'CommonConfirmDialog',
+export enum ModuleName {
+  HOME = 'home',
+  ORDER = 'order',
+  ORDER_LIST = 'order_list',
+  PERSONAL_CENTER = 'personal_center',
 }
+
+export enum EmitterEvent {
+  REFRESH_ORDER_LIST = 'refreshOrderList',
+  REFRESH_MINE = 'refreshMine'
+}
+
+export { RouterMap }

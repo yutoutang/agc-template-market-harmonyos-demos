@@ -80,9 +80,6 @@ export struct UserInfoCard {
         Row() {
           if (this.loading) {
             LoadingProgress()
-              .color($r('app.color.color_btn_emphasize_bg'))
-              .width(12)
-              .height(12)
               .margin({ right: 4 })
           } else {
             Image($r('app.media.ic_link'))
@@ -90,12 +87,12 @@ export struct UserInfoCard {
               .height(12)
               .margin({ right: 4 })
               .fillColor(this.userInfoStorage.isLogin ? $r('app.color.color_btn_emphasize_bg') :
-              $r('sys.color.ohos_id_color_text_primary'))
+                $r('sys.color.ohos_id_color_text_primary'))
           }
           Text(this.userInfoStorage.isLogin ? $r('app.string.disassociate') : $r('app.string.associate_account'))
             .fontSize($r('sys.float.Body_S'))
             .fontColor(this.userInfoStorage.isLogin ? $r('app.color.color_btn_emphasize_bg') :
-            $r('sys.color.ohos_id_color_text_primary'))
+              $r('sys.color.ohos_id_color_text_primary'))
         }
         .padding({
           left: 10,
@@ -105,7 +102,7 @@ export struct UserInfoCard {
         })
         .borderRadius(14)
         .backgroundColor(this.userInfoStorage.isLogin ? $r('app.color.color_link_bg') :
-        $r('sys.color.ohos_id_background_secondary'))
+          $r('sys.color.ohos_id_background_secondary'))
         .onClick(() => {
           if (this.userInfoStorage.isLogin) {
             GlobalDialog.showTextDialog({
@@ -116,14 +113,14 @@ export struct UserInfoCard {
               primaryButAction: () => {
                 this.loading = true
                 this.cancelRelative()
-                GlobalDialog.close()
+                GlobalDialog.close(this.getUIContext())
               },
               secondaryButAction: () => {
-                GlobalDialog.close()
+                GlobalDialog.close(this.getUIContext())
               },
-            })
+            }, this.getUIContext())
           } else {
-            GlobalDialog.showLoadingDialog()
+            GlobalDialog.showLoadingDialog(this.getUIContext())
             this.getQuickLoginAnonymousPhone()
           }
         })
@@ -151,31 +148,31 @@ export struct UserInfoCard {
             this.userInfoStorage.isLogin = true
             this.userInfoStorage.userInfo = new UserInfo(result.result[0])
           } else {
-            GlobalDialog.showToast('账号关联失败，请重试~')
+            GlobalDialog.showToast('账号关联失败，请重试~', this.getUIContext())
             this.cancelRelative()
           }
         }).catch(() => {
-          GlobalDialog.showToast('账号关联失败')
+          GlobalDialog.showToast('账号关联失败', this.getUIContext())
           this.cancelRelative()
         }).finally(() => {
-          GlobalDialog.close()
+          GlobalDialog.close(this.getUIContext())
         })
       }
     }).catch((error: BusinessError) => {
       // 用户取消授权
       if (error.code === 1001502012) {
-        GlobalDialog.showToast('取消关联手机号')
+        GlobalDialog.showToast('取消关联手机号', this.getUIContext())
       } else {
-        GlobalDialog.showToast('账号关联失败')
+        GlobalDialog.showToast('账号关联失败', this.getUIContext())
       }
       this.cancelRelative()
     }).finally(() => {
-      GlobalDialog.close()
+      GlobalDialog.close(this.getUIContext())
     })
   }
 
   cancelRelative() {
-    AuthenticationUtil.cancelAuthentication().then(() => {
+    AuthenticationUtil.cancelAuthentication(this.getUIContext()).then(() => {
       this.userInfoStorage.isLogin = false
     }).finally(() => {
       this.loading = false

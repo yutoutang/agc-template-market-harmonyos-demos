@@ -1,7 +1,8 @@
 import { InvestmentDetail, ProfitDetail } from '../model';
 import { pasteboard } from '@kit.BasicServicesKit';
-import { promptAction } from '@kit.ArkUI';
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
 import { DepositType, FinancialType } from '../common/Constant';
+import { UtilLog } from '@hw-agconnect/util-log';
 
 // 计算银行理财
 export function calculateCurrentDepositInterest(
@@ -133,16 +134,20 @@ export function getCopyText(investmentIncome: InvestmentDetail) {
 
 // 剪贴板内容
 export function copyText(text: string) {
-  // 创建剪贴板内容对象
-  const pasteboardData = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, text);
-  // 获取系统剪贴板对象
-  const systemPasteboard = pasteboard.getSystemPasteboard();
-  systemPasteboard.setData(pasteboardData); // 将数据放入剪贴板
-  systemPasteboard.getData().then((data) => { // 读取剪贴板内容
-    if (data) {
-      promptAction.showToast({ message: '复制成功', alignment: Alignment.Center });
-    } else {
-      promptAction.showToast({ message: '复制失败', alignment: Alignment.Center });
-    }
-  })
+  try {
+    // 创建剪贴板内容对象
+    const pasteboardData = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, text);
+    // 获取系统剪贴板对象
+    const systemPasteboard = pasteboard.getSystemPasteboard();
+    systemPasteboard.setData(pasteboardData); // 将数据放入剪贴板
+    systemPasteboard.getData().then((data) => { // 读取剪贴板内容
+      if (data) {
+        promptAction.showToast({ message: '复制成功' });
+      } else {
+        promptAction.showToast({ message: '复制失败' });
+      }
+    })
+  } catch (e) {
+    UtilLog.error(`copyText failed with error ${JSON.stringify(e)}`)
+  }
 }

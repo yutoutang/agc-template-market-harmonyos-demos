@@ -1,5 +1,6 @@
 import { FileVo } from '../model/FileVo';
-import { promptAction } from '@kit.ArkUI';
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { FileBasic, FileType, MainFile, TransferState } from '../common/Constant';
 import { common } from '@kit.AbilityKit';
 import { contact } from '@kit.ContactsKit';
@@ -40,10 +41,14 @@ export class FileUploadPageVM {
   }
 
   // 获取联系人数据
-  async getCloneFiles() {
-    this.contactList = await contact.queryContacts(getContext())
-    this.contact.size = this.contactList.length
-    this.contact.fileSize = 100
+  async getCloneFiles(uiContext: UIContext) {
+    try {
+      this.contactList = await contact.queryContacts(uiContext.getHostContext() as common.UIAbilityContext)
+      this.contact.size = this.contactList.length
+      this.contact.fileSize = 100
+    } catch (e) {
+      UtilLog.error(`getCloneFiles failed : ${JSON.stringify(e)}`)
+    }
   }
 
   // 将文件数据发送给新机

@@ -1,5 +1,6 @@
 let RichEditor = {};
 let isInit = false
+let MAX_LEN = 16000;
 
 RichEditor.editor = document.getElementById('editor');
 
@@ -237,6 +238,31 @@ RichEditor.removeFormat = function() {
     document.execCommand('removeFormat', false, null);
 }
 
+RichEditor.editor.addEventListener("beforeinput", (e) => {
+    // 非文本输入直接放行（图片、换行等）
+    if (!e.data) {
+        return
+    }
+    // 计算剩余可输入的文案长度
+    const remain = MAX_LEN - getPureTextLength(editor)
+    // 无剩余可输入，则不让继续输入
+    if (remain < 0) {
+        e.preventDefault()
+        return
+    }
+    // 判断输入的文案的长度是否超过剩余可输入的长度
+    if (e.data.length > remain) {
+        e.preventDefault()
+        insertTextAtCursor(e.data.slice(0, remain));
+        window.location.href = "re-callback://" + encodeURI(RichEditor.getHtml());
+        htmlContentModel.htmlContentChange(RichEditor.getHtml());
+    }
+    // 文案长度如果超过最大长度，则提示
+    let editorTextCount = getPureTextLength(editor);
+    if (editorTextCount >= MAX_LEN) {
+        htmlContentModel.handleTextLength();
+    }
+});
 // Event Listeners
 RichEditor.editor.addEventListener("input", RichEditor.callback);
 RichEditor.editor.addEventListener("keyup", function(e) {
@@ -289,6 +315,47 @@ RichEditor.getSelectedNode = function() {
         node = range.commonAncestorContainer ? range.commonAncestorContainer :
         range.parentElement ? range.parentElement() : range.item(0);
     }
+}
+
+function getPureTextLength(root) {
+    return getAllTextNodes(root)
+        .reduce((sum, n) => sum + n.nodeValue.length, 0)
+}
+
+function getAllTextNodes(root) {
+    const nodes = []
+    const walker = document.createTreeWalker(
+        root,
+        NodeFilter.SHOW_TEXT,
+        null,
+        false
+    )
+
+    let node
+    while ((node = walker.nextNode())) {
+        nodes.push(node)
+    }
+
+    return nodes
+}
+
+function insertTextAtCursor(text) {
+    const sel = window.getSelection()
+    if (!sel.rangeCount) {
+        return
+    }
+
+    const range = sel.getRangeAt(0)
+    range.deleteContents()
+
+    const node = document.createTextNode(text)
+    range.insertNode(node)
+
+    // 光标移动到插入内容后
+    range.setStartAfter(node)
+    range.collapse(true)
+    sel.removeAllRanges()
+    sel.addRange(range)
 }
 
 function watchRichText(editor, callback) {

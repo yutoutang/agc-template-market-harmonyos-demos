@@ -1,7 +1,9 @@
 import { common } from '@kit.AbilityKit';
 import { AdComponent, advertising, AutoAdComponent } from '@kit.AdsKit';
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { requestOAID } from '../utils/OaidUtils';
+
+const TAG = '[AdvertisementComponent]';
 
 @ComponentV2
 export struct AdvertisementComponent {
@@ -92,21 +94,21 @@ export struct AdvertisementComponent {
               onStatusChanged: (status: string, ad: advertising.Advertisement, data: string) => {
                 switch (status) {
                   case AdStatus.AD_OPEN:
-                    hilog.info(0x0000, 'testTag', `Status is onAdOpen${JSON.stringify(ad)},data:${data}`);
+                    UtilLog.info(TAG, `Status is onAdOpen${JSON.stringify(ad)},data:${data}`);
                     this.adOpen = true
                     break;
                   case AdStatus.AD_CLICKED:
-                    hilog.info(0x0000, 'testTag', 'Status is onAdClick');
+                    UtilLog.info(TAG, 'Status is onAdClick');
                     break;
                   case AdStatus.AD_CLOSED:
-                    hilog.info(0x0000, 'testTag', 'Status is onAdClose');
+                    UtilLog.info(TAG, 'Status is onAdClose');
                     this.visibilityState = false;
                     break;
                   case AdStatus.AD_LOAD:
-                    hilog.info(0x0000, 'testTag', 'Status is onAdLoad');
+                    UtilLog.info(TAG, 'Status is onAdLoad');
                     break;
                   case AdStatus.AD_FAIL:
-                    hilog.error(0x0000, 'testTag', 'Status is onAdFail');
+                    UtilLog.error(TAG, 'Status is onAdFail');
                     this.visibilityState = false;
                     break;
                 }
@@ -159,13 +161,13 @@ export struct AdvertisementComponent {
         onStatusChanged: (status: string, ad: advertising.Advertisement, data: string) => {
           switch (status) {
             case AdStatus.AD_OPEN:
-              hilog.info(0x0000, 'testTag', `Status is onAdOpen${JSON.stringify(ad)},data:${data}`);
+              UtilLog.info(TAG, `Status is onAdOpen${JSON.stringify(ad)},data:${data}`);
               break;
             case AdStatus.AD_CLICKED:
-              hilog.info(0x0000, 'testTag', 'Status is onAdClick');
+              UtilLog.info(TAG, 'Status is onAdClick');
               break;
             case AdStatus.AD_CLOSED:
-              hilog.info(0x0000, 'testTag', 'Status is onAdClose');
+              UtilLog.info(TAG, 'Status is onAdClose');
               this.skipAd();
             case AdStatus.AD_FAIL:
               this.skipAd();
@@ -207,7 +209,7 @@ export struct AdvertisementComponent {
       const adLoadListener: advertising.AdLoadListener = {
         // 广告请求失败回调
         onAdLoadFailure: (errorCode: number, errorMsg: string) => {
-          hilog.error(0x0000, 'testTag', `Failed to load ad. Code is ${errorCode}, message is ${errorMsg}`);
+          UtilLog.error(TAG, `Failed to load ad. Code is ${errorCode}, message is ${errorMsg}`);
         },
         // 广告请求成功回调
         onAdLoadSuccess: (ads: Array<advertising.Advertisement>) => {
@@ -215,7 +217,7 @@ export struct AdvertisementComponent {
           if (this.isTimeOut) {
             return;
           }
-          hilog.info(0x0000, 'testTag', 'Succeeded in loading ad');
+          UtilLog.info(TAG, 'Succeeded in loading ad');
           this.ad = ads[0];
         },
       };
@@ -223,7 +225,11 @@ export struct AdvertisementComponent {
       const adLoader: advertising.AdLoader = new advertising.AdLoader(this.context);
       this.timeOutHandler();
       // 调用广告请求接口
-      adLoader.loadAd(this.adRequestParams, this.adOptions, adLoadListener);
+      try {
+        adLoader.loadAd(this.adRequestParams, this.adOptions, adLoadListener);
+      } catch (e) {
+        UtilLog.error(TAG, 'loadAd fail, error: ' + JSON.stringify(e));
+      }
     } else {
       this.adRequestParams = {
         adId: adId,
@@ -251,7 +257,7 @@ export struct AdvertisementComponent {
     this.timeOutIndex = setTimeout(() => {
       this.isTimeOut = true;
       this.skipAd();
-      hilog.error(0x0000, 'testTag', 'Load ad time out');
+      UtilLog.error(TAG, 'Load ad time out');
     }, this.timeOutDuration);
   }
 }

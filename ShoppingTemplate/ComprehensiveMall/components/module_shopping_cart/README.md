@@ -4,7 +4,7 @@
 
 - [简介](#简介)
 - [约束与限制](#约束与限制)
-- [快速入门](#快速入门)
+- [使用](#使用)
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
@@ -27,7 +27,7 @@
 
 - 网络权限：ohos.permission.INTERNET
 
-## 快速入门
+## 使用
 
 1. 安装组件
 
@@ -70,7 +70,7 @@
 
    ```typescript
    import { ShoppingCart } from 'module_shopping_cart';
-   import { Product } from 'module_shopping_cart/src/main/ets/commons/Model';
+   import { Product } from 'module_shopping_cart';
 
    @Entry
    @ComponentV2
@@ -181,7 +181,7 @@ struct DemoPage {
 
 ```typescript
 import { ShoppingCart } from 'module_shopping_cart';
-import { Product } from 'module_shopping_cart/src/main/ets/commons/Model';
+import { Product } from 'module_shopping_cart';
 
 @Entry
 @ComponentV2

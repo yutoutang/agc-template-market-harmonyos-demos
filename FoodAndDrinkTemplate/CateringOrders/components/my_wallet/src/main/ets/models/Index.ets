@@ -10,10 +10,17 @@ export class RechargeTier {
 
 export interface RechargeRecord {
   id: string
-  // 充值金额
+  // 金额变动类型 1：充值  2：消费
+  recordType: number
+  // 变动金额
   rechargeMoney: number
   // 当前余额
   balance: number
-  // 充值时间
+  // 变动时间
   time: number
+}
+
+export enum WalletRecordType {
+  RECHARGE = 1,
+  CONSUME = 2
 }

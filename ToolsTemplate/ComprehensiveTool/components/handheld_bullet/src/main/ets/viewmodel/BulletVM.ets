@@ -1,5 +1,5 @@
-import { LevelMode, PersistenceV2, promptAction } from '@kit.ArkUI';
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { LevelMode, PersistenceV2 } from '@kit.ArkUI';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { Constant } from '../constant/Constant';
 import { Bullet, BulletHistoryList, ColorOption, GlowStick, Hint, SliderOption } from '../model/Index';
 import { PromptActionUtil } from '../util/PromptActionUtil';
@@ -56,7 +56,7 @@ export class BulletVM {
     PromptActionUtil.setOptions({
       levelMode: LevelMode.EMBEDDED,
       onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
-        hilog.info(0xFF00, 'BULLET', JSON.stringify(dismissDialogAction.reason));
+        UtilLog.info(0xFF00, 'BULLET', JSON.stringify(dismissDialogAction.reason));
       },
     });
     PromptActionUtil.openDialog();
@@ -71,9 +71,9 @@ export class BulletVM {
     this.showHintDialog(uiContext, node);
   }
 
-  displayBullet() {
+  displayBullet(uiContext: UIContext) {
     if (!this.bullet.content) {
-      promptAction.showToast({
+      uiContext.getPromptAction().showToast({
         message: '请填写弹幕内容',
       });
       return;
@@ -200,7 +200,7 @@ export class BulletVM {
     if (overflow < 0) {
       this.isOverFlow = true;
       this.overflowLen = overflow - this.contentWidth;
-      hilog.info(0xFF00, 'Bullet', `Bullet Display reset with offsetX: ${this.offsetX}, accurate: ${this.overflowLen}`);
+      UtilLog.info(0xFF00, 'Bullet', `Bullet Display reset with offsetX: ${this.offsetX}, accurate: ${this.overflowLen}`);
     }
     this.isAnimating = true;
     this.animate();
@@ -219,7 +219,7 @@ export class BulletVM {
     this.time = setTimeout(() => {
       // 继续当前方向的滚动
       this.offsetX = this.offsetX - this.bullet.speed * 0.1;
-      hilog.info(0xFF00, 'Bullet', `Bullet Display start with offsetX: ${this.offsetX}, speed: ${this.bullet.speed}`);
+      UtilLog.info(0xFF00, 'Bullet', `Bullet Display start with offsetX: ${this.offsetX}, speed: ${this.bullet.speed}`);
 
       // 检查是否需要重置位置
       if (this.offsetX <= this.overflowLen) {

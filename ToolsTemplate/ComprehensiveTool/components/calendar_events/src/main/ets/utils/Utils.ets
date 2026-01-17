@@ -74,10 +74,10 @@ function bufferToString(buffer: ArrayBufferLike): string {
   return resultPut;
 }
 
-export function getDataFromJSON<T>(rawFileName: string, component?: Object): T[] {
+export function getDataFromJSON<T>(rawFileName: string, uiContext: UIContext, component?: Object): T[] {
   let result: T[] = [];
   try {
-    let value: Uint8Array = getContext(component).resourceManager.getRawFileContentSync(rawFileName);
+    let value: Uint8Array = uiContext.getHostContext()!.resourceManager.getRawFileContentSync(rawFileName);
     result = JSON.parse(bufferToString(value.buffer)) as T[];
   } catch (error) {
     let code = (error as BusinessError).code;

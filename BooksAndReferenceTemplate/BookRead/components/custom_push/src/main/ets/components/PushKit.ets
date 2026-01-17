@@ -22,10 +22,10 @@ interface PushData {
 
 @ComponentV2
 export struct PushKit {
-
   windowTopHeight: number = AppStorage.get('windowTopHeight') as number || 38.77;
   i: number = 1
   @Local pushData: Array<PushDataImp> = []
+  @Param curBreakpoint:string = 'sm'
   dialogControllerImage: CustomDialogController = new CustomDialogController({
     builder: TipsDialog({
       title: '温馨提示',
@@ -52,8 +52,9 @@ export struct PushKit {
       },
     }),
   })
-  @Local unreadMessage:number = 0
-  @Event backPop: () => void = () => {}
+  @Local unreadMessage: number = 0
+  @Event backPop: () => void = () => {
+  }
 
   aboutToAppear(): void {
     for (let y = 0; y < 6; y++) {
@@ -72,20 +73,21 @@ export struct PushKit {
   build() {
     Column() {
       Row() {
-        Image($r('app.media.ic_back'))
-          .height('40vp')
-          .width('40vp')
-          .margin({ right: '8vp' })
-          .onClick(() => {
-            this.backPop()
-          })
-        Row() {
+        Row(){
+          Image($r('app.media.ic_back'))
+            .height('40vp')
+            .width('40vp')
+            .margin({ right: '8vp' })
+            .onClick(() => {
+              this.backPop()
+            })
+
           Text('系统消息')
             .fontSize(20)
             .fontWeight(FontWeight.Bold)
         }
-        .width(144)
-        .height(27)
+
+
 
         Image($r('app.media.ic_public_read'))
           .height('40vp')
@@ -95,8 +97,9 @@ export struct PushKit {
             this.dialogControllerImage.open()
           })
       }
+      .width('100%')
       .height(56)
-
+      .justifyContent(FlexAlign.SpaceBetween)
 
       List() {
         ForEach(this.pushData, (item: PushDataImp, index: number) => {
@@ -117,7 +120,7 @@ export struct PushKit {
                   Row() {
                     Text(item.time).fontSize(12).fontColor($r('app.color.time_gray'))
                     if (!item.read) {
-                      Image($r('app.media.ic_dot')).width(6).height(6).margin({ left: 4 })
+                      Image($r('app.media.red_dot')).width(8).height(8).margin({ left: 4 })
                     }
                   }
                   .height(18)
@@ -129,7 +132,7 @@ export struct PushKit {
 
               Divider()
                 .vertical(false)
-                .width(328)
+                .width('100%')
                 .margin({ top: 10.5 })
 
               Row() {
@@ -146,21 +149,26 @@ export struct PushKit {
             .alignItems(HorizontalAlign.Start)
           }
           .onAppear(() => {
-            item.read = true
-            this.pushData.splice(index, 1, item)
-            //减少角标
-            this.unreadMessage--
-            notificationManager.setBadgeNumber(this.unreadMessage)
+            try {
+              item.read = true
+              this.pushData.splice(index, 1, item)
+              //减少角标
+              this.unreadMessage--
+              notificationManager.setBadgeNumber(this.unreadMessage)
+            } catch (e) {
+              console.error('Failed to setBadgeNumber. Cause: ' + JSON.stringify(e))
+            }
           })
           .margin({ top: 8 })
-        })
+        }, (item: PushDataImp) => new Date().toString())
       }
       .edgeEffect(EdgeEffect.Spring)
       .scrollBar(BarState.Off)
+      .width(this.curBreakpoint === 'lg'?'70%':'100%')
     }
     .margin({ top: this.windowTopHeight })
-    .padding({ bottom: 32 + this.windowTopHeight })
+    .padding({ bottom: 32 + this.windowTopHeight, left: 12, right: 12 })
     .backgroundColor($r('app.color.pure_white'))
-    .width(328)
+    .width('100%')
   }
 }

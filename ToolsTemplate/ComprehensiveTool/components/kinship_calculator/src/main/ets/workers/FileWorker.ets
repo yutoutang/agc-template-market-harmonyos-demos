@@ -1,4 +1,5 @@
-import { buffer, ErrorEvent, MessageEvents, ThreadWorkerGlobalScope, worker } from '@kit.ArkTS';
+import { UtilLog } from '@hw-agconnect/util-log';
+import { buffer, MessageEvents, ThreadWorkerGlobalScope, worker } from '@kit.ArkTS';
 import { WorkerDataMessage, WorkerMessage } from '../model/Worker';
 import { common } from '@kit.AbilityKit';
 import { KinshipDictionary, KinshipMap } from '../model/Data';
@@ -14,16 +15,20 @@ workerPort.onmessage = (event: MessageEvents) => {
 }
 
 function getRawFileJsonData(context: common.UIAbilityContext) {
-  let mainValue: Uint8Array = context.resourceManager.getRawFileContentSync('main.json');
-  let mainStr = buffer.from(mainValue.buffer).toString();
-  let main: KinshipMap = JSON.parse(mainStr)
-  let prefixValue: Uint8Array = context.resourceManager.getRawFileContentSync('prefix.json');
-  let prefixStr = buffer.from(prefixValue.buffer).toString();
-  let prefix: KinshipDictionary = JSON.parse(prefixStr)
-  let branchValue: Uint8Array = context.resourceManager.getRawFileContentSync('branch.json');
-  let branchStr = buffer.from(branchValue.buffer).toString();
-  let branch: KinshipMap = JSON.parse(branchStr)
-  setMapData(main, prefix, branch)
+  try {
+    let mainValue: Uint8Array = context.resourceManager.getRawFileContentSync('main.json');
+    let mainStr = buffer.from(mainValue.buffer).toString();
+    let main: KinshipMap = JSON.parse(mainStr)
+    let prefixValue: Uint8Array = context.resourceManager.getRawFileContentSync('prefix.json');
+    let prefixStr = buffer.from(prefixValue.buffer).toString();
+    let prefix: KinshipDictionary = JSON.parse(prefixStr)
+    let branchValue: Uint8Array = context.resourceManager.getRawFileContentSync('branch.json');
+    let branchStr = buffer.from(branchValue.buffer).toString();
+    let branch: KinshipMap = JSON.parse(branchStr)
+    setMapData(main, prefix, branch)
+  } catch (e) {
+    UtilLog.error(`getRawFileJsonData failed with error ${JSON.stringify(e)}`)
+  }
 }
 
 function setMapData(data: KinshipMap, prefix: KinshipDictionary, branch: KinshipMap) {

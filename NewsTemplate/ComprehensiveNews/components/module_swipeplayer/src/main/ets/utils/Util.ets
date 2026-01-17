@@ -54,37 +54,56 @@ export function setSpeed(avPlayer: media.AVPlayer | undefined, speed: media.Play
 }
 
 export async function playVideo(avPlayer: media.AVPlayer | undefined, curIndex?: number, index?: number) {
-  if (!avPlayer) {
-    Logger.debug(TAG, `playVideo error! avPlayer undefined! curIndex: ${curIndex}, index: ${index}.`);
-    return;
-  }
-  let states = [AVPlayerState.PREPARED, AVPlayerState.PAUSED, AVPlayerState.COMPLETED]
-  if (states.includes(avPlayer.state as AVPlayerState)) {
-    Logger.debug(TAG, `playVideo. state:${avPlayer.state}, curIndex: ${curIndex}, index: ${index}.`);
-    await avPlayer.play();
+  try {
+    if (!avPlayer) {
+      Logger.debug(TAG, `playVideo error! avPlayer undefined! curIndex: ${curIndex}, index: ${index}.`);
+      return;
+    }
+    let states = [AVPlayerState.PREPARED, AVPlayerState.PAUSED, AVPlayerState.COMPLETED]
+    if (states.includes(avPlayer.state as AVPlayerState)) {
+      Logger.debug(TAG, `playVideo. state:${avPlayer.state}, curIndex: ${curIndex}, index: ${index}.`);
+      await avPlayer.play();
+    }
+  } catch (e) {
+    Logger.error(TAG, 'playVideo fail, error: ' + JSON.stringify(e));
   }
 }
 
 export async function pauseVideo(avPlayer: media.AVPlayer | undefined, curIndex?: number, index?: number) {
-  if (!avPlayer) {
-    Logger.debug(TAG, `pauseVideo error! avPlayer undefined! curIndex: ${curIndex}, index: ${index}.`);
-    return;
+  try {
+    if (!avPlayer) {
+      Logger.debug(TAG, `pauseVideo error! avPlayer undefined! curIndex: ${curIndex}, index: ${index}.`);
+      return;
+    }
+    Logger.debug(TAG, `pauseVideo. state:${avPlayer.state}, curIndex: ${curIndex}, index: ${index}.`);
+    await avPlayer.pause();
+  } catch (e) {
+    Logger.error(TAG, 'pauseVideo fail, error: ' + JSON.stringify(e));
   }
-  Logger.debug(TAG, `pauseVideo. state:${avPlayer.state}, curIndex: ${curIndex}, index: ${index}.`);
-  await avPlayer.pause();
 }
 
-export function setOrientation(orientation: number): Promise<void> {
-  let context: common.UIAbilityContext = getContext() as common.UIAbilityContext
-  return context.windowStage.getMainWindowSync().setPreferredOrientation(orientation)
+export async function setOrientation(uiContext: UIContext | undefined, orientation: number): Promise<void> {
+  try {
+    if (!uiContext) {
+      return;
+    }
+    let context: common.UIAbilityContext = uiContext.getHostContext() as common.UIAbilityContext
+    await context.windowStage.getMainWindowSync().setPreferredOrientation(orientation)
+  } catch (e) {
+    Logger.error(TAG, 'setOrientation fail, error: ' + JSON.stringify(e));
+  }
 }
 
 export function toast(uiContext: UIContext, options: promptAction.ShowToastOptions) {
-  let target = {
-    duration: 2000,
-  } as promptAction.ShowToastOptions;
-  target = assign(target, options)
-  uiContext.getPromptAction().showToast(target);
+  try {
+    let target = {
+      duration: 2000,
+    } as promptAction.ShowToastOptions;
+    target = assign(target, options)
+    uiContext.getPromptAction().showToast(target);
+  } catch (e) {
+    Logger.error(TAG, 'showToast fail, error: ' + JSON.stringify(e));
+  }
 }
 
 // 合并对象
@@ -102,20 +121,30 @@ export function assign(
 
 // 本地沙箱视频链接处理
 export function handleSandboxVideoUrl(videoUrlPath: string): string {
-  // 打开相应的资源文件地址获取fd，并为url赋值触发initialized状态机上报
-  let file = fs.openSync(videoUrlPath);
-  let fdPath = 'fd://' + file.fd;
-  return fdPath
+  try {
+    // 打开相应的资源文件地址获取fd，并为url赋值触发initialized状态机上报
+    let file = fs.openSync(videoUrlPath);
+    let fdPath = 'fd://' + file.fd;
+    return fdPath
+  } catch (e) {
+    Logger.error(TAG, 'openSync fail, error: ' + JSON.stringify(e));
+    return '';
+  }
 }
 
 // 判断是否是大折叠、阔折叠外屏、小折叠内屏
 export const isDisplayModeFull = (): boolean => {
-  // 是否可折叠
-  let isFoldable = display.isFoldable();
-  // 当前设备的显示模式
-  let foldDisplayMode: display.FoldDisplayMode | undefined = undefined
-  if (isFoldable) {
-    foldDisplayMode = display.getFoldDisplayMode();
+  try {
+    // 是否可折叠
+    let isFoldable = display.isFoldable();
+    // 当前设备的显示模式
+    let foldDisplayMode: display.FoldDisplayMode | undefined = undefined
+    if (isFoldable) {
+      foldDisplayMode = display.getFoldDisplayMode();
+    }
+    return foldDisplayMode === display.FoldDisplayMode.FOLD_DISPLAY_MODE_FULL;
+  } catch (e) {
+    Logger.error(TAG, 'isDisplayModeFull fail, error: ' + JSON.stringify(e));
+    return false;
   }
-  return foldDisplayMode === display.FoldDisplayMode.FOLD_DISPLAY_MODE_FULL;
 }

@@ -28,9 +28,9 @@ export interface FlexLayoutModel {
 }
 
 @ObservedV2
-export class RequestListData {
+export class RequestListData<T = NewsResponse> {
   navInfo: NavInfo = new NavInfo()
-  @Trace articles: NewsResponse[] = []
+  @Trace articles: T[] = []
   extraInfo: Record<string, string | boolean | Record<string, string | boolean>[]> = {}
 }
 

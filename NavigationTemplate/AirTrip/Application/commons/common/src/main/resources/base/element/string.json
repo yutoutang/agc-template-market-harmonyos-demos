@@ -7,6 +7,10 @@
     {
       "name": "calendar_tip",
       "value": "价格显示为单日成人票价最低价，价格有波动，以实际支付为准"
+    },
+    {
+      "name": "agcit_huawei_air_trip",
+      "value": "1.0.1"
     }
   ]
 }

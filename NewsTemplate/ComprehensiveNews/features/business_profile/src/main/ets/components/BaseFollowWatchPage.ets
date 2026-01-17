@@ -1,4 +1,4 @@
-import { CommonConstants } from 'lib_common';
+import { CommonConstants, loadingPage } from 'lib_common';
 import { AuthorModel } from 'lib_news_api';
 import { emptyBuilder } from 'lib_widget';
 import { FollowerPageViewModel } from '../viewmodels/FollowerPageVM';
@@ -8,10 +8,13 @@ import { AuthorItem } from './AuthorItem';
 @ComponentV2
 export struct BaseFollowWatchPage {
   @Require @Param vm: FollowerPageViewModel | WatchPageViewModel;
+  @Param loading: boolean = false;
 
   build() {
     Column() {
-      if (this.vm.dataSource.totalCount() > 0) {
+      if (this.loading) {
+        loadingPage()
+      } else if (this.vm.dataSource.totalCount() > 0) {
         WaterFlow() {
           LazyForEach(this.vm.dataSource, (v: AuthorModel) => {
             FlowItem() {
@@ -38,9 +41,6 @@ export struct BaseFollowWatchPage {
           right: this.vm.breakPointModel.pagePadding,
           top: CommonConstants.SPACE_M,
           bottom: this.vm.windowModel.windowBottomPadding,
-        })
-        .onReachEnd(() => {
-          this.vm.loadMore();
         })
       } else {
         Column() {

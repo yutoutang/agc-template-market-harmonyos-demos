@@ -262,10 +262,10 @@ BookRead
 
 * DevEco Studio版本：DevEco Studio 5.0.4 Release及以上
 * HarmonyOS SDK版本：HarmonyOS 5.0.4 Release SDK及以上
-* 设备类型：华为手机（直板机）
+* 设备类型：华为手机（包括双折叠和阔折叠）、平板
 * HarmonyOS版本：HarmonyOS 5.0.4(16)及以上
 
-### 权限要求
+### 权限
 
 - 网络权限：ohos.permission.INTERNET
 - 数据网络权限：ohos.permission.GET_NETWORK_INFO

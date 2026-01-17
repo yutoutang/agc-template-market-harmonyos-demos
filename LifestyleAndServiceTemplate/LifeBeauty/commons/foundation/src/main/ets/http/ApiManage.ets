@@ -8,7 +8,7 @@ import {
   MyGroupInfo,
   StoreInfo,
 } from '../model/Model';
-import { AppointState } from '../constants/AppConstant';
+import { AppointState, GroupOrderStatus } from '../constants/AppConstant';
 import {
   IBindCodeRequest,
   ICancelReserveRequest,
@@ -68,9 +68,9 @@ export const confirmRebindMobileWithSecret = (rebindSecret: string, config?: Axi
 /**
  * 读取用户信息
  */
-export const getUserInfo = (): Promise<GetUserInfoResp> => {
+export const getUserInfo = (isBindMobile: boolean): Promise<GetUserInfoResp> => {
   const url = HttpUrlMap.GET_USER_INFO;
-  return request.get(url);
+  return request.get(url, { params: { isBindMobile }});
 };
 
 /**
@@ -175,7 +175,7 @@ export const getGroupList = (): Promise<IGroupInfo[]> => {
 /**
  * 预下单
  */
-export const preOrder = (data: ISubmitOrderRequest, config?: AxiosRequestConfig) => {
+export const preOrder = (data: ISubmitOrderRequest, config?: AxiosRequestConfig): Promise<string> => {
   const url = HttpUrlMap.PRE_ORDER;
   return request.post(url, data, config);
 };
@@ -189,11 +189,19 @@ export const getMySingleVisitCardList = (): Promise<IMySingleCardInfo[]> => {
 };
 
 /**
+ * 使用或核销用户购买的次卡
+ */
+export const updateMySingleCard = (data: IMySingleCardInfo) => {
+  const url = HttpUrlMap.UPDATE_MY_SINGLE_VISIT_CARD;
+  return request.put(url, data);
+};
+
+/**
  * 查询用户购买的团购
  */
-export const getMyGroupList = (): Promise<MyGroupInfo[]> => {
+export const getMyGroupList = (status: GroupOrderStatus): Promise<MyGroupInfo[]> => {
   const url = HttpUrlMap.GET_MY_GROUP_LIST;
-  return request.get(url);
+  return request.get(url, { params: { status } });
 };
 
 /**

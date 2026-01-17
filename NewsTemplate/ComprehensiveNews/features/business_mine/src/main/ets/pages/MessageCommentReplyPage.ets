@@ -101,6 +101,7 @@ struct MsgCommentReplyPage {
           Span(v.commentBody)
         }
         .fontSize(14 * this.vm.settingInfo.fontSizeRatio)
+        .fontColor($r('sys.color.font_primary'))
       }
 
       // 回复的评论引用

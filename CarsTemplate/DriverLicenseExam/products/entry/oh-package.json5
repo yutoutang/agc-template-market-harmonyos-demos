@@ -11,7 +11,14 @@
     "@ohos_agcit/driver_license_exam_guide": "file:../../components/guide",
     "module_city_select": "file:../../components/module_city_select",
     "exam": "file:../../components/exam",
-    "search": "file:../../components/search"
+    "search": "file:../../components/search",
+    "feedback": "file:../../components/feedback",
+    "app_setting": "file:../../components/app_setting",
+    "collect_personal_info": "file:../../components/collect_personal_info",
+    "check_app_update": "file:../../components/check_app_update",
+    "aggregated_share": "file:../../components/aggregated_share",
+    "membership": "file:../../components/membership",
+    "aggregated_ads": "file:../../components/aggregated_ads",
   }
 }
 

@@ -1,6 +1,6 @@
 import { HashSet } from '@kit.ArkTS';
-import { ComponentContent, LevelMode, promptAction } from '@kit.ArkUI';
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { ComponentContent, LevelMode } from '@kit.ArkUI';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { getMyNfcName, getNfcItemImg, getNfcName, OnNfcChanged } from '../common/nfc/Nfc';
 import { NfcInfo, nfcCardInfo } from '../db/NfcCardInfo';
 import { delDialog, DelDialogParams } from '../components/DelDialog';
@@ -23,7 +23,7 @@ export struct CardAllView {
 
   aboutToAppear(): void {
     this.loadData();
-    getContext().eventHub.on(OnNfcChanged.name, (result: OnNfcChanged) => {
+    this.getUIContext().getHostContext()!.eventHub.on(OnNfcChanged.name, (result: OnNfcChanged) => {
       if (result.mine && this.nfcType === result.nfcType) {
         this.loadData();
       }
@@ -55,7 +55,7 @@ export struct CardAllView {
 
   private delAll() {
     if (this.vm.checked.isEmpty()) {
-      promptAction.showToast({
+      this.getUIContext().getPromptAction().showToast({
         message: '请先选择记录！',
       });
       return;
@@ -67,13 +67,13 @@ export struct CardAllView {
     params.confirm = () => {
       nfcCardInfo.deleteNfcInfoByIds(this.vm.checked, false)
         .then(result => {
-          promptAction.showToast({
+          this.getUIContext().getPromptAction().showToast({
             message: '删除成功！',
           });
           PromptActionUtil.closeDialog(delContentNode);
           this.loadData();
         }).catch((e: Error) => {
-        promptAction.showToast({
+        this.getUIContext().getPromptAction().showToast({
           message: '删除失败！',
         });
       });
@@ -86,7 +86,7 @@ export struct CardAllView {
     PromptActionUtil.setOptions({
       levelMode: LevelMode.EMBEDDED,
       onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
-        hilog.info(0xFF00, 'SubmitFeedBack', JSON.stringify(dismissDialogAction.reason));
+        UtilLog.info(0xFF00, 'MobileNFC', JSON.stringify(dismissDialogAction.reason));
       },
     });
 

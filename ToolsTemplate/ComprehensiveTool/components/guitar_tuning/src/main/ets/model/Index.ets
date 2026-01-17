@@ -4,7 +4,6 @@ export enum PermissionStatus {
   UNKNOWN = 2,
 }
 
-
 // 吉他弦信息
 export interface GuitarInfo {
   note: string,

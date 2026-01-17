@@ -39,7 +39,7 @@ export struct TodoDetails {
         baseActionSheet.close('TodoDetails')
       },
       onConfirm: () => {
-        this.calendarEventVM.updateUserEventInfo().then(resp => {
+        this.calendarEventVM.updateUserEventInfo(this.getUIContext()).then(resp => {
           if (resp) {
             baseActionSheet.close('TodoDetails')
           }
@@ -66,7 +66,7 @@ export struct TodoDetails {
 
         CalendarEventFooter({
           onDelete: () => {
-            this.calendarEventVM.deleteUserEventInfo(this.userEventInfo, () => {
+            this.calendarEventVM.deleteUserEventInfo(this.userEventInfo, this.getUIContext(), () => {
               this.calendarEventVM.getPageInfo()?.pop()
             })
           },
@@ -82,7 +82,7 @@ export struct TodoDetails {
               onWillAppear: () => {
                 this.calendarEventVM.setEventInfo(this.userEventInfo)
               },
-            })
+            }, this.getUIContext())
           },
         })
       }

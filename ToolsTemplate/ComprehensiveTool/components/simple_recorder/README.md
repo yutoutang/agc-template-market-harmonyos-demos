@@ -13,6 +13,17 @@
 
 <img src="./screenshot/recorder.png" width="300" >
 
+本组件工程代码结构如下所示：
+```ts
+simple_recorder/src/main/ets                      // 录音专家(har) 
+  |- components                                   // 模块组件
+  |- model                                        // 模型定义  
+  |- pages                                        // 页面
+  |- util                                         // 模块类
+  |- viewModels                                   // 与页面一一对应的vm层
+  |- workers                                      // 工作线程
+```
+
 ## 约束与限制
 
 ### 环境

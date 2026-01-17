@@ -1,5 +1,6 @@
 import { AbilityConstant, common } from '@kit.AbilityKit';
 import { AppStorageV2 } from '@kit.ArkUI';
+import { BusinessError } from '@kit.BasicServicesKit';
 import { ContinueModel, Logger, RouterMap, RouterUtils } from 'lib_common';
 import { MineServiceApi, NewsEnum } from 'lib_news_api';
 import { AVPlayerManager, AVPlayerSession, SwipePlayerController } from 'module_swipeplayer';
@@ -8,7 +9,7 @@ import { VideoService } from '../services/VideoService';
 import { BaseParamType } from '../types/Index';
 import { VideoSwipePageVM } from '../viewmodels/VideoSwipePageVM';
 
-const TAG = 'VideoDetailPageModel';
+const TAG = '[VideoDetailPageModel]';
 
 @ObservedV2
 export class VideoDetailPageModel extends VideoSwipePageVM {
@@ -38,18 +39,21 @@ export class VideoDetailPageModel extends VideoSwipePageVM {
       this.needReleasePlayer = false
       this.needLongTake = false;
     }
+    if (!param.longTakeTransitionParam) {
+      this.needLongTake = false;
+    }
     this.swipePlayerController.setAVPlayerMgr(this.avPlayerManager)
   }
 
-  initVideoListDataSource(param: Record<string, string | number | AVPlayerSession | undefined | Object>) {
+  async initVideoListDataSource(param: Record<string, string | number | AVPlayerSession | undefined | Object>) {
     const videoId = param.newsId as string;
     this.userId = param.authorId as string;
     this.isInfiniteScroll = !this.userId;
     let type = param.type as number;
-    let videoList = VideoService.queryVideoList(this.userId || '', type);
+    let videoList = await VideoService.queryVideoList(this.userId || '', type);
     if (videoId) {
       videoList = videoList.filter((item) => item.id !== videoId);
-      const videoDetailInfo = VideoService.queryVideoDataById(videoId);
+      const videoDetailInfo = await VideoService.queryVideoDataById(videoId);
       if (videoDetailInfo) {
         videoList.unshift(videoDetailInfo);
       }
@@ -60,12 +64,12 @@ export class VideoDetailPageModel extends VideoSwipePageVM {
   }
 
   // 处理swiper动画开始事件
-  handleSwiperAnimationStart(index: number, targetIndex: number) {
+  async handleSwiperAnimationStart(_index: number, targetIndex: number) {
     let totalNum = this.videoDataSources.totalCount();
     // 加载更多，无限上滑
     if (this.isInfiniteScroll || totalNum < this.totalCount) {
       if (totalNum - targetIndex <= 5) {
-        let videoList = VideoService.queryVideoList(this.userId);
+        let videoList = await VideoService.queryVideoList(this.userId);
         this.videoDataSources.pushDataArray(...videoList);
         this.totalCount = this.videoDataSources.totalCount();
       }
@@ -114,6 +118,8 @@ export class VideoDetailPageModel extends VideoSwipePageVM {
   enableContinue(context: common.UIAbilityContext) {
     context.setMissionContinueState(AbilityConstant.ContinueState.ACTIVE).then(() => {
       Logger.info(TAG, 'setMissionContinueState ACTIVE result: ACTIVE');
+    }).catch((e: BusinessError) => {
+      Logger.error(TAG, 'setMissionContinueState fail, error: ' + JSON.stringify(e));
     });
   }
 

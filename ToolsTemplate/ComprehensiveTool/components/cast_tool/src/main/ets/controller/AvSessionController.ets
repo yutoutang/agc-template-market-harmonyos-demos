@@ -1,9 +1,10 @@
 import { common, wantAgent } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { avSession } from '@kit.AVSessionKit';
+import { UtilLog as Logger, UtilLog } from '@hw-agconnect/util-log';
 import { MediaData } from '../model/Index';
 import { BackgroundTaskManager } from '../util/BackgroundTaskManager';
-import { Logger } from '../util/MyLog';
+
 
 const TAG = 'AvSessionController';
 
@@ -27,15 +28,19 @@ export class AvSessionController {
       Logger.info(TAG, `session create failed : conext is undefined`);
       return;
     }
-    this.avSession = await avSession.createAVSession(this.context, 'SHORT_AUDIO_SESSION', 'video');
-    Logger.info(TAG, `session create successed : sessionId : ${this.avSession.sessionId}`);
-    this.avSessionController = await this.avSession.getController();
-    Logger.info(TAG, `session controller create successed : sessionId : ${this.avSession.sessionId}`);
-    BackgroundTaskManager.startContinuousTask(this.context);
-    this.setLaunchAbility();
-    await this.avSession.setExtras({
-      requireAbilityList: ['url-cast'],
-    });
+    try {
+      this.avSession = await avSession.createAVSession(this.context, 'SHORT_AUDIO_SESSION', 'video');
+      Logger.info(TAG, `session create successed : sessionId : ${this.avSession.sessionId}`);
+      this.avSessionController = await this.avSession.getController();
+      Logger.info(TAG, `session controller create successed : sessionId : ${this.avSession.sessionId}`);
+      BackgroundTaskManager.startContinuousTask(this.context);
+      this.setLaunchAbility();
+      await this.avSession.setExtras({
+        requireAbilityList: ['url-cast'],
+      });
+    } catch (e) {
+      UtilLog.error(TAG, `sessionFlowFn fail : ${JSON.stringify(e)}`);
+    }
   }
 
   public async release() {
@@ -119,10 +124,14 @@ export class AvSessionController {
       requestCode: 0,
       wantAgentFlags: [wantAgent.WantAgentFlags.UPDATE_PRESENT_FLAG],
     };
-    wantAgent.getWantAgent(wantAgentInfo).then((agent) => {
-      if (this.avSession) {
-        this.avSession.setLaunchAbility(agent);
-      }
-    });
+    try {
+      wantAgent.getWantAgent(wantAgentInfo).then((agent) => {
+        if (this.avSession) {
+          this.avSession.setLaunchAbility(agent);
+        }
+      });
+    } catch (e) {
+      UtilLog.error(`getSupportedCameras failed: ${JSON.stringify(e)}`);
+    }
   }
 }

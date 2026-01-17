@@ -236,7 +236,7 @@ export struct SpeedGauge {
   }
 
   aboutToAppear(): void {
-    this.gaugeAnimator = Animator.create(this.animatorOptions);
+    this.gaugeAnimator = this.getUIContext().createAnimator(this.animatorOptions);
   }
 
   build() {

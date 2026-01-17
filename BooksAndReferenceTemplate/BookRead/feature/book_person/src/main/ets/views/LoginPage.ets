@@ -1,7 +1,6 @@
 import { authentication, loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { BusinessError, emitter } from '@kit.BasicServicesKit';
-import { promptAction } from '@kit.ArkUI';
 import { util } from '@kit.ArkTS';
 import { Constants, ReturnButton, TCRouter } from 'common';
 import { AvatarIcon } from '../comp/SelectAvatarCard';
@@ -17,6 +16,7 @@ export struct LoginPage {
   private USER_AUTHENTICATION_TAG = '华为账号用户认证协议';
   private USER_SERVICE_TAG = '用户服务协议';
   private PRIVACY_TAG = '隐私协议';
+  private promptAction = this.getUIContext().getPromptAction();
   // 定义LoginWithHuaweiIDButton展示的隐私文本，展示应用的用户服务协议、隐私协议和华为账号用户认证协议
   privacyText: loginComponentManager.PrivacyText[] = [{
     text: '已阅读并同意',
@@ -64,7 +64,7 @@ export struct LoginPage {
   // Toast提示
   showToast(resource: string) {
     try {
-      promptAction.showToast({
+      this.promptAction.showToast({
         message: resource,
         duration: 2000
       });
@@ -76,7 +76,7 @@ export struct LoginPage {
   }
 
   openAgreementDialog() {
-    promptAction.showDialog({
+    this.promptAction.showDialog({
       title: '用户协议与隐私条款',
       message: '已阅读并同意 《用户服务协议》和《隐私协议》。',
       buttons: [
@@ -113,7 +113,7 @@ export struct LoginPage {
       hilog.error(this.domainId, this.logTag,
         `Failed to login with LoginWithHuaweiIDButton. errCode is ${error.code}, errMessage is ${error.message}`);
       if (error.code === ErrorCode.ERROR_CODE_NETWORK_ERROR) {
-        AlertDialog.show(
+        this.getUIContext().showAlertDialog(
           {
             message: '网络未连接，请检查网络设置。',
             offset: { dx: 0, dy: -12 },
@@ -162,7 +162,7 @@ export struct LoginPage {
     } catch (err) {
       hilog.error(this.domainId, this.logTag,
         `Failed to login with LoginWithHuaweiIDButton, errCode: ${err.code}, errMessage: ${err.message}`);
-      AlertDialog.show(
+      this.getUIContext().showAlertDialog(
         {
           message: '服务或网络异常，请稍后重试',
           offset: { dx: 0, dy: -12 },
@@ -198,7 +198,7 @@ export struct LoginPage {
     // 用于防跨站点请求伪造
     authRequest.state = util.generateRandomUUID();
     try {
-      const controller = new authentication.AuthenticationController(getContext(this));
+      const controller = new authentication.AuthenticationController(this.getUIContext().getHostContext() as Context);
       controller.executeRequest(authRequest).then((data) => {
         const authorizationWithHuaweiIDResponse = data as authentication.AuthorizationWithHuaweiIDResponse;
         const state = authorizationWithHuaweiIDResponse.state;
@@ -216,7 +216,7 @@ export struct LoginPage {
           const nickName = authorizationWithHuaweiIDCredential.nickName as string;
           const openId = authorizationWithHuaweiIDResponse.data?.openID as string;
         } else {
-          promptAction.showToast({ message: '账号关联失败' })
+          this.promptAction.showToast({ message: '账号关联失败' })
         }
       }).catch((err: BusinessError) => {
         this.dealAllError(err);
@@ -421,30 +421,35 @@ export struct LoginPage {
 
   //两种模拟登录方式，quick为一键登录+匿名，mock为普通假登录
   quickLogin(openId:string, avatarUri:string, nickName:string){
-    // 恢复之前保存的会员状态和书币信息
+    try {
+      // 恢复之前保存的会员状态和书币信息
 
-    const savedMembershipStatus = AppStorage.get('membershipStatus') as boolean || false;
-    const savedBookCoinsValue = AppStorage.get('bookCoins') as number;
-    const savedBookCoins = typeof savedBookCoinsValue === 'number' ? savedBookCoinsValue : 100;
+      const savedMembershipStatus = AppStorage.get('membershipStatus') as boolean || false;
+      const savedBookCoinsValue = AppStorage.get('bookCoins') as number;
+      const savedBookCoins = typeof savedBookCoinsValue === 'number' ? savedBookCoinsValue : 100;
 
-    this.userInfo = {
-      id: openId,
-      avatarUrl: avatarUri,
-      nickName: nickName,
-      telephone: 'a11xxxx1111',
-      isMembership: savedMembershipStatus,
-      bookCoins: savedBookCoins,
-      isLogin: true,
-      totalReading: 0,
-      totalListening: 15,
-      level: 1,
-      continuousBuy: false,
-      reminderTime: 0,
-      fullScreen: false,
-      noTimeBattery: false
+      this.userInfo = {
+        id: openId,
+        avatarUrl: avatarUri,
+        nickName: nickName,
+        telephone: 'a11xxxx1111',
+        isMembership: savedMembershipStatus,
+        bookCoins: savedBookCoins,
+        isLogin: true,
+        totalReading: 0,
+        totalListening: 15,
+        level: 1,
+        continuousBuy: false,
+        reminderTime: 0,
+        fullScreen: false,
+        noTimeBattery: false
+      }
+      AppStorage.setOrCreate('userInfo', this.userInfo);
+      emitter.emit(Constants.LOGIN_CHANGE);
+    } catch (e) {
+      console.error('Failed to emitter emit login change. Cause: ' + JSON.stringify(e));
     }
-    AppStorage.setOrCreate('userInfo', this.userInfo);
-    emitter.emit(Constants.LOGIN_CHANGE);
+
 
     // 添加延迟，避免页面闪现
     setTimeout(() => {
@@ -476,7 +481,11 @@ export struct LoginPage {
       noTimeBattery: false
     }
     AppStorage.setOrCreate('userInfo', this.userInfo);
-    emitter.emit(Constants.LOGIN_CHANGE);
+    try {
+      emitter.emit(Constants.LOGIN_CHANGE);
+    } catch (e) {
+      console.error('Failed to emitter emit login change. Cause: ' + JSON.stringify(e));
+    }
 
     // 添加延迟，避免页面闪现
     setTimeout(() => {

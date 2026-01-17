@@ -1,7 +1,5 @@
-import { AppRouter, Constants,
-  DayFormat,
-  getDayLabel,
-  LoadingStatus,
+import {
+  AppRouter, Constants, DayFormat, getDayLabel, LoadingStatus,
 } from 'common';
 import { FlightInfo, FlightListResult } from '../model/FlightPageModel';
 import { FlightApi } from '../api/FlightApi';
@@ -27,9 +25,9 @@ export struct FlightSearchListPage {
   @Monitor('loadingStatus')
   onLoadingStatusChange(monitor: IMonitor) {
     if (monitor.value()?.now === LoadingStatus.LOADING) {
-      GlobalDialog.showLoadingDialog();
+      GlobalDialog.showLoadingDialog(this.getUIContext());
     } else {
-      GlobalDialog.close();
+      GlobalDialog.close(this.getUIContext());
     }
   }
 
@@ -95,7 +93,7 @@ export struct FlightSearchListPage {
     Row() {
       Text('前一天').fontWeight(400)
         .fontColor(this.isPreDisabled ? $r('sys.color.ohos_id_color_text_tertiary') :
-        $r('sys.color.ohos_id_color_text_primary'))
+          $r('sys.color.ohos_id_color_text_primary'))
         .onClick(() => {
           if (this.isPreDisabled) {
             return;
@@ -121,7 +119,7 @@ export struct FlightSearchListPage {
 
       Text('后一天').fontWeight(400)
         .fontColor(this.isNextDisabled ? $r('sys.color.ohos_id_color_text_tertiary') :
-        $r('sys.color.ohos_id_color_text_primary'))
+          $r('sys.color.ohos_id_color_text_primary'))
         .onClick(() => {
           if (this.isNextDisabled) {
             return;
@@ -192,7 +190,7 @@ export struct FlightSearchListPage {
           ListItem() {
             this.FlightItemView(item);
           };
-        });
+        },(item: FlightInfo, index: number)=>index + '__' + JSON.stringify(item));
       }
       .width(Constants.FULL_PERCENT_WIDTH)
       .height(Constants.FULL_PERCENT_HEIGHT)
@@ -285,7 +283,6 @@ export struct FlightSearchListPage {
 
       Button('重新搜索', { type: ButtonType.Normal, stateEffect: true })
         .borderRadius(4)
-        .fontSize(13)
         .backgroundColor($r('sys.color.ohos_id_color_emphasize'))
         .margin({ top: 10 })
         .onClick(() => {

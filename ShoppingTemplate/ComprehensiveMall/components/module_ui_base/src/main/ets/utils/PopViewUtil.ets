@@ -1,8 +1,9 @@
 import { ComponentContent, promptAction, window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { Logger } from './Logger';
+import { UtilLog as Logger } from '@hw-agconnect/util-log';
+import { WindowUtil } from './WindowUtil';
 
-const TAG: string = '[PopViewUtil]';
+const TAG: string = '[UIBase][PopViewUtil]';
 
 export class PopViewUtil {
   private static _ctx: UIContext;
@@ -11,12 +12,7 @@ export class PopViewUtil {
 
   private static async _getUIContext() {
     if (!PopViewUtil._ctx) {
-      try {
-        const win = await window.getLastWindow(getContext());
-        PopViewUtil._ctx = win.getUIContext();
-      } catch (err) {
-        Logger.error(TAG, 'get ui context failed.' + JSON.stringify(err));
-      }
+      PopViewUtil._ctx = WindowUtil.uiContext;
     }
   }
 
@@ -85,7 +81,11 @@ export class PopViewUtil {
     builder: WrappedBuilder<[T]> | WrappedBuilder<[]>,
     options: SheetOptions,
     args?: T,
+    uiContext?: UIContext,
   ) {
+    if (uiContext) {
+      PopViewUtil._ctx = uiContext;
+    }
     await PopViewUtil._getUIContext();
     if (!PopViewUtil._ctx) {
       return;

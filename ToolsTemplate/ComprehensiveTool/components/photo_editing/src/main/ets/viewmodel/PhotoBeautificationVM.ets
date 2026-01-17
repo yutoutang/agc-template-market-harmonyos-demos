@@ -166,8 +166,8 @@ export class PhotoBeautificationVM {
   }
 
   // 绘制裁剪框
-  drawClipImage() {
-    let lineWidth = vp2px(2);
+  drawClipImage(uiContext: UIContext) {
+    let lineWidth = uiContext.vp2px(2);
     let clipRectW = this.clipRect.width! + 4;
     let clipRectH = this.clipRect.height! + 4;
     this.cropContext.clearRect(2, 2, this.clipRect.width, this.clipRect.height);
@@ -486,7 +486,9 @@ export class PhotoBeautificationVM {
     let y = this.clipRect.y - this.imageArea.y;
     let pixelMap = ImageProcessingUtil.getRectanglePixelMap(pixelMapOrigin as PixelMap, Math.round(x * ratioX),
       Math.round(y * ratioY), Math.round(this.clipRect.width! * ratioX), Math.round(this.clipRect.height! * ratioY));
-    this.pushPixelMap(pixelMap);
+    if (pixelMap) {
+      this.pushPixelMap(pixelMap);
+    }
     this.barIndex = -1;
   };
   saveImageWithText: () => void = () => {

@@ -1,8 +1,8 @@
 import { AsyncCallback, BusinessError } from '@kit.BasicServicesKit';
 import { bundleManager, Want } from '@kit.AbilityKit';
-import { hilog } from '@kit.PerformanceAnalysisKit';
-import promptAction from '@ohos.promptAction';
 import { tag } from '@kit.ConnectivityKit';
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { Application, Card, PROP } from './Spec';
 import Util from '../Util';
 import StandardPboc from './reader/pboc/StandardPboc';
@@ -76,6 +76,7 @@ export class OnNfcChanged {
 const MODE_READER = 0;
 
 export default class NFC {
+  static startWant: Want
   static uuid: number;
   static running: boolean = false;
   static tagMode: number = MODE_READER;
@@ -83,6 +84,7 @@ export default class NFC {
 };
 
 export async function initNFC(want: Want) {
+  NFC.startWant = want
   NFC.nfcTagElementName = {
     bundleName: want.bundleName ?? '',
     abilityName: want.abilityName ?? '',
@@ -102,7 +104,7 @@ export async function startReadNFC(nfcType: number, callback: AsyncCallback<NFCS
         callback(undefined, new NFCState(NFC_STATE_WAIT));
         tag.on('readerMode', NFC.nfcTagElementName, techList, (error: BusinessError, tagInfo: tag.TagInfo) => {
           if (error) {
-            hilog.info(0x0000, 'testTag', 'readerModeCb readerModeCb error %{public}s', JSON.stringify(error));
+            UtilLog.info(0x0000, 'MobileNFC', 'readerModeCb readerModeCb error %{public}s', JSON.stringify(error));
             promptAction.showToast({
               message: 'readerModeCb readerModeCb error ' + JSON.stringify(error),
             });
@@ -113,7 +115,7 @@ export async function startReadNFC(nfcType: number, callback: AsyncCallback<NFCS
         });
         NFC.running = true;
       } catch (error) {
-        hilog.error(0x0000, 'testTag', 'on readerMode error = %{public}s', JSON.stringify(error));
+        UtilLog.error(0x0000, 'MobileNFC', 'on readerMode error = %{public}s', JSON.stringify(error));
         callback(new NFCError(-1, '读取NFC失败'), undefined);
       }
     } else {
@@ -122,7 +124,8 @@ export async function startReadNFC(nfcType: number, callback: AsyncCallback<NFCS
   });
 }
 
-export async function startCloneNFC(nfcType: number, nfcInfo: NfcInfo, callback: AsyncCallback<NFCState>) {
+export async function startCloneNFC(uiContext: UIContext, nfcType: number, nfcInfo: NfcInfo,
+  callback: AsyncCallback<NFCState>) {
   stopNFC((err, result) => {
     if (NFC.nfcTagElementName) {
       // 门禁卡 1 8 7
@@ -133,7 +136,7 @@ export async function startCloneNFC(nfcType: number, nfcInfo: NfcInfo, callback:
         callback(undefined, new NFCState(NFC_STATE_WAIT));
         tag.on('readerMode', NFC.nfcTagElementName, techList, (error: BusinessError, tagInfo: tag.TagInfo) => {
           if (error) {
-            hilog.info(0x0000, 'testTag', 'readerModeCb readerModeCb error %{public}s', JSON.stringify(error));
+            UtilLog.info(0x0000, 'MobileNFC', 'readerModeCb readerModeCb error %{public}s', JSON.stringify(error));
             promptAction.showToast({
               message: 'readerModeCb readerModeCb error ' + JSON.stringify(error),
             });
@@ -151,7 +154,7 @@ export async function startCloneNFC(nfcType: number, nfcInfo: NfcInfo, callback:
                     break;
                   case NFC_STATE_COMPLETE:
                     if (result.nfcInfo) {
-                      cloneNFC(nfcType, nfcInfo, result.nfcInfo, tagInfo, callback);
+                      cloneNFC(uiContext, nfcType, nfcInfo, result.nfcInfo, tagInfo, callback);
                     } else {
                       callback(new NFCError(-1, '克隆NFC失败'), undefined);
                     }
@@ -163,7 +166,7 @@ export async function startCloneNFC(nfcType: number, nfcInfo: NfcInfo, callback:
         });
         NFC.running = true;
       } catch (error) {
-        hilog.error(0x0000, 'testTag', 'on readerMode error = %{public}s', JSON.stringify(error));
+        UtilLog.error(0x0000, 'MobileNFC', 'on readerMode error = %{public}s', JSON.stringify(error));
         callback(new NFCError(-1, '读取NFC失败'), undefined);
       }
     } else {
@@ -183,7 +186,7 @@ export async function startFormatNFC(nfcType: number, actionModel: ActionModel, 
         callback(undefined, new NFCState(NFC_STATE_WAIT));
         tag.on('readerMode', NFC.nfcTagElementName, techList, (error: BusinessError, tagInfo: tag.TagInfo) => {
           if (error) {
-            hilog.info(0x0000, 'testTag', 'readerModeCb readerModeCb error %{public}s', JSON.stringify(error));
+            UtilLog.info(0x0000, 'MobileNFC', 'readerModeCb readerModeCb error %{public}s', JSON.stringify(error));
             promptAction.showToast({
               message: 'readerModeCb readerModeCb error ' + JSON.stringify(error),
             });
@@ -194,7 +197,7 @@ export async function startFormatNFC(nfcType: number, actionModel: ActionModel, 
         });
         NFC.running = true;
       } catch (error) {
-        hilog.error(0x0000, 'testTag', 'on readerMode error = %{public}s', JSON.stringify(error));
+        UtilLog.error(0x0000, 'MobileNFC', 'on readerMode error = %{public}s', JSON.stringify(error));
         callback(new NFCError(-1, '读取NFC失败'), undefined);
       }
     } else {
@@ -210,7 +213,7 @@ export async function stopNFC(callback?: AsyncCallback<void>) {
     try {
       tag.off('readerMode', NFC.nfcTagElementName);
     } catch (error) {
-      hilog.error(0x0000, 'testTag', 'off readerMode error = %{public}s', JSON.stringify(error));
+      UtilLog.error(0x0000, 'MobileNFC', 'off readerMode error = %{public}s', JSON.stringify(error));
     }
 
   }
@@ -264,17 +267,17 @@ async function readNFC(nfcType: number, tagInfo: tag.TagInfo, callback: AsyncCal
 
   // 获取特定技术类型的NFC标签对象
   if (tagInfo === null || tagInfo === undefined) {
-    hilog.error(0x0000, 'testTag', 'readerModeCb tagInfo is invalid');
+    UtilLog.error(0x0000, 'MobileNFC', 'readerModeCb tagInfo is invalid');
     callback(new NFCError(-1, 'NFC读取失败'), undefined);
     return;
   }
   if (tagInfo.uid === null || tagInfo.uid === undefined) {
-    hilog.error(0x0000, 'testTag', 'readerModeCb uid is invalid');
+    UtilLog.error(0x0000, 'MobileNFC', 'readerModeCb uid is invalid');
     callback(new NFCError(-1, 'NFC读取失败'), undefined);
     return;
   }
   if (tagInfo.technology === null || tagInfo.technology === undefined || tagInfo.technology.length === 0) {
-    hilog.error(0x0000, 'testTag', 'readerModeCb technology is invalid');
+    UtilLog.error(0x0000, 'MobileNFC', 'readerModeCb technology is invalid');
     callback(new NFCError(-1, 'NFC读取失败'), undefined);
     return;
   }
@@ -295,7 +298,7 @@ async function readNFC(nfcType: number, tagInfo: tag.TagInfo, callback: AsyncCal
           card.setProperty(PROP.NFCINFO, nfcInfo);
         }
       } catch (e) {
-        hilog.error(0x0000, 'readNFC', 'nfcF error: ', JSON.stringify(e));
+        UtilLog.error(0x0000, 'readNFC', 'nfcF error: ', JSON.stringify(e));
         if (checkTagError(e, callback)) {
           return;
         }
@@ -308,7 +311,7 @@ async function readNFC(nfcType: number, tagInfo: tag.TagInfo, callback: AsyncCal
           await FeliCaReader.readCard(nfcF, card);
         }
       } catch (e) {
-        hilog.error(0x0000, 'readNFC', 'nfcF error: ', JSON.stringify(e));
+        UtilLog.error(0x0000, 'readNFC', 'nfcF error: ', JSON.stringify(e));
         if (checkTagError(e, callback)) {
           return;
         }
@@ -321,7 +324,7 @@ async function readNFC(nfcType: number, tagInfo: tag.TagInfo, callback: AsyncCal
           StandardPboc.readCard(isoDep, card);
         }
       } catch (e) {
-        hilog.error(0x0000, 'readNFC', 'nfcF error: ', JSON.stringify(e));
+        UtilLog.error(0x0000, 'readNFC', 'nfcF error: ', JSON.stringify(e));
         if (checkTagError(e, callback)) {
           return;
         }
@@ -339,7 +342,8 @@ async function readNFC(nfcType: number, tagInfo: tag.TagInfo, callback: AsyncCal
   callback(undefined, new NFCState(NFC_STATE_COMPLETE, nfcInfo));
 }
 
-async function cloneNFC(nfcType: number, nfcInfo: NfcInfo, curNfcInfo: NfcInfo, tagInfo: tag.TagInfo,
+async function cloneNFC(uiContext: UIContext, nfcType: number, nfcInfo: NfcInfo, curNfcInfo: NfcInfo,
+  tagInfo: tag.TagInfo,
   callback: AsyncCallback<NFCState>) {
 
   curNfcInfo.name = await Util.getCardName(nfcType, '写卡自动备份');
@@ -347,7 +351,7 @@ async function cloneNFC(nfcType: number, nfcInfo: NfcInfo, curNfcInfo: NfcInfo, 
   let id: number;
   try {
     id = await nfcCardInfo.insertNfcInfo(curNfcInfo);
-    getContext().eventHub.emit(OnNfcChanged.name, new OnNfcChanged(curNfcInfo.type, true, false));
+    uiContext.getHostContext()!.eventHub.emit(OnNfcChanged.name, new OnNfcChanged(curNfcInfo.type, true, false));
   } catch (e) {
     id = -1;
   }
@@ -427,7 +431,7 @@ async function authenticateSector(mifareClassic: tag.MifareClassicTag,
       auth = true;
       break;
     } catch (e) {
-      hilog.error(0x0000, 'cloneNFC', 'mifareClassic error: ', JSON.stringify(e));
+      UtilLog.error(0x0000, 'cloneNFC', 'mifareClassic error: ', JSON.stringify(e));
       if (checkTagError(e, callback)) {
         return undefined;
       }

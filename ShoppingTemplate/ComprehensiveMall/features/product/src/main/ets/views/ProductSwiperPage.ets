@@ -1,3 +1,4 @@
+import { SharePicker, ShareRecordData } from 'aggregated_share'
 import {
   BreakpointStorage,
   BreakpointSystem,
@@ -6,10 +7,9 @@ import {
   routerStack,
   WindowUtil,
 } from 'lib_foundation'
-import { PreOrderInfoReq, ProductApis, ProductCardItem } from 'lib_network'
+import { PreOrderInfoReq, ProductCardItem } from 'lib_network'
 import { CommonSymbol, NavTitleBar } from 'lib_widget'
 import { ProductOperationType, ProductSaleUtil } from 'module_product_detail'
-import { ProductResource, ProductShare } from 'module_product_share'
 import { CartApi } from 'module_shopping_cart';
 import { CardLongTakeDelegate, LongTakeAnimationProperties, LongTakeTransitionParam } from 'module_transition'
 
@@ -34,7 +34,6 @@ export struct ProductSwiperPage {
   longTakeSession: LongTakeAnimationProperties = new LongTakeAnimationProperties();
   @Local
   longTakeTransitionParam: LongTakeTransitionParam | undefined = undefined;
-
   util: ProductSaleUtil = new ProductSaleUtil()
 
   @Computed
@@ -46,15 +45,14 @@ export struct ProductSwiperPage {
   }
 
   @Computed
-  get productResource() {
+  get shareOptions() {
     if (!this.curProduct) {
       return undefined
     }
-    const resource: ProductResource = {
-      image: this.curProduct.banner,
+    const resource: ShareRecordData = {
+      coverUrl: this.curProduct.banner,
       title: this.curProduct.title,
-      price: this.curProduct.price,
-      url: `http://test/${this.curProduct.productId}`,
+      landingPageUrl: `http://test/${this.curProduct.productId}`,
     }
     return resource;
   }
@@ -62,9 +60,9 @@ export struct ProductSwiperPage {
   build() {
     NavDestination() {
       CardLongTakeDelegate({
-        longTakeSession:this.longTakeSession
-      }){
-        Column(){
+        longTakeSession: this.longTakeSession,
+      }) {
+        Column() {
           this.buildHeader()
           Swiper() {
             ForEach(this.dataList, (card: ProductCardItem) => {
@@ -118,12 +116,12 @@ export struct ProductSwiperPage {
               name: RouterMap.PRODUCT_CART,
             })
           })
-        if (this.productResource) {
-          ProductShare({
-            productResource: this.productResource,
-          }) {
-            CommonSymbol({ src: $r('sys.symbol.share') })
-          }
+        if (this.shareOptions) {
+          CommonSymbol({ src: $r('sys.symbol.share') })
+            .onClick(() => {
+              const picker: SharePicker = new SharePicker(this.shareOptions!);
+              picker.show();
+            })
         }
       }
       .justifyContent(FlexAlign.End)
@@ -236,7 +234,7 @@ export struct ProductSwiperPage {
             })
             .onClick(() => {
               this.util.options.productId = card.productId;
-              this.util.options.isLogin = this.isLogin;
+              this.util.options.isLogin = iData.global.isLogin;
               this.util.handleButtonClick(ProductOperationType.PAY_NOW, true)
             });
         }
@@ -256,33 +254,36 @@ export struct ProductSwiperPage {
     .margin({ bottom: $r('app.float.space_l') })
   }
 
-  initUtil() {
-    this.util.init({
-      productId: this.curProduct?.productId ?? '',
-      isLogin: this.isLogin,
-      handleAddCart: (skuCode, count) => {
-        CartApi.addSkuToCart(skuCode, count).then(async () => {
-          const newCartData = await CartApi.getCartData()
-          iData.global.cartVersion = newCartData.version;
-          iData.global.cartTotal = newCartData.total;
-          WindowUtil.toast('成功加入购物车');
-        });
+  initUtil(uiContext?: UIContext) {
+    this.util.init(
+      {
+        productId: this.curProduct?.productId ?? '',
+        isLogin: this.isLogin,
+        handleAddCart: (skuCode, count) => {
+          CartApi.addSkuToCart({ skuCode, count }).then(async () => {
+            const newCartData = await CartApi.getCartData()
+            iData.global.cartVersion = newCartData.version;
+            iData.global.cartTotal = newCartData.total;
+            WindowUtil.toast('成功加入购物车');
+          });
+        },
+        handlePayNow: (skuCode, count) => {
+          const preOrderRequest: PreOrderInfoReq = {
+            items: [{
+              skuCode,
+              count,
+            }],
+          };
+          routerStack.pushPathByName(RouterMap.ORDER_SUBMIT, preOrderRequest);
+        },
+        handleNotLogin: () => {
+          routerStack.pushPathByName(RouterMap.USER_LOGIN, () => {
+            this.isLogin = iData.global.isLogin;
+          });
+        },
       },
-      handlePayNow: (skuCode, count) => {
-        const preOrderRequest: PreOrderInfoReq = {
-          items: [{
-            skuCode,
-            count,
-          }],
-        };
-        routerStack.pushPathByName(RouterMap.ORDER_SUBMIT, preOrderRequest);
-      },
-      handleNotLogin: () => {
-        routerStack.pushPathByName(RouterMap.USER_LOGIN, () => {
-          this.isLogin = iData.global.isLogin;
-        });
-      },
-    })
+      this.getUIContext()
+    )
   }
 }
 

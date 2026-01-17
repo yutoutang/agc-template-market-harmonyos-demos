@@ -22,7 +22,7 @@ export struct CalendarTodo {
   }
 
   creatUserEventInfo() {
-    this.calendarEventVM.saveEventData(this.userEventInfo)
+    this.calendarEventVM.saveEventData(this.userEventInfo, this.getUIContext())
   }
 
   dateTimeFormat(value: TimePickerResult) {

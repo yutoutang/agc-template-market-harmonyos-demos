@@ -1,8 +1,8 @@
+import { TabListItem } from './Types';
 import { buildCartPage } from '../tabviews/CartPage';
 import { buildCategoryPage } from '../tabviews/CategoryPage';
 import { buildHomePage } from '../tabviews/HomePage';
 import { buildProfilePage } from '../tabviews/ProfilePage';
-import { TabListItem } from './Types';
 
 export const TAB_LIST: TabListItem[] = [
   {

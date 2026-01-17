@@ -1,11 +1,11 @@
 import { BreakpointStorage, BreakpointSystem, BreakpointTypeEnum } from 'module_ui_base';
-import { Product } from '../commons/Model';
+import { ProductModel } from '../commons/Model';
 import { CartCard } from './CartCard';
 
 @ComponentV2
 export struct CartListView {
   // 数据源
-  @Param listData: Product[] = [];
+  @Param listData: ProductModel[] = [];
   // 是否编辑态
   @Param isEdit: boolean = false;
   // 购物车商品数量变化的事件回调
@@ -21,7 +21,7 @@ export struct CartListView {
 
   build() {
     List({ space: 12 }) {
-      ForEach(this.listData, (card: Product, index: number) => {
+      ForEach(this.listData, (card: ProductModel, index: number) => {
         ListItem() {
           CartCard({
             data: card,
@@ -44,7 +44,7 @@ export struct CartListView {
           end: this.CardItemEnd(card, index),
           edgeEffect: SwipeEdgeEffect.None,
         })
-      }, (item: Product, index: number) => index + '__' + JSON.stringify(item))
+      }, (item: ProductModel, index: number) => index + '__' + JSON.stringify(item))
     }
     .width('100%')
     .height('auto')
@@ -56,7 +56,7 @@ export struct CartListView {
   }
 
   @Builder
-  CardItemEnd(card: Product, index: number) {
+  CardItemEnd(card: ProductModel, index: number) {
     Row() {
       Button({ type: ButtonType.Normal, stateEffect: true }) {
         Text('删除')

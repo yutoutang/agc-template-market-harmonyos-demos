@@ -1,6 +1,7 @@
 import { AppStorageV2, window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { Logger } from './Logger';
+import { UtilLog as Logger } from '@hw-agconnect/util-log';
+import { LOG_TAG } from '../constants/Contants';
 
 const TAG = 'WindowUtil';
 
@@ -11,14 +12,16 @@ export class AvoidAreaSize {
 }
 
 export class WindowUtil {
+  private static _uiContext: UIContext
   private static _currentWindow: window.Window | null = null;
   private static _avoidAreaSize: AvoidAreaSize = AppStorageV2.connect(
     AvoidAreaSize,
     () => new AvoidAreaSize(),
   )!;
 
-  public static init(window: window.Window) {
+  public static init(window: window.Window, uiContext: UIContext) {
     WindowUtil._currentWindow = window;
+    WindowUtil._uiContext = uiContext;
     WindowUtil.addWindowAvoidAreaListener();
   }
 
@@ -36,15 +39,19 @@ export class WindowUtil {
   }
 
   public static addWindowAvoidAreaListener() {
-    if (WindowUtil._currentWindow) {
-      const systemArea = WindowUtil._currentWindow.getWindowAvoidArea(
-        window.AvoidAreaType.TYPE_SYSTEM,
-      );
-      WindowUtil._avoidAreaSize.top = px2vp(systemArea.topRect.height);
-      const bottomArea = WindowUtil._currentWindow.getWindowAvoidArea(
-        window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR,
-      );
-      WindowUtil._avoidAreaSize.bottom = px2vp(bottomArea.bottomRect.height);
+    try {
+      if (WindowUtil._currentWindow) {
+        const systemArea = WindowUtil._currentWindow.getWindowAvoidArea(
+          window.AvoidAreaType.TYPE_SYSTEM,
+        );
+        WindowUtil._avoidAreaSize.top = WindowUtil._uiContext.px2vp(systemArea.topRect.height);
+        const bottomArea = WindowUtil._currentWindow.getWindowAvoidArea(
+          window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR,
+        );
+        WindowUtil._avoidAreaSize.bottom = WindowUtil._uiContext.px2vp(bottomArea.bottomRect.height);
+      }
+    } catch (err) {
+      Logger.error(LOG_TAG, 'add window avoid area failed. error: ' + JSON.stringify(err))
     }
   }
 

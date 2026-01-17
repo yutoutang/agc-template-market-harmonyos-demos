@@ -1,12 +1,13 @@
 import { ComponentContent, promptAction } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
+import { WindowUtil } from './WindowUtil';
 
 enum PopViewShowType {
   OPEN
 }
 
 async function getUIContext() {
-  return (await (getContext() as common.UIAbilityContext).windowStage.getMainWindow()).getUIContext();
+  return (await (WindowUtil.context as common.UIAbilityContext).windowStage.getMainWindow()).getUIContext();
 }
 
 interface PopViewModel {

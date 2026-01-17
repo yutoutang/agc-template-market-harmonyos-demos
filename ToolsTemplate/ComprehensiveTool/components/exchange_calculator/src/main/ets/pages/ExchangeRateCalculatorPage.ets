@@ -17,11 +17,11 @@ export struct ExchangeRateCalculatorPage {
 
   aboutToAppear(): void {
     this.vm.getExchangeInfo();
-    this.vm.onKeyboardChange();
+    this.vm.onKeyboardChange(this.getUIContext());
   }
 
   aboutToDisappear(): void {
-    this.vm.offKeyboardChange();
+    this.vm.offKeyboardChange(this.getUIContext());
   }
 
   @Builder

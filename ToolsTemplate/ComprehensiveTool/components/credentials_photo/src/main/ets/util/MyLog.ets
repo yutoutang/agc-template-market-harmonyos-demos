@@ -1,4 +1,4 @@
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 
 export class Logger {
   private static flag: string = 'credentials_photo';
@@ -6,10 +6,10 @@ export class Logger {
   private static format: string = '%{public}s, %{public}s';
 
   public static info(...args: string[]): void {
-    hilog.info(Logger.domain, Logger.flag, Logger.format, args);
+    UtilLog.info(Logger.domain, Logger.flag, Logger.format, args);
   }
 
   public static error(...args: string[]): void {
-    hilog.error(Logger.domain, Logger.flag, Logger.format, args);
+    UtilLog.error(Logger.domain, Logger.flag, Logger.format, args);
   }
 }

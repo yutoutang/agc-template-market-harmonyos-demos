@@ -1,7 +1,14 @@
-import { AppRouter, AuthenticationUtil,
+import {
+  AppRouter,
+  AuthenticationUtil,
   ItineraryApi,
-  LoadingStatus, Trip, TripListResult, UserInfo, UserInfoStorage } from 'common';
-import { BaseTitle, GlobalDialog } from 'components'
+  LoadingStatus,
+  Trip,
+  TripListResult,
+  UserInfo,
+  UserInfoStorage
+} from 'common';
+import { BaseTitle, GlobalDialog } from 'components';
 import { TabBarView } from '../components/TabBarView';
 import { TabContentView } from '../components/TabContentView';
 import { ItineraryTabItem } from '../model/ItineraryPageModel';
@@ -40,7 +47,7 @@ export struct ItineraryPage {
   }
 
   geTripAllList() {
-    GlobalDialog.showLoadingDialog();
+    GlobalDialog.showLoadingDialog(this.getUIContext());
     ItineraryApi.getTripList().then((res) => {
       let result = res.result as TripListResult;
       if (result.ret.code === 0) {
@@ -58,7 +65,7 @@ export struct ItineraryPage {
         this.tabNavs[1].count = completedTrip.length;
       }
     }).finally(() => {
-      GlobalDialog.close();
+      GlobalDialog.close(this.getUIContext());
       this.loadingStatus = LoadingStatus.SUCCESS;
     });
   }
@@ -91,7 +98,7 @@ export struct ItineraryPage {
                 this.categoryTabIndex = index;
               },
             });
-          });
+          },(item: ItineraryTabItem, index: number)=>index + '__' + JSON.stringify(item));
         }
         .width('100%')
         .justifyContent(FlexAlign.Start)
@@ -122,7 +129,7 @@ export struct ItineraryPage {
                   },
                 });
               };
-            });
+            },(item: ItineraryTabItem, index: number)=>index + '__' + JSON.stringify(item));
           }
           .width('100%')
           .layoutWeight(1)
@@ -146,15 +153,16 @@ export struct ItineraryPage {
             .backgroundColor($r('sys.color.ohos_id_color_emphasize')).width('60%')
             .shadow(ShadowStyle.OUTER_DEFAULT_SM)
             .onClick(() => {
-              GlobalDialog.showLoadingDialog()
+              GlobalDialog.showLoadingDialog(this.getUIContext())
               AuthenticationUtil.silentLogin((isSuccess: boolean, userInfo: UserInfo) => {
-                GlobalDialog.close()
+                GlobalDialog.close(this.getUIContext())
                 // 账号关联登录成功
                 if (isSuccess) {
                   this.userInfoStorage.isLogin = true;
                   this.userInfoStorage.userInfo = userInfo
                 }
-              });
+              },
+                this.getUIContext());
             });
         }
         .width('100%')

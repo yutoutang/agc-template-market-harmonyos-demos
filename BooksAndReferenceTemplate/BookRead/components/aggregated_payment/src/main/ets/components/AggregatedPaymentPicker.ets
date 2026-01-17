@@ -5,7 +5,7 @@ import { AggregatedPaymentVM } from '../utils/AggregatedPaymentVM';
 @ComponentV2
 export struct AggregatedPaymentPicker {
   vm: AggregatedPaymentVM = AggregatedPaymentVM.instance;
-  context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+  context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
   @Local isShow: boolean = false;
   @Local checkedType: number = 0;
   @Local wxPayResultText: string = '';
@@ -43,8 +43,6 @@ export struct AggregatedPaymentPicker {
         .textAlign(TextAlign.Start)
         
         Divider()
-          .strokeWidth(1)
-          .color('#F0F0F0')
           .margin({ left: 12, right: 12, bottom: 8 })
       }
       

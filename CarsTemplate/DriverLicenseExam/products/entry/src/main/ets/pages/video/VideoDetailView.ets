@@ -1,6 +1,8 @@
 
 import { CommonConstants, CommonModel } from '@ohos_agcit/driver_license_exam_commonlib'
 import { Video } from '@ohos_agcit/driver_license_exam_datasource';
+import { SharePicker } from 'aggregated_share';
+import { window } from '@kit.ArkUI';
 
 @Builder
 export function VideoDetailViewBuilder() {
@@ -21,6 +23,26 @@ struct VideoDetailView {
     this.topRectHeight = AppStorage.get('topRectHeight') || 0;
   }
 
+  @Builder
+  share() {
+    Row() {
+      Image($r('app.media.share'))
+        .width(40)
+        .height(40)
+        .onClick(() => {
+          const picker: SharePicker = new SharePicker({
+            title: this.videoParam!.simpleDescription,
+          });
+          picker.show();
+        })
+    }
+    .height('100%')
+    .alignItems(VerticalAlign.Center)
+    .margin({
+      right:16
+    })
+  }
+
   build() {
     NavDestination() {
       if (this.videoParam !== undefined) {
@@ -32,16 +54,29 @@ struct VideoDetailView {
               })
                 .width(CommonConstants.FULL_WIDTH)
                 .height(204)
+                .objectFit(ImageFit.Auto)
+                .onFullscreenChange((e?) => {
+                  try {
+                    window.getLastWindow(this.getUIContext().getHostContext(), (err, data) => {
+                      if (e && e.fullscreen) {
+                        data.setPreferredOrientation(window.Orientation.LANDSCAPE); // 关键横屏设置
+                      } else {
+                        data.setPreferredOrientation(window.Orientation.PORTRAIT); // 关键横屏设置
+                      }
+                    });
+                  } catch (err) {
+                  }
 
-              Image($r('app.media.title_bar'))
-                .height(56)
-                .width(252)
-                .margin({
-                  left: 16
                 })
-                .onClick(() => {
-                  this.vm.navStack.pop()
+                .onFinish(() => {
+                  try {
+                    window.getLastWindow(this.getUIContext().getHostContext(), (err, data) => {
+                      data.setPreferredOrientation(window.Orientation.PORTRAIT); // 关键横屏设置
+                    });
+                  } catch (err) {
+                  }
                 })
+
             }
             .width(CommonConstants.FULL_WIDTH)
             .height(204)
@@ -75,10 +110,11 @@ struct VideoDetailView {
     .height(CommonConstants.FULL_HEIGHT)
     .width(CommonConstants.FULL_WIDTH)
     .padding({
-      top:px2vp(this.topRectHeight),
-      bottom: px2vp(this.bottomRectHeight)
+      top:this.getUIContext().px2vp(this.topRectHeight),
+      bottom: this.getUIContext().px2vp(this.bottomRectHeight)
     })
-    .hideTitleBar(true)
+    .title('视频详情')
+    .menus(this.share)
     .backgroundColor('#F1F3F5')
     .onReady(() => {
       const preIndex = this.vm.navStack.size() - 1;

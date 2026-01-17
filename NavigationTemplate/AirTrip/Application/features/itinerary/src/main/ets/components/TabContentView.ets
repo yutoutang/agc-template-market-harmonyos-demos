@@ -76,7 +76,7 @@ export struct TabContentView {
     .width('100%')
     .height('100%')
     .padding({ left: 24, right: 24 })
-    .divider({strokeWidth: 0.5, color: $r('sys.color.ohos_id_color_button_divider') })
+    .divider({strokeWidth: 0.5, color: $r('sys.color.comp_divider') })
   }
 
   @Builder

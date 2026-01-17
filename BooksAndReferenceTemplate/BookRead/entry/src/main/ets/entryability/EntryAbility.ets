@@ -45,19 +45,6 @@ export default class EntryAbility extends UIAbility {
       }
       AppStorage.setOrCreate('pushData', pushData)
     }
-
-    // 上报Push Token到服务端
-    // axios.post("http://localhost:8080/upload", pushToken, {
-    //   headers: {
-    //     "Content-Type": "application/json"
-    //   }
-    // })
-    //   .then((response:AxiosResponse) => {
-    //     console.log("服务器响应:", response.data);
-    //   })
-    //   .catch((err:BusinessError) => {
-    //     console.error("请求失败:", err);
-    //   });
   }
 
   onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): void {
@@ -121,12 +108,13 @@ export default class EntryAbility extends UIAbility {
     }
     // Main window is created, set main page for this ability
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
-    WindowUtils.init(windowStage.getMainWindowSync());
     windowStage.loadContent('pages/Index', (err) => {
       if (err.code) {
         hilog.error(0x0000, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');
         return;
       }
+      WindowUtils.init(windowStage.getMainWindowSync());
+      AppStorage.setOrCreate('uiContext', windowStage.getMainWindowSync().getUIContext());
       hilog.info(0x0000, 'testTag', 'Succeeded in loading the content.');
       notificationManager.requestEnableNotification(this.context).then(() => {
         hilog.info(0x0000, 'testTag', `[ANS] requestEnableNotification success`);

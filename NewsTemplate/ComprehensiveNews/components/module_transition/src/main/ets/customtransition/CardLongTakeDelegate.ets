@@ -29,8 +29,6 @@ export struct CardLongTakeDelegate {
     CustomTransition.getInstance().unRegisterNavParam(this.longTakeSession.getNavDestinationId());
   }
 
-
-
   @Styles
   ExitGestureStyle() {
     .gesture(
@@ -49,8 +47,8 @@ export struct CardLongTakeDelegate {
           let deltaY = event.offsetY;
           this.scaleValue =
             Math.max(1 - (1 - MIN_SCALE_VALUE) * Math.abs(deltaX) / this.rectWidth, MIN_SCALE_VALUE);
-          animateTo({
-            curve: curves.responsiveSpringMotion()
+          this.getUIContext().animateTo({
+            curve: curves.responsiveSpringMotion(),
           }, () => {
             this.longTakeSession.translateX = deltaX;
             this.longTakeSession.translateY = deltaY;
@@ -68,8 +66,8 @@ export struct CardLongTakeDelegate {
             let deltaY = event.offsetY;
             this.scaleValue =
               Math.max(1 - (1 - MIN_SCALE_VALUE) * Math.abs(deltaX) / this.rectWidth, MIN_SCALE_VALUE);
-            animateTo({
-              curve: curves.responsiveSpringMotion()
+            this.getUIContext().animateTo({
+              curve: curves.responsiveSpringMotion(),
             }, () => {
               this.longTakeSession.translateX = deltaX;
               this.longTakeSession.translateY = deltaY;
@@ -90,7 +88,7 @@ export struct CardLongTakeDelegate {
             if (this.scaleValue > RETURN_TO_PRE_PAGE_SCALE_VALUE) {
               this.longTakeSession.options?.onRecoverStart?.();
               let animationCount = ++this.animationCount;
-              animateTo({
+              this.getUIContext().animateTo({
                 curve: curves.springMotion(),
                 onFinish: () => {
                   if (currentTransitionProxy?.cancelTransition) {
@@ -100,7 +98,7 @@ export struct CardLongTakeDelegate {
                     this.longTakeSession.radius = 0;
                     this.longTakeSession.options?.onRecoverEnd?.();
                   }
-                }
+                },
               }, () => {
                 this.longTakeSession.translateX = 0;
                 this.longTakeSession.translateY = 0;
@@ -123,7 +121,7 @@ export struct CardLongTakeDelegate {
           this.longTakeSession.radius = 0;
           CustomTransition.getInstance().proxy?.cancelTransition?.();
           CustomTransition.getInstance().interactive = false;
-        })
+        }),
     )
   }
 
@@ -144,10 +142,10 @@ export struct CardLongTakeDelegate {
             .size(this.longTakeSession.snapShotSize)
             .objectFit(ImageFit.Auto)
             .syncLoad(true)// 等待截图同步加载，这样不会出现闪白或跳变的问题
-              // 此处的position要给的是从截图位置到展开页图片位置的距离
+            // 此处的position要给的是从截图位置到展开页图片位置的距离
             .position({
               x: this.longTakeSession.snapShotPositionX,
-              y: this.longTakeSession.snapShotPositionY
+              y: this.longTakeSession.snapShotPositionY,
             })
             .focusable(false)
             .enabled(false)
@@ -166,7 +164,7 @@ export struct CardLongTakeDelegate {
     .scale({ x: this.longTakeSession.scaleValue, y: this.longTakeSession.scaleValue })
     .translate({
       x: this.longTakeSession.translateX,
-      y: this.longTakeSession.translateY
+      y: this.longTakeSession.translateY,
     })
     .width(this.longTakeSession.clipWidth)
     .height(this.longTakeSession.clipHeight)

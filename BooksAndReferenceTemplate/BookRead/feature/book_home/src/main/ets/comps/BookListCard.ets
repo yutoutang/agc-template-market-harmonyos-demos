@@ -1,12 +1,20 @@
-import { BookInfo, BookLittleCard, BookLittleCardHome, Constants, TCRouter } from 'common';
-import {LazyDataVM} from 'swiper_card'
+import {
+  BookHomeCard,
+  BookInfo, BookLittleCard, BookLittleCardHome, BreakpointStorage,
+  BreakpointSystem,
+  BreakpointTypeEnum,
+  Constants, TCRouter } from 'common';
+import { LazyDataVM } from 'swiper_card'
+import { LengthMetrics } from '@kit.ArkUI';
+
 @ComponentV2
 export struct BookListCard {
   // 今日力荐 展示两行书本 + 换一批按钮
   @Param categoryName: ResourceStr = '';
   @Param @Require books: LazyDataVM<BookInfo>
   @Local prep: number = 0;
-  @Local angel:number = 0;
+  @Local angel: number = 0;
+  @Local curBreakpoint: BreakpointStorage = BreakpointSystem.currentBreakpoint
 
   @Builder
   bookCategoryBar(category: ResourceStr) {
@@ -39,41 +47,45 @@ export struct BookListCard {
   build() {
     Column() {
       this.bookCategoryBar(this.categoryName)
-      List({ space: 8 }) {
+      Grid() {
         LazyForEach(this.books, (item: BookInfo) => {
-          ListItem() {
+          GridItem() {
             Column() {
-              BookLittleCardHome({ info: item })
+              BookHomeCard({ info: item })
             }
           }
         })
       }
       .cachedCount(6)
-      .scrollBar(BarState.Off)
-      .edgeEffect(EdgeEffect.Spring)
-      .listDirection(Axis.Horizontal)
-      .lanes(2)
-      .height(400)
+      .columnsTemplate(this.curBreakpoint.value === BreakpointTypeEnum.SM?'1fr 1fr 1fr':'1fr 1fr 1fr 1fr 1fr')
+      .rowsTemplate(this.curBreakpoint.value === BreakpointTypeEnum.SM?'1fr 1fr':'1fr')
+      .height(this.curBreakpoint.value === BreakpointTypeEnum.SM?400:192)
       .rotate({ y: 1, angle: this.angel, perspective: this.prep })
-      Button('换一批')
-        .backgroundColor('#0d000000')
-        .height(28)
-        .fontColor($r('sys.color.black'))
-        .width('100%')
-        .margin({ left: 24, right: 24 })
-        .onClick(() => {
-          animateTo({
-            duration: 1000,
-            curve: Curve.EaseIn,
-            iterations: 1,
-            playMode: PlayMode.Normal,
-            onFinish: () => {
-              console.info('play end')
-            }
-          }, () => {
-            this.angel += 360
-          })
+
+      Row() {
+        Text('换一批')
+          .fontColor($r('sys.color.black'))
+          .fontWeight(FontWeight.Bold)
+      }
+      .backgroundColor('#0d000000')
+      .height(28)
+      .width('100%')
+      .justifyContent(FlexAlign.Center)
+      .borderRadius(20)
+      .margin({ left: 24, right: 24, top: 12 })
+      .onClick(() => {
+        this.getUIContext().animateTo({
+          duration: 1000,
+          curve: Curve.EaseIn,
+          iterations: 1,
+          playMode: PlayMode.Normal,
+          onFinish: () => {
+            console.info('play end')
+          }
+        }, () => {
+          this.angel += 360
         })
+      })
     }
     .width('100%')
     .padding({ left: 16, right: 16 })

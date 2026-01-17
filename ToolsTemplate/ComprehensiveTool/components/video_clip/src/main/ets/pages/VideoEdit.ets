@@ -1,7 +1,8 @@
-import { ComponentContent, LevelMode, promptAction } from '@kit.ArkUI';
+import { ComponentContent, LevelMode, window } from '@kit.ArkUI';
 import { fileIo as fs } from '@kit.CoreFileKit';
+import { common } from '@kit.AbilityKit';
 import { BusinessError } from '@ohos.base';
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 import sdk from 'libveditor.so';
 import { Sticker } from '../model/Sticker';
 import { StickerManage } from '../components/StickerManage';
@@ -19,7 +20,7 @@ export function VideoEditBuilder() {
 }
 
 @Builder
-function videoShare(previewUri: PixelMap) {
+function videoShare(previewUri: string) {
   Column() {
     Column({ space: 16 }) {
       Row() {
@@ -103,20 +104,35 @@ let stopContentNode: ComponentContent<Object>;
 
 @ComponentV2
 struct VideoEdit {
+  @Local cloneText: string = '';
   vm: VideoEditVM = VideoEditVM.instance;
   manageVM: VideoManageVM = VideoManageVM.instance;
-  @Local cloneText: string = '';
+  private windowClass =
+    (this.getUIContext().getHostContext()! as common.UIAbilityContext).windowStage.getMainWindowSync();
+
+  setOrientation(orientation: Orientation) {
+    this.windowClass.setPreferredOrientation(orientation).then(() => {
+      UtilLog.info(0xFF00, `VideoClip`, 'setWindowOrientation: ' + orientation + ' Succeeded.');
+    }).catch((err: BusinessError) => {
+      UtilLog.info(0xFF00, `VideoClip`, 'setWindowOrientation: ' + orientation + ' Failed. Cause: ' + JSON.stringify(err));
+    });
+  }
 
   aboutToAppear(): void {
+    this.vm.setUiContext(this.getUIContext());
+    this.setOrientation(window.Orientation.PORTRAIT);
+    this.vm.totalOutputVideoFilePath =
+      `${this.getUIContext().getHostContext()!.filesDir}/merge_${new Date().getTime()}.mp4`;
     getUIContext = this.getUIContext();
     shareContentNode =
-      new ComponentContent(getUIContext, wrapBuilder<[PixelMap]>(videoShare), this.vm.draft.previewUri!);
+      new ComponentContent(getUIContext, wrapBuilder<[string]>(videoShare), this.vm.draft.previewUri!);
     stopContentNode =
       new ComponentContent(getUIContext, wrapBuilder<[]>(stopExport));
   }
 
   // 组件销毁时清理资源
   aboutToDisappear() {
+    this.setOrientation(window.Orientation.UNSPECIFIED);
     this.clearClipMaterial();
   }
 
@@ -126,7 +142,7 @@ struct VideoEdit {
       this.vm.clearPixelMap();
       this.vm.stickers = [];
     } catch (err) {
-      hilog.info(0xFF00, 'VideoClip', `close file error: ${JSON.stringify(err)}`);
+      UtilLog.info(0xFF00, 'VideoClip', `close file error: ${JSON.stringify(err)}`);
     }
   }
 
@@ -136,7 +152,7 @@ struct VideoEdit {
     PromptActionUtil.setOptions({
       levelMode: mode,
       onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
-        hilog.info(0xFF00, 'VideoClip', JSON.stringify(dismissDialogAction.reason));
+        UtilLog.info(0xFF00, 'VideoClip', JSON.stringify(dismissDialogAction.reason));
       },
     });
     PromptActionUtil.openDialog();
@@ -145,19 +161,23 @@ struct VideoEdit {
   completeCallback(): CallableFunction {
     clearInterval(this.vm.exportInterval);
     return () => {
-      this.vm.saveFile().then(() => {
+      this.vm.saveFile(this.getUIContext()).then(() => {
         this.vm.showExportingBindCover = false;
         shareContentNode.update(this.vm.draft.previewUri);
         this.showNodeContent(shareContentNode, LevelMode.EMBEDDED);
+        this.vm.getVideoSizeByUri(this.vm.draft.mediaUri, this.getUIContext().getHostContext()!);
+        if (!this.manageVM.isMember) {
+          this.manageVM.usedCount.count += 1;
+        }
       });
 
       if (this.vm.wordFilePaths.length > 0) {
         this.vm.wordFilePaths.forEach(file => {
           try {
             fs.unlink(file);
-            hilog.info(0xFF00, 'VideoClip', `delete success!`);
+            UtilLog.info(0xFF00, 'VideoClip', `delete success!`);
           } catch (err) {
-            hilog.error(0xFF00, 'VideoClip', `delete fail!`);
+            UtilLog.error(0xFF00, 'VideoClip', `delete fail!`);
           }
         });
       }
@@ -176,10 +196,10 @@ struct VideoEdit {
             }, this.completeCallback(),
           );
         } catch (error) {
-          hilog.error(0xFF00, 'VideoClip', `errCode: ${error.code}, errMessage: ${error.message}`);
+          UtilLog.error(0xFF00, 'VideoClip', `errCode: ${error.code}, errMessage: ${error.message}`);
         }
       } else if (result === SaveButtonOnClickResult.TEMPORARY_AUTHORIZATION_FAILED) {
-        hilog.error(0xFF00, 'VideoClip', 'errCode: ' + error?.code);
+        UtilLog.error(0xFF00, 'VideoClip', 'errCode: ' + error?.code);
       }
     };
 
@@ -214,7 +234,7 @@ struct VideoEdit {
         this.vm.params.screenWidth = newValue.width;
         this.vm.params.screenHeight = newValue.height;
         // 重新绘制xComponent组件
-        this.vm.load();
+        this.vm.load(this.getUIContext());
       });
     }.hideTitleBar(true).onReady((ctx) => {
       this.vm.params = ctx.pathInfo.param as VideoAsset;
@@ -238,7 +258,7 @@ struct VideoEdit {
     .bindContentCover($$this.vm.showExportingBindCover, this.FullExportBuilder(), {
       onWillDismiss: (() => {
         if (this.vm.exportProgress) {
-          promptAction.showToast({ message: '视频导出过程中请勿退出', duration: 1000 });
+          this.getUIContext().getPromptAction().showToast({ message: '视频导出过程中请勿退出', duration: 1000 });
         } else {
           // 进度为0，允许退出
           this.showNodeContent(stopContentNode, LevelMode.OVERLAY);
@@ -289,7 +309,7 @@ struct VideoEdit {
             controller: this.vm.xComponentController,
           })
             .onLoad(() => {
-              this.vm.load();
+              this.vm.load(this.getUIContext());
             });
         }
         .zIndex(1);

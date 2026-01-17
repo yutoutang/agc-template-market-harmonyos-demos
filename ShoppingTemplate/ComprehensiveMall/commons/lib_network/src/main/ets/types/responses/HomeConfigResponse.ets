@@ -3,6 +3,7 @@ import { BaseResponse } from './BaseResponse';
 export interface HomeConfigResp extends BaseResponse {
   categoryList: CategoryItem[];
   searchList: string[];
+  bannerList: string[];
 }
 
 export interface CategoryProductListResp extends BaseResponse {

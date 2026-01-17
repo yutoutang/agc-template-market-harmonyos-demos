@@ -1,22 +1,24 @@
-import AxiosMockAdapter from '@hw-agconnect/axios-mock-adapter';
-import { AppStorageV2 } from '@kit.ArkUI';
 import { AxiosRequestConfig, HttpStatusCode } from '@ohos/axios';
+import AxiosMockAdapter from '@hw-agconnect/axios-mock-adapter';
+import { request } from './Apis';
+import { getProductListMock, REVIEW_ITEM_MOCK1, REVIEW_ITEM_MOCK2, REVIEW_ITEM_MOCK3 } from './MockData';
 import { Constants } from '../commons/Constants';
 import { RequestUrlMap } from '../commons/Enums';
-import { ProductReviewListModel } from '../commons/Models';
-import { ProductInfo, ProductReviewResp } from '../commons/Types';
-import { request } from './Apis';
-import { getProductListMock } from './MockData';
+import { ProductInfo, ProductReviewItem, ProductReviewResp } from '../commons/Types';
 
 @ObservedV2
 export class ProductDetailMockApis {
   @Trace
   private _mockList: ProductInfo[] = getProductListMock();
   @Trace
-  private _mockReviewList: ProductReviewListModel = AppStorageV2.connect(
-    ProductReviewListModel,
-    () => new ProductReviewListModel(),
-  )!;
+  private _mockReviewList: ProductReviewItem[] = [
+    REVIEW_ITEM_MOCK1,
+    REVIEW_ITEM_MOCK2,
+    REVIEW_ITEM_MOCK3,
+    REVIEW_ITEM_MOCK1,
+    REVIEW_ITEM_MOCK2,
+    REVIEW_ITEM_MOCK3,
+  ];
 
   public start(adapter: AxiosMockAdapter) {
     // 获取商品详情
@@ -45,11 +47,11 @@ export class ProductDetailMockApis {
         const id: string = config.params.id;
         const startIndex = (curPage - 1) * Constants.PAGE_SIZE;
         const endIndex = startIndex + Constants.PAGE_SIZE;
-        const list = this._mockReviewList.list;
+        const list = this._mockReviewList;
         const reviewList = list.slice(startIndex, endIndex);
         const isFinal =
           reviewList.length < Constants.PAGE_SIZE ||
-          endIndex === this._mockReviewList.list.length;
+            endIndex === this._mockReviewList.length;
         const total = list.length;
         const res: ProductReviewResp = {
           isFinal,

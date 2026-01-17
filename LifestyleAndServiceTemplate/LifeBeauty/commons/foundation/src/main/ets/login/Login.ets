@@ -1,9 +1,11 @@
 import { util } from '@kit.ArkTS';
-import { promptAction } from '@kit.ArkUI';
+import { PersistenceV2 } from '@kit.ArkUI';
 import { FunctionalButton, functionalButtonComponentManager } from '@kit.ScenarioFusionKit';
 import { authentication } from '@kit.AccountKit';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { Logger } from '../utils/Logger';
+import { UtilLog as Logger } from '@hw-agconnect/util-log';
+import { UIDialog } from '@hw-agconnect/ui-dialog';
+import { ToastDialog } from '@hw-agconnect/ui-toast';
 import {
   bindMobileWithCode,
   confirmRebindMobileWithSecret,
@@ -13,10 +15,10 @@ import {
 } from '../http/ApiManage';
 import { DialogRebindBuilder, RebindParams } from '../uicomponent/DialogReBind';
 import { PopViewUtils } from '../utils/PopViewUtils';
-import { CancelBindParams, DialogCancelBindBuilder } from '../uicomponent/DialogCancelBind';
 import { CurAppInfo } from '../constants/AppConstant';
-import { AppStorageBank } from '../model/Model';
-import { getUIContext, LoadingDialogUtil } from '../utils/LoadingUtils';
+import { GetUserInfoResp } from '../model/Model';
+import { LoadingDialogUtil } from '../utils/LoadingUtils';
+import { WindowUtil } from '../utils/WindowUtil';
 
 const TAG = '[Login]';
 
@@ -24,9 +26,17 @@ const TAG = '[Login]';
  * 获取并设置用户信息
  */
 export const queryUserInfo = async () => {
+  const storageUserInfo: GetUserInfoResp = PersistenceV2.connect(GetUserInfoResp, () => new GetUserInfoResp())!;
   try {
-    const userInfo = await getUserInfo();
-    AppStorageBank.updateUserInfo(userInfo);
+    const userInfo = await getUserInfo(storageUserInfo.isBindMobile);
+    storageUserInfo.userId = userInfo.userId;
+    storageUserInfo.nickName = userInfo.nickName;
+    storageUserInfo.avatar = userInfo.avatar;
+    storageUserInfo.mobile = userInfo.mobile;
+    storageUserInfo.createdTime = userInfo.createdTime;
+    storageUserInfo.updatedTime = userInfo.updatedTime;
+    storageUserInfo.memberId = userInfo.memberId;
+    storageUserInfo.points = userInfo.points;
   } catch (e) {
     Logger.error(TAG, 'queryUserInfo error:' + JSON.stringify(e));
   }
@@ -63,7 +73,7 @@ export const silentLogin = async (): Promise<Boolean> => {
       return true;
     });
   } catch (e) {
-    promptAction.showToast({ message: $r('app.string.login_in_error') });
+    ToastDialog.showToast({ message: '华为账号登录异常，请稍后重试~' });
     return false;
   }
 }
@@ -104,18 +114,23 @@ export const bindPhone = async (code: string | undefined, onBind?: () => void) =
 
     // 涉及确认换绑
     if (resp.rebindSecret) {
+      closeLoading();
       const rebindPhone = async () => {
         try {
+          openLoading();
           await confirmRebindMobileWithSecret(resp.rebindSecret);
           if (onBind) {
             onBind();
           }
+          setBindMobileSuccess();
           cancelAuthorization();
           queryUserInfo();
+          closeLoading();
         } catch (e) {
+          closeLoading();
           cancelAuthorization();
           Logger.error(TAG, 'ReBindPhone error:' + JSON.stringify(e));
-          promptAction.showToast({ message: $r('app.string.bind_phone_error') });
+          ToastDialog.showToast({ message: '关联手机号失败，请稍后重试~' });
         }
       };
 
@@ -130,13 +145,14 @@ export const bindPhone = async (code: string | undefined, onBind?: () => void) =
       if (onBind) {
         onBind();
       }
+      setBindMobileSuccess();
       cancelAuthorization();
       queryUserInfo();
     }
   } catch (e) {
     cancelAuthorization();
     Logger.error(TAG, 'BindPhone error:' + JSON.stringify(e));
-    promptAction.showToast({ message: $r('app.string.bind_phone_error') });
+    ToastDialog.showToast({ message: '关联手机号失败，请稍后重试~' });
   } finally {
     LoadingDialogUtil.close();
   }
@@ -147,16 +163,34 @@ export const bindPhone = async (code: string | undefined, onBind?: () => void) =
  */
 export const unbindPhone = () => {
   try {
-    const unbind = async () => {
-      await unbindMobile();
-      queryUserInfo();
-    };
-    PopViewUtils.showPopView<CancelBindParams>(wrapBuilder(DialogCancelBindBuilder),
-      new CancelBindParams(unbind),
-      { alignment: DialogAlignment.Center });
+    UIDialog.open({
+      titleOptions:{
+        primaryTitle: '账号解除关联',
+      },
+      contentOptions: {
+        content: '请确认是否解除账号关联？',
+        contentTextAlign: TextAlign.Center,
+      },
+      showConfirmButton: true,
+      showCancelButton: true,
+      confirmButtonOptions: {
+        buttonFontColor: '#E64566'
+      },
+      cancelButtonOptions: {
+        buttonFontColor: $r('sys.color.font_primary')
+      },
+      onConfirm: async () => {
+        await UIDialog.closeLast();
+        openLoading();
+        await unbindMobile();
+        const storageUserInfo: GetUserInfoResp = PersistenceV2.connect(GetUserInfoResp, () => new GetUserInfoResp())!;
+        storageUserInfo.isBindMobile = false;
+        queryUserInfo();
+      }
+    })
   } catch (e) {
     Logger.error(TAG, 'unbindPhone error: ' + JSON.stringify(e));
-    promptAction.showToast({ message: $r('app.string.unbind_phone_error') });
+    ToastDialog.showToast({ message: '解绑手机号失败，请稍后重试~' });
   }
 };
 
@@ -165,30 +199,28 @@ export const unbindPhone = () => {
  * 获取
  */
 export const onGetPhoneNumberFail = (callback?: () => void) => {
-  promptAction.showDialog({
-    title: '提示',
-    message: '元服务未获取phone权限或用户授权，点击确定创建一个mock账号。',
-    buttons: [
-      {
-        text: '取消',
-        color: $r('sys.color.brand'),
-      },
-      {
-        text: '确定',
-        color: $r('sys.color.brand'),
-      },
-    ],
-  }, (err, data) => {
-    if (err) {
+  UIDialog.open({
+    titleOptions: {
+      primaryTitle: '提示',
+    },
+    contentOptions: {
+      content: '元服务未获取phone权限或用户授权，点击确定创建一个mock账号。',
+    },
+    showConfirmButton: true,
+    showCancelButton: true,
+    cancelButtonOptions: {
+      buttonFontColor: $r('sys.color.brand')
+    },
+    onCancel: () => {
+      closeLoading();
       LoadingDialogUtil.close();
-      return;
-    }
-    if (data.index === 1) {
+      UIDialog.closeLast();
+    },
+    onConfirm: () => {
+      UIDialog.closeLast();
       bindPhone('123', callback);
-    } else {
-      LoadingDialogUtil.close();
     }
-  });
+  })
 }
 
 /**
@@ -196,38 +228,49 @@ export const onGetPhoneNumberFail = (callback?: () => void) => {
  */
 @ComponentV2
 export struct LoginButton {
+  @Param btnSize: SizeOptions = {width: 72, height: 28};
+  @Param isEffect: boolean = true;
+  @Param showLoginBtn: boolean = true;
+  @BuilderParam contentView: CustomBuilder;
   @Event onBind?: () => void = () => {
   };
 
   aboutToAppear(): void {
-    getUIContext().then((uiContext: UIContext) => {
-      LoadingDialogUtil.setUIContext(uiContext);
-    })
+    LoadingDialogUtil.setUIContext(WindowUtil.uiContext);
   }
 
   build() {
+    Stack() {
+      if (this.contentView) {
+        this.contentView()
+      }
+      this.loginBtnBuilder()
+    }
+  }
+
+  @Builder
+  loginBtnBuilder() {
     Row() {
       FunctionalButton({
         params: {
           openType: functionalButtonComponentManager.OpenType.GET_PHONE_NUMBER,
-          label: $r('app.string.bind_phone_btn'),
+          label: ' ',
           styleOption: {
             plain: true,
             styleConfig: new functionalButtonComponentManager
               .ButtonConfig()
-              .type(ButtonType.Normal)
-              .size({ height: 16 })
-              .borderRadius(0)
-              .padding(0)
-              .fontSize(12)
+              .type(ButtonType.Capsule)
+              .size(this.btnSize)
+              .fontSize(14)
               .fontColor(Color.Black)
               .fontWeight(FontWeight.Medium)
               .backgroundColor(Color.Transparent)
-              .borderWidth({ bottom: 1 }),
+              .stateEffect(this.isEffect)
           },
         },
         controller: new functionalButtonComponentManager.FunctionalButtonController()
           .onGetPhoneNumber((err, data) => {
+            openLoading()
             if (err) {
               Logger.error(TAG, 'fail to get phone number, error: ' + JSON.stringify(err));
               onGetPhoneNumberFail(this.onBind);
@@ -242,6 +285,7 @@ export struct LoginButton {
           LoadingDialogUtil.openLoadingDialog();
         })
     }
+    .visibility(this.showLoginBtn ? Visibility.Visible : Visibility.None)
   }
 }
 
@@ -254,9 +298,7 @@ export struct LoginButtonType2 {
   };
 
   aboutToAppear(): void {
-    getUIContext().then((uiContext: UIContext) => {
-      LoadingDialogUtil.setUIContext(uiContext);
-    })
+    LoadingDialogUtil.setUIContext(WindowUtil.uiContext);
   }
 
   build() {
@@ -264,7 +306,7 @@ export struct LoginButtonType2 {
       FunctionalButton({
         params: {
           openType: functionalButtonComponentManager.OpenType.GET_PHONE_NUMBER,
-          label: $r('app.string.good_card_appoint_btn'),
+          label: $r('app.string.good_card_purchase_btn'),
           styleOption: {
             styleConfig: new functionalButtonComponentManager
               .ButtonConfig()
@@ -303,9 +345,7 @@ export struct LoginButtonType3 {
   };
 
   aboutToAppear(): void {
-    getUIContext().then((uiContext: UIContext) => {
-      LoadingDialogUtil.setUIContext(uiContext);
-    })
+    LoadingDialogUtil.setUIContext(WindowUtil.uiContext);
   }
 
   build() {
@@ -352,9 +392,7 @@ export struct LoginButtonType4 {
   };
 
   aboutToAppear(): void {
-    getUIContext().then((uiContext: UIContext) => {
-      LoadingDialogUtil.setUIContext(uiContext);
-    })
+    LoadingDialogUtil.setUIContext(WindowUtil.uiContext);
   }
 
   build() {
@@ -362,7 +400,7 @@ export struct LoginButtonType4 {
       FunctionalButton({
         params: {
           openType: functionalButtonComponentManager.OpenType.GET_PHONE_NUMBER,
-          label: '抢购',
+          label: '购买',
           styleOption: {
             styleConfig: new functionalButtonComponentManager
               .ButtonConfig()
@@ -400,9 +438,7 @@ export struct LoginButtonType5 {
   };
 
   aboutToAppear(): void {
-    getUIContext().then((uiContext: UIContext) => {
-      LoadingDialogUtil.setUIContext(uiContext);
-    })
+    LoadingDialogUtil.setUIContext(WindowUtil.uiContext);
   }
 
   build() {
@@ -410,14 +446,14 @@ export struct LoginButtonType5 {
       FunctionalButton({
         params: {
           openType: functionalButtonComponentManager.OpenType.GET_PHONE_NUMBER,
-          label: '立即抢购',
+          label: '立即购买',
           styleOption: {
             styleConfig: new functionalButtonComponentManager
               .ButtonConfig()
               .fontSize(14)
               .fontColor($r('app.color.common_fg_white'))
               .backgroundColor($r('app.color.common_theme_color'))
-              .size({ height: 40, width: 120 }),
+              .size({ height: 40, width: '100%' }),
           },
         },
         controller: new functionalButtonComponentManager.FunctionalButtonController()
@@ -437,4 +473,40 @@ export struct LoginButtonType5 {
         })
     }
   }
+}
+
+@Builder
+function loadingBuilderView(param: object) {
+  Column() {
+    LoadingProgress()
+      .width(40)
+      .height(40)
+      .color($r('sys.color.icon_on_primary'))
+  }
+  .width(80)
+  .height(80)
+  .borderRadius(12)
+  .justifyContent(FlexAlign.Center)
+  .backgroundColor('#99000000')
+}
+
+// loading
+export function openLoading() {
+  PopViewUtils.showPopView(wrapBuilder(loadingBuilderView), [],
+    {
+      alignment: DialogAlignment.Center,
+      autoCancel: false,
+      maskColor: Color.Transparent
+    });
+}
+
+// close loading
+export function closeLoading() {
+  PopViewUtils.closePopView()
+}
+
+// 绑定手机号成功
+function setBindMobileSuccess() {
+  const storageUserInfo: GetUserInfoResp = PersistenceV2.connect(GetUserInfoResp, () => new GetUserInfoResp())!;
+  storageUserInfo.isBindMobile = true;
 }

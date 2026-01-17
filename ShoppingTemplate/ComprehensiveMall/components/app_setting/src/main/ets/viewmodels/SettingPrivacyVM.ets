@@ -1,6 +1,6 @@
-import { SettingPageEnum, SettingType } from '../types/SettingType';
 import { BaseViewModel } from '../models/BaseViewModel';
 import { SettingItem } from '../types/SettingItem';
+import { SettingPageEnum, SettingType } from '../types/SettingType';
 
 @ObservedV2
 export class SettingPrivacyVM extends BaseViewModel {

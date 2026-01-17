@@ -1,4 +1,5 @@
-import { AppStorageV2, promptAction } from '@kit.ArkUI';
+import { AppStorageV2 } from '@kit.ArkUI';
+import { emitter } from '@kit.BasicServicesKit';
 import {
   BaseViewModel,
   CommonConstants,
@@ -42,7 +43,7 @@ export class IndexPageViewModel extends BaseViewModel {
     }
   }
 
-  @Monitor('formCardRouter.id')
+  @Monitor('formCardModel.id')
   onFormCardClick() {
     this.checkJumpNewsDetail();
   }
@@ -54,6 +55,17 @@ export class IndexPageViewModel extends BaseViewModel {
 
   refreshUserInfo() {
     new AccountApi().queryUserInfo();
+  }
+
+  registerSubEmitter() {
+    emitter.on('on_sub_window', (eventData: emitter.GenericEventData<string>): void => {
+      let params: Record<string, string | boolean | undefined> = {
+        'avId': eventData?.data,
+        'subWindow': true,
+        'isCreateSubWindow': true,
+      }
+      RouterUtils.pushPathByName(RouterMap.AUDIO_DETAILS, params)
+    })
   }
 
   checkJumpNewsDetail() {
@@ -68,12 +80,12 @@ export class IndexPageViewModel extends BaseViewModel {
     }
   }
 
-  checkContinueScene() {
+  async checkContinueScene() {
     if (this.continueModel.id && this.continueModel.newsId) {
-      const news = BaseNewsServiceApi.queryNews(this.continueModel.newsId);
+      const news = await BaseNewsServiceApi.queryNews(this.continueModel.newsId);
       if (!news) {
         this.continueModel.id = 0;
-        promptAction.showToast({ message: '新闻内容不存在，无法流转' });
+        this.contextModel.showToast({ message: '新闻内容不存在，无法流转' });
         return;
       }
       RouterUtils.popToName(RouterMap.INDEX_PAGE, undefined, false);
@@ -100,7 +112,7 @@ export class IndexPageViewModel extends BaseViewModel {
       return false;
     } else {
       this.firstBackTime = nowTime;
-      promptAction.showToast({ message: '再按一次退出' });
+      this.contextModel.showToast({ message: '再按一次退出' });
       return true;
     }
   }
@@ -157,7 +169,8 @@ export class IndexPageViewModel extends BaseViewModel {
 
   @Computed
   get barBgColor() {
-    if ([TabBarType.HOME, TabBarType.COMMUNITY].includes(this.tabModel.selectedIndex)) {
+    if ([TabBarType.HOME, TabBarType.COMMUNITY].includes(this.tabModel.selectedIndex) ||
+    [4, 5].includes(this.tabModel.videoCurrentTabIndex)) {
       return $r('sys.color.background_secondary');
     }
     if (this.hideTabScene) {

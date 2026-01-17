@@ -12,6 +12,7 @@
     "lib_account": "file:../lib_account",
     "lib_news_api": "file:../lib_news_api",
     "module_channeledit": "file:../../components/module_channeledit",
-    "module_flexlayout": "file:../../components/module_flexlayout"
+    "module_flexlayout": "file:../../components/module_flexlayout",
+    "module_audioplayer": "file:../../components/module_audioplayer"
   }
 }

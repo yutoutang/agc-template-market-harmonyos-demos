@@ -10,7 +10,7 @@ export struct BaseCustomTabBar {
   }
 
   aboutToAppear(): void {
-    this.tabsInfos = getDataFromJSON<CustomTabsInfo>(this.rawSource, this);
+    this.tabsInfos = getDataFromJSON<CustomTabsInfo>(this.rawSource, this.getUIContext(),this);
   }
 
   build() {

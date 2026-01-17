@@ -1,10 +1,10 @@
-import { Constants, NavHeaderBar } from 'common';
+import { BreakpointStorage, BreakpointSystem, BreakpointTypeEnum, Constants, NavHeaderBar } from 'common';
 import { OptionView } from '../comp/OptionView';
 
 @ComponentV2
 export struct IssueAndFeedbackPage {
   @Local windowTopHeight: number = AppStorage.get('windowTopHeight') as number || 38.77;
-
+  @Local curBreakpoint: BreakpointStorage = BreakpointSystem.currentBreakpoint
   build() {
     NavDestination() {
       Stack({ alignContent: Alignment.TopStart }) {
@@ -20,6 +20,7 @@ export struct IssueAndFeedbackPage {
               OptionView({ text: '意见反馈', url: Constants.FEEDBACK_ROUTE })
               OptionView({ text: '反馈记录', url: Constants.FEEDBACK_RECORD_ROUTE })
             }
+            .width(this.curBreakpoint.value === BreakpointTypeEnum.LG ? '70%' : Constants.FULL_SIZE)
           }.layoutWeight(1)
           .scrollBar(BarState.Off)
           .edgeEffect(EdgeEffect.Spring)
@@ -30,7 +31,6 @@ export struct IssueAndFeedbackPage {
             top: 20
           })
         }
-        .alignItems(HorizontalAlign.Start)
         .width(Constants.FULL_SIZE)
       }
       .width(Constants.FULL_SIZE)

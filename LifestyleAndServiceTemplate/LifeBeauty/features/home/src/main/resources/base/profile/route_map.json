@@ -29,6 +29,11 @@
       "name": "SuccessPay",
       "pageSourceFile": "src/main/ets/pages/SuccessPay.ets",
       "buildFunction": "SuccessPayBuilder"
+    },
+    {
+      "name": "SelectStorePage",
+      "pageSourceFile": "src/main/ets/pages/SelectStorePage.ets",
+      "buildFunction": "SelectStorePageBuilder"
     }
   ]
 }

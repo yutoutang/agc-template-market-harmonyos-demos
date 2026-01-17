@@ -14,18 +14,20 @@
 
 此模板提供如下组件，所有组件存放在工程根目录的components下，如果您仅需使用组件，可参考对应组件的指导链接；如果您使用此模板，请参考本文档。
 
-| 组件                                | 描述                               | 使用指导                                             |
-| ----------------------------------- | ---------------------------------- | ---------------------------------------------------- |
-| 广告组件（aggregated_ads）          | 支持展示开屏广告                   | [使用指导](components/aggregated_ads/README.md)      |
-| 登录组件（aggregated_login）        | 支持华为一键登录和微信登录         | [使用指导](components/aggregated_login/README.md)    |
-| 支付组件（aggregated_payment）      | 支持华为支付，微信支付，支付宝支付 | [使用指导](components/aggregated_payment/README.md)  |
-| 热量计算组件（calorie_calculation） | 支持统计饮食计划的卡路里           | [使用指导](components/calorie_calculation/README.md) |
-| 菜谱瀑布流组件（featured_recipes）  | 支持展示菜谱列表瀑布流             | [使用指导](components/featured_recipes/README.md)    |
-| 搜索组件（home_search）             | 支持菜谱搜索的相关功能             | [使用指导](components/home_search/README.md)         |
-| 分类列表组件（link_category）       | 支持按分类展示菜谱列表             | [使用指导](components/link_category/README.md)       |
-| 个人中心组件（personal_homepage）   | 支持个人中心页面展示               | [使用指导](components/personal_homepage/README.md)   |
-| 菜篮子组件（shopping_basket）       | 支持菜篮子相关功能                 | [使用指导](components/shopping_basket/README.md)     |
-| 上传菜谱组件（upload_recipe）       | 支持上传菜谱的功能                 | [使用指导](components/upload_recipe/README.md)       |
+| 组件                          | 描述               | 使用指导                                             |
+|-----------------------------|------------------| ---------------------------------------------------- |
+| 广告组件（aggregated_ads）        | 支持展示开屏广告         | [使用指导](components/aggregated_ads/README.md)      |
+| 通用登录组件（aggregated_login）    | 支持华为账号一键登录及其他方式登录（微信、手机号登录）    | [使用指导](components/aggregated_login/README.md)    |
+| 会员组件（membership）            | 支持应用内支付实现会员开通的能力 | [使用指导](components/membership/README.md)  |
+| 热量计算组件（calorie_calculation） | 支持统计饮食计划的卡路里     | [使用指导](components/calorie_calculation/README.md) |
+| 菜谱瀑布流组件（featured_recipes）   | 支持展示菜谱列表瀑布流      | [使用指导](components/featured_recipes/README.md)    |
+| 搜索组件（home_search）           | 支持菜谱搜索的相关功能      | [使用指导](components/home_search/README.md)         |
+| 分类列表组件（link_category）       | 支持按分类展示菜谱列表      | [使用指导](components/link_category/README.md)       |
+| 个人中心组件（personal_homepage）   | 支持个人中心页面展示       | [使用指导](components/personal_homepage/README.md)   |
+| 菜篮子组件（shopping_basket）      | 支持菜篮子相关功能        | [使用指导](components/shopping_basket/README.md)     |
+| 上传菜谱组件（upload_recipe）       | 支持上传菜谱的功能        | [使用指导](components/upload_recipe/README.md)       |
+| 通用应用内设置组件（app_setting）      | 支持设置基础设置项        | [使用指导](components/app_setting/README.md)       |
+| 通用个人信息组件（collect_personal_info）     | 支持编辑头像、昵称、手机号等         | [使用指导](components/collect_personal_info/README.md)       |
 
 本模板为美食菜谱类应用提供了常用功能的开发样例，模板主要分首页、分类、热量计算和我的四大模块：
 
@@ -78,7 +80,7 @@
       |    |-- 登录
       |    |-- 用户信息
       |    └-- 开通会员
-      |         └-- 支付
+      |         └-- 数字收银台
       |-- 我的菜谱
       |    |-- 新增菜谱
       |-- 我的收藏
@@ -105,14 +107,21 @@ Recipes
   │  │  │      BaseHeader.ets                 // 一级页面标题组件
   │  │  │      BuildTitleBar.ets              // 二级页面标题组件
   │  │  │      HeaderMenuBuilder.ets          // 标题菜单内容组件
+  │  │  │      HeaderRefreshBuilder.ets       // 刷新组件
   │  │  │      MenuItemBuilder.ets            // 下拉菜单选项
   │  │  ├─constants
   │  │  │      CommonContants.ets             // 公共常量
   │  │  │      CommonEnums.ets                // 公共枚举值
+  │  │  │      GridRowColSetting.ets          // 栅格通用设置
+  │  │  ├─models
+  │  │  │      BreakpointModel.ets            // 栅格断点
   │  │  ├─types
   │  │  │      Types.ets                      // 公共抽象类
   │  │  └─utils
   │  │         AccountUtil.ets                // 账号工具类
+  │  │         BaseViewModel.ets              // 基础类
+  │  │         BreakpointUtils.ets            // 断点类
+  │  │         ContextUtils.ets               // 全局context类
   │  │         DialogUtil.ets                 // 弹窗工具类
   │  │         FormatUtil.ets                 // 格式化工具类
   │  │         Logger.ets                     // 日志工具类
@@ -152,36 +161,16 @@ Recipes
   │  │  └─viewmodel
   │  │         AggreagetedAdVM.ets            // 广告页面数据模型
   │  └─resources
-  │─components/aggregated_login/src/main   
-  │  ├─ets
-  │  │  ├─common
-  │  │  │      Constant.ets                   // 常量类
-  │  │  │      Logger.ets                     // 日志类
-  │  │  ├─components
-  │  │  │      AgreementDialog.ets            // 协议弹窗组件
-  │  │  │      LoginService.ets               // 登录组件
-  │  │  ├─model
-  │  │  │      Index.ets                      // 数据类型
-  │  │  │      WXApiWrap.ets                  // 微信登录数据类型
-  │  │  └─viewmodel
-  │  │         AggregatedLoginVM.ets          // 登录组件数据模型
-  │  └─resources
-  │─components/aggregated_payment/src/main   
-  │  ├─ets
-  │  │  ├─common
-  │  │  │      Constant.ets                   // 常量类
-  │  │  ├─components
-  │  │  │      AggregatedPaymentPicker.ets    // 支付组件
-  │  │  ├─model
-  │  │  │      Index.ets                      // 数据类型
-  │  │  │      WXApiWrap.ets                  // 微信支付数据类型
-  │  │  └─viewmodel
-  │  │         AggregatedPaymentVM.ets        // 支付组件数据模型
-  │  └─resources
+  │─components/aggregated_login               // 通用登录组件
+  │─components/app_setting                    // 通用应用内设置组件
   │─components/base_ui/src/main   
   │  ├─ets
   │  │  ├─components
   │  │  │      BaseTabs.ets                   // Tabs组件
+  │  │  ├─models
+  │  │  │      BaseViewModel.ets              // 基础模型
+  │  │  │      BreakpointModel.ets            // 断点模型
+  │  │  │      GridRowColSetting.ets          // 栅格通用设置
   │  │  └──types
   │  │         Index.ets                      // 数据类型
   │  └─resources
@@ -197,6 +186,7 @@ Recipes
   │  │  └─viewModels
   │  │         CaloriesSummaryVM.ets          // 热量计算数据模型
   │  └─resources
+  │─components/collect_personal_info          // 通用个人信息组件
   │─components/featured_recipes/src/main   
   │  ├─ets
   │  │  ├─components
@@ -225,6 +215,7 @@ Recipes
   │  │  └─types
   │  │         Index.ets                      // 数据类型
   │  └─resources
+  │─components/membership                     // 通用会员组件
   │─components/personal_homepage/src/main   
   │  ├─ets
   │  │  ├─components
@@ -317,10 +308,6 @@ Recipes
   │  │  │      UploadRecipe.ets               // 上传菜谱页面
   │  │  ├─types
   │  │  │      Index.ets                      // 抽象类
-  │  │  ├─util
-  │  │  │      MockApi.ets                    // 支付mock数据
-  │  │  │      OrderInfoUtil.ets              // 支付mock参数工具
-  │  │  │      SignUtils.ets                  // 支付mock签名工具
   │  │  └─viewModels
   │  │         BrowsingHistoryVM.ets          // 浏览历史页面数据模型
   │  │         MemberCenterPageVM.ets         // 会员中心页面数据模型
@@ -361,13 +348,13 @@ Recipes
 * 设备类型：华为手机
 * 系统版本：HarmonyOS 5.0.4(16)及以上
 
-### 权限要求
+### 权限
 
 - 网络权限：ohos.permission.INTERNET
 
 ### 调试
 
-本模板不支持使用模拟器调试，请使用真机进行调试
+本模板支持使用模拟器调试
 
 ## 快速入门
 

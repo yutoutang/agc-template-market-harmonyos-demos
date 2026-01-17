@@ -3,7 +3,7 @@ import { cloudResPrefetch } from '@kit.CloudFoundationKit';
 import { CloudRecommendListResult, Logger } from 'lib_common';
 import { HomeServiceApi, RequestListData } from 'lib_news_api';
 
-const TAG = 'CloudPrefetchUtils'
+const TAG = '[CloudPrefetchUtils]'
 
 /**
  * 预加载工具类

@@ -1,10 +1,11 @@
-import { AppStorageV2, promptAction } from '@kit.ArkUI';
+import { AppStorageV2 } from '@kit.ArkUI';
 import { emitter } from '@kit.BasicServicesKit';
 import { BaseLayoutVM } from '../viewmodel/BaseLayoutVM';
 import { ScheduledUtil } from '../util/Index';
 import { RemoteConstant } from '../constant/Index';
 import { ControlInfo, RunMode } from '../model/Index';
 import { getInstance } from './RouteModule';
+import { UtilLog } from '@hw-agconnect/util-log';
 
 @ComponentV2
 export struct BaseLayout {
@@ -50,15 +51,24 @@ export struct BaseLayout {
 
     this.vm.upDateView(this.controlInfo);
     this.onShow();
-    emitter.on('toSwitchClick', this.switchClick);
-    emitter.on('toModeClick', this.modeClick);
-    emitter.on('toSpeedClick', this.speedClick);
+    try {
+      emitter.on('toSwitchClick', this.switchClick);
+      emitter.on('toModeClick', this.modeClick);
+      emitter.on('toSpeedClick', this.speedClick);
+    } catch (e) {
+      UtilLog.error(`emit click event failed with error ${JSON.stringify(e)}`);
+    }
   }
 
   aboutToDisappear(): void {
-    emitter.off('toSwitchClick', this.switchClick);
-    emitter.off('toModeClick', this.modeClick);
-    emitter.off('toSpeedClick', this.speedClick);
+    try {
+      emitter.off('toSwitchClick', this.switchClick);
+      emitter.off('toModeClick', this.modeClick);
+      emitter.off('toSpeedClick', this.speedClick);
+    } catch (e) {
+      UtilLog.error(`click event off failed with error ${JSON.stringify(e)}`);
+    }
+
     clearInterval(this.timer);
   }
 
@@ -101,7 +111,7 @@ export struct BaseLayout {
                 this.vm.isNameShow = false;
                 this.onNameChange(this.controlInfo);
               } else {
-                promptAction.showToast({ message: '请输入自定义名称！' });
+                this.getUIContext().getPromptAction().showToast({ message: '请输入自定义名称！' });
               }
 
             });
@@ -325,7 +335,7 @@ export struct BaseLayout {
               if (this.controlInfo.switchStatus) {
                 // 自动模式无法调节温度
                 if (this.controlInfo.runMode === RunMode.AUTO) {
-                  promptAction.showToast({ message: '该模式下无法调节温度' });
+                  this.getUIContext().getPromptAction().showToast({ message: '该模式下无法调节温度' });
                   return;
                 }
                 if (this.controlInfo.temperature < RemoteConstant.MAX_TEMPERATURE) {
@@ -343,7 +353,7 @@ export struct BaseLayout {
             .onClick(() => {
               if (this.controlInfo.switchStatus) {
                 if (this.controlInfo.runMode === RunMode.AUTO) {
-                  promptAction.showToast({ message: '该模式下无法调节温度' });
+                  this.getUIContext().getPromptAction().showToast({ message: '该模式下无法调节温度' });
                   return;
                 }
                 if (this.controlInfo.temperature > RemoteConstant.MIN_TEMPERATURE) {

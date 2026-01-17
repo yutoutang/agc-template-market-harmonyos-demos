@@ -1,7 +1,7 @@
 import { common, wantAgent } from '@kit.AbilityKit';
 import { backgroundTaskManager } from '@kit.BackgroundTasksKit';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { Logger } from '../util/MyLog';
+import { UtilLog as Logger, UtilLog } from '@hw-agconnect/util-log';
 
 const TAG = '[BackgroundTaskManager]';
 
@@ -22,14 +22,18 @@ export class BackgroundTaskManager {
       wantAgentFlags: [wantAgent.WantAgentFlags.UPDATE_PRESENT_FLAG],
     };
 
-    wantAgent.getWantAgent(wantAgentInfo).then((wantAgentObj) => {
-      backgroundTaskManager.startBackgroundRunning(context,
-        backgroundTaskManager.BackgroundMode.AUDIO_PLAYBACK, wantAgentObj).then(() => {
-        Logger.info(TAG, 'startBackgroundRunning succeeded');
-      }).catch((err: BusinessError) => {
-        Logger.error(TAG, `startBackgroundRunning failed, cause:  ${JSON.stringify(err)}`);
+    try {
+      wantAgent.getWantAgent(wantAgentInfo).then((wantAgentObj) => {
+        backgroundTaskManager.startBackgroundRunning(context,
+          backgroundTaskManager.BackgroundMode.AUDIO_PLAYBACK, wantAgentObj).then(() => {
+          Logger.info(TAG, 'startBackgroundRunning succeeded');
+        }).catch((err: BusinessError) => {
+          Logger.error(TAG, `startBackgroundRunning failed, cause:  ${JSON.stringify(err)}`);
+        });
       });
-    });
+    } catch (e) {
+      UtilLog.error(`task manage failed with error ${JSON.stringify(e)}`)
+    }
   }
 
 

@@ -4,6 +4,7 @@ import fs from '@ohos.file.fs';
 import { util } from '@kit.ArkTS';
 import { promptAction } from '@kit.ArkUI';
 import { RecipeIngredient, Step } from '../types/Index';
+import { common } from '@kit.AbilityKit';
 
 
 const TAG = '[UploadRecipeVM]';
@@ -84,7 +85,7 @@ export class UploadRecipeVM {
 
 
   // 获取图片
-  public async selectImage(): Promise<string> {
+  public async selectImage(context: common.UIAbilityContext): Promise<string> {
     return new Promise((resolve, reject) => {
       try {
         let photoSelectOptions = new photoAccessHelper.PhotoSelectOptions();
@@ -95,7 +96,7 @@ export class UploadRecipeVM {
           let imgFile: fs.File | null = null;
           try {
             imgFile = fs.openSync(photoSelectResult.photoUris[0]!, fs.OpenMode.READ_ONLY);
-            let newPath: string = getContext().cacheDir + `/${util.generateRandomUUID(false)}.png`;
+            let newPath: string = context.cacheDir + `/${util.generateRandomUUID(false)}.png`;
             fs.copyFileSync(imgFile.fd, newPath);
             resolve('file://' + newPath);
           } catch (err) {

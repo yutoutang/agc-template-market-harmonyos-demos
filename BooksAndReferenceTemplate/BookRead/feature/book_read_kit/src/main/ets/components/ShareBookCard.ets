@@ -12,7 +12,7 @@ export struct ShareBookCard {
   @Param @Require book: BookInfo;
   @Param isShelf?: boolean = false;
   setShareData() {
-    const contextFaker: Context = getContext(this);
+    const contextFaker: Context = this.getUIContext().getHostContext() as Context;
     let bookUri = `${this.book.id}.png`
     let filePath = contextFaker.filesDir + `/${bookUri}`;
 
@@ -26,7 +26,7 @@ export struct ShareBookCard {
     });
 
     let controller: systemShare.ShareController = new systemShare.ShareController(shareData);
-    let context = getContext(this) as common.UIAbilityContext;
+    let context = this.getUIContext().getHostContext() as common.UIAbilityContext;
     controller.show(context, {
       selectionMode: systemShare.SelectionMode.SINGLE,
       previewMode: systemShare.SharePreviewMode.DETAIL,
@@ -38,7 +38,7 @@ export struct ShareBookCard {
   }
 
   async aboutToAppear(): Promise<void> {
-    const context = getContext(this) as common.UIAbilityContext;
+    const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
     const filesDir = context.filesDir;
     let bookUri = `${this.book.id.toString()}.png`
     // 用图片名称获取资源

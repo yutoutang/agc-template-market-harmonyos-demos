@@ -1,8 +1,19 @@
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
+import { UtilLog } from '@hw-agconnect/util-log';
+import { Decimal } from '@kit.ArkTS';
+import { AppStorageV2, componentUtils, PersistenceV2 } from '@kit.ArkUI';
+import { BusinessError } from '@kit.BasicServicesKit';
+import { callTelSheetBuilder, CarGoodsInfo, CustomSelectSheetBuilder, GoodsComp } from 'base_ui';
 import {
+  AppInfoModel,
+  BreakpointNameEnum,
+  BreakpointType,
   CommonUrl,
   Constants,
   CouponRouter,
   GoodsSpecEnum,
+  GridRowColSetting,
+  MustGoodsController,
   MyCarModel,
   NavHeaderBar,
   OrderDetailRouter,
@@ -13,20 +24,14 @@ import {
   RouterMap,
   RouterModule,
   StoreInfoModel,
-  StoreType,
   UserInfoModel,
   WindowModel,
 } from 'common/Index';
-import { AppStorageV2, componentUtils, promptAction } from '@kit.ArkUI';
-import { BusinessError } from '@kit.BasicServicesKit';
-import { MustGoodsController } from '../models/MustGoodsController';
-import { common } from '@kit.AbilityKit';
-import { CustomSelectSheetBuilder } from '../components/CustomSelectDialog';
-import { Decimal } from '@kit.ArkTS';
-import { CarGoodsInfo, GoodsComp } from 'base_ui';
 import { AddDnOrderReq } from 'network';
-import { Goods, PreorderLabel } from '../models/Index';
 import * as API from '../api/Index';
+import { Goods, PreorderLabel } from '../models/Index';
+
+const TAG = '[ConfirmOrderPage]'
 
 @Builder
 export function ConfirmOrderPageBuilder() {
@@ -35,11 +40,14 @@ export function ConfirmOrderPageBuilder() {
 
 @ComponentV2
 struct ConfirmOrderPage {
-  @Consumer('mustGoodsCtrl') mustGoodsCtrl: MustGoodsController = new MustGoodsController()
+  @Local breakpoint: string = '';
+  @Local mustGoodsCtrl: MustGoodsController =
+    AppStorageV2.connect(MustGoodsController, () => new MustGoodsController())!
+  @Local appInfoModel: AppInfoModel = AppStorageV2.connect(AppInfoModel, () => new AppInfoModel())!;
   @Local myCarModel: MyCarModel = AppStorageV2.connect(MyCarModel)!
   @Local storeModel: StoreInfoModel = AppStorageV2.connect(StoreInfoModel, () => new StoreInfoModel())!;
   @Local windowModel: WindowModel = AppStorageV2.connect(WindowModel, () => new WindowModel())!
-  @Local userInfoModel: UserInfoModel = AppStorageV2.connect(UserInfoModel, () => new UserInfoModel())!
+  @Local userInfoModel: UserInfoModel = PersistenceV2.connect(UserInfoModel, () => new UserInfoModel())!
   @Local remarks: string = ''
   // 预约号码
   @Local preorderPhone: string = ''
@@ -63,14 +71,15 @@ struct ConfirmOrderPage {
   @Local preorderSheetShow: boolean = false;
   @Local showPreorderSheet: boolean = false;
   @Local snackSizedDealShow: boolean = true;
+  @Local callTelSheet: boolean = false
   @Local addGoods: CarGoodsInfo[] = [];
-  @Local payType: number = 0;
   @Local selectWallet: boolean = false;
   @Local selectHWPay: boolean = false;
   @Local rechargeMoney?: RechargeTier
   @Local preorderLabelList: Array<PreorderLabel> = []
   @Local preorderLeftLabel: string = ''
-  context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+  // 积分兑换
+  @Local redeemedPoint: boolean = false;
   private weekDays = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
   private scroller: Scroller = new Scroller()
 
@@ -78,8 +87,11 @@ struct ConfirmOrderPage {
   get orderSumMoney() {
     // 订单总金额
     let sum = new Decimal(this.totalMoney).sub(this.reduction).sub(this.selectCouponMoney).toNumber()
-    if (this.storeModel.orderType === OrderTypeEnum.TAKEAWAY_DELIVERY) {
+    if (this.storeModel.orderType === OrderTypeEnum.TAKEOUT) {
       sum = new Decimal(sum).add(this.boxMoney).toNumber()
+    }
+    if (this.redeemedPoint) {
+      sum = new Decimal(sum).sub(Constants.POINT_REDEEMED_MONEY).toNumber()
     }
     if (this.addGoods.length) {
       this.addGoods.forEach(item => {
@@ -118,7 +130,11 @@ struct ConfirmOrderPage {
   @Computed
   get reductionMoney() {
     // 优惠总金额
-    return new Decimal(this.reduction).add(this.selectCouponMoney).add(this.pkgDiscountMoney).toNumber()
+    let money = new Decimal(this.reduction).add(this.selectCouponMoney).add(this.pkgDiscountMoney).toNumber()
+    if (this.redeemedPoint) {
+      money = new Decimal(money).add(Constants.POINT_REDEEMED_MONEY).toNumber()
+    }
+    return money
   }
 
   @Computed
@@ -158,7 +174,7 @@ struct ConfirmOrderPage {
 
   async aboutToAppear(): Promise<void> {
     this.getIsNew()
-    if (this.storeModel.storeType === StoreType.SCAN_TYPE) {
+    if (this.storeModel.orderType === OrderTypeEnum.DINE_IN) {
       this.initTableInfo()
     }
     this.initPkgDiscountMoney()
@@ -168,98 +184,134 @@ struct ConfirmOrderPage {
     this.getPreorderTimeList()
   }
 
-  @Styles
-  cardStyle(){
-    .width(Constants.FULL_SIZE)
-    .constraintSize({ maxWidth: Constants.FULL_SIZE })
-    .backgroundColor($r('sys.color.background_primary'))
-    .borderRadius(16)
-    .padding({
-      left: 12,
-      right: 12,
-      top: 16,
-      bottom: 16,
-    })
-    .margin({
-      left: 12,
-      right: 12,
-    })
-  }
-
   build() {
     NavDestination() {
-      Column() {
-        NavHeaderBar({ title: $r('app.string.confirm_order') })
-        Scroll(this.scroller) {
-          Column({ space: 12 }) {
-            // 店铺信息
-            this.storeInfoCard()
-            // 就餐方式
-            this.orderTypeCard()
-            // 订单商品
-            GoodsComp({ goodsList: this.goodsList }).margin({
-              left: 12,
-              right: 12,
-            })
-            // 优惠
-            this.reductionCard()
-            //支付方式
-            this.payTypeCard()
-            // 其他信息
-            this.otherCard()
-          }.margin({ top: 12, bottom: 12 })
-        }
-        .backgroundColor($r('sys.color.background_secondary'))
-        .layoutWeight(1)
-        .align(Alignment.Top)
-        .scrollBar(BarState.Off)
-
-        Row() {
+      GridRow(GridRowColSetting.DEFAULT_GRID_ROW_OPTIONS) {
+        GridCol({ span: GridRowColSetting.GRID_ROW_OPTIONS_COLUMNS }) {
           Column() {
-            Text() {
-              Span($r('app.string.total_pay'))
-                .fontSize($r('sys.float.Caption_L'))
-                .fontColor($r('sys.color.font_secondary'))
-                .lineHeight(14)
-              Span($r('app.string.currency_symbol'))
-                .fontSize(8)
-                .fontWeight(FontWeight.Medium)
-                .fontColor($r('sys.color.font_primary'))
-                .lineHeight(12)
-                .margin({ left: 1 })
-              Span(`${this.payMoney}`)
-                .fontSize($r('sys.float.Body_L'))
-                .fontWeight(FontWeight.Medium)
-                .fontColor($r('sys.color.font_primary'))
-                .lineHeight(18)
+            NavHeaderBar({ title: $r('app.string.confirm_order') })
+            Scroll(this.scroller) {
+              Column({ space: 12 }) {
+                // 店铺信息
+                this.storeInfoCard()
+                // 就餐方式
+                this.orderTypeCard()
+                // 订单商品
+                GoodsComp({ goodsList: this.goodsList }).margin({
+                  left: 12,
+                  right: 12,
+                })
+                // 优惠
+                this.reductionCard()
+                //支付方式
+                this.payTypeCard()
+                // 其他信息
+                this.otherCard()
+              }.margin({ top: 12, bottom: 12 })
             }
+            .backgroundColor($r('sys.color.background_secondary'))
+            .layoutWeight(1)
+            .align(Alignment.Top)
+            .scrollBar(BarState.Off)
 
-            Text(``) {
-              Span($r('app.string.discount_money')).fontSize(8).lineHeight(12)
-              Span($r('app.string.currency_symbol')).fontSize(8).fontWeight(FontWeight.Medium).lineHeight(12)
-              Span(this.reductionMoney.toString())
-                .fontSize($r('sys.float.Caption_M'))
-                .lineHeight(14)
-            }.fontColor('#E84026').margin({ top: 3 })
-          }.alignItems(HorizontalAlign.End)
+            Row() {
+              if (this.breakpoint === BreakpointNameEnum.SM) {
+                Column() {
+                  Text() {
+                    Span($r('app.string.total_pay'))
+                      .fontSize($r('sys.float.Caption_L'))
+                      .fontColor($r('sys.color.font_secondary'))
+                      .lineHeight(14)
+                    Span($r('app.string.currency_symbol'))
+                      .fontSize(8)
+                      .fontWeight(FontWeight.Medium)
+                      .fontColor($r('sys.color.font_primary'))
+                      .lineHeight(12)
+                      .margin({ left: 1 })
+                    Span(`${this.payMoney}`)
+                      .fontSize($r('sys.float.Body_L'))
+                      .fontWeight(FontWeight.Medium)
+                      .fontColor($r('sys.color.font_primary'))
+                      .lineHeight(18)
+                  }
 
-          Button('提交支付')
-            .fontSize($r('sys.float.Body_L'))
-            .fontWeight(700)
-            .fontColor($r('sys.color.comp_background_list_card'))
-            .padding({
-              left: 21,
-              right: 21,
+                  Text(``) {
+                    Span($r('app.string.discount_money')).fontSize(8).lineHeight(12)
+                    Span($r('app.string.currency_symbol')).fontSize(8).fontWeight(FontWeight.Medium).lineHeight(12)
+                    Span(this.reductionMoney.toString())
+                      .fontSize($r('sys.float.Caption_M'))
+                      .lineHeight(14)
+                  }.fontColor('#E84026').margin({ top: 8 })
+                }.alignItems(HorizontalAlign.End)
+              } else {
+                Row({ space: 8 }) {
+                  Text() {
+                    Span($r('app.string.total_pay'))
+                      .fontSize($r('sys.float.Caption_L'))
+                      .fontColor($r('sys.color.font_secondary'))
+                      .lineHeight(14)
+                    Span($r('app.string.currency_symbol'))
+                      .fontSize(8)
+                      .fontWeight(FontWeight.Medium)
+                      .fontColor($r('sys.color.font_primary'))
+                      .lineHeight(12)
+                      .margin({ left: 1 })
+                    Span(`${this.payMoney}`)
+                      .fontSize($r('sys.float.Body_L'))
+                      .fontWeight(FontWeight.Medium)
+                      .fontColor($r('sys.color.font_primary'))
+                      .lineHeight(18)
+                  }
+
+                  Text(``) {
+                    Span($r('app.string.discount_money')).fontSize(8).lineHeight(12)
+                    Span($r('app.string.currency_symbol')).fontSize(8).fontWeight(FontWeight.Medium).lineHeight(12)
+                    Span(this.reductionMoney.toString())
+                      .fontSize($r('sys.float.Caption_M'))
+                      .lineHeight(14)
+                  }.fontColor('#E84026')
+                }.alignItems(VerticalAlign.Bottom)
+              }
+
+
+              Button('提交支付')
+                .fontSize($r('sys.float.Body_L'))
+                .fontWeight(700)
+                .fontColor($r('sys.color.comp_background_list_card'))
+                .width(this.breakpoint === BreakpointNameEnum.SM ? 120 : 448)
+                .padding({
+                  left: 21,
+                  right: 21,
+                  top: 8,
+                  bottom: 8,
+                })
+                .margin({ left: 16 })
+                .backgroundColor($r('sys.color.multi_color_09'))
+                .onClick(() => {
+                  this.commitOrder()
+                })
+            }.width(Constants.FULL_SIZE).height(56).padding({
               top: 8,
               bottom: 8,
-            })
-            .margin({ left: 16 })
-            .backgroundColor($r('sys.color.multi_color_09'))
-            .onClick(() => {
-              this.commitOrder()
-            })
-        }.width(Constants.FULL_SIZE).height(56).padding(12).justifyContent(FlexAlign.End)
-      }.height(Constants.FULL_SIZE)
+              left: new BreakpointType<number>({
+                [BreakpointNameEnum.SM]: 12,
+                [BreakpointNameEnum.MD]: 24,
+                [BreakpointNameEnum.LG]: 24,
+                [BreakpointNameEnum.XL]: 24,
+              }).getValue(this.breakpoint),
+              right: new BreakpointType<number>({
+                [BreakpointNameEnum.SM]: 12,
+                [BreakpointNameEnum.MD]: 24,
+                [BreakpointNameEnum.LG]: 24,
+                [BreakpointNameEnum.XL]: 24,
+              }).getValue(this.breakpoint),
+            }).justifyContent(this.breakpoint === BreakpointNameEnum.SM ? FlexAlign.End : FlexAlign.SpaceBetween)
+          }.height(Constants.FULL_SIZE)
+        }
+      }
+      .onBreakpointChange((bp) => {
+        this.breakpoint = bp;
+      })
     }.hideTitleBar(true).padding({ bottom: this.windowModel.getWindowBottomHeight() })
   }
 
@@ -280,18 +332,25 @@ struct ConfirmOrderPage {
             .maxLines(1)
             .constraintSize({ maxWidth: '75%' })
             .textOverflow({ overflow: TextOverflow.Ellipsis })
-          Image($r('app.media.right')).width(16).margin({ left: 8 })
+          Image($r('app.media.right_arrow')).width(16).margin({ left: 8 })
         }.layoutWeight(1).onClick(() => {
           RouterModule.push(RouterMap.MERCHANT_DETAIL_PAGE)
         })
 
-        Row() {
-          Text('距您').fontSize(12).fontColor($r('sys.color.font_secondary'))
-          Text(this.storeModel.storeInfo.distanceStr)
-            .fontSize(12)
-            .fontColor($r('sys.color.multi_color_09'))
-            .margin({ left: 2 })
-        }
+        Image($r('app.media.phone_icon')).width(24).height(24)
+          .onClick(() => {
+            // 拨打商家电话
+            this.callTelSheet = true
+          })
+          .bindSheet($$this.callTelSheet, callTelSheetBuilder(this.storeModel.storeInfo.tel, () => {
+            this.callTelSheet = false
+          }), {
+            detents: [309, 310],
+            backgroundColor: $r('sys.color.background_fourth'),
+            blurStyle: BlurStyle.Thick,
+            preferType: SheetType.CENTER,
+            title: { title: $r('app.string.contact_us') },
+          });
       }.width(Constants.FULL_SIZE).constraintSize({ maxWidth: Constants.FULL_SIZE })
 
       Row() {
@@ -307,68 +366,28 @@ struct ConfirmOrderPage {
   @Builder
   orderTypeCard() {
     Column({ space: 12 }) {
-      if (this.storeModel.storeType === StoreType.SCAN_TYPE) {
+      if (this.storeModel.orderType === OrderTypeEnum.TAKEOUT) {
         Row() {
-          Text($r('app.string.my_location'))
-            .fontSize($r('sys.float.Body_M'))
-            .fontWeight(FontWeight.Medium)
-            .fontColor($r('sys.color.font_primary'))
+          Text('预约时间')
           Row() {
-            Image($r('app.media.order_list')).width(14).fillColor($r('app.color.mainColor'))
-            Text(this.myCarModel.tableInfo?.typeName)
-              .fontSize($r('sys.float.Body_M'))
+            Text(this.storeModel.preorderTime)
+              .fontSize(14)
               .fontColor($r('sys.color.font_primary'))
-              .margin({ left: 8 })
-            Divider()
-              .vertical(true)
-              .margin({ left: 8, right: 8 })
-              .height(16)
-            Text(this.myCarModel.tableInfo?.tableName)
-              .fontSize($r('sys.float.Body_M'))
-              .fontColor($r('sys.color.font_primary'))
-              .lineHeight(20)
+              .fontWeight(FontWeight.Medium)
+            Image($r('app.media.right_arrow')).width(16).margin({ left: 12 })
           }
-        }
-        .width(Constants.FULL_SIZE)
-        .margin({
-          left: 12,
-          right: 12,
-          top: 4,
+        }.width('100%').justifyContent(FlexAlign.SpaceBetween).onClick(() => {
+          this.showPreorderSheet = true
+        }).bindSheet($$this.showPreorderSheet, this.preorderSheet(), {
+          detents: [322, 323],
+          blurStyle: BlurStyle.Thick,
+          preferType: SheetType.CENTER,
+          showClose: true,
+          title: { title: $r('app.string.preorder_sheet_title') },
         })
-        .constraintSize({ maxWidth: Constants.FULL_SIZE })
-        .justifyContent(FlexAlign.SpaceBetween)
-        .bindSheet($$this.tableSheetShow,
-          CustomSelectSheetBuilder($r('app.string.pick_table'),
-            this.storeModel.tableList.map((item) => item.tableName ?? ''), (select: ResourceStr) => {
-              this.confirmTable(select);
-            }), {
-            height: 408,
-            blurStyle: BlurStyle.Thick,
-            showClose: false,
-          });
-
-        Divider().margin({ top: 16, bottom: 12 })
       }
-      Row() {
-        Text('预约时间')
-        Row() {
-          Text(this.myCarModel.preorderTime)
-            .fontSize(14)
-            .fontColor($r('sys.color.font_primary'))
-            .fontWeight(FontWeight.Medium)
-          Image($r('app.media.right')).width(16).margin({ left: 12 })
-        }
-      }.width('100%').justifyContent(FlexAlign.SpaceBetween).onClick(() => {
-        this.showPreorderSheet = true
-      }).bindSheet($$this.showPreorderSheet, this.preorderSheet(), {
-        detents: [322, 323],
-        blurStyle: BlurStyle.Thick,
-        showClose: true,
-        title: { title: $r('app.string.preorder_sheet_title') },
-      })
 
-      Divider()
-      Row() {
+      Row({ space: this.breakpoint === BreakpointNameEnum.SM ? 8 : 24 }) {
         Row() {
           Image($r('app.media.store_dining')).width(40)
           Column() {
@@ -384,17 +403,17 @@ struct ConfirmOrderPage {
               .margin({ top: 4 })
           }.margin({ left: 8 }).alignItems(HorizontalAlign.Start)
         }
-        .width(150)
+        .layoutWeight(1)
         .height(64)
         .padding(12)
         .borderWidth(1)
         .borderRadius(12)
-        .borderColor(this.storeModel.orderType === OrderTypeEnum.PICK_SELF ? $r('app.color.mainColor') :
+        .borderColor(this.storeModel.orderType === OrderTypeEnum.DINE_IN ? $r('app.color.mainColor') :
           '#CCCCCC')
-        .backgroundColor(this.storeModel.orderType === OrderTypeEnum.PICK_SELF ? '#0DED6F21' : '#ffffff')
+        .backgroundColor(this.storeModel.orderType === OrderTypeEnum.DINE_IN ? '#0DED6F21' : '#ffffff')
         .onClick(() => {
-          if (this.storeModel.orderType !== OrderTypeEnum.PICK_SELF) {
-            this.storeModel.orderType = OrderTypeEnum.PICK_SELF
+          if (this.storeModel.orderType !== OrderTypeEnum.DINE_IN) {
+            this.storeModel.orderType = OrderTypeEnum.DINE_IN
           }
         })
 
@@ -413,21 +432,92 @@ struct ConfirmOrderPage {
               .margin({ top: 4 })
           }.margin({ left: 8 }).alignItems(HorizontalAlign.Start)
         }
-        .width(150)
+        .layoutWeight(1)
         .height(64)
         .padding(12)
         .borderWidth(1)
         .borderRadius(12)
-        .borderColor(this.storeModel.orderType === OrderTypeEnum.TAKEAWAY_DELIVERY ? $r('app.color.mainColor') :
+        .borderColor(this.storeModel.orderType === OrderTypeEnum.TAKEOUT ? $r('app.color.mainColor') :
           '#CCCCCC')
-        .backgroundColor(this.storeModel.orderType === OrderTypeEnum.TAKEAWAY_DELIVERY ? '#0DED6F21' :
+        .backgroundColor(this.storeModel.orderType === OrderTypeEnum.TAKEOUT ? '#0DED6F21' :
           '#ffffff')
         .onClick(() => {
-          if (this.storeModel.orderType !== OrderTypeEnum.TAKEAWAY_DELIVERY) {
-            this.storeModel.orderType = OrderTypeEnum.TAKEAWAY_DELIVERY
+          if (this.storeModel.orderType !== OrderTypeEnum.TAKEOUT) {
+            this.storeModel.orderType = OrderTypeEnum.TAKEOUT
           }
         })
       }.width(Constants.FULL_SIZE).justifyContent(FlexAlign.SpaceBetween).margin({ bottom: 4 })
+
+      if (this.storeModel.orderType === OrderTypeEnum.DINE_IN) {
+        Row() {
+          Text('就餐人数')
+            .fontSize($r('sys.float.Subtitle_L'))
+            .fontWeight(FontWeight.Medium)
+            .fontColor($r('sys.color.font_primary'))
+          Row() {
+            Text(`${this.storeModel.dinerNum}`)
+              .fontSize($r('sys.float.Body_M'))
+              .fontColor($r('sys.color.font_primary'))
+              .margin({ left: 8 })
+          }
+        }
+        .width(Constants.FULL_SIZE)
+        .margin({
+          left: 12,
+          right: 12,
+          top: 4,
+        })
+        .constraintSize({ maxWidth: Constants.FULL_SIZE })
+        .justifyContent(FlexAlign.SpaceBetween)
+        .onClick(() => {
+          this.dinerSheetShow = true
+        })
+        .bindSheet($$this.dinerSheetShow,
+          CustomSelectSheetBuilder($r('app.strarray.diner_num'),
+            (select: ResourceStr) => {
+              this.confirmDiner(select);
+            }, this.storeModel.dinerNum), {
+            detents: [408, 409],
+            backgroundColor: $r('sys.color.background_fourth'),
+            blurStyle: BlurStyle.Thick,
+            preferType: SheetType.CENTER,
+            title: { title: $r('app.string.pick_dinner_num') },
+          });
+
+        Row() {
+          Text('我的桌号')
+            .fontSize($r('sys.float.Subtitle_L'))
+            .fontWeight(FontWeight.Medium)
+            .fontColor($r('sys.color.font_primary'))
+          Row() {
+            Text(`${this.storeModel.tableInfo?.typeName}${this.storeModel.tableInfo?.tableName}`)
+              .fontSize($r('sys.float.Body_M'))
+              .fontColor($r('sys.color.font_primary'))
+          }
+        }
+        .width(Constants.FULL_SIZE)
+        .margin({
+          left: 12,
+          right: 12,
+          top: 4,
+        })
+        .constraintSize({ maxWidth: Constants.FULL_SIZE })
+        .justifyContent(FlexAlign.SpaceBetween)
+        .onClick(() => {
+          this.tableSheetShow = true
+        })
+        .bindSheet($$this.tableSheetShow,
+          CustomSelectSheetBuilder(this.storeModel.tableList.map((item) => item.tableName ?? ''),
+            (select: ResourceStr) => {
+              this.confirmTable(select);
+            }, this.storeModel.tableInfo.tableName), {
+            detents: [408, 409],
+            backgroundColor: $r('sys.color.background_fourth'),
+            blurStyle: BlurStyle.Thick,
+            preferType: SheetType.CENTER,
+            title: { title: $r('app.string.pick_table') },
+          });
+      }
     }.cardStyle()
   }
 
@@ -464,6 +554,41 @@ struct ConfirmOrderPage {
         .padding({ top: 10, bottom: 10 })
         .justifyContent(FlexAlign.SpaceBetween)
 
+        // 红包
+        Row() {
+          Row() {
+            Image($r('app.media.ic_red_packet')).width(16)
+            Text('红包').fontSize($r('sys.float.Body_M')).fontColor($r('sys.color.font_primary')).margin({ left: 8 })
+          }
+
+          Row() {
+            Text('150积分抵扣5元').fontSize($r('sys.float.Caption_L')).fontColor('#E84026')
+            Checkbox({ name: '' })
+              .select($$this.redeemedPoint)
+              .selectedColor($r('sys.color.multi_color_09'))
+              .shape(CheckBoxShape.CIRCLE)
+              .enabled(this.userInfoModel.userInfo.totalScore > 150)
+              .height(24)
+              .width(24)
+              .padding(2)
+              .margin(0)
+              .onChange((value: boolean) => {
+                if (value) {
+                  API.checkPoint().then(res => {
+                    if (!res) {
+                      this.getUIContext().getPromptAction().showToast({ message: '积分不足，已有其他订单锁定积分兑换~' })
+                      this.redeemedPoint = false
+                    }
+                  })
+                }
+              })
+          }.justifyContent(FlexAlign.End)
+        }
+        .width(Constants.FULL_SIZE)
+        .height(40)
+        .padding({ top: 10, bottom: 10 })
+        .justifyContent(FlexAlign.SpaceBetween)
+
         Row() {
           Row() {
             Image($r('app.media.vouchers')).width(16)
@@ -491,7 +616,7 @@ struct ConfirmOrderPage {
                   .lineHeight(20)
               }.fontColor('#E84026')
             }
-            Image($r('app.media.right')).width(16)
+            Image($r('app.media.right_arrow')).width(16)
           }.onClick(() => {
             RouterModule.push(RouterMap.SELECT_COUPON_PAGE,
               { totalMoney: (this.myCarModel.myCar.money ?? 0), selectId: this.selectCouponId } as CouponRouter,
@@ -508,7 +633,7 @@ struct ConfirmOrderPage {
         .padding({ top: 10, bottom: 10 })
         .justifyContent(FlexAlign.SpaceBetween)
 
-        if (this.storeModel.orderType === OrderTypeEnum.TAKEAWAY_DELIVERY) {
+        if (this.storeModel.orderType === OrderTypeEnum.TAKEOUT) {
           Row() {
             Row() {
               Image($r('app.media.ic_packet')).width(16)
@@ -615,13 +740,13 @@ struct ConfirmOrderPage {
             .height(24)
             .width(24)
             .padding(2)
+            .margin(0)
             .onChange(() => {
               if (this.selectWallet) {
                 if (this.userInfoModel.userInfo.wallet < this.orderSumMoney) {
                   this.rechargeMoney = this.rechargeTierList[0]
                   this.selectHWPay = true
                 }
-                this.payType = PayType.WALLET
               } else {
                 this.rechargeMoney = undefined
               }
@@ -670,6 +795,7 @@ struct ConfirmOrderPage {
           .height(24)
           .width(24)
           .padding(2)
+          .margin(0)
           .onClick(() => {
             // 已选择充值金额，不允许取消华为支付
             if (this.selectHWPay || this.rechargeMoney) {
@@ -679,7 +805,6 @@ struct ConfirmOrderPage {
             }
             // 未选择钱包使用华为支付
             if (!this.selectWallet) {
-              this.payType = PayType.HUAWEI_PAY
             }
           })
       }.width('100%').justifyContent(FlexAlign.SpaceBetween)
@@ -700,7 +825,7 @@ struct ConfirmOrderPage {
             .fontColor($r('sys.color.font_secondary'))
             .textAlign(TextAlign.End)
             .width(200)
-          Image($r('app.media.right')).width(16)
+          Image($r('app.media.right_arrow')).width(16)
         }.justifyContent(FlexAlign.End).layoutWeight(1)
       }
       .width(Constants.FULL_SIZE)
@@ -711,7 +836,9 @@ struct ConfirmOrderPage {
         this.preorderSheetShow = true
       })
       .bindSheet($$this.preorderSheetShow, this.preorderPhoneBuilder(), {
-        height: 420, title: { title: '预留电话' },
+        height: 420,
+        preferType: SheetType.CENTER,
+        title: { title: '预留电话' },
       });
 
       Row() {
@@ -728,7 +855,7 @@ struct ConfirmOrderPage {
             .width(200)
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
-          Image($r('app.media.right')).width(16)
+          Image($r('app.media.right_arrow')).width(16)
         }.justifyContent(FlexAlign.End).layoutWeight(1)
       }
       .width(Constants.FULL_SIZE)
@@ -744,38 +871,6 @@ struct ConfirmOrderPage {
           },
         )
       })
-
-      Row() {
-        Text($r('app.string.dinner_num_label'))
-          .fontSize($r('sys.float.Body_M'))
-          .fontWeight(FontWeight.Medium)
-          .fontColor($r('sys.color.font_primary'))
-          .lineHeight(20)
-        Row() {
-          Text(this.myCarModel.dinerNum)
-            .fontSize($r('sys.float.Body_S'))
-            .fontColor($r('sys.color.font_secondary'))
-            .textAlign(TextAlign.End)
-            .width(100)
-            .textAlign(TextAlign.End)
-          Image($r('app.media.right')).width(16)
-        }.justifyContent(FlexAlign.End).layoutWeight(1)
-      }
-      .width(Constants.FULL_SIZE)
-      .padding({ top: 12, bottom: 12 })
-      .justifyContent(FlexAlign.SpaceBetween)
-      .onClick(() => {
-        this.dinerSheetShow = true
-      })
-      .bindSheet($$this.dinerSheetShow,
-        CustomSelectSheetBuilder($r('app.string.pick_dinner_num'), $r('app.strarray.diner_num'),
-          (select: ResourceStr) => {
-            this.confirmDiner(select);
-          }, this.myCarModel.dinerNum), {
-          height: 408,
-          blurStyle: BlurStyle.Thick,
-          showClose: false,
-        });
     }.cardStyle()
   }
 
@@ -839,7 +934,7 @@ struct ConfirmOrderPage {
                 .width(20)
                 .onChange((isChecked: boolean) => {
                   if (isChecked) {
-                    this.myCarModel.preorderTime =
+                    this.storeModel.preorderTime =
                       item.id === 0 ? item.label : `今天（${this.weekDays[new Date().getDay()-1]}） ${item.label}`
                   }
                   item.check = isChecked
@@ -861,13 +956,31 @@ struct ConfirmOrderPage {
     }
     .width(Constants.FULL_SIZE)
     .margin({
-      left: Constants.BORDER_WIDTH,
-      right: Constants.BORDER_WIDTH,
+      left: GridRowColSetting.getPageMargin(this.breakpoint),
+      right: GridRowColSetting.getPageMargin(this.breakpoint),
       bottom: this.windowModel.getWindowBottomHeight(),
     })
     .alignItems(VerticalAlign.Top)
     .constraintSize({ maxWidth: Constants.FULL_SIZE })
     .backgroundColor($r('sys.color.background_secondary'))
+  }
+
+  @Styles
+  cardStyle(){
+    .width(Constants.FULL_SIZE)
+    .constraintSize({ maxWidth: Constants.FULL_SIZE })
+    .backgroundColor($r('sys.color.background_primary'))
+    .borderRadius(16)
+    .padding({
+      left: 12,
+      right: 12,
+      top: 16,
+      bottom: 16,
+    })
+    .margin({
+      left: 12,
+      right: 12,
+    })
   }
 
   initPkgDiscountMoney() {
@@ -890,7 +1003,7 @@ struct ConfirmOrderPage {
   initTableInfo() {
     this.selectArray = this.storeModel.tableList.map((item) => item.tableName ?? '')
     // 校验餐桌和用餐人数选择
-    if (!this.myCarModel.tableId) {
+    if (!this.storeModel.tableId) {
       this.tableSheetShow = true
     }
   }
@@ -926,13 +1039,13 @@ struct ConfirmOrderPage {
   }
 
   commitOrder() {
-    if (this.storeModel.storeType === StoreType.SCAN_TYPE) {
-      if (!this.myCarModel.tableId) {
+    if (this.storeModel.orderType === OrderTypeEnum.DINE_IN) {
+      if (!this.storeModel.tableId) {
         this.tableSheetShow = true
         return
       }
     }
-    if (!this.myCarModel.dinerNum) {
+    if (!this.storeModel.dinerNum) {
       this.dinerSheetShow = true
       return
     }
@@ -975,34 +1088,35 @@ struct ConfirmOrderPage {
   confirmTable(select: ResourceStr) {
     if (select) {
       let table = this.storeModel.tableList.find(item => item.tableName === select)
-      this.myCarModel.tableId = table?.id ?? '1';
-      this.myCarModel.tableInfo = this.storeModel.tableList.find(item => item.id === this.myCarModel.tableId)!;
+      this.storeModel.tableId = table?.id ?? '1';
+      this.storeModel.tableInfo = this.storeModel.tableList.find(item => item.id === this.storeModel.tableId)!;
     }
     this.tableSheetShow = false
   }
 
   confirmDiner(select: ResourceStr) {
     if (select) {
-      this.myCarModel.dinerNum = select;
+      this.storeModel.dinerNum = select;
     } else {
-      this.myCarModel.dinerNum = this.myCarModel.dinerNum || `1人`;
+      this.storeModel.dinerNum = this.storeModel.dinerNum || `1人`;
     }
     this.dinerSheetShow = false
   }
 
   updateOrder() {
     API.getHuaweiPayInfo(this.orderId).then((resp: number) => {
+      this.updateUserInfo()
       RouterModule.replace(RouterMap.ORDER_DETAIL_PAGE,
         { orderId: `${this.orderId}`, isOrderJump: true } as OrderDetailRouter)
     }).catch((e: BusinessError) => {
-      console.error(`getHuaweiPayInfo error: ${JSON.stringify(e)}.`);
-      promptAction.showToast({ message: $r('app.string.update_order_failed') })
+      UtilLog.error(TAG, `getHuaweiPayInfo error: ${JSON.stringify(e)}.`);
+      promptAction.showToast({ message: '订单更新失败' })
     })
   }
 
   confirmOrder() {
     if (!this.myCarModel.myCar.goodsList?.length) {
-      promptAction.showToast({ message: $r('app.string.car_empty_toast') })
+      promptAction.showToast({ message: '购物车商品为空，请选择商品后结算' })
       return
     }
 
@@ -1014,30 +1128,29 @@ struct ConfirmOrderPage {
       orderType: this.storeModel.orderType,
       mjMoney: this.isNew ? 0 : this.reduction,
       xyhMoney: this.isNew ? this.reduction : 0,
+      redeemedPoint: this.redeemedPoint,
       note: this.remarks ? this.remarks : '',
-      boxMoney: this.storeModel.orderType === OrderTypeEnum.TAKEAWAY_DELIVERY ? (this.boxMoney || 0) : 0,
+      boxMoney: this.storeModel.orderType === OrderTypeEnum.TAKEOUT ? (this.boxMoney || 0) : 0,
       tableId: '',
       discount: '',
-      payType: this.payType,
+      payType: this.selectWallet ? PayType.WALLET : PayType.HUAWEI_PAY,
       rechargeId: this.rechargeMoney?.id,
       sz: '',
       tableware: '0',
-      preorderTime: this.myCarModel.preorderTime.toString(),
+      preorderTime: this.storeModel.preorderTime.toString(),
       preorderPhone: this.preorderPhone,
     }
     API.addDnOrder(this.goodsList, req).then(async (resp: number) => {
       this.orderId = `${resp}`
       this.mustGoodsCtrl.cleanCar()
       // 钱包支付，状态直接改为已支付
-      if (this.payType === 1 || this.rechargeMoney) {
-        API.purchase(this.context, Boolean(this.rechargeMoney?.id)).then(() => {
-          // 支付成功更新订单信息
+      if (!this.selectWallet || this.rechargeMoney) {
+        API.purchase(Boolean(this.rechargeMoney?.id)).then(() => {
+          // todo 支付回调处理
+          //  支付成功更新订单信息
           this.updateOrder()
-          // 更新钱包信息
-          API.getUserInfo().then((res) => {
-            this.userInfoModel.userInfo.wallet = res.wallet
-          })
         }).catch(() => {
+          // 支付失败跳转详情页
           RouterModule.replace(RouterMap.ORDER_DETAIL_PAGE,
             { orderId: `${resp}`, isOrderJump: true } as OrderDetailRouter)
         })
@@ -1050,8 +1163,16 @@ struct ConfirmOrderPage {
           { orderId: `${this.orderId}`, isOrderJump: true } as OrderDetailRouter)
       }
     }).catch((e: BusinessError) => {
-      console.error(`confirmOrder error: ${JSON.stringify(e)}.`);
-      promptAction.showToast({ message: $r('app.string.place_order_failed_msg', JSON.stringify(e)) })
+      UtilLog.error(TAG, `confirmOrder error: ${JSON.stringify(e)}.`);
+      promptAction.showToast({ message: `下单失败！错误码：${JSON.stringify(e)}` })
+    })
+  }
+
+  updateUserInfo() {
+    // 更新用户信息
+    API.getUserInfo().then((res) => {
+      this.userInfoModel.userInfo.wallet = res.wallet
+      this.userInfoModel.userInfo.totalScore = res.totalScore
     })
   }
 }

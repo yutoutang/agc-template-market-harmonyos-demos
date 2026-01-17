@@ -5,7 +5,7 @@ import NewsFeedVM from '../viewmodel/NewsFeedVM'
 
 @ComponentV2
 export struct RecommendArea {
-  @Local newsFeedVM: NewsFeedVM = NewsFeedVM.instance
+  @Param newsFeedVM: NewsFeedVM = new NewsFeedVM()
   @Require @Param settingInfo: SettingModel
   @Param isFolderStatus: boolean = false
   @Local newsBreakPoint: FeedBreakPointVM = new FeedBreakPointVM()

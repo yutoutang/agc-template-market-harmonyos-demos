@@ -1,4 +1,3 @@
-import { WxExtraInfo } from 'aggregated_payment';
 import { getMemberPackages, MemberPackage } from 'network';
 
 @ObservedV2
@@ -9,8 +8,10 @@ export class MemberCenterPageVM {
   @Trace isShow: boolean = false;
   appId: string = '';
   @Trace aliOrderStr: string = '';
-  wxOrderReq: WxExtraInfo = new WxExtraInfo();
   hwOrderStr: string = '';
+  @Trace lastPurchaseProductExpireTime: string = '';
+
+
 
   getMemberPackages() {
     getMemberPackages().then(res => {

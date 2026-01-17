@@ -1,3 +1,7 @@
+import { PersistenceV2 } from '@kit.ArkUI';
+import { LoginSheetUtils } from 'aggregated_login';
+import { MemberSheetUtils } from 'membership';
+import { LoginManageUtil, MemberManageUtil, MemberStatus, UPDATE_MEMBER_STATUS } from 'module_base';
 import { PHOTO_FRAMES } from '../constant/PhotoFrameData';
 import { PhotoFrameModel } from '../model/PhotoFrameModel';
 import { getInstance } from '../util/RouteModule';
@@ -13,6 +17,7 @@ export function PhotoFramePageBuilder() {
 export struct PhotoFramePage {
   @Local uri: string = '';
   @Local vm: PhotoFrameVM = new PhotoFrameVM();
+  @Local isMember: boolean = false;
   @Local frameIndex: number = 0;
   @Local dispW: Array<number> = new Array<number>(PHOTO_FRAMES.length).fill(1200);
   @Local dispH: Array<number> = new Array<number>(PHOTO_FRAMES.length).fill(1600);
@@ -24,6 +29,37 @@ export struct PhotoFramePage {
   @Local itemY: number = 0;
   @Local itemScale: number = 1;
   @Local itemRotate: number = 0;
+
+  async aboutToAppear(): Promise<void> {
+    this.isMember = await MemberManageUtil.queryMemberStatus(this.getUIContext());
+    this.getUIContext().getHostContext()!.eventHub.on(UPDATE_MEMBER_STATUS, (status: boolean) => {
+      this.isMember = status;
+    });
+  }
+
+  aboutToDisappear(): void {
+    this.getUIContext().getHostContext()!.eventHub.off(UPDATE_MEMBER_STATUS);
+  }
+
+  handleFrameClick(frame: RepeatItem<PhotoFrameModel>) {
+    let loginManageUtil = new LoginManageUtil(this.getUIContext());
+    if (!frame.item.isVip) {
+      this.frameIndex = frame.index;
+      this.vm.selectFrame(frame.item);
+    } else {
+      if (loginManageUtil.userInfoModel.isLogin && this.isMember) {
+        this.frameIndex = frame.index;
+        this.vm.selectFrame(frame.item);
+      } else {
+        if (!loginManageUtil.userInfoModel.isLogin) {
+          LoginSheetUtils.open(loginManageUtil.params, this.getUIContext());
+        } else if (!this.isMember) {
+          let memberManageUtil = new MemberManageUtil(this.getUIContext());
+          MemberSheetUtils.open(memberManageUtil.productsInfo, this.getUIContext());
+        }
+      }
+    }
+  }
 
   build() {
     NavDestination() {
@@ -121,10 +157,18 @@ export struct PhotoFramePage {
               .each((frame: RepeatItem<PhotoFrameModel>) => {
                 ListItem() {
                   Stack() {
-                    Image(frame.item.image)
-                      .height(100)
-                      .objectFit(ImageFit.Contain)
-                      .borderRadius(5);
+                    Stack({ alignContent: Alignment.TopStart }) {
+                      Image(frame.item.image)
+                        .height(100)
+                        .objectFit(ImageFit.Contain)
+                        .borderRadius(5);
+
+                      if (frame.item.isVip) {
+                        Image($r('app.media.vip_decorate'))
+                          .size({ width: 12, height: 12 }).margin({ left: 2, top: 2 });
+                      }
+                    };
+
                     if (this.frameIndex === frame.index) {
                       Image($r('app.media.bc_bg_photo_frame_selected'))
                         .height(100)
@@ -135,8 +179,7 @@ export struct PhotoFramePage {
                 }
                 .padding({ left: 5, right: 5 })
                 .onClick(() => {
-                  this.frameIndex = frame.index;
-                  this.vm.selectFrame(frame.item);
+                  this.handleFrameClick(frame);
                 });
               });
           }
@@ -145,7 +188,7 @@ export struct PhotoFramePage {
           .alignListItem(ListItemAlign.Center)
           .listDirection(Axis.Horizontal);
         };
-      }
+      };
     }
     .hideTitleBar(true).onReady((ctx) => {
       this.uri = ctx.pathInfo.param as string;

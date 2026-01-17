@@ -1,5 +1,7 @@
+import { BreakpointModel, BreakpointType } from 'commonlib';
 import { RecipeCategory } from 'link_category';
 import { queryRecipeCategory } from 'network';
+import { AppStorageV2 } from '@kit.ArkUI';
 
 const TAG = '[ClassificationVM]';
 
@@ -8,6 +10,13 @@ export class ClassificationVM {
   @Trace recipeCategoryList: RecipeCategory[] = []
   @Trace currentIndex: number = 0
   private static _instance: ClassificationVM;
+  columnOptions: BreakpointType<number> = new BreakpointType<number>({
+    sm: 3,
+    md: 4,
+    lg: 4,
+    xl: 4,
+  });
+  @Trace breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
 
   public static get instance() {
     if (!ClassificationVM._instance) {
@@ -26,5 +35,10 @@ export class ClassificationVM {
 
   changeCurrentIndex(index: number) {
     this.currentIndex = index
+  }
+
+  @Computed
+  get gridCount() {
+    return this.columnOptions.getValue(this.breakPointModel.currentBreakpoint);
   }
 }

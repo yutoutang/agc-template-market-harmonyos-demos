@@ -1,8 +1,6 @@
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 
-const DOMAIN = 0x0000;
 const TAG = '[ColorUtils]';
-const FORMAT = '%{public}s';
 
 export interface IRgb {
   r: number
@@ -82,7 +80,7 @@ export function getColorWithOpacity(hexColor: string, opacity: number) {
     // 转换回十六进制并返回
     return `#${rgbToHex(r, g, b)}`;
   } catch (e) {
-    hilog.error(DOMAIN, TAG, FORMAT, 'getColorWithOpacity fail, error: ' + JSON.stringify(e));
+    UtilLog.error(TAG, 'getColorWithOpacity fail, error: ' + JSON.stringify(e));
     return hexColor;
   }
 }

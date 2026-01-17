@@ -11,28 +11,18 @@ export class QRCodeParams {
 @Builder
 export function DialogQRCodeBuilder(params: QRCodeParams) {
   Column() {
-    Column({ space: 10 }) {
-      Image($r('app.media.ic_public_close_sheet'))
-        .width(40)
-        .height(40)
-        .alignSelf(ItemAlign.End)
-        .onClick(() => {
-          PopViewUtils.closePopView();
-        })
-
-      QRCode(params.qrcode).width(150).height(150).margin({ top: 24, bottom: 24 })
+    Column() {
+      QRCode(params.qrcode).width(200).height(200).margin({top: 8, bottom: 32})
       Text(params.qrcode).fontSize(16)
     }
     .width(CommonConstants.FULL_PERCENT)
     .padding({
-      left: 20,
-      right: 20,
-      top: 12,
-      bottom: 33,
+      top: 24,
+      bottom: 24,
     })
     .borderRadius(32)
     .backgroundColor(Color.White)
   }
-  .padding({ left: 10, right: 10 })
-
+  .padding({ left: 12, right: 12 })
+  .width(320)
 }

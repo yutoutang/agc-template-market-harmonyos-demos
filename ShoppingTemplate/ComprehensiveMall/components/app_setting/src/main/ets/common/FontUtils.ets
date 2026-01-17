@@ -1,6 +1,6 @@
 import { display } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { Logger } from './Logger';
+import { Logger } from 'module_ui_base';
 
 /**
  * fp2px

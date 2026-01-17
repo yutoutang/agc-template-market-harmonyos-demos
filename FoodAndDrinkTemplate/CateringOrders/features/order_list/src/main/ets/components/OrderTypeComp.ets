@@ -1,23 +1,30 @@
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
+import { UtilLog } from '@hw-agconnect/util-log';
+import { AppStorageV2 } from '@kit.ArkUI';
+import { BusinessError } from '@kit.BasicServicesKit';
+import { paySheetBuilder } from 'base_ui';
 import {
+  AppInfoModel,
   Constants,
   copyString,
   DnState,
   MyCarModel,
+  OrderTypeEnum,
   RouterMap,
   RouterModule,
   StoreInfoModel,
-  StoreType,
-} from 'common/Index'
-import { ButtonListComp } from './ButtonListComp'
-import { AppStorageV2, promptAction } from '@kit.ArkUI'
-import { BusinessError } from '@kit.BasicServicesKit'
-import { BtnType, MyOrderInfo } from '../models/Index'
-import * as API from '../api/Index'
-import { paySheetBuilder } from 'base_ui'
+  TabBarType,
+} from 'common/Index';
+import * as API from '../api/Index';
+import { BtnType, MyOrderInfo } from '../models/Index';
+import { ButtonListComp } from './ButtonListComp';
+
+const TAG = '[OrderTypeComp]'
 
 @ComponentV2
 export struct OrderTypeComp {
   @Param @Require orderDetail: MyOrderInfo
+  @Local appInfoModel: AppInfoModel = AppStorageV2.connect(AppInfoModel, () => new AppInfoModel())!;
   @Local storeModel: StoreInfoModel = AppStorageV2.connect(StoreInfoModel, () => new StoreInfoModel())!;
   @Local myCarModel: MyCarModel = AppStorageV2.connect(MyCarModel, () => new MyCarModel())!
   @Local countdownMin: number = 0
@@ -41,10 +48,10 @@ export struct OrderTypeComp {
         if (this.orderDetail.order.id) {
           API.addGoods(this.orderDetail.order.id).then(() => {
             API.getMyCar()
-            RouterModule.popToName(RouterMap.HOME_PAGE, 0)
+            RouterModule.popToName(RouterMap.MAIN_INDEX, TabBarType.ORDER)
           })
         } else {
-          promptAction.showToast({ message: $r('app.string.order_not_exist') })
+          promptAction.showToast({ message: '订单不存在。' })
         }
 
       },
@@ -56,10 +63,10 @@ export struct OrderTypeComp {
       callback: (orderId: string) => {
         API.cancelOrder(orderId).then((resp: number) => {
           if (resp === 1) {
-            promptAction.showToast({ message: $r('app.string.cancel_success') })
+            promptAction.showToast({ message: '取消成功' })
             this.getOrderInfo()
           } else {
-            promptAction.showToast({ message: $r('app.string.cancel_failed') })
+            promptAction.showToast({ message: '取消失败' })
           }
         })
       },
@@ -71,11 +78,10 @@ export struct OrderTypeComp {
       color: $r('sys.color.font_secondary'),
       backgroundColor: $r('sys.color.background_secondary'),
       callback: () => {
-        RouterModule.popToName(RouterMap.HOME_PAGE, 0)
+        RouterModule.popToName(RouterMap.MAIN_INDEX, TabBarType.ORDER)
       },
     },
   ]
-
   @Event getOrderInfo: () => void = () => {
   }
 
@@ -89,14 +95,14 @@ export struct OrderTypeComp {
     // 拉华为支付
     API.getHuaweiPayInfo(this.orderDetail.order.id ?? '').then((resp: number) => {
       if (resp) {
-        promptAction.showToast({ message: $r('app.string.pay_success') })
+        promptAction.showToast({ message: '支付成功' })
         this.getOrderInfo()
       } else {
-        promptAction.showToast({ message: $r('app.string.pay_failed') })
+        promptAction.showToast({ message: '支付失败' })
       }
     }).catch((e: BusinessError) => {
-      console.error(`getHuaweiPayInfo error: ${JSON.stringify(e)}.`);
-      promptAction.showToast({ message: $r('app.string.pay_failed_msg', JSON.stringify(e)) })
+      UtilLog.error(TAG, `getHuaweiPayInfo error: ${JSON.stringify(e)}.`);
+      promptAction.showToast({ message: `支付失败！错误码：${JSON.stringify(e)}` })
     })
   }
 
@@ -166,9 +172,11 @@ export struct OrderTypeComp {
           }
           this.paySheetFlag = false
         }), {
-          height: 397,
+          detents: [397, 398],
+          backgroundColor: $r('sys.color.background_fourth'),
+          title: { title: $r('app.string.select_pay_type') },
           blurStyle: BlurStyle.Thick,
-          showClose: false,
+          preferType: SheetType.CENTER,
         })
     }
     .width(Constants.FULL_SIZE)
@@ -181,7 +189,7 @@ export struct OrderTypeComp {
         .fontSize($r('sys.float.Title_S'))
         .fontWeight(FontWeight.Medium)
         .fontColor($r('sys.color.font_primary'))
-      if (this.storeModel.storeType === StoreType.SCAN_TYPE) {
+      if (this.storeModel.orderType === OrderTypeEnum.DINE_IN) {
         Row() {
           Image($r('app.media.table_icon')).width(16)
           Text(`${this.orderDetail.table?.typeName} ${this.orderDetail.table?.name}`)

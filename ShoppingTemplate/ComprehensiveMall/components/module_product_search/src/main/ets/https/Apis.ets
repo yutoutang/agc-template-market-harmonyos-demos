@@ -1,12 +1,12 @@
 import { AppStorageV2 } from '@kit.ArkUI';
-import { HistoryModel } from '../commons/Models';
-import { HistorySearchItem, HotSearchItem } from '../commons/Types';
 import {
   GUESS_LIKE_LIST1,
   GUESS_LIKE_LIST2,
   HISTORY_SEARCH_MOCK,
   HOT_SEARCH_MOCK,
 } from './MockData';
+import { HistoryModel } from '../commons/Models';
+import { HistorySearchItem, HotSearchItem } from '../commons/Types';
 
 // todo: 商品搜索组件的API定义,当前为纯端数据mock
 @ObservedV2

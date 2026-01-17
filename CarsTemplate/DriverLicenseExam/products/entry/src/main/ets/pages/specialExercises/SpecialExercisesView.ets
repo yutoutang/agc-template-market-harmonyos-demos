@@ -16,7 +16,7 @@ struct SpecialExercisesView {
   @Local topRectHeight: number = 0;
   @Local totalCount: number = 0;
   @Local chapterCount: number = 0;
-  examService: ExamService = ExamService.instance;
+  examService: ExamService = ExamService.instance(this.getUIContext().getHostContext() as Context);
 
   aboutToAppear(): void {
     this.bottomRectHeight = AppStorage.get('bottomRectHeight') || 0;
@@ -97,7 +97,7 @@ struct SpecialExercisesView {
     })
     .onClick(() => {
       if(number === 0) {
-        promptAction.showToast({
+        this.getUIContext().getPromptAction().showToast({
           message: $r('app.string.no_question'),
           duration: 1500,
         });
@@ -195,7 +195,13 @@ struct SpecialExercisesView {
             Flex({wrap: FlexWrap.Wrap}) {
               ForEach(CLASSIFY_DATA, (item:CLASSIFY_BY_TYPE) => {
                 this.classifyQuestion(item.name, item.quantity, item.type)
-              }, (item:CLASSIFY_BY_TYPE) => JSON.stringify(item.name))
+              }, (item:CLASSIFY_BY_TYPE) => {
+                try {
+                  return JSON.stringify(item.name)
+                } catch (err) {
+                  return ''
+                }
+              })
             }
           }
           .width(CommonConstants.FULL_WIDTH)
@@ -210,7 +216,13 @@ struct SpecialExercisesView {
             Flex({wrap: FlexWrap.Wrap}) {
               ForEach(DATA_BY_QUESTION_TYPE, (item:CLASSIFY_BY_TYPE) => {
                 this.classifyQuestion(item.name, item.quantity, item.type)
-              }, (item:CLASSIFY_BY_TYPE)=> JSON.stringify(item.name))
+              }, (item:CLASSIFY_BY_TYPE)=> {
+                try {
+                  return JSON.stringify(item.name)
+                } catch (err) {
+                  return ''
+                }
+              })
             }
           }
           .width(CommonConstants.FULL_WIDTH)
@@ -229,8 +241,8 @@ struct SpecialExercisesView {
     .title('专项练习')
     .backgroundColor('#F1F3F5')
     .padding({
-      top:px2vp(this.topRectHeight),
-      bottom: px2vp(this.bottomRectHeight)
+      top:this.getUIContext().px2vp(this.topRectHeight),
+      bottom: this.getUIContext().px2vp(this.bottomRectHeight)
     })
   }
 }

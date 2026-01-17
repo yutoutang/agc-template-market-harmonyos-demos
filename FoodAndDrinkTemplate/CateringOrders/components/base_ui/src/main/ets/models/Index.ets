@@ -47,7 +47,7 @@ export interface CouponRule {
   amountRuleDesc: string
   // 优惠模式: 固定金额-0(暂时只支持固定金额)
   discountMode: string
-  // 优惠类型：满减-0 ; 立减-1 ; 折扣-2
+  // 优惠类型：满减-0 ; 立减-1 ;
   discountType: string
   // 满减标准
   fullAmount: string

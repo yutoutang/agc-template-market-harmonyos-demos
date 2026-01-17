@@ -1,9 +1,9 @@
-import AxiosMockAdapter from '@hw-agconnect/axios-mock-adapter';
 import { AxiosRequestConfig, HttpStatusCode } from '@ohos/axios';
-import { RequestUrlMap } from '../commons/Enums';
-import { MessageGroup, MessageItem } from '../commons/Types';
+import AxiosMockAdapter from '@hw-agconnect/axios-mock-adapter';
 import { request } from './Apis';
 import { MOCK_MESSAGE_LIST, MOCK_MESSAGE_GROUP } from './MockData';
+import { RequestUrlMap } from '../commons/Enums';
+import { MessageGroup, MessageItem } from '../commons/Types';
 
 export class NoticeMockApis {
   private _mockGroup: MessageGroup[] = MOCK_MESSAGE_GROUP;

@@ -1,5 +1,3 @@
-// 路由表
-export { RouterMap } from './src/main/ets/common/Constants';
+export { FeedbackTrigger } from './src/main/ets/FeedbackTrigger';
 
-// 路由参数模型
 export { FeedbackModel } from './src/main/ets/common/FeedbackModel';

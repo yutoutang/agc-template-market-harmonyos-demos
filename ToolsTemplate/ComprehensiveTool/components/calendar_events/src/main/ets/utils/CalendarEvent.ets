@@ -6,7 +6,7 @@ import { CalendarInfo, UserEventItem } from '../model/UserEventModel';
 import { reminderMap, repeatMap } from '../constants/Constants';
 
 export class CalendarManage {
-  context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+  context?: common.UIAbilityContext;
   private static _instance: CalendarManage
 
   static get instance() {

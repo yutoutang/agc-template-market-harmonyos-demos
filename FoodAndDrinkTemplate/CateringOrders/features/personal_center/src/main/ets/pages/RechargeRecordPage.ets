@@ -19,7 +19,7 @@ struct RechargeRecordPage {
 
   build() {
     NavDestination() {
-      NavHeaderBar({ title: '充值记录' })
+      NavHeaderBar({ title: '账单明细' })
       RechargeRecordComp({ rechargeRecordList: this.rechargeRecordList })
         .layoutWeight(1)
         .backgroundColor($r('sys.color.background_secondary'))

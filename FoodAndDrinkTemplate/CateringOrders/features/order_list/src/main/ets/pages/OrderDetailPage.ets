@@ -1,26 +1,30 @@
-import { OrderTypeComp } from '../components/OrderTypeComp'
-import { PaymentDetailsComp } from '../components/PaymentDetailsComp'
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
+import { UtilLog } from '@hw-agconnect/util-log';
+import { AppStorageV2 } from '@kit.ArkUI';
+import { BusinessError } from '@kit.BasicServicesKit';
+import dataPreferences from '@ohos.data.preferences';
+import { GoodsComp } from 'base_ui';
 import {
   CardManager,
+  formatDateForForm,
   FormDataClass,
   NavHeaderBar,
   OrderDetailRouter,
+  OrderTypeEnum,
   RouterMap,
   RouterModule,
-  StoreInfoModel,
-  StoreType,
   WindowModel,
-} from 'common/Index'
-import { BusinessError } from '@kit.BasicServicesKit'
-import dataPreferences from '@ohos.data.preferences'
-import { ReductionCard } from '../components/ReductionCardComp'
-import { StoreInfoCard } from '../components/StoreInfoCardComp'
-import { AppStorageV2, promptAction } from '@kit.ArkUI'
-import { GoodsComp } from 'base_ui'
-import { MyOrderResp } from 'network'
-import * as API from '../api/Index'
-import { orderGoodsMapper, orderInfoMapper } from '../mapper/Index'
-import { MyOrderInfo } from '../models/Index'
+} from 'common/Index';
+import { MyOrderResp } from 'network';
+import * as API from '../api/Index';
+import { OrderTypeComp } from '../components/OrderTypeComp';
+import { PaymentDetailsComp } from '../components/PaymentDetailsComp';
+import { ReductionCard } from '../components/ReductionCardComp';
+import { StoreInfoCard } from '../components/StoreInfoCardComp';
+import { orderGoodsMapper, orderInfoMapper } from '../mapper/Index';
+import { MyOrderInfo } from '../models/Index';
+
+const TAG = '[OrderDetailPage]'
 
 @Builder
 export function OrderDetailPageBuilder() {
@@ -29,7 +33,6 @@ export function OrderDetailPageBuilder() {
 
 @ComponentV2
 struct OrderDetailPage {
-  @Local storeModel: StoreInfoModel = AppStorageV2.connect(StoreInfoModel, () => new StoreInfoModel())!;
   @Local windowModel: WindowModel = AppStorageV2.connect(WindowModel, () => new WindowModel())!
   @Local orderId: string = ''
   @Local isOrderJump: boolean = false
@@ -52,40 +55,43 @@ struct OrderDetailPage {
   getOrderInfo() {
     API.getOrderInfo(this.orderId).then((resp: MyOrderResp) => {
       if (resp) {
-        console.info(`getOrderInfo resp:${JSON.stringify(resp)}.`);
+        UtilLog.info(TAG, `getOrderInfo resp:${JSON.stringify(resp)}.`);
         this.orderDetailInfo = orderInfoMapper(resp)
         if (this.isOrderJump) {
           this.updateFormCard()
         }
       } else {
-        console.error(`getOrderInfo error: ${JSON.stringify(resp)}.`);
-        promptAction.showToast({ message: $r('app.string.order_not_exist') })
-        RouterModule.popToName(RouterMap.HOME_PAGE, 0)
+        UtilLog.error(TAG, `getOrderInfo error: ${JSON.stringify(resp)}.`);
+        promptAction.showToast({ message: '订单不存在。' })
+        RouterModule.popToName(RouterMap.MAIN_INDEX, 0)
       }
     }).catch((e: BusinessError) => {
-      console.error(`getOrderInfo error: ${JSON.stringify(e)}.`);
-      promptAction.showToast({ message: $r('app.string.order_not_exist') })
-      RouterModule.popToName(RouterMap.HOME_PAGE, 0)
+      UtilLog.error(TAG, `getOrderInfo error: ${JSON.stringify(e)}.`);
+      promptAction.showToast({ message: '订单不存在。' })
+      RouterModule.popToName(RouterMap.MAIN_INDEX, 0)
     })
   }
 
   updateFormCard() {
-    dataPreferences.removePreferencesFromCacheSync(getContext(this), { name: CardManager.KEY_CARD_ID })
-    let pref = dataPreferences.getPreferencesSync(getContext(this), { name: CardManager.KEY_CARD_INFO })
+    try {
+      dataPreferences.removePreferencesFromCacheSync(this.getUIContext().getHostContext(),
+        { name: CardManager.KEY_CARD_ID })
+    } catch (e) {
+      UtilLog.error(TAG, `removePreferencesFromCacheSync error: ${JSON.stringify(e)}.`);
+    }
     let dataClass = new FormDataClass()
-    let storeModel: StoreInfoModel = AppStorageV2.connect(StoreInfoModel, () => new StoreInfoModel())!;
-    dataClass.storeName = storeModel.storeInfo.name || ''
-    dataClass.storeType = this.storeModel.storeType.toString()
+    dataClass.storeName = this.orderDetailInfo.order.storeName || ''
+    dataClass.orderType = this.orderDetailInfo.order.orderType
+    dataClass.stateType = 3
     dataClass.orderState = true
     dataClass.orderId = this.orderId
     dataClass.storeTable =
-      this.storeModel.storeType === StoreType.SCAN_TYPE ?
+      this.orderDetailInfo.order.orderType === OrderTypeEnum.DINE_IN ?
         `${this.orderDetailInfo?.table?.typeName} | ${this.orderDetailInfo?.table?.name}` : ''
     dataClass.orderPickNum =
-      this.storeModel.storeType === StoreType.PICK_NUM_TYPE ? `${this.orderDetailInfo?.order?.oid}` : ''
-    pref.putSync(CardManager.KEY_CARD_INFO, dataClass)
-    pref.flush()
-    CardManager.get().updateCard(getContext(this), '', dataClass)
+      this.orderDetailInfo.order.orderType === OrderTypeEnum.TAKEOUT ? `${this.orderDetailInfo?.order?.oid}` : ''
+    dataClass.orderTime = formatDateForForm(new Date(this.orderDetailInfo.order.time))
+    CardManager.get().updateCard(dataClass)
   }
 
   build() {
@@ -99,7 +105,7 @@ struct OrderDetailPage {
               this.getOrderInfo()
             },
           })
-          StoreInfoCard()
+          StoreInfoCard({ orderDetail: this.orderDetailInfo })
           GoodsComp({ goodsList: orderGoodsMapper(this.orderDetailInfo.goods) })
           ReductionCard({ orderInfo: this.orderDetailInfo?.order })
           PaymentDetailsComp({ orderDetail: this.orderDetailInfo }).margin({ top: 8 })

@@ -153,7 +153,7 @@ export struct ShoppingBasket {
                         })
                         .backgroundColor('#E84026')
                         .onClick(() => {
-                          promptAction.openCustomDialog({
+                          this.getUIContext().getPromptAction().openCustomDialog({
                             builder: () => {
                               this.customDialogComponent(item, (item: BasketItem) => {
                                 this.removeRecipe(item)
@@ -237,7 +237,7 @@ export struct ShoppingBasket {
           .backgroundColor($r('sys.color.background_primary'))
           .onClick(() => {
             try {
-              promptAction.closeCustomDialog(this.customDialogComponentId)
+              this.getUIContext().getPromptAction().closeCustomDialog(this.customDialogComponentId)
             } catch (error) {
               let message = (error as BusinessError).message;
               let code = (error as BusinessError).code;
@@ -253,7 +253,7 @@ export struct ShoppingBasket {
           .onClick(() => {
             try {
               removeRecipe(item)
-              promptAction.closeCustomDialog(this.customDialogComponentId)
+              this.getUIContext().getPromptAction().closeCustomDialog(this.customDialogComponentId)
             } catch (error) {
               let message = (error as BusinessError).message;
               let code = (error as BusinessError).code;
@@ -303,11 +303,11 @@ export struct ShoppingBasket {
         .margin({ left: 24, right: 24 })
         .onClick(() => {
           if (!this.nameTemp) {
-            promptAction.showToast({ message: '输入用料名' })
+            this.getUIContext().getPromptAction().showToast({ message: '输入用料名' })
             return
           }
           if (!this.quantityTemp) {
-            promptAction.showToast({ message: '输入数目，备注等' })
+            this.getUIContext().getPromptAction().showToast({ message: '输入数目，备注等' })
             return
           }
           this.selectItem.todoList.push(new IngredientItem(this.nameTemp, this.quantityTemp, ''))

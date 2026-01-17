@@ -1,15 +1,14 @@
 import { routerStack } from 'lib_foundation';
 import { ContainerColumn, NavTitleBar } from 'lib_widget'
 import { RedemptionSubmitVM } from '../viewmodels/RedemptionSubmitVM'
-import { AddressManage } from 'module_address_manage';
 import { UserPointRedemptionSku } from 'lib_network';
+import { AddressManageUtil } from 'address_management';
 
 @Builder
 export function buildRedemptionSubmitPage() {
   RedemptionSubmitPage()
 }
 
-@Entry
 @ComponentV2
 struct RedemptionSubmitPage {
   vm: RedemptionSubmitVM = new RedemptionSubmitVM()
@@ -49,44 +48,41 @@ struct RedemptionSubmitPage {
   @Builder
   buildShippingInfo() {
     ContainerColumn() {
-      AddressManage({
-        navPathStack: routerStack,
-        isSelectMode: true,
-        onSelect: (data) => {
+      Row() {
+        Image($r('app.media.ic_address'))
+          .width(24)
+          .margin({ right: 16 });
+        Row() {
+          Column() {
+            Text(this.vm.displayAddress)
+              .fontColor($r('app.color.font_color_level1'))
+              .fontWeight(FontWeight.Medium)
+              .maxLines(1)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+              .margin({ bottom: 2 });
+            Text(this.vm.displayCustomerInfo)
+              .fontColor($r('app.color.font_color_level3'))
+              .fontSize($r('app.float.font_size_14'))
+              .maxLines(1)
+              .textOverflow({ overflow: TextOverflow.Ellipsis });
+          }
+          .layoutWeight(1)
+          .margin({ right: 16 })
+          .alignItems(HorizontalAlign.Start);
+
+          Image($r('sys.media.ohos_ic_public_arrow_right'))
+            .arrowStyle()
+        }
+        .layoutWeight(1)
+        .justifyContent(FlexAlign.SpaceBetween);
+      }
+      .onClick(() => {
+        AddressManageUtil.goToAddressListPage(routerStack, (data) => {
           this.vm.customerAddress = data.province + data.city + data.district + data.street + data.detail;
           this.vm.customerName = data.name;
           this.vm.customerPhone = data.phone;
-        },
-      }) {
-        Row() {
-          Image($r('app.media.ic_address'))
-            .width(24)
-            .margin({ right: 16 });
-          Row() {
-            Column() {
-              Text(this.vm.displayAddress)
-                .fontColor($r('app.color.font_color_level1'))
-                .fontWeight(FontWeight.Medium)
-                .maxLines(1)
-                .textOverflow({ overflow: TextOverflow.Ellipsis })
-                .margin({ bottom: 2 });
-              Text(this.vm.displayCustomerInfo)
-                .fontColor($r('app.color.font_color_level3'))
-                .fontSize($r('app.float.font_size_14'))
-                .maxLines(1)
-                .textOverflow({ overflow: TextOverflow.Ellipsis });
-            }
-            .layoutWeight(1)
-            .margin({ right: 16 })
-            .alignItems(HorizontalAlign.Start);
-
-            Image($r('sys.media.ohos_ic_public_arrow_right'))
-              .arrowStyle()
-          }
-          .layoutWeight(1)
-          .justifyContent(FlexAlign.SpaceBetween);
-        };
-      }
+        });
+      })
     }
   }
 

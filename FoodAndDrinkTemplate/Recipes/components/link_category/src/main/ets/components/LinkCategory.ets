@@ -1,15 +1,25 @@
 import { RecipeBriefInfo, RecipeCategory } from '../types/Index';
+import { BreakpointModel, BreakpointType } from 'base_ui';
+import { AppStorageV2 } from '@kit.ArkUI';
 
 @ComponentV2
 export struct LinkCategory {
   @Param recipeCategoryList: RecipeCategory[] = []
   @Param currentIndex: number = 0
+  @Param gridCount: number = 3
   titleItemScroller: Scroller = new Scroller();
   scroller: Scroller = new Scroller();
   @Event onRecipeClick: (recipeDetail: RecipeBriefInfo) => void = () => {
   }
   @Event changeCurrentIndex: (currentIndex: number) => void = () => {
   }
+  @Local breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
+  columnOptions: BreakpointType<number> = new BreakpointType<number>({
+    sm: 3,
+    md: 4,
+    lg: 4,
+    xl: 4,
+  });
 
   // 下标索引处理
   currentIndexChangeAction(index: number, isClassify: boolean): void {
@@ -21,6 +31,11 @@ export struct LinkCategory {
         this.titleItemScroller.scrollToIndex(index);
       }
     }
+  }
+
+  @Computed
+  get listLanes() {
+    return this.columnOptions.getValue(this.breakPointModel.currentBreakpoint);
   }
 
   // 分类列表
@@ -71,7 +86,7 @@ export struct LinkCategory {
             }
           }, (item: RecipeCategory, index: number) => item.name + index)
         }
-        .width(92)
+        .width(this.listLanes === 3 ? 92 : 180)
         .height('100%')
         .backgroundColor('#F1F3F5')
         .listDirection(Axis.Vertical) // 排列方向
@@ -90,7 +105,10 @@ export struct LinkCategory {
                   ForEach(item.recipeList, (listItem: RecipeBriefInfo) => {
                     GridItem() {
                       Column() {
-                        Image($r(`app.media.${listItem.thumbnail}`)).width(76).height(76).borderRadius(8)
+                        Image($r(`app.media.${listItem.thumbnail}`))
+                          .width(this.listLanes === 3 ? 76 : 116)
+                          .height(this.listLanes === 3 ? 76 : 116)
+                          .borderRadius(8)
                         Text(listItem.title)
                           .fontSize(14)
                           .fontWeight(FontWeight.Medium)
@@ -104,15 +122,12 @@ export struct LinkCategory {
                     }.onClick(() => {
                       this.onRecipeClick(listItem)
                     })
-
                   }, (listItem: RecipeBriefInfo) => `${item.id}${listItem.id}`)
                 }
                 .rowsGap(8)
                 .columnsGap(8)
-                .columnsTemplate('1fr 1fr 1fr')
-
+                .columnsTemplate(Array(this.listLanes).fill('1fr').join(' '))
               }
-
             }
           }, (item: RecipeCategory) => item.id.toString())
         }
@@ -125,7 +140,6 @@ export struct LinkCategory {
         .contentEndOffset(12)
         .onScrollIndex((start: number) => this.currentIndexChangeAction(start, false))
       }.layoutWeight(1)
-
     }
     .width('100%')
     .layoutWeight(1)

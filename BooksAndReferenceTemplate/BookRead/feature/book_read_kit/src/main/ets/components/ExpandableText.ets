@@ -1,4 +1,3 @@
-import measure from '@ohos.measure';
 import curves from '@ohos.curves';
 import { BusinessError } from '@ohos.base';
 import display from '@ohos.display';
@@ -27,7 +26,7 @@ export struct ExpandableText {
   }
 
   private performPreciseMeasurement() {
-    const textWidth = measure.measureText({
+    const textWidth = this.getUIContext().getMeasureUtils().measureText({
       textContent: this.content,
       fontSize: this.fontSize
     });
@@ -70,7 +69,7 @@ export struct ExpandableText {
           .onClick(() => {
             if (this.collapseText === '展开') {
               this.collapseText = '收起';
-              animateTo({
+              this.getUIContext().animateTo({
                 duration: 200,
                 curve: curves.springMotion(0.5, 0.8),
               }, () => {
@@ -78,7 +77,7 @@ export struct ExpandableText {
               });
             } else {
               this.collapseText = '展开';
-              animateTo({
+              this.getUIContext().animateTo({
                 duration: 150,
                 curve: Curve.Friction,
               }, () => {

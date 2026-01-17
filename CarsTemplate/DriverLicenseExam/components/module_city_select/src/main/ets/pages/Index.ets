@@ -113,7 +113,7 @@ export struct UICitySelect {
   @Builder
   TopSearch() {
     Row({ space: 10 }) {
-      Search({ value: $$this.searchKey, placeholder: '请输入名称' }).layoutWeight(1)
+      Search({ value: $$this.searchKey, placeholder: '请输入城市名称' }).layoutWeight(1)
         .onClick(() => {
           this.showSearchRsp = true;
         })

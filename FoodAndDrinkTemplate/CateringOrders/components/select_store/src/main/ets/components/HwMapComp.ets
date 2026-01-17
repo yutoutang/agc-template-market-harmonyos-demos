@@ -1,7 +1,10 @@
+import { UtilLog } from '@hw-agconnect/util-log';
 import { AsyncCallback } from '@kit.BasicServicesKit';
-import { map, mapCommon, MapComponent } from '@kit.MapKit';
 import { geoLocationManager } from '@kit.LocationKit';
+import { map, mapCommon, MapComponent } from '@kit.MapKit';
 import { MapLocation } from '../models/Index';
+
+const TAG = '[HwMapComp]'
 
 @ComponentV2
 export struct HwMapComp {
@@ -20,8 +23,6 @@ export struct HwMapComp {
     radiusFillColor: 0xff00FFFFFF,
     displayType: mapCommon.MyLocationDisplayType.FOLLOW,
   };
-  @Event changeStore: (storeName: string) => void = () => {
-  }
 
   @Computed
   get selectLocation(): MapLocation {
@@ -30,6 +31,9 @@ export struct HwMapComp {
     } else {
       return this.locations[0]
     }
+  }
+
+  @Event changeStore: (storeName: string) => void = () => {
   }
 
   aboutToAppear(): void {
@@ -48,12 +52,12 @@ export struct HwMapComp {
         this.mapController = mapController;
         this.mapEventManager = this.mapController.getEventManager();
         this.mapEventManager?.on('markerClick', (marker: map.Marker) => {
-          console.info(`on-markerClick marker = ${marker.getTitle()}`);
+          UtilLog.info(TAG, `on-markerClick marker = ${marker.getTitle()}`);
           this.changeStore(marker.getTitle())
         });
 
         this.mapController.on('mapLoad', () => {
-          console.info('mapLoad success');
+          UtilLog.info(TAG, 'mapLoad success');
         });
         this.abilityEnabled();
         mapController.setMyLocationStyle(this.style);
@@ -128,7 +132,7 @@ export struct HwMapComp {
       try {
         this.mapController.hide();
       } catch (e) {
-        console.error(`HwMap not open, can not hide.`)
+        UtilLog.error(TAG, `HwMap not open, can not hide.`)
       }
     }
   }
@@ -142,15 +146,20 @@ export struct HwMapComp {
   }
 
   getLocation(mapController?: map.MapComponentController): Promise<geoLocationManager.Location> {
-    let promise = geoLocationManager.getCurrentLocation();
-    console.info('getCurrentLocation' + JSON.stringify(promise));
-    promise.then(async (location: geoLocationManager.Location) => {
-      mapController?.setMyLocation(location);
-      return location;
-    }).catch((error: Error) => {
-      console.error('getCurrentLocation failed', 'getCurrentLocation error: ' + JSON.stringify(error));
-    });
-    return promise;
+    try {
+      let promise = geoLocationManager.getCurrentLocation();
+      UtilLog.info(TAG, 'getCurrentLocation' + JSON.stringify(promise));
+      promise.then(async (location: geoLocationManager.Location) => {
+        mapController?.setMyLocation(location);
+        return location;
+      }).catch((error: Error) => {
+        UtilLog.error(TAG, 'getCurrentLocation failed', 'getCurrentLocation error: ' + JSON.stringify(error));
+      });
+      return promise;
+    }catch (e) {
+      UtilLog.error(TAG, 'getCurrentLocation failed', 'getCurrentLocation e: ' + JSON.stringify(e));
+      return Promise.reject(e)
+    }
   }
 
   build() {

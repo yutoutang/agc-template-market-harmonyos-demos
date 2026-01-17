@@ -86,10 +86,10 @@ export struct CommentViewPage {
     }
     .hideTitleBar(true)
     .backgroundColor($r('sys.color.comp_background_primary'))
-    .onReady((cxt) => {
+    .onReady(async (cxt) => {
       const param = cxt.pathInfo.param as NewsResponse;
       this.vm.videoInfo = UIUtils.makeObserved(param);
-      let commentInfo = CommentServiceApi.queryCommentList(this.vm.videoInfo.id) as CommentInfo[]
+      let commentInfo = await CommentServiceApi.queryCommentList(this.vm.videoInfo.id) as CommentInfo[]
       this.vm.commentList = commentInfo?.map((value: CommentInfo) => {
         return new MakeObCommentServed(value)
       }) ?? [];

@@ -1,9 +1,9 @@
-import { promptAction } from '@kit.ArkUI';
 import dayjs from 'dayjs';
 import { BillConstants } from '../commons/Constants';
 import { CustomKeyboardButtonType } from '../commons/Enums';
 import { BillManageModel } from '../commons/Models';
 import { CustomKeyboardItem } from '../commons/Types';
+import { toastUtil } from '../utils/ToastUtil';
 
 @ComponentV2
 export struct CustomKeyboard {
@@ -260,14 +260,14 @@ export struct CustomKeyboard {
     } else if (!(btn.text === '0' && lastAmount === '')) {
       let temp = lastAmount.split('.');
       if (temp.length === 2 && temp[1].length >= 2) {
-        promptAction.showToast({ message: '最多两位小数~' });
+        toastUtil.showToast('最多两位小数~');
         return;
       }
       if (temp.length === 1 && temp[0] === '0' && btn.text !== '.') {
         return;
       }
       if (temp[0].length >= 6 && !lastAmount.includes('.')) {
-        promptAction.showToast({ message: '输入金额过大~' });
+        toastUtil.showToast('输入金额过大~');
         return;
       }
       lastAmount += btn.text;

@@ -5,64 +5,12 @@
       "value": "description"
     },
     {
-      "name": "month_sale",
-      "value": "月售%s"
-    },
-    {
-      "name": "select_package",
-      "value": "选套餐"
-    },
-    {
-      "name": "select_spec",
-      "value": "选规格"
-    },
-    {
       "name": "selected",
       "value": "已选："
     },
     {
-      "name": "good_number",
-      "value": "数量"
-    },
-    {
-      "name": "add_car",
-      "value": "加入购物车"
-    },
-    {
       "name": "add_success",
       "value": "添加成功！"
-    },
-    {
-      "name": "place_order",
-      "value": "去结算"
-    },
-    {
-      "name": "total_price",
-      "value": "共计"
-    },
-    {
-      "name": "unordered_must_good",
-      "value": "未点必选品"
-    },
-    {
-      "name": "need_goods",
-      "value": "请选择商品后下单"
-    },
-    {
-      "name": "need_must_goods",
-      "value": "请选择必选品"
-    },
-    {
-      "name": "clear_car",
-      "value": "清空购物车"
-    },
-    {
-      "name": "list_bottom",
-      "value": "我是有底线的~"
-    },
-    {
-      "name": "new_user_discount",
-      "value": "新用户下单立减%d元"
     },
     {
       "name": "claiming_succeeded",
@@ -71,10 +19,6 @@
     {
       "name": "claiming_failed",
       "value": "领取失败"
-    },
-    {
-      "name": "search_goods",
-      "value": "搜索商品"
     },
     {
       "name": "fill_remarks",
@@ -221,32 +165,12 @@
       "value": "1人"
     },
     {
-      "name": "sales_more",
-      "value": "月售100+"
-    },
-    {
       "name": "update_order_failed",
       "value": "订单更新失败"
     },
     {
-      "name": "order_title_store_dining",
-      "value": "堂食"
-    },
-    {
-      "name": "order_title_packing",
-      "value": "外带"
-    },
-    {
       "name": "preorder",
       "value": "预约"
-    },
-    {
-      "name": "distance_me",
-      "value": "距您"
-    },
-    {
-      "name": "preorder_today",
-      "value": "今天（%s） %s"
     },
     {
       "name": "preorder_sheet_title",
@@ -275,10 +199,6 @@
     {
       "name": "duplicate_request",
       "value": "重复请求"
-    },
-    {
-      "name": "store_activity",
-      "value": "店铺活动"
     },
     {
       "name": "agcit_huawei_catering_orders",

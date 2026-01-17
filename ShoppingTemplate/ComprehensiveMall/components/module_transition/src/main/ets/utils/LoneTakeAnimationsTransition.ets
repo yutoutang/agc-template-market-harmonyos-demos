@@ -1,11 +1,11 @@
 import { window } from '@kit.ArkUI'
-import { AnimateCallback, CustomTransition } from './CustomNavigationUtils';
-import { LongTakeTransitionType } from '../constants/LongTakeTransitionConstants';
 import { ComponentAttrUtils } from './ComponentAttrUtils';
+import { AnimateCallback, CustomTransition } from './CustomNavigationUtils';
 import { LongTakeTransitionParam } from './LongTakeTransitionParam';
 import { CustomTransitionOptions, LongTakeTransitionOptions } from './Options';
 import { SnapShotImage } from './SnapShotImage';
 import { WindowUtils } from './WindowUtils'
+import { LongTakeTransitionType } from '../constants/LongTakeTransitionConstants';
 
 const TAG: string = 'ezCustomTransition';
 

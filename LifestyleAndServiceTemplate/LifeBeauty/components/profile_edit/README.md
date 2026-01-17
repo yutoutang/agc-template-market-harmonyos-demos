@@ -12,7 +12,7 @@
 
 本组件支持编辑个人信息，包括姓名、性别、手机号、生日等，以及支持查看用户协议。
 
-<img src="./screenshots/sample1.jpg" width="300">
+<img src="./screenshots/sample1.png" width="300">
 
 ## 约束与限制
 
@@ -22,6 +22,10 @@
 - HarmonyOS SDK版本：HarmonyOS 5.0.3 Release SDK及以上
 - 设备类型：华为手机（包括双折叠和阔折叠）
 - 系统版本：HarmonyOS 5.0.3(15)及以上
+
+### 权限
+
+- 无
 
 ## 快速入门
 
@@ -60,6 +64,9 @@
     ```
 
 3. 调用组件，详细参数配置说明参见[API参考](#API参考)。
+
+4. （可选）智能填充服务，需要[申请接入智能填充服务](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/scenario-fusion-introduction-to-smart-fill#section1167564853816)。
+
 
 ## API参考
 

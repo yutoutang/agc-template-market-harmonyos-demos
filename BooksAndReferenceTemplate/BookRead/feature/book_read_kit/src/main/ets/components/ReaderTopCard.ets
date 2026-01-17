@@ -1,4 +1,3 @@
-import { promptAction } from '@kit.ArkUI';
 import { BookApi, BookInfo, Constants, GroupBook, TCRouter } from 'common';
 import { ShareBookCard } from './ShareBookCard';
 import { uniformTypeDescriptor as utd } from '@kit.ArkData';
@@ -16,7 +15,7 @@ export struct ReaderTopCard {
   windowTopHeight: number = AppStorage.get('windowTopHeight') as number || 38.77;
 
   setShareData() {
-    const contextFaker: Context = getContext(this);
+    const contextFaker: Context = this.getUIContext().getHostContext() as Context;
     let filePath = contextFaker.filesDir + '/book_image_1.png';
     let i = this.book.coverUrl
     let utdTypeId = utd.getUniformDataTypeByFilenameExtension('.png', utd.UniformDataType.IMAGE);
@@ -29,7 +28,7 @@ export struct ReaderTopCard {
     });
 
     let controller: systemShare.ShareController = new systemShare.ShareController(shareData);
-    let context = getContext(this) as common.UIAbilityContext;
+    let context = this.getUIContext().getHostContext() as common.UIAbilityContext;
     controller.show(context, {
       selectionMode: systemShare.SelectionMode.SINGLE,
       previewMode: systemShare.SharePreviewMode.DETAIL,
@@ -87,7 +86,7 @@ export struct ReaderTopCard {
       AppStorage.set('favBooks', favBooks);
       AppStorage.set('historyBooks', hisBooks)
     }
-    promptAction.showToast({
+    this.getUIContext().getPromptAction().showToast({
       message: toast,
       duration: 2000
     });

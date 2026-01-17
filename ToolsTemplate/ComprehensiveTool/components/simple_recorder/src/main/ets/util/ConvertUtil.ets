@@ -11,12 +11,11 @@ function commonCmd(cmd: string, callBack: Function) {
   };
   try {
     MP4Parser.ffmpegCmd(cmd, callback);
-  }catch (e) {
-    Logger.error(JSON.stringify(e))
+  } catch (e) {
+    Logger.error(JSON.stringify(e));
   }
 
 }
-
 
 
 // 转化为PCM格式音频
@@ -37,8 +36,6 @@ export async function extractToPCM(inputFilePath: string, outputFilePath: string
 }
 
 
-
-
 // mp3 wav aac m4a 格式互转
 export async function forMatAudio(inputFilePath: string, outputFilePath: string, callBack: Function) {
   const cmd = `ffmpeg -i ${inputFilePath} ${outputFilePath}`;
@@ -48,7 +45,7 @@ export async function forMatAudio(inputFilePath: string, outputFilePath: string,
 
 // 根据传入文件类型，生成一个沙箱中的路径 tag增加标志防止文件重复
 export function createFd(fileType: string, isAddTag: boolean = false, tag: string = ''): FileInfo {
-  const context: Context = getContext();
+  const context: Context = AppStorage.get('simple_recorder_context') as Context;
   const fileName: string = isAddTag ? `转换_${FormatUtil.formatFullDate(new Date())}_录音${tag}.${fileType}` :
     `${FormatUtil.formatFullDate(new Date())}_录音.${fileType}`;
   const path: string = context.filesDir + `/${fileName}`; // 文件沙箱路径，文件后缀名应与封装格式对应

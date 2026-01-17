@@ -31,10 +31,10 @@ export struct MyBalanceCard {
           Column(){
             Button(){
               Text('充值')
-                .fontSize(14)
+                .fontSize($r('sys.float.Body_M'))
                 .height(20)
                 .width(56)
-                .fontColor('#FFFFFF')
+                .fontColor($r('sys.color.font_on_primary'))
                 .textAlign(TextAlign.Center)
             }
             .position({ x: 'right', y: 'bottom' })

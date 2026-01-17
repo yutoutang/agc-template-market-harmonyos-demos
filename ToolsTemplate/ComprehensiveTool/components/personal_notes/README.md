@@ -28,10 +28,10 @@ personal_notes/src/main/ets                       // 隐私笔记(har)
 
 ## 约束和限制
 ### 环境
-- DevEco Studio版本：DevEco Studio 5.0.5 Release及以上
-- HarmonyOS SDK版本：HarmonyOS 5.0.5 Release SDK及以上
+- DevEco Studio版本：DevEco Studio 5.1.0 Release及以上
+- HarmonyOS SDK版本：HarmonyOS 5.1.0 Release SDK及以上
 - 设备类型：华为手机（包括双折叠和阔折叠）
-- HarmonyOS版本：HarmonyOS 5.0.5(17)及以上
+- HarmonyOS版本：HarmonyOS 5.1.0(18)及以上
 ### 权限
 - 无
 

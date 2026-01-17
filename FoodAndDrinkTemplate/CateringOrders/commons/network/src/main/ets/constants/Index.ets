@@ -11,10 +11,10 @@ export class HttpCode {
 }
 
 export class RequestUrl {
-  // todo 网络请求base url，真实网络请求可以替换请求地址
-  static readonly BASE_URL = 'https://xxxxxxxxx/catering/v1/app';
   // 接口请求超时时间
   static readonly REQUEST_TIME_OUT = 3 * 1000
+  // todo 网络请求base url，真实网络请求可以替换请求地址
+  static readonly BASE_URL = 'https://xxxxxxxxx/catering/v1/app';
   // 获取应用基础信息
   static readonly GET_APP_INFO_URL = '/store/app-info'
   // 获取店铺餐桌信息
@@ -65,13 +65,32 @@ export class RequestUrl {
   // 超值加购
   static readonly GET_SNACK_SIZED_DEAL = 'getSnackSizedDeal'
   // 删除订单
-  static readonly GET_DELETE_ORDER_URL = 'deleteOrder'
+  static readonly DELETE_ORDER_URL = 'deleteOrder'
   // 判断用户是否为新用户
   static readonly GET_IS_NEW_URL = 'getIsNew'
   // 获取华为支付信息
   static readonly GET_HUAWEI_PAY_INFO_URL = 'getHuaweiPayInfo'
   // 充值钱包
   static readonly RECHARGE_MONEY_URL = 'rechargeMoney'
-  // 查询充值记录
+  // 查询账单明细
   static readonly GET_RECHARGE_RECORD_URL = 'getRechargeRecord'
+  // 检查积分兑换情况
+  static readonly CHECK_POINT = 'checkPoint'
+  /**
+   * 门店相关
+   */
+  static readonly URL_STORE_BOOK_LIST = '/api/store/book/list'
+  static readonly URL_STORE_QUEUE_LIST = '/api/store/queue/list'
+  /**
+   * 订单相关
+   */
+  static readonly URL_ORDER_LIST = '/api/order/book/list'
+  static readonly URL_ORDER_BOOK_CREATE = '/api/order/book/create'
+  static readonly URL_ORDER_BOOK_CANCEL = '/api/order/book/cancel'
+  static readonly URL_ORDER_QUEUE_CREATE = '/api/order/queue/create'
+  static readonly URL_ORDER_QUEUE_CANCEL = '/api/order/queue/cancel'
+  static readonly URL_ORDER_QUEUE_REFRESH = '/api/order/queue/refresh'
+  static readonly URL_USER_POINT_LIST = '/api/user/point/list'
 }
+
+export const WEEK_DAYS = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']

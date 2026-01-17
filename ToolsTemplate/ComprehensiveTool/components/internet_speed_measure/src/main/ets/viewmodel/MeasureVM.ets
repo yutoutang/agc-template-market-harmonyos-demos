@@ -1,4 +1,5 @@
-import { promptAction, window } from '@kit.ArkUI';
+import { UtilLog } from '@hw-agconnect/util-log';
+import { UIContext, window } from '@kit.ArkUI';
 import { connection, statistics } from '@kit.NetworkKit';
 import { cryptoFramework } from '@kit.CryptoArchitectureKit';
 import { BusinessError, request } from '@kit.BasicServicesKit';
@@ -56,32 +57,36 @@ export class MeasureVM {
     return MeasureVM._instance;
   }
 
-  public in() {
+  public in(uiContext: UIContext) {
     this.status = MeasureStatus.WAITING;
     this.hasNet = false;
     this.type = NetworkType.UNDEFINED;
     this.address = '';
-    this._register();
-    this.setStatusBarContentColor('#ffffff');
+    this._register(uiContext);
+    this.setStatusBarContentColor('#ffffff', uiContext);
   }
 
   public out() {
     this._unregister();
   }
 
-  public setStatusBarContentColor(color: string) {
-    window.getLastWindow(getContext()).then(win => {
-      win.setWindowSystemBarProperties({ statusBarContentColor: color });
-    })
+  public setStatusBarContentColor(color: string, uiContext: UIContext) {
+    try {
+      window.getLastWindow(uiContext.getHostContext()).then(win => {
+        win.setWindowSystemBarProperties({ statusBarContentColor: color });
+      });
+    } catch (e) {
+      UtilLog.error(`setStatusBarContentColor failed : ${JSON.stringify(e)}`);
+    }
   }
 
-  public beginMeasure() {
+  public beginMeasure(uiContext: UIContext) {
     if (!this.hasNet) {
-      alert('网络不可用', '当前网络不可用,请检查网络');
+      alert('网络不可用', '当前网络不可用,请检查网络', uiContext);
       return;
     }
     if (this.status === MeasureStatus.GOING) {
-      promptAction.showToast({ message: '正在测速中...' });
+      uiContext.getPromptAction().showToast({ message: '正在测速中...' });
       return;
     }
 
@@ -96,14 +101,43 @@ export class MeasureVM {
 
     try {
       this.status = MeasureStatus.GOING;
-      this._requestDownload();
+      this._requestDownload(uiContext.getHostContext() as Context);
     } catch (err) {
       Logger.error(TAG, 'errCode: ' + (err as BusinessError).code + ', errMessage: ' + (err as BusinessError).message);
     }
   }
 
-  private _requestDownload() {
-    let context = getContext();
+  public stopMeasure() {
+    this.curValue = 0;
+    if (this.downloadTask) {
+      this.downloadTask.delete((err: BusinessError) => {
+        if (err) {
+          Logger.error(TAG, `Failed to remove the download task. Code: ${err.code}, message: ${err.message}`);
+          return;
+        }
+        this.downloadTask = undefined;
+      });
+    }
+
+    if (this.uploadTask) {
+      this.uploadTask.delete((err: BusinessError) => {
+        if (err) {
+          Logger.error(TAG, `Failed to remove the upload task. Code: ${err.code}, message: ${err.message}`);
+          return;
+        }
+        this.uploadTask = undefined;
+      });
+    }
+
+    try {
+      netQuality.off('netQosChange');
+      this.status = MeasureStatus.WAITING;
+    } catch (err) {
+      Logger.info(TAG, JSON.stringify(err, null, 2));
+    }
+  }
+
+  private _requestDownload(context: Context) {
     this.fileName = Date.now().toString() + '.jpeg';
     try {
       request.downloadFile(context, { url: this.downloadUrl, filePath: context.cacheDir + '/' + this.fileName })
@@ -119,7 +153,7 @@ export class MeasureVM {
                   this._calculateBytes(true, false);
                   this.downloadTask.delete().then(() => {
                     const timeId = setTimeout(() => {
-                      this._requestUpload();
+                      this._requestUpload(context);
                       clearTimeout(timeId);
                     }, 1000);
                   });
@@ -141,7 +175,7 @@ export class MeasureVM {
         .catch((err: BusinessError) => {
           this.stopMeasure();
           Logger.error(TAG, `Failed to request the download. Code: ${err.code}, message: ${err.message}`);
-        })
+        });
     } catch (err) {
       const code = (err as BusinessError).code;
       if (code === 401 && this.downloadUrl === 'downloadUrl') {
@@ -154,7 +188,7 @@ export class MeasureVM {
             this.downBytes = rand1.generateRandomSync(1).data[0] % 5 + 200;
             this.downloadTask = undefined;
             const timeId2 = setTimeout(() => {
-              this._requestUpload();
+              this._requestUpload(context);
               clearTimeout(timeId2);
             }, 1000);
             clearInterval(timeId1);
@@ -175,8 +209,7 @@ export class MeasureVM {
     }
   }
 
-  private _requestUpload() {
-    let context = getContext();
+  private _requestUpload(context: Context) {
     if (this.downloadUrl !== 'downloadUrl' && !fileIo.accessSync(context.cacheDir + '/' + this.fileName)) {
       this.stopMeasure();
       return;
@@ -262,37 +295,7 @@ export class MeasureVM {
     }
   }
 
-  public stopMeasure() {
-    this.curValue = 0;
-    if (this.downloadTask) {
-      this.downloadTask.delete((err: BusinessError) => {
-        if (err) {
-          Logger.error(TAG, `Failed to remove the download task. Code: ${err.code}, message: ${err.message}`);
-          return;
-        }
-        this.downloadTask = undefined;
-      });
-    }
-
-    if (this.uploadTask) {
-      this.uploadTask.delete((err: BusinessError) => {
-        if (err) {
-          Logger.error(TAG, `Failed to remove the upload task. Code: ${err.code}, message: ${err.message}`);
-          return;
-        }
-        this.uploadTask = undefined;
-      });
-    }
-
-    try {
-      netQuality.off('netQosChange');
-      this.status = MeasureStatus.WAITING;
-    } catch (err) {
-      Logger.info(TAG, JSON.stringify(err, null, 2));
-    }
-  }
-
-  private _register() {
+  private _register(uiContext: UIContext) {
     this.netCon.register((error) => {
       if (error) {
         Logger.error(TAG, `network register error: ${JSON.stringify(error)}`);
@@ -305,7 +308,7 @@ export class MeasureVM {
     });
     // 订阅网络能力变化事件。
     this.netCon.on('netCapabilitiesChange', (data: connection.NetCapabilityInfo) => {
-      this._getNetwork(data);
+      this._getNetwork(data, uiContext);
       Logger.info(TAG, `netCapabilitiesChange, get data: ${JSON.stringify(data)}`);
     });
     // 订阅网络连接信息变化事件。
@@ -339,7 +342,7 @@ export class MeasureVM {
   }
 
 
-  private _getNetwork(data?: connection.NetCapabilityInfo) {
+  private _getNetwork(data: connection.NetCapabilityInfo, uiContext: UIContext) {
     let netHandle: connection.NetHandle;
     let netCapability: connection.NetCapabilities;
     if (data) {
@@ -359,7 +362,7 @@ export class MeasureVM {
     }
     if (cap.includes(connection.NetCap.NET_CAPABILITY_VALIDATED)) {
       if (this.status === MeasureStatus.GOING) {
-        alert('网络变化', '当前网络发生变化,请重新测速');
+        alert('网络变化', '当前网络发生变化,请重新测速', uiContext);
         this.stopMeasure();
       }
       this.hasNet = true;
@@ -374,28 +377,34 @@ export class MeasureVM {
   }
 
   private _calculateBytes(isDown: boolean, isStart: boolean) {
-    let promise: Promise<number>;
-    if (isDown) {
-      promise = this.type === NetworkType.WIFI ? statistics.getIfaceRxBytes('wlan0') : statistics.getCellularRxBytes();
-    } else {
-      promise = this.type === NetworkType.WIFI ? statistics.getIfaceTxBytes('wlan0') : statistics.getCellularTxBytes();
-    }
-    promise.then(stats => {
-      if (isStart) {
-        this.startBytes = stats;
+    try {
+      let promise: Promise<number>;
+      if (isDown) {
+        promise =
+          this.type === NetworkType.WIFI ? statistics.getIfaceRxBytes('wlan0') : statistics.getCellularRxBytes();
       } else {
-        this.endBytes = stats;
-        if (isDown) {
-          this.downBytes = (this.endBytes - this.startBytes) / 1000000;
-        } else {
-          this.upBytes = (this.endBytes - this.startBytes) / 1000000;
-        }
+        promise =
+          this.type === NetworkType.WIFI ? statistics.getIfaceTxBytes('wlan0') : statistics.getCellularTxBytes();
       }
-    })
-      .catch((err: BusinessError) => {
-        Logger.error(TAG,
-          'errCode: ' + (err as BusinessError).code + ', errMessage: ' + (err as BusinessError).message);
-      });
+      promise.then(stats => {
+        if (isStart) {
+          this.startBytes = stats;
+        } else {
+          this.endBytes = stats;
+          if (isDown) {
+            this.downBytes = (this.endBytes - this.startBytes) / 1000000;
+          } else {
+            this.upBytes = (this.endBytes - this.startBytes) / 1000000;
+          }
+        }
+      })
+        .catch((err: BusinessError) => {
+          Logger.error(TAG,
+            'errCode: ' + (err as BusinessError).code + ', errMessage: ' + (err as BusinessError).message);
+        });
+    } catch (e) {
+      UtilLog.error(`calculateBytes failed: ${JSON.stringify(e)}`);
+    }
   }
 
   private _calculateAverage(numbers: number[]): number {

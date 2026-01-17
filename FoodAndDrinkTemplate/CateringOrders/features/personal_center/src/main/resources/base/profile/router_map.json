@@ -25,14 +25,6 @@
       }
     },
     {
-      "name": "PersonalCenterPage",
-      "pageSourceFile": "src/main/ets/pages/PersonalCenterPage.ets",
-      "buildFunction": "PersonalCenterPageBuilder",
-      "data": {
-        "description": "this is PersonalCenterPageBuilder"
-      }
-    },
-    {
       "name": "MyWalletPage",
       "pageSourceFile": "src/main/ets/pages/MyWalletPage.ets",
       "buildFunction": "MyWalletPageBuilder",
@@ -54,6 +46,22 @@
       "buildFunction": "WalletTermsPageBuilder",
       "data": {
         "description": "this is WalletTermsPageBuilder"
+      }
+    },
+    {
+      "name": "OrderPage",
+      "pageSourceFile": "src/main/ets/pages/OrderPage.ets",
+      "buildFunction": "orderPageBuilder",
+      "data": {
+        "description": "this is orderPageBuilder"
+      }
+    },
+    {
+      "name": "MyPointsPage",
+      "pageSourceFile": "src/main/ets/pages/MyPointsPage.ets",
+      "buildFunction": "MyPointsPageBuilder",
+      "data": {
+        "description": "this is MyPointsPageBuilder"
       }
     }
   ]

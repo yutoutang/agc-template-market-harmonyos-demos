@@ -34,7 +34,7 @@ struct WebContainer {
     }
     .title(this.title)
     .padding({
-      top:px2vp(this.topRectHeight)
+      top:this.getUIContext().px2vp(this.topRectHeight)
     })
     .onBackPressed(() => {
       this.vm.navStack.pop();

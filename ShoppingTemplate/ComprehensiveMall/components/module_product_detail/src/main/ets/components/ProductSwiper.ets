@@ -17,7 +17,7 @@ export struct ProductSwiper {
 
   @Computed
   get swiperPadding() {
-    return BreakpointSystem.isTablet ? 0 : $r('app.string.space_l')
+    return this.curBreakpoint.value === BreakpointTypeEnum.MD ? 0 : $r('app.string.space_l')
   }
 
   @Computed

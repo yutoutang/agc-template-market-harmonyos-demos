@@ -1,8 +1,8 @@
 import { AppStorageV2 } from '@kit.ArkUI';
-import { CustomWindowModel } from './WindowModel';
-import { FontModel } from './FontModel';
 import { BreakpointModel } from './BreakpointModel';
 import { CustomConfigModel } from './CustomConfigModel';
+import { FontModel } from './FontModel';
+import { CustomWindowModel } from './WindowModel';
 import {
   CustomPageModifier,
   CustomScrollModifier,

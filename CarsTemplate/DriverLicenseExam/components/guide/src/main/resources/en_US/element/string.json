@@ -3,6 +3,10 @@
     {
       "name": "subject_one",
       "value": "subject one"
+    },
+    {
+      "name": "agcit_huawei_driver_license_exam",
+      "value": "1.0.4"
     }
   ]
 }

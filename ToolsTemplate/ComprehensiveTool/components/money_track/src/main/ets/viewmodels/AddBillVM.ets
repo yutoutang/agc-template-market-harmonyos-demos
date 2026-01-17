@@ -1,9 +1,9 @@
-import { promptAction } from '@kit.ArkUI';
 import dayjs from 'dayjs';
 import { BalanceChangeType } from '../commons/Enums';
 import { BalanceResourceModel, BillManageModel } from '../commons/Models';
 import { BalanceResourceItem } from '../commons/Types';
 import { ResourceUtil } from '../utils/ResourceUtil';
+import { toastUtil } from '../utils/ToastUtil';
 
 @ObservedV2
 export class AddBillVM {
@@ -75,10 +75,10 @@ export class AddBillVM {
       }
     }
     if (amount < 0) {
-      promptAction.showToast({ message: '金额不得小于0，请检查输入~' });
+      toastUtil.showToast('金额不得小于0，请检查输入~');
       return false;
     } else if (amount > 999999) {
-      promptAction.showToast({ message: '金额过大，请检查输入~' });
+      toastUtil.showToast('金额过大，请检查输入~');
       return false;
     } else {
       this.billData.amount = amount;

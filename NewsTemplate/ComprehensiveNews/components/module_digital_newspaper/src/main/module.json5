@@ -1,0 +1,15 @@
+{
+  "module": {
+    "name": "module_digital_newspaper",
+    "type": "har",
+    "deviceTypes": [
+      "phone",
+      "tablet"
+    ],
+    "requestPermissions": [
+      {
+        "name": "ohos.permission.INTERNET",
+      },
+    ]
+  }
+}

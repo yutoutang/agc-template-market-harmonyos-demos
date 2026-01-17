@@ -1,4 +1,7 @@
-import { AccountUtil, RouterMap, RouterModule, UserInfo, RdbManager, recipesData, CommonConstants } from 'commonlib';
+import { AccountUtil, RouterMap, RouterModule, UserInfo, RdbManager, recipesData, CommonConstants,
+  BreakpointType,
+  BreakpointModel,
+  GlobalContextUtils} from 'commonlib';
 import {
   deleteMyRecipe,
   getBloggerInfo,
@@ -11,8 +14,9 @@ import { recipeListMapper } from '../mapper/Index';
 import { LazyDataSource, RecipeBriefInfo } from 'featured_recipes';
 import { TabIndexEnum } from 'base_ui';
 import { BloggerInfo } from 'personal_homepage';
-import { promptAction } from '@kit.ArkUI';
+import { AppStorageV2, promptAction } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
+import { ApiHandler, GenderType, PersonalInfo, SwitchInfo } from 'collect_personal_info';
 
 const TAG = '[MinePageVM]';
 
@@ -27,9 +31,61 @@ export class MinePageVM {
   @Trace noticeList: Notice[] = [];
   @Trace isToDelete: boolean = false;
   private static _instance: MinePageVM;
-  private context: common.UIAbilityContext = getContext() as common.UIAbilityContext;
+  private context: common.UIAbilityContext = GlobalContextUtils.globalUIAbilityContext;
   private rdbManager: RdbManager = new RdbManager(this.context);
   @Trace recipes: Array<recipesData> = [];
+  columnOptions: BreakpointType<number> = new BreakpointType<number>({
+    sm: 2,
+    md: 4,
+    lg: 4,
+    xl: 4,
+  });
+  @Trace breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
+  @Trace switchInfo: SwitchInfo = {
+    showAvatar: true,
+    showNickName: true,
+    showFullName: false,
+    showGender: false,
+    showBirthDate: false,
+    showPhoneNumber: true,
+    showIntroDesc: false,
+  };
+  @Trace personalInfo: PersonalInfo = {
+    avatar: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/avatar%2Favatar_12.jpg',
+    nickName: '华为用户',
+    gender: GenderType.MALE,
+    birthDate: new Date('1990-10-01'),
+    fullName: '张三',
+    phoneNumber: '10000001111',
+    introDesc: '在自己的小世界里，做一个快乐的普通人，把节奏放慢，享受生活！十六岁的青春张扬 十八岁的未来可期，携零零碎碎的美好奔赴未知的将来！',
+  };
+  @Trace apiInfo: ApiHandler = {
+    updateAvatar: (param: Object) => new Promise((resolve) => resolve()),
+    updateNickName: (param: Object) => new Promise((resolve) => resolve()),
+    updateGender: (param: Object) => new Promise((resolve) => resolve()),
+    updateBirth: (param: Object) => new Promise((resolve) => {
+      resolve()
+    }),
+    updateFullName: (param: Object) => new Promise((resolve) => resolve()),
+    updateIntro: (param: Object) => new Promise((resolve) => resolve()),
+    updatePhoneInfo: {
+      codeLength: 6,
+      sendCode: (phone: string) => {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            resolve()
+          }, 1000)
+        })
+      },
+      verifyCode: (phone: string, code: string) => {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            resolve()
+          }, 1000)
+        })
+      },
+    },
+  };
 
   public static get instance() {
     if (!MinePageVM._instance) {
@@ -173,9 +229,15 @@ export class MinePageVM {
     const res = await deleteMyRecipe(ids);
     if (res.status === 200) {
       this.queryMyRecipeList().then(() => {
-        promptAction.showToast({ message: '删除成功！' });
+        GlobalContextUtils.showToast({ message: '删除成功！' });
         this.isToDelete = false
       });
     }
+  }
+
+
+  @Computed
+  get gridCount() {
+    return this.columnOptions.getValue(this.breakPointModel.currentBreakpoint);
   }
 }

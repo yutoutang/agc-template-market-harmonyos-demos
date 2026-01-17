@@ -91,8 +91,6 @@ export struct Home {
           ToolsContainer({ toolList: this.vm.homeToolList, manageStatus: ManageStatus.NONE })
         }
       }.height('calc(100% - 56vp)').align(Alignment.Start)
-    }.hideTitleBar(true).onReady(()=> {
-      this.vm.pathStack = this.pathStack
-    });
+    }.hideTitleBar(true)
   }
 }

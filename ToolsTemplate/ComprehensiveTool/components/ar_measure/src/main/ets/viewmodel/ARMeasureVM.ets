@@ -1,8 +1,8 @@
-import { display, PersistenceV2, promptAction } from '@kit.ArkUI';
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { display, PersistenceV2 } from '@kit.ArkUI';
 import { pasteboard, systemDateTime } from '@kit.BasicServicesKit';
 import BigNumber from 'bignumber.js';
 import arEngine from 'libentry.so';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { ENGINE_UPDATE_INTERVAL, MeasureType, SPACE_MAP } from '../constant/Constant';
 import { HistoryList } from '../model/Index';
 
@@ -42,7 +42,7 @@ export class ARMeasureVM {
     } catch (e) {
       // 不支持AR测量
       this.isSupported = false;
-      hilog.error(0xFF00, 'ARMeasure', `Init XComponent failed ${JSON.stringify(e)}`);
+      UtilLog.error(0xFF00, 'ARMeasure', `Init XComponent failed ${JSON.stringify(e)}`);
     }
   }
 
@@ -72,12 +72,12 @@ export class ARMeasureVM {
       this.interval = setInterval(() => {
         arEngine.update(idStr);
         this.volume = arEngine.getVolume(idStr);
-        hilog.info(0xFF00, 'ARMeasure', `ARMeasure result is ${this.volume}`);
+        UtilLog.info(0xFF00, 'ARMeasure', `ARMeasure result is ${this.volume}`);
         if (this.semanticDenseMode === MeasureType.VOLUME) {
           let data = this.volume.split(':')[1];
           if (data.length > 1) {
             this.hasMeasured = true;
-            hilog.info(0xFF00, 'ARMeasure', `Volume Measure success with data ${data}`);
+            UtilLog.info(0xFF00, 'ARMeasure', `Volume Measure success with data ${data}`);
             this.handleFormatVolume(data);
           }
         } else {
@@ -85,64 +85,64 @@ export class ARMeasureVM {
           let data = this.volume.split(':')[1];
           if (data.length > 1) {
             this.hasMeasured = true;
-            hilog.info(0xFF00, 'ARMeasure', `Space Measure success with data ${data}`);
+            UtilLog.info(0xFF00, 'ARMeasure', `Space Measure success with data ${data}`);
             this.handleFormatSpace(data);
           }
         }
       }, ENGINE_UPDATE_INTERVAL);
     } catch (e) {
-      hilog.error(0xFF00, 'ARMeasure', `Load XComponent failed ${JSON.stringify(e)}`);
+      UtilLog.error(0xFF00, 'ARMeasure', `Load XComponent failed ${JSON.stringify(e)}`);
     }
   }
 
   handleFormatSpace(data: string) {
     let separateData = data.split('|');
-    hilog.info(0xFF00, 'ARMeasure', `measure data length is ${separateData.length}`);
+    UtilLog.info(0xFF00, 'ARMeasure', `measure data length is ${separateData.length}`);
     if (separateData.length === 3) {
       let left = separateData[0].substring(0, separateData[0].length - 1);
-      hilog.info(0xFF00, 'ARMeasure', `spaceData left is  ${left}`);
+      UtilLog.info(0xFF00, 'ARMeasure', `spaceData left is  ${left}`);
       let right = separateData[1].substring(0, separateData[1].length - 1);
-      hilog.info(0xFF00, 'ARMeasure', `spaceData right is  ${right}`);
+      UtilLog.info(0xFF00, 'ARMeasure', `spaceData right is  ${right}`);
       let bottom = separateData[2].substring(0, separateData[2].length - 2);
-      hilog.info(0xFF00, 'ARMeasure', `spaceData bottom is  ${bottom}`);
+      UtilLog.info(0xFF00, 'ARMeasure', `spaceData bottom is  ${bottom}`);
       this.spaceData = ['', bottom, left, right, ''];
     } else if (separateData.length === 4) {
       let left = separateData[0].substring(0, separateData[0].length - 1);
-      hilog.info(0xFF00, 'ARMeasure', `spaceData left is  ${left}`);
+      UtilLog.info(0xFF00, 'ARMeasure', `spaceData left is  ${left}`);
       let right = separateData[1].substring(0, separateData[1].length - 1);
-      hilog.info(0xFF00, 'ARMeasure', `spaceData right is  ${right}`);
+      UtilLog.info(0xFF00, 'ARMeasure', `spaceData right is  ${right}`);
       let top = separateData[2].substring(0, separateData[2].length - 1);
-      hilog.info(0xFF00, 'ARMeasure', `spaceData top is  ${top}`);
+      UtilLog.info(0xFF00, 'ARMeasure', `spaceData top is  ${top}`);
       let bottom = separateData[3].substring(0, separateData[3].length - 2);
-      hilog.info(0xFF00, 'ARMeasure', `spaceData bottom is  ${bottom}`);
+      UtilLog.info(0xFF00, 'ARMeasure', `spaceData bottom is  ${bottom}`);
       this.spaceData = [top, bottom, left, right, ''];
     } else {
       let left = separateData[0].substring(0, separateData[0].length - 1);
-      hilog.info(0xFF00, 'ARMeasure', `spaceData left is  ${left}`);
+      UtilLog.info(0xFF00, 'ARMeasure', `spaceData left is  ${left}`);
       let right = separateData[1].substring(0, separateData[1].length - 1);
-      hilog.info(0xFF00, 'ARMeasure', `spaceData right is  ${right}`);
+      UtilLog.info(0xFF00, 'ARMeasure', `spaceData right is  ${right}`);
       let top = separateData[2].substring(0, separateData[2].length - 1);
-      hilog.info(0xFF00, 'ARMeasure', `spaceData top is  ${top}`);
+      UtilLog.info(0xFF00, 'ARMeasure', `spaceData top is  ${top}`);
       let bottom = separateData[3].substring(0, separateData[3].length - 1);
-      hilog.info(0xFF00, 'ARMeasure', `spaceData bottom is  ${bottom}`);
+      UtilLog.info(0xFF00, 'ARMeasure', `spaceData bottom is  ${bottom}`);
       let back = separateData[4].substring(0, separateData[4].length - 2);
-      hilog.info(0xFF00, 'ARMeasure', `spaceData back is  ${back}`);
+      UtilLog.info(0xFF00, 'ARMeasure', `spaceData back is  ${back}`);
       this.spaceData = [top, bottom, left, right, back];
     }
-    hilog.info(0xFF00, 'ARMeasure', `spaceData is ${this.spaceData}`);
+    UtilLog.info(0xFF00, 'ARMeasure', `spaceData is ${this.spaceData}`);
   }
 
   handleFormatVolume(data: string) {
     let separateData = data.split('|');
-    hilog.info(0xFF00, 'ARMeasure', `separateData is ${separateData}`);
+    UtilLog.info(0xFF00, 'ARMeasure', `separateData is ${separateData}`);
     let length = separateData[0].substring(0, separateData[0].length - 1);
-    hilog.info(0xFF00, 'ARMeasure', `volumeData length is  ${length}`);
+    UtilLog.info(0xFF00, 'ARMeasure', `volumeData length is  ${length}`);
     let width = separateData[1].substring(0, separateData[1].length - 1);
-    hilog.info(0xFF00, 'ARMeasure', `volumeData width is  ${length}`);
+    UtilLog.info(0xFF00, 'ARMeasure', `volumeData width is  ${length}`);
     let height = separateData[2].substring(0, separateData[2].length - 2);
-    hilog.info(0xFF00, 'ARMeasure', `volumeData height is  ${length}`);
+    UtilLog.info(0xFF00, 'ARMeasure', `volumeData height is  ${length}`);
     this.volumeData = [length, width, height];
-    hilog.info(0xFF00, 'ARMeasure', `volumeData is ${this.volumeData}`);
+    UtilLog.info(0xFF00, 'ARMeasure', `volumeData is ${this.volumeData}`);
   }
 
   getText(record: string[], type: MeasureType) {
@@ -173,17 +173,21 @@ export class ARMeasureVM {
       .padStart(2, '0')}`;
   }
 
-  copyText(orderNo: string) {
-    const pasteboardData = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, orderNo);
-    const systemPasteboard = pasteboard.getSystemPasteboard();
-    systemPasteboard.setData(pasteboardData);
-    systemPasteboard.getData().then((data) => {
-      if (data) {
-        promptAction.showToast({ message: '复制成功' });
-      } else {
-        promptAction.showToast({ message: '复制失败' });
-      }
-    });
+  copyText(uiContext: UIContext, orderNo: string) {
+    try {
+      const pasteboardData = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, orderNo);
+      const systemPasteboard = pasteboard.getSystemPasteboard();
+      systemPasteboard.setData(pasteboardData);
+      systemPasteboard.getData().then((data) => {
+        if (data) {
+          uiContext.getPromptAction().showToast({ message: '复制成功' });
+        } else {
+          uiContext.getPromptAction().showToast({ message: '复制失败' });
+        }
+      });
+    } catch (e) {
+      UtilLog.error(`copyText failed with error ${JSON.stringify(e)}`)
+    }
   }
 
   save() {

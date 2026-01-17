@@ -7,7 +7,7 @@ export { GlobalKey } from './src/main/ets/constants/GlobalKey';
 
 export { RouterMap } from './src/main/ets/constants/RouterMap';
 
-export { WX_APPID } from './src/main/ets/constants/WeChatConstants';
+export { WX_APPID, QQ_APPID } from './src/main/ets/constants/ThirdConstants';
 
 export { DownloadWithoutWlanEnum, RemindWithoutWlanEnum } from './src/main/ets/constants/NetworkSettingEnum';
 
@@ -22,6 +22,8 @@ export {
 } from './src/main/ets/constants/GridRowColSetting';
 
 // models
+export { BaseViewModel } from './src/main/ets/models/BaseViewModel';
+
 export { UserInfoModel } from './src/main/ets/models/UserInfoModel';
 
 export { WindowModel } from './src/main/ets/models/WindowModel';
@@ -44,16 +46,19 @@ export { CloudRecommendListResult } from './src/main/ets/models/PreloadModel'
 
 export { ContinueModel } from './src/main/ets/models/ContinueModel';
 
-export { VideoExtraInfoModel } from './src/main/ets/models/VideoExtraInfoModel'
+export { VideoExtraInfoModel } from './src/main/ets/models/VideoExtraInfoModel';
 
-export { DisplayModel } from './src/main/ets/models/DisplayModel'
+export { VideoType } from './src/main/ets/constants/VideoEnum'
 
-export { BreakpointModel } from './src/main/ets/models/BreakpointModel'
+export { DisplayModel } from './src/main/ets/models/DisplayModel';
 
-export { CoverUri } from './src/main/ets/models/MediaModel'
+export { BreakpointModel } from './src/main/ets/models/BreakpointModel';
+
+export { CoverUri } from './src/main/ets/models/MediaModel';
+
+export { LoadingModel } from './src/main/ets/models/LoadingModel';
+
 // utils
-export { BaseViewModel } from './src/main/ets/utils/BaseViewModel';
-
 export { EventHubUtils } from './src/main/ets/utils/EventHubUtils';
 
 export { GlobalUtils } from './src/main/ets/utils/GlobalUtils';
@@ -100,14 +105,22 @@ export { SystemBarOperation } from './src/main/ets/utils/SystemBarOperation';
 
 export { NewsScan } from './src/main/ets/utils/NewsScan';
 
-export { CommonBreakpoint } from './src/main/ets/utils/CommonBreakpoint'
+export { CommonBreakpoint } from './src/main/ets/utils/CommonBreakpoint';
 
-export { MediaUtils } from './src/main/ets/utils/MediaUtils'
+export { MediaUtils } from './src/main/ets/utils/MediaUtils';
+
+export { OptimizeUtils } from './src/main/ets/utils/OptimizeUtils';
+
+export { LocationUtils } from './src/main/ets/utils/LocationUtils';
+
+export { PermissionUtils } from './src/main/ets/utils/PermissionUtils';
+
+export { GlobalContextUtils } from './src/main/ets/utils/ContextUtils';
 
 // dialogs
 export { CommonConfirmDialog, IConfirmDialogParams } from './src/main/ets/dialogs/CommonConfirmDialog';
 
-export { CommonLoadingDialog, loadingView } from './src/main/ets/dialogs/CommonLoading';
+export { CommonLoadingDialog, loadingView, loadingPage } from './src/main/ets/dialogs/CommonLoading';
 
 export { CommonTipDialog, ITipDialogParams } from './src/main/ets/dialogs/CommonTipDialog';
 

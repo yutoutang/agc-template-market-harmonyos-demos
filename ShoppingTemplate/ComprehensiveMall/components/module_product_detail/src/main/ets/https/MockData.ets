@@ -12,7 +12,7 @@ export const PRODUCT_ITEM1: ProductInfo = {
   dashPrice: '200',
   sales: '已售 3000+',
   title: '时尚轻商务系列针织打底纯羊毛内搭',
-  tags: ['退货包邮费最高减￥5'],
+  tags: ['VIP会员另享9.0折','退货包邮费最高减￥5'],
   logistics: [
     {
       icon: $r('app.media.ic_truck'),
@@ -166,7 +166,7 @@ export const PRODUCT_ITEM2: ProductInfo = {
   dashPrice: '128',
   sales: '已售 5000+',
   title: '休闲简约经典商务衬衫T恤日系风高级感',
-  tags: ['7天无理由'],
+  tags: ['VIP会员另享9.0折','7天无理由'],
   logistics: [
     { icon: $r('app.media.ic_truck'), content: '24小时发货' },
   ],
@@ -210,7 +210,7 @@ export const PRODUCT_ITEM2: ProductInfo = {
         skuCode: 'sku_200004',
         specs: { 'size': 'S', 'color': 'uuid_white' },
         stock: 10,
-        price: 128,
+        price: 108.8,
         dashPrice: 128,
       },
       {
@@ -353,7 +353,11 @@ export const REVIEW_ITEM_MOCK1: ProductReviewItem = {
   date: 1704220800000, // 2023-11-01 00:00:00
   content:
   '这款针织打底衫质量非常棒，纯羊毛材质，穿着舒适，保暖性很好。适合商务场合，搭配西装外套也很合适。',
-  mediaList: [],
+  mediaList: [
+    { type: ReviewMediaType.IMAGE, uri: $r('app.media.mock_spec_pink') },
+    { type: ReviewMediaType.IMAGE, uri: $r('app.media.mock_spec_white') },
+    { type: ReviewMediaType.IMAGE, uri: $r('app.media.mock_spec_green') },
+  ],
 };
 
 export const REVIEW_ITEM_MOCK2: ProductReviewItem = {

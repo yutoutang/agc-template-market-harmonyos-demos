@@ -6,7 +6,7 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-//    "@ohos/axios": "2.2.4",
+    "@ohos/axios": "2.2.4",
     "@ohos_agcit/driver_license_exam_commonlib": "file:../commonLib"
   }
 }

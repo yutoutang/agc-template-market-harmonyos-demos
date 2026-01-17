@@ -46,12 +46,24 @@ guitar_tuning/src/main/ets                        // 吉他调音器(har)
 
    a. 解压下载的组件包，将包中所有文件夹拷贝至您工程根目录的xxx目录下。
 
-   b. 在项目根目录build-profile.json5添加guitar_tuning模块。
+   b. 在项目根目录build-profile.json5添加guitar_tuning、membership、module_base、aggregated_login模块。
    ```
    "modules": [
       {
       "name": "guitar_tuning",
       "srcPath": "./xxx/guitar_tuning",
+      },
+      {
+      "name": "membership",
+      "srcPath": "./xxx/membership",
+      },
+      {
+      "name": "module_base",
+      "srcPath": "./xxx/module_base",
+      },
+      {
+      "name": "aggregated_login",
+      "srcPath": "./xxx/aggregated_login",
       },
    ]
    ```
@@ -59,6 +71,9 @@ guitar_tuning/src/main/ets                        // 吉他调音器(har)
    ```
    "dependencies": {
       "guitar_tuning": "file:./xxx/guitar_tuning",
+      "membership": "file:./xxx/membership",
+      "module_base": "file:./xxx/module_base",
+      "aggregated_login": "file:./xxx/aggregated_login",
    }
    ```
 

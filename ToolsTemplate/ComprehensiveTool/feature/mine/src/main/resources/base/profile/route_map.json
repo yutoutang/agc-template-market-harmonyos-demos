@@ -25,19 +25,35 @@
       }
     },
     {
-      "name": "SubmitFeedBack",
-      "pageSourceFile": "src/main/ets/pages/SubmitFeedBack.ets",
-      "buildFunction": "SubmitFeedBackBuilder",
+      "name": "LoginPage",
+      "pageSourceFile": "src/main/ets/pages/LoginPage.ets",
+      "buildFunction": "LoginPageBuilder",
       "data": {
-        "description": "this is SubmitFeedBack"
+        "description": "this is LoginPage"
       }
     },
     {
-      "name": "FeedBacks",
-      "pageSourceFile": "src/main/ets/pages/FeedBacks.ets",
-      "buildFunction": "FeedBacksBuilder",
+      "name": "ProfilePage",
+      "pageSourceFile": "src/main/ets/pages/ProfilePage.ets",
+      "buildFunction": "ProfilePageBuilder",
       "data": {
-        "description": "this is FeedBacks"
+        "description": "this is ProfilePage"
+      }
+    },
+    {
+      "name": "SettingPage",
+      "pageSourceFile": "src/main/ets/pages/SettingPage.ets",
+      "buildFunction": "SettingPageBuilder",
+      "data": {
+        "description": "this is SettingPage"
+      }
+    },
+    {
+      "name": "MemberShipSubscribe",
+      "pageSourceFile": "src/main/ets/pages/MemberShipSubscribe.ets",
+      "buildFunction": "MemberShipSubscribeBuilder",
+      "data": {
+        "description": "this is MemberShipSubscribe"
       }
     }
   ]

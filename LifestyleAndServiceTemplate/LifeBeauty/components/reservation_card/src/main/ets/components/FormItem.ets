@@ -8,12 +8,12 @@ export struct FormItem {
   build() {
     Row() {
       Text(this.info.label)
-        .fontSize(14)
-        .fontColor(this.enableOperate ? '#333333' : '#878787')
-        .width(100)
+        .fontSize(12)
+        .fontColor(this.enableOperate ? $r('sys.color.font_primary') : $r('sys.color.font_tertiary'))
+        .width(60)
       Text(this.info.content)
-        .fontSize(14)
-        .fontColor(this.enableOperate ? '#333333' : '#878787')
+        .fontSize(12)
+        .fontColor(this.enableOperate ? $r('sys.color.font_primary') : $r('sys.color.font_tertiary'))
         .maxLines(3)
         .textOverflow({ overflow: TextOverflow.Ellipsis })
         .layoutWeight(1)

@@ -1,8 +1,7 @@
 import { BusinessError, emitter } from '@kit.BasicServicesKit';
 import { fileIo, storageStatistics } from '@kit.CoreFileKit';
-import { promptAction } from '@kit.ArkUI';
 import { Logger } from '@hw-agconnect/ui-base';
-import { Constants, NavHeaderBar, TCRouter } from 'common';
+import { BreakpointStorage, BreakpointSystem, BreakpointTypeEnum, Constants, NavHeaderBar, TCRouter } from 'common';
 import { UserInfo } from 'base_common';
 
 @ComponentV2
@@ -10,12 +9,17 @@ export struct SettingPage {
   @Local windowTopHeight: number = AppStorage.get('windowTopHeight') as number || 38.77;
   @Local userInfo: UserInfo | undefined = undefined;
   @Local appCache: number = 10.33;
+  @Local curBreakpoint: BreakpointStorage = BreakpointSystem.currentBreakpoint
 
   async aboutToAppear(): Promise<void> {
     this.userInfo = AppStorage.get('userInfo') as UserInfo;
-    emitter.on(Constants.LOGIN_CHANGE, () => {
-      this.userInfo = AppStorage.get('userInfo') as UserInfo;
-    })
+    try {
+      emitter.on(Constants.LOGIN_CHANGE, () => {
+        this.userInfo = AppStorage.get('userInfo') as UserInfo;
+      })
+    } catch (e) {
+      console.error('Failed to emitter on login change. Cause: ' + JSON.stringify(e));
+    }
   }
 
   async onPageShow(): Promise<void>  {
@@ -48,7 +52,7 @@ export struct SettingPage {
                     .fontWeight(400)
                     .fontColor('#99000000')
                   Image($r('app.media.ic_arrow_right'))
-                    .width(7)
+                    .width(8)
                     .height(14)
                     .objectFit(ImageFit.Contain)
                 }
@@ -72,12 +76,13 @@ export struct SettingPage {
 
               this.settingOptionView('关于',Constants.ABOUT_ROUTE)
             }
+            .width(this.curBreakpoint.value === BreakpointTypeEnum.LG ? '70%' : Constants.FULL_SIZE)
+
             if (this.userInfo?.isLogin){
               this.loginOut()
             }
           }
           .layoutWeight(1)
-          .align(Alignment.Top)
           .justifyContent(FlexAlign.SpaceBetween)
           .padding({
             left: 12,
@@ -86,7 +91,6 @@ export struct SettingPage {
             bottom: 50
           })
         }
-        .alignItems(HorizontalAlign.Start)
         .width(Constants.FULL_SIZE)
       }
       .width(Constants.FULL_SIZE)
@@ -112,7 +116,7 @@ export struct SettingPage {
             .fontColor('#99000000')
         }
         Image($r('app.media.ic_arrow_right'))
-          .width(7)
+          .width(8)
           .height(14)
           .objectFit(ImageFit.Contain)
       }
@@ -152,8 +156,8 @@ export struct SettingPage {
           left: 16
         })
         .backgroundColor('#E84026')
-        .fontColor('#FFFFFF')
-        .fontSize(16)
+        .fontColor($r('sys.color.font_on_primary'))
+        .fontSize($r('sys.float.Body_L'))
         .align(Alignment.Bottom)
         .onClick(() => {
           const promptAction = this.getUIContext().getPromptAction();
@@ -175,18 +179,22 @@ export struct SettingPage {
               ]
             }, (err, data) => {
               if (data.index === 1) {
-                // 保留会员状态和书币信息，只清除登录状态
-                const savedMembershipStatus = this.userInfo?.isMembership || false;
-                const savedBookCoins = typeof this.userInfo?.bookCoins === 'number' ? this.userInfo.bookCoins : 100;
+                try {
+                  // 保留会员状态和书币信息，只清除登录状态
+                  const savedMembershipStatus = this.userInfo?.isMembership || false;
+                  const savedBookCoins = typeof this.userInfo?.bookCoins === 'number' ? this.userInfo.bookCoins : 100;
 
-                // 保存会员状态和书币信息到本地存储
-                AppStorage.setOrCreate('membershipStatus', savedMembershipStatus);
-                AppStorage.setOrCreate('bookCoins', savedBookCoins);
+                  // 保存会员状态和书币信息到本地存储
+                  AppStorage.setOrCreate('membershipStatus', savedMembershipStatus);
+                  AppStorage.setOrCreate('bookCoins', savedBookCoins);
 
-                // 清除用户信息
-                AppStorage.setOrCreate('userInfo', undefined);
-                emitter.emit(Constants.LOGIN_CHANGE);
-                TCRouter.pop();
+                  // 清除用户信息
+                  AppStorage.setOrCreate('userInfo', undefined);
+                  emitter.emit(Constants.LOGIN_CHANGE);
+                  TCRouter.pop();
+                } catch (e) {
+                  console.error('Failed to emitter emit login change. Cause: ' + JSON.stringify(e));
+                }
               }
             })
           }
@@ -196,22 +204,27 @@ export struct SettingPage {
 
   // 获取应用数据空间大小
   getCache() {
-    storageStatistics.getCurrentBundleStats((error: BusinessError, bundleStats: storageStatistics.BundleStats) => {
-      if (error) {
-        Logger.error('getCurrentBundleStats failed with error:' + JSON.stringify(error));
-      } else {
-        Logger.info('getCurrentBundleStats successfully:' + JSON.stringify(bundleStats));
-        Logger.info('appsize :' + bundleStats.appSize);
-        Logger.info('cacheSize :' + bundleStats.cacheSize);
-        Logger.info('dataSize :' + bundleStats.dataSize);
-        this.appCache = this.byteToM(bundleStats.cacheSize)
-      }
-    });
+    try {
+      storageStatistics.getCurrentBundleStats((error: BusinessError, bundleStats: storageStatistics.BundleStats) => {
+        if (error) {
+          Logger.error('getCurrentBundleStats failed with error:' + JSON.stringify(error));
+        } else {
+          Logger.info('getCurrentBundleStats successfully:' + JSON.stringify(bundleStats));
+          Logger.info('appsize :' + bundleStats.appSize);
+          Logger.info('cacheSize :' + bundleStats.cacheSize);
+          Logger.info('dataSize :' + bundleStats.dataSize);
+          this.appCache = this.byteToM(bundleStats.cacheSize)
+        }
+      });
+    } catch (e) {
+      console.error('Failed to getCache. Cause: ' + JSON.stringify(e));
+    }
+
   }
 
   // 清理缓存
   clearCache() {
-    let cacheDir = getContext(this).cacheDir;
+    let cacheDir = (this.getUIContext().getHostContext() as Context).cacheDir;
     Logger.info(cacheDir);
     fileIo.listFile(cacheDir).then((filenames) => {
       for (let i = 0; i < filenames.length; i++) {
@@ -236,7 +249,7 @@ export struct SettingPage {
         }
       }
     })
-    promptAction.showToast({ message: '缓存清理完成！' })
+    this.getUIContext().getPromptAction().showToast({ message: '缓存清理完成！' })
   }
 
   byteToM(num: number) {

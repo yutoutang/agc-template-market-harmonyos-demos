@@ -1,7 +1,8 @@
-import { AccountUtil, AppStorageMap, Logger, RdbManager, RouterMap, RouterModule, recipesData, CommonConstants } from 'commonlib';
+import { AccountUtil, AppStorageMap, Logger, RdbManager, RouterMap, RouterModule, recipesData, CommonConstants,
+  GlobalContextUtils, BreakpointModel, BreakpointType } from 'commonlib';
 import { addCollection, changeFollowers, queryRecipeDetail, RecipeBriefInfo, RecipeDetail, removeCollection } from 'network';
 import { BasketList } from '../types/Index';
-import { PersistenceV2, promptAction } from '@kit.ArkUI';
+import { AppStorageV2, PersistenceV2, promptAction } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
 
 const TAG = '[DishesVM]';
@@ -14,8 +15,9 @@ export class DishesVM {
   @Trace collection: boolean = false
   @Trace isFollower: boolean = false
   scroller: Scroller = new Scroller();
-  private context: common.UIAbilityContext = getContext() as common.UIAbilityContext;
+  private context: common.UIAbilityContext = GlobalContextUtils.globalUIAbilityContext;
   private rdbManager: RdbManager = new RdbManager(this.context);
+  @Trace breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
 
   async init() {
     let recipeRouter = RouterModule.getNavParam<RecipeDetail>(RouterMap.DISHES)
@@ -94,7 +96,7 @@ export class DishesVM {
         this.cancelCollection();
       }
     } else {
-      promptAction.showToast({ message: '未登录，请登录后重试！' });
+      GlobalContextUtils.showToast({ message: '未登录，请登录后重试！' });
       RouterModule.push(RouterMap.QUICK_LOGIN_PAGE);
     }
   }
@@ -106,9 +108,9 @@ export class DishesVM {
     if (this.recipeDetail) {
       if (AccountUtil.getUserInfo().isLogin) {
         this.basketList.addBasket(this.recipeDetail);
-        promptAction.showToast({ message: '添加成功~！' });
+        GlobalContextUtils.showToast({ message: '添加成功~！' });
       } else {
-        promptAction.showToast({ message: '未登录，请登录后重试！' });
+        GlobalContextUtils.showToast({ message: '未登录，请登录后重试！' });
         RouterModule.push(RouterMap.QUICK_LOGIN_PAGE);
       }
     }
@@ -121,9 +123,8 @@ export class DishesVM {
       } else {
         this.cancelCollection();
       }
-
     } else {
-      promptAction.showToast({ message: '未登录，请登录后重试！' });
+      GlobalContextUtils.showToast({ message: '未登录，请登录后重试！' });
       RouterModule.push(RouterMap.QUICK_LOGIN_PAGE);
     }
   }
@@ -139,5 +140,10 @@ export class DishesVM {
       changeFollowers(Number(this.recipeDetail?.authorId), 2)
     }
     this.isFollower = isFollower
+  }
+
+  @Computed
+  get breakPoint() {
+    return this.breakPointModel.currentBreakpoint;
   }
 }

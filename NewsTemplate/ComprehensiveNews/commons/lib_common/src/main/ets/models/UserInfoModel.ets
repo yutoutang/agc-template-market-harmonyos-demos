@@ -14,6 +14,7 @@ export class UserInfoModel {
   @Trace followersCount: number = 0;
   @Trace watchers: string[] = [];
   @Trace followers: string[] = [];
+  @Trace subscribe: string[] = [];
   @Trace likeNum: number = 0;
   @Trace loginChannel: string = '';
 }

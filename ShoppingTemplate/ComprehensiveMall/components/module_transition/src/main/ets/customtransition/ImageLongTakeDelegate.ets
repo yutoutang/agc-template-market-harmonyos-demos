@@ -1,4 +1,7 @@
 import { inspector, matrix4, window } from '@kit.ArkUI';
+import { BusinessError } from '@kit.BasicServicesKit'
+import { UtilLog } from '@hw-agconnect/util-log';
+import { LOG_TAG } from '../constants/LongTakeTransitionConstants';
 
 enum Status {
   IDLE,
@@ -25,10 +28,12 @@ export struct ImageLongTakeDelegate {
   @Local minOffsetY: number = 0;
   @Local gestureDisabled: boolean = false;
   @Local gestureCount: number = 0;
+
   @Monitor('gestureCount')
   onAllGestureFinishFn() {
     this.onAllGestureFinish()
   }
+
   @Local geometryPositionX: number = 0;
   @Local geometryPositionY: number = 0;
   @Local geometryScale: number = 1;
@@ -38,11 +43,13 @@ export struct ImageLongTakeDelegate {
     this.getUIContext().getUIInspector().createComponentObserver(this.photoId);
   private imagePositionX: number = 0;
   private imagePositionY: number = 600;
-  @Local  imageWidth: number = 1260;
+  @Local imageWidth: number = 1260;
+
   @Monitor('imageWidth')
   getImageWidthFn() {
     this.getImageWidth()
   }
+
   private imageHeight: number = 1680;
   private lastCenterX: number = 0;
   private lastCenterY: number = 0;
@@ -58,19 +65,26 @@ export struct ImageLongTakeDelegate {
   private realDisplayBoundsRight: number = 0;
   private realDisplayBoundsBottom: number = 0;
   private firstStarted = true;
-  @Event backToFirstPage: () => void = () => {};
+  @Event backToFirstPage: () => void = () => {
+  };
 
   init(): void {
-    let photoInfo = this.getUIContext().getComponentUtils().getRectangleById(this.photoId);
-    this.imagePositionX = photoInfo.windowOffset.x;
-    this.imagePositionY = photoInfo.windowOffset.y;
+    try {
+      let photoInfo = this.getUIContext().getComponentUtils().getRectangleById(this.photoId);
+      this.imagePositionX = photoInfo.windowOffset.x;
+      this.imagePositionY = photoInfo.windowOffset.y;
+    } catch (err) {
+      UtilLog.error(LOG_TAG, 'init failed. error:' + JSON.stringify(err))
+    }
   }
 
   getImageWidth() {
     window.getLastWindow(this.getUIContext().getHostContext()).then((data) => {
       let properties = data?.getWindowProperties();
       this.imageWidth = properties.windowRect.width
-    });
+    }).catch((err: BusinessError) => {
+      UtilLog.error(LOG_TAG, 'get lastWindowFailed. error: ' + JSON.stringify(err))
+    })
   }
 
   onAllGestureFinish(): void {
@@ -257,8 +271,8 @@ export struct ImageLongTakeDelegate {
     this.maxOffsetY = this.getUIContext().px2vp(this.realDisplayBoundsTop - leftTopPointY);
   }
 
-  clamp (num: number, min: number, max: number): number {
-   return Math.min(Math.max(num, min), max)
+  clamp(num: number, min: number, max: number): number {
+    return Math.min(Math.max(num, min), max)
   }
 
   // 双击

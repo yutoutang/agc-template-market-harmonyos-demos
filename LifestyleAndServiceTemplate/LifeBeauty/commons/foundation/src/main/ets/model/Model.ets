@@ -1,9 +1,10 @@
-import { AppStorageV2 } from '@kit.ArkUI';
+import { PersistenceV2 } from '@kit.ArkUI';
 import { AppointState, GroupOrderStatus, OrderType } from '../constants/AppConstant';
 import { IActiveMemberRequest } from './IRequest';
 import {
   GroupContent,
   IAppointment,
+  IBaseStore,
   IGoodInfo,
   IGoodList,
   IGroupInfo,
@@ -20,35 +21,54 @@ import {
 @ObservedV2
 export class StoreInfo implements IStoreInfo {
   // 门店ID
-  id: number = 0;
+  @Trace id: string = '';
   // 品牌商ID
   brandId: number = 0;
   // 店铺名称
-  storeName: string = '';
+  @Trace storeName: string = '';
   // 店铺简介
   storeProfile: string = '';
   // 联系电话
-  mobile: string = '';
+  @Trace mobile: string = '';
   // 店铺logo链接
   logoUrl: string = '';
   // 坐标
-  coords: string = '';
+  @Trace coords: string = '';
   // 地区
   region: string = '';
   // 地址
-  address: string = '';
-  // 认证名称
-  certName: string = '';
+  @Trace address: string = '';
   // 店铺横幅
   storeBanner: string = '';
-  // 营业执照
-  businessLicense: string = '';
   // 评分
   score: string = '5.0';
   // 经营状态
   businessStatus: number = 0;
   // 经营时间
   businessTimes: string = '';
+
+  constructor(store?: StoreInfo) {
+    this.id = store?.id ?? '';
+    this.brandId = store?.brandId ?? 0;
+    this.storeName = store?.storeName ?? '';
+    this.storeProfile = store?.storeProfile ?? '';
+    this.mobile = store?.mobile ?? '';
+    this.logoUrl = store?.logoUrl ?? '';
+    this.coords = store?.coords ?? '';
+    this.region = store?.region ?? '';
+    this.address = store?.address ?? '';
+    this.storeBanner = store?.storeBanner ?? '';
+    this.score = store?.score ?? '';
+    this.businessStatus = store?.businessStatus ?? 0;
+    this.businessTimes = store?.businessTimes ?? '';
+  }
+}
+
+// 店铺信息
+@ObservedV2
+export class StoreInfoModel {
+  @Trace storeId: string = '';
+  @Trace storeList: IBaseStore[] = [];
 }
 
 /**
@@ -60,6 +80,8 @@ export class GoodInfo implements IGoodInfo {
   id: number = 0;
   // 商品名称
   title: string = '';
+  // 副标题
+  subTitle?: string = '';
   // 所属类目ID
   classId: number = 0;
   // 主图
@@ -70,15 +92,22 @@ export class GoodInfo implements IGoodInfo {
   price: number = 0;
   // 会员价
   vipPrice: number = 0;
+  // 服务项目
+  projectNum: number = 1;
+  // 类型
+  goodType?: OrderType = OrderType.SINGLE_CARD
 
   constructor(v?: GoodInfo) {
     this.id = v?.id || 0;
     this.title = v?.title || '';
+    this.subTitle = v?.subTitle || '';
     this.classId = v?.classId || 0;
     this.images = v?.images || [];
     this.intro = v?.intro || [];
     this.price = v?.price || 0;
     this.vipPrice = v?.vipPrice || 0;
+    this.projectNum = v?.projectNum || 1;
+    this.goodType = v?.goodType || OrderType.SINGLE_CARD;
   }
 }
 
@@ -109,7 +138,7 @@ export class AppointmentInfo implements IAppointment {
   // 成功预约的ID
   id: number = 0;
   // 门店ID
-  storeId: number = 0;
+  storeId: string = '';
   // 用户ID
   userId: number = 0;
   //数据类型
@@ -128,6 +157,8 @@ export class AppointmentInfo implements IAppointment {
   contactPhone: string = '';
   // 预约的项目名称
   itemName: string = '';
+  // 预约的订单号
+  orderNo: string = '';
   // 商品图片
   itemPic: string = '';
   // 预约人数
@@ -147,7 +178,7 @@ export class AppointmentInfo implements IAppointment {
 
   constructor(item?: AppointmentInfo) {
     this.id = item?.id || 0;
-    this.storeId = item?.storeId || 0;
+    this.storeId = item?.storeId || '';
     this.contactName = item?.contactName || '';
     this.contactPhone = item?.contactPhone || '';
     this.numbers = item?.numbers || 1;
@@ -248,6 +279,8 @@ export class MyGroupInfo implements IMyGroupInfo {
   purchaseNums: number = 0;
   // 会员价
   vipPrice: number = 0;
+  // 实际价格
+  price: number = 0;
   // 套餐内容
   groupContent: GroupContent = {
     location: '',
@@ -273,6 +306,8 @@ export class MyGroupInfo implements IMyGroupInfo {
   consumeTime?: number = 0;
   // 退款时间
   refundTime?: number = 0;
+  // 团购所在的门店
+  groupStoreId: string = '';
 }
 
 @ObservedV2
@@ -282,7 +317,9 @@ export class SimpleGoodInfo {
   title: string = '';
   subTitle?: string = '';
   vipPrice: number = 0;
+  price: number = 0;
   image: string = '';
+  availableNum?: number = 0;
 }
 
 @ObservedV2
@@ -297,33 +334,42 @@ export class SimpleOrderInfo extends SimpleGoodInfo {
   numbers: number = 0;
   // 实际付款
   actualPay: number = 0;
+  // 商品id
+  goodId: number = 0;
+  // 订单号
+  orderNo: string = ''
 }
 
 /**
  * 读取用户信息响应
  */
 @ObservedV2
-export class GetUserInfoResp implements IUserInfo {
-  @Trace userId?: number;
+export class GetUserInfoResp {
+  @Trace isBindMobile: boolean = false;
+  @Trace userId: number = 0;
   @Trace nickName: string = '华为用户';
-  @Trace avatar?: string;
-  @Trace mobile?: string;
+  @Trace avatar: string = '';
+  @Trace mobile: string = '';
+  // 0：male  1：female  2：保密
+  @Trace gender: number = 2;
+  @Trace birthDate: string = '';
+  @Trace fullName: string = ''
   /**
    * 会员卡id
    */
-  @Trace memberId?: string;
+  @Trace memberId: string = '';
   /**
    * 积分数量
    */
-  @Trace points?: number;
+  @Trace points: number = 0;
   /**
    * 创建时间
    */
-  createdTime?: string;
+  createdTime: string = '';
   /**
    * 更新时间
    */
-  updatedTime?: string;
+  updatedTime: string = '';
 }
 
 export class ActiveMemberRequest implements IActiveMemberRequest {
@@ -335,20 +381,23 @@ export class ActiveMemberRequest implements IActiveMemberRequest {
 
 
 /**
- * AppStorageV2应用全局缓存库
+ * 分享参数模型
  */
-export class AppStorageBank {
-  static userInfo: GetUserInfoResp = AppStorageV2.connect(GetUserInfoResp, () => new GetUserInfoResp())!;
-
-  static updateUserInfo(v: GetUserInfoResp) {
-    AppStorageBank.userInfo.userId = v.userId;
-    AppStorageBank.userInfo.nickName = v.nickName;
-    AppStorageBank.userInfo.avatar = v.avatar;
-    AppStorageBank.userInfo.mobile = v.mobile;
-    AppStorageBank.userInfo.createdTime = v.createdTime;
-    AppStorageBank.userInfo.updatedTime = v.updatedTime;
-    AppStorageBank.userInfo.memberId = v.memberId;
-    AppStorageBank.userInfo.points = v.points;
-  }
+@ObservedV2
+export class CustomShareModel {
+  @Trace id: number = 0;
+  @Trace pageName: string = '';
+  @Trace goodId: number = 0;
+  @Trace goodName: string = '';
+  @Trace goodType: OrderType = OrderType.SINGLE_CARD;
 }
 
+// 系统的分享参数模型
+export interface ShareInfo {
+  showShareMenu: boolean; // 当前页面是否允许分享，面板分享开关是否打开, 不填默认为不允许
+  title?: string; // 系统分享面板标题，默认为元服务名称
+  description?: string; // 系统分享面板简介，默认为元服务一句话描述
+  previewUri?: string; // 分享图片缩略图，为本地文件uri，预留字段，不起作用
+  parameters?: Object; // 开发者自定参数
+  preview?: string; // 分享缩略图的base64编码，大小限制在32kb，太大会导致分享按钮置灰
+}

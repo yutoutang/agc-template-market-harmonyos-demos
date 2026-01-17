@@ -15,11 +15,14 @@
 import { audio } from '@kit.AudioKit';
 import { media } from '@kit.MediaKit';
 import { common } from '@kit.AbilityKit';
-import { promptAction } from '@kit.ArkUI';
+import { PersistenceV2 } from '@kit.ArkUI';
+import { MemberManageUtil, MemberStatus, UsedCount } from 'module_base';
+import { MemberSheetUtils } from 'membership';
 import { yinGuitarTuning } from '../util/TuningUtil';
 import { PermissionUtil, MyLog } from '../util/CommonUtil';
 import { calculateCentralValue } from '../util/MathUtil';
 import { GuitarInfo } from '../model/Index';
+import { UtilLog } from '@hw-agconnect/util-log';
 
 const TAG = '[TuningPageVM]';
 
@@ -84,6 +87,9 @@ export class TuningPageVM {
   // 当前琴弦对应的索引
   @Trace currenNoteIndex: number = -1;
   @Trace soundMap: Map<string, number> = new Map();
+  @Trace usedCount: UsedCount =
+    PersistenceV2.connect(UsedCount, 'GuitarUsedCount', () => new UsedCount())!;
+  @Trace isMember: boolean = false;
   // 临时保存当前一段稳定的频率
   private freqArr: number[] = [];
   // 成功的音效
@@ -91,7 +97,6 @@ export class TuningPageVM {
   private audioCapturer: audio.AudioCapturer | null = null;
   private soundPool: media.SoundPool | null = null;
   private currentStreamId: number = -1;
-  private context: Context = getContext() as common.UIAbilityContext;
   private timer: number = 0;
   private static _instance: TuningPageVM;
 
@@ -128,11 +133,15 @@ export class TuningPageVM {
     }
   }
 
+  showMemberSubscribeDialog(uiContext: UIContext) {
+    let memberManageUtil = new MemberManageUtil(uiContext);
+    MemberSheetUtils.open(memberManageUtil.productsInfo, uiContext);
+  }
 
   // 获取PCM原始数据
-  public async startCapture() {
+  public async startCapture(uiContext:UIContext) {
     if (!this.hasPermission) {
-      promptAction.showToast({ message: '请开启麦克风权限' });
+      uiContext.getPromptAction().showToast({ message: '请开启麦克风权限' });
       return;
     }
     if (this.currenNoteIndex === -1) {
@@ -171,10 +180,10 @@ export class TuningPageVM {
 
 
   // 请求麦克风权限
-  public async handlePermission() {
+  public async handlePermission(ctx:Context) {
     this.hasPermission = await PermissionUtil._checkPermissions('ohos.permission.MICROPHONE');
     if (!this.hasPermission) {
-      await PermissionUtil.requestPermissions(['ohos.permission.MICROPHONE']);
+      await PermissionUtil.requestPermissions(['ohos.permission.MICROPHONE'],ctx);
       this.hasPermission = await PermissionUtil._checkPermissions('ohos.permission.MICROPHONE');
     }
   }
@@ -197,40 +206,43 @@ export class TuningPageVM {
   }
 
   // 初始化 SoundPool
-  async initSoundPool() {
-    this.soundPool = await media.createSoundPool(5, {
-      usage: audio.StreamUsage.STREAM_USAGE_MUSIC,
-      rendererFlags: 0,
-    });
-    if (this.soundPool) {
-      this.soundPool.on('loadComplete', (soundId) => {
-        MyLog.info('加载完成' + soundId);
+  async initSoundPool(uiContext: UIContext) {
+    try {
+      this.soundPool = await media.createSoundPool(5, {
+        usage: audio.StreamUsage.STREAM_USAGE_MUSIC,
+        rendererFlags: 0,
       });
-      this.soundPool.on('error', (err) => {
-        MyLog.error('错误', err.message);
-      });
+      if (this.soundPool) {
+        this.soundPool.on('loadComplete', (soundId) => {
+          MyLog.info('加载完成' + soundId);
+        });
+        this.soundPool.on('error', (err) => {
+          MyLog.error('错误', err.message);
+        });
 
-      this.soundPool.on('playFinished', () => {
-        this.currentStreamId = -1;
-      });
+        this.soundPool.on('playFinished', () => {
+          this.currentStreamId = -1;
+        });
 
-      for (let i = 0; i < this.guitarStandard.length; i++) {
-        this.loadAudio(this.guitarStandard[i].filePath).then((res) => {
-          this.soundMap.set(this.guitarStandard[i].filePath, res);
+        for (let i = 0; i < this.guitarStandard.length; i++) {
+          this.loadAudio(this.guitarStandard[i].filePath, uiContext).then((res) => {
+            this.soundMap.set(this.guitarStandard[i].filePath, res);
+          });
+        }
+        this.loadAudio(this.successAudio, uiContext).then((res) => {
+          this.soundMap.set(this.successAudio, res);
         });
       }
-      this.loadAudio(this.successAudio).then((res) => {
-        this.soundMap.set(this.successAudio, res);
-      });
-
+    } catch (e) {
+      UtilLog.error(`session close failed: ${JSON.stringify(e)}`);
     }
   }
 
   // 加载新音频源
-  async loadAudio(filePath: string) {
+  async loadAudio(filePath: string, uiContext: UIContext) {
     if (this.soundPool) {
       // 加载新资源
-      const fileDescriptor = await this.context.resourceManager.getRawFd(filePath);
+      const fileDescriptor = await uiContext.getHostContext()!.resourceManager.getRawFd(filePath);
       const soundId = await this.soundPool.load(fileDescriptor.fd, fileDescriptor.offset, fileDescriptor.length);
       return soundId;
     }

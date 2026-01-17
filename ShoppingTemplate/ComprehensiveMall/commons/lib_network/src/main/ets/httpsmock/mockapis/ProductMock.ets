@@ -1,6 +1,6 @@
-import AxiosMockAdapter from '@hw-agconnect/axios-mock-adapter';
 import { PersistenceV2 } from '@kit.ArkUI';
 import { AxiosRequestConfig, HttpStatusCode } from '@ohos/axios';
+import AxiosMockAdapter from '@hw-agconnect/axios-mock-adapter';
 import { RequestUrlMap } from '../../constants/Enums';
 import { ProductListReq } from '../../types/RequestTypes';
 import { BaseResponse } from '../../types/responses/BaseResponse';

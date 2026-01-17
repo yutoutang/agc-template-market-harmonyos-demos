@@ -19,44 +19,43 @@ export interface MediaInfo {
   name: string,
   size: string,
   duration: number,
-  type:MediaType,
+  type: MediaType,
   url: string,
   headImg: image.PixelMap
 }
-
 
 
 @ObservedV2
 export class CastStatusModel {
   @Trace public isCasting: boolean = false;
   @Trace isCastPlaying: boolean = false;
-  @Trace castCurrentTime: number = 0
-  @Trace castDuration: number = 0
-  @Trace castResolution: string = ''
+  @Trace castCurrentTime: number = 0;
+  @Trace castDuration: number = 0;
+  @Trace castResolution: string = '';
   @Trace castVolume: number = 0;
   @Trace castMaxVolume: number = 100;
-  @Trace currentDeviceName: string = ''
-  @Trace currentDeviceType: avSession.DeviceType = avSession.DeviceType.DEVICE_TYPE_LOCAL
+  @Trace currentDeviceName: string = '';
+  @Trace currentDeviceType: avSession.DeviceType = avSession.DeviceType.DEVICE_TYPE_LOCAL;
 }
 
 export interface CastSessionListener {
-  onStartCasting(): void
+  onStartCasting(): void;
 
-  onEndCasting(): void
+  onEndCasting(): void;
 
-  onPlay(): void
+  onPlay(): void;
 
-  onPause(): void
+  onPause(): void;
 
-  onPlayNext(): void
+  onPlayNext(): void;
 
-  onPlayPre(): void
+  onPlayPre(): void;
 
-  onSeek(time: number): void
+  onSeek(time: number): void;
 
-  onFastForward(time: number): void
+  onFastForward(time: number): void;
 
-  onRewind(time: number): void
+  onRewind(time: number): void;
 }
 
 

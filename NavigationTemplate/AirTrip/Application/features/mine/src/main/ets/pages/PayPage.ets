@@ -35,13 +35,13 @@ export struct PayPage {
   onBackEvent() {
     GlobalDialog.showDialogForPayOrder({
       exit: () => {
-        GlobalDialog.close();
+        GlobalDialog.close(this.getUIContext());
         AppRouter.clear();
       },
       pay: () => {
-        GlobalDialog.close();
+        GlobalDialog.close(this.getUIContext());
       },
-    });
+    }, this.getUIContext());
   }
 
   payOrder() {
@@ -53,7 +53,7 @@ export struct PayPage {
         if (result.result) {
           // 添加行程
           this.addTrip();
-          GlobalDialog.showToast('支付成功');
+          GlobalDialog.showToast('支付成功', this.getUIContext());
           AppRouter.clear();
         }
       }
@@ -139,10 +139,14 @@ export struct PayPage {
 
               Column({ space: 8 }) {
                 Row({ space: 4 }) {
-                  Text(this.orderData.departureAirport).fontSize(14).fontColor($r('sys.color.ohos_id_color_text_primary'))
+                  Text(this.orderData.departureAirport)
+                    .fontSize(14)
+                    .fontColor($r('sys.color.ohos_id_color_text_primary'))
                     .fontWeight(FontWeight.Regular)
                   Image($r('app.media.ic_goto')).width(16).height(16)
-                  Text(this.orderData.destinationAirport).fontSize(14).fontColor($r('sys.color.ohos_id_color_text_primary'))
+                  Text(this.orderData.destinationAirport)
+                    .fontSize(14)
+                    .fontColor($r('sys.color.ohos_id_color_text_primary'))
                     .fontWeight(FontWeight.Regular)
                 }
 
@@ -196,7 +200,7 @@ export struct PayPage {
                   .onClick(() => {
                     this.selectedPay = item;
                   });
-                });
+                },(item: PayTypeData, index: number)=>index + '__' + JSON.stringify(item));
               }
               .width('100%')
               .padding({ left: 14, right: 14 })
@@ -204,7 +208,7 @@ export struct PayPage {
               .alignItems(HorizontalAlign.Start)
               .borderRadius(16);
             }
-            .margin({bottom: 20})
+            .margin({ bottom: 20 })
             .justifyContent(FlexAlign.Start)
           }
 
@@ -219,7 +223,7 @@ export struct PayPage {
               this.payOrder();
             })
           }
-          .position({left: 0, bottom: 0})
+          .position({ left: 0, bottom: 0 })
         }
         .width(Constants.FULL_PERCENT_WIDTH)
         .layoutWeight(1)

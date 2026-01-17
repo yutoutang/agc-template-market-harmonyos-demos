@@ -1,5 +1,5 @@
 import { ComponentContent, LevelMode } from '@kit.ArkUI';
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { ALL_CARD_TAB, NFC_TYPE } from '../common/Enum';
 import { getNfcName } from '../common/nfc/Nfc';
 import { getNavPathStack } from '../common/Route';
@@ -44,7 +44,7 @@ struct CloneCardPage {
             PromptActionUtil.setOptions({
               levelMode: LevelMode.EMBEDDED,
               onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
-                hilog.info(0xFF00, 'SubmitFeedBack', JSON.stringify(dismissDialogAction.reason));
+                UtilLog.info(JSON.stringify(dismissDialogAction.reason));
               },
             });
 

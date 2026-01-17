@@ -1,5 +1,6 @@
 import { CategoryItem, ProductSummaryItem } from '../commons/Types';
 import { ChipGroupItemOptions, ChipGroup, ChipSize } from '@kit.ArkUI';
+import { AnimateType, UISkeleton, SkeletonTheme } from '@hw-agconnect/ui-skeleton';
 
 @ComponentV2
 export struct ProductCategory {
@@ -80,13 +81,9 @@ export struct ProductCategory {
         if (this.curSubCategoryList.length) {
           this.subCategoryBarBuilder()
         }
-        if (this.isLoading) {
-          Column() {
-            LoadingProgress().width(32)
-          }
-          .layoutWeight(1)
-          .justifyContent(FlexAlign.Center)
-        } else if (!this.productList.length) {
+        if (!this.categoryTabs.length) {
+          LoadingProgress().width(32)
+        } else if (this.categoryTabs && !this.isLoading && !this.productList.length) {
           Column() {
             Image($r('app.media.ic_search_empty'))
               .width(120)
@@ -118,7 +115,7 @@ export struct ProductCategory {
         .textOverflow({ overflow: TextOverflow.Ellipsis })
         .fontColor(index === this.curIndex ? $r('app.color.theme_color') : $r('app.color.font_color_level2'))
         .fontWeight(index === this.curIndex ? FontWeight.Medium : FontWeight.Regular)
-        .fontSize(12);
+        .fontSize(14);
     }
     .width('100%')
     .height(48)
@@ -174,29 +171,42 @@ export struct ProductCategory {
         },
         gutter: { x: 12, y: 12 },
       }) {
-        ForEach(this.productList, (item: ProductSummaryItem) => {
-          GridCol({
-            offset: 0,
-            order: 0,
-          }) {
-            Column() {
-              Image(item.banner)
-                .width($r('app.string.size_percent_full'))
-                .aspectRatio(1)
-                .borderRadius($r('app.string.border_radius_8'))
-              Text(item.title)
-                .fontSize($r('app.string.font_size_14'))
-                .fontColor($r('app.color.font_color_level1'))
-                .margin({ top: $r('app.string.space_xs') })
-                .maxLines(1)
-                .textOverflow({ overflow: TextOverflow.Ellipsis })
+        if (this.isLoading) {
+          ForEach([1, 2, 3, 4, 5, 6, 7, 8], () => {
+            GridCol({
+              offset: 0,
+              order: 0,
+            }) {
+              UISkeleton({
+                theme: SkeletonTheme.IMAGE, animate: AnimateType.GRADIENT,
+              }).height(96)
             }
-            .alignItems(HorizontalAlign.Start)
-            .onClick(() => {
-              this.handleClickCard?.(item)
-            })
-          }
-        }, (item: ProductSummaryItem, index: number) => index + '__' + item.id)
+          }, (item: number) => item.toString())
+        } else {
+          ForEach(this.productList, (item: ProductSummaryItem) => {
+            GridCol({
+              offset: 0,
+              order: 0,
+            }) {
+              Column() {
+                Image(item.banner)
+                  .width($r('app.string.size_percent_full'))
+                  .aspectRatio(1)
+                  .borderRadius($r('app.string.border_radius_8'))
+                Text(item.title)
+                  .fontSize($r('app.string.font_size_14'))
+                  .fontColor($r('app.color.font_color_level1'))
+                  .margin({ top: $r('app.string.space_xs') })
+                  .maxLines(1)
+                  .textOverflow({ overflow: TextOverflow.Ellipsis })
+              }
+              .alignItems(HorizontalAlign.Start)
+              .onClick(() => {
+                this.handleClickCard?.(item)
+              })
+            }
+          }, (item: ProductSummaryItem, index: number) => index + '__' + item.id)
+        }
       }
       .width($r('app.string.size_percent_full'))
       .margin({

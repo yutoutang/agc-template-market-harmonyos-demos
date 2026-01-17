@@ -13,10 +13,12 @@
  * limitations under the License.
  */
 import { fileIo as fs } from '@kit.CoreFileKit';
+import { LoadingDialog } from '@kit.ArkUI';
 import { RecorderToolDialog } from '../components/RecorderToolDialog';
 import { RecordPageVM } from '../viewModels/RecordPageVM';
 import { PermissionUtil } from '../util/PermissionUtil';
 import { RecordStatus, SaveType } from '../model/Index';
+
 
 
 @Builder
@@ -31,6 +33,12 @@ export struct RecordPage {
     builder: this.buildDialog,
     customStyle: true,
   });
+
+  loadingController: CustomDialogController = new CustomDialogController({
+    builder: LoadingDialog({
+      content: '录音保存中...',
+    })
+  })
 
   aboutToAppear(): void {
     PermissionUtil.requestPermissions(['ohos.permission.MICROPHONE']);
@@ -50,15 +58,15 @@ export struct RecordPage {
   buildDialog() {
     RecorderToolDialog({
       save: async () => {
-        await this.vm.saveAudio(SaveType.ONLY_SAVE);
+        await this.vm.saveAudio(SaveType.ONLY_SAVE,this.loadingController);
         this.controller.close();
       },
       convert: async () => {
-        await this.vm.saveAudio(SaveType.CONVERT_SAVE);
+        await this.vm.saveAudio(SaveType.CONVERT_SAVE,this.loadingController);
         this.controller.close();
       },
       edit: async () => {
-        await this.vm.saveAudio(SaveType.EDIT_SAVE);
+        await this.vm.saveAudio(SaveType.EDIT_SAVE,this.loadingController);
         this.controller.close();
       },
       cancel: () => {
@@ -120,7 +128,7 @@ export struct RecordPage {
             } else {
               Image($r('app.media.ic_play_button')).width(56).onClick(() => {
                 if (this.vm.recordStatus === RecordStatus.PENDING) {
-                  this.vm.start();
+                  this.vm.start(this.getUIContext());
                 }
 
               });

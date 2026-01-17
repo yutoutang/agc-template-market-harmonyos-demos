@@ -1,3 +1,5 @@
+import { Decimal } from '@kit.ArkTS'
+import { PointRecord } from '../../../../../Index'
 import {
   CarGoodsInfoResp,
   CouponItem,
@@ -15,8 +17,7 @@ import {
 } from '../../types/Order'
 import { AddCarReq, AddDnOrderReq, CommonReq, GoodsReq, MyOrderReq } from '../../types/Request'
 import { getTableInfoResp, rechargeTierList } from './Store'
-import { Decimal } from '@kit.ArkTS'
-import { consumeMoney, rechargeMoney } from './User'
+import { consumeMoney, getPointList, insertPointRecord, lockedPoint, rechargeMoney, unlockedPoint } from './User'
 
 const specJson1 =
   `[{"specId":"1","specName":"奶油","specValId":"11","specVal":[{"specValId":"11","specValName":"动物奶油","specValLogo":"","specValNum":"1"},{"specValId":"12","specValName":"植物奶油","specValLogo":"","specValNum":"1"}]},{"specId":"2","specName":"糖类选择","specValId":"22","specVal":[{"specValId":"21","specValName":"蔗糖","specValLogo":"","specValNum":"1"},{"specValId":"22","specValName":"赤鲜糖醇（0糖）","specValLogo":"","specValNum":"1"}]},{"specId":"3","specName":"尺寸","specValId":"31","specVal":[{"specValId":"31","specValName":"6寸","specValLogo":"","specValNum":"1"},{"specValId":"32","specValName":"9寸","specValLogo":"","specValNum":"1"},{"specValId":"33","specValName":"12寸","specValLogo":"","specValNum":"1"}]}]`
@@ -211,16 +212,6 @@ class CommonRules {
     discountAmount: '15',
     discountCoefficient: '',
   }
-  // 折扣
-  static readonly RULE3: CouponRule = {
-    amountRuleNo: '3',
-    amountRuleDesc: '折扣',
-    discountMode: '0',
-    discountType: '2',
-    fullAmount: '',
-    discountAmount: '',
-    discountCoefficient: '0.8',
-  }
 }
 
 // 核销单 === 已使用
@@ -233,7 +224,7 @@ const OFFSET_INFO: OffsetInfo = {
 }
 const couponsOri: CouponItem[] =
   [
-  // 生效-待使用-活动期间-满减-低
+    // 生效-待使用-活动期间-满减-低
     {
       couponID: '1',
       couponName: '优惠券名称',
@@ -296,27 +287,6 @@ const couponsOri: CouponItem[] =
       createdTime: '',
       lastUpdateTime: '',
     },
-    // 生效-待使用-活动期间-折扣
-    {
-      couponID: '3',
-      couponName: '优惠券名称',
-      validityPeriodMode: '0',
-      startTime: '2025-1-1',
-      endTime: '2035-1-1',
-      status: '2',
-      amountRule: CommonRules.RULE3,
-      distributionQuantity: '-1',
-      repeatedPickup: '0',
-      categoryGroup: '',
-      brandGroup: '',
-      catalogGroup: '',
-      productGroup: '',
-      recipientLimits: '2',
-      specifiedSubGroup: [],
-      specifiedPickupScenario: [{ key: 0, value: '新用户注册' }],
-      createdTime: '',
-      lastUpdateTime: '',
-    },
     // 生效-待使用-活动期前-满减
     {
       couponID: '4',
@@ -347,27 +317,6 @@ const couponsOri: CouponItem[] =
       endTime: '2035-1-1',
       status: '2',
       amountRule: CommonRules.RULE2,
-      distributionQuantity: '-1',
-      repeatedPickup: '0',
-      categoryGroup: '',
-      brandGroup: '',
-      catalogGroup: '',
-      productGroup: '',
-      recipientLimits: '2',
-      specifiedSubGroup: [],
-      specifiedPickupScenario: [{ key: 0, value: '新用户注册' }],
-      createdTime: '',
-      lastUpdateTime: '',
-    },
-    // 生效-待使用-活动期前-折扣
-    {
-      couponID: '6',
-      couponName: '优惠券名称',
-      validityPeriodMode: '0',
-      startTime: '2030-1-1',
-      endTime: '2035-1-1',
-      status: '2',
-      amountRule: CommonRules.RULE3,
       distributionQuantity: '-1',
       repeatedPickup: '0',
       categoryGroup: '',
@@ -422,27 +371,6 @@ const couponsOri: CouponItem[] =
       createdTime: '',
       lastUpdateTime: '',
     },
-    // 生效-已使用-折扣
-    {
-      couponID: '9',
-      couponName: '优惠券名称',
-      validityPeriodMode: '0',
-      startTime: '2025-1-1',
-      endTime: '2035-1-1',
-      status: '2',
-      amountRule: CommonRules.RULE3,
-      distributionQuantity: '-1',
-      repeatedPickup: '0',
-      categoryGroup: '',
-      brandGroup: '',
-      catalogGroup: '',
-      productGroup: '',
-      recipientLimits: '2',
-      specifiedSubGroup: [],
-      specifiedPickupScenario: [{ key: 0, value: '新用户注册' }],
-      createdTime: '',
-      lastUpdateTime: '',
-    },
     // 生效-已过期-满减
     {
       couponID: '10',
@@ -485,30 +413,9 @@ const couponsOri: CouponItem[] =
       createdTime: '',
       lastUpdateTime: '',
     },
-    // 生效-已过期-折扣
-    {
-      couponID: '12',
-      couponName: '优惠券名称',
-      validityPeriodMode: '0',
-      startTime: '2025-1-1',
-      endTime: '2025-2-1',
-      status: '2',
-      amountRule: CommonRules.RULE3,
-      distributionQuantity: '-1',
-      repeatedPickup: '0',
-      categoryGroup: '',
-      brandGroup: '',
-      catalogGroup: '',
-      productGroup: '',
-      recipientLimits: '2',
-      specifiedSubGroup: [],
-      specifiedPickupScenario: [{ key: 0, value: '新用户注册' }],
-      createdTime: '',
-      lastUpdateTime: '',
-    },
   ]
 const myCoupons: CouponItem[] = [
-// 生效-待使用-活动期前-满减
+  // 生效-待使用-活动期前-满减
   {
     couponID: '4',
     couponName: '优惠券名称',
@@ -573,28 +480,6 @@ const myCoupons: CouponItem[] = [
     lastUpdateTime: '',
     offsetInfo: OFFSET_INFO,
   },
-  // 生效-已使用-折扣
-  {
-    couponID: '9',
-    couponName: '优惠券名称',
-    validityPeriodMode: '0',
-    startTime: '2025-1-1',
-    endTime: '2035-1-1',
-    status: '2',
-    amountRule: CommonRules.RULE3,
-    distributionQuantity: '-1',
-    repeatedPickup: '0',
-    categoryGroup: '',
-    brandGroup: '',
-    catalogGroup: '',
-    productGroup: '',
-    recipientLimits: '2',
-    specifiedSubGroup: [],
-    specifiedPickupScenario: [{ key: 0, value: '新用户注册' }],
-    createdTime: '',
-    lastUpdateTime: '',
-    offsetInfo: OFFSET_INFO,
-  },
   // 生效-已过期-满减
   {
     couponID: '10',
@@ -625,27 +510,6 @@ const myCoupons: CouponItem[] = [
     endTime: '2025-2-1',
     status: '2',
     amountRule: CommonRules.RULE2,
-    distributionQuantity: '-1',
-    repeatedPickup: '0',
-    categoryGroup: '',
-    brandGroup: '',
-    catalogGroup: '',
-    productGroup: '',
-    recipientLimits: '2',
-    specifiedSubGroup: [],
-    specifiedPickupScenario: [{ key: 0, value: '新用户注册' }],
-    createdTime: '',
-    lastUpdateTime: '',
-  },
-  // 生效-已过期-折扣
-  {
-    couponID: '12',
-    couponName: '优惠券名称',
-    validityPeriodMode: '0',
-    startTime: '2025-1-1',
-    endTime: '2025-2-1',
-    status: '2',
-    amountRule: CommonRules.RULE3,
     distributionQuantity: '-1',
     repeatedPickup: '0',
     categoryGroup: '',
@@ -870,6 +734,9 @@ export const cancelOrder = (params: CommonReq) => {
   if (order?.order?.state) {
     if (Number(order?.order?.state) === 1) {
       order.order.state = 3
+      if (order.order.redeemedPoint) {
+        unlockedPoint(150)
+      }
       return 1
     } else {
       return 2
@@ -902,12 +769,14 @@ export const addOrder = (params: AddDnOrderReq) => {
     tableware: params.tableware.toString(),
     yhqMoney: params.yhqMoney,
     couponId: params.couponId,
+    redeemedPoint: params.redeemedPoint,
     state: 1,
     oid: `${80000 + orderId}`,
     payTime: '',
-    tel: '',
-    name: '',
-    address: '',
+    storeTel: params.storeTel || '',
+    storeName: params.storeName || '',
+    storeLogo: params.storeLogo || '',
+    storeAddress: params.storeAddress || '',
     lat: '',
     lng: '',
     rechargeId: params.rechargeId || '',
@@ -943,10 +812,30 @@ export const addOrder = (params: AddDnOrderReq) => {
     goods: goodsList,
     table: temp,
   }
+  // 华为支付如果有积分抵扣，需要锁定积分
+  if (params.payType === 1 && params.redeemedPoint) {
+    lockedPoint(150)
+  }
   // 钱包支付，状态直接改为已支付
   if (params.payType === 2 && !params.rechargeId) {
     order.order.state = 2
     consumeMoney(params.money)
+    if (order.order.redeemedPoint) {
+      let point: PointRecord = {
+        id: getPointList().length + 1,
+        action: 2,
+        changePoint: 150,
+        time: new Date().getTime(),
+      }
+      insertPointRecord(point)
+    }
+    let point: PointRecord = {
+      id: getPointList().length + 1,
+      action: 1,
+      changePoint: order.order.money,
+      time: new Date().getTime(),
+    }
+    insertPointRecord(point)
   }
   orderList.push(order)
   orderId++
@@ -960,6 +849,9 @@ export const addGoods = (params: CommonReq): number => {
     return 2
   }
   deleteOrder(params)
+  if (order?.order.redeemedPoint) {
+    unlockedPoint(150)
+  }
   cleanCar()
   order?.goods?.forEach(item => {
     let goods = getAllGoodsList().find(i => i.id === item.id)
@@ -1016,6 +908,22 @@ export const getHuaweiPayInfo = (params: CommonReq) => {
         rechargeMoney(rechargeTier.id)
         consumeMoney(order.order.money)
       }
+      if (order.order.redeemedPoint) {
+        let point: PointRecord = {
+          id: getPointList().length + 1,
+          action: 2,
+          changePoint: 150,
+          time: new Date().getTime(),
+        }
+        insertPointRecord(point)
+      }
+      let point: PointRecord = {
+        id: getPointList().length + 1,
+        action: 1,
+        changePoint: order.order.money,
+        time: new Date().getTime(),
+      }
+      insertPointRecord(point)
       return 1
     } else {
       return 2

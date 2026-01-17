@@ -1,4 +1,4 @@
-import promptAction from '@ohos.promptAction';
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
 import { Type } from '@kit.ArkUI';
 import { LoanPrimeRate } from '../types/Index';
 import { queryLPRList } from '../common/Request';

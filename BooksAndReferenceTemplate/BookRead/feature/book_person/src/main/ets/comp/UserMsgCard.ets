@@ -1,6 +1,5 @@
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { BusinessError, emitter } from '@kit.BasicServicesKit';
-import { promptAction } from '@kit.ArkUI';
 import { Constants, TCRouter, UserInfoModel, UserInfoUtil } from 'common';
 import { UserInfo } from 'base_common';
 import { AvatarIcon, SelectAvatarCard } from './SelectAvatarCard';
@@ -15,9 +14,13 @@ export struct UserMsgCard {
 
   aboutToAppear(): void {
     this.loginPost();
-    emitter.on(Constants.LOGIN_CHANGE, () => {
-      this.loginPost();
-    })
+    try {
+      emitter.on(Constants.LOGIN_CHANGE, () => {
+        this.loginPost();
+      });
+    } catch (error) {
+      console.error('Failed to emitter on login change. Cause: ' + JSON.stringify(error));
+    }
     this.change();
   }
 
@@ -116,6 +119,6 @@ export struct UserMsgCard {
   dealAllError(error: BusinessError<Object>): void {
     hilog.error(0x0000, 'testTag',
       `Failed to login, errorCode is ${error.code}, errorMessage is ${error.message}`);
-    promptAction.showToast({ message: '账号关联失败' })
+    this.getUIContext().getPromptAction().showToast({ message: '账号关联失败' })
   }
 }

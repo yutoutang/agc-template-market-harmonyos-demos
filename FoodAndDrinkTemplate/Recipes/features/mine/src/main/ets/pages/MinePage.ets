@@ -114,7 +114,8 @@ struct MinePage {
   @Builder
   membershipBuilder() {
     Stack() {
-      Image($r('app.media.bg_membership')).width('100%')
+      Image(this.vm.gridCount === 2 ? $r('app.media.bg_membership') : $r('app.media.bg_large_membership'))
+        .width('100%')
       Row() {
         Button(this.vm.userInfo.isMembership ? '会员中心' : '开通会员', { controlSize: ControlSize.SMALL })
           .fontSize($r('sys.float.Body_M'))
@@ -139,10 +140,11 @@ struct MinePage {
         Image($r('app.media.ic_public_add')).width(40).height(40).fillColor('#66000000');
         Text('上传我的菜谱').fontSize(14).fontColor('#66000000');
       }
-      .height('100%')
+      .height(160)
       .width('100%')
       .backgroundColor('#F1F3F5')
       .borderRadius(8)
+      .margin({bottom: 46})
       .justifyContent(FlexAlign.Center)
       .onClick(() => {
         // 添加菜谱
@@ -154,7 +156,7 @@ struct MinePage {
           RouterModule.push(RouterMap.QUICK_LOGIN_PAGE);
         }
       });
-    }.height(160);
+    }.height(208)
   }
 }
 

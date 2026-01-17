@@ -19,6 +19,12 @@ export enum SenderType {
   CUSTOMER_SERVICE = 'customer_service',
 }
 
+export interface MessageData{
+  content: ResourceStr; // 消息内容（文本内容或图片URL）
+  type: MessageType; // 消息类型
+  timestamp: number; // 时间戳
+}
+
 // 消息实体类
 export class MessageModel {
   id: string; // 消息ID

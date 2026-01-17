@@ -146,7 +146,7 @@ export struct PictureBeautification {
           .visibility(this.vm.barIndex === 0 && this.vm.carouselCutTabIndex === 0 ? Visibility.Visible :
             Visibility.None)
           .onReady(() => {
-            this.vm.drawClipImage();
+            this.vm.drawClipImage(this.getUIContext());
           })
           .onTouch(event => {
             if (event.type === TouchType.Down) {

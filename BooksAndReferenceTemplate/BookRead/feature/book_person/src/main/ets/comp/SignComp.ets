@@ -12,12 +12,10 @@ export struct SignComp {
   @Consumer('index') index: number = 0;
   @Local point: number = 0;
   @Local signIn: number = AppStorage.get('signIn') || 0;
-  // @Local frontDay: Date = AppStorage.get('frontDay')||;
   private currentSliderModel: SliderModel | null = null
   private contentNode: ComponentContent<DialogClass> | null = null
   uiContext = this.getUIContext();
   promptAction = this.uiContext.getPromptAction();
-  // @Local arr: SliderList = PersistentStorage.persistProps(SliderList, 'SliderList', () => new SliderList())!
   @Local arr: SliderList = AppStorageV2.connect(SliderList, 'SliderList', () => new SliderList())!
   @Local userInfo: UserInfo = AppStorage.get('userInfo') as UserInfo;
 
@@ -56,7 +54,6 @@ export struct SignComp {
 
       Row() {
         Flex({ direction: FlexDirection.Row }) {
-
           ForEach(this.arr.sliderList, (item: SliderModel, index: number) => {
             ListItem() {
               CustomSlider({
@@ -69,14 +66,7 @@ export struct SignComp {
             .onClick(() => {
               if (item.day === Constants.DATE &&
                 this.arr.sliderList[this.index === 7 ? this.arr.sliderList.length - 1 : this.index].isClick === false) {
-                // this.currentSliderModel =
-                //   this.arr.sliderList[this.index === 7 ? this.arr.sliderList.length - 1 : this.index] as SliderModel
-                // this.contentNode = new ComponentContent((this.uiContext), wrapBuilder(SignInSuccessDialogBuilder),
-                //   new DialogClass(this.currentSliderModel.value));
                 try {
-                  // this.promptAction.openCustomDialog(this.contentNode, {
-                  //   alignment: DialogAlignment.Center,
-                  // });
                   if (this.userInfo?.bookCoins !== undefined) {
                     this.userInfo.bookCoins += item.value
                     emitter.emit(Constants.COINS_CHANGE)
@@ -84,18 +74,11 @@ export struct SignComp {
 
                   this.promptAction.showToast({ message: `成功签到，积分+${item.value}` })
                   if (this.signIn !== undefined) {
-                    // this.signIn++;
                     AppStorage.setOrCreate('signIn', this.signIn += 1)
-                    // this.signIn = AppStorage.get<number>('signIn')
                     this.arr.sliderList[this.index === 7 ? this.arr.sliderList.length - 1 : this.index].isClick = true;
                   } else {
                     AppStorage.setOrCreate('signIn', 1)
                   }
-                  setTimeout(() => {
-                    // this.closeDialog();
-
-
-                  }, 500)
                 } catch (error) {
                   let message = (error as BusinessError).message;
                   let code = (error as BusinessError).code;
@@ -103,17 +86,14 @@ export struct SignComp {
                 }
               }
             })
-          })
-
+          },(item:SliderModel)=>new Date().toString())
         }
-        .width(Constants.FULL_WIDTH)
+        .layoutWeight(1)
         .padding({
           top: 10,
         })
-
       }
       .alignSelf(ItemAlign.Center)
-
     }
     .borderRadius(12)
     .padding({
@@ -131,9 +111,63 @@ export struct SignComp {
 
   build() {
     Column() {
+      Text() {
+        Span('本轮已经连续签到')
+        Span(this.signIn.toString())
+        Span('天')
+      }
 
-      this.showSignIn()
+      Row() {
+        Flex({ direction: FlexDirection.Row }) {
+          ForEach(this.arr.sliderList, (item: SliderModel, index: number) => {
+            ListItem() {
+              CustomSlider({
+                sliderModel: item,
+                booLeft: this.index > index, //判断left左侧
+                booRight: this.index - 1 > index,
+                index: this.index
+              })
+            }
+            .onClick(() => {
+              if (item.day === Constants.DATE &&
+                this.arr.sliderList[this.index === 7 ? this.arr.sliderList.length - 1 : this.index].isClick === false) {
+                try {
+                  if (this.userInfo?.bookCoins !== undefined) {
+                    this.userInfo.bookCoins += item.value
+                    emitter.emit(Constants.COINS_CHANGE)
+                  }
+
+                  this.promptAction.showToast({ message: `成功签到，积分+${item.value}` })
+                  if (this.signIn !== undefined) {
+                    AppStorage.setOrCreate('signIn', this.signIn += 1)
+                    this.arr.sliderList[this.index === 7 ? this.arr.sliderList.length - 1 : this.index].isClick = true;
+                  } else {
+                    AppStorage.setOrCreate('signIn', 1)
+                  }
+                } catch (error) {
+                  let message = (error as BusinessError).message;
+                  let code = (error as BusinessError).code;
+                  hilog.error(DOMAIN_NUMBER, TAG, `OpenCustomDialog args error code is ${code}, message is ${message}`);
+                }
+              }
+            })
+          },(item:SliderModel)=>new Date().toString())
+        }
+        .width(Constants.FULL_WIDTH)
+        .padding({
+          top: 10,
+        })
+      }
+      .alignSelf(ItemAlign.Center)
     }
+    .borderRadius(16)
+    .padding({
+      left: 10,
+      right: 10,
+      top: 20,
+      bottom: 12
+    })
+    .backgroundColor($r('sys.color.comp_background_list_card'))
   }
 }
 
@@ -156,7 +190,6 @@ export struct CustomSlider {
           .margin({ top: 2 })
           .fontColor(this.sliderModel.isClick ? $r('sys.color.comp_background_list_card') :
             '#99000000')
-        // Text(`${this.sliderModel.day}`)
       }
       .width(40)
       .height(40)
@@ -174,7 +207,7 @@ export struct CustomSlider {
         .width(40)
         .textAlign(TextAlign.Center)
         .fontColor(this.sliderModel.isClick ? $r('app.color.sign_day_color_on') :
-        $r('app.color.sign_day_color_off'))
+          $r('app.color.sign_day_color_off'))
     }
     .width(Constants.CUSTOM_SLIDER_WIDTH)
     .height(Constants.CUSTOM_SLIDER_HEIGHT)
@@ -193,18 +226,6 @@ export class DialogClass {
 @Builder
 export function SignInSuccessDialogBuilder(dialogClass: DialogClass) {
   Column() {
-    // Stack({ alignContent: Alignment.Top }) {
-    //   Image($r('app.media.welfare_bg'))
-    //     .width(Constants.FULL_WIDTH)
-    //
-    //   Image($r('app.media.wechat'))
-    //     .width(75)
-    //     .height(95)
-    //     .margin({
-    //       top: 20
-    //     })
-    // }
-
     Text('签到成功')
       .fontSize(18)
       .fontWeight(FontWeight.Medium)
@@ -212,16 +233,6 @@ export function SignInSuccessDialogBuilder(dialogClass: DialogClass) {
         top: 10,
         bottom: 10
       })
-
-    // Row() {
-    //   Text(`+${dialogClass.data}`)
-    //     .fontSize(40)
-    //     .fontWeight(FontWeight.Medium)
-    //     .fontColor('#0A59F7')
-    //
-    //   Image($r('app.media.startIcon'))
-    //     .width(28)
-    // }
 
     Blank()
 

@@ -17,8 +17,12 @@
       "value": "获取位置权限"
     },
     {
+      "name": "app_tracking_constant",
+      "value": "跨应用关联权限"
+    },
+    {
       "name": "home_page",
-      "value": "考试"
+      "value": "首页"
     },
     {
       "name": "mine",
@@ -247,6 +251,10 @@
     {
       "name": "privacyAgreementPath",
       "value": "https://developer.huawei.com/"
+    },
+    {
+      "name": "agcit_huawei_driver_license_exam",
+      "value": "1.0.4"
     }
   ]
 }

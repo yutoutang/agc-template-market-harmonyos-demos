@@ -1,6 +1,10 @@
 import { AppStorageV2, window } from '@kit.ArkUI';
-import { GridRowColSetting } from '../common/GridRowColSetting';
+import { BusinessError } from '@kit.BasicServicesKit'
+import { WindowUtil } from 'module_ui_base';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { BreakpointModel } from './BreakpointModel';
+import { GridRowColSetting } from '../common/GridRowColSetting';
+import { LOG_TAG } from '../constants/CommonConstants';
 
 /**
  * 窗口持久化
@@ -57,15 +61,31 @@ export class CustomWindowModel {
     return this.avoidBottomPadding > 0 ? 0 : 16;
   }
 
+  public async getLastWindow() {
+    return window.getLastWindow(WindowUtil.context).then((win) => {
+      return win
+    }).catch((err: BusinessError) => {
+      UtilLog.error(LOG_TAG, 'get last window failed. error: ' + JSON.stringify(err))
+      return undefined
+    })
+  }
+
   /**
    * 获取底部避让区域高度
    */
   public getAvoidBottomPadding: () => void = () => {
-    window.getLastWindow(getContext()).then((currentWindow) => {
-      const area = currentWindow.getWindowAvoidArea(
-        window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR,
-      );
-      this.avoidBottomPadding = px2vp(area.bottomRect.height);
+    this.getLastWindow().then((currentWindow) => {
+      if (!currentWindow) {
+        return;
+      }
+      try {
+        const area = currentWindow.getWindowAvoidArea(
+          window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR,
+        );
+        this.avoidBottomPadding = WindowUtil.px2vp(area.bottomRect.height);
+      } catch (err) {
+        UtilLog.error('[Setting]', 'get window avoid area failed. error: ' + JSON.stringify(err))
+      }
     });
   };
 
@@ -74,8 +94,8 @@ export class CustomWindowModel {
    */
   public onAvoidAreaChange() {
     this.getAvoidBottomPadding();
-    window.getLastWindow(getContext()).then((currentWindow) => {
-      currentWindow.on('avoidAreaChange', this.getAvoidBottomPadding);
+    this.getLastWindow().then((currentWindow) => {
+      currentWindow?.on('avoidAreaChange', this.getAvoidBottomPadding);
     });
   }
 
@@ -83,8 +103,8 @@ export class CustomWindowModel {
    * 取消监听底部避让区域变化
    */
   public offAvoidAreaChange() {
-    window.getLastWindow(getContext()).then((currentWindow) => {
-      currentWindow.off('avoidAreaChange', this.getAvoidBottomPadding);
+    this.getLastWindow().then((currentWindow) => {
+      currentWindow?.off('avoidAreaChange', this.getAvoidBottomPadding);
     });
   }
 }

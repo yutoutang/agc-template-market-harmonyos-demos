@@ -1,8 +1,9 @@
-import { promptAction } from '@kit.ArkUI';
 import { BalanceChangeType } from '../commons/Enums';
 import { BalanceResourceModel } from '../commons/Models';
 import { BalanceResourceItem } from '../commons/Types';
+import { contextUtil } from '../utils/ContextUtil';
 import { ResourceUtil } from '../utils/ResourceUtil';
+import { toastUtil } from '../utils/ToastUtil';
 
 @ObservedV2
 export class ResourceManageVM {
@@ -29,7 +30,7 @@ export class ResourceManageVM {
       (item) => item.name === this.customResourceName,
     );
     if (isExist) {
-      promptAction.showToast({ message: '类型名称已存在~' });
+      toastUtil.showToast('类型名称已存在~');
       return false;
     }
     if (!this.selectedItem) {
@@ -62,11 +63,11 @@ export class ResourceManageVM {
     const res = ResourceUtil.deleteCustomResource(key);
     if (res) {
       callback?.(key);
-      promptAction.showToast({ message: '自定义类型删除成功~' });
-      promptAction.closeCustomDialog(dialogId);
+      toastUtil.showToast('自定义类型删除成功~');
+      contextUtil.getPromptAction()?.closeCustomDialog(dialogId);
       return;
     }
-    promptAction.showToast({ message: '自定义类型删除失败，请稍后重试' });
+    toastUtil.showToast('自定义类型删除失败，请稍后重试');
   }
 
   public customSortResource(index1: number, index2: number) {

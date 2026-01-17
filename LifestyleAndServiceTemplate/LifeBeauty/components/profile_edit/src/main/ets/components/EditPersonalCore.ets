@@ -1,8 +1,12 @@
+import { LengthMetrics, SymbolGlyphModifier } from '@kit.ArkUI';
+import { ToastDialog } from '@hw-agconnect/ui-toast';
+import { UIDialog } from '@hw-agconnect/ui-dialog';
 import { GENDER_OPTIONS, PHONE_REG } from '../common/Constants';
 import { formatDate } from '../common/Utils';
 import { GenderOption } from '../types/Gender';
 import { PersonalInfo } from '../types/PersonalInfo';
 import { EditPersonVM } from '../viewmodels/EditPersonVM';
+import { DatePickerDialog } from './DatePickerDialog';
 
 @Builder
 export function EditPersonalInfoCoreBuilder() {
@@ -12,37 +16,49 @@ export function EditPersonalInfoCoreBuilder() {
 @ComponentV2
 struct EditPersonalInfoCore {
   @Local vm: EditPersonVM = new EditPersonVM();
-  @Local showSheetGender: boolean = false;
-  @Local showSheetBirth: boolean = false;
   @Local name: string = '';
   @Local gender: number = -1;
   @Local phone: string = '';
   @Local birthDate: Date | null = null;
   @Local isAgree: boolean = false;
-  @Local tempGender: number = 0;
-  private tempBirth: Date | null = null;
+  fullNameController: TextInputController = new TextInputController();
+  phoneController: TextInputController = new TextInputController();
+
+  endIconModifier: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.checkmark'))
+    .fontSize(24).fontColor([$r('app.color.common_grey')]);
+
+  openDatePickerDialog() {
+    UIDialog.open({
+      contentBuilder: (): void => this.datePickerDialogView(),
+      showConfirmButton: false,
+      showCancelButton: false,
+    })
+  }
 
   build() {
     NavDestination() {
-      Scroll() {
-        Column() {
-          // 自定义标题
-          this.customTitleBuilder()
+      Column() {
+        // 自定义标题
+        this.customTitleBuilder()
+        // 内容
+        Scroll() {
+          Column() {
+            // form表单
+            this.formBuilder()
 
-          // form表单
-          this.formBuilder()
-
-          // 底部说明操作区域
-          this.agreePrivacyBuilder()
+            // 底部说明操作区域
+            this.agreePrivacyBuilder()
+          }
+          .width('100%')
         }
         .width('100%')
-        .height('100%')
-        .padding(12)
+        .layoutWeight(1)
+        .scrollBar(BarState.Off)
+        .align(Alignment.Top)
       }
       .width('100%')
       .height('100%')
-      .scrollBar(BarState.Off)
-      .align(Alignment.Top)
+      .padding(16)
     }
     .hideTitleBar(true)
     .backgroundColor($r('sys.color.background_secondary'))
@@ -54,21 +70,14 @@ struct EditPersonalInfoCore {
   @Builder
   customTitleBuilder() {
     Row() {
+      Text(this.vm.title).fontSize(20).fontWeight(700).margin({ left: 8 })
+      Blank()
       Image($r('app.media.ic_close_sheet'))
         .width(40)
         .height(40)
         .draggable(false)
         .onClick(() => {
           this.vm.close();
-        })
-      Text('编辑个人信息').fontSize(20).fontWeight(700).margin({ left: 8 })
-      Blank()
-      Image($r('app.media.ic_confirm_sheet'))
-        .width(40)
-        .height(40)
-        .draggable(false)
-        .onClick(() => {
-          this.onSubmit();
         })
     }
     .width('100%')
@@ -78,69 +87,72 @@ struct EditPersonalInfoCore {
   @Builder
   formBuilder() {
     Column() {
-      Row() {
-        Text('姓名').formLabel()
-        TextInput({ placeholder: '请输入', text: $$this.name })
-          .backgroundColor(Color.Transparent)
-          .layoutWeight(1)
-          .textAlign(TextAlign.End)
-          .padding(0)
-          .borderRadius(0)
-      }.formRowItem()
+      Column() {
+        Row() {
+          Text('姓名').formLabel()
+          TextInput({ placeholder: '请输入', text: $$this.name, controller: this.fullNameController })
+            .backgroundColor(Color.Transparent)
+            .contentType(ContentType.PERSON_FULL_NAME)
+            .selectionMenuHidden(true)
+            .layoutWeight(1)
+            .textAlign(TextAlign.End)
+            .padding(0)
+            .borderRadius(0)
+        }.formRowItem()
 
-      Row() {
-        Text('性别').formLabel()
-        Blank()
-        Row({ space: 6 }) {
-          Text(this.genderFill).fontColor($r('app.color.common_grey'))
-          Image($r('app.media.ic_public_arrow_right')).width(12).fillColor($r('app.color.common_grey'))
+        Row() {
+          Text('性别').formLabel()
+          Blank()
+          Row({ space: 6 }) {
+            Text(this.genderFill).fontColor($r('app.color.common_grey'))
+            SymbolGlyph($r('sys.symbol.arrowtriangle_down_fill'))
+              .fontSize(12)
+              .fontColor(['#CCCCCC'])
+          }
+          .bindMenu(this.genderMenu)
+          .onClick(() => {
+            this.fullNameController.stopEditing();
+            this.phoneController.stopEditing();
+          })
+        }.formRowItem()
+
+        Row() {
+          Text('手机号码').formLabel()
+          TextInput({ placeholder: '请输入', text: $$this.phone, controller: this.phoneController })
+            .maxLength(11)
+            .contentType(ContentType.PHONE_NUMBER)
+            .selectionMenuHidden(true)
+            .backgroundColor(Color.Transparent)
+            .layoutWeight(1)
+            .textAlign(TextAlign.End)
+            .padding(0)
+            .borderRadius(0)
+        }.formRowItem()
+
+        Row() {
+          Text('生日').formLabel()
+          Blank()
+          Row({ space: 6 }) {
+            Text(this.birthFill).fontColor($r('app.color.common_grey'))
+            Image($r('app.media.ic_public_arrow_right')).width(12).fillColor($r('app.color.common_grey'))
+          }
+          .onClick(() => {
+            this.fullNameController.stopEditing();
+            this.phoneController.stopEditing();
+            this.openDatePickerDialog()
+          })
         }
-        .onClick(() => {
-          this.showSheetGender = true;
-        })
-        .bindSheet($$this.showSheetGender, this.genderSheet(), {
-          showClose: false,
-          height: SheetSize.FIT_CONTENT,
-        })
-      }.formRowItem()
-
-      Row() {
-        Text('手机号').formLabel()
-        TextInput({ placeholder: '请输入', text: $$this.phone })
-          .type(InputType.PhoneNumber)
-          .backgroundColor(Color.Transparent)
-          .layoutWeight(1)
-          .textAlign(TextAlign.End)
-          .padding(0)
-          .borderRadius(0)
-      }.formRowItem()
-
-
-      Row() {
-        Text('生日').formLabel()
-        Blank()
-        Row({ space: 6 }) {
-          Text(this.birthFill).fontColor($r('app.color.common_grey'))
-          Image($r('app.media.ic_public_arrow_right')).width(12).fillColor($r('app.color.common_grey'))
-        }
-        .onClick(() => {
-          this.showSheetBirth = true;
-        })
-        .bindSheet($$this.showSheetBirth, this.birthSheet(), {
-          height: SheetSize.FIT_CONTENT,
-          showClose: false,
-        })
+        .formRowItem()
+        .borderWidth(0)
       }
-      .formRowItem()
-      .borderWidth(0)
+      .padding({ left: 12, right: 12 })
+      .backgroundColor(Color.White)
+      .borderRadius(8)
+      .margin({ top: 10, bottom: 40 })
     }
-    .padding({ left: 12, right: 12 })
-    .backgroundColor(Color.White)
-    .borderRadius(8)
-    .margin({
-      top: 10,
-      bottom: 40,
-    })
+    .constraintSize({ minHeight: 250 })
+    .layoutWeight(1)
+    .justifyContent(FlexAlign.Start)
   }
 
   @Builder
@@ -158,14 +170,14 @@ struct EditPersonalInfoCore {
           Text() {
             Span('加入即代表同意')
             Span('《用户授权协议》')
-              .fontColor($r('sys.color.brand'))
+              .fontColor($r('sys.color.multi_color_07'))
               .onClick(() => {
                 this.vm.sheetStack.pushPathByName('PrivacyH5', null);
               })
 
             Span('，同时授权你的姓名性别手机号生日信息，用于注册你的会员信息')
           }
-          .fontSize(10)
+          .fontSize(12)
           .layoutWeight(1)
           .textAlign(TextAlign.Start)
         }
@@ -184,8 +196,6 @@ struct EditPersonalInfoCore {
           this.onSubmit();
         })
     }
-    .layoutWeight(1)
-    .justifyContent(FlexAlign.End)
     .padding({
       bottom: 12,
       left: 6,
@@ -194,93 +204,68 @@ struct EditPersonalInfoCore {
   }
 
   @Builder
-  genderSheet() {
-    Column() {
-      Row() {
-        Image($r('app.media.ic_close_sheet')).width(40).height(40).onClick(() => {
-          this.showSheetGender = false;
+  genderMenu() {
+    Menu() {
+      ForEach(GENDER_OPTIONS, (item: GenderOption, index: number) => {
+        MenuItem({
+          content: item.label,
+          symbolEndIcon: this.gender === index ? this.endIconModifier : new SymbolGlyphModifier()
         })
-        Text('性别').fontSize(20).fontWeight(700).margin({ left: 8 })
-        Blank()
-        Image($r('app.media.ic_confirm_sheet')).width(40).height(40).onClick(() => {
-          this.gender = this.tempGender;
-          this.showSheetGender = false;
-        })
-      }
-      .width('100%')
-      .height(56)
-
-      Column() {
-        ForEach(GENDER_OPTIONS, (item: GenderOption, index: number) => {
-          Text(item.label)
-            .width('100%')
-            .height(40)
-            .textAlign(TextAlign.Center)
-            .padding({ left: 2, right: 2 })
-            .backgroundColor(this.tempGender === index ? Color.White : Color.Transparent)
-            .borderRadius(8)
-            .onClick(() => {
-              this.tempGender = index;
-            })
-        }, (item: GenderOption) => JSON.stringify(item))
-      }
-      .margin({ top: 57, bottom: 86 })
+          .onClick(() => {
+            this.gender = index;
+          })
+      }, (item: GenderOption) => JSON.stringify(item))
     }
-    .padding({ left: 16, right: 16 })
+    .width(224)
+    .menuItemDivider({
+      strokeWidth: LengthMetrics.vp(0.5),
+      color: $r('sys.color.comp_divider'),
+    })
   }
 
   @Builder
-  birthSheet() {
-    Column({ space: 16 }) {
-      Row() {
-        Image($r('app.media.ic_close_sheet')).width(40).height(40).onClick(() => {
-          this.showSheetBirth = false;
-        })
-        Text('生日').fontSize(20).fontWeight(700).margin({ left: 8 })
-        Blank()
-        Image($r('app.media.ic_confirm_sheet')).width(40).height(40).onClick(() => {
-          this.birthDate = this.tempBirth ?? new Date();
-          this.showSheetBirth = false;
-        })
-      }
-      .width('100%')
-      .height(56)
-
-      DatePicker({ selected: this.birthDate, start: new Date('1900-1-1'), end: new Date() })
-        .onDateChange((date: Date) => {
-          this.tempBirth = date;
-        })
+  datePickerDialogView() {
+    Column() {
+      DatePickerDialog({
+        date: this.birthDate || new Date(),
+        confirm: (value: Date) => {
+          this.birthDate = value;
+          UIDialog.closeLast();
+        },
+        cancel: () => {
+          UIDialog.closeLast();
+        }
+      })
     }
-    .padding({ left: 16, right: 16, bottom: 28 })
   }
 
   validateInfo(): boolean {
     if (this.vm.isNeedAgreePrivacy && !this.isAgree) {
-      this.getUIContext().getPromptAction().showToast({ message: '请勾选并同意协议' });
+      ToastDialog.showToast({ message: '请勾选并同意协议' });
       return false;
     }
     if (!this.name) {
-      this.getUIContext().getPromptAction().showToast({ message: '姓名未填写' });
+      ToastDialog.showToast({ message: '姓名未填写' });
       return false;
     }
 
     if (this.gender === -1) {
-      this.getUIContext().getPromptAction().showToast({ message: '性别未选择' });
+      ToastDialog.showToast({ message: '性别未选择' });
       return false;
     }
 
     if (!this.phone) {
-      this.getUIContext().getPromptAction().showToast({ message: '手机号未填写' });
+      ToastDialog.showToast({ message: '手机号未填写' });
       return false;
     }
 
     if (!PHONE_REG.test(this.phone)) {
-      this.getUIContext().getPromptAction().showToast({ message: '手机号不正确' });
+      ToastDialog.showToast({ message: '手机号不正确' });
       return false;
     }
 
     if (!this.birthDate) {
-      this.getUIContext().getPromptAction().showToast({ message: '生日未填写' });
+      ToastDialog.showToast({ message: '生日未填写' });
       return false;
     }
 

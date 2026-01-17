@@ -24,9 +24,9 @@ export class AccountApi {
   /**
    * 重新赋值userInfoModel
    */
-  public queryUserInfo() {
+  public async queryUserInfo() {
     if (this.checkLogin()) {
-      const user = MineServiceApi.queryAuthorInfo('', this.userInfoModel.loginChannel)
+      const user = await MineServiceApi.queryAuthorInfo('', this.userInfoModel.loginChannel)
       if (user) {
         this.handleUserInfo(user);
       }
@@ -36,8 +36,8 @@ export class AccountApi {
   /**
    * 华为账号登录
    */
-  public huaweiLogin(nickPhone: string) {
-    const user = MineServiceApi.signIn('hw', nickPhone);
+  public async huaweiLogin(nickPhone: string) {
+    const user = await MineServiceApi.signIn('hw', nickPhone);
     if (user) {
       this.userInfoModel.loginChannel = 'hw';
       this.handleUserInfo(user);
@@ -45,12 +45,23 @@ export class AccountApi {
   }
 
   /**
-   * 账密登录
+   * 发送验证码
+   * @param phone
    */
-  public accountPasswordLogin() {
-    const user = MineServiceApi.signIn()
+  public async sendCode(phone: string) {
+    await MineServiceApi.sendCode(phone);
+  }
+
+  /**
+   * 验证验证码
+   * @param phone
+   * @param code
+   */
+  public async verifyCode(phone: string, code: string) {
+    await MineServiceApi.verifyCode(phone, code);
+    const user = await MineServiceApi.signIn()
     if (user) {
-      this.userInfoModel.loginChannel = 'pw';
+      this.userInfoModel.loginChannel = 'phone_code';
       this.handleUserInfo(user);
     }
   }
@@ -58,9 +69,9 @@ export class AccountApi {
   /**
    * 微信登录
    */
-  public wechatLogin() {
+  public async wechatLogin() {
     const channel = 'wechat';
-    const user = MineServiceApi.signIn(channel)
+    const user = await MineServiceApi.signIn(channel)
     if (user) {
       this.userInfoModel.loginChannel = channel;
       this.handleUserInfo(user);

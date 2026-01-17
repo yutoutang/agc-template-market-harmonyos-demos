@@ -18,7 +18,7 @@ export class CalendarEventVM {
   calendarManage: CalendarManage = CalendarManage.instance
   @Trace userEventInfo: UserEventItem = new UserEventItem()
   @Trace userEvent: UserEvent = new UserEvent()
-  context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+  context?: common.UIAbilityContext;
 
   static get instance() {
     if (!CalendarEventVM._instance) {
@@ -51,7 +51,7 @@ export class CalendarEventVM {
     return compareDates(new Date(start), new Date(end))
   }
 
-  public async validate(userEventInfo: UserEventItem) {
+  public async validate(userEventInfo: UserEventItem, uiContext: UIContext) {
     let tips: string = ''
     switch (CalendarEventVM.instance.currentIndex) {
       case 0:
@@ -68,11 +68,11 @@ export class CalendarEventVM {
         break
     }
     if (!userEventInfo.content) {
-      promptAction.showToast({ message: tips })
+      uiContext.getPromptAction().showToast({ message: tips })
       return false
     }
     if (!this.validateSchedule(userEventInfo)) {
-      promptAction.showToast({ message: '开始时间不能大于结束时间' })
+      uiContext.getPromptAction().showToast({ message: '开始时间不能大于结束时间' })
       return false
     }
     return true
@@ -82,9 +82,9 @@ export class CalendarEventVM {
     this.currentIndex = index
   }
 
-  public async updateUserEventInfo() {
+  public async updateUserEventInfo(uiContext: UIContext) {
     this.updateBirRemDate(this.userEventInfo)
-    let validateRes: boolean = await CalendarEventVM.instance.validate(this.userEventInfo)
+    let validateRes: boolean = await CalendarEventVM.instance.validate(this.userEventInfo, uiContext)
     if (!validateRes) {
       return false
     }
@@ -116,10 +116,10 @@ export class CalendarEventVM {
     return resLength.length
   }
 
-  public async saveEventData(userEventInfo: UserEventItem) {
+  public async saveEventData(userEventInfo: UserEventItem, uiContext: UIContext) {
     userEventInfo.eventType = eventTypeEnum[this.currentIndex]
     this.updateBirRemDate(userEventInfo)
-    let validateRes: boolean = await CalendarEventVM.instance.validate(userEventInfo)
+    let validateRes: boolean = await CalendarEventVM.instance.validate(userEventInfo, uiContext)
     if (!validateRes) {
       return
     }
@@ -137,7 +137,7 @@ export class CalendarEventVM {
   }
 
 
-  public deleteUserEventInfo(info: UserEventItem, cb?: () => void) {
+  public deleteUserEventInfo(info: UserEventItem, uiContext: UIContext, cb?: () => void, ) {
     baseToast.show({
       type: 'dialog',
       cancelColor: $r('sys.color.font_primary'),
@@ -153,7 +153,7 @@ export class CalendarEventVM {
         }
         baseToast.hide()
       },
-    })
+    }, uiContext)
   }
 
   public setPageInfo(pageInfo: NavPathStack) {

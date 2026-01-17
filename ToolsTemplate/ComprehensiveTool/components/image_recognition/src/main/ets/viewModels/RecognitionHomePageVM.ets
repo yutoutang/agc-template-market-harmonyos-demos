@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { promptAction } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { scanBarcode, scanCore } from '@kit.ScanKit';
 import { MyLog } from '../util/MyLogUtil';
@@ -38,12 +37,12 @@ export class RecognitionHomePageVM {
 
 
   // 通用拍照识别
-  async toCamera() {
+  async toCamera(ctx:Context) {
     const hasPermission = await PermissionUtil._checkPermissions('ohos.permission.CAMERA');
     if (hasPermission) {
       getInstance().pushPathByName(RouterMap.CAMERA, null);
     } else {
-      PermissionUtil.requestPermissions(['ohos.permission.CAMERA']);
+      PermissionUtil.requestPermissions(['ohos.permission.CAMERA'],ctx);
     }
   }
 

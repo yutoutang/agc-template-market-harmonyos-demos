@@ -1,6 +1,7 @@
 import { ComponentContent, promptAction } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
 import { Logger } from './Logger';
+import { contextUtil } from './ContextUtil';
 
 const TAG = '[PopViewUtils]';
 
@@ -9,7 +10,7 @@ enum PopViewShowType {
 }
 
 async function getUIContext() {
-  return (await (getContext() as common.UIAbilityContext).windowStage.getMainWindow()).getUIContext();
+  return (await (contextUtil.getContext() as common.UIAbilityContext).windowStage.getMainWindow()).getUIContext();
 }
 
 interface PopViewModel {

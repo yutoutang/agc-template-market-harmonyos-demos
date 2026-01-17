@@ -1,6 +1,6 @@
+import { AddressManageUtil } from 'address_management';
 import { routerStack, WindowUtil } from 'lib_foundation';
 import { UserApis, UserPointRedemptionSku } from 'lib_network';
-import { getDefaultAddress } from 'module_address_manage';
 
 @ObservedV2
 export class RedemptionSubmitVM {
@@ -27,7 +27,7 @@ export class RedemptionSubmitVM {
   }
 
   init() {
-    getDefaultAddress().then((res) => {
+    AddressManageUtil.getDefaultAddress().then((res) => {
       if (res) {
         this.customerName = res.name;
         this.customerPhone = res.phone;

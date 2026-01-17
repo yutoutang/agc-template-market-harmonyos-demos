@@ -1,6 +1,6 @@
 import { abilityAccessCtrl, bundleManager, common, Permissions } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { Logger } from './MyLog';
+import { UtilLog as Logger } from '@hw-agconnect/util-log';
 import { PermissionStatus } from '../model/Index';
 
 

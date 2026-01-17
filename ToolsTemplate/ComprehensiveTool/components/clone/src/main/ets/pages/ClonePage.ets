@@ -1,4 +1,4 @@
-import { promptAction } from '@kit.ArkUI';
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
 import { getInstance, setPathStack } from '../common/CommonRoute';
 import { SystemUtil } from '../utils/SystemUtil';
 import { ClonePageVM } from '../viewmodel/ClonePageVM';

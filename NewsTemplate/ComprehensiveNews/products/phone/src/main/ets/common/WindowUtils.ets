@@ -1,7 +1,7 @@
 import { AppStorageV2, window } from '@kit.ArkUI';
 import { Logger, WindowModel } from 'lib_common';
 
-const TAG = 'WindowUtils';
+const TAG = '[WindowUtils]';
 
 /**
  * 窗口工具类
@@ -13,11 +13,15 @@ export class WindowUtils {
    */
   public static async setWinConfig(windowStage: window.WindowStage) {
     AppStorage.setOrCreate('windowStage', windowStage);
-    let windowClass: window.Window = windowStage.getMainWindowSync();
-    await windowClass.setWindowLayoutFullScreen(true);
-    WindowUtils.setAvoidArea(windowClass);
-    WindowUtils.onAvoidAreaChange(windowStage);
-    WindowUtils.setWindowSize(windowStage);
+    try {
+      let windowClass: window.Window = windowStage.getMainWindowSync();
+      await windowClass.setWindowLayoutFullScreen(true);
+      WindowUtils.setAvoidArea(windowClass);
+      WindowUtils.onAvoidAreaChange(windowStage);
+      WindowUtils.setWindowSize(windowStage);
+    } catch (error) {
+      Logger.error(TAG, 'setWinConfig fail, error: ' + JSON.stringify(error));
+    }
   }
 
   /**
@@ -26,12 +30,17 @@ export class WindowUtils {
    */
   public static setAvoidArea(windowClass: window.Window) {
     let windowModel: WindowModel = AppStorageV2.connect(WindowModel, () => new WindowModel())!;
-    let type = window.AvoidAreaType.TYPE_SYSTEM;
-    let avoidArea = windowClass.getWindowAvoidArea(type);
-    windowModel.windowTopPadding = px2vp(avoidArea.topRect.height);
-    type = window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR;
-    avoidArea = windowClass.getWindowAvoidArea(type);
-    windowModel.windowBottomPadding = px2vp(avoidArea.bottomRect.height);
+    try {
+      const uiContext = windowClass.getUIContext();
+      let type = window.AvoidAreaType.TYPE_SYSTEM;
+      let avoidArea = windowClass.getWindowAvoidArea(type);
+      windowModel.windowTopPadding = uiContext.px2vp(avoidArea.topRect.height);
+      type = window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR;
+      avoidArea = windowClass.getWindowAvoidArea(type);
+      windowModel.windowBottomPadding = uiContext.px2vp(avoidArea.bottomRect.height);
+    } catch (error) {
+      Logger.error(TAG, 'setAvoidArea fail, error: ' + JSON.stringify(error));
+    }
   }
 
   /**
@@ -39,10 +48,14 @@ export class WindowUtils {
    * @param windowStage
    */
   public static setWindowSize(windowStage: window.WindowStage) {
-    let windowModel: WindowModel = AppStorageV2.connect(WindowModel, () => new WindowModel())!;
-    let windowClass: window.Window = windowStage.getMainWindowSync();
-    windowModel.windowWidth = windowClass.getWindowProperties().windowRect.width;
-    windowModel.windowHeight = windowClass.getWindowProperties().windowRect.height;
+    try {
+      let windowModel: WindowModel = AppStorageV2.connect(WindowModel, () => new WindowModel())!;
+      let windowClass: window.Window = windowStage.getMainWindowSync();
+      windowModel.windowWidth = windowClass.getWindowProperties().windowRect.width;
+      windowModel.windowHeight = windowClass.getWindowProperties().windowRect.height;
+    } catch (error) {
+      Logger.error(TAG, 'setWindowSize fail, error: ' + JSON.stringify(error));
+    }
   }
 
   /**

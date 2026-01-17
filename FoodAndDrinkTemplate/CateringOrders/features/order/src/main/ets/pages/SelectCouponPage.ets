@@ -103,7 +103,7 @@ struct SelectCouponPage {
                     this.selectCoupon(coupon)
                   },
                   useNow: () => {
-                    RouterModule.popToName<number>(RouterMap.HOME_PAGE, TabBarType.HOMEPAGE)
+                    RouterModule.popToName<number>(RouterMap.MAIN_INDEX, TabBarType.ORDER)
                   },
                 })
               }

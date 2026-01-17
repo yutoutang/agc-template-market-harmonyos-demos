@@ -127,6 +127,10 @@
     {
       "name": "agcit_huawei_catering_orders",
       "value": "1.0.1"
+    },
+    {
+      "name": "confirm",
+      "value": "确定"
     }
   ]
 }

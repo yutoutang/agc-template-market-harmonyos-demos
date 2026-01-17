@@ -1,4 +1,6 @@
+import { BreakpointModel, BreakpointType } from 'base_ui';
 import { BloggerInfo } from '../types/Index';
+import { AppStorageV2 } from '@kit.ArkUI';
 
 @ComponentV2
 export struct BloggerInfomation {
@@ -14,6 +16,13 @@ export struct BloggerInfomation {
   }
   @Event followCb: (isFollower: boolean) => void = () => {
   }
+  columnOptions: BreakpointType<number> = new BreakpointType<number>({
+    sm: 2,
+    md: 4,
+    lg: 4,
+    xl: 4,
+  });
+  @Local breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
 
   @Builder
   userTagBuilder() {
@@ -21,6 +30,11 @@ export struct BloggerInfomation {
 
   @Builder
   membershipBuilder() {
+  }
+
+  @Computed
+  get gridCount() {
+    return this.columnOptions.getValue(this.breakPointModel.currentBreakpoint);
   }
 
   build() {
@@ -89,19 +103,20 @@ export struct BloggerInfomation {
           Column() {
             Text(this.bloggerInfo.getFans()).fontSize(12).fontColor($r('sys.color.font_primary'))
             Text('粉丝').fontSize(12).fontColor($r('sys.color.font_primary')).margin({ top: 6 })
-          }
+          }.margin({left: this.gridCount !== 2 && !this.isSelf ? 40 : 0})
 
           Column() {
             Text(this.bloggerInfo.getBeFavorite()).fontSize(12).fontColor($r('sys.color.font_primary'))
             Text('被收藏').fontSize(12).fontColor($r('sys.color.font_primary')).margin({ top: 6 })
-          }
+          }.margin({left: this.gridCount !== 2 && !this.isSelf ? 40 : 0})
 
           Column() {
             Text(this.bloggerInfo.getBeFollowed()).fontSize(12).fontColor($r('sys.color.font_primary'))
             Text('被跟做').fontSize(12).fontColor($r('sys.color.font_primary')).margin({ top: 6 })
-          }
+          }.margin({left: this.gridCount !== 2 && !this.isSelf ? 40 : 0})
         }
-
+        .width(this.gridCount === 2 || !this.isSelf ? '80%' : '100%')
+        .justifyContent(this.gridCount === 2 || !this.isSelf ? null : FlexAlign.SpaceAround)
         Button(this.isFollower ? '已关注' : '关注', { controlSize: ControlSize.SMALL })
           .fontSize($r('sys.float.Body_M'))
           .fontColor(this.isFollower ? '#E84026' : $r('sys.color.font_on_primary'))
@@ -111,7 +126,9 @@ export struct BloggerInfomation {
           .onClick(() => {
             this.followCb(!this.isFollower)
           })
-      }.padding(12).width('100%').justifyContent(FlexAlign.SpaceBetween).borderRadius(16)
+      }.padding(12).width('100%')
+      .justifyContent(FlexAlign.SpaceBetween).borderRadius(16)
+      // .justifyContent(this.gridCount === 2 ? FlexAlign.SpaceBetween : FlexAlign.SpaceAround).borderRadius(16)
     }
     .width('100%')
   }

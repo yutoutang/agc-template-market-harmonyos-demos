@@ -13,6 +13,8 @@
     "mine": 'file:../../features/mine',
     "network": 'file:../../commons/network',
     "aggregated_ads": 'file:../../components/aggregated_ads',
+    "aggregated_login": "file:../../components/aggregated_login",
+    "@hw-agconnect/util-log": "^1.0.0",
   }
 }
 

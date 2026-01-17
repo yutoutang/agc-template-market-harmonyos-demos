@@ -35,17 +35,15 @@ export class MathUtil {
 
   public static sortFav(items: GroupBook[]): Array<GroupBook> {
     return items.sort((a, b) => {
-      // 首先比较name字段，有值的排在前面
       const aHasName = a.groupName !== '';
       const bHasName = b.groupName !== '';
 
       if (aHasName && !bHasName) {
-        return -1; // a有name，b没有，a排在前面
+        return -1;
       } else if (!aHasName && bHasName) {
-        return 1;  // a没有name，b有，b排在前面
+        return 1;
       }
 
-      // name状态相同的情况下，比较时间戳，时间更近的排在前面
       return b.timestamp - a.timestamp;
     });
   }

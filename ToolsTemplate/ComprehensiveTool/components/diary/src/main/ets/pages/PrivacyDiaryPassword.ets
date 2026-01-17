@@ -1,8 +1,9 @@
 import { common } from '@kit.AbilityKit';
+import { PersistenceV2 } from '@kit.ArkUI';
+import { ToastDialog } from '@hw-agconnect/ui-toast';
 import { InputField } from '../components/InputField';
 import { DiaryExtraInfo } from '../models/Diary';
 import { DiaryUtil } from '../utils/DiaryUtil';
-import { PersistenceV2 } from '@kit.ArkUI';
 
 @Builder
 export function PrivacyDiaryPasswordBuilder() {
@@ -82,9 +83,9 @@ export struct PrivacyDiaryPassword {
   }
 
   toastMsg(message: string) {
-    this.getUIContext().getPromptAction().showToast({
+    ToastDialog.showToast({
       message: message,
-      alignment: Alignment.Center
+      toastAlignment: DialogAlignment.Center
     })
   }
 

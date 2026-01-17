@@ -5,7 +5,8 @@
       {
         "name": "default",
         "signingConfig": "default",
-        "compatibleSdkVersion": "5.0.1(13)",
+        "targetSdkVersion": "6.0.1(21)",
+        "compatibleSdkVersion": "5.1.1(19)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
           "strictMode": {
@@ -94,6 +95,10 @@
       "srcPath": "./commons/lib_preview_page"
     },
     {
+      "name": "lib_av_details",
+      "srcPath": "./commons/lib_av_details"
+    },
+    {
       "name": "module_channeledit",
       "srcPath": "./components/module_channeledit"
     },
@@ -114,10 +119,6 @@
       "srcPath": "./components/module_post"
     },
     {
-      "name": "module_feedback",
-      "srcPath": "./components/module_feedback"
-    },
-    {
       "name": "module_setfontsize",
       "srcPath": "./components/module_setfontsize"
     },
@@ -126,16 +127,8 @@
       "srcPath": "./components/module_swipeplayer"
     },
     {
-      "name": "module_share",
-      "srcPath": "./components/module_share"
-    },
-    {
       "name": "module_advertisement",
       "srcPath": "./components/module_advertisement"
-    },
-    {
-      "name": "module_text_reader",
-      "srcPath": "./components/module_text_reader"
     },
     {
       "name": "module_highlight",
@@ -152,6 +145,42 @@
     {
       "name": "module_flexlayout",
       "srcPath": "./components/module_flexlayout"
+    },
+    {
+      "name": "module_digital_newspaper",
+      "srcPath": "./components/module_digital_newspaper"
+    },
+    {
+      "name": "module_login",
+      "srcPath": "./components/module_login"
+    },
+    {
+      "name": "module_share",
+      "srcPath": "./components/module_share"
+    },
+    {
+      "name": "module_app_setting",
+      "srcPath": "./components/module_app_setting"
+    },
+    {
+      "name": "module_personal_info",
+      "srcPath": "./components/module_personal_info"
+    },
+    {
+      "name": "module_feedback",
+      "srcPath": "./components/module_feedback"
+    },
+    {
+      "name": "module_consent_dialog",
+      "srcPath": "./components/module_consent_dialog"
+    },
+    {
+      "name": "module_text_reader",
+      "srcPath": "./components/module_text_reader"
+    },
+    {
+      "name": "module_audioplayer",
+      "srcPath": "./components/module_audioplayer"
     }
   ]
 }

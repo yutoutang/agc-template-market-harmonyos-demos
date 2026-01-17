@@ -1,22 +1,28 @@
-import { image } from '@kit.ImageKit';
 import { Type } from '@kit.ArkUI';
 
+@ObservedV2
 export class VideoAsset {
-  videoUri: string | undefined;
-  fd?: number = 0;
-  screenWidth: Length | undefined;
-  screenHeight: Length | undefined;
+  @Trace videoUri: string | undefined;
+  @Trace fd?: number = 0;
+  @Trace screenWidth: Length | undefined;
+  @Trace screenHeight: Length | undefined;
 }
 
 @ObservedV2
 export class EditVideo {
   @Trace videoId: string = '';
   @Trace videoUri: string = '';
-  @Trace previewUri: image.PixelMap | null = null;
+  @Trace previewUri: string = '';
   @Trace duration: string = '';
   @Trace size: string = '';
   @Trace mediaUri: string = '';
   @Trace isSelect: boolean = false;
+}
+
+@ObservedV2
+export class VideoDraftList {
+  @Type(EditVideo)
+  @Trace list: EditVideo[] = [];
 }
 
 // 定义贴图信息结构

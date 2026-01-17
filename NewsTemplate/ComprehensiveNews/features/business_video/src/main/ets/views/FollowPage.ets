@@ -1,5 +1,6 @@
 import { PersistenceV2 } from '@kit.ArkUI';
-import { RouterMap, RouterUtils, UserInfoModel } from 'lib_common';
+import { UserInfoModel } from 'lib_common';
+import { LoginSheetUtils } from 'lib_account';
 import { TabPageType } from '../types/Index';
 import { VideoSwiperPage } from './VideoSwiperPage';
 
@@ -9,6 +10,7 @@ export struct FollowPage {
   @Param index: number = 0
   // 视频页里面的头部tabIndex
   @Param currentTabIndex: number = 0;
+  @Local isShown: boolean = false;
 
   userInfoModel: UserInfoModel = PersistenceV2.connect(UserInfoModel, () => new UserInfoModel())!;
 
@@ -19,6 +21,7 @@ export struct FollowPage {
           index: this.index,
           currentTabIndex: this.currentTabIndex,
           pageType: TabPageType.FOLLOW,
+          isShown: this.isShown
         })
       } else {
         this.logoutView()
@@ -28,6 +31,14 @@ export struct FollowPage {
     .height('100%')
     .backgroundColor('#000')
     .justifyContent(FlexAlign.Center)
+    .onVisibleAreaChange([0.0, 1.0], (isExpanding: boolean, currentRatio: number) => {
+      if (isExpanding && currentRatio >= 1.0) {
+        this.isShown = true;
+      }
+      if (!isExpanding && currentRatio <= 0.0) {
+        this.isShown = false;
+      }
+    })
   }
 
   @Builder
@@ -48,7 +59,7 @@ export struct FollowPage {
         .backgroundColor('#505050')
         .width('33%')
         .onClick(() => {
-          RouterUtils.pushPathByName(RouterMap.HUAWEI_LOGIN_PAGE);
+          LoginSheetUtils.jumpLoginPage();
         })
     }
   }

@@ -1,7 +1,7 @@
 import { ComponentContent, promptAction } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { UtilLog as Logger } from '@hw-agconnect/util-log';
 import { CommonConstants } from '../constants/Contants';
-import { Logger } from './Logger';
 
 const TAG = '[FullLoading]';
 

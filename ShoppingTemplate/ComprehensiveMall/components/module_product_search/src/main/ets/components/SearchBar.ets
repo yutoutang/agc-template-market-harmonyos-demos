@@ -3,7 +3,7 @@ import { Constants } from '../commons/Constants';
 @ComponentV2
 export struct SearchBar {
   @Param
-  placeholder:string = ''
+  placeholder: string = ''
   @Param
   searchWords: string = '';
   @Param
@@ -42,7 +42,9 @@ export struct SearchBar {
       if (this.disabled) {
         Row() {
           Text(this.searchWords)
-            .fontColor(Constants.FONT_COLOR_LEVEL2);
+            .fontColor(Constants.FONT_COLOR_LEVEL2)
+            .maxLines(1)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
         }
         .height(40)
         .layoutWeight(1)
@@ -60,7 +62,7 @@ export struct SearchBar {
         Search({
           value: this.searchWords,
           controller: this.controller,
-          placeholder: this.placeholder ?this.placeholder: '请输入搜索内容',
+          placeholder: this.placeholder ? this.placeholder : '请输入搜索内容',
         })
           .layoutWeight(1)
           .backgroundColor(Constants.BACKGROUND_COLOR_GREY_2)
@@ -81,7 +83,7 @@ export struct SearchBar {
             this.updateSearchWords?.(value);
           })
           .onSubmit((value) => {
-            this.submitSearch?.(value?value:this.placeholder);
+            this.submitSearch?.(value ? value : this.placeholder);
           });
       }
     }

@@ -52,8 +52,8 @@ struct SelectCityView {
     .width('100%')
     .title('城市选择')
     .padding({
-      top:px2vp(this.topRectHeight),
-      bottom: px2vp(this.bottomRectHeight)
+      top:this.getUIContext().px2vp(this.topRectHeight),
+      bottom: this.getUIContext().px2vp(this.bottomRectHeight)
     })
   }
 }

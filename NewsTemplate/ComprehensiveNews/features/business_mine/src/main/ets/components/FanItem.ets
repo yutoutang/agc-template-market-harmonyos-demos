@@ -55,18 +55,20 @@ export struct FanItem {
       CommonConfirmDialog.show({
         content: '确定不再关注TA？',
         confirm: () => {
-          MineServiceApi.cancelWatch(this.author.authorId);
-          this.refreshUserInfo();
+          MineServiceApi.cancelWatch(this.author.authorId).then(() => {
+            this.refreshUserInfo();
+          });
         },
       })
     } else {
-      MineServiceApi.addWatch(this.author.authorId);
-      this.refreshUserInfo();
+      MineServiceApi.addWatch(this.author.authorId).then(() => {
+        this.refreshUserInfo();
+      });
     }
   }
 
-  refreshUserInfo() {
-    const mine = MineServiceApi.queryAuthorInfo()
+  async refreshUserInfo() {
+    const mine = await MineServiceApi.queryAuthorInfo()
     this.userInfoModel.watchers = mine?.watchers || [];
     this.userInfoModel.watchersCount = mine?.watchersCount || 0;
     this.userInfoModel.followersCount = mine?.followersCount || 0;

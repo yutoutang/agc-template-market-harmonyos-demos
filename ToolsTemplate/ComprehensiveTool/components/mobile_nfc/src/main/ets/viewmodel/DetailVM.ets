@@ -1,6 +1,6 @@
-import { hilog } from '@kit.PerformanceAnalysisKit';
 import { ComponentContent } from '@kit.ArkUI';
-import promptAction, { LevelMode } from '@ohos.promptAction';
+import { LevelMode } from '@ohos.promptAction';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { OnNfcChanged } from '../common/nfc/Nfc';
 import { getNavPathStack } from '../common/Route';
 import { addMineDialog } from '../components/AddMineDialog';
@@ -23,12 +23,12 @@ export class DetailVM {
     return DetailVM._instance;
   }
 
-  private loadData() {
+  private loadData(uiContext: UIContext) {
     nfcCardInfo.findById(this.data.nfcInfo.id!)
       .then(result => {
         this.nfcInfo = result;
       }).catch((e: Error) => {
-      promptAction.showToast({
+      uiContext.getPromptAction().showToast({
         message: '加载失败！',
       });
       getNavPathStack().pop();
@@ -43,7 +43,7 @@ export class DetailVM {
     };
     params.confirm = (name: string) => {
       if (Util.isEmpty(name)) {
-        promptAction.showToast({
+        uiContext.getPromptAction().showToast({
           message: '请先输入名称',
         });
       } else if (name === this.nfcInfo!.name) {
@@ -51,29 +51,29 @@ export class DetailVM {
       } else {
         nfcCardInfo.findByName(name).then(result => {
           if (result) {
-            promptAction.showToast({
+            uiContext.getPromptAction().showToast({
               message: '名称重复！',
             });
           } else {
             this.nfcInfo!.name = name;
             nfcCardInfo.updateNfcInfo(this.nfcInfo!).then(result => {
-              getContext()
+              uiContext.getHostContext()!
                 .eventHub
                 .emit(OnNfcChanged.name,
                   new OnNfcChanged(this.nfcInfo.type, !this.nfcInfo.dealHistory, this.nfcInfo.isMine));
-              promptAction.showToast({
+              uiContext.getPromptAction().showToast({
                 message: '修改成功！',
               });
               PromptActionUtil.closeDialog(renameContentNode);
-              this.loadData();
+              this.loadData(uiContext);
             }).catch((e: Error) => {
-              promptAction.showToast({
+              uiContext.getPromptAction().showToast({
                 message: '修改失败！',
               });
             });
           }
         }).catch((e: Error) => {
-          promptAction.showToast({
+          uiContext.getPromptAction().showToast({
             message: '修改失败！',
           });
         });
@@ -86,7 +86,7 @@ export class DetailVM {
     PromptActionUtil.setOptions({
       levelMode: LevelMode.EMBEDDED,
       onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
-        hilog.info(0xFF00, 'SubmitFeedBack', JSON.stringify(dismissDialogAction.reason));
+        UtilLog.info(0xFF00, 'MobileNFC', JSON.stringify(dismissDialogAction.reason));
       },
     });
 
@@ -96,13 +96,13 @@ export class DetailVM {
   addMine(cardId: string, type: number, uiContext: UIContext) {
     nfcCardInfo.findAllWithMine(type).then(result => {
       if (result.length && result.find(item => item.cardId === cardId)) {
-        promptAction.showToast({
+        uiContext.getPromptAction().showToast({
           message: '您已添加过此卡片，请勿重复添加！',
         });
       } else {
         this.nfcInfo!.isMine = true;
         nfcCardInfo.updateNfcInfo(this.nfcInfo!).then(result => {
-          getContext()
+          uiContext.getHostContext()!
             .eventHub
             .emit(OnNfcChanged.name, new OnNfcChanged(this.nfcInfo.type, true, this.nfcInfo.isMine));
 
@@ -119,20 +119,20 @@ export class DetailVM {
           PromptActionUtil.setOptions({
             levelMode: LevelMode.EMBEDDED,
             onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
-              hilog.info(0xFF00, 'SubmitFeedBack', JSON.stringify(dismissDialogAction.reason));
+              UtilLog.info(0xFF00, 'MobileNFC', JSON.stringify(dismissDialogAction.reason));
             },
           });
 
           PromptActionUtil.openDialog();
-          this.loadData();
+          this.loadData(uiContext);
         }).catch((e: Error) => {
-          promptAction.showToast({
+          uiContext.getPromptAction().showToast({
             message: '添加失败！',
           });
         });
       }
     }).catch((e: Error) => {
-      promptAction.showToast({
+      uiContext.getPromptAction().showToast({
         message: '添加失败！',
       });
     });

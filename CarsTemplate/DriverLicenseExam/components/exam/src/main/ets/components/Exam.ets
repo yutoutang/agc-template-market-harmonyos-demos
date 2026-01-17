@@ -71,6 +71,8 @@ export struct Exam {
           Column({ space: 12 }) {
             SelectComponent({
               item: item,
+              index: examIndex,
+              currentIndex: this.currentIndex - 1,
               // 如果想退出考试重新进入后将已做题回显，打开这个参数
               // isReDisplay: item.selected.length !== 0,
               changeCorrectNum: (isAdd: boolean) => {
@@ -81,7 +83,13 @@ export struct Exam {
               },
             });
           };
-        }, (item: ExamDetail) => JSON.stringify(item.id));
+        }, (item: ExamDetail) => {
+          try {
+            return JSON.stringify(item.id)
+          } catch (err) {
+            return ''
+          }
+        });
       }
       .index(this.examManager.currentQuestionId)
       .height('100%')
@@ -412,12 +420,23 @@ export struct Exam {
             };
           }
           .onClick(() => {
-            this.currentIndex = index + 1;
-            this.examManager.currentQuestionId = index;
-            examController.swiperController.changeIndex(index);
-            this.isShowProblemListSheet = !this.isShowProblemListSheet;
+            try {
+              this.currentIndex = index + 1;
+              this.examManager.currentQuestionId = index;
+              examController.swiperController.changeIndex(index);
+              this.isShowProblemListSheet = !this.isShowProblemListSheet;
+            } catch (err) {
+
+            }
+
           });
-        }, (item: ExamDetail) => JSON.stringify(item.isCorrect));
+        }, (item: ExamDetail) => {
+          try {
+            return JSON.stringify(item.isCorrect)
+          } catch (err) {
+            return ''
+          }
+        });
       }
       .rowsGap(16)
       .columnsTemplate('repeat(auto-stretch, 69)')
@@ -533,7 +552,7 @@ export function showSettingSheet() {
           examController.showNext = false;
         });
     }
-    .width(360)
+    .width('100%')
     .padding({
       top: 5,
     });
@@ -569,11 +588,11 @@ export function showSettingSheet() {
         .fontSize(16)
         .fontColor('rgba(0,0,0,0.90)');
     }
-    .width(360);
+    .width('100%');
   }
   .height('100%')
-  .margin({
-    left: '4%',
-    right: '4%',
-  });
+  .padding({
+    left:20,
+    right:20
+  })
 }

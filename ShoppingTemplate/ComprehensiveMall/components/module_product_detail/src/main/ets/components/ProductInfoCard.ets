@@ -39,7 +39,7 @@ export struct ProductInfoCard {
           .textOverflow({ overflow: TextOverflow.Ellipsis });
 
         // 标签
-        Row() {
+        Row({ space: 4 }) {
           ForEach(this.productInfo.tags, (item: string) => {
             Row() {
               Text(item)

@@ -1,5 +1,5 @@
 import { ComponentContent, LevelMode } from '@kit.ArkUI';
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 import arEngine from 'libentry.so';
 import { ARMeasureVM } from '../viewmodel/ARMeasureVM';
 import { PromptActionUtil } from '../util/PromptActionUtil';
@@ -37,6 +37,10 @@ export struct ARMeasure {
 
   aboutToDisappear(): void {
     this.vm.saveMeasureRecord();
+    this.vm.semanticDenseMode = MeasureType.VOLUME;
+    hintContentNode.update(this.vm.semanticDenseMode);
+    // 模式切换
+    this.vm.switchMode(this.context);
   }
 
   showHintDialog(uiContext: UIContext, node: ComponentContent<Object>) {
@@ -47,7 +51,7 @@ export struct ARMeasure {
       offset: { dx: 0, dy: 160 },
       levelMode: LevelMode.EMBEDDED,
       onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
-        hilog.info(0xFF00, 'ARMeasure', JSON.stringify(dismissDialogAction.reason));
+        UtilLog.info(0xFF00, 'ARMeasure', JSON.stringify(dismissDialogAction.reason));
       },
     });
     PromptActionUtil.openDialog();
@@ -59,7 +63,7 @@ export struct ARMeasure {
     PromptActionUtil.setOptions({
       levelMode: LevelMode.OVERLAY,
       onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
-        hilog.info(0xFF00, 'ARMeasure', JSON.stringify(dismissDialogAction.reason));
+        UtilLog.info(0xFF00, 'ARMeasure', JSON.stringify(dismissDialogAction.reason));
       },
     });
     PromptActionUtil.openDialog();
@@ -102,7 +106,7 @@ export struct ARMeasure {
                 type: item.type,
                 record: data,
                 copyCallBack: (): void => {
-                  this.vm.copyText(data);
+                  this.vm.copyText(this.getUIContext(), data);
                 },
               };
               recordContentNode.update(record);

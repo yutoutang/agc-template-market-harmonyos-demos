@@ -1,11 +1,11 @@
 import { routerStack } from 'lib_foundation'
 import { ContainerColumn, NavTitleBar } from 'lib_widget'
-import { AddressManage } from 'module_address_manage'
 import { AddressInfo } from 'lib_network'
 import { OrderButtonStyleMap } from '../common/Enums'
 import { MyButtonModifier } from '../common/Types'
 import { buildAddressInfo } from '../components/AddressInfoCard'
 import { OrderUtil } from '../utils/OrderUtil'
+import { AddressManageUtil } from 'address_management'
 
 export interface UpdateAddressSheetOptions {
   originalAddress?: AddressInfo
@@ -41,33 +41,33 @@ export struct UpdateAddressSheet {
             Text('原地址')
               .fontSize($r('app.float.font_size_18'))
               .fontColor($r('app.color.font_color_level1'))
-            ContainerColumn(){
+            ContainerColumn() {
               buildAddressInfo(this.originalAddress)
             }
+
             Row() {
               Text('新地址')
                 .fontSize($r('app.float.font_size_18'))
                 .fontColor($r('app.color.font_color_level1'))
-              AddressManage({
-                navPathStack: routerStack,
-                isSelectMode: true,
-                onSelect: (data) => {
-                  this.newAddress = {
-                    name: data.name,
-                    cellphone: data.phone,
-                    address: data.province + data.city + data.district + data.street + data.detail,
-                  }
-                },
-              }) {
-                Button('选择地址')
-                  .attributeModifier(new MyButtonModifier(OrderButtonStyleMap.OUTLINE, ControlSize.SMALL))
-              }
+
+              Button('选择地址')
+                .attributeModifier(new MyButtonModifier(OrderButtonStyleMap.OUTLINE, ControlSize.SMALL))
+                .onClick(() => {
+                  AddressManageUtil.goToAddressListPage(routerStack,(data)=>{
+                    this.newAddress = {
+                      name: data.name,
+                      cellphone: data.phone,
+                      address: data.province + data.city + data.district + data.street + data.detail,
+                    }
+                    routerStack.pop()
+                  });
+                })
             }
             .width($r('app.string.size_percent_full'))
             .justifyContent(FlexAlign.SpaceBetween)
 
             if (this.newAddress) {
-              ContainerColumn(){
+              ContainerColumn() {
                 buildAddressInfo(this.newAddress)
               }
             }
@@ -98,7 +98,7 @@ export struct UpdateAddressSheet {
           topLeft: $r('app.float.border_radius_xl'),
           topRight: $r('app.float.border_radius_xl'),
         })
-        .padding({top:$r('app.float.space_m')})
+        .padding({ top: $r('app.float.space_m') })
         .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
 
       }

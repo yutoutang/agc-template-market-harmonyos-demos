@@ -8,8 +8,8 @@ export class Constant {
   static PADDING_HEIGHT: number = 14;
   static ADSORPTION_ANGLE: number = 1.2;
   static ADSORPTION_POS: number = 4;
+  static MAX_FILE_SIZE: number = 500;
   static ADSORB_ANGLES: number[] = [0, 90, 180, 270, 360];
-  static totalOutputVideoFilePath = `${getContext(this).cacheDir}/merge_${new Date().getTime()}.mp4`;
   static FONT_COLOR_LIST: string[] =
     ['#000000', '#FFFFFF', '#E52424', '#E56224', '#F6C800', '#63B959', '#48ADDD', '#5445EF', '#A946F1'];
   static RECOMMEND_TEXT_LIST: string[] = [

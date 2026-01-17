@@ -1,10 +1,11 @@
 import { common } from '@kit.AbilityKit';
 import { ComponentContent, promptAction } from '@kit.ArkUI';
 import { DialogParams } from '../types/Types';
+import { GlobalContextUtils } from './ContextUtils';
 import { Logger } from './Logger';
 
 async function getUIContext() {
-  return (await (getContext() as common.UIAbilityContext).windowStage.getMainWindow()).getUIContext()
+  return (await (GlobalContextUtils.globalUIAbilityContext).windowStage.getMainWindow()).getUIContext()
 }
 
 /**
@@ -28,9 +29,8 @@ export class DialogUtil {
     try {
       if (!DialogUtil.uiContext) {
         DialogUtil.uiContext = await getUIContext()
-
       }
-      DialogUtil.contentNode =        new ComponentContent(DialogUtil.uiContext, dialogBuilder, params)
+      DialogUtil.contentNode = new ComponentContent(DialogUtil.uiContext, dialogBuilder, params)
       let options: promptAction.BaseDialogOptions = {
         alignment: DialogAlignment.Center,
         autoCancel: true,
@@ -46,11 +46,10 @@ export class DialogUtil {
           }
         },
       }
-
       const promptAction = DialogUtil.uiContext.getPromptAction()
       promptAction.openCustomDialog(DialogUtil.contentNode, options)
     } catch (error) {
-      console.error('PromptActionUtils', ` closeCustomDialog error = ${JSON.stringify(error)}`)
+      Logger.error('PromptActionUtils', ` closeCustomDialog error = ${JSON.stringify(error)}`)
     }
   }
 
@@ -61,7 +60,7 @@ export class DialogUtil {
       const promptAction = DialogUtil.uiContext.getPromptAction()
       promptAction.closeCustomDialog(DialogUtil.contentNode)
     } catch (error) {
-      console.error('PromptActionUtils', ` closeCustomDialog error = ${JSON.stringify(error)}`)
+      Logger.error('PromptActionUtils', ` closeCustomDialog error = ${JSON.stringify(error)}`)
     }
   }
 }

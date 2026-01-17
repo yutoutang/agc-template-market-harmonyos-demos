@@ -28,7 +28,7 @@ export struct CalendarEventMain {
   @Event onCalendarEventChange: (userEventInfo: UserEventItem) => void = () => {}
   @Event onCalendarEventDelete: (userEventInfo: UserEventItem) => void = () => {}
   @Local eventList: ToggleItem[] = []
-  private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+  private context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
   @Local themeVM: ThemeVM = ThemeVM.instance;
 
   @Monitor('selectColor')
@@ -43,7 +43,7 @@ export struct CalendarEventMain {
     RemindEventDispatcher.eventDeleteCallback = (userEventInfo: UserEventItem) => {
       this.onCalendarEventDelete(userEventInfo)
     }
-    this.eventList = getDataFromJSON<ToggleItem>('Event_list.json', this);
+    this.eventList = getDataFromJSON<ToggleItem>('Event_list.json', this.getUIContext(), this);
     this.calendarEventVM.setUserEvent(this.userEvent)
     this.calendarEventVM.setContext(this.context)
     this.themeVM.setTheme(this.selectColor, this.titleColor)
@@ -102,7 +102,7 @@ export struct CalendarEventMain {
         onClose: () => {
           this.calendarEventVM.clearDate()
         },
-      })
+      }, this.getUIContext())
     })
   }
 

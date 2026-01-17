@@ -1,5 +1,5 @@
-import { RouterPageEnum, UserInfoStorage, AuthenticationUtil, UserInfo } from 'common';
-import { GlobalDialog } from 'components'
+import { AuthenticationUtil, UserInfo, UserInfoStorage } from 'common';
+import { GlobalDialog } from 'components';
 import { PersistenceV2 } from '@kit.ArkUI';
 import { MainEntryVM } from '../viewmodel/MainEntryVM';
 import { TabInfo } from '../types';
@@ -46,11 +46,11 @@ struct Index {
           secondaryButName: '取消',
           primaryButAction: async () => {
             // 关闭账号关联弹框
-            await GlobalDialog.close()
+            await GlobalDialog.close(this.getUIContext())
             // loading弹框
-            await GlobalDialog.showLoadingDialog()
+            await GlobalDialog.showLoadingDialog(this.getUIContext())
             AuthenticationUtil.silentLogin(async (isSuccess: boolean, userInfo: UserInfo) => {
-              await GlobalDialog.close()
+              await GlobalDialog.close(this.getUIContext())
               // 账号关联登录成功
               if (isSuccess) {
                 this.userInfoStorage.isLogin = true;
@@ -59,12 +59,13 @@ struct Index {
                 this.currentTabIndex = 3
                 this.vm.navStack.pushPathByName('OrderCenterPage', '')
               }
-            })
+            },
+              this.getUIContext())
           },
           secondaryButAction: () => {
-            GlobalDialog.close()
+            GlobalDialog.close(this.getUIContext())
           },
-        })
+        }, this.getUIContext())
       }
     }
   }
@@ -83,7 +84,7 @@ struct Index {
           .tabBar(this.TabItem(item, index))
           .backgroundColor(item.pageBgColor)
           .expandSafeArea([SafeAreaType.SYSTEM], item.safeAreaEdge)
-        })
+        },(item: TabInfo, index: number)=>index + '__' + JSON.stringify(item))
       }
       .barWidth('100%')
       .scrollable(false)
@@ -108,7 +109,7 @@ struct Index {
         .lineHeight(14)
         .fontWeight(FontWeight.Regular)
         .fontColor(this.currentTabIndex === index ? $r('sys.color.ohos_id_color_emphasize') :
-        $r('sys.color.ohos_id_color_text_primary'))
+          $r('sys.color.ohos_id_color_text_primary'))
     }
   }
 }

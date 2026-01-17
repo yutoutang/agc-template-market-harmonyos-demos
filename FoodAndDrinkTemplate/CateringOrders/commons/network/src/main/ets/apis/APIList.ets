@@ -1,20 +1,38 @@
-import AxiosRequest from './HttpRequest';
-import '../mocks/RequestMock';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { AxiosRequestHeaders } from '@ohos/axios';
-import { AddCarReq, AddDnOrderReq, CommonReq, MyOrderReq } from '../types/Request';
 import { RequestUrl } from '../constants/Index';
-import { AppInfoResp, StoreInfoResp, TableInfoResp } from '../types/Store';
-import { BaseResponse } from '../types/Response';
-import { HelpMsgResp, RechargeRecord, UserInfoResp } from '../types/User';
+import '../mocks/MockAdapter.ets';
 import {
+  BookOrderDetail,
   CouponItem,
   DishesTypeResp,
   GoodsResp,
   GoodsSpecResp,
   MyCarResp,
   MyOrderResp,
+  OrderLists,
   PackageSpecResp,
+  QueueOrderDetail,
 } from '../types/Order';
+import {
+  AddCarReq,
+  AddDnOrderReq,
+  BookOrderData,
+  BookStoreParams,
+  CancelBookOrderDate,
+  CancelQueueOrderDate,
+  CommonReq,
+  MyOrderReq,
+  QueueOrderData,
+  QueueStoreParams,
+  RefreshQueueOrderParams,
+} from '../types/Request';
+import { BaseResponse } from '../types/Response';
+import { AppInfoResp, StoreInfoResp, TableInfoResp } from '../types/Store';
+import { HelpMsgResp, PointRecord, RechargeRecord, UserInfoResp } from '../types/User';
+import AxiosRequest from './AxiosHttpRequest';
+
+const TAG = '[APIList]'
 
 // 获取应用基础信息
 export const getAppInfo = () => {
@@ -43,11 +61,17 @@ export const getStoreList = () => {
   })
 };
 
-export function getUserInfo() {
+export function getUserInfo(storeId?: string, unionId?: string, isRelative?: boolean) {
+  let params = {
+    storeId,
+    unionId,
+    isRelative,
+  } as CommonReq
   return AxiosRequest.get<BaseResponse<UserInfoResp>>({
     url: RequestUrl.GET_LOGIN_HM_URL,
     showLoading: true,
     headers: {} as AxiosRequestHeaders,
+    params,
   })
 }
 
@@ -237,7 +261,7 @@ export function getMyOrder(page: number, state: Array<number>) {
     page,
     pagesize: 10,
   } as MyOrderReq
-  console.info(`getMyOrder params info: ${JSON.stringify(params)}.`);
+  UtilLog.info(TAG, `getMyOrder params info: ${JSON.stringify(params)}.`);
   return AxiosRequest.get<BaseResponse<Array<MyOrderResp>>>({
     url: RequestUrl.GET_MY_ORDER_URL,
     showLoading: true,
@@ -250,7 +274,7 @@ export function getOrderInfo(orderId: string) {
   let params = {
     orderId: orderId,
   } as CommonReq
-  console.info(`getMyOrder params info: ${JSON.stringify(params)}.`);
+  UtilLog.info(TAG, `getMyOrder params info: ${JSON.stringify(params)}.`);
   return AxiosRequest.get<BaseResponse<MyOrderResp>>({
     url: RequestUrl.GET_ORDER_INFO_URL,
     showLoading: true,
@@ -359,7 +383,7 @@ export function deleteOrder(orderId: string) {
     orderId,
   } as CommonReq
   return AxiosRequest.delete<BaseResponse<number>>({
-    url: RequestUrl.GET_DELETE_ORDER_URL,
+    url: RequestUrl.DELETE_ORDER_URL,
     showLoading: true,
     headers: {} as AxiosRequestHeaders,
     params,
@@ -393,6 +417,109 @@ export function rechargeMoney(rechargeTierId: string) {
 export function getRechargeRecord() {
   return AxiosRequest.get<BaseResponse<RechargeRecord[]>>({
     url: RequestUrl.GET_RECHARGE_RECORD_URL,
+    showLoading: true,
+    headers: {} as AxiosRequestHeaders,
+    params: {},
+  })
+}
+
+export function checkPoint() {
+  return AxiosRequest.get<BaseResponse<boolean>>({
+    url: RequestUrl.CHECK_POINT,
+    showLoading: true,
+    headers: {} as AxiosRequestHeaders,
+    params: {},
+  })
+}
+
+// 订座门店列表获取
+export const getBookStoreListApi = (params: BookStoreParams): Promise<BaseResponse<StoreInfoResp[]>> => {
+  return AxiosRequest.get<BaseResponse<StoreInfoResp[]>>({
+    url: RequestUrl.URL_STORE_BOOK_LIST,
+    showLoading: true,
+    headers: {} as AxiosRequestHeaders,
+    params: params,
+  })
+};
+
+// 排号门店列表获取
+export const getQueueStoreListApi = (count: number): Promise<BaseResponse<StoreInfoResp[]>> => {
+  const params: QueueStoreParams = { max: count };
+  return AxiosRequest.get<BaseResponse<StoreInfoResp[]>>({
+    url: RequestUrl.URL_STORE_QUEUE_LIST,
+    showLoading: true,
+    headers: {} as AxiosRequestHeaders,
+    params: params,
+  })
+};
+
+// 创建订座订单
+export const createBookOrderApi = (data: BookOrderData): Promise<BaseResponse<BookOrderDetail>> => {
+  return AxiosRequest.post<BaseResponse<BookOrderDetail>>({
+    url: RequestUrl.URL_ORDER_BOOK_CREATE,
+    showLoading: true,
+    headers: {} as AxiosRequestHeaders,
+    data: data,
+  })
+};
+
+// 取消订座订单
+export const cancelBookOrderApi = (orderId: number): Promise<BaseResponse<void>> => {
+  const data: CancelBookOrderDate = { orderId };
+  return AxiosRequest.post<BaseResponse<void>>({
+    url: RequestUrl.URL_ORDER_BOOK_CANCEL,
+    showLoading: true,
+    headers: {} as AxiosRequestHeaders,
+    data: data,
+  })
+};
+
+// 创建排号订单
+export const createQueueOrderApi = (data: QueueOrderData): Promise<BaseResponse<QueueOrderDetail>> => {
+  return AxiosRequest.post<BaseResponse<QueueOrderDetail>>({
+    url: RequestUrl.URL_ORDER_QUEUE_CREATE,
+    showLoading: true,
+    headers: {} as AxiosRequestHeaders,
+    data: data,
+  })
+};
+
+// 取消排号订单
+export const cancelQueueOrderApi = (orderId: number): Promise<BaseResponse<void>> => {
+  const data: CancelQueueOrderDate = { orderId };
+  return AxiosRequest.post<BaseResponse<void>>({
+    url: RequestUrl.URL_ORDER_QUEUE_CANCEL,
+    showLoading: true,
+    headers: {} as AxiosRequestHeaders,
+    data: data,
+  })
+};
+
+// 刷新排号订单
+export const refreshQueueOrderApi = (orderId: number): Promise<BaseResponse<QueueOrderDetail | undefined>> => {
+  const params: RefreshQueueOrderParams = { orderId };
+  return AxiosRequest.get<BaseResponse<QueueOrderDetail | undefined>>({
+    url: RequestUrl.URL_ORDER_QUEUE_REFRESH,
+    showLoading: true,
+    headers: {} as AxiosRequestHeaders,
+    params: params,
+  })
+};
+
+// 获取我的订单
+export const getOrderListApi = (): Promise<BaseResponse<OrderLists>> => {
+  return AxiosRequest.get<BaseResponse<OrderLists>>({
+    url: RequestUrl.URL_ORDER_LIST,
+    showLoading: true,
+    headers: {} as AxiosRequestHeaders,
+    params: {},
+  })
+}
+
+// 获取我的积分记录
+export const getPointList = (): Promise<BaseResponse<PointRecord[]>> => {
+  return AxiosRequest.get<BaseResponse<PointRecord[]>>({
+    url: RequestUrl.URL_USER_POINT_LIST,
     showLoading: true,
     headers: {} as AxiosRequestHeaders,
     params: {},

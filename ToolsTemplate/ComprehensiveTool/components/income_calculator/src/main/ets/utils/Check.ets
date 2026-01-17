@@ -1,5 +1,5 @@
 import { CalTaxInput, IncomeType } from '../model/CalTaxInput';
-import { promptAction } from '@kit.ArkUI';
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
 
 export function check(incomeType: IncomeType, texInput: CalTaxInput) {
   let isPassed: boolean = true

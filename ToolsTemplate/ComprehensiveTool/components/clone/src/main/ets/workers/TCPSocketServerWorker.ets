@@ -1,5 +1,6 @@
 import { MessageEvents, ThreadWorkerGlobalScope, worker } from '@kit.ArkTS';
 import { socket } from '@kit.NetworkKit';
+import { common } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { WorkerMessage } from '../model/WorkerMessage';
 import { BinaryMessageType, LENGTH_TRANSFER_HEADER, WorkerMessageType } from '../common/Constant';
@@ -8,9 +9,8 @@ import { BufferUtil } from '../utils/BufferUtil';
 import { BinaryProtocolData, BinaryProtocolHeader } from '../model/BinaryProtocol';
 import { BinaryProtocolCodec } from '../utils/BinaryProtocolCodec';
 import Logger from '../common/Constant'
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { ReceiverUtil } from '../service/ReceiverUtil'
-import { common } from '@kit.AbilityKit';
 
 const workerPort: ThreadWorkerGlobalScope = worker.workerPort;
 
@@ -126,7 +126,7 @@ function handleBinaryFileMessage(messageType: BinaryMessageType, data: ArrayBuff
       case BinaryMessageType.FILE_COUNT:
         receiverUtil.handleFileCount(data)
       default:
-        hilog.info(0x0001, 'testTag', '%{public}s', '未知的二进制消息类型');
+        UtilLog.info(0x0001, 'testTag', '%{public}s', '未知的二进制消息类型');
     }
   } catch (error) {
     console.error('处理二进制文件消息失败:', JSON.stringify(error));

@@ -1,6 +1,6 @@
-import { CommonConstants, GridRowColSetting } from 'lib_common';
+import { CommonConstants, RouterUtils } from 'lib_common';
 import { NavHeaderBar } from 'lib_widget';
-import { SettingCard } from '../components/SettingCard';
+import { SettingView } from 'module_app_setting';
 import { SettingPrivacyVM } from '../viewmodels/SettingPrivacyVM'
 
 @Builder
@@ -18,29 +18,12 @@ struct SettingPrivacy {
         NavHeaderBar({
           title: '隐私设置',
         })
-        GridRow(GridRowColSetting.DEFAULT_GRID_ROW_OPTIONS) {
-          GridCol({
-            span: GridRowColSetting.DEFAULT_CENTER_COL_SPAN,
-            offset: GridRowColSetting.DEFAULT_CENTER_COL_OFFSET,
-          }) {
-            Scroll() {
-              Column({ space: CommonConstants.SPACE_M }) {
-                SettingCard({ list: this.vm.list1 })
-                SettingCard({ list: this.vm.list2 })
-                SettingCard({ list: this.vm.list3 })
-              }
-              .padding({
-                left: this.vm.breakPointModel.pagePadding,
-                right: this.vm.breakPointModel.pagePadding,
-                top: CommonConstants.PADDING_M,
-                bottom: this.vm.windowModel.windowBottomPadding,
-              })
-            }
-            .layoutWeight(1)
-            .scrollBar(BarState.Off)
-            .align(Alignment.Top)
-            .edgeEffect(EdgeEffect.Spring)
-          }
+        Column({ space: CommonConstants.SPACE_M }) {
+          SettingView({
+            pathStack: RouterUtils.getStack(),
+            settingList: [this.vm.group1, this.vm.group2, this.vm.group3],
+            fontSizeRatio: this.vm.settingInfo.fontSizeRatio,
+          })
         }
         .layoutWeight(1)
       }

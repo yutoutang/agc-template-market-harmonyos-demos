@@ -10,6 +10,6 @@
     "common": "file:../../commons/common",
     "network": "file:../../commons/network",
     "base_ui": "file:../../components/base_ui",
-    "my_wallet": "file:../../components/my_wallet"
+    "my_wallet": "file:../../components/my_wallet",
   }
 }

@@ -1,26 +1,35 @@
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { UtilLog, LogConfig } from '@hw-agconnect/util-log';
 
 /**
  * 日志打印类
  */
 export class Logger {
-  private static domain: number = 0xff00;
-  private static prefix: string = 'ComprehensiveNews';
-  private static format: string = '%{public}s, %{public}s';
+  private static readonly CONFIG: LogConfig = {
+    tag: 'ComprehensiveNews',
+    domain: 0xff00,
+    open: true,
+    showStack: true,
+    showBorder: true,
+    showDivider: true,
+  };
+
+  public static setLogConfig() {
+    UtilLog.setGlobalConfig(Logger.CONFIG);
+  }
 
   public static debug(...args: string[]): void {
-    hilog.debug(Logger.domain, Logger.prefix, Logger.format, args);
+    UtilLog.debug(args);
   }
 
   public static info(...args: string[]): void {
-    hilog.info(Logger.domain, Logger.prefix, Logger.format, args);
+    UtilLog.info(args);
   }
 
   public static warn(...args: string[]): void {
-    hilog.warn(Logger.domain, Logger.prefix, Logger.format, args);
+    UtilLog.warn(args);
   }
 
   public static error(...args: string[]): void {
-    hilog.error(Logger.domain, Logger.prefix, Logger.format, args);
+    UtilLog.error(args);
   }
 }

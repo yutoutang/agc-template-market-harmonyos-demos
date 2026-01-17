@@ -1,11 +1,13 @@
 import { RecipeIngredient, Step, UploadRecipeData } from '../types/Index';
 import { UploadRecipeVM } from '../viewModels/UploadRecipeVM';
 import { LengthMetrics, promptAction } from '@kit.ArkUI';
+import { common } from '@kit.AbilityKit';
 
 @ComponentV2
 export struct UploadRecipe {
   @Local vm: UploadRecipeVM = new UploadRecipeVM();
 @Event uploadRecipe:(data:UploadRecipeData)=>void=()=>{}
+
   build() {
     Column() {
       Scroll() {
@@ -30,7 +32,7 @@ export struct UploadRecipe {
 
             if (this.vm.mainImg) {
               Image(this.vm.mainImg).width(120).height(120).borderRadius(12).onClick(() => {
-                this.vm.selectImage().then(res => {
+                this.vm.selectImage(this.getUIContext().getHostContext() as common.UIAbilityContext).then(res => {
                   this.vm.mainImg = res;
                 });
               });
@@ -45,7 +47,7 @@ export struct UploadRecipe {
               .borderRadius(12)
               .justifyContent(FlexAlign.Center)
               .onClick(() => {
-                this.vm.selectImage().then(res => {
+                this.vm.selectImage(this.getUIContext().getHostContext() as common.UIAbilityContext).then(res => {
                   this.vm.mainImg = res;
                 });
               });
@@ -144,7 +146,7 @@ export struct UploadRecipe {
                   Text(`步骤${index + 1}`);
                   if (item.stepImg) {
                     Image(item.stepImg).width(120).height(120).borderRadius(12).onClick(() => {
-                      this.vm.selectImage().then(res => {
+                      this.vm.selectImage(this.getUIContext().getHostContext() as common.UIAbilityContext).then(res => {
                         item.stepImg = res;
                       });
                     });
@@ -159,7 +161,7 @@ export struct UploadRecipe {
                     .borderRadius(12)
                     .justifyContent(FlexAlign.Center)
                     .onClick(() => {
-                      this.vm.selectImage().then(res => {
+                      this.vm.selectImage(this.getUIContext().getHostContext() as common.UIAbilityContext).then(res => {
                         item.stepImg = res;
                       });
                     });
@@ -244,7 +246,7 @@ export struct UploadRecipe {
         .height(36)
         .onClick(() => {
           if (this.vm.ingredients.length === 1) {
-            promptAction.showToast({ message: '至少需要1份食材！' });
+            this.getUIContext().getPromptAction().showToast({ message: '至少需要1份食材！' });
           } else {
             this.vm.ingredients.splice(index, 1);
           }
@@ -267,7 +269,7 @@ export struct UploadRecipe {
         .height(36)
         .onClick(() => {
           if (this.vm.steps.length === 1) {
-            promptAction.showToast({ message: '至少需要1个步骤！' });
+            this.getUIContext().getPromptAction().showToast({ message: '至少需要1个步骤！' });
           } else {
             this.vm.steps.splice(index, 1);
           }

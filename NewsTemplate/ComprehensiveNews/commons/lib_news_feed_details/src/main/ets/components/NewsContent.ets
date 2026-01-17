@@ -1,10 +1,9 @@
 import { PersistenceV2 } from '@kit.ArkUI'
-import dayjs from 'dayjs'
 import { webview } from '@kit.ArkWeb'
 import { BusinessError } from '@kit.BasicServicesKit'
-import { FormatCount, RouterMap, RouterUtils, SettingModel, UserInfoModel } from 'lib_common'
+import { FormatCount, Logger, RouterMap, RouterUtils, SettingModel, TimeUtils } from 'lib_common'
+import { Share } from 'lib_widget'
 import { ImagePreview, PreviewVerticalAlign } from 'module_imagepreview'
-import { Share } from 'module_share'
 import { handlerCoverImage } from '../utils/Utils'
 import NewsFeedVM from '../viewmodel/NewsFeedVM'
 import { FeedBreakPointVM } from '../viewmodel/FeedBreakPointVM'
@@ -14,10 +13,12 @@ class Native {
   }
 }
 
+const TAG = '[NewsContent]';
+
 @ComponentV2
 export struct NewsContent {
   @Param fontSizeRatio: number = 1
-  @Local newsFeedVM: NewsFeedVM = NewsFeedVM.instance
+  @Param newsFeedVM: NewsFeedVM = new NewsFeedVM()
   @Local settingInfo: SettingModel = PersistenceV2.connect(SettingModel, () => new SettingModel())!
   webViewController: webview.WebviewController = new webview.WebviewController();
   @Local nativeObj: Native = new Native();
@@ -34,14 +35,17 @@ export struct NewsContent {
 
   @Monitor('settingInfo.darkSwitch')
   darkSwitch() {
-    this.webViewController.runJavaScript(`setWebFontColor(${this.settingInfo.darkSwitch})`);
+    this.webViewController.runJavaScript(`setWebFontColor(${this.settingInfo.darkSwitch})`)
+      .catch((e: BusinessError) => {
+        Logger.error(TAG, 'runJavaScript fail, error: ' + JSON.stringify(e));
+      });
   }
 
   expandAnimation() {
     if (this.timer) {
       clearTimeout(this.timer)
     }
-    animateTo({
+    this.getUIContext().animateTo({
       duration: 500,
       curve: Curve.EaseOut,
       playMode: PlayMode.Normal,
@@ -72,7 +76,6 @@ export struct NewsContent {
         .onClick(() => {
           this.onAddWatch()
         })
-        .visibility(!this.newsFeedVM.isFeedSelf ? Visibility.Visible : Visibility.None)
       }
       .width(72)
       .height(28)
@@ -80,6 +83,7 @@ export struct NewsContent {
       .backgroundColor(this.newsFeedVM.isWatch() ? $r('sys.color.background_primary') : $r('app.color.app_theme'))
       .borderRadius(14)
       .justifyContent(FlexAlign.Center)
+      .visibility(!this.newsFeedVM.isFeedSelf ? Visibility.Visible : Visibility.None)
     }
     .visibility(this.isExpand ? Visibility.None : Visibility.Visible)
   }
@@ -99,7 +103,7 @@ export struct NewsContent {
           .fontSize(16 * this.fontSizeRatio)
       }
       .onClick(() => {
-        animateTo({
+        this.getUIContext().animateTo({
           duration: 500,
           curve: Curve.EaseOut,
           playMode: PlayMode.Normal,
@@ -143,7 +147,7 @@ export struct NewsContent {
   }
 
   preview = (srcList: string[], index: number) => {
-    ImagePreview.show(srcList, {
+    ImagePreview.show(this.getUIContext(), srcList, {
       indexPosition: PreviewVerticalAlign.Top,
       startIndex: index,
       authorBuilder: () => {
@@ -173,14 +177,12 @@ export struct NewsContent {
   @Builder
   shareBuilder() {
     Share({
-      qrCodeInfo: {
-        id: this.newsFeedVM.articleDetails.id,
-        type: this.newsFeedVM.articleDetails.type,
+      shareData: {
+        recordId: this.newsFeedVM.articleDetails.id,
         title: this.newsFeedVM.articleDetails.title,
-        articleFrom: this.newsFeedVM.articleDetails.articleFrom,
-        createTime: dayjs(this.newsFeedVM.articleDetails.createTime).format('YYYY-MM-DD HH:mm'),
+        subTitle: this.newsFeedVM.articleDetails.articleFrom,
+        createTime: this.newsFeedVM.articleDetails.createTime,
         coverUrl: handlerCoverImage(this.newsFeedVM.articleDetails),
-        isVideo: !!this.newsFeedVM.articleDetails.postImgList?.[0]?.surfaceUrl,
       },
       shareRenderBuilder: () => {
         this.shareCommentBuilder()
@@ -216,10 +218,8 @@ export struct NewsContent {
             .fontSize(14 * this.fontSizeRatio)
             .fontWeight(FontWeight.Medium)
             .fontColor($r('sys.color.font_primary'))
-            .maxLines(1)
-            .textOverflow({ overflow: TextOverflow.Ellipsis })
             .constraintSize({ maxWidth: 'calc(100% - 44vp)' })
-          Text(dayjs(this.newsFeedVM.articleDetails.createTime).format('YYYY-MM-DD HH:mm'))
+          Text(TimeUtils.formatDate(this.newsFeedVM.articleDetails.createTime))
             .fontSize(12 * this.fontSizeRatio)
             .fontWeight(FontWeight.Regular)
             .fontColor($r('sys.color.font_tertiary'))
@@ -245,7 +245,7 @@ export struct NewsContent {
       .borderRadius(14)
       .justifyContent(FlexAlign.Center)
     }
-    .margin({ top: 17, bottom: 25 })
+    .margin({ top: 12, bottom: 12 })
   }
 
   build() {
@@ -260,7 +260,10 @@ export struct NewsContent {
         .width('100%')
         .alignItems(HorizontalAlign.Start)
       }
-      .padding(16)
+      .padding({
+        top: 8,
+        bottom: 8,
+      })
       .backgroundColor($r('sys.color.background_primary'))
 
       Column() {
@@ -281,26 +284,30 @@ export struct NewsContent {
           .backgroundColor($r('sys.color.background_primary'))
           .accessibilityGroup(true)
           .onControllerAttached(() => {
-            this.webViewController.loadData(
-              this.newsFeedVM.setRichToHtml(),
-              'text/html',
-              'UTF-8',
-            );
             try {
-              this.webViewController.registerJavaScriptProxy(this.nativeObj, 'native', ['preview'],
+              this.webViewController.loadData(
+                this.newsFeedVM.setRichToHtml(),
+                'text/html',
+                'UTF-8',
               );
+              this.webViewController.registerJavaScriptProxy(this.nativeObj, 'native', ['preview']);
             } catch (error) {
-              console.error(`ErrorCode: ${(error as BusinessError).code},  Message: ${(error as BusinessError).message}`);
+              Logger.error(TAG,
+                `ErrorCode: ${(error as BusinessError).code},  Message: ${(error as BusinessError).message}`);
             }
-
           })
-          .onPageEnd(() => {
+          .onPageEnd(async () => {
             this.webViewController.runJavaScript(`getSize()`)
               .then((result: string) => {
                 let res: Record<string, number> = JSON.parse(result)
-                this.richTextHeight = px2vp(res.height) * 1.2
-              })
-            this.webViewController.runJavaScript(`setWebFontColor(${this.settingInfo.darkSwitch})`);
+                this.richTextHeight = this.getUIContext().px2vp(res.height) * 1.2
+              }).catch((e: BusinessError) => {
+              Logger.error(TAG, 'runJavaScript fail, error: ' + JSON.stringify(e));
+            });
+            this.webViewController.runJavaScript(`setWebFontColor(${this.settingInfo.darkSwitch})`)
+              .catch((e: BusinessError) => {
+                Logger.error(TAG, 'runJavaScript fail, error: ' + JSON.stringify(e));
+              });
           })
       }
     }

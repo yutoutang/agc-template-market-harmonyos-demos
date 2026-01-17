@@ -1,22 +1,21 @@
-export class LayoutSetting {
-  type: string = ''
-  style: Record<string, string | number> = {}
-  showType: string = ''
-  children: LayoutSetting[] = []
-}
+import { NodeControllerFactory } from '../factory/NativeNodeFactory'
+import { JSONObject, LayoutSetting } from './CommonModel'
 
-export class LayoutParams {
-  nativeCardData: JSONObject
-  currentIndex: number = 0
-  extraInfo: Record<string, string | boolean | Record<string, string | boolean>[] | JSONObject[]> = {}
-  layout: LayoutSetting = new LayoutSetting()
+export class FrameNodeParams {
+  viewLayout: LayoutSetting
+  articles: JSONObject[]
+  extraInfo?: Record<string, number | string | boolean | Record<string, string | boolean>[]>
+  style: Record<string, string | number>
+  nodeControllerFactory?: NodeControllerFactory
 
-  constructor(nativeCardData: JSONObject, currentIndex: number,
-    extraInfo: Record<string, string | boolean | Record<string, string | boolean>[]>, layout: LayoutSetting) {
-    this.nativeCardData = nativeCardData
-    this.currentIndex = currentIndex
+  constructor(viewLayout: LayoutSetting, articles: JSONObject[], style: Record<string, string | number>,
+    extraInfo?: Record<string, number | string | boolean | Record<string, string | boolean>[]>,
+    nodeControllerFactory?: NodeControllerFactory) {
+    this.viewLayout = viewLayout
+    this.articles = articles
+    this.style = style
     this.extraInfo = extraInfo
-    this.layout = layout
+    this.nodeControllerFactory = nodeControllerFactory
   }
 }
 
@@ -37,5 +36,3 @@ export enum BreakpointNameEnum {
 export class BreakpointModel {
   @Trace currentBreakpoint: BreakpointNameEnum = BreakpointNameEnum.SM;
 }
-
-export type JSONObject = ESObject;

@@ -1,4 +1,4 @@
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 
 export class Logger {
   private static domain: number = 0xff00;
@@ -6,18 +6,18 @@ export class Logger {
   private static format: string = '%{public}s, %{public}s';
 
   public static debug(...args: string[]): void {
-    hilog.debug(Logger.domain, Logger.tag, Logger.format, args);
+    UtilLog.debug(Logger.domain, Logger.tag, Logger.format, args);
   }
 
   public static info(...args: string[]): void {
-    hilog.info(Logger.domain, Logger.tag, Logger.format, args);
+    UtilLog.info(Logger.domain, Logger.tag, Logger.format, args);
   }
 
   public static warn(...args: string[]): void {
-    hilog.warn(Logger.domain, Logger.tag, Logger.format, args);
+    UtilLog.warn(Logger.domain, Logger.tag, Logger.format, args);
   }
 
   public static error(...args: string[]): void {
-    hilog.error(Logger.domain, Logger.tag, Logger.format, args);
+    UtilLog.error(Logger.domain, Logger.tag, Logger.format, args);
   }
 }

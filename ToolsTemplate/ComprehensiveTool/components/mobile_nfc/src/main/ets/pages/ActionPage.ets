@@ -1,9 +1,9 @@
+import { UtilLog } from '@hw-agconnect/util-log';
 import { ACTION_TYPE } from '../common/Enum';
 import { NFC_STATE_NORMAL, NFC_STATE_WAIT, stopNFC, } from '../common/nfc/Nfc';
 import { getNavPathStack } from '../common/Route';
 import { ActionModel } from '../model/Index';
 import { ActionVM } from '../viewmodel/ActionVM';
-import { hilog } from '@kit.PerformanceAnalysisKit';
 
 @Extend(Text)
 function readText() {
@@ -127,7 +127,7 @@ struct ActionPage {
     }.title('读取卡片').onReady((ctx) => {
       this.vm.data = ctx.pathInfo.param as ActionModel;
     }).onBackPressed(() => {
-      hilog.info(0x0000, 'testTag', '%{public}s', 'action type is ' + this.vm.data.action);
+      UtilLog.info(0x0000, 'testTag', '%{public}s', 'action type is ' + this.vm.data.action);
       if (this.vm.data.action === ACTION_TYPE.ACTION_READ) {
         let list = getNavPathStack().getIndexByName('CardMyPage')
         list.length ? getNavPathStack().popToName('CardMyPage'): getNavPathStack().pop()

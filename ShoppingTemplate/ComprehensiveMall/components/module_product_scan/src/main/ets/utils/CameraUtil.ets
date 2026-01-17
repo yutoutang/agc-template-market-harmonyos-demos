@@ -18,10 +18,9 @@ import { JSON } from '@kit.ArkTS';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { camera } from '@kit.CameraKit';
 import { image } from '@kit.ImageKit';
-import { photoAccessHelper } from '@kit.MediaLibraryKit';
-import { Logger } from 'module_ui_base';
+import { Logger, SafeJson } from 'module_ui_base';
 
-const TAG: string = 'CameraUtil';
+const TAG: string = '[CameraUtil]';
 
 class CameraUtil {
   private cameraManager: camera.CameraManager | undefined = undefined;
@@ -47,7 +46,6 @@ class CameraUtil {
       height: 1080,
     },
   };
-
   private curSceneMode: camera.SceneMode = camera.SceneMode.NORMAL_PHOTO;
 
   setSceneMode(sceneMode: camera.SceneMode): void {
@@ -68,8 +66,8 @@ class CameraUtil {
     let index = previewProfiles.findIndex((previewProfile: camera.Profile) => {
       return (
         previewProfile.size.width === this.previewProfileObj.size.width &&
-        previewProfile.size.height === this.previewProfileObj.size.height &&
-        previewProfile.format === this.previewProfileObj.format
+          previewProfile.size.height === this.previewProfileObj.size.height &&
+          previewProfile.format === this.previewProfileObj.format
       );
     });
     if (index === -1) {
@@ -88,8 +86,8 @@ class CameraUtil {
     let index = photoProfiles.findIndex((photoProfile: camera.Profile) => {
       return (
         photoProfile.size.width === this.photoProfileObj.size.width &&
-        photoProfile.size.height === this.photoProfileObj.size.height &&
-        photoProfile.format === this.photoProfileObj.format
+          photoProfile.size.height === this.photoProfileObj.size.height &&
+          photoProfile.format === this.photoProfileObj.format
       );
     });
     if (index === -1) {
@@ -223,7 +221,7 @@ class CameraUtil {
       );
     } catch (error) {
       let err = error as BusinessError;
-      Logger.error(TAG, `initCamera fail: ${JSON.stringify(err)}`);
+      Logger.error(TAG, `initCamera fail: ${SafeJson.jsonStringify(err)}`);
     }
   }
 
@@ -231,30 +229,17 @@ class CameraUtil {
    * Trigger a photo with specified parameters.
    */
   async takePicture(): Promise<void> {
-    Logger.info(TAG, 'takePicture start');
-    let photoSettings: camera.PhotoCaptureSetting = {
-      quality: camera.QualityLevel.QUALITY_LEVEL_HIGH,
-      mirror: false,
-    };
-    await this.photoOutput?.capture(photoSettings);
-    Logger.info(TAG, 'takePicture end');
-  }
-
-  async saveCameraPhoto(asset: photoAccessHelper.PhotoAsset) {
-    Logger.info('saveCameraPhoto');
     try {
-      let context = getContext(this);
-      let phAccessHelper = photoAccessHelper.getPhotoAccessHelper(context);
-      let assetChangeRequest: photoAccessHelper.MediaAssetChangeRequest =
-        new photoAccessHelper.MediaAssetChangeRequest(asset);
-      assetChangeRequest.saveCameraPhoto();
-      await phAccessHelper.applyChanges(assetChangeRequest);
-      Logger.info('apply saveCameraPhoto successfully');
+      Logger.info(TAG, 'takePicture start');
+      let photoSettings: camera.PhotoCaptureSetting = {
+        quality: camera.QualityLevel.QUALITY_LEVEL_HIGH,
+        mirror: false,
+      };
+      await this.photoOutput?.capture(photoSettings);
     } catch (err) {
-      Logger.error(
-        `apply saveCameraPhoto failed with error: ${err.code}, ${err.message}`,
-      );
+      Logger.error(TAG, 'take picture failed. error:' + SafeJson.jsonStringify(err))
     }
+    Logger.info(TAG, 'takePicture end');
   }
 
   /**
@@ -268,7 +253,7 @@ class CameraUtil {
       let err = error as BusinessError;
       Logger.error(
         TAG,
-        `previewOutput release fail: error: ${JSON.stringify(err)}`,
+        `previewOutput release fail: error: ${SafeJson.jsonStringify(err)}`,
       );
     } finally {
       this.previewOutput = undefined;
@@ -279,7 +264,7 @@ class CameraUtil {
       let err = error as BusinessError;
       Logger.error(
         TAG,
-        `photoOutput release fail: error: ${JSON.stringify(err)}`,
+        `photoOutput release fail: error: ${SafeJson.jsonStringify(err)}`,
       );
     } finally {
       this.photoOutput = undefined;
@@ -291,7 +276,7 @@ class CameraUtil {
       let err = error as BusinessError;
       Logger.error(
         TAG,
-        `captureSession release fail: error: ${JSON.stringify(err)}`,
+        `captureSession release fail: error: ${SafeJson.jsonStringify(err)}`,
       );
     } finally {
       this.session = undefined;
@@ -302,7 +287,7 @@ class CameraUtil {
       let err = error as BusinessError;
       Logger.error(
         TAG,
-        `cameraInput close fail: error: ${JSON.stringify(err)}`,
+        `cameraInput close fail: error: ${SafeJson.jsonStringify(err)}`,
       );
     } finally {
       this.cameraInput = undefined;
@@ -326,7 +311,7 @@ class CameraUtil {
       Logger.info(TAG, `getCameraManager success: ${cameraManager}`);
     } catch (error) {
       let err = error as BusinessError;
-      Logger.error(TAG, `getCameraManager failed: ${JSON.stringify(err)}`);
+      Logger.error(TAG, `getCameraManager failed: ${SafeJson.jsonStringify(err)}`);
     }
     return cameraManager;
   }
@@ -346,7 +331,7 @@ class CameraUtil {
       );
     } catch (error) {
       let err = error as BusinessError;
-      Logger.error(TAG, `getSupportedCameras failed: ${JSON.stringify(err)}`);
+      Logger.error(TAG, `getSupportedCameras failed: ${SafeJson.jsonStringify(err)}`);
     }
     return supportedCameras;
   }
@@ -368,7 +353,7 @@ class CameraUtil {
       Logger.info(TAG, `createPreviewOutput success: ${previewOutput}`);
     } catch (error) {
       let err = error as BusinessError;
-      Logger.error(TAG, `createPreviewOutput failed: ${JSON.stringify(err)}`);
+      Logger.error(TAG, `createPreviewOutput failed: ${SafeJson.jsonStringify(err)}`);
     }
     return previewOutput;
   }
@@ -386,7 +371,7 @@ class CameraUtil {
       Logger.info(TAG, `createPhotoOutputFn success: ${photoOutput}`);
     } catch (error) {
       let err = error as BusinessError;
-      Logger.error(TAG, `createPhotoOutputFn failed: ${JSON.stringify(err)}`);
+      Logger.error(TAG, `createPhotoOutputFn failed: ${SafeJson.jsonStringify(err)}`);
     }
     return photoOutput;
   }
@@ -405,7 +390,7 @@ class CameraUtil {
       Logger.info(TAG, 'createCameraInputFn success');
     } catch (error) {
       let err = error as BusinessError;
-      Logger.error(TAG, `createCameraInputFn failed: ${JSON.stringify(err)}`);
+      Logger.error(TAG, `createCameraInputFn failed: ${SafeJson.jsonStringify(err)}`);
     }
     return cameraInput;
   }
@@ -421,7 +406,7 @@ class CameraUtil {
       Logger.info(TAG, 'cameraInput open success');
     } catch (error) {
       let err = error as BusinessError;
-      Logger.error(TAG, `createCameraInput failed : ${JSON.stringify(err)}`);
+      Logger.error(TAG, `createCameraInput failed : ${SafeJson.jsonStringify(err)}`);
     }
     return isOpenSuccess;
   }
@@ -463,7 +448,7 @@ class CameraUtil {
       Logger.info(TAG, 'sessionFlowFn success');
     } catch (error) {
       let err = error as BusinessError;
-      Logger.error(TAG, `sessionFlowFn fail : ${JSON.stringify(err)}`);
+      Logger.error(TAG, `sessionFlowFn fail : ${SafeJson.jsonStringify(err)}`);
     }
   }
 
@@ -478,7 +463,7 @@ class CameraUtil {
       photoOutput.on(
         'captureStartWithInfo',
         (
-          err: BusinessError,
+          _err: BusinessError,
           captureStartInfo: camera.CaptureStartInfo,
         ): void => {
           Logger.info(
@@ -490,7 +475,7 @@ class CameraUtil {
       photoOutput.on(
         'frameShutter',
         (
-          err: BusinessError,
+          _err: BusinessError,
           frameShutterInfo: camera.FrameShutterInfo,
         ): void => {
           Logger.info(
@@ -502,7 +487,7 @@ class CameraUtil {
       );
       photoOutput.on(
         'captureEnd',
-        (err: BusinessError, captureEndInfo: camera.CaptureEndInfo): void => {
+        (_err: BusinessError, captureEndInfo: camera.CaptureEndInfo): void => {
           Logger.info(
             TAG,
             `photoOutputCallBack captureEnd captureId:
@@ -537,10 +522,12 @@ class CameraUtil {
               const imageSource: image.ImageSource = image.createImageSource(
                 component.byteBuffer,
               );
+
               class SizeTmp {
                 height: number = 100;
                 width: number = 100;
               }
+
               let options: Record<string, number | boolean | SizeTmp> = {
                 'alphaType': 0,
                 'editable': false,
@@ -603,7 +590,7 @@ class CameraUtil {
    * @returns
    */
   registerCameraStatusChange(
-    err: BusinessError,
+    _err: BusinessError,
     cameraStatusInfo: camera.CameraStatusInfo,
   ): void {
     Logger.info(
@@ -672,7 +659,7 @@ class CameraUtil {
         Logger.info(
           TAG,
           'onCaptureSessionErrorChange captureSession fail: ' +
-            JSON.stringify(captureSessionError.code),
+          JSON.stringify(captureSessionError.code),
         );
       });
     } catch (error) {
@@ -682,12 +669,16 @@ class CameraUtil {
 
   setFocusMode(focusMode: camera.FocusMode): void {
     Logger.info(TAG, `setFocusMode is called`);
-    let isSupported = this.session?.isFocusModeSupported(focusMode);
-    Logger.info(TAG, `setFocusMode isSupported: ${isSupported}`);
-    if (!isSupported) {
-      return;
+    try {
+      let isSupported = this.session?.isFocusModeSupported(focusMode);
+      Logger.info(TAG, `setFocusMode isSupported: ${isSupported}`);
+      if (!isSupported) {
+        return;
+      }
+      this.session?.setFocusMode(focusMode);
+    } catch (err) {
+      Logger.error(TAG, 'set focus mode failed. error:' + SafeJson.jsonStringify(err))
     }
-    this.session?.setFocusMode(focusMode);
   }
 }
 

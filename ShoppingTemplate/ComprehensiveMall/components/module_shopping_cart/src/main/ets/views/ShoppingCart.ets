@@ -1,5 +1,5 @@
 import { LoadingStatus } from '../commons/Constants';
-import { Product } from '../commons/Model';
+import { ProductModel } from '../commons/Model';
 import { CartControlPanel } from '../components/CartControlPanel';
 import { CartListView } from '../components/CartListView';
 import { CartPageHeader } from '../components/CartPageHeader';
@@ -11,6 +11,8 @@ export struct ShoppingCart {
   @Param isChildRoute: boolean = false;
   // 是否登录
   @Param isLogin: boolean = false;
+  // 是否是会员
+  @Param isMember: boolean = false;
   // 自定义模块
   @BuilderParam customContentBuilder: CustomBuilder;
   // 登录事件回调
@@ -18,7 +20,7 @@ export struct ShoppingCart {
   };
   // 结算事件回调
   @Event
-  public onCheckout: (selectedGoodList: Product[]) => void = () => {
+  public onCheckout: (selectedGoodList: ProductModel[]) => void = () => {
   };
   // 作为子页面时，返回事件回调
   @Event onBack: () => void = () => {
@@ -30,6 +32,7 @@ export struct ShoppingCart {
 
   aboutToAppear(): void {
     this.vm.isLogin = this.isLogin;
+    this.vm.isMember = this.isMember;
   }
 
   // 监听登录状态
@@ -140,16 +143,13 @@ export struct ShoppingCart {
               CartControlPanel({
                 isEdit: this.vm.isEdit,
                 isChildRoute: this.isChildRoute,
-                totalPrice: this.vm.totalPrice,
-                discountAmount: this.vm.discountAmount,
+                cartPrice: this.vm.cartPrice,
                 quantity: this.vm.quantity,
                 onSelectAll: () => {
                   // 计算选择的商品个数
                   this.vm.calcQuantity();
                   // 计算总价
                   this.vm.calcTotalPrice();
-                  // 计算优惠
-                  this.vm.calcDiscountAmount();
                 },
                 onDelete: () => {
                   // 删除
@@ -157,7 +157,7 @@ export struct ShoppingCart {
                 },
                 onCheckout: () => {
                   // 结算
-                  const selectedGoodList: Product[] = this.vm.onCheckout();
+                  const selectedGoodList: ProductModel[] = this.vm.onCheckout();
                   this.onCheckout && this.onCheckout(selectedGoodList);
                 },
               })

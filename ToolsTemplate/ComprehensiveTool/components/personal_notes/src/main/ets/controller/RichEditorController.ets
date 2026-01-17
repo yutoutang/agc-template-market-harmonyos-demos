@@ -1,11 +1,13 @@
 import { image } from '@kit.ImageKit';
 import { fileIo } from '@kit.CoreFileKit';
-import { PickerUtil } from '../utils/PickerUtil';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { display, LengthMetrics } from '@kit.ArkUI';
+import { PickerUtil } from '../utils/PickerUtil';
 import { AlignmentInfo } from '../commons/Interface';
 import { ChangeRecord } from '../models/ChangeRecord';
-import { COLOR_LIST } from '../commons/Constant';
+import { COLOR_LIST, RICH_IMAGE_MAX_NUM, RICH_IMAGE_MAX_SIZE } from '../commons/Constant';
 import { TextAlignment } from '../commons/Enum';
+import { WindowUtil } from '../utils/WindowUtil';
 
 @ObservedV2
 export class RichEditorController {
@@ -50,6 +52,8 @@ export class RichEditorController {
   @Trace isDeleteAll: boolean = false;
   // 是否展示
   @Trace showMoreFunction: boolean = true;
+  // 内容长度
+  @Trace contentLength: number = 0;
 
   // 段落对齐样式以及点击回调
   paragraphAlignments: AlignmentInfo[] = [
@@ -387,6 +391,25 @@ export class RichEditorController {
     );
   }
 
+  // 找出富文本中的图片
+  findImgSrcList(htmlStr: string): string[] {
+    const regx = /<img[^>]+src=["']\s*([^"']+)\s*["']/g;
+    const matches = htmlStr.matchAll(regx);
+    let imgSrcList: string[] = [];
+    for (const match of matches) {
+      const imgSrc = match[1];
+      imgSrcList.push(imgSrc.trim());
+    }
+    return imgSrcList;
+  }
+
+  showToast(message: string) {
+    WindowUtil.uiContext.getPromptAction().showToast({
+      message: message,
+      alignment: Alignment.Center
+    })
+  }
+
   /**
    * 选择图片
    */
@@ -395,7 +418,42 @@ export class RichEditorController {
       maxSelectNumber: 1,
     }).then((uris) => {
       let imageUri = uris[0];
-      let pixelMap: image.PixelMap = RichEditorController.loadImage(imageUri);
+
+      if (!imageUri) {
+        return;
+      }
+      // 校验图片个数
+      let imgSrcList: string[] = []
+      try {
+        const newHtml = StyledString.toHtml(this.controller.getStyledString());
+        imgSrcList = this.findImgSrcList(newHtml);
+      } catch (e) {
+        UtilLog.error('[RichEditorController]', `styleString to html failed. error: ${JSON.stringify(e)}`)
+      }
+      if (imgSrcList.length >= RICH_IMAGE_MAX_NUM) {
+        this.showToast(`图片总数超过${RICH_IMAGE_MAX_NUM}个，已达上限`)
+        return;
+      }
+      // 校验图片总大小
+      let size: number = 0;
+      try {
+        for (let i = 0; i < imgSrcList.length; i++) {
+          const filePath = imgSrcList[i].replace('file://', '');
+          const stat = fileIo.statSync(filePath);
+          if (stat) {
+            size += stat.size;
+          }
+        }
+      } catch (e) {
+        UtilLog.error('[RichEditorController]', `get file stat failed. error: ${JSON.stringify(e)}`)
+      }
+      const sizeGB = size / 1024 / 1024 / 1024;
+      if (sizeGB >= RICH_IMAGE_MAX_SIZE) {
+        this.showToast(`图片总大小超过${RICH_IMAGE_MAX_SIZE}GB，已达上限`)
+        return
+      }
+
+      let pixelMap: image.PixelMap | undefined = RichEditorController.loadImage(imageUri);
       if (pixelMap) {
         let info = pixelMap.getImageInfoSync();
         let width = info.size.width;
@@ -423,6 +481,8 @@ export class RichEditorController {
         // 如果输入之前是全部删除操作，则进行重置
         this.resetDeleteAllState()
         this.addHistoryRecord(richEditorStyledString);
+        // 获取内容长度
+        this.contentLength = this.controller.getStyledString().length;
       }
     });
   }
@@ -436,11 +496,15 @@ export class RichEditorController {
     }
   }
 
-  private static loadImage(name: string): image.PixelMap {
+  private static loadImage(name: string): image.PixelMap | undefined {
     let imageSource: image.ImageSource;
     let fileSource = fileIo.openSync(name, fileIo.OpenMode.READ_ONLY);
-    imageSource = image.createImageSource(fileSource.fd);
-    return imageSource.createPixelMapSync();
+    try {
+      imageSource = image.createImageSource(fileSource.fd);
+      return imageSource.createPixelMapSync();
+    } catch (e) {
+      return undefined
+    }
   }
 }
 

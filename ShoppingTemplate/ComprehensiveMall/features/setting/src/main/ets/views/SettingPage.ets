@@ -1,5 +1,6 @@
 import { AboutModel, SettingGroup, SettingItem, SettingType, SettingView, SupportedSetting } from 'app_setting';
 import { iData, routerStack, RouterMap, WindowUtil } from 'lib_foundation';
+import { UserApis } from 'lib_network';
 import { CommonConfirmDialog, NavTitleBar } from 'lib_widget';
 
 @ComponentV2
@@ -56,11 +57,12 @@ export struct SettingPage {
               .onClick(() => {
                 CommonConfirmDialog.show({
                   content: '确认退出账号登录吗？',
-                  confirm: () => {
-                    iData.global.userInfo.reset();
-                    iData.global.isLogin = false;
-                    WindowUtil.toast('已退出登录');
-                    routerStack.pop();
+                  confirm: async () => {
+                    const res = await UserApis.logout()
+                    if (res.code === 0) {
+                      WindowUtil.toast('已退出登录');
+                      routerStack.pop();
+                    }
                   },
                 })
               },

@@ -1,3 +1,5 @@
+import { Logger } from 'module_ui_base';
+import { LOG_TAG } from '../commons/Constants';
 import { PopupSheetController } from '../commons/Model';
 
 @ComponentV2
@@ -33,41 +35,49 @@ export struct PopupSheet {
     } else {
       this.popupController.hide();
       setTimeout(() => {
-        this.promptAction.closeCustomDialog(this.dialogId);
+        try {
+          this.promptAction.closeCustomDialog(this.dialogId);
+        } catch (err) {
+          Logger.error(LOG_TAG, 'close custom dialog failed. error:' + JSON.stringify(err))
+        }
       }, 100);
     }
   }
 
   async open() {
-    this.dialogId = await this.promptAction.openCustomDialog({
-      builder: () => {
-        this.ContentBuilder();
-      },
-      width: '100%',
-      backgroundBlurStyle: BlurStyle.NONE,
-      cornerRadius: 0,
-      alignment: DialogAlignment.Bottom,
-      isModal: true,
-      maskColor: 0x66000000,
-      maskRect: {
-        x: 0,
-        y: 0,
+    try {
+      this.dialogId = await this.promptAction.openCustomDialog({
+        builder: () => {
+          this.ContentBuilder();
+        },
         width: '100%',
-        height: this.maskHeight,
-      },
-      onDidAppear: () => {
-        this.onOpen();
-      },
-      onDidDisappear: () => {
-        this.onClose();
-      },
-      onWillDismiss: (action: DismissDialogAction) => {
-        // 1 点击遮罩返回  0 左滑右滑返回
-        if (action.reason === DismissReason.PRESS_BACK || action.reason === DismissReason.TOUCH_OUTSIDE) {
-          this.close();
-        }
-      },
-    });
+        backgroundBlurStyle: BlurStyle.NONE,
+        cornerRadius: 0,
+        alignment: DialogAlignment.Bottom,
+        isModal: true,
+        maskColor: 0x66000000,
+        maskRect: {
+          x: 0,
+          y: 0,
+          width: '100%',
+          height: this.maskHeight,
+        },
+        onDidAppear: () => {
+          this.onOpen();
+        },
+        onDidDisappear: () => {
+          this.onClose();
+        },
+        onWillDismiss: (action: DismissDialogAction) => {
+          // 1 点击遮罩返回  0 左滑右滑返回
+          if (action.reason === DismissReason.PRESS_BACK || action.reason === DismissReason.TOUCH_OUTSIDE) {
+            this.close();
+          }
+        },
+      });
+    } catch (err) {
+      Logger.error(LOG_TAG, 'open custom dialog failed. error:' + JSON.stringify(err))
+    }
   }
 
   // 关闭弹框

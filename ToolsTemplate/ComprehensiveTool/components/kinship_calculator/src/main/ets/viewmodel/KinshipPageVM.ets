@@ -27,9 +27,9 @@ export class KenshipPageVM {
     this.clear()
   }
 
-  handleInput(text: string) {
+  handleInput(text: string, uiContext: UIContext) {
     if (this.count > 7) {
-      promptAction.showToast({ message: '超出计算范围' })
+      uiContext.getPromptAction().showToast({ message: '超出计算范围' })
       return
     }
     this.count += 1

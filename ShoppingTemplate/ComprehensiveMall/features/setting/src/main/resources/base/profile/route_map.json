@@ -6,6 +6,11 @@
       "buildFunction": "buildSettingPage"
     },
     {
+      "name": "LoginPage",
+      "pageSourceFile": "src/main/ets/views/LoginPage.ets",
+      "buildFunction": "buildLoginPage"
+    },
+    {
       "name": "SettingPrivacyPage",
       "pageSourceFile": "src/main/ets/views/SettingPrivacyPage.ets",
       "buildFunction": "buildSettingPrivacyPage"

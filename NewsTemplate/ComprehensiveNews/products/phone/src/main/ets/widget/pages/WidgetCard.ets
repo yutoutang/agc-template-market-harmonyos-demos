@@ -1,8 +1,5 @@
 import { Constants } from '../common/Constants';
 import { FormItemModel } from '../common/Types';
-import { Logger } from '../common/Logger';
-
-const TAG = 'WidgetCard';
 
 const storageWidget = new LocalStorage();
 
@@ -18,7 +15,7 @@ struct WidgetCard {
     try {
       this.list = JSON.parse(this.data) as FormItemModel[];
     } catch (e) {
-      Logger.error(TAG, 'parse form data failed, error: ' + JSON.stringify(e));
+      this.list = [];
     }
   }
 

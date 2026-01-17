@@ -23,15 +23,6 @@ export class Goods implements GoodsResp {
   boxMoney: number = 0
 }
 
-export class DiscountModel {
-  icon: ResourceStr
-  content: ResourceStr
-
-  constructor(icon: ResourceStr, content: ResourceStr) {
-    this.icon = icon
-    this.content = content
-  }
-}
 
 export class PreorderLabel {
   id: number

@@ -62,19 +62,12 @@ export struct BookWaterFlowCard {
         .textAlign(TextAlign.Start)
         .width(Constants.FULL_SIZE)
       Column() {
-        WaterFlow() {
-          ForEach(this.bookInfoList, (info: BookInfo) => {
-            FlowItem() {
-              this.waterItem(info)
-            }
-            .width(Constants.FULL_SIZE)
-          }, (item: BookInfo) => `${item.id}+${new Date().toString()}`)
-        }
-        .cachedCount(5)
-        .columnsTemplate('1fr 1fr')
-        .columnsGap(10)
-        .rowsGap(5)
-        .padding({ bottom: '29%' })
+        ForEach(this.bookInfoList, (info: BookInfo) => {
+          FlowItem() {
+            this.waterItem(info)
+          }
+          .width(Constants.FULL_SIZE)
+        }, (item: BookInfo) => `${item.id}+${new Date().toString()}`)
       }.padding({ top: 5 })
     }
     .padding({ top: 20, left: 18, right: 18 })

@@ -15,12 +15,12 @@ export class GuideService {
   @Trace private completeGuidance: boolean = false; // 是否完成导引
   @Trace public guideData: GuideData = GuideData.instance;
 
-  public changeGuidanceStatus() {
+  public changeGuidanceStatus(uiContext:UIContext) {
     if (this.guideData.city && this.guideData.licenseType && this.guideData.driveStage) {
       this.completeGuidance = true;
       return;
     }
-    this.checkData();
+    this.checkData(uiContext);
   }
 
   public isCompleteGuidance():boolean {
@@ -43,9 +43,9 @@ export class GuideService {
     return this.guideData;
   }
 
-  private checkData() {
+  private checkData(uiContext:UIContext) {
     if (this.guideData.city === '') {
-      promptAction.showToast({
+      uiContext.getPromptAction().showToast({
         message: $r('app.string.select_city'),
         duration: 1500,
 
@@ -53,14 +53,14 @@ export class GuideService {
       return;
     }
     if (this.guideData.licenseType === undefined) {
-      promptAction.showToast({
+      uiContext.getPromptAction().showToast({
         message: $r('app.string.select_license_type'),
         duration: 1500,
       })
       return;
     }
     if (this.guideData.driveStage === undefined) {
-      promptAction.showToast({
+      uiContext.getPromptAction().showToast({
         message: $r('app.string.select_drive_stage'),
         duration: 1500,
       })

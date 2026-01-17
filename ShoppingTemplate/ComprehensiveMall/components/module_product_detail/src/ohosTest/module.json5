@@ -3,8 +3,7 @@
     "name": "module_product_detail_test",
     "type": "feature",
     "deviceTypes": [
-      "phone",
-      "tablet"
+      "phone"
     ],
     "deliveryWithInstall": true,
     "installationFree": true

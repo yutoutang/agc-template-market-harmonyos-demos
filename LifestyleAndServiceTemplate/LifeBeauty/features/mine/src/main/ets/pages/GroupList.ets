@@ -1,17 +1,5 @@
-import { AppStorageV2 } from '@kit.ArkUI';
-import {
-  UIEmpty,
-  getMyGroupList,
-  GetUserInfoResp,
-  GroupOrderStatus,
-  MyGroupInfo,
-  CommonUtils,
-  refund,
-  RouterMap,
-  RouterModule,
-  UIOrderPart,
-  OrderType,
-} from 'foundation';
+import { GroupListContentView } from '../components/GroupListContentView';
+import { NavBarListView, NavItemInfo, TabTypeEnum } from '../components/NavBarListView';
 
 @Builder
 export function GroupListBuilder() {
@@ -20,143 +8,51 @@ export function GroupListBuilder() {
 
 @ComponentV2
 export struct GroupList {
-  @Local list: MyGroupInfo[] = [];
-  @Local isRefreshing: boolean = false;
-  @Local userInfo: GetUserInfoResp = AppStorageV2.connect(GetUserInfoResp, () => new GetUserInfoResp())!;
-
-  aboutToAppear(): void {
-    this.queryList();
-  }
-
-  queryList() {
-    getMyGroupList().then((resp) => {
-      this.isRefreshing = false;
-      this.list = resp as MyGroupInfo[];
-    })
-  }
-
-  @Computed
-  get isBindPhone() {
-    return this.userInfo?.mobile !== '';
-  }
-
-  isAvailable(item: MyGroupInfo) {
-    return item.status === GroupOrderStatus.AVAILABLE;
-  }
-
-  getTitle(item: MyGroupInfo) {
-    if (item.status === GroupOrderStatus.REFUND) {
-      return '已退款';
-    }
-    if (item.status === GroupOrderStatus.USE_UP) {
-      return '已使用';
-    }
-
-    return '待使用';
-  }
-
-  @Builder
-  GroupCard(item: MyGroupInfo) {
-    Column() {
-      // 上半部分
-      Column({ space: 10 }) {
-        Text(this.getTitle(item))
-          .fontSize(12)
-          .fontColor(this.isAvailable(item) ? $r('sys.color.brand') : $r('app.color.common_grey'))
-          .alignSelf(ItemAlign.End)
-
-        UIOrderPart({
-          goodInfo: {
-            type: OrderType.GROUP,
-            id: item.groupId,
-            title: item.title,
-            subTitle: item.subTitle,
-            vipPrice: item.vipPrice,
-            image: item.images[0] ?? '',
-          },
-        })
-      }
-      .padding(10)
-      .width('100%')
-      .backgroundColor(Color.White)
-      .borderWidth(this.isAvailable(item) ? { bottom: 0.5 } : 0)
-      .borderColor($r('app.color.grey_20'))
-      .borderRadius({
-        topLeft: 8,
-        topRight: 8,
-        bottomLeft: this.isAvailable(item) ? 0 : 8,
-        bottomRight: this.isAvailable(item) ? 0 : 8,
-      })
-      .onClick(() => {
-        RouterModule.push({ url: RouterMap.MY_BOOK_GROUP_DETAIL, param: item });
-      })
-
-      // 下半部分
-      if (this.isAvailable(item)) {
-        Row() {
-          Button() {
-            Text('退款')
-              .fontSize($r('sys.float.Body_M'))
-              .fontWeight(500)
-              .width(56)
-              .height(20)
-              .textAlign(TextAlign.Center)
-          }
-          .backgroundColor('#F2F2F2')
-          .padding({
-            top: 4,
-            bottom: 4,
-            left: 8,
-            right: 8,
-          })
-          .onClick(() => {
-            refund(item.orderNo).then(() => {
-              CommonUtils.openNoticeDialog('已提交退款申请，等待商家退款，退款成功将短信通知您', '好的', () => {
-                this.queryList();
-              });
-            });
-          })
-        }
-        .width('100%')
-        .padding(10)
-        .backgroundColor(Color.White)
-        .borderRadius({ bottomLeft: 8, bottomRight: 8 })
-        .justifyContent(FlexAlign.End)
-      }
-    }
-  }
+  @Local tabType: TabTypeEnum = TabTypeEnum.ALL;
+  @Local selectedTabIndex: number = 0;
+  private controller: TabsController = new TabsController()
+  tabNavList: NavItemInfo[] = [
+    {id: TabTypeEnum.ALL, label: '全部'},
+    {id: TabTypeEnum.UNUSED, label: '待使用'},
+    {id: TabTypeEnum.USED, label: '已使用'},
+    {id: TabTypeEnum.REFUNDED, label: '已退款'},
+  ]
 
   build() {
     NavDestination() {
       Column() {
-        if (this.isBindPhone && this.list.length) {
-          Refresh({ refreshing: $$this.isRefreshing }) {
-            Scroll() {
-              Column({ space: 8 }) {
-                ForEach(this.list, (item: MyGroupInfo) => {
-                  this.GroupCard(item)
-                }, (v: MyGroupInfo) => JSON.stringify(v))
-              }
-            }
-            .width('100%')
-            .height('100%')
-            .align(Alignment.Top)
-            .scrollBar(BarState.Off)
-            .edgeEffect(EdgeEffect.Spring)
-            .padding(10)
+        // 自定义tabbar
+        NavBarListView({
+          options: this.tabNavList,
+          tabType: this.tabType,
+          onChangeTabType: (index: number) => {
+            this.tabType = this.tabNavList[index].id;
+            this.selectedTabIndex = index;
           }
-          .layoutWeight(1)
-          .onRefreshing(() => {
-            this.queryList();
-          })
-        } else {
-          UIEmpty({ emptyDesc: this.isBindPhone ? '暂无团购记录' : '关联手机号后查看团购记录' })
-            .margin({ top: 140, bottom: 20 })
+        })
+        Tabs({ barPosition: BarPosition.Start, controller: this.controller, index: this.selectedTabIndex }) {
+          ForEach(this.tabNavList, (item: NavItemInfo) => {
+            TabContent() {
+              GroupListContentView({
+                tabType: item.id,
+                currentType: this.tabType
+              })
+            }
+          }, (item: NavItemInfo) => JSON.stringify(item))
         }
+        .width('100%')
+        .layoutWeight(1)
+        .barHeight(0)
+        .onAnimationStart((index: number, targetIndex: number, extraInfo: SwiperAnimationEvent) => {
+          this.tabType = this.tabNavList[targetIndex].id;
+        })
+        .onChange((index: number) => {
+          this.selectedTabIndex = index;
+        })
       }
       .width('100%')
     }
-    .title('团购', { backgroundColor: Color.White })
+    .title('团购')
     .backgroundColor($r('app.color.common_page_bg'))
   }
 }

@@ -1,13 +1,9 @@
-import { display } from '@kit.ArkUI';
-import { systemShare } from '@kit.ShareKit';
-import { uniformTypeDescriptor as utd } from '@kit.ArkData';
-import { common } from '@kit.AbilityKit';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import isToday from 'dayjs/plugin/isToday';
 import isYesterday from 'dayjs/plugin/isYesterday';
+import { GlobalContextUtils } from 'lib_common';
 import { Size } from './Model'
-import { FeedCardInfoModel } from '../model/RecommendModel';
 
 dayjs.extend(relativeTime);
 dayjs.extend(isToday);
@@ -23,7 +19,7 @@ export function extractDimension(url: string, dimension: string) {
     const dimensionString = match[0];
     // 从匹配结果中提取数字部分
     const value = parseInt(dimensionString.slice(dimension.length + 1), 10);
-    return px2vp(value);
+    return GlobalContextUtils.globalUIContext.px2vp(value);
   }
   return null;
 }
@@ -62,88 +58,6 @@ export function calculateDimensions(url: string | undefined): Size {
     }
   }
   return new Size(width, height);
-}
-
-export function calculateDimensionsUser(url: string): Size {
-  // 调用 extractDimension 函数提取宽度和高度
-  let width = extractDimension(url, 'w');
-  let height = extractDimension(url, 'h');
-
-  // 如果提取的宽度或高度为 null，则使用 0 作为默认值
-  width = width !== null ? width : 0;
-  height = height !== null ? height : 0;
-
-  // 计算宽高比
-  const aspectRatio = width / height;
-
-  if (aspectRatio < 1) {
-    width = 220 - 16
-    height = width / (2 / 3);
-  } else if (aspectRatio === 1) {
-    width = 280 - 16
-    height = width;
-  } else {
-    width = 327 - 16
-    height = width / 1.5;
-  }
-  return new Size(width, height);
-}
-
-export function twoImagesSize(num: number, content: UIContext, componentId: string) {
-  let info = content.getComponentUtils().getRectangleById(componentId)
-  let currentWidth = info.size.width
-  if (componentId === 'home_news' && AppStorage.get('home_news')) {
-    currentWidth = AppStorage.get('home_news') ?? currentWidth
-  }
-  if (componentId === 'home_news') {
-    AppStorage.setOrCreate('home_news', currentWidth)
-  }
-  console.log(currentWidth + 'currentWidth', componentId)
-  /*
-   * 组件padding 24 间距 8
-   * num 组件数量
-   * */
-  if (!(num % 3) || num >= 6) {
-    return (px2vp(currentWidth) - 16) / 3
-  }
-  return (px2vp(currentWidth) - 16) / 2
-}
-
-export function twoImagesSizeUser(num: number) {
-  let displayClass: display.Display = display.getDefaultDisplaySync();
-  /*
-   * 组件padding 24 间距 8
-   * num 组件数量
-   * */
-  if (num === 9) {
-    return (px2vp(displayClass.width) - 24 - 24 - 32) / 3
-  }
-  if (num >= 4) {
-    return (px2vp(displayClass.width) - 24 - 16 - 32) / 2
-  }
-  return (px2vp(displayClass.width) - 24 - 16 - 32) / num
-}
-
-export function harmonyOSSystemShare(content: string, context: common.UIAbilityContext) {
-  /*
-   * 拉起华为分享
-   * 当前只支持分享链接
-   * */
-  let data: systemShare.SharedData = new systemShare.SharedData({
-    utd: utd.UniformDataType.PLAIN_TEXT,
-    content: content,
-  });
-
-  let controller: systemShare.ShareController = new systemShare.ShareController(data);
-  controller.show(context, {
-    previewMode: systemShare.SharePreviewMode.DETAIL,
-    selectionMode: systemShare.SelectionMode.SINGLE,
-  });
-  let callback = () => {
-    console.info('Share panel closed');
-  };
-  controller.on('dismiss', callback);
-  controller.off('dismiss', callback);
 }
 
 /*

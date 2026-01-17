@@ -5,6 +5,7 @@
 - [简介](#简介)
 - [约束与限制](#约束与限制)
 - [使用](#使用)
+- [API参考](#API参考)
 - [示例代码](#示例代码)
 
 ## 简介
@@ -51,12 +52,24 @@
 
    a. 解压下载的组件包，将包中所有文件夹拷贝至您工程根目录的xxx目录下。
 
-   b. 在项目根目录build-profile.json5添加video_clip模块。
+   b. 在项目根目录build-profile.json5添加video_clip、membership、module_base、aggregated_login模块。
    ```
    "modules": [
       {
       "name": "video_clip",
       "srcPath": "./xxx/video_clip",
+      },
+      {
+      "name": "membership",
+      "srcPath": "./xxx/membership",
+      },
+      {
+      "name": "module_base",
+      "srcPath": "./xxx/module_base",
+      },
+      {
+      "name": "aggregated_login",
+      "srcPath": "./xxx/aggregated_login",
       },
    ]
    ```
@@ -64,8 +77,15 @@
    ```
    "dependencies": {
       "video_clip": "file:./xxx/video_clip",
+      "membership": "file:./xxx/membership",
+      "module_base": "file:./xxx/module_base",
+      "aggregated_login": "file:./xxx/aggregated_login",
    }
    ```
+
+## API参考
+
+* 无
 
 ## 示例代码
 

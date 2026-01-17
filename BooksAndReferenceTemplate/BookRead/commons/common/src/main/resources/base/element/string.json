@@ -643,6 +643,10 @@
     {
       "name": "completed",
       "value": "已完结"
+    },
+    {
+      "name": "agcit_huawei_book_read",
+      "value": "2.1.2"
     }
   ]
 }

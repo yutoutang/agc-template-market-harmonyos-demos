@@ -7,4 +7,5 @@ export interface CustomFilter {
   brightness: number,
   grayscale: boolean,
   isHot: boolean
+  isVip: boolean
 }

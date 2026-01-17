@@ -54,8 +54,24 @@
       "srcPath": "./components/reservation_form"
     },
     {
+      "name": "collect_personal_info",
+      "srcPath": "./components/collect_personal_info"
+    },
+    {
+      "name": "select_store",
+      "srcPath": "./components/select_store"
+    },
+    {
       "name": "home",
-      "srcPath": "./features/home"
+      "srcPath": "./features/home",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
     },
     {
       "name": "mine",

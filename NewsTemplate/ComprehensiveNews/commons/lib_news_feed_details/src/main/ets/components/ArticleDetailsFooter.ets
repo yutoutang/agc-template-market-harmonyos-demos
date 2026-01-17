@@ -1,18 +1,17 @@
 import { PersistenceV2 } from '@kit.ArkUI'
-import dayjs from 'dayjs'
 import { SettingModel } from 'lib_common'
-import { WxShareViewModel } from 'module_share'
+import { ShareUtils } from 'lib_widget'
 import { handlerCoverImage } from '../utils/Utils'
 import NewsFeedVM from '../viewmodel/NewsFeedVM'
 
 @ComponentV2
 export struct ArticleDetailsFooter {
-  @Local newsFeedVM: NewsFeedVM = NewsFeedVM.instance
+  @Param newsFeedVM: NewsFeedVM = new NewsFeedVM()
   @Local settingInfo: SettingModel = PersistenceV2.connect(SettingModel, () => new SettingModel())!
 
   @Computed
   get getDarkLike() {
-    return this.settingInfo.darkSwitch ? $r('app.media.details_like_dark'): $r('app.media.details_like')
+    return this.settingInfo.darkSwitch ? $r('app.media.details_like_dark') : $r('app.media.details_like')
   }
 
   @Builder
@@ -41,7 +40,7 @@ export struct ArticleDetailsFooter {
       Flex() {
         Row() {
           Image(this.newsFeedVM.articleDetails.isLiked ? $r('app.media.details_like_active') :
-          this.getDarkLike)
+            this.getDarkLike)
             .width(16 * this.settingInfo.fontSizeRatio)
             .height(14 * this.settingInfo.fontSizeRatio)
             .margin({ right: 5 })
@@ -80,18 +79,17 @@ export struct ArticleDetailsFooter {
         .margin({ left: 5 })
         .accessibilityText('分享到微信')
         .onClick(() => {
-          WxShareViewModel.instance.newsWebShare({
-            id: this.newsFeedVM.articleDetails.id,
-            type: this.newsFeedVM.articleDetails.type,
+          const instance = new ShareUtils({
+            recordId: this.newsFeedVM.articleDetails.id,
             title: this.newsFeedVM.articleDetails.title,
-            articleFrom: this.newsFeedVM.articleDetails.articleFrom,
-            createTime: dayjs(this.newsFeedVM.articleDetails.createTime).format('YYYY-MM-DD HH:mm'),
+            subTitle: this.newsFeedVM.articleDetails.articleFrom,
+            createTime: this.newsFeedVM.articleDetails.createTime,
             coverUrl: handlerCoverImage(this.newsFeedVM.articleDetails),
-            isVideo: !!this.newsFeedVM.articleDetails.postImgList?.[0]?.surfaceUrl,
           })
+          instance.shareToWX(this.getUIContext());
         })
       }
     }
-    .margin({ bottom: 16,top:16 })
+    .margin({ bottom: 16, top: 16 })
   }
 }

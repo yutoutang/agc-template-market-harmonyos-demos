@@ -12,9 +12,9 @@ export class MsgFansViewModel extends BaseViewModel {
     this.queryNewFansList();
   }
 
-  queryNewFansList() {
-    const list = MineServiceApi.queryNewFans().map(v => new AuthorModel(v));
-    this.fansDataSource.setData(list);
+  async queryNewFansList() {
+    const list = await MineServiceApi.queryNewFans();
+    this.fansDataSource.setData(list.map(v => new AuthorModel(v)));
   }
 
   setAllRead() {

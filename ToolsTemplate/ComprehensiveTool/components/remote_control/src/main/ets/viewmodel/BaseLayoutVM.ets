@@ -1,6 +1,5 @@
-import { RemoteApi } from '../http/Api';
 import { ControlInfo, RunMode, WindDirection, WindMode, WindSpeed } from '../model/Index';
-import { SendUtil, ScheduledUtil } from '../util/Index';
+import {  ScheduledUtil } from '../util/Index';
 
 
 const TAG = '[BaseLayoutVM]';

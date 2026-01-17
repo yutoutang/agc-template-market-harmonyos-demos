@@ -1,8 +1,7 @@
-import { hilog } from '@kit.PerformanceAnalysisKit';
 import { abilityAccessCtrl, bundleManager, common, Permissions } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { PermissionStatus } from '../model/Index';
-
 
 // 日志打印
 export class MyLog {
@@ -11,21 +10,19 @@ export class MyLog {
   private static format: string = '%{public}s, %{public}s';
 
   public static info(...args: string[]): void {
-    hilog.info(MyLog.domain, MyLog.tag, MyLog.format, args);
+    UtilLog.info(MyLog.domain, MyLog.tag, MyLog.format, args);
   }
 
   public static error(...args: string[]): void {
-    hilog.error(MyLog.domain, MyLog.tag, MyLog.format, args);
+    UtilLog.error(MyLog.domain, MyLog.tag, MyLog.format, args);
   }
 }
-
 
 // 权限工具
 export class PermissionUtil {
   private static _atManager: abilityAccessCtrl.AtManager = abilityAccessCtrl.createAtManager();
-  private static _context: Context;
 
-  public static async requestPermissions(permissions: Permissions[]) {
+  public static async requestPermissions(permissions: Permissions[],ctx:Context) {
     const needAuthorized: Permissions[] = [];
     let permissive = true;
     for (let permission of permissions) {
@@ -37,11 +34,8 @@ export class PermissionUtil {
     if (!needAuthorized.length) {
       return permissive;
     }
-    if (!PermissionUtil._context) {
-      PermissionUtil._context = getContext() as common.UIAbilityContext;
-    }
     // 向用户申请授权
-    const data = await PermissionUtil._atManager.requestPermissionsFromUser(PermissionUtil._context, needAuthorized);
+    const data = await PermissionUtil._atManager.requestPermissionsFromUser(ctx, needAuthorized);
     const grantStatus: number[] = data.authResults;
     const needAuthorizedAgain: Permissions[] = [];
     grantStatus.forEach((item, index) => {
@@ -54,13 +48,13 @@ export class PermissionUtil {
         MyLog.info('request permission failed:: user denied');
       }
     });
-    PermissionUtil._requestPermissionsOnSetting(needAuthorizedAgain);
+    PermissionUtil._requestPermissionsOnSetting(needAuthorizedAgain,ctx);
     return permissive;
   }
 
   // 用户首次拒绝后二次申请授权
-  private static async _requestPermissionsOnSetting(permissions: Permissions[]) {
-    PermissionUtil._atManager.requestPermissionOnSetting(PermissionUtil._context, permissions)
+  private static async _requestPermissionsOnSetting(permissions: Permissions[],ctx:Context) {
+    PermissionUtil._atManager.requestPermissionOnSetting(ctx, permissions)
       .then((data: abilityAccessCtrl.GrantStatus[]) => {
         MyLog.info('request permission on setting success::' + JSON.stringify(data));
       })

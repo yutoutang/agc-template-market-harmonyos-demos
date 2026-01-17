@@ -4,7 +4,7 @@ import { relationship } from '../utils/relationship'
 import { KenshipPageVM } from '../viewmodel/KinshipPageVM'
 import { common } from '@kit.AbilityKit'
 import { FileService } from '../utils/Service'
-import { promptAction } from '@kit.ArkUI';
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
 
 @ComponentV2
 export struct KinshipPage {
@@ -122,7 +122,7 @@ export struct KinshipPage {
                       .fontColor($r('sys.color.font_primary'))
                       .enabled(day === '夫' ? this.vm.showManButton : day === '妻' ? this.vm.showWomanButton : true)
                       .onClick(() => {
-                        this.vm.handleInput(day)
+                        this.vm.handleInput(day, this.getUIContext())
                       })
                   }
                 }

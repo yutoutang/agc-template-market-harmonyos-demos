@@ -11,6 +11,7 @@
     "swiper_card": "file:../../components/swiper_card",
     "aggregated_payment": "file:../../components/aggregated_payment",
     "incentive_ad": "file:../../components/incentive_ad",
-    "custom_push": "file:../../components/custom_push"
+    "custom_push": "file:../../components/custom_push",
+    "membership": "file:../../components/membership"
   }
 }

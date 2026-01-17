@@ -1,4 +1,5 @@
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { LevelMode } from '@kit.ArkUI';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { ACTION_TYPE } from '../common/Enum';
 import { getNfcCardBgImg } from '../common/nfc/Nfc';
 import { PromptActionUtil } from '../common/PromptActionUtil';
@@ -6,7 +7,6 @@ import { getNavPathStack } from '../common/Route';
 import Util from '../common/Util';
 import { ActionModel, DetailModel } from '../model/Index';
 import { DetailVM } from '../viewmodel/DetailVM';
-import { LevelMode } from '@kit.ArkUI';
 
 let uIContext: UIContext;
 
@@ -24,7 +24,7 @@ struct DetailPage {
     PromptActionUtil.setOptions({
       levelMode: LevelMode.EMBEDDED,
       onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
-        hilog.info(0xFF00, 'NFCDetailPage', JSON.stringify(dismissDialogAction.reason));
+        UtilLog.info(0xFF00, 'NFCDetailPage', JSON.stringify(dismissDialogAction.reason));
       },
     });
   }

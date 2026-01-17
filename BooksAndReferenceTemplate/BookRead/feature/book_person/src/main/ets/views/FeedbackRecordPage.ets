@@ -1,4 +1,7 @@
-import { Constants, FeedbackItem, FeedbackItemType, ReturnButton, FeedbackRecord, NavHeaderBar } from 'common';
+import { Constants, FeedbackItem, FeedbackItemType, ReturnButton, FeedbackRecord, NavHeaderBar,
+  BreakpointTypeEnum,
+  BreakpointSystem,
+  BreakpointStorage} from 'common';
 import { AppStorageV2 } from '@kit.ArkUI';
 
 @Entry
@@ -8,7 +11,7 @@ export struct FeedbackRecordPage {
   @Local windowTopHeight: number = AppStorage.get('windowTopHeight') as number || 38.77;
   @Local feedbackRecord: FeedbackRecord =
     AppStorageV2.connect(FeedbackRecord, 'feedbackRecord', () => new FeedbackRecord())!
-
+  @Local curBreakpoint: BreakpointStorage = BreakpointSystem.currentBreakpoint
   async initData() {
     this.feedbackList = this.feedbackRecord.feedbackList
   }
@@ -70,11 +73,18 @@ export struct FeedbackRecordPage {
                       .fontSize($r('sys.float.Body_L'))
                       .fontWeight(FontWeight.Medium)
                       .margin({ top: 12, bottom: 8 })
-                    Row() {
-                      ForEach(item.stageImageUris, (itemUri: string, index: number) => {
-                        Image(itemUri).width(80).height(80).margin({ right: 8 })
-                      }, (item: string) => `${item}+${new Date().toString()}`)
+                    Scroll(){
+                      Row() {
+                        ForEach(item.stageImageUris, (itemUri: string, index: number) => {
+                          Image(itemUri).width(80).height(80).margin({ right: 8 })
+                        }, (item: string) => `${item}+${new Date().toString()}`)
+                      }
                     }
+                    .width('100%')
+                    .scrollable(ScrollDirection.Horizontal)
+                    .edgeEffect(EdgeEffect.Spring)
+                    .scrollBar(BarState.Off)
+                    .align(Alignment.Start)
                   }
                   .alignItems(HorizontalAlign.Start)
                   .width(Constants.FULL_SIZE)
@@ -85,10 +95,10 @@ export struct FeedbackRecordPage {
                 .width('100%')
                 .borderRadius(16)
                 .alignItems(HorizontalAlign.Start)
-              }, (item: FeedbackItemType) => `${item.stageImageUris}+${new Date().toString()}`)
+              }, (item: FeedbackItemType,index) => `${item.description}+${new Date().toString()}+${index}`)
             }
           }
-          .width('100%')
+          .width(this.curBreakpoint.value === BreakpointTypeEnum.LG ? '70%' : Constants.FULL_SIZE)
           .backgroundColor($r('sys.color.background_secondary'))
           .padding({
             top: 12,
@@ -97,9 +107,12 @@ export struct FeedbackRecordPage {
             bottom: 12
           })
         }
+        .height('100%')
         .width('100%')
         .margin({ bottom: 100 })
         .edgeEffect(EdgeEffect.Spring)
+        .scrollBar(BarState.Off)
+        .align(Alignment.Top)
       }
       .height('100%')
       .width('100%')

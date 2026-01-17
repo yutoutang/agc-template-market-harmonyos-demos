@@ -9,6 +9,7 @@ import { MarkOptions } from '../types/Types';
 import { HistoryUtil } from '../utils/HistoryUtil';
 import { FormatUtil } from '../utils/FormatUtil';
 import { Logger } from '../utils/Logger';
+import { contextUtil } from '../utils/ContextUtil'
 
 const TAG = '[WaterMarksVM]';
 
@@ -62,9 +63,9 @@ export class WaterMarksVM {
   }
 
   public getSandboxDir() {
-    const ctx = getContext();
-    this.tempDir = ctx.tempDir;
-    this.fileDir = ctx.filesDir;
+    const ctx = contextUtil.getContext();
+    this.tempDir = ctx!.tempDir;
+    this.fileDir = ctx!.filesDir;
   }
 
   public resetParamsInEdit() {
@@ -88,7 +89,7 @@ export class WaterMarksVM {
     this.selectedList = Array.from<boolean>({ length: this.optionsList.length }).fill(false);
     this.editing = false;
   }
-  
+
   public resetDrawParams() {
     this.maskText = '图片水印';
     this.fontSize = (FONT_SIZE_LIST[0] + FONT_SIZE_LIST[1]) / 2;
@@ -212,15 +213,15 @@ export class WaterMarksVM {
   }
 
   private _createPixelMap(file: fs.File) {
-    const imageSource: image.ImageSource = image.createImageSource(file.fd);
     try {
+      const imageSource: image.ImageSource = image.createImageSource(file.fd);
       this.pixelMap = imageSource.createPixelMapSync();
       this.pixelMapWithMarks = undefined;
       this.pixelMapWithMarksTemp = undefined;
       this.markOptions = undefined;
       const info = this.pixelMap.getImageInfoSync();
-      this.iWidth = px2vp(info.size.width);
-      this.iHeight = px2vp(info.size.height);
+      this.iWidth = contextUtil.getUiContext()!.px2vp(info.size.width);
+      this.iHeight = contextUtil.getUiContext()!.px2vp(info.size.height);
     } catch (e) {
       Logger.error(TAG, 'Create pixelMap failed, Cause:' + JSON.stringify(e));
     }

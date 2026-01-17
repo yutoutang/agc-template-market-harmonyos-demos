@@ -27,8 +27,13 @@ export class SettingNetworkModel {
   @Trace remindWithoutWlan: number = 0;
   // 使用移动网络改善内容浏览体验
   @Trace optimizeWith4G: boolean = true;
+  // 直播是否启用小窗播放
+  @Trace enableLivePiP: boolean = true;
   // 视频自动下滑
   @Trace autoPlayNext: boolean = true;
   // 推荐频道自动播放视频
   @Trace autoPlayTabRecommend: boolean = true;
+  // 退出广播，开启小窗播放
+  @Trace enableAudioSub: boolean = true
+
 }

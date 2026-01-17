@@ -36,38 +36,47 @@ export class NetworkUtil {
   }
 
   getNetwork() {
-    let netHandle = connection.getDefaultNetSync();
-    // 是否有网络
-    if (netHandle.netId >= 100) {
-      this.networkModel.hasNet = true;
-      // 获取netHandle对应网络的能力信息
-      let capInfo = connection.getNetCapabilitiesSync(netHandle)
-      if (capInfo.bearerTypes[0] === 0) {
-        this.networkModel.isCellular = true
-        this.networkModel.isWiFi = false
-      } else if (capInfo.bearerTypes[0] === 1) {
+    try {
+      let netHandle = connection.getDefaultNetSync();
+      // 是否有网络
+      if (netHandle.netId >= 100) {
+        this.networkModel.hasNet = true;
+        // 获取netHandle对应网络的能力信息
+        let capInfo = connection.getNetCapabilitiesSync(netHandle)
+        if (capInfo.bearerTypes[0] === 0) {
+          this.networkModel.isCellular = true
+          this.networkModel.isWiFi = false
+        } else if (capInfo.bearerTypes[0] === 1) {
+          this.networkModel.isCellular = false
+          this.networkModel.isWiFi = true
+        }
+      } else {
+        this.networkModel.hasNet = false;
         this.networkModel.isCellular = false
-        this.networkModel.isWiFi = true
+        this.networkModel.isWiFi = false
       }
-    } else {
-      this.networkModel.hasNet = false;
-      this.networkModel.isCellular = false
-      this.networkModel.isWiFi = false
-    }
 
-    Logger.info(TAG, `getDefaultNetSync: ${JSON.stringify(netHandle)}`)
+      Logger.info(TAG, `getDefaultNetSync: ${JSON.stringify(netHandle)}`)
+    } catch (e) {
+      Logger.error(TAG, 'getNetCapabilitiesSync fail, error: ' + JSON.stringify(e));
+    }
   }
 
   getConnectNetAddress() {
-    let netHandle = connection.getDefaultNetSync();
-    // 是否有网络
-    if (netHandle.netId >= 100) {
-      const connectInfo = connection.getConnectionPropertiesSync(netHandle);
-      if (connectInfo.dnses.length > 0) {
-        this.networkModel.netAddress = connectInfo.dnses.map((item: connection.NetAddress) => item.address)
+    try {
+      let netHandle = connection.getDefaultNetSync();
+      // 是否有网络
+      if (netHandle.netId >= 100) {
+        const connectInfo = connection.getConnectionPropertiesSync(netHandle);
+        if (connectInfo.dnses.length > 0) {
+          this.networkModel.netAddress = connectInfo.dnses.map((item: connection.NetAddress) => item.address)
+        }
       }
+      Logger.info(TAG,
+        `getConnectNetAddress, get current netAddress is: ${JSON.stringify(this.networkModel.netAddress)}`)
+    } catch (e) {
+      Logger.error(TAG, 'getConnectNetAddress fail, error: ' + JSON.stringify(e));
     }
-    Logger.info(TAG, `getConnectNetAddress, get current netAddress is: ${JSON.stringify(this.networkModel.netAddress)}`)
   }
 
   handleNetworkAvailable() {
@@ -79,7 +88,7 @@ export class NetworkUtil {
     httpRequest.request(
       'https://www-file.huawei.com/admin/asset/v1/pro/view/2644ff4ada00431f91c7d31209cf5f9b.jpg',
       options,
-      (err: BusinessError, data: http.HttpResponse) => {
+      (err: BusinessError) => {
         if (err) {
           const noNetworkErrors = [2300005, 2300006, 2300007]
           if (noNetworkErrors.includes(err.code)) {
@@ -92,28 +101,32 @@ export class NetworkUtil {
   }
 
   netQualityListener() {
-    netQuality.on('netSceneChange', (list: Array<netQuality.NetworkScene>) => {
-      if (list.length > 0) {
-        list.forEach((scene) => {
-          // WiFi是弱网情况，且流量管理里面的移动数据开关打开，则切换到移动数据
-          if (this.settingInfo.network.optimizeWith4G && scene.scene === 'weakSignal' &&
-            scene.pathType === netQuality.PathType.WIFI_PRIMARY
-          ) {
-            let netHandles = connection.getAllNetsSync();
-            for (let i = 0; i < netHandles.length; i++) {
-              let item = netHandles[i];
-              if (item.netId !== 0) {
-                let netCapabilities = connection.getNetCapabilitiesSync(item);
-                if (netCapabilities.bearerTypes[0] === connection.NetBearType.BEARER_CELLULAR) {
-                  connection.setAppNet(item);
-                  return;
+    try {
+      netQuality.on('netSceneChange', (list: Array<netQuality.NetworkScene>) => {
+        if (list.length > 0) {
+          list.forEach(async (scene) => {
+            // WiFi是弱网情况，且流量管理里面的移动数据开关打开，则切换到移动数据
+            if (this.settingInfo.network.optimizeWith4G && scene.scene === 'weakSignal' &&
+              scene.pathType === netQuality.PathType.WIFI_PRIMARY
+            ) {
+              let netHandles = connection.getAllNetsSync();
+              for (let i = 0; i < netHandles.length; i++) {
+                let item = netHandles[i];
+                if (item.netId !== 0) {
+                  let netCapabilities = connection.getNetCapabilitiesSync(item);
+                  if (netCapabilities.bearerTypes[0] === connection.NetBearType.BEARER_CELLULAR) {
+                    await connection.setAppNet(item);
+                    return;
+                  }
                 }
               }
             }
-          }
-        });
-      }
-    });
+          });
+        }
+      });
+    } catch (e) {
+      Logger.error(TAG, 'netQualityListener fail, error: ' + JSON.stringify(e));
+    }
   }
 
   registerNet() {

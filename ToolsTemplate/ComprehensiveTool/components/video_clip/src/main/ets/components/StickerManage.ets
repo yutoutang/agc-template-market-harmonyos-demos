@@ -1,6 +1,6 @@
 import { vibrator } from '@kit.SensorServiceKit';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 import sdk from 'libveditor.so';
 import { Sticker } from '../model/Sticker';
 import { GestureState, XAdsorbType, YAdsorbType } from '../common/Enum';
@@ -62,8 +62,8 @@ export struct StickerManage {
       const originalHeight = videoArea[2].y - videoArea[0].y;
 
       // 初始化中心原点坐标系统参数
-      videoWidth = px2vp(originalWidth);
-      videoHeight = px2vp(originalHeight);
+      videoWidth = this.getUIContext().px2vp(originalWidth);
+      videoHeight = this.getUIContext().px2vp(originalHeight);
       maxX = videoArea[1].x; // x轴最大值
       minX = videoArea[0].x; // x轴最小值
       maxY = videoArea[2].y; // y轴最大值
@@ -72,8 +72,8 @@ export struct StickerManage {
     // 初始化吸附位置
     this.adsorbPosX = [minX + Constant.PADDING_WIDTH, 0, maxX - Constant.PADDING_WIDTH];
     this.adsorbPosY = [minY + Constant.PADDING_HEIGHT, 0, maxY - Constant.PADDING_HEIGHT];
-    this.stickerX = px2vp(this.sticker.screenWidth);
-    this.stickerY = px2vp(this.sticker.screenHeight);
+    this.stickerX = this.getUIContext().px2vp(this.sticker.screenWidth);
+    this.stickerY = this.getUIContext().px2vp(this.sticker.screenHeight);
     this.widthFromSDK = this.sticker.width;
     this.heightFromSDK = this.sticker.height;
     this.angle = this.sticker.rotation || 0;
@@ -104,13 +104,13 @@ export struct StickerManage {
     // 计算坐标
     let deltaX = event.fingerList[0].globalX - this.panStartGlobalX;
     let deltaY = event.fingerList[0].globalY - this.panStartGlobalY;
-    hilog.info(0xFF00, 'VideoClip',
+    UtilLog.info(0xFF00, 'VideoClip',
       `panStartGlobalX: ${this.panStartGlobalX},panStartGlobalY: ${this.panStartGlobalY}`);
-    hilog.info(0xFF00, 'VideoClip', `globalX: ${event.fingerList[0].globalX},globalY: ${event.fingerList[0].globalY}`);
-    hilog.info(0xFF00, 'VideoClip', `deltaX: ${deltaX},deltaY: ${deltaY}`);
+    UtilLog.info(0xFF00, 'VideoClip', `globalX: ${event.fingerList[0].globalX},globalY: ${event.fingerList[0].globalY}`);
+    UtilLog.info(0xFF00, 'VideoClip', `deltaX: ${deltaX},deltaY: ${deltaY}`);
     let newX = this.panStartX + deltaX;
     let newY = this.panStartY + deltaY;
-    hilog.info(0xFF00, 'VideoClip', `newX: ${newX},newY: ${newY}`);
+    UtilLog.info(0xFF00, 'VideoClip', `newX: ${newX},newY: ${newY}`);
     // 限制在视频范围内
     newX = this.calcRealPosX(newX);
     newY = this.calcRealPosY(newY);
@@ -135,14 +135,15 @@ export struct StickerManage {
     this.stickerY = this.panEndY;
     this.sticker.offsetX = this.panEndX;
     this.sticker.offsetY = this.panEndY;
-    sdk.MoveImage(this.sticker.id, vp2px(this.sticker.offsetX), vp2px(this.sticker.offsetY));
+    sdk.MoveImage(this.sticker.id, this.getUIContext().vp2px(this.sticker.offsetX),
+      this.getUIContext().vp2px(this.sticker.offsetY));
   }
 
   pinchStart(event: GestureEvent) {
     this.curGestureState = GestureState.PINCH;
     this.isPanReject = true;
     this.pinchStartScale = this.curPinchValue; // 记录当前缩放值作为起始点
-    hilog.info(0xFF00, 'VideoClip', `StickerManage', 'pinchStart current scale: ${this.curPinchValue}`);
+    UtilLog.info(0xFF00, 'VideoClip', `StickerManage', 'pinchStart current scale: ${this.curPinchValue}`);
   }
 
   pinchUpdate(event: GestureEvent) {
@@ -153,12 +154,12 @@ export struct StickerManage {
       this.pinchValue = Math.max(0.1, Math.min(this.pinchValue, 3.0));
 
       sdk.ScaleImage(this.sticker.id, this.pinchValue);
-      hilog.info(0xFF00, 'VideoClip', `StickerManage', 'StickerManage', 'pinchStart current scale: ${this.pinchValue}`);
+      UtilLog.info(0xFF00, 'VideoClip', `StickerManage', 'StickerManage', 'pinchStart current scale: ${this.pinchValue}`);
     }
   }
 
   pinchEnd() {
-    hilog.info(0xFF00, 'VideoClip', `StickerManage', 'StickerManage', 'pinchEnd: ${this.pinchValue}`);
+    UtilLog.info(0xFF00, 'VideoClip', `StickerManage', 'StickerManage', 'pinchEnd: ${this.pinchValue}`);
     this.curGestureState = GestureState.NONE;
     this.curPinchValue = this.pinchValue;
     sdk.ScaleImage(this.sticker.id, this.pinchValue);
@@ -198,17 +199,17 @@ export struct StickerManage {
 
   // 限制x坐标在范围内
   calcRealPosX(panPosX: number): number {
-    const limitedMinX = px2vp(minX); // 左边界
-    const limitedMaxX = px2vp(maxX); // 右边界
-    hilog.info(0xFF00, 'VideoClip', `minX = ${limitedMinX},MaxX = ${limitedMaxX}`);
+    const limitedMinX = this.getUIContext().px2vp(minX); // 左边界
+    const limitedMaxX = this.getUIContext().px2vp(maxX); // 右边界
+    UtilLog.info(0xFF00, 'VideoClip', `minX = ${limitedMinX},MaxX = ${limitedMaxX}`);
     return Math.max(limitedMinX, Math.min(panPosX, limitedMaxX));
   }
 
   // 限制y坐标在范围内（
   calcRealPosY(panPosY: number): number {
     // 考虑贴纸高度，确保不超出边界
-    const limitedMinY = px2vp(minY); // 上边界
-    const limitedMaxY = px2vp(maxY); // 下边界
+    const limitedMinY = this.getUIContext().px2vp(minY); // 上边界
+    const limitedMaxY = this.getUIContext().px2vp(maxY); // 下边界
     return Math.max(limitedMinY, Math.min(panPosY, limitedMaxY));
   }
 
@@ -330,8 +331,8 @@ export struct StickerManage {
       });
     }.zIndex(2)
     .visibility(this.remove ? Visibility.None : Visibility.Visible).position({
-      x: this.stickerX - px2vp(this.sticker.width / 2),
-      y: this.stickerY - px2vp(this.sticker.height / 2),
+      x: this.stickerX - this.getUIContext().px2vp(this.sticker.width / 2),
+      y: this.stickerY - this.getUIContext().px2vp(this.sticker.height / 2),
     });
   }
 }
@@ -416,12 +417,12 @@ function vibrate(id: string) {
       usage: 'unknown',
     }, (error: BusinessError) => {
       if (error) {
-        hilog.info(0xFF00, 'VideoClip', `failed to start vibration`);
+        UtilLog.info(0xFF00, 'VideoClip', `failed to start vibration`);
       } else {
-        hilog.info(0xFF00, 'VideoClip', `success in starting vibration`);
+        UtilLog.info(0xFF00, 'VideoClip', `success in starting vibration`);
       }
     });
   } catch (err) {
-    hilog.info(0xFF00, 'VideoClip', `an unexpected error occurred, error code : ${err?.code}`);
+    UtilLog.info(0xFF00, 'VideoClip', `an unexpected error occurred, error code : ${err?.code}`);
   }
 }

@@ -1,11 +1,18 @@
 import { AppStorageV2 } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
 import { BaseTitle } from '../components/BaseTitle';
-import { AppRouter,
+import {
+  AppRouter,
   checkLocationEnabled,
-  City, CityDataModel, CityType, DataStorage,
+  City,
+  CityDataModel,
+  CityType,
+  DataStorage,
   getAddressInfo,
-  LocationType, PermissionUtil } from 'common';
+  LocationType,
+  PermissionUtil
+} from 'common';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 
 @Builder
 export function citySelectionPageBuilder() {
@@ -30,8 +37,7 @@ export struct CitySelectionPage {
   @Local isLocationEnabled: boolean = false
   // 定位中
   @Local isPositioning: boolean = false
-
-  private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+  private context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
 
   aboutToAppear(): void {
     this.cityTableList = CityDataModel.getCityData()
@@ -110,7 +116,7 @@ export struct CitySelectionPage {
         } else {
           Row({ space: 4 }) {
             if (this.isPositioning) {
-              LoadingProgress().width(12).height(12).color('#9900000')
+              LoadingProgress()
             }
             Text(this.isPositioning ? '定位中' :
               (this.isLocationEnabled ? '定位失败，请检查定位权限' : '定位失败，请检查定位服务'))
@@ -171,7 +177,7 @@ export struct CitySelectionPage {
               }
             })
           }
-        })
+        },(item: City, index: number)=>index + '__' + JSON.stringify(item))
       }
       .width('100%')
       .columnsTemplate('1fr 1fr 1fr 1fr')
@@ -279,17 +285,17 @@ export struct CitySelectionPage {
                           }
                         })
                     }
-                  })
+                  },(item: string, index: number)=>index + '__' + JSON.stringify(item))
                 }
-                .divider({ strokeWidth: 0.5, color: $r('sys.color.ohos_id_color_button_divider') })
-              })
+                .divider({ strokeWidth: 0.5, color: $r('sys.color.comp_divider') })
+              },(item: CityType, index: number)=>index + '__' + JSON.stringify(item))
             }
             .width('100%')
             .height('100%')
             .sticky(StickyStyle.Header)
             .scrollBar(BarState.Off)
             .padding({ right: 20 })
-            .divider({ strokeWidth: 0.5, color: $r('sys.color.ohos_id_color_button_divider') })
+            .divider({ strokeWidth: 0.5, color: $r('sys.color.comp_divider') })
             .nestedScroll({
               scrollForward: NestedScrollMode.PARENT_FIRST,
               scrollBackward: NestedScrollMode.SELF_FIRST,
@@ -329,15 +335,18 @@ export struct CitySelectionPage {
 
         Column() {
           AlphabetIndexer({ arrayValue: this.letterList, selected: this.selectedIndex })
-            .selectedFont({ size: 12 })
-            .selectedColor('#fff')
-            .selectedBackgroundColor('#191919')
             .usingPopup(false)// 是否显示弹出框
             .itemSize(16)
             .onSelect((index: number) => {
               let selectIndexer = this.letterList[index]
               let idx = this.cityTableList.findIndex((item: CityType) => item.name === selectIndexer)
-              this.listScroller.scrollToItemInGroup(idx, 0, true)
+              try {
+                this.listScroller.scrollToItemInGroup(idx, 0, true)
+              } catch (error) {
+                hilog.error(0x0000, 'testTag',
+                  'Failed to scrollToItemInGroup, errorCode=%{public}d, errorMsg=%{public}s', error.code,
+                  error.message);
+              }
               this.offsetY = 0
               this.showIndexer = true
             })
@@ -346,7 +355,13 @@ export struct CitySelectionPage {
             .width(34).height(34)
             .offset({ x: -10, y: 40 })
             .onClick(() => {
-              this.listScroller.scrollToItemInGroup(0, 0)
+              try {
+                this.listScroller.scrollToItemInGroup(0, 0)
+              } catch (error) {
+                hilog.error(0x0000, 'testTag',
+                  'Failed to scrollToItemInGroup, errorCode=%{public}d, errorMsg=%{public}s', error.code,
+                  error.message);
+              }
               this.scroller.scrollToIndex(0, true)
               this.offsetY = 0
               this.showIndexer = false

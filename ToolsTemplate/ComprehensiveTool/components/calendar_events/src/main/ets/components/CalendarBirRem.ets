@@ -32,7 +32,7 @@ export struct CalendarBirRem {
   }
 
   creatUserEventInfo() {
-    this.calendarEventVM.saveEventData(this.userEventInfo)
+    this.calendarEventVM.saveEventData(this.userEventInfo, this.getUIContext())
   }
 
   @Builder
@@ -109,7 +109,7 @@ export struct CalendarBirRem {
           customContent: () => {
             this.datePickerBuilder()
           },
-        })
+        }, this.getUIContext())
       })
       .padding({ top: 12, bottom: 12 })
       .width('100%')

@@ -76,14 +76,12 @@ export struct ArticlePost {
                 config: {
                   before_init: {
                     type: 'defined',
-                    definedBody: `(config)=>{console.log('callback in before_init, config : ', config)}`,
+                    definedBody: `(config)=>{}`,
                   },
                   init_instance_callback: {
                     type: 'defined',
                     definedBody: `
-                        (editor) => {
-                          console.log('callback in init_instance_callback, editor : ', editor);
-                        }`,
+                        (editor) => {}`,
                   },
                 },
                 content: '',

@@ -1,12 +1,15 @@
-import { AsyncCallback, BusinessError } from '@kit.BasicServicesKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { abilityAccessCtrl, common, Want } from '@kit.AbilityKit';
-import { map, mapCommon, MapComponent } from '@kit.MapKit';
-import { geoLocationManager } from '@kit.LocationKit';
-import { HwMapModel } from 'common/src/main/ets/models/RouterModel';
-import { CommonUrl, Constants, RouterMap } from 'common/src/main/ets/constants/Common';
 import { AppStorageV2 } from '@kit.ArkUI';
-import { AppInfoModel, StoreInfoModel, WindowModel } from 'common/src/main/ets/models/StorageModel';
+import { AsyncCallback, BusinessError } from '@kit.BasicServicesKit';
+import { geoLocationManager } from '@kit.LocationKit';
+import { map, mapCommon, MapComponent } from '@kit.MapKit';
 import { RouterModule } from 'common';
+import { CommonUrl, Constants, RouterMap } from 'common/src/main/ets/constants/Common';
+import { HwMapModel } from 'common/src/main/ets/models/RouterModel';
+import { AppInfoModel, StoreInfoModel, WindowModel } from 'common/src/main/ets/models/StorageModel';
+
+const TAG = '[HwMapPage]'
 
 @Builder
 export function HwMapPageBuilder() {
@@ -49,7 +52,7 @@ export struct HwMapPage {
       if (!err) {
         this.mapController = mapController;
         this.mapController.on('mapLoad', () => {
-          console.info('mapLoad success');
+          UtilLog.info(TAG, 'mapLoad success');
         });
         this.abilityEnabled();
         mapController.setMyLocationStyle(this.style);
@@ -96,7 +99,7 @@ export struct HwMapPage {
   initPermission() {
     let atManager: abilityAccessCtrl.AtManager = abilityAccessCtrl.createAtManager();
 
-    atManager.requestPermissionsFromUser(getContext(this) as common.UIAbilityContext,
+    atManager.requestPermissionsFromUser(this.getUIContext().getHostContext(),
       ['ohos.permission.LOCATION', 'ohos.permission.APPROXIMATELY_LOCATION'])
       .then((data) => {
         let grantStatus: Array<number> = data.authResults;
@@ -116,7 +119,7 @@ export struct HwMapPage {
         }
         // 授权成功
       }).catch((err: BusinessError) => {
-      console.error(`Failed to request permissions from user. Code is ${err.code}, message is ${err.message}`);
+      UtilLog.error(TAG, `Failed to request permissions from user. Code is ${err.code}, message is ${err.message}`);
     });
   }
 
@@ -129,15 +132,21 @@ export struct HwMapPage {
   }
 
   getLocation(mapController?: map.MapComponentController): Promise<geoLocationManager.Location> {
-    let promise = geoLocationManager.getCurrentLocation();
-    console.info('getCurrentLocation' + JSON.stringify(promise));
-    promise.then(async (location: geoLocationManager.Location) => {
-      mapController?.setMyLocation(location);
-      return location;
-    }).catch((error: Error) => {
-      console.error('getCurrentLocation failed', 'getCurrentLocation error: ' + JSON.stringify(error));
-    });
-    return promise;
+    try {
+      let promise = geoLocationManager.getCurrentLocation();
+      UtilLog.info(TAG, 'getCurrentLocation' + JSON.stringify(promise));
+      promise.then(async (location: geoLocationManager.Location) => {
+        mapController?.setMyLocation(location);
+        return location;
+      }).catch((error: Error) => {
+        UtilLog.error(TAG, 'getCurrentLocation failed', 'getCurrentLocation error: ' + JSON.stringify(error));
+      });
+      return promise;
+    } catch (e) {
+      UtilLog.error(TAG, 'getCurrentLocation failed', 'getCurrentLocation e: ' + JSON.stringify(e));
+      return Promise.reject(e)
+    }
+
   }
 
   goPetalMap() {
@@ -154,7 +163,7 @@ export struct HwMapPage {
       },
     }
 
-    let context = getContext(this) as common.UIAbilityContext;
+    let context = this.getUIContext().getHostContext() as common.UIAbilityContext;
     context.startAbility(petalMapWant);
   }
 
@@ -164,8 +173,7 @@ export struct HwMapPage {
         RelativeContainer() {
           MapComponent({ mapOptions: this.mapOption, mapCallback: this.callback })
           Row() {
-            Image($r('app.media.back'))
-              .fillColor($r('sys.color.black'))
+            Image($r('app.media.ic_back_white'))
               .width(24)
               .height(24)
               .margin({ left: 13 })
@@ -258,7 +266,7 @@ export struct HwMapPage {
         try {
           this.mapController.hide();
         } catch (e) {
-          console.error(`HwMap not open, can not hide.`)
+          UtilLog.error(TAG, `HwMap not open, can not hide.`)
         }
       }
     })

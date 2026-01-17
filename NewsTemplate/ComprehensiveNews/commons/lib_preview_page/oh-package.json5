@@ -6,11 +6,10 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "dayjs": "1.11.13",
-    'module_share': 'file:../../components/module_share',
-    'module_newsfeed': 'file:../../components/module_newsfeed',
-    'lib_news_api': 'file:../lib_news_api',
     'lib_common': 'file:../lib_common',
-    "module_transition": "file:../../components/module_transition"
+    "lib_widget": "file:../lib_widget",
+    'lib_news_api': 'file:../lib_news_api',
+    'module_newsfeed': 'file:../../components/module_newsfeed',
+    "module_transition": "file:../../components/module_transition",
   }
 }

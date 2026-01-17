@@ -1,5 +1,9 @@
-import { promptAction } from '@kit.ArkUI';
+import { BusinessError } from '@kit.BasicServicesKit'
 import { pasteboard } from '@kit.BasicServicesKit';
+import { LOG_TAG } from 'module_shopping_cart/src/main/ets/commons/Constants';
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast'
+import { UtilLog } from '@hw-agconnect/util-log';
+import { SafeJson } from 'lib_foundation';
 
 export function assign(target: Object, ...source: Object[]) {
   for (let s of source) {
@@ -17,27 +21,33 @@ export function assign(target: Object, ...source: Object[]) {
  */
 export function copyText(text: string) {
   // 创建剪贴板内容对象
-  const pasteboardData = pasteboard.createData(
-    pasteboard.MIMETYPE_TEXT_PLAIN,
-    text,
-  );
-  // 获取系统剪贴板对象
-  const systemPasteboard = pasteboard.getSystemPasteboard();
-  systemPasteboard.setData(pasteboardData); // 将数据放入剪贴板
-  systemPasteboard.getData().then((data) => {
-    // 读取剪贴板内容
-    if (data) {
-      promptAction.showToast({
-        message: '复制成功',
-        alignment: Alignment.Center,
-      });
-    } else {
-      promptAction.showToast({
-        message: '复制失败',
-        alignment: Alignment.Center,
-      });
-    }
-  });
+  try {
+    const pasteboardData = pasteboard.createData(
+      pasteboard.MIMETYPE_TEXT_PLAIN,
+      text,
+    );
+    // 获取系统剪贴板对象
+    const systemPasteboard = pasteboard.getSystemPasteboard();
+    systemPasteboard.setData(pasteboardData).catch((err: BusinessError) => {
+      UtilLog.error(LOG_TAG, 'system pasteboard set data failed. error: ' + SafeJson.jsonStringify(err))
+    }); // 将数据放入剪贴板
+    systemPasteboard.getData().then((data) => {
+      // 读取剪贴板内容
+      if (data) {
+        promptAction.showToast({
+          message: '复制成功',
+        });
+      } else {
+        promptAction.showToast({
+          message: '复制失败',
+        });
+      }
+    }).catch((err: BusinessError) => {
+      UtilLog.error(LOG_TAG, 'system pasteboard get data failed. error: ' + SafeJson.jsonStringify(err))
+    })
+  }catch (err) {
+    UtilLog.error(LOG_TAG, 'system pasteboard copyText failed. error: ' + SafeJson.jsonStringify(err))
+  }
 }
 
 export function formatFullDate(date: Date): string {

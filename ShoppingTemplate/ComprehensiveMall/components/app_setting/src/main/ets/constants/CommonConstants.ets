@@ -25,3 +25,5 @@ export class CommonConstants {
   // 弹窗最大宽度
   public static readonly DIALOG_MAX_WIDTH: number = 400;
 }
+
+export const LOG_TAG: string = '[Setting]'

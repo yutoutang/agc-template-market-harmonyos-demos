@@ -18,6 +18,7 @@ export struct SheetHeaderComp {
         })
       }
       .width($r('app.string.full_size'))
+      .padding({top:4,bottom:8})
       .justifyContent(FlexAlign.SpaceBetween)
     }
   }

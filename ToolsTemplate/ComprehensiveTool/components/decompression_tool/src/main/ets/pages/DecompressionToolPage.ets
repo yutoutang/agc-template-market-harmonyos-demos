@@ -6,8 +6,6 @@ import { DecompressionToolPageVM } from '../viewmodel/DecompressionToolPageVM';
 import { IMenu, menuList } from '../common/Constant';
 import Logger from '../util/Logger';
 
-const context: Context = getContext(this);
-
 @Builder
 export function DecompressionToolPageBuilder() {
   DecompressionToolPage();
@@ -16,7 +14,8 @@ export function DecompressionToolPageBuilder() {
 @ComponentV2
 struct DecompressionToolPage {
   vm: DecompressionToolPageVM = DecompressionToolPageVM.instance
-  mainWin: window.Window = (context as common.UIAbilityContext).windowStage.getMainWindowSync();
+  mainWin: window.Window =
+    (this.getUIContext().getHostContext() as common.UIAbilityContext).windowStage.getMainWindowSync();
 
   aboutToAppear(): void {
     this.vm.context = this.getUIContext().getHostContext()

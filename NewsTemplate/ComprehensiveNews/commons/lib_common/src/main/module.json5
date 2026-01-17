@@ -5,6 +5,11 @@
     "deviceTypes": [
       "phone",
       "tablet"
+    ],
+    "requestPermissions": [
+      {
+        "name": "ohos.permission.INTERNET"
+      }
     ]
   }
 }

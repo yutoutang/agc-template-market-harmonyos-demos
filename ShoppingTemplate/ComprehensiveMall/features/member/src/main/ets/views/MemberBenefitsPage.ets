@@ -9,7 +9,6 @@ export function buildMemberBenefitsPage() {
   MemberBenefitsPage()
 }
 
-@Entry
 @ComponentV2
 struct MemberBenefitsPage {
   vm: MemberBenefitsVM = new MemberBenefitsVM()
@@ -17,7 +16,7 @@ struct MemberBenefitsPage {
   build() {
     NavDestination() {
       NavTitleBar({
-        title: '会员福利',
+        title: '积分商城',
       })
       Scroll() {
         Column({ space: 12 }) {

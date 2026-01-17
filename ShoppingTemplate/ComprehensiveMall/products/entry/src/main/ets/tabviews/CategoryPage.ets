@@ -2,7 +2,6 @@ import { routerStack, RouterMap } from 'lib_foundation';
 import { NavTitleBar } from 'lib_widget';
 import { CategoryItem, HomeApis, ProductSummaryItem } from 'lib_network';
 import { ProductCategory } from 'module_product_category';
-import { LoneTakeAnimationsTransition, LongTakeTransitionParam } from 'module_transition';
 
 @ComponentV2
 export struct CategoryPageContent {

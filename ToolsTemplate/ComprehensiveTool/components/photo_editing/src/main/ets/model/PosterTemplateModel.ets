@@ -16,6 +16,7 @@ export default class PosterTemplateModel {
   @Trace oriRegions: PicRegionJSON[] = []
   @Trace regions: PosterRegion[] = []
   @Trace hasProcessed: boolean = false
+  @Trace isVip: boolean = false;
 }
 
 export interface XY { x: number; y: number }

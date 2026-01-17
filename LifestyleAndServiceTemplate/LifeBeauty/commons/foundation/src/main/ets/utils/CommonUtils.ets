@@ -2,12 +2,12 @@
  * Copyright (c) Huawei Technologies Co., Ltd. 2024-2025. All rights reserved.
  */
 import { BusinessError } from '@kit.BasicServicesKit';
-import { promptAction } from '@kit.ArkUI';
+import { ToastDialog } from '@hw-agconnect/ui-toast';
 import { BASE_URL } from '../constants/AppConstant';
-import { Logger } from './Logger';
-import { PopViewUtils } from './PopViewUtils';
-import { NoticeDialog, NoticeDialogParams } from '../uicomponent/NoticeDialog';
+import { UtilLog as Logger } from '@hw-agconnect/util-log';
+import { UIDialog } from '@hw-agconnect/ui-dialog';
 import { ErrorCode } from '../constants/ErrorCode';
+import { WindowUtil } from './WindowUtil';
 
 const TAG = '[CommonUtils]';
 
@@ -19,12 +19,28 @@ export class CommonUtils {
    * 时间戳转换成xxxx-xx-xx
    * @param datetime
    */
-  static formatDate(datetime?: number) {
+  static formatDate(datetime: number | string | Date | undefined, format = 'YYYY-MM-DD') {
     if (!datetime) {
       return '';
     }
-    const date = new Date(datetime);
-    return `${date.getFullYear()}-${CommonUtils.padZero(date.getMonth() + 1)}-${CommonUtils.padZero(date.getDate())}`;
+    let targetDate = datetime instanceof Date ? datetime : new Date(datetime);
+    const month = targetDate.getMonth();
+    const formats: Record<string, string | number> = {
+      // 年份
+      'YYYY': targetDate.getFullYear(),
+      'YY': targetDate.getFullYear().toString().slice(-2),
+      // 月份
+      'MM': CommonUtils.padZero(month + 1),
+      // 日期
+      'DD': CommonUtils.padZero(targetDate.getDate()),
+      // 时间
+      'HH': CommonUtils.padZero(targetDate.getHours()),
+      'hh': CommonUtils.padZero(targetDate.getHours() % 12 || 12),
+      'mm': CommonUtils.padZero(targetDate.getMinutes()),
+      'ss': CommonUtils.padZero(targetDate.getSeconds()),
+    }
+    return format.replace(/\[([^\]]+)]|Y{2,4}|M{1,4}|D{1,2}|H{1,2}|h{1,2}|m{1,2}|s{1,2}/g,
+      (match: string, escaped: string): string => escaped || formats[match].toString())
   }
 
   /**
@@ -80,7 +96,7 @@ export class CommonUtils {
     if (url.startsWith('mockImage://')) {
       const resourceName = url.split('//')[1];
       try {
-        const resource = getContext().resourceManager.getMediaBase64ByNameSync(resourceName);
+        const resource = WindowUtil.context!.resourceManager.getMediaBase64ByNameSync(resourceName);
         return resource;
       } catch (err) {
         Logger.error(TAG, `get image resource failed, ${err}, ${resourceName}`);
@@ -118,32 +134,22 @@ export class CommonUtils {
       if (error.code === ErrorCode.INVOICE_ASSISTANT_NETWORK_ERROR) {
         return;
       }
-      AlertDialog.show({
-        message: $r('app.string.hwid_no_internet_connect'),
-        offset: { dx: 0, dy: -12 },
-        alignment: DialogAlignment.Center,
-        autoCancel: false,
-        confirm: {
-          value: $r('app.string.hwid_text_button_known'),
-          action: () => {
-          },
+      UIDialog.open({
+        contentOptions:{
+          content: $r('app.string.hwid_no_internet_connect'),
+          contentTextAlign: TextAlign.Center,
         },
-      });
+        confirmButtonOptions:{
+          button: $r('app.string.hwid_text_button_known'),
+        },
+        showConfirmButton: true,
+        onConfirm: () => {
+          UIDialog.closeLast();
+        }
+      })
     } else if (!userCanceled.includes(error.code)) {
       // Other exceptions not caused by user cancellations.
-      promptAction.showToast({ message: error.message, duration: 2000 });
+      ToastDialog.showToast({ message: error.message, duration: 2000 });
     }
   }
-
-  /**
-   * 打开普通提示弹窗
-   * @param title
-   * @param btnLabel
-   * @param confirm
-   */
-  static openNoticeDialog(title: ResourceStr, btnLabel?: ResourceStr, confirm?: () => void) {
-    PopViewUtils.showPopView<NoticeDialogParams>(wrapBuilder(NoticeDialog),
-      new NoticeDialogParams(title, btnLabel, confirm),
-      { alignment: DialogAlignment.Center });
-  };
 }

@@ -1,12 +1,20 @@
-import { CommonConstants, RouterMap, RouterModule } from 'commonlib';
+import { BreakpointUtils, CommonConstants, GlobalContextUtils, RouterMap, RouterModule } from 'commonlib';
 
 @Entry
 @ComponentV2
 struct Index {
   navStack: NavPathStack = RouterModule.getStack();
+  breakpoint: BreakpointUtils | null = null;
 
   aboutToAppear(): void {
+    GlobalContextUtils.setUIContext('entry', this.getUIContext());
+    this.breakpoint = new BreakpointUtils(this.getUIContext().getMediaQuery());
+    this.breakpoint?.register()
     RouterModule.replace(RouterMap.LAUNCH_PAGE)
+  }
+
+  aboutToDisappear(): void {
+    this.breakpoint?.unRegister();
   }
 
   build() {

@@ -1,5 +1,5 @@
 import { BreakpointSystem, BreakpointTypeEnum, WindowUtil } from 'lib_foundation';
-import { updateUserPointsReq, UserApis, UserPointRedemptionSku, UserPoints } from 'lib_network';
+import { UpdateUserPointsReq, UserApis, UserPointRedemptionSku, UserPoints } from 'lib_network';
 import { UserPointsUsedType } from '../commons/Enums';
 
 @ObservedV2
@@ -47,7 +47,7 @@ export class MemberBenefitsVM {
     }
     if (this.userPoints) {
       const newPoints = this.userPoints.pointsArr[this.userPoints.checkedDays]
-      const data: updateUserPointsReq = {
+      const data: UpdateUserPointsReq = {
         type: UserPointsUsedType.INCOME,
         newPoints,
         label: '签到',

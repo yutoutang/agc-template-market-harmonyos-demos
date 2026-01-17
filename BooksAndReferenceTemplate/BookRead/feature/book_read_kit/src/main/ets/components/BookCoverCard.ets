@@ -1,4 +1,14 @@
-import { BookApi, BookInfo, Constants, NavHeaderBar, TCRouter, GroupBook } from 'common';
+import {
+  BookApi,
+  BookInfo,
+  Constants,
+  NavHeaderBar,
+  TCRouter,
+  GroupBook,
+  BreakpointStorage,
+  BreakpointSystem,
+  BreakpointTypeEnum
+} from 'common';
 import { ReviewDataUtil } from '../utils/ReviewDataUtil';
 import { ReviewInfo } from '../model/ReviewModels';
 
@@ -7,6 +17,7 @@ export struct BookCoverCard {
   @Param @Require book: BookInfo;
   @Local isAddSuccess: boolean = false;
   @Local wonderfulReviews: ReviewInfo[] = [];
+  @Local curBreakpoint: BreakpointStorage = BreakpointSystem.currentBreakpoint
 
   async aboutToAppear(): Promise<void> {
     const rsp = await BookApi.getBooksShelfGroup('favBooks', Constants.API_GET_BOOK_FAVOURITE_PATH, '');
@@ -72,7 +83,7 @@ export struct BookCoverCard {
           .height(12)
           .margin({ right: 2 })
           .fillColor(star <= rating ? '#FFD700' : '#E0E0E0')
-      })
+      }, (item: string) => JSON.stringify(item))
     }
   }
 
@@ -195,7 +206,7 @@ export struct BookCoverCard {
       .justifyContent(FlexAlign.Center)
       .margin({ top: 24 })
     }
-    .width(328)
+    .width('100%')
     .height(233)
     .backgroundColor('#FFFFFF')
     .borderRadius(16)
@@ -218,8 +229,6 @@ export struct BookCoverCard {
 
       // 添加分割线
       Divider()
-        .strokeWidth(0.5)
-        .color('#1A000000')
         .margin({ bottom: 12 })
 
       Text(this.book.description || $r('app.string.no_briefly'))
@@ -248,8 +257,9 @@ export struct BookCoverCard {
       .borderRadius(14)
       .justifyContent(FlexAlign.Center)
     }
-    .width(328)
-    .height(161)
+    .width('100%')
+    .height(this.curBreakpoint.value === BreakpointTypeEnum.SM ? 161 : 233)
+    .justifyContent(FlexAlign.SpaceBetween)
     .backgroundColor('#FFFFFF')
     .borderRadius(16)
     .padding(16)
@@ -314,8 +324,6 @@ export struct BookCoverCard {
 
               if (index < this.wonderfulReviews.length - 1) {
                 Divider()
-                  .strokeWidth(0.5)
-                  .color('#1A000000')
                   .margin({ top: 12, bottom: 12 })
               }
             }
@@ -323,20 +331,26 @@ export struct BookCoverCard {
             .alignItems(HorizontalAlign.Start)
           }, (review: ReviewInfo) => review.id)
         }
-        .layoutWeight(1)
+        .width('100%')
+        .backgroundColor('#FFFFFF')
+        .borderRadius(16)
+        .padding(16)
       } else {
-        Text('暂无评论')
-          .fontSize(14)
-          .fontColor('#99000000')
-          .layoutWeight(1)
-          .textAlign(TextAlign.Center)
+        Column() {
+          Text('暂无评论')
+            .fontSize(14)
+            .fontColor('#99000000')
+            .layoutWeight(1)
+            .textAlign(TextAlign.Center)
+        }
+        .width('100%')
+        .height(100)
+        .backgroundColor('#FFFFFF')
+        .borderRadius(16)
+        .padding(20)
       }
     }
-    .width(328)
-    .height(183)
-    .backgroundColor('#FFFFFF')
-    .borderRadius(16)
-    .padding(16)
+    .width('100%')
     .alignItems(HorizontalAlign.Start)
   }
 
@@ -344,34 +358,57 @@ export struct BookCoverCard {
     Column() {
       NavHeaderBar({
         title: $r('app.string.read'),
-        hasBackButton: false,
+        hasBackButton: true,
         hasBgColor: false,
         isMainPage: true,
       })
 
       Scroll() {
         Column({ space: 16 }) {
-          // 书籍信息
-          this.buildBookInfoCard()
-          // 书籍简介
-          this.buildBookDescriptionCard()
-          // 精彩书评
-          this.buildWonderfulReviewCard()
+          if (this.curBreakpoint.value === BreakpointTypeEnum.SM) {
+            // 书籍信息
+            this.buildBookInfoCard()
+            // 书籍简介
+            this.buildBookDescriptionCard()
+            // 精彩书评
+            this.buildWonderfulReviewCard()
+          } else {
+            Row({ space: 12 }) {
+              Column() {
+                this.buildBookInfoCard()
+              }.layoutWeight(1)
 
-          Text($r('app.string.start_reading'))
-            .fontSize(14)
-            .fontColor('#99000000')
-            .margin({ top: 24, bottom: 40 })
-            .textAlign(TextAlign.Center)
-            .padding({ left: 20, right: 20, top: 12, bottom: 12 })
-            .backgroundColor('rgba(0, 0, 0, 0.05)')
-            .borderRadius(14)
+              Column() {
+                this.buildBookDescriptionCard()
+              }.layoutWeight(1)
+            }.width('100%')
+
+            this.buildWonderfulReviewCard()
+          }
         }
         .width('100%')
         .padding({ left: 16, right: 16, top: 20 })
       }
       .layoutWeight(1)
       .edgeEffect(EdgeEffect.Spring)
+      .scrollBar(BarState.Off)
+      .align(Alignment.Top)
+
+      Text($r('app.string.start_reading'))
+        .fontSize(14)
+        .fontColor('#99000000')
+        .margin({ top: 12, bottom: 24 })
+        .textAlign(TextAlign.Center)
+        .padding({
+          left: 20,
+          right: 20,
+          top: 12,
+          bottom: 12
+        })
+        .backgroundColor('rgba(0, 0, 0, 0.05)')
+        .borderRadius(14)
+
+
     }
     .width(Constants.FULL_SIZE)
     .height(Constants.FULL_SIZE)

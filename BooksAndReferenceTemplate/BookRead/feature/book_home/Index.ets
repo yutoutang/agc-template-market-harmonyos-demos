@@ -1,4 +1,4 @@
-export { BookListPage } from './src/main/ets/views/BookListPage';
+export { BookListPage, BookListPageBuilder } from './src/main/ets/views/BookListPage';
 
 export { BookViewListPage } from './src/main/ets/views/BookViewListPage';
 

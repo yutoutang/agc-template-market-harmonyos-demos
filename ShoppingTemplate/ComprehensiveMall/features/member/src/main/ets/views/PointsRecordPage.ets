@@ -9,7 +9,6 @@ export function buildPointsRecordPage() {
   PointsRecordPage()
 }
 
-@Entry
 @ComponentV2
 struct PointsRecordPage {
   vm: PointsRecordVM = new PointsRecordVM()

@@ -1,6 +1,7 @@
 import { BaseViewModel, BreakpointType, CircleButtonModifier, RouterMap, RouterUtils } from 'lib_common';
-import { AuthorModel, AuthorResponse, AuthorServiceApi, BaseNewsServiceApi } from 'lib_news_api';
-import { LayoutNewsDataSource, NewsDataSource } from '../common/DataSource';
+import { AuthorModel, AuthorServiceApi, BaseNewsServiceApi } from 'lib_news_api';
+import { LayoutNewsDataSource } from '../common/DataSource';
+import { ListModel } from '../common/ListModel';
 
 @ObservedV2
 export class PersonalPageViewModel extends BaseViewModel {
@@ -10,11 +11,15 @@ export class PersonalPageViewModel extends BaseViewModel {
   @Trace curIndex: number = 0;
   @Trace targetIndex: number = 0;
   @Trace loading: boolean = false;
+  @Trace userLoading: boolean = false;
   @Trace articleDataSource: LayoutNewsDataSource = new LayoutNewsDataSource();
   @Trace videoDataSource: LayoutNewsDataSource = new LayoutNewsDataSource();
   @Trace postDataSource: LayoutNewsDataSource = new LayoutNewsDataSource();
-  @Trace dataSource: (LayoutNewsDataSource | NewsDataSource) [] =
-    [this.articleDataSource, this.videoDataSource, this.postDataSource];
+  @Trace dataSource: ListModel[] = [
+    new ListModel(this.articleDataSource),
+    new ListModel(this.videoDataSource),
+    new ListModel(this.postDataSource),
+  ];
   buttonModifier: CircleButtonModifier = new CircleButtonModifier();
   columnOptions: BreakpointType<number> = new BreakpointType<number>({
     sm: 1,
@@ -23,45 +28,57 @@ export class PersonalPageViewModel extends BaseViewModel {
     xl: 3,
   });
 
-  init() {
+  async init(showLoading: boolean = true) {
     this.userId = RouterUtils.getParamByName(RouterMap.PROFILE_HOME) as string || this.userInfoModel.authorId;
-    this.queryAuthorInfo();
-    this.queryArticleList();
-    this.queryVideoList();
-    this.queryPostList();
+    await this.queryAuthorInfo(showLoading);
+    await this.queryArticleList();
+    await this.queryVideoList();
+    await this.queryPostList();
   }
 
-  onRefreshing() {
+  async onRefreshing() {
     this.loading = true;
-    setTimeout(() => {
-      this.init();
-      this.loading = false;
-    }, 300);
+    await this.init(false);
+    this.loading = false;
   }
 
-  queryAuthorInfo() {
-    const user = AuthorServiceApi.queryAuthorInfo(this.userId) as AuthorResponse;
-    this.userInfo = new AuthorModel(user);
+  async queryAuthorInfo(showLoading: boolean = true) {
+    if (showLoading) {
+      this.userLoading = true;
+    }
+    await AuthorServiceApi.queryAuthorInfo(this.userId)
+      .then((user) => {
+        if (user) {
+          this.userInfo = new AuthorModel(user);
+        }
+      })
+      .finally(() => {
+        this.userLoading = false;
+      });
+
   }
 
-  queryArticleList() {
-    const list = BaseNewsServiceApi.queryAuthorArticles(this.userId);
+  async queryArticleList() {
+    const list = await BaseNewsServiceApi.queryAuthorArticles(this.userId);
     this.articleDataSource.setData(list);
+    this.dataSource[0].count = list.length;
   }
 
-  queryVideoList() {
-    const list = BaseNewsServiceApi.queryAuthorVideos(this.userId);
+  async queryVideoList() {
+    const list = await BaseNewsServiceApi.queryAuthorVideos(this.userId);
     this.videoDataSource.setData(list);
+    this.dataSource[1].count = list.length;
   }
 
-  queryPostList() {
-    const list = BaseNewsServiceApi.queryAuthorPosts(this.userId);
+  async queryPostList() {
+    const list = await BaseNewsServiceApi.queryAuthorPosts(this.userId);
     list.forEach((item) => {
       item.extraInfo.showUserBar = false;
       item.extraInfo.showTimeBottom = true;
       item.extraInfo.authorId = this.userId
     })
     this.postDataSource.setData(list);
+    this.dataSource[2].count = list.length;
   }
 
   jumpChatPage() {
@@ -78,7 +95,8 @@ export class PersonalPageViewModel extends BaseViewModel {
     return this.userInfoModel.authorId === this.userInfo?.authorId;
   }
 
-  @Computed get authorNameMaxWidth() {
+  @Computed
+  get authorNameMaxWidth() {
     let width = 24 + 8 + 12;
 
     if (!this.isMyself) {
@@ -86,7 +104,7 @@ export class PersonalPageViewModel extends BaseViewModel {
       width += 16;
       width += 4;
     }
-    
+
     return width;
   }
 }

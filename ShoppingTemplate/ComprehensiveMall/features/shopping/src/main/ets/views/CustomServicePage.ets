@@ -19,7 +19,7 @@ export struct CustomServicePage {
         userAvatar: this.userInfo.avatar ? this.userInfo.avatar : $r('app.media.ic_default_avatar'),
       })
     }
-    .title('在线客服')
+    .title('在线客服', { backgroundColor: $r('app.color.background_color_white') })
     .onReady(() => {
       this.getUIContext().setKeyboardAvoidMode(KeyboardAvoidMode.RESIZE_WITH_CARET)
     })

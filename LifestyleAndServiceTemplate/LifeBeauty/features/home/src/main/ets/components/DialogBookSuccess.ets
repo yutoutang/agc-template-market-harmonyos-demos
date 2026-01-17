@@ -8,31 +8,23 @@ export class BookSuccessParam {
 export function DialogBookSuccessBuilder(param: BookSuccessParam) {
   Column() {
     Column({ space: 10 }) {
-      Image($r('app.media.ic_public_success')).width(50).height(50)
+      Image($r('app.media.ic_public_success')).width(46).height(46)
 
       Text($r('app.string.dialog_book_success_title'))
         .fontSize(20)
         .fontColor('#212121')
         .fontWeight(FontWeight.Bold)
-        .margin({ top: 20 })
       Text($r('app.string.dialog_book_success_content'))
-        .fontSize(15)
+        .fontSize(16)
         .fontColor('#434343')
-        .margin({ top: 12 })
         .textAlign(TextAlign.Center)
       Text($r('app.string.btn_common_know'))
-        .fontSize(15)
+        .width('100%')
+        .textAlign(TextAlign.Center)
+        .fontSize(16)
+        .fontWeight(500)
         .fontColor($r('app.color.common_theme_color'))
-        .borderWidth(1)
-        .borderColor($r('app.color.common_theme_color'))
-        .borderRadius(24)
-        .padding({
-          left: 70,
-          right: 70,
-          top: 15,
-          bottom: 15,
-        })
-        .margin({ top: 17 })
+        .margin({ top: 8 })
         .onClick(() => {
           PopViewUtils.closePopView();
           RouterModule.popToName(RouterMap.MAIN);

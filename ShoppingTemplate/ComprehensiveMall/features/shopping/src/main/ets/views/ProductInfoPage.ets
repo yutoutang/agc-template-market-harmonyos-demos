@@ -1,10 +1,10 @@
-import { promptAction } from '@kit.ArkUI';
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast'
 import { iData, routerStack, RouterMap, WindowUtil, BreakpointSystem } from 'lib_foundation';
-import { CommonConfirmDialog, CommonSymbol, ContainerColumn, CustomServiceSheet, NavTitleBar } from 'lib_widget';
+import { CommonConfirmDialog, CommonSymbol, CustomServiceSheet, NavTitleBar } from 'lib_widget';
 import { ProductDetail } from 'module_product_detail';
-import { ProductResource, ProductShare } from 'module_product_share';
 import { CartApi } from 'module_shopping_cart';
 import { PreOrderInfoReq, ProductApis } from 'lib_network';
+import { SharePicker, ShareRecordData } from 'aggregated_share';
 
 @ComponentV2
 export struct ProductInfoNewPage {
@@ -15,9 +15,11 @@ export struct ProductInfoNewPage {
   @Local
   cartNum: number = iData.global.cartTotal;
   @Local
-  productResource: ProductResource | undefined = undefined;
+  isMember: boolean = iData.global.userInfo.isMember
   @Local
   collectedStatus: boolean = false
+  @Local
+  shareOptions: ShareRecordData = { title: '' }
 
   build() {
     NavDestination() {
@@ -26,7 +28,7 @@ export struct ProductInfoNewPage {
       }) {
         Row({ space: 16 }) {
 
-          if (this.productResource) {
+          if (this.shareOptions.title) {
             CommonSymbol({
               src: this.collectedStatus ? $r('sys.symbol.star_fill') : $r('sys.symbol.star'),
               color: this.collectedStatus ? $r('app.color.theme_color') : $r('sys.color.font_primary'),
@@ -35,13 +37,13 @@ export struct ProductInfoNewPage {
                 this.changeCollectStatus()
               })
 
-            ProductShare({
-              productResource: this.productResource,
-            }) {
-              Image($r('app.media.ic_share'))
-                .width(40)
-                .height(40);
-            }
+            Image($r('app.media.ic_share'))
+              .width(40)
+              .height(40)
+              .onClick(() => {
+                const picker: SharePicker = new SharePicker(this.shareOptions);
+                picker.show();
+              })
           }
         }
         .justifyContent(FlexAlign.End)
@@ -52,14 +54,14 @@ export struct ProductInfoNewPage {
         ProductDetail({
           stack: routerStack,
           isLogin: this.isLogin,
+          isMember: false,
           productId: this.productId,
           cartProdNum: this.cartNum,
           getProductInfo: (data) => {
-            this.productResource = {
-              image: data.banners[0],
+            this.shareOptions = {
+              coverUrl: data.banners[0],
               title: data.title,
-              price: Number(data.price),
-              url: `http://test/${data.id}`,
+              landingPageUrl: `http://test/${data.id}`,
             };
           },
           clickCustomService: () => {
@@ -69,7 +71,7 @@ export struct ProductInfoNewPage {
             routerStack.pushPath({ name: RouterMap.PRODUCT_CART });
           },
           handleAddCart: (skuCode, count) => {
-            CartApi.addSkuToCart(skuCode, count).then(async () => {
+            CartApi.addSkuToCart({ skuCode, count }).then(async () => {
               const newCartData = await CartApi.getCartData()
               iData.global.cartVersion = newCartData.version;
               iData.global.cartTotal = newCartData.total;
@@ -91,6 +93,9 @@ export struct ProductInfoNewPage {
               this.isLogin = iData.global.isLogin;
             });
           },
+          handleClickMemberLink: () => {
+            routerStack.pushPathByName(RouterMap.USER_MEMBER_SUBSCRIPTION, undefined)
+          },
         })
           .layoutWeight(1);
       }
@@ -109,6 +114,8 @@ export struct ProductInfoNewPage {
     })
     .onShown(() => {
       this.getCartNum();
+      this.isLogin = iData.global.isLogin;
+      this.isMember = iData.global.userInfo.isMember;
     })
   }
 

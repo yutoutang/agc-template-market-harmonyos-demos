@@ -1,6 +1,7 @@
-import { RouterMap, RouterModule } from 'commonlib';
+import { BreakpointModel, BreakpointType, RouterMap, RouterModule } from 'commonlib';
 import { getBloggerFollowers } from 'network';
 import { BloggerFollowerClz } from '../types/Index';
+import { AppStorageV2 } from '@kit.ArkUI';
 
 const TAG = '[FollowersPageVM]';
 
@@ -8,6 +9,13 @@ const TAG = '[FollowersPageVM]';
 export class FollowersPageVM {
   @Trace followerList: BloggerFollowerClz[] = []
   @Trace authorName: string = ''
+  columnOptions: BreakpointType<number> = new BreakpointType<number>({
+    sm: 1,
+    md: 2,
+    lg: 2,
+    xl: 2,
+  });
+  @Trace breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
 
   init() {
     let params = RouterModule.getNavParam<Record<string, number | string>>(RouterMap.FOLLOWERS_PAGE)
@@ -20,5 +28,10 @@ export class FollowersPageVM {
             item.isFollower))
       }
     })
+  }
+
+  @Computed
+  get getLanes() {
+    return this.columnOptions.getValue(this.breakPointModel.currentBreakpoint);
   }
 }

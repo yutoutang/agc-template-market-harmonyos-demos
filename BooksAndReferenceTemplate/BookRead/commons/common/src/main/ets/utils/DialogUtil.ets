@@ -1,10 +1,10 @@
 import { Logger } from '@hw-agconnect/ui-base';
 import { ComponentContent, promptAction } from '@kit.ArkUI';
 import { DialogParams } from '../model/Book';
-import { common } from '@kit.AbilityKit';
 
 async function getUIContext() {
-  return (await (getContext() as common.UIAbilityContext).windowStage.getMainWindow()).getUIContext()
+  let uiContext: UIContext = AppStorage.get('uiContext') as UIContext;
+  return uiContext;
 }
 
 /**

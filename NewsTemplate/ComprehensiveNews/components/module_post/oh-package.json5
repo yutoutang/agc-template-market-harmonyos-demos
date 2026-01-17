@@ -6,6 +6,7 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "module_imagepreview": "file:../module_imagepreview"
+    "@hw-agconnect/util-log": "1.0.0",
+    "module_imagepreview": "file:../module_imagepreview",
   }
 }

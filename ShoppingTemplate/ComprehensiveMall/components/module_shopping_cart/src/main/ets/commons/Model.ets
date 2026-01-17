@@ -1,5 +1,7 @@
+import { CartProductInfo } from './Types';
+
 @ObservedV2
-export class Product {
+export class ProductModel implements CartProductInfo {
   public productId: string = '';
   public skuCode: string = '';
   @Trace public skuDesc: string = '';
@@ -11,6 +13,21 @@ export class Product {
   @Trace public price: number = 0;
   @Trace public dashPrice?: number = 0;
   @Trace public isSelected: boolean = false;
+
+  constructor(product?: CartProductInfo) {
+    if(product){
+      this.productId = product.productId
+      this.skuCode = product.skuCode
+      this.skuDesc = product.skuDesc
+      this.stock = product.stock
+      this.count = product.count
+      this.banner = product.banner
+      this.title = product.title
+      this.serviceDesc = product.serviceDesc
+      this.price = product.price
+      this.dashPrice = product.dashPrice
+    }
+  }
 }
 
 @ObservedV2
@@ -18,43 +35,8 @@ export class MockCart {
   @Trace data: string = '';
 }
 
-export interface CartCardDto {
-  productId: string;
-  skuCode: string;
-  skuDesc: string;
-  stock: number;
-  count: number;
-  banner: string;
-  title: string;
-  serviceDesc: string;
-  price: number;
-  dashPrice?: number;
-  isSelected: boolean;
-}
-
-export interface CartDto {
-  version: string;
-  total: number;
-  cards: CartCardDto[];
-}
-
-export interface ProductSkuItem {
-  productId: string;
-  skuCode: string;
-  skuDesc: string;
-  stock: number;
-  banner: string;
-  title: string;
-  serviceDesc: string;
-  price: number;
-  dashPrice?: number;
-}
-
-export interface UpdateCartReq {
-  skuCode: string;
-  count: number;
-}
 
 export class PopupSheetController {
-  hide: () => void = () => {};
+  hide: () => void = () => {
+  };
 }

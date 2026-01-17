@@ -1,28 +1,23 @@
-import { promptAction } from '@kit.ArkUI';
 import {
-  common,
-  ConfigurationConstant,
-  EnvironmentCallback,
+  common, ConfigurationConstant, EnvironmentCallback,
 } from '@kit.AbilityKit';
+import { BusinessError } from '@kit.BasicServicesKit'
 import { notificationManager } from '@kit.NotificationKit';
+import { ToastDialog as promptAction, ToastDialog } from '@hw-agconnect/ui-toast'
+import { AppGalleryUtils } from '../common/AppGalleryUtils';
+import { FileUtils } from '../common/FileUtils';
+import { CommonConfirmDialog } from '../components/CommonConfirmDialog';
+import { LOG_TAG } from '../constants/CommonConstants';
+import { lightDarkOptions } from '../constants/LightDarkOptions';
 import { BaseViewModel } from '../models/BaseViewModel';
+import {
+  AboutModel, AgreementModel, IFontModel, WebModel,
+} from '../models/CustomConfigModel';
 import { SettingItem, SettingGroup } from '../types/SettingItem';
 import {
-  SettingPageEnum,
-  SettingType,
-  SupportedSetting,
+  SettingPageEnum, SettingType, SupportedSetting,
 } from '../types/SettingType';
-import {
-  AboutModel,
-  AgreementModel,
-  IFontModel,
-  WebModel,
-} from '../models/CustomConfigModel';
-import { Logger } from '../common/Logger';
-import { FileUtils } from '../common/FileUtils';
-import { AppGalleryUtils } from '../common/AppGalleryUtils';
-import { lightDarkOptions } from '../constants/LightDarkOptions';
-import { CommonConfirmDialog } from '../components/CommonConfirmDialog';
+import { Logger } from 'module_ui_base';
 
 const TAG = '[SettingViewModel]';
 
@@ -77,17 +72,25 @@ export class SettingViewModel extends BaseViewModel {
   }
 
   handlePush(item: SettingItem) {
-    const isOn = notificationManager.isNotificationEnabledSync();
-    item
-      .setType(SettingType.SWITCH)
-      .setLabel(item.label ?? '通知开关')
-      .setSwitchValue(isOn)
-      .setItemId(this.PUSH_ITEM_ID)
-      .setClickEvent(() => {
-        notificationManager.openNotificationSettings(
-          this.uiContext?.getHostContext() as common.UIAbilityContext,
-        );
-      });
+    try {
+      const isOn = notificationManager.isNotificationEnabledSync()
+      item
+        .setType(SettingType.SWITCH)
+        .setLabel(item.label ?? '通知开关')
+        .setSwitchValue(isOn)
+        .setItemId(this.PUSH_ITEM_ID)
+        .setClickEvent(() => {
+          notificationManager.openNotificationSettings(
+            this.uiContext?.getHostContext() as common.UIAbilityContext,
+          ).catch((err: BusinessError) => {
+            Logger.error(LOG_TAG, 'set notification status failed. error:' + JSON.stringify(err))
+
+          })
+        });
+    } catch (err) {
+      Logger.error(LOG_TAG, 'get notification status failed. error:' + JSON.stringify(err))
+    }
+
   }
 
   async handleCache(item: SettingItem) {
@@ -101,7 +104,7 @@ export class SettingViewModel extends BaseViewModel {
         CommonConfirmDialog.show({
           primaryTitle: '温馨提示',
           content:
-            'APP使用过程中下载的图片、音频、视频等资源将被清除，不可还原。',
+          'APP使用过程中下载的图片、音频、视频等资源将被清除，不可还原。',
           confirm: () => {
             FileUtils.clearCache(this.uiContext?.getHostContext()!);
             setTimeout(async () => {
@@ -124,10 +127,14 @@ export class SettingViewModel extends BaseViewModel {
     if (item.selectIndex < options.length && item.selectIndex >= 0) {
       const colorMode = options[item.selectIndex]
         .value as ConfigurationConstant.ColorMode;
-      this.uiContext
+      try {
+        this.uiContext
         ?.getHostContext()
         ?.getApplicationContext()
-        .setColorMode(colorMode);
+          .setColorMode(colorMode);
+      } catch (err) {
+        Logger.error(LOG_TAG, 'set color mode failed. error: ' + JSON.stringify(err))
+      }
     }
 
     item
@@ -137,12 +144,16 @@ export class SettingViewModel extends BaseViewModel {
       .setSelectEvent((index: number) => {
         const colorMode = lightDarkOptions[index]
           .value as ConfigurationConstant.ColorMode;
-        this.uiContext
+        try {
+          this.uiContext
           ?.getHostContext()
           ?.getApplicationContext()
-          .setColorMode(colorMode);
-        if (item.onChange) {
-          item.onChange(colorMode);
+            .setColorMode(colorMode);
+          if (item.onChange) {
+            item.onChange(colorMode);
+          }
+        } catch (err) {
+          Logger.error(LOG_TAG, 'set color mode failed. error: ' + JSON.stringify(err))
         }
       });
   }
@@ -169,9 +180,7 @@ export class SettingViewModel extends BaseViewModel {
           if (resp) {
             AppGalleryUtils.showUpdateDialog(context);
           } else {
-            this.uiContext
-              ?.getPromptAction()
-              .showToast({ message: '已是最新版本' });
+            ToastDialog.showToast({ message: '已是最新版本' });
           }
           if (item.onChange) {
             item.onChange(resp);
@@ -238,18 +247,22 @@ export class SettingViewModel extends BaseViewModel {
   }
 
   getLatestPushStatus() {
-    const isOn = notificationManager.isNotificationEnabledSync();
-    this.settingList.forEach((group: SettingGroup) => {
-      group.list.forEach((item: SettingItem) => {
-        if (item.id === this.PUSH_ITEM_ID) {
-          const oldValue = item.switchV;
-          item.setSwitchValue(isOn);
-          if (item.onChange && oldValue !== isOn) {
-            item.onChange(isOn);
+    try {
+      const isOn = notificationManager.isNotificationEnabledSync();
+      this.settingList.forEach((group: SettingGroup) => {
+        group.list.forEach((item: SettingItem) => {
+          if (item.id === this.PUSH_ITEM_ID) {
+            const oldValue = item.switchV;
+            item.setSwitchValue(isOn);
+            if (item.onChange && oldValue !== isOn) {
+              item.onChange(isOn);
+            }
           }
-        }
+        });
       });
-    });
+    } catch (err) {
+      Logger.error(LOG_TAG, 'get notification status failed. error:' + JSON.stringify(err))
+    }
   }
 
   getCache() {
@@ -264,12 +277,13 @@ export class SettingViewModel extends BaseViewModel {
       return;
     }
     this.fontModel.sysFontSizeScale = this.context.config
-      ?.fontSizeScale as number;
+    ?.fontSizeScale as number;
     let environmentCallback: EnvironmentCallback = {
       onConfigurationUpdated: (config) => {
         this.fontModel.sysFontSizeScale = config.fontSizeScale as number;
       },
-      onMemoryLevel: () => {},
+      onMemoryLevel: () => {
+      },
     };
     try {
       this.callbackId = this.context

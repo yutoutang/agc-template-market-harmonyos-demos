@@ -1,49 +1,63 @@
 import { AbilityConstant, UIAbility, Want } from '@kit.AbilityKit';
-import { hilog } from '@kit.PerformanceAnalysisKit';
 import { AppStorageV2, window } from '@kit.ArkUI';
 import { FormCardJump } from '../types/Types';
+import { WXLoginService } from 'aggregated_login';
+import { UtilLog } from '@hw-agconnect/util-log';
 
-const DOMAIN = 0x0000;
+const TAG = '[EntryAbility]';
 
 export default class EntryAbility extends UIAbility {
+  // 实例化登录服务
+  private loginServiceImpl: WXLoginService =
+    WXLoginService.create()
+    // todo 填写微信开放平台配置的应用AppID
+      .initWX('wxc92d9d6570127a32')
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');
+    UtilLog.setGlobalConfig({
+      tag: 'ComprehensiveMall',
+      domain: 0xff00,
+      open: true,
+      showStack: false,
+    })
+    UtilLog.info(TAG, 'Ability onCreate');
+    this.loginServiceImpl.handleWant(want);
     this.resolvePagePath(want);
   }
 
   onDestroy(): void {
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onDestroy');
+    UtilLog.info(TAG, 'Ability onDestroy');
   }
 
   onWindowStageCreate(windowStage: window.WindowStage): void {
     // Main window is created, set main page for this ability
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
+    UtilLog.info(TAG, 'Ability onWindowStageCreate');
 
     windowStage.loadContent('pages/Index', (err) => {
       if (err.code) {
-        hilog.error(DOMAIN, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err));
+        UtilLog.error(TAG, JSON.stringify(err));
         return;
       }
-      hilog.info(DOMAIN, 'testTag', 'Succeeded in loading the content.');
+      UtilLog.info(TAG, 'Succeeded in loading the content.');
     });
   }
 
   onWindowStageDestroy(): void {
     // Main window is destroyed, release UI related resources
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageDestroy');
+    UtilLog.info(TAG, 'Ability onWindowStageDestroy');
   }
 
   onForeground(): void {
     // Ability has brought to foreground
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onForeground');
+    UtilLog.info(TAG, 'Ability onForeground');
   }
 
   onBackground(): void {
     // Ability has back to background
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onBackground');
+    UtilLog.info(TAG, 'Ability onBackground');
   }
 
   onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): void {
+    this.loginServiceImpl.handleWant(want);
     this.resolvePagePath(want);
   }
 

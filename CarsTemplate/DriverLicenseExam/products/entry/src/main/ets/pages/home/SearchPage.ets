@@ -3,6 +3,7 @@ import { ExamDetail, getQuestionType } from 'exam';
 import { SearchComponent, SearchController } from 'search';
 import { LengthMetrics } from '@kit.ArkUI';
 import { CommonModel } from '@ohos_agcit/driver_license_exam_commonlib';
+import { Context } from '@kit.AbilityKit';
 
 @Builder
 export function SearchPageBuilder() {
@@ -12,10 +13,11 @@ export function SearchPageBuilder() {
 @ComponentV2
 struct SearchPage {
   vm: CommonModel = CommonModel.instance;
-  examService: ExamService = ExamService.instance;
+  examService: ExamService = ExamService.instance(this.getUIContext().getHostContext() as Context);
   private searchController: SearchController = SearchController.instance;
   @Local searchKey: string = '';
   @Local textWidth: number = 0;
+  scroller:Scroller = new Scroller();
 
   build() {
     NavDestination() {
@@ -31,7 +33,7 @@ struct SearchPage {
       .width('100%')
       .height('100%')
       .padding({
-        top: px2vp(AppStorage.get('topRectHeight') || 0) + 12,
+        top: this.getUIContext().px2vp(AppStorage.get('topRectHeight') || 0) + 12,
         left: '4%',
         right: '4%',
       });
@@ -83,7 +85,7 @@ struct SearchPage {
           });
       }.justifyContent(FlexAlign.SpaceBetween).margin({ bottom: 12 }).width('100%');
 
-      List() {
+      List({scroller: this.scroller}) {
         ForEach(this.searchController.historySearch, (item: string, index: number) => {
           ListItem() {
             Column() {
@@ -137,8 +139,9 @@ struct SearchPage {
       .edgeEffect(EdgeEffect.None)
       .layoutWeight(1);
     }
+    .layoutWeight(1)
     .padding({
-      bottom: px2vp(AppStorage.get('bottomRectHeight')),
+      bottom: this.getUIContext().px2vp(AppStorage.get('bottomRectHeight')),
     });
   }
 

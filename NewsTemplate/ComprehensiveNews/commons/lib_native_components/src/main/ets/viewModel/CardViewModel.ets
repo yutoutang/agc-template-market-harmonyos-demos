@@ -1,10 +1,21 @@
+import { AppStorageV2 } from '@kit.ArkUI';
 import { LoginSheetUtils } from 'lib_account';
-import { BaseViewModel, CommonConfirmDialog, RouterParams, RouterToNews } from 'lib_common';
+import {
+  BaseViewModel,
+  BreakpointModel,
+  CommonConfirmDialog,
+  RouterParams,
+  RouterToNews,
+} from 'lib_common';
 import { CommentServiceApi, MineServiceApi, NewsResponse } from 'lib_news_api';
 import { LayoutParams } from 'module_flexlayout';
+import { PiPWindowModel } from 'module_swipeplayer';
 import { LoneTakeAnimationsTransition, LongTakeTransitionParam } from 'module_transition';
 
+@ObservedV2
 export class CardViewModel extends BaseViewModel {
+  @Trace breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
+  pipWindowModel: PiPWindowModel = AppStorageV2.connect(PiPWindowModel, () => new PiPWindowModel())!;
   private authorId: string = ''
   private uiContext: UIContext
 
@@ -62,12 +73,12 @@ export class CardViewModel extends BaseViewModel {
         MineServiceApi.cancelWatch(this.authorId);
         let watchIndex = this.userInfoModel.watchers.findIndex(v => v === this.authorId)
         this.userInfoModel.watchers.splice(watchIndex, 1)
-        MineServiceApi.cancelWatch(this.authorId)
       },
     })
   }
 
-  /*
+  /**
+   * 跳转新闻详情
    * cardData 数据源
    * formType 跳转来源，判断是否是从首页点击评论进入
    * componentId  一镜到底id
@@ -94,4 +105,6 @@ export class CardViewModel extends BaseViewModel {
     }
     RouterToNews.pushToNewsDetails<NewsResponse>(params)
   }
+
+
 }

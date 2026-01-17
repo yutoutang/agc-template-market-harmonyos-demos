@@ -1,23 +1,34 @@
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 
-export class Logger {
-  private static domain: number = 0xff00;
-  private static prefix: string = 'ComprehensiveMallTemplate';
-  private static format: string = '%{public}s, %{public}s';
-
-  public static debug(...args: string[]): void {
-    hilog.debug(Logger.domain, Logger.prefix, Logger.format, args);
+class Logger {
+  constructor() {
+    UtilLog.setGlobalConfig({
+      tag: '[ComprehensiveMall]',
+      domain: 0xff00,
+      open: true,
+      showStack: true,
+      showBorder: true,
+      showDivider: true,
+    });
   }
 
-  public static info(...args: string[]): void {
-    hilog.info(Logger.domain, Logger.prefix, Logger.format, args);
+  public debug(...args: string[]): void {
+    UtilLog.debug(args);
   }
 
-  public static warn(...args: string[]): void {
-    hilog.warn(Logger.domain, Logger.prefix, Logger.format, args);
+  public info(...args: string[]): void {
+    UtilLog.info(args);
   }
 
-  public static error(...args: string[]): void {
-    hilog.error(Logger.domain, Logger.prefix, Logger.format, args);
+  public warn(...args: string[]): void {
+    UtilLog.warn(args);
+  }
+
+  public error(...args: string[]): void {
+    UtilLog.error(args);
   }
 }
+
+const logger = new Logger()
+
+export { logger as Logger }

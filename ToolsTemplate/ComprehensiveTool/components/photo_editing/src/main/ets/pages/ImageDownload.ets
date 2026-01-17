@@ -36,7 +36,7 @@ export struct ImageDownload {
             SaveButton({ icon: SaveIconStyle.FULL_FILLED, buttonType: ButtonType.Circle })
               .size({ width: 48, height: 48 })
               .onClick(() => {
-                this.vm.handleSaveButtonClick(getContext());
+                this.vm.handleSaveButtonClick(this.getUIContext());
               });
           }.layoutWeight(1);
 

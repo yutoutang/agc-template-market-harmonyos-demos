@@ -5,6 +5,8 @@ export const RICH_ID = 'RICH_ID';
 export const WEB_ID = 'editor_web';
 export const CALLBACK_SCHEME = 're-callback://';
 export const STATE_SCHEME = 're-state://';
+export const PHOTO_MAX_COUNT = 20;
+export const PHOTO_MAX_SIZE = 1; // GB
 
 export const WEEK_MAP = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
 

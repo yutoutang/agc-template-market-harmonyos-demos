@@ -12,6 +12,7 @@ import { LoneTakeAnimationsTransition, LongTakeTransitionParam } from 'module_tr
 import { LabelPresetType, SortTypeMap } from '../commons/Enums';
 import util from '@ohos.util';
 
+
 @ComponentV2
 export struct ProductWaterFlow {
   @Param
@@ -130,10 +131,6 @@ export struct ProductWaterFlow {
               .id(this.testId + '/' + item.productId)
               .onClick(() => {
                 if (this.openSwiper) {
-                  // routerStack.pushPath({
-                  //   name: RouterMap.PRODUCT_SWIPER,
-                  //   param: item.productId,
-                  // })
                   this.jumpToSwiperPage(this.testId + '/' + item.productId)
                 } else {
                   this.handleProductClick?.(item.productId);

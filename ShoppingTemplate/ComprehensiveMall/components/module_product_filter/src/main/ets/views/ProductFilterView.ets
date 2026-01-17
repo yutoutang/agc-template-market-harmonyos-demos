@@ -1,5 +1,3 @@
-import { PopViewUtil } from 'module_ui_base'
-import { FILTER_TYPE_LIST } from '../commons/Constants'
 import { FilterSelectionItemModel, FilterSelectionListModel } from '../commons/Models'
 import { FilterOptionItem, FilterSelectionItem, FilterTypeInterface, ProductFilterOptions } from '../commons/Types'
 
@@ -193,7 +191,7 @@ function buildCheckBox(config: CheckBoxConfiguration) {
 }
 
 @Extend(Row)
-function optionButtonStyle(selected:boolean){
+function optionButtonStyle(selected: boolean) {
   .justifyContent(FlexAlign.Center)
   .padding({
     top: $r('app.string.space_xs'),

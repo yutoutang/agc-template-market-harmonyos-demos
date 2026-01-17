@@ -9,5 +9,6 @@
     "foundation": "file:../../commons/foundation",
     "profile_edit": "file:../../components/profile_edit",
     "reservation_form": "file:../../components/reservation_form",
+    "select_store": "file:../../components/select_store"
   }
 }

@@ -15,6 +15,10 @@
     {
       "name": "first_class",
       "value": "公务舱/头等舱"
+    },
+    {
+      "name": "agcit_huawei_air_trip",
+      "value": "1.0.1"
     }
   ]
 }

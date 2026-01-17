@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { promptAction } from '@kit.ArkUI';
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
 import { TitleBar } from '../components/TitleBar';
 import { FormatUtil } from '../util/FormatUtil';
 import { ConvertPageVM } from '../viewModels/ConvertPageVM';

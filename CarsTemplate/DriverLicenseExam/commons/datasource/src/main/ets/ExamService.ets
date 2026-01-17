@@ -1,7 +1,6 @@
 import { ClassificationTypeEnum, ExamDetail, ExamManager, QuestionTypeEnum } from 'exam';
 import { Chapter, EXAM_MANAGER_TYPE, WRONG_COLLECT, Video } from './Model';
 
-export const videoUrl: string = getContext(this).resourceManager.getStringSync($r('app.string.video_url'));
 
 const COLOR_GARDEN = ['#46B1E3', '#61CFBE', '#ED6F21', '#A5D61D', '#AC49F5', '#64BB5C'];
 
@@ -14,12 +13,14 @@ export class ExamService {
   private examDetails: ExamDetail[] = [];
   @Trace mockExamCount: number = 0;
   @Trace mockExamScore: number[] = [];
+  static context: Context;
 
   constructor() {
     this.examDetails = this.generateExamDetail();
   }
 
-  public static get instance() {
+  public static instance(context: Context) {
+    ExamService.context = context
     if (!ExamService._instance) {
       ExamService._instance = new ExamService();
     }
@@ -362,6 +363,7 @@ export class ExamService {
    * @returns 全部考题
    */
   private generateExamDetail(): Array<ExamDetail> {
+    const videoUrl: string = ExamService.context.resourceManager.getStringSync($r('app.string.video_url').id);
     let examDetails: Array<ExamDetail> = [];
     examDetails.push(new ExamDetail('驾驶机动车通过学校时要注意什么 ?', '',
       ['观察标志标线',
@@ -516,6 +518,7 @@ export class ExamService {
   }
 
   public getVideList(): Video[] {
+    const videoUrl: string = ExamService.context.resourceManager.getStringSync($r('app.string.video_url').id);
     return [
       {
         poster: $r('app.media.video_poster'),
@@ -534,6 +537,7 @@ export class ExamService {
         description: '侧方位停车有两个地方需要注意：一是左右后视镜要调整，左边后视镜尽量压低，能看到左边的后轮就行。右边后视镜能看到车身即可。上下调到前门把手在后视镜中间。二是车内后视镜要调整，要调整到抬头的时候可以看到车的后面挡风玻璃中间。',
         copyrightNotice: '未经许可，请勿转载使用',
         time: '01:04',
+        needVip: true
       },
       {
         poster: $r('app.media.video_poster'),
@@ -543,6 +547,7 @@ export class ExamService {
         description: '侧方位停车有两个地方需要注意：一是左右后视镜要调整，左边后视镜尽量压低，能看到左边的后轮就行。右边后视镜能看到车身即可。上下调到前门把手在后视镜中间。二是车内后视镜要调整，要调整到抬头的时候可以看到车的后面挡风玻璃中间。',
         copyrightNotice: '未经许可，请勿转载使用',
         time: '01:04',
+        needVip: true
       },
     ];
   }

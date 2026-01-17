@@ -1,14 +1,14 @@
-import { CustomContentDialog } from '@kit.ArkUI';
+import { CustomContentDialog, window } from '@kit.ArkUI';
 import { bookParser, readerCore, ReadPageComponent } from '@kit.ReaderKit';
 import { common, ConfigurationConstant } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { BusinessError, systemDateTime, emitter } from '@kit.BasicServicesKit';
-import { AppStorageV2, promptAction } from '@kit.ArkUI';
+import { AppStorageV2 } from '@kit.ArkUI';
 import { Logger } from '@hw-agconnect/ui-base';
 import { ReaderToolBar } from 'reader_tool_bar';
-import { baseActionSheet,UserInfo } from 'base_common';
+import { baseActionSheet, UserInfo } from 'base_common';
 import { ReviewDataUtil } from '../utils/ReviewDataUtil';
-import { BookApi, BookInfo, Constants, EpubUtils, ReadSet, TCRouter} from 'common';
+import { BookApi, BookInfo, BreakpointSystem, Constants, EpubUtils, ReadSet, TCRouter, WindowUtils } from 'common';
 import { ReaderTopCard } from './ReaderTopCard';
 import { BookCoverCard } from './BookCoverCard';
 
@@ -21,7 +21,7 @@ export struct ReaderPage {
   @Local curChapterId: number = 0
   @Local readerComponentController: readerCore.ReaderComponentController =
     new readerCore.ReaderComponentController();
-  private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+  private context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
   @Local bookParserHandler: bookParser.BookParserHandler | null = null;
   @Local spineList: bookParser.SpineItem[] = []
   private windowClass = this.context.windowStage.getMainWindowSync();
@@ -39,6 +39,7 @@ export struct ReaderPage {
   @Local isNavigatingToReview: boolean = false;
   @Local isLastPage: boolean = false;
   @Local hasTriggeredReviewNavigation: boolean = false;
+  @Local swiperIndex:number = 0
   private lastSwipeTime: number = 0;
   private swipeThreshold: number = 50;
   private swipeStartX: number = 0;
@@ -52,7 +53,7 @@ export struct ReaderPage {
         this.reminderDialogBuilder();
       },
     }),
-    cancel:this.onAccept,
+    cancel: this.onAccept,
     alignment: DialogAlignment.Center,
     customStyle: false,
     cornerRadius: 32,
@@ -60,45 +61,61 @@ export struct ReaderPage {
     backgroundColor: Color.White,
   })
 
+  onWindowsAppear(): void {
+    WindowUtils.onWindowSizeChange(() => {
+      this.readerSetting.viewPortWidth = WindowUtils.getWindowWidth()
+      this.readerSetting.viewPortHeight = WindowUtils.getWindowHeight()
+      if (this.swiperIndex > 0) {
+        this.readerComponentController.setPageConfig(this.readerSetting)
+      }
+    })
+  }
+
   @Builder
   reminderDialogBuilder() {
-    Column({space:24}) {
+    Column({ space: 24 }) {
       Image($r('app.media.rest_reminder'))
         .width(220)
         .height(220)
         .objectFit(ImageFit.Contain)
-      Row({space:4}){
+      Row({ space: 4 }) {
         Text('您已经阅读了')
           .fontSize(16)
-        Text(this.reminderTime+'分钟')
+        Text(this.reminderTime + '分钟')
           .fontSize(16)
           .fontColor('#E84026')
           .fontWeight(FontWeight.Bold)
         Text('休息一下吧~~')
           .fontSize(16)
       }
+
       Button('我知道了')
         .backgroundColor('#0D000000')
-        .fontColor('#E84026')
+        .fontColor($r('sys.color.warning'))
         .width(Constants.FULL_SIZE)
         .onClick(() => {
           this.onAccept()
         })
     }
     .padding({
-      left:24,
-      right:24
+      left: 24,
+      right: 24
     })
   }
+
   // 处理书币扣费和更新
   private updateBookCoinsAndSave(price: number): void {
     if (this.userInfo) {
-      this.userInfo.bookCoins -= price;
-      AppStorage.set('userInfo', this.userInfo);
-      emitter.emit(Constants.COINS_CHANGE);
+      try {
+        this.userInfo.bookCoins -= price;
+        AppStorage.set('userInfo', this.userInfo);
+        emitter.emit(Constants.COINS_CHANGE);
+      } catch (e) {
+        console.error('Failed to emitter emit coins change. Cause: ' + JSON.stringify(e));
+      }
     }
   }
-  
+
   @Builder
   buildBuyChapter(index: number) {
     Column({ space: 8 }) {
@@ -115,7 +132,7 @@ export struct ReaderPage {
       Button('购买')
         .onClick(() => {
           if (this.price > this.userInfo!.bookCoins!) {
-            promptAction.showToast({
+            this.getUIContext().getPromptAction().showToast({
               message: '余额不足',
               duration: 2000
             });
@@ -166,8 +183,8 @@ export struct ReaderPage {
     this.userInfo = AppStorage.get<UserInfo>('userInfo');
     this.startTime = systemDateTime.getTime(false)
     // mock同一本书
-    this.book!.localPath =
-      await EpubUtils.loadEpubFileFromNetwork('mock', this.book!.epubUrl, getContext(this).cacheDir)
+    this.book!.localPath = await EpubUtils.loadEpubFileFromNetwork('mock', this.book!.epubUrl,
+      (this.getUIContext().getHostContext() as Context).cacheDir)
     const hisRsp = await BookApi.getBooksShelfList('historyBooks', Constants.API_GET_BOOK_HISTORY_PATH, '');
     let books = hisRsp.books;
     let index = books.findIndex(book => book.id === this.book!.id)
@@ -276,7 +293,9 @@ export struct ReaderPage {
         this.isLoading = false;
         let spineItem = this.spineList[data.resourceIndex]
         let catalogItem = this.catalogItemList.filter(item => item.resourceFile === spineItem.href)
-        this.curChapterId = catalogItem[0].catalogId
+        if (catalogItem.length > 0) {
+          this.curChapterId = catalogItem[0].catalogId
+        }
 
         // 更新最后一页状态
         this.updateLastPageStatus(data);
@@ -321,7 +340,8 @@ export struct ReaderPage {
     if (this.spineList && this.spineList.length > 0) {
       // 判断是否在最后一个spine
       this.isLastPage = data.resourceIndex >= this.spineList.length - 1;
-      hilog.info(0x0000, 'testTag', `当前页面索引: ${data.resourceIndex}, 总页面数: ${this.spineList.length}, 是否最后一页: ${this.isLastPage}`);
+      hilog.info(0x0000, 'testTag',
+        `当前页面索引: ${data.resourceIndex}, 总页面数: ${this.spineList.length}, 是否最后一页: ${this.isLastPage}`);
     }
   }
 
@@ -361,6 +381,8 @@ export struct ReaderPage {
         domPos = this.pageData.startDomPos
       }
       if (this.bookParserHandler) {
+        this.readerSetting.viewPortWidth = WindowUtils.getWindowWidth()
+        this.readerSetting.viewPortHeight = WindowUtils.getWindowHeight()
         this.readerComponentController.registerBookParser(this.bookParserHandler);
         this.readerComponentController.setPageConfig(this.readerSetting)
         this.readerComponentController.startPlay(spineIndex, domPos);
@@ -391,16 +413,21 @@ export struct ReaderPage {
       this.readerComponentController.releaseBook();
     }
     this.notFullScreen()
+    // 退出页面需要注销监听
+    WindowUtils.onWindowSizeOff()
+    // 重新注册外层监听
+    const uiContext = this.getUIContext()
+    BreakpointSystem.register(uiContext)
   }
 
   setFullScreen() {
-    if(this.userInfo?.fullScreen) {
-    this.windowClass.setWindowSystemBarEnable([]);
+    if (this.userInfo?.fullScreen) {
+      this.windowClass.setWindowSystemBarEnable([]);
     }
   }
 
   notFullScreen() {
-      this.windowClass.setWindowSystemBarEnable(['status', 'navigation']);
+    this.windowClass.setWindowSystemBarEnable(['status', 'navigation']);
   }
 
   onAccept() {
@@ -410,16 +437,16 @@ export struct ReaderPage {
   }
 
   initTimer() {
-    if(this.reminderTime>0){
+    if (this.reminderTime > 0) {
       this.timerId = setTimeout((() => {
         this.dialogController.open()
       }), this.reminderTime * 60 * 1000);
-      Logger.info('Timer is about to start'+ this.timerId)
+      Logger.info('Timer is about to start' + this.timerId)
     }
   }
 
   clearTimer() {
-    Logger.info('Timer has been cleared'+ this.timerId)
+    Logger.info('Timer has been cleared' + this.timerId)
     clearTimeout(this.timerId);
   }
 
@@ -430,7 +457,7 @@ export struct ReaderPage {
     }
     this.lastSwipeTime = currentTime;
     this.isNavigatingToReview = true;
-    promptAction.showToast({
+    this.getUIContext().getPromptAction().showToast({
       message: '已到最后一页，为您推荐精彩书评',
       duration: 2000
     });
@@ -473,13 +500,15 @@ export struct ReaderPage {
                 .onActionUpdate((event: GestureEvent) => {
                   const deltaX = event.offsetX - this.swipeStartX;
                   if (deltaX < -this.swipeThreshold && this.isLastPage && !this.hasTriggeredSwipe) {
-                    hilog.info(0x0000, 'testTag', `检测到最后一页左滑手势: deltaX=${deltaX}, threshold=${this.swipeThreshold}`);
+                    hilog.info(0x0000, 'testTag',
+                      `检测到最后一页左滑手势: deltaX=${deltaX}, threshold=${this.swipeThreshold}`);
                     this.hasTriggeredSwipe = true;
                     this.handleSwipeToReview();
                   }
                 })
                 .onActionEnd((event: GestureEvent) => {
-                  hilog.info(0x0000, 'testTag', `手势结束: endX=${event.offsetX}, totalDeltaX=${event.offsetX - this.swipeStartX}`);
+                  hilog.info(0x0000, 'testTag',
+                    `手势结束: endX=${event.offsetX}, totalDeltaX=${event.offsetX - this.swipeStartX}`);
                   // 重置状态
                   this.hasTriggeredSwipe = false;
                 })
@@ -493,7 +522,10 @@ export struct ReaderPage {
               }
               .layoutWeight(1)
               .width('100%')
-              .hitTestBehavior(HitTestMode.None)
+              .hitTestBehavior(HitTestMode.Block)
+              .onClick(() => {
+                this.showController = false;
+              })
 
               ReaderToolBar({
                 spineList: this.spineList,
@@ -509,7 +541,7 @@ export struct ReaderPage {
             .hitTestBehavior(HitTestMode.None)
           } else {
             Row() {
-              if(!this.userInfo?.noTimeBattery){
+              if (!this.userInfo?.noTimeBattery) {
                 TextClock({ timeZoneOffset: -8, controller: this.textClockController })
                   .format('hh:mm')
               }
@@ -518,7 +550,7 @@ export struct ReaderPage {
             .position({ bottom: this.bottomRectHeight })
             .padding({ left: 16, right: 16 })
             .width('100%')
-            .justifyContent(this.userInfo?.noTimeBattery? FlexAlign.End: FlexAlign.SpaceBetween)
+            .justifyContent(this.userInfo?.noTimeBattery ? FlexAlign.End : FlexAlign.SpaceBetween)
           }
 
           Row() {
@@ -534,6 +566,7 @@ export struct ReaderPage {
         .height('100%')
       }
       .onChange((index) => {
+        this.swiperIndex = index
         if (index === 1) {
           this.setFullScreen()
         }
@@ -548,6 +581,7 @@ export struct ReaderPage {
         this.book = p
         ReviewDataUtil.setCurrentBookInfo(this.book);
       }
+      this.onWindowsAppear()
     })
     .onWillShow(async () => {
       if (this.isNavigatingToReview) {

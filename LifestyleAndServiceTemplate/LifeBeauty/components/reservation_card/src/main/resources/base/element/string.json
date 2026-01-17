@@ -14,7 +14,7 @@
     },
     {
       "name": "schedule_to_add",
-      "value": "添加至日程"
+      "value": "添加日程"
     },
     {
       "name": "subscribe_added",
@@ -26,7 +26,7 @@
     },
     {
       "name": "toast_appoint_canceled",
-      "value": "已取消预约"
+      "value": "取消成功"
     },
     {
       "name": "toast_schedule_cannot_cancel",
@@ -57,12 +57,8 @@
       "value": "联系人："
     },
     {
-      "name": "form_item_nums",
-      "value": "人数："
-    },
-    {
-      "name": "form_content_nums",
-      "value": "%s人"
+      "name": "form_item_phone",
+      "value": "手机号码："
     },
     {
       "name": "form_item_remark",
@@ -74,15 +70,19 @@
     },
     {
       "name": "dialog_cancel_appoint_title",
-      "value": "是否取消预约"
+      "value": "取消预约"
+    },
+    {
+      "name": "dialog_cancel_appoint_content",
+      "value": "取消预约后，需要重新进行预约，您是否确定取消预约？"
     },
     {
       "name": "dialog_cancel_appoint_no",
-      "value": "不取消"
+      "value": "取消"
     },
     {
       "name": "dialog_cancel_appoint_yes",
-      "value": "取消预约"
+      "value": "确定"
     },
     {
       "name": "agcit_huawei_life_beauty_reservation_card",

@@ -1,12 +1,15 @@
-import { CustomContentDialog, promptAction } from '@kit.ArkUI'
-import { FileType } from '../common/Constant'
-import { CompressedFile } from '../model/ZipModel'
-import { deleteZipDocument, getFolderList, moveFile, rename, reSave } from '../utils/CompressUtil'
+import { CustomContentDialog } from '@kit.ArkUI'
+import { FileType, WorkerMessageType } from '../common/Constant'
+import { CompressedFile, WorkerMessage, WorkerSend } from '../model/ZipModel'
+import { deleteZipDocument, getFolderList, getStoragePath, moveFile, rename, reSave } from '../utils/CompressUtil'
 import { MoveBuilder } from './MoveBuilder'
 import { RenameCustomDialog } from './RenameCustomDialog'
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
+import { CompressPageVM } from '../viewmodel/CompressPageVM'
 
 @ComponentV2
 export struct EditSetting {
+  vm: CompressPageVM = CompressPageVM.instance
   @Param fileList: CompressedFile[] = []
   @Param selectedIdList: string[] = []
   @Param originFolderPath: string = ''
@@ -171,7 +174,7 @@ export struct EditSetting {
           promptAction.showToast({ message: '请勾选文件！' })
         }
       })
-      this.labelBuilder($r('sys.symbol.save'), '另存为', () => {
+      this.labelBuilder($r('sys.symbol.save'), '另存为', async () => {
         if (!this.isSelectedFile) {
           promptAction.showToast({ message: '请勾选文件！' })
           return
@@ -189,7 +192,15 @@ export struct EditSetting {
             return
           }
           const path = `${this.currentFolderPath}/${file.name}`
-          reSave(path, file.name)
+          const uris = await getStoragePath(file.name)
+          const workerSend: WorkerSend = {
+            filePath: path,
+            uris,
+          };
+          this.vm.zipWorker.postMessage({
+            type: WorkerMessageType.SAVE,
+            data: JSON.stringify(workerSend),
+          } as WorkerMessage);
         }
       })
       if (this.isAllSelect) {

@@ -2,11 +2,8 @@ import { Logger } from '@hw-agconnect/ui-base';
 import { BookInfo } from '../model/Book';
 import { LazyDataVM } from '../model/LazyDataVM';
 
-
 @ComponentV2
 export struct TUISwiper {
-  // 中间图片是否覆盖两边
-  @Param isCovered: boolean = false
   // 中心图片宽度
   @Param @Once imgWidth: number = 264
   // 中心图片高度
@@ -15,8 +12,6 @@ export struct TUISwiper {
   @Param interval: number = 5000
   // 是否循环
   @Param isLoop: boolean = true
-  // Builder
-  // @Require @Param builderList: Src[] = []
   @Require @Param builderList: WrappedBuilder<[BookInfo]>[] = [];
   @Require @Param bookList: LazyDataVM<BookInfo> = new LazyDataVM();
   // 当前索引
@@ -49,6 +44,7 @@ export struct TUISwiper {
   @Local minWidth: number = 164
   // 外部容器宽度改变时，重新刷新轮播图
   @Local isShow: boolean = true
+  @Local midBook: number = 0
   private controller: SwiperController = new SwiperController()
   // 透明度变化区间长度
   private ratioOpacity: number = 0.1
@@ -57,6 +53,8 @@ export struct TUISwiper {
   // 初始化图片宽高备份值
   private bakWidth: number = 0
   private bakHeight: number = 0
+  private count: number = 0
+  private midCount: number = 0
   // 标志是否为第一次加载导致容器宽度变化
   private changeFlag: number = 0
   // 当前图片被点击
@@ -73,59 +71,36 @@ export struct TUISwiper {
     this.currentIndex = 0
     // 获取当前容器宽度相对360vp的比率
     this.containerRatio = this.containerWidth / 360
-    // 覆盖模式限制宽度
-    if (this.isCovered) {
-      // 初始化覆盖模式下的样式属性
-      this.imgSpace = 32 * this.containerRatio
-      this.maxWidth = 296 * this.containerRatio
-      this.minWidth = 164 * this.containerRatio
-      if (this.imgWidth > this.maxWidth) {
-        this.imgHeight = this.imgHeight / (this.imgWidth / this.maxWidth)
-        this.imgWidth = this.maxWidth
-      }
-      if (this.imgWidth < this.minWidth) {
-        this.imgHeight = this.imgHeight * (this.minWidth / this.imgWidth)
-        this.imgWidth = this.minWidth
-      }
-      this.marginWidth = this.containerWidth / 3
-      // 根据上下间距,确定覆盖模式下Y轴缩放比例
-      this.ratioY = 2 * this.imgSpace / this.imgHeight
-      // 确定X轴缩放比例
-      this.ratioX = (this.imgWidth - this.marginWidth) / this.imgWidth
-      // 计算覆盖状态下X轴的缩放比例
-      this.allScaleX = new Array(this.builderList.length).fill(1 - this.ratioX)
-      this.allScaleX[0] = 1
-      // 初始化透明度变化区间
-      this.allOpacity = new Array(this.builderList.length).fill(1 - this.ratioOpacity)
-      this.allOpacity[0] = 1
+    if (this.containerWidth <= 450) {
+      this.count = 3
+      this.midCount = 1
+    } else if (this.containerWidth <= 740) {
+      this.count = 5
+      this.midCount = 2
     } else {
-      this.imgSpace = 24 * this.containerRatio
-      this.maxWidth = 264 * this.containerRatio
-      this.minWidth = 136 * this.containerRatio
-      // 平铺切换模式限制宽度
-      if (this.imgWidth > this.maxWidth) {
-        this.imgHeight = this.imgHeight / (this.imgWidth / this.maxWidth)
-        this.imgWidth = this.maxWidth
-      }
-      if (this.imgWidth < this.minWidth) {
-        this.imgHeight = this.imgHeight * (this.minWidth / this.imgWidth)
-        this.imgWidth = this.minWidth
-      }
-      this.marginWidth = (this.containerWidth - this.imgWidth - this.imgSpace) / 2
-      // 根据上下间距,确定缩放比例
-      this.ratioY = 2 * this.imgSpace / this.imgHeight
+      this.count = 7
+      this.midCount = 3
     }
+
+    this.imgSpace = 24 * this.containerRatio
+    this.maxWidth = 264 * this.containerRatio
+    this.minWidth = 136 * this.containerRatio
+
+    this.marginWidth = (this.containerWidth - this.imgWidth - this.imgSpace) / 2
+    // 根据上下间距,确定缩放比例
+    this.ratioY = 0.4
+
     // 预留上下8的间隔
-    this.swiperHeight = this.imgHeight + 16 * this.containerRatio
+    this.swiperHeight = this.imgHeight + 12
 
     // 初始化最开始的缩放比例
     this.allScaleY = new Array(this.builderList.length).fill(1 - this.ratioY)
-    this.allScaleY[0] = 1
+    this.allScaleY[this.midCount] = 1
   }
 
   aboutToAppear(): void {
-    if (this.builderList.length < 3) {
-      Logger.error('Please transfer at least three images!')
+    if (this.builderList.length < this.count) {
+      Logger.error('Please transfer enough images!')
     } else {
       //备份初始化宽高，防止因窗口变化，宽高变化后，无法恢复
       this.bakWidth = this.imgWidth
@@ -144,36 +119,32 @@ export struct TUISwiper {
                 builder.builder(this.bookList.getData(index))
               }
               .borderRadius(this.currentIndex === index ? 24 : 12)
-              // .shadow({ radius: vp2px(4 * this.containerRatio), color: 'rgba(0,0,0,0.2)', fill: true })
               .height(this.imgHeight * this.allScaleY[index])
-              .width(this.imgWidth)
+              .width(this.imgWidth * this.allScaleY[index])
               .onClick(() => {
-                if (index === this.currentIndex) {
-                  this.onImageClick(index)
-                } else {
-                  this.controller.changeIndex(index, true)
-                }
+                this.onImageClick(index)
               })
             }
             .justifyContent(FlexAlign.Center)
-            .padding({ top: 8 * this.containerRatio, bottom: 8 * this.containerRatio })
-            .margin({ left: 12 * this.containerRatio, right: 12 * this.containerRatio })
           }, (item: WrappedBuilder<[BookInfo]>, index) => index.toString())
         }
+        .itemSpace(12)
         .width(this.containerWidth)
         .height(this.swiperHeight)
-        .prevMargin(this.marginWidth)
-        .nextMargin(this.marginWidth)
         .indicator(false)
         .autoPlay(true)
+        .displayCount(this.count)
         .interval(this.interval) // 停留时间
-        .loop(this.isLoop)
+        .loop(true)
         .customContentTransition({
           timeout: 1000,
           transition: (proxy: SwiperContentTransitionProxy) => {
-            // 计算缩放比例
-            let scaleY = 1 - (Math.abs(proxy.position)) * this.ratioY
-            this.allScaleY[(proxy.index)%(this.allScaleY.length)] = scaleY
+            const realIndex = (proxy.index + this.builderList.length) % this.builderList.length;
+            if (Math.abs(proxy.position) < this.midCount + 1 && Math.abs(proxy.position) > this.midCount - 0.8) {
+              this.allScaleY[realIndex] = 1 - 0.3 * Math.abs(proxy.position - this.midCount);
+            } else {
+              this.allScaleY[realIndex] = 0.6
+            }
             let scaleX = 1 - (Math.abs(proxy.position)) * this.ratioX
             this.allScaleX[(proxy.index)%(this.allScaleX.length)] = scaleX
             // 计算透明度变化区间
@@ -183,15 +154,35 @@ export struct TUISwiper {
           }
         })
         .onAnimationStart((index, targetIndex) => {
-          this.bakIndex = targetIndex
+          this.bakIndex = (targetIndex + this.builderList.length) % this.builderList.length
           this.currentIndex = this.bakIndex
+          this.midBook = (this.currentIndex + this.builderList.length + this.midCount) % this.builderList.length
         })
         .onAppear(() => {
           // 清除定时器
           clearTimeout(this.timer)
         })
       }
-    }.size({ width: '100%', height: this.swiperHeight }).onAreaChange((oldValue: Area, newValue: Area) => {
+      Column({ space: 8 }) {
+        Text(this.bookList.getData(this.midBook).name)
+          .padding({ top: 3 })
+          .fontSize($r('sys.float.Body_L'))
+          .fontColor($r('sys.color.font_primary'))
+          .fontWeight(FontWeight.Medium)
+        Row() {
+          Image($r('app.media.ic_public_star'))
+            .height(15)
+            .width(20)
+            .padding({ right: 8 })
+          Text(`${this.bookList.getData(this.midBook)?.rate} ${this.bookList.getData(this.midBook)?.category}` +
+            `|${this.bookList.getData(this.midBook)?.author}`)
+            .fontSize($r('sys.float.Body_M'))
+            .fontColor($r('sys.color.font_secondary'))
+        }
+      }
+      .padding({ top: 12, bottom: 12 })
+    }
+    .size({ width: '100%' }).onAreaChange((oldValue: Area, newValue: Area) => {
       // 根据外层容器撑满
       if (this.containerWidth !== newValue.width as number) {
         this.containerWidth = newValue.width as number

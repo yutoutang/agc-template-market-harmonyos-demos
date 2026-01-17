@@ -6,6 +6,8 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "dayjs": "^1.11.13"
+    "dayjs": "^1.11.13",
+    "@hw-agconnect/ui-toast": "^1.0.0",
+    "@hw-agconnect/util-log": "^1.0.0"
   }
 }

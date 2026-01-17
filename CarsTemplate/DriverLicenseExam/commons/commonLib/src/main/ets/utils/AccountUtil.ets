@@ -85,5 +85,6 @@ export class AccountUtil {
     AccountUtil._accountInfo.idToken = '';
     AccountUtil._userInfo.avatar = $r('app.media.user_avatar');
     AccountUtil._userInfo.nickname = $r('app.string.user_name');
+    AccountUtil._userInfo.phone = '';
   }
 }

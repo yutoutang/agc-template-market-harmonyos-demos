@@ -8,10 +8,11 @@ const TAG: string = '[PhoneFormAbility]';
 
 export default class PhoneFormAbility extends FormExtensionAbility {
   private formData: FormCardData = {
-    data: FormUtils.queryFormData(),
+    data: FormUtils.getDefaultFormData(),
   };
 
   onAddForm(want: Want) {
+    Logger.setLogConfig();
     if (!FormUtils.isSubscribed) {
       FormUtils.subscribeFormId(this.context, TAG);
     }

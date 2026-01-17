@@ -31,6 +31,10 @@
     {
       "name": "true_or_false",
       "value": "判断题"
+    },
+    {
+      "name": "agcit_huawei_driver_license_exam",
+      "value": "1.0.4"
     }
   ]
 }

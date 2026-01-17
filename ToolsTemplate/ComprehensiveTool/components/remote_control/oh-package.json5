@@ -6,6 +6,7 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "@ohos/high_light_guide": "^1.0.2"
+    "@ohos/high_light_guide": "^1.0.2",
+    "@hw-agconnect/util-log": "^1.0.0"
   }
 }

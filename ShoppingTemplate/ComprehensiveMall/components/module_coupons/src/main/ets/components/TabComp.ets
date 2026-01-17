@@ -123,7 +123,7 @@ export struct TabComp {
       .barBackgroundColor(this.tabBarBgColor)
       .backgroundColor(this.tabContentBgColor)
       .animationDuration(this.animationDuration)
-      .onSizeChange((oldValue, newValue) => {
+      .onSizeChange((_oldValue, newValue) => {
         this._tabsWidth = newValue.width as number;
         if (!this._isStartAnimateTo) {
           this._setIndicatorAttr(this._textInfos[this.localIndex][0], this._textInfos[this.localIndex][1]);
@@ -135,7 +135,7 @@ export struct TabComp {
         this.$index(index);
         this._listController.scrollToIndex(index - 1, true);
       })
-      .onAnimationStart((index: number, targetIndex: number) => {
+      .onAnimationStart((_index: number, targetIndex: number) => {
         // 切换动画开始时触发该回调。下划线跟着页面一起滑动，同时宽度渐变。
         this.localIndex = targetIndex;
         this._startAnimateTo(this.animationDuration, this._textInfos[targetIndex][0], this._textInfos[targetIndex][1]);
@@ -159,7 +159,7 @@ export struct TabComp {
               ListItem() {
                 this.tabBarBuilder(item, index);
               }
-              .onAreaChange((oldValue: Area, newValue: Area) => {
+              .onAreaChange((_oldValue: Area, newValue: Area) => {
                 this._textInfos[index] = [newValue.position.x as number, newValue.width as number];
                 if (!this._isStartAnimateTo && this.localIndex === index && this._tabsWidth > 0) {
                   this._setIndicatorAttr(this._textInfos[this.localIndex][0], this._textInfos[this.localIndex][1]);
@@ -199,7 +199,7 @@ export struct TabComp {
               Row() {
                 this.tabBarBuilder(item, index);
               }
-              .onAreaChange((oldValue: Area, newValue: Area) => {
+              .onAreaChange((_oldValue: Area, newValue: Area) => {
                 this._textInfos[index] = [newValue.position.x as number, newValue.width as number];
                 if (!this._isStartAnimateTo && this.localIndex === index && this._tabsWidth > 0) {
                   this._setIndicatorAttr(this._textInfos[this.localIndex][0], this._textInfos[this.localIndex][1]);
@@ -241,7 +241,7 @@ export struct TabComp {
 
   private _startAnimateTo(duration: number, leftMargin: number, width: number) {
     this._isStartAnimateTo = true;
-    animateTo({
+    this.getUIContext().animateTo({
       duration: duration,
       curve: Curve.Linear,
       iterations: 1,

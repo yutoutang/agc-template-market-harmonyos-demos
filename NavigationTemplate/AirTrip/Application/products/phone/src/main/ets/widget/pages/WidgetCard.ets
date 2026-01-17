@@ -67,7 +67,7 @@ struct WidgetCard {
               params: { message: item.serviceId, }
             });
           })
-        })
+        },(item: Record<string, string>, index: number)=>index + '__' + JSON.stringify(item))
       }
       .width(this.FULL)
       .layoutWeight(1)

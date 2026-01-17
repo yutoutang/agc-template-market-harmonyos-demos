@@ -9,9 +9,9 @@
     "lib_foundation": "file:../../commons/lib_foundation",
     "lib_widget": "file:../../commons/lib_widget",
     "lib_network": "file:../../commons/lib_network",
-    "module_product_share": "file:../../components/module_product_share",
     "module_product_detail": "file:../../components/module_product_detail",
     "module_shopping_cart": "file:../../components/module_shopping_cart",
-    "module_transition": "file:../../components/module_transition"
+    "module_transition": "file:../../components/module_transition",
+    "aggregated_share": "file:../../components/aggregated_share"
   }
 }

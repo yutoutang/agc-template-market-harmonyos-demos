@@ -3,14 +3,16 @@ export enum RouterMap {
   INDEX_PAGE = 'IndexPage',
   SAFE_PAGE = 'SafePage',
   SPLASH_PAGE = 'SplashPage',
-  PRIVACY_PAGE = 'PrivacyPage',
-  AGREE_PRIVACY_PAGE = 'AgreePrivacyPage',
-
   // 首页模块
   HOME_PAGE = 'HomePage',
   NEWS_SEARCH = 'NewsSearch',
   NEWS_POST = 'NewsPost',
   NEWS_PUBLISH_SELECT = 'NewsPublishSelect',
+  DIGITAL_NEWSPAPER = 'ENewsPage',
+  AUDIO_DETAILS = 'AudioDetails',
+  AUDIO_PLAYING_DETAILS = 'AudioPlayingDetails',
+  VIDEO_PROGRAM_DETAILS = 'VideoProgramDetails',
+  VIDEO_PROGRAM_HISTORY = 'VideoProgramHistory',
   // 图片预览
   IMAGE_PREVIEW = 'ImagePreview',
   // 视频预览
@@ -20,10 +22,8 @@ export enum RouterMap {
   VIDEO_DETAIL_PAGE = 'VideoDetailPage',
   VIDEO_LANDSCAPE_PAGE = 'LandscapeVideo',
   LIVESTREAM_DETAIL_PAGE = 'LivestreamDetailPage',
-  // 账号模块
+  // 登录模块
   HUAWEI_LOGIN_PAGE = 'HuaweiLoginPage',
-  OTHER_LOGIN_PAGE = 'OtherLoginPage',
-  PROTOCOL_WEBVIEW = 'ProtocolWebView',
   // 文章详情
   ARTICLE_FEED_DETAILS = 'ArticleFeedDetails',
   // 互动模块
@@ -46,12 +46,11 @@ export enum RouterMap {
   SETTING_PRIVACY = 'SettingPrivacy',
   SETTING_NETWORK = 'SettingNetwork',
   SETTING_FONT = 'SettingFont',
-  SETTING_ABOUT = 'SettingAbout',
-  SETTING_H5 = 'SettingH5',
+  SETTING_SUBSCRIBE = 'SubscribePage',
   // 个人主页模块
   PROFILE_HOME = 'PersonalHomePage',
   PROFILE_WATCH = 'WatchPage',
   PROFILE_FOLLOWER = 'FollowerPage',
   // 意见反馈模块
-  FEEDBACK_PAGE = 'FeedbackPage',
+  FEEDBACK_SUBMIT_PAGE = 'FeedbackSubmitPage'
 }

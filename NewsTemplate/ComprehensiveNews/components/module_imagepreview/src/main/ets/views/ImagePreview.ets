@@ -1,4 +1,6 @@
-import { ComponentContent, PromptAction, window } from '@kit.ArkUI'
+import { ComponentContent, PromptAction } from '@kit.ArkUI'
+import { common } from '@kit.AbilityKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { clamp, getComponentsInfo, getSizeByUnit } from '../utils/Utils'
 
 type PreviewImgType = PixelMap | ResourceStr | DrawableDescriptor
@@ -23,6 +25,7 @@ export enum PreviewVerticalAlign {
   Bottom = 'bottom',
 }
 
+const TAG = '[ImagePreview]';
 
 @ObservedV2
 class ImagePreviewOption {
@@ -189,7 +192,7 @@ struct PreviewContent {
           Column() {
             Text(`${this.active + 1} / ${this.params.list.length}`)
               .fontColor(this.params.indexFontColor)
-              .fontSize(this.params.indexFontSize ? getSizeByUnit(this.params.indexFontSize, true) : '')
+              .fontSize(this.params.indexFontSize ? getSizeByUnit(this.params.indexFontSize) : '')
               .constraintSize({ minWidth: 50 })
               .textAlign(TextAlign.Center)
           }
@@ -291,17 +294,16 @@ struct SwiperItem {
   @Event onDisabledSwiper: (isDisabled: boolean) => void = () => {
   }
 
-  @Monitor('isMoving')
-  moveChange() {
-    console.log('isMoving')
-  }
-
   // 初始化
   init(width: number, height: number) {
-    let comInfo = getComponentsInfo(this.getUIContext(), 'PreviewImgContent')
-    let rootRatio = comInfo.height / comInfo.width
-    this.imgWidth = px2vp(width)
-    this.imgHeight = px2vp(height)
+    const uiContext = this.getUIContext();
+    let comInfo = getComponentsInfo(uiContext, 'PreviewImgContent')
+    let rootRatio = 1;
+    if (comInfo) {
+      rootRatio = comInfo.height / comInfo.width
+    }
+    this.imgWidth = uiContext.px2vp(width)
+    this.imgHeight = uiContext.px2vp(height)
     this.imageRatio = height / width
     this.rootWidth = this.imgWidth
     this.rootHeight = this.imgHeight
@@ -446,6 +448,7 @@ struct SwiperItem {
         .scale({ x: this.curScale, y: this.curScale, z: 1 })
         .translate({ x: this.offsetX, y: this.offsetY, z: 0 })
         .draggable(this.imgDraggable)
+        .autoResize(true)
         .animation({
           duration: 100,
         })
@@ -525,46 +528,54 @@ class ImagePreview {
   /**
    * 显示预览
    */
-  public async show(list: PreviewImgType[], option?: ImagePreviewOption) {
+  public async show(uiContext: UIContext, list: PreviewImgType[], option?: ImagePreviewOption) {
     let opt: ImagePreviewParams = new ImagePreviewParams(list, option)
     opt.hide = (): void => this.hide()
     if (ImagePreview._instance.contentNode) {
       this.hide()
     }
-    let windowClass = await window.getLastWindow(getContext())
-    let systemBarProperty = windowClass.getWindowSystemBarProperties()
-    AppStorage.setOrCreate('statusBarContentColor', systemBarProperty.statusBarContentColor)
-    let uiContext = windowClass.getUIContext()
-    let contentNode = new ComponentContent(uiContext, wrapBuilder(previewBuilder), opt)
-    let promptAction = uiContext.getPromptAction()
-    ImagePreview._instance = this.getInstance(contentNode, promptAction)
-    promptAction.openCustomDialog(contentNode, {
-      alignment: DialogAlignment.Center,
-      isModal: true,
-      maskColor: opt.maskColor,
-      autoCancel: false,
-      onDidAppear: () => {
-        windowClass.setWindowSystemBarProperties({
-          statusBarContentColor: '#ffffff',
-        })
-      },
-      onWillDisappear: () => {
-        let mainStatusBarContentColor: string = AppStorage.get('statusBarContentColor') ?? '#ffffff'
-        windowClass.setWindowSystemBarProperties({
-          statusBarContentColor: mainStatusBarContentColor,
-        })
-      },
-    })
+    try {
+      let context = uiContext.getHostContext() as common.UIAbilityContext;
+      let windowClass = context.windowStage.getMainWindowSync();
+      let systemBarProperty = windowClass.getWindowSystemBarProperties()
+      AppStorage.setOrCreate('statusBarContentColor', systemBarProperty.statusBarContentColor)
+      let contentNode = new ComponentContent(uiContext, wrapBuilder(previewBuilder), opt)
+      let promptAction = uiContext.getPromptAction()
+      ImagePreview._instance = this.getInstance(contentNode, promptAction)
+      await promptAction.openCustomDialog(contentNode, {
+        alignment: DialogAlignment.Center,
+        isModal: true,
+        maskColor: opt.maskColor,
+        autoCancel: false,
+        onDidAppear: async () => {
+          await windowClass.setWindowSystemBarProperties({
+            statusBarContentColor: '#ffffff',
+          })
+        },
+        onWillDisappear: async () => {
+          let mainStatusBarContentColor: string = AppStorage.get('statusBarContentColor') ?? '#ffffff'
+          await windowClass.setWindowSystemBarProperties({
+            statusBarContentColor: mainStatusBarContentColor,
+          })
+        },
+      })
+    } catch (e) {
+      UtilLog.error(TAG, 'show fail, error: ' + JSON.stringify(e));
+    }
   }
 
   /**
    * 关闭预览
    */
   public hide() {
-    if (ImagePreview._instance.contentNode) {
-      ImagePreview._instance.promptAction?.closeCustomDialog(ImagePreview._instance.contentNode)
-      ImagePreview._instance.contentNode?.dispose()
-      ImagePreview._instance.contentNode = null
+    try {
+      if (ImagePreview._instance.contentNode) {
+        ImagePreview._instance.promptAction?.closeCustomDialog(ImagePreview._instance.contentNode)
+        ImagePreview._instance.contentNode?.dispose()
+        ImagePreview._instance.contentNode = null
+      }
+    } catch (e) {
+      UtilLog.error(TAG, 'closeCustomDialog fail, error: ' + JSON.stringify(e));
     }
   }
 }

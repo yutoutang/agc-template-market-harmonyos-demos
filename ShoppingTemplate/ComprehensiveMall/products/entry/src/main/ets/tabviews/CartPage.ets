@@ -1,14 +1,11 @@
+import { ToastDialog } from '@hw-agconnect/ui-toast';
 import {
-  iData,
-  routerStack,
-  RouterMap,
-  Style,
+  iData, routerStack, RouterMap, Style,
 } from 'lib_foundation';
-import { Product, ShoppingCart } from 'module_shopping_cart';
-import { promptAction } from '@kit.ArkUI';
-import { CartPageVM } from '../viewmodels/CartPageVM';
 import { PreOrderInfoReq, PreOrderItem } from 'lib_network';
+import { Product, ShoppingCart } from 'module_shopping_cart';
 import { ProductWaterFlow } from 'product';
+import { CartPageVM } from '../viewmodels/CartPageVM';
 
 @ComponentV2
 struct CartPage {
@@ -24,7 +21,7 @@ struct CartPage {
 
   private handleCheckout(list: Product[]): void {
     if (!list.length) {
-      promptAction.showToast({ message: '您还没有选择商品' });
+      ToastDialog.showToast({ message: '您还没有选择商品' });
       return;
     }
     const orders: PreOrderItem[] = [];
@@ -47,13 +44,14 @@ struct CartPage {
       ShoppingCart({
         isChildRoute: this.isChildRoute,
         isLogin: this.vm.global.isLogin,
+        isMember: this.vm.global.userInfo.isMember,
         customContentBuilder: () => {
           // 自定义组件  推荐商品
           this.recommendedProductSection();
         },
         onLogin: () => {
           // 登录逻辑
-          routerStack.pushPathByName('HuaweiQuickLoginPage', () => {
+          routerStack.pushPathByName(RouterMap.USER_LOGIN, () => {
             this.vm.global.isLogin = iData.global.isLogin;
           });
         },
@@ -99,11 +97,11 @@ struct CartPage {
           });
         },
       })
-        .expandSafeArea([SafeAreaType.SYSTEM],[SafeAreaEdge.BOTTOM])
+        .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
     }
     .padding({ left: 12, right: 12 })
     .backgroundColor($r('app.color.background_color_grey'))
-    .expandSafeArea([SafeAreaType.SYSTEM],[SafeAreaEdge.BOTTOM])
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
   }
 }
 

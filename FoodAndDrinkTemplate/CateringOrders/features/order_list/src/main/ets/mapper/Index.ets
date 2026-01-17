@@ -43,9 +43,10 @@ export function orderInfoMapper(myOrderResp: MyOrderResp): MyOrderInfo {
   orderInfo.couponId = myOrderResp.order.couponId
   orderInfo.state = myOrderResp.order.state
   orderInfo.oid = myOrderResp.order.oid
-  orderInfo.tel = myOrderResp.order.tel
-  orderInfo.name = myOrderResp.order.name
-  orderInfo.address = myOrderResp.order.address
+  orderInfo.storeName = myOrderResp.order.storeName
+  orderInfo.storeLogo = myOrderResp.order.storeLogo
+  orderInfo.storeTel = myOrderResp.order.storeTel
+  orderInfo.storeAddress = myOrderResp.order.storeAddress
   orderInfo.lat = myOrderResp.order.lat
   orderInfo.lng = myOrderResp.order.lng
   orderInfo.preorderTime = myOrderResp.order.preorderTime

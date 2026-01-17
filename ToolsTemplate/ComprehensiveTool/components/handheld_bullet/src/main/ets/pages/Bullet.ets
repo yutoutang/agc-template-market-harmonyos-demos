@@ -197,7 +197,7 @@ export struct Bullet {
   BulletOperation() {
     Column({ space: 12 }) {
       Button('显示弹幕').borderRadius(20).fontColor($r('sys.color.font_on_primary')).width('100%').onClick(() => {
-        this.vm.displayBullet();
+        this.vm.displayBullet(this.getUIContext());
       });
 
       Text('提示：显示弹幕后，长按屏幕可以退出弹幕模式').fontSize(10);

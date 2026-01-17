@@ -1,3 +1,4 @@
+import { UtilLog } from '@hw-agconnect/util-log';
 import { display, PersistenceV2, promptAction } from '@kit.ArkUI';
 import { CommonConstants } from '../constants/CommonConstants';
 import DrawInvoker from './DrawInvoker';
@@ -88,23 +89,27 @@ export class DrawBoardVM {
     this.mPaint.setColor(CommonConstants.BLACK);
     this.mPaint.setGlobalAlpha(CommonConstants.ONE);
     this.mBrush = new NormalBrush();
-    display.on('foldStatusChange', (data: display.FoldStatus) => {
-      if (data === 2) {
-        this.scaleValueX = 0.5;
-        this.pinchValueX = 0.5;
-        this.scaleValueY = 1;
-        this.pinchValueY = 1;
-        this.context.clearRect(0, 0, this.context.width, this.context.height);
-        this.drawInvoker.execute(this.context);
-      } else if (data === 1) {
-        this.scaleValueX = 1;
-        this.scaleValueY = 1;
-        this.pinchValueX = 1;
-        this.pinchValueY = 1;
-        this.context.clearRect(0, 0, this.context.width, this.context.height);
-        this.drawInvoker.execute(this.context);
-      }
-    })
+    try {
+      display.on('foldStatusChange', (data: display.FoldStatus) => {
+        if (data === 2) {
+          this.scaleValueX = 0.5;
+          this.pinchValueX = 0.5;
+          this.scaleValueY = 1;
+          this.pinchValueY = 1;
+          this.context.clearRect(0, 0, this.context.width, this.context.height);
+          this.drawInvoker.execute(this.context);
+        } else if (data === 1) {
+          this.scaleValueX = 1;
+          this.scaleValueY = 1;
+          this.pinchValueX = 1;
+          this.pinchValueY = 1;
+          this.context.clearRect(0, 0, this.context.width, this.context.height);
+          this.drawInvoker.execute(this.context);
+        }
+      })
+    } catch (e) {
+      UtilLog.error(`initDrawBord failed with error ${JSON.stringify(e)}`);
+    }
   }
 
   handleTouch(event: TouchEvent) {
@@ -620,14 +625,6 @@ export class DrawBoardVM {
   }
 
   /*
-   * 保存到相册
-   * */
-  async saveToAlbum(context: Context) {
-    const toDataURL = this.context.toDataURL('image/png', 0.92)
-    PhotoUtils.saveImageToAlbum(context, toDataURL)
-  }
-
-  /*
    * 判断是否有绘画路径
    * */
   public hasContent(): boolean {
@@ -638,7 +635,7 @@ export class DrawBoardVM {
   /*
    * 返回提醒
    * */
-  saveNotice() {
+  saveNotice(uiContext: UIContext) {
     if (this.hasContent()) {
       baseToast.show({
         type: 'dialog',
@@ -648,7 +645,7 @@ export class DrawBoardVM {
           baseToast.hide();
           this.pathStack.pop()
         },
-      });
+      }, uiContext);
       return true;
     }
     return false;
@@ -751,11 +748,11 @@ export class DrawBoardVM {
     this.drawOperateRedo()
   }
 
-  public validate() {
+  public validate(uiContext: UIContext) {
     if (this.title) {
       return true
     }
-    promptAction.showToast({ message: '请输入名称' })
+    uiContext.getPromptAction().showToast({ message: '请输入名称' })
     return false
   }
 

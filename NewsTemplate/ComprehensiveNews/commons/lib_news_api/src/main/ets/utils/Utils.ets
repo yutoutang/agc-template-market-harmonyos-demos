@@ -1,4 +1,7 @@
 import dayjs from 'dayjs';
+import isYesterday from 'dayjs/plugin/isYesterday';
+
+dayjs.extend(isYesterday);
 
 /**
  * 通用方法类
@@ -74,6 +77,16 @@ export class Utils {
       const diffDays = now.diff(target, 'day');
       return `${diffDays}天前`;
     }
+    return target.format('YYYY-MM-DD');
+  }
+
+  /**
+   * 格式化日期
+   * @param dateTimeStamp
+   * @returns
+   */
+  public static formatDate(dateTimeStamp: number): string {
+    const target = dayjs(dateTimeStamp);
     return target.format('YYYY-MM-DD');
   }
 }

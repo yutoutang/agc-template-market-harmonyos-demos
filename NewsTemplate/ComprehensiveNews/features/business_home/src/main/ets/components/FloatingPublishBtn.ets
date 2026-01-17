@@ -1,6 +1,9 @@
 import { AppStorageV2, PersistenceV2, window } from '@kit.ArkUI'
+import { common } from '@kit.AbilityKit'
 import { LoginSheetUtils } from 'lib_account'
-import { BreakpointModel, BreakpointNameEnum, RouterMap, RouterUtils, UserInfoModel } from 'lib_common'
+import { BreakpointModel, BreakpointNameEnum, Logger, RouterMap, RouterUtils, UserInfoModel } from 'lib_common'
+
+const TAG = '[FloatingPublishBtn]';
 
 @ComponentV2
 export struct FloatingPublishBtn {
@@ -25,6 +28,19 @@ export struct FloatingPublishBtn {
 
   aboutToAppear() {
     this.getWindowInfo()
+    this.listenSizeChange()
+  }
+
+  listenSizeChange() {
+    let context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+    try {
+      let windowClass = (context as common.UIAbilityContext).windowStage.getMainWindowSync();
+      windowClass.on('windowSizeChange', () => {
+        this.getWindowInfo();
+      })
+    } catch (err) {
+      Logger.error(`listenSizeChange fail, error code: ${err.code}, error mesage: ${err.message}`);
+    }
   }
 
   getWindowInfo() {
@@ -34,26 +50,30 @@ export struct FloatingPublishBtn {
     } else {
       this.imageSize = 68
     }
-    window.getLastWindow(getContext(this), (err, windowClass) => {
-      if (!err.code) {
-        this.statusHeight = px2vp(windowClass.getWindowAvoidArea(window.AvoidAreaType.TYPE_SYSTEM).topRect.height)
-        this.bottomAvoidAreaHeight =
-          px2vp(windowClass.getWindowAvoidArea(window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR)
-            .bottomRect
-            .height)
-        let windowProperties = windowClass.getWindowProperties()
-        this.winWidth = px2vp(windowProperties.windowRect.width)
-        this.winHeight = px2vp(windowProperties.windowRect.height)
-        if ([BreakpointNameEnum.LG, BreakpointNameEnum.XL].includes(this.breakpointModel.currentBreakpoint)) {
-          // 要减去左边tab栏的宽度
-          this.positionX = this.winWidth - this.imageSize - this.breakpointModel.pagePadding - 120
-          this.positionY = this.winHeight * 0.8
-          return
-        }
-        this.positionX = this.winWidth - this.imageSize - this.breakpointModel.pagePadding
+    let uiContext = this.getUIContext();
+    let context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+    try {
+      let windowClass = (context as common.UIAbilityContext).windowStage.getMainWindowSync();
+      this.statusHeight =
+        uiContext.px2vp(windowClass.getWindowAvoidArea(window.AvoidAreaType.TYPE_SYSTEM).topRect.height)
+      this.bottomAvoidAreaHeight =
+        uiContext.px2vp(windowClass.getWindowAvoidArea(window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR)
+          .bottomRect
+          .height)
+      let windowProperties = windowClass.getWindowProperties()
+      this.winWidth = uiContext.px2vp(windowProperties.windowRect.width)
+      this.winHeight = uiContext.px2vp(windowProperties.windowRect.height)
+      if ([BreakpointNameEnum.LG, BreakpointNameEnum.XL].includes(this.breakpointModel.currentBreakpoint)) {
+        // 要减去左边tab栏的宽度
+        this.positionX = this.winWidth - this.imageSize - this.breakpointModel.pagePadding - 120
         this.positionY = this.winHeight * 0.8
+        return
       }
-    })
+      this.positionX = this.winWidth - this.imageSize - this.breakpointModel.pagePadding
+      this.positionY = this.winHeight * 0.8
+    } catch (error) {
+      Logger.error(TAG, 'getWindowInfo fail, error: ' + JSON.stringify(error));
+    }
   }
 
   build() {
@@ -107,7 +127,7 @@ export struct FloatingPublishBtn {
             curve: Curve.EaseOut,
           }, () => {
             if ([BreakpointNameEnum.LG, BreakpointNameEnum.XL].includes(this.breakpointModel.currentBreakpoint)) {
-              this.positionX = this.winWidth - this.imageSize - this.breakpointModel.pagePadding- 120
+              this.positionX = this.winWidth - this.imageSize - this.breakpointModel.pagePadding - 120
               return
             }
             this.positionX = this.winWidth - this.imageSize - this.breakpointModel.pagePadding

@@ -96,10 +96,10 @@ export struct ToolsContainer {
               if (!this.vm.hasPermission) {
                 this.requestPermissionsFn();
               } else {
-                this.vm.handleToolLayout(this.manageStatus, item, this.toolList, index);
+                this.vm.handleToolLayout(this.getUIContext(), this.manageStatus, item, this.toolList, index);
               }
             } else {
-              this.vm.handleToolLayout(this.manageStatus, item, this.toolList, index);
+              this.vm.handleToolLayout(this.getUIContext(), this.manageStatus, item, this.toolList, index);
             }
           });
         }, (item: ToolTypeModule) => JSON.stringify(item));

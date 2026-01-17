@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { Orientation } from '../constant/Enum';
 import { BulletVM } from '../viewmodel/BulletVM';
 
@@ -17,9 +17,9 @@ export struct BulletDisplay {
 
   setOrientation(orientation: number) {
     this.windowClass.setPreferredOrientation(orientation).then(() => {
-      hilog.info(0xFF00, `Bullet`, 'setWindowOrientation: ' + orientation + ' Succeeded.');
+      UtilLog.info(0xFF00, `Bullet`, 'setWindowOrientation: ' + orientation + ' Succeeded.');
     }).catch((err: BusinessError) => {
-      hilog.info(0xFF00, `Bullet`, 'setWindowOrientation: ' + orientation + ' Failed. Cause: ' + JSON.stringify(err));
+      UtilLog.info(0xFF00, `Bullet`, 'setWindowOrientation: ' + orientation + ' Failed. Cause: ' + JSON.stringify(err));
     });
   }
 
@@ -75,7 +75,7 @@ export struct BulletDisplay {
                 .fontColor(this.vm.bullet.textColor)
                 .maxLines(1);
             }
-            .translate({ x: vp2px(this.vm.offsetX - this.vm.bullet.content.length * 16) })
+            .translate({ x: this.getUIContext().vp2px(this.vm.offsetX - this.vm.bullet.content.length * 16) })
             .onAppear(() => {
               this.vm.startScrolling();
             })
@@ -149,7 +149,7 @@ export struct BulletDisplay {
           }
         })
         .onActionEnd(() => {
-          hilog.info(0xFF00, 'Bullet', `Bullet Display quit by longPressGesture`);
+          UtilLog.info(0xFF00, 'Bullet', `Bullet Display quit by longPressGesture`);
         }),
     ).backgroundColor(this.vm.bullet.bgColor).hideTitleBar(true);
   }

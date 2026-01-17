@@ -1,10 +1,14 @@
 import { media } from '@kit.MediaKit';
 import { util } from '@kit.ArkTS';
 import { display } from '@kit.ArkUI';
+import { BusinessError } from '@kit.BasicServicesKit';
 import { PlayerLayoutSize } from '../controller/PlayerLayoutSize';
 import { VideoPlayerModel } from './VideoPlayerModel';
 import { AVPlayerManager, AVPlayerSession } from '../controller/AVPlayerManager';
 import { VideoPlayerData } from '../type/Index';
+import { Logger } from '../utils/Logger';
+
+const TAG = '[SwipePlayerModel]';
 
 @ObservedV2
 export class SwipePlayerModel extends VideoPlayerModel {
@@ -27,6 +31,12 @@ export class SwipePlayerModel extends VideoPlayerModel {
   @Trace leftRateOpacity: number = 0;
   @Trace rightRateOpacity: number = 1;
 
+  // 是否显示全屏按钮
+  @Computed
+  get showFullScreenBtn() {
+    return this.checkVideoSize() && !this.isAccelerate && !this.playerLayoutSize.getSlideMovingFlag()
+  }
+
   initPlayerManager(data: VideoPlayerData, videoItemPlayerSession?: AVPlayerSession) {
     // 设置视频数据
     this.setVideoData(data);
@@ -35,29 +45,39 @@ export class SwipePlayerModel extends VideoPlayerModel {
     if (this.index === 0 && videoItemPlayerSession) {
       this.isFromList = true;
       this.itemAVPlayer = videoItemPlayerSession!.avPlayer
+      this.itemAVPlayer?.pause().catch((e: BusinessError) => {
+        Logger.error(TAG, 'initPlayerManager fail, error: ' + JSON.stringify(e));
+      }).finally(() => {
+        this.isPause = false;
+      })
     }
     this.avPlayerManager.setPlayerId(this.index, this.playerId);
     this.avPlayerManager.setSession(this.playerId, this.playerSession!);
   }
 
   async initAVPlayer() {
-    if (this.isFromList && this.index === 0 && this.itemAVPlayer) {
-      this.showCover = false
-      this.isPause = false
-      this.itemAVPlayer!.surfaceId = this.surfaceId
-      this.itemAVPlayer.play()
-      this.playerSession.setAVPlayer(this.itemAVPlayer);
-      this.initPlayerListener(this.itemAVPlayer)
-      return
-    }
-    // 创建播放器
-    const avPlayer = await media.createAVPlayer();
-    if (avPlayer) {
-      this.playerSession.setAVPlayer(avPlayer);
-      // 设置视频url
-      this.setDataSource();
-      // 初始化监听事件
-      this.initPlayerListener(avPlayer)
+    try {
+      // 从视频推荐页或新闻详情页进入的短视频滑动页
+      if (this.isFromList && this.index === 0 && this.itemAVPlayer) {
+        this.showCover = false
+        this.isPause = false
+        this.itemAVPlayer!.surfaceId = this.surfaceId
+        this.playerSession.setAVPlayer(this.itemAVPlayer);
+        this.initPlayerListener(this.itemAVPlayer)
+        await this.itemAVPlayer.play();
+        return
+      }
+      // 创建播放器
+      const avPlayer = await media.createAVPlayer();
+      if (avPlayer) {
+        this.playerSession.setAVPlayer(avPlayer);
+        // 设置视频url
+        this.setDataSource();
+        // 初始化监听事件
+        this.initPlayerListener(avPlayer)
+      }
+    } catch (e) {
+      Logger.error(TAG, 'createAVPlayer fail, error: ' + JSON.stringify(e));
     }
   }
 
@@ -75,46 +95,59 @@ export class SwipePlayerModel extends VideoPlayerModel {
     this.xComponentId = 'XComponentId' + this.playerId;
   }
 
-  playOrPause() {
-    if (this.isPause) {
-      this.playerSession?.avPlayer?.play();
-    } else {
-      this.playerSession?.avPlayer?.pause();
+  async playOrPause() {
+    try {
+      if (this.isPause) {
+        await this.playerSession?.avPlayer?.play();
+      } else {
+        await this.playerSession?.avPlayer?.pause();
+      }
+    } catch (e) {
+      Logger.error(TAG, 'playOrPause fail, error: ' + JSON.stringify(e));
     }
   }
 
-  // 是否显示全屏按钮
-  showFullScreenBtn(): boolean {
-    let height = Number(this.playerLayoutSize.getXComponentHeight());
-    let width = Number(this.playerLayoutSize.getXComponentWidth());
+  // 判断视频播放时的尺寸大小
+  checkVideoSize(): boolean {
+    try {
+      let height = Number(this.playerLayoutSize.getXComponentHeight());
+      let width = Number(this.playerLayoutSize.getXComponentWidth());
 
-    let displayClass = display.getDefaultDisplaySync();
-    let orientation = displayClass.orientation;
-    let landscapes = [display.Orientation.LANDSCAPE, display.Orientation.LANDSCAPE_INVERTED];
-    // 设备横向时不展示全屏播放按钮
-    if (landscapes.includes(orientation)) {
+      let displayClass = display.getDefaultDisplaySync();
+      let orientation = displayClass.orientation;
+      let landscapes = [display.Orientation.LANDSCAPE, display.Orientation.LANDSCAPE_INVERTED];
+      // 设备横向时不展示全屏播放按钮
+      if (landscapes.includes(orientation)) {
+        return false;
+      }
+      return height / width < 1
+    } catch (e) {
+      Logger.error(TAG, 'showFullScreenBtn fail, error: ' + JSON.stringify(e));
       return false;
     }
-    return height / width < 1
   }
 
   // 自适应视频尺寸
   adaptiveVideoSize() {
-    let size = this.uiContext!.getComponentUtils().getRectangleById(this.componentId).size;
-    let playerLayoutWidth = size.width;
-    let playerLayoutHeight = size.height;
+    try {
+      let size = this.uiContext!.getComponentUtils().getRectangleById(this.componentId).size;
+      let playerLayoutWidth = size.width;
+      let playerLayoutHeight = size.height;
 
-    let videoRatio = Number(this.videoWidth) / Number(this.videoHeight);
-    let screenRatio = playerLayoutWidth / playerLayoutHeight;
+      let videoRatio = Number(this.videoWidth) / Number(this.videoHeight);
+      let screenRatio = playerLayoutWidth / playerLayoutHeight;
 
-    let widthForVp = this.uiContext!.px2vp(Number(this.videoWidth) * playerLayoutHeight / Number(this.videoHeight))
-    let heightForVp = this.uiContext!.px2vp(playerLayoutHeight)
-    if (videoRatio > screenRatio) {
-      widthForVp = this.uiContext!.px2vp(playerLayoutWidth)
-      heightForVp = this.uiContext!.px2vp(Number(this.videoHeight) * playerLayoutWidth / Number(this.videoWidth))
+      let widthForVp = this.uiContext!.px2vp(Number(this.videoWidth) * playerLayoutHeight / Number(this.videoHeight))
+      let heightForVp = this.uiContext!.px2vp(playerLayoutHeight)
+      if (videoRatio > screenRatio) {
+        widthForVp = this.uiContext!.px2vp(playerLayoutWidth)
+        heightForVp = this.uiContext!.px2vp(Number(this.videoHeight) * playerLayoutWidth / Number(this.videoWidth))
+      }
+      this.playerLayoutSize.updateXComponentWidth(widthForVp);
+      this.playerLayoutSize.updateXComponentHeight(heightForVp);
+    } catch (e) {
+      Logger.error(TAG, 'adaptiveVideoSize fail, error: ' + JSON.stringify(e));
     }
-    this.playerLayoutSize.updateXComponentWidth(widthForVp);
-    this.playerLayoutSize.updateXComponentHeight(heightForVp);
   }
 
   // 长按加速
@@ -129,6 +162,7 @@ export class SwipePlayerModel extends VideoPlayerModel {
       }
     }
   }
+
   // 取消长按
   offLongPress() {
     this.isAccelerate = false;

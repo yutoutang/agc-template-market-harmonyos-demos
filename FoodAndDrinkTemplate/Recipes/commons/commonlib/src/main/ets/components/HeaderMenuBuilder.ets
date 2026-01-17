@@ -2,6 +2,7 @@ import { RouterMap } from '../constants/CommonEnums'
 import { AccountUtil } from '../utils/AccountUtil'
 import { RouterModule } from '../utils/RouterModule'
 import { promptAction } from '@kit.ArkUI'
+import { GlobalContextUtils } from '../utils/ContextUtils'
 
 @Builder
 export function HeaderMenuBuilder() {
@@ -18,7 +19,7 @@ export function HeaderMenuBuilder() {
       if (AccountUtil.getUserInfo().isLogin) {
         RouterModule.push(RouterMap.SHOPPING_BASKET_PAGE);
       } else {
-        promptAction.showToast({ message: '未登录，请登录后重试！' });
+        GlobalContextUtils.showToast({ message: '未登录，请登录后重试！' });
         RouterModule.push(RouterMap.QUICK_LOGIN_PAGE);
       }
     })

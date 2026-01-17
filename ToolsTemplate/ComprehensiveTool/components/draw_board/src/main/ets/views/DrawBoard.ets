@@ -82,7 +82,7 @@ export struct DrawBoard {
       if (this.drawBoardVM.tabCurrentIndex === 3) {
         this.drawBoardVM.tabCurrentIndex = 0;
       }
-      return this.drawBoardVM.saveNotice()
+      return this.drawBoardVM.saveNotice(this.getUIContext())
     })
     .hideTitleBar(true)
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])

@@ -12,13 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { UtilLog } from '@hw-agconnect/util-log';
 import { BusinessError, pasteboard } from '@kit.BasicServicesKit';
-import { promptAction } from '@kit.ArkUI';
 import { getInstance, RouterMap } from '../util/Route';
-
-
-
-
 
 @ObservedV2
 export class TextResultPageVM {
@@ -37,16 +33,20 @@ export class TextResultPageVM {
   }
 
 
-  public toCopy() {
+  public toCopy(uiContext: UIContext) {
     if (this.textResult) {
-      const pasteData = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, this.textResult);
-      pasteboard.getSystemPasteboard().setData(pasteData).then(() => {
-        promptAction.showToast({ message: '复制成功' });
-      }).catch((err: BusinessError) => {
-        promptAction.showToast({ message: '复制失败' });
-      });
+      try {
+        const pasteData = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, this.textResult);
+        pasteboard.getSystemPasteboard().setData(pasteData).then(() => {
+          uiContext.getPromptAction().showToast({ message: '复制成功' });
+        }).catch((err: BusinessError) => {
+          uiContext.getPromptAction().showToast({ message: '复制失败' });
+        });
+      } catch (e) {
+        UtilLog.error(`onKeyboardChange failed with error ${JSON.stringify(e)}`);
+      }
     } else {
-      promptAction.showToast({ message: '暂无内容!' });
+      uiContext.getPromptAction().showToast({ message: '暂无内容!' });
     }
   }
 }

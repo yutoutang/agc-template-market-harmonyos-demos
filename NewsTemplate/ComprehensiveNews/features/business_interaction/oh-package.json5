@@ -10,9 +10,8 @@
     "lib_widget": "file:../../commons/lib_widget",
     "lib_news_api": "file:../../commons/lib_news_api",
     "lib_account": "file:../../commons/lib_account",
-    "module_post": "file:../../components/module_post",
-    "module_share": "file:../../components/module_share",
     "lib_flex_layout": "file:../../commons/lib_flex_layout",
+    "module_post": "file:../../components/module_post",
     "module_newsfeed": "file:../../components/module_newsfeed",
     "module_transition": "file:../../components/module_transition"
   }

@@ -1,4 +1,3 @@
-import { promptAction } from '@kit.ArkUI';
 import { Constant } from '../common/Constant';
 import { TextSettingType } from '../common/Enum';
 import { AudioInfo, SoundByTag } from '../model/Index';
@@ -50,7 +49,7 @@ export struct OperationComponent {
             .padding(4)
             .onClick(() => {
               if (this.vm.textInfo.fontSize <= 8) {
-                promptAction.showToast({ message: '字体大小最小不超过8' });
+                this.getUIContext().getPromptAction().showToast({ message: '字体大小最小不超过8' });
                 return;
               }
               this.vm.textInfo.fontSize--;
@@ -66,7 +65,7 @@ export struct OperationComponent {
             .backgroundColor('#F1F3F5')
             .onClick(() => {
               if (this.vm.textInfo.fontSize >= 32) {
-                promptAction.showToast({ message: '字体大小最大不超过32' });
+                this.getUIContext().getPromptAction().showToast({ message: '字体大小最大不超过32' });
                 return;
               }
               this.vm.textInfo.fontSize++;
@@ -96,7 +95,6 @@ export struct OperationComponent {
           style: SliderStyle.OutSet,
         })
           .layoutWeight(1)
-          .showTips(true)
           .onChange((value: number) => {
             this.vm.textInfo.opacity = value;
           });
@@ -212,7 +210,7 @@ export struct OperationComponent {
                   .fontSize(14)
                   .type(ButtonType.Normal)
                   .onClick(async () => {
-                    this.vm.applyBgSound(item);
+                    this.vm.applyBgSound(this.getUIContext(),item);
                     if (item.isCached) {
                       this.vm.musicPicker = false;
                     }
@@ -258,7 +256,7 @@ export struct OperationComponent {
                   .type(ButtonType.Normal)
                   .backgroundColor(item.isCached ? 'rgba(10, 89, 247, 1)' : 'rgba(10, 89, 247, 0.2)')
                   .onClick(async () => {
-                    this.vm.applyBgSound(item);
+                    this.vm.applyBgSound(this.getUIContext(), item);
                     if (item.isCached) {
                       this.vm.soundPicker = false;
                     }
@@ -297,7 +295,7 @@ export struct OperationComponent {
             .alignContent(Alignment.BottomStart)
             .onClick(() => {
               // 先下载后使用
-              this.vm.cacheSticker(item);
+              this.vm.cacheSticker(item, this.getUIContext());
               this.vm.stickerPicker = false;
             });
           };
@@ -331,7 +329,7 @@ export struct OperationComponent {
             .onClick(() => {
               this.vm.editTabIndex = 1;
               StickerApis.getStickerList().then((res) => {
-                this.vm.handleStickerByTag(res);
+                this.vm.handleStickerByTag(this.getUIContext(), res);
                 this.vm.stickerPicker = true;
               });
             })
@@ -408,6 +406,7 @@ export struct OperationComponent {
           Image($r('app.media.audio')).size({ width: 24, height: 24 });
           Text('音效').fontSize(14);
         }.onClick(() => {
+          this.vm.soundTabIndex = 0;
           SoundApis.getSoundList().then((res) => {
             this.vm.handleSoundByTag(res);
             this.vm.soundPicker = true;

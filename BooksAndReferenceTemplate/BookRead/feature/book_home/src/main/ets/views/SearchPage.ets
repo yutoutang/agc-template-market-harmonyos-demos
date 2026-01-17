@@ -102,12 +102,11 @@ export struct SearchPage {
             })
               .enableKeyboardOnFocus(this.isCategory ? false : true)
               .layoutWeight(1)
-              .height(40)
               .backgroundColor('#F5F5F5')
               .defaultFocus(this.isCategory ? false : true)
-              .placeholderColor(Color.Grey)
-              .placeholderFont({ size: 14, weight: 400 })
-              .textFont({ size: 16, weight: 400 })
+              .placeholderColor($r('sys.color.font_secondary'))
+              .placeholderFont({ size: $r('sys.float.Body_L'), weight: 400 })
+              .textFont({ size: $r('sys.float.Body_L'), weight: 400 })
               .onSubmit(async (value: string) => {
                 this.submitValue = value;
                 this.isSubmit = true;
@@ -149,7 +148,7 @@ export struct SearchPage {
               Column() {
                 Image($r('app.media.SearchNoResult'))
                   .height('120vp').width('120vp')
-                  .margin({ right: '2vp', top: '50%' })
+                  .margin({ right: '2vp', top: '20%' })
                 Text($r('app.string.noSearchResult'))
                   .fontSize($r('sys.float.Subtitle_S'))
                   .fontColor($r('sys.color.font_secondary'))

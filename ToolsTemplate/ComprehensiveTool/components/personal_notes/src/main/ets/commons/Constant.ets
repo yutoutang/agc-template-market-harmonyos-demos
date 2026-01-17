@@ -40,6 +40,9 @@ export const NOTE_SHOW_TYPE_LIST: NoteOperateType[] = [
 
 export const SNAPSHOT_ID = 'SNAPSHOT_ID'
 export const RICH_ID = 'RICH_ID';
+export const RICH_TEXT_MAX_LENGTH = 20000;
+export const RICH_IMAGE_MAX_NUM = 20;
+export const RICH_IMAGE_MAX_SIZE = 1; // GB
 
 export interface MoreFunction {
   icon: ResourceStr,

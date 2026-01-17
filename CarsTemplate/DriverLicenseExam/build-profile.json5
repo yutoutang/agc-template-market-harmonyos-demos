@@ -5,8 +5,7 @@
       {
         "name": "default",
         "signingConfig": "default",
-        "compatibleSdkVersion": "5.0.1(13)",
-        "targetSdkVersion": "5.0.1(13)",
+        "compatibleSdkVersion": "5.0.3(15)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
           "strictMode": {
@@ -43,10 +42,6 @@
       "srcPath": "./commons/commonLib"
     },
     {
-      "name": "network",
-      "srcPath": "./commons/network"
-    },
-    {
       "name": "datasource",
       "srcPath": "./commons/datasource"
     },
@@ -63,8 +58,40 @@
       "srcPath": "./components/exam"
     },
     {
+      "name": "app_setting",
+      "srcPath": "./components/app_setting"
+    },
+    {
+      "name": "collect_personal_info",
+      "srcPath": "./components/collect_personal_info"
+    },
+    {
+      "name": "aggregated_ads",
+      "srcPath": "./components/aggregated_ads"
+    },
+    {
+      "name": "feedback",
+      "srcPath": "./components/feedback"
+    },
+    {
+      "name": "check_app_update",
+      "srcPath": "./components/check_app_update"
+    },
+    {
+      "name": "aggregated_share",
+      "srcPath": "./components/aggregated_share"
+    },
+    {
+      "name": "membership",
+      "srcPath": "./components/membership"
+    },
+    {
       "name": "search",
       "srcPath": "./components/search"
+    },
+    {
+      "name": "network",
+      "srcPath": "./commons/network"
     }
   ]
 }

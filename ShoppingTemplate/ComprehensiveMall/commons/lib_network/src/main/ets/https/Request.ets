@@ -1,6 +1,6 @@
 import { BusinessError } from '@kit.BasicServicesKit';
 import axios, { AxiosResponse } from '@ohos/axios';
-import { Logger } from 'lib_foundation';
+import { UtilLog as Logger } from '@hw-agconnect/util-log';
 
 /**
  * todo: 1. 配置axios实例； 2. 在../apis目录下查看接口定义并对接真实后端

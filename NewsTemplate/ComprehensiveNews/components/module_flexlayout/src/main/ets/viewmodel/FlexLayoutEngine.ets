@@ -1,5 +1,6 @@
 import { FrameController } from '../factory/FrameNodeFactory'
-import { BreakpointModel, JSONObject, LayoutParams, LayoutSetting } from '../model/Model'
+import { JSONObject, LayoutParams, LayoutSetting } from '../model/CommonModel'
+import { BreakpointModel} from '../model/Model'
 import { NodeBuilderRegister } from '../utils/NodeBuilderConfig'
 
 @ObservedV2

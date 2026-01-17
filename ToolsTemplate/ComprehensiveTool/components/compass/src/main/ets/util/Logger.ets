@@ -1,4 +1,4 @@
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 
 export class Logger {
   private domain: number;
@@ -11,27 +11,23 @@ export class Logger {
   }
 
   debug(...args: string[]): void {
-    hilog.debug(this.domain, this.prefix, this.format, args);
+    UtilLog.debug(this.domain, this.prefix, this.format, args);
   }
 
   info(...args: string[]): void {
-    hilog.info(this.domain, this.prefix, this.format, args);
+    UtilLog.info(this.domain, this.prefix, this.format, args);
   }
 
   warn(...args: string[]): void {
-    hilog.warn(this.domain, this.prefix, this.format, args);
+    UtilLog.warn(this.domain, this.prefix, this.format, args);
   }
 
   error(...args: string[]): void {
-    hilog.error(this.domain, this.prefix, this.format, args);
+    UtilLog.error(this.domain, this.prefix, this.format, args);
   }
 
   fatal(...args: string[]): void {
-    hilog.fatal(this.domain, this.prefix, this.format, args);
-  }
-
-  isLoggable(level: number): void {
-    hilog.isLoggable(this.domain, this.prefix, level);
+    UtilLog.fatal(this.domain, this.prefix, this.format, args);
   }
 }
 

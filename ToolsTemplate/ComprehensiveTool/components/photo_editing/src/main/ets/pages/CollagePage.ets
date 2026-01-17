@@ -1,3 +1,6 @@
+import { LoginManageUtil, MemberManageUtil } from 'module_base';
+import { LoginSheetUtils } from 'aggregated_login';
+import { MemberSheetUtils } from 'membership';
 import { FixedCollage } from './FixedCollage';
 import { FreeCollage } from './FreeCollage';
 import { PosterCollage } from './PosterCollage';
@@ -18,10 +21,12 @@ export function CollagePageBuilder() {
 
 @ComponentV2
 export struct CollagePage {
+  @Local isMember: boolean = false;
   vm: CollageVM = CollageVM.instance;
   uiContext: UIContext = this.getUIContext();
 
   async aboutToAppear(): Promise<void> {
+    this.isMember = await MemberManageUtil.queryMemberStatus(this.getUIContext());
     this.vm.init(this.uiContext);
   }
 
@@ -118,13 +123,35 @@ export struct CollagePage {
                 Repeat(this.vm.posterList)
                   .each((ri: RepeatItem<PosterTemplateModel>) => {
                     ListItem() {
-                      Image(ri.item.background)
-                        .height(70)
-                        .width(70).borderRadius(8);
+                      Stack({ alignContent: Alignment.TopStart }) {
+                        Image(ri.item.background)
+                          .height(70)
+                          .width(70).borderRadius(8);
+
+                        if (ri.item.isVip) {
+                          Image($r('app.media.vip_decorate'))
+                            .size({ width: 12, height: 12 }).margin({ left: 2, top: 2 });
+                        }
+                      };
                     }
                     .onClick(() => {
-                      this.vm.fixedIndex = ri.index;
-                      this.vm.selectPoster(ri.item);
+                      let loginManageUtil = new LoginManageUtil(this.getUIContext());
+                      if (!ri.item.isVip) {
+                        this.vm.fixedIndex = ri.index;
+                        this.vm.selectPoster(ri.item);
+                      } else {
+                        if (loginManageUtil.userInfoModel.isLogin && this.isMember) {
+                          this.vm.fixedIndex = ri.index;
+                          this.vm.selectPoster(ri.item);
+                        } else {
+                          if (!loginManageUtil.userInfoModel.isLogin) {
+                            LoginSheetUtils.open(loginManageUtil.params, this.getUIContext());
+                          } else if (!this.isMember) {
+                            let memberManageUtil = new MemberManageUtil(this.getUIContext());
+                            MemberSheetUtils.open(memberManageUtil.productsInfo, this.getUIContext());
+                          }
+                        }
+                      }
                     });
                   });
               }

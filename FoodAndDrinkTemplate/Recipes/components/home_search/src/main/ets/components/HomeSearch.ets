@@ -82,18 +82,12 @@ export struct HomeSearch {
               this.curTabIndex = 0
             },
           }) {
-            Text('清空')
-              .fontSize(14)
-              .fontWeight(FontWeight.Medium)
-              .fontColor($r('sys.color.font_primary'))
-              .height(28)
-              .width(72)
-              .textAlign(TextAlign.Center)
-              .backgroundColor('#0D000000')
-              .borderRadius(14)
+            SymbolGlyph($r('sys.symbol.trash'))
+              .fontSize(24)
+              .fontColor([$r('sys.color.icon_primary')])
               .onClick(() => {
                 this.clearRecords()
-              });
+              })
           }
         }
         .margin({ top: 16 }).visibility(this.historyInfo.length ? Visibility.Visible : Visibility.None)

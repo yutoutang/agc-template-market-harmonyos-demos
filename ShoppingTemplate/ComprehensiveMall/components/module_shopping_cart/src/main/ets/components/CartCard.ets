@@ -1,11 +1,11 @@
-import { Product } from '../commons/Model';
+import { WindowUtil } from 'module_ui_base';
+import { ProductModel } from '../commons/Model';
 import { NumberStepper } from './basic/NumberStepper';
-import { promptAction } from '@kit.ArkUI';
 
 @ComponentV2
 export struct CartCard {
   // 卡片数据
-  @Param data: Product = new Product();
+  @Param data: ProductModel = new ProductModel();
   // 是否编辑态
   @Param isEdit: boolean = false;
   // 购物车商品数量变化的事件回调
@@ -139,17 +139,11 @@ export struct CartCard {
             buttonType: ButtonType.Circle,
             onChange: (value) => {
               if (value <= 0) {
-                promptAction.showToast({
-                  message: '宝贝数量不能再减少了~',
-                  alignment: Alignment.Center,
-                });
+                WindowUtil.toast('宝贝数量不能再减少了~');
                 return;
               }
               if (value > this.data.stock) {
-                promptAction.showToast({
-                  message: '数量不能再增加了，超出库存限制！',
-                  alignment: Alignment.Center,
-                });
+                WindowUtil.toast('数量不能再增加了，超出库存限制！');
                 return;
               }
               this.data.count = value;

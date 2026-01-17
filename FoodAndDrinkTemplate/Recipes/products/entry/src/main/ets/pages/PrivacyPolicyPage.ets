@@ -1,5 +1,6 @@
 import { common } from '@kit.AbilityKit'
-import { CommonConstants, PreferenceUtil, RouterMap, RouterModule } from 'commonlib'
+import { BreakpointModel, BreakpointType, CommonConstants, PreferenceUtil, RouterMap, RouterModule } from 'commonlib'
+import { AppStorageV2 } from '@kit.ArkUI';
 
 @Builder
 export function PrivacyPolicyPageBuilder() {
@@ -8,6 +9,18 @@ export function PrivacyPolicyPageBuilder() {
 
 @ComponentV2
 struct PrivacyPolicyPage {
+  columnOptions: BreakpointType<number> = new BreakpointType<number>({
+    sm: 0,
+    md: 70,
+    lg: 70,
+    xl: 70,
+  });
+  @Local breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
+
+  @Computed
+  get pageMargin() {
+    return this.columnOptions.getValue(this.breakPointModel.currentBreakpoint);
+  }
   build() {
     NavDestination() {
       Scroll() {
@@ -36,13 +49,13 @@ struct PrivacyPolicyPage {
                 RouterModule.push(RouterMap.TERMS_OF_SERVICE_PAGE);
               })
               Span('。')
-            }.fontSize(10).fontColor($r('sys.color.font_secondary')).margin({ top: 16 })
+            }.fontSize(10).fontColor($r('sys.color.font_secondary')).margin({ top: 16 }).width('100%')
 
             Text('请您仔细阅读上述声明，点击“同意”，即表示您知悉并同意我们向您提供本应用服务。')
               .fontSize(10)
               .fontColor($r('sys.color.font_secondary'))
               .margin({ top: 4 })
-
+              .width('100%')
             Row({ space: 12 }) {
               Button('取消')
                 .layoutWeight(1)
@@ -51,7 +64,7 @@ struct PrivacyPolicyPage {
                 .fontColor('#E84026')
                 .backgroundColor($r('sys.color.background_secondary'))
                 .onClick(() => {
-                  let context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+                  const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
                   context.terminateSelf()
                 })
               Button('同意')
@@ -66,6 +79,7 @@ struct PrivacyPolicyPage {
                 })
             }.margin({ top: 16 })
           }
+          .margin({bottom: this.pageMargin})
         }.height(CommonConstants.FULL_HEIGHT).padding({ left: 16, right: 16 }).justifyContent(FlexAlign.SpaceBetween)
       }.scrollBar(BarState.Off).edgeEffect(EdgeEffect.Spring)
 

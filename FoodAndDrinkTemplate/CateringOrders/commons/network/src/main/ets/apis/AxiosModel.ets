@@ -1,21 +1,6 @@
 import { AxiosRequestHeaders, AxiosResponse, InternalAxiosRequestConfig } from '@ohos/axios';
 import { BusinessError } from '@kit.BasicServicesKit';
 
-
-/**
- * 定义接口响应包装类
- */
-export interface BaseResponse {
-  errorCode: number
-  errorMsg: string
-  //拓展xxx-API响应体
-}
-
-export interface ApiResponse<T> extends BaseResponse {
-  data: T;
-  //拓展xxx-API响应体
-}
-
 export interface InterceptorHooks {
   requestInterceptor?: (config: HttpRequestConfig) => Promise<HttpRequestConfig>;
   requestInterceptorCatch?: (error: BusinessError) => BusinessError;

@@ -1,10 +1,11 @@
 import { Decimal } from '@kit.ArkTS';
-import measure from '@ohos.measure';
 import { BUY_NOTE_LIST, Constants, GoodsSpecEnum } from '../constants/Index';
 import { BuyNote, Goods, PackageSpecResp, SpecCatalogResp, SpecItemResp } from '../models/Index';
+import { BreakpointNameEnum, BreakpointType, GridRowColSetting } from '../utils/GridRowColSetting';
 
 @ComponentV2
 export struct GoodsDetail {
+  @Param breakpoint: string = '';
   @Param goodsInfo: Goods = new Goods();
   @Param goodSpecList: Array<SpecCatalogResp> = [];
   @Param selectSpecArr: Array<PackageSpecResp> = [];
@@ -15,14 +16,16 @@ export struct GoodsDetail {
   @Local expandMore: boolean = false;
   @Local textSize?: SizeOptions = undefined;
   private scroller: Scroller = new Scroller();
-  @Event clickAddCarCb: (goodNum: number) => void = () => {
-  }
-  @Event getSelectSpec: (item: SpecItemResp, index: number) => void = () => {
-  }
+  private indicatorController: IndicatorComponentController = new IndicatorComponentController();
 
   @Computed
   get sumPrice() {
     return new Decimal(this.goodSinglePrice).mul(this.goodNum).toNumber();
+  }
+
+  @Event clickAddCarCb: (goodNum: number) => void = () => {
+  }
+  @Event getSelectSpec: (item: SpecItemResp, index: number) => void = () => {
   }
 
   build() {
@@ -36,15 +39,51 @@ export struct GoodsDetail {
                   Image(`${Constants.CLOUD_STORAGE_URL}${item}`).width('100%').height(300);
                 }, (item: string) => `${item}`)
               }
-              .displayMode(SwiperDisplayMode.STRETCH)
+              .prevMargin(new BreakpointType({
+                [BreakpointNameEnum.SM]: 0,
+                [BreakpointNameEnum.MD]: 180,
+                [BreakpointNameEnum.LG]: 180,
+                [BreakpointNameEnum.XL]: 180,
+              }).getValue(this.breakpoint))
+              .nextMargin(new BreakpointType({
+                [BreakpointNameEnum.SM]: 0,
+                [BreakpointNameEnum.MD]: 180,
+                [BreakpointNameEnum.LG]: 180,
+                [BreakpointNameEnum.XL]: 180,
+              }).getValue(this.breakpoint))
+              .itemSpace(20)
               .loop(true)
               .autoPlay(true)
               .vertical(false)
-              .indicator(new DotIndicator().selectedColor($r('sys.color.multi_color_09')))
+              .indicator(this.breakpoint === BreakpointNameEnum.SM ?
+                new DotIndicator().selectedColor($r('sys.color.multi_color_09')) : this.indicatorController)
               .interval(2000)
+              .borderRadius(this.breakpoint === BreakpointNameEnum.SM ? 0 : 20)
               .onChange((index) => {
                 this.swiperIndex = index;
               })
+
+              Row() {
+                IndicatorComponent(this.indicatorController)
+                  .initialIndex(0)
+                  .style(
+                    new DotIndicator()
+                      .itemWidth(6)
+                      .itemHeight(6)
+                      .selectedItemWidth(12)
+                      .selectedItemHeight(6)
+                      .color($r('sys.color.comp_background_secondary'))
+                      .selectedColor($r('sys.color.multi_color_09')))
+                  .loop(true)
+                  .count(this.goodsInfo?.bigImg.length)
+                  .vertical(true)
+              }
+              .width('100%')
+              .height(32)
+              .padding({ top: 12, bottom: 12 })
+              .justifyContent(FlexAlign.Center)
+              .margin({ top: 4 })
+              .visibility(this.breakpoint === BreakpointNameEnum.SM ? Visibility.None : Visibility.Visible)
 
               Column() {
                 Row() {
@@ -66,7 +105,7 @@ export struct GoodsDetail {
 
                 Row() {
                   Text(Number(this.goodsInfo?.sales) > 100 ? $r('app.string.sales_more') :
-                  $r('app.string.month_sale', this.goodsInfo?.sales))
+                    $r('app.string.month_sale', this.goodsInfo?.sales))
                     .fontSize($r('sys.float.Caption_M'))
                     .fontColor($r('sys.color.font_tertiary'))
                     .margin({ top: 4 });
@@ -91,13 +130,19 @@ export struct GoodsDetail {
                     };
                   }
                 }.width('100%').justifyContent(FlexAlign.SpaceBetween);
-
               }
               .width('100%')
               .justifyContent(FlexAlign.SpaceBetween)
+              .backgroundColor($r('sys.color.background_primary'))
+              .margin(this.breakpoint === BreakpointNameEnum.SM ? 0 : {
+                left: GridRowColSetting.getPageMargin(this.breakpoint),
+                right: GridRowColSetting.getPageMargin(this.breakpoint),
+              })
+              .constraintSize({ maxWidth: '100%' })
+              .borderRadius(this.breakpoint === BreakpointNameEnum.SM ? 0 : 20)
               .padding({
-                left: 16,
-                right: 16,
+                left: GridRowColSetting.getPageMargin(this.breakpoint),
+                right: GridRowColSetting.getPageMargin(this.breakpoint),
                 top: 12,
                 bottom: 12,
               });
@@ -105,7 +150,6 @@ export struct GoodsDetail {
             }
             .width('100%')
             .alignItems(HorizontalAlign.Start)
-            .backgroundColor($r('sys.color.background_primary'));
 
             if (this.goodsInfo?.specType === GoodsSpecEnum.SPEC_TYPE) {
               this.goodSpecComp();
@@ -173,6 +217,7 @@ export struct GoodsDetail {
         .borderRadius(18)
         .justifyContent(FlexAlign.Center)
         .width('100%')
+        .constraintSize({ maxWidth: 448 })
         .margin({ top: 12 })
         .padding({ top: 8, bottom: 8 })
         .backgroundColor($r('sys.color.multi_color_09'))
@@ -211,7 +256,10 @@ export struct GoodsDetail {
     })
     .borderRadius(16)
     .alignItems(HorizontalAlign.Start)
-    .margin({ left: 16, right: 16, bottom: 12 })
+    .margin({
+      left: GridRowColSetting.getPageMargin(this.breakpoint),
+      right: GridRowColSetting.getPageMargin(this.breakpoint), bottom: 12,
+    })
     .constraintSize({ maxWidth: '100%' })
     .backgroundColor($r('sys.color.background_primary'));
   }
@@ -234,8 +282,8 @@ export struct GoodsDetail {
                   .fontSize($r('sys.float.Body_S'))
                   .fontWeight(FontWeight.Medium)
                   .fontColor(this.selectSpecArr[index]?.specName === item.specValName ?
-                  $r('sys.color.font_on_primary') :
-                  $r('sys.color.font_secondary'))
+                    $r('sys.color.font_on_primary') :
+                    $r('sys.color.font_secondary'))
               }
               .padding({
                 left: 12,
@@ -245,7 +293,7 @@ export struct GoodsDetail {
               })
               .margin({ right: 8, bottom: 8 })
               .backgroundColor(this.selectSpecArr[index]?.specName === item.specValName ?
-              $r('sys.color.multi_color_09') : $r('sys.color.background_primary'))
+                $r('sys.color.multi_color_09') : $r('sys.color.background_primary'))
               .borderRadius(20)
               .border(this.selectSpecArr[index]?.specName === item.specValName ?
                 { width: 0 } : { width: 1, color: '#66000000' })
@@ -269,7 +317,10 @@ export struct GoodsDetail {
       bottom: 16,
     })
     .borderRadius(16)
-    .margin({ top: 12, left: 16, right: 16 })
+    .margin({
+      left: GridRowColSetting.getPageMargin(this.breakpoint),
+      right: GridRowColSetting.getPageMargin(this.breakpoint),
+    })
     .constraintSize({ maxWidth: '100%' })
     .justifyContent(FlexAlign.Start)
     .backgroundColor($r('sys.color.background_primary'));
@@ -277,12 +328,11 @@ export struct GoodsDetail {
 
   @Builder
   goodPkgComp() {
-    Column() {
+    Column({ space: 12 }) {
       Text($r('app.string.package_details'))
         .fontSize($r('sys.float.Body_L'))
         .fontColor($r('sys.color.font_primary'))
         .fontWeight(FontWeight.Medium)
-        .margin({ top: 12, bottom: 12, left: 16 });
       Column() {
         ForEach(this.goodSpecList, (goodSpec: SpecCatalogResp, index: number) => {
           Column() {
@@ -307,8 +357,8 @@ export struct GoodsDetail {
                     .fontSize($r('sys.float.Caption_M'))
                     .height(26)
                     .fontColor(this.selectSpecArr[index].specName === item.specValName ?
-                    $r('sys.color.multi_color_09') :
-                    $r('sys.color.font_secondary'))
+                      $r('sys.color.multi_color_09') :
+                      $r('sys.color.font_secondary'))
                     .maxLines(2)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
                     .margin({ top: 6 })
@@ -316,8 +366,8 @@ export struct GoodsDetail {
                   Text(`x${item.specValNum}`)
                     .fontSize($r('sys.float.Caption_L'))
                     .fontColor(this.selectSpecArr[index].specName === item.specValName ?
-                    $r('sys.color.multi_color_09') :
-                    $r('sys.color.font_secondary'))
+                      $r('sys.color.multi_color_09') :
+                      $r('sys.color.font_secondary'))
                     .width('100%')
                     .textAlign(TextAlign.End);
                 }
@@ -326,7 +376,7 @@ export struct GoodsDetail {
                 .padding(6)
                 .margin({ right: 6, bottom: 12 })
                 .backgroundColor(this.selectSpecArr[index].specName === item.specValName ? '#1AED6F21' :
-                $r('sys.color.background_secondary'))
+                  $r('sys.color.background_secondary'))
                 .borderRadius(8)
                 .border(this.selectSpecArr[index].specName === item.specValName ?
                   { width: 1, color: $r('sys.color.multi_color_09') } : { width: 0 })
@@ -351,13 +401,11 @@ export struct GoodsDetail {
         top: 16,
         bottom: 16,
       })
-      .margin({ left: 16, right: 16 })
 
       Text($r('app.string.buy_notes'))
         .fontSize($r('sys.float.Body_L'))
         .fontColor($r('sys.color.font_primary'))
         .fontWeight(FontWeight.Medium)
-        .margin({ top: 12, bottom: 12, left: 16 });
       Column() {
         List({ space: 12 }) {
           ForEach(BUY_NOTE_LIST, (item: BuyNote) => {
@@ -378,8 +426,13 @@ export struct GoodsDetail {
         top: 16,
         bottom: 16,
       })
-      .margin({ left: 16, right: 16, bottom: 12 })
     }.alignItems(HorizontalAlign.Start)
+    .margin({
+      top: 12,
+      bottom: 12,
+      left: GridRowColSetting.getPageMargin(this.breakpoint),
+      right: GridRowColSetting.getPageMargin(this.breakpoint),
+    })
   }
 
   @Builder
@@ -399,12 +452,13 @@ export struct GoodsDetail {
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
               .onAreaChange((newValue: Area) => {
-                this.textSize = measure.measureTextSize({
+                this.textSize = this.getUIContext().getMeasureUtils().measureTextSize({
                   textContent: str,
                   fontSize: $r('sys.float.Caption_M'),
                 })
                 if (item.noteDesc.length > 2 ||
-                  (this.textSize?.width && newValue.width && px2vp(Number(this.textSize?.width)) > newValue.width)) {
+                  (this.textSize?.width && newValue.width &&
+                    this.getUIContext().px2vp(Number(this.textSize?.width)) > newValue.width)) {
                   this.showMore = true
                 }
               })

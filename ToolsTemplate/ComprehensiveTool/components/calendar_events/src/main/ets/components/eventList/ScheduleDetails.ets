@@ -39,7 +39,7 @@ export struct ScheduleDetails {
         baseActionSheet.close('ScheduleDetails')
       },
       onConfirm: () => {
-        this.calendarEventVM.updateUserEventInfo().then(resp => {
+        this.calendarEventVM.updateUserEventInfo(this.getUIContext()).then(resp => {
           if (resp) {
             baseActionSheet.close('ScheduleDetails')
           }
@@ -66,7 +66,7 @@ export struct ScheduleDetails {
 
         CalendarEventFooter({
           onDelete: () => {
-            this.calendarEventVM.deleteUserEventInfo(this.scheduleInfo,() => {
+            this.calendarEventVM.deleteUserEventInfo(this.scheduleInfo, this.getUIContext(), () => {
               this.calendarEventVM.getPageInfo()?.pop()
             })
           },
@@ -82,7 +82,7 @@ export struct ScheduleDetails {
               onWillAppear:() => {
                 this.calendarEventVM.setEventInfo(this.scheduleInfo)
               }
-            })
+            },this.getUIContext())
           },
         })
       }

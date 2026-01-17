@@ -10,3 +10,9 @@ export enum CompressedFormat {
 }
 
 export const compressedFormat: string[] = ['zip', '7z']
+
+export enum WorkerMessageType {
+  COMPRESS = 'compress',
+  DECOMPRESS = 'decompress',
+  SAVE = 'save'
+}

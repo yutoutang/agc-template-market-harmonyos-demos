@@ -28,13 +28,17 @@ export struct WriteReviewPage {
       console.info('获取到书名参数:', this.bookName);
     }
     this.loadReviews();
+    try {
+      // 监听用户信息变更事件
+      emitter.on(Constants.LOGIN_CHANGE, () => {
+        console.info('用户信息变更，更新评论用户信息');
+        ReviewDataUtil.updateCurrentUserReviews();
+        this.loadReviews();
+      });
+    } catch (e) {
+      console.error('Failed to emitter on login change. Cause: ' + JSON.stringify(e));
+    }
 
-    // 监听用户信息变更事件
-    emitter.on(Constants.LOGIN_CHANGE, () => {
-      console.info('用户信息变更，更新评论用户信息');
-      ReviewDataUtil.updateCurrentUserReviews();
-      this.loadReviews();
-    });
   }
 
   onPageShow(): void {
@@ -69,7 +73,7 @@ export struct WriteReviewPage {
           .height(16)
           .margin({ right: 4 })
           .fillColor(star <= rating ? '#FFD700' : '#E0E0E0')
-      })
+      }, (item: string) => JSON.stringify(item))
     }
   }
 
@@ -81,12 +85,12 @@ export struct WriteReviewPage {
         Text($r('app.string.all'))
           .fontSize(14)
           .fontColor(this.vm.currentFilter === ReviewFilterType.ALL ?
-          Color.White : $r('sys.color.ohos_id_color_text_secondary'))
+            Color.White : $r('sys.color.ohos_id_color_text_secondary'))
       }
       .width(60)
       .height(32)
       .backgroundColor(this.vm.currentFilter === ReviewFilterType.ALL ?
-      Color.Black : $r('sys.color.ohos_id_color_card_bg'))
+        Color.Black : '#f1f3f5')
       .borderRadius(16)
       .justifyContent(FlexAlign.Center)
       .onClick(() => {
@@ -97,18 +101,16 @@ export struct WriteReviewPage {
         Text($r('app.string.latest'))
           .fontSize(14)
           .fontColor(this.vm.currentFilter === ReviewFilterType.LATEST ?
-          Color.White : $r('sys.color.ohos_id_color_text_secondary'))
+            Color.White : $r('sys.color.ohos_id_color_text_secondary'))
 
-        Image($r('app.media.base_ic_public_clock'))
+        Image($r('app.media.time_interval'))
           .width(12)
           .height(12)
-          .fillColor(this.vm.currentFilter === ReviewFilterType.LATEST ?
-          Color.White : $r('sys.color.ohos_id_color_text_secondary'))
       }
       .width(70)
       .height(32)
       .backgroundColor(this.vm.currentFilter === ReviewFilterType.LATEST ?
-      Color.Black : $r('sys.color.ohos_id_color_card_bg'))
+        Color.Black : '#f1f3f5')
       .borderRadius(16)
       .justifyContent(FlexAlign.Center)
       .onClick(() => {
@@ -140,10 +142,15 @@ export struct WriteReviewPage {
               Text(review.vipLevel)
                 .fontSize(10)
                 .fontColor(Color.White)
-                .padding({ left: 6, right: 6, top: 2, bottom: 2 })
+                .padding({
+                  left: 6,
+                  right: 6,
+                  top: 2,
+                  bottom: 2
+                })
                 .backgroundImage($r('app.media.lv_bg'))
                 .backgroundImageSize(ImageSize.Contain)
-                .margin({left: 5})
+                .margin({ left: 5 })
             }
           }
           .width('100%')
@@ -169,8 +176,6 @@ export struct WriteReviewPage {
 
       if (index < this.reviewList.length - 1) {
         Divider()
-          .strokeWidth(1)
-          .color($r('sys.color.ohos_id_color_list_separator'))
           .margin({ bottom: 16 })
       } else {
         Blank()
@@ -178,7 +183,7 @@ export struct WriteReviewPage {
       }
     }
     .width('100%')
-    .margin({top: 5})
+    .margin({ top: 5 })
     .alignItems(HorizontalAlign.Start)
   }
 
@@ -193,8 +198,13 @@ export struct WriteReviewPage {
         }, (review: ReviewInfo) => review.id)
       }
     }
-    .width(340)
-    .padding({ left: 16, right: 16, top: 20, bottom: 20 })
+    .width('100%')
+    .padding({
+      left: 16,
+      right: 16,
+      top: 20,
+      bottom: 20
+    })
     .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
     .borderRadius(16)
     .alignItems(HorizontalAlign.Start)
@@ -222,6 +232,7 @@ export struct WriteReviewPage {
           Blank()
         }
         .width('100%')
+        .layoutWeight(1)
         .alignItems(HorizontalAlign.Center)
       }
       .width('100%')

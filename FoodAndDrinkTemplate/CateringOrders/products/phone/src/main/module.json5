@@ -69,6 +69,20 @@
           ],
           "when": "inuse"
         }
+      },
+      {
+        "name": "ohos.permission.READ_CALENDAR",
+        "reason": "$string:reason_read_calendar",
+        "usedScene": {
+          "when": "always"
+        }
+      },
+      {
+        "name": "ohos.permission.WRITE_CALENDAR",
+        "reason": "$string:reason_write_calendar",
+        "usedScene": {
+          "when": "always"
+        }
       }
     ],
     "metadata": [

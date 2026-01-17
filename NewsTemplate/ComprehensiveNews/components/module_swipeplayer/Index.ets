@@ -1,4 +1,3 @@
-
 export { VideoSwipePlayer } from './src/main/ets/views/VideoSwipePlayer'
 
 export { VideoProgressBar } from './src/main/ets/components/VideoProgressBar'
@@ -14,8 +13,14 @@ export { SwipePlayerController } from './src/main/ets/controller/SwipePlayerCont
 export { AVPlayerManager, AVPlayerSession, registerAVPlayerCallback } from './src/main/ets/controller/AVPlayerManager'
 
 export { PlayerLayoutSize } from './src/main/ets/controller/PlayerLayoutSize'
+
 // 横屏页面
 export { LandscapeVideoBuilder } from './src/main/ets/views/LandscapeVideo';
 
 // 网络
-export { VideoNetworkModel, VideoNetworkSetting } from './src/main/ets/models/VideoNetworkModel'
+export { VideoNetworkModel, VideoNetworkSetting } from './src/main/ets/models/VideoNetworkModel';
+
+// 画中画
+export { PiPWindowModel } from './src/main/ets/models/PiPWindowModel';
+
+export { secondToTime } from './src/main/ets/utils/Util'

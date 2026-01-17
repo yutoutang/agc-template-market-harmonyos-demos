@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import hilog from '@ohos.hilog';
+import { UtilLog } from '@hw-agconnect/util-log';
 
 /**
  * 日志打印类
@@ -30,20 +30,20 @@ class Logger {
   }
 
   debug(...args: string[]) {
-    hilog.debug(this.domain, this.prefix, this.format, args);
+    UtilLog.debug(this.domain, this.prefix, this.format, args);
   }
 
   info(...args: string[]) {
-    hilog.info(this.domain, this.prefix, this.format, args);
+    UtilLog.info(this.domain, this.prefix, this.format, args);
   }
 
   warn(...args: string[]) {
-    hilog.warn(this.domain, this.prefix, this.format, args);
+    UtilLog.warn(this.domain, this.prefix, this.format, args);
   }
 
   error(...args: string[]) {
-    hilog.error(this.domain, this.prefix, this.format, args);
+    UtilLog.error(this.domain, this.prefix, this.format, args);
   }
 }
 
-export default new Logger('CommunityApplication');
+export default new Logger('Decompression');

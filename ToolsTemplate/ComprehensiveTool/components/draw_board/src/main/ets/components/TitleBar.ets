@@ -39,7 +39,7 @@ export struct TitleBar {
                 this.drawTitle();
               },
               confirmAction: () => {
-                if (this.drawBoardVM.validate()) {
+                if (this.drawBoardVM.validate(this.getUIContext())) {
                   this.drawBoardVM.saveDrawBoard();
                   baseToast.hide();
                 }
@@ -47,7 +47,7 @@ export struct TitleBar {
               cancelAction: () => {
                 this.drawBoardVM.title = '';
               },
-            });
+            }, this.getUIContext());
           } else {
             baseToast.show({
               type: 'dialog',
@@ -59,7 +59,7 @@ export struct TitleBar {
               cancelAction: () => {
                 baseToast.hide();
               },
-            });
+            }, this.getUIContext());
           }
         });
       MenuItem({ symbolStartIcon: this.cleanIconModifier, content: '清空' })
@@ -78,7 +78,7 @@ export struct TitleBar {
             cancelAction: () => {
               baseToast.hide();
             },
-          });
+          }, this.getUIContext());
         });
       MenuItem({ symbolStartIcon: this.fileIconModifier, content: '文件管理' })
         .onClick(() => {
@@ -104,7 +104,7 @@ export struct TitleBar {
                   baseToast.hide();
                   this.drawBoardVM.pathStack.pop();
                 },
-              });
+              }, this.getUIContext());
             } else {
               this.drawBoardVM.pathStack.pop();
             }

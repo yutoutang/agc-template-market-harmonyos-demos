@@ -17,7 +17,6 @@ import { systemShare } from '@kit.ShareKit';
 import { uniformTypeDescriptor as utd } from '@kit.ArkData';
 import { fileUri, picker, fileIo as fs } from '@kit.CoreFileKit';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { promptAction } from '@kit.ArkUI';
 import { getInstance, RouterMap } from '../util/Route';
 import { FileInfo } from '../model/Index';
 import { MyLog } from '../util/MyLogUtil';
@@ -62,7 +61,7 @@ export class PdfResultPageVM {
   }
 
 
-  async savePdf() {
+  async savePdf(uiContext:UIContext) {
     let uris: string = '';
     try {
       const documentSaveOptions = new picker.DocumentSaveOptions(); // 创建文件管理器保存选项实例
@@ -89,7 +88,7 @@ export class PdfResultPageVM {
       file = fs.openSync(this.filePath, fs.OpenMode.READ_ONLY);
       file2 = fs.openSync(uris + '', fs.OpenMode.READ_WRITE);
       fs.copyFileSync(file.fd, file2.fd);
-      promptAction.showToast({ message: '导出成功！' });
+      uiContext.getPromptAction().showToast({ message: '导出成功！' });
     } catch (error) {
       let err: BusinessError = error as BusinessError;
       MyLog.error(`save failed, code is ${err.code}, message is ${err.message}`);

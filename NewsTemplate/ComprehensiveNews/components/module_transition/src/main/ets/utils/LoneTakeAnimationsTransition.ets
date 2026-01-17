@@ -1,4 +1,5 @@
-import { window } from '@kit.ArkUI'
+import { window } from '@kit.ArkUI';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { AnimateCallback, CustomTransition } from './CustomNavigationUtils';
 import { LongTakeTransitionType } from '../constants/LongTakeTransitionConstants';
 import { ComponentAttrUtils } from './ComponentAttrUtils';
@@ -19,21 +20,21 @@ export class LoneTakeAnimationsTransition {
   public static generateLongTakeParam(uiContext: UIContext, cardId: string, cornerRadius: number,
     options?: LongTakeTransitionOptions): LongTakeTransitionParam | undefined {
     if (!uiContext || !cardId) {
-      console.error(TAG, 'generateLongTakeParam error, cardId is invalid');
+      UtilLog.error(TAG, 'generateLongTakeParam error, cardId is invalid');
       return undefined;
     }
 
     try {
       let pixelMap = uiContext.getComponentSnapshot().getSync(cardId);
-      console.info(TAG, `get ${cardId} snapshot sync success!`);
+      UtilLog.info(TAG, `get ${cardId} snapshot sync success!`);
       SnapShotImage.pixelMap = pixelMap;
     } catch (error) {
-      console.error(`getSync ${cardId} failed, errorCode: ` + error.code + '; message: ' + error.message);
+      UtilLog.error(`getSync ${cardId} failed, errorCode: ` + error.code + '; message: ' + error.message);
       return undefined;
     }
 
     let cardRectInfo = ComponentAttrUtils.getRectInfoById(uiContext, cardId, cornerRadius);
-    console.info(TAG, 'getRectInfoById value is ' + JSON.stringify(cardRectInfo))
+    UtilLog.info(TAG, 'getRectInfoById value is ' + JSON.stringify(cardRectInfo))
     if (!cardRectInfo) {
       return undefined;
     }
@@ -70,7 +71,7 @@ export class LoneTakeAnimationsTransition {
     CustomTransition.getInstance().operation = operation;
     if (CustomTransition.getInstance().interactive) {
       let customAnimation: NavigationAnimatedTransition = {
-        onTransitionEnd: (isSuccess: boolean) => {
+        onTransitionEnd: () => {
           options?.onTransitionEnd?.();
           CustomTransition.getInstance().proxy = undefined;
         },
@@ -96,13 +97,13 @@ export class LoneTakeAnimationsTransition {
         if (currCount === LoneTakeAnimationsTransition.animationCount) {
           LoneTakeAnimationsTransition.animationCount = 0;
           options?.onTransitionEnd?.();
-          console.info(TAG, `current custom transition result is ${isSuccess}`);
+          UtilLog.info(TAG, `current custom transition result is ${isSuccess}`);
         }
       },
       timeout: 1000,
       transition: (transitionProxy: NavigationTransitionProxy) => {
         options?.onTransitionStart?.();
-        console.info(TAG, 'trigger custom transition callback');
+        UtilLog.info(TAG, 'trigger custom transition callback');
         if (fromParam.animation) {
           fromParam.animation(operation === NavigationOperation.PUSH, true, transitionProxy);
         }

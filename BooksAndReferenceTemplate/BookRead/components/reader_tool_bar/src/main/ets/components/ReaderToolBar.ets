@@ -1,5 +1,5 @@
 import { bookParser, readerCore } from '@kit.ReaderKit';
-import { AppStorageV2, promptAction } from '@kit.ArkUI';
+import { AppStorageV2 } from '@kit.ArkUI';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { common, ConfigurationConstant } from '@kit.AbilityKit';
 import { emitter } from '@kit.BasicServicesKit';
@@ -27,7 +27,7 @@ export struct ReaderToolBar {
   @Local isReadingBySingle: boolean = true;
   @Local selectState: SelectState = AppStorageV2.connect(SelectState, () => new SelectState())!;
   @Local userInfo: UserInfo = AppStorage.get<UserInfo>('userInfo')!
-  private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+  private context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
   private windowClass = this.context.windowStage.getMainWindowSync();
 
   aboutToAppear(): void {
@@ -49,14 +49,20 @@ export struct ReaderToolBar {
     const domPos: string = this.bookParserHandler?.getDomPosByCatalogHref(catalogItem.href || '') || '';
     return domPos;
   }
+
   // 处理书币扣费和更新
   private updateBookCoinsAndSave(price: number): void {
     if (this.userInfo) {
-      this.userInfo.bookCoins -= price;
-      AppStorage.set('userInfo', this.userInfo);
-      emitter.emit({ eventId: 14 });
+      try{
+        this.userInfo.bookCoins -= price;
+        AppStorage.set('userInfo', this.userInfo);
+        emitter.emit({ eventId: 14 });
+      } catch (error) {
+        console.error('Failed to emitter emit coins change. Cause: ' + JSON.stringify(error));
+      }
     }
   }
+
   /**
    * 获取书籍目录对应的资源条目
    *
@@ -89,21 +95,24 @@ export struct ReaderToolBar {
 
   @Builder
   buildBuyChapter(ri: RepeatItem<bookParser.CatalogItem>) {
-    Column({ space: 8 }) {
-      Text(`价格：${this.price}书币`)
-      Text(`余额：${this.userInfo!.bookCoins}书币`)
-      Row() {
-        Checkbox()
-          .onChange((value) => {
-            this.userInfo!.continuousBuy = value
-          })
-        Text('自动购买下一章')
+    Column() {
+      Column({ space: 8 }) {
+        Text(`价格：${this.price}书币`)
+        Text(`余额：${this.userInfo!.bookCoins}书币`)
+        Row() {
+          Checkbox()
+            .onChange((value) => {
+              this.userInfo!.continuousBuy = value
+            })
+          Text('自动购买下一章')
+        }
       }
+      .alignItems(HorizontalAlign.Start)
 
       Button('购买')
         .onClick(() => {
           if (this.price > this.userInfo!.bookCoins!) {
-            promptAction.showToast({
+            this.getUIContext().getPromptAction().showToast({
               message: '余额不足',
               duration: 2000
             });
@@ -116,8 +125,10 @@ export struct ReaderToolBar {
         })
         .width('100%')
     }
+    .height(260)
     .padding({ bottom: 30, left: 16, right: 16 })
     .alignItems(HorizontalAlign.Start)
+    .justifyContent(FlexAlign.SpaceBetween)
     .width('100%')
   }
 
@@ -132,11 +143,11 @@ export struct ReaderToolBar {
       })
       .borderRadius(14)
       .fontColor(this.selectState.fontSelectedIndex === index ? $r('sys.color.ohos_id_color_text_primary_contrary') :
-      $r('sys.color.ohos_id_color_text_secondary'))
+        $r('sys.color.ohos_id_color_text_secondary'))
       .fontSize(14)
       .fontWeight('medium')
       .backgroundColor(this.selectState.fontSelectedIndex === index ? $r('sys.color.ohos_id_color_handup') :
-      $r('sys.color.ohos_id_color_button_normal'))
+        $r('sys.color.ohos_id_color_button_normal'))
       .onClick(() => {
         this.selectState.fontSelectedIndex = index
         this.readerSetting.fontName = name;
@@ -203,7 +214,7 @@ export struct ReaderToolBar {
             style: SliderStyle.InSet
           })
             .blockColor($r('app.color.font_modifier_inner_color'))
-            .trackColor($r('app.color.pure_white'))
+            .trackColor($r('sys.color.comp_background_secondary'))
             .selectedColor($r('app.color.slider_selected_color'))
             .onChange((value: number) => {
               this.readerSetting.lineHeight = value
@@ -245,11 +256,11 @@ export struct ReaderToolBar {
             })
             .borderRadius(14)
             .fontColor(this.selectState.isReadingBySwiper ? $r('sys.color.ohos_id_color_text_secondary') :
-            $r('sys.color.ohos_id_color_text_primary_contrary'))
+              $r('sys.color.ohos_id_color_text_primary_contrary'))
             .fontSize(14)
             .fontWeight('medium')
             .backgroundColor(this.selectState.isReadingBySwiper ? $r('sys.color.ohos_id_color_button_normal') :
-            $r('sys.color.ohos_id_color_handup'))
+              $r('sys.color.ohos_id_color_handup'))
             .onClick(() => {
               this.readerSetting.flipMode = '0'
               this.selectState.isReadingBySwiper = false
@@ -265,11 +276,11 @@ export struct ReaderToolBar {
             })
             .borderRadius(14)
             .fontColor(this.selectState.isReadingBySwiper ? $r('sys.color.ohos_id_color_text_primary_contrary') :
-            $r('sys.color.ohos_id_color_text_secondary'))
+              $r('sys.color.ohos_id_color_text_secondary'))
             .fontSize(14)
             .fontWeight('medium')
             .backgroundColor(this.selectState.isReadingBySwiper ? $r('sys.color.ohos_id_color_handup') :
-            $r('sys.color.ohos_id_color_button_normal'))
+              $r('sys.color.ohos_id_color_button_normal'))
             .onClick(() => {
               this.readerSetting.flipMode = '1'
               this.selectState.isReadingBySwiper = true
@@ -303,7 +314,7 @@ export struct ReaderToolBar {
         style: SliderStyle.OutSet
       })
         .blockColor($r('app.color.font_modifier_inner_color'))
-        .trackColor($r('app.color.pure_white'))
+        .trackColor($r('sys.color.comp_background_secondary'))
         .selectedColor($r('app.color.slider_selected_color'))
         .onChange((value: number) => {
           this.autoLight = false
@@ -347,7 +358,7 @@ export struct ReaderToolBar {
                 .fontSize(14)
                 .width('100%')
                 .fontColor(this.curChapterId === ri.item.catalogId ? $r('sys.color.ohos_id_color_warning') :
-                $r('sys.color.ohos_fa_text_primary'))
+                  $r('sys.color.ohos_fa_text_primary'))
                 .textOverflow({ overflow: TextOverflow.Ellipsis })
                 .maxLines(1)
             }
@@ -466,8 +477,8 @@ export struct ReaderToolBar {
           baseActionSheet.show({
             id: 'catalog',
             title: { title: '目录' },
-            height: SheetSize.FIT_CONTENT,
-            preferType: SheetType.BOTTOM,
+            height: '90%',
+            preferType: SheetType.CENTER,
             customContent: () => {
               this.buildCatalogCard()
             },

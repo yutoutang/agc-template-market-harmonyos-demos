@@ -9,21 +9,22 @@ import { WatchButton } from './WatchButton';
 export struct UserIntro {
   @Require @Param userInfo: AuthorModel;
   @Param fontSizeRatio: number = 1;
-  @Event refreshProfileHomePage: () => void = () => {};
+  @Event refreshProfileHomePage: () => void = () => {
+  };
   @Local mineInfo: UserInfoModel = PersistenceV2.connect(UserInfoModel, () => new UserInfoModel())!;
   @Local breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
 
   build() {
     Column({ space: CommonConstants.SPACE_M }) {
       Row({ space: CommonConstants.SPACE_M }) {
-        Image(this.userInfo.authorIcon || $r('app.media.ic_user_default'))
+        Image(this.userInfo?.authorIcon || $r('app.media.ic_user_default'))
           .width(Constants.USER_ICON_W)
           .aspectRatio(1)
           .clipShape(new CircleShape({ width: Constants.USER_ICON_W, height: Constants.USER_ICON_W }))
-          .accessibilityText(this.userInfo.authorNickName + '头像')
+          .accessibilityText(this.userInfo?.authorNickName + '头像')
         Column() {
           Row({ space: CommonConstants.SPACE_S }) {
-            Text(this.userInfo.authorNickName)
+            Text(this.userInfo?.authorNickName)
               .fontSize(18 * this.fontSizeRatio)
               .fontColor($r('sys.color.font_primary'))
               .fontWeight(FontWeight.Medium)
@@ -39,15 +40,13 @@ export struct UserIntro {
             .visibility(this.isMyself ? Visibility.Visible : Visibility.None)
             .accessibilityText('编辑个人信息按钮')
             .onClick(() => {
-              RouterUtils.pushPathByName(RouterMap.SETTING_PERSONAL, null, () => {
-                this.refreshProfileHomePage();
-              });
+              RouterUtils.pushPathByName(RouterMap.SETTING_PERSONAL);
             })
           }
 
           Row({ space: CommonConstants.SPACE_M }) {
             Row({ space: CommonConstants.SPACE_XXS }) {
-              Text(`${this.userInfo.watchersCount}`)
+              Text(`${this.userInfo?.watchersCount}`)
                 .fontSize(12 * this.fontSizeRatio)
                 .fontColor($r('sys.color.font_primary'))
               Text('关注')
@@ -55,13 +54,11 @@ export struct UserIntro {
                 .fontColor($r('sys.color.font_secondary'))
             }
             .onClick(() => {
-              RouterUtils.pushPathByName(RouterMap.PROFILE_WATCH, this.userInfo.authorId, () => {
-                this.refreshProfileHomePage();
-              });
+              RouterUtils.pushPathByName(RouterMap.PROFILE_WATCH, this.userInfo?.authorId);
             })
 
             Row({ space: CommonConstants.SPACE_XXS }) {
-              Text(`${this.userInfo.followersCount}`)
+              Text(`${this.userInfo?.followersCount}`)
                 .fontSize(12 * this.fontSizeRatio)
                 .fontColor($r('sys.color.font_primary'))
               Text('粉丝')
@@ -69,13 +66,11 @@ export struct UserIntro {
                 .fontColor($r('sys.color.font_secondary'))
             }
             .onClick(() => {
-              RouterUtils.pushPathByName(RouterMap.PROFILE_FOLLOWER, this.userInfo.authorId, () => {
-                this.refreshProfileHomePage();
-              });
+              RouterUtils.pushPathByName(RouterMap.PROFILE_FOLLOWER, this.userInfo?.authorId);
             })
 
             Row({ space: CommonConstants.SPACE_XXS }) {
-              Text(`${this.userInfo.likeNum}`)
+              Text(`${this.userInfo?.likeNum}`)
                 .fontSize(12 * this.fontSizeRatio)
                 .fontColor($r('sys.color.font_primary'))
               Text('获赞')
@@ -99,6 +94,9 @@ export struct UserIntro {
         Column() {
           WatchButton({
             author: this.userInfo,
+            refreshAuthorInfo: () => {
+              this.refreshProfileHomePage();
+            },
           })
         }
         .height(Constants.USER_ICON_W)
@@ -109,7 +107,7 @@ export struct UserIntro {
         Text('简介')
           .fontSize(12 * this.fontSizeRatio)
           .fontColor($r('sys.color.font_primary'))
-        Text(this.userInfo.authorDesc || '这家伙很神秘，没有写个人简介。')
+        Text(this.userInfo?.authorDesc || '这家伙很神秘，没有写个人简介。')
           .fontSize(12 * this.fontSizeRatio)
           .fontColor($r('sys.color.font_primary'))
       }
@@ -127,6 +125,6 @@ export struct UserIntro {
 
   @Computed
   get isMyself() {
-    return this.userInfo.authorId === this.mineInfo.authorId;
+    return this.userInfo?.authorId === this.mineInfo.authorId;
   }
 }

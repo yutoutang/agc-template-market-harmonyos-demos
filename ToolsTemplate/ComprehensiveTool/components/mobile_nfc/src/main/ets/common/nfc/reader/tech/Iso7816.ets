@@ -1,5 +1,6 @@
 import { tag } from '@kit.ConnectivityKit'
 import Util from '../../../Util'
+import NFC from '../../Nfc';
 
 export class Iso7816 {
   static EMPTY = [0]
@@ -432,9 +433,9 @@ export class StdTag {
   nfcTag: tag.IsoDepTag;
   id: ID
 
-  constructor(tag: tag.IsoDepTag) {
-    this.nfcTag = tag
-    this.id = new ID(tag.getTagInfo().uid);
+  constructor(isoDeepTag: tag.IsoDepTag) {
+    this.nfcTag = isoDeepTag
+    this.id = new ID(tag.getTagInfo(NFC.startWant).uid);
   }
 
   getID(): ID {

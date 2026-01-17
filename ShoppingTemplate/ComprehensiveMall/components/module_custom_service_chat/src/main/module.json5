@@ -3,8 +3,12 @@
     "name": "module_custom_service_chat",
     "type": "har",
     "deviceTypes": [
-      "default",
-      "tablet"
+      "phone"
+    ],
+    "requestPermissions": [
+      {
+        "name": "ohos.permission.INTERNET"
+      }
     ]
   }
 }

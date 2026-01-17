@@ -1,4 +1,4 @@
-import { AppRouter, Constants, DayFormat, ItineraryApi, LoadingStatus, Trip, TripListResult } from 'common'
+import { AppRouter, Constants, DayFormat, ItineraryApi, LoadingStatus, Trip, TripListResult } from 'common';
 import { BaseTitle, GlobalDialog } from 'components';
 
 @Builder
@@ -13,7 +13,7 @@ export struct ItineraryDetailPage {
   @Local tripDetail: Trip = new Trip()
 
   getTripDetail(id: string) {
-    GlobalDialog.showLoadingDialog()
+    GlobalDialog.showLoadingDialog(this.getUIContext())
     ItineraryApi.getTripDetail(id).then((res) => {
       let result = res.result as TripListResult
       if (result.ret.code === 0) {
@@ -22,7 +22,7 @@ export struct ItineraryDetailPage {
         }
       }
     }).finally(() => {
-      GlobalDialog.close()
+      GlobalDialog.close(this.getUIContext())
       this.loadingStatus = LoadingStatus.SUCCESS
     })
   }
@@ -30,15 +30,15 @@ export struct ItineraryDetailPage {
   // 出发时间
   takeoffTime(): string {
     return this.tripDetail.status === '1' ?
-    new DayFormat(this.tripDetail.planTakeoffTime).format('HH:mm') :
-    new DayFormat(this.tripDetail.actualTakeoffTime).format('HH:mm')
+      new DayFormat(this.tripDetail.planTakeoffTime).format('HH:mm') :
+      new DayFormat(this.tripDetail.actualTakeoffTime).format('HH:mm')
   }
 
   // 到达时间
   landingTime(): string {
     return this.tripDetail.status === '1' ?
-    new DayFormat(this.tripDetail.planLandingTime).format('HH:mm') :
-    new DayFormat(this.tripDetail.actualLandingTime).format('HH:mm')
+      new DayFormat(this.tripDetail.planLandingTime).format('HH:mm') :
+      new DayFormat(this.tripDetail.actualLandingTime).format('HH:mm')
   }
 
   getFlyDuration(flight: Trip) {
@@ -82,12 +82,19 @@ export struct ItineraryDetailPage {
                 Text(new DayFormat(this.tripDetail.planTakeoffTime).format('YYYY-MM-DD'))
                   .fontSize(8).fontWeight(FontWeight.Regular)
 
-                Text('单程').fontSize(10).fontWeight(FontWeight.Regular)
+                Text('单程')
+                  .fontSize(10)
+                  .fontWeight(FontWeight.Regular)
                   .fontColor($r('sys.color.white'))
-                  .padding({left:6, right: 6, top:2, bottom: 2})
+                  .padding({
+                    left: 6,
+                    right: 6,
+                    top: 2,
+                    bottom: 2
+                  })
                   .backgroundColor('#466DFA')
                   .borderRadius(8)
-                  .position({right: 0})
+                  .position({ right: 0 })
               }
               .width(Constants.FULL_PERCENT_WIDTH)
 
@@ -121,11 +128,12 @@ export struct ItineraryDetailPage {
                   Row() {
                     Text(this.landingTime())
                       .fontSize(16).fontWeight(FontWeight.Medium)
-                    if(this.isNextDay(this.tripDetail)) {
+                    if (this.isNextDay(this.tripDetail)) {
                       Text('次日')
                         .fontSize(8).fontWeight(FontWeight.Medium)
                     }
                   }
+
                   Text(this.tripDetail.destinationAirport)
                     .fontSize(10).fontWeight(FontWeight.Regular)
                     .fontColor('#99000000')

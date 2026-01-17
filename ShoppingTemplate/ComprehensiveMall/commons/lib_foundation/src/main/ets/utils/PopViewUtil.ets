@@ -1,6 +1,7 @@
 import { ComponentContent, promptAction, window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { Logger } from './Logger';
+import { UtilLog as Logger } from '@hw-agconnect/util-log';
+import { WindowUtil } from './WindowUtil';
 
 const TAG: string = '[PopViewUtil]';
 
@@ -12,8 +13,7 @@ export class PopViewUtil {
   private static async _getUIContext() {
     if (!PopViewUtil._ctx) {
       try {
-        const win = await window.getLastWindow(getContext());
-        PopViewUtil._ctx = win.getUIContext();
+        PopViewUtil._ctx = WindowUtil.globalUIContext;
       } catch (err) {
         Logger.error(TAG, 'get ui context failed.' + JSON.stringify(err));
       }

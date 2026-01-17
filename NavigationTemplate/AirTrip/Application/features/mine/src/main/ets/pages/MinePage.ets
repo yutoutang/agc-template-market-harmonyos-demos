@@ -1,4 +1,4 @@
-import { Constants, callTel, UserInfoStorage, AuthenticationUtil, UserInfo, AppRouter } from 'common';
+import { AppRouter, AuthenticationUtil, callTel, Constants, UserInfo, UserInfoStorage } from 'common';
 import { NavItemView } from '../components/NavItemView';
 import { UserInfoCard } from '../components/UserInfoCard';
 import { MinePageModel, NavItem } from '../model/MinePageModel';
@@ -13,7 +13,8 @@ export function minePageBuilder() {
 
 @ComponentV2
 export struct MinePage {
-  @Local userInfoStorage: UserInfoStorage = PersistenceV2.connect(UserInfoStorage, 'UserInfoStorage', () => new UserInfoStorage())!
+  @Local userInfoStorage: UserInfoStorage =
+    PersistenceV2.connect(UserInfoStorage, 'UserInfoStorage', () => new UserInfoStorage())!
   @Local isShowMode: boolean = false
   orderList: NavItem[] = MinePageModel.getOrderList()
   functionalList: NavItem[] = MinePageModel.getFunctionalList()
@@ -30,11 +31,11 @@ export struct MinePage {
       secondaryButName: '取消',
       primaryButAction: async () => {
         // 关闭账号关联弹框
-        await GlobalDialog.close()
+        await GlobalDialog.close(this.getUIContext())
         // loading弹框
-        await GlobalDialog.showLoadingDialog()
+        await GlobalDialog.showLoadingDialog(this.getUIContext())
         AuthenticationUtil.silentLogin(async (isSuccess: boolean, userInfo: UserInfo) => {
-          await GlobalDialog.close()
+          await GlobalDialog.close(this.getUIContext())
           // 账号关联登录成功
           if (isSuccess) {
             this.userInfoStorage.isLogin = true;
@@ -43,12 +44,13 @@ export struct MinePage {
               cb()
             })
           }
-        })
+        },
+          this.getUIContext())
       },
       secondaryButAction: () => {
-        GlobalDialog.close()
+        GlobalDialog.close(this.getUIContext())
       },
-    })
+    }, this.getUIContext())
   }
 
   handleClickEvent(type: ResourceStr) {
@@ -151,7 +153,7 @@ export struct MinePage {
             })
           }
         })
-      })
+      },(item: NavItem, index: number)=>index + '__' + JSON.stringify(item))
     }
     .width('100%')
     .padding({ top: 20, bottom: 20 })
@@ -162,7 +164,7 @@ export struct MinePage {
 
   @Builder
   ServiceView() {
-    Column({space: 8}) {
+    Column({ space: 8 }) {
       ForEach(this.functionalList, (item: NavItem, index: number) => {
         NavItemView({
           data: item,
@@ -170,7 +172,7 @@ export struct MinePage {
             this.handleClickEvent(item.type)
           }
         })
-      })
+      },(item: NavItem, index: number)=>index + '__' + JSON.stringify(item))
     }
     .width('100%')
     .bindSheet($$this.isShowMode, this.SheetBuilder(), {

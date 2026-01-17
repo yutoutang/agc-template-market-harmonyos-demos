@@ -1,11 +1,12 @@
 import { common } from '@kit.AbilityKit';
 import { BusinessError, pasteboard } from '@kit.BasicServicesKit';
 import { paymentService } from '@kit.PaymentKit';
-import { Logger, RouterMap, routerStack, WindowUtil } from 'lib_foundation';
+import { RouterMap, routerStack, SafeJson, WindowUtil } from 'lib_foundation';
 import { AddressInfo, OrderApis, OrderItem, OrderSkuItem } from 'lib_network';
 import { OrderReviewReq } from 'lib_network';
 import { CommonConfirmDialog, CustomServiceSheet } from 'lib_widget';
 import { CartApi } from 'module_shopping_cart';
+import { UtilLog as Logger } from '@hw-agconnect/util-log';
 import {
   ORDER_STATUS_COMPLETE,
   ORDER_STATUS_PENDING_PAYMENT,
@@ -17,9 +18,7 @@ import {
   ORDER_STATUS_REVIEWED,
 } from '../common/Constants';
 import {
-  OrderActionMap,
-  OrderShipmentMap,
-  OrderStatusMap,
+  OrderActionMap, OrderShipmentMap, OrderStatusMap,
 } from '../common/Enums';
 import { OrderActionReq, OrderStatusInfo } from '../common/Types';
 
@@ -108,8 +107,7 @@ export class OrderUtil {
    * @param param
    */
   public static handleImmediatePayment(param: OrderActionReq) {
-    const context: common.UIAbilityContext =
-      getContext() as common.UIAbilityContext;
+    const context = WindowUtil.globalContext as common.UIAbilityContext;
     paymentService
       .requestPayment(context, '')
       .then(() => {
@@ -134,6 +132,7 @@ export class OrderUtil {
   public static handleConfirmReceipt(param: OrderActionReq) {
     CommonConfirmDialog.show({
       primaryTitle: '提示',
+      secondaryTitle: '确认收到货了吗？',
       content: '为了保证您的售后权益，请收到商品确认无误后再确认收货',
       confirm: () => {
         OrderApis.updateDetail(param.orderNo, {
@@ -243,10 +242,10 @@ export class OrderUtil {
    */
   public static handleCancelRefund(param: OrderActionReq) {
     const data = param.data as OrderItem;
-    let status:number = 0
-    if(data?.logisticInfo?.length === 1){
+    let status: number = 0
+    if (data?.logisticInfo?.length === 1) {
       status = OrderStatusMap.PENDING_SHIPMENT
-    }else{
+    } else {
       status = OrderStatusMap.PENDING_RECEIPT
     }
     CommonConfirmDialog.show({
@@ -274,11 +273,11 @@ export class OrderUtil {
   public static handleReorder(param: OrderActionReq) {
     const data = param.data as OrderSkuItem[];
     if (data?.length) {
-      let promises: Promise<string>[] = [];
+      let promises: Promise<number>[] = [];
       let skuTable: Record<string, string | number> = {};
       data.forEach((item) => {
         skuTable[item.skuCode] = item.count;
-        const promise = CartApi.addSkuToCart(item.skuCode, item.count);
+        const promise = CartApi.addSkuToCart({ skuCode: item.skuCode, count: item.count });
         promises.push(promise);
       });
       Promise.all(promises).then(() => {
@@ -312,22 +311,27 @@ export class OrderUtil {
    * @param orderNo
    */
   public static copyOrderNumber(orderNo: string) {
-    const pasteboardData = pasteboard.createData(
-      pasteboard.MIMETYPE_TEXT_PLAIN,
-      orderNo,
-    );
-    const systemPasteboard = pasteboard.getSystemPasteboard();
-    systemPasteboard
-      .setData(pasteboardData)
-      .then(() => {
-        WindowUtil.toast('复制成功!');
-      })
-      .catch((err: BusinessError) => {
-        WindowUtil.toast('复制失败!');
-        Logger.error(
-          TAG,
-          'copy order number failed. error:' + JSON.stringify(err),
-        );
-      });
+    try {
+      const pasteboardData = pasteboard.createData(
+        pasteboard.MIMETYPE_TEXT_PLAIN,
+        orderNo,
+      );
+      const systemPasteboard = pasteboard.getSystemPasteboard();
+      systemPasteboard
+        .setData(pasteboardData)
+        .then(() => {
+          WindowUtil.toast('复制成功!');
+        })
+        .catch((err: BusinessError) => {
+          WindowUtil.toast('复制失败!');
+          Logger.error(
+            TAG,
+            'copy order number failed. error:' + JSON.stringify(err),
+          );
+        });
+    } catch (err) {
+      WindowUtil.toast('复制失败!');
+      Logger.error(TAG, 'copy order number failed. err' + SafeJson.jsonStringify(err))
+    }
   }
 }

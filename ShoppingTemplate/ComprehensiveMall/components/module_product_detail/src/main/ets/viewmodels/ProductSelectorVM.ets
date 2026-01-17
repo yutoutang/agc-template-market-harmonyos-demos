@@ -1,4 +1,4 @@
-import { promptAction } from '@kit.ArkUI';
+import {ToastDialog as promptAction} from '@hw-agconnect/ui-toast'
 import { SpecViewModel } from '../commons/Models';
 import { ProductSelectionInfo, SkuItem, SpecOption } from '../commons/Types';
 import { ProductDetailApis } from '../https/Apis';

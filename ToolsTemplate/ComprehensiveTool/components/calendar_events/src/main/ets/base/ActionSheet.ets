@@ -1,3 +1,4 @@
+import { UtilLog } from '@hw-agconnect/util-log';
 import { ComponentContent, window } from '@kit.ArkUI'
 import { generateId } from '../utils/Utils'
 
@@ -97,11 +98,17 @@ class ActionSheet {
   /*
    * 展示actionSheet
    */
-  public async show(option: ActionSheetOption) {
+  public async show(option: ActionSheetOption, uiContext: UIContext) {
     let key = option.id ?? this.getUniKey()
     if (this.uiContext === null) {
-      let windowClass: window.Window = await window.getLastWindow(getContext())
-      this.uiContext = windowClass.getUIContext()
+      let windowClass: window.Window | null = null
+      try {
+        windowClass = await window.getLastWindow(uiContext.getHostContext()!);
+      } catch (e) {
+        UtilLog.error(`show dialog failed with error ${JSON.stringify(e)}`);
+      }
+
+      this.uiContext = windowClass!.getUIContext();
     }
     let params = new ActionSheetParams(option)
     params.id = key

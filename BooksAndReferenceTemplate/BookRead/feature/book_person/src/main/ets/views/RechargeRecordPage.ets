@@ -1,12 +1,14 @@
-import { Constants, NavHeaderBar} from 'common';
+import { BreakpointStorage, BreakpointSystem, BreakpointTypeEnum, Constants, NavHeaderBar } from 'common';
 import { RechargeRecord } from 'common/src/main/ets/model/Member';
 import { RechargeRecordVM } from 'common/src/main/ets/viewmodel/RechargeRecordVM';
 
 @Preview
 @ComponentV2
 export struct RechargeRecordPage {
+  @Local curBreakpoint: BreakpointStorage = BreakpointSystem.currentBreakpoint
   vm: RechargeRecordVM = new RechargeRecordVM();
   bottomRectHeight: number = AppStorage.get('bottomRectHeight') as number
+
   aboutToAppear(): void {
     this.vm.getRechargeRecords();
   }
@@ -17,16 +19,14 @@ export struct RechargeRecordPage {
         NavHeaderBar({
           title: '充值记录',
           hasBackButton: true,
-          hasBgColor: true,
+          hasBgColor: false,
           isMainPage: false,
         })
         Column() {
           if (this.vm.isLoading) {
             Column() {
               LoadingProgress()
-                .width(48)
-                .height(48)
-                .color('#E39331')
+                .color($r('sys.color.icon_tertiary'))
 
               Text('加载中...')
                 .fontSize(14)
@@ -55,7 +55,7 @@ export struct RechargeRecordPage {
               .height(400)
             }
             .layoutWeight(1)
-            .width('100%')
+            .width(this.curBreakpoint.value === BreakpointTypeEnum.LG ? '70%' : '100%')
             .height('100%')
             .backgroundColor($r('sys.color.background_primary'))
             .borderRadius(16)
@@ -69,7 +69,7 @@ export struct RechargeRecordPage {
                 .height(100)
               }, (record: RechargeRecord) => record.id)
             }
-            .width('100%')
+            .width(this.curBreakpoint.value === BreakpointTypeEnum.LG ? '70%' : '100%')
             .layoutWeight(1)
             .scrollBar(BarState.Off)
             .edgeEffect(EdgeEffect.Spring)
@@ -86,7 +86,12 @@ export struct RechargeRecordPage {
         .width(Constants.FULL_SIZE)
         .height(Constants.FULL_SIZE)
         .layoutWeight(1)
-        .padding({ bottom: this.bottomRectHeight, left: 12, right: 12,top:12 })
+        .padding({
+          bottom: this.bottomRectHeight,
+          left: 12,
+          right: 12,
+          top: 12
+        })
         .backgroundColor($r('sys.color.background_secondary'))
       }
     }

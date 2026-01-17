@@ -1,0 +1,20 @@
+{
+  "color": [
+    {
+      "name": "bottom_bar_1",
+      "value": "#E5E5E5"
+    },
+    {
+      "name": "bottom_bar_2",
+      "value": "#999999"
+    },
+    {
+      "name": "img_bg",
+      "value": "#E5E5EA"
+    },
+    {
+      "name": "pressed_bg",
+      "value": "#19000000"
+    }
+  ]
+}

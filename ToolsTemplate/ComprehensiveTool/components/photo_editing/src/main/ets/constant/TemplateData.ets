@@ -156,6 +156,7 @@ POSTER_2_1.oriRegions = [
       }],
   },
 ];
+POSTER_2_1.isVip = true;
 
 const POSTER_2_2 = new PosterTemplateModel();
 POSTER_2_2.id = 'poster2_2';

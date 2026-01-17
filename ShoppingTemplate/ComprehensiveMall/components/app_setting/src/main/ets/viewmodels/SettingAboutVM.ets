@@ -1,7 +1,11 @@
 import { common, Want, bundleManager } from '@kit.AbilityKit';
-import { LayeredDrawableDescriptor, promptAction } from '@kit.ArkUI';
+import { LayeredDrawableDescriptor } from '@kit.ArkUI';
+import { BusinessError } from '@kit.BasicServicesKit'
+import { Logger, WindowUtil } from 'module_ui_base';
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast'
 import { AppGalleryUtils } from '../common/AppGalleryUtils';
 import { TelephoneUtils } from '../common/TelephoneUtils';
+import { LOG_TAG } from '../constants/CommonConstants';
 import { BaseViewModel } from '../models/BaseViewModel';
 
 @ObservedV2
@@ -20,29 +24,36 @@ export class SettingAboutVM extends BaseViewModel {
   }
 
   async getBundleInfo() {
-    const resource = getContext().resourceManager;
-    const bundleInfo = await bundleManager.getBundleInfoForSelf(
-      bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_APPLICATION,
-    );
-    // 获取应用名称
-    this.appName = resource.getStringSync(bundleInfo.appInfo.labelId);
-    // 获取版本信息
-    this.appVersionName = bundleInfo.versionName;
-    // 获取应用图标
-    const draw = resource.getDrawableDescriptor(bundleInfo.appInfo.iconId);
-    const isLayered = draw instanceof LayeredDrawableDescriptor;
-    if (isLayered) {
-      let layered = draw as LayeredDrawableDescriptor;
-      this.appIcon = layered.getPixelMap();
-    } else {
-      this.appIcon = resource.getMediaContentBase64Sync(
-        bundleInfo.appInfo.iconId,
+    if (!WindowUtil.context) {
+      return;
+    }
+    try {
+      const resource = WindowUtil.context.resourceManager;
+      const bundleInfo = await bundleManager.getBundleInfoForSelf(
+        bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_APPLICATION,
       );
+      // 获取应用名称
+      this.appName = resource.getStringSync(bundleInfo.appInfo.labelId);
+      // 获取版本信息
+      this.appVersionName = bundleInfo.versionName;
+      // 获取应用图标
+      const draw = resource.getDrawableDescriptor(bundleInfo.appInfo.iconId);
+      const isLayered = draw instanceof LayeredDrawableDescriptor;
+      if (isLayered) {
+        let layered = draw as LayeredDrawableDescriptor;
+        this.appIcon = layered.getPixelMap();
+      } else {
+        this.appIcon = resource.getMediaContentBase64Sync(
+          bundleInfo.appInfo.iconId,
+        );
+      }
+    } catch (err) {
+      Logger.error(LOG_TAG, 'get bundle info failed. error: ' + JSON.stringify(err))
     }
   }
 
   checkUpdate() {
-    const context = getContext(this) as common.UIAbilityContext;
+    const context = WindowUtil.context as common.UIAbilityContext;
     this.loading = true;
     AppGalleryUtils.checkAppUpdate(context)
       .then((resp: boolean) => {
@@ -64,12 +75,14 @@ export class SettingAboutVM extends BaseViewModel {
   }
 
   goWebsite() {
-    const context = getContext(this) as common.UIAbilityContext;
+    const context = WindowUtil.context as common.UIAbilityContext;
     let want: Want = {
       action: 'ohos.want.action.viewData',
       entities: ['entity.system.browsable'],
       uri: 'https://beian.miit.gov.cn/#/home',
     };
-    context.startAbility(want);
+    context.startAbility(want).catch((err: BusinessError) => {
+      Logger.error(LOG_TAG, 'start ability failed. error:' + JSON.stringify(err))
+    })
   }
 }

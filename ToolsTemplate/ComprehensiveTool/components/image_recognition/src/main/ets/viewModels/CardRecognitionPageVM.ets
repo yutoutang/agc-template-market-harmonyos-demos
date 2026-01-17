@@ -16,8 +16,6 @@ import { CardType } from '@kit.VisionKit';
 import { getInstance, RouterMap } from '../util/Route';
 
 
-
-
 @ObservedV2
 export class CardRecognitionPageVM {
   @Trace text: string = '';

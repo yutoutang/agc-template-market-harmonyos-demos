@@ -1,5 +1,4 @@
 import { Constants } from 'common';
-import { promptAction } from '@kit.ArkUI';
 
 @ComponentV2
 export struct DeleteBottomCard {
@@ -17,7 +16,7 @@ export struct DeleteBottomCard {
         }
       }
       .onClick(() => {
-        promptAction.showDialog({
+        this.getUIContext().getPromptAction().showDialog({
           title: $r('app.string.delete_book_flag'),
           message: $r('app.string.q_delete_book_flag'),
           buttons: [
@@ -33,7 +32,7 @@ export struct DeleteBottomCard {
         }, (err, data) => {
           if(data.index === 1){
             this.delete();
-            promptAction.showToast({ message: $r('app.string.delete_book_success') })
+            this.getUIContext().getPromptAction().showToast({ message: $r('app.string.delete_book_success') })
           }
         })
       })

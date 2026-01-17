@@ -1,6 +1,7 @@
 import { image } from '@kit.ImageKit';
 import { fileIo, fileUri } from '@kit.CoreFileKit';
 import { Logger } from './Logger';
+import { UtilLog } from '@hw-agconnect/util-log';
 
 export class ImageUtils {
   /**
@@ -13,7 +14,7 @@ export class ImageUtils {
    */
   // [Start get_snapshot_area]
   static async getSnapshotArea(pixelMap: PixelMap, scrollYOffsets: number[], listWidth: number,
-    listHeight: number): Promise<image.PositionArea> {
+    listHeight: number, uiContext: UIContext): Promise<image.PositionArea> {
     // Gets the number of bytes per line of image pixels.
     let stride = pixelMap.getBytesNumberPerRow();
     // Get the total number of bytes of image pixels.
@@ -29,11 +30,11 @@ export class ImageUtils {
       if (listHeight - realScrollHeight > 0) {
         let cropRegion: image.Region = {
           x: 0,
-          y: vp2px(listHeight - realScrollHeight),
+          y: uiContext.vp2px(listHeight - realScrollHeight),
           size: {
-            height: vp2px(realScrollHeight),
-            width: vp2px(listWidth)
-          }
+            height: uiContext.vp2px(realScrollHeight),
+            width: uiContext.vp2px(listWidth),
+          },
         };
         // Crop roll area
         await pixelMap.crop(cropRegion);
@@ -49,16 +50,17 @@ export class ImageUtils {
       region: {
         size: {
           width: imgInfo.size.width,
-          height: imgInfo.size.height
+          height: imgInfo.size.height,
         },
         x: 0,
-        y: 0
-      }
-    }
+        y: 0,
+      },
+    };
     // Write data to a specified area
     pixelMap.readPixelsSync(area);
     return area;
   }
+
   // [End get_snapshot_area]
 
   /**
@@ -71,47 +73,58 @@ export class ImageUtils {
    */
   // [Start merge_image]
   static async mergeImage(areaArray: image.PositionArea[], lastOffsetY: number, listWidth: number,
-    listHeight: number): Promise<PixelMap> {
+    listHeight: number, uiContext: UIContext): Promise<PixelMap | null> {
     // Create a long screenshot PixelMap
     let opts: image.InitializationOptions = {
       editable: true,
       pixelFormat: 4,
       size: {
-        width: vp2px(listWidth),
-        height: vp2px(lastOffsetY + listHeight)
-      }
+        width: uiContext.vp2px(listWidth),
+        height: uiContext.vp2px(lastOffsetY + listHeight),
+      },
     };
-    let longPixelMap = image.createPixelMapSync(opts);
-    let imgPosition: number = 0;
+    let longPixelMap: image.PixelMap | null = null;
+    try {
+      longPixelMap = image.createPixelMapSync(opts);
+      let imgPosition: number = 0;
 
-    for (let i = 0; i < areaArray.length; i++) {
-      let readArea = areaArray[i];
-      let area: image.PositionArea = {
-        pixels: readArea.pixels,
-        offset: 0,
-        stride: readArea.stride,
-        region: {
-          size: {
-            width: readArea.region.size.width,
-            height: readArea.region.size.height
+      for (let i = 0; i < areaArray.length; i++) {
+        let readArea = areaArray[i];
+        let area: image.PositionArea = {
+          pixels: readArea.pixels,
+          offset: 0,
+          stride: readArea.stride,
+          region: {
+            size: {
+              width: readArea.region.size.width,
+              height: readArea.region.size.height,
+            },
+            x: 0,
+            y: imgPosition,
           },
-          x: 0,
-          y: imgPosition
-        }
+        };
+        imgPosition += readArea.region.size.height;
+        longPixelMap.writePixelsSync(area);
       }
-      imgPosition += readArea.region.size.height;
-      longPixelMap.writePixelsSync(area);
+      return longPixelMap;
+    } catch (e) {
+      UtilLog.error(`createPixelMapSync failed with error ${e}`);
+      return longPixelMap
     }
-    return longPixelMap;
   }
+
   // [End merge_image]
 
   // 将图片保存到沙箱
   static saveImgToCache(context: Context, imageUri: string, name: string): string {
-    let cachePath = context.cacheDir + '/' + name;
+    let imgDirPath = context.filesDir + '/diaryDir';
+    if (!fileIo.accessSync(imgDirPath)) {
+      fileIo.mkdirSync(imgDirPath);
+    }
+    let cachePath = context.filesDir + '/diaryDir/' + name;
     let file = fileIo.openSync(imageUri, fileIo.OpenMode.READ_ONLY);
     let file2 = fileIo.openSync(cachePath, fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE);
-    fileIo.copyFileSync(file.fd, file2.fd)
+    fileIo.copyFileSync(file.fd, file2.fd);
     fileIo.closeSync(file);
     fileIo.closeSync(file2);
 
@@ -143,7 +156,7 @@ export class ImageUtils {
     let imgSrcList: string[] = [];
     for (const match of matches) {
       const imgSrc = match[1];
-      imgSrcList.push(imgSrc);
+      imgSrcList.push(imgSrc.trim());
     }
     return imgSrcList;
   }

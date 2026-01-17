@@ -1,10 +1,12 @@
 import { RouterMap } from '../constants/Common';
-import { Logger } from './Logger';
+import { UtilLog as Logger } from '@hw-agconnect/util-log';
+import { NavPushPathHelper } from '@kit.ArkUI';
 
 const TAG: string = '[RouterModule]';
 
 export class RouterModule {
   private static _stack: NavPathStack = new NavPathStack();
+  private static helper: NavPushPathHelper = new NavPushPathHelper(this._stack)
 
   public static getStack() {
     return RouterModule._stack;
@@ -14,6 +16,21 @@ export class RouterModule {
   public static push<T = object>(url: RouterMap | string, param?: T, onPop?: Callback<PopInfo>, animated?: boolean) {
     try {
       RouterModule._stack.pushPathByName(url, param, onPop, animated);
+    } catch (err) {
+      Logger.error(TAG, 'navigation stack push failed::' + JSON.stringify(err));
+    }
+  }
+
+  // 跨模块跳转到指定路由栈的指定路由页面
+  public static helperPush(
+    moduleName: string,
+    name: RouterMap | string,
+    param: Record<string, object> = {},
+    onPop: Callback<PopInfo> = () => {},
+    animated?: boolean,
+  ) {
+    try {
+      RouterModule.helper.pushPathByName(moduleName, name, param, onPop, animated);
     } catch (err) {
       Logger.error(TAG, 'navigation stack push failed::' + JSON.stringify(err));
     }

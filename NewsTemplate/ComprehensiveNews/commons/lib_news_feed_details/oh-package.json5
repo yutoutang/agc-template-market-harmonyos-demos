@@ -6,17 +6,16 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "dayjs": "1.11.13",
     "lib_news_api": "file:../lib_news_api",
     "lib_common": "file:../lib_common",
     "lib_widget": "file:../lib_widget",
     "lib_account": "file:../lib_account",
+    'lib_preview_page': "file:../../commons/lib_preview_page",
     "module_feedcomment": "file:../../components/module_feedcomment",
     "module_newsfeed": "file:../../components/module_newsfeed",
     "module_imagepreview": "file:../../components/module_imagepreview",
-    "module_share": "file:../../components/module_share",
     "module_text_reader": "file:../../components/module_text_reader",
-    'lib_preview_page': "file:../../commons/lib_preview_page",
+    "module_audioplayer": "file:../../components/module_audioplayer",
     "module_transition": "file:../../components/module_transition"
   }
 }

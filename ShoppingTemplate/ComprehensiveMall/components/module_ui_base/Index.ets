@@ -1,5 +1,3 @@
-export { Logger } from './src/main/ets/utils/Logger';
-
 export {
   ObservedArray,
   LazyDataSource,
@@ -18,3 +16,9 @@ export {
   BreakpointSystem,
   BreakpointType,
 } from './src/main/ets/utils/BreakpointSystem';
+
+export { WindowUtil } from './src/main/ets/utils/WindowUtil'
+
+export { Logger } from './src/main/ets/utils/Logger'
+
+export { SafeJson } from './src/main/ets/utils/SafeJson'

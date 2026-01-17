@@ -1,8 +1,7 @@
-import { Constants, NavHeaderBar, TCRouter } from 'common';
+import { BreakpointStorage, BreakpointSystem, BreakpointTypeEnum, Constants, NavHeaderBar, TCRouter } from 'common';
 import { UserInfo } from 'base_common';
 import { RechargePackage, RechargeRecord } from 'common/src/main/ets/model/Member';
 import { AggregatedPaymentPicker, ChannelType, MockApi } from 'aggregated_payment';
-import { promptAction } from '@kit.ArkUI';
 import { emitter } from '@kit.BasicServicesKit';
 import { RechargeVM } from 'common/src/main/ets/viewmodel/RechargeVM';
 import { RechargeRecordVM } from 'common/src/main/ets/viewmodel/RechargeRecordVM';
@@ -11,30 +10,37 @@ import { RechargeRecordVM } from 'common/src/main/ets/viewmodel/RechargeRecordVM
 @ComponentV2
 export struct RechargePage {
   vm: RechargeVM = new RechargeVM();
+  @Local curBreakpoint: BreakpointStorage = BreakpointSystem.currentBreakpoint
+  private promptAction = this.getUIContext().getPromptAction();
 
   aboutToAppear(): void {
     this.vm.getRechargePackages();
   }
 
   updateBookCoins(amount: number) {
-    // 更新用户书币余额
-    const userInfoFromStorage: UserInfo = AppStorage.get('userInfo') as UserInfo;
-    if (userInfoFromStorage) {
-      const currentCoins = typeof userInfoFromStorage.bookCoins === 'number' ? userInfoFromStorage.bookCoins : 100;
-      userInfoFromStorage.bookCoins = currentCoins + amount;
-      AppStorage.setOrCreate('userInfo', userInfoFromStorage);
-      AppStorage.setOrCreate('bookCoins', userInfoFromStorage.bookCoins);
+    try {
+      // 更新用户书币余额
+      const userInfoFromStorage: UserInfo = AppStorage.get('userInfo') as UserInfo;
+      if (userInfoFromStorage) {
+        const currentCoins = typeof userInfoFromStorage.bookCoins === 'number' ? userInfoFromStorage.bookCoins : 100;
+        userInfoFromStorage.bookCoins = currentCoins + amount;
+        AppStorage.setOrCreate('userInfo', userInfoFromStorage);
+        AppStorage.setOrCreate('bookCoins', userInfoFromStorage.bookCoins);
+      }
+      // 触发事件通知其他页面更新余额
+      emitter.emit(Constants.LOGIN_CHANGE);
+    } catch (e) {
+      console.error('Failed to emitter emit login change. Cause: ' + JSON.stringify(e));
     }
-    // 触发事件通知其他页面更新余额
-    emitter.emit(Constants.LOGIN_CHANGE);
+
   }
 
   build() {
     NavDestination() {
       Stack() {
         Image($r('app.media.rbg'))
+          .width('100%')
           .height(350)
-          .objectFit(ImageFit.Fill)
           .backgroundColor('#F0F2F5');
 
         Image($r('app.media.rbg2'))
@@ -52,110 +58,135 @@ export struct RechargePage {
             isMainPage: false,
           })
 
-          Column({ space: 12 }) {
-            Row() {
-              Text('选择充值套餐')
-                .fontSize(18)
-                .fontWeight(FontWeight.Bold)
-                .fontColor($r('sys.color.font_primary'))
+          Scroll() {
+            Column() {
+              Column({ space: 12 }) {
+                Row() {
+                  Text('选择充值套餐')
+                    .fontSize(18)
+                    .fontWeight(FontWeight.Bold)
+                    .fontColor($r('sys.color.font_primary'))
 
-              Text('充值记录')
-                .fontSize(14)
-                .fontColor('#E39331')
-                .onClick(() => {
-                  TCRouter.push(Constants.RECHARGE_RECORD_ROUTE);
-                })
-            }
-            .width(Constants.FULL_SIZE)
-            .justifyContent(FlexAlign.SpaceBetween)
-            .alignItems(VerticalAlign.Center)
-
-            Grid() {
-              ForEach(this.vm.rechargePackages, (item: RechargePackage) => {
-                GridItem() {
-                  Column({ space: 8 }) {
-                    Column({ space: 4 }) {
-                      Text(`${item.coins}`)
-                        .fontSize(24)
-                        .fontWeight(FontWeight.Bold)
-                        .fontColor(this.vm.selectId === item.id ? '#E39331' : $r('sys.color.font_primary'))
-
-                      Text('书币')
-                        .fontSize(12)
-                        .fontColor($r('sys.color.font_secondary'))
-
-                      if (item.bonus && item.bonus > 0) {
-                        Text(`送${item.bonus}`)
-                          .fontSize(10)
-                          .fontColor('#E39331')
-                      }
-
-                      Text() {
-                        Span('￥').fontSize(12)
-                        Span(item.price.toString()).fontWeight(FontWeight.Bold)
-                      }
-                      .fontSize(16)
-                      .fontColor(this.vm.selectId === item.id ? '#E39331' : $r('sys.color.font_primary'))
-                      .margin({ top: 8 })
-                    }
-                    .padding({ top: item.isRecommended ? 16 : 20, bottom: 16 })
-                    .width(Constants.FULL_SIZE)
-                  }
-                  .width(Constants.FULL_SIZE)
-                  .height(130)
-                  .backgroundColor(this.vm.selectId === item.id ? '#FFF8F0' : $r('sys.color.background_primary'))
-                  .border({
-                    width: this.vm.selectId === item.id ? 2 : 1,
-                    color: this.vm.selectId === item.id ? '#E39331' : '#E5E5E5',
-                    radius: 12,
-                  })
-                  .onClick(() => {
-                    this.vm.selectId = item.id;
-                  })
+                  Text('充值记录')
+                    .fontSize(14)
+                    .fontColor('#E39331')
+                    .onClick(() => {
+                      TCRouter.push(Constants.RECHARGE_RECORD_ROUTE);
+                    })
                 }
-              }, (item: RechargePackage) => item.id.toString())
+                .width(Constants.FULL_SIZE)
+                .justifyContent(FlexAlign.SpaceBetween)
+                .alignItems(VerticalAlign.Center)
+
+                Grid() {
+                  ForEach(this.vm.rechargePackages, (item: RechargePackage) => {
+                    GridItem() {
+                      Column({ space: 8 }) {
+                        Column({ space: 4 }) {
+                          Text(`${item.coins}`)
+                            .fontSize(24)
+                            .fontWeight(FontWeight.Bold)
+                            .fontColor(this.vm.selectId === item.id ? '#E39331' : $r('sys.color.font_primary'))
+
+                          Text('书币')
+                            .fontSize(12)
+                            .fontColor($r('sys.color.font_secondary'))
+
+                          if (item.bonus && item.bonus > 0) {
+                            Text(`送${item.bonus}`)
+                              .fontSize(10)
+                              .fontColor('#E39331')
+                          }
+
+                          Text() {
+                            Span('￥').fontSize(12)
+                            Span(item.price.toString()).fontWeight(FontWeight.Bold)
+                          }
+                          .fontSize(16)
+                          .fontColor(this.vm.selectId === item.id ? '#E39331' : $r('sys.color.font_primary'))
+                          .margin({ top: 8 })
+                        }
+                        .padding({ top: item.isRecommended ? 16 : 20, bottom: 16 })
+                        .width(Constants.FULL_SIZE)
+                      }
+                      .width(Constants.FULL_SIZE)
+                      .height(130)
+                      .backgroundColor(this.vm.selectId === item.id ? '#FFF8F0' : $r('sys.color.background_primary'))
+                      .border({
+                        width: this.vm.selectId === item.id ? 2 : 1,
+                        color: this.vm.selectId === item.id ? '#E39331' : '#E5E5E5',
+                        radius: 12,
+                      })
+                      .onClick(() => {
+                        this.vm.selectId = item.id;
+                      })
+                    }
+                  }, (item: RechargePackage) => item.id.toString())
+                }
+                .columnsTemplate('1fr 1fr 1fr')
+                .rowsTemplate('1fr 1fr')
+                .columnsGap(12)
+                .rowsGap(12)
+                .height(292)
+                .alignSelf(ItemAlign.Center)
+                .width(this.curBreakpoint.value === BreakpointTypeEnum.LG ? '70%' : Constants.FULL_SIZE)
+              }
+              .width(Constants.FULL_SIZE)
+              .backgroundColor($r('sys.color.background_primary'))
+              .borderRadius({
+                topLeft: 16,
+                topRight: 16,
+                bottomLeft: 0,
+                bottomRight: 0
+              })
+              .padding({
+                left: 16,
+                right: 16,
+                top: 20,
+                bottom: 10
+              })
+              .alignItems(HorizontalAlign.Start)
+
+              Column({ space: 16 }) {
+                Text('充值说明')
+                  .fontSize(16)
+                  .fontWeight(FontWeight.Medium)
+                  .fontColor($r('sys.color.font_primary'))
+                  .alignSelf(ItemAlign.Start)
+
+                Column({ space: 8 }) {
+                  Text('• 书币可用于购买付费图书和章节')
+                    .fontSize(12)
+                    .fontColor($r('sys.color.font_secondary'))
+                    .alignSelf(ItemAlign.Start)
+
+                  Text('• 充值成功后书币将立即到账')
+                    .fontSize(12)
+                    .fontColor($r('sys.color.font_secondary'))
+                    .alignSelf(ItemAlign.Start)
+
+                  Text('• 书币不可提现，仅限在本应用内使用')
+                    .fontSize(12)
+                    .fontColor($r('sys.color.font_secondary'))
+                    .alignSelf(ItemAlign.Start)
+                }
+                .alignItems(HorizontalAlign.Start)
+              }
+              .alignItems(HorizontalAlign.Start)
+
+              Column().height(140)
             }
-            .columnsTemplate('1fr 1fr 1fr')
-            .rowsTemplate('1fr 1fr')
-            .columnsGap(12)
-            .rowsGap(12)
-            .height(292)
-            .width(Constants.FULL_SIZE)
+            .backgroundColor('#ffffff')
+            .width('100%')
+            .layoutWeight(1)
+
           }
-          .width(Constants.FULL_SIZE)
-          .backgroundColor($r('sys.color.background_primary'))
-          .borderRadius({ topLeft: 16, topRight: 16, bottomLeft: 0, bottomRight: 0 })
-          .padding({ left: 16, right: 16, top: 20, bottom: 10 })
-          .position({ x: 0, y: 210 })
-          .alignItems(HorizontalAlign.Start)
-
-          Column({ space: 16 }) {
-            Text('充值说明')
-              .fontSize(16)
-              .fontWeight(FontWeight.Medium)
-              .fontColor($r('sys.color.font_primary'))
-              .alignSelf(ItemAlign.Start)
-
-            Column({ space: 8 }) {
-              Text('• 书币可用于购买付费图书和章节')
-                .fontSize(12)
-                .fontColor($r('sys.color.font_secondary'))
-                .alignSelf(ItemAlign.Start)
-
-              Text('• 充值成功后书币将立即到账')
-                .fontSize(12)
-                .fontColor($r('sys.color.font_secondary'))
-                .alignSelf(ItemAlign.Start)
-
-              Text('• 书币不可提现，仅限在本应用内使用')
-                .fontSize(12)
-                .fontColor($r('sys.color.font_secondary'))
-                .alignSelf(ItemAlign.Start)
-            }
-            .alignItems(HorizontalAlign.Start)
-          }
-          .alignItems(HorizontalAlign.Start)
-          .margin({ top: 470 })
+          .borderRadius(12)
+          .margin({ top: 120 })
+          .scrollBar(BarState.Off)
+          .edgeEffect(EdgeEffect.Spring)
+          .align(Alignment.Top)
+          .layoutWeight(1)
         }
         .padding({ left: 0, right: 0 })
         .justifyContent(FlexAlign.Start)
@@ -166,7 +197,6 @@ export struct RechargePage {
               .select($$this.vm.selectCheckbox)
               .height(24)
               .width(24)
-              .selectedColor('#E39331')
               .shape(CheckBoxShape.CIRCLE)
 
             Row({ space: 4 }) {
@@ -179,7 +209,7 @@ export struct RechargePage {
                 .fontColor('#E39331')
                 .onClick(() => {
                   // 可以跳转到充值协议页面
-                  promptAction.showToast({ message: '充值协议页面' });
+                  this.promptAction.showToast({ message: '充值协议页面' });
                 })
             }
           }
@@ -187,13 +217,21 @@ export struct RechargePage {
           Button('立即充值')
             .fontColor($r('sys.color.font_on_primary'))
             .backgroundColor('#E39331')
-            .width(Constants.FULL_SIZE)
+            .width(this.curBreakpoint.value === BreakpointTypeEnum.LG ? '70%' : Constants.FULL_SIZE)
             .height(48)
-            .bindSheet($$this.vm.isShow, this.paymentChannelSheet(),
-              { showClose: false, height: '45%' })
+            .bindSheet($$this.vm.isShow, this.paymentChannelSheet(), {
+              preferType: SheetType.CENTER,
+              showClose: false,
+              height: '45%',
+              onWillDismiss: (dismissSheetAction: DismissSheetAction) => {
+                if (dismissSheetAction.reason === DismissReason.TOUCH_OUTSIDE) {
+                  dismissSheetAction.dismiss()
+                }
+              }
+            })
             .onClick(() => {
               if (!this.vm.selectCheckbox) {
-                promptAction.showToast({ message: '请先同意充值协议' });
+                this.promptAction.showToast({ message: '请先同意充值协议' });
                 return;
               }
 
@@ -206,7 +244,13 @@ export struct RechargePage {
               });
             })
         }
-        .padding({ left: 16, right: 16, top: 8, bottom: 34 })
+        .backgroundColor('#ffffff')
+        .padding({
+          left: 16,
+          right: 16,
+          top: 8,
+          bottom: 34
+        })
         .position({ x: 0, y: '100%' })
         .translate({ x: 0, y: -126 })
         .width(Constants.FULL_SIZE)
@@ -259,10 +303,10 @@ export struct RechargePage {
             timestamp: timestamp,
             date: RechargeRecordVM.formatDateTime(timestamp)
           };
-          
+
           RechargeRecordVM.saveRechargeRecord(rechargeRecord);
 
-          promptAction.showToast({
+          this.promptAction.showToast({
             message: `充值成功！获得${totalCoins}书币`,
             duration: 2000,
           });

@@ -1,4 +1,5 @@
 import { PackageSpecResp } from './Order';
+import { StoreInfoResp } from './Store';
 
 export interface CommonReq {
   // 商户Id
@@ -42,6 +43,9 @@ export interface CommonReq {
 
   // 充值金额
   rechargeTierId: string;
+
+  // 是否关联
+  isRelative: boolean;
 }
 
 export interface AddCarReq {
@@ -102,12 +106,17 @@ export interface AddDnOrderReq {
   tableware: ResourceStr, //用餐人数
   yhqMoney: number, //优惠券金额
   couponId: string, //抵扣优惠券ID
-  orderType: number, //订单使用类型 填写 0 店铺堂食
+  redeemedPoint: boolean, //是否兑换积分
+  orderType: number, //订单使用类型 填写 1 店铺堂食 2 打包带走
   boxMoney: number, //打包费
   reductionMoney: number, //优惠金额
   rechargeId?: string, // 充值档次
   preorderTime: string, // 预约时间
   preorderPhone: string, // 预约号码
+  storeName?: string, // 店铺名称
+  storeLogo?: string, // 店铺logo
+  storeTel?: string, // 店铺电话
+  storeAddress?: string, // 店铺地址
 }
 
 
@@ -120,4 +129,44 @@ export interface MyOrderReq {
 
   // 订单页大小
   pagesize: number
+}
+
+export interface BookStoreParams {
+  // 0-0:00~8:59, 1-9:00~15:59, 2-16:00~21:59, 3-22:00~23:59
+  period: number;
+  max: number;
+  isPrivate: boolean;
+}
+
+export interface QueueStoreParams {
+  max: number;
+}
+
+export interface BookOrderData {
+  store: StoreInfoResp;
+  time: string;
+  count: number;
+  room: boolean;
+  name: string;
+  phone: string;
+  decoration?: string;
+  tableWares?: string[];
+  tips?: string;
+}
+
+export interface CancelBookOrderDate {
+  orderId: number;
+}
+
+export interface QueueOrderData {
+  store: StoreInfoResp;
+  count: number;
+}
+
+export interface CancelQueueOrderDate {
+  orderId: number;
+}
+
+export interface RefreshQueueOrderParams {
+  orderId: number;
 }

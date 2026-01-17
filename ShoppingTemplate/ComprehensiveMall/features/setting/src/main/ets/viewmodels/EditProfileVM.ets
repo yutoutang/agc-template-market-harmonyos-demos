@@ -1,10 +1,12 @@
-import { util } from '@kit.ArkTS';
-import { promptAction } from '@kit.ArkUI';
-import { BusinessError } from '@kit.BasicServicesKit';
-import { functionalButtonComponentManager } from '@kit.ScenarioFusionKit';
-import fs from '@ohos.file.fs';
-import { iData, routerStack } from 'lib_foundation';
-import { UserInfoModel } from 'lib_foundation';
+import { ObservedInfoItem, FormGroup, FormType } from 'collect_personal_info';
+import { iData, UserInfoModel } from 'lib_foundation';
+import { UserApis } from 'lib_network';
+
+enum UserInfoType {
+  AVATAR = 'avatar',
+  NICKNAME = 'nickname',
+  PHONE = 'phone'
+}
 
 @ObservedV2
 export class EditProfileVM {
@@ -16,51 +18,81 @@ export class EditProfileVM {
   nickname: string = '';
   @Trace
   userInfo: UserInfoModel = iData.global.userInfo;
-
-  @Computed
-  get displayPhone(){
-    if(!this.userInfo.phone){
-      return ''
-    }
-    return `${this.userInfo.phone.substring(0, 3)}****${this.userInfo.phone.substring(7)}`;
-  }
-
-  initData() {
-    this.avatar = this.userInfo.avatar;
-    this.nickname = this.userInfo.nickname;
-  }
-
-  getAvatarSrc(
-    error: BusinessError,
-    data: functionalButtonComponentManager.ChooseAvatarResult,
-  ) {
-    if (error) {
-      promptAction.showToast({ message: '获取头像失败，请稍后重试' });
-      return;
-    }
-    let avatarFile: fs.File | null = null;
-    try {
-      avatarFile = fs.openSync(data.avatarUri!, fs.OpenMode.READ_ONLY);
-      let newPath =
-        getContext().filesDir + `/${util.generateRandomUUID(false)}.png`;
-      fs.copyFileSync(avatarFile.fd, newPath);
-      this.avatar = 'file://' + newPath;
-    } catch (err) {
-      console.error('get photo error:' + err);
-    } finally {
-      if (avatarFile) {
-        try {
-          fs.closeSync(avatarFile);
-        } catch (err) {
-          console.error('close file failed,error:' + JSON.stringify(err));
-        }
+  @Trace avatarItem: ObservedInfoItem = new ObservedInfoItem({
+    type: FormType.CHOOSE_AVATAR,
+    label: '头像',
+    value: this.userInfo.avatar ? this.userInfo.avatar : $r('app.media.default_avatar'),
+    onChange: async (param?: Object) => {
+      const res = await UserApis.updateUserInfo({
+        type: UserInfoType.AVATAR,
+        value: param as string,
+      })
+      if (res.code === 0) {
+        this.avatarItem.value = param as string;
       }
-    }
-  }
-
-  handleSave() {
-    this.userInfo.avatar = this.avatar;
-    this.userInfo.nickname = this.nickname;
-    routerStack.pop();
-  }
+    },
+  });
+  @Trace nickNameItem: ObservedInfoItem = new ObservedInfoItem({
+    type: FormType.TEXT_INPUT,
+    label: '昵称',
+    value: this.userInfo.nickname,
+    minLength: 2,
+    maxLength: 10,
+    placeholderText: '请输入昵称',
+    invocation: (_param: Object) => {
+      return Promise.resolve();
+    },
+    validMessageText: '内容为空，请输入后保存',
+    onChange: async (param?: Object) => {
+      const res = await UserApis.updateUserInfo({
+        type: UserInfoType.NICKNAME,
+        value: param as string,
+      })
+      if (res.code === 0) {
+        this.nickNameItem.value = param as string;
+      }
+    },
+  })
+  @Trace phoneItem: ObservedInfoItem = new ObservedInfoItem({
+    type: FormType.PHONE_INPUT,
+    label: '手机号码',
+    value: this.userInfo.anonymousPhone,
+    phoneInfo: {
+      codeLength: 6,
+      sendCode: (_phone: string) => {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve()
+          }, 1000)
+        })
+      },
+      verifyCode: (_phone: string, _code: string) => {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve()
+          }, 1000)
+        })
+      },
+    },
+    onChange: async (param?: Object) => {
+      const res = await UserApis.updateUserInfo({
+        type: UserInfoType.PHONE,
+        value: param as string,
+      })
+      if (res.code === 0) {
+        this.phoneItem.value = param as string;
+      }
+    },
+  })
+  @Trace list: FormGroup[] = [
+    {
+      list: [this.avatarItem],
+    },
+    {
+      list: [
+        this.nickNameItem,
+        this.phoneItem,
+      ],
+    },
+  ];
 }

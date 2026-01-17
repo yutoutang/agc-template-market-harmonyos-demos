@@ -1,12 +1,11 @@
 import { avSession } from '@kit.AVSessionKit';
 import { common } from '@kit.AbilityKit';
 import { fileIo as fs } from '@kit.CoreFileKit';
+import { UtilLog as Logger } from '@hw-agconnect/util-log';
 import { AvCastController } from '../controller/AvCastController';
 import { AvSessionController } from '../controller/AvSessionController';
-import { Logger } from '../util/MyLog';
 import { toastUtil } from '../util/ToastUtil';
 import { MediaData, CastSessionListener, CastStatusModel, MediaType } from '../model/Index';
-
 
 
 const TAG = '[CastService]';
@@ -39,7 +38,7 @@ export class CastService {
           this.castStatusModel.isCasting = true;
         }
       } else {
-        toastUtil.showToast('获取投播资源失败')
+        toastUtil.showToast('获取投播资源失败');
         Logger.error(TAG, 'can not get source');
         this.castController?.endCasting();
         this.castStatusModel.isCasting = false;
@@ -49,9 +48,9 @@ export class CastService {
       (currentDevice.castCategory === avSession.AVCastCategory.CATEGORY_LOCAL &&
         connectState === avSession.ConnectionState.STATE_CONNECTED)) {
       if (device) {
-        this.pause()
+        this.pause();
         this.castController?.endCasting();
-        this.sessionController.unregisterSessionListener()
+        this.sessionController.unregisterSessionListener();
         this.castStatusModel.isCasting = false;
         // 投屏端断开链接关闭投屏文件
         if (this.curFile) {
@@ -90,6 +89,9 @@ export class CastService {
 
   public registerSessionListener(listener: CastSessionListener): void {
     this.sessionListener = listener;
+    if (this.sessionListener && this.castController) {
+      this.castController.registerCastListener(this.sessionListener);
+    }
   }
 
   public unregisterSessionListener(): void {
@@ -193,7 +195,7 @@ export class CastService {
   }
 
 
-  public wifiError(){
+  public wifiError() {
 
   }
 
@@ -202,8 +204,6 @@ export class CastService {
     await this.initAvCastController();
     this.castController = undefined;
   }
-
-
 
 
   private async initAvCastController() {
@@ -233,6 +233,8 @@ export class CastService {
     let castItem: avSession.AVQueueItem = {
       itemId: this.curSource.sortId,
       description: {
+        // todo 修改为自己的应用名称
+        appName: '本地影音投屏',
         assetId: this.curSource.id,
         title: this.curSource.name,
         mediaType: this.curSource.mediaType === MediaType.VIDEO ? 'VIDEO' : 'AUDIO',
@@ -255,41 +257,33 @@ export class CastService {
   }
 
   private sessionPlayCallback = (): void => {
+    console.log('播放');
     this.sessionListener?.onPlay();
   };
-
-
   private sessionPauseCallback = (): void => {
+    console.log('暂停');
     this.sessionListener?.onPause();
   };
-
-
   private sessionPlayNextCallback = (): void => {
+    console.log('下一级');
     this.sessionListener?.onPlayNext();
   };
-
-
   private sessionPlayPreviousCallback = (): void => {
+    console.log('上一级');
     this.sessionListener?.onPlayPre();
   };
-
-
   private sessionFastForwardCallback = (time?: number) => {
     if (!time) {
       return;
     }
     this.sessionListener?.onFastForward(time);
   };
-
-
   private sessionRewindCallback = (time?: number) => {
     if (!time) {
       return;
     }
     this.sessionListener?.onRewind(time);
   };
-
-
   private sessionSeekCallback = (seekTime: number) => {
     this.sessionListener?.onSeek(seekTime);
   };

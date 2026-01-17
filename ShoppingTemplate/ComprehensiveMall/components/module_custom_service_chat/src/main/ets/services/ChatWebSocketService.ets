@@ -1,7 +1,8 @@
 import { BusinessError } from '@kit.BasicServicesKit';
 import webSocket from '@ohos.net.webSocket';
+import { Logger } from 'module_ui_base';
 import { BaseChatService } from '../models/BaseChatModel';
-import { MessageModel, MessageType, SenderType } from '../models/MessageModel';
+import { MessageData, MessageModel, MessageType, SenderType } from '../models/MessageModel';
 
 /**
  * todo: 实现真实的websocket对话类
@@ -17,7 +18,7 @@ export class ChatWebSocketService extends BaseChatService {
   // 连接WebSocket服务器
   async connect(serverUrl: string): Promise<boolean> {
     try {
-      this.webSocket = await webSocket.createWebSocket();
+      this.webSocket = webSocket.createWebSocket();
 
       // 注册事件监听器
       this.webSocket.on('open', () => {
@@ -29,10 +30,13 @@ export class ChatWebSocketService extends BaseChatService {
       this.webSocket.on(
         'message',
         (err: BusinessError, value: string | ArrayBuffer) => {
+          if (err) {
+            return;
+          }
           console.info('on message, message:' + value);
           // 当收到服务器的`bye`消息时（此消息字段仅为示意，具体字段需要与服务器协商），主动断开连接。
           if (value === 'bye') {
-            this.webSocket!.close((err: BusinessError, value: boolean) => {
+            this.webSocket!.close((err: BusinessError) => {
               if (!err) {
                 console.info('Connection closed successfully');
               } else {
@@ -79,11 +83,11 @@ export class ChatWebSocketService extends BaseChatService {
     }
 
     try {
-      const messageData: ESObject = {
+      const messageData: MessageData = {
         type: type,
         content: content,
         timestamp: Date.now(),
-      } as ESObject;
+      }
 
       await this.webSocket.send(JSON.stringify(messageData));
       return true;
@@ -112,7 +116,9 @@ export class ChatWebSocketService extends BaseChatService {
   // 断开连接
   disconnect(): void {
     if (this.webSocket) {
-      this.webSocket.close();
+      this.webSocket.close().catch((err: BusinessError) => {
+        Logger.error('close websocket failed. error: ' + JSON.stringify(err))
+      })
       this.webSocket = null;
     }
   }

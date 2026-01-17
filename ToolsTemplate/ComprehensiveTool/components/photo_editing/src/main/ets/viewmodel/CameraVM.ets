@@ -1,15 +1,16 @@
 import { BusinessError } from '@kit.BasicServicesKit';
+import { PersistenceV2 } from '@kit.ArkUI';
 import { image } from '@kit.ImageKit';
 import { camera } from '@kit.CameraKit';
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { fileIo } from '@kit.CoreFileKit';
+import { UserInfoModel } from 'module_base';
 import { CustomFilter } from '../model/CustomFilter';
 import { formatToPixelMapFormatMap, pixelMapFormatToSizeMap } from '../constant/Constants';
 import { PRESETS } from '../constant/Presets';
 import { ImageProcessingUtil } from '../util/ImageProcessingUtil';
 import { getInstance } from '../util/RouteModule';
-import { promptAction } from '@kit.ArkUI';
 
 @ObservedV2
 export class CameraVM {
@@ -24,6 +25,8 @@ export class CameraVM {
   filters: CustomFilter[] = PRESETS;
   private imageReceiverSurfaceId: string = '';
   @Trace context: Context | undefined = undefined;
+  userInfoModel: UserInfoModel = PersistenceV2.connect(UserInfoModel, () => new UserInfoModel())!;
+  @Trace isMember: boolean = false;
   private session: camera.PhotoSession | undefined = undefined;
   private previewOutput: camera.PreviewOutput | undefined = undefined;
   private cameraInput: camera.CameraInput | undefined = undefined;
@@ -51,14 +54,18 @@ export class CameraVM {
    */
   async initImageReceiver(): Promise<void> {
     if (!this.imageReceiver) {
-      // 创建ImageReceiver。
-      let size: image.Size = { width: this.imageWidth, height: this.imageHeight };
-      this.imageReceiver = image.createImageReceiver(size, image.ImageFormat.JPEG, 8);
-      // 获取第一路流SurfaceId。
-      this.imageReceiverSurfaceId = await this.imageReceiver.getReceivingSurfaceId();
-      console.info(`initImageReceiver imageReceiverSurfaceId:${this.imageReceiverSurfaceId}`);
-      // 注册监听处理预览流每帧图像数据。
-      this.onImageArrival(this.imageReceiver);
+      try {
+        // 创建ImageReceiver。
+        let size: image.Size = { width: this.imageWidth, height: this.imageHeight };
+        this.imageReceiver = image.createImageReceiver(size, image.ImageFormat.JPEG, 8);
+        // 获取第一路流SurfaceId。
+        this.imageReceiverSurfaceId = await this.imageReceiver.getReceivingSurfaceId();
+        console.info(`initImageReceiver imageReceiverSurfaceId:${this.imageReceiverSurfaceId}`);
+        // 注册监听处理预览流每帧图像数据。
+        this.onImageArrival(this.imageReceiver);
+      } catch (e) {
+        UtilLog.error(`initImageReceiver failed: ${JSON.stringify(e)}`);
+      }
     }
   }
 
@@ -92,12 +99,16 @@ export class CameraVM {
             console.info(`getComponent with width:${width} height:${height} stride:${stride}`);
             // oriPixelMap创建时使用的size、srcPixelFormat需要与相机预览输出流previewProfile中的size、format保持一致。此处format以NV21格式为例。
             // stride与width一致。
-            let oriPixelMap: PixelMap;
+            let oriPixelMap: PixelMap| undefined = undefined;
             if (stride === width) {
-              oriPixelMap = await image.createPixelMap(imgComponent.byteBuffer, {
-                size: { height: height, width: width },
-                srcPixelFormat: pixelMapFormat,
-              });
+              try {
+                oriPixelMap = await image.createPixelMap(imgComponent.byteBuffer, {
+                  size: { height: height, width: width },
+                  srcPixelFormat: pixelMapFormat,
+                });
+              } catch (e) {
+                UtilLog.error(`createPixelMap failed with error ${JSON.stringify(e)}`);
+              }
             } else {
               // stride与width不一致。
               const dstBufferSize = width * height * mSize; // 以NV21为例（YUV_420_SP格式的图片）YUV_420_SP内存计算公式：长x宽+(长x宽)/2。
@@ -106,19 +117,23 @@ export class CameraVM {
                 const srcBuf = new Uint8Array(imgComponent.byteBuffer, j * stride, width);
                 dstArr.set(srcBuf, j * width);
               }
-              oriPixelMap = await image.createPixelMap(dstArr.buffer, {
-                size: { height: height, width: width },
-                srcPixelFormat: pixelMapFormat,
-              });
+              try {
+                oriPixelMap = await image.createPixelMap(dstArr.buffer, {
+                  size: { height: height, width: width },
+                  srcPixelFormat: pixelMapFormat,
+                });
+              } catch (e) {
+                UtilLog.error(`createPixelMap failed with error ${JSON.stringify(e)}`);
+              }
             }
             // 因为pixelmap和相机流的宽高相反，所以需要旋转90度
             if (this.mCameraPosition === camera.CameraPosition.CAMERA_POSITION_BACK) {
-              await oriPixelMap.rotate(90);
+              await oriPixelMap?.rotate(90);
             } else {
-              await oriPixelMap.rotate(-90);
+              await oriPixelMap?.rotate(-90);
             }
             this.pixelMap = await ImageProcessingUtil.filterImage(this.filter, oriPixelMap);
-            oriPixelMap.release();
+            oriPixelMap?.release();
           } else {
             console.error('byteBuffer is null');
           }
@@ -268,28 +283,32 @@ export class CameraVM {
         if (!buffer) {
           return;
         }
-        let pixelMap = image.createImageSource(buffer).createPixelMapSync();
-        this.capturePixelmap = await ImageProcessingUtil.filterImage(this.filter, pixelMap);
-        // 跳转到下载页面
-        getInstance().pushPathByName('ImageDownload', this.capturePixelmap);
-        this.imageObj!.release();
-        this.isBusy = false;
+        try {
+          let pixelMap = image.createImageSource(buffer).createPixelMapSync();
+          this.capturePixelmap = await ImageProcessingUtil.filterImage(this.filter, pixelMap);
+          // 跳转到下载页面
+          getInstance().pushPathByName('ImageDownload', this.capturePixelmap);
+          this.imageObj!.release();
+          this.isBusy = false;
+        } catch (e) {
+          UtilLog.error(`captureCallback failed: ${JSON.stringify(e)}`);
+        }
       });
   }
 
-  async handleSaveButtonClick(context: Context) {
+  async handleSaveButtonClick(uiContext: UIContext) {
     let file: fileIo.File | undefined = undefined;
     try {
-      const phAccessHelper = photoAccessHelper.getPhotoAccessHelper(context);
+      const phAccessHelper = photoAccessHelper.getPhotoAccessHelper(uiContext.getHostContext());
       const filePath = await phAccessHelper.createAsset(photoAccessHelper.PhotoType.IMAGE, 'jpeg');
       const imagePacker = image.createImagePacker();
       const imageBuffer = await imagePacker.packToData(this.capturePixelmap, { format: 'image/jpeg', quality: 100 });
       const mode = fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE;
       file = fileIo.openSync(filePath, mode);
       fileIo.writeSync(file.fd, imageBuffer);
-      promptAction.showToast({ message: '保存图片到相册成功~' });
+      uiContext.getPromptAction().showToast({ message: '保存图片到相册成功~' });
     } catch (err) {
-      hilog.error(0x0000, 'CameraVM', 'save to album error', JSON.stringify(err));
+      UtilLog.error('save to album error', JSON.stringify(err));
     } finally {
       if (file) {
         fileIo.close(file);

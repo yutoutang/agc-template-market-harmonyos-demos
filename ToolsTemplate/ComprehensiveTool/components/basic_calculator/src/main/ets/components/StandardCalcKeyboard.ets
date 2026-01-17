@@ -4,7 +4,7 @@ import { CalcButtonItemModel } from '../model/CalcButtonItemModel';
 import { HistoryUtils } from '../utils/HistoryUtils';
 import CheckEmptyUtil from '../common/CheckEmptyUtil';
 import CalculateUtil from '../common/CalculateUtil';
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { BreakpointModel, BreakpointStorage, BreakpointSystem, BreakpointTypeEnum } from '../utils/BreakpointSystem';
 
 @ComponentV2
@@ -16,7 +16,7 @@ export struct StandardCalcKeyboard {
   @Local lastBtnIsEqu: boolean = false;
   @Local isClickEquBtn: boolean = false;
   @Local curBreakpoint: BreakpointStorage = BreakpointSystem.currentBreakpoint
-  context: common.Context = getContext(this) as common.UIAbilityContext;
+  context: common.Context = this.getUIContext().getHostContext() as common.UIAbilityContext;
   calcButtonItemModel: CalcButtonItemModel[] = [
     new CalcButtonItemModel('del', BUTTON_TYPE.LETTERS, 0, 'C',
       $r('sys.color.background_emphasize')),
@@ -388,9 +388,9 @@ export struct StandardCalcKeyboard {
     }
     let result = '';
     try {
-      result = this.context.resourceManager.getStringSync(resource);
+      result = this.context.resourceManager.getStringSync(resource.id);
     } catch (error) {
-      hilog.error(0xff00, 'Template', '[CalculateModel] getResourceString fail: ' + JSON.stringify(error));
+      UtilLog.error('[CalculateModel] getResourceString fail: ' + JSON.stringify(error));
     }
     return result;
   }

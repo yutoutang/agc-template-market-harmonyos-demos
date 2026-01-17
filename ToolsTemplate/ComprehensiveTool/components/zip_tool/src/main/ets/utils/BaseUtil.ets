@@ -2,7 +2,7 @@ import { systemShare } from '@kit.ShareKit';
 import { common } from '@kit.AbilityKit';
 import { uniformTypeDescriptor as utd } from '@kit.ArkData';
 import { fileUri } from '@kit.CoreFileKit';
-import Logger from './ZipLogger';
+import { UtilLog as Logger } from '@hw-agconnect/util-log';
 
 export function formatFullDate(date: Date): string {
   const pad = (n: number) => n < 10 ? '0' + n : n.toString();

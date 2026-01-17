@@ -24,3 +24,7 @@ export interface TabBarModule {
   defaultIcon: ResourceStr;
   component: WrappedBuilder<[]>;
 }
+
+export class PushActionParams {
+  name: string = ''
+}

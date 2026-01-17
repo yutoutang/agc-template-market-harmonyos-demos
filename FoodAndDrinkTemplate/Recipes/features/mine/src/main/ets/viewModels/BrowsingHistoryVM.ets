@@ -2,13 +2,13 @@ import { queryRecipeHistoryList } from 'network';
 import { historyListMapper } from '../mapper/Index';
 import { RecipeItem } from '../types/Index';
 import { common } from '@kit.AbilityKit';
-import { RdbManager, recipesData, CommonConstants } from 'commonlib';
+import { RdbManager, recipesData, CommonConstants, GlobalContextUtils } from 'commonlib';
 
 @ObservedV2
 export class BrowsingHistoryVM {
   private static _instance: BrowsingHistoryVM;
   @Trace history: RecipeItem[] = [];
-  private context: common.UIAbilityContext = getContext() as common.UIAbilityContext;
+  private context: common.UIAbilityContext = GlobalContextUtils.globalUIAbilityContext;
   private rdbManager: RdbManager = new RdbManager(this.context);
 
   async queryRecipeHistory() {

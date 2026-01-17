@@ -4,15 +4,15 @@
 
 - [简介](#简介)
 - [约束与限制](#约束与限制)
-- [快速入门](#快速入门)
+- [使用](#使用)
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
 ## 简介
 
-本组件提供了钱包充值和查看充值记录的功能，可以使用华为支付充值钱包并查看充值记录。
+本组件提供了钱包充值和查看账单明细的功能，可以使用华为支付充值钱包并查看账单明细。
 
-| 钱包充值                                                   | 充值记录                                                   |
+| 钱包充值                                                   | 账单明细                                                   |
 |--------------------------------------------------------|--------------------------------------------------------|
 | <img src="./screenshot/Screenshot_1.jpeg" width="300"> | <img src="./screenshot/Screenshot_2.jpeg" width="300"> |
 
@@ -26,7 +26,11 @@
 * 设备类型：华为手机（包括双折叠和阔折叠）
 * 系统版本：HarmonyOS 5.0.4(16)及以上
 
-## 快速入门
+### 权限
+
+- 无
+
+## 使用
 
 1. 安装组件。  
    如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
@@ -78,7 +82,7 @@
        // 去付款
      },
    })
-   // 充值记录
+   // 账单明细
    RechargeRecordComp({ rechargeRecordList: this.rechargeRecordList })
    ```
 
@@ -98,13 +102,13 @@ MyWallet(options?: MyWalletOptions)
 
 RechargeRecordComp(options?: RechargeRecordCompOptions)
 
-充值记录组件。
+账单明细组件。
 
 **参数：**
 
 | 参数名     | 类型                                                          | 是否必填 | 说明       |
 |---------|-------------------------------------------------------------|------|----------|
-| options | [RechargeRecordCompOptions](#RechargeRecordCompOptions对象说明) | 是    | 充值记录的参数。 |
+| options | [RechargeRecordCompOptions](#RechargeRecordCompOptions对象说明) | 是    | 账单明细的参数。 |
 
 ### MyWalletOptions对象说明
 
@@ -118,7 +122,7 @@ RechargeRecordComp(options?: RechargeRecordCompOptions)
 
 | 名称                 | 类型                                      | 是否必填 | 说明     |
 |--------------------|-----------------------------------------|------|--------|
-| rechargeRecordList | [RechargeRecord](#RechargeRecord对象说明)[] | 是    | 充值记录列表 |
+| rechargeRecordList | [RechargeRecord](#RechargeRecord对象说明)[] | 是    | 账单明细列表 |
 
 ### RechargeTier对象说明
 
@@ -133,12 +137,13 @@ RechargeRecordComp(options?: RechargeRecordCompOptions)
 
 ### RechargeRecord对象说明
 
-| 名称            | 类型     | 是否必填 | 说明     |
-|---------------|--------|------|--------|
-| id            | string | 是    | 充值档次序号 |
-| rechargeMoney | number | 是    | 充值金额   |
-| balance       | number | 是    | 当前余额   |
-| time          | number | 是    | 充值时间   |
+| 名称            | 类型     | 是否必填 | 说明                |
+|---------------|--------|------|-------------------|
+| id            | string | 是    | 充值档次序号            |
+| recordType    | number | 是    | 金额变动类型 1：充值  2：消费 |
+| rechargeMoney | number | 是    | 充值金额              |
+| balance       | number | 是    | 当前余额              |
+| time          | number | 是    | 充值时间              |
 
 ### 事件
 
@@ -148,7 +153,7 @@ RechargeRecordComp(options?: RechargeRecordCompOptions)
 
 goRechargeCb(callback: () => void)
 
-跳转充值记录页面
+跳转账单明细页面
 
 #### changeSelectCb
 
@@ -175,7 +180,6 @@ goPayCb(callback: () => void)
 本示例展示钱包充值页面。
 
 ```typescript
-import { promptAction } from '@kit.ArkUI';
 import { MyWallet, RechargeTier } from 'my_wallet';
 
 @Entry
@@ -223,16 +227,16 @@ struct Index {
             rechargeTierList: this.rechargeTierList,
             selectTier: this.selectTier,
             goRechargeCb: (): void => {
-               promptAction.showToast({ message: '跳转充值记录页面' })
+               this.getUIContext().getPromptAction().showToast({ message: '跳转账单明细页面' })
             },
             changeSelectCb: (selectTier: RechargeTier) => {
                this.selectTier = selectTier
             },
             goWalletTermsCb: () => {
-               promptAction.showToast({ message: '跳转协议页面' })
+               this.getUIContext().getPromptAction().showToast({ message: '跳转协议页面' })
             },
             goPayCb: () => {
-               promptAction.showToast({ message: '去支付' })
+               this.getUIContext().getPromptAction().showToast({ message: '去支付' })
             },
          })
       }
@@ -244,7 +248,7 @@ struct Index {
 }
 ```
 
-### 示例2（充值记录）
+### 示例2（账单明细）
 
 本示例展示钱包钱包页面。
 
@@ -261,6 +265,7 @@ struct Index {
       for (let index = 0; index < 10; index++) {
          let record: RechargeRecord = {
             id: `${index}`,
+            recordType: index % 2 + 1,
             rechargeMoney: index * 100,
             balance: index * 100,
             time: new Date().getTime(),
@@ -277,6 +282,7 @@ struct Index {
             .padding(16)
             .backgroundColor($r('sys.color.background_secondary'))
       }
+      .padding({ top: 45 })
    }
 }
 ```

@@ -1,4 +1,3 @@
-import { PersistenceV2 } from '@kit.ArkUI';
 import { DownloadWithoutWlanEnum, VideoNetworkModel, VideoNetworkSetting } from '../models/VideoNetworkModel';
 
 @ComponentV2

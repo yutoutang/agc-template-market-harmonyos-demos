@@ -1,6 +1,16 @@
 import { emitter } from '@kit.BasicServicesKit';
 import { UserInfo } from 'base_common';
-import { BookApi, Constants, GetUserInfoRsp, NavHeaderBar, ReturnButton, TCRouter} from 'common';
+import {
+  BookApi,
+  BreakpointStorage,
+  BreakpointSystem,
+  BreakpointTypeEnum,
+  Constants,
+  GetUserInfoRsp,
+  NavHeaderBar,
+  ReturnButton,
+  TCRouter
+} from 'common';
 import { AvatarIcon, SelectAvatarCard } from '../comp/SelectAvatarCard';
 
 @ComponentV2
@@ -15,17 +25,23 @@ export struct AccountPage {
   @Local isModifyNickName: boolean = false;
   @Local isModifyTelephone: boolean = false;
   @Local windowTopHeight: number = AppStorage.get('windowTopHeight') as number || 38.77;
+  @Local curBreakpoint: BreakpointStorage = BreakpointSystem.currentBreakpoint
 
   async aboutToAppear(): Promise<void> {
     this.userInfo = AppStorage.get('userInfo') as UserInfo;
     this.avatarIcon = new AvatarIcon(this.userInfo?.avatarUrl, 40, 40);
     this.telephone = this.userInfo.telephone as string;
     this.nickName = this.userInfo.nickName;
-    emitter.on(Constants.LOGIN_CHANGE,()=>{
-      this.avatarIcon.avatarUrl = AppStorage.get<UserInfo>('userInfo')?.avatarUrl as string
-    })
+    try {
+      emitter.on(Constants.LOGIN_CHANGE, () => {
+        this.avatarIcon.avatarUrl = AppStorage.get<UserInfo>('userInfo')?.avatarUrl as string
+      })
+    } catch (e) {
+      console.error('Failed to emitter on login change. Cause: ' + JSON.stringify(e));
+    }
   }
-  submitModifyMsg(){
+
+  submitModifyMsg() {
     if (this.userInfo) {
       if (this.isModifyNickName) {
         this.userInfo.nickName = this.modifyContent;
@@ -37,7 +53,11 @@ export struct AccountPage {
         this.isModifyTelephone = false;
       }
     }
-    emitter.emit(Constants.LOGIN_CHANGE);
+    try {
+      emitter.emit(Constants.LOGIN_CHANGE);
+    } catch (e) {
+      console.error('Failed to emitter emit login change. Cause: ' + JSON.stringify(e));
+    }
     AppStorage.set('userInfo', this.userInfo);
     this.isShowModifyBind = false;
     const uiContext = this.getUIContext?.();
@@ -46,6 +66,7 @@ export struct AccountPage {
       promptAction.showToast({ message: $r('app.string.modify_success') });
     }
   }
+
   @Styles
   settingCard() {
     .width(Constants.FULL_SIZE)
@@ -66,7 +87,7 @@ export struct AccountPage {
         .fontSize($r('sys.float.Body_L'))
         .fontColor($r('sys.color.font_primary'))
         .height(20)
-      Row({space : 4}) {
+      Row({ space: 4 }) {
         if (this.userInfo?.isLogin) {
           SelectAvatarCard({ avatarIcon: this.avatarIcon, isLogin: this.userInfo?.isLogin })
         } else {
@@ -98,7 +119,7 @@ export struct AccountPage {
         .fontColor($r('sys.color.font_primary'))
         .height(20)
 
-      Row({space : 4}) {
+      Row({ space: 4 }) {
         Text(this.nickName)
           .height(20)
         Image($r('app.media.ic_modify_name'))
@@ -130,9 +151,8 @@ export struct AccountPage {
     }
     .backgroundColor($r('sys.color.comp_background_list_card'))
     .borderRadius(16)
-    .padding({left:12, right:12})
+    .padding({ left: 12, right: 12 })
   }
-
 
   @Builder
   phoneCard() {
@@ -141,7 +161,7 @@ export struct AccountPage {
         .fontSize($r('sys.float.Body_L'))
         .fontColor($r('sys.color.font_primary'))
         .height(20)
-      Row({space : 4}) {
+      Row({ space: 4 }) {
         Text(this.telephone)
           .fontSize($r('sys.float.Body_L'))
           .fontColor($r('sys.color.font_secondary'))
@@ -180,7 +200,7 @@ export struct AccountPage {
     }
     .onClick(() => {
       const promptAction = this.getUIContext().getPromptAction();
-      
+
       if (!this.userInfo?.isLogin) {
         promptAction.showToast({ message: $r('app.string.no_login_out') })
       } else {
@@ -199,18 +219,22 @@ export struct AccountPage {
           ]
         }, (err, data) => {
           if (data.index === 1) {
-            // 保留会员状态和书币信息，只清除登录状态
-            const savedMembershipStatus = this.userInfo?.isMembership || false;
-            const savedBookCoins = typeof this.userInfo?.bookCoins === 'number' ? this.userInfo.bookCoins : 100;
-            
-            // 保存会员状态和书币信息到本地存储
-            AppStorage.setOrCreate('membershipStatus', savedMembershipStatus);
-            AppStorage.setOrCreate('bookCoins', savedBookCoins);
-            
-            // 清除用户信息
-            AppStorage.setOrCreate('userInfo', undefined);
-            emitter.emit(Constants.LOGIN_CHANGE);
-            TCRouter.pop();
+            try {
+              // 保留会员状态和书币信息，只清除登录状态
+              const savedMembershipStatus = this.userInfo?.isMembership || false;
+              const savedBookCoins = typeof this.userInfo?.bookCoins === 'number' ? this.userInfo.bookCoins : 100;
+
+              // 保存会员状态和书币信息到本地存储
+              AppStorage.setOrCreate('membershipStatus', savedMembershipStatus);
+              AppStorage.setOrCreate('bookCoins', savedBookCoins);
+
+              // 清除用户信息
+              AppStorage.setOrCreate('userInfo', undefined);
+              emitter.emit(Constants.LOGIN_CHANGE);
+              TCRouter.pop();
+            } catch (e) {
+              console.error('Failed to emitter emit login change. Cause: ' + JSON.stringify(e));
+            }
           }
         })
       }
@@ -246,7 +270,7 @@ export struct AccountPage {
         .height(40)
         .borderRadius(20)
         .backgroundColor($r('sys.color.multi_color_08'))
-        .onClick(()=>{
+        .onClick(() => {
           this.submitModifyMsg()
         })
     }
@@ -270,7 +294,11 @@ export struct AccountPage {
               this.avatarCard();
               this.nickNameAndPhoneCard()
             }
-          }.layoutWeight(1)
+            .width(this.curBreakpoint.value === BreakpointTypeEnum.LG ? '70%' : '100%')
+            .justifyContent(FlexAlign.Center)
+          }
+          .width('100%')
+          .layoutWeight(1)
           .scrollBar(BarState.Off)
           .edgeEffect(EdgeEffect.Spring)
           .align(Alignment.Top)
@@ -285,8 +313,10 @@ export struct AccountPage {
           detents: [SheetSize.MEDIUM, SheetSize.LARGE, 800],
           height: SheetSize.FIT_CONTENT,
           preferType: SheetType.BOTTOM,
-          title: { title: this.isModifyNickName ? $r('app.string.modify_nickname') : $r('app.string.modify_telephone') },
-          onWillDismiss: ()=>{
+          title: {
+            title: this.isModifyNickName ? $r('app.string.modify_nickname') : $r('app.string.modify_telephone')
+          },
+          onWillDismiss: () => {
             this.isShowModifyBind = false;
             this.isModifyNickName = false;
             this.isModifyTelephone = false;

@@ -29,7 +29,7 @@ export struct DownloadButton {
   async save(pixelMap: image.PixelMap) {
     let file: fileIo.File | undefined = undefined;
     try {
-      const phAccessHelper = photoAccessHelper.getPhotoAccessHelper(getContext());
+      const phAccessHelper = photoAccessHelper.getPhotoAccessHelper(this.getUIContext().getHostContext());
       let suffix = this.vm.suffix;
       if (suffix === 'jpg') {
         suffix = 'jpeg';

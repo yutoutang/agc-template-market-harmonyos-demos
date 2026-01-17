@@ -1,8 +1,10 @@
-import { abilityAccessCtrl, common } from '@kit.AbilityKit';
-import { Constants } from '../constants/Common';
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
+import { UtilLog } from '@hw-agconnect/util-log';
+import { abilityAccessCtrl } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { geoLocationManager } from '@kit.LocationKit';
-import { promptAction } from '@kit.ArkUI';
+import { Constants } from '../constants/Common';
+import { WindowUtil } from './WindowUtil';
 
 class PermissionUtil {
   private static instance?: PermissionUtil
@@ -20,7 +22,7 @@ class PermissionUtil {
   initPermission(): Promise<boolean> {
     return new Promise((resolve, reject) => {
       let atManager: abilityAccessCtrl.AtManager = abilityAccessCtrl.createAtManager();
-      atManager.requestPermissionsFromUser(getContext() as common.UIAbilityContext,
+      atManager.requestPermissionsFromUser(WindowUtil.globalUIAbilityContext,
         ['ohos.permission.LOCATION', 'ohos.permission.APPROXIMATELY_LOCATION'])
         .then((data) => {
           let grantStatus: Array<number> = data.authResults;
@@ -28,7 +30,7 @@ class PermissionUtil {
           resolve(hasMapPermission)
         }).catch((err: BusinessError) => {
         reject(err.message)
-        console.error(`Failed to request permissions from user. Code is ${err.code}, message is ${err.message}`);
+        UtilLog.error(`Failed to request permissions from user. Code is ${err.code}, message is ${err.message}`);
       });
     })
   }
@@ -36,14 +38,14 @@ class PermissionUtil {
   async getLocation(): Promise<geoLocationManager.Location> {
     return new Promise(async (resolve, reject) => {
       if (!await this.initPermission()) {
-        promptAction.showToast({ message: $r('app.string.permission_failed') })
+        promptAction.showToast({ message: '权限获取失败' })
         reject()
         return
       }
       geoLocationManager.getCurrentLocation().then((location: geoLocationManager.Location) => {
         resolve(location);
       }).catch((error: Error) => {
-        console.error('getCurrentLocation failed', 'getCurrentLocation error: ' + JSON.stringify(error));
+        UtilLog.error('getCurrentLocation failed', 'getCurrentLocation error: ' + JSON.stringify(error));
         reject(error)
       });
     })

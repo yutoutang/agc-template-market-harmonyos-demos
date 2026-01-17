@@ -1,3 +1,4 @@
+import emitter from '@ohos.events.emitter';
 import { CommonConstants } from 'lib_common';
 import { HomePageBuilder } from 'business_home';
 import { MinePageBuilder } from 'business_mine';
@@ -16,11 +17,11 @@ export function IndexPageBuilder() {
 struct IndexPage {
   @Local vm: IndexPageViewModel = new IndexPageViewModel();
   @Provider() selectedIndex: number = 0;
-
   aboutToAppear(): void {
     this.vm.refreshUserInfo();
     this.vm.checkJumpNewsDetail();
     this.vm.checkContinueScene();
+    this.vm.registerSubEmitter();
   }
 
   @Monitor('selectedIndex')

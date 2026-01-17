@@ -1,5 +1,6 @@
-import { common } from '@kit.AbilityKit';
 import { ComponentContent } from '@kit.ArkUI';
+import { BusinessError } from '@kit.BasicServicesKit';
+import { Logger } from '../common/Logger';
 
 enum PopViewShowType {
   OPEN
@@ -10,16 +11,13 @@ interface PopViewModel {
   popType: PopViewShowType;
 }
 
-async function getUIContext() {
-  return (await (getContext() as common.UIAbilityContext).windowStage.getMainWindow()).getUIContext();
-}
+const TAG = '[SharePopViewUtils]';
 
 /**
  * 全局弹窗类
  */
 export class PopViewUtils {
   private static popShare: PopViewUtils;
-  private static uiContext: UIContext;
   private sheetList: PopViewModel[] = [];
 
   private static shareInstance(): PopViewUtils {
@@ -29,58 +27,41 @@ export class PopViewUtils {
     return PopViewUtils.popShare;
   }
 
-  private static async showSheetView<T extends Object>(type: PopViewShowType,
+  private static async showSheetView<T extends Object>(uiContext: UIContext, type: PopViewShowType,
     contentView: WrappedBuilder<[T]> | WrappedBuilder<[]>, args?: T,
     options?: SheetOptions): Promise<void> {
-    if (!PopViewUtils.uiContext) {
-      PopViewUtils.uiContext = await getUIContext();
+    let componentContent: ComponentContent<Object> | null = null;
+    if (args) {
+      componentContent = new ComponentContent(uiContext, contentView, args);
+    } else {
+      componentContent = new ComponentContent(uiContext, contentView as WrappedBuilder<[]>);
     }
-    if (PopViewUtils.uiContext) {
-      let componentContent: ComponentContent<Object> | null = null;
-      if (args) {
-        componentContent = new ComponentContent(PopViewUtils.uiContext, contentView, args);
-      } else {
-        componentContent = new ComponentContent(PopViewUtils.uiContext, contentView as WrappedBuilder<[]>);
+    uiContext.openBindSheet(componentContent, options).then(() => {
+      if (componentContent) {
+        let sheetList = PopViewUtils.shareInstance().sheetList;
+        let info: PopViewModel = {
+          com: componentContent,
+          popType: type,
+        };
+        sheetList[0] = info;
       }
-
-      let sheetOptions: SheetOptions = {
-        height: options?.height,
-        dragBar: options?.dragBar,
-        maskColor: options?.maskColor,
-        detents: options?.detents,
-        showClose: options?.showClose,
-        title: options?.title,
-        backgroundColor: options?.backgroundColor,
-        onHeightDidChange: options?.onHeightDidChange,
-        onDetentsDidChange: options?.onDetentsDidChange,
-        scrollSizeMode: options?.scrollSizeMode,
-        onWillDisappear:options?.onWillDisappear
-      };
-      PopViewUtils.uiContext.openBindSheet(componentContent, sheetOptions);
-      let sheetList = PopViewUtils.shareInstance().sheetList;
-      let info: PopViewModel = {
-        com: componentContent,
-        popType: type,
-      };
-      sheetList[0] = info;
-    }
+    }).catch((e: BusinessError) => {
+      Logger.error(TAG, 'openBindSheet fail, error: ' + JSON.stringify(e));
+    });
   }
 
-  private static async closeSheetView(type: PopViewShowType): Promise<void> {
-    if (!PopViewUtils.uiContext) {
-      PopViewUtils.uiContext = await getUIContext();
-    }
-    if (PopViewUtils.uiContext) {
-      let sameTypeList = PopViewUtils.shareInstance().sheetList.filter((model) => {
-        return model.popType === type;
+  private static async closeSheetView(uiContext: UIContext, type: PopViewShowType): Promise<void> {
+    let sameTypeList = PopViewUtils.shareInstance().sheetList.filter((model) => {
+      return model.popType === type;
+    })
+    let info = sameTypeList[sameTypeList.length - 1];
+    if (info?.com) {
+      PopViewUtils.shareInstance().sheetList = PopViewUtils.shareInstance().sheetList.filter((model) => {
+        return model.com !== info.com;
       })
-      let info = sameTypeList[sameTypeList.length - 1];
-      if (info?.com) {
-        PopViewUtils.shareInstance().sheetList = PopViewUtils.shareInstance().sheetList.filter((model) => {
-          return model.com !== info.com;
-        })
-        PopViewUtils.uiContext.closeBindSheet(info.com);
-      }
+      uiContext.closeBindSheet(info.com).catch((e: BusinessError) => {
+        Logger.error(TAG, 'closeBindSheet fail, error: ' + JSON.stringify(e));
+      });
     }
   }
 
@@ -91,15 +72,15 @@ export class PopViewUtils {
    * @param args
    * @param options
    */
-  public static showSheet<T extends Object>(contentView: WrappedBuilder<[T]> | WrappedBuilder<[]>,
+  public static showSheet<T extends Object>(uiContext: UIContext, contentView: WrappedBuilder<[T]> | WrappedBuilder<[]>,
     options?: SheetOptions, args?: T): void {
-    PopViewUtils.showSheetView(PopViewShowType.OPEN, contentView, args, options);
+    PopViewUtils.showSheetView(uiContext, PopViewShowType.OPEN, contentView, args, options);
   }
 
   /**
    * 关闭半模态弹窗
    */
-  public static closeSheet(): void {
-    PopViewUtils.closeSheetView(PopViewShowType.OPEN);
+  public static closeSheet(uiContext: UIContext): void {
+    PopViewUtils.closeSheetView(uiContext, PopViewShowType.OPEN);
   }
 }

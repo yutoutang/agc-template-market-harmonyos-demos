@@ -17,6 +17,7 @@ export class Constants {
 }
 
 export class PostImgVideoItem {
+  id: number = 0
   picVideoUrl: string = ''
   surfaceUrl: string = ''
 }

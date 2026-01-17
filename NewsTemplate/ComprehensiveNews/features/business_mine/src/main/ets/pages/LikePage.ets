@@ -28,7 +28,7 @@ struct LikePage {
     }
     .hideTitleBar(true)
     .onShown(() => {
-      this.vm.queryList();
+      this.vm.queryList(false);
     })
   }
 }

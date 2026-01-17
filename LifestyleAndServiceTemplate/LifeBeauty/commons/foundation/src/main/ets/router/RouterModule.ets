@@ -1,4 +1,4 @@
-import { Logger } from '../utils/Logger';
+import { UtilLog as Logger } from '@hw-agconnect/util-log';
 
 const TAG = '[RouterModule]';
 

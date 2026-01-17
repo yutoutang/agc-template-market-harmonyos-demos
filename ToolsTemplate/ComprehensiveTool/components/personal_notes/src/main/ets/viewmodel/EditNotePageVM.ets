@@ -1,11 +1,12 @@
+import { unifiedDataChannel } from '@kit.ArkData';
+import { pasteboard } from '@kit.BasicServicesKit';
+import { ToastDialog } from '@hw-agconnect/ui-toast';
 import { Note } from '../models/Note';
 import { RichEditorController } from '../controller/RichEditorController'
 import { ThemeController } from '../controller/ThemeController';
 import { SnapShotController } from '../controller/SnapShotController';
 import { NoteUtil } from '../utils/NoteUtil';
 import { ACTION_NAME, MoreFunction, SNAPSHOT_ID } from '../commons/Constant';
-import { unifiedDataChannel } from '@kit.ArkData';
-import { pasteboard } from '@kit.BasicServicesKit';
 import { ChangeRecord } from '../models/ChangeRecord';
 import { Category } from '../models/Category';
 
@@ -169,9 +170,9 @@ export class EditNotePageVM {
   }
 
   showToast(message: string) {
-    this.uiContext?.getPromptAction().showToast({
+    ToastDialog.showToast({
       message: message,
-      alignment: Alignment.Center,
+      toastAlignment: DialogAlignment.Center,
       duration: 1500
     })
   }

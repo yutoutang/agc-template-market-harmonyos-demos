@@ -12,11 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { PersistenceV2, promptAction } from '@kit.ArkUI';
+import { UtilLog } from '@hw-agconnect/util-log';
+import { PersistenceV2 } from '@kit.ArkUI';
 import { speechRecognizer } from '@kit.CoreSpeechKit';
 import { BusinessError, pasteboard } from '@kit.BasicServicesKit';
 import { util } from '@kit.ArkTS';
 import { fileIo as fs, picker } from '@kit.CoreFileKit';
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
 import { FileCapture } from '../util/FileCapture';
 import { RouterMap, getInstance } from '../util/Route';
 import { PlayUtil } from '../util/PlayUtil';
@@ -122,19 +124,23 @@ export class ConvertPageVM {
     };
     // 调用createEngine方法
     return new Promise<void>((resolve, reject) => {
-      speechRecognizer.createEngine(initParamsInfo, (err: BusinessError, speechRecognitionEngine:
-        speechRecognizer.SpeechRecognitionEngine) => {
-        if (!err) {
-          Logger.info(TAG, 'succeeded in creating engine.');
-          // 接收创建引擎的实例
-          this.asrEngine = speechRecognitionEngine;
-          this.setListener();
-          resolve();
-        } else {
-          Logger.error(TAG, `Failed to create engine. Message: ${err.message}.`);
-          reject();
-        }
-      });
+      try {
+        speechRecognizer.createEngine(initParamsInfo, (err: BusinessError, speechRecognitionEngine:
+          speechRecognizer.SpeechRecognitionEngine) => {
+          if (!err) {
+            Logger.info(TAG, 'succeeded in creating engine.');
+            // 接收创建引擎的实例
+            this.asrEngine = speechRecognitionEngine;
+            this.setListener();
+            resolve();
+          } else {
+            Logger.error(TAG, `Failed to create engine. Message: ${err.message}.`);
+            reject();
+          }
+        });
+      } catch (e) {
+        UtilLog.error(`createEngine failed with error ${JSON.stringify(e)}`);
+      }
     });
   }
 
@@ -206,16 +212,20 @@ export class ConvertPageVM {
   }
 
   public toCopy() {
-    if (this.generatedText || this.progressText) {
-      const pasteData = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN,
-        this.isFinal ? this.generatedText : this.generatedText + this.progressText);
-      pasteboard.getSystemPasteboard().setData(pasteData).then(() => {
-        promptAction.showToast({ message: '复制成功' });
-      }).catch((err: BusinessError) => {
-        promptAction.showToast({ message: '复制失败' });
-      });
-    } else {
-      promptAction.showToast({ message: '暂无内容!' });
+    try {
+      if (this.generatedText || this.progressText) {
+        const pasteData = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN,
+          this.isFinal ? this.generatedText : this.generatedText + this.progressText);
+        pasteboard.getSystemPasteboard().setData(pasteData).then(() => {
+          promptAction.showToast({ message: '复制成功' });
+        }).catch((err: BusinessError) => {
+          promptAction.showToast({ message: '复制失败' });
+        });
+      } else {
+        promptAction.showToast({ message: '暂无内容!' });
+      }
+    } catch (e) {
+      UtilLog.error(`toCopy error ${JSON.stringify(e)}`)
     }
   }
 

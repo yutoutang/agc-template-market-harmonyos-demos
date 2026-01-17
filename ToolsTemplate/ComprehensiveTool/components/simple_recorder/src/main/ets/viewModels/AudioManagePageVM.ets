@@ -15,7 +15,6 @@
 import { PersistenceV2 } from '@kit.ArkUI';
 import { fileIo as fs } from '@kit.CoreFileKit';
 import { MyAudio } from '../model/Index';
-import { RouterMap, getInstance } from '../util/Route';
 import { Logger } from '../util/Logger';
 import { AudioInfo } from '../model/Index';
 

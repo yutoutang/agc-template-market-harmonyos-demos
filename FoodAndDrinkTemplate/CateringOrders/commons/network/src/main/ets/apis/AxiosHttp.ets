@@ -1,7 +1,9 @@
-import axios, { AxiosInstance } from '@ohos/axios';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { BusinessError } from '@kit.BasicServicesKit';
+import axios, { AxiosInstance } from '@ohos/axios';
 import { HttpRequestConfig, InterceptorHooks } from './AxiosModel';
 
+const TAG = '[AxiosHttpRequest]'
 
 /**
  * 网络请求构造
@@ -11,6 +13,13 @@ export class AxiosHttpRequest {
   config: HttpRequestConfig;
   instance: AxiosInstance;
   interceptorHooks?: InterceptorHooks;
+
+  constructor(options: HttpRequestConfig) {
+    this.config = options;
+    this.instance = axios.create(options);
+    this.interceptorHooks = options.interceptorHooks;
+    this.setupInterceptor()
+  }
 
   setupInterceptor(): void {
     this.instance.interceptors.request.use(
@@ -23,13 +32,6 @@ export class AxiosHttpRequest {
     );
   }
 
-  constructor(options: HttpRequestConfig) {
-    this.config = options;
-    this.instance = axios.create(options);
-    this.interceptorHooks = options.interceptorHooks;
-    this.setupInterceptor()
-  }
-
   request<T>(config: HttpRequestConfig): Promise<T> {
     return new Promise<T>((resolve, reject) => {
       this.instance
@@ -38,7 +40,7 @@ export class AxiosHttpRequest {
           resolve(res);
         })
         .catch((err: BusinessError) => {
-          console.error('网络请求Request异常：', err.message)
+          UtilLog.error(TAG, '网络请求Request异常：', err.message)
           if (err) {
             reject(err);
           }

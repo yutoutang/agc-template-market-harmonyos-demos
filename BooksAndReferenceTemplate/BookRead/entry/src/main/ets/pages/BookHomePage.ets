@@ -1,42 +1,16 @@
-import { BookListPage } from 'book_home';
-import { PersonPage } from 'book_person';
-import { BookShelfPage } from 'book_shelf';
-import {BookSortPage} from 'book_sort'
-import { Constants } from 'common';
+import { BreakpointStorage, BreakpointSystem, BreakpointTypeEnum, TabInfo } from 'common';
 import { UserInfo } from 'base_common';
-@Builder
-function bookList() {
-  BookListPage();
-}
-
-@Builder
-function person() {
-  PersonPage();
-}
-
-@Builder
-function bookshelf() {
-  BookShelfPage();
-}
-
-@Builder
-function bookSort() {
-  BookSortPage();
-}
-const bookshelfBuilder: WrappedBuilder<[string]> = wrapBuilder(bookshelf);
-const bookListBuilder: WrappedBuilder<[string]> = wrapBuilder(bookList);
-const personBuilder: WrappedBuilder<[string]> = wrapBuilder(person);
-const bookSortBuilder: WrappedBuilder<[string]> = wrapBuilder(bookSort);
-
+import { IndexData } from '../model/MainTab';
 
 @ComponentV2
 export struct BookHomePage {
   @Provider('currentIndexTab') currentIndexTab: number = 0;
   @Provider('tabController') tabsController: TabsController = new TabsController();
-  @Provider('isHistory') isHistory:boolean = false
+  @Provider('isHistory') isHistory: boolean = false
   @Provider('userInfo') userInfo: UserInfo | undefined = undefined;
+  @Local curBreakpoint: BreakpointStorage = BreakpointSystem.currentBreakpoint
   @Builder
-  tabBuilder(title: Resource, index: number, selectedImg: Resource, normalImg: Resource) {
+  tabBuilder(title: string, index: number, selectedImg: Resource, normalImg: Resource) {
     Column() {
       Image(this.currentIndexTab === index ? selectedImg : normalImg)
         .width(24)
@@ -48,7 +22,7 @@ export struct BookHomePage {
         .fontColor(this.currentIndexTab === index ? $r('app.color.font_overdue') : '#E6000000')
     }
     .justifyContent(FlexAlign.Center)
-    .height(52)
+    .height(this.isTablet ? 100 : undefined)
     .width('100%')
     .onClick(() => {
       this.currentIndexTab = index;
@@ -57,45 +31,34 @@ export struct BookHomePage {
 
   }
 
-  @Builder
-  tabContentBuilder(text: Resource,
-    index: number,
-    selectedImg: Resource,
-    normalImg: Resource,
-    builder: WrappedBuilder<[string]>) {
-    TabContent() {
-      Stack() {
-        builder.builder('');
-      }
-      .height('100%')
-    }
-    .backgroundColor(Color.White)
-    .tabBar(this.tabBuilder(text, index, selectedImg, normalImg))
+  @Computed
+  get isTablet() {
+    return BreakpointSystem.currentBreakpoint.value === BreakpointTypeEnum.LG
   }
 
   build() {
     NavDestination() {
       Tabs({
-        barPosition: BarPosition.End,
+        barPosition: this.curBreakpoint.value === BreakpointTypeEnum.LG ? BarPosition.Start : BarPosition.End,
+        index: this.currentIndexTab,
         controller: this.tabsController
       }) {
-        this.tabContentBuilder($r('app.string.bookshelf'),
-          Constants.TAB_INDEX_ZERO, $r('app.media.shelf_tab_active'), $r('app.media.shelf_tab'), bookshelfBuilder)
-        this.tabContentBuilder($r('app.string.book_case'),
-          Constants.TAB_INDEX_ONE, $r('app.media.mall_tab_active'), $r('app.media.mall_tab'), bookListBuilder)
-        this.tabContentBuilder($r('app.string.book_sort'),
-          Constants.TAB_INDEX_TWO, $r('app.media.sort_tab_active'), $r('app.media.sort_tab'), bookSortBuilder)
-        this.tabContentBuilder($r('app.string.person'),
-          Constants.TAB_INDEX_THREE, $r('app.media.person_tab_active'), $r('app.media.person_tab'), personBuilder)
+        ForEach(IndexData.MAIN_TAB, (item: TabInfo) => {
+          TabContent() {
+            item.component?.builder();
+          }
+          .tabBar(this.tabBuilder(item.label, item.index, item.activeIcon, item.defaultIcon))
+        }, (item: TabInfo) => item.index.toString())
       }
-      .clip(true)
-      .width('100%')
-      .backgroundColor('#F3F4F5')
-      .barHeight(50)
-      .barMode(BarMode.Fixed)
+      .clip(false)
+      .height('100%')
+      .backgroundColor('#fff')
       .padding({ bottom: 18 })
       .animationDuration(0)
       .scrollable(false)
+      .barMode(this.isTablet ? BarMode.Scrollable : BarMode.Fixed)
+      .vertical(this.isTablet)
+      .barWidth(this.isTablet ? 96 : '100%')
       .onAnimationStart((targetIndex: number) => {
         this.currentIndexTab = targetIndex;
       })

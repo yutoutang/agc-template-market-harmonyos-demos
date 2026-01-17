@@ -48,8 +48,20 @@ export interface FilterSelectionItem {
   value: string[];
 }
 
-export interface updateUserPointsReq {
+export interface UpdateUserPointsReq {
   newPoints: number
   type: number
   label: string
+}
+
+export interface UpdateUserInfoReq {
+  type: string // avatar nickname phone
+  value: string
+}
+
+export interface UserLoginReq {
+  phoneNumbers?: string
+  verifyCode?: string
+  unionID?: string
+  authorizationCode?: string
 }

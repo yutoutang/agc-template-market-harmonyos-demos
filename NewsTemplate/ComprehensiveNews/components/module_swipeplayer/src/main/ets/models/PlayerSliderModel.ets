@@ -1,11 +1,13 @@
 import { emitter } from '@kit.BasicServicesKit';
-import { common } from '@kit.AbilityKit';
 import { window } from '@kit.ArkUI';
+import { Logger } from '../utils/Logger';
 
 export enum SliderType {
   VOLUME,
   BRIGHT
 }
+
+const TAG = '[PlayerSliderModel]';
 
 @ObservedV2
 export class PlayerSliderModel {
@@ -39,14 +41,18 @@ export class PlayerSliderModel {
     this.volume = value;
     emitter.emit('systemVolumeChange', {
       data: {
-        volume: value
-      }
+        volume: value,
+      },
     } as emitter.EventData)
   }
 
-  handleBrightChange(value: number) {
-    this.bright = value;
-    let windowClass = AppStorage.get<window.Window>('windowClass')
-    windowClass?.setWindowBrightness(value);
+  async handleBrightChange(value: number) {
+    try {
+      this.bright = value;
+      let windowClass = AppStorage.get<window.Window>('windowClass')
+      await windowClass?.setWindowBrightness(value);
+    } catch (e) {
+      Logger.error(TAG, 'setWindowBrightness fail, error: ' + JSON.stringify(e));
+    }
   }
 }

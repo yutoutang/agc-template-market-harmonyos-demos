@@ -5,7 +5,7 @@ export struct AddPassengerView {
 
   build() {
     Row({space: 8}) {
-      Image($r('app.media.ic_add_passenger')).width(24).height(24)
+      SymbolGlyph($r('sys.symbol.person_badge_plus')).fontSize(24)
       Text('添加乘机人').fontSize(16).fontColor($r('app.color.color_btn_emphasize_bg')).fontWeight(FontWeight.Medium)
     }
     .width('100%')

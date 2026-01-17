@@ -1,23 +1,10 @@
 import display from '@ohos.display';
 import { usbManager } from '@kit.BasicServicesKit';
 import { i18n } from '@kit.LocalizationKit';
-import { promptAction } from '@kit.ArkUI';
 import { NFC_TYPE, Operation } from './Enum';
 import { nfcCardInfo } from '../db/NfcCardInfo';
 
 export default class Util {
-  /**
-   * 吐司提示
-   * @param name 提示内容
-   */
-  public static toast(name: string, duration: number = 2000): void {
-    promptAction.showToast({
-      message: name,
-      duration: duration,
-      bottom: Util.screenHeight() / 2 - 20,
-    });
-  }
-
   /**
    * 去掉浮点的小数
    */

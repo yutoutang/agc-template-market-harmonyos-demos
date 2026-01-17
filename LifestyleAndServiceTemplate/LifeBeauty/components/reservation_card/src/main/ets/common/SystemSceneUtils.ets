@@ -2,16 +2,27 @@ import { serviceNotification } from '@kit.PushKit';
 import { abilityAccessCtrl, PermissionRequestResult, Permissions, bundleManager } from '@kit.AbilityKit';
 import { calendarManager } from '@kit.CalendarKit';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 
-const DOMAIN = 0x0000;
 const TAG = '[SystemSceneUtils]';
-const FORMAT = '%{public}s';
 
 /**
  * 系统Utils
  */
 export class SystemSceneUtils {
+  private static uiContext: UIContext;
+  private static context: Context | undefined;
+  /**
+   * 初始化context
+   */
+  public static init(uiContext: UIContext) {
+    if (SystemSceneUtils.uiContext) {
+      return;
+    }
+    SystemSceneUtils.uiContext = uiContext;
+    SystemSceneUtils.context = SystemSceneUtils.uiContext.getHostContext();
+  }
+
   /**
    * 检查用户是否授权
    * @param permission
@@ -29,8 +40,7 @@ export class SystemSceneUtils {
       tokenId = bundleInfo.appInfo.accessTokenId;
     } catch (error) {
       const err: BusinessError = error as BusinessError;
-      hilog.error(DOMAIN, TAG, FORMAT,
-        `Failed to get bundle info for self. Code is ${err.code}, message is ${err.message}`);
+      UtilLog.error(TAG, `Failed to get bundle info for self. Code is ${err.code}, message is ${err.message}`)
     }
 
     // 校验应用是否被授予权限
@@ -38,7 +48,7 @@ export class SystemSceneUtils {
       grantStatus = await atManager.checkAccessToken(tokenId, permission);
     } catch (error) {
       const err: BusinessError = error as BusinessError;
-      hilog.error(DOMAIN, TAG, FORMAT, `Failed to check access token. Code is ${err.code}, message is ${err.message}`);
+      UtilLog.error(TAG, `Failed to check access token. Code is ${err.code}, message is ${err.message}`)
     }
 
     return grantStatus === abilityAccessCtrl.GrantStatus.PERMISSION_GRANTED;
@@ -53,20 +63,20 @@ export class SystemSceneUtils {
       'ohos.permission.READ_CALENDAR',
       'ohos.permission.WRITE_CALENDAR',
     ];
-    const mContext = getContext();
+    const mContext = SystemSceneUtils.context;
 
     const isGrantedRead = await SystemSceneUtils.checkPermissionGrant(permissions[0]);
     const isGrantedWrite = await SystemSceneUtils.checkPermissionGrant(permissions[1]);
 
     if (isGrantedRead && isGrantedWrite) {
-      hilog.info(DOMAIN, TAG, FORMAT, 'already granted calendar permission')
+      UtilLog.info(TAG, 'already granted calendar permission')
       return calendarManager.getCalendarManager(mContext);
     }
 
     const atManager = abilityAccessCtrl.createAtManager();
 
     return atManager.requestPermissionsFromUser(mContext, permissions).then(async (result: PermissionRequestResult) => {
-      hilog.info(DOMAIN, TAG, FORMAT, `get Permission success, result: ${JSON.stringify(result)}`);
+      UtilLog.info(TAG, `get Permission success, result: ${JSON.stringify(result)}`)
       if (result.authResults.every(v => v === 0)) {
         return calendarManager.getCalendarManager(mContext);
       }
@@ -94,12 +104,11 @@ export class SystemSceneUtils {
       const entityIds: string[] = entityIdStr.split(',');
       const type: serviceNotification.SubscribeNotificationType =
         serviceNotification.SubscribeNotificationType.SUBSCRIBE_WITH_HUAWEI_ID;
-      const res = await serviceNotification.requestSubscribeNotification(getContext(), entityIds, type);
-      hilog.info(DOMAIN, TAG, FORMAT, 'Succeeded in requesting serviceNotification: %{public}s' + JSON.stringify(res));
+      const res = await serviceNotification.requestSubscribeNotification(SystemSceneUtils.context, entityIds, type);
+      UtilLog.info(TAG, 'Succeeded in requesting serviceNotification: %{public}s' + JSON.stringify(res));
       return res!;
     } catch (err) {
-      hilog.error(DOMAIN, TAG, FORMAT,
-        'Failed to request serviceNotification: ' + JSON.stringify(err as BusinessError));
+      UtilLog.error(TAG, 'Failed to request serviceNotification: ' + JSON.stringify(err as BusinessError));
       return null;
     }
   }

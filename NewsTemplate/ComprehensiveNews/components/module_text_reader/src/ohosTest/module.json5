@@ -3,7 +3,7 @@
     "name": "module_text_reader_test",
     "type": "feature",
     "deviceTypes": [
-      "phone",
+      "default",
       "tablet"
     ],
     "deliveryWithInstall": true,

@@ -1,4 +1,4 @@
-import { RechargeRecord } from '../models/Index'
+import { RechargeRecord, WalletRecordType } from '../models/Index'
 import { getFullDate } from '../utils/Index'
 
 @ComponentV2
@@ -11,13 +11,24 @@ export struct RechargeRecordComp {
         ForEach(this.rechargeRecordList, (item: RechargeRecord) => {
           ListItem() {
             Column({ space: 2 }) {
-              Row() {
-                Text('充值成功').fontSize(14).fontColor($r('sys.color.font_primary')).fontWeight(FontWeight.Medium)
-                Text(`+${item.rechargeMoney}`)
-                  .fontSize(14)
-                  .fontColor($r('sys.color.font_primary'))
-                  .fontWeight(FontWeight.Medium)
-              }.width('100%').justifyContent(FlexAlign.SpaceBetween)
+              if (item.recordType === WalletRecordType.RECHARGE) {
+                Row() {
+                  Text('充值成功').fontSize(14).fontColor($r('sys.color.font_primary')).fontWeight(FontWeight.Medium)
+                  Text(`+${item.rechargeMoney}`)
+                    .fontSize(14)
+                    .fontColor($r('sys.color.font_primary'))
+                    .fontWeight(FontWeight.Medium)
+                }.width('100%').justifyContent(FlexAlign.SpaceBetween)
+              }
+              if (item.recordType === WalletRecordType.CONSUME) {
+                Row() {
+                  Text('消费').fontSize(14).fontColor($r('sys.color.font_primary')).fontWeight(FontWeight.Medium)
+                  Text(`-${item.rechargeMoney}`)
+                    .fontSize(14)
+                    .fontColor($r('sys.color.font_primary'))
+                    .fontWeight(FontWeight.Medium)
+                }.width('100%').justifyContent(FlexAlign.SpaceBetween)
+              }
 
               Row() {
                 Text(getFullDate(new Date(item.time))).fontSize(12).fontColor($r('sys.color.font_tertiary'))

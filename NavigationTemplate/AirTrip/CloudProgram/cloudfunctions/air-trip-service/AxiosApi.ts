@@ -9,10 +9,10 @@ export interface UserInfoRes {
 export async function getUserInfoByAccessToken(authorizationCode: string): Promise<UserInfoRes> {
   let data = {
     grant_type: 'authorization_code',
-    // 应用OAuth 2.0客户端ID（凭据）的clientId
-    client_id: "xxxx",
-    // 应用OAuth 2.0客户端ID（凭据）的client Secret
-    client_secret: "xxxxxx",
+    // todo: 应用OAuth 2.0客户端ID（凭据）的clientId
+    client_id: "xxxxx",
+    // todo: 应用OAuth 2.0客户端ID（凭据）的client Secret
+    client_secret: "xxxxx",
     code: authorizationCode
   }
   try {

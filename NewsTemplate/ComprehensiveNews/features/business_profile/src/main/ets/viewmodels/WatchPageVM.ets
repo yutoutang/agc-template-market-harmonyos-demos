@@ -1,5 +1,5 @@
-import { BaseViewModel, BreakpointType, RouterMap, RouterUtils } from 'lib_common';
-import { AuthorModel, AuthorServiceApi } from 'lib_news_api';
+import { BaseViewModel, BreakpointType, LoadingModel, RouterMap, RouterUtils } from 'lib_common';
+import { AuthorModel, AuthorResponse, AuthorServiceApi } from 'lib_news_api';
 import { AuthorDataSource } from '../common/DataSource';
 
 @ObservedV2
@@ -8,6 +8,9 @@ export class WatchPageViewModel extends BaseViewModel {
   @Trace title: string = '我的关注';
   @Trace emptyTip: string = '暂无关注';
   @Trace dataSource: AuthorDataSource = new AuthorDataSource();
+  @Trace loadingModel: LoadingModel<AuthorResponse[], string> = new LoadingModel((userId?: string) => {
+    return AuthorServiceApi.queryWatchUsers(userId ?? '');
+  });
   columnOptions: BreakpointType<number> = new BreakpointType<number>({
     sm: 1,
     md: 2,
@@ -22,11 +25,13 @@ export class WatchPageViewModel extends BaseViewModel {
   }
 
   queryWatchList() {
-    const list = AuthorServiceApi.queryWatchUsers(this.userId).map(v => new AuthorModel(v));
-    this.dataSource.setData(list);
-  }
-
-  loadMore() {
+    this.loadingModel.callApi({
+      pageLoading: true,
+      requestParams: this.userId,
+    }).then((list) => {
+      const result = list.map(v => new AuthorModel(v));
+      this.dataSource.setData(result);
+    });
   }
 
   customBack() {

@@ -7,17 +7,18 @@
   "license": "Apache-2.0",
   "dependencies": {
     "lib_widget": "file:../lib_widget",
-    "module_newsfeed": "file:../../components/module_newsfeed",
     "lib_news_api": "file:../lib_news_api",
-    "module_share": "file:../../components/module_share",
     "lib_common": "file:../lib_common",
     "lib_account": "file:../lib_account",
     "lib_news_feed_details": "file:../lib_news_feed_details",
+    'lib_preview_page': "file:../../commons/lib_preview_page",
+    'lib_av_details': "file:../lib_av_details",
+    "module_newsfeed": "file:../../components/module_newsfeed",
     "module_swipeplayer": "file:../../components/module_swipeplayer",
     "module_highlight": "file:../../components/module_highlight",
     "module_advertisement": "file:../../components/module_advertisement",
     "module_transition": "file:../../components/module_transition",
-    'lib_preview_page': "file:../../commons/lib_preview_page",
-    "module_flexlayout": "file:../../components/module_flexlayout"
+    "module_flexlayout": "file:../../components/module_flexlayout",
+    'module_audioplayer': "file:../../components/module_audioplayer"
   }
 }

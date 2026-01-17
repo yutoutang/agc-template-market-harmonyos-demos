@@ -15,6 +15,7 @@
     "module_transition": "file:../../components/module_transition",
     "module_post": "file:../../components/module_post",
     "module_articlepost": "file:../../components/module_articlepost",
+    "module_digital_newspaper": "file:../../components/module_digital_newspaper",
   },
   "devDependencies": {},
   "dynamicDependencies": {}

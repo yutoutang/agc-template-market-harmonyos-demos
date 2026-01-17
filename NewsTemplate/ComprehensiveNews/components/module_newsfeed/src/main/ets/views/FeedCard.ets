@@ -3,7 +3,6 @@ import { UserInfoModel } from 'lib_common';
 import { FeedDetail } from '../components/FeedDetail';
 import { FeedOperate } from '../components/FeedOperate';
 import { FeedCardInfoModel } from '../model/RecommendModel';
-import { getDateDiff } from '../utils/Index';
 
 /*
  * 动态区域组件

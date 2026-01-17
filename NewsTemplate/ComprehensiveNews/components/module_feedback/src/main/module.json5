@@ -2,10 +2,18 @@
   "module": {
     "name": "module_feedback",
     "type": "har",
-    "routerMap": "$profile:route_map",
     "deviceTypes": [
-      "phone",
+      "default",
       "tablet"
-    ]
+    ],
+    "requestPermissions": [
+      {
+        "name": "ohos.permission.VIBRATE"
+      },
+      {
+        "name": "ohos.permission.INTERNET"
+      }
+    ],
+    "routerMap": "$profile:route_map"
   }
 }

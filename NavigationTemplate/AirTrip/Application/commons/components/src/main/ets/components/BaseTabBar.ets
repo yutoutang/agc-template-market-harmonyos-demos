@@ -28,7 +28,7 @@ export struct BaseTabBar {
     Row() {
       ForEach(this.tabBarList, (item: BaseTabBarItem, index: number) => {
         this.TabBarView(item, index)
-      })
+      },(item: BaseTabBarItem, index: number)=>index + '__' + JSON.stringify(item))
     }
     .justifyContent(FlexAlign.SpaceBetween)
   }

@@ -1,4 +1,4 @@
-import { Constants, TCRouter } from 'common';
+import { BreakpointSystem, Constants, TCRouter } from 'common';
 import { BookHomePage } from './BookHomePage';
 import {
   AboutPage,
@@ -34,6 +34,8 @@ import { ReaderPage,WriteReviewPage, WriteCommentPage, WonderfulReviewPage, MyRe
 @ComponentV2
 struct Index {
   aboutToAppear(): void {
+    const uiContext = this.getUIContext()
+    BreakpointSystem.register(uiContext)
     TCRouter.replace(Constants.HOME_ROUTER);
     this.pushKitRouter()
   }

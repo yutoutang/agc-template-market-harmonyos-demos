@@ -28,9 +28,11 @@ export struct PrivacyAgreementView {
   openSheet: boolean = false
   @Local
   isAgree: boolean = false
+  @Local
+  preferInstance:PreferenceUtils = PreferenceUtils.getInstance(this.getUIContext().getHostContext()!)
 
   aboutToAppear(): void {
-    this.isAgree = PreferenceUtils.getInstance().get(AGREE_PRIVACY_KEY) as boolean;
+    this.isAgree = this.preferInstance.get(AGREE_PRIVACY_KEY) as boolean;
     if (this.isAgree) {
       this.handleConfirm?.()
     }
@@ -81,7 +83,7 @@ export struct PrivacyAgreementView {
                 .backgroundColor(this.themeColor)
                 .layoutWeight(1)
                 .onClick(() => {
-                  PreferenceUtils.getInstance().put(AGREE_PRIVACY_KEY, true);
+                  this.preferInstance.put(AGREE_PRIVACY_KEY, true);
                   this.handleConfirm?.()
                 })
             }
@@ -140,7 +142,7 @@ export struct PrivacyAgreementView {
             .layoutWeight(1)
             .onClick(() => {
               this.openSheet = false;
-              PreferenceUtils.getInstance().put(AGREE_PRIVACY_KEY, true);
+              this.preferInstance.put(AGREE_PRIVACY_KEY, true);
               this.handleConfirm?.()
             })
         }

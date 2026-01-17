@@ -83,7 +83,7 @@ export struct BaseSliderSwitch {
               this.positionMap.set(index, newValue)
             })
             .onClick(() => {
-              animateTo({
+              this.getUIContext().animateTo({
                 duration: 300,
                 curve: Curve.EaseOut,
               }, () => {

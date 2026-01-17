@@ -19,6 +19,7 @@ export interface DraftModel {
 
 export interface StickerShowModel extends ImageShowModel {
   tag: string[]
+  isVip: boolean
 }
 
 @ObservedV2

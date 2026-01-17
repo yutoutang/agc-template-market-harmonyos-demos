@@ -5,6 +5,11 @@
     "routerMap": "$profile:route_map",
     "deviceTypes": [
       "phone"
+    ],
+    "requestPermissions": [
+      {
+        "name": "ohos.permission.INTERNET"
+      }
     ]
   }
 }

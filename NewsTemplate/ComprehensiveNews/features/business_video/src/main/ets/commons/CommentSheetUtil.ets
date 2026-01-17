@@ -1,5 +1,5 @@
 import { emitter } from '@kit.BasicServicesKit';
-import { BaseViewModel, PopViewUtils } from 'lib_common';
+import { BaseViewModel, GlobalContextUtils, PopViewUtils } from 'lib_common';
 import { NewsResponse } from 'lib_news_api';
 import { PlayerLayoutSize } from 'module_swipeplayer';
 import { CommentView } from '../components/CommentView';
@@ -11,6 +11,7 @@ export class CommentSheetParams extends BaseViewModel {
   @Trace isShowKeyboard: boolean = false;
   @Trace playerLayoutSize: PlayerLayoutSize = new PlayerLayoutSize();
   @Trace commentController: CommentController = new CommentController();
+  @Trace sheetTargetId: number = -1;
 }
 
 @Builder
@@ -33,13 +34,12 @@ struct commentSheetView {
 export class CommentSheetUtils {
   static sheetParams: CommentSheetParams = new CommentSheetParams();
 
-  static initParams(videoInfo: NewsResponse, isShowKeyboard: boolean,
-    playerLayoutSize: PlayerLayoutSize, commentController: CommentController
-  ) {
-    CommentSheetUtils.sheetParams.videoInfo = videoInfo
-    CommentSheetUtils.sheetParams.isShowKeyboard = isShowKeyboard
-    CommentSheetUtils.sheetParams.playerLayoutSize = playerLayoutSize
-    CommentSheetUtils.sheetParams.commentController = commentController;
+  static initParams(sheetParam: CommentSheetParams) {
+    CommentSheetUtils.sheetParams.videoInfo = sheetParam.videoInfo
+    CommentSheetUtils.sheetParams.isShowKeyboard = sheetParam.isShowKeyboard
+    CommentSheetUtils.sheetParams.playerLayoutSize = sheetParam.playerLayoutSize
+    CommentSheetUtils.sheetParams.commentController = sheetParam.commentController;
+    CommentSheetUtils.sheetParams.sheetTargetId = sheetParam.sheetTargetId
   }
 
   static open() {
@@ -52,11 +52,12 @@ export class CommentSheetUtils {
       preferType: SheetType.BOTTOM,
       backgroundColor: $r('sys.color.background_secondary'),
       onHeightDidChange: (height: number) => {
-        let sheetHeight = px2vp(height)
+        let sheetHeight = GlobalContextUtils.globalUIContext.px2vp(height)
         let windowTop = CommentSheetUtils.sheetParams.windowModel.windowTopPadding
         let tabHeight = CommentSheetUtils.sheetParams.tabModel.tabHeight as number
         let total = sheetHeight - tabHeight
-        const windowHeight = px2vp(CommentSheetUtils.sheetParams.windowModel.windowHeight)
+        const windowHeight =
+          GlobalContextUtils.globalUIContext.px2vp(CommentSheetUtils.sheetParams.windowModel.windowHeight)
         CommentSheetUtils.sheetParams.playerLayoutSize.updatePlayerHeight(`${windowHeight - total - windowTop}vp`)
       },
       onWillDisappear: () => {
@@ -83,6 +84,6 @@ export class CommentSheetUtils {
         };
         emitter.emit('showTabHeader', eventData)
       },
-    });
+    }, undefined, CommentSheetUtils.sheetParams.sheetTargetId);
   }
 }

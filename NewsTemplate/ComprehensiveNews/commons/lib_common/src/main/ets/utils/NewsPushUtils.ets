@@ -17,6 +17,7 @@ export class RouterToNews {
     } as Record<string, string | number>;
     RouterUtils.pushPathByName(RouterMap.ARTICLE_FEED_DETAILS, routerParams);
   }
+
   /**
    * 跳转新闻详情页
    * @param {routerParams} 跳转参数，携带一镜到底参数longTakeTransitionParam
@@ -29,6 +30,15 @@ export class RouterToNews {
      * */
     if (routerParams.type === NewsEnum.Video || routerParams.surfaceUrl) {
       RouterUtils.pushPathByName(RouterMap.VIDEO_DETAIL_PAGE, routerParams)
+      return
+    }
+    if (routerParams.type === NewsEnum.Broadcast || routerParams.type === NewsEnum.Television) {
+      let params: Record<string, string | undefined | NewsEnum> = {
+        'avId': routerParams.newsId,
+        'longTakeTransitionParam': undefined,
+      }
+      RouterUtils.pushPathByName(routerParams.type === NewsEnum.Broadcast ? RouterMap.AUDIO_DETAILS :
+        RouterMap.VIDEO_PROGRAM_DETAILS, params)
       return
     }
     if (routerParams.cardData) {

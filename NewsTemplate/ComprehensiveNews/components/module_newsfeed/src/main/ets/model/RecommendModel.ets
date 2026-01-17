@@ -11,6 +11,14 @@ export enum NewsEnum {
    * 动态
    */
   Post,
+  /**
+   * 广播
+   */
+  Broadcast,
+  /**
+   * 电视
+   */
+  Television
 }
 
 @ObservedV2

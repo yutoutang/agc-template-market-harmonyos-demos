@@ -44,7 +44,8 @@
     "credentials_photo": "file:../components/credentials_photo",
     "ar_measure": "file:../components/ar_measure",
     "translator": "file:../components/translator",
-    "cast_tool": "file:../components/cast_tool"
+    "cast_tool": "file:../components/cast_tool",
+    "aggregated_login": "file:../components/aggregated_login"
   }
 }
 

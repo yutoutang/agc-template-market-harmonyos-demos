@@ -1,8 +1,14 @@
+import { common } from '@kit.AbilityKit';
 import { AppStorageV2, curves, PersistenceV2 } from '@kit.ArkUI';
+import { notificationManager } from '@kit.NotificationKit';
+import { BusinessError } from '@kit.BasicServicesKit';
 import {
   BaseViewModel,
   BreakpointModel,
   BreakpointNameEnum,
+  FileUtils,
+  Logger,
+  OptimizeUtils,
   PushActionParams,
   PushUtils,
   RouterMap,
@@ -12,10 +18,10 @@ import {
   SearchHistory,
   SettingModel,
 } from 'lib_common';
-import { BaseNewsServiceApi, RequestListData } from 'lib_news_api';
-import { notificationManager } from '@kit.NotificationKit';
-import { common } from '@kit.AbilityKit';
+import { BaseNewsServiceApi, HomeServiceApi, RequestListData } from 'lib_news_api';
 import { LongTakeAnimationProperties, LongTakeTransitionParam } from 'module_transition';
+
+const TAG = '[HomeViewModel]';
 
 @ObservedV2
 export class HomeViewModel extends BaseViewModel {
@@ -23,22 +29,40 @@ export class HomeViewModel extends BaseViewModel {
   @Trace searchResultList: RequestListData[] = []
   @Trace settingInfo: SettingModel = PersistenceV2.connect(SettingModel, () => new SettingModel())!;
   @Trace breakpointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
+  public eNewsMap: Map<string, PixelMap> = new Map();
 
   @Computed
   get isSmDevice() {
     return this.breakpointModel.currentBreakpoint === BreakpointNameEnum.SM
   }
 
-  getSearchResultList(searchValue: string) {
-    this.searchResultList = BaseNewsServiceApi.querySearchResultList(searchValue)
+  async getSearchResultList(searchValue: string) {
+    this.searchResultList = await BaseNewsServiceApi.querySearchResultList(searchValue)
+  }
+
+  // 预加载图片
+  async preloadENewsImages() {
+    // 调用接口查询图片数据
+    const sourceId = '1';
+    const publishDate = new Date().getTime();
+    const list = await HomeServiceApi.queryDigitalNewsList(sourceId, publishDate);
+    list.forEach((v) => {
+      // 下载解码成PixelMap，并将其缓存
+      FileUtils.downloadImage(v.newsImg)
+        .then((pixelMap) => {
+          this.eNewsMap.set(v.newsImg, pixelMap);
+        })
+    })
   }
 
   searchChange(searchValue: string) {
-    this.getSearchResultList(searchValue)
-    if (this.searchHistory.historyList.includes(searchValue) || searchValue.trim() === '') {
-      return
-    }
-    this.searchHistory.historyList.push(searchValue)
+    OptimizeUtils.debounce(() => {
+      this.getSearchResultList(searchValue)
+      if (this.searchHistory.historyList.includes(searchValue) || searchValue.trim() === '') {
+        return
+      }
+      this.searchHistory.historyList.push(searchValue)
+    })
   }
 
   clearHistory() {
@@ -46,18 +70,19 @@ export class HomeViewModel extends BaseViewModel {
   }
 
   // mock 开启随机推送
-  sendPushMessage() {
-    let pushArticle = BaseNewsServiceApi.queryAllNewsList()
+  async sendPushMessage() {
+    let pushArticle = await BaseNewsServiceApi.queryAllNewsList()
     PushUtils.randomPushMessage(pushArticle)
   }
 
   sendPushNotice(context: common.UIAbilityContext) {
     if (!this.settingInfo.pushSwitch) {
-      notificationManager.requestEnableNotification(context).then((err) => {
+      notificationManager.requestEnableNotification(context).then(() => {
         this.settingInfo.pushSwitch = true;
         this.sendPushMessage();
-      }).catch(() => {
+      }).catch((error: BusinessError) => {
         this.settingInfo.pushSwitch = false;
+        Logger.error(TAG, 'requestEnableNotification fail, error: ' + JSON.stringify(error));
       });
     } else {
       this.sendPushMessage();
@@ -80,7 +105,7 @@ export class HomeViewModel extends BaseViewModel {
   /*
    * 跳转到搜索
    * */
-  public goSearchWithLongTake(uiContext: UIContext) {
+  public goSearchWithLongTake() {
     RouterUtils.pushPathByName(RouterMap.NEWS_SEARCH)
   }
 
@@ -98,8 +123,9 @@ export class HomeViewModel extends BaseViewModel {
       });
     }
   }
-  
-  @Computed get pagePaddingBottom() {
+
+  @Computed
+  get pagePaddingBottom() {
     if (this.tabModel.isTabVertical) {
       return this.windowModel.windowBottomPadding;
     }
@@ -110,7 +136,7 @@ export class HomeViewModel extends BaseViewModel {
    * sm屏幕下，返回不需要一镜到底的效果
    * */
   public onLongTakeSearchBack(uiContext: UIContext) {
-    if(this.isSmDevice) {
+    if (this.isSmDevice) {
       RouterUtils.pop();
       return
     }

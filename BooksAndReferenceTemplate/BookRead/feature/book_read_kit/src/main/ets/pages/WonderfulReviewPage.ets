@@ -3,7 +3,6 @@ import { ReviewInfo } from '../model/ReviewModels';
 import { ReviewDataUtil } from '../utils/ReviewDataUtil';
 import { ExpandableText } from '../components/ExpandableText';
 import { emitter } from '@kit.BasicServicesKit';
-import { promptAction } from '@kit.ArkUI';
 
 interface RouteParams {
   bookName?: string;
@@ -14,26 +13,32 @@ interface RouteParams {
 export struct WonderfulReviewPage {
   @Local reviewList: ReviewInfo[] = [];
   @Local isFromCompleted: boolean = true;
+  bottomRectHeight: number = AppStorage.get('bottomRectHeight') as number || 38.77
 
   aboutToAppear(): void {
     // 初始化评论系统，确保用户信息同步
     ReviewDataUtil.initialize();
-    
+
     // 获取路由参数，判断是否从已读完状态进入
     const params = TCRouter.getParams<RouteParams>(Constants.WONDERFUL_REVIEW_ROUTE);
     if (params && params.fromCompleted !== undefined) {
       this.isFromCompleted = params.fromCompleted;
       console.info(`精彩书评页面来源: ${this.isFromCompleted ? '最后一页左滑(已读完)' : '首页更多评论(未读完)'}`);
     }
-    
+
     this.loadReviews();
-    
-    // 监听用户信息变更事件
-    emitter.on(Constants.LOGIN_CHANGE, () => {
-      console.info('用户信息变更，更新评论用户信息');
-      ReviewDataUtil.updateCurrentUserReviews();
-      this.loadReviews();
-    });
+
+    try {
+      // 监听用户信息变更事件
+      emitter.on(Constants.LOGIN_CHANGE, () => {
+        console.info('用户信息变更，更新评论用户信息');
+        ReviewDataUtil.updateCurrentUserReviews();
+        this.loadReviews();
+      });
+    } catch (e) {
+      console.error('Failed to emitter on login change. Cause: ' + JSON.stringify(e));
+    }
+
   }
 
   onPageShow(): void {
@@ -61,13 +66,13 @@ export struct WonderfulReviewPage {
           Image($r('app.media.Stroke'))
             .width(20)
             .height(20)
-        })
+        }, (item: string) => JSON.stringify(item))
       }
       .margin({ bottom: 16 })
 
       Row() {
-        Image(this.isFromCompleted ? 
-          $r('app.media.ic_public_lock_open_base_ic_public_lock_open') : 
+        Image(this.isFromCompleted ?
+          $r('app.media.ic_public_lock_open_base_ic_public_lock_open') :
           $r('app.media.ic_public_locked'))
           .width(16)
           .height(16)
@@ -89,14 +94,14 @@ export struct WonderfulReviewPage {
       .onClick(() => {
         // 如果是未读完状态，阻止跳转并显示提示
         if (!this.isFromCompleted) {
-          promptAction.showToast({
+          this.getUIContext().getPromptAction().showToast({
             message: '看完才可以评论哦，快去看书吧！',
             duration: 2000
           });
           console.info('未读完状态，阻止跳转到评论页面');
           return;
         }
-        
+
         // 已读完状态，正常跳转到评论页面
         const currentBook = ReviewDataUtil.getCurrentBookInfo();
         if (currentBook) {
@@ -108,7 +113,7 @@ export struct WonderfulReviewPage {
         }
       })
     }
-    .width(340)
+    .width('100%')
     .height(127)
     .backgroundColor(Color.White)
     .borderRadius(16)
@@ -127,7 +132,7 @@ export struct WonderfulReviewPage {
           .height(12)
           .margin({ right: 2 })
           .fillColor(star <= rating ? '#FFD700' : '#E0E0E0')
-      })
+      }, (item: string) => JSON.stringify(item))
     }
   }
 
@@ -153,7 +158,12 @@ export struct WonderfulReviewPage {
               Text(review.vipLevel)
                 .fontSize(10)
                 .fontColor(Color.White)
-                .padding({ left: 6, right: 6, top: 2, bottom: 2 })
+                .padding({
+                  left: 6,
+                  right: 6,
+                  top: 2,
+                  bottom: 2
+                })
                 .backgroundImage($r('app.media.lv_bg'))
                 .backgroundImageSize(ImageSize.Contain)
                 .margin({ left: 5 })
@@ -171,26 +181,24 @@ export struct WonderfulReviewPage {
       .alignItems(VerticalAlign.Top)
       .margin({ bottom: 12 })
 
-        ExpandableText({
-          content: review.content.toString(),
-          fontSize: 14,
-          lineHeight: 20,
-          fontColor: $r('sys.color.ohos_id_color_text_primary'),
-          widthRatio: 0.8
-        })
-          .margin({ bottom: 8 })
+      ExpandableText({
+        content: review.content.toString(),
+        fontSize: 14,
+        lineHeight: 20,
+        fontColor: $r('sys.color.ohos_id_color_text_primary'),
+        widthRatio: 0.8
+      })
+        .margin({ bottom: 8 })
 
-        // 分割线
-        if (index < this.reviewList.length - 1) {
-          Divider()
-            .strokeWidth(1)
-            .color($r('sys.color.ohos_id_color_list_separator'))
-            .margin({ bottom: 16 })
-        } else {
-          // 最后一项增加额外的底部间距
-          Blank()
-            .height(20)
-        }
+      // 分割线
+      if (index < this.reviewList.length - 1) {
+        Divider()
+          .margin({ bottom: 16 })
+      } else {
+        // 最后一项增加额外的底部间距
+        Blank()
+          .height(20)
+      }
     }
     .width('100%')
     .margin({ top: 5 })
@@ -243,12 +251,13 @@ export struct WonderfulReviewPage {
         }, (review: ReviewInfo) => review.id)
       }
     }
-    .width(340)
-    .padding({ left: 16, right: 16, bottom: 20 })
+    .width('100%')
+    .padding({ left: 16, right: 16 })
     .backgroundColor(Color.White)
-    .borderRadius(16)
     .alignItems(HorizontalAlign.Start)
-    .margin({ top:5, left: 16, right: 16, bottom: 20 })
+    .margin({
+      top: 5
+    })
   }
 
   build() {
@@ -272,11 +281,13 @@ export struct WonderfulReviewPage {
           .layoutWeight(1)
           .scrollable(ScrollDirection.Vertical)
           .edgeEffect(EdgeEffect.Spring)
-          .padding({ bottom: 40 })
-          .margin({top: 10})
+          .scrollBar(BarState.Off)
+          .margin({ top: 10 })
+          .borderRadius(16)
         }
         .width('100%')
-        .height('100%')
+        .layoutWeight(1)
+        .padding({ left: 12, right: 12, bottom: this.bottomRectHeight })
       }
       .width('100%')
       .height('100%')

@@ -6,6 +6,9 @@ import {   showToast, AccountUtil, StringUtil, CommonConstants,
 import { ExamService } from '@ohos_agcit/driver_license_exam_datasource'
 import { GuideService, licenseTypeName } from '@ohos_agcit/driver_license_exam_guide'
 import { JSON } from '@kit.ArkTS';
+import { FeedbackTrigger } from 'feedback';
+import { CustomWindowModel } from 'app_setting';
+import { AppStorageV2 } from '@kit.ArkUI';
 
 @Builder
 export function MineViewBuilder() {
@@ -32,14 +35,20 @@ export struct MineView {
   @Param accuracyRate: number = 0;
   @Param averageScore: number = 0;
   @Local currentTab: number = 0; // 0-科目一，1-科目四
-  examService: ExamService= ExamService.instance;
+  examService: ExamService= ExamService.instance(this.getUIContext().getHostContext() as Context);
   guideService: GuideService = GuideService.instance;
   logTag: string = 'PrepareLoginPage';
   domainId: number = 0x0000;
   topRectHeight: number = AppStorage.get('topRectHeight') || 0;
+  bottomRectHeight:number = AppStorage.get('bottomRectHeight') || 0;
   scroller: Scroller = new Scroller();
   vm: CommonModel = CommonModel.instance;
   @Local egDivider: DividerTmp = new DividerTmp(1, 40, 0, '#ffe9f0f0');
+
+  aboutToAppear(): void {
+    this.bottomRectHeight = AppStorage.get('bottomRectHeight') || 0;
+    this.topRectHeight = AppStorage.get('topRectHeight') || 0;
+  }
 
   // 构建题库切换模块
   @Builder
@@ -133,14 +142,39 @@ export struct MineView {
       const params: Record<string, Object> = { 'anonymousPhone': quickLoginAnonymousPhone };
       this.vm.navStack.pushPathByName('QuickLoginPage', params, true);
     } else {
-      const hint: string = getContext().resourceManager.getStringSync($r('app.string.get_mobile_number_error'));
-      showToast(hint);
+      const hint: string = (this.getUIContext().getHostContext() as Context).resourceManager.getStringSync($r('app.string.get_mobile_number_error').id);
+      showToast(hint, this.getUIContext());
     }
   }
 
   // 显示开发中提示
   private showDevelopingToast() {
-    showToast('此功能开发中');
+    showToast('此功能开发中', this.getUIContext());
+  }
+
+  @Builder
+  Feedback(commonService: MinePageCommonService) {
+    FeedbackTrigger() {
+      Row() {
+        Image($r(commonService.icon))
+          .width(24)
+          .height(24)
+          .margin({ left: 12 })
+        Text(commonService.label)
+          .fontSize(16)
+          .fontWeight(FontWeight.Medium)
+          .margin({ left: 16 })
+        Blank()
+        Image($r('app.media.ic_right_arrow_lined'))
+          .width(7)
+          .height(14)
+          .fillColor('rgba(0,0,0,0.2)')
+          .margin({ right: 12 })
+      }
+      .width(CommonConstants.FULL_PERCENT)
+      .height(46)
+      .justifyContent(FlexAlign.Start)
+    }
   }
 
   // 构建功能模块项
@@ -188,57 +222,98 @@ export struct MineView {
         Column() {
           this.topArea();
           // 用户信息模块
-          Row() {
-            Image(AccountUtil.getUserInfo().avatar)
-              .width(56)
-              .height(56)
-              .borderRadius(28)
-              .margin({ left: 12 })
+          Column() {
+            Row() {
+              Image(AccountUtil.getUserInfo().avatar)
+                .width(56)
+                .height(56)
+                .borderRadius(28)
 
-            Text(AccountUtil.getUserInfo().nickname)
-              .fontSize(18)
-              .fontFamily('鸿蒙黑体')
-              .fontWeight(FontWeight.Medium)
-              .margin({ left: 12 })
+              Column({space:4}) {
+                Text(AccountUtil.getUserInfo().nickname)
+                  .fontSize(18)
+                  .fontFamily('鸿蒙黑体')
+                  .fontWeight(FontWeight.Medium)
 
-            Blank()
-            Image($r('app.media.ic_right_arrow_lined'))
-              .width(7)
-              .height(18)
-              .fillColor('rgba(0,0,0,0.2)')
-              .margin({ right: 12 })
+                if (AccountUtil.getUserInfo().phone) {
+                  Row() {
+                    Image($r('app.media.ic_public_mobilephone'))
+                      .width(16)
+                      .height(16)
+                      .margin({
+                        right:8
+                      })
+
+                    Text(AccountUtil.getUserInfo().phone)
+                      .fontFamily('HarmonyHeiTi')
+                      .fontColor('#000000')
+                      .fontSize(12)
+                      .fontWeight(400)
+                      .lineHeight(16)
+                  }
+                }
+              }
+              .alignItems(HorizontalAlign.Start)
+              .margin({
+                left:16
+              })
+
+              Blank()
+              if (!AccountUtil.getUserInfo().phone) {
+                Image($r('app.media.ic_right_arrow_lined'))
+                  .width(7)
+                  .height(18)
+                  .fillColor('rgba(0,0,0,0.2)')
+              }
+
+            }
+            .width(CommonConstants.FULL_PERCENT)
+            .onClick(async () => {
+              if (AccountUtil.getAccountInfo().idToken === '') {
+                // 真实登录，mock场景先注释
+                // AccountUtil.quickLogin();
+                // this.jumpLoginPage(AccountUtil.getAccountInfo().quickLoginAnonymousPhone);
+                // mock登录，真实使用场景需删除
+                this.jumpLoginPage('a000******00');
+              }else {
+                this.vm.navStack.pushPathByName('PersonalInfo', undefined)
+              }
+            });
+            Divider()
+              .margin({
+                top:12,
+                bottom:12
+              })
+            Row() {
+              Text('会员中心')
+                .width(72)
+                .height(28)
+                .fontSize(14)
+                .borderRadius(14)
+                .fontColor('#fff')
+                .backgroundColor('rgba(100, 187, 92, 1)')
+                .textAlign(TextAlign.Center)
+                .onClick(() => {
+                  if (AccountUtil.getAccountInfo().idToken === '') {
+                    // 真实登录，mock场景先注释
+                    // AccountUtil.quickLogin();
+                    // this.jumpLoginPage(AccountUtil.getAccountInfo().quickLoginAnonymousPhone);
+                    // mock登录，真实使用场景需删除
+                    this.jumpLoginPage('a000******00');
+                  }else {
+                    this.vm.navStack.pushPathByName('membership', true)
+                  }
+                })
+
+            }
+            .justifyContent(FlexAlign.End)
+            .width('100%')
           }
           .width(CommonConstants.FULL_PERCENT)
-          .height(72)
           .backgroundColor(Color.White)
           .borderRadius(16)
           .margin({ top: 5 })
-          .onClick(async () => {
-            if (AccountUtil.getAccountInfo().idToken === '') {
-              // 真实登录，mock场景先注释
-              // AccountUtil.quickLogin();
-              // this.jumpLoginPage(AccountUtil.getAccountInfo().quickLoginAnonymousPhone);
-              // mock登录，真实使用场景需删除
-              this.jumpLoginPage('a000******00');
-            }else {
-              this.vm.navStack.pushPathByName('PersonalInfo', undefined)
-            }
-          });
-
-          List(){
-            ForEach(COMMON_SERVICE, (item: MinePageCommonService) => {
-              ListItem(){
-                Column() {
-                  this.FunctionItem(item)
-                }
-                .width(CommonConstants.FULL_PERCENT)
-                .height(46)
-                .backgroundColor(Color.White)
-                .borderRadius(16)
-                .margin({ top: 12 })
-              }
-            }, (item: MinePageCommonService) => JSON.stringify(item.label))
-          }
+          .padding(12)
 
 
           // 新增题库模块
@@ -251,11 +326,47 @@ export struct MineView {
           .backgroundColor(Color.White)
           .margin({ top: 12 })
           .padding(12)
+
+          List(){
+            ForEach(COMMON_SERVICE, (item: MinePageCommonService) => {
+              ListItem(){
+                Column() {
+                  if (item.label === '意见反馈') {
+                    this.Feedback(item)
+                  } else {
+                    this.FunctionItem(item)
+                  }
+
+                }
+                .width(CommonConstants.FULL_PERCENT)
+                .height(46)
+
+              }
+            }, (item: MinePageCommonService) => {
+              try {
+                return JSON.stringify(item.label)
+              } catch (err) {
+                return ''
+              }
+            })
+          }
+          .backgroundColor(Color.White)
+          .divider({
+            strokeWidth:0.5,
+            color:'#ddd',
+            startMargin:12,
+            endMargin:12
+          })
+          .borderRadius(16)
+          .margin({
+            top:12
+          })
+          .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
         }
         .padding({
           left:16,
           right:16,
-          top: px2vp(this.topRectHeight) + 10,
+          top: this.getUIContext().px2vp(this.topRectHeight) + 10,
         })
         .width(CommonConstants.FULL_PERCENT)
       }

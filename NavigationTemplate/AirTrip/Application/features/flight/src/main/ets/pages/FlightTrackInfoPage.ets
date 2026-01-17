@@ -16,7 +16,7 @@ export struct FlightTrackInfoPage {
   @Local flightDetail: FlightInfo = new FlightInfo();
 
   getFlightTrackInfo() {
-    GlobalDialog.showLoadingDialog();
+    GlobalDialog.showLoadingDialog(this.getUIContext());
     FlightApi.getFlightDetail(this.flightNo).then((res) => {
       let result = res.result as FlightListResult;
       if (result.ret.code === 0) {
@@ -26,7 +26,7 @@ export struct FlightTrackInfoPage {
       }
       this.loadingStatus = LoadingStatus.SUCCESS;
     }).finally(() => {
-      GlobalDialog.close()
+      GlobalDialog.close(this.getUIContext())
     })
   }
 
@@ -109,6 +109,7 @@ export struct FlightTrackInfoPage {
                     .fontWeight(FontWeight.Bold).fontSize(16)
                     .fontColor($r('sys.color.font_emphasize'))
                 }
+
                 Column({ space: 8 }) {
                   Text('行李转盘')
                     .fontWeight(400)

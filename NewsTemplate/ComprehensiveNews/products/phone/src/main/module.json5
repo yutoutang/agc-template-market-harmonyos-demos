@@ -10,7 +10,9 @@
     ],
     "querySchemes": [
       "weixin",
-      "wxopensdk"
+      "wxopensdk",
+      "qqopenapi",
+      "https"
     ],
     "deliveryWithInstall": true,
     "installationFree": false,
@@ -35,12 +37,24 @@
         "skills": [
           {
             "entities": [
-              "entity.system.home"
+              "entity.system.home",
+              "entity.system.browser"
             ],
             "actions": [
               "action.system.home",
-              "wxentity.action.open"
-            ]
+              "wxentity.action.open",
+              "ohos.want.action.viewData"
+            ],
+            "uris": [
+              {
+// 接收QQ回调数据
+                "scheme": "qqopenapi",
+// todo 填写业务申请的QQ互联AppId，如果填错会导致QQ无法回调
+                "host": "102061317",
+                "pathRegex": "\\b(auth|share)\\b"
+              }
+            ],
+            "domainVerify": true
           }
         ]
       }

@@ -1,12 +1,13 @@
-import { promptAction } from '@kit.ArkUI'
+import { BusinessError } from '@kit.BasicServicesKit'
 import dayjs from 'dayjs'
-import { PopViewUtils } from 'lib_common'
+import { Logger, PopViewUtils } from 'lib_common'
 import { BuilderParams, CommentInfo } from '../model/Model'
 import { CommentUtils } from '../utils/CommentUtils'
 import { CommentEventDispatcher } from '../utils/EventDispatcher'
 import { FeedCommentVM } from '../viewmodel/FeedCommentVM'
 import { confirmDialogView } from './PressAction'
 
+const TAG = '[CommentCard]';
 
 @ComponentV2
 export struct CommentCard {
@@ -35,7 +36,11 @@ export struct CommentCard {
         .fontColor($r('sys.color.font_primary'))
       Row({ space: 50 }) {
         Button('取消').onClick(() => {
-          promptAction.closeCustomDialog(this.customDialogComponentId)
+          try {
+            this.getUIContext().getPromptAction().closeCustomDialog(this.customDialogComponentId)
+          } catch (error) {
+            Logger.error(TAG, 'closeCustomDialog fail, error: ' + JSON.stringify(error));
+          }
         })
           .backgroundColor(Color.Transparent)
           .fontColor($r('sys.color.font_primary'))
@@ -43,7 +48,11 @@ export struct CommentCard {
           this.onDeleteComment(this.commentInfo.commentId)
           CommentEventDispatcher.dispatchToDeleteComment(this.commentInfo.commentId)
           PopViewUtils.closePopView()
-          promptAction.closeCustomDialog(this.customDialogComponentId)
+          try {
+            this.getUIContext().getPromptAction().closeCustomDialog(this.customDialogComponentId)
+          } catch (error) {
+            Logger.error(TAG, 'closeCustomDialog fail, error: ' + JSON.stringify(error));
+          }
         })
           .backgroundColor(Color.Transparent)
           .fontColor($r('sys.color.warning'))
@@ -64,18 +73,24 @@ export struct CommentCard {
     })
   }
   pressDelete = () => {
-    promptAction.openCustomDialog({
-      builder: () => {
-        this.customDialogComponent()
-      },
-      onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
-        if (dismissDialogAction.reason !== DismissReason.TOUCH_OUTSIDE) {
-          dismissDialogAction.dismiss()
-        }
-      },
-    }).then((dialogId: number) => {
-      this.customDialogComponentId = dialogId
-    })
+    this.getUIContext()
+      .getPromptAction()
+      .openCustomDialog({
+        builder: () => {
+          this.customDialogComponent()
+        },
+        onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
+          if (dismissDialogAction.reason !== DismissReason.TOUCH_OUTSIDE) {
+            dismissDialogAction.dismiss()
+          }
+        },
+      })
+      .then((dialogId: number) => {
+        this.customDialogComponentId = dialogId
+      })
+      .catch((e: BusinessError) => {
+        Logger.error(TAG, 'openCustomDialog fail, error: ' + JSON.stringify(e))
+      })
   }
 
   pressCancel() {
@@ -171,8 +186,8 @@ export struct CommentCard {
               this.navPathStack.pushPathByName('TotalComment', this.commentInfo)
             })
             .visibility(this.commentInfo.replyComments?.length ?
-            Visibility.Visible :
-            Visibility.None)
+              Visibility.Visible :
+              Visibility.None)
           }
         }.width('100%').alignItems(HorizontalAlign.Start)
         .gesture(
@@ -197,8 +212,8 @@ export struct CommentCard {
           this.totalCommentBuilder()
         }
         .visibility(this.commentInfo.replyComments?.length ?
-        Visibility.Visible :
-        Visibility.None)
+          Visibility.Visible :
+          Visibility.None)
       }
     }
     .width('100%')

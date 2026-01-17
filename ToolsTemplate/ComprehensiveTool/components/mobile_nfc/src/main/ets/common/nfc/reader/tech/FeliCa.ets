@@ -1,5 +1,6 @@
 import { tag } from '@kit.ConnectivityKit';
 import Util from '../../../Util';
+import NFC from '../../Nfc';
 
 export default class FeliCa {
   static EMPTY: number[] = [];
@@ -284,7 +285,7 @@ export class Tag {
   constructor(nfcTag: tag.NfcFTag) {
     this.nfcTag = nfcTag
     this.sys = nfcTag.getSystemCode();
-    this.idm = new IDm(nfcTag.getTagInfo().uid);
+    this.idm = new IDm(tag.getTagInfo(NFC.startWant).uid);
     this.pmm = new PMm(nfcTag.getPmm());
   }
 

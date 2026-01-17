@@ -1,139 +1,84 @@
-import { promptAction } from '@kit.ArkUI';
-import { common, ConfigurationConstant } from '@kit.AbilityKit';
+import { ConfigurationConstant } from '@kit.AbilityKit';
 import { notificationManager } from '@kit.NotificationKit';
-import { AppGalleryUtils, BaseViewModel, CommonConfirmDialog, FileUtils, RouterMap, RouterUtils } from 'lib_common';
+import { BusinessError } from '@kit.BasicServicesKit';
+import { BaseViewModel, Logger, RouterMap, RouterUtils } from 'lib_common';
 import { AccountApi } from 'lib_account';
-import { ISelectOption, SettingItem } from '../types/Types';
+import { AboutModel, SettingItem, SettingGroup, SettingType, SupportedSetting } from 'module_app_setting';
+
+const TAG = '[SettingViewModel]';
 
 @ObservedV2
 export class SettingViewModel extends BaseViewModel {
   private accountInstance: AccountApi = new AccountApi();
+  public uiContext: UIContext | null = null;
   @Trace isFocusOnPage: boolean = true;
   @Trace isLoading: boolean = false;
-  @Trace cacheSize: string = '0';
-  @Trace cacheSettingItem = new SettingItem({
-    label: '清理缓存',
-    extraLabel: this.getLocalCacheLabel(),
-    onClick: () => {
-      this.cacheSize = '0';
-      this.cacheSettingItem.extraLabel = this.getLocalCacheLabel();
-      FileUtils.clearCache();
-      promptAction.showToast({ message: '清除缓存成功' });
-    },
-  })
-  @Trace colorSettingItem = new SettingItem({
-    label: '夜间模式',
-    typeSelect: true,
-    selectTitle: '夜间模式',
-    selectOptions: [
-      {
-        id: 0,
-        label: '跟随系统',
-        value: -1,
-      },
-      {
-        id: 1,
-        label: '普通模式',
-        value: 1,
-      },
-      {
-        id: 2,
-        label: '夜间模式',
-        value: 0,
-      },
-    ],
-    selectV: this.getColorIndex(),
-    onSelect: (option) => {
-      this.settingInfo.colorMode = (option as ISelectOption).value as ConfigurationConstant.ColorMode;
-      this.colorSettingItem.selectV = this.getColorIndex();
-      getContext().getApplicationContext().setColorMode(this.settingInfo.colorMode);
-    },
-  });
-  @Trace pushSettingItem = new SettingItem({
-    label: '通知开关',
-    typeSwitch: true,
-    switchV: this.settingInfo.pushSwitch,
-    onClick: (isOn) => {
-      this.requestPushPermission(isOn as boolean);
-    },
-  });
   @Trace list1: SettingItem[] = [
-    new SettingItem({
-      label: '个人信息',
-      routerName: RouterMap.SETTING_PERSONAL,
-      onClick: () => {
+    new SettingItem()
+      .setType(SettingType.ROUTER)
+      .setLabel('个人信息')
+      .setRouterParam({ routerName: RouterMap.SETTING_PERSONAL })
+      .setClickEvent(() => {
         if (this.userInfoModel.isLogin) {
           RouterUtils.pushPathByName(RouterMap.SETTING_PERSONAL);
         } else {
-          promptAction.showToast({ message: '请先登录' });
+          this.contextModel.showToast({ message: '请先登录' });
         }
-      },
-    }),
-    new SettingItem({
-      label: '隐私设置',
-      routerName: RouterMap.SETTING_PRIVACY,
-    }),
+      }),
+    new SettingItem()
+      .setType(SettingType.ROUTER)
+      .setLabel('隐私设置')
+      .setRouterParam({ routerName: RouterMap.SETTING_PRIVACY }),
   ];
   @Trace list2: SettingItem[] = [
-    this.pushSettingItem,
-    new SettingItem({
-      label: '播放与网络设置',
-      routerName: RouterMap.SETTING_NETWORK,
-    }),
-    this.cacheSettingItem,
+    new SettingItem()
+      .setSupportedType(SupportedSetting.PUSH_SWITCH)
+      .setOnChange((isOn) => {
+        this.settingInfo.pushSwitch = isOn as boolean;
+      }),
+    new SettingItem()
+      .setType(SettingType.ROUTER)
+      .setLabel('播放与网络设置')
+      .setRouterParam({ routerName: RouterMap.SETTING_NETWORK }),
+    new SettingItem()
+      .setSupportedType(SupportedSetting.CLEAR_CACHE),
   ];
   @Trace list3: SettingItem[] = [
-    this.colorSettingItem,
-    new SettingItem({
-      label: '字体大小',
-      routerName: RouterMap.SETTING_FONT,
-    }),
+    new SettingItem()
+      .setSupportedType(SupportedSetting.LIGHT_DARK_MODE)
+      .setSelectIndex(this.getColorIndex())
+      .setOnChange((colorMode) => {
+        this.settingInfo.colorMode = colorMode as ConfigurationConstant.ColorMode;
+      }),
+    new SettingItem()
+      .setType(SettingType.ROUTER)
+      .setLabel('字体大小')
+      .setRouterParam({ routerName: RouterMap.SETTING_FONT }),
   ];
   @Trace list4: SettingItem[] = [
-    new SettingItem({
-      label: '检测版本',
-      onClick: () => {
-        const context = getContext(this) as common.UIAbilityContext;
-        AppGalleryUtils.checkAppUpdate(context).then((resp: boolean) => {
-          if (resp) {
-            AppGalleryUtils.showUpdateDialog(context);
-          } else {
-            promptAction.showToast({ message: '已是最新版本' });
-          }
-        })
-      },
-    }),
-    new SettingItem({
-      label: '关于我们',
-      routerName: RouterMap.SETTING_ABOUT,
-    }),
+    new SettingItem()
+      .setSupportedType(SupportedSetting.CHECK_VERSION),
+    new SettingItem()
+      .setSupportedType(SupportedSetting.ABOUT)
+      .setExtraParams({
+        icpText: '苏ICP备17040376号-135A',
+        copyrightText: '华为xx 版权所有 © 2019-2025',
+        hotline: '00000000',
+      } as AboutModel),
   ];
+  @Trace group1: SettingGroup = new SettingGroup().setList(this.list1);
+  @Trace group2: SettingGroup = new SettingGroup().setList(this.list2);
+  @Trace group3: SettingGroup = new SettingGroup().setList(this.list3);
+  @Trace group4: SettingGroup = new SettingGroup().setList(this.list4);
 
-  requestPushPermission(isOn: boolean) {
-    notificationManager.openNotificationSettings(getContext(this) as common.UIAbilityContext)
+  requestPushPermission() {
+    notificationManager.openNotificationSettings(this.contextModel.globalUIAbilityContext)
       .then(() => {
         this.isFocusOnPage = false;
       })
-  }
-
-  getLatestPushStatus() {
-    if (!this.isFocusOnPage) {
-      const isOn = notificationManager.isNotificationEnabledSync();
-      this.settingInfo.pushSwitch = isOn;
-      this.pushSettingItem.switchV = isOn;
-      this.isFocusOnPage = true;
-    }
-  }
-
-  getCache() {
-    FileUtils.getCache().then((resp: number) => {
-      this.cacheSize = (resp / 1024 / 1024).toFixed(2);
-      this.cacheSettingItem.extraLabel = this.getLocalCacheLabel();
-    })
-  }
-
-  getLocalCacheLabel() {
-    return `${this.cacheSize}M`;
+      .catch((error: BusinessError) => {
+        Logger.error(TAG, 'openNotificationSettings fail, error: ' + JSON.stringify(error));
+      })
   }
 
   getColorIndex() {
@@ -146,27 +91,11 @@ export class SettingViewModel extends BaseViewModel {
     return 0;
   }
 
-  onSignOutBtnClick() {
-    CommonConfirmDialog.show({
-      content: '确定退出登录吗？',
-      confirm: () => {
-        this.isLoading = true;
-        this.accountInstance.signOut()
-          .then(() => {
-            promptAction.showToast({ message: '已退出登录' });
-          })
-          .finally(() => {
-            this.isLoading = false;
-          });
-      },
-    })
+  signOutApi(): Promise<void> {
+    return this.accountInstance.signOut();
   }
 
-  @Computed
-  get signOutBtnLabel() {
-    if (this.isLoading) {
-      return '正在退出登录...'
-    }
-    return '退出登录'
+  signOutSuccessCb(): void {
+    RouterUtils.pop();
   }
 }

@@ -24,7 +24,6 @@ export struct TSearch {
     }
     .width(this.widthLength)
     .height(40)
-    // .margin({ top: 15, bottom: 15 })
     .borderWidth($r('sys.float.border_small'))
     .borderRadius(24)
     .backgroundColor('#0D000000')

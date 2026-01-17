@@ -1,4 +1,5 @@
 import { uiObserver, window } from '@kit.ArkUI';
+import { BusinessError } from '@kit.BasicServicesKit';
 import { AVPlayerSession, VideoCard, VideoNetworkModel, VideoNetworkSetting } from 'module_swipeplayer';
 import { CommonConstants, Logger, NetworkUtil, RouterMap, RouterUtils, TimeUtils } from 'lib_common';
 import { NetworkExceptionView } from 'lib_widget';
@@ -14,9 +15,7 @@ export struct RecommendPage {
   @Param index: number = 2
   // 视频页里面的头部tabIndex
   @Param currentTabIndex: number = 2;
-
   @Local vm: RecommendPageVM = new RecommendPageVM()
-
   // WindowStage生命周期变化的监听回调函数
   private windowStageEventCallback = (type: window.WindowStageEventType) => {
     const allPathStack = RouterUtils.getStack().getAllPathName()
@@ -24,10 +23,9 @@ export struct RecommendPage {
     if (this.currentTabIndex === this.index && this.vm.tabModel.selectedIndex === 1 &&
       lastPathName === RouterMap.INDEX_PAGE
     ) {
-      let eventType = window.WindowStageEventType;
-      if (type === eventType.RESUMED || type === eventType.SHOWN) {
+      if (type === window.WindowStageEventType.RESUMED || type === window.WindowStageEventType.SHOWN) {
         this.vm.avPlayerManager.play(this.vm.currentIndex);
-      } else if (type === eventType.PAUSED || type === eventType.HIDDEN) {
+      } else if (type === window.WindowStageEventType.PAUSED || type === window.WindowStageEventType.HIDDEN) {
         this.vm.avPlayerManager.pause(this.vm.currentIndex);
       }
     }
@@ -107,12 +105,12 @@ export struct RecommendPage {
                   this.vm.loading = false
                 }
               }, 100)
-            }
+            },
           })
         }
       } else {
         Refresh({ refreshing: $$this.vm.isRefreshing, builder: this.customRefreshComponent }) {
-          WaterFlow({scroller: this.vm.listScroller }) {
+          WaterFlow({ scroller: this.vm.listScroller }) {
             LazyForEach(this.vm.videoListDataSource, (item: VideoNewsData, index: number) => {
               FlowItem() {
                 VideoCard({
@@ -137,7 +135,9 @@ export struct RecommendPage {
                       'newsId': item.getVideoId(),
                       'playerSession': playerSession,
                     }
-                    playerSession!.avPlayer?.pause();
+                    playerSession!.avPlayer?.pause().catch((e: BusinessError) => {
+                      Logger.error(TAG, 'pause fail, error: ' + JSON.stringify(e));
+                    });
                     // 监听页面跳转
                     this.vm.navRouteModel.navDestinationUpdateListeners.delete('clickVideoCardListener');
                     this.vm.navRouteModel.navDestinationUpdateListeners.set('clickVideoCardListener', (info) => {
@@ -156,7 +156,7 @@ export struct RecommendPage {
                   onPlayItem: (playIndex: number) => {
                     Logger.info(TAG, 'onPlayItem play video index is ' + playIndex)
                     this.vm.handleListScrollByUserClick(playIndex)
-                  }
+                  },
                 })
               }
               .width(CommonConstants.FULL_PERCENT)
@@ -179,11 +179,11 @@ export struct RecommendPage {
           .scrollBar(BarState.Off)
           .friction(0.6)
           .edgeEffect(EdgeEffect.None)
-          .padding({left: this.vm.getListPadding(), right: this.vm.getListPadding()})
-          .onWillScroll((scrollOffset: number, scrollState: ScrollState, scrollSource: ScrollSource) => {
+          .padding({ left: this.vm.getListPadding(), right: this.vm.getListPadding() })
+          .onWillScroll((scrollOffset: number) => {
             this.vm.yOffset += scrollOffset
           })
-          .onScrollFrameBegin((offset: number, state: ScrollState) => {
+          .onScrollFrameBegin((offset: number) => {
             this.vm.isUserActionScroll = true;
             return { offsetRemain: offset };
           })
@@ -240,7 +240,7 @@ export struct RecommendPage {
       }
     }
     .align(Alignment.Bottom)
-    .padding({top: 16, bottom: 16})
+    .padding({ top: 16, bottom: 16 })
     .clip(true)
     .constraintSize({ minHeight: 32 })
     .width('100%')
@@ -258,14 +258,14 @@ export struct RecommendPage {
         .fontSize(12)
     }
     .width(CommonConstants.FULL_PERCENT)
-    .padding({top: CommonConstants.PADDING_XL, bottom: CommonConstants.PADDING_XL})
+    .padding({ top: CommonConstants.PADDING_XL, bottom: CommonConstants.PADDING_XL })
     .justifyContent(FlexAlign.Center)
     .visibility(this.vm.isLoadingMore ? Visibility.Visible : Visibility.Hidden)
   }
 
   @Builder
   videoCardInfoView(item: VideoNewsData) {
-    Column({space: 2}) {
+    Column({ space: 2 }) {
       Text(item.title)
         .fontSize(16)
         .fontColor($r('sys.color.font_primary'))
@@ -273,7 +273,7 @@ export struct RecommendPage {
         .lineHeight(21)
         .maxLines(2)
 
-      Row({space: 12}) {
+      Row({ space: 12 }) {
         Text(item.author.authorNickName)
           .fontSize(12)
           .fontColor($r('sys.color.font_primary'))

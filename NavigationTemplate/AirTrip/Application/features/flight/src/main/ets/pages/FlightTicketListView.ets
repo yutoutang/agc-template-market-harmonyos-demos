@@ -44,7 +44,7 @@ export struct FlightTicketListView {
             }
             .alignItems(HorizontalAlign.Start)
             Button('预订', { type: ButtonType.Capsule })
-              .fontColor($r('sys.color.white'))
+              .fontColor($r('sys.color.font_on_primary'))
               .fontWeight(400)
               .backgroundColor('#E84026')
               .width(72)
@@ -75,7 +75,7 @@ export struct FlightTicketListView {
         .borderRadius(16)
         .alignItems(HorizontalAlign.Start)
         .backgroundColor($r('sys.color.white'))
-      })
+      },(item: FlightSpaceInfo, index: number)=>index + '__' + JSON.stringify(item))
     }
     .width('100%')
     .justifyContent(FlexAlign.Start)

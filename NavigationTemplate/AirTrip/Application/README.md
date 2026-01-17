@@ -3,10 +3,9 @@
 ## 目录
 
 - [功能介绍](#功能介绍)
-- [环境要求](#环境要求)
+- [约束与限制](#约束与限制)
 - [快速入门](#快速入门)
 - [示例效果](#示例效果)
-- [权限要求](#权限要求)
 - [开源许可协议](#开源许可协议)
 
 ## 功能介绍
@@ -117,17 +116,20 @@
    └──phone/src/main/resources               // 资源文件目录
 ```
 
-## 环境要求
+## 约束与限制
 
-### 软件
+### 环境
 
-* DevEco Studio版本：DevEco Studio 5.0.3 Release及以上
-* HarmonyOS SDK版本：HarmonyOS 5.0.3 Release SDK及以上
-
-### 硬件
-
+* DevEco Studio版本：DevEco Studio 6.0.0 Release及以上
+* HarmonyOS SDK版本：HarmonyOS 6.0.0 Release SDK及以上
 * 设备类型：华为手机（直板机）
-* HarmonyOS版本：HarmonyOS 5.0.3 Release及以上
+* HarmonyOS版本：HarmonyOS 6.0.0 Release及以上
+
+### 权限
+
+* 获取位置权限：ohos.permission.LOCATION、ohos.permission.APPROXIMATELY_LOCATION
+* 网络权限：ohos.permission.INTERNET
+
 
 ## 快速入门
 
@@ -135,25 +137,27 @@
 
 在运行此模板前，需要完成以下配置：
 
-1. 在DevEco Studio中打开此模板。
+1. 在AppGallery Connect创建元服务，将包名配置到模板中。
 
-2. 在AppGallery Connect创建元服务，将包名配置到模板中。
-
-   a. 参考[创建元服务](https://developer.huawei.com/consumer/cn/doc/app/agc-help-createharmonyapp-0000001945392297)为元服务创建APPID，并进行关联。
+   a. 参考[创建元服务](https://developer.huawei.com/consumer/cn/doc/app/agc-help-createharmonyapp-0000001945392297)为元服务创建APP ID，并将APP ID与元服务进行关联。
 
    b. 返回应用列表页面，查看元服务的包名。
 
-   c. 将Application/AppScope/app.json5文件中的bundleName替换为创建元服务的包名。
+   c. 将模板工程根目录下AppScope/app.json5文件中的bundleName替换为创建元服务的包名。
 
-3. 配置签名。
+2. 配置服务器域名。
 
-   a. 为元服务进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing)。
+   本模板接口均采用mock数据，由于元服务包体大小有限制，部分图片资源将从云端拉取，所以需为模板项目[配置服务器域名](https://developer.huawei.com/consumer/cn/doc/atomic-guides/agc-help-harmonyos-server-domain)，“httpRequest合法域名”需要配置为：`https://agc-storage-drcn.platform.dbankcloud.cn`
 
-   b. 添加公钥指纹，详细参考：[配置应用证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-signature-info-0000001628566748#section5181019153511)。
+3. 配置华为账号服务。
+
+   a. 将元服务的client ID配置到entry/src/main路径下的module.json5文件，详细参考：[配置Client ID](https://developer.huawei.com/consumer/cn/doc/atomic-guides/account-atomic-client-id)。
+
+   b. 如需获取用户真实手机号，需要申请phone权限，详细参考：[配置scope权限](https://developer.huawei.com/consumer/cn/doc/atomic-guides/account-guide-atomic-permissions)，并在端侧使用快速验证手机号码Button进行[验证获取手机号码](https://developer.huawei.com/consumer/cn/doc/atomic-guides/account-guide-atomic-get-phonenumber)。
 
 4. 本模板是端云一体模版，采用云函数接口的方式mock请求数据，所以需要部署云函数以及云数据库。
 
-   a. [开通元函数服务](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/cloudfoundation-enable-function)和[开通云数据库服务](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/cloudfoundation-enable-database)。
+   a. [开通云函数服务](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/cloudfoundation-enable-function)和[开通云数据库服务](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/cloudfoundation-enable-database)。
 
    b. 在CloudProgram/cloud-config.json文件中配置相关信息，依次填写当前项目的appId、appName、projectId、teamId、projectName，相关信息查询参考[查看应用基本信息](https://developer.huawei.com/consumer/cn/doc/app/agc-help-appinfo-0000001100014694)。
    ![截图](screenshot/img_1.png)
@@ -175,24 +179,16 @@
    b. 为预加载绑定签名部署的云函数app-resource-service。
    ![截图](screenshot/img_7.png)
 
-6. 配置华为账号服务。
+6. 对元服务进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing#section297715173233)。
 
-   a. 将元服务的client ID配置到Application/product/phone模块的module.json5文件，详细参考：[配置Client ID](https://developer.huawei.com/consumer/cn/doc/atomic-guides/account-atomic-client-id)。
-
-   b. 添加公钥指纹，详细参考：[配置应用证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-signature-info-0000001628566748#section5181019153511)。
-
-   c. 如需获取用户真实手机号，需要申请phone权限，详细参考：[配置scope权限](https://developer.huawei.com/consumer/cn/doc/atomic-guides/account-guide-atomic-permissions)，并在端侧使用快速验证手机号码Button进行[验证获取手机号码](https://developer.huawei.com/consumer/cn/doc/atomic-guides/account-guide-atomic-get-phonenumber)。
-
-7. 为元服务[配置服务器域名](https://developer.huawei.com/consumer/cn/doc/atomic-guides/agc-help-harmonyos-server-domain)，配置httpRequest合法域名即可。
+7. 添加手工签名所用证书对应的公钥指纹。详细参考：[配置应用签名证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-signature-info-0000001628566748#section5181019153511)
 
 
 ### 运行调试工程
 
 1. 连接调试手机和PC。
 
-2. 对元服务[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing#section297715173233)。
-
-3. 菜单选择“Run > Run 'phone' ”或者“Run > Debug 'phone' ”，运行或调试模板工程。
+2. 菜单选择“Run > Run 'phone' ”或者“Run > Debug 'phone' ”，运行或调试模板工程。
 
 ## 示例效果
 
@@ -203,12 +199,6 @@
 3. [航班动态](https://agc-storage-drcn.platform.dbankcloud.cn/v0/default-bucket-o7oax/3.mp4?token=e180aa35-fb42-4abe-8ec6-99fb511fc6d4)
 
 4. [我的](https://agc-storage-drcn.platform.dbankcloud.cn/v0/default-bucket-o7oax/4.mp4?token=1242ff11-000c-4783-bf71-b7d1d7f5308b)
-
-
-## 权限要求
-
-* 获取位置权限：ohos.permission.LOCATION、ohos.permission.APPROXIMATELY_LOCATION
-* 网络权限：ohos.permission.INTERNET
 
 ## 开源许可协议
 

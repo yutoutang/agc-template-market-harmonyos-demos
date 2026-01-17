@@ -16,5 +16,17 @@
 export enum SettingType {
   FEEDBACK = 0,
   PRIVACY_POLICY = 1,
-  TERMS_OF_SERVICE = 2
+  TERMS_OF_SERVICE = 2,
+  SETTING = 3
+}
+
+export enum ErrorCode {
+  // 使用华为账号登录组件时，未设置协议状态为ACCEPTED。
+  ERROR_CODE_AGREEMENT_STATUS_NOT_ACCEPTED = 1005300001,
+  // 用户未登录华为账号
+  ERROR_CODE_UN_LOGIN1 = 1001502001,
+  // 账号未登录
+  ERROR_CODE_UN_LOGIN2 = 1001600002,
+  // 用户取消当前操作。
+  ERROR_CODE_CANCEL = 1001600005,
 }

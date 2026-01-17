@@ -7,5 +7,6 @@
   "license": "Apache-2.0",
   "dependencies": {
     "lib_common": "file:../lib_common",
+    "module_share": "file:../../components/module_share"
   }
 }

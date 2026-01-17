@@ -4,12 +4,12 @@ export class PreloadResponse {
 }
 
 export interface AppInfoResp {
-  // 店铺id
-  storeId: string
-  // 店铺类型 1：按桌号点餐 2：按取餐码点餐
-  storeType: number
-  // 店铺状态 1：营业
-  status: number
+  // banner图
+  bannerList: string[]
+  // 图片域名
+  imgBaseUrl: string
+  // 客服电话
+  telephone: string
 }
 
 export interface StoreInfoResp {
@@ -35,9 +35,24 @@ export interface StoreInfoResp {
   xyhMoney: number
   // 备注口味：多个以;；分隔
   taste: string
+  // 活动满减
   reductionList: Array<ReductionResp>
   // 充值档次
   rechargeTier: Array<RechargeTier>
+  // 包间
+  privateRoom: Array<number>,
+
+  // 大厅
+  diningHall: Array<number>,
+
+  // 餐桌最大人数
+  maxCount: number,
+
+  // 是否排队
+  needQueue: boolean,
+
+  // 排队信息
+  queueInfo: StoreQueueInfoResp,
 }
 
 export interface TableInfoResp {
@@ -69,4 +84,12 @@ export interface RechargeTier {
   realMoney: number
   desc: string
   type: number
+}
+
+export interface StoreQueueInfoResp {
+  used: number;
+  min: number;
+  mid: number;
+  max: number;
+  now: number;
 }

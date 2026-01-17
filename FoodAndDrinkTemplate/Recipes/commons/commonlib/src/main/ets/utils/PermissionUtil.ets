@@ -3,6 +3,7 @@ import { BusinessError, Callback } from '@kit.BasicServicesKit';
 import { Logger } from './Logger';
 import { authentication } from '@kit.AccountKit';
 import { util } from '@kit.ArkTS';
+import { GlobalContextUtils } from './ContextUtils';
 
 const TAG: string = '[PermissionUtil]';
 
@@ -52,7 +53,7 @@ export class PermissionUtil {
       return;
     }
     if (!PermissionUtil._context) {
-      PermissionUtil._context = getContext() as common.UIAbilityContext;
+      PermissionUtil._context = GlobalContextUtils.globalContext;
     }
     // 向用户申请授权
     PermissionUtil._atManager.requestPermissionsFromUser(PermissionUtil._context, needAuthorized).then((data) => {

@@ -1,5 +1,6 @@
 import { wifiManager } from '@kit.ConnectivityKit';
 import { common } from '@kit.AbilityKit';
+import { UtilLog as Logger, UtilLog } from '@hw-agconnect/util-log';
 import { getInstance, RouterMap, setPathStack } from '../util/Route';
 import { CustomTitle } from '../components/CustomTitle';
 import { CastPageVM } from '../viewModels/CastPageVM';
@@ -26,16 +27,24 @@ export struct CastPage {
   aboutToAppear(): void {
     this.vm.getWifiInfo();
     PermissionUtil.requestPermissions(['ohos.permission.READ_IMAGEVIDEO'], this.uiContext);
-    wifiManager.on('wifiConnectionChange', this.vm.getWifiInfo);
+    try {
+      wifiManager.on('wifiConnectionChange', this.vm.getWifiInfo);
+    } catch (e) {
+      UtilLog.error(`wifiConnectionChange listen failed with error ${JSON.stringify(e)}`);
+    }
   }
 
   aboutToDisappear(): void {
-    wifiManager.off('wifiConnectionChange', this.vm.getWifiInfo);
+    try {
+      wifiManager.off('wifiConnectionChange', this.vm.getWifiInfo);
+    } catch (e) {
+      UtilLog.error(`wifiConnectionChange listen off failed with error ${JSON.stringify(e)}`);
+    }
   }
 
   build() {
     NavDestination() {
-      CustomTitle({ title: 'TV电视投屏' });
+      CustomTitle({ title: '本地影音投屏' });
       Column({ space: 16 }) {
         Column() {
           Row({ space: 8 }) {
@@ -127,6 +136,14 @@ export struct CastPage {
     .onReady((ctx) => {
       toastUtil.setUiContext(this.getUIContext());
       setPathStack(ctx.pathStack);
+      Logger.setGlobalConfig({
+        tag: 'cast_tool', // 指定日志标识
+        domain: 0xff00, // 日志对应的领域标识
+        open: true,
+        showStack: false,
+        showBorder: false,
+        showDivider: false,
+      });
     });
   }
 }

@@ -110,7 +110,7 @@ export struct OperationPage {
               .shadow(
                 this.vm.splitBtnIndex === index ?
                   {
-                    radius: vp2px(3),
+                    radius: this.getUIContext().vp2px(3),
                     color: 'rgba(0, 0, 0, 0.2)',
                   } : undefined)
               .onClick(() => {

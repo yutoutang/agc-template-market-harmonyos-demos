@@ -17,7 +17,7 @@ export struct MeasurePage {
   @Local stack: NavPathStack | undefined;
 
   aboutToAppear(): void {
-    this.vm.in();
+    this.vm.in(this.getUIContext());
   }
 
   aboutToDisappear(): void {
@@ -31,7 +31,7 @@ export struct MeasurePage {
           title: '网速测量',
           stack: this.stack,
           backClick: () => {
-            this.vm.setStatusBarContentColor('#000000');
+            this.vm.setStatusBarContentColor('#000000', this.getUIContext());
           },
         })
       }
@@ -59,7 +59,7 @@ export struct MeasurePage {
     .onReady((ctx) => {
       this.stack = ctx.pathStack;
     }).onBackPressed(() => {
-      this.vm.setStatusBarContentColor('#000000');
+      this.vm.setStatusBarContentColor('#000000', this.getUIContext());
       return false
     });
   }
@@ -71,7 +71,7 @@ export struct MeasurePage {
         .width(StyleConstants.IMAGE_148)
         .height(StyleConstants.IMAGE_148)
         .onClick(() => {
-          this.vm.beginMeasure();
+          this.vm.beginMeasure(this.getUIContext());
         })
     }
     .height('50%')
@@ -140,7 +140,7 @@ export struct MeasurePage {
           .width(StyleConstants.IMAGE_120)
           .height(StyleConstants.IMAGE_120)
           .onClick(() => {
-            this.vm.beginMeasure();
+            this.vm.beginMeasure(this.getUIContext());
           })
         Text(this.vm.desc).textColor2()
       }

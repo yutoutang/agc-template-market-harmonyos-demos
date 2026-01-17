@@ -1,4 +1,4 @@
-import { Constants, copyString, getFullDate, OrderListEnum, OrderTypeEnum } from 'common/Index';
+import { Constants, copyString, OrderTypeEnum } from 'common/Index';
 import { MyOrderInfo } from '../models/Index';
 
 @ComponentV2
@@ -32,46 +32,65 @@ export struct PaymentDetailsComp {
       .justifyContent(FlexAlign.SpaceBetween)
       .padding({ top: 12, bottom: 12 })
 
+      // 预约号码
+      Row() {
+        Text('预约号码').fontSize($r('sys.float.Body_M')).fontColor($r('sys.color.font_secondary'))
+        Row() {
+          Text(this.orderDetail.order.preorderPhone)
+            .fontSize($r('sys.float.Body_S'))
+            .fontColor($r('sys.color.font_primary'))
+        }.justifyContent(FlexAlign.End).layoutWeight(1)
+      }
+      .width(Constants.FULL_SIZE)
+      .justifyContent(FlexAlign.SpaceBetween)
+      .padding({ top: 12, bottom: 12 })
 
       // 就餐方式
       Row() {
         Text($r('app.string.order_type')).fontSize($r('sys.float.Body_M')).fontColor($r('sys.color.font_secondary'))
         Row() {
-          Text(Number(this.orderDetail.order.orderType) === OrderTypeEnum.PICK_SELF ?
-          $r('app.string.store_dining') :
-          $r('app.string.picking')).fontSize($r('sys.float.Body_S')).fontColor($r('sys.color.font_primary'))
-        }.justifyContent(FlexAlign.End).layoutWeight(1)
-      }
-      .width(Constants.FULL_SIZE)
-      .justifyContent(FlexAlign.SpaceBetween)
-      .padding({ top: 12, bottom: 12 })
-      // 预约时间
-      Row() {
-        Text('预约时间').fontSize($r('sys.float.Body_M')).fontColor($r('sys.color.font_secondary'))
-        Row() {
-          Text(this.orderDetail.order.preorderTime).fontSize($r('sys.float.Body_S')).fontColor($r('sys.color.font_primary'))
-        }.justifyContent(FlexAlign.End).layoutWeight(1)
-      }
-      .width(Constants.FULL_SIZE)
-      .justifyContent(FlexAlign.SpaceBetween)
-      .padding({ top: 12, bottom: 12 })
-      // 预约号码
-      Row() {
-        Text('预约号码').fontSize($r('sys.float.Body_M')).fontColor($r('sys.color.font_secondary'))
-        Row() {
-          Text(this.orderDetail.order.preorderPhone).fontSize($r('sys.float.Body_S')).fontColor($r('sys.color.font_primary'))
+          Text(Number(this.orderDetail.order.orderType) === OrderTypeEnum.DINE_IN ?
+            $r('app.string.store_dining') :
+            $r('app.string.picking')).fontSize($r('sys.float.Body_S')).fontColor($r('sys.color.font_primary'))
         }.justifyContent(FlexAlign.End).layoutWeight(1)
       }
       .width(Constants.FULL_SIZE)
       .justifyContent(FlexAlign.SpaceBetween)
       .padding({ top: 12, bottom: 12 })
 
-      if (Number(this.orderDetail.order.state) !== OrderListEnum.CANCELED) {
+      if (this.orderDetail.order.orderType === OrderTypeEnum.TAKEOUT) {
+        // 预约时间
+        Row() {
+          Text('预约时间').fontSize($r('sys.float.Body_M')).fontColor($r('sys.color.font_secondary'))
+          Row() {
+            Text(this.orderDetail.order.preorderTime)
+              .fontSize($r('sys.float.Body_S'))
+              .fontColor($r('sys.color.font_primary'))
+          }.justifyContent(FlexAlign.End).layoutWeight(1)
+        }
+        .width(Constants.FULL_SIZE)
+        .justifyContent(FlexAlign.SpaceBetween)
+        .padding({ top: 12, bottom: 12 })
+
+      }
+      if (this.orderDetail.order.orderType === OrderTypeEnum.DINE_IN) {
         Row() {
           Text($r('app.string.dinner_num_label'))
             .fontSize($r('sys.float.Body_M'))
             .fontColor($r('sys.color.font_secondary'))
           Text(this.orderDetail.order.tableware.toString())
+            .fontSize($r('sys.float.Body_S'))
+            .fontColor($r('sys.color.font_primary'))
+        }
+        .width(Constants.FULL_SIZE)
+        .justifyContent(FlexAlign.SpaceBetween)
+        .padding({ top: 12, bottom: 12 })
+
+        Row() {
+          Text('我的桌号')
+            .fontSize($r('sys.float.Body_M'))
+            .fontColor($r('sys.color.font_secondary'))
+          Text(`${this.orderDetail.table?.typeName}${this.orderDetail.table?.name}`)
             .fontSize($r('sys.float.Body_S'))
             .fontColor($r('sys.color.font_primary'))
         }

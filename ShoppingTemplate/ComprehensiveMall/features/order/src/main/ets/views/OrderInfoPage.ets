@@ -1,6 +1,6 @@
 import { CommonLoading, CommonScroll, ContainerColumn, CustomServiceSheet } from 'lib_widget'
 import { DiscountItem, OrderInfo, OrderItem, OrderSkuItem } from 'lib_network'
-import { Formatter, iResourceMgr } from 'lib_foundation'
+import { Formatter } from 'lib_foundation'
 import { OrderFormItem } from '../components/OrderFormItem'
 import { buildButtonList, buildOrderBaseInfoCard } from '../components/OrderInfoCard'
 import { OrderUtil } from '../utils/OrderUtil'
@@ -103,7 +103,7 @@ export struct OrderInfoPageNew {
             .layoutWeight(1)
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
-          if(this.vm.enableExpressPage){
+          if (this.vm.enableExpressPage) {
             Image($r('app.media.ic_arrow_right'))
               .width(16)
               .height(16)
@@ -182,11 +182,13 @@ export struct OrderInfoPageNew {
             .fontColor($r('app.color.font_color_level2'))
         }
 
-        OrderFormItem({ label: '优惠' }) {
-          Text(`- ¥${(orderItem.orderInfo.finalPrice - orderItem.orderInfo.originalPrice).toFixed(2)}`)
-            .fontSize($r('app.float.font_size_12'))
-            .fontColor($r('app.color.theme_color'))
-        }
+        ForEach(orderItem.orderInfo.discounts, (item: DiscountItem) => {
+          OrderFormItem({ label: item.label }) {
+            Text(`- ¥${(item.discountPrice)}`)
+              .fontSize($r('app.float.font_size_12'))
+              .fontColor($r('app.color.theme_color'))
+          }
+        }, (item: DiscountItem) => item.type + '__' + item.discountPrice)
 
         OrderFormItem({ label: '实付金额' }) {
           Text() {

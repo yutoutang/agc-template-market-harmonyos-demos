@@ -70,7 +70,7 @@ export struct NewsTabContent {
               }
               .backgroundColor($r('sys.color.background_primary'))
               .id('news_flow_' + this.channelItem.id +'_'+ index + '_'+ value.extraInfo.flexId)
-            }, (value: RequestListData, index: number) => index + JSON.stringify(value.articles[0]))
+            }, (value: RequestListData, index: number) => index + JSON.stringify(value.articles?.[0]))
           }
           .onReachEnd(
             // 防止回弹时额外触发
@@ -80,7 +80,7 @@ export struct NewsTabContent {
             }, 800)
           )
           .edgeEffect(EdgeEffect.Spring)
-          .columnsTemplate(`repeat(${this.newsContentVM.getLanesPoint}, 1fr)`)
+          .columnsTemplate(this.newsContentVM.isNeedTemplate(this.channelItem.id))
           .columnsGap(16)
           .rowsGap(12)
           .scrollBar(BarState.Off)

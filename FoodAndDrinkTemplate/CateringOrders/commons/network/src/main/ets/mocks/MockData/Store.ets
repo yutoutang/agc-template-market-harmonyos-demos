@@ -1,4 +1,11 @@
-import { AppInfoResp, RechargeTier, ReductionResp, StoreInfoResp, TableInfoResp } from '../../types/Store';
+import {
+  AppInfoResp,
+  RechargeTier,
+  ReductionResp,
+  StoreInfoResp,
+  StoreQueueInfoResp,
+  TableInfoResp,
+} from '../../types/Store';
 
 const reductionList: ReductionResp[] = [{
   id: '1',
@@ -59,6 +66,14 @@ export const rechargeTierList: RechargeTier[] = [{
   type: 1,
 }]
 
+const QUEUE_INFO: StoreQueueInfoResp = {
+  used: 9,
+  min: 3,
+  mid: 3,
+  max: 3,
+  now: 1,
+};
+
 const storeList: StoreInfoResp[] = [
   {
     id: '1',
@@ -82,6 +97,11 @@ const storeList: StoreInfoResp[] = [
     taste: '少糖；不要奶油奶沫；动物奶油；少糖；少糖；动物奶油；少糖；不要奶油奶沫；动物奶油',
     reductionList: reductionList,
     rechargeTier: rechargeTierList,
+    privateRoom: [5, 3, 0, 4, 5, 3, 0, 4, 5, 3, 0, 4, 5, 3, 0, 4, 5, 3, 0, 4, 5, 3, 0, 4],
+    diningHall: [2, 4, 6, 8, 10, 10, 10, 10, 10, 10, 10, 6, 0, 1, 6, 10, 10, 6, 3, 0, 3, 6, 8, 10],
+    maxCount: 6,
+    needQueue: true,
+    queueInfo: QUEUE_INFO,
   }, {
   id: '2',
   name: '餐饮店（安德门大街）',
@@ -104,6 +124,11 @@ const storeList: StoreInfoResp[] = [
   taste: '少糖；不要奶油奶沫；动物奶油；少糖；少糖；动物奶油；少糖；不要奶油奶沫；动物奶油',
   reductionList: reductionList,
   rechargeTier: rechargeTierList,
+  privateRoom: [5, 3, 1, 4, 5, 3, 0, 4, 5, 3, 0, 4, 5, 3, 0, 4, 5, 3, 1, 4, 5, 3, 0, 4],
+  diningHall: [2, 4, 6, 8, 10, 10, 10, 10, 10, 10, 10, 6, 0, 1, 6, 10, 10, 6, 3, 1, 3, 6, 8, 10],
+  maxCount: 8,
+  needQueue: false,
+  queueInfo: QUEUE_INFO,
 }, {
   id: '3',
   name: '餐饮店（安德门大街2店）',
@@ -126,6 +151,11 @@ const storeList: StoreInfoResp[] = [
   taste: '少糖；不要奶油奶沫；动物奶油；少糖；少糖；动物奶油；少糖；不要奶油奶沫；动物奶油',
   reductionList: reductionList,
   rechargeTier: rechargeTierList,
+  privateRoom: [5, 3, 0, 4, 5, 3, 0, 4, 5, 3, 0, 4, 0, 3, 0, 4, 5, 3, 0, 0, 0, 3, 0, 4],
+  diningHall: [2, 4, 6, 8, 10, 10, 10, 10, 10, 10, 10, 6, 0, 1, 6, 10, 10, 6, 0, 1, 3, 6, 8, 10],
+  maxCount: 6,
+  needQueue: true,
+  queueInfo: QUEUE_INFO,
 }];
 
 export const getStoreList = (): Array<StoreInfoResp> => {
@@ -134,9 +164,9 @@ export const getStoreList = (): Array<StoreInfoResp> => {
 
 export const getAppInfoResp = (): AppInfoResp => {
   return {
-    storeId: '1',
-    storeType: 2,
-    status: 1,
+    bannerList: ['CateringOrderTemplate/good_spec_logo1.png', 'CateringOrderTemplate/good_spec_logo2.png'],
+    imgBaseUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/test-1pvkp/',
+    telephone: '10000000001',
   }
 }
 
@@ -144,65 +174,65 @@ export const getTableInfoResp = (): Array<TableInfoResp> => {
   let result: Array<TableInfoResp> = [{
     id: '1',
     tableName: '1号桌',
-    typeName: '1人桌',
+    typeName: '小桌',
     num: 1,
     status: 0,
   }, {
     id: '2',
     tableName: '2号桌',
-    typeName: '2人桌',
+    typeName: '小桌',
     num: 2,
     status: 0,
   },
     {
       id: '3',
       tableName: '3号桌',
-      typeName: '3人桌',
+      typeName: '中桌',
       num: 3,
       status: 0,
     }, {
       id: '4',
       tableName: '4号桌',
-      typeName: '4人桌',
+      typeName: '中桌',
       num: 4,
       status: 0,
     },
     {
       id: '5',
       tableName: '5号桌',
-      typeName: '5人桌',
+      typeName: '大桌',
       num: 5,
       status: 0,
     }, {
       id: '6',
       tableName: '6号桌',
-      typeName: '6人桌',
+      typeName: '大桌',
       num: 6,
       status: 0,
     },
     {
       id: '7',
       tableName: '7号桌',
-      typeName: '7人桌',
+      typeName: '大桌',
       num: 7,
       status: 0,
     }, {
       id: '8',
       tableName: '8号桌',
-      typeName: '8人桌',
+      typeName: '大桌',
       num: 8,
       status: 0,
     },
     {
       id: '9',
       tableName: '9号桌',
-      typeName: '9人桌',
+      typeName: '大桌',
       num: 9,
       status: 0,
     }, {
       id: '10',
       tableName: '10号桌',
-      typeName: '10人桌',
+      typeName: '大桌',
       num: 10,
       status: 0,
     }]

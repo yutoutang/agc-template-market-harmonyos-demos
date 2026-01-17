@@ -1,4 +1,4 @@
-import { display, LoadingDialog, window } from '@kit.ArkUI';
+import { LoadingDialog } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
 import { CameraService } from '../util/CameraUtil';
 import { GlobalContext } from '../util/GlobalContext';

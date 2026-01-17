@@ -1,8 +1,11 @@
 import { abilityAccessCtrl, Permissions } from '@kit.AbilityKit';
+import { UtilLog } from '@hw-agconnect/util-log';
+import { LoginManageUtil, MemberManageUtil, UPDATE_MEMBER_STATUS } from 'module_base';
+import { LoginSheetUtils } from 'aggregated_login';
+import { MemberSheetUtils } from 'membership';
 import { CustomFilter } from '../model/CustomFilter';
 import { CameraVM } from '../viewmodel/CameraVM';
 import { getInstance } from '../util/RouteModule';
-import { hilog } from '@kit.PerformanceAnalysisKit';
 
 @Builder
 export function FilteredCameraBuilder() {
@@ -17,6 +20,37 @@ export struct FilteredCamera {
   @Local context: Context | undefined = this.uiContext.getHostContext();
   private cameraPermission: Permissions = 'ohos.permission.CAMERA';
   cameraVM: CameraVM = CameraVM.instance;
+
+  async aboutToAppear(): Promise<void> {
+    this.cameraVM.isMember = await MemberManageUtil.queryMemberStatus(this.getUIContext());
+    this.getUIContext().getHostContext()!.eventHub.on(UPDATE_MEMBER_STATUS, (status: boolean) => {
+      this.cameraVM.isMember = status;
+    });
+  }
+
+  aboutToDisappear(): void {
+    this.getUIContext().getHostContext()!.eventHub.off(UPDATE_MEMBER_STATUS)
+  }
+
+  handleFilterClick(ri: RepeatItem<CustomFilter>) {
+    let loginManageUtil = new LoginManageUtil(this.getUIContext());
+    if (!ri.item.isVip) {
+      this.cameraVM.selectedFilterIndex = ri.index;
+      this.cameraVM.setFilter(ri.index);
+    } else {
+      if (loginManageUtil.userInfoModel.isLogin && this.cameraVM.isMember) {
+        this.cameraVM.selectedFilterIndex = ri.index;
+        this.cameraVM.setFilter(ri.index);
+      } else {
+        if (!loginManageUtil.userInfoModel.isLogin) {
+          LoginSheetUtils.open(loginManageUtil.params, this.getUIContext());
+        } else if (!this.cameraVM.isMember) {
+          let memberManageUtil = new MemberManageUtil(this.getUIContext());
+          MemberSheetUtils.open(memberManageUtil.productsInfo, this.getUIContext());
+        }
+      }
+    }
+  }
 
   async requestPermissionsFn(): Promise<void> {
     let atManager = abilityAccessCtrl.createAtManager();
@@ -63,10 +97,18 @@ export struct FilteredCamera {
                       .each((ri: RepeatItem<CustomFilter>) => {
                         ListItem() {
                           Stack({ alignContent: Alignment.Bottom }) {
-                            Image(ri.item.image)
-                              .height(80)
-                              .width(60)
-                              .borderRadius(8);
+                            Stack({ alignContent: Alignment.TopStart }) {
+                              Image(ri.item.image)
+                                .height(80)
+                                .width(60)
+                                .borderRadius(8);
+
+                              if (ri.item.isVip) {
+                                Image($r('app.media.vip_decorate'))
+                                  .size({ width: 12, height: 12 }).margin({ left: 2, top: 2 });
+                              }
+                            };
+
                             Column() {
                               Text('');
                               if (this.cameraVM.selectedFilterIndex === ri.index) {
@@ -85,8 +127,7 @@ export struct FilteredCamera {
                           });
                         }
                         .onClick(() => {
-                          this.cameraVM.selectedFilterIndex = ri.index;
-                          this.cameraVM.setFilter(ri.index);
+                          this.handleFilterClick(ri);
                         });
                       });
                   }
@@ -131,7 +172,7 @@ export struct FilteredCamera {
     }
     .hideTitleBar(true)
     .onWillShow(async () => {
-      hilog.error(0xFF00, 'pictureTest', `申请权限失败`);
+      UtilLog.error(`申请权限失败`);
       this.cameraVM.context = this.context;
       await this.requestPermissionsFn();
       await this.cameraVM.initImageReceiver();

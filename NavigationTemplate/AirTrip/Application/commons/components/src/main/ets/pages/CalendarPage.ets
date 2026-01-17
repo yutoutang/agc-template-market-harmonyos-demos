@@ -70,7 +70,7 @@ export struct CalendarPage {
         }
         .width(Constants.FULL_PERCENT_WIDTH)
         .padding({left: 16, top: 9, bottom:9})
-        .backgroundColor('#F1F3F5')
+        .backgroundColor($r('sys.color.capsule_progress_inprogress_border_color'))
 
         MonthList({
           currentSelectedDay: this.currentSelectDay,

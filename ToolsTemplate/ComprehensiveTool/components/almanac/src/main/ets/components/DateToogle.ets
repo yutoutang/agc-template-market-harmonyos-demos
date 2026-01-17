@@ -21,8 +21,8 @@ export struct DateToggle {
   /**
    * 日期变化事件
    */
-  @Event onDateChange: (date: Date) => void = () => {}
-
+  @Event onDateChange: (date: Date) => void = () => {
+  }
   almanacVM: AlmanacVM = AlmanacVM.instance;
 
   @Builder
@@ -51,8 +51,9 @@ export struct DateToggle {
       }.margin({ top: 10 })
       .onClick(() => {
         baseActionSheet.show({
+          uiContext: this.getUIContext(),
           id: 'almanacBuilder',
-          detents:[300,301],
+          detents: [300, 301],
           showClose: false,
           customContent: () => {
             this.alDatePickerBuilder()

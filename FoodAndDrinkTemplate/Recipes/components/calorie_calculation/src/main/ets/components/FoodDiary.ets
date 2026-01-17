@@ -63,6 +63,7 @@ export struct FoodDiary {
       .backgroundColor($r('sys.color.background_primary'))
       .bindSheet($$this.showAddSheet, this.addSnackSheet(), {
         detents: [312, 313, 314],
+        height: 360,
         blurStyle: BlurStyle.Thick,
         preferType: SheetType.CENTER,
         showClose: true,
@@ -109,7 +110,7 @@ export struct FoodDiary {
                       .fontSize(12)
                       .fontColor($r('sys.color.font_primary'))
                       .textAlign(TextAlign.Start)
-                      .width(80)
+                      .width('28%')
                       .height(36)
                       .borderRadius(8)
                       .padding({
@@ -122,7 +123,7 @@ export struct FoodDiary {
                     Text(`${food.calories}千卡`)
                       .fontSize(12)
                       .fontColor('#E84026')
-                      .width(80)
+                      .width('28%')
                       .height(36)
                       .borderRadius(8)
                       .padding({

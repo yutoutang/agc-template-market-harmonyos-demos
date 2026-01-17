@@ -1,5 +1,3 @@
-import { intl } from '@kit.LocalizationKit';
-
 export class DHMS {
   days: number = 0;
   hours: number = 0;
@@ -24,7 +22,7 @@ export class DHMS {
 export class TimeUtils {
   public static timestamp2YMDH(timestamp: number) {
     let date = new Date(timestamp);
-    let formatForYMDH = new intl.DateTimeFormat('zh-CN', {
+    let formatForYMDH = new Intl.DateTimeFormat('zh-CN', {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
@@ -37,7 +35,7 @@ export class TimeUtils {
 
   public static timestamp2YMD(timestamp: number) {
     let date = new Date(timestamp);
-    let formatForYMDH = new intl.DateTimeFormat('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    let formatForYMDH = new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
     return formatForYMDH.format(date);
   }
 }

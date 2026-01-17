@@ -6,6 +6,9 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "@ohos/axios": "2.2.4"
-  }
+    "@ohos/axios": "2.2.6",
+    "@hw-agconnect/axios-mock-adapter": "^1.0.0"
+  },
+  "devDependencies": {},
+  "dynamicDependencies": {}
 }

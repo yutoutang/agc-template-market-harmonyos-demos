@@ -1,8 +1,13 @@
-import { PassengerApi, PassengerInfo, PassengerListResult, CommonFuncResult,
-  maskPhone,
-  maskCertificate,
+import {
+  AppRouter,
   CardMap,
-  AppRouter} from 'common'
+  CommonFuncResult,
+  maskCertificate,
+  maskPhone,
+  PassengerApi,
+  PassengerInfo,
+  PassengerListResult
+} from 'common'
 import { BaseTitle, GlobalDialog } from 'components'
 import { AddPassengerView } from '../components/AddPassengerView'
 
@@ -17,7 +22,7 @@ export struct PassengerListPage {
   @Local passengerList: PassengerInfo[] = []
 
   getPassengerList() {
-    GlobalDialog.showLoadingDialog()
+    GlobalDialog.showLoadingDialog(this.getUIContext())
     PassengerApi.getPassengerList().then((res) => {
       let response: PassengerListResult = res.result as PassengerListResult
       if (response.ret.code === 0) {
@@ -35,8 +40,8 @@ export struct PassengerListPage {
         }
         this.passengerList = resList
       }
-    }).finally(() =>{
-      GlobalDialog.close()
+    }).finally(() => {
+      GlobalDialog.close(this.getUIContext())
     })
   }
 
@@ -82,11 +87,12 @@ export struct PassengerListPage {
             .swipeAction({
               end: this.ItemEnd(item, index)
             })
-          })
+          },(item: PassengerInfo, index: number)=>index + '__' + JSON.stringify(item))
 
           // 防止按钮遮挡列表数据
           ListItem() {
-            Row(){}.height(50 + px2vp(91))
+            Row() {
+            }.height(50 + this.getUIContext().px2vp(91))
           }
         }
         .width('100%')
@@ -99,7 +105,7 @@ export struct PassengerListPage {
     }
     .hideTitleBar(true)
     .backgroundColor($r('app.color.color_page_bg'))
-    .onWillShow(() =>{
+    .onWillShow(() => {
       // 获取乘机人列表
       this.getPassengerList()
     })
@@ -142,11 +148,11 @@ export struct PassengerListPage {
   ItemEnd(item: PassengerInfo, index: number) {
     Row() {
       Button({ type: ButtonType.Circle, stateEffect: true }) {
-        Image($r('app.media.ic_delete')).fillColor($r('sys.color.ohos_id_color_warning')).width(24).height(24)
+        SymbolGlyph($r('sys.symbol.trash')).fontColor([$r('sys.color.ohos_id_color_warning')]).fontSize(24)
       }.width(48).height(48).backgroundColor($r('sys.color.white'))
       .onClick(() => {
         this.deletePassenger(item, index)
       })
-    }.padding({left: 8}).justifyContent(FlexAlign.SpaceEvenly)
+    }.padding({ left: 8 }).justifyContent(FlexAlign.SpaceEvenly)
   }
 }

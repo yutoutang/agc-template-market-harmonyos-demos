@@ -1,20 +1,20 @@
 import {
+  AppRouter,
+  CardMap,
   CommonFuncResult,
   Constants,
   DataStorage,
+  DayFormat,
   formatMMDD,
   getDayLabel,
   LoadingStatus,
   maskCertificate,
   maskPhone,
   OrderApi,
-  OrderListResult,
   OrderInfo,
+  OrderListResult,
   PassengerInfo,
   pasteText,
-  CardMap,
-  AppRouter,
-  DayFormat,
 } from 'common';
 import { AppStorageV2 } from '@kit.ArkUI';
 import { BaseTitle, GlobalDialog } from 'components';
@@ -52,7 +52,7 @@ export struct OrderDetailPage {
 
   getOrderDetail() {
     this.loadingStatus = LoadingStatus.LOADING;
-    GlobalDialog.showLoadingDialog();
+    GlobalDialog.showLoadingDialog(this.getUIContext());
     OrderApi.getOrderDetail(this.orderNo).then((res) => {
       let result = res.result as OrderListResult;
       if (result.ret.code === 0) {
@@ -66,7 +66,7 @@ export struct OrderDetailPage {
       }
     }).finally(() => {
       this.loadingStatus = LoadingStatus.SUCCESS;
-      GlobalDialog.close();
+      GlobalDialog.close(this.getUIContext());
     });
   }
 
@@ -119,7 +119,7 @@ export struct OrderDetailPage {
         if (result.result) {
           this.orderStatus = 0;
           if (showToast) {
-            GlobalDialog.showToast('取消成功');
+            GlobalDialog.showToast('取消成功', this.getUIContext());
           }
         }
       }
@@ -170,7 +170,7 @@ export struct OrderDetailPage {
                         airportConstructionPrice: this.orderDetail.airportConstructionPrice + '',
                         fuelPrice: this.orderDetail.fuelPrice + '',
                         passengerNum: (JSON.parse(this.orderDetail.passengerList) ?? []).length,
-                      });
+                      }, this.getUIContext());
                     });
                   }
                   .width('100%')
@@ -182,7 +182,7 @@ export struct OrderDetailPage {
                     Image($r('app.media.ic_copy')).width(14).height(14)
                       .onClick(() => {
                         // 复制订单编号
-                        pasteText(this.orderNo);
+                        pasteText(this.orderNo, this.getUIContext());
                       });
                   };
 
@@ -294,7 +294,7 @@ export struct OrderDetailPage {
                     Divider()
                       .vertical(true)
                       .strokeWidth(3)
-                      .color($r('sys.color.ohos_id_color_button_divider'))
+                      .color($r('sys.color.comp_divider'))
                       .height(32);
 
                     Column({ space: 14 }) {
@@ -310,19 +310,19 @@ export struct OrderDetailPage {
                       .vertical(true)
                       .strokeWidth(1)
                       .height(10)
-                      .color($r('sys.color.ohos_id_color_button_divider'));
+                      .color($r('sys.color.comp_divider'));
                     Text(this.orderDetail.aircraftType)
                       .fontSize(10).fontColor('#999');
                     Divider()
                       .vertical(true)
                       .strokeWidth(1)
                       .height(10)
-                      .color($r('sys.color.ohos_id_color_button_divider'));
+                      .color($r('sys.color.comp_divider'));
                     Text(this.orderDetail.mealType)
                       .fontSize(10).fontColor('#999');
                   };
 
-                  Divider().strokeWidth(0.5).color($r('sys.color.ohos_id_color_button_divider')).width('100%');
+                  Divider()
 
                   List({ space: 12 }) {
                     ForEach(this.passengerList, (item: PassengerInfo) => {
@@ -358,7 +358,7 @@ export struct OrderDetailPage {
                         .width('100%')
                         .alignItems(HorizontalAlign.Start);
                       };
-                    });
+                    },(item: PassengerInfo, index: number)=>index + '__' + JSON.stringify(item));
                   }
                   .width('100%')
                   .constraintSize({ maxHeight: 140 })
@@ -378,7 +378,10 @@ export struct OrderDetailPage {
                       .fontColor($r('sys.color.ohos_id_color_text_primary'))
                       .fontSize(13);
                     Row({ space: 4 }) {
-                      Text('手机号').fontColor($r('sys.color.ohos_id_color_text_tertiary')).fontSize(12).fontWeight(400);
+                      Text('手机号')
+                        .fontColor($r('sys.color.ohos_id_color_text_tertiary'))
+                        .fontSize(12)
+                        .fontWeight(400);
                       Text('+86').fontColor($r('sys.color.ohos_id_color_text_tertiary')).fontSize(12).fontWeight(400);
                       Text(maskPhone(this.orderDetail.contactPhone))
                         .fontColor($r('sys.color.ohos_id_color_text_tertiary'))
@@ -422,7 +425,7 @@ export struct OrderDetailPage {
         .scrollBar(BarState.Off)
         .onWillScroll((xOffset: number, yOffset: number) => {
           this.offsetValue += yOffset;
-          this.scrollY = vp2px(this.offsetValue);
+          this.scrollY = this.getUIContext().vp2px(this.offsetValue);
         });
       }
       .width('100%')

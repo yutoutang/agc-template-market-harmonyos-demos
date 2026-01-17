@@ -20,7 +20,7 @@ export struct CapsuleTab {
   private onChangeTab(index: number) {
     if (this.currentIndex !== index) {
       this.onChange(index)
-      animateTo({
+      this.getUIContext().animateTo({
         duration: 300,
         curve: Curve.EaseInOut,
       }, () => {

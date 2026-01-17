@@ -34,6 +34,7 @@ export struct FeedSingleImageSize {
           Image(this.postImgListItem.picVideoUrl)
             .attributeModifier(this.modifier)
             .objectFit(ImageFit.Cover)
+            .autoResize(true)
             .visibility(this.postImgListItem.surfaceUrl ? Visibility.None : Visibility.Visible)
             .borderRadius(12)
             .clip(true)

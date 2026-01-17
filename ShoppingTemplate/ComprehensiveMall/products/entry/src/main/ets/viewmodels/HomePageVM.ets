@@ -8,14 +8,17 @@ import {
   RouterMap,
   GlobalStateMgr,
   iData,
-  Logger,
   WindowUtil,
   BreakpointSystem,
   BreakpointTypeEnum,
+  PushUtil,
+  PermissionUtil,
 } from 'lib_foundation';
-import { CategoryItem, HomeApis } from 'lib_network';
+import { CategoryItem } from 'lib_network';
 import { CustomScanOptions, ScanRouterMap } from 'module_product_scan';
 import { LoneTakeAnimationsTransition, LongTakeTransitionParam } from 'module_transition';
+import { UtilLog as Logger } from '@hw-agconnect/util-log';
+import { PreloadUtil } from '../utils/PreloadUtil';
 
 const TAG: string = '[HomePageVM]';
 
@@ -28,6 +31,8 @@ export class HomePageVM {
   public refreshStatus: RefreshStatus = RefreshStatus.Inactive;
   @Trace
   public isRefreshing: boolean = false;
+  @Trace
+  bannerList:string[] = []
   @Trace
   categoryList: CategoryItem[] = [];
   @Trace
@@ -50,17 +55,22 @@ export class HomePageVM {
   public async loadHomePage(): Promise<void> {
     this.loadingStatus = LoadingStatus.LOADING;
     try {
-      const res = await HomeApis.getHomeConfig();
-      if (res.code === 0) {
+      const res = await PreloadUtil.getPreloadData();
+      if (res?.code === 0) {
         this.categoryList = res.categoryList;
         this.searchList = res.searchList;
+        this.bannerList = res.bannerList;
         this.currentSearchStr = res.searchList[0];
-        this.loadingStatus = LoadingStatus.SUCCESS;
       }
+      this.loadingStatus = LoadingStatus.SUCCESS;
     } catch (e) {
       this.loadingStatus = LoadingStatus.FAIL;
     }
     this.isRefreshing = false;
+    PermissionUtil.requestNotificationPermission(()=>{
+      // push能力测试
+      PushUtil.pushMessageMock()
+    })
   }
 
   public jumpToCategoryPage(id: string) {

@@ -1,5 +1,6 @@
 import { common } from '@kit.AbilityKit';
 import { PersistenceV2 } from '@kit.ArkUI';
+import { ToastDialog } from '@hw-agconnect/ui-toast';
 import { PrivacyPwdBuilderParams } from '../commons/Interface';
 import { DiaryExtraInfo } from '../models/Diary';
 import { PasswordCodeInput } from './PasswordCodeInput';
@@ -50,10 +51,10 @@ export struct PrivacyPwdInputDialog {
   }
 
   toastMsg(message: string) {
-    this.getUIContext().getPromptAction().showToast({
+    ToastDialog.showToast({
       message: message,
-      alignment: Alignment.Top,
-      offset: { dx: 0, dy: 200 }
+      toastAlignment: DialogAlignment.Top,
+      toastOffset: { dx: 0, dy: 200 }
     })
   }
 

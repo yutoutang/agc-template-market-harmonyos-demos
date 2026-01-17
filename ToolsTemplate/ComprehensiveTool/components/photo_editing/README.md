@@ -35,12 +35,24 @@
 
    a. 解压下载的组件包，将包中所有文件夹拷贝至您工程根目录的xxx目录下。
 
-   b. 在项目根目录build-profile.json5添加photo_editing模块。
+   b. 在项目根目录build-profile.json5添加photo_editing、membership、module_base、aggregated_login。
    ```
    "modules": [
       {
       "name": "photo_editing",
       "srcPath": "./xxx/photo_editing",
+      },
+      {
+      "name": "membership",
+      "srcPath": "./xxx/membership",
+      },
+      {
+      "name": "module_base",
+      "srcPath": "./xxx/module_base",
+      },
+      {
+      "name": "aggregated_login",
+      "srcPath": "./xxx/aggregated_login",
       },
    ]
    ```
@@ -48,6 +60,9 @@
    ```
    "dependencies": {
       "photo_editing": "file:./xxx/photo_editing",
+      "membership": "file:./xxx/membership",
+      "module_base": "file:./xxx/module_base",
+      "aggregated_login": "file:./xxx/aggregated_login",
    }
    ```
 

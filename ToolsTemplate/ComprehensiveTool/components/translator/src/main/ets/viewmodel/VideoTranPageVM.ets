@@ -7,7 +7,7 @@ import {
   STATUS_CONTINUE_FRAME,
   allLanguages
 } from '../common/Constant';
-import { PersistenceV2, promptAction } from '@kit.ArkUI';
+import { PersistenceV2 } from '@kit.ArkUI';
 import { FileInfo } from '../model/Audio';
 import { RecorderManage } from '../util/RecorderUtil';
 import { PermissionUtil } from '../util/PermissionUtil';
@@ -21,6 +21,8 @@ import { copyFile, createFd, extractToPCM } from '../util/PcmUtil';
 import { TranslatorService } from '../service/TranslatorService';
 import { HistoryInfo, MyHistory } from '../model/History';
 import { TranLogger } from '../util/TranLogger';
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
+import { UtilLog } from '@hw-agconnect/util-log';
 
 @ObservedV2
 export class VideoTranPageVM {
@@ -89,6 +91,8 @@ export class VideoTranPageVM {
     this.recordTimeText = '00:00'
     this.translatorRes = ''
     this.recordStatus = RecordStatus.PENDING
+    this.inputLanguage = '中文'
+    this.outputLanguage = '英文'
     this.pause()
   }
 
@@ -211,12 +215,17 @@ export class VideoTranPageVM {
 
     while (state) {
       let nextOffset = offset + bufferSize
-      const arrayBuffer = fileData.slice(offset, nextOffset);
-      let audio = buffer.from(arrayBuffer).toString('base64');
-      if (!arrayBuffer || arrayBuffer.byteLength === 0) {
-        status = STATUS_LAST_FRAME;
+      let audio:string = ''
+      try {
+        const arrayBuffer = fileData.slice(offset, nextOffset);
+        audio = buffer.from(arrayBuffer).toString('base64');
+        if (!arrayBuffer || arrayBuffer.byteLength === 0) {
+          status = STATUS_LAST_FRAME;
+        }
+        offset = nextOffset
+      } catch (e) {
+        UtilLog.error(`playerUrlInit failed: ${JSON.stringify(e)}`);
       }
-      offset = nextOffset
 
       let d: WebAudio = {
         header: {

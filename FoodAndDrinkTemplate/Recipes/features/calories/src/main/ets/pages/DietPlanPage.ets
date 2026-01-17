@@ -39,7 +39,7 @@ struct DietPlanPage {
         .fontSize(12)
         .fontColor($r('sys.color.font_primary'))
         .textAlign(TextAlign.Center)
-        .width(68)
+        .width(68 * this.vm.pageWidth)
         .margin({
           left: 12,
           right: 8,
@@ -106,7 +106,7 @@ struct DietPlanPage {
               }
             }, (item: FoodCategory, index: number) => item.name + index)
           }
-          .width(92)
+          .width(92 * this.vm.pageWidth)
           .height('100%')
           .backgroundColor('#F1F3F5')
           .listDirection(Axis.Vertical) // 排列方向
@@ -182,7 +182,12 @@ struct DietPlanPage {
               count: this.vm.selectFoods.length,
               style: { fontSize: 10, badgeSize: 16 },
             }) {
-              Image($r('app.media.ic_dish')).width(40).height(40)
+              Image($r('app.media.ic_dish'))
+                .width(40)
+                .height(40)
+                .onClick(() => {
+                  this.vm.showCheckedFoods = true;
+                })
             }
           } else {
             Image($r('app.media.ic_dish_off')).width(40).height(40)
@@ -195,7 +200,16 @@ struct DietPlanPage {
             .onClick(() => {
               this.vm.addDietPlan()
             })
-        }.padding({ left: 24, right: 24 })
+        }
+        .padding({ left: 24, right: 24 })
+        .bindSheet($$this.vm.showCheckedFoods, this.checkedFoods(), {
+          blurStyle: BlurStyle.Thick,
+          height:330,
+          preferType: SheetType.CENTER,
+          showClose: true,
+          title: { title: '已添加' },
+          backgroundColor: '#F1F3F5',
+        });
       }
     }
     .title(buildTitleBar('饮食计划'), { paddingStart: LengthMetrics.vp(16) })
@@ -273,15 +287,6 @@ struct DietPlanPage {
       }.margin({ top: 24 })
 
       Row({ space: 16 }) {
-        Button('取消')
-          .fontSize($r('sys.float.Body_L'))
-          .fontWeight(FontWeight.Medium)
-          .fontColor($r('sys.color.font_primary'))
-          .backgroundColor('#e6e8e9')
-          .layoutWeight(1)
-          .onClick(() => {
-            this.vm.showAddFoodSheet = false
-          })
         Button('确定')
           .fontSize($r('sys.float.Body_L'))
           .fontWeight(FontWeight.Medium)
@@ -291,6 +296,15 @@ struct DietPlanPage {
           .onClick(() => {
             this.vm.confirmBtn()
           })
+        Button('取消')
+          .fontSize($r('sys.float.Body_L'))
+          .fontWeight(FontWeight.Medium)
+          .fontColor($r('sys.color.font_primary'))
+          .backgroundColor('#e6e8e9')
+          .layoutWeight(1)
+          .onClick(() => {
+            this.vm.showAddFoodSheet = false
+          })
       }.margin({ top: 24 })
     }
     .width(CommonConstants.FULL_WIDTH)
@@ -299,5 +313,74 @@ struct DietPlanPage {
     .backgroundColor($r('sys.color.background_secondary'))
     .borderRadius({ topLeft: 32, topRight: 32 })
     .constraintSize({ maxWidth: CommonConstants.FULL_WIDTH })
+  }
+
+  @Builder
+  checkedFoods() {
+    Column({ space: 12 }) {
+      Row() {
+        Blank().layoutWeight(1)
+        Row() {
+          Image($r('app.media.ic_delete'))
+            .size({width: 20, height: 20})
+            .align(Alignment.End)
+            .margin({right: 8})
+          Text('清空')
+            .fontSize(14)
+            .fontWeight(FontWeight.Medium)
+            .fontColor($r('sys.color.font_secondary'))
+            .padding({ top: 12, bottom: 12 })
+            .textAlign(TextAlign.End)
+            .borderRadius(12)
+        }.onClick(() => {
+          this.vm.selectFoods = [];
+          this.vm.showCheckedFoods = false;
+        })
+      }
+      Divider().strokeWidth(1).margin({ bottom: 12 })
+      List({scroller: this.vm.checkedScroller }) {
+        ForEach(this.vm.selectFoods, (item: FoodCalories) => {
+          ListItem() {
+            Column() {
+              Row() {
+                Column() {
+                  Text(item.name)
+                    .fontSize(14)
+                    .fontWeight(FontWeight.Medium)
+                    .fontColor($r('sys.color.font_primary'))
+                    .maxLines(2)
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
+                  Text(`${item.calories}千卡/${item.weight}克`)
+                    .fontSize(12)
+                    .fontColor($r('sys.color.font_secondary'))
+                    .margin({ top: 2 })
+                }
+                .alignItems(HorizontalAlign.Start)
+                .layoutWeight(1)
+                Checkbox({ name: `${item.id}`, group: `foodGroup` })
+                  .select(this.vm.selectFoods.some(food => food.id === item.id))
+                  .height(20)
+                  .width(20)
+                  .selectedColor('#64BB5C')
+                  .shape(CheckBoxShape.CIRCLE)
+                  .onClick(() => {
+                    this.vm.changeFood(item);
+                    if(this.vm.selectFoods.length === 0){
+                      this.vm.showCheckedFoods = false;
+                    }
+                  })
+              }
+              .justifyContent(FlexAlign.SpaceBetween)
+              .width(CommonConstants.FULL_WIDTH)
+              .padding({ top: 12, bottom: 4, left: 4 })
+              Divider().strokeWidth(1).margin({ bottom: 12 })
+            }
+          }
+        },(item: FoodCalories) => item.id.toString())
+      }
+    }
+    .padding({ left: 28, right: 28 })
+    .margin({ top: 6 })
+    .backgroundColor(Color.White)
   }
 }

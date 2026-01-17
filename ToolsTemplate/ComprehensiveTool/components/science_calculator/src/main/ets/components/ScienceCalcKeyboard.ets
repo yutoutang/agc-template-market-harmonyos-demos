@@ -1,9 +1,8 @@
-import { CalcButton, CalcButtonType } from '../model/CalculatorButton';
-import { AdvancedCalculatorModel } from '../model/AdvancedCalculatorModel';
 import { CALC_FUN_BUTTONS, CALC_NORMAL_BUTTONS } from '../common/KeyBoardConstant';
-import { promptAction } from '@kit.ArkUI';
-import { HistoryUtils } from '../utils/HistoryUtils';
+import { AdvancedCalculatorModel } from '../model/AdvancedCalculatorModel';
+import { CalcButton, CalcButtonType } from '../model/CalculatorButton';
 import { BreakpointModel, BreakpointStorage, BreakpointSystem, BreakpointTypeEnum } from '../utils/BreakpointSystem';
+import { HistoryUtils } from '../utils/HistoryUtils';
 
 @ComponentV2
 export struct ScienceCalcKeyboard {
@@ -361,7 +360,7 @@ export struct ScienceCalcKeyboard {
   }
 
   private showMemoryStatus(message: string): void {
-    promptAction.showToast({
+    this.getUIContext().getPromptAction().showToast({
       message: message,
       duration: 1000,
     });

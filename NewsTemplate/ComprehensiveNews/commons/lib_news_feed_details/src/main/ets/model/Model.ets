@@ -59,7 +59,7 @@ export class NewsFeedInfo implements NewsResponse {
   // 是否被收藏
   isMarked: boolean = false
   // 富文本
-  richContent?: string = ''
+  @Trace richContent?: string = ''
   // 相关推荐
   recommends?: NewsFeedInfo[] = []
   // 视频url

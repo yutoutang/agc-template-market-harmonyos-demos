@@ -19,7 +19,7 @@ export class VideoUtil {
   }
 
   /**
-   * 将byte转换为MB
+   * 将byte转换为MB，带单位
    * @param byteSize
    * @returns
    */
@@ -29,6 +29,48 @@ export class VideoUtil {
     }
     const units = ['B', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${units[i]}`;
+    const size = `${(bytes / Math.pow(1024, i)).toFixed(2)} ${units[i]}`;
+    return size;
+  }
+
+  /**
+   * 文件大小Bytes转MB
+   * @param {number|string} bytes
+   * @param {number} decimalPlaces
+   * @returns {number}
+   */
+  static fileBytesToMB(bytes: number, decimalPlaces = 2) {
+    const validBytes = isNaN(Number(bytes)) ? 0 : Math.max(0, Number(bytes));
+
+    const mbValue = validBytes / 1048576;
+
+    const pow = Math.pow(10, decimalPlaces);
+    return Math.round(Number(mbValue.toPrecision(12)) * pow) / pow;
+  }
+
+  /**
+   * 将毫秒数转换为时分秒格式的字符串（HH:MM:SS）
+   * @param milliseconds 输入的毫秒数
+   * @returns 格式化后的时分秒字符串
+   */
+  static formatMillisecondsToHMS(milliseconds: number): string {
+    const totalSeconds = Math.max(0, Math.floor(Math.abs(milliseconds) / 1000));
+
+    const hours = Math.floor(totalSeconds / 3600);
+    const remainingSecondsAfterHours = totalSeconds % 3600;
+    const minutes = Math.floor(remainingSecondsAfterHours / 60);
+    const seconds = remainingSecondsAfterHours % 60;
+
+    const padZero = (num: number): string => num.toString().padStart(2, '0');
+
+    const formattedMinutes = padZero(minutes);
+    const formattedSeconds = padZero(seconds);
+
+    if (hours > 0) {
+      const formattedHours = padZero(hours);
+      return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+    } else {
+      return `${formattedMinutes}:${formattedSeconds}`;
+    }
   }
 }

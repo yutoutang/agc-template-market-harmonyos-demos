@@ -1,13 +1,11 @@
-import { promptAction } from '@kit.ArkUI';
-import { addFeedBack, queryFeedBack } from '../apis/APIList';
-import { FeedbackItemType } from '../model/FeedbackRecordModel';
-import { FeedBackBody, FeedBacks } from '../model/FeedBacks';
+import { PersistenceV2 } from '@kit.ArkUI';
+import { ModifyPersonalInfoRequest, UserInfoModel, UserResponse, UserServiceApi } from 'module_base';
 
 @ObservedV2
 export class MineVM {
   @Trace content: string = '';
-  @Trace feedbacks: FeedBacks = new FeedBacks();
-  @Trace pathStack: NavPathStack = new NavPathStack()
+  @Trace pathStack: NavPathStack = new NavPathStack();
+  @Trace userInfoModel: UserInfoModel = PersistenceV2.connect(UserInfoModel, () => new UserInfoModel())!;
   private static _instance: MineVM;
 
   public static get instance() {
@@ -17,22 +15,29 @@ export class MineVM {
     return MineVM._instance;
   }
 
-  queryFeedbacks() {
-    queryFeedBack().then((res) => {
-      this.feedbacks = res.data;
-    });
+  async login(uid: string) {
+    const user = await UserServiceApi.signIn('hw', uid);
+    if (user) {
+      this.userInfoModel.loginChannel = 'hw';
+      this.handleUserInfo(user);
+    }
   }
 
-  submit(item: FeedbackItemType) {
-    let param: FeedBackBody = {
-      date: item.time,
-      content: item.description,
-      imgUrls: item.stageImageUris,
-    };
-    addFeedBack(param).then((res) => {
-      if (res.status === 200) {
-        promptAction.showToast({ message: '提交成功，感谢您的反馈~', duration: 1000 });
-      }
-    });
+  handleUserInfo(user: UserResponse) {
+    this.userInfoModel.isLogin = true;
+    this.userInfoModel.userId = user.userId;
+    this.userInfoModel.userIcon = user.userIcon;
+    this.userInfoModel.userNickName = user.userNickName;
+    this.userInfoModel.userPhone = user.userPhone;
+  }
+
+  updateUserInfo(request: ModifyPersonalInfoRequest) {
+    UserServiceApi.modifyPersonalInfo(request);
+  }
+
+  signOut() {
+    this.userInfoModel.isLogin = false;
+    // 返回我的页面
+    this.pathStack.pop();
   }
 }

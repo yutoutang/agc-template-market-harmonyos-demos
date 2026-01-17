@@ -39,8 +39,7 @@ export const LIST_RULE: Record<string, Record<string, string | VerticalAlign | H
 };
 
 export const ALIGN_RULE_COUNT: Record<string, Record<string, string | VerticalAlign | HorizontalAlign>> = {
-  'top': { 'anchor': '__container__', 'align': VerticalAlign.Top },
-  'bottom': { 'anchor': '__container__', 'align': VerticalAlign.Bottom },
+  'center': { 'anchor': '__container__', 'align': VerticalAlign.Center },
   'left': { 'anchor': '__container__', 'align': HorizontalAlign.Start },
 };
 
@@ -51,7 +50,6 @@ export const ALIGN_RULE_DIVIDER: Record<string, Record<string, string | Vertical
 };
 
 export const ALIGN_RULE_CATEGORY: Record<string, Record<string, string | VerticalAlign | HorizontalAlign>> = {
-  'top': { 'anchor': '__container__', 'align': VerticalAlign.Top },
-  'bottom': { 'anchor': '__container__', 'align': VerticalAlign.Bottom },
+  'center': { 'anchor': '__container__', 'align': VerticalAlign.Center },
   'left': { 'anchor': RuleID.DIVIDER_ID, 'align': HorizontalAlign.Start },
 };

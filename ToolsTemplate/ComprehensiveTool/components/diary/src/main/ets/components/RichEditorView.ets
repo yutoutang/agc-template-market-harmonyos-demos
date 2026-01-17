@@ -1,4 +1,5 @@
 import { display } from '@kit.ArkUI';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { CALLBACK_SCHEME, STATE_SCHEME, WEB_ID } from '../commons/Constant';
 import { PageMode } from '../commons/Enum';
 import { EditorController } from '../controller/EditorController';
@@ -7,18 +8,19 @@ import { RichTextToolBar } from './RichTextToolBar';
 import { SnapShotWebController } from '../controller/SnapShotWebController';
 import { SnapshotPreview } from './SnapshotPreview';
 
+const TAG = '[RichEditorView]'
+
 
 @ComponentV2
 export struct RichEditorView {
   @Param pageMode: PageMode = PageMode.CREATE;
   @Param editorController: EditorController = new EditorController();
-  keyboardUtil: KeyboardUtil  = new KeyboardUtil(this.getUIContext());
+  keyboardUtil: KeyboardUtil = new KeyboardUtil(this.getUIContext());
   @Param snapShotWebController: SnapShotWebController =
     new SnapShotWebController(this.editorController.webviewController);
   @Local bgWidth: Length = 0;
   @Local bgHeight: Length = 0;
   @Local isKeyboardShow: boolean = false;
-
 
   @Computed
   get bgColor() {
@@ -28,9 +30,13 @@ export struct RichEditorView {
 
   aboutToAppear(): void {
     // 获取屏幕尺寸
-    const displayData = display.getDefaultDisplaySync();
-    this.snapShotWebController.displayWidth = this.getUIContext().px2vp(displayData.width);
-    this.snapShotWebController.displayHeight = this.getUIContext().px2vp(displayData.height);
+    try {
+      const displayData = display.getDefaultDisplaySync();
+      this.snapShotWebController.displayWidth = this.getUIContext().px2vp(displayData.width);
+      this.snapShotWebController.displayHeight = this.getUIContext().px2vp(displayData.height);
+    } catch (error) {
+      UtilLog.error(TAG, `getDefaultDisplaySync failed. error: ${JSON.stringify(error)}`);
+    }
 
     // 注册软键盘监听
     this.keyboardUtil.registerKeyboardListener(
@@ -92,6 +98,17 @@ export struct RichEditorView {
               .onPageVisible(() => {
                 this.loadData()
               })
+              .onControllerAttached(() => {
+                const context = this.getUIContext().getHostContext() as Context
+                try {
+                  // 设置允许可以跨域访问的路径列表
+                  this.editorController.webviewController.setPathAllowingUniversalAccess([
+                    context.filesDir + '/diaryDir',
+                  ])
+                } catch (error) {
+                  UtilLog.error(TAG, `setPathAllowingUniversalAccess failed. error: ${JSON.stringify(error)}`);
+                }
+              })
               .onLoadIntercept((event) => {
                 const url = event.data.getRequestUrl();
                 if (url.startsWith(CALLBACK_SCHEME)) {
@@ -109,7 +126,7 @@ export struct RichEditorView {
               .javaScriptProxy({
                 object: this.editorController.htmlModel,
                 name: 'htmlContentModel',
-                methodList: ['htmlContentChange', 'undo', 'redo'],
+                methodList: this.editorController.htmlModel.htmlMethodList,
                 controller: this.editorController.webviewController,
               })
               .onAreaChange((oldValue, newValue) => {
@@ -142,7 +159,12 @@ export struct RichEditorView {
           }
           .width('100%')
           .layoutWeight(1)
-          .padding(this.pageMode === PageMode.VIEW ? null : { left: 16, right: 16, top: 8, bottom: 8 })
+          .padding(this.pageMode === PageMode.VIEW ? null : {
+            left: 16,
+            right: 16,
+            top: 8,
+            bottom: 8,
+          })
           .backgroundColor(this.bgColor)
           .borderRadius(16)
         }
@@ -151,7 +173,7 @@ export struct RichEditorView {
         .bindContentCover(
           $$this.snapShotWebController.isShowPreview,
           this.previewWindowComponent(),
-          { modalTransition: ModalTransition.NONE }
+          { modalTransition: ModalTransition.NONE },
         )
       }
       .padding({ left: 16, right: 16 })
@@ -160,7 +182,7 @@ export struct RichEditorView {
 
       // 底部工具栏
       RichTextToolBar({
-        editorController:this.editorController,
+        editorController: this.editorController,
         showToolBar: this.isKeyboardShow,
       })
     }

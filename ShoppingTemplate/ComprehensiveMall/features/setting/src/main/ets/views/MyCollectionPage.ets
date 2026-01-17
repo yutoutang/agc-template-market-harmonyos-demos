@@ -8,7 +8,6 @@ export function buildMyCollectionPage() {
   MyCollectionPage()
 }
 
-@Entry
 @ComponentV2
 export struct MyCollectionPage {
   @Local

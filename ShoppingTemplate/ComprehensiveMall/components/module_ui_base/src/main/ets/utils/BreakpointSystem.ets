@@ -1,5 +1,6 @@
 import { AppStorageV2, window } from '@kit.ArkUI';
-import { Logger } from './Logger';
+import { BusinessError } from '@kit.BasicServicesKit';
+import { UtilLog as Logger } from '@hw-agconnect/util-log';
 
 export enum BreakpointTypeEnum {
   SM = 'sm',
@@ -62,18 +63,24 @@ class BreakpointSystem {
     this._uiContext = uiContext;
     if (this._uiContext) {
       this.updateBreakpoint();
-      window.getLastWindow(this._uiContext.getHostContext()).then((win) => {
-        this._windowClass = win;
-        this._windowClass.on('windowSizeChange', () => {
-          this.updateBreakpoint();
-        });
-      });
+      window.getLastWindow(this._uiContext.getHostContext())
+        .then((win) => {
+          this._windowClass = win;
+          this._windowClass.on('windowSizeChange', () => {
+            this.updateBreakpoint();
+          });
+        })
+        .catch((err: BusinessError) => {
+          Logger.error(TAG, 'get window failed. error:' + JSON.stringify(err))
+        })
     }
   }
 
   public unregister() {
     if (this._windowClass) {
-      this._windowClass.off('windowSizeChange');
+      this._windowClass.off('windowSizeChange', () => {
+        this.updateBreakpoint();
+      });
     }
   }
 

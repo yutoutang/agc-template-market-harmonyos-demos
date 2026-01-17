@@ -50,12 +50,24 @@ zip_tool/src/main/ets                             // 解压缩工具(har)
 
    a. 解压下载的组件包，将包中所有文件夹拷贝至您工程根目录的xxx目录下。
 
-   b. 在项目根目录build-profile.json5添加zip_tool模块。
+   b. 在项目根目录build-profile.json5添加zip_tool、membership、module_base、aggregated_login模块。
    ```
    "modules": [
       {
       "name": "zip_tool",
       "srcPath": "./xxx/zip_tool",
+      },
+      {
+      "name": "membership",
+      "srcPath": "./xxx/membership",
+      },
+      {
+      "name": "module_base",
+      "srcPath": "./xxx/module_base",
+      },
+      {
+      "name": "aggregated_login",
+      "srcPath": "./xxx/aggregated_login",
       },
    ]
    ```
@@ -63,6 +75,9 @@ zip_tool/src/main/ets                             // 解压缩工具(har)
    ```
    "dependencies": {
       "zip_tool": "file:./xxx/zip_tool",
+      "membership": "file:./xxx/membership",
+      "module_base": "file:./xxx/module_base",
+      "aggregated_login": "file:./xxx/aggregated_login",
    }
    ```
 

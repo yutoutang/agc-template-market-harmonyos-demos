@@ -1,3 +1,4 @@
+import { LengthMetrics } from '@kit.ArkUI';
 import {
   iData,
   routerStack,
@@ -6,20 +7,15 @@ import {
   BreakpointSystem,
   BreakpointTypeEnum,
 } from 'lib_foundation';
-import { promptLogin } from 'module_login';
-import { AddressManage } from 'module_address_manage';
 import { ContainerColumn, NavTitleBar } from 'lib_widget';
 import { MainMenuItem, SubMenuItem } from '../commons/Types';
 import { ProfileUtil } from '../utils/ProfileUtil';
-import { MainMenuOption } from '../commons/Enums';
-import { LengthMetrics, router } from '@kit.ArkUI';
 
 @Builder
 export function buildProfilePage() {
   ProfilePage();
 }
 
-@Entry
 @ComponentV2
 export struct ProfilePage {
   build() {
@@ -32,18 +28,21 @@ export struct ProfilePage {
         Column({ space: 12 }) {
           if (BreakpointSystem.currentBreakpoint.value === BreakpointTypeEnum.LG) {
             Flex({ space: { main: LengthMetrics.vp(16) } }) {
-              Row() {
+              Column() {
                 buildUserInfoArea()
               }
               .tabletContainerStyle(iData.global.isLogin)
 
-              Row() {
+              Column() {
+                buildCheckInArea()
                 buildMainMenuArea()
               }
-              .tabletContainerStyle(iData.global.isLogin)
+              .height(iData.global.isLogin ? 128 : 78)
+              .justifyContent(FlexAlign.SpaceBetween)
             }
           } else {
             buildUserInfoArea()
+            buildCheckInArea()
             buildMainMenuArea()
           }
 
@@ -79,16 +78,32 @@ function buildUserInfoArea() {
         .draggable(false)
         .margin({ right: 16 });
       Column() {
-        Text(iData.global.isLogin ?
-          iData.global.userInfo.nickname ? iData.global.userInfo.nickname : '华为用户' :
-          '未登录',
-        )
-          .fontWeight(FontWeight.Medium)
-          .fontSize(18)
-          .maxLines(1)
-          .textOverflow({ overflow: TextOverflow.Ellipsis })
-          .textAlign(TextAlign.Start)
-          .fontColor(Style.FONT_COLOR_LEVEL1);
+        Row() {
+          Text(iData.global.isLogin ?
+            iData.global.userInfo.nickname ? iData.global.userInfo.nickname : '华为用户' :
+            '未登录',
+          )
+            .fontWeight(FontWeight.Medium)
+            .fontSize(18)
+            .maxLines(1)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+            .textAlign(TextAlign.Start)
+            .fontColor(Style.FONT_COLOR_LEVEL1)
+            .margin({ right: 8 })
+          if (iData.global.isLogin) {
+            Row() {
+              SymbolGlyph($r('sys.symbol.v_diamond_fill'))
+                .fontColor([iData.global.userInfo.isMember ? $r('app.color.theme_color') :
+                  $r('app.color.font_color_level3')])
+                .margin({ right: 2 })
+              if (iData.global.userInfo.isMember) {
+                Text('VIP会员').fontColor($r('app.color.font_color_level1')).fontSize(12)
+              }
+            }
+            .alignItems(VerticalAlign.Center)
+          }
+        }.alignItems(VerticalAlign.Top)
+
         Row() {
           if (iData.global.isLogin) {
             Image($r('app.media.ic_mobile_phone'))
@@ -115,7 +130,7 @@ function buildUserInfoArea() {
     }
     .onClick(() => {
       if (!iData.global.isLogin) {
-        promptLogin();
+        ProfileUtil.login()
       } else {
         routerStack.pushPath({ name: RouterMap.USER_PROFILE_EDIT });
       }
@@ -124,12 +139,12 @@ function buildUserInfoArea() {
     if (iData.global.isLogin) {
       Divider().margin({ top: $r('app.float.space_m'), bottom: $r('app.float.space_m') })
       Row() {
-        Text('签到可领取积分兑换好物').fontSize(14).fontColor($r('app.color.font_color_level1'))
-        Button('前往签到')
+        Text('多项会员福利等你来领').fontSize(14).fontColor($r('app.color.font_color_level1'))
+        Button('会员中心')
           .controlSize(ControlSize.SMALL)
           .backgroundColor($r('app.color.theme_color'))
           .onClick(() => {
-            routerStack.pushPath({ name: RouterMap.USER_MEMBER_BENEFITS })
+            routerStack.pushPath({ name: RouterMap.USER_MEMBER_SUBSCRIPTION })
           })
       }
       .width($r('app.string.size_percent_full'))
@@ -139,38 +154,41 @@ function buildUserInfoArea() {
 }
 
 @Builder
+function buildCheckInArea() {
+  if (iData.global.isLogin) {
+    ContainerColumn({ bottomGap: false }) {
+      Row() {
+        Image($r('app.media.ic_checkmark_calendar_fill'))
+          .margin({ right: $r('app.float.space_xs') })
+          .width(16)
+          .height(16)
+        Text('签到可领取积分兑换好物')
+          .fontSize($r('app.float.font_size_14'))
+          .fontColor($r('app.color.font_color_level1'))
+          .layoutWeight(1)
+        Image($r('app.media.ic_arrow_right')).commonIconStyle()
+      }
+      .width($r('app.string.size_percent_full'))
+      .onClick(() => {
+        routerStack.pushPath({ name: RouterMap.USER_MEMBER_BENEFITS })
+      })
+    }
+  }
+}
+
+@Builder
 function buildMainMenuArea() {
   Row() {
     ForEach(ProfileUtil.MAIN_MENU_LIST, (item: MainMenuItem) => {
-      if (item.type === MainMenuOption.ADDRESS) {
-        AddressManage({
-          navPathStack: routerStack,
-          onBeforeNavigate: () => {
-            if (!iData.global.isLogin) {
-              promptLogin();
-              return false;
-            }
-            return true;
-          },
-        }) {
-          Column() {
-            Image(item.icon)
-              .width(40)
-              .height(40)
-            Text(item.label).commonLabelStyle()
-          }
-        };
-      } else {
-        Column() {
-          Image(item.icon)
-            .width(40)
-            .height(40)
-          Text(item.label).commonLabelStyle()
-        }
-        .onClick(() => {
-          ProfileUtil.handleMainMenuClick(item.type)
-        })
+      Column() {
+        Image(item.icon)
+          .width(40)
+          .height(40)
+        Text(item.label).commonLabelStyle()
       }
+      .onClick(() => {
+        ProfileUtil.handleMainMenuClick(item.type)
+      })
     }, (item: MainMenuItem) => item.label)
   }
   .containerStyle()
@@ -193,7 +211,7 @@ function buildOrderInfoArea() {
     }
     .onClick(() => {
       if (!iData.global.isLogin) {
-        promptLogin();
+        ProfileUtil.login()
         return;
       }
       routerStack.pushPathByName(RouterMap.ORDER_LIST, 0);
@@ -252,8 +270,7 @@ function buildSubMenuArea() {
 @Builder
 function buildOrderTab(icon: ResourceStr, label: string, type: number) {
   Column() {
-    Image(icon)
-      .commonIconStyle()
+    Image(icon).commonIconStyle()
       .width(24)
       .height(24)
       .margin({ bottom: 4 });
@@ -264,7 +281,7 @@ function buildOrderTab(icon: ResourceStr, label: string, type: number) {
   .justifyContent(FlexAlign.Start)
   .onClick(() => {
     if (!iData.global.isLogin) {
-      promptLogin();
+      ProfileUtil.login()
     } else {
       routerStack.pushPathByName(RouterMap.ORDER_LIST, type);
     }
@@ -290,6 +307,7 @@ function commonLabelStyle() {
 @Extend(Text)
 function formLabelStyle() {
   .fontWeight(FontWeight.Medium)
+  .fontSize(14)
   .fontColor($r('app.color.font_color_level1'))
 }
 
@@ -301,10 +319,10 @@ function commonIconStyle() {
   .fillColor(Style.FONT_COLOR_LEVEL2);
 }
 
-@Extend(Row)
+@Extend(Column)
 function tabletContainerStyle(isLogin: boolean) {
   .backgroundColor($r('app.color.background_color_white'))
   .borderRadius(16)
   .height(isLogin ? 128 : 78)
-  .alignItems(VerticalAlign.Center)
+  .justifyContent(FlexAlign.Center)
 }

@@ -9,7 +9,7 @@ export function ChapterListViewBuilder() {
 @ComponentV2
 struct ChapterListView {
   vm: CommonModel = CommonModel.instance;
-  examService: ExamService = ExamService.instance;
+  examService: ExamService = ExamService.instance(this.getUIContext().getHostContext() as Context);
   @Local chapterList:Chapter[] = this.examService.getChapterList();
   @Local bottomRectHeight: number = 0;
   @Local topRectHeight: number = 0;
@@ -119,8 +119,8 @@ struct ChapterListView {
     .title('章节练习')
     .backgroundColor('#F1F3F5')
     .padding({
-      top:px2vp(this.topRectHeight),
-      bottom: px2vp(this.bottomRectHeight)
+      top:this.getUIContext().px2vp(this.topRectHeight),
+      bottom: this.getUIContext().px2vp(this.bottomRectHeight)
     })
   }
 }

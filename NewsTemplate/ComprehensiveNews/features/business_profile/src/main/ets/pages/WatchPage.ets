@@ -27,6 +27,7 @@ struct WatchPage {
         })
         BaseFollowWatchPage({
           vm: this.vm,
+          loading: this.vm.loadingModel.loading,
         })
       }
       .width(CommonConstants.FULL_PERCENT)

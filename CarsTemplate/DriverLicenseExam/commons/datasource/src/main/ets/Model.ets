@@ -121,5 +121,6 @@ export interface Video {
   time: string,
   simpleDescription: string,
   description: string,
-  copyrightNotice: string
+  copyrightNotice: string,
+  needVip?: boolean,
 }

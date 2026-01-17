@@ -11,7 +11,7 @@ export struct PrivacyAgreement {
   topRectHeight: number = 0;
   vm: CommonModel = CommonModel.instance;
   controller: webview.WebviewController = new webview.WebviewController();
-  privacyAgreementPath : string = getContext(this).resourceManager.getStringSync($r('app.string.privacyAgreementPath'));
+  privacyAgreementPath : string = (this.getUIContext().getHostContext() as Context).resourceManager.getStringSync($r('app.string.privacyAgreementPath').id);
 
   build() {
     NavDestination() {
@@ -22,7 +22,7 @@ export struct PrivacyAgreement {
     }
     .hideTitleBar(true)
     .margin({
-      top: px2vp(this.topRectHeight)
+      top: this.getUIContext().px2vp(this.topRectHeight)
     })
     .onReady((cxt: NavDestinationContext) => {
       let param = cxt.pathInfo.param as Record<string, Object>;

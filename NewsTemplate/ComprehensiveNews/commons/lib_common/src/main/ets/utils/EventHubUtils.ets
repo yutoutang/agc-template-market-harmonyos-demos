@@ -1,11 +1,12 @@
 import { common } from '@kit.AbilityKit';
 import { EventEnum } from '../constants/EventEnum';
+import { GlobalContextUtils } from './ContextUtils';
 
 /**
  * EventHub线程通信
  */
 export class EventHubUtils {
-  private eventHub: common.EventHub = (getContext(this) as common.UIAbilityContext).eventHub;
+  private eventHub: common.EventHub;
   private static instance: EventHubUtils;
 
   public static getInstance(): EventHubUtils {
@@ -13,6 +14,10 @@ export class EventHubUtils {
       EventHubUtils.instance = new EventHubUtils();
     }
     return EventHubUtils.instance;
+  }
+
+  constructor() {
+    this.eventHub = GlobalContextUtils.globalUIAbilityContext.eventHub;
   }
 
   public emit(eventKey: EventEnum | string, ...args: Object[]) {

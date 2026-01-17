@@ -1,7 +1,5 @@
-import { AppRouter, BaseTabBarItem,
-  DayFormat,
-  getDayLabel,
-  LocationType
+import {
+  AppRouter, BaseTabBarItem, DayFormat, getDayLabel, LocationType
 } from 'common';
 import { BaseTabBar, BaseTitle, GlobalDialog } from 'components';
 import { FlightApi } from '../api/FlightApi';
@@ -47,19 +45,19 @@ export struct FlightPage {
     // 按起降地查询
     if (this.selectedBarIndex === 0) {
       if (this.departureCity === '') {
-        GlobalDialog.showToast('请选择出发地')
+        GlobalDialog.showToast('请选择出发地', this.getUIContext())
         return
       }
       if (this.destinationCity === '') {
-        GlobalDialog.showToast('请选择目的地')
+        GlobalDialog.showToast('请选择目的地', this.getUIContext())
         return
       }
       if (this.departureCity === this.destinationCity) {
-        GlobalDialog.showToast('出发地和目的地不能相同')
+        GlobalDialog.showToast('出发地和目的地不能相同', this.getUIContext())
         return
       }
 
-      let paramData: Record<string, string|Date> = {
+      let paramData: Record<string, string | Date> = {
         'departureCity': this.departureCity,
         'destinationCity': this.destinationCity,
         'departureDate': this.departureDate
@@ -71,14 +69,14 @@ export struct FlightPage {
     } else {
       // 按航班号查询
       if (this.flightNumValue === '') {
-        GlobalDialog.showToast('请输入航班号')
+        GlobalDialog.showToast('请输入航班号', this.getUIContext())
         return
       }
       // 退出输入框的编辑状态
       this.textInputController.stopEditing()
-      GlobalDialog.showLoadingDialog();
+      GlobalDialog.showLoadingDialog(this.getUIContext());
       FlightApi.getFlightDetail(this.flightNumValue).then((res) => {
-        GlobalDialog.close()
+        GlobalDialog.close(this.getUIContext())
         let result = res.result as FlightListResult;
         if (result.ret.code === 0) {
           if (result.result?.length) {
@@ -94,14 +92,14 @@ export struct FlightPage {
               })
             }
           } else {
-            GlobalDialog.showToast('没有找到符合条件的航班')
+            GlobalDialog.showToast('没有找到符合条件的航班', this.getUIContext())
           }
         } else {
-          GlobalDialog.showToast('没有找到符合条件的航班')
+          GlobalDialog.showToast('没有找到符合条件的航班', this.getUIContext())
         }
       }).catch(() => {
-        GlobalDialog.close()
-        GlobalDialog.showToast('没有找到符合条件的航班')
+        GlobalDialog.close(this.getUIContext())
+        GlobalDialog.showToast('没有找到符合条件的航班', this.getUIContext())
       })
     }
   }
@@ -121,7 +119,7 @@ export struct FlightPage {
             currentIndex: this.selectedBarIndex!!
           })
 
-          Column({space: 24}) {
+          Column({ space: 24 }) {
             if (this.tabBarList[this.selectedBarIndex].type === 'BY_CITY') {
               this.SearchFlightByCityView()
             } else {
@@ -147,9 +145,9 @@ export struct FlightPage {
     .linearGradient(
       {
         angle: 180,
-        colors: [ [ 'rgba(194,207,255,1)', 0.1 ], [ 'rgba(241,243,245,1)', 0.4 ] ]
+        colors: [['rgba(194,207,255,1)', 0.1], ['rgba(241,243,245,1)', 0.4]]
       })
-    .expandSafeArea([ SafeAreaType.SYSTEM ], [ SafeAreaEdge.TOP ])
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
   }
 
   @Builder
@@ -165,12 +163,12 @@ export struct FlightPage {
           .fontSize(14)
           .fontWeight(FontWeight.Medium)
           .maxLines(1)
-          .textOverflow({overflow: TextOverflow.Ellipsis})
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
       }
       .width('40%')
       .justifyContent(FlexAlign.Center)
       .height(64)
-      .padding({left: 8, right:8})
+      .padding({ left: 8, right: 8 })
       .backgroundColor('#F3F3F3')
       .borderRadius(14)
       .onClick(() => {
@@ -202,12 +200,12 @@ export struct FlightPage {
           .fontSize(14)
           .fontWeight(FontWeight.Medium)
           .maxLines(1)
-          .textOverflow({overflow: TextOverflow.Ellipsis})
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
       }
       .width('40%')
       .justifyContent(FlexAlign.Center)
       .height(64)
-      .padding({left: 8, right:8})
+      .padding({ left: 8, right: 8 })
       .backgroundColor('#F3F3F3')
       .borderRadius(16)
       .onClick(() => {
@@ -226,17 +224,25 @@ export struct FlightPage {
 
   @Builder
   SearchFlightByFlightNumView() {
-    Column({space: 10}) {
+    Column({ space: 10 }) {
       Text('航班号').fontSize(16).fontWeight(FontWeight.Medium)
 
-      TextInput({ placeholder: '请输入航班号，例如CA1516', text: this.flightNumValue, controller: this.textInputController  })
+      TextInput({
+        placeholder: '请输入航班号，例如CA1516',
+        text: this.flightNumValue,
+        controller: this.textInputController
+      })
         .width('100%')
         .backgroundColor('#F3F3F3')
-        .padding({left: 18, top:14, bottom: 14, right: 14 })
+        .padding({
+          left: 18,
+          top: 14,
+          bottom: 14,
+          right: 14
+        })
         .borderRadius(16)
         .maxLength(7)
-        .placeholderFont({ size: 14, weight: FontWeight.Regular })
-        .placeholderColor('#66000000')
+        .placeholderFont({ size: $r('sys.float.Body_L'), weight: FontWeight.Regular })
         .onChange((value: string) => {
           this.flightNumValue = value.toLocaleUpperCase()
         })
@@ -252,7 +258,7 @@ export struct FlightPage {
 
   @Builder
   SelectedDateView() {
-    Column({space: 10}) {
+    Column({ space: 10 }) {
       Text('出发日期').fontSize(16).fontWeight(FontWeight.Medium)
 
       Row({ space: 6 }) {
@@ -262,7 +268,7 @@ export struct FlightPage {
       }
       .width('100%')
       .backgroundColor('#F3F3F3')
-      .padding({left: 18, top:14, bottom: 14})
+      .padding({ left: 18, top: 14, bottom: 14 })
       .borderRadius(16)
       .onClick(() => {
         this.selectedDepartureDate()

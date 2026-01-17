@@ -25,6 +25,14 @@
       }
     },
     {
+      "name": "splashPage",
+      "pageSourceFile": "src/main/ets/pages/SplashPage.ets",
+      "buildFunction": "SplashPageBuilder",
+      "data": {
+        "description": "this is splash"
+      }
+    },
+    {
       "name": "specialExercisesView",
       "pageSourceFile": "src/main/ets/pages/specialExercises/SpecialExercisesView.ets",
       "buildFunction": "specialExercisesViewBuilder",
@@ -84,6 +92,11 @@
       "name": "webContainer",
       "pageSourceFile": "src/main/ets/components/WebContainer.ets",
       "buildFunction": "WebContainerBuilder"
+    },
+    {
+      "name": "membership",
+      "pageSourceFile": "src/main/ets/pages/mine/MemberShip.ets",
+      "buildFunction": "MemberShipSample1Builder"
     }
   ]
 }

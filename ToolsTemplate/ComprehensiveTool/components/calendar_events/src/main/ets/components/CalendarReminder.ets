@@ -40,7 +40,7 @@ export struct CalendarReminder {
               customContent: () => {
                 this.reminderBuilder()
               },
-            })
+            }, this.getUIContext())
           })
           .width('100%')
           .justifyContent(FlexAlign.SpaceBetween)

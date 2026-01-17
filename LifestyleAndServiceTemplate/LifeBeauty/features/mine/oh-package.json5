@@ -8,5 +8,6 @@
   "dependencies": {
     "foundation": "file:../../commons/foundation",
     "reservation_card": "file:../../components/reservation_card",
+    "collect_personal_info": "file:../../components/collect_personal_info"
   }
 }

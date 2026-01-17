@@ -1,12 +1,67 @@
-import { COLOR_LIST, HIGHLIGHT_COLOR_FILTER, ORIGIN_COLOR_FILTER } from '../commons/Constant';
+import { common } from '@kit.AbilityKit';
+import { fileIo } from '@kit.CoreFileKit';
+import { UtilLog } from '@hw-agconnect/util-log';
+import { COLOR_LIST, HIGHLIGHT_COLOR_FILTER, ORIGIN_COLOR_FILTER, PHOTO_MAX_COUNT,
+  PHOTO_MAX_SIZE } from '../commons/Constant';
 import { EditorController } from '../controller/EditorController';
 import { PickerUtil } from '../utils/PickerUtil';
 import { AlignmentInfo } from '../commons/Interface';
+import { ImageUtils } from '../utils/ImageUtils';
 
 @ComponentV2
 export struct RichTextToolBar {
   @Param editorController: EditorController = new EditorController();
   @Param showToolBar: boolean = false
+
+  handleSelectPhoto(imageUri: string) {
+    // 获取富文本中的所有图片
+    const htmlContent = this.editorController.richTextContent;
+    const imgList: string[] = ImageUtils.findImgSrcList(htmlContent);
+    // 校验图片个数
+    if (imgList.length >= PHOTO_MAX_COUNT) {
+      this.getUIContext().getPromptAction().showToast({
+        message: `图片总数超过${PHOTO_MAX_COUNT}个，已达上限`
+      })
+      return;
+    }
+
+    // 校验图片大小
+    let size: number = 0;
+    try {
+      for (let i = 0; i < imgList.length; i++) {
+        const filePath = imgList[i].replace('file:///', '');
+        const stat = fileIo.statSync(filePath);
+        if (stat) {
+          size += stat.size;
+        }
+      }
+    } catch (e) {
+      UtilLog.error('[RichTextToolBar]', `get file stat failed. error: ${JSON.stringify(e)}`)
+    }
+    const sizeGB = this.bytesToGB(size);
+    if (sizeGB >= PHOTO_MAX_SIZE) {
+      this.getUIContext().getPromptAction().showToast({
+        message: `图片总大小超过${PHOTO_MAX_SIZE}GB，已达上限`
+      })
+      return;
+    }
+
+    // 保存到沙箱
+    const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+    const imgName = new Date().getTime() + '.jpg';
+    const sandboxUri = ImageUtils.saveImgToCache(context, imageUri, imgName);
+    this.editorController.htmlModel.htmlImgSandboxUris.push(sandboxUri)
+    this.editorController.insertImage(sandboxUri);
+
+    setTimeout(() => {
+      let pageHeight = this.editorController.webviewController.getPageHeight();
+      this.editorController.webviewController.scrollTo(0, Number(pageHeight) + 320, 100);
+    }, 300)
+  }
+
+  bytesToGB(bytes: number = 0) {
+    return bytes / 1024 / 1024 / 1024
+  }
 
   build() {
     Column() {
@@ -87,12 +142,8 @@ export struct RichTextToolBar {
               if (!imageUri) {
                 return
               }
-              this.editorController.insertImage(imageUri);
 
-              setTimeout(() => {
-                let pageHeight = this.editorController.webviewController.getPageHeight();
-                this.editorController.webviewController.scrollTo(0, Number(pageHeight) + 320, 100);
-              }, 300)
+              this.handleSelectPhoto(imageUri)
             });
           });
       }

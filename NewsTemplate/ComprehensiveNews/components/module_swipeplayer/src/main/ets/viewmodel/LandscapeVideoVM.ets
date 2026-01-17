@@ -1,14 +1,18 @@
 import { media } from '@kit.MediaKit';
-import { display, window } from '@kit.ArkUI';
+import { window } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
+import { BusinessError } from '@kit.BasicServicesKit';
 import { Constants } from '../constants/Constants'
 import { AVPlayerSession } from '../controller/AVPlayerManager';
-import { isDisplayModeFull, pauseVideo, playVideo } from '../utils/Util';
+import { isDisplayModeFull, pauseVideo, playVideo, setOrientation } from '../utils/Util';
 import { VolumeAndBright } from '../utils/VolumeAndBright';
-import { AVPlayerState, PageNameEnum } from '../type/Index';
+import { AVPlayerState, BreakpointNameEnum, PageNameEnum } from '../type/Index';
 import { ProgressController } from '../components/VideoProgressBar';
 import { BreakpointModel } from '../models/BreakpointModel';
 import { LongTakeAnimationProperties, LongTakeTransitionParam } from 'module_transition';
+import { Logger } from '../utils/Logger';
+
+const TAG = '[LandscapeVideoVM]';
 
 @ObservedV2
 export class LandscapeVideoVM {
@@ -47,18 +51,30 @@ export class LandscapeVideoVM {
   // 一多适配的断点
   @Trace breakpointModel: BreakpointModel = new BreakpointModel();
   @Trace isFullMode: boolean = false;
+  @Trace isMute: boolean = true
+  // 是否隐藏进度条
+  @Trace isHideSlide = false;
   positionX: number = 0;
   positionY: number = 0;
   progressController: ProgressController = new ProgressController();
-
   uiContext?: UIContext
   windowClass?: window.Window
-  constructor(uiContext: UIContext) {
-    this.uiContext = uiContext
-    const context: common.UIAbilityContext = uiContext.getHostContext() as common.UIAbilityContext
-    this.windowClass = context.windowStage!.getMainWindowSync();
 
-    AppStorage.setAndRef('windowClass', this.windowClass)
+  constructor(uiContext: UIContext) {
+    try {
+      this.uiContext = uiContext
+      const context: common.UIAbilityContext = uiContext.getHostContext() as common.UIAbilityContext
+      this.windowClass = context.windowStage!.getMainWindowSync();
+
+      AppStorage.setAndRef('windowClass', this.windowClass)
+    } catch (e) {
+      Logger.error(TAG, 'getMainWindowSync fail, error: ' + JSON.stringify(e));
+    }
+  }
+
+  @Computed
+  get isTablet() {
+    return [BreakpointNameEnum.LG, BreakpointNameEnum.XL].includes(this.breakpointModel.currentBreakpoint);
   }
 
   init() {
@@ -68,7 +84,7 @@ export class LandscapeVideoVM {
       // 判断是否是大折叠、阔折叠外屏、小折叠内屏
       this.isFullMode = isDisplayModeFull();
       if (!this.isBackFlag && size.width < size.height &&
-        this.pathStack.getAllPathName().includes(PageNameEnum.VIDEO_LANDSCAPE_PAGE)
+      this.pathStack.getAllPathName().includes(PageNameEnum.VIDEO_LANDSCAPE_PAGE)
       ) {
         this.pathStack.pop();
       }
@@ -82,9 +98,11 @@ export class LandscapeVideoVM {
 
   async onBack() {
     this.isBackFlag = true;
-    // 设置横竖屏
-    let displayClass = display.getDefaultDisplaySync();
-    this.pathStack.pop();
+    // 退出横屏时，设置横竖屏  平板等大屏设备跟随传感器自动旋转，其他设置为竖屏
+    let orientation = this.isTablet ? window.Orientation.AUTO_ROTATION : window.Orientation.USER_ROTATION_PORTRAIT
+    setOrientation(this.uiContext, orientation).then(() => {
+      this.pathStack.pop();
+    })
   }
 
   showOrHiddenBar() {
@@ -116,15 +134,31 @@ export class LandscapeVideoVM {
 
   switchPlayOrPause() {
     if (this.isPlaying) {
-      pauseVideo(this.player);
+      this.pause();
       this.isPlaying = false;
       this.trackThicknessSize = Constants.TRACK_SIZE_MAX;
     } else {
-      playVideo(this.player);
+      this.play();
       this.isPlaying = true;
       this.trackThicknessSize = Constants.TRACK_SIZE_MIN;
     }
-    this.windowClass?.setWindowKeepScreenOn(true);
+    this.windowClass?.setWindowKeepScreenOn(true).catch((e: BusinessError) => {
+      Logger.error(TAG, 'setWindowKeepScreenOn fail, error: ' + JSON.stringify(e));
+    });
+  }
+
+  play() {
+    playVideo(this.player);
+  }
+
+  pause() {
+    pauseVideo(this.player);
+  }
+
+  setMute() {
+    if (this.isMute) {
+      this.volumeUtil.playerSliderModel.volume = 0
+    }
   }
 
   // 处理视频外层的显示和隐藏
@@ -199,7 +233,7 @@ export class LandscapeVideoVM {
     if (!event.fingerList[0]) {
       return
     }
-    
+
     if (event.fingerList[0].displayX >= (this.xComponentWidth as number) / 2) {
       this.onVolumeActionUpdate(event)
     } else {
@@ -213,7 +247,7 @@ export class LandscapeVideoVM {
       return;
     }
     const canOperateState: string[] = [
-      AVPlayerState.PREPARED, AVPlayerState.PLAYING, AVPlayerState.PAUSED, AVPlayerState.COMPLETED
+      AVPlayerState.PREPARED, AVPlayerState.PLAYING, AVPlayerState.PAUSED, AVPlayerState.COMPLETED,
     ];
     if (canOperateState.indexOf(this.player.state) === -1) {
       return;
@@ -293,7 +327,7 @@ export class LandscapeVideoVM {
   // 自定义动画注册
   public registerCustomTransition(
     navDestContext: NavDestinationContext,
-    longTakeSession: LongTakeAnimationProperties
+    longTakeSession: LongTakeAnimationProperties,
   ) {
     let param = navDestContext.pathInfo?.param as Record<string, Object>;
     let longTakeTransitionParam = param.longTakeTransitionParam as LongTakeTransitionParam;

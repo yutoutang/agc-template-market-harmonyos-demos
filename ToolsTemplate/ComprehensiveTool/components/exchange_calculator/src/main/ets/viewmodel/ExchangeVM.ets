@@ -1,7 +1,8 @@
+import { UtilLog } from '@hw-agconnect/util-log';
 import { window } from '@kit.ArkUI';
-import { queryExchangeList } from '../apis/APIList';
 import { ICurrencyData } from '../model/Types';
-import { Currency } from '../mocks/MockData/Exchange';
+import { Currency } from '../httpsmock/Exchange';
+import { ExchangeServiceApi } from '../https/apis/ExchangeService';
 
 @ObservedV2
 export class ExchangeVM {
@@ -14,14 +15,22 @@ export class ExchangeVM {
     this.keyboardShow = data ? true : false;
   };
 
-  public onKeyboardChange() {
-    window.getLastWindow(getContext())
-      .then(currentWindow => currentWindow.on('keyboardHeightChange', this._keyboardHeightChangeCallback));
+  public onKeyboardChange(uiContext: UIContext) {
+    try {
+      window.getLastWindow(uiContext.getHostContext())
+        .then(currentWindow => currentWindow.on('keyboardHeightChange', this._keyboardHeightChangeCallback));
+    } catch (e) {
+      UtilLog.error(`onKeyboardChange failed with error ${JSON.stringify(e)}`);
+    }
   }
 
-  public offKeyboardChange() {
-    window.getLastWindow(getContext())
-      .then(currentWindow => currentWindow.off('keyboardHeightChange', this._keyboardHeightChangeCallback));
+  public offKeyboardChange(uiContext: UIContext) {
+    try {
+      window.getLastWindow(uiContext.getHostContext())
+        .then(currentWindow => currentWindow.off('keyboardHeightChange', this._keyboardHeightChangeCallback));
+    } catch (e) {
+      UtilLog.error(`offKeyboardChange failed with error ${e}`)
+    }
   }
 
   private static _instance: ExchangeVM;
@@ -34,10 +43,9 @@ export class ExchangeVM {
   }
 
   public getExchangeInfo() {
-    queryExchangeList().then((resp) => {
-      let exchangeInfo = resp.data;
-      this.updateTime = this.getCurrentTimeStr(exchangeInfo.updateTime);
-      this.exchangeData = exchangeInfo.rates.map((item: Currency) => {
+    ExchangeServiceApi.queryExchangeList().then((resp) => {
+      this.updateTime = this.getCurrentTimeStr(resp.updateTime);
+      this.exchangeData = resp.rates.map((item: Currency) => {
         return {
           bankConversionPri: item.rate,
           name: item.name,

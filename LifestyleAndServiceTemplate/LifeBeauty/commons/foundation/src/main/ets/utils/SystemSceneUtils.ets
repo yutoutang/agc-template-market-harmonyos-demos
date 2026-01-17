@@ -4,7 +4,8 @@ import { map, mapCommon } from '@kit.MapKit';
 import { geoLocationManager } from '@kit.LocationKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { util } from '@kit.ArkTS';
-import { Logger } from './Logger';
+import { UtilLog as Logger } from '@hw-agconnect/util-log';
+import { WindowUtil } from './WindowUtil';
 
 const TAG = '[SystemSceneUtils]';
 
@@ -17,11 +18,14 @@ export class SystemSceneUtils {
    * @param address
    * @param coords
    */
-  public static async jumpPetalMap(context: common.UIAbilityContext, address: string, coords: string[]) {
+  public static jumpPetalMap(context: common.UIAbilityContext, address: string, coords: string[]) {
     if (coords.length < 2) {
       return;
     }
-    const bundleInfo = await SystemSceneUtils.getBundleInfo();
+    const bundleInfo = SystemSceneUtils.getBundleInfo();
+    if (!bundleInfo) {
+      return;
+    }
     let petalMapWant: Want = {
       bundleName: 'com.huawei.hmos.maps.app',
       uri: 'maps://routes',
@@ -72,7 +76,7 @@ export class SystemSceneUtils {
         return '0m';
       }
       if (distance < 1000) {
-        return `${distance}m`;
+        return `${distance.toFixed(1)}m`;
       } else {
         return `${(distance / 1000).toFixed(1)}km`;
       }
@@ -102,12 +106,13 @@ export class SystemSceneUtils {
     }
 
     const atManager = abilityAccessCtrl.createAtManager();
-    return atManager.requestPermissionsFromUser(getContext(), permissions).then((result: PermissionRequestResult) => {
-      if (result.authResults.every(v => v === 0)) {
-        return true;
-      }
-      return false;
-    });
+    return atManager.requestPermissionsFromUser(WindowUtil.context, permissions)
+      .then((result: PermissionRequestResult) => {
+        if (result.authResults.every(v => v === 0)) {
+          return true;
+        }
+        return false;
+      });
   }
 
   /**
@@ -153,7 +158,7 @@ export class SystemSceneUtils {
     let file: fs.File | null = null;
     try {
       file = fs.openSync(uri, fs.OpenMode.READ_ONLY);
-      const newPath: string = getContext().filesDir + `/${util.generateRandomUUID(false)}.png`;
+      const newPath: string = WindowUtil.context!.filesDir + `/${util.generateRandomUUID(false)}.png`;
       fs.copyFileSync(file.fd, newPath);
       return 'file://' + newPath;
     } catch (error) {
@@ -170,8 +175,13 @@ export class SystemSceneUtils {
    * 获取包信息
    * @returns
    */
-  public static async getBundleInfo() {
-    const bundleInfo = await bundleManager.getBundleInfoForSelf(bundleManager.BundleFlag.GET_BUNDLE_INFO_DEFAULT);
+  public static getBundleInfo() {
+    let bundleInfo: bundleManager.BundleInfo | null = null;
+    try {
+      bundleInfo = bundleManager.getBundleInfoForSelfSync(bundleManager.BundleFlag.GET_BUNDLE_INFO_DEFAULT);
+    } catch (err) {
+      Logger.error(TAG, `getBundleInfo failed. error: ${JSON.stringify(err)}`);
+    }
     return bundleInfo;
   }
 }

@@ -17,6 +17,8 @@ export class VideoViewModel extends BaseViewModel {
     new TabNav('featured', '精选'),
     new TabNav('recommend', '推荐', $r('app.color.color_tab_blue')),
     new TabNav('livestream', '直播', $r('app.color.color_tab_blue')),
+    new TabNav('livestream', '电视', $r('app.color.color_tab_blue')),
+    new TabNav('livestream', '广播', $r('app.color.color_tab_blue')),
   ]
 
   tabController: TabsController = new TabsController();

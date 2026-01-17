@@ -3,8 +3,7 @@
     "name": "select_store",
     "type": "har",
     "deviceTypes": [
-      "default",
-      "tablet"
+      "default"
     ]
   }
 }

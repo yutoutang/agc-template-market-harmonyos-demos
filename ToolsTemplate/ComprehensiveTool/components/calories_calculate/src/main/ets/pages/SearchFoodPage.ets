@@ -201,7 +201,7 @@ struct SearchFoodPage {
             .fontColor($r('sys.color.font_on_primary'))
             .backgroundColor('#E84026')
             .onClick(() => {
-              this.vm.confirmBtn(item);
+              this.vm.confirmBtn(item, this.getUIContext());
             });
         }.layoutWeight(1).height(228);
       }.margin({ top: 24 });

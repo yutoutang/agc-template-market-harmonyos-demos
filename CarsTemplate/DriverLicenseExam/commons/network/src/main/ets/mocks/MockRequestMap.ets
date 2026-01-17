@@ -1,5 +1,4 @@
-import { promptAction } from '@kit.ArkUI';
-import { Logger } from '@ohos_agcit/car_beauty_care_commonlib';
+import { Logger } from '@ohos_agcit/driver_license_exam_commonlib';
 import { RequestUrl } from '../constants/NetworkEnums';
 import { BaseResponse } from '../types/ResponseTypes';
 import { httpsMock } from './HttpApisMock';
@@ -26,7 +25,6 @@ function simulateDelay<T>(data: T, delay: number): Promise<T> {
 
 function mockErrorHandler(msg?: string): Promise<string> {
   const errMsg: string = 'replace mock data failed!';
-  promptAction.showToast({ message: errMsg });
   Logger.error('[MockRequest]', msg ?? '', errMsg);
   return Promise.reject(errMsg);
 }

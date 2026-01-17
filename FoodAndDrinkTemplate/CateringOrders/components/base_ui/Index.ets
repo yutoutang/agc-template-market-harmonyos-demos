@@ -10,7 +10,10 @@ export * from './src/main/ets/components/CouponCardComp'
 
 export { SheetHeaderComp } from './src/main/ets/components/SheetHeaderComp'
 
+export { CustomSelectSheetBuilder } from './src/main/ets/components/CustomSelectDialog'
+
 export * from './src/main/ets/constants/Index'
 
-export * from './src/main/ets/models/Index'
+export * from './src/main/ets/constants/Styles'
 
+export * from './src/main/ets/models/Index'

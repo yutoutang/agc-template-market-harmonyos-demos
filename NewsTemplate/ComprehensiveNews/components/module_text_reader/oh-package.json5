@@ -6,8 +6,6 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "@ohos/axios": "2.2.4"
-  },
-  "devDependencies": {},
-  "dynamicDependencies": {}
+    "@hw-agconnect/util-log": "1.0.0",
+  }
 }

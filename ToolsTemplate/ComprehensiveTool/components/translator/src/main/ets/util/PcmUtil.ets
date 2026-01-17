@@ -3,6 +3,8 @@ import { FileInfo } from '../model/Audio';
 import { FormatUtil } from './FormatUtil';
 import fs from '@ohos.file.fs'
 import { TranLogger } from './TranLogger';
+import { contextUtil } from './ContextUtil';
+import { common } from '@kit.AbilityKit';
 
 interface ICallBack {
   callBackResult: (code: number) => void
@@ -10,7 +12,7 @@ interface ICallBack {
 
 // 根据传入文件类型，生成一个沙箱中的路径 tag增加标志防止文件重复
 export function createFd(fileType: string, isAddTag: boolean = false, tag: string = ''): FileInfo {
-  const context: Context = getContext();
+  const context: Context = contextUtil.getContext() as common.UIAbilityContext
   const fileName: string = isAddTag ? `转换_${FormatUtil.formatFullDate(new Date())}_录音${tag}.${fileType}` :
     `${FormatUtil.formatFullDate(new Date())}_录音.${fileType}`;
   const path: string = context.filesDir + `/${fileName}`; // 文件沙箱路径，文件后缀名应与封装格式对应
@@ -23,7 +25,7 @@ export function createFd(fileType: string, isAddTag: boolean = false, tag: strin
 
 // 将录音文件复制一份
 export function copyFile(path: string) {
-  const context: Context = getContext();
+  const context: Context = contextUtil.getContext() as common.UIAbilityContext
   let file: fs.File | null = null;
   const filePath = context.filesDir + '/temp.mp3';
   file = fs.openSync(filePath, fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE)

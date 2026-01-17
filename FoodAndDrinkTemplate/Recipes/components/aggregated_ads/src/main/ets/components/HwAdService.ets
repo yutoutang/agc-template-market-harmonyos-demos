@@ -17,7 +17,7 @@ export struct HwAdService {
     adType: AdType.SPLASH_AD,
     adCount: 1,
   };
-  private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+  private context = this.getUIContext().getHostContext() as common.UIAbilityContext
   private adDisplayOptions: advertising.AdDisplayOptions = {
     mute: false,
   };

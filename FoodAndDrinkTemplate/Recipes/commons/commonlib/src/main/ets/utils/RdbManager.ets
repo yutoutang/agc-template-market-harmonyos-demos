@@ -2,6 +2,7 @@ import { relationalStore } from '@kit.ArkData';
 import { common } from '@kit.AbilityKit';
 import { CommonConstants } from '../constants/CommonConstants';
 import { recipesData } from '../types/Types';
+import { Logger } from './Logger';
 
 export class RdbManager {
   private rdbStore: relationalStore.RdbStore | null = null;
@@ -20,7 +21,7 @@ export class RdbManager {
       this.rdbStore = await relationalStore.getRdbStore(context, STORE_CONFIG);
       await this.rdbStore.executeSql(CommonConstants.RECIPES_TABLE.sqlCreate);
     } catch (error) {
-      console.error(`Failed to get RdbStore. Code:${error.code}, message:${error.message}`);
+      Logger.error(`Failed to get RdbStore. Code:${error.code}, message:${error.message}`);
     }
   }
 
@@ -30,9 +31,9 @@ export class RdbManager {
     if (this.rdbStore) {
       try {
         const rowId = await this.rdbStore?.insert(CommonConstants.RECIPES_TABLE.tableName, value);
-        console.info(`Succeeded in inserting data. rowId:${rowId}`);
+        Logger.info(`Succeeded in inserting data. rowId:${rowId}`);
       } catch (error) {
-        console.error(`Failed to insert data. Code:${error.code}, message:${error.message}`);
+        Logger.error(`Failed to insert data. Code:${error.code}, message:${error.message}`);
       }
     }
     return rowId;
@@ -46,7 +47,7 @@ export class RdbManager {
         predicates.equalTo('id', data.id);
         rows = await this.rdbStore.delete(predicates);
       } catch (error) {
-        console.error(`Failed to insert data. Code:${error.code}, message:${error.message}`);
+        Logger.error(`Failed to insert data. Code:${error.code}, message:${error.message}`);
       }
     }
     return rows;
@@ -60,9 +61,9 @@ export class RdbManager {
         let predicates = new relationalStore.RdbPredicates(CommonConstants.RECIPES_TABLE.tableName);
         predicates.equalTo('id', data.id);
         rows = await this.rdbStore.update(valueBucket, predicates);
-        console.info(`Succeeded in updating data. row count: ${rows}`);
+        Logger.info(`Succeeded in updating data. row count: ${rows}`);
       } catch (error) {
-        console.error(`Failed to update data. Code:${error.code}, message:${error.message}`);
+        Logger.error(`Failed to update data. Code:${error.code}, message:${error.message}`);
       }
     }
     return rows;
@@ -79,12 +80,12 @@ export class RdbManager {
         const resultSet: relationalStore.ResultSet =
           await this.rdbStore.query(predicates, CommonConstants.RECIPES_TABLE.columns);
         result = this.formatData(resultSet);
-        console.info(`ResultSet column names: ${resultSet.columnNames}, column count: ${resultSet.columnCount}`);
+        Logger.info(`ResultSet column names: ${resultSet.columnNames}, column count: ${resultSet.columnCount}`);
         if (result.length > 0) {
           resultSet.close();
         }
       } catch (error) {
-        console.error(`Failed to query data. Code:${error.code}, message:${error.message}`);
+        Logger.error(`Failed to query data. Code:${error.code}, message:${error.message}`);
       }
     }
     return result;
@@ -147,7 +148,7 @@ export class RdbManager {
           resultSet.goToNextRow();
         }
       } catch (error) {
-        console.error(`Failed to query data. Code:${error.code}, message:${error.message}`);
+        Logger.error(`Failed to query data. Code:${error.code}, message:${error.message}`);
       }
     }
     return list;

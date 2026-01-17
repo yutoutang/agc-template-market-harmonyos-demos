@@ -1,15 +1,16 @@
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
-import { hilog } from '@kit.PerformanceAnalysisKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { media } from '@kit.MediaKit';
 import { fileIo } from '@kit.CoreFileKit';
 import { image } from '@kit.ImageKit';
 import fs from '@ohos.file.fs';
-import { MediaParams, VideoSizeData } from '../models/MediaModel';
 import { util } from '@kit.ArkTS';
+import { MediaParams, VideoSizeData } from '../models/MediaModel';
+import { GlobalContextUtils } from './ContextUtils';
+import { Logger } from './Logger';
 
-const DOMAIN = 0x0000;
 const TAG = '[MediaUtils]';
+
 export class MediaUtils {
   /**
    * 用系统picker，拉起相册或者相机
@@ -25,11 +26,10 @@ export class MediaUtils {
     const photoViewPicker = new photoAccessHelper.PhotoViewPicker();
     return photoViewPicker.select(photoSelectOptions).then((photoSelectResult: photoAccessHelper.PhotoSelectResult) => {
       uris = photoSelectResult.photoUris;
-      hilog.info(DOMAIN, TAG, 'photoViewPicker.select to file succeed and uris are:' + uris);
+      Logger.info(TAG, 'photoViewPicker.select to file succeed and uris are:' + uris);
       return uris;
     }).catch((err: BusinessError) => {
-      hilog.error(DOMAIN, TAG,
-        `Invoke photoViewPicker.select failed, code is ${err.code}, message is ${err.message}`);
+      Logger.error(TAG, `Invoke photoViewPicker.select failed, code is ${err.code}, message is ${err.message}`);
       return uris;
     })
   }
@@ -43,19 +43,24 @@ export class MediaUtils {
     if (!uri) {
       return undefined;
     }
-    let avImageGenerator: media.AVImageGenerator = await media.createAVImageGenerator();
-    const fileAlbum = fileIo.openSync(uri, fileIo.OpenMode.READ_ONLY);
-    const avFileDescriptor = { fd: fileAlbum.fd } as media.AVFileDescriptor;
-    const videoSize = await MediaUtils.getVideoData(avFileDescriptor);
-    if (avImageGenerator) {
-      avImageGenerator.fdSrc = avFileDescriptor;
-    } else {
-      hilog.error(DOMAIN, TAG, 'Create AVImageGenerator failed!');
+    try {
+      let avImageGenerator: media.AVImageGenerator = await media.createAVImageGenerator();
+      const fileAlbum = fileIo.openSync(uri, fileIo.OpenMode.READ_ONLY);
+      const avFileDescriptor = { fd: fileAlbum.fd } as media.AVFileDescriptor;
+      const videoSize = await MediaUtils.getVideoData(avFileDescriptor);
+      if (avImageGenerator) {
+        avImageGenerator.fdSrc = avFileDescriptor;
+      } else {
+        Logger.error(TAG, 'Create AVImageGenerator failed!');
+        return undefined;
+      }
+      const pixelMap = await avImageGenerator?.fetchFrameByTime(0,
+        media.AVImageQueryOptions.AV_IMAGE_QUERY_CLOSEST_SYNC, videoSize.photoSize);
+      return pixelMap;
+    } catch (e) {
+      Logger.error(TAG, 'getVideoThumbnail fail, error: ' + JSON.stringify(e));
       return undefined;
     }
-    const pixelMap = await avImageGenerator?.fetchFrameByTime(0,
-      media.AVImageQueryOptions.AV_IMAGE_QUERY_CLOSEST_SYNC, videoSize.photoSize);
-    return pixelMap;
   }
 
   /**
@@ -65,16 +70,21 @@ export class MediaUtils {
    */
   public static async getVideoData(avFileDescriptor: media.AVFileDescriptor): Promise<VideoSizeData> {
     let videoSize: VideoSizeData = new VideoSizeData();
-    let avMetaDataExtractor: media.AVMetadataExtractor = await media.createAVMetadataExtractor();
-    avMetaDataExtractor.fdSrc = avFileDescriptor;
-    let metadata = await avMetaDataExtractor.fetchMetadata();
-    videoSize.photoSize.width = parseInt(metadata.videoWidth as string);
-    videoSize.photoSize.height = parseInt(metadata.videoHeight as string);
-    if (metadata.duration) {
-      videoSize.totalTime = parseInt(metadata.duration);
+    try {
+      let avMetaDataExtractor: media.AVMetadataExtractor = await media.createAVMetadataExtractor();
+      avMetaDataExtractor.fdSrc = avFileDescriptor;
+      let metadata = await avMetaDataExtractor.fetchMetadata();
+      videoSize.photoSize.width = parseInt(metadata.videoWidth as string);
+      videoSize.photoSize.height = parseInt(metadata.videoHeight as string);
+      if (metadata.duration) {
+        videoSize.totalTime = parseInt(metadata.duration);
+      }
+      await avMetaDataExtractor.release();
+      return videoSize;
+    } catch (e) {
+      Logger.error(TAG, 'getVideoData fail, error: ' + JSON.stringify(e));
+      return videoSize;
     }
-    avMetaDataExtractor.release();
-    return videoSize;
   }
 
   /**
@@ -88,15 +98,22 @@ export class MediaUtils {
     }
     let file: fs.File | null = null;
     try {
-      const newPath: string = getContext().cacheDir + `/${util.generateRandomUUID(false)}.png`;
+      const newPath: string = GlobalContextUtils.globalContext.cacheDir + `/${util.generateRandomUUID(false)}.png`;
       file = fs.openSync(newPath, fs.OpenMode.WRITE_ONLY | fs.OpenMode.CREATE);
       let imagePacker: image.ImagePacker = image.createImagePacker();
       let packOpts: image.PackingOption = { format: 'image/png', quality: 100 };
       await imagePacker.packToFile(pixelMap, file.fd, packOpts);
       return 'file://' + newPath;
+    } catch (e) {
+      Logger.error(TAG, 'writePixelMap fail, error: ' + JSON.stringify(e));
+      return '';
     } finally {
-      if (file) {
-        fs.closeSync(file);
+      try {
+        if (file) {
+          fs.closeSync(file);
+        }
+      } catch (e) {
+        Logger.error(TAG, 'fs.closeSync error: ' + JSON.stringify(e));
       }
     }
   }

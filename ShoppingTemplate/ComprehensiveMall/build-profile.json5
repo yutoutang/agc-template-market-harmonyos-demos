@@ -56,24 +56,12 @@
       "srcPath": "./commons/lib_foundation"
     },
     {
-      "name": "module_address_manage",
-      "srcPath": "./components/module_address_manage"
-    },
-    {
       "name": "module_shopping_cart",
       "srcPath": "./components/module_shopping_cart"
     },
     {
-      "name": "module_login",
-      "srcPath": "./components/module_login"
-    },
-    {
       "name": "module_coupons",
       "srcPath": "./components/module_coupons"
-    },
-    {
-      "name": "module_product_share",
-      "srcPath": "./components/module_product_share"
     },
     {
       "name": "module_product_search",
@@ -120,8 +108,8 @@
       "srcPath": "./components/module_custom_service_chat"
     },
     {
-      "name": "module_feedback",
-      "srcPath": "./components/module_feedback"
+      "name": "feedback",
+      "srcPath": "./components/feedback"
     },
     {
       "name": "product",
@@ -140,8 +128,36 @@
       "srcPath": "./components/module_transition"
     },
     {
+      "name": "module_advertisement",
+      "srcPath": "./components/module_advertisement"
+    },
+    {
       "name": "member",
       "srcPath": "./features/member"
+    },
+    {
+      "name": "aggregated_login",
+      "srcPath": "./components/aggregated_login"
+    },
+    {
+      "name": "address_management",
+      "srcPath": "./components/address_management"
+    },
+    {
+      "name": "aggregated_share",
+      "srcPath": "./components/aggregated_share"
+    },
+    {
+      "name": "collect_personal_info",
+      "srcPath": "./components/collect_personal_info"
+    },
+    {
+      "name": "membership",
+      "srcPath": "./components/membership"
+    },
+    {
+      "name": "aggregated_payment",
+      "srcPath": "./components/aggregated_payment"
     }
   ]
 }

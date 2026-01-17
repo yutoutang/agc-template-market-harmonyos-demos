@@ -1,3 +1,4 @@
+import { UtilLog } from '@hw-agconnect/util-log';
 import { AppStorageV2, window } from '@kit.ArkUI';
 
 export enum BreakpointTypeEnum {
@@ -38,12 +39,16 @@ class BreakpointSystem {
     this._uiContext = uiContext
     if (this._uiContext) {
       this.updateBreakpoint()
-      window.getLastWindow(this._uiContext.getHostContext()).then((win) => {
-        this._windowClass = win
-        this._windowClass.on('windowSizeChange', (data: window.Size) => {
-          this.updateBreakpoint(data)
+      try {
+        window.getLastWindow(this._uiContext.getHostContext()).then((win) => {
+          this._windowClass = win
+          this._windowClass.on('windowSizeChange', (data: window.Size) => {
+            this.updateBreakpoint(data)
+          })
         })
-      })
+      } catch (e) {
+        UtilLog.error(`session close failed: ${JSON.stringify(e)}`);
+      }
     }
   }
 
@@ -62,7 +67,7 @@ class BreakpointSystem {
     this.currentBreakpoint.wight = temp
     let height = AppStorage.get('height') as number || 792
     if (data) {
-      height = px2vp(data.height)
+      height = this._uiContext!.px2vp(data.height)
     }
     if (height < 792) {
       this.currentBreakpoint.height = BreakpointTypeEnum.LG_WIDE

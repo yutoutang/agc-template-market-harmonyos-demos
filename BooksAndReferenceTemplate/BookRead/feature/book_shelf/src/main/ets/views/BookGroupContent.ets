@@ -13,7 +13,7 @@ import {
 } from 'common';
 import { SearchResultCard } from 'book_home';
 import { ManageGroupBottomCard } from '../comps/ManageGroupBottomCard';
-import { promptAction } from '@kit.ArkUI'
+import { SymbolGlyphModifier } from '@kit.ArkUI'
 import { loginComponentManager } from '@hms.core.account.LoginComponent';
 
 let customDialogId: number = 0
@@ -38,6 +38,9 @@ export struct BookGroupContent {
   @Local groupName: string | undefined = '';
   @Local selectGroupBook: boolean = false;
   @Local favBooks: GroupBook[] = [];
+  @Local folderIconModifier: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.folder'));
+  @Local renameIconModifier: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.highlighter_line'));
+  @Local trashIconModifier: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.trash'));
   @Local wBuilder: WrappedBuilder<[DialogParams]> = wrapBuilder(dialogView);
   @Local changeItem: DialogParams = new DialogParams('新建分组', '', true, '取消', '确认', () => {
   }, () => {
@@ -123,7 +126,7 @@ export struct BookGroupContent {
           AppStorage.set('favBooks', this.groupBooks)
           DialogUtil.close()
         } else {
-          promptAction.showToast({ message: '输入不能为空' })
+          this.getUIContext().getPromptAction().showToast({ message: '输入不能为空' })
         }
       }
     ))
@@ -156,21 +159,22 @@ export struct BookGroupContent {
   selectMenu() {
     Menu() {
       MenuItem({
-        startIcon: $r('app.media.ic_grid'),
+        symbolStartIcon: this.folderIconModifier,
         content: '管理分组',
         builder: this.manageGroup
       })
       MenuItem({
-        startIcon: $r('app.media.ic_list'),
+        symbolStartIcon: this.renameIconModifier,
         content: '重命名分组',
         builder: this.nameGroup
       })
       MenuItem({
-        startIcon: $r('app.media.ic_trash'),
+        symbolStartIcon: this.trashIconModifier,
         content: '解散分组',
         builder: this.deleteGroup
       })
     }
+    .width(224)
   }
 
   build() {
@@ -192,11 +196,10 @@ export struct BookGroupContent {
                 .margin({ left: 10, top: 16 + this.windowTopHeight })
             }
 
-
             Image($r('app.media.icon_select_all_off'))
               .height(40)
               .width(40)
-              .margin({ top: 16 + this.windowTopHeight })// .bindMenu(this.selectMenu)
+              .margin({ top: 16 + this.windowTopHeight })
               .onClick(() => {
                 this.isShown = true
               })
@@ -215,7 +218,6 @@ export struct BookGroupContent {
                 if (this.isDeleteGroup) {
                   GroupBookCheckCard({
                     info: item, manageGroupEvent: (book: BookInfo, isShowM: boolean) => {
-
                       if (isShowM) {
                         this.manageBooksSet.add(book.name as string);
                       } else {
@@ -227,7 +229,7 @@ export struct BookGroupContent {
                   SearchResultCard({ info: item })
                 }
               }
-            })
+            }, (item: BookInfo) => `${item.id}+${new Date().toString()}`)
           }
           .scrollBar(BarState.Off)
           .edgeEffect(EdgeEffect.Spring)
@@ -239,6 +241,7 @@ export struct BookGroupContent {
 
             ManageGroupBottomCard({
               delete: () => { //删除
+                let promptAction = this.getUIContext().getPromptAction();
                 if (this.manageBooksSet.size !== 0) {
                   promptAction.showDialog({
                     title: $r('app.string.delete_book_flag'),
@@ -311,12 +314,12 @@ export struct BookGroupContent {
 
 
         Column() {
-          ForEach(this.groupBooks, ((item: GroupBook, index: number) => {
+          ForEach(this.groupBooks, (item: GroupBook, index: number) => {
             if (item.groupName !== '' && item.groupName !== this.groupName) {
               Row() {
                 Row() {
                   Image(item.isSelect ? $r('app.media.selected_yes') :
-                  $r('app.media.selected_no'))
+                    $r('app.media.selected_no'))
                     .height(20)
                     .width(20).margin({ left: 14 })
 
@@ -349,7 +352,7 @@ export struct BookGroupContent {
                 this.selectGroupBook = item.isSelect
               })
             }
-          }))
+          }, (item: GroupBook) => item.timestamp.toString())
         }
         .alignItems(HorizontalAlign.Start)
         .width('100%')

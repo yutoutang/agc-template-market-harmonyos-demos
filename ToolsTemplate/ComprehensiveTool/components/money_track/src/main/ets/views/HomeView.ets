@@ -8,6 +8,7 @@ import { BillSummaryCard } from '../components/BillSummaryCard';
 import { ChartSummary } from '../components/charts/ChartSummary';
 import { TypeFilterSheet } from '../components/TypeFilterSheet';
 import { BillManageUtil } from '../utils/BillManageUtil';
+import { contextUtil } from '../utils/ContextUtil';
 import { EventBus, EventKey } from '../utils/EventBus';
 import { HomeVM } from '../viewmodels/HomeVM';
 
@@ -26,6 +27,10 @@ export struct HomeView {
   @Local
   isRefreshing: boolean = false;
   vm: HomeVM = new HomeVM();
+
+  aboutToAppear(): void {
+    contextUtil.setUiContext(this.getUIContext())
+  }
 
   build() {
     NavDestination() {
@@ -98,7 +103,7 @@ export struct HomeView {
     }
     .onReady(async (context) => {
       this.stack = context.pathStack;
-      await this.vm.initData(context.pathStack);
+      await this.vm.initData(context.pathStack, this.getUIContext());
     })
     .hideTitleBar(true)
 
@@ -204,7 +209,7 @@ export struct HomeView {
           BillCard({
             card: item,
             handleDelete: (id: number) => {
-              this.vm.deleteBill(id);
+              this.vm.deleteBill(id, this.getUIContext());
             },
             handleClickItem: (bill: BillCardItem) => {
               this.stack.pushPath({

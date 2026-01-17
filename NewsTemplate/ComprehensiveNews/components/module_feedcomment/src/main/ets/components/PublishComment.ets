@@ -1,5 +1,4 @@
-import { PopViewUtils } from 'lib_common'
-import { promptAction } from '@kit.ArkUI'
+import { GlobalContextUtils, PopViewUtils } from 'lib_common'
 import { FeedCommentVM } from '../viewmodel/FeedCommentVM'
 import { CommentParams } from '../model/Model'
 
@@ -17,9 +16,6 @@ export struct PublishComment {
   @Local emojiActive: boolean = false
   @Local keyBordHeight: number = 0
   @Local feedCommentVM: FeedCommentVM = FeedCommentVM.instance;
-
-  async aboutToAppear() {
-  }
 
   build() {
     Column() {
@@ -54,12 +50,12 @@ export struct PublishComment {
         .accessibilityText('发送按钮')
         .onClick(() => {
           if (this.commendText.trim() === '') {
-            promptAction.showToast({ message: '发表内容不能为空' })
+            GlobalContextUtils.showToast({ message: '发表内容不能为空' })
             return
           }
           this.commentParams?.callback?.(this.commendText)
           PopViewUtils.closeSheet()
-          promptAction.showToast({ message: '发表成功' })
+          GlobalContextUtils.showToast({ message: '发表成功' })
         })
         .justifyContent(FlexAlign.Center)
         .borderRadius(40)

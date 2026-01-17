@@ -1,15 +1,15 @@
 import { image } from '@kit.ImageKit';
 import { BusinessError } from '@ohos.base';
-import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
+import { fileIo, fileIo as fs, fileUri } from '@kit.CoreFileKit';
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
 import { uniformTypeDescriptor as utd } from '@kit.ArkData';
-import { hilog } from '@kit.PerformanceAnalysisKit';
 import { systemShare } from '@kit.ShareKit';
 import { common } from '@kit.AbilityKit';
 import { request } from '@kit.BasicServicesKit';
 import { media } from '@kit.MediaKit';
-import { PersistenceV2, promptAction } from '@kit.ArkUI';
+import { PersistenceV2 } from '@kit.ArkUI';
 import dataSharePredicates from '@ohos.data.dataSharePredicates';
+import { UtilLog } from '@hw-agconnect/util-log';
 import sdk from 'libveditor.so';
 import { TrimType } from '../common/Enum';
 import {
@@ -49,6 +49,7 @@ export class VideoEditVM {
   @Trace soundList: SoundByTag[] = [];
   @Trace stickerList: StickersByTag[] = [];
   @Trace videoThumbNail: image.PixelMap | null = null;
+  @Trace videoThumbNailUri: string = '';
   @Trace fileSize: string = '';
   @Trace params: VideoAsset = new VideoAsset();
   @Trace draft: EditVideo = new EditVideo();
@@ -87,6 +88,7 @@ export class VideoEditVM {
   @Trace isInCut: boolean = false;
   @Trace showExportingBindCover: boolean = false;
   @Trace bgSoundFd: number[] = [];
+  uiContext?: UIContext;
   surfaceID: string = '';
   xComponentController = new XComponentController();
   dragLeft: boolean = true;
@@ -95,7 +97,7 @@ export class VideoEditVM {
   dragStartPos: number = 0;
   trimType: TrimType = TrimType.Idle;
   exportInterval: number = 0;
-  totalOutputVideoFilePath = `${getContext(this).filesDir}/merge_${new Date().getTime()}.mp4`;
+  totalOutputVideoFilePath = '';
 
   public static get instance() {
     if (!VideoEditVM._instance) {
@@ -104,15 +106,19 @@ export class VideoEditVM {
     return VideoEditVM._instance;
   }
 
-  load() {
-    hilog.info(0xFF00, 'VideoClip', 'XComponent Onload');
-    this.fetchFrameByTime();
+  setUiContext(uiContext: UIContext) {
+    this.uiContext = uiContext;
+  }
+
+  load(uiContext: UIContext) {
+    UtilLog.info(0xFF00, 'VideoClip', 'XComponent Onload');
+    this.fetchFrameByTime(uiContext);
     // XComponent的容器宽度
-    hilog.info(0xFF00, 'VideoClip',
+    UtilLog.info(0xFF00, 'VideoClip',
       `calculate container size, screenWidth: ${this.params.screenWidth}, screenHeight: ${this.params.screenHeight}`);
-    let containerWidth = vp2px(this.params.screenWidth as number);
-    let containerHeight = vp2px((this.params.screenHeight as number * 0.65));
-    hilog.info(0xFF00, 'VideoClip',
+    let containerWidth = uiContext.vp2px(this.params.screenWidth as number);
+    let containerHeight = uiContext.vp2px((this.params.screenHeight as number * 0.65));
+    UtilLog.info(0xFF00, 'VideoClip',
       `containerWidth: ${containerWidth}, containerHeight: ${containerHeight}`);
     // 根据容器宽度和视频的宽高比计算高度
     sdk.SetCanvasSize(containerHeight, containerWidth);
@@ -138,13 +144,13 @@ export class VideoEditVM {
     if (this.imgUri !== '') {
       let imageClass: TImageInfo = sdk.AddImage(this.imgUri, this.isWordFile);
 
-      sdk.MoveImage(imageClass.imageId, vp2px(this.params.screenWidth as number) / 2,
-        vp2px(this.params.screenHeight as number * 0.7) / 2);
+      sdk.MoveImage(imageClass.imageId, (this.uiContext?.vp2px(this.params.screenWidth as number) ?? 0) / 2,
+        (this.uiContext?.vp2px(this.params.screenHeight as number * 0.65) ?? 0) / 2);
       let newSticker =
         new Sticker(imageClass.imageId, this.imgUri, this.startOffsetX,
           this.startOffsetY, 1, 0, true, imageClass.width,
-          imageClass.height, vp2px(this.params.screenWidth as number) / 2,
-          vp2px(this.params.screenHeight as number * 0.7) / 2);
+          imageClass.height, (this.uiContext?.vp2px(this.params.screenWidth as number) ?? 0) / 2,
+          (this.uiContext?.vp2px(this.params.screenHeight as number * 0.65) ?? 0) / 2);
 
       this.stickers.push(newSticker);
       this.selectedStickerId = newSticker.id;
@@ -157,8 +163,8 @@ export class VideoEditVM {
     if (this.wordUri !== '') {
       let imageClass: TImageInfo = sdk.AddImage(this.wordUri, this.isWordFile);
 
-      sdk.MoveImage(imageClass.imageId, vp2px(this.params.screenWidth as number) / 2,
-        vp2px(this.params.screenHeight as number * 0.65) / 2);
+      sdk.MoveImage(imageClass.imageId, (this.uiContext?.vp2px(this.params.screenWidth as number) ?? 0) / 2,
+        (this.uiContext?.vp2px(this.params.screenHeight as number * 0.65) ?? 0) / 2);
 
       this.wordUri = '';
       this.isWordFile = false;
@@ -175,6 +181,7 @@ export class VideoEditVM {
     this.isInCut = false;
     // 重置所有资源
     this.pixelMaps = [];
+    this.isWordFile = false;
     this.wordUri = '';
     this.imgUri = '';
     this.isFinish = false;
@@ -231,9 +238,9 @@ export class VideoEditVM {
   // 拖拽结束
   dragEnd() {
     if (this.trimType === TrimType.DragLeftBar) {
-      hilog.info(0xFF00, 'VideoClip', `clip move DragLeftBar to ${this.seekValue}`);
+      UtilLog.info(0xFF00, 'VideoClip', `clip move DragLeftBar to ${this.seekValue}`);
     } else if (this.trimType === TrimType.DragRightBar) {
-      hilog.info(0xFF00, 'VideoClip', `clip move DragRightBar to ${this.seekValue}`);
+      UtilLog.info(0xFF00, 'VideoClip', `clip move DragRightBar to ${this.seekValue}`);
     }
     this.isSeekMoving = false;
     this.isDragMoving = false;
@@ -317,7 +324,7 @@ export class VideoEditVM {
     this.selectedSoundList = this.soundList[0].sounds;
   }
 
-  handleStickerByTag(result: StickerResp[]) {
+  handleStickerByTag(uiContext: UIContext, result: StickerResp[]) {
     // 先清空贴纸列表
     this.stickerList = [];
     result.forEach(item => {
@@ -326,7 +333,7 @@ export class VideoEditVM {
       if (tagStickers) {
         let sticker = new Sticker();
         sticker.id = item.stickerId;
-        sticker.uri = Util.handleImgUrl(item.source);
+        sticker.uri = Util.handleImgUrl(uiContext, item.source);
 
         tagStickers.stickers.push(sticker);
       } else {
@@ -335,7 +342,7 @@ export class VideoEditVM {
 
         let sticker = new Sticker();
         sticker.id = item.stickerId;
-        sticker.uri = Util.handleImgUrl(item.source);
+        sticker.uri = Util.handleImgUrl(uiContext, item.source);
 
         stickersByTag.stickers.push(sticker);
 
@@ -347,66 +354,49 @@ export class VideoEditVM {
   }
 
   // 获取视频时长
-  async getDuration(): Promise<number> {
+  async getDuration(uiContext: UIContext): Promise<number> {
     try {
       this.newDuration = sdk.GetOriginalDuration();
       if (this.newDuration <= 0) {
         VideoManageVM.instance.pathStack.pop();
-        promptAction.showToast({ message: '获取视频时长失败，请重试' });
-        hilog.error(0xFF00, 'VideoClip', `获取视频时长失败: ${this.newDuration}`);
+        uiContext.getPromptAction().showToast({ message: '获取视频时长失败，请重试' });
+        UtilLog.error(0xFF00, 'VideoClip', `获取视频时长失败: ${this.newDuration}`);
         this.durationError = 1;
       }
       return isNaN(this.newDuration) ? 0 : this.newDuration;
     } catch (error) {
       let err: BusinessError = error as BusinessError;
-      hilog.error(0xFF00, 'VideoClip', `获取视频时长失败: ${err.code}, ${err.message}`);
+      UtilLog.error(0xFF00, 'VideoClip', `获取视频时长失败: ${err.code}, ${err.message}`);
       return 0;
     }
   }
 
-  async getVideoSizeByUri(uri: string, context: common.UIAbilityContext) {
+
+  async getVideoSizeByUri(uri: string, context: Context) {
     try {
-      const phAccessHelper = photoAccessHelper.getPhotoAccessHelper(context);
-
-      // 创建查询条件（通过URI定位视频）
-      const predicates = new dataSharePredicates.DataSharePredicates();
-      predicates.equalTo('uri', uri);
-
-      // 配置查询字段（仅获取文件大小）
-      const fetchOption: photoAccessHelper.FetchOptions = {
-        predicates: predicates,
-        fetchColumns: [photoAccessHelper.PhotoKeys.SIZE],
-      };
-
-      // 执行查询
-      const result = await phAccessHelper.getAssets(fetchOption);
-      const videoAsset = await result.getFirstObject();
+      let videoAsset = await Util.getVideoAsset(uri, context);
 
       if (videoAsset) {
         // 提取文件大小
         const fileSize = videoAsset.get(photoAccessHelper.PhotoKeys.SIZE) as number;
-        this.fileSize = VideoUtil.formatFileSize(fileSize);
-        videoAsset.getThumbnail().then((res: image.PixelMap) => {
-          this.videoThumbNail = res;
-        });
-      } else {
-        this.fileSize = '未找到视频信息';
+        const duration = videoAsset.get(photoAccessHelper.PhotoKeys.DURATION) as number;
+        this.draft.size = VideoUtil.formatFileSize(fileSize);
+        this.draft.duration = VideoUtil.formatMillisecondsToHMS(duration);
       }
     } catch (error) {
-      hilog.error(0xFF00, 'VideoClip', `查询视频大小错误：${error.code}, ${error.message}`);
+      UtilLog.error(0xFF00, 'VideoClip', `查询视频大小错误：${error.code}, ${error.message}`);
     }
   }
 
   // 获取缩略图
-  async fetchFrameByTime() {
+  async fetchFrameByTime(uiContext: UIContext) {
     let avImageGenerator: media.AVImageGenerator | null = null;
     try {
       avImageGenerator = await media.createAVImageGenerator();
       avImageGenerator.fdSrc = fs.openSync(this.params.videoUri);
-      this.getVideoSizeByUri(this.params.videoUri ?? '', getContext(this) as common.UIAbilityContext);
-      this.newDuration = await this.getDuration();
+      this.newDuration = await this.getDuration(uiContext);
       this.curDuration = this.newDuration - this.curTrimInValue - this.curTrimOutValue;
-      hilog.info(0xFF00, 'VideoClip', `newDuration: ${this.newDuration}`);
+      UtilLog.info(0xFF00, 'VideoClip', `newDuration: ${this.newDuration}`);
       const interval = this.newDuration / 6;
       for (let j = 0; j < 6; j++) {
         this.timeUs[j] = j * interval;
@@ -419,11 +409,11 @@ export class VideoEditVM {
       };
       for (let i = 0; i < this.timeUs.length; i++) {
         this.pixelMaps[i] = await avImageGenerator.fetchFrameByTime(this.timeUs[i], queryOption, param);
-        hilog.info(0xFF00, 'VideoClip', `缩略图获取中时间, + 十等分时间戳${this.timeUs[i]}`);
+        UtilLog.info(0xFF00, 'VideoClip', `缩略图获取中时间, + 十等分时间戳${this.timeUs[i]}`);
       }
       avImageGenerator.release();
     } catch (err) {
-      hilog.error(0xFF00, 'VideoClip', `FetchFrameByTime errCode is ${err.code}, message is ${err.message}`);
+      UtilLog.error(0xFF00, 'VideoClip', `FetchFrameByTime errCode is ${err.code}, message is ${err.message}`);
     } finally {
       fs.closeSync(avImageGenerator?.fdSrc?.fd);
     }
@@ -459,15 +449,35 @@ export class VideoEditVM {
     }
   }
 
-  async saveFile() {
+  async savePixelMapToCache(context: Context, pixelMap: PixelMap) {
     try {
-      let context = getContext();
+      this.videoThumbNailUri =
+        fileUri.getUriFromPath(context.filesDir + `/${Date.now().toString()}.png`);
+      let file = await fileIo.open(this.videoThumbNailUri, fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE);
+      let imagePackerApi = image.createImagePacker();
+      let packOpts: image.PackingOption = { format: 'image/png', quality: 100 };
+      await imagePackerApi.packToFile(pixelMap, file.fd, packOpts);
+      this.draft.previewUri = this.videoThumbNailUri;
+      imagePackerApi.release().then(() => {
+        fileIo.close(file.fd);
+      }).catch((err: BusinessError) => {
+        UtilLog.error(`Failed to release the image source instance.code ${err.code},message is ${err.message}`);
+      });
+    } catch (err) {
+      UtilLog.error(`Failed to pack the image to file.code ${err.code},message is ${err.message}`);
+    }
+  }
+
+  async saveFile(uiContext: UIContext) {
+    try {
+      let context = uiContext.getHostContext();
+      // 选取剪辑后开始时间最近帧为封面
       let filePath = 'file://' + this.totalOutputVideoFilePath;
       this.draft = {
         videoId: Date.now().toString(),
         videoUri: filePath,
         duration: VideoUtil.formatUsToMinSec(this.curDuration),
-        previewUri: this.videoThumbNail,
+        previewUri: this.videoThumbNailUri,
         size: this.fileSize,
         mediaUri: '',
         isSelect: false,
@@ -477,51 +487,53 @@ export class VideoEditVM {
         photoAccessHelper.MediaAssetChangeRequest.createVideoAssetRequest(context, filePath);
       await phAccessHelper.applyChanges(assetChangeHelper);
       let asset: photoAccessHelper.PhotoAsset = assetChangeHelper.getAsset();
+      const pixelMap = await asset.getThumbnail();
+      await this.savePixelMapToCache(uiContext.getHostContext()!, pixelMap);
       this.draft.mediaUri = asset.uri;
     } catch (error) {
-      hilog.error(0xFF00, 'VideoClip', `导出失败: ${error}`);
+      UtilLog.error(0xFF00, 'VideoClip', `导出失败: ${error}`);
     }
   }
 
-  async downloadAndCacheFile(item: AudioInfo) {
-    let context = getContext(this) as common.UIAbilityContext;
+  async downloadAndCacheFile(uiContext: UIContext, item: AudioInfo) {
+    let context = uiContext.getHostContext() as common.UIAbilityContext;
     let cacheDir = context.cacheDir;
     let dirPath = cacheDir + '/sound';
     fs.mkdir(dirPath).then(() => {
       let filePath = dirPath + '/' + item.name;
-      this.downloadFile(filePath, item);
+      this.downloadFile(uiContext, filePath, item);
     }).catch((err: BusinessError) => {
       let filePath = dirPath + '/' + item.name;
-      this.downloadFile(filePath, item);
+      this.downloadFile(uiContext, filePath, item);
     });
   }
 
-  async applyBgSound(item: AudioInfo) {
+  async applyBgSound(uiContext: UIContext, item: AudioInfo) {
     if (!item.isCached) {
-      await this.downloadAndCacheFile(item);
+      await this.downloadAndCacheFile(uiContext, item);
     } else {
       // 重新打开
       let fileDescriptor = fs.openSync(item.fileUri);
       item.fd = fileDescriptor.fd;
-      hilog.info(0xFF00, 'VideoClip', `file fd reopen is ${item.fd}`);
+      UtilLog.info(0xFF00, 'VideoClip', `file fd reopen is ${item.fd}`);
       this.bgSoundFd.push(item.fd);
       sdk.SetBgAudio(item.fileUri, item.fd);
       this.selectedAudio = item;
     }
   }
 
-  downloadFile(filePath: string, item: AudioInfo) {
+  downloadFile(uiContext: UIContext, filePath: string, item: AudioInfo) {
     try {
       // 判断是否已下载过文件
       let res = fs.accessSync(filePath);
       if (res) {
-        promptAction.showToast({
+        uiContext.getPromptAction().showToast({
           message: '该音频已下载，您可以直接使用',
         });
         this.uri = fileUri.getUriFromPath(filePath);
       } else {
         // 下载文件
-        request.downloadFile(getContext(this) as common.UIAbilityContext, {
+        request.downloadFile(uiContext.getHostContext() as common.UIAbilityContext, {
           url: item.uri,
           filePath: filePath,
         }).then((downloadTask: request.DownloadTask) => {
@@ -546,36 +558,36 @@ export class VideoEditVM {
               this.bgSoundFd.push(item.fd);
               avMetadataExtractor.fdSrc = fileDescriptor;
             } catch (error) {
-              hilog.info(0xFF00, 'VideoClip', `open file error : ${error}`);
+              UtilLog.info(0xFF00, 'VideoClip', `open file error : ${error}`);
             }
           });
         }).catch((err: BusinessError) => {
           // 下载请求失败回调，可以弹窗提示失败
           if (err.code === 13900015) {
-            hilog.info(0xFF00, 'VideoClip', '目录已存在');
+            UtilLog.info(0xFF00, 'VideoClip', '目录已存在');
           } else {
-            hilog.error(0xFF00, 'VideoClip', JSON.stringify(err));
+            UtilLog.error(0xFF00, 'VideoClip', JSON.stringify(err));
           }
         });
       }
     } catch (error) {
       // 下载请求失败回调，可以弹窗提示失败
       let err: BusinessError = error as BusinessError;
-      hilog.error(0xFF00, 'VideoClip',
+      UtilLog.error(0xFF00, 'VideoClip',
         `Invoke downloadTask downloadFile failed====, code is ${err.code}, message is ${err.message}`);
     }
   }
 
-  downloadSticker(filePath: string, sticker: Sticker) {
+  downloadSticker(filePath: string, sticker: Sticker, uiContext: UIContext) {
     try {
       // 判断是否已下载过文件
       let res = fs.accessSync(filePath);
       if (res) {
-        hilog.info(0xFF00, 'VideoClip', '该贴纸文件已下载');
+        UtilLog.info(0xFF00, 'VideoClip', '该贴纸文件已下载');
         this.imgUri = fileUri.getUriFromPath(filePath);
       } else {
         // 下载文件
-        request.downloadFile(getContext(this) as common.UIAbilityContext, {
+        request.downloadFile(uiContext.getHostContext() as common.UIAbilityContext, {
           url: sticker.uri,
           filePath: filePath,
         }).then((downloadTask: request.DownloadTask) => {
@@ -585,31 +597,31 @@ export class VideoEditVM {
         }).catch((err: BusinessError) => {
           // 下载请求失败回调，可以弹窗提示失败
           if (err.code === 13900015) {
-            hilog.info(0xFF00, 'VideoClip', '目录已存在');
+            UtilLog.info(0xFF00, 'VideoClip', '目录已存在');
           } else {
-            hilog.error(0xFF00, 'VideoClip', JSON.stringify(err));
+            UtilLog.error(0xFF00, 'VideoClip', JSON.stringify(err));
           }
         });
       }
     } catch (error) {
       // 下载请求失败回调，可以弹窗提示失败
       let err: BusinessError = error as BusinessError;
-      hilog.error(0xFF00, 'VideoClip',
+      UtilLog.error(0xFF00, 'VideoClip',
         `Invoke downloadTask downloadFile failed====, code is ${err.code}, message is ${err.message}`);
     }
   }
 
-  cacheSticker(sticker: Sticker) {
-    let context = getContext(this) as common.UIAbilityContext;
+  cacheSticker(sticker: Sticker, uiContext: UIContext) {
+    let context = uiContext.getHostContext() as common.UIAbilityContext;
     let cacheDir = context.cacheDir;
     let dirPath = cacheDir + '/sticker';
     fs.mkdir(dirPath).then(() => {
       let filePath = dirPath + '/' + sticker.id;
-      this.downloadSticker(filePath, sticker);
+      this.downloadSticker(filePath, sticker, uiContext);
     }).catch((err: BusinessError) => {
-      hilog.info(0xFF00, 'VideoClip', `创建贴纸目录失败：${JSON.stringify(err)}`);
+      UtilLog.info(0xFF00, 'VideoClip', `创建贴纸目录失败：${JSON.stringify(err)}`);
       let filePath = dirPath + '/' + sticker.id;
-      this.downloadSticker(filePath, sticker);
+      this.downloadSticker(filePath, sticker, uiContext);
     });
   }
 
@@ -628,9 +640,10 @@ export class VideoEditVM {
       selectionMode: systemShare.SelectionMode.SINGLE,
       previewMode: systemShare.SharePreviewMode.DETAIL,
     }).then(() => {
-      hilog.error(0xFF00, 'VideoClip', `ShareController show success`);
+      UtilLog.error(0xFF00, 'VideoClip', `ShareController show success`);
     }).catch((error: BusinessError) => {
-      hilog.error(0xFF00, 'VideoClip', `ShareController show error. code: ${error?.code}, message: ${error?.message}`);
+      UtilLog.error(0xFF00, 'VideoClip',
+        `ShareController show error. code: ${error?.code}, message: ${error?.message}`);
     });
   }
 }

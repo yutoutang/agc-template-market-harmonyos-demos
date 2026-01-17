@@ -21,6 +21,15 @@ export interface ICreateAppointmentRequest {
 
   // 预约人数
   numbers: string;
+
+  // 预约门店
+  storeId: string;
+
+  // 预约的商品类型
+  goodType: OrderType;
+
+  // 预约的订单号
+  orderNo: string;
 }
 
 /**
@@ -35,6 +44,9 @@ export interface IUpdateAppointmentRequest {
 
   // 是否设置订阅，值为1表示设置了订阅，0取消订阅
   setSubscription: number;
+
+  // 预约完成时间
+  completedTime?: number;
 }
 
 /**
@@ -71,6 +83,10 @@ export interface IActiveMemberRequest {
 export interface IUpdateUserInfo {
   nickName?: string;
   avatarUrl?: string;
+  mobile?: string;
+  gender?: number;
+  birthDate?: string;
+  fullName?: string;
 }
 
 export interface ISubmitOrderRequest {
@@ -94,6 +110,9 @@ export interface ISubmitOrderRequest {
 
   // 实际付款
   actualPay: number;
+
+  // 团购所在门店id
+  groupStoreId: string;
 }
 
 export interface IRefundGroup {
@@ -102,4 +121,8 @@ export interface IRefundGroup {
 
 export interface IQueryAppointList {
   status: AppointState[];
+}
+
+export interface IQueryUserInfo {
+  isBindMobile: boolean;
 }

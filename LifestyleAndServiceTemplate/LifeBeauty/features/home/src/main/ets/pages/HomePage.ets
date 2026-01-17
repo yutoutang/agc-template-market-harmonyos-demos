@@ -1,23 +1,30 @@
 import { common } from '@kit.AbilityKit';
-import { AppStorageV2 } from '@kit.ArkUI';
+import { AppStorageV2, PersistenceV2 } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { UtilLog as Logger } from '@hw-agconnect/util-log';
 import {
   StoreInfo,
   GoodListInfo,
   GoodInfo,
   getStoreInfo,
   getGoodList,
-  Logger,
   PopViewUtils,
   CommonConstants,
   CommonUtils,
   SystemSceneUtils,
   GetUserInfoResp,
   GoodCard,
+  BreakpointModel,
+  BreakpointNameEnum,
+  AppPrivacyUtils,
+  silentLogin,
+  StoreInfoModel,
+  RouterModule,
+  RouterMap,
+  Params,
+  DialogCallBuilder,
 } from 'foundation';
-import { DialogCallBuilder, Params } from '../components/DialogCall';
-import { LIST_RULE, RuleID, STORE_STATUS } from '../common/Constant';
-import { BusinessParams, DialogBusinessBuilder } from '../components/DialogBusiness';
+import { LIST_RULE, RuleID } from '../common/Constant';
 import { ActiveMember } from '../components/ActiveMemberModule';
 import { SingleVisitList } from '../components/SingleVisitModule';
 import { GroupBuyList } from '../components/GroupModule';
@@ -47,27 +54,70 @@ function subText() {
 export struct Home {
   homeVM: HomeBaseVM = HomeBaseVM.instance;
   @Local storeInfo: StoreInfo = new StoreInfo();
-  @Local userInfo: GetUserInfoResp = AppStorageV2.connect(GetUserInfoResp, () => new GetUserInfoResp())!;
+  @Local storeModel: StoreInfoModel = AppStorageV2.connect(StoreInfoModel, () => new StoreInfoModel())!;
+  @Local userInfo: GetUserInfoResp = PersistenceV2.connect(GetUserInfoResp, () => new GetUserInfoResp())!;
+  @Local breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
   @Local goodList: GoodListInfo[] = [];
   @Local distance: string = '0m';
   @Local titleBgOpacity: number = 0;
   @Local isGranted: boolean = false;
   @Local isRefreshing: boolean = false;
   scroller: Scroller = new Scroller();
+  @Local privacyImpl: AppPrivacyUtils = AppPrivacyUtils.instance;
 
-  async aboutToAppear(): Promise<void> {
+  @Monitor('privacyImpl.agreeFlag')
+  agreeFlagChange() {
+    if (this.privacyImpl.agreeFlag) {
+      Logger.info(TAG, 'user has agree the privacy, start silent login and apply permission');
+      // 静默登录
+      silentLogin();
+      SystemSceneUtils.applyLocationPermission().then((isGranted) => {
+        if (isGranted) {
+          this.calcDistance();
+        }
+      })
+    }
+  }
+
+  @Monitor('storeModel.storeId')
+  storeIdChange() {
+    const store = this.homeVM.storeList.find((item) => item.id === this.storeModel.storeId);
+    if (store) {
+      this.storeInfo.id = store.id;
+      this.storeInfo.storeName = store.storeName;
+      this.storeInfo.mobile = store.mobile;
+      this.storeInfo.coords = store.coords;
+      this.storeInfo.address = store.address;
+      this.distance = store.distance ?? '0m'
+    }
+  }
+
+  aboutToAppear(): void {
+    // 静默登录
+    if (this.privacyImpl.agreeFlag) {
+      silentLogin();
+    }
+    this.init();
+  }
+
+  async init() {
     await this.getStoreInfo();
     this.getGoodList();
     await this.homeVM.init();
-    const isGranted = await SystemSceneUtils.applyLocationPermission();
-    if (isGranted) {
-      this.calcDistance();
+    // 申请权限
+    if (this.privacyImpl.agreeFlag) {
+      const isGranted = await SystemSceneUtils.applyLocationPermission();
+      if (isGranted) {
+        this.calcDistance();
+      }
     }
+    this.storeModel.storeList = this.homeVM.storeList;
   }
 
   getStoreInfo() {
     return getStoreInfo().then((resp) => {
-      this.storeInfo = resp as StoreInfo;
+      this.storeInfo = new StoreInfo(resp as StoreInfo);
+      this.storeModel.storeId = this.storeInfo.id
       Logger.info(TAG, 'get store info response = ' + JSON.stringify(resp));
     }).catch((e: BusinessError) => {
       Logger.error(TAG, 'get store info error = ' + JSON.stringify(e));
@@ -95,20 +145,29 @@ export struct Home {
   }
 
   @Computed
-  get starList() {
-    const list: number[] = [];
-    try {
-      if (this.storeInfo.score) {
-        const scoreNum = Math.round(Number(this.storeInfo.score));
-        while (list.length < scoreNum) {
-          list.push(list.length + 1);
-        }
-        return list;
-      }
-      return [1, 2, 3, 4, 5];
-    } catch (e) {
-      return [1, 2, 3, 4, 5];
+  get starCount() {
+    const scoreNum = Math.floor(Number(this.storeInfo.score));
+    const multiple = Math.ceil(scoreNum / 5);
+    return scoreNum / multiple;
+  }
+
+  @Computed
+  get waterFlowLanes() {
+    let lanesValue = 2
+    switch (this.breakPointModel.currentBreakpoint) {
+      case BreakpointNameEnum.SM:
+        lanesValue = 2;
+        break;
+      case BreakpointNameEnum.MD:
+        lanesValue = 4;
+        break;
+      case BreakpointNameEnum.LG:
+      case BreakpointNameEnum.XL:
+        lanesValue = 5;
+        break;
     }
+
+    return lanesValue
   }
 
   openPhoneDialog() {
@@ -116,73 +175,81 @@ export struct Home {
       { alignment: DialogAlignment.Bottom, autoCancel: true });
   }
 
+  selectStore() {
+    this.storeModel.storeList = this.homeVM.storeList;
+    RouterModule.push({url: RouterMap.SELECT_STORE_PAGE})
+  }
+
   @Builder
   StoreInfoCard() {
     // 卡片
-    Column({ space: 8 }) {
+    Column({ space: 12 }) {
       // 店铺的图文等介绍
-      Row({ space: 10 }) {
-        Image(CommonUtils.handleImgUrl(this.storeInfo.logoUrl)).width(70).height(70).borderRadius(8)
+      Row({ space: 12 }) {
+        Image(CommonUtils.handleImgUrl(this.storeInfo.logoUrl)).width(64).height(64).borderRadius(8)
         Column({ space: 6 }) {
           Text(this.storeInfo.storeName).fontSize(16).fontWeight(FontWeight.Bold)
-          Row({ space: 2 }) {
-            ForEach(this.starList, (v: number) => {
-              Image($r('app.media.icon_star')).width(11).height(11).fillColor($r('app.color.common_theme_color'))
+          Row({ space: 4 }) {
+            ForEach([1,2,3,4,5], (v: number) => {
+              Image($r('app.media.icon_star'))
+                .width(12)
+                .height(12)
+                .fillColor(v <= this.starCount ? $r('app.color.common_theme_color') : $r('app.color.grey_20'))
             }, (item: number) => item.toString())
-            Text(`${this.storeInfo.score}分`)
-              .fontSize(10)
+            Text(this.storeInfo.score)
+              .fontSize(12)
               .fontColor($r('app.color.common_theme_color'))
-            Text(this.storeInfo.businessStatus === STORE_STATUS.IN ? $r('app.string.business_in') :
-            $r('app.string.business_out')).fontSize(10).fontColor($r('app.color.common_grey'))
-            Text(this.storeInfo.businessTimes).fontSize(10).fontColor($r('app.color.common_grey'))
+            Text('营业时间')
+              .fontSize(12)
+              .fontColor($r('app.color.grey_60'))
+              .margin({left: 8})
+            Text(this.storeInfo.businessTimes).fontSize(12).fontColor($r('app.color.grey_60'))
           }
 
-          Row({ space: 4 }) {
+          Row({ space: 8 }) {
             Text($r('app.string.home_tag_no_other_price')).subTextContainer().subText()
             Text($r('app.string.home_tag_refund')).subTextContainer().subText()
             Text($r('app.string.home_tag_security')).subTextContainer().subText()
-            if (this.storeInfo.businessLicense) {
-              Row({ space: 4 }) {
-                Text($r('app.string.home_tag_auth')).subText()
-                Image($r('app.media.ic_public_arrow_right')).height(10).fillColor($r('app.color.common_grey'))
-              }
-              .subTextContainer()
-              .onClick(() => {
-                PopViewUtils.showPopView<BusinessParams>(wrapBuilder(DialogBusinessBuilder),
-                  new BusinessParams(this.storeInfo.businessLicense),
-                  { alignment: DialogAlignment.TopEnd });
-              })
-            }
           }
         }.alignItems(HorizontalAlign.Start)
       }.width(CommonConstants.FULL_PERCENT).alignItems(VerticalAlign.Center)
 
       // 位置、导航、电话
       Row() {
-        Image($r('app.media.ic_location')).width(10).height(10)
+        SymbolGlyph($r('sys.symbol.local')).fontSize(16).fontColor([$r('sys.color.icon_primary')])
         Column({ space: 4 }) {
-          Text(this.storeInfo.address || $r('app.string.empty_location')).fontSize(12)
-          Text(this.distance).fontSize(11).fontColor('#878787')
+          Row() {
+            Text(this.storeInfo.address || $r('app.string.empty_location')).fontSize(12)
+              .maxLines(1).textOverflow({overflow: TextOverflow.Ellipsis})
+              .constraintSize({maxWidth: 'calc(100% - 24vp)'})
+              .textOverflow({overflow: TextOverflow.Ellipsis})
+            SymbolGlyph($r('sys.symbol.chevron_right')).fontSize(18).fontColor([$r('sys.color.icon_primary')])
+              .margin({left: 8 })
+          }
+          Text(`距您${this.distance}`).fontSize(12).fontColor($r('app.color.grey_60'))
         }
         .alignItems(HorizontalAlign.Start)
-        .margin({ left: 6 })
+        .margin({ left: 4 })
         .layoutWeight(1)
-
-        Column() {
-          Image($r('app.media.ic_navigation')).width(22).height(22)
-          Text($r('app.string.home_label_navi')).fontSize(8).fontColor('#656565')
-        }
-        .margin({ left: 20 })
         .onClick(() => {
-          const context = getContext(this) as common.UIAbilityContext;
+          this.selectStore()
+        })
+
+        Column({space: 4}) {
+          SymbolGlyph($r('sys.symbol.location_north_up_right_circle_fill'))
+            .fontColor(['#E64566'])
+            .fontSize(24)
+        }
+        .margin({ left: 10 })
+        .onClick(() => {
+          const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
           SystemSceneUtils.jumpPetalMap(context, this.storeInfo.address, this.storeInfo.coords.split(','))
         })
 
-        Column() {
-          Image($r('app.media.ic_call')).width(22).height(22)
-          Text($r('app.string.home_label_call')).fontSize(8).fontColor('#656565')
+        Column({space: 4}) {
+          Image($r('app.media.ic_call')).width(24).height(24)
         }
-        .margin({ left: 10 })
+        .margin({ left: 8 })
         .onClick(() => {
           this.openPhoneDialog();
         })
@@ -190,24 +257,18 @@ export struct Home {
       }.width(CommonConstants.FULL_PERCENT).alignItems(VerticalAlign.Top)
     }
     .backgroundColor($r('sys.color.comp_background_list_card'))
-    .padding(10)
-    .borderRadius(8)
+    .padding(12)
+    .borderRadius(16)
 
-    if (this.userInfo.mobile && !this.userInfo.memberId) {
-      ActiveMember().margin({ top: 14 })
+    if (this.userInfo.mobile) {
+      ActiveMember({
+        isMember: Boolean(this.userInfo.memberId)
+      })
     }
   }
 
   @Builder
   GoodList(v: GoodListInfo) {
-    Row() {
-      Text() {
-        Span('— ')
-        Span(v.title)
-        Span(' —')
-      }.fontSize(12).fontColor($r('app.color.common_grey'))
-    }.width(CommonConstants.FULL_PERCENT).justifyContent(FlexAlign.Center)
-
     WaterFlow() {
       ForEach(v.goods, (good: GoodInfo) => {
         FlowItem() {
@@ -217,7 +278,7 @@ export struct Home {
       }, (v: GoodInfo) => JSON.stringify(v))
     }
     .cachedCount(10)
-    .columnsTemplate('1fr 1fr')
+    .columnsTemplate(`repeat(${this.waterFlowLanes}, 1fr)`)
     .columnsGap(10)
     .rowsGap(6)
     .width(CommonConstants.FULL_PERCENT)
@@ -243,24 +304,33 @@ export struct Home {
             RelativeContainer() {
               Image(CommonUtils.handleImgUrl(this.storeInfo.storeBanner))
                 .width(CommonConstants.FULL_PERCENT)
+                .height(200)
                 .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
                 .id(RuleID.BANNER_ID)
 
               Refresh({ refreshing: $$this.isRefreshing }) {
                 Scroll() {
-                  Column({ space: 10 }) {
+                  Column({ space: 12 }) {
                     this.StoreInfoCard()
                     SingleVisitList()
                     GroupBuyList()
+
+                    Row() {
+                      Text('为您推荐')
+                        .fontSize(18)
+                        .fontColor($r('sys.color.font_primary'))
+                        .fontWeight(700)
+                    }
+                    .width('100%')
+                    .justifyContent(FlexAlign.Start)
+                    .margin({top: 12})
                     ForEach(this.goodList, (v: GoodListInfo) => {
                       this.GoodList(v)
                     }, (item: GoodListInfo) => JSON.stringify(item))
                   }
-
                   .padding({
-                    left: 10,
-                    right: 10,
-                    top: 40,
+                    left: this.breakPointModel.pagePadding,
+                    right: this.breakPointModel.pagePadding,
                     bottom: 10,
                   })
                 }

@@ -63,10 +63,10 @@ export class Constants {
     text: '向右90°',
   }, {
     imageSource: $r('app.media.carouse_vertical'),
-    text: '垂直',
+    text: '水平',
   }, {
     imageSource: $r('app.media.carouse_level'),
-    text: '水平',
+    text: '垂直',
   }];
   static filterTagList: string[] = ['最新', '热门', '基础', '质感'];
   static filterList: CustomFilter[] = PRESETS;

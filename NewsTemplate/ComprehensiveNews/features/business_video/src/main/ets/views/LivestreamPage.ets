@@ -33,10 +33,10 @@ export struct LivestreamPage {
               // 模拟请求判断网络能否使用
               let networkUtil = NetworkUtil.getInstance()
               networkUtil.handleNetworkAvailable();
-              setTimeout(() => {
+              setTimeout(async () => {
                 // 模拟
                 if (this.vm.networkModel.isNetworkAvailable) {
-                  this.vm.init()
+                  await this.vm.init()
                   this.vm.showExceptionPage = false;
                 } else {
                   this.vm.loading = false

@@ -111,9 +111,10 @@ export struct FeedDetail {
       [8, 6], // 8张时保留6张
       [9, 9],// 9张时保留9张
     ]);
-    const count = this.curFeedCardInfo.postImgList.length;
+    const originalCount = this.curFeedCardInfo.postImgList.length;
+    const count = Math.min(originalCount, 9);
     const keepCount = rules.get(count) ?? count;
-    this.truncatedCount = count - keepCount;
+    this.truncatedCount = originalCount - keepCount;
     return this.curFeedCardInfo.postImgList.slice(0, keepCount);
   }
 
@@ -139,6 +140,9 @@ export struct FeedDetail {
               .fontColor($r('sys.color.font_primary'))
               .fontSize(14 * this.fontSizeRatio)
               .fontWeight(FontWeight.Medium)
+              .constraintSize({
+                maxWidth: 'calc(100% - 48vp)'
+              })
             this.publishCustomTimeBuilder()
           }.alignItems(HorizontalAlign.Start)
         }

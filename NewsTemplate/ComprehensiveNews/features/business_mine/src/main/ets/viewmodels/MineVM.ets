@@ -1,45 +1,55 @@
 import { BaseViewModel, RouterMap, RouterUtils } from 'lib_common';
+import { LoginSheetUtils } from 'lib_account';
 import { FeedbackModel } from 'module_feedback';
-import { SettingItem } from 'business_setting';
+import { IRouterParams, SettingGroup, SettingItem, SettingType } from 'module_app_setting';
 import { MineGridItem } from '../types/Types';
 
 @ObservedV2
 export class MineViewModel extends BaseViewModel {
-  @Trace feedbackItem: SettingItem = new SettingItem({
-    icon: $r('app.media.ic_public_edit'),
-    label: '意见反馈',
-    routerName: RouterMap.FEEDBACK_PAGE,
-    routerParams: {
-      windowTopPadding: this.windowModel.windowTopPadding,
-      windowBottomPadding: this.windowModel.windowBottomPadding,
-      fontSizeRatio: this.settingInfo.fontSizeRatio,
-    } as FeedbackModel,
-  });
-  serviceList: SettingItem[] = [
-    new SettingItem({
-      icon: $r('app.media.ic_public_history'),
-      label: '浏览历史',
-      routerName: RouterMap.MINE_HISTORY_PAGE,
-    }),
+  @Trace feedbackItem: SettingItem = new SettingItem()
+    .setType(SettingType.ROUTER)
+    .setLabel('意见反馈')
+    .setIcon($r('app.media.ic_public_edit'))
+    .setRouterParam(this.feedbackRouterParam);
+  @Trace list: SettingItem[] = [
+    new SettingItem()
+      .setType(SettingType.ROUTER)
+      .setLabel('我的订阅')
+      .setIcon($r('app.media.plus_bookmark'))
+      .setRouterParam({ routerName: RouterMap.SETTING_SUBSCRIBE }),
+    new SettingItem()
+      .setType(SettingType.ROUTER)
+      .setLabel('浏览历史')
+      .setIcon($r('app.media.ic_public_history'))
+      .setRouterParam({ routerName: RouterMap.MINE_HISTORY_PAGE }),
     this.feedbackItem,
-    new SettingItem({
-      icon: $r('app.media.ic_public_setting'),
-      label: '设置',
-      routerName: RouterMap.SETTING_PAGE,
-    }),
+    new SettingItem()
+      .setType(SettingType.ROUTER)
+      .setLabel('设置')
+      .setIcon($r('app.media.ic_public_setting'))
+      .setRouterParam({ routerName: RouterMap.SETTING_PAGE }),
   ];
+  @Trace group: SettingGroup = new SettingGroup().setList(this.list)
 
   @Monitor('settingInfo.fontSizeRatio')
   onFontRatioChange() {
-    this.feedbackItem.routerParams = {
-      windowTopPadding: this.windowModel.windowTopPadding,
-      windowBottomPadding: this.windowModel.windowBottomPadding,
-      fontSizeRatio: this.settingInfo.fontSizeRatio,
-    } as FeedbackModel
+    this.feedbackItem.setRouterParam(this.feedbackRouterParam);
+  }
+
+  @Computed
+  get feedbackRouterParam() {
+    return {
+      routerName: RouterMap.FEEDBACK_SUBMIT_PAGE,
+      routerParams: {
+        windowTopPadding: this.windowModel.windowTopPadding,
+        windowBottomPadding: this.windowModel.windowBottomPadding,
+        fontSizeRatio: this.settingInfo.fontSizeRatio,
+      } as FeedbackModel,
+    } as IRouterParams
   }
 
   jumpLogin() {
-    RouterUtils.pushPathByName(RouterMap.HUAWEI_LOGIN_PAGE);
+    LoginSheetUtils.jumpLoginPage();
   }
 
   jumpProfile() {

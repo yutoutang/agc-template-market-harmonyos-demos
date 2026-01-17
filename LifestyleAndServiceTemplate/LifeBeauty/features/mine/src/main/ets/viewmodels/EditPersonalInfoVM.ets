@@ -1,65 +1,139 @@
-import { BusinessError } from '@kit.BasicServicesKit';
-import { AppStorageV2, promptAction } from '@kit.ArkUI';
+import { PersistenceV2 } from '@kit.ArkUI';
 import {
-  CommonUtils,
-  GetUserInfoResp,
-  Logger,
+  CommonUtils, GetUserInfoResp,
   RouterModule,
-  SystemSceneUtils,
   updateUserInfo,
-  ErrorCode,
 } from 'foundation';
-
-const TAG = 'EditPersonalInfoVM';
+import { ApiHandler, FormGroup, FormType,
+  GenderType,
+  ObservedInfoItem, PersonalInfo, SwitchInfo } from 'collect_personal_info';
 
 @ObservedV2
 export class EditPersonalInfoVM {
-  @Trace userInfo: GetUserInfoResp = AppStorageV2.connect(GetUserInfoResp, () => new GetUserInfoResp())!;
-  @Trace nickName: string = this.userInfo.nickName;
-  @Trace showNickNameSheet: boolean = false;
+  @Trace userInfo: GetUserInfoResp = PersistenceV2.connect(GetUserInfoResp, () => new GetUserInfoResp())!;
+  @Trace avatarItem: ObservedInfoItem = new ObservedInfoItem({
+    type: FormType.CHOOSE_AVATAR,
+    label: '头像',
+    value: this.userInfo.avatar ? this.userInfo.avatar : $r('app.media.ic_user_default'),
+    onChange: (param?: Object) => {
+      const avatarUri = param as string;
+      this.avatarItem.value = avatarUri;
+      this.userInfo.avatar = avatarUri;
+      updateUserInfo({ avatarUrl: avatarUri });
+    },
+  });
+  @Trace nickNameItem: ObservedInfoItem = new ObservedInfoItem({
+    type: FormType.TEXT_INPUT,
+    label: '昵称',
+    value: this.userInfo.nickName,
+    minLength: 2,
+    maxLength: 20,
+    placeholderText: '昵称',
+    invocation: (param: Object) => {
+      return Promise.resolve();
+    },
+    validMessageText: '昵称不能为空',
+    onChange: (param?: Object) => {
+      const nickName = param as string;
+      this.nickNameItem.value = nickName;
+      this.userInfo.nickName = nickName;
+      updateUserInfo({ nickName: nickName });
+    },
+  })
+  @Trace genderItem: ObservedInfoItem = new ObservedInfoItem({
+    type: FormType.DROP_SELECT,
+    label: '性别',
+    selectOptions: [
+      {
+        id: 0,
+        value: 0,
+        label: '男',
+      },
+      {
+        id: 1,
+        value: 1,
+        label: '女',
+      },
+      {
+        id: 2,
+        value: 2,
+        label: '保密',
+      },
+    ],
+    value: this.userInfo.gender,
+    onChange: (param?: Object) => {
+      const gender = param as number;
+      this.genderItem.value = param as number;
+      this.userInfo.gender = gender;
+      updateUserInfo({ gender: gender });
+    },
+  });
 
-  saveUserIcon(uri: string) {
-    if (!uri) {
-      return;
-    }
-    const resp = SystemSceneUtils.handleUri(uri);
-    this.userInfo.avatar = resp;
-    updateUserInfo({ avatarUrl: resp });
-    Logger.info(TAG, 'user icon saved success, url:' + resp);
-  }
+  @Trace fullNameItem: ObservedInfoItem = new ObservedInfoItem({
+    type: FormType.TEXT_INPUT,
+    label: '姓名',
+    minLength: 2,
+    maxLength: 10,
+    placeholderText: '姓名',
+    validMessageText: '姓名不能为空',
+    value: this.userInfo.fullName,
+    onChange: (param?: Object) => {
+      const fullName = param as string;
+      this.fullNameItem.value = fullName;
+      this.userInfo.fullName = fullName;
+      updateUserInfo({ fullName: fullName });
+    },
+  })
 
-  modifyNickName() {
-    if (!this.nickName) {
-      promptAction.showToast({ message: '昵称不能为空' });
-      return
-    }
-    this.userInfo.nickName = this.nickName;
-    updateUserInfo({ nickName: this.nickName });
-    this.showNickNameSheet = false;
-  }
+  @Trace birthItem: ObservedInfoItem = new ObservedInfoItem({
+    type: FormType.DATE_SELECT,
+    label: '出生日期',
+    sheetTitle: '出生日期',
+    sheetOptions: {
+      height: 440,
+    },
+    value: this.userInfo.birthDate ? new Date(this.userInfo.birthDate) : undefined,
+    onChange: (param?: Object) => {
+      this.birthItem.value = param as Date;
+      const birthDate = CommonUtils.formatDate(param as Date)
+      this.userInfo.birthDate = birthDate;
+      updateUserInfo({ birthDate: birthDate });
+    },
+  });
+  @Trace phoneItem: ObservedInfoItem = new ObservedInfoItem({
+    type: FormType.PHONE_INPUT,
+    label: '手机号码',
+    maxLength: 11,
+    validMessageText: '手机号码不能为空',
+    value: this.userInfo.mobile,
+    onChange: (param?: Object) => {
+      const mobile = param as string;
+      this.phoneItem.value = mobile;
+      this.userInfo.mobile = mobile
+      updateUserInfo({ mobile: mobile });
+    },
+  })
 
-  handleAvatarError(error: BusinessError) {
-    Logger.error(TAG, 'onChooseAvatar failed, error: ' + JSON.stringify(error));
-    if (error.code === ErrorCode.EXTEND_SERVICE_USER_CANCELED) {
-      return;
-    }
-    let errorMsg: string = this.getAccountErrorMsg(error.code);
-
-    CommonUtils.openNoticeDialog(errorMsg, '确定');
-  }
-
-  getAccountErrorMsg(code: number) {
-    if ([ErrorCode.UN_LOGIN_1, ErrorCode.UN_LOGIN_2].includes(code)) {
-      return '用户未登录华为账号，请前往设置-登录华为账号。';
-    }
-    return '未知异常';
-  }
+  @Trace list: FormGroup[] = [
+    {
+      list: [this.avatarItem],
+    },
+    {
+      list: [
+        this.nickNameItem,
+        this.genderItem,
+        this.birthItem
+      ],
+    },
+    {
+      list: [
+        this.fullNameItem,
+        this.phoneItem,
+      ],
+    },
+  ];
 
   customBack() {
-    if (this.showNickNameSheet) {
-      this.showNickNameSheet = false;
-      return true;
-    }
     RouterModule.pop();
     return true;
   }

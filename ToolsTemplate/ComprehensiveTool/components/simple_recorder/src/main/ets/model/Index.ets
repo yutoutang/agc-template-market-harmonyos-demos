@@ -142,3 +142,16 @@ export interface RouteParams {
   id: string,
   isOperation: boolean
 }
+
+
+// worker参数
+export interface SaveWorkerParm {
+  filePath: string,
+  pcmPath: string
+}
+
+
+export enum SaveMessageType {
+  SUCCESS = '0',
+  ERROR = '1'
+}

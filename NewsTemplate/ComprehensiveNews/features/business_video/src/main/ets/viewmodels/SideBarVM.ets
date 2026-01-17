@@ -8,8 +8,8 @@ import { VideoService } from '../services/VideoService';
 export class SideBarVM extends BaseViewModel {
   @Trace videoInfo: NewsResponse = {} as NewsResponse
 
-  getVideoInfo(videoId: string) {
-    const videoDetailInfo = VideoService.queryVideoDataById(videoId);
+  async getVideoInfo(videoId: string) {
+    const videoDetailInfo = await VideoService.queryVideoDataById(videoId);
     if (videoDetailInfo) {
       this.videoInfo = UIUtils.makeObserved(videoDetailInfo);
     }

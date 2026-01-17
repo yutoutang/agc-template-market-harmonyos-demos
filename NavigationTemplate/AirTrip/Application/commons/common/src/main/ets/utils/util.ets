@@ -1,12 +1,12 @@
-import { mapCommon, map, site } from '@kit.MapKit'
+import { map, mapCommon, site } from '@kit.MapKit';
 import { geoLocationManager } from '@kit.LocationKit';
 import { BusinessError, pasteboard } from '@kit.BasicServicesKit';
 import { call } from '@kit.TelephonyKit';
 import { DayFormat } from './DayFormat';
 import { Decimal } from '@kit.ArkTS';
-import { promptAction } from '@kit.ArkUI';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 
-export const getDayLabel = (date: Date) : string=> {
+export const getDayLabel = (date: Date): string => {
   let today: Date = new Date()
   let tY = today.getFullYear()
   let tM = today.getMonth()
@@ -34,32 +34,44 @@ export const convertCoordinate = (wgs84Position: mapCommon.LatLng): mapCommon.La
 
 // 根据经纬度获取城市信息
 export const getAddressInfo = async (): Promise<string> => {
-  let requestInfo: geoLocationManager.CurrentLocationRequest = {
-    'priority': geoLocationManager.LocationRequestPriority.FIRST_FIX,
-    'scenario': geoLocationManager.LocationRequestScenario.UNSET,
-  };
-  let cityName: string = ''
-  let location: geoLocationManager.Location = await geoLocationManager.getCurrentLocation(requestInfo)
-  if (location) {
-    let wgs84Position: mapCommon.LatLng = {
-      latitude: location.latitude,
-      longitude: location.longitude
+  try {
+    let requestInfo: geoLocationManager.CurrentLocationRequest = {
+      'priority': geoLocationManager.LocationRequestPriority.FIRST_FIX,
+      'scenario': geoLocationManager.LocationRequestScenario.UNSET,
     };
-    // 转换经纬度坐标
-    let gcj02Position: mapCommon.LatLng = convertCoordinate(wgs84Position)
-    let params: site.NearbySearchParams = {
-      location: gcj02Position,
-      pageSize: 1,
-      language: 'zh',
+    let cityName: string = ''
+    let location: geoLocationManager.Location = await geoLocationManager.getCurrentLocation(requestInfo)
+    if (location) {
+      let wgs84Position: mapCommon.LatLng = {
+        latitude: location.latitude,
+        longitude: location.longitude
+      };
+      // 转换经纬度坐标
+      let gcj02Position: mapCommon.LatLng = convertCoordinate(wgs84Position)
+      let params: site.NearbySearchParams = {
+        location: gcj02Position,
+        pageSize: 1,
+        language: 'zh',
+      }
+      try {
+        const result = await site.nearbySearch(params);
+        if (result.sites?.length) {
+          cityName = result.sites[0].addressComponent?.city?.cityName?.replace('市', '') ?? ''
+        }
+      } catch (error) {
+        hilog.error(0x0000, 'testTag', 'Failed to nearbySearch, errorCode=%{public}d, errorMsg=%{public}s', error.code,
+          error.message);
+      }
     }
-    const result = await site.nearbySearch(params);
-    if (result.sites?.length) {
-      cityName = result.sites[0].addressComponent?.city?.cityName?.replace('市', '') ?? ''
-    }
+    return new Promise((resolve) => {
+      resolve(cityName)
+    })
+  } catch (error) {
+    hilog.error(0x0000, 'testTag', 'Failed to getCurrentLocation, errorCode=%{public}d, errorMsg=%{public}s',
+      error.code,
+      error.message);
+    return ''
   }
-  return new Promise((resolve) => {
-    resolve(cityName)
-  })
 }
 
 // 校验手机号码是否有效
@@ -79,7 +91,7 @@ export function maskPhone(phone: string): string {
 }
 
 // 证件号码脱敏
-export function maskCertificate(certificate:string, type:string = 'idCard') {
+export function maskCertificate(certificate: string, type: string = 'idCard') {
   if (!certificate) {
     return ''
   }
@@ -87,7 +99,7 @@ export function maskCertificate(certificate:string, type:string = 'idCard') {
   const str = certificate.toString();
   const len = str.length;
 
-  switch(type) {
+  switch (type) {
     case 'idCard': // 身份证
     case 'Hukou': // 户口簿
       if (len === 18) {
@@ -130,37 +142,58 @@ export function generateRandomFlightTime(minHours = 1, maxHours = 12): string {
 }
 
 // 复制操作
-export function pasteText(text: string) {
-  // 获取系统剪贴板对象
-  let systemPasteboard = pasteboard.getSystemPasteboard();
-  // 创建一条纯文本类型的剪贴板内容对象
-  let pasteData = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, text);
-  let textRecord: pasteboard.PasteDataRecord = pasteboard.createRecord(pasteboard.MIMETYPE_TEXT_PLAIN, text);
-  let pasteText = pasteData.getPrimaryText()
-  if (pasteText) {
-    pasteData.replaceRecord(0, textRecord);
-  } else {
-    pasteData.addRecord(textRecord);
-  }
-  // 将数据写入系统剪贴板
-  systemPasteboard.setData(pasteData).then(()=>{
-    promptAction.showToast({
-      message: '复制成功'
+export function pasteText(text: string, uiContext: UIContext) {
+  try {
+    // 获取系统剪贴板对象
+    let systemPasteboard = pasteboard.getSystemPasteboard();
+    // 创建一条纯文本类型的剪贴板内容对象
+    let pasteData = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, text);
+    let textRecord: pasteboard.PasteDataRecord = pasteboard.createRecord(pasteboard.MIMETYPE_TEXT_PLAIN, text);
+    let pasteText = pasteData.getPrimaryText()
+    if (pasteText) {
+      try {
+        pasteData.replaceRecord(0, textRecord);
+      } catch (error) {
+        hilog.error(0x0000, 'testTag', 'Failed to replaceRecord, errorCode=%{public}d, errorMsg=%{public}s', error.code,
+          error.message);
+      }
+    } else {
+      pasteData.addRecord(textRecord);
+    }
+    // 将数据写入系统剪贴板
+    systemPasteboard.setData(pasteData).then(() => {
+      try {
+        uiContext.getPromptAction().showToast({
+          message: '复制成功'
+        })
+      } catch (error) {
+        hilog.error(0x0000, 'testTag', 'Failed to show toast, errorCode=%{public}d, errorMsg=%{public}s', error.code,
+          error.message);
+      }
     })
-  })
+  } catch (error) {
+    hilog.error(0x0000, 'testTag', 'Failed to createRecord, errorCode=%{public}d, errorMsg=%{public}s', error.code,
+      error.message);
+  }
 }
 
 /*
  * 拉起拨号盘进行拨号
  * */
 export function callTel(phone: string): void {
-  call.makeCall(phone ?? '0564-252525663', (err: BusinessError) => {
-    if (err) {
-      console.error(`Failed to make call. Code is ${err.code}, Message is ${err.message}`);
-      return;
-    }
-    console.info('Succeeded in making call.');
-  })
+  try {
+    call.makeCall(phone ?? '0564-252525663', (err: BusinessError) => {
+      if (err) {
+        console.error(`Failed to make call. Code is ${err.code}, Message is ${err.message}`);
+        return;
+      }
+      console.info('Succeeded in making call.');
+    })
+  } catch (error) {
+    hilog.error(0x0000, 'testTag', 'Failed to makeCall, errorCode=%{public}d, errorMsg=%{public}s', error.code,
+      error.message);
+  }
+
 }
 
 // 判断位置服务是否已经使能

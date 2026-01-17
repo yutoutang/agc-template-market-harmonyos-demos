@@ -25,16 +25,20 @@
       "value": "立即预约"
     },
     {
+      "name": "buy_good_btn",
+      "value": "立即购买"
+    },
+    {
       "name": "book_good_title",
       "value": "预约"
     },
     {
       "name": "good_detail_member_price",
-      "value": "会员到手价￥"
+      "value": "会员到手价："
     },
     {
       "name": "good_detail_more_title",
-      "value": "—— 图文详情 ——"
+      "value": "图文详情"
     },
     {
       "name": "good_detail_more_empty",

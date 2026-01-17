@@ -12,8 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { CardRecognition, CardSide, CardType, ShootingMode, CallbackParam } from '@kit.VisionKit';
-import { promptAction } from '@kit.ArkUI';
+import {
+  CardRecognition,
+  CardSide,
+  CardType,
+  ShootingMode,
+  CardRecognitionResult,
+} from '@kit.VisionKit';
 import { getInstance } from '../util/Route';
 import { CardRecognitionPageVM } from '../viewModels/CardRecognitionPageVM';
 
@@ -40,10 +45,10 @@ export struct CardRecognitionPage {
               defaultShootingMode: ShootingMode.MANUAL,
               isPhotoSelectionSupported: true,
             },
-            callback: (res: CallbackParam) => {
-              if (res.code === -1) {
+            callback: (res: CardRecognitionResult) => {
+              if (res.code !== 200) {
                 getInstance().pop();
-                promptAction.showToast({ message: '识别失败！' });
+                this.getUIContext().getPromptAction().showToast({ message: '识别失败！' });
               } else {
                 const cardType = res.cardType as CardType;
                 const cardInfo = res.cardInfo as Record<string, Record<string, string>>;

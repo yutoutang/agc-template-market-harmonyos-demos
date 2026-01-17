@@ -11,9 +11,9 @@ import {
   OrderInfo,
   PassengerInfo,
   WebPageParams,
-} from 'common'
-import { AppStorageV2 } from '@kit.ArkUI'
-import { BaseTitle, CreateOrderDialogParam, GlobalDialog } from 'components'
+} from 'common';
+import { AppStorageV2 } from '@kit.ArkUI';
+import { BaseTitle, CreateOrderDialogParam, GlobalDialog } from 'components';
 import { FlightInfo, FlightOrderInfo, FlightPageModel, FlightSpaceInfo, Instruct } from '../model/FlightPageModel';
 import { BaggageAndRefundSheet } from '../components/BaggageAndRefundSheet';
 
@@ -49,14 +49,17 @@ export struct SubmitOrderPage {
   getWeekDay(): string {
     return `${getDayLabel(new Date(this.flightInfo.takeoffTime))}`
   }
+
   // 获取舱位
   getSpaceLabel(): string {
     return this.spaceInfo.spaceType === 'ECONOMY_CLASS' ? '经济舱' : '公务舱/头等舱'
   }
+
   // 获取起飞和降落时间
   getFlyTime(): string {
     return this.flightInfo.takeoffTime.split(' ')[1] + ' - ' + this.flightInfo.landingTime.split(' ')[1]
   }
+
   // 是否是次日到达
   isNextDay(flight: FlightInfo): boolean {
     const depDate = new Date(flight.takeoffTime).toDateString();
@@ -69,7 +72,7 @@ export struct SubmitOrderPage {
     let selectedList = this.passengerList.filter((item: PassengerInfo) => item.isChecked)
     AppRouter.navStack.pushPathByName('SelectPassengerPage', selectedList, (popInfo) => {
       let resData = popInfo.result as Record<string, PassengerInfo[] | string>
-      if (resData.selectedPassengers ) {
+      if (resData.selectedPassengers) {
         let list: PassengerInfo[] = resData.selectedPassengers as PassengerInfo[]
         let resList: PassengerInfo[] = []
         for (let i = 0; i < list.length; i++) {
@@ -88,6 +91,7 @@ export struct SubmitOrderPage {
       }
     })
   }
+
   // 删除所选的乘机人
   deletePassenger(data: PassengerInfo, index: number) {
     this.passengerList.splice(index, 1)
@@ -97,23 +101,23 @@ export struct SubmitOrderPage {
   // 提交订单
   submitOrder() {
     if (this.selectedCount === 0) {
-      GlobalDialog.showToast('请选择乘机人')
+      GlobalDialog.showToast('请选择乘机人', this.getUIContext())
       return
     }
     if (this.contactName === '') {
-      GlobalDialog.showToast('请输入联系人姓名')
+      GlobalDialog.showToast('请输入联系人姓名', this.getUIContext())
       return
     }
     if (this.contactPhone === '') {
-      GlobalDialog.showToast('请输入手机号')
+      GlobalDialog.showToast('请输入手机号', this.getUIContext())
       return
     }
     if (this.contactPhone && !checkPhoneValid(this.contactPhone)) {
-      GlobalDialog.showToast('请输入正确的手机号')
+      GlobalDialog.showToast('请输入正确的手机号', this.getUIContext())
       return
     }
     if (!this.isCheckedInstruct) {
-      GlobalDialog.showToast('请阅读并勾选预订须知')
+      GlobalDialog.showToast('请阅读并勾选预订须知', this.getUIContext())
       return
     }
 
@@ -160,21 +164,21 @@ export struct SubmitOrderPage {
       takeoffTime: orderData.takeoffTime,
       passengerList: orderData.passengerList,
       view: () => {
-        GlobalDialog.close()
+        GlobalDialog.close(this.getUIContext())
         AppRouter.push({
           url: 'OrderDetailPage',
           param: orderData.orderNo
         })
       },
       pay: () => {
-        GlobalDialog.close()
+        GlobalDialog.close(this.getUIContext())
         AppRouter.push({
           url: 'PayPage',
           param: orderData
         })
       }
     } as CreateOrderDialogParam
-    GlobalDialog.showDialogForCreateOrder(dialogParam)
+    GlobalDialog.showDialogForCreateOrder(dialogParam, this.getUIContext())
     // 模拟订单生成
     let setIn = setInterval(() => {
       if (GlobalDialog.globalDialogInstance) {
@@ -275,7 +279,7 @@ export struct SubmitOrderPage {
             showClose: false,
           })
 
-          Divider().strokeWidth(0.5).width('100%').color($r('sys.color.ohos_id_color_button_divider'))
+          Divider().width('100%')
 
           Row() {
             Row({ space: 4 }) {
@@ -303,7 +307,7 @@ export struct SubmitOrderPage {
                     airportConstructionPrice: '50',
                     fuelPrice: '10',
                     passengerNum: this.selectedCount
-                  })
+                  }, this.getUIContext())
                 }
               })
 
@@ -326,12 +330,12 @@ export struct SubmitOrderPage {
           left: 16,
           top: 10,
           right: 16,
-          bottom: 10 + px2vp(91)
+          bottom: 10 + this.getUIContext().px2vp(91)
         })
         .backgroundColor($r('sys.color.white'))
         .borderRadius(6)
         .position({
-          bottom: px2vp(-91),
+          bottom: this.getUIContext().px2vp(-91),
           left: 0
         })
       }
@@ -355,17 +359,18 @@ export struct SubmitOrderPage {
         Image($r('app.media.ic_air_logo')).width(24).height(24).borderRadius(24)
 
         Column({ space: 8 }) {
-          Row({space: 8}) {
+          Row({ space: 8 }) {
             Text(new DayFormat(new Date(this.flightInfo.takeoffTime)).format('MM月DD日'))
             Text(this.getWeekDay())
           }
+
           Text() {
             Span(this.flightInfo.departureAirport)
             Span(' - ')
             Span(this.flightInfo.destinationAirport)
           }
 
-          Row({space: 8}) {
+          Row({ space: 8 }) {
             Text(this.flightInfo.airlineName + this.flightInfo.flightNo).fontSize(10).fontColor('#99000000')
             Text(this.flightInfo.aircraftType).fontSize(10).fontColor('#99000000')
             Text(this.getSpaceLabel()).fontSize(10).fontColor('#99000000')
@@ -401,6 +406,7 @@ export struct SubmitOrderPage {
             }
           })
         }
+
         ListItem() {
           TicketInfoItem({
             label: '行李',
@@ -411,6 +417,7 @@ export struct SubmitOrderPage {
             }
           })
         }
+
         ListItem() {
           TicketInfoItem({
             label: '出票',
@@ -422,7 +429,7 @@ export struct SubmitOrderPage {
       .padding({ left: 14, right: 14 })
       .borderRadius(8)
       .backgroundColor($r('sys.color.white'))
-      .divider({ strokeWidth: 0.5, color: $r('sys.color.ohos_id_color_button_divider') })
+      .divider({ strokeWidth: 0.5, color: $r('sys.color.comp_divider') })
       .bindSheet($$this.isShowMode, this.SheetBuilder(), {
         height: '70%',
         blurStyle: BlurStyle.COMPONENT_THICK,
@@ -433,11 +440,12 @@ export struct SubmitOrderPage {
       })
     }
     .width('100%')
-    .margin({top: 18})
+    .margin({ top: 18 })
     .alignItems(HorizontalAlign.Start)
     .borderRadius(16)
     .backgroundColor('#E5E5EA')
   }
+
   @Builder
   PassengerInfoView() {
     Column({ space: 14 }) {
@@ -452,10 +460,10 @@ export struct SubmitOrderPage {
       .width('100%')
       .justifyContent(FlexAlign.SpaceBetween)
 
-      Divider().vertical(false).strokeWidth(0.5).color($r('sys.color.ohos_id_color_button_divider')).width('100%')
+      Divider().vertical(false).color($r('sys.color.comp_divider')).width('100%')
 
       // 乘机人
-      List({space: 16}) {
+      List({ space: 16 }) {
         ForEach(this.passengerList, (item: PassengerInfo, index: number) => {
           ListItem() {
             Row({ space: 12 }) {
@@ -469,7 +477,7 @@ export struct SubmitOrderPage {
               }
               .alignItems(HorizontalAlign.Start)
 
-              Image($r('app.media.ic_delete')).width(16).height(16)
+              SymbolGlyph($r('sys.symbol.trash')).fontSize(16)
                 .onClick(() => {
                   this.deletePassenger(item, index)
                 })
@@ -479,14 +487,15 @@ export struct SubmitOrderPage {
             .borderRadius(6)
             .justifyContent(FlexAlign.SpaceBetween)
           }
-        })
+        },(item: PassengerInfo, index: number)=>index + '__' + JSON.stringify(item))
       }
-      .divider({ strokeWidth: 0.5, color: $r('sys.color.ohos_id_color_button_divider') })
+      .edgeEffect(EdgeEffect.Spring, {alwaysEnabled: true})
+      .divider({ strokeWidth: 0.5, color: $r('sys.color.comp_divider') })
 
       // 添加乘机人
       Button({ type: ButtonType.Capsule, stateEffect: true }) {
         Row({ space: 12 }) {
-          Image($r('app.media.ic_add_passenger')).width(16).height(17)
+          SymbolGlyph($r('sys.symbol.person_badge_plus')).fontSize(16)
           Text('添加乘机人').fontSize(16).fontColor($r('sys.color.ohos_id_color_emphasize'))
             .fontWeight(FontWeight.Medium)
         }
@@ -504,53 +513,53 @@ export struct SubmitOrderPage {
     .borderRadius(18)
     .backgroundColor($r('sys.color.white'))
   }
+
   // 联系人
   @Builder
   ContactInfoView() {
     Column({ space: 16 }) {
       Row({ space: 16 }) {
-        Row({space: 8}) {
+        Row({ space: 8 }) {
           Text('*').fontSize(16).fontColor('#E84026')
           Text('联系人').fontSize(16).fontWeight(FontWeight.Medium)
         }
 
         TextInput({ text: this.contactName, placeholder: '请输入联系人' })
-          .placeholderColor('#66000000')
-          .placeholderFont({ size: 12, weight: FontWeight.Regular })
+          .placeholderFont({ size: $r('sys.float.Body_L'), weight: FontWeight.Regular })
           .type(InputType.Normal)
           .maxLength(32)
           .padding(0)
           .layoutWeight(1)
           .borderRadius(0)
           .backgroundColor(Color.Transparent)
-          .caretColor($r('sys.color.ohos_id_color_emphasize'))
-          .inputFilter(Constants.NAME_REG, () => {})
+          .caretColor($r('sys.color.font_emphasize'))
+          .inputFilter(Constants.NAME_REG, () => {
+          })
           .onChange((value: string) => {
             this.contactName = value
           })
       }
 
-      Divider().vertical(false).strokeWidth(0.5).color($r('sys.color.ohos_id_color_button_divider')).width('100%')
+      Divider().vertical(false).color($r('sys.color.comp_divider')).width('100%')
 
       Row({ space: 12 }) {
-        Row({space: 8}) {
+        Row({ space: 8 }) {
           Text('*').fontSize(16).fontColor('#E84026')
           Text('联系人电话').fontSize(16).fontWeight(FontWeight.Medium)
         }
 
         Text('+86').fontSize(12).fontWeight(FontWeight.Regular).fontColor('#66000000')
-        Divider().vertical(true).strokeWidth(0.5).height(13).color($r('sys.color.ohos_id_color_button_divider'))
+        Divider().vertical(true).height(13).color($r('sys.color.comp_divider'))
 
         TextInput({ text: this.contactPhone, placeholder: '请输入手机号码' })
-          .placeholderColor('#66000000')
-          .placeholderFont({ size: 12, weight: FontWeight.Regular })
+          .placeholderFont({ size: $r('sys.float.Body_L'), weight: FontWeight.Regular })
           .type(InputType.PhoneNumber)
           .maxLength(11)
           .padding(0)
           .layoutWeight(1)
           .borderRadius(0)
           .backgroundColor(Color.Transparent)
-          .caretColor($r('sys.color.ohos_id_color_emphasize'))
+          .caretColor($r('sys.color.font_emphasize'))
           .onChange((value: string) => {
             this.contactPhone = value
           })
@@ -562,6 +571,7 @@ export struct SubmitOrderPage {
     .borderRadius(18)
     .backgroundColor($r('sys.color.white'))
   }
+
   // 预订须知
   @Builder
   InstructSheetBuilder() {
@@ -572,7 +582,7 @@ export struct SubmitOrderPage {
             Text(item.name)
           }
           .width(Constants.FULL_PERCENT_WIDTH)
-          .padding({top: 18, bottom: 18})
+          .padding({ top: 18, bottom: 18 })
           .justifyContent(FlexAlign.Center)
           .onClick(() => {
             this.showInstructMode = false
@@ -586,17 +596,19 @@ export struct SubmitOrderPage {
             })
           });
         }
-      })
+      },(item: Instruct, index: number)=>index + '__' + JSON.stringify(item))
 
       ListItem() {
-        Row() {}.width(Constants.FULL_PERCENT_WIDTH).height(12).backgroundColor('#E5E5EA')
+        Row() {
+        }.width(Constants.FULL_PERCENT_WIDTH).height(12).backgroundColor('#E5E5EA')
       }
+
       ListItem() {
         Row() {
           Text('取消').fontColor('#466DFA')
         }
         .width(Constants.FULL_PERCENT_WIDTH)
-        .padding({top: 18, bottom: 18})
+        .padding({ top: 18, bottom: 18 })
         .justifyContent(FlexAlign.Center)
         .onClick(() => {
           this.showInstructMode = !this.showInstructMode
@@ -605,7 +617,7 @@ export struct SubmitOrderPage {
     }
     .width(Constants.FULL_PERCENT_WIDTH)
     .alignListItem(ListItemAlign.Center)
-    .divider({strokeWidth: 0.5, color: $r('sys.color.ohos_id_color_button_divider') })
+    .divider({ strokeWidth: 0.5, color: $r('sys.color.comp_divider') })
   }
 
   // 半模态

@@ -1,4 +1,4 @@
-import { RouterMap, RouterModule } from 'commonlib';
+import { BreakpointModel, BreakpointType, RouterMap, RouterModule } from 'commonlib';
 import {
   addCustomFood,
   addDietPlans,
@@ -8,7 +8,7 @@ import {
   queryFoodCategory,
 } from 'network';
 import { FoodCalories, FoodCategory } from '../types/Index';
-import { promptAction } from '@kit.ArkUI';
+import { AppStorageV2, promptAction } from '@kit.ArkUI';
 
 @ObservedV2
 export class DietPlanPageVM {
@@ -24,9 +24,11 @@ export class DietPlanPageVM {
   @Trace inputCalories: string = ''
   @Trace showAddFoodSheet: boolean = false
   @Trace inputText: string = ''
+  @Trace showCheckedFoods: boolean = false;
   submitLoading: boolean = false
   titleItemScroller: Scroller = new Scroller();
   scroller: Scroller = new Scroller();
+  checkedScroller: Scroller = new Scroller();
   menuList: Array<SelectOption> = [
     { value: '早餐', icon: $r('app.media.ic_checked') },
     { value: '午餐', icon: $r('app.media.ic_checked') },
@@ -35,6 +37,13 @@ export class DietPlanPageVM {
     { value: '中午加餐', icon: $r('app.media.ic_checked') },
     { value: '晚上加餐', icon: $r('app.media.ic_checked') }]
   keyboardList: Array<string> = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', '.']
+  columnOptions: BreakpointType<number> = new BreakpointType<number>({
+    sm: 1,
+    md: 2,
+    lg: 2,
+    xl: 2,
+  });
+  @Trace breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
 
   init() {
     queryFoodCategory().then(res => {
@@ -184,5 +193,10 @@ export class DietPlanPageVM {
         promptAction.showToast({ message: '添加失败~' })
       }
     })
+  }
+
+  @Computed
+  get pageWidth() {
+    return this.columnOptions.getValue(this.breakPointModel.currentBreakpoint);
   }
 }

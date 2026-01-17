@@ -1,9 +1,8 @@
+import { PersistenceV2 } from '@kit.ArkUI'
 import { FormatCount, RouterMap, RouterUtils, SettingModel, UserInfoModel } from 'lib_common'
 import { NewsResponse } from 'lib_news_api'
+import { Share } from 'lib_widget'
 import { FeedCard } from 'module_newsfeed'
-import { PersistenceV2 } from '@kit.ArkUI'
-import { Share } from 'module_share'
-import { TimeUtils } from 'lib_common'
 import { InteractionViewModel } from '../viewmodels/InteractionViewModel'
 import { TabItem } from '../common/Constants'
 
@@ -39,14 +38,12 @@ export struct InteractionFeedCard {
   @Builder
   shareBuilder() {
     Share({
-      qrCodeInfo: {
-        id: this.cardInfo.id,
-        type: this.cardInfo.type,
+      shareData: {
+        recordId: this.cardInfo.id,
         title: this.cardInfo.title,
-        articleFrom: this.cardInfo.articleFrom,
-        createTime: TimeUtils.formatDate(this.cardInfo.createTime, 'YYYY-MM-DD HH:mm'),
+        subTitle: this.cardInfo.articleFrom,
+        createTime: this.cardInfo.createTime,
         coverUrl: this.cardInfo.postImgList?.[0]?.picVideoUrl,
-        isVideo: !!this.cardInfo.postImgList?.[0]?.surfaceUrl,
       },
       shareRenderBuilder: () => {
         this.shareCommentBuilder()

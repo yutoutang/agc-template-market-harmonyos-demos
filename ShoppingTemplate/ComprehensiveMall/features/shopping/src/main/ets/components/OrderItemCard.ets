@@ -1,4 +1,4 @@
-import { iResourceMgr, Style } from 'lib_foundation';
+import { Style } from 'lib_foundation';
 import { OrderSkuItem } from 'lib_network';
 
 @ComponentV2
@@ -9,7 +9,7 @@ export struct OrderItemCard {
   build() {
     if (this.sku) {
       Row() {
-        Image(iResourceMgr.resolveUri(this.sku.banner as string))
+        Image(this.sku.banner)
           .width(80)
           .height(80)
           .objectFit(ImageFit.Cover)

@@ -3,6 +3,7 @@ import { BusinessError, emitter } from '@kit.BasicServicesKit';
 import { Constants, TCRouter, UserInfoModel, UserInfoUtil } from 'common';
 import { UserInfo } from 'base_common';
 import { AvatarIcon, SelectAvatarCard } from './SelectAvatarCard';
+
 @ComponentV2
 export struct MyInfoCard {
   @Local userName: string = ''
@@ -18,9 +19,14 @@ export struct MyInfoCard {
     // 初始化用户信息
     UserInfoUtil.init();
     this.loadUserInfo();
-    emitter.on(Constants.LOGIN_CHANGE, () => {
-      this.loadUserInfo();
-    });
+    try {
+      emitter.on(Constants.LOGIN_CHANGE, () => {
+        this.loadUserInfo();
+      });
+    } catch (e) {
+      console.error('Failed to emitter on login change. Cause: ' + JSON.stringify(e));
+    }
+
   }
 
   onPageShow(): void {
@@ -42,7 +48,8 @@ export struct MyInfoCard {
       this.level = userInfoFromStorage.level || 1;
       this.levelString = 'LV' + this.level;
       if (this.userTel) {
-        this.userTel = `${this.userTel.substring(0, this.userTel.length - 8)}****${this.userTel.substring(this.userTel.length - 4)}`;
+        this.userTel =
+          `${this.userTel.substring(0, this.userTel.length - 8)}****${this.userTel.substring(this.userTel.length - 4)}`;
       }
     } else {
       this.isLogin = false;
@@ -85,31 +92,18 @@ export struct MyInfoCard {
   @Builder
   membershipBuilder() {
     Stack() {
-      Row(){
-        Row({space:8}){
-          Image($r('app.media.ic_vip_on'))
-            .width(32)
-            .height(32)
-            .objectFit(ImageFit.Contain)
-          Column({ space: 2 }) {
-            Text('阅读听书会员')
-              .fontColor('#D17E18')
-              .fontSize(16)
-              .fontWeight(FontWeight.Medium)
-            Text('开通会员享受购书折扣')
-              .fontColor('#D17E18')
-              .fontSize(12)
-              .fontWeight(FontWeight.Regular)
-          }
-          .alignItems(HorizontalAlign.Start)
+      Row() {
+        Row({ space: 4 }) {
+          Text('超10万+精品图书畅读').fontSize(14)
+          Image($r('app.media.arrow_right')).width(12)
         }
         .alignItems(VerticalAlign.Top)
-        Button((this.isLogin && this.isMembership) ? $r('app.string.member_center') : $r('app.string.open_member'),
-          { controlSize: ControlSize.SMALL })
-          .fontSize(14)
+
+        Button($r('app.string.member_center'), { controlSize: ControlSize.SMALL })
+          .fontSize($r('sys.float.Body_M'))
           .fontWeight(FontWeight.Medium)
           .fontColor($r('sys.color.font_on_primary'))
-          .backgroundColor('#E3922F')
+          .backgroundColor('#E84026')
           .onClick(() => {
             if (!this.isLogin) {
               this.showLoginPrompt();
@@ -119,20 +113,15 @@ export struct MyInfoCard {
           })
       }
       .width(Constants.FULL_SIZE)
-      .alignItems(VerticalAlign.Top)
       .justifyContent(FlexAlign.SpaceBetween)
     }
-    .height(64)
+    .height(50)
     .width(Constants.FULL_SIZE)
     .borderRadius(12)
     .padding({
-      top:12,
-      left:12,
-      right:12
+      left: 12,
+      right: 12
     })
-    .alignContent(Alignment.TopStart)
-    .backgroundImage($r('app.media.vipcard_background'))
-    .backgroundImageSize({width:Constants.FULL_SIZE, height:64})
   }
 
   change() {
@@ -159,7 +148,7 @@ export struct MyInfoCard {
         }
         if (this.isLogin) {
           Column() {
-            Row({space:4}) {
+            Row({ space: 4 }) {
               Text(this.userName)
                 .fontSize(24)
                 .fontWeight(500)
@@ -169,65 +158,17 @@ export struct MyInfoCard {
             .height(32)
             .width(Constants.FULL_SIZE)
 
-            Row(){
-              if (this.isMembership){
-                Row() {
-                  Image($r('app.media.ic_vip_on'))
-                    .height(20)
-                    .width(17.7)
-                    .objectFit(ImageFit.Contain)
-                    .margin({
-                      left:8,
-                      right:8
-                    })
-                  Text('VIP会员')
-                    .height(16)
-                    .width(43)
-                    .fontSize(12)
-                    .fontWeight(FontWeight.Medium)
-                    .margin({
-                      top:8,
-                      bottom:8
-                    })
-                    .fontColor('#E6E08A21')
-                }
-                .height(28)
-                .width(96)
-                .margin({top:4})
-                .borderRadius(8)
-                .backgroundColor('#FCF2CC')
-              } else {
-                Row() {
-                  Image($r('app.media.ic_vip_off'))
-                    .height(20)
-                    .width(17.7)
-                    .objectFit(ImageFit.Contain)
-                    .margin({
-                      left:8,
-                      right:8
-                    })
-                  Text($r('app.string.vip_off'))
-                    .height(16)
-                    .width(36)
-                    .fontSize(12)
-                    .fontWeight(FontWeight.Medium)
-                    .margin({
-                      top:8,
-                      bottom:8
-                    })
-                }
-                .height(28)
-                .width(96)
-                .margin({top:4})
-                .borderRadius(8)
-                .backgroundColor($r('sys.color.comp_background_secondary'))
-              }
+            Row({ space: 8 }) {
+              Image($r('app.media.ic_public_mobile_phone'))
+                .height(16)
+              Text(this.userTel)
+                .fontSize(12)
             }
             .height(32)
             .width(Constants.FULL_SIZE)
           }
           .height(64)
-          .width(Constants.FULL_SIZE)
+          .layoutWeight(1)
           .justifyContent(FlexAlign.SpaceBetween)
 
         } else {
@@ -247,10 +188,12 @@ export struct MyInfoCard {
           })
         }
       }
+      .width('100%')
+      .justifyContent(FlexAlign.Start)
+
       this.membershipBuilder()
     }
-    .height(164)
-    .width(Constants.FULL_SIZE)
+    .height(150)
     .justifyContent(FlexAlign.SpaceBetween)
     .backgroundColor($r('sys.color.background_primary'))
     .borderRadius(16)

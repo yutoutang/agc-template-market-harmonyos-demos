@@ -6,6 +6,7 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
+    "@hw-agconnect/util-log": "^1.0.0",
     "@ohos/mpchart": "^3.0.22"
   }
 }

@@ -9,9 +9,6 @@
     "common": "file:../../commons/common",
     "network": "file:../../commons/network",
     "base_ui": "file:../../components/base_ui",
-    "order": "file:../../features/order",
-    "order_list": "file:../../features/order_list",
-    "personal_center": "file:../../features/personal_center"
   }
 }
 

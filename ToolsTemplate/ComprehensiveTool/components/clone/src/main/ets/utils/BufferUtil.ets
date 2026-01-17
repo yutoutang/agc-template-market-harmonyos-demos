@@ -1,3 +1,4 @@
+import { UtilLog } from '@hw-agconnect/util-log';
 import { buffer, util } from '@kit.ArkTS';
 
 export class BufferUtil {
@@ -27,7 +28,13 @@ export class BufferUtil {
     return mergedBuffer;
   }
 
-  static stringToArrayBuffer(str: string): ArrayBuffer {
-    return buffer.from(str).buffer;
+  static stringToArrayBuffer(str: string): ArrayBuffer | null {
+    let buf: ArrayBuffer | null = null
+    try {
+      buf = buffer.from(str).buffer
+    } catch (e) {
+      UtilLog.error(`createPixelMap failed with error ${JSON.stringify(e)}`);
+    }
+    return buf;
   }
 }

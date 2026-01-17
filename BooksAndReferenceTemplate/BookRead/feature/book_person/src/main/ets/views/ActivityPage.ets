@@ -4,7 +4,7 @@ import {  Constants } from 'common';
 @ComponentV2
 export struct ActivityPage {
   @Local windowTopHeight: number = AppStorage.get('windowTopHeight') as number || 38.77;
-  controller: webview.WebviewController = new webview.WebviewController();
+  @Local controller: webview.WebviewController = new webview.WebviewController();
 
   build() {
     NavDestination() {
@@ -13,10 +13,10 @@ export struct ActivityPage {
           .fileAccess(false)
           .geolocationAccess(false)
       }
-      .padding({top:this.windowTopHeight})
       .width(Constants.FULL_SIZE)
       .height(Constants.FULL_SIZE)
     }
-    .hideTitleBar(true)
+    .title('活动中心')
+    .padding({top:this.windowTopHeight})
   }
 }

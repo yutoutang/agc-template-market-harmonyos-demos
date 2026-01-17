@@ -35,6 +35,10 @@
     {
       "name": "add_passenger_tip",
       "value": "温馨提醒：填写信息需与乘机人证件一致，否则影响登机"
+    },
+    {
+      "name": "agcit_huawei_air_trip",
+      "value": "1.0.1"
     }
   ]
 }

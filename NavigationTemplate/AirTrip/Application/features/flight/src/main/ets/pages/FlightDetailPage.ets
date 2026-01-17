@@ -76,7 +76,7 @@ export struct FlightDetailPage {
                 .onClick(() => {
                   this.selectedBarIndex = index
                 })
-              })
+              },(item: BaseTabBarItem, index: number)=>index + '__' + JSON.stringify(item))
             }
             .width(Constants.FULL_PERCENT_WIDTH)
             .margin({top: 12})
@@ -105,7 +105,7 @@ export struct FlightDetailPage {
                     }
                   })
                 }
-              })
+              },(item: BaseTabBarItem, index: number)=>index + '__' + JSON.stringify(item))
             }
             .width('100%')
             .height('auto')

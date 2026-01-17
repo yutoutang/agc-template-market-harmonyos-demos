@@ -5,5 +5,10 @@
   "main": "Index.ets",
   "author": "",
   "license": "Apache-2.0",
-  "dependencies": {}
+  "dependencies": {
+    "@hw-agconnect/ui-toast": "^1.0.0",
+    "@hw-agconnect/ui-dialog": "^1.0.0"
+  },
+  "devDependencies": {},
+  "dynamicDependencies": {}
 }

@@ -1,4 +1,4 @@
-import { promptAction, UIUtils } from '@kit.ArkUI';
+import { UIUtils } from '@kit.ArkUI';
 import { emitter } from '@kit.BasicServicesKit';
 import { LoginSheetUtils } from 'lib_account';
 import { BaseViewModel, RouterParams, RouterToNews } from 'lib_common';
@@ -51,7 +51,7 @@ export class InteractionViewModel extends BaseViewModel {
     emitter.off('recommendRefresh')
   }
 
-  public async setActionData(actionAPi: () => NewsResponse[]) {
+  public async setActionData(actionAPi: () => Promise<NewsResponse[]>) {
     this.interactionList = await actionAPi()
     this.interactionList = this.interactionList.map(item => UIUtils.makeObserved(item))
     this.isRefreshing = false
@@ -133,7 +133,7 @@ export class InteractionViewModel extends BaseViewModel {
   }
 
   public emptyToast() {
-    promptAction.showToast({
+    this.contextModel.showToast({
       message: '暂无更新数据',
       alignment: Alignment.Bottom,
     })

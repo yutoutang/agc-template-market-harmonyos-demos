@@ -12,6 +12,7 @@ export interface HomePageRouter {
 export interface OrderDetailRouter {
   orderId: string,
   isOrderJump: boolean
+  index: number
 }
 
 export interface CouponRouter {

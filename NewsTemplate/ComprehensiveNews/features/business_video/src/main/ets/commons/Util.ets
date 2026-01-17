@@ -1,4 +1,7 @@
 import { common } from '@kit.AbilityKit';
+import { GlobalContextUtils, Logger } from 'lib_common';
+
+const TAG = '[Utils]';
 
 export function secondToTime(seconds: number): string {
   let hourUnit = 60 * 60;
@@ -17,7 +20,12 @@ export function secondToTime(seconds: number): string {
   return `00:${secondStr}`;
 }
 
-export function setOrientation(orientation: number): Promise<void> {
-  let context: common.UIAbilityContext = getContext() as common.UIAbilityContext
-  return context.windowStage.getMainWindowSync().setPreferredOrientation(orientation)
+export async function setOrientation(orientation: number): Promise<void> {
+  let context: common.UIAbilityContext = GlobalContextUtils.globalUIAbilityContext
+  try {
+    const window = context.windowStage.getMainWindowSync()
+    await window.setPreferredOrientation(orientation)
+  } catch (error) {
+    Logger.error(TAG, 'setOrientation fail, error: ' + JSON.stringify(error));
+  }
 }

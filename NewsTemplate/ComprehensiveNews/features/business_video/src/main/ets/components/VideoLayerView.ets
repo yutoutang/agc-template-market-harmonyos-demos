@@ -1,7 +1,15 @@
 import { AppStorageV2, PersistenceV2 } from '@kit.ArkUI';
+import { BusinessError } from '@kit.BasicServicesKit';
 import {
   BreakpointModel,
-  CommonConstants, Logger, SettingModel, TabModel, TimeUtils, UserInfoModel, WindowModel } from 'lib_common';
+  CommonConstants,
+  Logger,
+  SettingModel,
+  TabModel,
+  TimeUtils,
+  UserInfoModel,
+  WindowModel,
+} from 'lib_common';
 import { LoginSheetUtils } from 'lib_account';
 import { AVPlayerSession, PlayerLayoutSize, SwipePlayerController, VideoProgressBar } from 'module_swipeplayer';
 import { Sidebar } from './Sidebar';
@@ -39,14 +47,18 @@ export struct VideoLayerView {
     let avPlayer = this.swipePlayerController.getAVPlayer()
     let state = avPlayer?.state
     if (state === 'playing') {
-      avPlayer?.pause()
+      avPlayer?.pause().catch((e: BusinessError) => {
+        Logger.error(TAG, 'pause fail, error: ' + JSON.stringify(e));
+      });
       // 当前是视频tab
       if (this.tabModel.selectedIndex === 1) {
         this.tabModel.showTabBar = true
         Logger.debug(TAG, 'tab bar is visible: ' + this.tabModel.showTabBar)
       }
     } else {
-      avPlayer?.play()
+      avPlayer?.play().catch((e: BusinessError) => {
+        Logger.error(TAG, 'play fail, error: ' + JSON.stringify(e));
+      });
       // 当前是视频tab
       if (this.tabModel.selectedIndex === 1) {
         this.tabModel.showTabBar = false

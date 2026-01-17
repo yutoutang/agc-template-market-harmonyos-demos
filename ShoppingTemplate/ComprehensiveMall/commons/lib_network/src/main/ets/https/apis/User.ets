@@ -1,7 +1,8 @@
 import { RequestUrlMap } from '../../constants/Enums';
-import { updateUserPointsReq } from '../../types/RequestTypes';
+import { UpdateUserInfoReq, UpdateUserPointsReq, UserLoginReq } from '../../types/RequestTypes';
 import { BaseResponse } from '../../types/responses/BaseResponse';
 import {
+  MembershipInfoResp,
   ProductForPointsResp,
   UserPointRedemptionSku,
   UserPointsRecordResp,
@@ -10,6 +11,27 @@ import {
 import request from '../Request';
 
 class UserApis {
+  /**
+   * 用户登录
+   */
+  public login(params?: UserLoginReq): Promise<BaseResponse> {
+    return request.get(RequestUrlMap.USER_LOGIN, { params })
+  }
+
+  /**
+   * 用户登出
+   */
+  public logout(): Promise<BaseResponse> {
+    return request.get(RequestUrlMap.USER_LOGOUT)
+  }
+
+  /**
+   * 修改用户信息
+   */
+  public updateUserInfo(data: UpdateUserInfoReq): Promise<BaseResponse> {
+    return request.put(RequestUrlMap.USER_INFO, data)
+  }
+
   /**
    * 获取用户积分信息
    */
@@ -28,7 +50,7 @@ class UserApis {
   /**
    * 更新用户积分
    */
-  public updateUserPoints(data: updateUserPointsReq): Promise<BaseResponse> {
+  public updateUserPoints(data: UpdateUserPointsReq): Promise<BaseResponse> {
     return request.put(RequestUrlMap.USER_POINTS, data);
   }
 
@@ -44,6 +66,20 @@ class UserApis {
    */
   public redeemPointsForProducts(product: UserPointRedemptionSku): Promise<BaseResponse> {
     return request.post(RequestUrlMap.USER_POINTS_REDEMPTION, product)
+  }
+
+  /**
+   * 开通/续费年卡会员
+   */
+  public subscribeMembership(): Promise<BaseResponse> {
+    return request.post(RequestUrlMap.USER_MEMBERSHIP)
+  }
+
+  /**
+   * 查询会员信息
+   */
+  public getMembershipInfo(): Promise<MembershipInfoResp> {
+    return request.get(RequestUrlMap.USER_MEMBERSHIP)
   }
 }
 

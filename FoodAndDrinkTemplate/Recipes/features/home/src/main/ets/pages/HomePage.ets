@@ -1,5 +1,6 @@
 import { HomePageVM } from '../viewModels/HomePageVM';
-import { BaseHeader, RouterMap, RouterModule, RdbManager, CommonConstants, PreferenceUtil } from 'commonlib';
+import { BaseHeader, RouterMap, RouterModule, RdbManager, CommonConstants, PreferenceUtil,
+  HeaderRefreshBuilder } from 'commonlib';
 import { FeaturedRecipes } from 'featured_recipes';
 import { TabItem } from '../types/Index';
 import { emitter } from '@kit.BasicServicesKit';
@@ -13,7 +14,7 @@ export function HomePageBuilder() {
 @ComponentV2
 struct HomePage {
   vm: HomePageVM = HomePageVM.instance;
-  private context: common.UIAbilityContext = getContext() as common.UIAbilityContext;
+  private context = this.getUIContext().getHostContext() as common.UIAbilityContext;
   private rdbManager: RdbManager = new RdbManager(this.context);
 
   async aboutToAppear() {
@@ -21,18 +22,37 @@ struct HomePage {
     this.rdbManager.initDatabase(this.context);
   }
 
+  public emptyToast() {
+    this.getUIContext().getPromptAction().showToast({
+      message: '暂无更新数据',
+      alignment: Alignment.Bottom,
+    })
+  }
+
+  refresh(): void {
+    setTimeout(()=>{
+      this.vm.isRefreshing = false;
+    },1000)
+  }
+
   build() {
     NavDestination() {
       BaseHeader({ showSearch: this.vm.isSearchVisible, showRightMenu: this.vm.isSearchVisible })
+      Refresh({ refreshing: $$this.vm.isRefreshing, builder: HeaderRefreshBuilder() }) {
         Scroll() {
           Column() {
             Swiper() {
-              ForEach(this.vm.bannerUrl, (item: ResourceStr) => {
-                Image(item).width('100%').height(270).borderRadius(16);
-              }, (item: ResourceStr) => item.toString());
+              ForEach(this.vm.bannerUrl, (item: ResourceStr, index: number) => {
+                Image(item)
+                  .width(this.vm.gridCount === 2 ? '100%' : 340)
+                  .height('100%')
+                  .borderRadius(16)
+              }, (item: ResourceStr) => JSON.stringify(item));
             }
             .width('100%')
-            .height(270)
+            .height(this.vm.gridCount === 2 ? 270 : 192)
+            .itemSpace(12)
+            .nextMargin(this.vm.gridCount === 2 ? 0 : 12)
             .autoPlay(true)
             .loop(true)
             .indicator( // 设置圆点导航点样式
@@ -43,7 +63,8 @@ struct HomePage {
                 .selectedItemHeight(6)
                 .color('#33FFFFFF')
                 .selectedColor('#E84026'))
-            .borderRadius(16);
+            .borderRadius(16)
+            .displayCount(this.vm.gridCount / 2)
 
             Column() {
               Row({ space: 8 }) {
@@ -89,18 +110,37 @@ struct HomePage {
             FeaturedRecipes({
               dishesList: this.vm.dishesList,
               showTitle: true,
+              isLoading: this.vm.isLoading,
               onClickCb: async (id: number) => {
                 RouterModule.push(RouterMap.DISHES, { 'id': id } as Record<string, number>)
               },
               jumpBloggerInfo: (id: number) => {
                 RouterModule.push(RouterMap.BLOGGER_PROFILE_PAGE, { 'id': id } as Record<string, number>)
               },
+              loadMore: () => {
+                this.vm.isLoading = true;
+                // 模拟接口请求数据的延时操作
+                setTimeout(()=>{
+                  if(this.vm.dishesList.totalCount() < this.vm.totalCount) {
+                    this.vm.dishesList.appendArrayData(this.vm.dishesList.getDataList().slice(0, 25))
+                    this.vm.isLoading = false;
+                  } else {
+                    this.vm.isLoading = false;
+                    this.emptyToast();
+                  }
+                },1000)
+              }
             })
           }.padding({ left: 16, right: 16 });
         }.align(Alignment.Top)
         .height('calc(100% - 56vp)')
         .scrollBar(BarState.Off)
         .edgeEffect(EdgeEffect.Spring);
+      }
+      .refreshOffset(56)
+      .onRefreshing(() => {
+        this.refresh();
+      })
     }.hideTitleBar(true);
   }
 }

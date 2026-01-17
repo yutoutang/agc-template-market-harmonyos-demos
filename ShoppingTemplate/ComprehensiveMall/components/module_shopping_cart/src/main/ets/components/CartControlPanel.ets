@@ -1,4 +1,5 @@
 import { CommonConfirmDialog } from 'module_ui_base';
+import { CartPrice, DiscountItem } from '../commons/Types';
 import { PopupSheet } from './PopupSheet';
 
 @ComponentV2
@@ -8,7 +9,11 @@ export struct CartControlPanel {
   // 是否是子页面路由
   @Param isChildRoute: boolean = false;
   // 总价
-  @Param totalPrice: number = 0;
+  @Param cartPrice: CartPrice = {
+    originalPrice: 0,
+    finalPrice: 0,
+    discountList: [],
+  };
   // 优惠
   @Param discountAmount: number = 0;
   // 选择的商品个数
@@ -32,7 +37,7 @@ export struct CartControlPanel {
           CheckboxGroup({ group: 'checkboxGroup' })
             .selectedColor('#FFE64566')
             .checkboxShape(CheckBoxShape.CIRCLE)
-            .onChange((event: CheckboxGroupResult) => {
+            .onChange(() => {
               this.visible = false;
               this.onSelectAll && this.onSelectAll();
             })
@@ -49,7 +54,7 @@ export struct CartControlPanel {
             this.DeleteBtn();
           } else {
             // 总价大于0，需要展示明细
-            if (this.totalPrice > 0) {
+            if (this.cartPrice.finalPrice > 0) {
               this.TotalCostDetailView();
             } else {
               this.TotalView();
@@ -72,7 +77,7 @@ export struct CartControlPanel {
 
       PopupSheet({
         visible: this.visible!!,
-        cornerRadius: 12,
+        cornerRadius: 32,
         maskHeight: this.popupMaskHeight,
         customContentBuilder: () => {
           this.PopupContentBuilder();
@@ -82,7 +87,7 @@ export struct CartControlPanel {
     }
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
     .backgroundColor(Color.White)
-    .onAreaChange((ov, nv) => {
+    .onAreaChange((_ov, nv) => {
       if (nv.globalPosition.y) {
         this.popupMaskHeight = nv.globalPosition.y;
       }
@@ -115,7 +120,7 @@ export struct CartControlPanel {
         .fontSize(12)
         .fontColor($r('app.color.theme_color'))
         .fontWeight(FontWeight.Medium)
-      Text(this.totalPrice.toString())
+      Text(this.cartPrice.finalPrice.toString())
         .fontSize(16)
         .fontColor($r('app.color.theme_color'))
         .fontWeight(FontWeight.Medium)
@@ -174,17 +179,21 @@ export struct CartControlPanel {
     .margin({ left: 16 })
     .onClick(() => {
       this.onCheckout && this.onCheckout();
+      this.visible = false;
     })
   }
 
   @Builder
   PopupContentBuilder() {
     Column({ space: 14 }) {
-      this.PopupContentItem('商品金额', this.totalPrice + (this.discountAmount || 0));
+      this.PopupContentItem('商品金额', this.cartPrice.originalPrice);
       // 是否有优惠
       if (this.discountAmount) {
         this.PopupContentItem('活动优惠', this.discountAmount);
       }
+      ForEach(this.cartPrice.discountList, (discount: DiscountItem) => {
+        this.PopupContentItem(discount.label, discount.discountPrice, true);
+      }, (discount: DiscountItem) => discount.type + '__' + discount.discountPrice)
       // 合计
       Row() {
         Text('合计')
@@ -194,8 +203,8 @@ export struct CartControlPanel {
 
         Text() {
           Span('¥').fontSize(12)
-          Span(this.totalPrice.toString())
-            .fontSize(16)
+          Span(this.cartPrice.finalPrice.toString())
+            .fontSize(24)
         }
         .fontColor($r('app.color.theme_color'))
         .fontWeight(FontWeight.Medium)
@@ -209,17 +218,22 @@ export struct CartControlPanel {
   }
 
   @Builder
-  PopupContentItem(label: string, value: number) {
+  PopupContentItem(label: string, value: number, isDiscount: boolean = false) {
     Row() {
       Text(label)
         .fontSize(14)
         .fontColor($r('sys.color.ohos_id_color_text_tertiary'))
         .fontWeight(FontWeight.Regular)
 
-      Text(`¥${value}`)
-        .fontSize(14)
-        .fontColor($r('sys.color.ohos_id_color_text_primary'))
-        .fontWeight(FontWeight.Medium)
+      Text() {
+        if (isDiscount) {
+          Span('-')
+        }
+        Span(`¥${value}`)
+      }
+      .fontSize(14)
+      .fontColor($r('sys.color.ohos_id_color_text_primary'))
+      .fontWeight(FontWeight.Medium)
     }
     .width('100%')
     .justifyContent(FlexAlign.SpaceBetween)

@@ -18,7 +18,6 @@ export class GlobalStateMgr {
   public userInfo: UserInfoModel = new UserInfoModel();
 }
 
-@ObservedV2
 class IData {
   public get global() {
     return PersistenceV2.connect(

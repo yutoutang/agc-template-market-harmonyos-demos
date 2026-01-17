@@ -1,4 +1,4 @@
-import { CircleButtonModifier, CommonConfirmDialog } from 'lib_common';
+import { CircleButtonModifier, CommonConfirmDialog, GlobalContextUtils } from 'lib_common';
 
 @ComponentV2
 export struct SetReadIcon {
@@ -28,7 +28,7 @@ export struct SetReadIcon {
             },
           });
         } else {
-          this.getUIContext().getPromptAction().showToast({ message: '暂无未读消息' });
+          GlobalContextUtils.showToast({ message: '暂无未读消息' });
         }
       })
     }

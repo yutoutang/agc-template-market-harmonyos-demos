@@ -11,13 +11,14 @@
     "lib_network": "file:../../commons/lib_network",
     "module_product_detail": "file:../../components/module_product_detail",
     "module_shopping_cart": "file:../../components/module_shopping_cart",
-    "module_address_manage": "file:../../components/module_address_manage",
     "module_coupons": "file:../../components/module_coupons",
-    "module_product_share": "file:../../components/module_product_share",
     "module_product_search": "file:../../components/module_product_search",
     "module_product_filter": "file:../../components/module_product_filter",
     "module_custom_service_chat": "file:../../components/module_custom_service_chat",
     "module_transition": "file:../../components/module_transition",
+    "address_management": "file:../../components/address_management",
+    "aggregated_share": "file:../../components/aggregated_share",
+    "aggregated_payment": "file:../../components/aggregated_payment",
     "order": "file:../order",
     "product": "file:../product"
   }

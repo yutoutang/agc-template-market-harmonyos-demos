@@ -1,7 +1,8 @@
-import { mapCommon, map, navi } from '@kit.MapKit';
 import { AsyncCallback } from '@kit.BasicServicesKit';
-import { OrderApis, OrderExpressInfo, OrderItem } from 'lib_network';
 import { image } from '@kit.ImageKit';
+import { mapCommon, map, navi } from '@kit.MapKit';
+import { OrderApis, OrderExpressInfo, OrderItem } from 'lib_network';
+import { UtilLog } from '@hw-agconnect/util-log';
 
 const DEFAULT_LATITUDE = 31.97;
 const DEFAULT_LONGITUDE = 118.75;
@@ -65,7 +66,7 @@ export class OrderExpressInfoVM {
         this.mapEventManager.on('mapLoad', callback);
         setTimeout(() => {
           this.testDrivingRoutes()
-          this.addMarker()
+          this.addPositionMarker()
           this.addMarkerCard(func1, func2)
         }, 500)
       }
@@ -85,16 +86,20 @@ export class OrderExpressInfoVM {
       waypoints: this.expressInfo.waypoints,
       language: 'zh_CN',
     };
-    const result = await navi.getDrivingRoutes(params);
-    this.mapController?.addPolyline({
-      points: result.routes[0].overviewPolyline,
-      width: 16,
-      color: 0xFFE64566,
-    })
-    console.info('Succeeded in getting driving routes.');
+    try {
+      const result = await navi.getDrivingRoutes(params);
+      await this.mapController?.addPolyline({
+        points: result.routes[0].overviewPolyline,
+        width: 16,
+        color: 0xFFE64566,
+      })
+      UtilLog.info('Succeeded in getting driving routes.');
+    } catch (err) {
+      UtilLog.error('get driving routes failed. error: ' + JSON.stringify(err));
+    }
   }
 
-  async addMarker() {
+  async addPositionMarker() {
     let markerOptions1: mapCommon.MarkerOptions = {
       position: this.expressInfo!.origins,
       rotation: 0,
@@ -108,7 +113,7 @@ export class OrderExpressInfoVM {
       flat: false,
       icon: $r('app.media.ic_send_map'),
     };
-    await this.mapController?.addMarker(markerOptions1)
+    await this._addMarker(markerOptions1);
 
     let markerOptions2: mapCommon.MarkerOptions = {
       position: this.expressInfo!.destination,
@@ -123,7 +128,7 @@ export class OrderExpressInfoVM {
       flat: false,
       icon: $r('app.media.ic_get_map'),
     };
-    await this.mapController?.addMarker(markerOptions2)
+    await this._addMarker(markerOptions2);
   }
 
   addMarkerCard(func1: () => void, func2: () => void) {
@@ -147,7 +152,7 @@ export class OrderExpressInfoVM {
           flat: false,
           icon: pixmap,
         };
-        this.mapController?.addMarker(markerOptions);
+        this._addMarker(markerOptions);
       })
 
     this._uiContext.getComponentSnapshot().createFromBuilder(func2,
@@ -170,7 +175,15 @@ export class OrderExpressInfoVM {
           flat: false,
           icon: pixmap,
         };
-        this.mapController?.addMarker(markerOptions);
+        this._addMarker(markerOptions);
       })
+  }
+
+  private async _addMarker(options: mapCommon.MarkerOptions) {
+    try {
+      await this.mapController?.addMarker(options);
+    } catch (err) {
+      UtilLog.error('add marker failed. error: ' + JSON.stringify(err))
+    }
   }
 }

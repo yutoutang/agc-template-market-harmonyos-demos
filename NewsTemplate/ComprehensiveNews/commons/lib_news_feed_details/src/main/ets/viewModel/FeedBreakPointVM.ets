@@ -1,13 +1,14 @@
 import { AppStorageV2 } from '@kit.ArkUI';
-import { BreakpointModel, BreakpointNameEnum } from 'lib_common';
+import { BreakpointModel, BreakpointNameEnum, GlobalContextUtils } from 'lib_common';
 
 @ObservedV2
 export class FeedBreakPointVM {
   @Trace isSplit: boolean = false
   @Trace breakpointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
+
   @Computed
   get getNewsLanes() {
-    return this.isFolderStatus  ? 2 : 1
+    return this.isFolderStatus ? 2 : 1
   }
 
   @Computed
@@ -21,7 +22,7 @@ export class FeedBreakPointVM {
   }
 
   public switchSplit() {
-    animateTo({
+    GlobalContextUtils.globalUIContext.animateTo({
       duration: 200,
       curve: Curve.EaseOut,
       playMode: PlayMode.Normal,

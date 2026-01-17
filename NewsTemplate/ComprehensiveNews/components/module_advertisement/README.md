@@ -86,7 +86,8 @@
          })
        }
        .height('100%')
-       .width('100%')
+       .width('50%')
+       .margin({ top: 36 })
      }
    }
    ```
@@ -138,7 +139,8 @@ skipAd: () => void = () => {}
          })
        }
        .height('100%')
-       .width('100%')
+       .width('50%')
+       .margin({ top: 36 })  
      }
    }
    ```
@@ -170,7 +172,8 @@ skipAd: () => void = () => {}
          })
        }
        .height('100%')
-       .width('100%')
+       .width('50%')
+       .margin({ top: 36 })
      }
    }
    ```

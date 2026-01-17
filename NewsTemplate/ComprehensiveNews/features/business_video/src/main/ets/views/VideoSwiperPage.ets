@@ -1,11 +1,12 @@
-import { uiObserver, window } from '@kit.ArkUI';
-import { VideoSwipePlayer, VideoNetworkModel, VideoNetworkSetting } from 'module_swipeplayer';
+import { AppStorageV2, uiObserver, window } from '@kit.ArkUI';
+import { VideoSwipePlayer, VideoNetworkModel, VideoNetworkSetting, PiPWindowModel } from 'module_swipeplayer';
 import {
   CommonConstants,
   SystemBarOperation,
   RouterUtils,
   GridRowColSetting,
-  NetworkUtil
+  NetworkUtil,
+  Logger,
 } from 'lib_common';
 import { NewsResponse } from 'lib_news_api';
 import { NetworkExceptionView } from 'lib_widget';
@@ -14,7 +15,9 @@ import { VideoSwipePageVM } from '../viewmodels/VideoSwipePageVM';
 import { TabPageType } from '../types/Index';
 import { CommentView } from '../components/CommentView';
 
-@ComponentV2({ freezeWhenInactive: true })
+const TAG = '[VideoSwiperPage]';
+
+@ComponentV2
 export struct VideoSwiperPage {
   // tab页面的index
   @Param index: number = 1
@@ -22,20 +25,26 @@ export struct VideoSwiperPage {
   @Param currentTabIndex: number = 1;
   // tab的页面类别
   @Param pageType: TabPageType = TabPageType.FEATURED
+  // 页面是否展示
+  @Param isShown: boolean = false;
   // 是否刷新页面
   @Consumer() isRefreshPage: boolean = false;
   // 路由栈
   @Local pathStack: NavPathStack = RouterUtils.getStack('main')
   @Local vm: VideoSwipePageVM = new VideoSwipePageVM()
+  pipWindowModel: PiPWindowModel = AppStorageV2.connect(PiPWindowModel, () => new PiPWindowModel())!;
   // WindowStage生命周期变化的监听回调函数
-  private windowStageEventCallback = (type: window.WindowStageEventType) => {
-    if (this.currentTabIndex === this.index && this.vm.tabModel.selectedIndex === 1) {
-      let eventType = window.WindowStageEventType
-      if (type === eventType.RESUMED || type === eventType.SHOWN) {
-        this.vm.swipePlayerController.getAVPlayer()?.play();
-      } else if (type === eventType.PAUSED || type === eventType.HIDDEN) {
-        this.vm.swipePlayerController.getAVPlayer()?.pause()
+  private windowStageEventCallback = async (type: window.WindowStageEventType) => {
+    try {
+      if (this.currentTabIndex === this.index && this.vm.tabModel.selectedIndex === 1) {
+        if (type === window.WindowStageEventType.RESUMED || type === window.WindowStageEventType.SHOWN) {
+          await this.vm.swipePlayerController.getAVPlayer()?.play();
+        } else if (type === window.WindowStageEventType.PAUSED || type === window.WindowStageEventType.HIDDEN) {
+          await this.vm.swipePlayerController.getAVPlayer()?.pause()
+        }
       }
+    } catch (e) {
+      Logger.error(TAG, 'play or pause fail, error: ' + JSON.stringify(e));
     }
   }
 
@@ -65,23 +74,21 @@ export struct VideoSwiperPage {
 
   // 监听是否刷新
   @Monitor('isRefreshPage')
-  onRefreshPage() {
+  async onRefreshPage() {
     if (this.currentTabIndex === this.index && this.isRefreshPage) {
-      setTimeout(() => {
-        // 刷新数据
-        this.vm.initVideoDataSource();
-        this.isRefreshPage = false;
-        // 回到第一个
-        this.vm.swipePlayerController?.changeIndex(0, false)
-      }, 500)
+      // 刷新数据
+      await this.vm.initVideoDataSource();
+      this.isRefreshPage = false;
+      // 回到第一个
+      this.vm.swipePlayerController?.changeIndex(0, false)
     }
   }
 
-  aboutToAppear(): void {
+  async aboutToAppear(): Promise<void> {
     this.vm.pageType = this.pageType;
     this.vm.swipePlayerController.setAVPlayerMgr(this.vm.avPlayerManager)
     // 初始化视频数据
-    this.vm.initVideoDataSource()
+    await this.vm.initVideoDataSource()
     // 模拟首次进入页面时，判断是否展示网络异常页面
     this.vm.showExceptionPage = !this.vm.networkModel.isNetworkAvailable
     // 监听 windowStageEvent
@@ -126,34 +133,31 @@ export struct VideoSwiperPage {
   build() {
     Stack() {
       GridRow({
-        columns: GridRowColSetting.GRID_ROW_OPTIONS_COLUMNS
+        columns: GridRowColSetting.GRID_ROW_OPTIONS_COLUMNS,
       }) {
         GridCol({
           span: {
             sm: 4,
             md: this.vm.isShowSideComment ? 4 : 8,
             lg: this.vm.isShowSideComment ? 8 : 12,
-          }
+          },
         }) {
-          Stack({alignContent: Alignment.Top}) {
+          Stack({ alignContent: Alignment.Top }) {
             if (this.vm.showExceptionPage) {
               if (!this.vm.loading) {
                 NetworkExceptionView({
-                  refreshNetwork: () => {
+                  refreshNetwork: async () => {
                     this.vm.loading = true;
                     // 模拟请求判断网络能否使用
                     let networkUtil = NetworkUtil.getInstance()
                     networkUtil.handleNetworkAvailable();
-                    setTimeout(() => {
-                      // 模拟
-                      if (this.vm.networkModel.isNetworkAvailable) {
-                        this.vm.initVideoDataSource()
-                        this.vm.showExceptionPage = false;
-                      } else {
-                        this.vm.loading = false
-                      }
-                    }, 100)
-                  }
+                    if (this.vm.networkModel.isNetworkAvailable) {
+                      await this.vm.initVideoDataSource()
+                      this.vm.showExceptionPage = false;
+                    } else {
+                      this.vm.loading = false
+                    }
+                  },
                 })
               }
             } else {
@@ -168,7 +172,7 @@ export struct VideoSwiperPage {
                   pathStack: this.pathStack,
                   isLandscape: this.vm.displayModel.isLandscape,
                   currentBreakpoint: this.vm.breakPointModel.currentBreakpoint,
-                  isShown: this.vm.tabModel.selectedIndex === 1 && this.currentTabIndex === this.index,
+                  isShown: this.isShown,
                   playerStateCallback: (state: string, id: string) => {
                     this.vm.onPlayerStateListen(state, id)
                   },
@@ -177,14 +181,14 @@ export struct VideoSwiperPage {
                     bottomTabHeight: this.vm.tabModel.tabHeight,
                     totalCount: Number.POSITIVE_INFINITY,
                     swiperCallback: {
-                      onAnimationStart: (_index: number, targetIndex: number, extraInfo: SwiperAnimationEvent) => {
+                      onAnimationStart: (_index: number, targetIndex: number, _extraInfo: SwiperAnimationEvent) => {
                         this.vm.handleSwiperAnimationStart(_index, targetIndex)
                       },
                       onChange: (index: number) => {
                         this.vm.handleSwiperChange(index)
-                      }
-                    }
-                  }
+                      },
+                    },
+                  },
                 })
               }
               .layoutWeight(1)
@@ -211,13 +215,13 @@ export struct VideoSwiperPage {
       // 评论区适配双折叠和平板
       if (this.vm.isShowSideComment) {
         GridRow({
-          columns: GridRowColSetting.GRID_ROW_OPTIONS_COLUMNS
+          columns: GridRowColSetting.GRID_ROW_OPTIONS_COLUMNS,
         }) {
           GridCol({
             span: {
               md: this.vm.isShowSideComment ? 4 : 8,
               lg: this.vm.isShowSideComment ? 8 : 12,
-            }
+            },
           }) {
             Column() {
             }
@@ -250,7 +254,7 @@ export struct VideoSwiperPage {
     Row() {
       LoadingProgress()
         .height(32)
-        .color(Color.White)
+        .color($r('sys.color.icon_on_primary'))
     }
     .height(32)
     .width(CommonConstants.FULL_PERCENT)

@@ -1,11 +1,14 @@
 import { emitter } from '@kit.BasicServicesKit';
-import { CommonConstants } from 'lib_common';
+import { CommonConstants, VideoType } from 'lib_common';
 import { VideoViewModel } from '../viewmodels/VideoViewModel';
 import { FollowPage } from '../views/FollowPage';
 import { FeaturedPage } from '../views/FeaturedPage';
 import { RecommendPage } from '../views/RecommendPage';
 import { TabHeaderView } from '../components/TabHeaderView';
 import { LivestreamPage } from '../views/LivestreamPage';
+import { BroadcastPage } from '../views/BroadcastPage';
+import { TelevisionPage } from '../views/TelevisionPage';
+
 
 @Builder
 export function VideoPageBuilder() {
@@ -39,7 +42,7 @@ struct VideoPage {
           onChangeTabIndex: (index: number) => {
             this.isRefreshPage = this.vm.currentTabIndex === index
             this.vm.onChangeTabIndex(index)
-          }
+          },
         })
       }
       .animation({ duration: 200 })
@@ -63,7 +66,7 @@ struct VideoPage {
         // 关注
         FollowPage({
           currentTabIndex: this.vm.indicatorIndex,
-          index: 0,
+          index: VideoType.FOLLOW,
         })
       }
 
@@ -71,7 +74,7 @@ struct VideoPage {
         // 精选
         FeaturedPage({
           currentTabIndex: this.vm.indicatorIndex,
-          index: 1,
+          index: VideoType.CHOICE,
         })
       }
 
@@ -79,7 +82,7 @@ struct VideoPage {
         // 推荐
         RecommendPage({
           currentTabIndex: this.vm.indicatorIndex,
-          index: 2,
+          index: VideoType.RECOMMEND,
         })
       }
 
@@ -87,7 +90,23 @@ struct VideoPage {
         // 直播
         LivestreamPage({
           currentTabIndex: this.vm.indicatorIndex,
-          index: 3,
+          index: VideoType.LIVE,
+        })
+      }
+
+      TabContent() {
+        // 电视
+        TelevisionPage({
+          currentTabIndex: this.vm.indicatorIndex,
+          index: VideoType.TELEVISION,
+        })
+      }
+
+      TabContent() {
+        // 广播
+        BroadcastPage({
+          currentTabIndex: this.vm.indicatorIndex,
+          index: VideoType.BROADCAST,
         })
       }
     }

@@ -1,7 +1,7 @@
-import { ComponentContent, promptAction } from '@kit.ArkUI';
-import { common } from '@kit.AbilityKit';
+import { ComponentContent } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { Constants, DayFormat, getDayLabel, PassengerInfo } from 'common';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 
 // dialog头部
 @ComponentV2
@@ -103,22 +103,14 @@ export interface TextPromptDialogParam {
 }
 
 export class GlobalDialog {
-  static uiContext: UIContext;
   static globalDialogInstance?: ComponentContent<Object>;
 
   // 全局Loading弹框
-  static async showLoadingDialog(dialogParam: LoadingDialogParam = {}): Promise<void> {
-    if (!GlobalDialog.uiContext) {
-      let context = getContext() as common.UIAbilityContext
-      const windowStage = context.windowStage
-      const mainWindow = await windowStage.getMainWindow()
-      GlobalDialog.uiContext = mainWindow.getUIContext()
-    }
-
+  static async showLoadingDialog(uiContext: UIContext, dialogParam: LoadingDialogParam = {}): Promise<void> {
     let contentNode: ComponentContent<LoadingDialogParam> =
-      new ComponentContent(GlobalDialog.uiContext, wrapBuilder(loadingDialogBuilder), dialogParam);
+      new ComponentContent(uiContext, wrapBuilder(loadingDialogBuilder), dialogParam);
     // 通过 context 获取 promptAction，用于操作对话框显示
-    const promptAction = GlobalDialog.uiContext.getPromptAction()
+    const promptAction = uiContext.getPromptAction()
 
     //显示弹窗
     await promptAction.openCustomDialog(contentNode, {
@@ -137,30 +129,29 @@ export class GlobalDialog {
   }
 
   // toast提示
-  static showToast(error: BusinessError | string) {
+  static showToast(error: BusinessError | string, uiContext: UIContext) {
     const message: string = typeof error === 'string' ? error : error.message
-    promptAction.showToast({
-      message,
-      duration: 2000,
-      alignment: Alignment.Center,
-      textColor: Color.White,
-      backgroundColor: '#333333',
-      backgroundBlurStyle: BlurStyle.NONE
-    });
+    try {
+      uiContext.getPromptAction().showToast({
+        message,
+        duration: 2000,
+        alignment: Alignment.Center,
+        textColor: Color.White,
+        backgroundColor: '#333333',
+        backgroundBlurStyle: BlurStyle.NONE
+      });
+    } catch (error) {
+      hilog.error(0x0000, 'testTag', 'Failed to show toast, errorCode=%{public}d, errorMsg=%{public}s', error.code,
+        error.message);
+    }
   }
 
   // 费用明细的弹框
-  static async showDialogForCostDetail(dialogParam: CostDetailDialogParam) {
-    if (!GlobalDialog.uiContext) {
-      let context = getContext() as common.UIAbilityContext
-      const windowStage = context.windowStage
-      const mainWindow = await windowStage.getMainWindow()
-      GlobalDialog.uiContext = mainWindow.getUIContext()
-    }
+  static async showDialogForCostDetail(dialogParam: CostDetailDialogParam, uiContext: UIContext) {
     let contentNode: ComponentContent<CostDetailDialogParam> =
-      new ComponentContent(GlobalDialog.uiContext, wrapBuilder(costDetailDialogComponent), dialogParam);
+      new ComponentContent(uiContext, wrapBuilder(costDetailDialogComponent), dialogParam);
     // 通过 context 获取 promptAction，用于操作对话框显示
-    const promptAction = GlobalDialog.uiContext.getPromptAction()
+    const promptAction = uiContext.getPromptAction()
 
     //显示弹窗
     await promptAction.openCustomDialog(contentNode, {
@@ -179,17 +170,11 @@ export class GlobalDialog {
   }
 
   // 订单创建中的弹框
-  static async showDialogForCreateOrder(dialogParam: CreateOrderDialogParam) {
-    if (!GlobalDialog.uiContext) {
-      let context = getContext() as common.UIAbilityContext
-      const windowStage = context.windowStage
-      const mainWindow = await windowStage.getMainWindow()
-      GlobalDialog.uiContext = mainWindow.getUIContext()
-    }
+  static async showDialogForCreateOrder(dialogParam: CreateOrderDialogParam, uiContext: UIContext) {
     let contentNode: ComponentContent<CreateOrderDialogParam> =
-      new ComponentContent(GlobalDialog.uiContext, wrapBuilder(createOrderDialogComponent), dialogParam);
+      new ComponentContent(uiContext, wrapBuilder(createOrderDialogComponent), dialogParam);
     // 通过 context 获取 promptAction，用于操作对话框显示
-    const promptAction = GlobalDialog.uiContext.getPromptAction()
+    const promptAction = uiContext.getPromptAction()
 
     //显示弹窗
     await promptAction.openCustomDialog(contentNode, {
@@ -205,17 +190,11 @@ export class GlobalDialog {
   }
 
   // 订单支付页面返回时的弹框
-  static async showDialogForPayOrder(dialogParam: PayOrderDialogParam) {
-    if (!GlobalDialog.uiContext) {
-      let context = getContext() as common.UIAbilityContext
-      const windowStage = context.windowStage
-      const mainWindow = await windowStage.getMainWindow()
-      GlobalDialog.uiContext = mainWindow.getUIContext()
-    }
+  static async showDialogForPayOrder(dialogParam: PayOrderDialogParam, uiContext: UIContext) {
     let contentNode: ComponentContent<PayOrderDialogParam> =
-      new ComponentContent(GlobalDialog.uiContext, wrapBuilder(payOrderDialogComponent), dialogParam);
+      new ComponentContent(uiContext, wrapBuilder(payOrderDialogComponent), dialogParam);
     // 通过 context 获取 promptAction，用于操作对话框显示
-    const promptAction = GlobalDialog.uiContext.getPromptAction()
+    const promptAction = uiContext.getPromptAction()
 
     //显示弹窗
     await promptAction.openCustomDialog(contentNode, {
@@ -231,13 +210,7 @@ export class GlobalDialog {
   }
 
   // 带有输入框的dialog
-  static async showDialogWithInputBox(dialogParam: GlobalDialogWithInputParam) {
-    if (!GlobalDialog.uiContext) {
-      let context = getContext() as common.UIAbilityContext
-      const windowStage = context.windowStage
-      const mainWindow = await windowStage.getMainWindow()
-      GlobalDialog.uiContext = mainWindow.getUIContext()
-    }
+  static async showDialogWithInputBox(dialogParam: GlobalDialogWithInputParam, uiContext: UIContext) {
     if (!dialogParam.but1Name) {
       dialogParam.but1Name = '取消';
     }
@@ -245,9 +218,9 @@ export class GlobalDialog {
       dialogParam.but2Name = '确定';
     }
     let contentNode: ComponentContent<GlobalDialogWithInputParam> =
-      new ComponentContent(GlobalDialog.uiContext, wrapBuilder(buildInputBoxComponent), dialogParam);
+      new ComponentContent(uiContext, wrapBuilder(buildInputBoxComponent), dialogParam);
 
-    const promptAction = GlobalDialog.uiContext.getPromptAction()
+    const promptAction = uiContext.getPromptAction()
     //显示弹窗
     await promptAction.openCustomDialog(contentNode, {
       alignment: DialogAlignment.Center, //对话框在屏幕中央显示
@@ -257,17 +230,11 @@ export class GlobalDialog {
   }
 
   // 纯文本的dialog
-  static async showTextDialog(dialogParam: TextPromptDialogParam) {
-    if (!GlobalDialog.uiContext) {
-      let context = getContext() as common.UIAbilityContext
-      const windowStage = context.windowStage
-      const mainWindow = await windowStage.getMainWindow()
-      GlobalDialog.uiContext = mainWindow.getUIContext()
-    }
+  static async showTextDialog(dialogParam: TextPromptDialogParam, uiContext: UIContext) {
     let contentNode: ComponentContent<TextPromptDialogParam> =
-      new ComponentContent(GlobalDialog.uiContext, wrapBuilder(buildTextBoxComponent), dialogParam);
+      new ComponentContent(uiContext, wrapBuilder(buildTextBoxComponent), dialogParam);
 
-    const promptAction = GlobalDialog.uiContext.getPromptAction()
+    const promptAction = uiContext.getPromptAction()
     //显示弹窗
     await promptAction.openCustomDialog(contentNode, {
       alignment: DialogAlignment.Center, //对话框在屏幕中央显示
@@ -277,11 +244,8 @@ export class GlobalDialog {
   }
 
   //关闭弹窗
-  static async close() {
-    if (!GlobalDialog.uiContext) {
-      return
-    }
-    const promptAction = GlobalDialog.uiContext.getPromptAction()
+  static async close(uiContext: UIContext) {
+    const promptAction = uiContext.getPromptAction()
     if (GlobalDialog?.globalDialogInstance) {
       await promptAction.closeCustomDialog(GlobalDialog.globalDialogInstance)
     }
@@ -289,6 +253,7 @@ export class GlobalDialog {
     GlobalDialog.globalDialogInstance = undefined
   }
 }
+
 // loading弹框的UI
 @Builder
 function loadingDialogBuilder(param: LoadingDialogParam) {
@@ -311,12 +276,12 @@ function loadingDialogBuilder(param: LoadingDialogParam) {
 // 费用明细弹框UI
 @Builder
 function costDetailDialogComponent(param: CostDetailDialogParam) {
-  Column({space: 14}) {
+  Column({ space: 14 }) {
     BaseDialogHeader({
       title: param.title
     })
 
-    Row({space: 4}) {
+    Row({ space: 4 }) {
       Text('在线支付').fontWeight(400)
       Text('¥' + param.totalCost).fontColor($r('sys.color.ohos_id_color_warning'))
     }
@@ -325,10 +290,10 @@ function costDetailDialogComponent(param: CostDetailDialogParam) {
     .padding(14)
     .borderRadius(6)
 
-    Column({space: 14}) {
+    Column({ space: 14 }) {
       Row() {
         Text('票价').fontSize(13).fontWeight(400).fontColor($r('sys.color.ohos_id_color_text_tertiary'))
-        Text('¥'+ param.taxPrice + '*' + param.passengerNum + '人')
+        Text('¥' + param.taxPrice + '*' + param.passengerNum + '人')
           .fontSize(12).fontWeight(400).fontColor($r('sys.color.ohos_id_color_text_tertiary'))
       }
       .width('100%')
@@ -337,7 +302,7 @@ function costDetailDialogComponent(param: CostDetailDialogParam) {
       Divider().color($r('sys.color.comp_divider')).width('100%')
       Row() {
         Text('机建费').fontSize(13).fontWeight(400).fontColor($r('sys.color.ohos_id_color_text_tertiary'))
-        Text('¥'+ param.airportConstructionPrice + '*' + param.passengerNum + '人')
+        Text('¥' + param.airportConstructionPrice + '*' + param.passengerNum + '人')
           .fontSize(12).fontWeight(400).fontColor($r('sys.color.ohos_id_color_text_tertiary'))
       }
       .width('100%')
@@ -346,7 +311,7 @@ function costDetailDialogComponent(param: CostDetailDialogParam) {
       Divider().color($r('sys.color.comp_divider')).width('100%')
       Row() {
         Text('燃油费').fontSize(13).fontWeight(400).fontColor($r('sys.color.ohos_id_color_text_tertiary'))
-        Text('¥'+ param.fuelPrice + '*' + param.passengerNum + '人')
+        Text('¥' + param.fuelPrice + '*' + param.passengerNum + '人')
           .fontSize(12).fontWeight(400).fontColor($r('sys.color.ohos_id_color_text_tertiary'))
       }
       .width('100%')
@@ -361,7 +326,7 @@ function costDetailDialogComponent(param: CostDetailDialogParam) {
   .alignItems(HorizontalAlign.Start)
   .width('100%')
   .height('70%')
-  .padding({left: 14, right: 14, bottom: px2vp(91)})
+  .padding({ left: 14, right: 14, bottom: 14 })
   .backgroundColor('#fff5f3f3')
   .borderRadius(10)
 }
@@ -369,7 +334,7 @@ function costDetailDialogComponent(param: CostDetailDialogParam) {
 // 订单创建中的弹框UI
 @Builder
 function createOrderDialogComponent(param: CreateOrderDialogParam) {
-  Column({space: 14}) {
+  Column({ space: 14 }) {
     Row() {
       Text('请确认订单信息')
         .fontSize(20)
@@ -380,9 +345,9 @@ function createOrderDialogComponent(param: CreateOrderDialogParam) {
     .justifyContent(FlexAlign.Center)
 
     Scroll() {
-      Column({space: 14}) {
+      Column({ space: 14 }) {
         Row() {
-          Row({space: 8}) {
+          Row({ space: 8 }) {
             Text('单程')
               .fontSize(12)
               .fontColor($r('sys.color.white'))
@@ -398,6 +363,7 @@ function createOrderDialogComponent(param: CreateOrderDialogParam) {
               .fontSize(14)
               .fontWeight(FontWeight.Regular)
           }
+
           if (param.okList[0]) {
             Image($r('app.media.ic_selected')).width(14).height(14)
           }
@@ -426,7 +392,7 @@ function createOrderDialogComponent(param: CreateOrderDialogParam) {
         .justifyContent(FlexAlign.SpaceBetween)
 
         Text('乘机人').fontWeight(400)
-        List({space: 12}) {
+        List({ space: 12 }) {
           ForEach(JSON.parse(param.passengerList), (item: PassengerInfo) => {
             if (item) {
               ListItem() {
@@ -436,6 +402,7 @@ function createOrderDialogComponent(param: CreateOrderDialogParam) {
                     Span(' ')
                     Span(item.certificateNo).fontWeight(400).fontColor($r('sys.color.ohos_id_color_text_tertiary'))
                   }
+
                   if (param.okList[3]) {
                     Image($r('app.media.ic_selected')).width(14).height(14)
                   }
@@ -444,7 +411,7 @@ function createOrderDialogComponent(param: CreateOrderDialogParam) {
                 .justifyContent(FlexAlign.SpaceBetween)
               }
             }
-          })
+          },(item: PassengerInfo, index: number)=>index + '__' + JSON.stringify(item))
         }
         .width('100%')
         .height(80)
@@ -453,12 +420,17 @@ function createOrderDialogComponent(param: CreateOrderDialogParam) {
 
         Divider().color($r('sys.color.comp_divider')).width('100%')
 
-        Row({space: 10}) {
+        Row({ space: 10 }) {
           if (param.okList.every((isOk: boolean) => isOk)) {
             Button({ type: ButtonType.Capsule, stateEffect: true }) {
               Text('查看订单').fontSize(16).fontColor('#466DFA').fontWeight(FontWeight.Medium)
             }
-            .padding({left: 16, top: 8, bottom: 8, right: 16 })
+            .padding({
+              left: 16,
+              top: 8,
+              bottom: 8,
+              right: 16
+            })
             .backgroundColor('#F3F3F3')
             .onClick(() => {
               param.view && param.view()
@@ -467,7 +439,12 @@ function createOrderDialogComponent(param: CreateOrderDialogParam) {
             Button({ type: ButtonType.Capsule, stateEffect: true }) {
               Text('去支付').fontSize(16).fontColor($r('sys.color.white')).fontWeight(FontWeight.Medium)
             }
-            .padding({left: 16, top: 8, bottom: 8, right: 16 })
+            .padding({
+              left: 16,
+              top: 8,
+              bottom: 8,
+              right: 16
+            })
             .backgroundColor('#466DFA')
             .onClick(() => {
               param.pay && param.pay()
@@ -492,8 +469,8 @@ function createOrderDialogComponent(param: CreateOrderDialogParam) {
   }
   .alignItems(HorizontalAlign.Start)
   .width('88%')
-  .constraintSize({maxHeight: '45%'})
-  .padding({left: 12, right: 12})
+  .constraintSize({ maxHeight: '45%' })
+  .padding({ left: 12, right: 12 })
   .backgroundColor($r('sys.color.white'))
   .borderRadius(16)
 }
@@ -507,21 +484,27 @@ function payOrderDialogComponent(param: PayOrderDialogParam) {
       showClose: false
     })
 
-    Text('请您尽快完成支付，若退出后，您可以前往个人中心-待支付订单内继续支付').margin({top: 6})
+    Text('请您尽快完成支付，若退出后，您可以前往个人中心-待支付订单内继续支付').margin({ top: 6 })
       .fontWeight(400)
       .fontSize(13)
       .fontColor($r('sys.color.ohos_id_color_text_primary'))
 
-    Divider().color($r('sys.color.comp_divider')).width('100%').margin({top: 14})
+    Divider().color($r('sys.color.comp_divider')).width('100%').margin({ top: 14 })
 
     Row() {
-      Text('狠心离开').fontColor($r('sys.color.ohos_id_color_text_tertiary')).fontWeight(400).fontSize(13)
+      Text('狠心离开')
+        .fontColor($r('sys.color.ohos_id_color_text_tertiary'))
+        .fontWeight(400)
+        .fontSize(13)
         .padding(14)
         .onClick(() => {
           param.exit && param.exit()
         })
-      Divider().strokeWidth(0.5).color($r('sys.color.ohos_id_color_button_divider')).height(14).vertical(true)
-      Text('继续支付').fontColor($r('sys.color.ohos_id_color_emphasize')).fontWeight(400).fontSize(13)
+      Divider().height(14).vertical(true)
+      Text('继续支付')
+        .fontColor($r('sys.color.ohos_id_color_emphasize'))
+        .fontWeight(400)
+        .fontSize(13)
         .padding(14)
         .onClick(() => {
           param.pay && param.pay()
@@ -532,8 +515,8 @@ function payOrderDialogComponent(param: PayOrderDialogParam) {
   }
   .alignItems(HorizontalAlign.Start)
   .width('80%')
-  .constraintSize({maxHeight: '50%'})
-  .padding({left: 14, right: 14})
+  .constraintSize({ maxHeight: '50%' })
+  .padding({ left: 14, right: 14 })
   .backgroundColor($r('sys.color.white'))
   .borderRadius(6)
 }
@@ -544,7 +527,7 @@ function buildInputBoxComponent(param: GlobalDialogWithInputParam) {
   Column({ space: 14 }) {
     Text(param?.hint)
       .fontSize($r('sys.float.Body_L'))
-      .fontColor($r('sys.color.ohos_id_color_text_primary') )
+      .fontColor($r('sys.color.ohos_id_color_text_primary'))
 
     TextInput({ text: param.content, placeholder: param.placeholder })
       .placeholderColor($r('sys.color.font_secondary'))
@@ -592,7 +575,7 @@ function buildTextBoxComponent(param: TextPromptDialogParam) {
   Column({ space: 18 }) {
     Text(param?.title)
       .fontSize(20)
-      .fontColor($r('sys.color.ohos_id_color_text_primary') )
+      .fontColor($r('sys.color.ohos_id_color_text_primary'))
       .fontWeight(FontWeight.Medium)
     Text(param.content).fontWeight(FontWeight.Regular).fontSize(14)
     Row() {

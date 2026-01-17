@@ -1,8 +1,8 @@
-import { AppStorageV2, CircleShape } from '@kit.ArkUI';
+import { AppStorageV2, CircleShape, PersistenceV2 } from '@kit.ArkUI';
 import { common, Configuration, EnvironmentCallback } from '@kit.AbilityKit';
 import { i18n } from '@kit.LocalizationKit';
+import { UtilLog as Logger } from '@hw-agconnect/util-log';
 import {
-  AppointState,
   CommonConstants,
   getGoodList,
   GetUserInfoResp,
@@ -10,26 +10,36 @@ import {
   GoodInfo,
   GoodListInfo,
   CommonUtils,
-  Logger,
   LoginButton,
   PopViewUtils,
   RouterMap,
   RouterModule,
   unbindPhone,
+  BreakpointModel,
+  closeLoading,
+  BreakpointNameEnum,
 } from 'foundation';
-import { DialogQRCodeBuilder, QRCodeParams } from '../components/DialogQRCode';
 import { MineIconLabel } from '../components/MineIconLabel';
+import { APPOINTMENT_MENUS, MineIconLabelItem } from '../common/Constant';
 
 const TAG = '[Mine]';
+
+@Extend(Column)
+function barColumnStyle() {
+  .width(CommonConstants.FULL_PERCENT)
+  .padding({ left: 12, right: 12, top: 24, bottom: 16 })
+  .alignItems(HorizontalAlign.Start)
+  .backgroundColor(Color.White)
+  .borderRadius(16)
+}
 
 @ComponentV2
 export struct Mine {
   @Local goodList: GoodListInfo[] = [];
   @Local isRefreshing: boolean = false;
-  @Local userInfo: GetUserInfoResp = AppStorageV2.connect(GetUserInfoResp, () => new GetUserInfoResp())!;
-  @Local titleBgOpacity: number = 0;
-  scroller: Scroller = new Scroller();
-  private context = getContext(this) as common.UIAbilityContext;
+  @Local userInfo: GetUserInfoResp = PersistenceV2.connect(GetUserInfoResp, () => new GetUserInfoResp())!;
+  @Local breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
+  private context = this.getUIContext().getHostContext() as common.UIAbilityContext;
   // 注册订阅系统环境变化的ID
   private callbackId: number = 0;
   // 系统语言
@@ -68,6 +78,11 @@ export struct Mine {
     }
   }
 
+  @Monitor('userInfo.mobile')
+  onChangeMobile() {
+    PopViewUtils.closePopView()
+  }
+
   aboutToAppear(): void {
     this.getGoodList();
   }
@@ -87,92 +102,6 @@ export struct Mine {
     return this.userInfo.nickName || $r('app.string.default_user_name');
   }
 
-  @Builder
-  titleBuilder() {
-    Row() {
-      Text('个人中心')
-        .fontSize(26)
-        .fontWeight(700)
-        .padding({ left: 16 })
-        .height(56)
-    }
-    .width('100%')
-    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
-    .backgroundColor(Color.White)
-    .opacity(this.titleBgOpacity)
-  }
-
-  @Builder
-  titleInside() {
-    Text('个人中心')
-      .fontSize(26)
-      .fontWeight(700)
-      .padding({ left: 16 })
-      .height(56)
-      .alignSelf(ItemAlign.Start)
-      .opacity(1 - 2 * this.titleBgOpacity)
-  }
-
-  @Builder
-  UserBar() {
-    Row({ space: 8 }) {
-      Image(CommonUtils.handleImgUrl(this.userInfo.avatar) || $r('app.media.ic_user_default'))
-        .width(56)
-        .height(56)
-        .clipShape(new CircleShape({ width: 56, height: 56 }))
-        .onClick(() => {
-          if (this.isBindPhone()) {
-            RouterModule.push({ url: RouterMap.MY_PERSONAL_INFO });
-          }
-        })
-      if (this.isBindPhone()) {
-        Column({ space: 10 }) {
-          Row({ space: 10 }) {
-            Text(this.userName)
-              .fontSize(18)
-              .fontWeight(500)
-              .maxLines(1)
-              .textOverflow({ overflow: TextOverflow.Ellipsis })
-              .constraintSize({ maxWidth: 150 })
-              .onClick(() => {
-                RouterModule.push({ url: RouterMap.MY_PERSONAL_INFO });
-              })
-
-            if (this.userInfo.memberId) {
-              Row({ space: 4 }) {
-                Image($r('app.media.ic_member')).width(10)
-                Text('高级会员').fontSize(10).fontColor($r('app.color.common_member'))
-              }
-              .backgroundColor('#1F1F20')
-              .borderRadius(20)
-              .height(20)
-              .padding({ left: 4, right: 4 })
-            }
-          }
-
-          Text($r('app.string.btn_cancel_bind_phone'))
-            .fontSize(12)
-            .decoration({ type: TextDecorationType.Underline })
-            .onClick(() => {
-              unbindPhone();
-            })
-        }.alignItems(HorizontalAlign.Start).layoutWeight(1)
-      } else {
-        Column({ space: 4 }) {
-          Text($r('app.string.default_user_name')).fontSize(18).fontWeight(500)
-          LoginButton()
-        }.alignItems(HorizontalAlign.Start)
-      }
-    }
-    .width(CommonConstants.FULL_PERCENT)
-    .padding({
-      left: 20,
-      right: 20,
-      top: 20,
-      bottom: 15,
-    })
-  }
-
   @Computed
   get pointLabel() {
     if (this.userInfo.points) {
@@ -189,86 +118,36 @@ export struct Mine {
     return '0';
   }
 
-  @Builder
-  MoreUserInfo() {
-    Row({ space: 20 }) {
-      Column({ space: 7 }) {
-        Text(this.pointLabel).fontWeight(500).fontSize(16)
-        Text('积分').fontSize(12)
-      }
-
-      Column({ space: 7 }) {
-        Text(this.memberLabel).fontWeight(500).fontSize(16)
-        Text('会员卡').fontSize(12)
-      }.onClick(() => {
-        if (!this.userInfo.memberId) {
-          return;
-        }
-        PopViewUtils.showPopView<QRCodeParams>(wrapBuilder(DialogQRCodeBuilder),
-          new QRCodeParams(this.userInfo.memberId),
-          { alignment: DialogAlignment.Center, autoCancel: true });
-      })
+  @Computed
+  get maskPhoneNumber() {
+    // 手机号脱敏
+    if (this.userInfo.mobile) {
+      return this.userInfo.mobile.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2');
     }
-    .width('100%')
-    .justifyContent(FlexAlign.SpaceEvenly)
-    .margin({ bottom: 20 })
+    return ''
   }
 
-  @Builder
-  ServiceBar() {
-    Grid() {
-      GridItem() {
-        Column() {
-          Text('我的订单').fontSize(16).fontWeight(500).alignSelf(ItemAlign.Start).margin({ bottom: 10 })
-          Row() {
-            MineIconLabel({
-              icon: $r('app.media.ic_bar_appointed'),
-              label: '已预约',
-              routeUrl: RouterMap.MY_APPOINTMENT_LIST,
-              routeParam: AppointState.NEW,
-            })
-
-            MineIconLabel({
-              icon: $r('app.media.ic_bar_appoint_done'),
-              label: '已完成',
-              routeUrl: RouterMap.MY_APPOINTMENT_LIST,
-              routeParam: AppointState.FINISH,
-            })
-          }
-          .width('100%')
-          .justifyContent(FlexAlign.SpaceAround)
-        }
-        .padding(10)
-        .backgroundColor(Color.White)
-        .borderRadius(8)
-      }
-
-      GridItem() {
-        Column() {
-          Text('服务与工具').fontSize(16).fontWeight(500).alignSelf(ItemAlign.Start).margin({ bottom: 10 })
-          Row() {
-            MineIconLabel({
-              icon: $r('app.media.ic_bar_single_card'),
-              label: '次卡',
-              routeUrl: RouterMap.MY_SINGLE_VISIT_LIST,
-            })
-
-            MineIconLabel({
-              icon: $r('app.media.ic_bar_group'),
-              label: '团购',
-              routeUrl: RouterMap.MY_GROUP_LIST,
-            })
-          }
-          .width('100%')
-          .justifyContent(FlexAlign.SpaceAround)
-        }
-        .padding(10)
-        .backgroundColor(Color.White)
-        .borderRadius(8)
-      }
+  @Computed
+  get waterFlowLanes() {
+    let lanesValue = 2
+    switch (this.breakPointModel.currentBreakpoint) {
+      case BreakpointNameEnum.SM:
+        lanesValue = 2;
+        break;
+      case BreakpointNameEnum.MD:
+        lanesValue = 4;
+        break;
+      case BreakpointNameEnum.LG:
+      case BreakpointNameEnum.XL:
+        lanesValue = 5;
+        break;
     }
-    .columnsGap(10)
-    .columnsTemplate('1fr 1fr')
+
+    return lanesValue
+  }
+
+  jumpToAppointment(url: string, state?: number) {
+    RouterModule.push({ url: url, param: state });
   }
 
   @Builder
@@ -282,7 +161,7 @@ export struct Mine {
       }, (v: GoodInfo) => JSON.stringify(v))
     }
     .cachedCount(10)
-    .columnsTemplate('1fr 1fr')
+    .columnsTemplate(`repeat(${this.waterFlowLanes}, 1fr)`)
     .columnsGap(10)
     .rowsGap(6)
     .width(CommonConstants.FULL_PERCENT)
@@ -291,50 +170,257 @@ export struct Mine {
 
   build() {
     NavDestination() {
-      Stack() {
-        Scroll(this.scroller) {
-          Column() {
-            Column() {
-              this.titleInside()
-              this.UserBar()
-              this.MoreUserInfo()
-            }
-            .backgroundImage($r('app.media.mine_top_bg'))
-            .backgroundImageSize(ImageSize.Cover)
-            .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
+      Column() {
+        // 标题
+        this.titleBuilder()
+        Scroll() {
+          Column({space: 12}) {
+            // 用户信息
+            this.UserBar()
+            // 我的预约
+            this.MyAppointmentBar()
+            // 服务与工具
+            this.ServiceBar()
 
-            Column({ space: 16 }) {
-              this.ServiceBar()
+            Column({ space: 8 }) {
               if (this.goodList.length) {
+                Text('为您推荐')
+                  .fontSize(18).fontWeight(700)
+                  .width('100%').textAlign(TextAlign.Start)
                 this.WaterFlowBuilder()
               }
             }
-            .padding({
-              left: 10,
-              right: 10,
-              top: 16,
-              bottom: 16,
-            })
+            .padding({ top: 16, bottom: 16 })
           }
+          .padding({
+            left: this.breakPointModel.pagePadding,
+            right: this.breakPointModel.pagePadding,
+          })
         }
         .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
         .width(CommonConstants.FULL_PERCENT)
-        .height(CommonConstants.FULL_PERCENT)
+        .layoutWeight(1)
         .scrollBar(BarState.Off)
         .align(Alignment.Top)
         .edgeEffect(EdgeEffect.Spring)
-        .onDidScroll(() => {
-          this.titleBgOpacity = this.scroller.currentOffset().yOffset / 56;
-        })
-
-        this.titleBuilder()
       }
       .width(CommonConstants.FULL_PERCENT)
       .height(CommonConstants.FULL_PERCENT)
-      .alignContent(Alignment.Top)
-
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
     }
     .hideTitleBar(true)
     .backgroundColor($r('app.color.common_page_bg'))
+  }
+
+  @Builder
+  titleBuilder() {
+    Text('我的')
+      .fontSize(26)
+      .fontWeight(700)
+      .padding({ left: 16 })
+      .height(56)
+      .alignSelf(ItemAlign.Start)
+  }
+
+  @Builder
+  linkAccountBuilder() {
+    Row({space: 4}) {
+      SymbolGlyph(this.isBindPhone() ? $r('sys.symbol.link_slash') : $r('sys.symbol.link'))
+        .fontSize(18)
+        .fontColor([this.isBindPhone() ? Color.White : $r('sys.color.font_primary')])
+      Text(this.isBindPhone() ? '取消关联' : '关联账户')
+        .fontSize(14)
+        .fontColor(this.isBindPhone() ? Color.White : $r('sys.color.font_primary'))
+    }
+    .padding({left: 8, right: 8, top: 4, bottom: 4})
+    .backgroundColor(this.isBindPhone() ? '#E64566' : $r('sys.color.comp_background_tertiary'))
+    .justifyContent(FlexAlign.Center)
+    .borderRadius(20)
+    .onClick(() => {
+      if (this.isBindPhone()) {
+        unbindPhone();
+      }
+    })
+  }
+
+  @Builder
+  UserBar() {
+    Row() {
+      Image(CommonUtils.handleImgUrl(this.userInfo.avatar) || $r('app.media.ic_user_default'))
+        .width(48)
+        .height(48)
+        .clipShape(new CircleShape({ width: 48, height: 48 }))
+        .margin({right: 16})
+        .onClick(() => {
+          if (this.isBindPhone()) {
+            RouterModule.push({ url: RouterMap.MY_PERSONAL_INFO });
+          }
+        })
+      if (this.isBindPhone()) {
+        Column({ space: 4 }) {
+          Row({ space: 4 }) {
+            Text(this.userName)
+              .fontSize(18)
+              .fontWeight(500)
+              .maxLines(1)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+              .constraintSize({ maxWidth: 150 })
+              .onClick(() => {
+                RouterModule.push({ url: RouterMap.MY_PERSONAL_INFO });
+              })
+
+            if (this.userInfo.memberId) {
+              Image($r('app.media.ic_member'))
+                .width(24)
+                .padding({ left: 4, right: 4 })
+            }
+          }
+          Row({space: 8}) {
+            Image($r('app.media.ic_public_mobilephone'))
+              .width(16)
+              .height(16)
+
+            Text(this.maskPhoneNumber)
+              .fontSize(12)
+              .fontWeight(400)
+          }
+        }.alignItems(HorizontalAlign.Start).layoutWeight(1)
+      } else {
+        Text($r('app.string.default_user_name')).fontSize(18).fontWeight(500)
+      }
+
+      Blank()
+
+      Column() {
+        LoginButton({
+          btnSize: { width: 92, height: 28 },
+          showLoginBtn: this.userInfo?.mobile === '',
+          contentView: () => {
+            this.linkAccountBuilder()
+          }
+        })
+      }
+      .alignSelf(ItemAlign.Stretch)
+      .justifyContent(FlexAlign.End)
+    }
+    .width(CommonConstants.FULL_PERCENT)
+    .padding({ left: 12, right: 12, top: 16, bottom: 16 })
+    .backgroundColor(Color.White)
+    .borderRadius(16)
+  }
+
+  @Builder
+  appointAllBuilder() {
+    Row({space: 4}) {
+      Text('全部').fontSize(14).fontColor($r('sys.color.font_secondary'))
+      SymbolGlyph($r('sys.symbol.chevron_right')).fontSize(22).fontColor([$r('sys.color.icon_tertiary')])
+    }
+    .onClick(() => {
+      this.jumpToAppointment(RouterMap.MY_APPOINTMENT_LIST, 0);
+    })
+  }
+
+  @Builder
+  appointItemBuilder(item: MineIconLabelItem) {
+    MineIconLabel({
+      icon: item.icon,
+      label: item.label,
+      routeUrl: item.routeUrl,
+      routeParam: item.routeParam,
+    })
+  }
+
+  @Builder
+  MyAppointmentBar() {
+    Column({space: 16}) {
+      Row() {
+        Text('我的预约').fontSize(18).fontWeight(700)
+        Blank()
+        LoginButton({
+          btnSize: { width: 60, height: 20 },
+          isEffect: false,
+          showLoginBtn: this.userInfo?.mobile === '',
+          onBind: () => {
+            // 关闭关联账户时的loading
+            closeLoading();
+            this.jumpToAppointment(RouterMap.MY_APPOINTMENT_LIST, 0);
+          },
+          contentView: () => {
+            this.appointAllBuilder()
+          }
+        })
+      }
+      .width(CommonConstants.FULL_PERCENT)
+
+      Row() {
+        ForEach(APPOINTMENT_MENUS, (item: MineIconLabelItem) => {
+          LoginButton({
+            btnSize: { width: 36, height: 56 },
+            isEffect: false,
+            showLoginBtn: this.userInfo?.mobile === '',
+            onBind: () => {
+              // 关闭关联账户时的loading
+              closeLoading();
+              this.jumpToAppointment(item.routeUrl, item.routeParam as number);
+            },
+            contentView: () => {
+              this.appointItemBuilder(item)
+            }
+          })
+        }, (item: MineIconLabelItem) => JSON.stringify(item))
+      }
+      .width(CommonConstants.FULL_PERCENT)
+      .justifyContent(FlexAlign.SpaceAround)
+    }
+    .barColumnStyle()
+  }
+
+  @Builder
+  ServiceBar() {
+    Column({space: 16}) {
+      Text('服务与工具').fontSize(18).fontWeight(700).alignSelf(ItemAlign.Start)
+      Row() {
+        LoginButton({
+          btnSize: { width: 36, height: 56 },
+          isEffect: false,
+          showLoginBtn: this.userInfo?.mobile === '',
+          onBind: () => {
+            // 关闭关联账户时的loading
+            closeLoading();
+            this.jumpToAppointment(RouterMap.MY_SINGLE_VISIT_LIST);
+          },
+          contentView: () => {
+            this.appointItemBuilder({
+              icon: $r('app.media.ic_bar_single_card'),
+              label: '次卡',
+              routeUrl: RouterMap.MY_SINGLE_VISIT_LIST,
+              iconSize: { width: 32, height: 32 }
+            } as MineIconLabelItem)
+          }
+        })
+
+        LoginButton({
+          btnSize: { width: 36, height: 56 },
+          isEffect: false,
+          showLoginBtn: this.userInfo?.mobile === '',
+          onBind: () => {
+            // 关闭关联账户时的loading
+            closeLoading();
+            this.jumpToAppointment(RouterMap.MY_GROUP_LIST);
+          },
+          contentView: () => {
+            this.appointItemBuilder({
+              icon: $r('app.media.ic_bar_group'),
+              label: '团购',
+              routeUrl: RouterMap.MY_GROUP_LIST,
+              iconSize: { width: 32, height: 32 }
+            } as MineIconLabelItem)
+          }
+        })
+      }
+      .width('50%')
+      .justifyContent(FlexAlign.SpaceAround)
+    }
+    .barColumnStyle()
   }
 }

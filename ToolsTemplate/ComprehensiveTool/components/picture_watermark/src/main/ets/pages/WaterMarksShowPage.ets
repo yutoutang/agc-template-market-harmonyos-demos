@@ -1,4 +1,3 @@
-import { promptAction } from '@kit.ArkUI';
 import { CommonButton } from '../components/CommonButton';
 import { CommonHeader } from '../components/CommonHeader';
 import { DownloadButton } from '../components/DownLoadButton';
@@ -7,6 +6,7 @@ import { MENU_LIST } from '../constants/Constants';
 import { MarksPage } from '../constants/Enum';
 import { StyleConstants } from '../constants/Styles';
 import { alertToConfirm } from '../utils/AlertUtil';
+import { contextUtil } from '../utils/ContextUtil';
 import { HistoryUtil } from '../utils/HistoryUtil';
 import { WaterMarksVM } from '../viewmodel/WaterMarksVM';
 
@@ -21,6 +21,7 @@ export struct WaterMarksShowPage {
   @Local stack?: NavPathStack;
 
   aboutToAppear(): void {
+    contextUtil.setUiContext(this.getUIContext())
     this.vm.resetParamsInShow();
     this.vm.getSandboxDir();
   }
@@ -51,7 +52,11 @@ export struct WaterMarksShowPage {
           btnWidth: this.vm.pixelMapWithMarks ? 'calc(50% - 12vp)' : '100%',
           handleClick: () => {
             if (!this.vm.pixelMap) {
-              promptAction.showToast({ message: '请先上传一张图片' });
+              try {
+                this.getUIContext().getPromptAction().showToast({ message: '请先上传一张图片' });
+              } catch (e) {
+                console.log(JSON.stringify(e))
+              }
               return;
             }
             this.stack?.pushPathByName(MarksPage.EDIT_PAGE, null, false);

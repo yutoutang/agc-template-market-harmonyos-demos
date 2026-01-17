@@ -9,6 +9,6 @@
   "dependencies": {
     "common": "file:../../commons/common",
     "network": "file:../../commons/network",
-    "base_ui": "file:../../components/base_ui"
+    "base_ui": "file:../../components/base_ui",
   }
 }

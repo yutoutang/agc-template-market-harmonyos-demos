@@ -11,6 +11,7 @@ export const PRESETS: CustomFilter[] =
       brightness: 0,
       grayscale: false,
       isHot: false,
+      isVip: false
     },
     {
       image: $r('app.media.bg_filter1'),
@@ -26,6 +27,7 @@ export const PRESETS: CustomFilter[] =
       brightness: 0.15,
       grayscale: false,
       isHot: true,
+      isVip: false
     },
     {
       image: $r('app.media.bg_filter2'),
@@ -41,6 +43,7 @@ export const PRESETS: CustomFilter[] =
       brightness: 0.2,
       grayscale: false,
       isHot: true,
+      isVip: false
     },
     {
       image: $r('app.media.bg_filter3'),
@@ -56,6 +59,7 @@ export const PRESETS: CustomFilter[] =
       brightness: 0.05,
       grayscale: false,
       isHot: true,
+      isVip: false
     },
     {
       image: $r('app.media.ic_filter_restore'),
@@ -71,6 +75,7 @@ export const PRESETS: CustomFilter[] =
       brightness: 0,
       grayscale: false,
       isHot: false,
+      isVip: false
     },
     {
       image: $r('app.media.ic_filter_romantic'),
@@ -86,6 +91,7 @@ export const PRESETS: CustomFilter[] =
       brightness: 0.1,
       grayscale: false,
       isHot: false,
+      isVip: false
     },
     {
       image: $r('app.media.ic_filter_warm'),
@@ -101,5 +107,6 @@ export const PRESETS: CustomFilter[] =
       brightness: 0.1,
       grayscale: false,
       isHot: false,
+      isVip: true
     },
   ];

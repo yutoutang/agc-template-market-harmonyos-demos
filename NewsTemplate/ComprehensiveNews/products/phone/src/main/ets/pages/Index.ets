@@ -6,8 +6,9 @@ import { IndexVM } from '../viewmodels/IndexVM';
 @ComponentV2
 struct Index {
   vm: IndexVM = new IndexVM();
-  @Local isEnabled: boolean = true;
+
   aboutToAppear(): void {
+    this.vm.contextModel.setUIContext('phone', this.getUIContext());
     this.vm.setInterception();
     this.vm.redirect();
     this.vm.navDestinationListener()
@@ -23,17 +24,18 @@ struct Index {
   build() {
     Navigation(RouterUtils.getStack()) {
     }
+    .id('navigationId')
     .hideNavBar(true)
-    .enabled(this.isEnabled)
+    .enabled(this.vm.isEnabled)
     .hideTitleBar(true)
     .customNavContentTransition((from: NavContentInfo, to: NavContentInfo, operation: NavigationOperation) => {
       return LoneTakeAnimationsTransition.customNavContentTransition(from, to, operation, {
         // 自定义转场过程中禁用手势，避免出现体验问题
         onTransitionStart: () => {
-          this.isEnabled = false;
+          this.vm.isEnabled = false;
         },
         onTransitionEnd: () => {
-          this.isEnabled = true;
+          this.vm.isEnabled = true;
         }
       });
     })

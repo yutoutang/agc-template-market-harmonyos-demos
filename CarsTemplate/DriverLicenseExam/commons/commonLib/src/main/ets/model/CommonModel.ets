@@ -28,7 +28,7 @@ export class CommonModel {
 
   // 获取位置授权
   public async requestLocationPermission():Promise<boolean | undefined> {
-    const permissions: Permissions[] = ['ohos.permission.APPROXIMATELY_LOCATION','ohos.permission.LOCATION'];
+    const permissions: Permissions[] = ['ohos.permission.APPROXIMATELY_LOCATION','ohos.permission.LOCATION','ohos.permission.APP_TRACKING_CONSENT'];
     return PermissionUtil.requestPermissions(permissions);
   }
 
@@ -39,18 +39,19 @@ export class CommonModel {
     const allowGetPosition = await PermissionUtil.requestPermissions(permissions);
     this.allowGetPosition = allowGetPosition;
     if (allowGetPosition) {
-      const location = await geoLocationManager.getCurrentLocation();
-      if (location) {
-        try {
-          let reverseGeocodeRequest:geoLocationManager.ReverseGeoCodeRequest = {'latitude': location.latitude, 'longitude':  location.longitude, 'maxItems': 1}
-          const res = await geoLocationManager.getAddressesFromLocation(reverseGeocodeRequest);
-          console.log('[location]',JSON.stringify(res))
-          if (res && res.length > 0) {
-            addressParam = res[0].locality || '';
-          }
-        } catch (e) {
-          console.log(e);
+      try {
+        const location = await geoLocationManager.getCurrentLocation();
+        if (location) {
+
+            let reverseGeocodeRequest:geoLocationManager.ReverseGeoCodeRequest = {'latitude': location.latitude, 'longitude':  location.longitude, 'maxItems': 1}
+            const res = await geoLocationManager.getAddressesFromLocation(reverseGeocodeRequest);
+            console.log('[location]',JSON.stringify(res))
+            if (res && res.length > 0) {
+              addressParam = res[0].locality || '';
+            }
         }
+      } catch (e) {
+        console.log(e);
       }
     }
 

@@ -11,6 +11,7 @@ export class MemberCenterVM {
   @Trace aliOrderStr: string = '';
   wxOrderReq: WxExtraInfo = new WxExtraInfo();
   hwOrderStr: string = '';
+  @Trace lastPurchaseProductExpireTime: string = '';
 
   getMemberPackages() {
     // 模拟会员套餐数据

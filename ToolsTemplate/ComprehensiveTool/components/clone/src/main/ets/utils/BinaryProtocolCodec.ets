@@ -42,7 +42,7 @@ export class BinaryProtocolCodec {
       const textDecoder = util.TextDecoder.create();
       // 将 ArrayBuffer 转换为 Uint8Array
       const uint8Data = new Uint8Array(dataBuffer);
-      const jsonStr: string = textDecoder.decode(uint8Data);
+      const jsonStr: string = textDecoder.decodeToString(uint8Data);
       return JSON.parse(jsonStr) as FileCountMessage;
     } catch (error) {
       throw new Error(`解码文件开始消息失败: ${error}`);
@@ -55,7 +55,7 @@ export class BinaryProtocolCodec {
       const textDecoder = util.TextDecoder.create();
       // 将 ArrayBuffer 转换为 Uint8Array
       const uint8Data = new Uint8Array(dataBuffer);
-      const jsonStr: string = textDecoder.decode(uint8Data);
+      const jsonStr: string = textDecoder.decodeToString(uint8Data);
       return JSON.parse(jsonStr)
     } catch (error) {
       throw new Error(`解码文件开始消息失败: ${error}`);

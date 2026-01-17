@@ -1,4 +1,5 @@
-import { BreakpointSystem } from 'module_ui_base';
+import { UISkeleton, SkeletonTheme, SkeletonType } from '@hw-agconnect/ui-skeleton';
+import { BreakpointSystem, WindowUtil } from 'module_ui_base';
 import { Constants } from '../commons/Constants';
 import { ProductOperationType } from '../commons/Enums';
 import { ProductInfo, ProductReviewItem } from '../commons/Types';
@@ -18,6 +19,8 @@ export struct ProductDetail {
   isLogin: boolean = false;
   @Param
   cartProdNum: number = 0;
+  @Param
+  isMember: boolean = false;
   @Event
   clickCustomService: () => void
   @Event
@@ -30,6 +33,8 @@ export struct ProductDetail {
   handleNotLogin: () => void;
   @Event
   getProductInfo: (data: ProductInfo) => void;
+  @Event
+  handleClickMemberLink: () => void
   @Local
   isLoading: boolean = false;
   @Local
@@ -45,6 +50,7 @@ export struct ProductDetail {
 
   async aboutToAppear() {
     this.isLoading = true;
+    WindowUtil.initWindowUtil(this.getUIContext())
     await this.util.init({
       productId: this.productId,
       isLogin: this.isLogin,
@@ -63,8 +69,17 @@ export struct ProductDetail {
     Column() {
       if (this.isLoading) {
         Column() {
-          LoadingProgress().width(32);
+          UISkeleton({
+            options: [
+              { width: '100%', height: 320, type: SkeletonType.RECT },
+              { width: 180, height: 30, type: SkeletonType.TEXT },
+              { width: '100%', height: 30, type: SkeletonType.TEXT },
+            ],
+          })
+            .height(420)
+          UISkeleton({ theme: SkeletonTheme.PARAGRAPH })
         }
+        .padding(16)
         .layoutWeight(1)
       } else if (!this.util.options.productInfo) {
         Column() {
@@ -102,6 +117,8 @@ export struct ProductDetail {
                   ProductInfoCard({
                     productInfo: this.util.options.productInfo,
                   }).margin({ bottom: 8 });
+                  // 会员推广卡片
+                  this.memberCardBuilder()
                   // 用户评价
                   this.productReviewBuilder()
                   // 详情介绍
@@ -125,7 +142,10 @@ export struct ProductDetail {
               // 基本信息
               ProductInfoCard({
                 productInfo: this.util.options.productInfo,
-              }).margin({ bottom: 8 });
+              })
+              // 会员推广卡片
+
+              this.memberCardBuilder()
               // 用户评价
               this.productReviewBuilder()
               // 详情介绍
@@ -147,6 +167,38 @@ export struct ProductDetail {
     .justifyContent(FlexAlign.Center)
     .backgroundColor(Constants.BACKGROUND_COLOR_GREY)
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM]);
+  }
+
+  @Builder
+  memberCardBuilder() {
+    Column() {
+      if (!this.isMember) {
+        Row() {
+          SymbolGlyph($r('sys.symbol.bell_fill'))
+            .fontSize(24)
+            .fontColor([$r('app.color.font_color_level1_invert')])
+            .margin({ right: $r('app.string.space_xs') })
+          Text('开通会员，享9折优惠！')
+            .fontWeight(FontWeight.Medium)
+            .fontColor($r('app.color.font_color_level1_invert'))
+
+          Blank()
+          Button('立即查看')
+            .backgroundColor($r('app.color.background_color_white'))
+            .fontColor($r('app.color.theme_color'))
+            .controlSize(ControlSize.SMALL)
+            .onClick(() => {
+              this.handleClickMemberLink?.()
+            })
+        }
+        .width('100%')
+        .padding($r('app.string.space_m'))
+        .borderRadius($r('app.string.border_radius_8'))
+        .backgroundColor($r('app.color.theme_color'))
+      }
+    }
+    .padding($r('app.string.space_m'))
+    .constraintSize({ minHeight: 12 })
   }
 
   @Builder

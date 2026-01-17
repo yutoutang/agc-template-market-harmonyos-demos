@@ -1,6 +1,5 @@
-import dayjs from 'dayjs';
 import { BreakpointModel, FormatCount } from 'lib_common';
-import { Share } from 'module_share';
+import { Share } from 'lib_widget';
 import { ImageLongTakeDelegate } from 'module_transition';
 import { ImagePreviewVM } from '../viewmodel/ImagePreviewVM';
 
@@ -15,7 +14,7 @@ struct ImagePreviewPage {
   @Local imagePointModel: BreakpointModel = new BreakpointModel()
 
   async aboutToAppear() {
-   this.imagePreviewVM.setSystemBarProperty()
+    this.imagePreviewVM.setSystemBarProperty()
   }
 
   aboutToDisappear(): void {
@@ -25,13 +24,11 @@ struct ImagePreviewPage {
   @Builder
   shareBuilder() {
     Share({
-      qrCodeInfo: {
-        id: this.imagePreviewVM.curFeedCardInfo.id,
-        type: this.imagePreviewVM.curFeedCardInfo.type,
+      shareData: {
+        recordId: this.imagePreviewVM.curFeedCardInfo.id,
         title: this.imagePreviewVM.curFeedCardInfo.title,
-        createTime: dayjs(this.imagePreviewVM.curFeedCardInfo.createTime).format('YYYY-MM-DD HH:mm'),
+        createTime: this.imagePreviewVM.curFeedCardInfo.createTime,
         coverUrl: this.imagePreviewVM.handlerCoverImage,
-        isVideo: !!this.imagePreviewVM.curFeedCardInfo.postImgList?.[0]?.surfaceUrl,
       },
       shareRenderBuilder: () => {
         this.shareCommentBuilder()
@@ -125,7 +122,7 @@ struct ImagePreviewPage {
 
         Column({ space: 5 }) {
           Image(this.imagePreviewVM.curFeedCardInfo.isLiked ? $r('app.media.like_active') :
-          $r('app.media.preview_like'))
+            $r('app.media.preview_like'))
             .width(23)
             .height(20)
           Text(this.imagePreviewVM.curFeedCardInfo.likeCount?.toString())

@@ -2,7 +2,8 @@ import { AVCastPicker } from '@kit.AVSessionKit';
 
 @ComponentV2
 export struct CastPicker {
-  @Param text:string = ''
+  @Param text: string = '';
+
   build() {
     AVCastPicker({
       normalColor: Color.Red,

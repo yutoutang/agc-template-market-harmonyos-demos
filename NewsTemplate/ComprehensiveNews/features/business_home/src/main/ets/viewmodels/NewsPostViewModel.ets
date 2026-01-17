@@ -1,11 +1,13 @@
-import { BreakpointModel, BreakpointNameEnum, CoverUri, RouterMap, RouterUtils, UserInfoModel } from 'lib_common'
-import { Constants, NewsStyleEnum, newsStyleList, videoSetting } from '../constants/NewsConstants'
-import { AppStorageV2, promptAction } from '@kit.ArkUI'
-import { ArticleServiceApi, PostImgList } from 'lib_news_api'
+import { AppStorageV2 } from '@kit.ArkUI'
 import { emitter } from '@kit.BasicServicesKit'
+import {
+  BaseViewModel, BreakpointModel, BreakpointNameEnum, CoverUri, RouterMap, RouterUtils,
+} from 'lib_common'
+import { ArticleServiceApi, PostImgList } from 'lib_news_api'
+import { Constants, NewsStyleEnum, newsStyleList, videoSetting } from '../constants/NewsConstants'
 
 @ObservedV2
-export class NewsPostViewModel extends UserInfoModel {
+export class NewsPostViewModel extends BaseViewModel {
   @Trace title: string = ''
   @Trace content: string = ''
   @Trace coverThreeList: CoverUri[] = [new CoverUri(), new CoverUri(), new CoverUri()]
@@ -23,7 +25,6 @@ export class NewsPostViewModel extends UserInfoModel {
     return this.breakpointModel.currentBreakpoint === BreakpointNameEnum.LG
   }
 
-
   public getPostVideoWidth() {
     return this.isSmDevice || this.isLgDevice ? Constants.VIDEO_SIZE_SM_W : Constants.VIDEO_SIZE_LG_W
   }
@@ -35,7 +36,7 @@ export class NewsPostViewModel extends UserInfoModel {
   public async publishNews() {
     let message = await this.validate()
     if (message) {
-      promptAction.showToast({ message: message })
+      this.contextModel.showToast({ message: message })
       return
     }
     /*
@@ -57,16 +58,17 @@ export class NewsPostViewModel extends UserInfoModel {
       }))
     }
     let setting = newsStyleList.find(item => item.id === this.selectedId)?.setting as string
-    ArticleServiceApi.addArticle(this.title, this.handleImageSize(this.content), setting, postImgList)
-    // 添加到动态布局文件中
-    RouterUtils.popToName(RouterMap.INDEX_PAGE)
-    // 通知关注刷新
-    emitter.emit('follow_recommend_fresh')
+    ArticleServiceApi.addArticle(this.title, this.handleImageSize(this.content), setting, postImgList).then(() => {
+      // 添加到动态布局文件中
+      RouterUtils.popToName(RouterMap.INDEX_PAGE);
+      // 通知关注刷新
+      emitter.emit('follow_recommend_fresh');
+    })
   }
 
   public async publishVideo(surface: string, videoUri: string, title: string) {
     if (!surface) {
-      promptAction.showToast({ message: '未上传视频' })
+      this.contextModel.showToast({ message: '未上传视频' })
       return
     }
     /*
@@ -76,12 +78,13 @@ export class NewsPostViewModel extends UserInfoModel {
       picVideoUrl: videoUri,
       surfaceUrl: surface,
     }]
-    let articleInfo = ArticleServiceApi.addArticle(title, '', videoSetting, postImgList)
-    // 添加到动态布局文件中
-    ArticleServiceApi.addFlexLayout(articleInfo.id, videoSetting)
-    RouterUtils.replacePathByName(RouterMap.INDEX_PAGE)
-    // 通知首页刷新
-    emitter.emit('follow_recommend_fresh')
+    ArticleServiceApi.addArticle(title, '', videoSetting, postImgList).then(async (articleInfo) => {
+      // 添加到动态布局文件中
+      await ArticleServiceApi.addFlexLayout(articleInfo.id, videoSetting);
+      RouterUtils.replacePathByName(RouterMap.INDEX_PAGE);
+      // 通知首页刷新
+      emitter.emit('follow_recommend_fresh');
+    })
   }
 
   public handleImageSize(content: string) {

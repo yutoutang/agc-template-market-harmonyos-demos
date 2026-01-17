@@ -1,4 +1,4 @@
-import { AccountUtil, BaseHeader, RouterMap, RouterModule } from 'commonlib';
+import { AccountUtil, BaseHeader, GlobalContextUtils, RouterMap, RouterModule } from 'commonlib';
 import { promptAction } from '@kit.ArkUI';
 
 @Builder
@@ -82,7 +82,7 @@ struct SideBarPage {
     if (AccountUtil.getUserInfo().isLogin) {
       RouterModule.replace(url);
     } else {
-      promptAction.showToast({ message: '未登录，请登录后重试！' });
+      GlobalContextUtils.showToast({ message: '未登录，请登录后重试！' });
       RouterModule.push(RouterMap.QUICK_LOGIN_PAGE);
     }
   }

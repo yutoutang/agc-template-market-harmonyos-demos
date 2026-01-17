@@ -5,3 +5,5 @@ export enum LoadingStatus {
   SUCCESS = 'success',
   FAILED = 'failed',
 }
+
+export const LOG_TAG:string = '[ShoppingCart]'

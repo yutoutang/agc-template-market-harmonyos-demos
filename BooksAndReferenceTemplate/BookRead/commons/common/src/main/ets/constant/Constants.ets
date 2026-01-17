@@ -68,7 +68,7 @@ export class Constants {
   public static readonly FULL_WIDTH: string = '100%';
   public static readonly FULL_HEIGHT: string = '100%';
   public static readonly CUSTOM_SLIDER_WIDTH: string = '15%';
-  public static readonly CUSTOM_SLIDER_HEIGHT: string = '10%';
+  public static readonly CUSTOM_SLIDER_HEIGHT: string = 'auto';
   public static readonly DATE: string = '今天';
   public static readonly SWIPER_CHANGE: emitter.InnerEvent = {
     eventId: 10

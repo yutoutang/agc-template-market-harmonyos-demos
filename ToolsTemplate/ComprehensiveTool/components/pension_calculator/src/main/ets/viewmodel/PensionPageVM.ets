@@ -1,6 +1,7 @@
 import { PensionCalcRes, PensionInfo } from '../model';
 import { inputMethod } from '@kit.IMEKit';
-import { componentUtils, promptAction } from '@kit.ArkUI';
+import { componentUtils } from '@kit.ArkUI';
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
 
 
 @ObservedV2
@@ -77,8 +78,8 @@ export class PensionPageVM {
     }
   }
 
-  getBarInfo() {
-    let obj: componentUtils.ComponentInfo = componentUtils.getRectangleById(`pensionButton`);
-    return px2vp(obj.windowOffset.y)
+  getBarInfo(uiContext: UIContext) {
+    let obj: componentUtils.ComponentInfo = uiContext.getComponentUtils().getRectangleById(`pensionButton`);
+    return uiContext.px2vp(obj.windowOffset.y)
   }
 }

@@ -1,5 +1,5 @@
 import { tag } from '@kit.ConnectivityKit';
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 import Util from '../../Util';
 import { APP, Application, Card, CUR, PROP } from '../Spec';
 import { ReadResponse, ServiceCode, Tag } from './tech/FeliCa';
@@ -15,7 +15,7 @@ export default class FeliCaReader {
       try {
         card.addApplication(await FeliCaReader.readApplication(tag, FeliCaReader.SYS_SZT));
       } catch (e) {
-        hilog.error(0xff00, 'Template', 'read fail: ' + JSON.stringify(e));
+        UtilLog.error(0xff00, 'MobileNFC', 'read fail: ' + JSON.stringify(e));
       }
 
       tag.close();

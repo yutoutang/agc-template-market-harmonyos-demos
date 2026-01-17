@@ -47,7 +47,7 @@ struct  CanvasView {
 @ComponentV2
 export struct HomeView {
   vm: CommonModel = CommonModel.instance;
-  examService: ExamService = ExamService.instance;
+  examService: ExamService = ExamService.instance(this.getUIContext().getHostContext() as Context);
   @Local currentTab: number = 0; //当前tab索引（科目一、科目二）
   @Param didCount: number = 0; //已练习的题目数量
   @Param totalCount: number = 0 //总题目数量
@@ -161,8 +161,8 @@ export struct HomeView {
       Column({space:8}) {
         Row() {
           Image($r('app.media.shunxu_practice'))
-            .width(16)
-            .height(16)
+            .width(24)
+            .height(24)
             .margin({ left: 12, right: 4 });
 
           Text('顺序练习')
@@ -184,7 +184,7 @@ export struct HomeView {
         }
         .width(CommonConstants.FULL_WIDTH)
         .height(42)
-        .borderRadius(16)
+        .borderRadius(8)
         .backgroundColor('#64BB5C')
         .onClick(() => {
           const param:ROUTE_PARAM = {
@@ -226,8 +226,8 @@ export struct HomeView {
       Column() {
         Row() {
           Image($r('app.media.trophy'))
-            .width(16)
-            .height(16)
+            .width(24)
+            .height(24)
             .margin({ right: 4 });
 
           Text('模拟考试')
@@ -250,7 +250,7 @@ export struct HomeView {
         }
         .width(CommonConstants.FULL_WIDTH)
         .height(42)
-        .borderRadius(16)
+        .borderRadius(8)
         .backgroundColor('#46B1E3')
         .padding({ left: 12, right: 12 })
         .onClick(() => {
@@ -271,14 +271,15 @@ export struct HomeView {
       .alignItems(HorizontalAlign.Center)
 
       Row() {
-        Column({space:8}) {
+        Column({space:4}) {
           Image($r('app.media.special_practice'))
-            .width(32)
-            .height(32)
+            .width(40)
+            .height(40)
             .objectFit(ImageFit.Contain);
 
           Text('专项练习')
-            .fontSize(12)
+            .fontSize(14)
+            .lineHeight(19)
             .fontColor('rgba(0,0,0,0.9)')
         }
         .justifyContent(FlexAlign.Center)
@@ -286,15 +287,16 @@ export struct HomeView {
           this.vm.navStack.pushPathByName('specialExercisesView', true)
         })
 
-        Column({space:8}) {
+        Column({space:4}) {
           Image($r('app.media.tel_program'))
-            .width(32)
-            .height(32)
+            .width(40)
+            .height(40)
             .objectFit(ImageFit.Contain);
 
 
           Text('视频课程')
-            .fontSize(12)
+            .fontSize(14)
+            .lineHeight(19)
             .fontColor('rgba(0,0,0,0.9)')
         }
         .justifyContent(FlexAlign.Center)
@@ -302,14 +304,15 @@ export struct HomeView {
           this.vm.navStack.pushPathByName('videoListView', true)
         })
 
-        Column({space:8}) {
+        Column({space:4}) {
           Image($r('app.media.wrong_questing'))
-            .width(32)
-            .height(32)
+            .width(40)
+            .height(40)
             .objectFit(ImageFit.Contain);
 
           Text('错题收藏')
-            .fontSize(12)
+            .fontSize(14)
+            .lineHeight(19)
             .fontColor('rgba(0,0,0,0.9)')
         }
         .justifyContent(FlexAlign.Center)
@@ -318,7 +321,7 @@ export struct HomeView {
         })
       }
       .width(CommonConstants.FULL_WIDTH)
-      .height(80)
+      .padding(12)
       .borderRadius(16)
       .backgroundColor(Color.White)
       .justifyContent(FlexAlign.SpaceEvenly)
@@ -448,7 +451,7 @@ export struct HomeView {
         }
         .width(CommonConstants.FULL_WIDTH)
         .padding({
-          top: px2vp(AppStorage.get('topRectHeight') || 0) + 10,
+          top: this.getUIContext().px2vp(AppStorage.get('topRectHeight') || 0) + 10,
           left: 16,
           right: 16
         })

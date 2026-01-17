@@ -75,6 +75,7 @@ export struct TabHeaderView {
         .height(56)
         .width('100%')
         .listDirection(Axis.Horizontal)
+        .scrollBar(BarState.Off)
         .padding({ left: CommonConstants.PADDING_L, right: CommonConstants.PADDING_L })
         .alignListItem(ListItemAlign.Center)
       }

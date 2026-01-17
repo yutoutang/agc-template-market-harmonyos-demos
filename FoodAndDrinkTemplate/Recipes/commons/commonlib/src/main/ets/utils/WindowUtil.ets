@@ -1,5 +1,6 @@
 import { AppStorageV2, display, UIContext, window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { GlobalContextUtils } from './ContextUtils';
 import { Logger } from './Logger';
 
 const TAG = 'WindowUtil';
@@ -68,7 +69,7 @@ export class WindowUtil {
 
   public static getContext() {
     if (WindowUtil._currentWindow) {
-      WindowUtil._context = getContext();
+      WindowUtil._context = GlobalContextUtils.globalContext;
       WindowUtil._uiContext = WindowUtil._currentWindow.getUIContext();
     }
   }
@@ -76,15 +77,15 @@ export class WindowUtil {
   public static getWindowAvoidArea() {
     if (WindowUtil._currentWindow) {
       const systemArea = WindowUtil._currentWindow.getWindowAvoidArea(window.AvoidAreaType.TYPE_SYSTEM);
-      WindowUtil._avoidAreaSize.top = px2vp(systemArea.topRect.height);
+      WindowUtil._avoidAreaSize.top = GlobalContextUtils.globalUIContext.px2vp(systemArea.topRect.height);
       const bottomArea = WindowUtil._currentWindow.getWindowAvoidArea(window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR);
-      WindowUtil._avoidAreaSize.bottom = px2vp(bottomArea.bottomRect.height);
+      WindowUtil._avoidAreaSize.bottom = GlobalContextUtils.globalUIContext.px2vp(bottomArea.bottomRect.height);
     }
   }
 
   private static async getCurrentWindow() {
     await window
-      .getLastWindow(getContext())
+      .getLastWindow(GlobalContextUtils.globalContext)
       .then((win) => {
         WindowUtil._currentWindow = win;
       })

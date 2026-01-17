@@ -1,4 +1,4 @@
-export { IButtonItem } from './src/main/ets/constants/Constants'
+export { IButtonItem } from './src/main/ets/constants/Constants';
 
 export { NavHeaderBar } from './src/main/ets/components/NavHeaderBar';
 
@@ -10,6 +10,12 @@ export { NewsSearchTransition } from './src/main/ets/components/NewsSearchTransi
 
 export { emptyBuilder, EmptyBuilderParams } from './src/main/ets/components/EmptyBuilder';
 
-export { NetworkExceptionView } from './src/main/ets/components/NetworkExceptionView'
+export { NetworkExceptionView } from './src/main/ets/components/NetworkExceptionView';
 
-export { BaseImage } from './src/main/ets/components/BaseImage'
+export { BaseImage } from './src/main/ets/components/BaseImage';
+
+export { Share } from './src/main/ets/components/BaseShare';
+
+export { ShareUtils } from './src/main/ets/utils/ShareUtils';
+
+export * from 'module_share';

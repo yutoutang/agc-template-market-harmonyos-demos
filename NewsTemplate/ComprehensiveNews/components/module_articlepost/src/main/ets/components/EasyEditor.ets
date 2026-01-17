@@ -1,10 +1,12 @@
-import { promptAction } from '@kit.ArkUI';
 import { webview } from '@kit.ArkWeb';
-import { Callback } from '@kit.BasicServicesKit';
+import { BusinessError, Callback } from '@kit.BasicServicesKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { RawEditorOptions } from '../options/tinymce'
 import { EasyEditorBridge } from '../utils/Bridge';
 import { EasyEditorController } from '../utils/Controller';
 import { bindWith } from '../utils/Index'
+
+const TAG = '[EasyEditor]';
 
 @ComponentV2
 export struct EasyEditor {
@@ -39,31 +41,45 @@ export struct EasyEditor {
         Text('取消')
           .fontColor($r('sys.color.font_emphasize'))
           .onClick(() => {
-            promptAction.closeCustomDialog(this.customDialogComponentId)
+            try {
+              this.getUIContext().getPromptAction().closeCustomDialog(this.customDialogComponentId)
+            } catch (error) {
+              UtilLog.error(TAG, 'closeCustomDialog fail, error: ' + JSON.stringify(error));
+            }
           })
         Text('确认')
           .fontColor($r('sys.color.font_emphasize'))
           .onClick(() => {
             confirm()
-            promptAction.closeCustomDialog(this.customDialogComponentId)
+            try {
+              this.getUIContext().getPromptAction().closeCustomDialog(this.customDialogComponentId)
+            } catch (error) {
+              UtilLog.error(TAG, 'closeCustomDialog fail, error: ' + JSON.stringify(error));
+            }
           })
       }
     }.height(160).padding({ top: 16, bottom: 26 }).justifyContent(FlexAlign.SpaceBetween)
   }
 
   removeFormat(confirm: () => void) {
-    promptAction.openCustomDialog({
-      builder: () => {
-        this.customDialogComponent(confirm)
-      },
-      onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
-        if (dismissDialogAction.reason !== DismissReason.TOUCH_OUTSIDE) {
-          dismissDialogAction.dismiss()
-        }
-      },
-    }).then((dialogId: number) => {
-      this.customDialogComponentId = dialogId
-    })
+    this.getUIContext()
+      .getPromptAction()
+      .openCustomDialog({
+        builder: () => {
+          this.customDialogComponent(confirm)
+        },
+        onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
+          if (dismissDialogAction.reason !== DismissReason.TOUCH_OUTSIDE) {
+            dismissDialogAction.dismiss()
+          }
+        },
+      })
+      .then((dialogId: number) => {
+        this.customDialogComponentId = dialogId
+      })
+      .catch((e: BusinessError) => {
+        UtilLog.error(TAG, 'openCustomDialog fail, error: ' + JSON.stringify(e));
+      })
   }
 
   aboutToAppear(): void {
@@ -93,23 +109,26 @@ export struct EasyEditor {
       .backgroundColor($r('sys.color.background_primary'))
       .onlineImageAccess(true)
       .databaseAccess(true)
-      .mixedMode(MixedMode.All)
       .onControllerAttached(() => {
-        this._privateController.registerJavaScriptProxy(new EasyEditorBridge(this),
-          'EasyEditorBridge',
-          ['fetchConfig', 'onContentChanged', 'fetchContent', 'darkMode', 'removeFormat'], [],
-          `{"javascriptProxyPermission":{"urlPermissionList":[{"scheme":"resource","host":"rawfile","port":"","path":""}]}}`)
-        if (this.javascriptProxies?.length) {
-          this.javascriptProxies.forEach(proxy => {
-            this._privateController.registerJavaScriptProxy(proxy.object,
-              proxy.name,
-              proxy.methodList ?? [],
-              proxy.asyncMethodList ?? [],
-              proxy.permission ??
-                `{"javascriptProxyPermission":{"urlPermissionList":[{"scheme":"resource","host":"rawfile","port":"","path":""}]}}`)
-          })
+        try {
+          this._privateController.registerJavaScriptProxy(new EasyEditorBridge(this),
+            'EasyEditorBridge',
+            ['fetchConfig', 'onContentChanged', 'fetchContent', 'darkMode', 'removeFormat'], [],
+            `{"javascriptProxyPermission":{"urlPermissionList":[{"scheme":"resource","host":"rawfile","port":"","path":""}]}}`)
+          if (this.javascriptProxies?.length) {
+            this.javascriptProxies.forEach(proxy => {
+              this._privateController.registerJavaScriptProxy(proxy.object,
+                proxy.name,
+                proxy.methodList ?? [],
+                proxy.asyncMethodList ?? [],
+                proxy.permission ??
+                  `{"javascriptProxyPermission":{"urlPermissionList":[{"scheme":"resource","host":"rawfile","port":"","path":""}]}}`)
+            })
+          }
+          this._privateController.loadUrl($rawfile('easy_tinymce/index.html'));
+        } catch (e) {
+          UtilLog.error(TAG, 'onControllerAttached fail, error: ' + JSON.stringify(e));
         }
-        this._privateController.loadUrl($rawfile('easy_tinymce/index.html'));
       })
       .width('100%')
       .layoutWeight(1)
@@ -121,7 +140,9 @@ export struct EasyEditor {
    */
   setContent(content: string) {
     this.content = content
-    this._privateController.runJavaScript(`window.injectContent()`)
+    this._privateController.runJavaScript(`window.injectContent()`).catch((e: BusinessError) => {
+      UtilLog.error(TAG, 'setContent runJavaScript fail, error: ' + JSON.stringify(e));
+    });
   }
 
   /**
@@ -138,6 +159,9 @@ export struct EasyEditor {
    */
   onHideOperation() {
     this._privateController.runJavaScript(`window.toggleToolbar(${this.hideRichOperation})`)
+      .catch((e: BusinessError) => {
+        UtilLog.error(TAG, 'onHideOperation runJavaScript fail, error: ' + JSON.stringify(e));
+      });
   }
 }
 

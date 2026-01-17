@@ -9,9 +9,13 @@ export struct MembershipCard {
 
   aboutToAppear(): void {
     this.loadUserInfo();
-    emitter.on(Constants.LOGIN_CHANGE, () => {
-      this.loadUserInfo();
-    });
+    try {
+      emitter.on(Constants.LOGIN_CHANGE, () => {
+        this.loadUserInfo();
+      });
+    } catch (e) {
+      console.error('Failed to emitter on login change. Cause: ' + JSON.stringify(e));
+    }
   }
 
   loadUserInfo() {
@@ -58,7 +62,7 @@ export struct MembershipCard {
         .fontColor('#D17E18')
       Button(this.userInfoModel.isMembership ? $r('app.string.member_center') : $r('app.string.open_member'), 
         { controlSize: ControlSize.SMALL })
-        .fontSize(14)
+        .fontSize($r('sys.float.Body_M'))
         .fontWeight(FontWeight.Medium)
         .fontColor($r('sys.color.font_on_primary'))
         .backgroundColor('#E3922F')

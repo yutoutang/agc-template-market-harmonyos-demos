@@ -1,4 +1,4 @@
-import { PersistenceV2, promptAction } from '@kit.ArkUI';
+import { PersistenceV2 } from '@kit.ArkUI';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { BillConstants } from '../commons/Constants';
 import { BalanceChangeType } from '../commons/Enums';
@@ -7,6 +7,7 @@ import {
   BalanceResourceModel,
 } from '../commons/Models';
 import { BalanceResourceItem } from '../commons/Types';
+import { toastUtil } from './ToastUtil';
 
 @ObservedV2
 class ResourceUtil {
@@ -104,10 +105,10 @@ class ResourceUtil {
       } else {
         this._resource.expense.push(item);
       }
-      promptAction.showToast({ message: '自定义分类添加成功~' });
+      toastUtil.showToast('自定义分类添加成功~');
       return true;
     } catch {
-      promptAction.showToast({ message: '自定义分类添加失败' });
+      toastUtil.showToast('自定义分类添加失败');
       return false;
     }
   }

@@ -18,7 +18,6 @@ import { NavTitle } from '../components/NavTitle';
 import { PdfResultPageVM } from '../viewModels/PdfResultPageVM';
 
 
-
 @Builder
 export function PdfResultPageBuilder() {
   PdfResultPage();
@@ -72,7 +71,7 @@ export struct PdfResultPage {
             .fontWeight(FontWeight.Regular)
             .fontColor($r('sys.color.font_primary'));
         }.padding(4).height('100%').onClick(() => {
-          this.vm.savePdf();
+          this.vm.savePdf(this.getUIContext());
         });
 
         Column({ space: 4 }) {

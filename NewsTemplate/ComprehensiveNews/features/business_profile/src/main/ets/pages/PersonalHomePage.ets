@@ -1,8 +1,9 @@
-import { CommonConstants } from 'lib_common';
+import { CommonConstants, loadingPage } from 'lib_common';
 import { FlexLayoutPage } from 'lib_flex_layout';
 import { NewsEnum, RequestListData } from 'lib_news_api';
 import { emptyBuilder, NavHeaderBar } from 'lib_widget';
 import { LayoutNewsDataSource } from '../common/DataSource';
+import { ListModel } from '../common/ListModel';
 import { TabBar } from '../components/TabBar';
 import { UserIntro } from '../components/UserIntro';
 import { UniformNews } from '../components/UniformNews';
@@ -34,21 +35,25 @@ struct PersonalHomePage {
         Refresh({ refreshing: $$this.vm.loading }) {
           Scroll() {
             Column({ space: CommonConstants.SPACE_M }) {
-              UserIntro({
-                userInfo: this.vm.userInfo!,
-                fontSizeRatio: this.vm.settingInfo.fontSizeRatio,
-                refreshProfileHomePage: () => {
-                  this.vm.queryAuthorInfo()
-                },
-              })
-              this.contentBuilder()
+              if (this.vm.userLoading) {
+                loadingPage()
+              } else {
+                UserIntro({
+                  userInfo: this.vm.userInfo!,
+                  fontSizeRatio: this.vm.settingInfo.fontSizeRatio,
+                  refreshProfileHomePage: () => {
+                    this.vm.queryAuthorInfo(false)
+                  },
+                })
+                this.contentBuilder()
+              }
             }
           }
           .width(CommonConstants.FULL_PERCENT)
           .height(CommonConstants.FULL_PERCENT)
           .scrollBar(BarState.Off)
           .align(Alignment.Top)
-          .edgeEffect(EdgeEffect.None)
+          .edgeEffect(EdgeEffect.Spring)
           .onReachEnd(() => {
             this.vm.showInfoTop = true;
           })
@@ -66,6 +71,9 @@ struct PersonalHomePage {
       .height(CommonConstants.FULL_PERCENT)
     }
     .hideTitleBar(true)
+    .onWillShow(() => {
+      this.vm.queryAuthorInfo(false);
+    })
     .linearGradient({
       direction: GradientDirection.Bottom,
       repeating: false,
@@ -85,10 +93,10 @@ struct PersonalHomePage {
         },
       })
       Tabs({ index: this.vm.curIndex }) {
-        ForEach(this.vm.dataSource, (v: LayoutNewsDataSource, index: number) => {
+        ForEach(this.vm.dataSource, (v: ListModel, index: number) => {
           TabContent() {
-            if (v.totalCount() > 0) {
-              this.listBuilder(v, index)
+            if (v.count > 0) {
+              this.listBuilder(v.dataSource, index)
             } else {
               Column() {
                 emptyBuilder({
@@ -101,7 +109,7 @@ struct PersonalHomePage {
               })
             }
           }
-        }, (v: LayoutNewsDataSource, index: number) => index.toString())
+        }, (v: ListModel, index: number) => index.toString())
       }
       .width(CommonConstants.FULL_PERCENT)
       .layoutWeight(1)
@@ -147,7 +155,7 @@ struct PersonalHomePage {
     }
     .width(CommonConstants.FULL_PERCENT)
     .height(CommonConstants.FULL_PERCENT)
-    .cachedCount(1)
+    .cachedCount(2)
     .columnsTemplate(this.vm.getColumnsTemplate())
     .columnsGap(CommonConstants.SPACE_XXL)
     .align(Alignment.Top)
@@ -184,6 +192,9 @@ struct PersonalHomePage {
         Row() {
           WatchButton({
             author: this.vm.userInfo!,
+            refreshAuthorInfo: () => {
+              this.vm.queryAuthorInfo(false);
+            },
           })
         }
         .margin({
@@ -202,7 +213,7 @@ struct PersonalHomePage {
       }
       .attributeModifier(this.vm.buttonModifier)
       .accessibilityText('私信')
-      .visibility(this.vm.isMyself ? Visibility.None : Visibility.Visible)
+      .visibility(this.vm.isMyself || this.vm.userLoading ? Visibility.None : Visibility.Visible)
       .onClick(() => {
         this.vm.jumpChatPage();
       })

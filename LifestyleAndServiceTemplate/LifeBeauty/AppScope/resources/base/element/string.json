@@ -6,7 +6,7 @@
     },
     {
       "name": "agcit_huawei_life_beauty",
-      "value": "1.0.2"
+      "value": "1.0.3"
     },
     {
       "name": "agcittype_huawei_life_beauty",
@@ -14,7 +14,7 @@
     },
     {
       "name": "agcitkid_huawei_life_beauty",
-      "value": "agcit_huawei_life_beauty_profile_edit/1.0.0,agcit_huawei_life_beauty_reservation_card/1.0.0,agcit_huawei_life_beauty_reservation_form/1.0.0"
+      "value": "agcit_huawei_life_beauty_profile_edit/1.0.1,agcit_huawei_life_beauty_reservation_card/1.0.0,agcit_huawei_life_beauty_reservation_form/1.0.0,agcit_huawei_common_collect_personal_info/1.0.0,agcit_huawei_tea_drink_orders_select_store/1.0.1"
     }
   ]
 }

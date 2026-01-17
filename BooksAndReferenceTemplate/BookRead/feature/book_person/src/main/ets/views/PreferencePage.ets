@@ -1,4 +1,13 @@
-import { Constants, GenderOption, PreferenceInfo, ReturnButton, TCRouter } from 'common';
+import {
+  BreakpointStorage,
+  BreakpointSystem,
+  BreakpointTypeEnum,
+  Constants,
+  GenderOption,
+  PreferenceInfo,
+  ReturnButton,
+  TCRouter
+} from 'common';
 import { AppStorageV2, LengthMetrics } from '@kit.ArkUI';
 
 @ObservedV2
@@ -27,6 +36,7 @@ class NovelTypeItem {
 
 @ComponentV2
 export struct PreferencePage {
+  @Local curBreakpoint: BreakpointStorage = BreakpointSystem.currentBreakpoint
   @Local windowTopHeight: number = AppStorage.get('windowTopHeight') as number || 38.77;
   @Local preferenceInfo: PreferenceInfo =
     AppStorageV2.connect(PreferenceInfo, 'preferenceInfo', () => new PreferenceInfo())!
@@ -68,12 +78,12 @@ export struct PreferencePage {
             .width(Constants.FULL_SIZE)
             .justifyContent(FlexAlign.Start)
 
-            Row() {
+            Row({ space: 12 }) {
               this.genderOptionView(this.genderSelectList[0], $r('app.media.novel_for_men'))
               this.genderOptionView(this.genderSelectList[1], $r('app.media.novel_for_women'))
               this.genderOptionView(this.genderSelectList[2], $r('app.media.novel_for_both'))
             }
-            .height(136)
+            .height('auto')
             .width(Constants.FULL_SIZE)
             .justifyContent(FlexAlign.SpaceBetween)
 
@@ -96,7 +106,7 @@ export struct PreferencePage {
 
             this.selectTypeView()
           }
-          .width(Constants.FULL_SIZE)
+          .width(this.curBreakpoint.value === BreakpointTypeEnum.LG ? '70%' : Constants.FULL_SIZE)
           .padding({
             left: 16,
             right: 16,
@@ -115,8 +125,8 @@ export struct PreferencePage {
             left: 16
           })
           .backgroundColor('#E84026')
-          .fontColor('#FFFFFF')
-          .fontSize(16)
+          .fontColor($r('sys.color.font_on_primary'))
+          .fontSize($r('sys.float.Body_L'))
           .opacity(this.isGenderSelected === false && this.selectedTypeNum === 0 ? 0.4 : 1)
           .align(Alignment.Bottom)
           .onClick(() => {
@@ -188,28 +198,32 @@ export struct PreferencePage {
 
   @Builder
   genderOptionView(genderSelectItem: GenderSelectItem, image: ResourceStr) {
-    Stack() {
+    RelativeContainer() {
       Image(image)
-        .width(104)
-        .height(136)
+        .width('100%')
         .borderRadius(14)
         .border({
           width: genderSelectItem.selected ? 2 : 0,
           color: '#E84026'
         })
+        .id('image')
+
       Text(genderSelectItem.text)
         .width(24)
         .height(54)
         .fontSize(20)
         .fontWeight(700)
-        .fontColor('#FFFFFF')// 白色
-        .position({ x: 72, y: 16 })
+        .fontColor('#FFFFFF') // 白色
+        .margin({ top: 5, right: 5 })
+        .alignRules({
+          top: { anchor: 'image', align: VerticalAlign.Top },
+          right: { anchor: 'image', align: HorizontalAlign.End }
+        })
 
       Checkbox({ name: genderSelectItem.text, group: 'checkboxGroup', })
         .select(genderSelectItem.selected)
         .height(24)
         .width(24)
-        .position({ x: 72, y: 104 })
         .padding({
           top: 2,
           bottom: 2,
@@ -227,7 +241,14 @@ export struct PreferencePage {
             genderSelectItem.selected = true
           }
         })
+        .alignRules({
+          bottom: { anchor: 'image', align: VerticalAlign.Bottom },
+          right: { anchor: 'image', align: HorizontalAlign.End }
+        })
     }
+    .layoutWeight(1)
+    .height('auto')
+    .width('auto')
     .onClick(() => {
       if (this.isGenderSelected) {
         this.genderSelectList.forEach(item => item.selected = false);
@@ -268,7 +289,7 @@ export struct PreferencePage {
           .borderRadius(14)
           .backgroundColor(item.selected ? '#E84026' : '#0D000000')
         }
-      },(item:NovelTypeItem)=>`${item.type}+${new Date().toString()}`)
+      }, (item: NovelTypeItem) => `${item.type}+${new Date().toString()}`)
     }
   }
 

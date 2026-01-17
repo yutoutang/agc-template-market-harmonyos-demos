@@ -1,7 +1,7 @@
 import { common } from '@kit.AbilityKit';
 import { nfcController } from '@kit.ConnectivityKit';
-import { hilog } from '@kit.PerformanceAnalysisKit';
-import { ComponentContent, LevelMode, promptAction } from '@kit.ArkUI';
+import { ComponentContent, LevelMode } from '@kit.ArkUI';
+import { UtilLog } from '@hw-agconnect/util-log';
 import {
   NFC_STATE_COMPLETE,
   NFC_STATE_NORMAL,
@@ -79,7 +79,7 @@ export class ActionVM {
           PromptActionUtil.closeDialog(nfcOpenContentNode);
         };
         params.confirm = () => {
-          let context = getContext(this) as common.UIAbilityContext;
+          let context = uiContext.getHostContext() as common.UIAbilityContext;
           context.startAbility({
             bundleName: 'com.huawei.hmos.settings',
             abilityName: 'com.huawei.hmos.settings.MainAbility',
@@ -95,14 +95,14 @@ export class ActionVM {
         PromptActionUtil.setOptions({
           levelMode: LevelMode.EMBEDDED,
           onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
-            hilog.info(0xFF00, 'SubmitFeedBack', JSON.stringify(dismissDialogAction.reason));
+            UtilLog.info(0xFF00, 'MobileNFC', JSON.stringify(dismissDialogAction.reason));
           },
         });
 
         PromptActionUtil.openDialog();
       }
     } else {
-      promptAction.showToast({
+      uiContext.getPromptAction().showToast({
         message: '当前设备不支持NFC！',
       });
     }
@@ -124,13 +124,13 @@ export class ActionVM {
                 case '3100201':
                 case '3100202':
                   this.state = NFC_STATE_NORMAL;
-                  promptAction.showToast({
+                  uiContext.getPromptAction().showToast({
                     message: '克隆失败：请保持卡片贴于手机背面NFC感应区域，请勿移动卡片',
                   });
                   break;
                 default:
                   this.state = NFC_STATE_NORMAL;
-                  promptAction.showToast({
+                  uiContext.getPromptAction().showToast({
                     message: '读卡失败：卡片可能被加密或不支持此种卡片',
                   });
                   getNavPathStack()
@@ -154,7 +154,7 @@ export class ActionVM {
                       default:
                         if (result.nfcInfo.balance >= 0) {
                           this.state = NFC_STATE_NORMAL;
-                          promptAction.showToast({
+                          uiContext.getPromptAction().showToast({
                             message: '读卡失败：卡片可能被加密或不支持此种卡片',
                           });
                           getNavPathStack()
@@ -167,7 +167,7 @@ export class ActionVM {
                       case NFC_TYPE.NFC_TYPE_BANK:
                         if (result.nfcInfo.balance === -1) {
                           this.state = NFC_STATE_NORMAL;
-                          promptAction.showToast({
+                          uiContext.getPromptAction().showToast({
                             message: '读卡失败：卡片可能被加密或不支持此种卡片',
                           });
                           getNavPathStack()
@@ -181,7 +181,7 @@ export class ActionVM {
                     nfcCardInfo.insertNfcInfo(result.nfcInfo)
                       .then(id => {
                         result.nfcInfo!.id = id;
-                        getContext()
+                        uiContext.getHostContext()!
                           .eventHub
                           .emit(OnNfcChanged.name,
                             new OnNfcChanged(result.nfcInfo!.type, !result.nfcInfo!.dealHistory,
@@ -191,7 +191,7 @@ export class ActionVM {
                       })
                       .catch((e: Error) => {
                         this.state = NFC_STATE_NORMAL;
-                        promptAction.showToast({
+                        uiContext.getPromptAction().showToast({
                           message: '读卡失败：卡片可能被加密或不支持此种卡片',
                         });
                         getNavPathStack()
@@ -200,7 +200,7 @@ export class ActionVM {
                       });
                   } else {
                     this.state = NFC_STATE_NORMAL;
-                    promptAction.showToast({
+                    uiContext.getPromptAction().showToast({
                       message: '读卡失败：卡片可能被加密或不支持此种卡片',
                     });
                     getNavPathStack()
@@ -213,7 +213,7 @@ export class ActionVM {
           });
           break;
         case ACTION_TYPE.ACTION_CLONE:
-          startCloneNFC(this.data.nfcType!, this.data.nfcInfo!, (err, result) => {
+          startCloneNFC(uiContext, this.data.nfcType!, this.data.nfcInfo!, (err, result) => {
             if (err) {
               stopNFC();
               switch (err.code.toString()) {
@@ -258,12 +258,12 @@ export class ActionVM {
                 case '3100101':
                 case '3100201':
                 case '3100202':
-                  promptAction.showToast({
+                  uiContext.getPromptAction().showToast({
                     message: '克隆失败：请保持卡片贴于手机背面NFC感应区域，请勿移动卡片',
                   });
                   break;
                 default:
-                  promptAction.showToast({
+                  uiContext.getPromptAction().showToast({
                     message: '格式化失败：卡片可能被加密或不支持此种卡片',
                   });
                   break;

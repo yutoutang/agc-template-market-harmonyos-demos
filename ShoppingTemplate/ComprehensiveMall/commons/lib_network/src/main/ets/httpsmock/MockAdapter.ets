@@ -1,9 +1,9 @@
 import AxiosMockAdapter from '@hw-agconnect/axios-mock-adapter';
-import instance from '../https/Request';
 import { HomeMockApis } from './mockapis/HomeMock';
 import { OrderMockApis } from './mockapis/OrderMock';
 import { ProductMockApis } from './mockapis/ProductMock';
 import { UserMockApis } from './mockapis/UserMock';
+import instance from '../https/Request';
 
 // 创建mock拦截器
 const mockAdapter = new AxiosMockAdapter(instance, {

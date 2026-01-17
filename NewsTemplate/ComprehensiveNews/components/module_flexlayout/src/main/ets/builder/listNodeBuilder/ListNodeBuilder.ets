@@ -1,6 +1,7 @@
-import { FrameNodeParams, getNativeNodeController, NodeControllerFactory } from '../../factory/NativeNodeFactory'
+import { getNativeNodeController, NodeControllerFactory } from '../../factory/NativeNodeFactory'
+import { JSONObject, LayoutSetting } from '../../model/CommonModel'
 import { FlexLayoutBreakPointVM } from '../../model/FlexLayoutBreakPointVM'
-import { BreakpointNameEnum, JSONObject, LayoutSetting } from '../../model/Model'
+import { BreakpointNameEnum, FrameNodeParams } from '../../model/Model'
 
 @Builder
 export function ListNodeBuilder(frameNodeParams: FrameNodeParams) {

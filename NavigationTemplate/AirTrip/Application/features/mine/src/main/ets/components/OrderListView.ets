@@ -130,7 +130,7 @@ export struct OrderListView {
           Image($r('app.media.ic_copy')).width(16).height(16)
             .onClick(() => {
               // 复制订单编号
-              pasteText(item.orderNo)
+              pasteText(item.orderNo, this.getUIContext())
             })
         }
 
@@ -141,7 +141,7 @@ export struct OrderListView {
       .width(Constants.FULL_PERCENT_WIDTH)
       .justifyContent(FlexAlign.SpaceBetween)
 
-      Divider().strokeWidth(0.5).color($r('sys.color.ohos_id_color_button_divider'))
+      Divider()
 
       Row() {
         Row({ space: 8 }) {
@@ -236,7 +236,7 @@ export struct OrderListView {
       }
       .width(Constants.FULL_PERCENT_WIDTH)
 
-      Divider().strokeWidth(0.5).color($r('sys.color.ohos_id_color_button_divider'))
+      Divider()
 
       Row({ space: 8 }) {
         if (item.status === 1) {

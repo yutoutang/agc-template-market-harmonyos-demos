@@ -1,12 +1,14 @@
 import { PersistenceV2 } from '@kit.ArkUI';
 import { LoginSheetUtils } from 'lib_account';
-import { CommonConfirmDialog, UserInfoModel } from 'lib_common';
+import { CommonConfirmDialog, GlobalContextUtils, UserInfoModel } from 'lib_common';
 import { AuthorModel, MineServiceApi } from 'lib_news_api';
 import { Constants } from '../common/Constants';
 
 @ComponentV2
 export struct WatchButton {
   @Require @Param author: AuthorModel;
+  @Event refreshAuthorInfo: () => void = () => {
+  };
   @Local userInfoModel: UserInfoModel = PersistenceV2.connect(UserInfoModel, () => new UserInfoModel())!;
 
   build() {
@@ -28,26 +30,30 @@ export struct WatchButton {
       LoginSheetUtils.open();
       return;
     }
-    if (this.author.authorId === this.userInfoModel.authorId) {
-      this.getUIContext().getPromptAction().showToast({ message: '不可关注自己' });
+    if (this.author?.authorId === this.userInfoModel.authorId) {
+      GlobalContextUtils.showToast({ message: '不可关注自己' });
       return;
     }
     if (this.isWatchByMe) {
       CommonConfirmDialog.show({
         content: '确定不再关注TA？',
         confirm: () => {
-          MineServiceApi.cancelWatch(this.author.authorId);
-          this.refreshUserInfo();
+          MineServiceApi.cancelWatch(this.author?.authorId).then(() => {
+            this.refreshUserInfo();
+            this.refreshAuthorInfo();
+          });
         },
       })
     } else {
-      MineServiceApi.addWatch(this.author.authorId);
-      this.refreshUserInfo();
+      MineServiceApi.addWatch(this.author?.authorId).then(() => {
+        this.refreshUserInfo();
+        this.refreshAuthorInfo();
+      });
     }
   }
 
-  refreshUserInfo() {
-    const mine = MineServiceApi.queryAuthorInfo()
+  async refreshUserInfo() {
+    const mine = await MineServiceApi.queryAuthorInfo()
     this.userInfoModel.watchers = mine?.watchers || [];
     this.userInfoModel.watchersCount = mine?.watchersCount || 0;
     this.userInfoModel.followersCount = mine?.followersCount || 0;
@@ -56,13 +62,13 @@ export struct WatchButton {
   // 我有没有关注他
   @Computed
   get isWatchByMe() {
-    return this.userInfoModel.watchers.includes(this.author.authorId);
+    return this.userInfoModel.watchers.includes(this.author?.authorId);
   }
 
   // 他有没有关注我
   @Computed
   get isWatchByHim() {
-    return this.userInfoModel.followers.includes(this.author.authorId);
+    return this.userInfoModel.followers.includes(this.author?.authorId);
   }
 
   @Computed

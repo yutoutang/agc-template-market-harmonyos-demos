@@ -1,3 +1,4 @@
+import { UtilLog } from '@hw-agconnect/util-log';
 import { ComponentContent, PromptAction, UIObserver, window } from '@kit.ArkUI'
 
 @ComponentV2
@@ -208,26 +209,30 @@ class Toast {
    * 根据参数打开弹框
    */
   private async open(option: ToastOption) {
-    let windowClass = await window.getLastWindow(getContext())
-    let uiContext = windowClass.getUIContext()
-    let loadingDialog = new ComponentContent(uiContext, wrapBuilder(defaultBuilder), option)
-    let promptAction = uiContext.getPromptAction()
-    let uiObserver = uiContext.getUIObserver()
-    Toast._instance = Toast.getInstance(loadingDialog, promptAction, uiObserver)
-    await promptAction.openCustomDialog(loadingDialog, {
-      alignment: DialogAlignment.Center,
-      autoCancel: false,
-      isModal: true,
-      transition: TransitionEffect.IDENTITY,
-      onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
-        if (dismissDialogAction.reason === DismissReason.PRESS_BACK) {
-          dismissDialogAction.dismiss()
-        }
-        if (dismissDialogAction.reason === DismissReason.TOUCH_OUTSIDE) {
-          dismissDialogAction.dismiss()
-        }
-      },
-    })
+    try {
+      let windowClass = await window.getLastWindow(getContext())
+      let uiContext = windowClass.getUIContext()
+      let loadingDialog = new ComponentContent(uiContext, wrapBuilder(defaultBuilder), option)
+      let promptAction = uiContext.getPromptAction()
+      let uiObserver = uiContext.getUIObserver()
+      Toast._instance = Toast.getInstance(loadingDialog, promptAction, uiObserver)
+      await promptAction.openCustomDialog(loadingDialog, {
+        alignment: DialogAlignment.Center,
+        autoCancel: false,
+        isModal: true,
+        transition: TransitionEffect.IDENTITY,
+        onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
+          if (dismissDialogAction.reason === DismissReason.PRESS_BACK) {
+            dismissDialogAction.dismiss()
+          }
+          if (dismissDialogAction.reason === DismissReason.TOUCH_OUTSIDE) {
+            dismissDialogAction.dismiss()
+          }
+        },
+      })
+    } catch (e) {
+      UtilLog.error(`session close failed: ${JSON.stringify(e)}`);
+    }
   }
 
   /**

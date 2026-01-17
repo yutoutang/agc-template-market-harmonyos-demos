@@ -2,11 +2,10 @@ import { LayoutTemplateModel } from './LayoutTemplateModel'
 import PosterTemplateModel from './PosterTemplateModel'
 import FreeCollageModel from './FreeCollageModel'
 import ImageModel from './ImageModel'
-
-export type CollageMode = 'fixed' | 'poster' | 'free' | 'join'
+import { CollageMode } from '../constant/Enum';
 
 export default class CollageModel {
-  mode: CollageMode = 'fixed'
+  mode: CollageMode = CollageMode.FIXED
 
   // 各模式独立管理图片
   fixedImages: ImageModel[] = []

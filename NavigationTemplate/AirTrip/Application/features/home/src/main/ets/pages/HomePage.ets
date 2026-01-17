@@ -1,22 +1,22 @@
 import {
+  AppRouter,
+  AuthenticationUtil,
+  City,
   DataStorage,
-  RouterPageEnum,
-  WebPageParams,
+  DayInfo,
   getDayLabel,
   LocationType,
-  DayInfo,
-  UserInfoStorage,
-  AuthenticationUtil,
-  UserInfo,
   ResourceData,
   ResourceInfo,
-  City,
-  AppRouter,
+  UserInfo,
+  UserInfoStorage,
+  WebPageParams
 } from 'common';
 import { BaseTabBar, BaseTitle, GlobalDialog } from 'components';
 import { AppStorageV2, PersistenceV2 } from '@kit.ArkUI';
 import { emitter } from '@kit.BasicServicesKit';
 import { HomePageVM } from '../viewmodel/HomePageVM';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 
 @Builder
 export function homePageBuilder() {
@@ -92,7 +92,7 @@ export struct HomePage {
   @Monitor('selectedBarIndex')
   onChangeSelectedBarIndex(monitor: IMonitor) {
     if (monitor.value()?.now === 1) {
-      GlobalDialog.showToast('暂未上线，敬请期待')
+      GlobalDialog.showToast('暂未上线，敬请期待', this.getUIContext())
       this.selectedBarIndex = 0
     }
   }
@@ -115,8 +115,14 @@ export struct HomePage {
 
     this.initResourceData()
   }
+
   aboutToDisappear(): void {
-    emitter.off(1)
+    try {
+      emitter.off(1)
+    } catch (error) {
+      hilog.error(0x0000, 'testTag', 'Failed to emitter off, errorCode=%{public}d, errorMsg=%{public}s', error.code,
+        error.message);
+    }
   }
 
   initResourceData() {
@@ -137,8 +143,13 @@ export struct HomePage {
       this.bannerList = resourceData?.bannerServices ?? []
       AppStorage.setOrCreate('resourceData', resourceData)
     };
-
-    emitter.on(event, callback);
+    try {
+      emitter.on(event, callback);
+    } catch (error) {
+      hilog.error(0x0000, 'testTag', 'Failed to initResourceData, errorCode=%{public}d, errorMsg=%{public}s',
+        error.code,
+        error.message);
+    }
   }
 
   // 机票预订
@@ -155,11 +166,11 @@ export struct HomePage {
         secondaryButName: '取消',
         primaryButAction: async () => {
           // 关闭账号关联弹框
-          await GlobalDialog.close()
+          await GlobalDialog.close(this.getUIContext())
           // loading弹框
-          await GlobalDialog.showLoadingDialog()
+          await GlobalDialog.showLoadingDialog(this.getUIContext())
           AuthenticationUtil.silentLogin(async (isSuccess: boolean, userInfo: UserInfo) => {
-            await GlobalDialog.close()
+            await GlobalDialog.close(this.getUIContext())
             // 账号关联登录成功
             if (isSuccess) {
               this.userInfoStorage.isLogin = true;
@@ -168,12 +179,14 @@ export struct HomePage {
                 url: 'FlightListPage'
               })
             }
-          })
+          },
+            this.getUIContext()
+          )
         },
         secondaryButAction: () => {
-          GlobalDialog.close()
+          GlobalDialog.close(this.getUIContext())
         },
-      })
+      }, this.getUIContext())
     }
   }
 
@@ -192,16 +205,16 @@ export struct HomePage {
             .fontColor($r('sys.color.ohos_id_color_text_tertiary'))
           Text(this.departure || '请选择')
             .fontColor(this.departure ? $r('sys.color.ohos_id_color_text_primary') :
-            $r('sys.color.ohos_id_color_text_tertiary'))
+              $r('sys.color.ohos_id_color_text_tertiary'))
             .fontSize(14)
             .fontWeight(FontWeight.Bold)
             .maxLines(1)
-            .textOverflow({overflow: TextOverflow.Ellipsis})
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
         }
         .width('40%')
         .justifyContent(FlexAlign.Center)
         .height(64)
-        .padding({left: 8, right:8})
+        .padding({ left: 8, right: 8 })
         .backgroundColor('#F3F3F3')
         .borderRadius(16)
         .onClick(() => {
@@ -236,16 +249,16 @@ export struct HomePage {
             .fontColor($r('sys.color.ohos_id_color_text_tertiary'))
           Text(this.destination || '请选择')
             .fontColor(this.destination ? $r('sys.color.ohos_id_color_text_primary') :
-            $r('sys.color.ohos_id_color_text_tertiary'))
+              $r('sys.color.ohos_id_color_text_tertiary'))
             .fontSize(14)
             .fontWeight(FontWeight.Bold)
             .maxLines(1)
-            .textOverflow({overflow: TextOverflow.Ellipsis})
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
         }
         .width('40%')
         .justifyContent(FlexAlign.Center)
         .height(64)
-        .padding({left: 8, right:8})
+        .padding({ left: 8, right: 8 })
         .backgroundColor('#F3F3F3')
         .borderRadius(16)
         .onClick(() => {
@@ -321,7 +334,7 @@ export struct HomePage {
               param: params
             })
           });
-      });
+      },(item: ResourceInfo, index: number)=>index + '__' + JSON.stringify(item));
     }
     .autoPlay(true)
     .interval(3000)
@@ -331,12 +344,7 @@ export struct HomePage {
     .itemSpace(0)
     .indicator( // 设置圆点导航点样式
       new DotIndicator()
-        .itemWidth(8)
-        .itemHeight(8)
-        .selectedItemWidth(8)
-        .selectedItemHeight(8)
-        .color($r('sys.color.ohos_id_color_tertiary'))
-        .selectedColor($r('sys.color.white')))
+    )
     .shadow(ShadowStyle.OUTER_DEFAULT_XS)
   }
 
@@ -364,7 +372,7 @@ export struct HomePage {
             param: params
           })
         })
-      })
+      },(item: ResourceInfo, index: number)=>index + '__' + JSON.stringify(item))
     }
     .width('100%')
     .justifyContent(FlexAlign.SpaceAround)

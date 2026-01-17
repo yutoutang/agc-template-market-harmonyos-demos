@@ -112,7 +112,7 @@ export class EditorController {
     if(!content) {
       return
     }
-    this.webviewController.runJavaScript(`RichEditor.setHtml('${content.replace(/%/g, '%25')}');`)
+    this.webviewController.runJavaScript(`RichEditor.setHtml(${JSON.stringify(content.replace(/%/g, '%25'))});`)
   }
 
   bold() {
@@ -177,7 +177,7 @@ export class EditorController {
 
   parseHtmlContent(contentHtml: string): string {
     // 1. 将<br> 或 <br/> 标签替换成 \n
-    let text = contentHtml.replace(/<br\s*\/?>/g, '\n');
+    let text = contentHtml.replace(/<br\s*\/?>/g, '');
     // 2. 使用正则表达式移除所有HTML标签
     text = text.replace(/<\/?[^>]+>/g, '');
     // 3. 解码HTML实体

@@ -4,7 +4,7 @@
 
 - [简介](#简介)
 - [约束与限制](#约束与限制)
-- [快速入门](#快速入门)
+- [使用](#使用)
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
@@ -20,8 +20,8 @@
 
 ### 环境
 
-- DevEco Studio版本：DevEco Studio 5.0.3 Release及以上
-- HarmonyOS SDK版本：HarmonyOS 5.0.3 Release SDK及以上
+- DevEco Studio版本：DevEco Studio 6.0.0 Release及以上
+- HarmonyOS SDK版本：HarmonyOS 6.0.0 Release SDK及以上
 - 设备类型：华为手机（包括双折叠和阔折叠）、平板
 - 系统版本：HarmonyOS 5.0.1(13)及以上
 
@@ -29,7 +29,7 @@
 
 - 网络权限：ohos.permission.INTERNET、ohos.permission.GET_NETWORK_INFO
 
-## 快速入门
+## 使用
 
 1. 安装组件。
 
@@ -286,6 +286,8 @@ struct Index {
 ```
 
 滑动视频页：
+
+需要在工程的entry\src\main\ets\pages目录下新建滑动视频页：SwipeVideoPage.ets
 
 ```ts
 // SwipeVideoPage.ets

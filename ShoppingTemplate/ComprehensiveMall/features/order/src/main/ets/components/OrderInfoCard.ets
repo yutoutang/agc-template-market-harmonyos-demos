@@ -1,4 +1,4 @@
-import { iResourceMgr, RouterMap, routerStack } from 'lib_foundation';
+import { RouterMap, routerStack } from 'lib_foundation';
 import { OrderInfo, OrderItem, OrderSkuItem } from 'lib_network';
 import { OrderActionMap, OrderShipmentMap } from '../common/Enums';
 import { MyButtonModifier, OrderAction } from '../common/Types';
@@ -12,7 +12,7 @@ import { OrderUtil } from '../utils/OrderUtil';
 @Builder
 export function buildOrderBaseInfoCard(skuInfo: OrderSkuItem) {
   Row() {
-    Image(iResourceMgr.resolveUri(skuInfo.banner))
+    Image(skuInfo.banner)
       .width(60)
       .height(60)
       .borderRadius($r('app.float.border_radius_s'))

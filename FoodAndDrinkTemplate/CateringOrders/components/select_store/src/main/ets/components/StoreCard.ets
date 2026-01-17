@@ -1,7 +1,12 @@
-import { promptAction } from '@kit.ArkUI'
-import { common, Want } from '@kit.AbilityKit'
-import { StoreInfo } from '../models/Index'
-import { callTelSheetBuilder } from 'base_ui'
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
+import { common, Want } from '@kit.AbilityKit';
+import { callTelSheetBuilder } from 'base_ui';
+import { SearchItem, StoreInfo } from 'search';
+
+@Builder
+export function storeCardBuilder(searchItem:SearchItem){
+  StoreCard({storeInfo:searchItem.store,packageName:searchItem.packageName})
+}
 
 @ComponentV2
 export struct StoreCard {
@@ -61,10 +66,10 @@ export struct StoreCard {
                   destinationName: this.storeInfo.address ?? '',
                 },
               }
-              let context = getContext(this) as common.UIAbilityContext;
+              let context = this.getUIContext().getHostContext() as common.UIAbilityContext;
               context.startAbility(petalMapWant);
             } else {
-              promptAction.showToast({ message: $r('app.string.store_address_error') })
+              promptAction.showToast({ message: '商户地址错误！' })
             }
           })
           Image($r('app.media.ic_public_telephone')).width(24).margin({ left: 24 }).onClick(() => {
@@ -73,10 +78,11 @@ export struct StoreCard {
             .bindSheet($$this.callTelSheet, callTelSheetBuilder(this.storeInfo.tel, () => {
               this.callTelSheet = false
             }), {
-              height: 290,
+              detents: [309, 310],
+              backgroundColor: $r('sys.color.background_fourth'),
               blurStyle: BlurStyle.Thick,
-              backgroundColor: '#E6FFFFFF',
-              showClose: false,
+              preferType: SheetType.CENTER,
+              title: { title: $r('app.string.contact_us') },
             });
         }
 

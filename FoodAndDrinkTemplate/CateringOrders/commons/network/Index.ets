@@ -11,3 +11,7 @@ export * from './src/main/ets/types/Request';
 export * from './src/main/ets/types/Response';
 
 export * from './src/main/ets/constants/Index'
+export * from './src/main/ets/utils/OrderUtil'
+
+// 启动mock
+import('./src/main/ets/mocks/MockAdapter');

@@ -76,4 +76,5 @@ export class SearchPageVM {
   async goRecipeDetail(id: number) {
     RouterModule.push(RouterMap.DISHES, { 'id': id } as Record<string, number>);
   }
+
 }

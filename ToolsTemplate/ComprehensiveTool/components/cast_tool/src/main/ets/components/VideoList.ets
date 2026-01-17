@@ -1,8 +1,8 @@
 import { common } from '@kit.AbilityKit';
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
 import { dataSharePredicates } from '@kit.ArkData';
+import { UtilLog as Logger, UtilLog } from '@hw-agconnect/util-log';
 import { formatFileSize } from '../util/FormatUtil';
-import { Logger } from '../util/MyLog';
 import { MediaInfo, MediaType, CastParams, MediaData } from '../model/Index';
 import { PermissionUtil } from '../util/PermissionUtil';
 import { formatTime } from '../util/FormatUtil';
@@ -16,7 +16,6 @@ export struct VideoList {
   @Event onSelect: (param: CastParams) => void = () => {
 
   };
-
 
   aboutToAppear(): void {
     this.getVideo();
@@ -48,44 +47,48 @@ export struct VideoList {
   async getVideo() {
     const hasPermission = await PermissionUtil._checkPermissions('ohos.permission.READ_IMAGEVIDEO');
     if (!hasPermission) {
-      PermissionUtil.requestPermissions(['ohos.permission.READ_IMAGEVIDEO'],this.uiContext);
+      PermissionUtil.requestPermissions(['ohos.permission.READ_IMAGEVIDEO'], this.uiContext);
     }
     // 图片和视频
-    let phAccessHelper = photoAccessHelper.getPhotoAccessHelper(this.uiContext);
-    let predicates: dataSharePredicates.DataSharePredicates = new dataSharePredicates.DataSharePredicates();
-    predicates.equalTo(photoAccessHelper.PhotoKeys.PHOTO_TYPE, photoAccessHelper.PhotoType.VIDEO);
-    let fetchOption: photoAccessHelper.FetchOptions = {
-      fetchColumns: [photoAccessHelper.PhotoKeys.DURATION, photoAccessHelper.PhotoKeys.SIZE],
-      predicates: predicates,
-    };
+    try {
+      let phAccessHelper = photoAccessHelper.getPhotoAccessHelper(this.uiContext);
+      let predicates: dataSharePredicates.DataSharePredicates = new dataSharePredicates.DataSharePredicates();
+      predicates.equalTo(photoAccessHelper.PhotoKeys.PHOTO_TYPE, photoAccessHelper.PhotoType.VIDEO);
+      let fetchOption: photoAccessHelper.FetchOptions = {
+        fetchColumns: [photoAccessHelper.PhotoKeys.DURATION, photoAccessHelper.PhotoKeys.SIZE],
+        predicates: predicates,
+      };
 
-    let fetchResult: photoAccessHelper.FetchResult<photoAccessHelper.PhotoAsset> =
-      await phAccessHelper.getAssets(fetchOption);
-    fetchResult.getAllObjects((err, photoAssetList) => {
-      if (err === undefined) {
-        this.mediaList = [];
-        photoAssetList.forEach(async (asset) => {
-          // 获取时长
-          let duration: photoAccessHelper.MemberType = asset.get(photoAccessHelper.PhotoKeys.DURATION);
-          // 获取文件大小
-          let size: photoAccessHelper.MemberType = asset.get(photoAccessHelper.PhotoKeys.SIZE);
-          // 获取缩略图
-          let headImg = await asset.getThumbnail();
-          const video: MediaInfo = {
-            name: asset.displayName,
-            url: asset.uri,
-            duration: Number(duration),
-            type: MediaType.VIDEO,
-            headImg: headImg,
-            size: formatFileSize(Number(size)),
-          };
-          this.mediaList.push(video);
-        });
+      let fetchResult: photoAccessHelper.FetchResult<photoAccessHelper.PhotoAsset> =
+        await phAccessHelper.getAssets(fetchOption);
+      fetchResult.getAllObjects((err, photoAssetList) => {
+        if (err === undefined) {
+          this.mediaList = [];
+          photoAssetList.forEach(async (asset) => {
+            // 获取时长
+            let duration: photoAccessHelper.MemberType = asset.get(photoAccessHelper.PhotoKeys.DURATION);
+            // 获取文件大小
+            let size: photoAccessHelper.MemberType = asset.get(photoAccessHelper.PhotoKeys.SIZE);
+            // 获取缩略图
+            let headImg = await asset.getThumbnail();
+            const video: MediaInfo = {
+              name: asset.displayName,
+              url: asset.uri,
+              duration: Number(duration),
+              type: MediaType.VIDEO,
+              headImg: headImg,
+              size: formatFileSize(Number(size)),
+            };
+            this.mediaList.push(video);
+          });
 
-      } else {
-        Logger.error(`photoAsset failed with err:${err.code}, ${err.message}`);
-      }
-    });
+        } else {
+          Logger.error(`photoAsset failed with err:${err.code}, ${err.message}`);
+        }
+      });
+    } catch (e) {
+      UtilLog.error(`getVideo failed with error ${JSON.stringify(e)}`);
+    }
   }
 
   build() {

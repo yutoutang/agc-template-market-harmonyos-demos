@@ -4,6 +4,7 @@ import { image } from '@kit.ImageKit';
 import { avSession } from '@kit.AVSessionKit';
 import { ImageUtil } from '../util/ImageUtil';
 import { CastService } from '../service/CastService';
+import { UtilLog } from '@hw-agconnect/util-log';
 
 @ObservedV2
 export class CastPageVM {
@@ -26,14 +27,18 @@ export class CastPageVM {
 
   // 获取wifi信息
   getWifiInfo: () => void = () => {
-    wifiManager.getLinkedInfo((err, data: wifiManager.WifiLinkedInfo) => {
-      if (err) {
-        this.connState = wifiManager.ConnState.UNKNOWN;
-        return;
-      }
-      this.wifiName = data.ssid;
-      this.connState = data.connState;
-    });
+    try {
+      wifiManager.getLinkedInfo((err, data: wifiManager.WifiLinkedInfo) => {
+        if (err) {
+          this.connState = wifiManager.ConnState.UNKNOWN;
+          return;
+        }
+        this.wifiName = data.ssid;
+        this.connState = data.connState;
+      });
+    } catch (e) {
+      UtilLog.error(`getWifiInfo failed with error ${JSON.stringify(e)}`);
+    }
   };
 
   // 获取封面
@@ -50,6 +55,4 @@ export class CastPageVM {
     let avCastPicker = new avSession.AVCastPickerHelper(context);
     await avCastPicker.select(avCastPickerOptions);
   }
-
-
 }

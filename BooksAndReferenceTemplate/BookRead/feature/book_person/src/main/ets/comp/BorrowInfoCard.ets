@@ -4,6 +4,7 @@ import { BorrowInfo, BorrowStatus, Constants, StatusInfo, TCRouter, TimeUtils } 
 @ComponentV2
 export struct BorrowInfoCard {
   @Param @Require info: BorrowInfo;
+  private context: Context = this.getUIContext().getHostContext() as Context;
 
   aboutToAppear(): void {
     this.info.statusInfo = new StatusInfo(this.info.status);
@@ -29,8 +30,7 @@ export struct BorrowInfoCard {
       }
 
       Row() {
-        Text(`${getContext()
-          .resourceManager
+        Text(`${this.context.resourceManager
           .getStringByNameSync('borrow_time')}: ${TimeUtils.timestamp2YMD(this.info.borrowBegin)}`)
           .fontSize($r('sys.float.Body_L'))
           .fontColor($r('sys.color.font_primary'))
@@ -40,8 +40,7 @@ export struct BorrowInfoCard {
       .padding({ top: 8, bottom: 8 })
 
       Row() {
-        Text(`${getContext()
-          .resourceManager
+        Text(`${this.context.resourceManager
           .getStringByNameSync('borrow_deadline')}: ${TimeUtils.timestamp2YMD(this.info.borrowBegin)}-${TimeUtils.timestamp2YMD(this.info.borrowDeadline)}`)
           .fontSize($r('sys.float.Body_L'))
           .fontColor($r('sys.color.font_primary'))
@@ -51,8 +50,7 @@ export struct BorrowInfoCard {
 
       if (this.info.status === BorrowStatus.RETURNED) {
         Row() {
-          Text(`${getContext()
-            .resourceManager
+          Text(`${this.context.resourceManager
             .getStringByNameSync('borrow_return_time')}: ${TimeUtils.timestamp2YMD(this.info.borrowEnd)}`)
             .fontSize($r('sys.float.Body_L'))
             .fontColor($r('sys.color.font_primary'))
@@ -62,7 +60,7 @@ export struct BorrowInfoCard {
       }
 
       Row() {
-        Text(`${getContext().resourceManager.getStringByNameSync('borrow_count')}: ${this.info.borrowNum}`)
+        Text(`${this.context.resourceManager.getStringByNameSync('borrow_count')}: ${this.info.borrowNum}`)
           .fontSize($r('sys.float.Body_L'))
           .fontColor($r('sys.color.font_primary'))
       }

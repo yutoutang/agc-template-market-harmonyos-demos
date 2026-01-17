@@ -141,21 +141,21 @@ export struct MonthList {
                     .width('calc((100% - 12vp) / 7)')
                     .justifyContent(FlexAlign.Center)
                     .alignItems(HorizontalAlign.Center)
-                  })
+                  },(item: Day, index: number)=>index + '__' + JSON.stringify(item))
                 }
                 .width(Constants.FULL_PERCENT_WIDTH)
                 .justifyContent(FlexAlign.SpaceBetween)
               }
               .padding(6)
-            })
+            },(item: Day[], index: number)=>index + '__' + JSON.stringify(item))
           }
-        })
+        },(item: MonthData, index: number)=>index + '__' + JSON.stringify(item))
       }
       .width(Constants.FULL_PERCENT_WIDTH)
       .height(Constants.FULL_PERCENT_HEIGHT)
       .sticky(StickyStyle.Header)
       .scrollBar(BarState.Off)
-      .divider({ strokeWidth: 0.5, color: $r('sys.color.ohos_id_color_button_divider') })
+      .divider({ strokeWidth: 0.5, color: $r('sys.color.comp_divider') })
       .onAreaChange((oldValue: Area, newValue: Area) => {
         if (newValue) {
           this.listScroller.scrollToItemInGroup(this.dataStorage.selectCalendarListIndex, 0, true)

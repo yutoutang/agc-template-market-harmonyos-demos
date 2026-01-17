@@ -1,4 +1,3 @@
-
 class ToastUtil {
   private uiContext: UIContext | undefined = undefined;
 

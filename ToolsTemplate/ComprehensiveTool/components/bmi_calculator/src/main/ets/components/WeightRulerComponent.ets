@@ -1,3 +1,4 @@
+import { UtilLog } from '@hw-agconnect/util-log';
 import { LengthMetrics } from '@kit.ArkUI';
 import { display } from '@kit.ArkUI';
 
@@ -41,13 +42,21 @@ export struct WeightRulerComponent {
       }
     };
 
-    display.on('change', this.displayChangeCallback);
+    try {
+      display.on('change', this.displayChangeCallback);
+    } catch (e) {
+      UtilLog.error(`addDisplayListener failed with error ${JSON.stringify(e)}`);
+    }
   }
 
   private removeDisplayListener(): void {
     if (this.displayChangeCallback) {
-      display.off('change', this.displayChangeCallback);
-      this.displayChangeCallback = null;
+      try {
+        display.off('change', this.displayChangeCallback);
+        this.displayChangeCallback = null;
+      } catch (e) {
+        UtilLog.error(`removeDisplayListener failed with error ${JSON.stringify(e)}`);
+      }
     }
   }
 

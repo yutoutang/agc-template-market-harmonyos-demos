@@ -1,5 +1,5 @@
 import { util } from '@kit.ArkTS'
-import { FileType } from '../common/Constant'
+import { FileType, WorkerMessageType } from '../common/Constant'
 
 @ObservedV2
 export class CompressedFile {
@@ -23,4 +23,23 @@ export class CompressedFile {
     this.count = count
     this.updatedTime = updatedTime
   }
+}
+
+export interface WorkerSend {
+  filePath?: string,
+  currentFolderPath?: string,
+  name?: string,
+  documentSelectResult?: string[]
+  uris?: string,
+  sandboxFilePath?: string
+}
+
+export interface WorkerGet {
+  dirPath: string,
+  path: string,
+}
+
+export interface WorkerMessage {
+  type: WorkerMessageType,
+  data: object | string
 }

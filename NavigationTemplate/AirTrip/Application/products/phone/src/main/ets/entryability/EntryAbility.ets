@@ -12,13 +12,18 @@ let preloadEvent: emitter.InnerEvent = {
 
 export default class EntryAbility extends UIAbility {
   private widgetMsg: string = '';
+
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onCreate');
     // 获取卡片router事件中传递的targetPage参数
     if (want?.parameters?.params) {
       // want.parameters.params 对应 postCardAction() 中 params 内容
-      let params: Record<string, Object> = JSON.parse(want.parameters.params as string);
-      this.widgetMsg = params.message as string;
+      try {
+        let params: Record<string, Object> = JSON.parse(want.parameters.params as string);
+        this.widgetMsg = params.message as string;
+      } catch (error) {
+        hilog.error(0x0000, 'testTag', '%{public}s', error);
+      }
     }
 
     // 在应用启动时调用函数获取应用数据
@@ -28,10 +33,14 @@ export default class EntryAbility extends UIAbility {
   // 如果UIAbility已在后台运行，在收到Router事件后会触发onNewWant生命周期回调
   onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     if (want?.parameters?.params) {
-      // want.parameters.params 对应 postCardAction() 中 params 内容
-      let params: Record<string, Object> = JSON.parse(want.parameters.params as string);
-      this.widgetMsg = params.message as string;
-      AppStorage.setOrCreate('widgetRouter', this.widgetMsg)
+      try {
+        // want.parameters.params 对应 postCardAction() 中 params 内容
+        let params: Record<string, Object> = JSON.parse(want.parameters.params as string);
+        this.widgetMsg = params.message as string;
+        AppStorage.setOrCreate('widgetRouter', this.widgetMsg)
+      } catch (error) {
+        hilog.error(0x0000, 'testTag', '%{public}s', error);
+      }
     }
   }
 
@@ -73,12 +82,17 @@ export default class EntryAbility extends UIAbility {
       let result = res.result as ResourceDataResult
       if (result.ret.code === 0) {
         let resourceData = result.result as ResourceData
-        emitter.emit(preloadEvent, {
-          data: {
-            resourceData: resourceData
-          }
-        })
-        AppStorage.setOrCreate('resourceData', resourceData)
+        try {
+          emitter.emit(preloadEvent, {
+            data: {
+              resourceData: resourceData
+            }
+          })
+          AppStorage.setOrCreate('resourceData', resourceData)
+        } catch (error) {
+          hilog.error(0x0000, 'testTag', 'Failed to preload, errorCode=%{public}d, errorMsg=%{public}s', error.code,
+            error.message);
+        }
       } else {
         this.functionNormal()
       }
@@ -92,12 +106,17 @@ export default class EntryAbility extends UIAbility {
       let result = res.result as ResourceDataResult
       if (result.ret.code === 0) {
         let resourceData = result.result as ResourceData
-        emitter.emit(preloadEvent, {
-          data: {
-            resourceData: resourceData
-          }
-        });
-        AppStorage.setOrCreate('resourceData', resourceData)
+        try {
+          emitter.emit(preloadEvent, {
+            data: {
+              resourceData: resourceData
+            }
+          });
+          AppStorage.setOrCreate('resourceData', resourceData)
+        } catch (error) {
+          hilog.error(0x0000, 'testTag', 'Failed to normal load, errorCode=%{public}d, errorMsg=%{public}s', error.code,
+            error.message);
+        }
       }
     })
   }

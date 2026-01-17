@@ -1,14 +1,15 @@
 import { Constants, NavHeaderBar, TCRouter, UserInfoUtil } from 'common';
 import { AggregatedPaymentPicker, ChannelType, MockApi } from 'aggregated_payment'
-import { MemberPackage } from 'common/src/main/ets/model/Member'
-import { promptAction } from '@kit.ArkUI';
 import { emitter } from '@kit.BasicServicesKit';
 import { MemberCenterVM } from 'common/src/main/ets/viewmodel/MemberCenterVM';
+import { FinishStatus, MemberList, MemberParams, MemberShipPage, ProductInfo } from 'membership';
+import { iap } from '@kit.IAPKit';
 
 @Preview
 @ComponentV2
 export struct MemberCenterPage {
   vm: MemberCenterVM = new MemberCenterVM();
+  private promptAction = this.getUIContext().getPromptAction();
 
   aboutToAppear(): void {
     this.vm.getMemberPackages();
@@ -17,218 +18,61 @@ export struct MemberCenterPage {
   updateMembership() {
     // 使用新的UserInfoUtil更新会员状态
     UserInfoUtil.updateMembership();
-    // 触发事件通知其他页面更新会员状态
-    emitter.emit(Constants.LOGIN_CHANGE);
+    try {
+      // 触发事件通知其他页面更新会员状态
+      emitter.emit(Constants.LOGIN_CHANGE);
+    } catch (e) {
+      console.error('Failed to emitter emit login change. Cause: ' + JSON.stringify(e));
+    }
+  }
+
+  subscribeEvent = async (params: MemberParams): Promise<void> => {
+    this.getUIContext().getPromptAction().showToast({ message: this.getSubscribeMsg(params) });
+    if ((params.type === iap.ProductType.NONRENEWABLE || params.type === iap.ProductType.AUTORENEWABLE) &&
+      params.status === FinishStatus.FINISHED) {
+      this.updateMembership()
+      this.queryExpireTime(params.productId, params.purchaseTime);
+    }
+  };
+  ownedMemberEvent = async (list: MemberList): Promise<void> => {
+    if (list.renewList.length || list.nonRenewList.length) {
+      this.getUIContext().getPromptAction().showToast({ message: `您已拥有会员` });
+    }
+  };
+  queryExpireTime = (productId: string, time?: number): Promise<void> => {
+    // 请求开发者服务器获取非周期订阅商品到期时间（涉及商品id、购买次数）
+    return new Promise(() => {
+      this.vm.lastPurchaseProductExpireTime = 'xxxx-xx-xx';
+    });
+  };
+
+  getSubscribeMsg(param: MemberParams) {
+    let message = '';
+    if (param.status === FinishStatus.FINISHED) {
+      message = '会员订阅成功';
+    } else if (param.status === FinishStatus.UNFINISHED) {
+      message = `会员订阅失败，订阅错误码为${param.errCode}，错误原因为${param.errMsg}`;
+    }
+    return message;
   }
 
   build() {
     NavDestination() {
       Stack() {
-        Image($r('app.media.bg'))
-          .width(Constants.FULL_SIZE)
-          .height(180)
-          .backgroundColor('#F0F2F5');
-
-        Column() {
-          NavHeaderBar({
-            title: $r('app.string.member_center'),
-            hasBackButton: true,
-            hasBgColor: false,
-            isMainPage: false,
-          })
-
-          Column({ space: 8 }) {
-            Text($r('app.string.member_packages'))
-              .fontSize(18)
-              .fontWeight(FontWeight.Bold)
-              .fontColor($r('sys.color.font_primary'))
-              .alignSelf(ItemAlign.Start)
-
-            List({ space: 8 }) {
-              ForEach(this.vm.memberPackages, (item: MemberPackage) => {
-                ListItem() {
-                  Column() {
-                    Column() {
-                      Text(item.title)
-                        .fontSize(15)
-                        .fontWeight(FontWeight.Medium)
-                        .fontColor($r('sys.color.font_primary'))
-                      Text() {
-                        Span('￥').fontSize(10)
-                        Span(item.price.toString()).fontWeight(FontWeight.Bold)
-                      }
-                      .fontSize(16)
-                      .fontColor(this.vm.selectId === item.id ? '#562E15' : $r('sys.color.font_primary'))
-                      .margin({ top: 6 })
-                    }
-                    .backgroundColor(this.vm.selectId === item.id ? '#FFFCF2' : $r('sys.color.background_primary'))
-                    .padding({ top: 16, bottom: 18 })
-                    .width(104)
-
-                    Text(item.description)
-                      .fontSize(12)
-                      .fontColor(this.vm.selectId === item.id ? '#562E15' : $r('sys.color.font_primary'))
-                      .width(104)
-                      .height(26)
-                      .backgroundColor(this.vm.selectId === item.id ? '#F8E6CE' : '#0D000000')
-                      .textAlign(TextAlign.Center)
-                  }
-                  .clip(true)
-                  .border({
-                    width: this.vm.selectId === item.id ? 2 : 1,
-                    color: this.vm.selectId === item.id ? '#F8E6CE' : '#0D000000',
-                    radius: 8,
-                  })
-                  .onClick(() => {
-                    this.vm.selectId = item.id;
-                  })
-                }
-              }, (item: MemberPackage) => item.id.toString())
-            }
-            .listDirection(Axis.Horizontal)
-            .height(124)
-            .scrollBar(BarState.Off)
-            .edgeEffect(EdgeEffect.Spring)
-            .clip(false)
-            .width(Constants.FULL_SIZE)
-          }
-          .width(Constants.FULL_SIZE)
-          .height(172)
-          .borderRadius({ topLeft: 16, topRight: 16, bottomLeft: 0, bottomRight: 0 })
-          .padding({ left: 16, right: 16, top: 16, bottom: 16 })
-          .position({ x: 0, y: 100 })
-          .alignItems(HorizontalAlign.Start)
-          .clip(false)
-
-          Column({ space: 16 }) {
-            Text($r('app.string.member_privileges'))
-              .fontSize(18)
-              .fontWeight(FontWeight.Bold)
-              .fontColor($r('sys.color.font_primary'))
-
-            Column({ space: 16 }) {
-              Row() {
-                Image($r('app.media.ad'))
-                  .width(40)
-                  .height(40)
-                  .borderRadius(20)
-                  .fillColor('#E3922F')
-                Column() {
-                  Text($r('app.string.no_ads'))
-                    .fontSize(14)
-                    .fontWeight(FontWeight.Medium)
-                    .fontColor($r('sys.color.font_primary'))
-                  Text($r('app.string.no_ads_desc'))
-                    .fontSize(12)
-                    .fontColor($r('sys.color.font_secondary'))
-                    .margin({ top: 4 })
-                }
-                .alignItems(HorizontalAlign.Start)
-                .margin({ left: 8 })
-              }
-
-              Row() {
-                Image($r('app.media.ask'))
-                  .width(40)
-                  .height(40)
-                  .borderRadius(20)
-                  .fillColor('#E3922F')
-                Column() {
-                  Text($r('app.string.priority_consultation'))
-                    .fontSize(14)
-                    .fontWeight(FontWeight.Medium)
-                    .fontColor($r('sys.color.font_primary'))
-                  Text($r('app.string.priority_consultation_desc'))
-                    .fontSize(12)
-                    .fontColor($r('sys.color.font_secondary'))
-                    .margin({ top: 4 })
-                }
-                .alignItems(HorizontalAlign.Start)
-                .margin({ left: 8 })
-              }
-
-              Row() {
-                Image($r('app.media.cs'))
-                  .width(40)
-                  .height(40)
-                  .borderRadius(20)
-                  .fillColor('#E3922F')
-                Column() {
-                  Text($r('app.string.exclusive_service'))
-                    .fontSize(14)
-                    .fontWeight(FontWeight.Medium)
-                    .fontColor($r('sys.color.font_primary'))
-                  Text($r('app.string.exclusive_service_desc'))
-                    .fontSize(12)
-                    .fontColor($r('sys.color.font_secondary'))
-                    .margin({ top: 4 })
-                }
-                .alignItems(HorizontalAlign.Start)
-                .margin({ left: 8 })
-              }
-            }
-            .width('100%')
-            .padding(12)
-            .border({ width: 1, color: '#E39331', radius: 16 })
-            .alignItems(HorizontalAlign.Start)
-          }
-          .alignItems(HorizontalAlign.Start)
-          .margin({ top: 200 })
-        }
-        .padding({ left: 16, right: 16 })
-        .justifyContent(FlexAlign.Start)
-        .height(Constants.FULL_SIZE)
-
-        Column({ space: 12 }) {
-          Row({ space: 8 }) {
-            Checkbox({ name: `1`, group: `membershipPrivacy` })
-              .select($$this.vm.selectCheckbox)
-              .height(24)
-              .width(24)
-              .selectedColor('#E39331')
-              .shape(CheckBoxShape.CIRCLE)
-
-            Row({ space: 4 }) {
-              Text($r('app.string.agree_member_agreement'))
-                .fontSize(12)
-                .fontColor($r('sys.color.font_secondary'))
-
-              Text($r('app.string.member_agreement'))
-                .fontSize(12)
-                .fontColor('#E39331')
-                .onClick(() => {
-                  TCRouter.push(Constants.MEMBER_AGREEMENT_ROUTE);
-                })
-            }
-          }
-
-          Button($r('app.string.open_now'))
-            .fontColor($r('sys.color.font_on_primary'))
-            .backgroundColor('#E39331')
-            .width(Constants.FULL_SIZE)
-            .bindSheet($$this.vm.isShow, this.paymentChannelSheet(),
-              { showClose: false, height: '45%' })
-            .onClick(() => {
-              if (!this.vm.selectCheckbox) {
-                promptAction.showToast({ message: $r('app.string.agree_member_agreement_tip') });
-                return;
-              }
-
-              // 获取各支付方式的预下单信息
-              this.vm.wxOrderReq = MockApi.getWxPreOrderInfo();
-              this.vm.hwOrderStr = MockApi.getHuaweiOrderInfo();
-              MockApi.getAliPreOrderInfo().then((res) => {
-                this.vm.aliOrderStr = res;
-                this.vm.isShow = true;
-              });
-            })
-        }
-        .padding({ left: 16, right: 16, top: 8, bottom: 34 })
-        .position({ x: 0, y: '100%' })
-        .translate({ x: 0, y: -126 })
-        .width(Constants.FULL_SIZE)
+        MemberShipPage({
+          routerModule: TCRouter.getStack(),
+          themeColor: '#E39331',
+          linearColors: [['#FFFFFF', 0.0], ['#F8E6CE', 0.5], ['#E39331', 1.0]],
+          btnFontColor: '#fff',
+          isSheet: false,
+          lastPurchaseProductExpireTime: this.vm.lastPurchaseProductExpireTime,
+          productsInfo: PRODUCTS_INFO,
+          privacyContent: PRIVACY_CONTENT,
+          subscribeCallBack: this.subscribeEvent,
+          queryExpireTime: this.queryExpireTime,
+          ownedMemberCallBack: this.ownedMemberEvent,
+        });
       }
-      .alignContent(Alignment.Top)
     }
     .hideTitleBar(true)
   }
@@ -258,7 +102,7 @@ export struct MemberCenterPage {
         preOrderInfo: this.vm.aliOrderStr,
       }],
       paySuccessEvent: (type: ChannelType) => {
-        promptAction.showToast({
+        this.promptAction.showToast({
           message: '支付成功~',
           duration: 2000,
         });
@@ -268,4 +112,68 @@ export struct MemberCenterPage {
       },
     });
   }
-} 
+}
+
+export const PRIVACY_CONTENT =
+  '   欢迎您使用“xxxx”。“xxxx”采用收费与免费结合的方式。您须注册华为账号后，才能继续进行购买服务。通过购买程序支付费用后，您就可以使用会员所提供的收费服务。在开始购买程序之前，请您首先同意并接受以下服务条款。\n' +
+    '   本协议是您与华为软件技术有限公司（以下统称“华为”）之间关于“xxxx"提供的各种付费服务签订的服务协议，描述了华为与xxxx付费服务用户之间关于软件许可以及服务使用及相关方面的权利义务。同意本协议，您可享受会员权益。 \n' +
+    '   您同意本“xxxx"付费服务协议条款即表示同意遵守《xxxx用户协议》《关于xxxx与隐私的声明》（以下称“基础协议"），本协议未涉及事项以《xxxx用户协议》为准，若您拒绝接受本协议，不影响已同意的基础协议。 \n' +
+    '   华为在此特别提醒，请事先仔细阅读本服务协议中各项条款，包括但不限于免除或者限制华为责任的免责条款以及对用户的权利限制条款。请您仔细审阅并决定接受或不接受本服务协议。';
+
+// todo: 替换为您配置的商品ID及对应的权益
+export const PRODUCTS_INFO: ProductInfo[] =
+  [
+    {
+      type: iap?.ProductType?.AUTORENEWABLE,
+      productId: 'F0001',
+      privileges: [
+        {
+          id: 'privilege_1',
+          icon: $r('app.media.ad'),
+          title: '免广告',
+          des: '去除所有阅读页面广告',
+        },
+        {
+          id: 'privilege_2',
+          icon: $r('app.media.ask'),
+          title: '提高咨询',
+          des: '开通私信功能',
+        },
+        {
+          id: 'privilege_3',
+          icon: $r('app.media.cs'),
+          title: '专属客服',
+          des: '专属于您的私人客服',
+        },
+      ],
+      privacyName: '连续包周服务协议',
+      privacyContent: '   本协议是您（以下简称“用户”）与xxx（以下简称“开发者”）就您通过华为应用内支付（HUAWEI IAP）服务购买开发者提供的续期订阅商品（以下简称“订阅商品”）所订立的具有法律约束力的服务协议。华为服务（香港）有限公司（以下简称“华为”）为您提供应用内支付技术支持服务，您在使用本连续包期服务前，应仔细阅读并充分理解本协议所有条款，尤其是涉及您重大权益的条款（包括但不限于续期规则、取消方式、费用条款、免责声明等）。您通过华为应用内支付完成订阅商品购买或激活连续包期服务，即视为您已完全接受本协议全部内容，同意受本协议约束。\n' +
+        '   本协议适用于用户通过华为IAP服务购买的所有续期订阅商品的连续包期服务，涵盖订阅激活、服务使用、自动续期、订阅管理（取消、恢复、切换）、费用支付、退款处理等全流程相关权利义务约定。\n' +
+        '   用户可随时取消连续包期服务，取消操作不影响当期订阅服务的使用，仅停止下一期自动续期。取消路径：打开华为应用市场/相关应用 → 进入“我的”→ 找到“支付与购买”→ 选择“订阅管理”→ 找到对应订阅商品 → 点击“取消订阅”，按提示完成操作（也可通过应用内提供的“订阅管理”入口跳转至华为订阅管理页面）。\n' +
+        '   取消订阅后，用户仍可在当期订阅周期结束前享受完整服务，周期结束后服务自动终止，不再产生续期扣费。',
+    },
+    {
+      type: iap?.ProductType?.NONRENEWABLE,
+      productId: 'F0002',
+      privileges: [
+        {
+          id: 'privilege_1',
+          icon: $r('app.media.ad'),
+          title: '免广告',
+          des: '去除所有阅读页面广告',
+        },
+        {
+          id: 'privilege_2',
+          icon: $r('app.media.ask'),
+          title: '提高咨询',
+          des: '开通私信功能',
+        },
+        {
+          id: 'privilege_3',
+          icon: $r('app.media.cs'),
+          title: '专属客服',
+          des: '专属于您的私人客服',
+        },
+      ],
+    },
+  ];

@@ -18,8 +18,8 @@ export struct NavHeaderBar {
       Row() {
         if (this.hasBackButton) {
           Image(this.backImg)
-            .width(24)
-            .height(24)
+            .width(40)
+            .height(40)
             .onClick(() => {
               RouterModule.pop()
             })

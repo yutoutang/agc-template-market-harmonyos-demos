@@ -1,3 +1,4 @@
+import { UtilLog } from '@hw-agconnect/util-log';
 import { AppStorageV2, window } from '@kit.ArkUI';
 import { Logger } from './Logger';
 
@@ -58,12 +59,16 @@ class BreakpointSystem {
     this._uiContext = uiContext
     if (this._uiContext) {
       this.updateBreakpoint()
-      window.getLastWindow(this._uiContext.getHostContext()).then((win) => {
-        this._windowClass = win
-        this._windowClass.on('windowSizeChange', () => {
-          this.updateBreakpoint()
+      try {
+        window.getLastWindow(this._uiContext.getHostContext()).then((win) => {
+          this._windowClass = win
+          this._windowClass.on('windowSizeChange', () => {
+            this.updateBreakpoint()
+          })
         })
-      })
+      } catch (e) {
+        UtilLog.error(`session close failed: ${JSON.stringify(e)}`);
+      }
     }
   }
 

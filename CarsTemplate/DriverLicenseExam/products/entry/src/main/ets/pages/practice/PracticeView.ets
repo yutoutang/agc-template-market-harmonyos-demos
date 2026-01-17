@@ -11,7 +11,7 @@ export function PracticeViewBuilder() {
 @ComponentV2
 export struct PracticeView {
   vm: CommonModel = CommonModel.instance;
-  private examService: ExamService = ExamService.instance;
+  private examService: ExamService = ExamService.instance(this.getUIContext().getHostContext() as Context);
   private examController: ExamController = ExamController.instance;
   @Local title: string | Resource = '顺序练习';
   @Local type: EXAM_MANAGER_TYPE = EXAM_MANAGER_TYPE.sequence;
@@ -44,7 +44,7 @@ export struct PracticeView {
     .menus(this.toolBar())
     .backgroundColor('#F1F3F5')
     .padding({
-      top: px2vp(AppStorage.get('topRectHeight') || 0),
+      top: this.getUIContext().px2vp(AppStorage.get('topRectHeight') || 0),
     })
     .onReady((ctx: NavDestinationContext) => {
       const index = this.vm.navStack.size();
@@ -81,7 +81,7 @@ export struct PracticeView {
   navTitle() {
     Text(this.title)
       .fontColor('#E5000000')
-      .fontSize(px2fp(64))
+      .fontSize(this.getUIContext().px2fp(64))
       .fontWeight(FontWeight.Bold)
       .height(CommonConstants.FULL_HEIGHT)
       .margin({
@@ -93,8 +93,8 @@ export struct PracticeView {
   toolBar() {
     Row() {
       Image($r('app.media.setting'))
-        .width(27)
-        .height(27);
+        .width(40)
+        .height(40);
     }
     .width(50)
     .height(40)
@@ -108,7 +108,6 @@ export struct PracticeView {
     })
     .bindSheet($$this.isShowSetting, showSettingSheet(), {
       height: 200,
-      width: 400,
       title: { title: '设置' },
       backgroundColor: Color.White,
     });

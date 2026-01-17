@@ -1,5 +1,6 @@
-import { FrameNodeParams, getNativeNodeController, NodeControllerFactory } from '../../factory/NativeNodeFactory'
-import { JSONObject, LayoutSetting } from '../../model/Model'
+import { getNativeNodeController, NodeControllerFactory } from '../../factory/NativeNodeFactory'
+import { JSONObject, LayoutSetting } from '../../model/CommonModel'
+import { FrameNodeParams} from '../../model/Model'
 
 
 @Builder

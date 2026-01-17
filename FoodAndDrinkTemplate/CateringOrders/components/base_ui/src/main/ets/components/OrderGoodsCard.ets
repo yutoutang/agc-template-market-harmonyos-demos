@@ -12,13 +12,19 @@ export struct GoodsComp {
   }
 
   @Computed
+  get carAddGoodsList() {
+    return this.goodsList.filter(item => item.specType === GoodSpecEnum.ADD_GOODS)
+  }
+
+  @Computed
   get carPgkGoodsList() {
     return this.goodsList.filter(item => item.specType === GoodSpecEnum.PACKAGE_TYPE)
   }
 
   @Computed
   get carGoodsList() {
-    return this.goodsList.filter(item => item.specType !== GoodSpecEnum.PACKAGE_TYPE && item.isMust !== GOODS_MUST)
+    return this.goodsList.filter(item => ![GoodSpecEnum.PACKAGE_TYPE, GoodSpecEnum.ADD_GOODS].includes(item.specType) &&
+      item.isMust !== GOODS_MUST)
   }
 
   @Styles
@@ -37,6 +43,7 @@ export struct GoodsComp {
 
   build() {
     Column({ space: 12 }) {
+      Text('订单详情').fontSize($r('sys.float.Subtitle_L')).fontWeight(FontWeight.Medium).fontColor($r('sys.color.font_primary')).margin({ top: 12 })
       if (this.carPgkGoodsList.length) {
         // 套餐详情
         Column() {
@@ -61,7 +68,22 @@ export struct GoodsComp {
           };
         }.cardStyle();
       }
-
+      if (this.carAddGoodsList.length) {
+        // 超值加购详情
+        Column({ space: 12 }) {
+          Text('超值加购')
+            .fontSize($r('sys.float.Body_M'))
+            .fontWeight(FontWeight.Medium)
+            .fontColor($r('sys.color.font_primary'))
+          List({ space: 16 }) {
+            ForEach(this.carAddGoodsList, (goodInfo: CarGoodsInfo | GoodsOfOrder) => {
+              ListItem() {
+                this.goodsCard(goodInfo);
+              };
+            }, (goodInfo: CarGoodsInfo | GoodsOfOrder) => `${goodInfo.id}${goodInfo.num}${goodInfo.spec}`);
+          }.edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true });
+        }.cardStyle().alignItems(HorizontalAlign.Start);
+      }
       if (this.carMustGoodsList.length) {
         // 必选品详情
         Column() {
@@ -78,7 +100,7 @@ export struct GoodsComp {
           }.margin({ top: 12 });
         }.cardStyle().alignItems(HorizontalAlign.Start);
       }
-    };
+    }.alignItems(HorizontalAlign.Start);
 
   }
 

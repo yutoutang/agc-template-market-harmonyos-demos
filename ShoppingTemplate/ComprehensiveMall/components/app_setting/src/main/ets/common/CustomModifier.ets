@@ -1,6 +1,6 @@
 import { AppStorageV2 } from '@kit.ArkUI';
-import { CustomWindowModel } from '../models/WindowModel';
 import { CommonConstants } from '../constants/CommonConstants';
+import { CustomWindowModel } from '../models/WindowModel';
 
 /**
  * 页面滚动容器modifier

@@ -133,7 +133,7 @@ export struct PensionPage {
                 this.vm.pensionCalcRes.personalAccountPension = res.personalAccountPension.toString()
                 this.vm.pensionCalcRes.estimatedPayment = res.monthlyBenefit.toString()
                 this.vm.closeKeyboard()
-                const instance = this.vm.getBarInfo() - 20
+                const instance = this.vm.getBarInfo(this.getUIContext()) - 20
                 this.scroller.scrollTo({ xOffset: 0, yOffset: instance, animation: true })
               })
             if (this.vm.pensionCalcRes.showRes) {

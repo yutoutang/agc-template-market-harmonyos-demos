@@ -1,8 +1,16 @@
 import { AbilityConstant, common } from '@kit.AbilityKit'
 import { AppStorageV2, UIUtils } from '@kit.ArkUI'
-import { BaseViewModel, BundleInfo, CommonConfirmDialog, ContinueModel, GridRowColSetting, Logger,
+import { avSession } from '@kit.AVSessionKit'
+import {
+  BaseViewModel,
+  BundleInfo,
+  CommonConfirmDialog,
+  ContinueModel,
+  GridRowColSetting,
+  Logger,
   RouterParams,
-  RouterToNews} from 'lib_common'
+  RouterToNews,
+} from 'lib_common'
 import {
   BaseNewsServiceApi,
   CommentResponse,
@@ -12,47 +20,43 @@ import {
   PublishCommentRequest,
 } from 'lib_news_api'
 import { LoginSheetUtils } from 'lib_account'
+import { AudioConstants, MediaController, SubUtils } from 'module_audioplayer'
 import { LoneTakeAnimationsTransition, LongTakeAnimationProperties, LongTakeTransitionParam } from 'module_transition'
 import { CommentInfo, NewsFeedInfo } from '../model/Model'
 import { MakeObCommentServed } from '../utils/Utils'
 import { FeedBreakPointVM } from './FeedBreakPointVM'
 
-const TAG = 'NewsFeedVM'
+const TAG = '[NewsFeedVM]'
 
 @ObservedV2
 export class NewsFeedVM extends BaseViewModel {
-  private static _instance: NewsFeedVM
   @Trace articleDetails: NewsFeedInfo = new NewsFeedInfo()
   @Trace commentInfoList: CommentInfo[] = []
   @Trace scroller: Scroller = new Scroller();
   @Trace bundleInfo: BundleInfo | undefined = undefined
   @Trace continueModel: ContinueModel = AppStorageV2.connect(ContinueModel, () => new ContinueModel())!;
   @Trace feedBreakPointVM: FeedBreakPointVM = new FeedBreakPointVM()
+  @Trace loading: boolean = true
   feedCommentScroller: Scroller = new Scroller()
-  uiContext:UIContext | undefined = undefined
+  uiContext: UIContext | undefined = undefined
+
   @Computed
   get isFeedSelf() {
     return this.userInfoModel.authorId === this.articleDetails?.author?.authorId;
   }
 
-  public static get instance() {
-    if (!NewsFeedVM._instance) {
-      NewsFeedVM._instance = new NewsFeedVM()
-    }
-    return NewsFeedVM._instance
-  }
-
-  public setUiContext(uiContext:UIContext) {
+  public setUiContext(uiContext: UIContext) {
     this.uiContext = uiContext
   }
 
-  public initArticle(articleId: string) {
-    let articleRes = BaseNewsServiceApi.queryNews(articleId) as NewsFeedInfo
+  public async initArticle(articleId: string) {
+    let articleRes = await BaseNewsServiceApi.queryNews(articleId) as NewsFeedInfo
     this.articleDetails = UIUtils.makeObserved(articleRes);
+    this.loading = false;
   }
 
-  public initComment(articleId: string) {
-    let commentInfo = CommentServiceApi.queryCommentList(articleId) as CommentInfo[]
+  public async initComment(articleId: string) {
+    let commentInfo = await CommentServiceApi.queryCommentList(articleId) as CommentInfo[]
     this.commentInfoList = commentInfo?.map((value: CommentInfo) => {
       return new MakeObCommentServed(value)
     }) ?? [];
@@ -191,6 +195,7 @@ export class NewsFeedVM extends BaseViewModel {
 
   public setCardData(cardData: NewsFeedInfo) {
     this.articleDetails = UIUtils.makeObserved(cardData);
+    this.loading = false
   }
 
   getUserInfo() {
@@ -236,13 +241,16 @@ export class NewsFeedVM extends BaseViewModel {
                }
            }
            .post-image {
-              display: block;
-              margin-left: auto;
-              margin-right: auto;
-              height: auto;
+               display: block;
+               margin-left: auto;
+               margin-right: auto;
+               height: auto;
+           }
+           .news-body {
+               margin: 16px 0 16px 0;
            }
         </style>
-        <body id="body">
+        <body id="body" class="news-body">
           ${this.articleDetails.richContent}
           <script>
            function callNativePreview(srcList, index) {
@@ -319,6 +327,8 @@ export class NewsFeedVM extends BaseViewModel {
   public enableContinue(context: common.UIAbilityContext) {
     context.setMissionContinueState(AbilityConstant.ContinueState.ACTIVE).then(() => {
       Logger.info(TAG, 'setMissionContinueState ACTIVE result: ACTIVE')
+    }).catch(() => {
+      Logger.error(TAG, 'setMissionContinueState ACTIVE fail')
     });
   }
 
@@ -351,7 +361,7 @@ export class NewsFeedVM extends BaseViewModel {
   * componentId  一镜到底id
   * isQueryCardData 是否携带新闻详情跳转到详情页
   * */
-  public pushToNewsDetails(cardData: NewsFeedInfo,componentId: string, formType?: string,
+  public pushToNewsDetails(cardData: NewsFeedInfo, componentId: string, formType?: string,
     isQueryCardData: boolean = false) {
     let params: RouterParams<NewsResponse> = {
       newsId: cardData.id,
@@ -368,6 +378,23 @@ export class NewsFeedVM extends BaseViewModel {
       params.longTakeTransitionParam = longTakeTransitionParam;
     }
     RouterToNews.pushToNewsDetails<NewsResponse>(params)
+  }
+
+  /*
+   * 需要释放AvSession
+   * */
+  async destroyAvSession() {
+    SubUtils.destroySubWindow(AudioConstants.AUDIO_SUB_NAME)
+    MediaController.pause()
+    let avSession: avSession.AVSession = AppStorage.get('avSession') as avSession.AVSession
+    if (avSession) {
+      try {
+        await avSession.destroy()
+      } catch (e) {
+        Logger.error(TAG, `avSession.destroy fail. Code: ${e.code}, message: ${e.message}`)
+      }
+      AppStorage.setOrCreate('avSession', '')
+    }
   }
 }
 

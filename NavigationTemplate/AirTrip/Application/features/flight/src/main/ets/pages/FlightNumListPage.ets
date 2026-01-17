@@ -40,13 +40,13 @@ export struct FlightNumListPage {
                 })
               })
             }
-          })
+          },(item: FlightInfo, index: number)=>index + '__' + JSON.stringify(item))
         }
         .width(Constants.FULL_PERCENT_WIDTH)
         .layoutWeight(1)
         .scrollBar(BarState.Off)
         .padding({ left:16, right: 16 })
-        .divider({ strokeWidth: 0.5, color: $r('sys.color.ohos_id_color_button_divider') })
+        .divider({ strokeWidth: 0.5, color: $r('sys.color.comp_divider') })
       }
     }
     .hideTitleBar(true)

@@ -2,7 +2,7 @@ import { MyControl } from '../model/Index';
 import { PersistenceV2 } from '@kit.ArkUI';
 
 
-const TAG = '[RemotePageVM]';
+
 
 @ObservedV2
 export class RemotePageVM {

@@ -8,8 +8,12 @@
     "lint:fix": "eslint . --ext .js,.ets,.jsx,.tsx --fix"
   },
   "dependencies": {
+    "@hw-agconnect/util-log": "^1.0.0",
+    "@hw-agconnect/ui-toast": "^1.0.0",
+    "@hw-agconnect/ui-dialog": "^1.0.0"
   },
   "devDependencies": {
-    "@ohos/hypium": "1.0.19",
-  }
+    "@ohos/hypium": "1.0.19"
+  },
+  "dynamicDependencies": {}
 }

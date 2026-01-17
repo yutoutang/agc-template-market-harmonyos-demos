@@ -48,7 +48,7 @@ export struct SearchComponent {
           })
           .onSubmit((searchCondition: string) => {
             if (searchCondition === undefined || searchCondition === '') {
-              promptAction.showToast({
+              this.getUIContext().getPromptAction().showToast({
                 message: '请输入搜索内容',
                 duration: 1000,
               });
@@ -68,7 +68,7 @@ export struct SearchComponent {
           .onClick(() => {
             if (this.searchCondition === undefined ||
               this.searchCondition === '') {
-              promptAction.showToast({
+              this.getUIContext().getPromptAction().showToast({
                 message: '请输入搜索内容',
                 duration: 1000,
               });
@@ -87,6 +87,7 @@ export struct SearchComponent {
           this.hotSearchBuilder();
           this.historySearchBuilder();
         }
+        .layoutWeight(1)
         .padding({
           top: 20,
         });

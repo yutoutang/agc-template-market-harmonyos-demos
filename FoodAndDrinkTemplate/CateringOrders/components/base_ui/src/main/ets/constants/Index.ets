@@ -35,7 +35,5 @@ export enum ReductionTypes {
   FULL_REDUCTION = '0',
   // 立减
   DIRECT_REDUCTION = '1',
-  // 折扣
-  DISCOUNT_REDUCTION = '2',
 }
 

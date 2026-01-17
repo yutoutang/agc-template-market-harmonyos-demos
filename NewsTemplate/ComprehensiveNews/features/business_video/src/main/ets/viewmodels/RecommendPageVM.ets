@@ -44,20 +44,17 @@ export class RecommendPageVM extends BaseViewModel {
   // 播放管理
   avPlayerManager: AVPlayerManager = AVPlayerManager.getInstance()
 
-  initVideoListDataSource() {
-    let videoList = VideoService.queryVideoList();
+  async initVideoListDataSource() {
+    let videoList = await VideoService.queryVideoList();
     this.videoListDataSource.setData(videoList);
   }
 
-  refreshList() {
+  async refreshList() {
     this.avPlayerManager.clear();
-    // 模拟下拉刷新
-    setTimeout(() => {
-      this.initVideoListDataSource();
-      //  重置
-      this.currentIndex = 0;
-      this.isRefreshing = false;
-    }, 1000);
+    await this.initVideoListDataSource();
+    //  重置
+    this.currentIndex = 0;
+    this.isRefreshing = false;
   }
 
   offsetChanged(offset: number) {
@@ -65,14 +62,12 @@ export class RecommendPageVM extends BaseViewModel {
     this.ratio = 1 - Math.pow(offset / this.maxRefreshingHeight, 3);
   }
 
-  loadMore() {
+  async loadMore() {
     this.isScrollEnd = true
     this.isLoadingMore = true;
-    setTimeout(() => {
-      let videoList = VideoService.queryVideoList();
-      this.videoListDataSource.pushDataArray(...videoList)
-      this.isLoadingMore = false;
-    }, 1000);
+    let videoList = await VideoService.queryVideoList();
+    this.videoListDataSource.pushDataArray(...videoList)
+    this.isLoadingMore = false;
   }
 
   // 处理滚动事件

@@ -1,6 +1,6 @@
 import { BusinessError } from '@kit.BasicServicesKit';
 import { ComponentContent, promptAction, UIContext } from '@kit.ArkUI';
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 
 export class PromptActionUtil {
   static ctx: UIContext;
@@ -23,12 +23,12 @@ export class PromptActionUtil {
     if (PromptActionUtil.contentNode !== null) {
       PromptActionUtil.ctx.getPromptAction().openCustomDialog(PromptActionUtil.contentNode, PromptActionUtil.options)
         .then(() => {
-          hilog.info(0xFF00, 'TAG', 'OpenCustomDialog complete');
+          UtilLog.info(0xFF00, 'TAG', 'OpenCustomDialog complete');
         })
         .catch((error: BusinessError) => {
           let message = (error as BusinessError).message;
           let code = (error as BusinessError).code;
-          hilog.info(0xFF00, 'TAG', `OpenCustomDialog args error code is ${code}, message is ${message}`);
+          UtilLog.info(0xFF00, 'TAG', `OpenCustomDialog args error code is ${code}, message is ${message}`);
         })
     }
   }
@@ -37,12 +37,12 @@ export class PromptActionUtil {
     if (PromptActionUtil.contentNode !== null) {
       PromptActionUtil.ctx.getPromptAction().closeCustomDialog(contentNode)
         .then(() => {
-          hilog.info(0xFF00, 'TAG', 'CloseCustomDialog complete');
+          UtilLog.info(0xFF00, 'TAG', 'CloseCustomDialog complete');
         })
         .catch((error: BusinessError) => {
           let message = (error as BusinessError).message;
           let code = (error as BusinessError).code;
-          hilog.info(0xFF00, 'TAG', `CloseCustomDialog args error code is ${code}, message is ${message}`);
+          UtilLog.info(0xFF00, 'TAG', `CloseCustomDialog args error code is ${code}, message is ${message}`);
         })
     }
   }

@@ -1,4 +1,4 @@
-import { LoadingStatus, Style, routerStack, RouterMap } from 'lib_foundation';
+import { LoadingStatus } from 'lib_foundation';
 import { NavTitleBar } from 'lib_widget';
 import { HomePageContent } from '../components/HomePageContent';
 import { HomePageVM } from '../viewmodels/HomePageVM';
@@ -41,6 +41,7 @@ export struct HomePage {
             } else if (this.vm.loadingStatus === LoadingStatus.SUCCESS) {
               HomePageContent({
                 categoryList: this.vm.categoryList,
+                bannerList: this.vm.bannerList,
                 scroller: this.scroller,
                 handleClickCategory: (id) => {
                   this.vm.jumpToCategoryPage(id);

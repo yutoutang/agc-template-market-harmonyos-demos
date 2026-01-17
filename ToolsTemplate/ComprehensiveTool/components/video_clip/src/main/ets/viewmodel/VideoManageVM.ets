@@ -1,18 +1,29 @@
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { BusinessError } from '@ohos.base';
 import { fileIo as fs } from '@kit.CoreFileKit';
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
-import { promptAction } from '@kit.ArkUI';
+import { PersistenceV2 } from '@kit.ArkUI';
+import { MemberSheetUtils } from 'membership';
+import { LoginManageUtil, MAX_FREE_USE_TIME, MemberManageUtil, UsedCount } from 'module_base';
 import sdk from 'libveditor.so';
-import { EditVideo, VideoAsset } from '../model/Index';
+import { EditVideo, VideoAsset, VideoDraftList } from '../model/Index';
+import { LoginSheetUtils } from 'aggregated_login';
+import { Util } from '../util/Util';
+import { VideoUtil } from '../util/VideoUtil';
+import { Constant } from '../common/Constant';
 
 @ObservedV2
 export class VideoManageVM {
   private static _instance: VideoManageVM;
   @Trace videoUri: string | undefined = undefined;
   @Trace draftTabIndex: number = 0;
-  @Trace drafts: EditVideo[] = [];
-  @Trace recycles: EditVideo[] = [];
+  @Trace drafts: VideoDraftList =
+    PersistenceV2.connect(VideoDraftList, 'VideoDraftList', () => new VideoDraftList())!;
+  @Trace recycles: VideoDraftList =
+    PersistenceV2.connect(VideoDraftList, 'VideoRecycleList', () => new VideoDraftList())!;
+  @Trace usedCount: UsedCount =
+    PersistenceV2.connect(UsedCount, 'VideoUsedCount', () => new UsedCount())!;
+  @Trace isMember: boolean = false;
   @Trace screenWidth: Length | undefined = 0;
   @Trace oldScreenWidth: Length | undefined = 0;
   @Trace screenHeight: Length | undefined = 0;
@@ -33,37 +44,56 @@ export class VideoManageVM {
     return VideoManageVM._instance;
   }
 
-  handleDraftClickEvent(video: EditVideo) {
-    if (this.draftTabIndex === 1) {
-      promptAction.showToast({
-        message: '回收站内的草稿不支持编辑',
-        duration: 1000,
-      });
-      return;
-    }
+  showMemberSubscribeDialog(uiContext: UIContext) {
+    let memberManageUtil = new MemberManageUtil(uiContext);
+    MemberSheetUtils.open(memberManageUtil.productsInfo, uiContext);
+  }
 
-    this.videoUri = video.mediaUri;
-    this.file = fs.openSync(video.mediaUri);
-    this.fd = this.file.fd;
+  handleDraftClickEvent(uiContext: UIContext, loginManageUtil: LoginManageUtil, video: EditVideo) {
+    try {
+      if (this.draftTabIndex === 1) {
+        uiContext.getPromptAction().showToast({
+          message: '回收站内的草稿不支持编辑',
+          duration: 1000,
+        });
+        return;
+      }
 
-    let res: number = sdk.SetVideo(this.videoUri, this.fd);
+      if (!loginManageUtil.userInfoModel.isLogin) {
+        LoginSheetUtils.open(loginManageUtil.params, uiContext);
+        return;
+      } else if (!this.isMember && this.usedCount.count > MAX_FREE_USE_TIME) {
+        this.showMemberSubscribeDialog(uiContext);
+        return;
+      }
 
-    hilog.info(0xFF00, 'VideoClip', `selected draft URI: ${this.videoUri}, fd: ${this.fd}`);
+      this.videoUri = video.mediaUri;
+      this.file = fs.openSync(video.mediaUri);
+      this.fd = this.file.fd;
 
-    if (res === 0) {
-      let videoAsset: VideoAsset = {
-        videoUri: video.mediaUri,
-        fd: this.fd,
-        screenWidth: this.screenWidth,
-        screenHeight: this.screenHeight,
-      };
-      this.pathStack.pushPathByName('VideoEdit', videoAsset, (popInfo: PopInfo) => {
-        this.drafts.unshift(popInfo.result as EditVideo);
-      });
+      let res: number = sdk.SetVideo(this.videoUri, this.fd);
+
+      UtilLog.info(0xFF00, 'VideoClip', `selected draft URI: ${this.videoUri}, fd: ${this.fd}`);
+
+      if (res === 0) {
+        let videoAsset: VideoAsset = {
+          videoUri: video.mediaUri,
+          fd: this.fd,
+          screenWidth: this.screenWidth,
+          screenHeight: this.screenHeight,
+        };
+        this.pathStack.pushPathByName('VideoEdit', videoAsset, (popInfo: PopInfo) => {
+          let draft = popInfo.result as EditVideo;
+          this.drafts.list.unshift(draft);
+        });
+      }
+    } catch (e) {
+      uiContext.getPromptAction().showToast({ message: '请排查草稿视频是否存在或其他异常' });
+      UtilLog.info(0xFF00, 'VideoClip', `请排查草稿视频是否存在或其他原因 ${e}`);
     }
   }
 
-  async selectVideo() {
+  async selectVideo(uiContext: UIContext) {
     try {
       let options: photoAccessHelper.PhotoSelectOptions = {
         MIMEType: photoAccessHelper.PhotoViewMIMETypes.VIDEO_TYPE,
@@ -76,11 +106,21 @@ export class VideoManageVM {
       let photoPicker = new photoAccessHelper.PhotoViewPicker();
       photoPicker.select(options).then((selectResult: photoAccessHelper.PhotoSelectResult) => {
         if (selectResult.photoUris.length === 0) {
-          hilog.info(0xFF00, 'VideoClip', `no photo are selected.`);
+          UtilLog.info(0xFF00, 'VideoClip', `no photo are selected.`);
         } else {
-          selectResult.photoUris.forEach((uri) => {
-            hilog.info(0xFF00, 'VideoClip', `selected photo URI: ${uri}`);
+          selectResult.photoUris.forEach(async (uri) => {
+            UtilLog.info(0xFF00, 'VideoClip', `selected photo URI: ${uri}`);
             this.videoUri = uri;
+
+            let asset = await Util.getVideoAsset(this.videoUri, uiContext.getHostContext()!);
+
+            const fileSize = VideoUtil.fileBytesToMB(asset?.get(photoAccessHelper.PhotoKeys.SIZE) as number);
+
+            if (fileSize >= Constant.MAX_FILE_SIZE) {
+              uiContext.getPromptAction().showToast({ message: `最大支持剪辑${Constant.MAX_FILE_SIZE}MB以内视频!` });
+              return;
+            }
+
             this.file = fs.openSync(this.videoUri);
             this.fd = this.file.fd;
 
@@ -94,29 +134,29 @@ export class VideoManageVM {
                 screenHeight: this.screenHeight,
               };
               this.pathStack.pushPathByName('VideoEdit', videoAsset, (popInfo: PopInfo) => {
-                this.drafts.unshift(popInfo.result as EditVideo);
+                this.drafts.list.unshift(popInfo.result as EditVideo);
               });
             } else {
-              promptAction.showToast({
+              uiContext.getPromptAction().showToast({
                 message: '请选择要创作的视频',
               });
             }
           });
         }
       }).catch((err: BusinessError) => {
-        hilog.error(0xFF00, 'VideoClip', `PhotoPicker,select failed with err: ${err.code},${err.message}`);
+        UtilLog.error(0xFF00, 'VideoClip', `PhotoPicker,select failed with err: ${err.code},${err.message}`);
       });
     } catch (error) {
       let err: BusinessError = error as BusinessError;
-      hilog.error(0xFF00, 'VideoClip', `PhotoPicker,select failed with err: ${err.code},${err.message}`);
+      UtilLog.error(0xFF00, 'VideoClip', `PhotoPicker,select failed with err: ${err.code},${err.message}`);
     }
   }
 
   clearCheckStatus() {
     if (this.draftTabIndex === 0) {
-      this.drafts.map(item => item.isSelect = false);
+      this.drafts.list.map(item => item.isSelect = false);
     } else {
-      this.recycles.map(item => item.isSelect = false);
+      this.recycles.list.map(item => item.isSelect = false);
     }
   }
 
@@ -139,10 +179,10 @@ export class VideoManageVM {
   }
 
   moveToRecycle() {
-    this.recycles.push(...this.selectedDrafts);
+    this.recycles.list.push(...this.selectedDrafts);
     // 从草稿箱删除
     this.selectedDrafts.forEach(item => {
-      this.drafts = this.drafts.filter(draft => draft.videoId !== item.videoId);
+      this.drafts.list = this.drafts.list.filter(draft => draft.videoId !== item.videoId);
     });
     // 清空选择列表
     this.selectedDrafts = [];
@@ -150,9 +190,9 @@ export class VideoManageVM {
   }
 
   restoreToDraft() {
-    this.drafts.push(...this.selectedRecycles);
+    this.drafts.list.push(...this.selectedRecycles);
     this.selectedRecycles.forEach(item => {
-      this.recycles = this.recycles.filter(recycle => recycle.videoId !== item.videoId);
+      this.recycles.list = this.recycles.list.filter(recycle => recycle.videoId !== item.videoId);
     });
     this.selectedRecycles = [];
     this.isEdit = false;
@@ -160,7 +200,7 @@ export class VideoManageVM {
 
   deletePermanently() {
     this.selectedRecycles.forEach(item => {
-      this.recycles = this.recycles.filter(recycle => recycle.videoId !== item.videoId);
+      this.recycles.list = this.recycles.list.filter(recycle => recycle.videoId !== item.videoId);
     });
     this.selectedRecycles = [];
     this.isEdit = false;

@@ -1,6 +1,5 @@
 import { photoAccessHelper } from '@kit.MediaLibraryKit'
 import { CommonConstants, MediaUtils, RouterMap, RouterUtils } from 'lib_common'
-import { Constants } from '../constants/NewsConstants'
 import { NewsPostViewModel } from '../viewmodels/NewsPostViewModel'
 
 @ComponentV2
@@ -10,7 +9,8 @@ export struct VideoPost {
   @Local videoUri: string = ''
   @Local surfaceUrl: string = ''
   @Local body: string = ''
-  @Event onValidate: (isCanBack: boolean) => void = () => {}
+  @Event onValidate: (isCanBack: boolean) => void = () => {
+  }
 
   @Computed
   get isCanBack() {
@@ -55,7 +55,7 @@ export struct VideoPost {
         .draggable(false)
     }
     .onClick(() => {
-      RouterUtils.pushPathByName(RouterMap.Video_PREVIEW,this.videoUri)
+      RouterUtils.pushPathByName(RouterMap.Video_PREVIEW, this.videoUri)
     })
     .width(this.newsPostViewModel.getPostVideoWidth())
     .height(this.newsPostViewModel.getPostVideoHeight())

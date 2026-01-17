@@ -18,8 +18,8 @@ export class LivestreamDetailPageVM extends BaseViewModel {
   // 当前indicator的下标
   @Trace indicatorIndex: number = 0;
 
-  init() {
-    let commentInfo = CommentServiceApi.queryCommentList(this.livestreamInfo.id) as CommentInfo[]
+  async init() {
+    let commentInfo = await CommentServiceApi.queryCommentList(this.livestreamInfo.id) as CommentInfo[]
     this.commentList = commentInfo?.map((value: CommentInfo) => {
       return new MakeObCommentServed(value)
     }) ?? [];

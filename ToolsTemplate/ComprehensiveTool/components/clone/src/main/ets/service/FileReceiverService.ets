@@ -1,5 +1,5 @@
 import { common } from '@kit.AbilityKit';
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { ContactMessage, FileCountMessage, FileEndMessage, FileStartMessage } from '../model/BinaryProtocol';
 import { FileTransferCallback } from '../model/FileTransferCallback';
 import { addContactByPermissions, FileUtil } from '../utils/FileUtil';
@@ -51,7 +51,7 @@ export class FileReceiverService {
         case BinaryMessageType.FILE_COUNT:
           this.handleFileCount(data);
         default:
-          hilog.info(0x0001, 'testTag', '%{public}s', '未知的二进制消息类型');
+          UtilLog.info(0x0001, 'testTag', '%{public}s', '未知的二进制消息类型');
       }
     } catch (error) {
       console.error('处理二进制文件消息失败:', JSON.stringify(error));

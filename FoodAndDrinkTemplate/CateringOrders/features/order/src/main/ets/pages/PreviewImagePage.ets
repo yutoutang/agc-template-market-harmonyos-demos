@@ -1,3 +1,4 @@
+import { UtilLog } from '@hw-agconnect/util-log';
 import window from '@ohos.window';
 import { CommonUrl, Constants, ImageRouter, RouterMap, RouterModule } from 'common/Index';
 
@@ -14,10 +15,14 @@ struct PreviewImagePage {
 
   aboutToAppear() {
     this.getParams()
-    window.getLastWindow(getContext(this)).then(currentWindow => {
-      let property = currentWindow.getWindowProperties();
-      this.screenWidth = property.windowRect.width;
-    })
+    try {
+      window.getLastWindow(this.getUIContext().getHostContext()).then(currentWindow => {
+        let property = currentWindow.getWindowProperties();
+        this.screenWidth = property.windowRect.width;
+      })
+    } catch (e) {
+      UtilLog.error(`Get currentWindow failed.`, e)
+    }
   }
 
   getParams() {
@@ -73,7 +78,7 @@ struct ImageComponent {
       if (this.geometryScale === 1) {
         reject()
       }
-      animateTo({ duration: 200, onFinish: resolve }, () => {
+      this.getUIContext()?.animateTo({ duration: 200, onFinish: resolve }, () => {
         this.geometryScale = 1
         this.geometryOffsetX = 0
         this.geometryOffsetY = 0

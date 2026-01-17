@@ -1,7 +1,7 @@
 import fs from '@ohos.file.fs';
 import { util } from '@kit.ArkTS';
 import { common } from '@kit.AbilityKit';
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 import image from '@ohos.multimedia.image';
 import { VideoEditVM } from '../viewmodel/VideoEditVM';
 import { TextInfo } from '../model/Index';
@@ -87,7 +87,7 @@ export struct TextInputCanvas {
 
     const fontStyle = this.vm.textInfo.isItalics ? 'italic' : 'normal';
     const fontWeight = this.vm.textInfo.isBold ? 'bold' : 'normal';
-    const fontSize = `${vp2px(this.vm.textInfo.fontSize)}px`;
+    const fontSize = `${this.getUIContext().vp2px(this.vm.textInfo.fontSize)}px`;
 
     // 设置文字样式
     context.font = `${fontStyle} ${fontWeight} ${fontSize} sans-serif`;
@@ -120,7 +120,7 @@ export struct TextInputCanvas {
       }
     }
 
-    hilog.info(0xFF00, 'VideoClip', `draw text : ${this.textInfo.text}`);
+    UtilLog.info(0xFF00, 'VideoClip', `draw text : ${this.textInfo.text}`);
 
     // 绘制最后一行
     if (currentLine) {
@@ -153,12 +153,12 @@ export struct TextInputCanvas {
         await fs.write(fileDescriptor.fd, buffer);
         this.setImageURI(filePath, dataUrl);
       } catch (error) {
-        hilog.error(0xFF00, 'VideoClip', `open file error : ${error}`);
+        UtilLog.error(0xFF00, 'VideoClip', `open file error : ${error}`);
       } finally {
         fs.closeSync(fileFd);
       }
     } catch (err) {
-      hilog.error(0xFF00, 'VideoClip', 'save fail');
+      UtilLog.error(0xFF00, 'VideoClip', 'save fail');
     }
   }
 

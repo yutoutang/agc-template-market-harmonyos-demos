@@ -23,6 +23,10 @@
     {
       "name": "subject_four",
       "value": "科目四"
+    },
+    {
+      "name": "agcit_huawei_driver_license_exam",
+      "value": "1.0.4"
     }
   ]
 }

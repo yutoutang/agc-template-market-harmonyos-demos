@@ -1,6 +1,6 @@
 import { queryMyRecipeList, RecipeBriefInfo, deleteMyRecipe } from 'network';
 import { promptAction } from '@kit.ArkUI';
-import { DialogParams, DialogUtil } from 'commonlib';
+import { DialogParams, DialogUtil, GlobalContextUtils } from 'commonlib';
 import { ConfirmDialogComponent } from '../components/ConfirmDialogComponent';
 
 @ObservedV2
@@ -32,7 +32,7 @@ export class MyRecipeVM {
       this.isToDelete = false;
       this.toDeleteIds = [];
       this.getMyRecipeList();
-      promptAction.showToast({ message: '删除成功！' });
+      GlobalContextUtils.showToast({ message: '删除成功！' });
     }
   }
 
@@ -48,7 +48,7 @@ export class MyRecipeVM {
         },
       });
     } else {
-      promptAction.showToast({ message: '请选择您要删除的菜谱！' });
+      GlobalContextUtils.showToast({ message: '请选择您要删除的菜谱！' });
     }
   }
 }

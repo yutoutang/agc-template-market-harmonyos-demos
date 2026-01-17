@@ -1,8 +1,9 @@
 import { TabIndexEnum } from 'base_ui';
-import { AccountUtil, RouterMap, RouterModule } from 'commonlib';
+import { AccountUtil, BreakpointModel, BreakpointType, RouterMap, RouterModule } from 'commonlib';
 import { LazyDataSource, RecipeBriefInfo } from 'featured_recipes';
 import { changeFollowers, getBloggerInfo } from 'network';
 import { BloggerInfo } from 'personal_homepage';
+import { AppStorageV2 } from '@kit.ArkUI';
 
 const TAG = '[BloggerProfilePageVM]';
 
@@ -12,6 +13,13 @@ export class BloggerProfilePageVM {
   @Trace recipeList: LazyDataSource<RecipeBriefInfo> = new LazyDataSource();
   @Trace currentIndex: number = 1
   @Trace isFollower: boolean = false
+  columnOptions: BreakpointType<number> = new BreakpointType<number>({
+    sm: 2,
+    md: 4,
+    lg: 4,
+    xl: 4,
+  });
+  @Trace breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
 
   init() {
     let params = RouterModule.getNavParam<Record<string, number>>(RouterMap.BLOGGER_PROFILE_PAGE)
@@ -45,5 +53,10 @@ export class BloggerProfilePageVM {
     }
     this.isFollower = isFollower
     this.init()
+  }
+
+  @Computed
+  get gridCount() {
+    return this.columnOptions.getValue(this.breakPointModel.currentBreakpoint);
   }
 }

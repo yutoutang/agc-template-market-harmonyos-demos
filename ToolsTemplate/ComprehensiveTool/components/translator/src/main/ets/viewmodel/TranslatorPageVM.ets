@@ -1,6 +1,6 @@
 import { allLanguages } from '../common/Constant'
 import { TranslatorService } from '../service/TranslatorService'
-import { PersistenceV2, promptAction } from '@kit.ArkUI';
+import { PersistenceV2 } from '@kit.ArkUI';
 import { HistoryInfo, MyHistory } from '../model/History';
 import { util } from '@kit.ArkTS';
 
@@ -40,5 +40,7 @@ export class TranslatorPageVM {
   clear() {
     this.inputText = ''
     this.translatorRes = ''
+    this.inputLanguage = '中文'
+    this.outputLanguage = '英文'
   }
 }

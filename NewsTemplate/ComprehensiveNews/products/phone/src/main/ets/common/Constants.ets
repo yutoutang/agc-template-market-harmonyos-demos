@@ -43,9 +43,10 @@ export const REQUIRE_LOGIN_PAGE_LIST: RouterMap[] = [
   RouterMap.MINE_COMMENT_PAGE,
   RouterMap.MINE_MARK_PAGE,
   RouterMap.MINE_LIKE_PAGE,
-  RouterMap.FEEDBACK_PAGE,
+  RouterMap.FEEDBACK_SUBMIT_PAGE,
   RouterMap.PUBLISH_POST_PAGE,
   RouterMap.MINE_MSG_IM_CHAT,
+  RouterMap.SETTING_SUBSCRIBE,
 ];
 
 export const agreePrivacyKey: string = 'isAgreePrivacy';

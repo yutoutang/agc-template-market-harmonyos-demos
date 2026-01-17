@@ -1,7 +1,7 @@
 import { AlertDialog } from '@kit.ArkUI';
 import { calendarManager } from '@kit.CalendarKit';
 import { serviceNotification } from '@kit.PushKit';
-import { i18n, intl } from '@kit.LocalizationKit';
+import { i18n } from '@kit.LocalizationKit';
 import { OperateBtn } from './OperateBtn';
 import { SystemSceneUtils } from '../common/SystemSceneUtils';
 import { AppointState, AppointmentInfo } from '../common/Type';
@@ -30,18 +30,19 @@ export struct ReservationCard {
   @Local reserveTime: string = '';
   private dialogControllerConfirm: CustomDialogController = new CustomDialogController({
     builder: AlertDialog({
-      primaryTitle: '',
+      primaryTitle: $r('app.string.dialog_cancel_appoint_title'),
       secondaryTitle: '',
-      content: $r('app.string.dialog_cancel_appoint_title'),
+      content: $r('app.string.dialog_cancel_appoint_content'),
       primaryButton: {
         value: $r('app.string.dialog_cancel_appoint_no'),
-        role: ButtonRole.NORMAL,
+        fontColor: $r('sys.color.font_primary'),
         action: () => {
         },
       },
       secondaryButton: {
         value: $r('app.string.dialog_cancel_appoint_yes'),
-        role: ButtonRole.ERROR,
+        role: ButtonRole.NORMAL,
+        fontColor: this.themeColor,
         action: () => {
           this.cancelReservation();
         },
@@ -55,19 +56,24 @@ export struct ReservationCard {
   }
 
   aboutToAppear(): void {
+    // 初始化
+    SystemSceneUtils.init(this.getUIContext());
     this.reserveTime = this.getReserveTime();
   }
 
+  @Computed
+  get maskPhoneNumber() {
+    // 手机号脱敏
+    return this.appointInfo.contactPhone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2');
+  }
+
   build() {
-    Stack() {
-      Column({ space: 4 }) {
-        Row({ space: 10 }) {
-          Image(this.showOperateBar() ? $r('app.media.icon_circle_red') : $r('app.media.icon_circle_grey'))
-            .width(10)
-            .height(10)
+    Row() {
+      Column({ space: 12 }) {
+        Row() {
           Text($r('app.string.text_appoint_time_desc', this.reserveTime))
-            .fontSize(18)
-            .fontColor(this.showOperateBar() ? '#212121' : '#878787')
+            .fontSize(16)
+            .fontColor(this.showOperateBar() ? $r('sys.color.font_primary') : $r('sys.color.font_tertiary'))
             .fontWeight(FontWeight.Medium)
         }.width('100%')
 
@@ -79,14 +85,14 @@ export struct ReservationCard {
           FormItem({
             info: {
               label: $r('app.string.form_item_contact'),
-              content: `${this.appointInfo.contactName} ${this.appointInfo.contactPhone}`,
+              content: this.appointInfo.contactName,
             },
             enableOperate: this.showOperateBar(),
           })
           FormItem({
             info: {
-              label: $r('app.string.form_item_nums'),
-              content: $r('app.string.form_content_nums', this.appointInfo.numbers.toString()),
+              label: $r('app.string.form_item_phone'),
+              content: this.maskPhoneNumber,
             },
             enableOperate: this.showOperateBar(),
           })
@@ -103,10 +109,7 @@ export struct ReservationCard {
           this.OperateBar()
         }
       }
-      .width('100%')
-      .backgroundColor($r('sys.color.comp_background_list_card'))
-      .borderRadius(8)
-      .padding(10)
+      .layoutWeight(1)
 
       if (this.showCanceledIcon) {
         Image($r('app.media.icon_canceled')).waterMark()
@@ -119,45 +122,48 @@ export struct ReservationCard {
       if (this.showOverTimeIcon()) {
         Image($r('app.media.ic_overtime')).waterMark()
       }
-
-    }.alignContent(Alignment.End)
-
+    }
+    .width('100%')
+    .backgroundColor($r('sys.color.comp_background_list_card'))
+    .borderRadius(16)
+    .padding({ left: 12, right: 12, top: 16, bottom: 16})
   }
 
   @Builder
   OperateBar() {
-    Column() {
+    Column({ space: 12 }) {
       Divider()
       Row() {
         OperateBtn({
-          imgSrc: $r('app.media.icon_cancel'),
+          imgSrc: $r('sys.symbol.xmark_circle'),
           btnText: $r('app.string.btn_cancel_appoint'),
-          fgColor: '#878787',
+          fgColor: $r('sys.color.font_primary'),
           onClickEvent: this.openCancelConfirmDialog,
         })
 
         Divider().vertical(true).height(20)
 
         OperateBtn({
-          imgSrc: this.scheduleIcon,
-          btnText: this.scheduleText,
-          fgColor: this.isAddSchedule ? '#434343' : this.themeColor,
+          imgSrc: $r('sys.symbol.checkmark_calendar'),
+          btnText: $r('app.string.schedule_to_add'),
+          fgColor: this.themeColor,
+          isDisabled: this.isAddSchedule,
           onClickEvent: this.onScheduleClick,
         })
 
         Divider().vertical(true).height(20)
 
         OperateBtn({
-          imgSrc: this.subscribeIcon,
-          btnText: this.subscribeText,
-          fgColor: this.isSubscribe ? '#434343' : this.themeColor,
+          imgSrc: $r('sys.symbol.bell'),
+          btnText: $r('app.string.subscribe_to_add'),
+          fgColor: this.themeColor,
+          isDisabled: this.isSubscribe,
           onClickEvent: this.onSubscribeClick,
         })
       }
       .width('100%')
-      .padding(6)
       .justifyContent(FlexAlign.SpaceBetween)
-    }.margin({ top: 10 })
+    }
   }
 
   showOperateBar() {
@@ -177,8 +183,8 @@ export struct ReservationCard {
 
   getReserveTime() {
     const date = new Date(this.appointInfo.reserveTime);
-    const monthDayFormat = new intl.DateTimeFormat(this.systemLanguage, { month: 'long', day: 'numeric' });
-    const timeFormat = new intl.DateTimeFormat(this.systemLanguage, { timeStyle: 'short', hourCycle: 'h24' });
+    const monthDayFormat = new Intl.DateTimeFormat(this.systemLanguage, { month: 'long', day: 'numeric' });
+    const timeFormat = new Intl.DateTimeFormat(this.systemLanguage, { timeStyle: 'short', hourCycle: 'h24' });
     return `${monthDayFormat.format(date)} ${timeFormat.format(date)}`;
   }
 
@@ -262,28 +268,6 @@ export struct ReservationCard {
   }
 
   @Computed
-  get scheduleText() {
-    return this.isAddSchedule ? $r('app.string.schedule_added') : $r('app.string.schedule_to_add');
-  }
-
-  @Computed
-  get scheduleIcon() {
-    return this.isAddSchedule ? $r('app.media.icon_schedule_done') :
-    $r('app.media.icon_schedule');
-  }
-
-  @Computed
-  get subscribeText() {
-    return this.isSubscribe ? $r('app.string.subscribe_added') : $r('app.string.subscribe_to_add');
-  }
-
-  @Computed
-  get subscribeIcon() {
-    return this.isSubscribe ? $r('app.media.icon_subscribe_done') :
-    $r('app.media.icon_subscribe');
-  }
-
-  @Computed
   get showFinishedIcon() {
     return this.appointInfo.state === AppointState.FINISH;
   }
@@ -296,7 +280,6 @@ export struct ReservationCard {
 
 @Extend(Image)
 function waterMark() {
-  .width(64)
-  .height(56)
-  .margin({ right: 20 })
+  .width(48)
+  .height(48)
 }

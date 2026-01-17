@@ -17,16 +17,19 @@ export struct CouponCard {
   @Param totalMoney: number = 0;
   // 已选择优惠券ID;
   @Param selectId: string = '';
-  // 选中优惠券回调
-  @Event clickCoupon: (coupon: CouponItem) => void = () => {
-  };
-  @Event claimNow: () => void = () => {
-  };
-  @Event useNow: () => void = () => {
-  };
   /** 本地参数 **/
   @Local showInstruction: boolean = false;
   private status: ScenarioStatus = ScenarioStatus.NOW_USE;
+
+  // 选中优惠券回调
+  @Event clickCoupon: (coupon: CouponItem) => void = () => {
+  };
+
+  @Event claimNow: () => void = () => {
+  };
+
+  @Event useNow: () => void = () => {
+  };
 
   aboutToAppear() {
     this.status = getScenarioStatus(this.coupon, this.totalMoney);
@@ -39,19 +42,12 @@ export struct CouponCard {
         // 左
         Column({ space: 2 }) {
           Row({ space: 2 }) {
-            if (this.coupon.amountRule.discountType === ReductionTypes.DISCOUNT_REDUCTION) {
-              Text((Number(this.coupon.amountRule.discountCoefficient) * 10).toFixed(1)).leftMainNumberStyle()
-              Text($r('app.string.coupon_discount')).leftMainUnitStyle().margin({ bottom: $r('app.string.margin_4') })
-            } else {
-              Text($r('app.string.currency_symbol')).leftMainUnitStyle().margin({ bottom: $r('app.string.margin_4') })
-              Text(this.coupon.amountRule.discountAmount).leftMainNumberStyle()
-            }
+            Text($r('app.string.currency_symbol')).leftMainUnitStyle().margin({ bottom: $r('app.string.margin_4') })
+            Text(this.coupon.amountRule.discountAmount).leftMainNumberStyle()
           }.alignItems(VerticalAlign.Bottom)
 
           if (this.coupon.amountRule.discountType === ReductionTypes.FULL_REDUCTION) {
             Text($r('app.string.full_available', `${Number(this.coupon.amountRule.fullAmount)}`)).leftSubStyle()
-          } else if (this.coupon.amountRule.discountType === ReductionTypes.DISCOUNT_REDUCTION) {
-            Text($r('app.string.discount_available', '新品')).leftSubStyle()
           } else {
             Text($r('app.string.no_threshold')).leftSubStyle()
           }
@@ -97,11 +93,11 @@ export struct CouponCard {
           Image($r('app.media.ic_coupon_used')).width(48).position({ top: -24, right: -8 })
         } else if (this.status === ScenarioStatus.EXPIRE) {
           Image($r('app.media.ic_coupon_expired')).width(48).position({ top: -24, right: -8 })
-        } else if (this.isPickUpPage ) {
+        } else if (this.isPickUpPage) {
           if (this.isPickUp) {
             Image($r('app.media.ic_coupon_pickup')).width(48).position({ top: -24, right: -8 })
-          }else {
-            Button($r('app.string.claim_now'),{controlSize:ControlSize.SMALL})
+          } else {
+            Button($r('app.string.claim_now'), { controlSize: ControlSize.SMALL })
               .fontSize($r('sys.float.Body_M'))
               .fontColor($r('sys.color.font_on_primary'))
               .backgroundColor($r('app.color.sys_brand_fuchsia'))

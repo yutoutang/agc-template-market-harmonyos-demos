@@ -1,56 +1,66 @@
-import { formBindingData, FormExtensionAbility, formInfo, formProvider } from '@kit.FormKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { Want } from '@kit.AbilityKit';
-import { CardManager, FormDataClass, Subscriber as SubscriberClass } from 'common';
-import { BusinessError } from '@kit.BasicServicesKit';
+import { formBindingData, FormExtensionAbility, formInfo } from '@kit.FormKit';
+import { CardInfo, CardManager, FormDataClass, PreferenceUtil } from 'common';
+import { HttpRequest, OrderUtil } from 'network';
+
+const TAG: string = '[EntryFormAbility]';
 
 export default class EntryFormAbility extends FormExtensionAbility {
   onAddForm(want: Want) {
     // Called to return a FormBindingData object.
     let formId: string = ''
+    let formDimension = 2
     if (want?.parameters) {
       formId = want.parameters[formInfo.FormParam.IDENTITY_KEY] as string
-      if (formId) {
-        // 保存获取到formId,后续手动调用刷新
-        CardManager.get().saveCardId(this.context, formId)
-        SubscriberClass.publish(SubscriberClass.eventFormId, formId)
-      }
+      // 获取卡片类型
+      formDimension = want.parameters[formInfo.FormParam.DIMENSION_KEY] as number
     }
-    let formData = new FormDataClass();
-    const bindingData: formBindingData.FormBindingData = formBindingData.createFormBindingData(formData);
-    // 定义需要通过Push Kit代理刷新的字段，每个key均需要在上面bindingData中定义
-    const text_key: formBindingData.ProxyData = {
-      key: 'orderState',
-      subscriberId: formId,
-    };
-    bindingData.proxies = [text_key];
-    return bindingData;
+    let cardInfo: CardInfo = { formId, formDimension };
+    try {
+      PreferenceUtil.getInstance(this.context).putToArray('card_id', JSON.stringify(cardInfo))
+    } catch (e) {
+      UtilLog.error(TAG, `onAddForm error: ${e}`);
+    }
+    let formData = new FormDataClass(formDimension);
+    return formBindingData.createFormBindingData(formData);
   }
 
   onCastToNormalForm(formId: string) {
-    // Called when the form provider is notified that a temporary form is successfully
-    // converted to a normal form.
-    CardManager.get().saveCardId(this.context, formId)
-    CardManager.get().updateCard(this.context, formId)
+    UtilLog.error(TAG, 'onCastToNormalForm error.')
   }
 
   onUpdateForm(formId: string) {
     // Called to notify the form provider to update a specified form.
-    console.log('onUpdateForm start')
-    let initFormData = new FormDataClass();
-    let formData: formBindingData.FormBindingData = formBindingData.createFormBindingData(initFormData);
-    formProvider.updateForm(formId, formData).catch((error: BusinessError) => {
-      console.error('onUpdateForm error:' + error.message)
-    });
+    UtilLog.info(TAG, 'onUpdateForm start:', formId)
+    CardManager.get().updateCard(new FormDataClass(), formId, this.context)
+    UtilLog.info(TAG, 'onUpdateForm end', formId)
   }
 
   onFormEvent(formId: string, message: string) {
-
-    // Called when a specified message event defined by the form provider is triggered.
+    OrderUtil.setContext(this.context)
+    UtilLog.info(TAG, `FormAbility onFormEvent, formId = ${formId}, message: ${JSON.stringify(message)}`);
+    let msgParams: Record<string, string> = JSON.parse(message)
+    if (msgParams.type === '1') {
+      HttpRequest.cancelBookOrderApi(Number(msgParams.orderId)).then(res => {
+        UtilLog.info(TAG, `FormAbility onFormEvent cancelBookOrderApi, res = ${JSON.stringify(res)}}`);
+        CardManager.get().updateCard(new FormDataClass(), formId, this.context)
+      })
+    } else if (msgParams.type === '2') {
+      HttpRequest.cancelQueueOrderApi(Number(msgParams.orderId)).then(res => {
+        UtilLog.info(TAG, `FormAbility onFormEvent cancelQueueOrderApi, res = ${JSON.stringify(res)}}`);
+        CardManager.get().updateCard(new FormDataClass(), formId, this.context)
+      })
+    }
   }
 
   onRemoveForm(formId: string) {
     // Called to notify the form provider that a specified form has been destroyed.
-    CardManager.get().clearCardId(this.context)
+    try {
+      CardManager.get().removeCard(formId, this.context)
+    } catch (e) {
+      UtilLog.error(TAG, `[EntryFormAbility] onRemoveForm error: ${e}`);
+    }
   }
 
   onAcquireFormState(want: Want) {

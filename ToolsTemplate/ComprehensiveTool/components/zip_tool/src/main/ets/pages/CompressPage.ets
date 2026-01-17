@@ -1,5 +1,5 @@
 import { common } from '@kit.AbilityKit';
-import { CustomContentDialog, promptAction } from '@kit.ArkUI';
+import { CustomContentDialog } from '@kit.ArkUI';
 import { CompressPageVM } from '../viewmodel/CompressPageVM';
 import { buildNewFolder, getFolderList, readCompressedFile } from '../utils/CompressUtil';
 import { CompressedFile } from '../model/ZipModel';
@@ -11,6 +11,8 @@ import { BuildCustomDialog } from '../components/BuildCustomDialog';
 import { compressedFormat, FileType } from '../common/Constant';
 import { TitleBar } from '../components/TitleBar';
 import { MoveBuilder } from '../components/MoveBuilder';
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
+import { MAX_FREE_USE_TIME } from 'module_base';
 
 @Builder
 export function CompressPageBuilder() {
@@ -50,6 +52,11 @@ struct CompressPage {
       },
     }),
   })
+
+  @Computed
+  get isCanUse() {
+    return this.vm.isMember || (!this.vm.isMember && this.vm.usedCount.count < MAX_FREE_USE_TIME)
+  }
 
   onBuildCancel() {
     this.vm.folderName = ''
@@ -173,7 +180,9 @@ struct CompressPage {
               .width(72)
               .height(72)
           }
-          .layoutWeight(1)
+          .width('100%')
+          .height('calc(100% - 56vp)')
+          .justifyContent(FlexAlign.Center)
         }
       }
     }
@@ -341,7 +350,11 @@ struct CompressPage {
       .borderRadius($r('sys.float.corner_radius_level10'))
       .margin({ bottom: 16 })
       .onClick(() => {
-        this.vm.pickerSelect()
+        if (this.isCanUse) {
+          this.vm.pickerSelect()
+        } else {
+          this.getUIContext().getPromptAction().showToast({ message: '购买会员方可享受无限使用次数' })
+        }
       })
       .bindSheet($$this.vm.isShow, this.configureBuilder(), {
         height: this.vm.titleBarName === '压缩' ? 400 : 240,

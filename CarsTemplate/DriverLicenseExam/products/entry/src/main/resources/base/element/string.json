@@ -17,6 +17,10 @@
       "value": "permission_reason_location"
     },
     {
+      "name": "app_tracking_constant",
+      "value": "app_tracking_constant"
+    },
+    {
       "name": "home_page",
       "value": "home page"
     },
@@ -251,6 +255,10 @@
     {
       "name": "no_question",
       "value": "no question"
+    },
+    {
+      "name": "agcit_huawei_driver_license_exam",
+      "value": "1.0.4"
     }
   ]
 }

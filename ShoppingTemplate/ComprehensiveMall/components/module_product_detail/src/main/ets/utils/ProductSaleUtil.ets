@@ -1,4 +1,4 @@
-import { PopViewUtil } from 'module_ui_base';
+import { PopViewUtil, WindowUtil } from 'module_ui_base';
 import { Constants } from '../commons/Constants';
 import { ProductOperationType } from '../commons/Enums';
 import { ProductSaleOptionsModel } from '../commons/Models';
@@ -10,7 +10,10 @@ import { ProductSelector } from '../views/ProductSelector';
 export class ProductSaleUtil {
   @Trace options: ProductSaleOptionsModel = new ProductSaleOptionsModel()
 
-  async init(options?: ProductSaleOptions) {
+  async init(options?: ProductSaleOptions,uiContext?:UIContext) {
+    if(uiContext){
+      WindowUtil.initWindowUtil(uiContext)
+    }
     this.options.init(options)
     this.options.productInfo = await ProductDetailApis.getProductDetail(this.options.productId);
     if(this.options.productInfo){

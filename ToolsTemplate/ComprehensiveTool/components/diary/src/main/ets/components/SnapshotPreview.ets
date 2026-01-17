@@ -1,3 +1,4 @@
+import { UtilLog } from '@hw-agconnect/util-log';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { fileIo } from '@kit.CoreFileKit';
 import { image } from '@kit.ImageKit';
@@ -66,31 +67,35 @@ export struct SnapshotPreview {
 
   async saveSnapshot(result: SaveButtonOnClickResult): Promise<void> {
     if (result === SaveButtonOnClickResult.SUCCESS) {
-      const helper = photoAccessHelper.getPhotoAccessHelper(this.context);
-      const uri = await helper.createAsset(photoAccessHelper.PhotoType.IMAGE, 'png');
-      const file = await fileIo.open(uri, fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE);
-      const imagePackerApi: image.ImagePacker = image.createImagePacker();
-      const packOpts: image.PackingOption = {
-        format: 'image/png',
-        quality: 100,
-      };
-      imagePackerApi.packToData(this.mergedImage, packOpts).then(async (data) => {
-        fileIo.writeSync(file.fd, data);
-        fileIo.closeSync(file.fd);
-        this.getUIContext().getPromptAction().showToast({
-          message: '已保存至相册',
-          duration: 1800
-        })
-        const imgName = `${Date.now()}.png`;
-        const img =
-          fileIo.openSync(this.context.filesDir + `/${imgName}`, fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE);
-        await fileIo.write(img.fd, data)
-        // 关闭文档
-        await fileIo.close(img.fd)
+      try {
+        const helper = photoAccessHelper.getPhotoAccessHelper(this.context);
+        const uri = await helper.createAsset(photoAccessHelper.PhotoType.IMAGE, 'png');
+        const file = await fileIo.open(uri, fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE);
+        const imagePackerApi: image.ImagePacker = image.createImagePacker();
+        const packOpts: image.PackingOption = {
+          format: 'image/png',
+          quality: 100,
+        };
+        imagePackerApi.packToData(this.mergedImage, packOpts).then(async (data) => {
+          fileIo.writeSync(file.fd, data);
+          fileIo.closeSync(file.fd);
+          this.getUIContext().getPromptAction().showToast({
+            message: '已保存至相册',
+            duration: 1800
+          })
+          const imgName = `${Date.now()}.png`;
+          const img =
+            fileIo.openSync(this.context.filesDir + `/${imgName}`, fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE);
+          await fileIo.write(img.fd, data)
+          // 关闭文档
+          await fileIo.close(img.fd)
 
-        this.setShareData(imgName)
-      }).catch((error: BusinessError) => {
-      });
+          this.setShareData(imgName)
+        }).catch((error: BusinessError) => {
+        });
+      } catch (e) {
+        UtilLog.error(`saveSnapshot failed with error ${e}`)
+      }
     }
     this.closeSnapPopup();
   }

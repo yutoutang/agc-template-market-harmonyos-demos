@@ -1,4 +1,3 @@
-import { promptAction } from '@kit.ArkUI';
 import relationalStore from '@ohos.data.relationalStore';
 import { BaseDB } from '../basedb/BaseDB';
 import { DBOperator } from '../basedb/Constants';
@@ -9,6 +8,7 @@ import {
   TableSchema,
 } from '../basedb/Types';
 import { Logger } from '../Logger';
+import { toastUtil } from '../ToastUtil';
 import { AccountingDBConstants } from './Constants';
 import {
   AccountTableFields,
@@ -92,10 +92,10 @@ class AccountingDB extends BaseDB {
     return this.transaction(async () => {
       try {
         await this.insert(AccountingDBConstants.TRANSACTION_TABLE_NAME, tx);
-        promptAction.showToast({ message: '交易记录新增成功~' });
+        toastUtil.showToast('交易记录新增成功~');
         Logger.info(TAG, 'insert transaction success.');
       } catch (err) {
-        promptAction.showToast({ message: '交易记录新增失败，请稍后重试~' });
+        toastUtil.showToast('交易记录新增失败，请稍后重试~');
         Logger.error(
           TAG,
           'insert transaction failed. error:' + JSON.stringify(err),
@@ -115,10 +115,10 @@ class AccountingDB extends BaseDB {
       await this.delete(AccountingDBConstants.TRANSACTION_TABLE_NAME, [
         condition,
       ]);
-      promptAction.showToast({ message: '删除成功~' });
+      toastUtil.showToast('删除成功~');
       Logger.info(TAG, 'delete transaction success.');
     } catch (err) {
-      promptAction.showToast({ message: '交易记录删除失败，请稍后重试~' });
+      toastUtil.showToast('交易记录删除失败，请稍后重试~');
       Logger.error(
         TAG,
         'delete transaction failed. error:' + JSON.stringify(err),
@@ -138,11 +138,11 @@ class AccountingDB extends BaseDB {
         AccountingDBConstants.TRANSACTION_TABLE_NAME,
         [condition],
       );
-      promptAction.showToast({ message: '删除成功~' });
+      toastUtil.showToast('删除成功~');
       Logger.info(TAG, 'delete transaction success.');
       return res;
     } catch (err) {
-      promptAction.showToast({ message: '交易记录删除失败，请稍后重试~' });
+      toastUtil.showToast('交易记录删除失败，请稍后重试~');
       Logger.error(
         TAG,
         'delete transaction failed. error:' + JSON.stringify(err),
@@ -176,13 +176,13 @@ class AccountingDB extends BaseDB {
         [condition],
       );
       if (res === 1) {
-        promptAction.showToast({ message: '交易记录更新成功~' });
+        toastUtil.showToast('交易记录更新成功~');
         Logger.info(TAG, 'update transaction success.');
       } else {
         throw new Error(res.toString());
       }
     } catch (err) {
-      promptAction.showToast({ message: '交易记录更新失败，请稍后重试~' });
+      toastUtil.showToast('交易记录更新失败，请稍后重试~');
       Logger.error(
         TAG,
         'update transaction failed. error:' + JSON.stringify(err),

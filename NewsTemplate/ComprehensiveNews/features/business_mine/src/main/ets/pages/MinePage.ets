@@ -1,7 +1,7 @@
 import { CircleShape } from '@kit.ArkUI';
-import { CommonConstants } from 'lib_common';
+import { CommonConstants, RouterUtils } from 'lib_common';
 import { NavHeaderBar } from 'lib_widget';
-import { SettingCard } from 'business_setting';
+import { SettingView } from 'module_app_setting';
 import { mineGridList } from '../constants/Constants';
 import { MineGridItem } from '../types/Types';
 import { MineViewModel } from '../viewmodels/MineVM';
@@ -182,9 +182,19 @@ struct MinePage {
         .fontSize(18 * this.vm.settingInfo.fontSizeRatio)
         .fontColor($r('sys.color.font_primary'))
         .fontWeight(FontWeight.Medium)
-      SettingCard({
-        list: this.vm.serviceList,
+      SettingView({
+        pathStack: RouterUtils.getStack(),
+        settingList: [this.vm.group],
+        fontSizeRatio: this.vm.settingInfo.fontSizeRatio,
         enableLaneSetting: true,
+        enableEdgeEffect: false,
+        fullGridCol: true,
+        autoHeight: true,
+        pagePadding: {
+          top: 8,
+          left: 0,
+          right: 0,
+        },
       })
     }
     .margin({ top: CommonConstants.PADDING_XS })

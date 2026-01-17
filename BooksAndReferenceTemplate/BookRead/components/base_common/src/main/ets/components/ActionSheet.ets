@@ -104,8 +104,7 @@ class ActionSheet {
   public async show(option: ActionSheetOption) {
     let key = option.id ?? this.getUniKey()
     if (this.uiContext === null) {
-      let windowClass: window.Window = await window.getLastWindow(getContext())
-      this.uiContext = windowClass.getUIContext()
+      this.uiContext = AppStorage.get('uiContext') as UIContext;
     }
     let params = new ActionSheetParams(option)
     params.id = key

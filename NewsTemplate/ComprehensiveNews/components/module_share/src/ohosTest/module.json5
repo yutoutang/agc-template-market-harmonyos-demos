@@ -3,7 +3,7 @@
     "name": "module_share_test",
     "type": "feature",
     "deviceTypes": [
-      "phone",
+      "default",
       "tablet"
     ],
     "deliveryWithInstall": true,

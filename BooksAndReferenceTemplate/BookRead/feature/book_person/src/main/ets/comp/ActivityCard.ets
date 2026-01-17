@@ -23,7 +23,7 @@ export struct ActivityCard {
             .height(48)
             .width(48)
             .objectFit(ImageFit.Contain)
-            .margin({left:22})
+            .margin({left:15})
         }
         .onClick(() => {
           TCRouter.pushByLogin(Constants.WELFARE_CENTER);
@@ -46,7 +46,7 @@ export struct ActivityCard {
             .height(48)
             .width(48)
             .objectFit(ImageFit.Contain)
-            .margin({left:22})
+            .margin({left:15})
         }
         .onClick(() => {
           TCRouter.push(Constants.ACTIVITY_ROUTE);

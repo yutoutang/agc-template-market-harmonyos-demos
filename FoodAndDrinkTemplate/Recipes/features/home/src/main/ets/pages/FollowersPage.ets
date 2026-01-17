@@ -19,7 +19,7 @@ struct FollowersPage {
   build() {
     NavDestination() {
       List() {
-        ForEach(this.vm.followerList, (item: BloggerFollower) => {
+        ForEach(this.vm.followerList, (item: BloggerFollower, index: number) => {
           ListItem() {
             Row() {
               Row() {
@@ -41,8 +41,13 @@ struct FollowersPage {
                 })
             }.width('100%').justifyContent(FlexAlign.SpaceBetween).padding({ top: 12, bottom: 12 })
           }
+          .margin({left: this.vm.getLanes === 2 && index % 2 !== 0 ? 18 : 0})
         }, (item: BloggerFollower) => JSON.stringify(item))
-      }.padding({ left: 16, right: 16 }).contentStartOffset(12).contentEndOffset(12)
+      }
+      .padding({ left: 16, right: 16 })
+      .contentStartOffset(12)
+      .contentEndOffset(12)
+      .lanes(this.vm.getLanes)
     }.title(buildTitleBar(`${this.vm.authorName}关注的人`), { paddingStart: LengthMetrics.vp(16) })
   }
 }

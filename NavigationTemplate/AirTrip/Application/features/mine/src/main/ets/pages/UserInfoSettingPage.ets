@@ -1,7 +1,7 @@
-import { AppRouter, CommonFuncResult,
-  Constants, maskPhone, UserApi,
-  UserInfoStorage } from 'common'
-import { FunctionalButton, functionalButtonComponentManager } from '@kit.ScenarioFusionKit'
+import {
+  AppRouter, CommonFuncResult, Constants, maskPhone, UserApi, UserInfoStorage
+} from 'common';
+import { FunctionalButton, functionalButtonComponentManager } from '@kit.ScenarioFusionKit';
 import fs from '@ohos.file.fs';
 import { util } from '@kit.ArkTS';
 import { PersistenceV2 } from '@kit.ArkUI';
@@ -15,7 +15,8 @@ export function userInfoSettingPageBuilder() {
 
 @ComponentV2
 export struct UserInfoSettingPage {
-  @Local userInfoStorage: UserInfoStorage = PersistenceV2.connect(UserInfoStorage, 'UserInfoStorage', () => new UserInfoStorage())!
+  @Local userInfoStorage: UserInfoStorage =
+    PersistenceV2.connect(UserInfoStorage, 'UserInfoStorage', () => new UserInfoStorage())!
 
   updateUserInfo() {
     let userParam: Record<string, string> = {
@@ -28,7 +29,7 @@ export struct UserInfoSettingPage {
     UserApi.updateUserInfo(userParam).then((res) => {
       let result = res.result as CommonFuncResult
       if (result.ret.code === 0) {
-        GlobalDialog.showToast('修改成功')
+        GlobalDialog.showToast('修改成功', this.getUIContext())
       } else {
         console.error(`errorCode: ${result.ret.code}, message: ${result.ret.desc}`);
       }
@@ -64,7 +65,7 @@ export struct UserInfoSettingPage {
           }
         })
 
-        Column({space: 12}) {
+        Column({ space: 12 }) {
           // 头像
           Column() {
             UserInfoItem({
@@ -76,10 +77,10 @@ export struct UserInfoSettingPage {
           }
           .width(Constants.FULL_PERCENT_WIDTH)
           .backgroundColor($r('sys.color.white'))
-          .padding({left: 12, right: 12 })
+          .padding({ left: 12, right: 12 })
           .borderRadius(16)
 
-          Column({space: 12}) {
+          Column({ space: 12 }) {
             UserInfoItem({
               text: '昵称',
               rightBuilder: () => {
@@ -87,7 +88,7 @@ export struct UserInfoSettingPage {
               }
             })
 
-            Divider().strokeWidth(0.5).color($r('sys.color.ohos_id_color_button_divider'))
+            Divider()
 
             UserInfoItem({
               text: '电话',
@@ -98,10 +99,15 @@ export struct UserInfoSettingPage {
           }
           .width(Constants.FULL_PERCENT_WIDTH)
           .backgroundColor($r('sys.color.white'))
-          .padding({left: 12, right:12, top:18, bottom: 18})
+          .padding({
+            left: 12,
+            right: 12,
+            top: 18,
+            bottom: 18
+          })
           .borderRadius(16)
         }
-        .padding({left: 16, top: 12, right: 16})
+        .padding({ left: 16, top: 12, right: 16 })
       }
       .width(Constants.FULL_PERCENT_WIDTH)
       .height(Constants.FULL_PERCENT_HEIGHT)
@@ -112,7 +118,7 @@ export struct UserInfoSettingPage {
 
   @Builder
   AvatarRightView() {
-    Row({space: 4}) {
+    Row({ space: 4 }) {
       FunctionalButton({
         params: {
           openType: functionalButtonComponentManager.OpenType.CHOOSE_AVATAR,
@@ -137,7 +143,7 @@ export struct UserInfoSettingPage {
           try {
             file = fs.openSync(data.avatarUri, fs.OpenMode.READ_ONLY)
             let avatar = `${util.generateRandomUUID(false)}.jpg`
-            let imagePath = `${getContext().filesDir}/${avatar}`
+            let imagePath = `${this.getUIContext().getHostContext()!.filesDir}/${avatar}`
             fs.copyFileSync(file.fd, imagePath)
             this.userInfoStorage.userInfo.avatar = 'file://' + imagePath
             this.updateUserInfo()
@@ -155,9 +161,10 @@ export struct UserInfoSettingPage {
         .fillColor($r('sys.color.ohos_id_color_text_tertiary'))
     }
   }
+
   @Builder
   UserNameRightView() {
-    Row({space: 4}) {
+    Row({ space: 4 }) {
       Text(this.userInfoStorage.userInfo.userName)
         .fontSize(14).fontWeight(FontWeight.Regular)
         .fontColor('#99000000')
@@ -177,14 +184,15 @@ export struct UserInfoSettingPage {
         onConfirm: (value?: string) => {
           this.userInfoStorage.userInfo.userName = value || this.userInfoStorage.userInfo.userName;
           this.updateUserInfo()
-          GlobalDialog.close()
+          GlobalDialog.close(this.getUIContext())
         },
         onCancel: () => {
-          GlobalDialog.close()
+          GlobalDialog.close(this.getUIContext())
         }
-      })
+      }, this.getUIContext())
     })
   }
+
   @Builder
   PhoneRightView() {
     Text(maskPhone(this.userInfoStorage.userInfo.phoneNumber))
@@ -196,9 +204,11 @@ export struct UserInfoSettingPage {
 @ComponentV2
 struct UserInfoItem {
   @Param text: string = ''
+
   @Builder
   rightViewBuilder() {
   };
+
   @BuilderParam rightBuilder: () => void = this.rightViewBuilder;
 
   build() {
@@ -210,6 +220,6 @@ struct UserInfoItem {
     .width(Constants.FULL_PERCENT_WIDTH)
     .justifyContent(FlexAlign.SpaceBetween)
     .backgroundColor($r('sys.color.white'))
-    .padding({top: 12, bottom: 12 })
+    .padding({ top: 12, bottom: 12 })
   }
 }

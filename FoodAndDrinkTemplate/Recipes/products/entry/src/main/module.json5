@@ -7,6 +7,10 @@
     "deviceTypes": [
       "phone"
     ],
+    "querySchemes": [
+      "weixin",
+      "wxopensdk"
+    ],
     "deliveryWithInstall": true,
     "pages": "$profile:main_pages",
     "routerMap": "$profile:router_map",

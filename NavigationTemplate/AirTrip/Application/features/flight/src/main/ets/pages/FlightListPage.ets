@@ -1,15 +1,9 @@
-import { AppRouter, Constants,
-  DataStorage,
-  DayFormat,
-  DayInfo,
-  getDayLabel,
-  LoadingStatus,
-} from 'common'
-import { AppStorageV2 } from '@kit.ArkUI'
+import { AppRouter, Constants, DataStorage, DayFormat, DayInfo, getDayLabel, LoadingStatus, } from 'common';
+import { AppStorageV2 } from '@kit.ArkUI';
 import { FlightInfo, FlightListResult, SortBy } from '../model/FlightPageModel';
 import { FlightApi } from '../api/FlightApi';
 import { getFlyDuration, isNextDay } from '../utils/FlightUtil';
-import { GlobalDialog, DayList, BaseTitle, BaseTip } from 'components'
+import { BaseTip, BaseTitle, DayList, GlobalDialog } from 'components';
 
 @Builder
 export function flightListPageBuilder() {
@@ -33,7 +27,7 @@ export struct FlightListPage {
 
   openLoadingDialog() {
     // Loading
-    GlobalDialog.showLoadingDialog({
+    GlobalDialog.showLoadingDialog(this.getUIContext(), {
       maskRect: {
         width: '100%',
         height: '90%',
@@ -57,7 +51,7 @@ export struct FlightListPage {
       'departureDate': '2025/04/09', // 当前只有这个时间能查到数据
     };
     FlightApi.getFlightSearchList(params).then((res) => {
-      GlobalDialog.close()
+      GlobalDialog.close(this.getUIContext())
       let result = res.result as FlightListResult;
       if (result.ret.code === 0) {
         /*
@@ -95,7 +89,7 @@ export struct FlightListPage {
       this.loadingStatus = this.flightList.length ? LoadingStatus.SUCCESS : LoadingStatus.EMPTY
       this.isRefreshing = false;
     }).catch(() => {
-      GlobalDialog.close()
+      GlobalDialog.close(this.getUIContext())
       this.loadingStatus = LoadingStatus.EMPTY;
       this.isRefreshing = false;
     })
@@ -211,7 +205,7 @@ export struct FlightListPage {
           ListItem() {
             this.FlightItemView(item)
           }
-        })
+        },(item: FlightInfo, index: number)=>index + '__' + JSON.stringify(item))
 
         ListItem() {
           Row() {
@@ -297,7 +291,7 @@ export struct FlightListPage {
       Row() {
       }.width(Constants.FULL_PERCENT_WIDTH).height(1).border({
         width: { bottom: 1 },
-        color: { bottom: $r('sys.color.ohos_id_color_button_divider') },
+        color: { bottom: $r('sys.color.comp_divider') },
         style: { bottom: BorderStyle.Dotted },
       })
 
@@ -334,7 +328,6 @@ export struct FlightListPage {
 
       Button('重新搜索', { type: ButtonType.Normal, stateEffect: true })
         .borderRadius(4)
-        .fontSize(13)
         .backgroundColor($r('sys.color.ohos_id_color_emphasize'))
         .margin({ top: 10 })
         .onClick(() => {
@@ -354,7 +347,7 @@ export struct FlightListPage {
         .fontWeight(400)
     }
     .width(Constants.FULL_PERCENT_WIDTH)
-    .padding({left: 16, right:16})
+    .padding({ left: 16, right: 16 })
   }
 
   @Builder
@@ -449,7 +442,12 @@ export struct FlightListPage {
       .padding({ left: 8 })
     }
     .width(Constants.FULL_PERCENT_WIDTH)
-    .padding({ left: 16, right: 16, top: 12, bottom: 12 })
+    .padding({
+      left: 16,
+      right: 16,
+      top: 12,
+      bottom: 12
+    })
     .backgroundColor('#fff5f3f3')
   }
 }

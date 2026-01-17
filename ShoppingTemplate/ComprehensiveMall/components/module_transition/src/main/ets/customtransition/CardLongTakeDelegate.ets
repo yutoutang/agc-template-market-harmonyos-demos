@@ -47,7 +47,7 @@ export struct CardLongTakeDelegate {
           let deltaY = event.offsetY;
           this.scaleValue =
             Math.max(1 - (1 - MIN_SCALE_VALUE) * Math.abs(deltaX) / this.rectWidth, MIN_SCALE_VALUE);
-          animateTo({
+          this.getUIContext().animateTo({
             curve: curves.responsiveSpringMotion(),
           }, () => {
             this.longTakeSession.translateX = deltaX;
@@ -66,7 +66,7 @@ export struct CardLongTakeDelegate {
             let deltaY = event.offsetY;
             this.scaleValue =
               Math.max(1 - (1 - MIN_SCALE_VALUE) * Math.abs(deltaX) / this.rectWidth, MIN_SCALE_VALUE);
-            animateTo({
+            this.getUIContext().animateTo({
               curve: curves.responsiveSpringMotion(),
             }, () => {
               this.longTakeSession.translateX = deltaX;
@@ -88,7 +88,7 @@ export struct CardLongTakeDelegate {
             if (this.scaleValue > RETURN_TO_PRE_PAGE_SCALE_VALUE) {
               this.longTakeSession.options?.onRecoverStart?.();
               let animationCount = ++this.animationCount;
-              animateTo({
+              this.getUIContext().animateTo({
                 curve: curves.springMotion(),
                 onFinish: () => {
                   if (currentTransitionProxy?.cancelTransition) {

@@ -1,6 +1,6 @@
 import { media } from '@kit.MediaKit';
 import { emitter } from '@kit.BasicServicesKit';
-import { display, uiObserver, window } from '@kit.ArkUI';
+import { AppStorageV2, display, window } from '@kit.ArkUI';
 import { LongTakeTransitionParam } from 'module_transition';
 import { LoneTakeAnimationsTransition } from 'module_transition';
 import { AVPlayerState, BreakpointNameEnum, PageNameEnum, VideoPlayerData } from '../type/Index';
@@ -14,6 +14,10 @@ import { PlayerSpeedRateView } from './PlayerSpeedRateView';
 import { DownloadWithoutWlanEnum, VideoNetworkModel, VideoNetworkSetting } from '../models/VideoNetworkModel';
 import { handleSandboxVideoUrl, setOrientation, toast } from '../utils/Util';
 import { BreakpointModel } from '../models/BreakpointModel';
+import { PiPWindowModel } from '../models/PiPWindowModel';
+import { Logger } from '../utils/Logger';
+
+const TAG = '[VideoPlayerView]';
 
 @ComponentV2
 export struct VideoPlayerView {
@@ -29,7 +33,7 @@ export struct VideoPlayerView {
   @Param @Require swipePlayerController: SwipePlayerController;
   // 视频播放的外层交互组件
   @Param videoLayerBuilder:
-  WrappedBuilder<[ESObject, AVPlayerSession, SwipePlayerController, PlayerLayoutSize]> | undefined = undefined;
+  WrappedBuilder<[Object, AVPlayerSession, SwipePlayerController, PlayerLayoutSize]> | undefined = undefined;
   // 全屏按钮
   @BuilderParam fullBtnBuilder: () => CustomBuilder
   // 是否自动播放
@@ -42,27 +46,30 @@ export struct VideoPlayerView {
   // 底部tab高度
   @Consumer() bottomTabHeight: Length | undefined;
   // 播放状态回调
-  @Event playerStateCallback: (state: string, id: string) => void = (state: string, id: string) => {
+  @Event playerStateCallback: (state: string, id: string) => void = () => {
   }
   // 路由变化的监听事件
-  @Consumer() navDestinationUpdateListeners: Map<string, (info: uiObserver.NavDestinationInfo) => void> = new Map();
+  @Local pipWindowModel: PiPWindowModel = AppStorageV2.connect(PiPWindowModel, () => new PiPWindowModel())!;
   // 路由栈
   @Param @Require pathStack: NavPathStack
-  // 当前组件所在的页面是否显示
-  @Param isShown: boolean = false;
   // 是否横屏
   @Param isLandscape: boolean = false;
+  // 当前组件所在的页面是否显示
+  @Param isShown: boolean = false;
   // 一多适配的断点
   @Param breakpointModel: BreakpointModel = new BreakpointModel();
   // 播放进度变化的回调
-  @Event playerTimeUpdateCallback: (id: string, timeMs: number) => void = (id: string, timeMs: number) => {
+  @Event playerTimeUpdateCallback: (id: string, timeMs: number) => void = () => {
   }
   private xComponentController = new XComponentController();
   vm: SwipePlayerModel = new SwipePlayerModel(this.getUIContext(), this.index)
   // 准备状态监听事件
   private preparedListener = () => {
     if (this.index === this.currentIndex && this.autoPlay) {
-      this.vm.playerSession.play()
+      const isShown = AppStorage.get<boolean>('isShown');
+      if (isShown) {
+        this.vm.playerSession.play()
+      }
     } else {
       // 没有封面图时，取视频的 2ms 的位置帧作为封面
       if (!this.videoData.getCoverUrl()) {
@@ -72,14 +79,19 @@ export struct VideoPlayerView {
   }
   // 资源初始化状态
   private initializedListener = (avPlayer: media.AVPlayer) => {
-    let timer = setInterval(() => {
-      if (this.index !== this.currentIndex) {
-        if (this.vm.avPlayerManager.getAVPlayer(this.currentIndex)?.state === 'playing') {
-          avPlayer!.prepare();
-          clearInterval(timer);
+    let timer = setInterval(async () => {
+      try {
+        if (this.index !== this.currentIndex) {
+          if (this.vm.avPlayerManager.getAVPlayer(this.currentIndex)?.state === 'playing') {
+            await avPlayer!.prepare();
+            clearInterval(timer);
+          }
+        } else {
+          await avPlayer!.prepare();
         }
-      } else {
-        avPlayer!.prepare();
+      } catch (e) {
+        clearInterval(timer);
+        Logger.error(TAG, 'prepare fail, error: ' + JSON.stringify(e));
       }
     }, 100);
   }
@@ -245,7 +257,7 @@ export struct VideoPlayerView {
 
   // 跳转到横屏页
   pushToLandscapePage(
-    param: Record<string, Object | AVPlayerSession | BreakpointModel | LongTakeTransitionParam | undefined>
+    param: Record<string, Object | AVPlayerSession | BreakpointModel | LongTakeTransitionParam | undefined>,
   ) {
     let longTakeTransitionParam: LongTakeTransitionParam | undefined =
       LoneTakeAnimationsTransition.generateLongTakeParam(this.getUIContext(), 'player', 9);
@@ -265,8 +277,8 @@ export struct VideoPlayerView {
     param.videoTitle = this.videoData.getVideoTitle();
     param.breakpointModel = this.breakpointModel
     // 视频播放，跨页面流转
-    this.navDestinationUpdateListeners.delete('fullScreenListener');
-    this.navDestinationUpdateListeners.set('fullScreenListener', (info) => {
+    this.pipWindowModel.navDestinationUpdateListeners.clear();
+    this.pipWindowModel.navDestinationUpdateListeners.set('fullScreenListener', (info) => {
       if (info.name === PageNameEnum.VIDEO_LANDSCAPE_PAGE && info.state === 3) {
         let avPlayer = (param.playerSession as AVPlayerSession).getAVPlayer() as media.AVPlayer;
         if (avPlayer) {
@@ -275,23 +287,27 @@ export struct VideoPlayerView {
       }
     })
 
-    if (isSetOrientation) {
-      // 窗口旋转
-      let displayClass = display.getDefaultDisplaySync();
-      let orientation = displayClass.orientation;
-      if (orientation === display.Orientation.LANDSCAPE) {
-        await setOrientation(window.Orientation.USER_ROTATION_LANDSCAPE_INVERTED)
-      } else if (orientation === display.Orientation.LANDSCAPE_INVERTED) {
-        await setOrientation(window.Orientation.USER_ROTATION_LANDSCAPE)
-      } else if (orientation === display.Orientation.PORTRAIT) {
-        await setOrientation(window.Orientation.USER_ROTATION_LANDSCAPE)
-      } else if (orientation === display.Orientation.PORTRAIT_INVERTED) {
-        await setOrientation(window.Orientation.USER_ROTATION_LANDSCAPE_INVERTED)
+    try {
+      if (isSetOrientation) {
+        // 窗口旋转
+        let displayClass = display.getDefaultDisplaySync();
+        let orientation = displayClass.orientation;
+        if (orientation === display.Orientation.LANDSCAPE) {
+          await setOrientation(this.getUIContext(), window.Orientation.USER_ROTATION_LANDSCAPE_INVERTED)
+        } else if (orientation === display.Orientation.LANDSCAPE_INVERTED) {
+          await setOrientation(this.getUIContext(), window.Orientation.USER_ROTATION_LANDSCAPE)
+        } else if (orientation === display.Orientation.PORTRAIT) {
+          await setOrientation(this.getUIContext(), window.Orientation.USER_ROTATION_LANDSCAPE)
+        } else if (orientation === display.Orientation.PORTRAIT_INVERTED) {
+          await setOrientation(this.getUIContext(), window.Orientation.USER_ROTATION_LANDSCAPE_INVERTED)
+        }
+        this.vm.isClickFullScreenBtn = true;
+        this.pushToLandscapePage(param)
+      } else {
+        this.pushToLandscapePage(param)
       }
-      this.vm.isClickFullScreenBtn = true;
-      this.pushToLandscapePage(param)
-    } else {
-      this.pushToLandscapePage(param)
+    } catch (e) {
+      Logger.error(TAG, 'getDefaultDisplaySync fail, error: ' + JSON.stringify(e));
     }
   }
 
@@ -383,10 +399,9 @@ export struct VideoPlayerView {
             this.defaultVideoProgressBar()
           }
         }
+
         // 全屏播放按钮
-        if (this.vm.showFullScreenBtn() && !this.vm.isAccelerate &&
-          !this.vm.playerLayoutSize.getSlideMovingFlag()
-        ) {
+        if (this.vm.showFullScreenBtn) {
           this.fullScreenBtnView()
         }
       }
@@ -402,7 +417,7 @@ export struct VideoPlayerView {
         })
         .onActionEnd(() => {
           this.vm.offLongPress()
-        })
+        }),
     )
   }
 

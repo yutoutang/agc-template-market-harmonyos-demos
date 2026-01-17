@@ -1,3 +1,6 @@
+import { common } from '@kit.AbilityKit';
+import { window } from '@kit.ArkUI';
+import { ToastDialog } from '@hw-agconnect/ui-toast';
 import { ShowMethod, ToolBarName } from '../commons/Enum';
 import { CategoryController } from '../controller/CategoryController';
 import { NoteSearchController } from '../controller/NoteSearchController';
@@ -8,8 +11,6 @@ import { CommonDataSource } from '../models/CommonDataSource';
 import { Note } from '../models/Note';
 import { CategoryUtil } from '../utils/CategotyUtil';
 import { NoteUtil } from '../utils/NoteUtil';
-import { common } from '@kit.AbilityKit';
-import { window } from '@kit.ArkUI';
 
 
 @ObservedV2
@@ -114,9 +115,9 @@ export class PersonalNotesVM {
       }
     })
     if (tempArray.length === 0) {
-      this.uiContext?.getPromptAction().showToast({
+      ToastDialog.showToast({
         message: '还未选中任何笔记',
-        alignment: Alignment.Center
+        toastAlignment: DialogAlignment.Center
       })
     }
     return tempArray;

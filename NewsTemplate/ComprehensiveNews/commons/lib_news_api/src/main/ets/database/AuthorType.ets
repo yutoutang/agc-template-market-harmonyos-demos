@@ -16,6 +16,8 @@ export interface BaseAuthor {
   authorIp: string
   // 关注的人
   watchers: string[]
+  // 订阅号
+  subscribe: string[]
   // 粉丝
   followers: string[]
   // 获赞数量

@@ -4,7 +4,7 @@
 
 - [简介](#简介)
 - [约束与限制](#约束与限制)
-- [快速入门](#快速入门)
+- [使用](#使用)
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
@@ -20,14 +20,18 @@
 
 - DevEco Studio版本：DevEco Studio 5.0.4 Release及以上
 - HarmonyOS SDK版本：HarmonyOS 5.0.4 Release SDK及以上
-- 设备类型：华为手机（直板机）
+- 设备类型：华为手机（包括双折叠和阔折叠）、平板
 - HarmonyOS版本：HarmonyOS 5.0.4(16)及以上
 
-## 快速入门
+### 权限
+
+- 无
+
+## 使用
 
 1. 安装组件。
 
-   如果是在DevEvo Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
+   如果是在DevEco Studio使用插件集成组件，则无需安装组件，请忽略此步骤。
    
    如果是从生态市场下载组件，请参考以下步骤安装组件。 
    
@@ -61,7 +65,6 @@
 
    ```typescript
     TUISwiper({
-     isCovered: , // 中间图片是否覆盖两边
      imgWidth: , // 中心图片宽度
      imgHeight: , // 中心图片高度
      interval: , // 间隔时间
@@ -85,7 +88,6 @@ TUISwiper({
    builderList: LazyDataVM<BookInfo>,
    bookList: WrappedBuilder<BookInfo>,
    isLoop: boolean,
-   isCovered: boolean,
    onImageClick: (index: number) => {
    }
 })
@@ -96,7 +98,6 @@ TUISwiper({
 
 | 参数名          | 类型                                                       | 是否必填 | 说明       |
 |-------------|----------------------------------------------------------|----|----------|
-| isCovered   | boolean                                                  | 否  | 中间图片是否覆盖两边 |
 | imgWidth    | number                                                   | 否  | 中心图片宽度   |
 | imgHeight   | number                                                   | 否  | 中心图片高度   |
 | interval    | number                                                   | 否  | 间隔时间     |
@@ -201,7 +202,6 @@ struct Index {
             builderList: this.builderList,
             bookList: this.books,
             isLoop: true,
-            isCovered: false,
             onImageClick: (index: number) => {
             }
          })

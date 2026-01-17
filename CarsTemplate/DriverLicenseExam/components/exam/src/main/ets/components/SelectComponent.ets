@@ -16,6 +16,9 @@ export struct SelectComponent {
   @Param @Require changeCorrectNum: (isAdd: boolean) => void;
   @Param @Require changeErrorNum: (isAdd: boolean) => void;
   @Local checkBoxImage: boolean = false;
+  videoController:VideoController = new VideoController();
+  @Param @Require index:number;
+  @Param @Require currentIndex: number;
 
   @Monitor('examController.renderView')
   renderViewChange(){
@@ -25,6 +28,13 @@ export struct SelectComponent {
     }
     this.ansIndexList = [];
     this.selectIndexList = [];
+  }
+
+  @Monitor('currentIndex')
+  currentIndexChange() {
+    if (this.index !== this.currentIndex) {
+      this.videoController.pause();
+    }
   }
 
   // 如果想退出考试重新进入后将已做题回显，打开这个方法
@@ -214,10 +224,16 @@ export struct SelectComponent {
           .fontSize(this.examController.fontSize - 2)
           .fontWeight(FontWeight.Bold)
           .fontColor('#64BB5C');
-      }, (item: number) => JSON.stringify(item))
+      }, (item: number) => {
+        try {
+          return JSON.stringify(item)
+        } catch (err) {
+          return ''
+        }
+      })
 
       if (this.item.isCorrect === false) {
-        Text('      您的答案:  ')
+        Text('      您的选择:  ')
           .fontSize(this.examController.fontSize - 2)
           .fontColor('rgba(0,0,0,0.90)');
 
@@ -226,7 +242,13 @@ export struct SelectComponent {
             .fontSize(this.examController.fontSize - 2)
             .fontColor('#E84026')
             .fontWeight(FontWeight.Bold);
-        }, (item: number) => JSON.stringify(item))
+        }, (item: number) => {
+          try {
+            return JSON.stringify(item)
+          } catch (err) {
+            return ''
+          }
+        })
       }
     }
     .height(28)
@@ -263,6 +285,7 @@ export struct SelectComponent {
 
       Video({
         src: this.item.videoExplainUrl,
+        controller: this.videoController
       })
         .width('100%')
         .height(160)

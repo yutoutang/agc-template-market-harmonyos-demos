@@ -28,8 +28,6 @@ export { PromptActionClass } from './src/main/ets/utils/PromptActionClass'
 
 export { CommonModel } from './src/main/ets/model/CommonModel'
 
-export { LocateUtil } from './src/main/ets/utils/LocateUtil'
-
 
 export { LogUtil } from './src/main/ets/utils/LogUtil'
 
@@ -38,6 +36,10 @@ export { PickerUtil } from './src/main/ets/utils/PickerUtil'
 export { StringUtil } from './src/main/ets/utils/StringUtil'
 
 export { ObjectUtil } from './src/main/ets/utils/ObjectUtil'
+
+export { PushUtils } from './src/main/ets/push/PushUtils'
+
+export { PushActionParams } from './src/main/ets/push/Model'
 
 
 

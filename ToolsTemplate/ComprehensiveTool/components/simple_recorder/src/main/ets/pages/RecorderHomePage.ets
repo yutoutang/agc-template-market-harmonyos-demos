@@ -96,6 +96,7 @@ export struct RecorderHomePage {
     .hideTitleBar(true)
     .onReady((ctx) => {
       setPathStack(ctx.pathStack);
+      AppStorage.setOrCreate('simple_recorder_context', this.getUIContext().getHostContext());
     });
   }
 }

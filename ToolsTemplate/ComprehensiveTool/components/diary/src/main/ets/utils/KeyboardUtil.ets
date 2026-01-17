@@ -1,3 +1,4 @@
+import { UtilLog } from '@hw-agconnect/util-log';
 import { window } from '@kit.ArkUI';
 
 export class KeyboardUtil {
@@ -8,22 +9,30 @@ export class KeyboardUtil {
   }
 
   registerKeyboardListener(onKeyboardShow: () => void, onKeyboardHide: () => void) {
-    window.getLastWindow(this.uiContext.getHostContext()).then(currentWindow => {
-      currentWindow.on('keyboardHeightChange', (data: number) => {
-        const keyboardHeight = this.uiContext.px2vp(data)
-        if (keyboardHeight > 0) {
-          onKeyboardShow()
-        } else {
-          onKeyboardHide()
-        }
+    try {
+      window.getLastWindow(this.uiContext.getHostContext()).then(currentWindow => {
+        currentWindow.on('keyboardHeightChange', (data: number) => {
+          const keyboardHeight = this.uiContext.px2vp(data)
+          if (keyboardHeight > 0) {
+            onKeyboardShow()
+          } else {
+            onKeyboardHide()
+          }
+        })
       })
-    })
+    } catch (e) {
+      UtilLog.error(`registerKeyboardListener failed with error ${JSON.stringify(e)}`);
+    }
   }
 
   unregisterKeyboardListener() {
-    window.getLastWindow(this.uiContext.getHostContext()).then(currentWindow => {
-      currentWindow.off('keyboardHeightChange')
-    })
+    try {
+      window.getLastWindow(this.uiContext.getHostContext()).then(currentWindow => {
+        currentWindow.off('keyboardHeightChange')
+      })
+    } catch (e) {
+      UtilLog.error(`unregisterKeyboardListener failed with error ${JSON.stringify(e)}`);
+    }
   }
 
   hideKeyboard() {

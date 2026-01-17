@@ -1,7 +1,7 @@
-import { updateManager } from '@kit.AppGalleryKit';
 import { common } from '@kit.AbilityKit';
+import { updateManager } from '@kit.AppGalleryKit';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { Logger } from './Logger';
+import { Logger } from 'module_ui_base';
 
 const TAG = '[AppGalleryUtils]';
 
@@ -24,7 +24,7 @@ export class AppGalleryUtils {
           Logger.info(
             TAG,
             'Succeeded in checking Result updateAvailable:' +
-              checkResult.updateAvailable,
+            checkResult.updateAvailable,
           );
           return (
             checkResult.updateAvailable ===

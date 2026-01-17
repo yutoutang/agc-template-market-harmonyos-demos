@@ -9,6 +9,7 @@ export enum RouterMap {
   GROUP_DETAIL = 'GroupDetail', // 团购详情页
   SUBMIT_ORDER = 'SubmitOrder', // 下单页
   SUCCESS_PAY = 'SuccessPay', // 下单成功页
+  SELECT_STORE_PAGE = 'SelectStorePage', // 门店选择页
 
   // 我的
   MY_APPOINTMENT_LIST = 'AppointmentList', // 预约列表管理

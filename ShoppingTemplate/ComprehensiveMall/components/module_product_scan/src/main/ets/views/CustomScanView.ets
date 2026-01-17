@@ -1,11 +1,12 @@
-import { scanBarcode } from '@kit.ScanKit';
-import { CustomScanVM } from '../viewmodels/CustomScanVM';
-import { CameraUtil } from '../utils/CameraUtil';
-import { window } from '@kit.ArkUI';
-import { Logger } from 'module_ui_base';
 import { common, abilityAccessCtrl } from '@kit.AbilityKit';
-import { TabIndexMap } from '../commons/Enums';
+import { window } from '@kit.ArkUI';
+import { BusinessError } from '@kit.BasicServicesKit';
+import { scanBarcode } from '@kit.ScanKit';
+import { Logger, SafeJson } from 'module_ui_base';
+import { TabIndexMap } from '../commons/Constants';
 import { CustomScanOptions } from '../commons/Types';
+import { CameraUtil } from '../utils/CameraUtil';
+import { CustomScanVM } from '../viewmodels/CustomScanVM';
 
 const TAG: string = '[CustomScan]';
 
@@ -123,7 +124,12 @@ export struct CustomScanView {
       window.getLastWindow(this.getUIContext().getHostContext())
         .then((win) => {
           this.curWindow = win;
-          this.curWindow.setWindowLayoutFullScreen(true)
+          this.curWindow.setWindowLayoutFullScreen(true).catch((err: BusinessError) => {
+            Logger.info(TAG, 'set full screen failed. error: ' + SafeJson.jsonStringify(err))
+          })
+        })
+        .catch((err: BusinessError) => {
+          Logger.info(TAG, 'get last window failed. error: ' + SafeJson.jsonStringify(err))
         })
       this.release = false;
       await this.requestCameraPermission();
@@ -135,7 +141,9 @@ export struct CustomScanView {
     .onHidden(() => {
       this.release = true
       if (this.curWindow) {
-        this.curWindow.setWindowLayoutFullScreen(false)
+        this.curWindow.setWindowLayoutFullScreen(false).catch((err: BusinessError) => {
+          Logger.info(TAG, 'set full screen failed. error: ' + SafeJson.jsonStringify(err))
+        })
       }
     })
   }
@@ -242,11 +250,15 @@ export struct CustomScanView {
   async requestCameraPermission() {
     let context = this.getUIContext().getHostContext() as common.UIAbilityContext;
     let atManager = abilityAccessCtrl.createAtManager();
-    let grantStatus = await atManager.requestPermissionsFromUser(context, ['ohos.permission.CAMERA']);
-    if (grantStatus.authResults[0] === 0) {
-      this.userGrant = true;
-    } else {
-      this.stack.pop()
+    try {
+      let grantStatus = await atManager.requestPermissionsFromUser(context, ['ohos.permission.CAMERA']);
+      if (grantStatus.authResults[0] === 0) {
+        this.userGrant = true;
+      } else {
+        this.stack.pop()
+      }
+    } catch (err) {
+      Logger.error(TAG, 'request permission failed. error:' + JSON.stringify(err))
     }
   }
 }

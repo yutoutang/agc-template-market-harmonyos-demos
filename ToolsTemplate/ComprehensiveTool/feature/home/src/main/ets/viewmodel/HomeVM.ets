@@ -1,5 +1,5 @@
-import { PersistenceV2, promptAction } from '@kit.ArkUI';
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { PersistenceV2 } from '@kit.ArkUI';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { SelectedToolType, ToolTypeList, ToolTypeModule, ToolTypeModules } from '../model/Index';
 import { TOOL_TYPE_MODULES } from '../constant/Index';
 import { Category, ManageStatus } from '../constant/Enum';
@@ -18,7 +18,7 @@ export class HomeVM {
   @Trace calculatorToolList: ToolTypeModules = [];
   @Trace lifeToolList: ToolTypeModules = [];
   @Trace hasPermission: boolean = false;
-  @Trace pathStack: NavPathStack = new NavPathStack()
+  @Trace pathStack: NavPathStack = new NavPathStack();
   private static _instance: HomeVM;
 
   public static get instance() {
@@ -43,12 +43,13 @@ export class HomeVM {
     this.calculatorToolList = JSON.parse(this.calculatorToolTypes.list);
     this.lifeToolList = JSON.parse(this.lifeToolListTypes.list);
     if (this.selectedToolType.url) {
-      hilog.info(0xFF00, 'Home', `selectedToolType url is: ${this.selectedToolType.url}`);
+      UtilLog.info(`selectedToolType url is: ${this.selectedToolType.url}`);
       this.pathStack.pushPathByName(this.selectedToolType.url, null);
     }
   }
 
-  handleToolLayout(state: ManageStatus, tool: ToolTypeModule, tools: ToolTypeModule[], index: number) {
+  handleToolLayout(uiContext: UIContext, state: ManageStatus, tool: ToolTypeModule, tools: ToolTypeModule[],
+    index: number) {
     if (state === ManageStatus.NONE) {
       this.pathStack.pushPathByName(tool.url, null);
     } else if (state === ManageStatus.ADD) {
@@ -66,7 +67,7 @@ export class HomeVM {
       if (this.homeToolList.length > 1) {
         this.homeToolList = this.homeToolList.filter(type => type.title !== tool.title);
       } else {
-        promptAction.showToast({ message: '至少需要保留一个工具哦~', duration: 1000 });
+        uiContext.getPromptAction().showToast({ message: '至少需要保留一个工具哦~', duration: 1000 });
         return;
       }
       if (tool.category === Category.CALCULATE) {

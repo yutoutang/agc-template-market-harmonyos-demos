@@ -1,4 +1,5 @@
-import { LengthMetrics, promptAction } from '@kit.ArkUI';
+import { LengthMetrics } from '@kit.ArkUI';
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast'
 import { Constants } from '../commons/Constants';
 import { ProductSelectorVM } from '../viewmodels/ProductSelectorVM';
 import { SpecViewModel } from '../commons/Models';
@@ -196,9 +197,9 @@ export struct ProductSelector {
         }
         if (this.vm.enableConfirm) {
           if (this.operationType === ProductOperationType.ADD_TO_CART) {
-            this.handleAddCart?.(this.vm.curSku.skuCode, this.vm.selectedCount);
+            this.handleAddCart?.(this.vm.curSku.skuCode, Number(this.vm.selectedCount));
           } else {
-            this.handlePayNow?.(this.vm.curSku.skuCode, this.vm.selectedCount);
+            this.handlePayNow?.(this.vm.curSku.skuCode, Number(this.vm.selectedCount));
           }
         }
       })

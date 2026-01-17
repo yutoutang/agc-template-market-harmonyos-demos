@@ -1,13 +1,14 @@
-import { routerStack, Style } from 'lib_foundation';
+import { AddressManageUtil } from 'address_management';
+import { aggregatedPaymentService } from 'aggregated_payment';
+import { routerStack, Style, WindowUtil } from 'lib_foundation';
+import { OrderSkuItem, PreOrderInfoReq } from 'lib_network';
+import { NavTitleBar } from 'lib_widget';
+import { Coupons } from 'module_coupons';
+import { DiscountItem, PopupSheet } from 'module_shopping_cart';
 import { ShippingOption } from '../commons/Enums';
 import { OrderSubmitVM } from '../viewmodel/OrderSubmitVM';
 import { ShippingInfoButton } from '../components/ShippingInfoButton';
-import { AddressManage } from 'module_address_manage';
 import { OrderItemCard } from '../components/OrderItemCard';
-import { Coupons } from 'module_coupons';
-import { PopupSheet } from 'module_shopping_cart';
-import { NavTitleBar } from 'lib_widget';
-import { OrderSkuItem, PreOrderInfoReq } from 'lib_network';
 
 @Builder
 export function buildOrderSubmitPage() {
@@ -24,6 +25,10 @@ export struct OrderSubmitPage {
   @Local
   showRemarkSheet: boolean = false;
 
+  aboutToDisappear(): void {
+    aggregatedPaymentService.unregisterAllPaymentCallbacks();
+  }
+
   build() {
     NavDestination() {
       NavTitleBar({
@@ -38,7 +43,6 @@ export struct OrderSubmitPage {
           } else {
             this.shippingInfoBuilder();
             this.productInfoBuilder();
-            this.paymentBuilder()
           }
         }
       }
@@ -88,10 +92,26 @@ export struct OrderSubmitPage {
       })
         .margin({ bottom: 16 });
       if (this.vm.shippingIndex === ShippingOption.EXPRESS) {
-        AddressManage({
-          navPathStack: routerStack,
-          isSelectMode: true,
-          onSelect: (data) => {
+        Row() {
+          Image($r('app.media.ic_address'))
+            .width(24)
+            .margin({ right: 16 });
+          Row() {
+            Column() {
+              Text(this.vm.customerAddress).addressInfoStyle();
+              Text(this.vm.customerName + ' ' + this.vm.customerPhone).customerLabelStyle();
+            }
+            .layoutWeight(1)
+            .margin({ right: 16 })
+            .alignItems(HorizontalAlign.Start);
+
+            Image($r('sys.media.ohos_ic_public_arrow_right')).arrowStyle();
+          }
+          .layoutWeight(1)
+          .justifyContent(FlexAlign.SpaceBetween);
+        }
+        .onClick(() => {
+          AddressManageUtil.goToAddressListPage(routerStack, (data) => {
             this.vm.customerAddress = data.province + data.city + data.district + data.street + data.detail;
             this.vm.customerName = data.name;
             this.vm.customerPhone = data.phone;
@@ -100,27 +120,9 @@ export struct OrderSubmitPage {
               latitude: data.latitude,
               longitude: data.longitude,
             }
-          },
-        }) {
-          Row() {
-            Image($r('app.media.ic_address'))
-              .width(24)
-              .margin({ right: 16 });
-            Row() {
-              Column() {
-                Text(this.vm.customerAddress).addressInfoStyle();
-                Text(this.vm.customerName + ' ' + this.vm.customerPhone).customerLabelStyle();
-              }
-              .layoutWeight(1)
-              .margin({ right: 16 })
-              .alignItems(HorizontalAlign.Start);
-
-              Image($r('sys.media.ohos_ic_public_arrow_right')).arrowStyle();
-            }
-            .layoutWeight(1)
-            .justifyContent(FlexAlign.SpaceBetween);
-          };
-        };
+            routerStack.pop()
+          });
+        })
       } else if (this.vm.shippingIndex === ShippingOption.SELF_PICK_UP) {
         Row() {
           Image($r('app.media.shop'))
@@ -158,23 +160,37 @@ export struct OrderSubmitPage {
         label: '配送服务',
         content: this.vm.ShippingLabel,
       });
-      this.infoItemBuilder({
-        label: '优惠券',
-        content: '-¥' + this.vm.discountPrice,
-        contentColor: Style.THEME_COLOR,
-        callback: () => {
-          Coupons.select({
-            totalMoney: this.vm.totalPrice,
-            selectId: this.vm.discountId,
-            confirm: (data) => {
-              this.vm.discountPrice = Number(data.reduce.toFixed(2));
+
+      ForEach(this.vm.cartPrice.discountList, (discount: DiscountItem) => {
+        if (discount.type === 2) {
+          this.infoItemBuilder({
+            label: discount.label,
+            content: '-¥' + discount.discountPrice,
+            contentColor: Style.THEME_COLOR,
+            callback: () => {
+              Coupons.initContext(WindowUtil.globalUIContext)
+              Coupons.select({
+                totalMoney: this.vm.cartPrice.originalPrice,
+                selectId: this.vm.discountId,
+                confirm: (data) => {
+                  this.vm.addCouponDiscount(data.reduce)
+                },
+              });
             },
           });
-        },
-      });
+        } else {
+          this.infoItemBuilder({
+            label: discount.label,
+            content: '-¥' + discount.discountPrice,
+            contentColor: Style.THEME_COLOR,
+          });
+        }
+      },
+        (discount: DiscountItem) => discount.type + '__' + discount.discountPrice)
+
       this.infoItemBuilder({
         label: '订单总金额',
-        content: '¥' + this.vm.finalPrice,
+        content: '¥' + this.vm.cartPrice.finalPrice,
       });
       this.infoItemBuilder({
         label: '备注',
@@ -197,23 +213,6 @@ export struct OrderSubmitPage {
   }
 
   @Builder
-  paymentBuilder() {
-    Row() {
-      Image($r('app.media.ic_huawei_pay'))
-        .height(24)
-        .borderRadius(8)
-        .margin({ right: 12 })
-
-      Text('华为支付').formContentStyle().fontSize(16)
-      Blank()
-      Radio({ value: '华为支付', group: 'payment' })
-        .checked(true)
-        .radioStyle({ checkedBackgroundColor: Style.THEME_COLOR })
-    }
-    .containerStyle();
-  }
-
-  @Builder
   bottomButtonBuilder() {
     Row() {
       Column() {
@@ -221,7 +220,7 @@ export struct OrderSubmitPage {
           Span(`共${this.vm.totalProductCount}件, `).fontColor(Style.FONT_COLOR_LEVEL3);
           Span('合计: ');
           Span('¥ ').fontWeight(FontWeight.Medium).fontColor(Style.THEME_COLOR);
-          Span(this.vm.finalPrice.toString())
+          Span(this.vm.cartPrice.finalPrice.toString())
             .fontWeight(FontWeight.Medium)
             .fontColor(Style.THEME_COLOR)
             .fontSize(Style.FONT_SIZE_16);
@@ -293,13 +292,11 @@ export struct OrderSubmitPage {
   @Builder
   priceDetailPopupBuilder() {
     Column({ space: 14 }) {
-      this.PopupContentItem('商品金额', this.vm.totalDashPrice);
-      if (this.vm.totalPrice < this.vm.totalDashPrice) {
-        this.PopupContentItem('活动优惠', this.vm.totalDashPrice - this.vm.totalPrice, true);
-      }
-      if (this.vm.discountPrice) {
-        this.PopupContentItem('优惠券', this.vm.discountPrice, true);
-      }
+      this.PopupContentItem('商品金额', this.vm.cartPrice.originalPrice);
+      // 是否有优惠
+      ForEach(this.vm.cartPrice.discountList, (discount: DiscountItem) => {
+        this.PopupContentItem(discount.label, discount.discountPrice, true);
+      }, (discount: DiscountItem) => discount.type + '__' + discount.discountPrice)
       Row() {
         Text('合计')
           .fontColor($r('sys.color.ohos_id_color_text_primary'))
@@ -307,7 +304,7 @@ export struct OrderSubmitPage {
 
         Text() {
           Span('¥').fontSize(12);
-          Span(this.vm.finalPrice.toString());
+          Span(this.vm.cartPrice.finalPrice.toString());
         }
         .fontColor(Style.THEME_COLOR)
         .fontWeight(FontWeight.Medium);

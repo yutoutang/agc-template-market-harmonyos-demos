@@ -1,6 +1,6 @@
 import { formatTime } from '../util/FormatUtil';
 import { CastService } from '../service/CastService';
-import { Logger } from '../util/MyLog';
+import { UtilLog as Logger } from '@hw-agconnect/util-log';
 
 /**
  * 功能描述：建议进度条默认实现，通过play session感知播放变化并控制播放进度

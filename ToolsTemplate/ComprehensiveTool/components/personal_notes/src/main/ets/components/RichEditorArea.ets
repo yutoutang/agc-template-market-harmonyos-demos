@@ -1,5 +1,6 @@
 import { LengthMetrics } from '@kit.ArkUI';
-import { COLOR_LIST, HIGHLIGHT_COLOR_FILTER, ORIGIN_COLOR_FILTER, RICH_ID } from '../commons/Constant';
+import { COLOR_LIST, HIGHLIGHT_COLOR_FILTER, ORIGIN_COLOR_FILTER, RICH_ID,
+  RICH_TEXT_MAX_LENGTH } from '../commons/Constant';
 import { TextAlignment } from '../commons/Enum';
 import { AlignmentInfo } from '../commons/Interface';
 import { RichEditorController } from '../controller/RichEditorController';
@@ -294,6 +295,7 @@ export struct RichEditorArea {
         }
       }
       this.richEditorController.onDidChange(rangeAfter.start, rangeAfter.end);
+      this.richEditorController.contentLength = this.richEditorController.controller.getStyledString().length;
     }
   }
 
@@ -345,29 +347,46 @@ export struct RichEditorArea {
     Column() {
       Column() {
         Scroll(this.snapShotController.scroller) {
-          Column() {
-            this.titleInputView()
+          Stack({alignContent: Alignment.Top}) {
+            Column() {
+              this.titleInputView()
 
-            RichEditor(this.richEditorController.options)
-              .placeholder('开始书写你的笔记', { fontColor: $r('sys.color.font_tertiary'), font: { size: 14 } })
-              .barState(BarState.Off)
-              .id(RICH_ID)
-              .onReady(() => {
-                // 注册文本变化回调
-                this.richEditorController.controller.onContentChanged(this.contentChangedListener);
-                // 设定组件展示的属性字符串
-                this.richEditorController.controller.setStyledString(this.noteContent)
-              })
-              .width('100%')
-              .onEditingChange((editingStatus) => {
-                this.handleEditChange(editingStatus)
-              })
-              .layoutWeight(this.richEditorLayoutWeight)
-              .onSelectionChange((range: RichEditorRange) => {
-                this.handleRichEditorChange(range)
-              })
+              RichEditor(this.richEditorController.options)
+                .placeholder('开始书写你的笔记', { fontColor: $r('sys.color.font_tertiary'), font: { size: 14 } })
+                .barState(BarState.Off)
+                .id(RICH_ID)
+                .maxLength(RICH_TEXT_MAX_LENGTH)
+                .onReady(() => {
+                  // 注册文本变化回调
+                  this.richEditorController.controller.onContentChanged(this.contentChangedListener);
+                  // 设定组件展示的属性字符串
+                  this.richEditorController.controller.setStyledString(this.noteContent)
+                  this.richEditorController.contentLength =
+                    this.richEditorController.controller.getStyledString().length;
+                })
+                .width('100%')
+                .onEditingChange((editingStatus) => {
+                  this.handleEditChange(editingStatus)
+                })
+                .layoutWeight(this.richEditorLayoutWeight)
+                .onSelectionChange((range: RichEditorRange) => {
+                  this.handleRichEditorChange(range)
+                })
+            }
+            .width('100%')
+            .margin({bottom: 16})
+
+            Row() {
+              Text(`${this.richEditorController.contentLength} / ${RICH_TEXT_MAX_LENGTH}字`)
+                .fontSize(12)
+                .fontColor($r('sys.color.font_tertiary'))
+            }
+            .padding({left: 8, top: 4, right: 8, bottom: 4})
+            .borderRadius(4)
+            .position({ bottom: 4, right: 20 })
           }
           .width('100%')
+          .height('100%')
         }
         .scrollBar(BarState.Off)
         .id(this.snapShotController.snapShotId)

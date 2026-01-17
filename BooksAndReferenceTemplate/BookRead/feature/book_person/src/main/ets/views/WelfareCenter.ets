@@ -1,15 +1,25 @@
 import { UserInfo } from 'base_common';
-import { Constants, NavHeaderBar, TaskCoins, TaskList } from 'common'
+import {
+  BreakpointStorage,
+  BreakpointSystem,
+  BreakpointTypeEnum,
+  Constants,
+  NavHeaderBar,
+  TaskCoins,
+  TaskList
+} from 'common'
 import { emitter } from '@kit.BasicServicesKit';
 import { SignComp } from '../comp/SignComp'
-import { AppStorageV2, promptAction } from '@kit.ArkUI';
+import { AppStorageV2 } from '@kit.ArkUI';
 
 class TimeCoins {
   coin: number = 0;
   time: number = 0;
   isReceive: number = 0
 }
-AppStorage.setOrCreate('bookFinished',0)
+
+AppStorage.setOrCreate('bookFinished', 0)
+
 @ComponentV2
 export struct WelfareCenter {
   @Local bookCoins: number = 0;
@@ -18,6 +28,7 @@ export struct WelfareCenter {
   @Consumer('userInfo') userInfo: UserInfo | undefined = undefined;
   @Consumer('index') index: number = 0;
   @Local taskT: TaskList = AppStorageV2.connect(TaskList, 'TaskList', () => new TaskList())!
+  @Local curBreakpoint: BreakpointStorage = BreakpointSystem.currentBreakpoint
   private stages: Array<TimeCoins> = [
     { coin: 50, time: 12, isReceive: 0 },
     { coin: 100, time: 37, isReceive: 0 },
@@ -27,12 +38,21 @@ export struct WelfareCenter {
 
   aboutToAppear(): void {
     this.loadUserInfo();
-    emitter.on(Constants.COINS_CHANGE, () => {
-      this.loadUserInfo();
-    })
-    emitter.on(Constants.COINS_AD, () => {
-      this.loadUserInfo();
-    })
+    try {
+      emitter.on(Constants.COINS_CHANGE, () => {
+        this.loadUserInfo();
+      });
+    } catch (error) {
+      console.error('Failed to emitter on coins change. Cause: ' + JSON.stringify(error));
+    }
+
+    try {
+      emitter.on(Constants.COINS_AD, () => {
+        this.loadUserInfo();
+      });
+    } catch (error) {
+      console.error('Failed to emitter on coins ad. Cause: ' + JSON.stringify(error));
+    }
     this.userInfo = AppStorage.get('userInfo') as UserInfo;
   }
 
@@ -82,7 +102,7 @@ export struct WelfareCenter {
       Stack() {
         Progress({ value: this.userInfo?.totalReading, total: 100, type: ProgressType.Linear })
           .width(Constants.FULL_SIZE)
-          .color('#ED6F21')
+          .color('#E84026')
           .style({
             enableScanEffect: false,
           })
@@ -109,17 +129,18 @@ export struct WelfareCenter {
               .backgroundColor('#FDF1DB')
               .margin({ bottom: 6 })
               .onClick(() => {
-                if ((this.userInfo?.totalReading || 0) >= item.time&&item.coin<1) {
+                let promptAction = this.getUIContext().getPromptAction();
+                if ((this.userInfo?.totalReading || 0) >= item.time && item.coin < 1) {
                   this.bookCoins += item.coin
                   item.isReceive++
                   promptAction.showToast({ message: '已领取成功' })
-                }else if(item.isReceive>0){
-                  promptAction.showToast({message:'您已领取'})
+                } else if (item.isReceive > 0) {
+                  promptAction.showToast({ message: '您已领取' })
                 }
               })
 
               Image((this.userInfo?.totalReading || 0) >= item.time ? $r('app.media.circle_red') :
-              $r('app.media.circle_grey'))
+                $r('app.media.circle_grey'))
                 .height(8)
                 .width(8)
                 .margin({ bottom: 4 })
@@ -131,13 +152,14 @@ export struct WelfareCenter {
               .fontColor((this.userInfo?.totalReading || 0) >= item.time ? '#000000' : '#66000000')
             }
             .width('25%')
-          })
+          }, (item: TimeCoins) => item.time + new Date().toString())
 
         }
         .width(Constants.FULL_SIZE)
       }
     }
-    .width(Constants.FULL_SIZE)
+    .layoutWeight(this.curBreakpoint.value === BreakpointTypeEnum.SM ? 0 : 1)
+    .width(this.curBreakpoint.value === BreakpointTypeEnum.SM ? Constants.FULL_SIZE : 'auto')
     .padding({
       left: 12,
       right: 12,
@@ -146,7 +168,6 @@ export struct WelfareCenter {
     })
     .backgroundColor($r('sys.color.white'))
     .borderRadius(16)
-    .margin({ bottom: 12 })
   }
 
   @Builder
@@ -191,10 +212,10 @@ export struct WelfareCenter {
 
           Button(item.finished < item.allFinish ? item.buttonOn : item.buttonOff,
             { stateEffect: item.finished < item.allFinish ? true : false })
-            .fontSize(10)
+            .fontSize($r('sys.float.Body_S'))
             .height(30)
             .padding({ left: 15, right: 15 })
-            .fontColor($r('sys.color.white'))
+            .fontColor($r('sys.color.font_on_primary'))
             .enabled(item.finished < item.allFinish ? true : false)
             .backgroundColor('#ED6F21')
             .onClick(() => {
@@ -207,7 +228,7 @@ export struct WelfareCenter {
         .width(Constants.FULL_SIZE)
         .margin({ bottom: 8 })
         .justifyContent(FlexAlign.SpaceBetween)
-      })
+      }, (item: TaskCoins) => item.title + new Date().toString())
     }
     .padding({
       left: 12,
@@ -234,10 +255,19 @@ export struct WelfareCenter {
             })
 
             Scroll() {
-              Column() {
+              Column({ space: 12 }) {
                 this.showBookCoins()
-                SignComp()
-                this.getReadTimeCoins()
+                if (this.curBreakpoint.value === BreakpointTypeEnum.SM) {
+                  SignComp()
+                  this.getReadTimeCoins()
+                } else {
+                  Row({ space: 12 }) {
+                    SignComp()
+                      .layoutWeight(1)
+                    this.getReadTimeCoins()
+                  }
+                  .width('100%')
+                }
                 this.getTaskCoins()
               }
               .layoutWeight(1)

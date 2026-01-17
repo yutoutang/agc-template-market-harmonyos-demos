@@ -1,6 +1,6 @@
 import { FunctionalButton, functionalButtonComponentManager } from '@kit.ScenarioFusionKit';
 import { CommonConstants } from '../constants/CommonConstants';
-import { Logger } from '../utils/Logger';
+import { UtilLog as Logger } from '@hw-agconnect/util-log';
 import { bindPhone } from '../login/Login';
 import { PopViewUtils } from '../utils/PopViewUtils';
 import { CommonUtils } from '../utils/CommonUtils';

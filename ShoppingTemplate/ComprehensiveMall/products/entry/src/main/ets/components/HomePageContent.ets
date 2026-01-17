@@ -2,22 +2,17 @@ import {
   BreakpointStorage,
   BreakpointSystem,
   BreakpointTypeEnum,
-  iResourceMgr,
   RouterMap,
   routerStack,
   Style,
 } from 'lib_foundation';
 import { CategoryItem } from 'lib_network';
-import { LoneTakeAnimationsTransition, LongTakeTransitionParam } from 'module_transition';
 import { ProductWaterFlow } from 'product';
 
 @ComponentV2
 export struct HomePageContent {
   @Param
-  bannerList: ResourceStr[] = [
-    $r('app.media.mock_homepage_banner1'),
-    $r('app.media.mock_homepage_banner2'),
-  ];
+  bannerList: ResourceStr[] = [];
   @Param
   categoryList: CategoryItem[] = [];
   @Param
@@ -82,7 +77,7 @@ export struct HomePageContent {
   @Builder
   bannerBuilder() {
     Swiper() {
-      ForEach(this.bannerList, (item: ResourceStr) => {
+      ForEach(this.bannerList, (item: string) => {
         Image(item)
           .objectFit(ImageFit.Cover)
           .draggable(false);
@@ -103,7 +98,7 @@ export struct HomePageContent {
         Row() {
           ForEach(this.categoryList, (category: CategoryItem) => {
             Column() {
-              Image(iResourceMgr.resolveUri(category.iconUrl))
+              Image(category.iconUrl)
                 .width(48)
                 .height(48)
                 .margin({ bottom: 4 });
@@ -126,7 +121,7 @@ export struct HomePageContent {
               Column({ space: 16 }) {
                 ForEach(list, (category: CategoryItem) => {
                   Column() {
-                    Image(iResourceMgr.resolveUri(category.iconUrl))
+                    Image(category.iconUrl)
                       .width(48)
                       .height(48)
                       .margin({ bottom: 4 });

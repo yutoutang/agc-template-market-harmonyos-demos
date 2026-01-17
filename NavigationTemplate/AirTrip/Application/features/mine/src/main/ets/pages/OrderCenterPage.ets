@@ -15,7 +15,6 @@ export struct OrderCenterPage {
   @Local currentType: string = ''
   // 订单列表
   @Local orderList: OrderInfo[] = []
-
   tabList: BaseTabBarItem[] = [
     new BaseTabBarItem('', '全部'),
     new BaseTabBarItem('1', '待支付'),
@@ -23,14 +22,14 @@ export struct OrderCenterPage {
   ]
 
   getOrderList() {
-    GlobalDialog.showLoadingDialog()
+    GlobalDialog.showLoadingDialog(this.getUIContext())
     OrderApi.getOrderList(this.currentType).then((res) => {
       let result = res.result as OrderListResult
       if (result.ret.code === 0) {
         this.orderList = result.result
       }
     }).finally(() => {
-      GlobalDialog.close()
+      GlobalDialog.close(this.getUIContext())
     })
   }
 
@@ -45,20 +44,20 @@ export struct OrderCenterPage {
         OrderApi.deleteOrder(item).then((res) => {
           let result = res.result as CommonFuncResult
           if (result.ret.code === 0 && (result.result === 1 || result.result === 0)) {
-            GlobalDialog.showToast('删除成功')
+            GlobalDialog.showToast('删除成功', this.getUIContext())
             this.orderList.splice(index, 1)
           } else {
-            GlobalDialog.showToast('删除失败')
+            GlobalDialog.showToast('删除失败', this.getUIContext())
           }
         }).catch(() => {
-          GlobalDialog.showToast('删除失败')
+          GlobalDialog.showToast('删除失败', this.getUIContext())
         })
-        GlobalDialog.close()
+        GlobalDialog.close(this.getUIContext())
       },
       secondaryButAction: () => {
-        GlobalDialog.close()
+        GlobalDialog.close(this.getUIContext())
       }
-    })
+    }, this.getUIContext())
   }
 
   // 取消订单
@@ -73,19 +72,19 @@ export struct OrderCenterPage {
           let result = res.result as CommonFuncResult
           if (result.ret.code === 0 && (result.result === 1 || result.result === 0)) {
             this.getOrderList()
-            GlobalDialog.showToast('取消成功')
+            GlobalDialog.showToast('取消成功', this.getUIContext())
           } else {
-            GlobalDialog.showToast('取消失败')
+            GlobalDialog.showToast('取消失败', this.getUIContext())
           }
         }).catch(() => {
-          GlobalDialog.showToast('取消失败')
+          GlobalDialog.showToast('取消失败', this.getUIContext())
         })
-        GlobalDialog.close()
+        GlobalDialog.close(this.getUIContext())
       },
       secondaryButAction: () => {
-        GlobalDialog.close()
+        GlobalDialog.close(this.getUIContext())
       }
-    })
+    }, this.getUIContext())
   }
 
   build() {
@@ -100,7 +99,7 @@ export struct OrderCenterPage {
           }
         })
 
-        Tabs({index: this.categoryTabIndex}) {
+        Tabs({ index: this.categoryTabIndex }) {
           ForEach(this.tabList, (item: BaseTabBarItem) => {
             TabContent() {
               OrderListView({
@@ -139,7 +138,7 @@ export struct OrderCenterPage {
                   marginTop: 15,
                 })
             )
-          })
+          },(item: BaseTabBarItem, index: number)=>index + '__' + JSON.stringify(item))
         }
         .width('100%')
         .layoutWeight(1)

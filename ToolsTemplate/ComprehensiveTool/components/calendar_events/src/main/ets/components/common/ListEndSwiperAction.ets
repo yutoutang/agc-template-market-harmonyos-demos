@@ -46,7 +46,7 @@ export struct ListEndSwiperAction {
         }
       }
       .onClick(() => {
-        this.calendarEventVM.deleteUserEventInfo(this.userEventInfo, this.onDelete)
+        this.calendarEventVM.deleteUserEventInfo(this.userEventInfo, this.getUIContext(), this.onDelete)
       })
       .justifyContent(FlexAlign.Center)
       .width(64)

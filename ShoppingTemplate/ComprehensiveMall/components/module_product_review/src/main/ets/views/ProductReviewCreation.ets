@@ -1,11 +1,11 @@
 import { BusinessError } from '@kit.BasicServicesKit';
+import { photoAccessHelper } from '@kit.MediaLibraryKit'
 import { Constants } from '../commons/Constants'
 import { SkuReviewModel, ReviewDraftModel } from '../commons/Models'
 import { OrderSkuItem, ReviewDraft, ReviewMediaItem } from '../commons/Types'
 import { CommonRating } from '../components/CommonRating'
-import { photoAccessHelper } from '@kit.MediaLibraryKit'
-import { Logger } from 'module_ui_base'
 import { ReviewMediaType } from '../commons/Enums';
+import { Logger } from 'module_ui_base';
 
 const TAG: string = '[ProductReviewCreation]'
 
