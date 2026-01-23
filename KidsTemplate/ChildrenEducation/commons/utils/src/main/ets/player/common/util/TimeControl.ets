@@ -1,16 +1,24 @@
 import { DateUtil } from '../../../utils/DateUtil';
 import { GlobalContext } from '../../../utils/GlobalContext';
-import { promptAction } from '@kit.ArkUI';
 import { PlayConstants } from '../constants/PlayConstants';
 import { CommonConstants } from '../../../constants/CommonConstants';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 
 export class TimeControl {
-  public static timeControl(): boolean {
+  static logTag: string = 'TimeControl';
+  static domainId: number = 0x0000;
+  
+  public static timeControl(uiContext: UIContext): boolean {
     if (TimeControl.checkTime()) {
-      promptAction.showToast({
-        message: PlayConstants.NOT_ALLOW_WATCH,
-        alignment: Alignment.Center,
-      });
+      try {
+        uiContext.getPromptAction().showToast({
+          message: PlayConstants.NOT_ALLOW_WATCH,
+          alignment: Alignment.Center,
+        });
+      } catch (error) {
+        hilog.error(TimeControl.domainId, TimeControl.logTag,
+          `Error occurred. errCode is ${error.code}, errMessage is ${error.message}`);
+      }
       return true;
     }
     return false;

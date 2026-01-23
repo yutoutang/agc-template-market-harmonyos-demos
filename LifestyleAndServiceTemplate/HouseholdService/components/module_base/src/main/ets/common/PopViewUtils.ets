@@ -12,8 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { common } from '@kit.AbilityKit';
+
 import { ComponentContent, promptAction } from '@kit.ArkUI';
+import { BusinessError } from '@kit.BasicServicesKit';
+import { UtilLog } from '@hw-agconnect/util-log';
+import { WindowUtil } from '../common/WindowUtils';
+
+const TAG: string = '[ModuleBasePopViewUtil]'
+const DOMAIN: number = 0x0000
 
 export enum PopViewShowType {
   OPEN
@@ -38,8 +44,9 @@ export class PopViewUtils {
 
   static async showDialog<T extends object>(type: PopViewShowType, contentView: WrappedBuilder<[T]>, args: T,
     options?: promptAction.BaseDialogOptions): Promise<void> {
+    PopViewUtils._getUIContext();
     if (!PopViewUtils.uiContext) {
-      PopViewUtils.uiContext = await getUIContext();
+      return;
     }
     if (PopViewUtils.uiContext) {
       let prompt = PopViewUtils.uiContext.getPromptAction();
@@ -53,7 +60,10 @@ export class PopViewUtils {
           }
         },
       };
-      prompt.openCustomDialog(componentContent, customOptions);
+      prompt.openCustomDialog(componentContent, customOptions).catch((err: BusinessError) => {
+        UtilLog.error(TAG, DOMAIN,
+          `PoPViewUtils openCustomDialog failed. Code is ${err.code}, message is ${err.message}`);
+      });
       let infoList = PopViewUtils.shareInstance().infoList;
       let info: PopViewModel = {
         com: componentContent,
@@ -64,8 +74,9 @@ export class PopViewUtils {
   }
 
   static async closeDialog(type: PopViewShowType): Promise<void> {
+    PopViewUtils._getUIContext();
     if (!PopViewUtils.uiContext) {
-      PopViewUtils.uiContext = await getUIContext();
+      return;
     }
     if (PopViewUtils.uiContext) {
       let prompt = PopViewUtils.uiContext.getPromptAction();
@@ -77,7 +88,10 @@ export class PopViewUtils {
         PopViewUtils.shareInstance().infoList = PopViewUtils.shareInstance().infoList.filter((model) => {
           return model.com !== info.com;
         })
-        prompt.closeCustomDialog(info.com);
+        prompt.closeCustomDialog(info.com).catch((err: BusinessError) => {
+          UtilLog.error(TAG, DOMAIN,
+            `PoPViewUtils openCustomDialog failed. Code is ${err.code}, message is ${err.message}`);
+        });
       }
     }
   }
@@ -90,8 +104,10 @@ export class PopViewUtils {
   static closePopView(): void {
     PopViewUtils.closeDialog(PopViewShowType.OPEN);
   }
-}
 
-async function getUIContext() {
-  return (await (getContext() as common.UIAbilityContext).windowStage.getMainWindow()).getUIContext();
+  private static _getUIContext() {
+    if (!PopViewUtils.uiContext) {
+      PopViewUtils.uiContext = WindowUtil.uiContext;
+    }
+  }
 }

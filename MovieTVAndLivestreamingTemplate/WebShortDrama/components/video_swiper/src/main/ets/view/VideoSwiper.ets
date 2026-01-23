@@ -24,8 +24,11 @@ const TAG = '[VideoSwiper]'
 export struct VideoSwiper {
   // 短视频数据
   @Param @Require videoPlayDataSource: VideoPlayDataSource = new VideoPlayDataSource();
-  // 初始化当前视频的下标
+  // 当前视频的下标
   @Param @Once currentVideoIndex: number = 0;
+  @Consumer('currentIndex') currentIndex: number = this.currentVideoIndex;
+  // 初始化当前视频的下标
+  preVideoIndex: number = this.currentVideoIndex
   // 外部view
   @Param @Require contentBuilder: WrappedBuilder<[VideoPlayData, PlayController, PlaySession]>;
   // 播放控制器
@@ -44,6 +47,9 @@ export struct VideoSwiper {
   @Local refreshed: boolean = false
   // Swiper组件控制器
   private swiperController: SwiperController = new SwiperController();
+  //实时更新接续数据
+  @Event updateContinueModel: (index: number) => void = (index: number) => {
+  }
 
   aboutToAppear(): void {
     hilog.debug(0x0000, TAG, `data size:${this.videoPlayDataSource.totalCount()}`)
@@ -73,7 +79,7 @@ export struct VideoSwiper {
   getRefreshDisplay() {
     Row() {
       LoadingProgress()
-        .size({ width:40, height:40 })
+        .size({ width: 40, height: 40 })
         .color(Color.White)
       Text(this.getStatusText())
         .fontSize(14)
@@ -88,7 +94,7 @@ export struct VideoSwiper {
   getLoadMoreDisplay() {
     Row() {
       LoadingProgress()
-        .size({ width:40, height:40 })
+        .size({ width: 40, height: 40 })
         .color($r('sys.color.icon_secondary'))
       Text($r('app.string.loading'))
         .fontSize(14)
@@ -128,27 +134,35 @@ export struct VideoSwiper {
             (item: VideoPlayData, index: number) => index + '__' + JSON.stringify(item)
           )
         }
-        .cachedCount(0)
+        .cachedCount(this.firstFlag ? 0 : 2)
         .width('100%')
         .height('100%')
         .vertical(true)
-        .loop(false)
+        .loop(this.inPage === 'Home' ? true : false)
         .curve(Curve.Ease)
         .duration(300)
+        .index(this.preVideoIndex)
         .indicator(false)
         .backgroundColor(Color.Black)
-        .index($$this.currentVideoIndex)
-        .onAnimationEnd((index: number, extraInfo: SwiperAnimationEvent) => {
-          hilog.debug(0x0000, TAG, `onAnimationEnd index: ${index}, extraInfo: ${extraInfo}.`);
-          if (index === this.videoPlayDataSource.totalCount() - 1) {
-            this.loadMoreData();
-          }
+        .onAnimationStart((index: number, targetIndex: number, extraInfo: SwiperAnimationEvent) => {
+          hilog.debug(0x0000, TAG,
+            `onAnimationStart index: ${index},  targetIndex:${targetIndex}, extraInfo: ${extraInfo}.`);
+          this.currentVideoIndex = targetIndex;
+          this.currentIndex = targetIndex
+          this.playController.curentIndex = targetIndex
+          this.updateContinueModel(targetIndex)
         })
-        .onChange((index: number) => {
-          hilog.debug(0x0000, TAG, `onChange index: ${index}.`);
-          this.currentVideoIndex = index;
-          this.playController.curentIndex = index
-        })
+        // .onAnimationEnd((index: number, extraInfo: SwiperAnimationEvent) => {
+        //   hilog.debug(0x0000, TAG, `onAnimationEnd index: ${index}, extraInfo: ${extraInfo}.`);
+          // if (index === this.videoPlayDataSource.totalCount() - 1) {
+          //   this.loadMoreData();
+          // }
+        // })
+        // .onChange((index: number) => {
+        //   hilog.debug(0x0000, TAG, `onChange index: ${index}.`);
+        //   this.currentVideoIndex = index;
+        //   this.playController.curentIndex = index
+        // })
         .disableSwipe(this.playController.disableSwiper)
       }
       .onStateChange(async (value: RefreshStatus) => {

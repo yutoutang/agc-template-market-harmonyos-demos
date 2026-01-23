@@ -1,8 +1,5 @@
-import {
-  selectedPageData,
-  SelectedPageData, VideoCard,
-} from '@ohos_agcit/children_education_datasource';
-import { CommonConstants, FeedTitle, TwoColumn, NoMoreTab } from '@ohos_agcit/children_education_utils';
+import { DataGenerator, SelectedPageData, VideoCard } from '@ohos_agcit/children_education_datasource';
+import { CommonConstants, FeedTitle, NoMoreTab, TwoColumn } from '@ohos_agcit/children_education_utils';
 import { AudioStoryZone } from '../components/AudioStoryZone';
 import { Banner } from '../components/Banner';
 import { HobbyCategory } from '../components/HobbyCategory';
@@ -12,8 +9,8 @@ import { PremiumVideo } from '../components/PremiumVideo';
 @ComponentV2
 export struct SelectedPage {
   @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
-  @Local selectedPageData: SelectedPageData = selectedPageData;
-  @Local premiumVideo : Array<VideoCard> = this.selectedPageData.premiumVideoZero;
+  @Local selectedPageData: SelectedPageData = DataGenerator.getSelectedPageData(this.getUIContext())
+  @Local premiumVideo: Array<VideoCard> = this.selectedPageData.premiumVideoZero;
   @Consumer('age') age: string = '0-3岁';
 
   @Monitor('age')
@@ -55,7 +52,7 @@ export struct SelectedPage {
         ListItemGroup({
           header: FeedTitle('app.media.feed_head_video', '热门动画榜',
             () => {
-              this.appPathStack.pushPathByName('HotAnimationListView', undefined);
+              this.appPathStack.pushPathByName('HotAnimationListView', '热门动画榜');
             }),
         }) {
           TwoColumn({
@@ -75,7 +72,7 @@ export struct SelectedPage {
 
         ListItemGroup({
           header: FeedTitle('app.media.feed_head_video', '经典故事', () => {
-            this.appPathStack.pushPathByName('HotAnimationListView', undefined);
+            this.appPathStack.pushPathByName('HotAnimationListView', '经典故事');
           }),
         }) {
           TwoColumn({

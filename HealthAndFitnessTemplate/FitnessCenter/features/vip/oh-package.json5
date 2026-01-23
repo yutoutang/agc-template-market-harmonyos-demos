@@ -6,7 +6,7 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "uicomponents": "file:../../common/uiComponents",
-    "external_interactions":"file:../../common/external_interactions"
+    "external_interactions": "file:../../common/external_interactions",
+    "module_recharge": "file:../../components/module_recharge",
   }
 }

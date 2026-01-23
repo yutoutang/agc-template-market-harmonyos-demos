@@ -49,9 +49,9 @@ export struct VideoPlayView {
   @Local pauseClickHeight: number = 560
   videoFit: VideoFit = VideoFit.Contain
   @Local duration: number = 0;
-  @Local currentTime: number = 0;
+  @Consumer('currentTime') currentTime: number = 0
 
-  @Monitor('curIndex','isPageShow','onFoldStatusChange')
+  @Monitor('curIndex', 'isPageShow', 'onFoldStatusChange')
   onIndexChanged(monitor: IMonitor) {
     monitor.dirty.forEach((path: string) => {
       console.log(`${path} change from ${monitor.value(path)?.before} to ${monitor.value(path)?.now}`);
@@ -84,7 +84,7 @@ export struct VideoPlayView {
   private xComponentId: string = 'XComponentId' + this.componentId;
   playerSession: PlaySession = new PlaySession()
 
-  @Monitor('avPlayer.videoHeight','avPlayer.videoWidth')
+  @Monitor('avPlayer.videoHeight', 'avPlayer.videoWidth')
   ratioChange(monitor: IMonitor) {
     monitor.dirty.forEach((path: string) => {
       switch (path) {
@@ -100,6 +100,11 @@ export struct VideoPlayView {
           break;
       }
     })
+  }
+
+  @Monitor('avPlayer.currentTime')
+  onTimeChange(monitor: IMonitor){
+    this.currentTime = monitor.value()?.now as number
   }
 
   aboutToDisappear(): void {
@@ -129,24 +134,13 @@ export struct VideoPlayView {
     Stack() {
       Stack({ alignContent: Alignment.Center }) {
         Stack({ alignContent: Alignment.Center }) {
-          if (this.avPlayer) {
-            CoverLayer({
-              avPlayer: this.avPlayer,
-              curIndex: this.curIndex,
-              index: this.index,
-              previewUri: this.previewUri,
-              xComponentWidth: this.xComponentWidth,
-              xComponentHeight: this.xComponentHeight
-            })
-          }
-
-
           Stack() {
             XComponent({
               id: this.xComponentId,
               type: XComponentType.SURFACE,
               controller: this.xComponentController
             })
+              .foregroundBlurStyle(this.videoData.isLocked() ? BlurStyle.COMPONENT_THIN : BlurStyle.NONE)
               .width(this.xComponentWidth)
               .height(this.xComponentHeight)
               .onLoad(async () => {
@@ -161,15 +155,24 @@ export struct VideoPlayView {
                 this.playerSession.setAVPlayer(this.avPlayer)
                 hilog.info(0x000, TAG, `normal setSurfaceID:${this.surfaceID} id:${this.avPlayer.id}`)
                 this.avPlayer.setSurfaceID(this.surfaceID)
-                if (!this.videoData.isLocked()) {
+                if (!this.videoData.isLocked() && this.firstFlag) {
                   if (this.videoData.getPlayTime() > 0) {
                     this.avPlayer.seek(this.videoData.getPlayTime() * 1000)
                   }
-                  this.avPlayer.play()
+                  let timeoutID = setInterval(() => {
+                    if (this.avPlayer?.isReady) {
+                      this.avPlayer!.play()
+                      clearTimeout(timeoutID)
+                    }
+                  }, 60);
+                  this.firstLoaded()
                 }
 
                 this.setListener()
                 this.playController.setAVPlayer(this.index, this.avPlayer)
+                hilog.info(0x0000, TAG,
+                  `Xcomponent create success,surfaceID: ${this.surfaceID}, curIndex: ${this.curIndex},
+                  index: ${this.index}, url: ${this.videoData.getUrl()}`);
               })
               .onDestroy(() => {
                 hilog.info(0x0000, TAG,
@@ -178,6 +181,16 @@ export struct VideoPlayView {
               })
               .id('player')
               .zIndex(1)
+            if (!this.videoData.isLocked() && this.avPlayer) {
+              CoverLayer({
+                avPlayer: this.avPlayer,
+                curIndex: this.curIndex,
+                index: this.index,
+                previewUri: this.previewUri,
+                xComponentWidth: this.xComponentWidth,
+                xComponentHeight: this.xComponentHeight
+              })
+            }
           }
           .id(this.componentId)
           .width(this.layoutSize.playerWidth)
@@ -212,6 +225,7 @@ export struct VideoPlayView {
             .width('100%')
             .height('100%')
             .hitTestBehavior(HitTestMode.Transparent)
+            .position({ x: this.layoutSize.playerPositionX, y: this.layoutSize.playerPositionY })
           }
         }
         .width('100%')
@@ -239,9 +253,13 @@ export struct VideoPlayView {
       this.updateIsPlay(false)
       this.isPlaying = false;
       this.trackThicknessSize = Const.TRACK_SIZE_MIN;
-      let context = getContext(this);
-      let windowClass = await window.getLastWindow(context);
-      await windowClass.setWindowKeepScreenOn(false);
+      let context = this.getUIContext().getHostContext()!;
+      try {
+        let windowClass = await window.getLastWindow(context);
+        await windowClass.setWindowKeepScreenOn(false);
+      }catch (error) {
+        console.error('Failed.');
+      }
       return;
     } else {
       if (this.videoData.isLocked()) {
@@ -251,9 +269,13 @@ export struct VideoPlayView {
       this.updateIsPlay(true)
       this.isPlaying = true;
       this.trackThicknessSize = Const.TRACK_SIZE_MIN;
-      let context = getContext(this);
-      let windowClass = await window.getLastWindow(context);
-      await windowClass.setWindowKeepScreenOn(true);
+      let context = this.getUIContext().getHostContext()!;
+      try {
+        let windowClass = await window.getLastWindow(context);
+        await windowClass.setWindowKeepScreenOn(true);
+      }catch (error) {
+        console.error('Failed.');
+      }
     }
   }
 
@@ -312,12 +334,12 @@ export struct VideoPlayView {
     hilog.debug(0x000, TAG, `updateIsPlay:${isPlay}`)
     if (isPlay) {
       CastService.getInstance().play({
-        elapsedTime: (this.avPlayer?.currentTime || 0)*1000,
+        elapsedTime: (this.avPlayer?.currentTime || 0) * 1000,
         updateTime: new Date().getTime()
       }, this.avPlayer?.duration)
     } else {
       CastService.getInstance().pause({
-        elapsedTime: (this.avPlayer?.currentTime || 0)*1000,
+        elapsedTime: (this.avPlayer?.currentTime || 0) * 1000,
         updateTime: new Date().getTime()
       }, this.avPlayer?.duration)
     }
@@ -328,7 +350,7 @@ export struct VideoPlayView {
   }
 
   autoVideoSize() {
-    let size = componentUtils.getRectangleById(this.componentId).size;
+    let size = this.getUIContext().getComponentUtils().getRectangleById(this.componentId).size;
     let playerComponentWidth = size.width;
     let playerComponentHeight = size.height;
     let videoRatio = this.videoWidth / this.videoHeight;
@@ -337,26 +359,26 @@ export struct VideoPlayView {
     // 保持宽高比进行缩小或者放大，使得视频两边都大于或等于显示边界。
     if (this.videoFit === VideoFit.Cover) {
       if (videoRatio > componentRatio) {
-        this.xComponentWidth = px2vp(this.videoWidth * playerComponentHeight / this.videoHeight);
-        this.xComponentHeight = px2vp(playerComponentHeight);
+        this.xComponentWidth = this.getUIContext().px2vp(this.videoWidth * playerComponentHeight / this.videoHeight);
+        this.xComponentHeight = this.getUIContext().px2vp(playerComponentHeight);
       } else {
-        this.xComponentWidth = px2vp(playerComponentWidth);
-        this.xComponentHeight = px2vp(this.videoHeight * playerComponentWidth / this.videoWidth);
+        this.xComponentWidth = this.getUIContext().px2vp(playerComponentWidth);
+        this.xComponentHeight = this.getUIContext().px2vp(this.videoHeight * playerComponentWidth / this.videoWidth);
       }
     }
     // 保持宽高比进行缩小或者放大，使得视频高度填满。
     if (this.videoFit === VideoFit.CoverH) {
-      this.xComponentWidth = px2vp(this.videoWidth * playerComponentHeight / this.videoHeight);
-      this.xComponentHeight = px2vp(playerComponentHeight);
+      this.xComponentWidth = this.getUIContext().px2vp(this.videoWidth * playerComponentHeight / this.videoHeight);
+      this.xComponentHeight = this.getUIContext().px2vp(playerComponentHeight);
     }
     // 保持宽高比进行缩小或者放大，使得图片完全显示在显示边界内。
     if (this.videoFit === VideoFit.Contain) {
       if (videoRatio > componentRatio) {
-        this.xComponentWidth = px2vp(playerComponentWidth);
-        this.xComponentHeight = px2vp(this.videoHeight * playerComponentWidth / this.videoWidth);
+        this.xComponentWidth = this.getUIContext().px2vp(playerComponentWidth);
+        this.xComponentHeight = this.getUIContext().px2vp(this.videoHeight * playerComponentWidth / this.videoWidth);
       } else {
-        this.xComponentWidth = px2vp(this.videoWidth * playerComponentHeight / this.videoHeight);
-        this.xComponentHeight = px2vp(playerComponentHeight);
+        this.xComponentWidth = this.getUIContext().px2vp(this.videoWidth * playerComponentHeight / this.videoHeight);
+        this.xComponentHeight = this.getUIContext().px2vp(playerComponentHeight);
       }
     }
   }

@@ -3,6 +3,8 @@ import { Constants, LoginType } from '../common/Constant';
 import { AggregatedLoginVM } from '../viewmodel/AggregatedLoginVM';
 import { AgreePrivacyBox } from './AgreePrivacyBox';
 import { LoginSheetUtils } from '../utils/LoginSheetUtils';
+import { AiBarHeight, AppStorageKeys, StatusBarHeight } from '@agctemplate/widgets'
+import { AppStorageV2 } from '@kit.ArkUI';
 
 @Builder
 export function OtherLoginPageBuilder() {
@@ -13,6 +15,10 @@ export function OtherLoginPageBuilder() {
 export struct OtherLoginPage {
   vm: AggregatedLoginVM = AggregatedLoginVM.getInstance(false);
   @Local routerModule: NavPathStack = new NavPathStack();
+  @Local aiBarHeight: AiBarHeight = AppStorageV2.connect(AiBarHeight, AppStorageKeys.AI_BAR_HEIGHT,
+    () => new AiBarHeight())!;
+  @Local statusBarHeight: StatusBarHeight = AppStorageV2.connect(StatusBarHeight, AppStorageKeys.STATUS_BAR_HEIGHT,
+    () => new StatusBarHeight())!;
   pageParam: NavParam = new NavParam();
 
   aboutToAppear(): void {
@@ -244,6 +250,10 @@ export struct OtherLoginPage {
         .width(Constants.FULL_PERCENT)
       }
     }
+    .padding({
+      top: `${this.getUIContext().px2vp(this.statusBarHeight.value)}vp`,
+      bottom: `${this.getUIContext().px2vp(this.aiBarHeight.value)}vp`
+    })
     .backgroundColor($r('sys.color.background_secondary'))
     .hideTitleBar(true)
     .onReady((ctx: NavDestinationContext) => {

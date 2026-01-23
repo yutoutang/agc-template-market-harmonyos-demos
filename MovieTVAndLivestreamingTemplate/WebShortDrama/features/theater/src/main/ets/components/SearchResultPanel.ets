@@ -36,7 +36,11 @@ export struct SearchResultPanel {
             .alignItems(HorizontalAlign.Start)
           }
         }else {
-          this.nullBuilder()
+          Column(){
+            this.nullBuilder()
+          }
+          .layoutWeight(1)
+          .justifyContent(FlexAlign.Center)
         }
       }
       .alignItems(HorizontalAlign.Start)

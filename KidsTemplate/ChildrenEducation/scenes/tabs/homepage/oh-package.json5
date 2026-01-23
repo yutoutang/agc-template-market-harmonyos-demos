@@ -12,6 +12,7 @@
     "@ohos_agcit/children_education_englishzone": "../../services/englishZone",
     "@ohos_agcit/children_education_sing": "../../services/sing",
     "@ohos_agcit/children_education_chinese": "../../services/chinese",
-    "@ohos_agcit/children_education_utils": "../../../commons/utils"
+    "@ohos_agcit/children_education_utils": "../../../commons/utils",
+    "membership": "../../../components/membership"
   }
 }

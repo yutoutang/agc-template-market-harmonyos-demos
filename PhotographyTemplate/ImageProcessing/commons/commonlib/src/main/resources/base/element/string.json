@@ -1,0 +1,36 @@
+{
+  "string": [
+    {
+      "name": "page_show",
+      "value": "page from package"
+    },
+    {
+      "name": "edit",
+      "value": "编辑"
+    },
+    {
+      "name": "cancel",
+      "value": "取消"
+    },
+    {
+      "name": "one_click_clear",
+      "value": "一键清空"
+    },
+    {
+      "name": "delete",
+      "value": "删除"
+    },
+    {
+      "name": "single_choice",
+      "value": "单选"
+    },
+    {
+      "name": "apply_location_reason",
+      "value": "需要知道您所在的位置，以便提供相应服务。"
+    },
+    {
+      "name": "agcit_huawei_image_processing",
+      "value": "1.0.0"
+    }
+  ]
+}

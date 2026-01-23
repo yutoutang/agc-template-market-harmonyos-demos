@@ -255,6 +255,7 @@ struct FeedbackSubmitPage {
                     }
                   }
                 }
+                .backgroundColor('#EC6E45')
                 .width('100%')
                 .height(40)
                 .type(ButtonType.Capsule)

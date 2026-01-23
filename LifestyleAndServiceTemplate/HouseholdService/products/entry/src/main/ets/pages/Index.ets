@@ -12,18 +12,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { RouterMap } from 'module_base';
-import { RouterModule, LoginUtil } from 'lib_foundation';
+import { RouterMap, WindowUtil } from 'module_base';
+import { AppPrivacyUtils, RouterModule } from 'lib_foundation';
 
 @Entry
 @ComponentV2
 struct Index {
+  @Local privacyImpl: AppPrivacyUtils = AppPrivacyUtils.instance;
+
   aboutToAppear() {
-    LoginUtil.silentLogin().then((isSuccess) => {
-      if (isSuccess) {
-        RouterModule.replace({ url: RouterMap.MAIN });
-      }
-    });
+    this.privacyImpl.subscribe();
+    WindowUtil.initWindowUtil(this.getUIContext());
+    if (!this.privacyImpl.CONFIG_SHOW_HOME && !this.privacyImpl.agreeFlag) {
+      // 未同意隐私协议，不进入首页
+      return;
+    }
+    this.funcCore();
+  }
+
+  aboutToDisappear(): void {
+    this.privacyImpl.unSubscribe();
+  }
+
+  @Monitor('privacyImpl.agreeFlag')
+  agreeFlagChange() {
+    if (!this.privacyImpl.CONFIG_SHOW_HOME && this.privacyImpl.agreeFlag) {
+      this.funcCore();
+    }
+  }
+
+  funcCore() {
+    // 跳转首页
+    RouterModule.replace({ url: RouterMap.MAIN });
   }
 
   build() {

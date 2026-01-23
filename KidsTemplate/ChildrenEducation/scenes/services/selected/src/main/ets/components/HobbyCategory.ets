@@ -1,4 +1,4 @@
-import { VideoCard, VideoDetail, videoDetail } from '@ohos_agcit/children_education_datasource';
+import { DataGenerator, VideoCard, VideoDetail } from '@ohos_agcit/children_education_datasource';
 import { CommonConstants } from '@ohos_agcit/children_education_utils';
 
 @ComponentV2
@@ -25,15 +25,15 @@ export struct HobbyCategory {
           });
 
         Image($r('app.media.hobby_icon_1'))
-          .width('35%')
           .alignRules({
-            bottom: { anchor: CommonConstants.IMAGE, align: VerticalAlign.Bottom },
-            right: { anchor: CommonConstants.IMAGE, align: HorizontalAlign.End },
+            bottom: { align: VerticalAlign.Bottom, anchor: CommonConstants.IMAGE },
+            right: { align: HorizontalAlign.End, anchor: CommonConstants.IMAGE },
           })
           .padding({
             bottom: '8%',
             right: '10%',
-          });
+          })
+          .width('35%')
       }
       .width('auto')
       .height('auto')
@@ -41,7 +41,7 @@ export struct HobbyCategory {
         right: '6vp',
       })
       .onClick(() => {
-        let detail: VideoDetail = videoDetail;
+        let detail: VideoDetail = DataGenerator.getVideoDetail(this.getUIContext());
         detail.videoCard = this.hobbyCategory[0];
         this.appPathStack.pushPathByName('VideoDetailListView', detail);
       });
@@ -79,7 +79,7 @@ export struct HobbyCategory {
         left: '6vp',
       })
       .onClick(() => {
-        let detail: VideoDetail = videoDetail;
+        let detail: VideoDetail = DataGenerator.getVideoDetail(this.getUIContext());
         detail.videoCard = this.hobbyCategory[1];
         this.appPathStack.pushPathByName('VideoDetailListView', detail);
       });

@@ -2,6 +2,7 @@
   "module": {
     "name": "phone",
     "type": "entry",
+    "routerMap": "$profile:router_map",
     "description": "$string:module_desc",
     "mainElement": "EntryAbility",
     "deviceTypes": [

@@ -62,12 +62,16 @@ export struct SearchTipPanel {
           })
         }
       } else {
-        this.nullBuilder()
+        Column(){
+          this.nullBuilder()
+        }
+        .height('100%')
+        .justifyContent(FlexAlign.Center)
       }
     }
     .backgroundColor('#F1F3F5')
     .width('100%')
-    .height(200)
+    .height('100%')
     .alignItems(VerticalAlign.Top)
   }
 

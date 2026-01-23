@@ -1,8 +1,7 @@
 import { userAuth } from '@kit.UserAuthenticationKit';
 import { BusinessError, Callback } from '@kit.BasicServicesKit';
 import { LogUtil } from './LogUtil';
-import { promptAction } from '@kit.ArkUI';
-import { AuthOptions, StatusResult } from './entity/AuthOptions';
+import { AuthOptions, StatusResult } from '../model/AuthOptions';
 import { StringUtil } from './StringUtil';
 import { cryptoFramework } from '@kit.CryptoArchitectureKit';
 
@@ -36,10 +35,8 @@ export class AuthUtil {
    * @param showTip 是否显示提示语
    * @param callBack
    */
-  static onStartEasy(showTip: boolean = false, callBack: Callback<userAuth.UserAuthResult>) {
-    const options: AuthOptions = new AuthOptions();
+  static onStartEasy(options: AuthOptions, callBack: Callback<userAuth.UserAuthResult>) {
     LogUtil.error(JSON.stringify(options, null, 2));
-    options.showTip = showTip;
     AuthUtil.onStart(options, callBack);
   }
 
@@ -88,11 +85,15 @@ export class AuthUtil {
           callBack?.(result);
           if (userAuth.UserAuthResultCode.SUCCESS === result.result && options.showTip) {
             const errorTip = AuthUtil.getErrorMsg(result.result, '');
-            if (StringUtil.isNotEmpty(errorTip)) {
-              promptAction.showToast({
-                message: errorTip,
-                alignment: Alignment.Center,
-              });
+            if (StringUtil.isNotEmpty(errorTip) && options.uiContext) {
+              try {
+                options.uiContext.getPromptAction().showToast({
+                  message: errorTip,
+                  alignment: Alignment.Center,
+                });
+              } catch (error) {
+
+              }
             }
           }
         },
@@ -101,12 +102,6 @@ export class AuthUtil {
     } catch (err) {
       let error = err as BusinessError;
       LogUtil.error(`AuthUtil-onStart-异常 ~ code: ${error.code} -·- message: ${error.message}`);
-      if (options.showTip) {
-        promptAction.showToast({
-          message: AuthUtil.getErrorMsg(error.code, '认证失败：' + error.message),
-          alignment: Alignment.Center,
-        });
-      }
     }
   }
 
@@ -172,8 +167,12 @@ export class AuthUtil {
    * 生成挑战值
    */
   private static getChallenge() {
-    let rand = cryptoFramework.createRandom();
-    let randData: Uint8Array = rand?.generateRandomSync(16)?.data;
-    return randData;
+    try {
+      const rand = cryptoFramework.createRandom();
+      const result = rand.generateRandomSync(16);
+      return result.data;
+    } catch (e) {
+      return new Uint8Array(16);
+    }
   }
 }

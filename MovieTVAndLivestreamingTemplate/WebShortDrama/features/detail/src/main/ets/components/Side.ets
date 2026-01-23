@@ -1,4 +1,4 @@
-import { AppStorageV2, ComponentContent, display, promptAction, window } from '@kit.ArkUI';
+import { AppStorageV2, ComponentContent, display, window } from '@kit.ArkUI';
 import { ShortDramaDetailItemVM } from '../viewmodels/ShortDramaDetailItemVM';
 import { PlayController } from 'video_swiper';
 import { getMedia, NAV_PAGE_NAME } from '@agctemplate/resources';
@@ -25,16 +25,37 @@ export struct Side {
   @Local myMessageStorage: MyMessageStorage = MyMessageStorage.instance()
   @Local isShowShareSheet: boolean = false
   @Local commentShow: boolean = false
+  @Local isExpanded: boolean = display.getFoldStatus() === display.FoldStatus.FOLD_STATUS_EXPANDED
   @Local isTabletLandScape: boolean = deviceInfo.deviceType === 'tablet' &&
-    display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE
+    (display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE ||
+      display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE_INVERTED)
   callback: Callback<number> = (data: number) => {
     if (deviceInfo.deviceType === 'tablet' &&
-      display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE) {
-      this.isTabletLandScape = true
+      (display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE ||
+        display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE_INVERTED)) {
+      if (!this.isTabletLandScape) {
+        this.closeCommentDialog()
+        this.isTabletLandScape = true
+      }
     } else {
-      this.isTabletLandScape = false
+      if (this.isTabletLandScape) {
+        this.closeCommentDialog()
+        this.isTabletLandScape = false
+      }
     }
-    this.closeCommentDialog()
+  }
+  callback2: Callback<display.FoldStatus> = (data: display.FoldStatus) => {
+    if (data === display.FoldStatus.FOLD_STATUS_EXPANDED) {
+      if (!this.isExpanded) {
+        this.closeCommentDialog()
+        this.isExpanded = true
+      }
+    } else {
+      if (this.isExpanded) {
+        this.closeCommentDialog()
+        this.isExpanded = false
+      }
+    }
   }
   windowStage: window.WindowStage = AppStorage.get('windowStage') as window.WindowStage;
   // 获取主窗口的方式
@@ -65,15 +86,17 @@ export struct Side {
           dismissDialogAction.dismiss()
         }
       },
-      alignment: this.isTabletLandScape ? DialogAlignment.CenterEnd :
+      alignment: this.isTabletLandScape || this.isExpanded ? DialogAlignment.CenterEnd :
         DialogAlignment.Bottom,
       onWillDisappear: () => {
         this.commentShow = false
         this.myMessageStorage.showFlag = false
         this.myMessageStorage.isShowCommentSheet = false
         this.playControl.setPlayerHeight(`100%`)
+        this.playControl.setPlayerWidth('100%')
         this.playControl.setPlayerPositionX(0)
-      }
+      },
+      keyboardAvoidMode: KeyboardAvoidMode.NONE
     })
   }
 
@@ -85,7 +108,7 @@ export struct Side {
   private changeLikeCount(isAdd: boolean) {
     if (isAdd) {
       this.videoDes.dramaSocialInfo.setLike();
-      promptAction.showToast({
+      this.getUIContext().getPromptAction().showToast({
         message: '点赞成功',
         backgroundColor: 'rgba(46, 48, 51, 0.9)',
         backgroundBlurStyle: BlurStyle.NONE,
@@ -94,7 +117,7 @@ export struct Side {
       })
     } else {
       this.videoDes.dramaSocialInfo.unsetLike();
-      promptAction.showToast({
+      this.getUIContext().getPromptAction().showToast({
         message: '取消点赞',
         backgroundColor: 'rgba(46, 48, 51, 0.9)',
         backgroundBlurStyle: BlurStyle.NONE,
@@ -108,7 +131,7 @@ export struct Side {
   private changeFavoriteCount(isIncrease: boolean) {
     if (isIncrease) {
       this.videoDes.dramaSocialInfo.setFavor();
-      promptAction.showToast({
+      this.getUIContext().getPromptAction().showToast({
         message: '收藏成功',
         backgroundColor: 'rgba(46, 48, 51, 0.9)',
         backgroundBlurStyle: BlurStyle.NONE,
@@ -117,7 +140,7 @@ export struct Side {
       })
     } else {
       this.videoDes.dramaSocialInfo.unsetFavor();
-      promptAction.showToast({
+      this.getUIContext().getPromptAction().showToast({
         message: '取消收藏',
         backgroundColor: 'rgba(46, 48, 51, 0.9)',
         backgroundBlurStyle: BlurStyle.NONE,
@@ -128,6 +151,7 @@ export struct Side {
   }
 
   aboutToAppear(): void {
+    display.on('foldStatusChange',this.callback2)
     display.on('change', this.callback)
     if (this.myMessageStorage.showFlag) {
       return
@@ -141,7 +165,12 @@ export struct Side {
   }
 
   aboutToDisappear(): void {
-    display.off('change', this.callback)
+    try {
+      display.off('foldStatusChange',this.callback2)
+      display.off('change', this.callback)
+    }catch (error){
+      console.error('failed.')
+    }
   }
 
   sideSendFavoriteEmitter() {
@@ -197,10 +226,12 @@ export struct Side {
       .height(40)
       .id('comment_button')
       .onClick(() => {
-        if(this.isTabletLandScape){
+        if (this.isTabletLandScape) {
           this.playControl.setPlayerPositionX('-15%')
-        }else{
-          this.playControl.setPlayerHeight(`60%`)
+        } else if(this.isExpanded){
+          this.playControl.setPlayerWidth('50%')
+        }else {
+          this.playControl.setPlayerHeight('40%')
         }
         this.commentShow = true
         this.openCommentDialog()
@@ -215,7 +246,7 @@ export struct Side {
           .onClick(() => {
             if (this.userInfo.isPhoneAssociated) {
               this.changeFavoriteCount(!this.videoDes.dramaSocialInfo.isFavorite ? true : false);
-              this.sideSendFavoriteEmitter()
+              // this.sideSendFavoriteEmitter()
             } else {
               WindowManager.setWindowSystemBarProperties({ statusBarContentColor: '#e6000000' })
               this.playControl.pause()

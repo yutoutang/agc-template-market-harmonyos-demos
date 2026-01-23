@@ -1,54 +1,89 @@
 import { HomePage } from '@ohos_agcit/children_education_homepage';
 import { MinePage } from '@ohos_agcit/children_education_minepage';
-import { VipPage } from '@ohos_agcit/children_education_vippage';
 import {
   AudioPlayPage,
   AuthUtil,
+  BreakpointType,
   CommonConstants,
   DateConstants,
   DateUtil,
-  DialogUtils,
   GlobalContext,
+  GlobalInfoModel,
   ObjectUtil,
+  PushActionParams,
+  PushUtils,
   StringUtil,
-  VideoPlayPage,
+  VideoPlayPage
 } from '@ohos_agcit/children_education_utils';
 import { emitter } from '@kit.BasicServicesKit';
 import { History, UsedLimit, User, VipRecord } from '@ohos_agcit/children_education_datasource';
-import { CustomContentDialog, PersistenceV2 } from '@kit.ArkUI';
-import { ArrayList, JSON } from '@kit.ArkTS';
+import { AppStorageV2, CustomContentDialog, PersistenceV2 } from '@kit.ArkUI';
+import { ArrayList } from '@kit.ArkTS';
 import { userAuth } from '@kit.UserAuthenticationKit';
+import { AuthOptions } from '@ohos_agcit/children_education_utils/src/main/ets/model/AuthOptions';
+import { notificationManager } from '@kit.NotificationKit';
 
 
 @Entry
 @ComponentV2
 struct Index {
-  @Local currentIndex: number = 0;
   private tabsController: TabsController = new TabsController();
-  @Provider(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
-  @Provider(CommonConstants.IS_VIP) isVip: boolean = false;
-  @Provider(CommonConstants.VALID_TIME) validTime: string = '';
   private timerID: number = -1;
-  @Local vipRecord: VipRecord = PersistenceV2.connect(VipRecord, () => new VipRecord())!;
-  @Local usedLimit: UsedLimit = PersistenceV2.connect(UsedLimit, () => new UsedLimit())!;
+  @Provider(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
   @Provider(CommonConstants.USER_INFO) user: User = PersistenceV2.connect(User, () => new User())!;
+  @Provider(CommonConstants.VIP_RECORD) vipRecord: VipRecord = PersistenceV2.connect(VipRecord, () => new VipRecord())!;
+  @Local currentIndex: number = 0;
+  @Local usedLimit: UsedLimit = PersistenceV2.connect(UsedLimit, () => new UsedLimit())!;
   @Local dialogOpen: boolean = false;
+  @Local globalInfo: GlobalInfoModel =
+    AppStorageV2.connect<GlobalInfoModel>(GlobalInfoModel, () => new GlobalInfoModel())!;
+  @Local isVertical: boolean = new BreakpointType<boolean>({
+    sm: false,
+    md: false,
+    lg: true,
+  }).getValue(this.globalInfo.currentBreakpoint)
+
+  /**
+   * 监听断点变化
+   */
+  @Monitor('globalInfo.currentBreakpoint')
+  onBreakPointChange() {
+    this.isVertical = new BreakpointType<boolean>({
+      sm: false,
+      md: false,
+      lg: true,
+    }).getValue(this.globalInfo.currentBreakpoint)
+  }
+
+  sendPushMessage() {
+    let pushArticle:PushActionParams = {
+      picVideoUrl: '',
+      title: '儿童教育模板',
+      id: '461323198429547557'
+    }
+    PushUtils.randomPushMessage(pushArticle, this.getUIContext().getHostContext() as Context)
+  }
+
+  sendPushNotice() {
+    try {
+      const isOn = notificationManager.isNotificationEnabledSync();
+      if (isOn) {
+        this.sendPushMessage();
+      }
+    } catch (error) {
+    }
+  }
 
   aboutToAppear(): void {
-    console.log('enter aboutToAppear');
-    emitter.on(CommonConstants.TAB_INDEX, (eventData: emitter.EventData) => {
-      this.tabsController.changeIndex(eventData?.data?.tabIndex);
-    });
-    emitter.on(CommonConstants.IS_VIP, (eventData: emitter.EventData) => {
+    this.sendPushMessage()
+    emitter.on(CommonConstants.VIP_RECORD, (eventData: emitter.EventData) => {
       console.log('receive change vip message data: ' + eventData?.data?.isVip);
       this.vipRecord.isVip = eventData?.data?.isVip;
       this.vipRecord.validTime = eventData?.data?.validTime;
-      this.isVip = this.vipRecord.isVip;
-      this.validTime = this.vipRecord.validTime;
       PersistenceV2.save(VipRecord);
     });
+
     emitter.on(CommonConstants.TIME_CONTROL, (eventData: emitter.EventData) => {
-      console.log('reveive change time control message, data:' + JSON.stringify(eventData?.data));
       this.vipRecord.timeLimit = eventData?.data?.timeLimit;
       this.vipRecord.lunchTimeState = eventData?.data?.lunchTimeState;
       this.vipRecord.nightTimeState = eventData?.data?.nightTimeState;
@@ -58,26 +93,35 @@ struct Index {
       this.vipRecord.nightEndTime = eventData?.data?.nightEndTime;
       PersistenceV2.save(VipRecord);
     });
-    emitter.on(CommonConstants.USER_INFO, (eventData: emitter.EventData) =>{
-      console.log('receive user info, data :' + JSON.stringify(eventData?.data))
+    emitter.on(CommonConstants.USER_INFO, (eventData: emitter.EventData) => {
       if (ObjectUtil.isNotNull(eventData?.data?.isLogin)) {
         this.user.isLogin = eventData?.data?.isLogin;
       }
       if (StringUtil.isNotEmpty(eventData?.data?.userName)) {
         this.user.userName = eventData?.data?.userName;
       }
+      if (StringUtil.isNotEmpty(eventData?.data?.fullName)) {
+        this.user.fullName = eventData?.data?.fullName;
+      }
       if (ObjectUtil.isNotNull(eventData?.data?.userAvatar)) {
         this.user.userAvatar = eventData?.data?.userAvatar;
+      }
+      if (ObjectUtil.isNotNull(eventData?.data?.gender)) {
+        this.user.gender = eventData?.data?.gender;
       }
       if (StringUtil.isNotEmpty(eventData?.data?.phone)) {
         this.user.phone = eventData?.data?.phone;
       }
+      if (StringUtil.isNotEmpty(eventData?.data?.birthDate)) {
+        this.user.birthDate = eventData?.data?.birthDate;
+      }
+      if (StringUtil.isNotEmpty(eventData?.data?.introDesc)) {
+        this.user.introDesc = eventData?.data?.introDesc;
+      }
       PersistenceV2.save(User);
     })
-  }
 
-  aboutToDisappear(): void {
-    emitter.off(CommonConstants.TAB_INDEX);
+    this.appPathStack.pushPathByName('AdPage', undefined);
   }
 
   onPageShow(): void {
@@ -117,7 +161,6 @@ struct Index {
    * 初始化数据
    */
   initAppData() {
-    console.log(' enter initAppData, vipRecord data: ' + JSON.stringify(this.vipRecord));
     GlobalContext.getContext().setObject(CommonConstants.LUNCH_TIME_STATE, this.vipRecord.lunchTimeState);
     GlobalContext.getContext().setObject(CommonConstants.NIGHT_TIME_STATE, this.vipRecord.nightTimeState);
     GlobalContext.getContext().setObject(CommonConstants.LUNCH_START_TIME, this.vipRecord.lunchStartTime);
@@ -134,9 +177,6 @@ struct Index {
         .setObject(CommonConstants.TIME_LIMIT, this.vipRecord.timeLimit + CommonConstants.MINUTE);
     }
     GlobalContext.getContext().setObject(CommonConstants.HISTORY_LIST, new ArrayList<History>());
-    GlobalContext.getContext().setObject(CommonConstants.IS_VIP, this.vipRecord.isVip);
-    this.isVip = this.vipRecord.isVip;
-    this.validTime = this.vipRecord.validTime;
   }
 
   /**
@@ -198,7 +238,7 @@ struct Index {
     Navigation(this.appPathStack) {
       Column() {
         Tabs({
-          barPosition: BarPosition.End,
+          barPosition: this.isVertical ? BarPosition.Start : BarPosition.End,
           controller: this.tabsController,
         }) {
           TabContent() {
@@ -208,26 +248,22 @@ struct Index {
             $r('app.media.ic_tab_homepage_off')));
 
           TabContent() {
-            VipPage();
-          }
-          .tabBar(this.tabBuilder($r('app.string.vip'), 1, $r('app.media.ic_tab_vip_on'),
-            $r('app.media.ic_tab_vip_off')));
-
-          TabContent() {
             MinePage();
           }
-          .tabBar(this.tabBuilder($r('app.string.mine_page'), 2, $r('app.media.ic_tab_mine_on'),
+          .tabBar(this.tabBuilder($r('app.string.mine_page'), 1, $r('app.media.ic_tab_mine_on'),
             $r('app.media.ic_tab_mine_off')));
         }
         .clip(false)
         .layoutWeight(1)
         .scrollable(false)
         .width(CommonConstants.FULL_PERCENT)
-        .barHeight(52)
+        .barHeight(this.isVertical ? '60%' : 52)
+        .barWidth(this.isVertical ? 52 : '100%')
         .barMode(BarMode.Fixed)
         .onAnimationStart((index: number, targetIndex: number) => {
           this.currentIndex = targetIndex;
-        });
+        })
+        .vertical(this.isVertical)
       };
     }
     .hideTitleBar(true)
@@ -254,7 +290,11 @@ struct Index {
           value: '时长控制',
           buttonStyle: ButtonStyleMode.TEXTUAL,
           action: () => {
-            AuthUtil.onStartEasy(true, (result: userAuth.UserAuthResult) => {
+            const options: AuthOptions = new AuthOptions();
+            options.showTip = true
+            options.uiContext = this.getUIContext()
+
+            AuthUtil.onStartEasy(options, (result: userAuth.UserAuthResult) => {
               if (result.result === 12500000) {
                 this.dialogOpen = false;
                 this.usedLimit.isTimeOut = false;
@@ -279,7 +319,7 @@ struct Index {
           role: ButtonRole.ERROR,
           action: () => {
             // 终止应用的所有进程，进程退出时不会正常走完应用生命周期。使用Promise异步回调。仅支持主线程调用。
-            let applicationContext = getContext(this).getApplicationContext();
+            let applicationContext = this.getUIContext().getHostContext()!.getApplicationContext();
             applicationContext.killAllProcesses();
           },
         },
@@ -296,9 +336,9 @@ struct Index {
       },
       buttons: [
         {
-          value: '确定',
           buttonStyle: ButtonStyleMode.TEXTUAL,
           role: ButtonRole.ERROR,
+          value: '确定',
           action: () => {
           },
         },

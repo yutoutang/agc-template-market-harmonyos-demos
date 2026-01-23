@@ -9,9 +9,18 @@ import {
   unsetFavorite
 } from '@agctemplate/server/src/main/ets/api/mock/mockData/mockDramaFactory'
 import { container, WindowManager } from '@agctemplate/utils'
-import { AiBarHeight, AppStorageKeys, BreakPointType, MainTitleModifier, StatusBarHeight } from '@agctemplate/widgets'
-import { AlertDialog, AppStorageV2 } from '@kit.ArkUI'
+import {
+  AiBarHeight,
+  AppStorageKeys,
+  BreakPoint,
+  BreakPointType,
+  BreakPointValue,
+  MainTitleModifier,
+  StatusBarHeight
+} from '@agctemplate/widgets'
+import { AlertDialog, AppStorageV2, display } from '@kit.ArkUI'
 import { emitter } from '@kit.BasicServicesKit'
+import { deviceInfo } from '@kit.BasicServicesKit';
 
 @ComponentV2
 export struct FavorMainPage {
@@ -26,6 +35,22 @@ export struct FavorMainPage {
     () => new AiBarHeight(0))!;
   @Consumer('tabState') tabState: boolean = true;
   @Consumer('curTabIndex') currentIndex: number = 0;
+  @Local currentBreakpoint: BreakPoint = AppStorageV2.connect(BreakPoint, AppStorageKeys.CURRENT_BREAK_POINT,
+    () => new BreakPoint(BreakPointValue.SM))!;
+  @Local trackSize: number =
+    new BreakPointType<number>({ sm: 99, md: 159, lg: 189 }).getValue(this.currentBreakpoint.value)!
+  @Local isTabletLandScape: boolean = deviceInfo.deviceType === 'tablet' &&
+    (display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE ||
+      display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE_INVERTED)
+  callback: Callback<number> = (data: number) => {
+    if (deviceInfo.deviceType === 'tablet' &&
+      (display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE ||
+        display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE_INVERTED)) {
+      this.isTabletLandScape = true
+    } else {
+      this.isTabletLandScape = false
+    }
+  }
   modifier: MainTitleModifier = new MainTitleModifier();
   deleteDialogController: CustomDialogController = new CustomDialogController({
     builder: AlertDialog({
@@ -63,9 +88,19 @@ export struct FavorMainPage {
     }
   }
 
+  @Monitor('currentBreakpoint.value')
+  onBreakChange(monitor: IMonitor) {
+    this.trackSize = new BreakPointType<number>({ sm: 99, md: 159, lg: 189 }).getValue(this.currentBreakpoint.value)!
+  }
+
   aboutToAppear(): void {
     this.sendDeleteFavoriteEmitter()
     this.updateFavorites()
+    display.on('change', this.callback)
+  }
+
+  aboutToDisappear(): void {
+    display.off('change', this.callback)
   }
 
   sendDeleteFavoriteEmitter() {
@@ -97,24 +132,22 @@ export struct FavorMainPage {
         }
         .width('100%')
       }
+      .position({ left: this.isTabletLandScape && this.isDeleting ? 96 : 0 })
       .width('100%')
       .height(this.isDeleting ? '92.5%' : '100%')
       .padding({
         left: 16,
-        right: 16,
+        right: this.isTabletLandScape && this.isDeleting ? 112 : 16,
         bottom: this.isDeleting ? 80 : 0
       })
       .backgroundColor($r('sys.color.background_secondary'))
-
-      Column() {
-        if (this.isDeleting) {
-          this.footItemBuilder()
-        }
-      }.layoutWeight(1)
+      if (this.isDeleting) {
+        this.footItemBuilder()
+      }
     }
     .backgroundColor($r('sys.color.background_secondary'))
     .padding({
-      top: `${px2vp(this.statusBarHeight.value)}vp`,
+      top: `${this.getUIContext().px2vp(this.statusBarHeight.value)}vp`,
       bottom: this.isDeleting ? 0 : 70
     })
     .hideTitleBar(true)
@@ -186,14 +219,18 @@ export struct FavorMainPage {
         }) // 打开virtualScroll模式，totalCount为期望加载的数据长度
     }
     .edgeEffect(EdgeEffect.Spring)
-    .columnsTemplate('1fr 1fr 1fr')
+    .columnsTemplate(`repeat(auto-stretch, ${this.trackSize})`)
+    .columnsGap(new BreakPointType<number>({ sm: 8, md: 12, lg: 16 }).getValue(this.currentBreakpoint.value))
     .scrollBar(BarState.Off)
     .cachedCount(4) // 容器组件的预加载区域大小
   }
 
   @Builder
   footItemBuilder() {
-    Row() {
+    Flex({
+      direction: this.isTabletLandScape ? FlexDirection.Column : FlexDirection.Row,
+      justifyContent: FlexAlign.Center
+    }) {
       Column() {
         Image(getMedia('app.media.ic_public_delete_all'))
           .width(22)
@@ -203,7 +240,10 @@ export struct FavorMainPage {
           .fontSize(13)
           .margin({ top: 5.36 })
       }
-      .width('50%')
+      .justifyContent(FlexAlign.Center)
+      .alignItems(HorizontalAlign.Center)
+      .width(this.isTabletLandScape ? '100%' : '50%')
+      .height(this.isTabletLandScape ? '50%' : '100%')
       .onClick(() => {
         this.getAllIds()
         this.deleteDialogController.open()
@@ -218,7 +258,10 @@ export struct FavorMainPage {
           .fontSize(13)
           .margin({ top: 5.36 })
       }
-      .width('50%')
+      .justifyContent(FlexAlign.Center)
+      .alignItems(HorizontalAlign.Center)
+      .width(this.isTabletLandScape ? '100%' : '50%')
+      .height(this.isTabletLandScape ? '50%' : '100%')
       .opacity(this.selectCount > 0 ? 1 : 0.4)
       .enabled(this.selectCount > 0)
       .onClick(() => {
@@ -226,8 +269,9 @@ export struct FavorMainPage {
         this.deleteDialogController.open()
       })
     }
-    .width('100%')
-    .justifyContent(FlexAlign.Center)
+    .position({ left: 0, bottom: 0 })
+    .width(this.isTabletLandScape ? 96 : '100%')
+    .height(this.isTabletLandScape ? '100%' : 60)
     .backgroundColor($r('sys.color.comp_background_gray'))
     .padding({
       top: 8,

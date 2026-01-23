@@ -1,4 +1,4 @@
-import { VideoCard, VideoDetail, videoDetail } from '@ohos_agcit/children_education_datasource';
+import { DataGenerator, VideoCard, VideoDetail } from '@ohos_agcit/children_education_datasource';
 import { CommonConstants } from '../constants/CommonConstants';
 import { IconAndCount } from './IconAndCount';
 import { TagLabelCard } from './TagLabelCard';
@@ -19,7 +19,6 @@ export struct TwoColumn {
                 .borderRadius(10)
                 .id(CommonConstants.IMAGE)
                 .zIndex(0);
-              IconAndCount(CommonConstants.IMAGE, item.isVip, item.updateCount, item.totalCount, '20%', '45%', '50%');
             }
             .height('auto')
             .width('auto');
@@ -48,11 +47,11 @@ export struct TwoColumn {
           right: '4%'
         })
         .onClick(() => {
-          let detail: VideoDetail = videoDetail;
+          let detail: VideoDetail = DataGenerator.getVideoDetail(this.getUIContext());
           detail.videoCard = item;
           this.appPathStack.pushPathByName('VideoDetailListView', detail);
         });
-      }, (item:VideoCard) => JSON.stringify(item));
+      }, (item: VideoCard) => JSON.stringify(item));
     }
     .lanes(2)
     .width(CommonConstants.FULL_PERCENT)
@@ -75,13 +74,11 @@ export struct CommonOneColumn {
         Image(this.videoCard.imageUrl)
           .borderRadius(12)
           .id(CommonConstants.IMAGE);
-        IconAndCount(CommonConstants.IMAGE, this.videoCard.isVip, this.videoCard.updateCount, this.videoCard.totalCount, '13%', '20%',
-          '25%');
       }
       .width('auto')
       .height('auto')
       .onClick(() => {
-        let detail: VideoDetail = videoDetail;
+        let detail: VideoDetail = DataGenerator.getVideoDetail(this.getUIContext());
         detail.videoCard = this.videoCard;
         this.appPathStack.pushPathByName('VideoDetailListView', detail);
       });
@@ -96,7 +93,7 @@ export struct CommonOneColumn {
         Blank();
         ForEach(this.videoCard.tags, (item: string) => {
           TagLabelCard(item);
-        }, (item:string) => item);
+        }, (item: string) => item);
       }
       .width(CommonConstants.FULL_PERCENT)
       .justifyContent(FlexAlign.SpaceAround);

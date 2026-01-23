@@ -18,34 +18,34 @@ export struct QuickLoginPage {
   // 是否勾选协议
   @State isSelected: boolean = false;
   @State quickLoginAnonymousPhone: string = '';
-  // 弹窗是否已开启
-  private customerDiaLogOpen: boolean = false;
   error?: BusinessError;
   response: loginComponentManager.HuaweiIDCredential = {} as loginComponentManager.HuaweiIDCredential;
   // 控制登录中不可点击协议和复选框的状态变量
   @State enableStatus: boolean = true;
-  @State anonymousPhone: string = ''
+  @State anonymousPhone: string = '';
   controller: loginComponentManager.LoginWithHuaweiIDButtonController =
     new loginComponentManager.LoginWithHuaweiIDButtonController()
-      // 需要用户同意协议才能完成华为账号登录，请先设置协议状态为NOT_ACCEPTED，当用户同意协议后设置协议状态为ACCEPTED，才可以完成华为账号登录
+    // 需要用户同意协议才能完成华为账号登录，请先设置协议状态为NOT_ACCEPTED，当用户同意协议后设置协议状态为ACCEPTED，才可以完成华为账号登录
       .setAgreementStatus(loginComponentManager.AgreementStatus.NOT_ACCEPTED)
       .onClickLoginWithHuaweiIDButton((_error: BusinessError, response: loginComponentManager.HuaweiIDCredential) => {
         // 处理用户点击一键登录按钮逻辑，灰度传入undefined模拟流程，应用申请权限后，传入error
         this.handleLoginWithHuaweiIDButton(undefined, response);
       });
+  // 弹窗是否已开启
+  private customerDiaLogOpen: boolean = false;
   agreementDialog: CustomDialogController = new CustomDialogController({
     builder: AgreementDialog({
       cancel: () => {
         this.enableStatus = true;
         this.agreementDialog.close();
-        this.customerDiaLogOpen = false
+        this.customerDiaLogOpen = false;
         // 设置协议状态为NOT_ACCEPTED
         this.controller.setAgreementStatus(loginComponentManager.AgreementStatus.NOT_ACCEPTED);
       },
       confirm: () => {
         this.enableStatus = false;
         this.agreementDialog.close();
-        this.customerDiaLogOpen = false
+        this.customerDiaLogOpen = false;
         this.isSelected = true;
         // 设置协议状态为ACCEPTED
         this.controller.setAgreementStatus(loginComponentManager.AgreementStatus.ACCEPTED);
@@ -56,15 +56,15 @@ export struct QuickLoginPage {
         }
       },
       pathStack: this.pathStack,
-      title:'用户协议和隐私政策',
-      text:Constants.privacyText,
+      title: '用户协议和隐私政策',
+      text: Constants.privacyText,
     }),
     autoCancel: false,
     alignment: DialogAlignment.Center,
   });
 
   aboutToAppear(): void {
-    this.getQuickLoginAnonymousPhone()
+    this.getQuickLoginAnonymousPhone();
   }
 
   // 处理点击一键登录后的方法
@@ -77,7 +77,7 @@ export struct QuickLoginPage {
         `Failed to click LoginWithHuaweiIDButton. Code is ${error.code}, message is ${error.message}`);
       this.error = error;
       if (error.code === LoginErrorCode.ERROR_CODE_NETWORK_ERROR) {
-        AlertDialog.show(
+        this.getUIContext().showAlertDialog(
           {
             message: 'No Internet connection. Check your network settings. ',
             offset: { dx: 0, dy: -12 },
@@ -86,17 +86,17 @@ export struct QuickLoginPage {
             confirm: {
               value: 'OK',
               action: () => {
-              }
-            }
-          }
+              },
+            },
+          },
         );
       } else if (error.code === LoginErrorCode.ERROR_CODE_AGREEMENT_STATUS_NOT_ACCEPTED) {
         // 未同意协议，弹出协议弹框，推荐使用该回调方式
         this.agreementDialog.open();
-        this.customerDiaLogOpen = true
+        this.customerDiaLogOpen = true;
       } else if (error.code === LoginErrorCode.ERROR_CODE_LOGIN_OUT) {
         // 华为账号未登录提示
-        this.showToast('You have not logged in with your Huawei ID. Please try again.')
+        this.showToast('You have not logged in with your Huawei ID. Please try again.');
       } else if (error.code === LoginErrorCode.ERROR_CODE_NOT_SUPPORTED) {
         // 账号不支持该scopes或permissions提示
         this.showToast('The scopes or permissions are not supported.');
@@ -113,22 +113,20 @@ export struct QuickLoginPage {
     try {
       if (this.isSelected) {
         // 配置好可用的调试证书和client_id后再放开校验
-        // if (response) {
         hilog.info(this.domainId, this.logTag, 'Succeed in clicking LoginWithHuaweiIDButton.');
         if (this.response.unionID === undefined) {
           this.response = response;
         }
-        this.loginState = true
+        this.loginState = true;
         this.pathStack.pop();
-        // }
       } else {
         this.agreementDialog.open();
-        this.customerDiaLogOpen = true
+        this.customerDiaLogOpen = true;
       }
     } catch (e) {
       hilog.info(this.domainId, this.logTag,
         `Failed to LoginWithHuaweiIDButton, errCode: ${e.code}, errMessage: ${e.message}`);
-      AlertDialog.show(
+      this.getUIContext().showAlertDialog(
         {
           message: 'Service or network error. Please try again later.',
           offset: { dx: 0, dy: -12 },
@@ -137,9 +135,9 @@ export struct QuickLoginPage {
           confirm: {
             value: 'OK',
             action: () => {
-            }
-          }
-        }
+            },
+          },
+        },
       );
     } finally {
       this.enableStatus = true;
@@ -149,13 +147,13 @@ export struct QuickLoginPage {
   // Toast提示
   showToast(resource: string) {
     try {
-      promptAction.showToast({
+      this.getUIContext().getPromptAction().showToast({
         message: resource,
-        duration: 2000
+        duration: 2000,
       });
     } catch (error) {
-      let message = (error as BusinessError).message
-      let code = (error as BusinessError).code
+      let message = (error as BusinessError).message;
+      let code = (error as BusinessError).code;
       hilog.error(this.domainId, this.logTag, `showToast args error code is ${code}, message is ${message}`);
     }
     ;
@@ -178,12 +176,12 @@ export struct QuickLoginPage {
                 })
                 .onError(() => {
                   hilog.error(this.domainId, this.logTag, 'Failed to load appIcon.');
-                })
+                });
             }.margin({
               top: 44,
               left: 124,
-              right: 124
-            })
+              right: 124,
+            });
 
             Column() {
               Text(this.anonymousPhone)
@@ -194,7 +192,7 @@ export struct QuickLoginPage {
                 .lineHeight(48)
                 .textAlign(TextAlign.Center)
                 .maxLines(1)
-                .constraintSize({ maxWidth: '100%', minHeight: 48 })
+                .constraintSize({ maxWidth: '100%', minHeight: 48 });
 
               Text('华为账号绑定号码')
                 .fontSize($r('sys.float.ohos_id_text_size_body2'))
@@ -206,11 +204,11 @@ export struct QuickLoginPage {
                 .maxLines(1)
                 .constraintSize({ maxWidth: '100%' })
                 .margin({
-                  top: 8
-                })
+                  top: 8,
+                });
             }.margin({
-              top: 64
-            })
+              top: 64,
+            });
 
             Column() {
               LoginWithHuaweiIDButton({
@@ -219,16 +217,16 @@ export struct QuickLoginPage {
                   loginType: loginComponentManager.LoginType.QUICK_LOGIN,
                   supportDarkMode: true,
                 },
-                controller: this.controller
-              }).id('login_with_huaweiId_button')
+                controller: this.controller,
+              }).id('login_with_huaweiId_button');
             }
             .height(40)
             .width('100%')
             .constraintSize({ maxWidth: 448 })
             .margin({
               top: 56,
-              bottom: 16
-            })
+              bottom: 16,
+            });
 
             Column() {
               Column() {
@@ -241,7 +239,7 @@ export struct QuickLoginPage {
                   .focusOnTouch(true)
                   .textOverflow({ overflow: TextOverflow.Ellipsis })
                   .maxLines(1)
-                  .padding({ left: 8, right: 8 })
+                  .padding({ left: 8, right: 8 });
               }
               .backgroundColor($r('sys.color.ohos_id_color_button_normal'))
               .constraintSize({ minHeight: 40 })
@@ -249,10 +247,10 @@ export struct QuickLoginPage {
               .borderRadius(16)
               .width('100%')
               .onClick(() => {
-                this.pathStack.replacePathByName('otherLogin', null)
-              })
-            }
-          }
+                this.pathStack.replacePathByName('otherLogin', null);
+              });
+            };
+          };
 
           Row() {
             Row() {
@@ -276,36 +274,36 @@ export struct QuickLoginPage {
                     // 设置协议状态为NOT_ACCEPTED
                     this.controller.setAgreementStatus(loginComponentManager.AgreementStatus.NOT_ACCEPTED);
                   }
-                })
+                });
             }.padding({
-              right: 12
-            })
+              right: 12,
+            });
 
             PrivacyTextSpan({
               privacyTexts: Constants.privacyText,
               clickAction: () => {
                 if (this.enableStatus) {
-                    this.pathStack.pushPathByName('terms', null);
+                  this.pathStack.pushPathByName('terms', null);
                 }
-              }
-            })
+              },
+            });
           }
           .width('100%')
           .alignItems(VerticalAlign.Top)
           .margin({
-            bottom: 44
-          })
+            bottom: 44,
+          });
         }
         .justifyContent(FlexAlign.SpaceBetween)
         .constraintSize({ minHeight: '100%' })
         .margin({
           left: 16,
-          right: 16
-        })
-      }.backgroundColor('#F1F3F5')
+          right: 16,
+        });
+      }.backgroundColor('#F1F3F5');
     }
     .padding({
-      top: px2vp(this.topRectHeight)
+      top: this.getUIContext().px2vp(this.topRectHeight),
     })
     .width('100%')
     .height('100%')
@@ -314,7 +312,7 @@ export struct QuickLoginPage {
     })
     .onShown(() => {
       if (this.customerDiaLogOpen) {
-        this.agreementDialog.open()
+        this.agreementDialog.open();
       }
     })
     .onBackPressed(() => {
@@ -341,16 +339,16 @@ export struct QuickLoginPage {
         const anonymousPhone = response.data?.extraInfo?.quickLoginAnonymousPhone as string;
         if (anonymousPhone) {
           hilog.info(0x0000, 'testTag', 'Succeeded in authentication.');
-          this.anonymousPhone = anonymousPhone
+          this.anonymousPhone = anonymousPhone;
           return;
         }
         hilog.info(0x0000, 'testTag', 'Succeeded in authentication. AnonymousPhone is empty.');
       }).catch((error: BusinessError) => {
         // 以下内容配置好可用的调试证书和client_id后删除，当前为写死虚拟号码
-        this.anonymousPhone = '123******90'
+        this.anonymousPhone = '123******90';
         hilog.error(0x0000, 'testTag',
           `Failed to get quickLoginAnonymousPhone, errorCode is ${error.code}, errorMessage is ${error.message}`);
-      })
+      });
     } catch (error) {
       hilog.error(0x0000, 'testTag',
         `Failed to get quickLoginAnonymousPhone, errorCode is ${error.code}, errorMessage is ${error.message}`);

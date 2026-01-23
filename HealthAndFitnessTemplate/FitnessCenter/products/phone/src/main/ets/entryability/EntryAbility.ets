@@ -2,8 +2,10 @@ import { abilityAccessCtrl, AbilityConstant,
   PermissionRequestResult,
   Permissions, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import { window } from '@kit.ArkUI';
+import { AppStorageV2, window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { ScreenPropStorage } from 'external_interactions'
+import { FileUtils } from 'feedback';
 
 export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
@@ -25,6 +27,7 @@ export default class EntryAbility extends UIAbility {
       }
       hilog.info(0x0000, 'testTag', 'Succeeded in loading the content.');
     });
+    FileUtils.init(this.context);
     let windowClass: window.Window = windowStage.getMainWindowSync(); // 获取应用主窗口
     let isLayoutFullScreen = true;
     windowClass.setWindowLayoutFullScreen(isLayoutFullScreen).then(() => {
@@ -42,13 +45,9 @@ export default class EntryAbility extends UIAbility {
     avoidArea = windowClass.getWindowAvoidArea(type);
     let topRectHeight = avoidArea.topRect.height; // 获取状态栏区域高度
     AppStorage.setOrCreate('topRectHeight', topRectHeight);
-    const permissions: Permissions[] = ['ohos.permission.READ_CALENDAR','ohos.permission.WRITE_CALENDAR'];
-    let atManager = abilityAccessCtrl.createAtManager();
-    atManager.requestPermissionsFromUser(this.context, permissions).then((result: PermissionRequestResult) => {
-      console.info(`get Permission success, result: ${JSON.stringify(result)}`);
-    }).catch((error: BusinessError) => {
-      console.error(`get Permission error, error. Code: ${error.code}, message: ${error.message}`);
-    })
+    let screenPropStorage: ScreenPropStorage = AppStorageV2.connect(ScreenPropStorage, 'ScreenPropStorage',() => new ScreenPropStorage())!
+    screenPropStorage.topRectHeight = topRectHeight
+    screenPropStorage.bottomRectHeight = bottomRectHeight
   }
 
   onWindowStageDestroy(): void {

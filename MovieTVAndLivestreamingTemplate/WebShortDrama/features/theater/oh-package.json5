@@ -11,5 +11,6 @@
     "@agctemplate/resources": "1.0.0",
     "@agctemplate/widgets": "1.0.0",
     "@agctemplate/server": "1.0.0",
+    "search": "file:../../components/search"
   }
 }

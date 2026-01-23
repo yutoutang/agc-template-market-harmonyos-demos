@@ -61,7 +61,7 @@ export struct PrivacyStatementPage {
     }
     .backgroundColor($r('sys.color.background_secondary'))
     .hideTitleBar(true)
-    .padding({ top: `${px2vp(this.statusBarHeight.value)}vp`, bottom: 36 })
+    .padding({ top: `${this.getUIContext().px2vp(this.statusBarHeight.value)}vp`, bottom: 36 })
   }
 }
 

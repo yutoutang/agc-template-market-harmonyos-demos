@@ -36,16 +36,37 @@ export struct HomeDramaDes {
   @Local isShowShareSheet: boolean = false
   @Consumer('curTabIndex') curTabIndex: number = 0;
   @Local processController: ProcessController | undefined = undefined
+  @Local isExpanded: boolean = display.getFoldStatus() === display.FoldStatus.FOLD_STATUS_EXPANDED
   @Local isTabletLandScape: boolean = deviceInfo.deviceType === 'tablet' &&
-    display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE
+    (display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE ||
+      display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE_INVERTED)
   callback: Callback<number> = (data: number) => {
     if (deviceInfo.deviceType === 'tablet' &&
-      display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE) {
-      this.isTabletLandScape = true
+      (display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE ||
+        display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE_INVERTED)) {
+      if (!this.isTabletLandScape) {
+        this.closeCommentDialog()
+        this.isTabletLandScape = true
+      }
     } else {
-      this.isTabletLandScape = false
+      if (this.isTabletLandScape) {
+        this.closeCommentDialog()
+        this.isTabletLandScape = false
+      }
     }
-    this.closeCommentDialog()
+  }
+  callback2: Callback<display.FoldStatus> = (data: display.FoldStatus) => {
+    if (data === display.FoldStatus.FOLD_STATUS_EXPANDED) {
+      if (!this.isExpanded) {
+        this.closeCommentDialog()
+        this.isExpanded = true
+      }
+    } else {
+      if (this.isExpanded) {
+        this.closeCommentDialog()
+        this.isExpanded = false
+      }
+    }
   }
   windowStage: window.WindowStage = AppStorage.get('windowStage') as window.WindowStage;
   // 获取主窗口的方式
@@ -89,13 +110,15 @@ export struct HomeDramaDes {
           dismissDialogAction.dismiss()
         }
       },
-      alignment: this.isTabletLandScape ? DialogAlignment.CenterEnd :
+      alignment: this.isTabletLandScape || this.isExpanded ? DialogAlignment.CenterEnd :
         DialogAlignment.Bottom,
       onWillDisappear: () => {
         this.isShowCommentSheet = false
-        this.playControl.setPlayerHeight(`100%`)
+        this.playControl.setPlayerHeight('100%')
+        this.playControl.setPlayerWidth('100%')
         this.playControl.setPlayerPositionX(0)
-      }
+      },
+      keyboardAvoidMode: KeyboardAvoidMode.NONE
     })
   }
 
@@ -104,7 +127,12 @@ export struct HomeDramaDes {
   }
 
   aboutToAppear(): void {
-    display.on('change', this.callback)
+    try {
+      display.on('foldStatusChange',this.callback2)
+      display.on('change', this.callback)
+    }catch (error){
+      console.error('failed')
+    }
     this.playerSession.registerListener(this.avPlayerListener)
     this.getDeleteEmitter()
     this.getDetailInfoFavoriteEmitter()
@@ -123,6 +151,7 @@ export struct HomeDramaDes {
   }
 
   aboutToDisappear(): void {
+    display.off('foldStatusChange',this.callback2)
     display.off('change', this.callback)
   }
 
@@ -151,7 +180,11 @@ export struct HomeDramaDes {
     let event: emitter.InnerEvent = {
       eventId: 1
     };
-    emitter.on(event, this.onBackground);
+    try {
+      emitter.on(event, this.onBackground);
+    }catch (error){
+      console.error('failed')
+    }
   }
 
   foreEmitter() {
@@ -268,10 +301,12 @@ export struct HomeDramaDes {
         .height(40)
         .onClick(() => {
           this.isShowCommentSheet = !this.isShowCommentSheet
-          if(this.isTabletLandScape){
+          if (this.isTabletLandScape) {
             this.playControl.setPlayerPositionX('-15%')
-          }else{
-            this.playControl.setPlayerHeight(`60%`)
+          } else if(this.isExpanded){
+            this.playControl.setPlayerWidth('50%')
+          }else {
+            this.playControl.setPlayerHeight('40%')
           }
           this.openCommentDialog()
         })
@@ -312,8 +347,8 @@ export struct HomeDramaDes {
       .width(40)
       .height(208)
       .margin({ bottom: 72, right: 8 })
-      .onVisibleAreaChange([0],(isExpanding:boolean,currentRatio:number)=>{
-        if(isExpanding){
+      .onVisibleAreaChange([0], (isExpanding: boolean, currentRatio: number) => {
+        if (isExpanding) {
           this.playControl.play()
         }
       })
@@ -327,7 +362,6 @@ export struct HomeDramaDes {
     .width('100%')
     .height('100%')
   }
-
 
   @Builder
   shareCommentBuilder() {

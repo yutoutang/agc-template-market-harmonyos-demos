@@ -3,7 +3,8 @@
     "name": "wheel",
     "type": "har",
     "deviceTypes": [
-      "default"
+      "default",
+      "tablet"
     ]
   }
 }

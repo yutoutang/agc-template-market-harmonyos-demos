@@ -25,6 +25,14 @@ export interface LoginWithHuaweiIDResp {
 }
 
 /**
+ * 绑定手机号响应
+ */
+export interface BindMobileWithCodeResp {
+  status: string;
+  rebindSecret: string;
+}
+
+/**
  * 用户信息模型
  */
 export interface IUserInfo {
@@ -51,6 +59,62 @@ export interface IUserInfo {
 }
 
 /**
+ * 订单信息
+ */
+export interface IFullOrderInfo {
+  // 订单ID
+  id: string;
+
+  // 订单标题
+  title: string;
+
+  // 订单副标题
+  subTitle?: string;
+
+  // 会员价格
+  vipPrice: number;
+
+  // 图片链接
+  image: string;
+
+  // 预约地址
+  addressName: string;
+
+  // 手机号
+  contactPhone: string;
+
+  // 预约时间
+  appointTime: number;
+
+  // 备注信息
+  remark: string;
+
+  // 实际付款
+  actualPay: number;
+
+  // 订单ID
+  orderId: string;
+
+  // 订单状态
+  status: OrderStatus;
+
+  // 下单时间
+  orderTime: number;
+
+  // 付款时间
+  payTime?: number;
+
+  // 使用时间
+  consumeTime?: number;
+
+  // 退款时间
+  refundTime?: number;
+
+  // 是否订阅推送
+  setSubscription: boolean;
+}
+
+/**
  * 首页包含的聚合信息
  */
 export interface IHomeInfo {
@@ -68,6 +132,14 @@ export interface IHomeInfo {
 
   // 轮播商品
   bannerGoods: IGoodInfo[];
+}
+
+/**
+ * 历史、猜你想搜、联想词条
+ */
+export interface ISearchWordItem {
+  content: string;
+  id: number | string;
 }
 
 /**
@@ -115,4 +187,7 @@ export interface IOrderDetail {
 
   // 退款时间
   refundTime?: number;
+
+  // 是否订阅推送
+  setSubscription: boolean;
 }

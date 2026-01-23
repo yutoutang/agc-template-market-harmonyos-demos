@@ -1,7 +1,8 @@
 {
   "module": {
     "name": "business_home",
-    "type": "har",
+    "type": "shared",
+    "deliveryWithInstall": true,
     "routerMap": "$profile:home_route_map",
     "deviceTypes": [
       "phone"

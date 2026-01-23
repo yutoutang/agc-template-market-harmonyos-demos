@@ -6,6 +6,18 @@ import { appRouter, WindowManager } from '@agctemplate/utils';
 import { aggregatedPaymentService, CashierPicker, PaymentType } from 'aggregated_payment';
 import { UIContext } from '@kit.ArkUI';
 import { deviceInfo } from '@kit.BasicServicesKit';
+import { iap } from '@kit.IAPKit';
+import { BusinessError } from '@kit.BasicServicesKit';
+import { hilog } from '@kit.PerformanceAnalysisKit';
+import { common } from '@kit.AbilityKit';
+import {
+  FinishStatus,
+  MemberSheetUtils,
+  MemberParams,
+  ProductsInfoOptions,
+  MemberStatusUtil,
+  MemberList,
+} from 'membership';
 
 @ComponentV2
 export struct LockedLayer {
@@ -28,6 +40,197 @@ export struct LockedLayer {
   @Local purAgree: boolean = false
   private uiContext: UIContext = this.getUIContext();
   private navPathStack: NavPathStack = new NavPathStack();
+
+  @Local lastPurchaseProductExpireTime: string = '';
+  subscribeEvent = async (params: MemberParams): Promise<void> => {
+    this.getUIContext().getPromptAction().showToast({ message: '会员订阅成功' });
+    if (params.type === iap?.ProductType.NONRENEWABLE && params.status === FinishStatus.FINISHED) {
+      this.queryExpireTime(params.productId, params.purchaseTime);
+    }
+  };
+  ownedMemberEvent = async (list: MemberList): Promise<void> => {
+    if (list.renewList.length || list.nonRenewList.length) {
+      this.getUIContext().getPromptAction().showToast({ message: `您已拥有会员` });
+    }
+  };
+  queryExpireTime = (productId: string, time?: number): Promise<void> => {
+    // 请求开发者服务器获取非周期订阅商品到期时间（涉及商品id、购买次数）
+    return new Promise(() => {
+      this.lastPurchaseProductExpireTime = 'xxxx-xx-xx';
+    });
+  };
+  productsInfo: ProductsInfoOptions = {
+    isSheet: true,
+    themeColor: '#BD9164',
+    linearColors: [['#FFFFFF', 0.0], ['#FCF5EB', 0.5], ['#F2D2A6', 1.0]],
+    btnFontColor: $r('sys.color.font_on_primary'),
+    // todo: 替换为您配置的商品ID及对应的权益
+    productsInfo: [{
+      type: iap?.ProductType.AUTORENEWABLE,
+      productId: 'F0001',
+      privileges: [
+        {
+          id: 'privilege_1',
+          icon: $r('app.media.privilege'),
+          title: '商品1-权益1',
+          des: '商品1-权益介绍1',
+        },
+        {
+          id: 'privilege_2',
+          icon: $r('app.media.privilege'),
+          title: '商品1-权益2',
+          des: '商品1-权益介绍2',
+        },
+      ],
+      privacyName: '连续包周服务协议',
+      privacyContent: '   本协议是您（以下简称“用户”）与xxx（以下简称“开发者”）就您通过华为应用内支付（HUAWEI IAP）服务购买开发者提供的续期订阅商品（以下简称“订阅商品”）所订立的具有法律约束力的服务协议。华为服务（香港）有限公司（以下简称“华为”）为您提供应用内支付技术支持服务，您在使用本连续包期服务前，应仔细阅读并充分理解本协议所有条款，尤其是涉及您重大权益的条款（包括但不限于续期规则、取消方式、费用条款、免责声明等）。您通过华为应用内支付完成订阅商品购买或激活连续包期服务，即视为您已完全接受本协议全部内容，同意受本协议约束。\n' +
+        '   本协议适用于用户通过华为IAP服务购买的所有续期订阅商品的连续包期服务，涵盖订阅激活、服务使用、自动续期、订阅管理（取消、恢复、切换）、费用支付、退款处理等全流程相关权利义务约定。\n' +
+        '   用户可随时取消连续包期服务，取消操作不影响当期订阅服务的使用，仅停止下一期自动续期。取消路径：打开华为应用市场/相关应用 → 进入“我的”→ 找到“支付与购买”→ 选择“订阅管理”→ 找到对应订阅商品 → 点击“取消订阅”，按提示完成操作（也可通过应用内提供的“订阅管理”入口跳转至华为订阅管理页面）。\n' +
+        '   取消订阅后，用户仍可在当期订阅周期结束前享受完整服务，周期结束后服务自动终止，不再产生续期扣费。',
+    },
+      {
+        type: iap?.ProductType.AUTORENEWABLE,
+        productId: 'F0006',
+        privileges: [
+          {
+            id: 'privilege_1',
+            icon: $r('app.media.privilege'),
+            title: '商品2-权益1',
+            des: '商品2-权益介绍1',
+          },
+          {
+            id: 'privilege_2',
+            icon: $r('app.media.privilege'),
+            title: '商品2-权益2',
+            des: '商品2-权益介绍2',
+          },
+        ],
+        privacyName: '连续包月服务协议',
+        privacyContent: '   本协议是您（以下简称“用户”）与xxx（以下简称“开发者”）就您通过华为应用内支付（HUAWEI IAP）服务购买开发者提供的续期订阅商品（以下简称“订阅商品”）所订立的具有法律约束力的服务协议。华为服务（香港）有限公司（以下简称“华为”）为您提供应用内支付技术支持服务，您在使用本连续包期服务前，应仔细阅读并充分理解本协议所有条款，尤其是涉及您重大权益的条款（包括但不限于续期规则、取消方式、费用条款、免责声明等）。您通过华为应用内支付完成订阅商品购买或激活连续包期服务，即视为您已完全接受本协议全部内容，同意受本协议约束。\n' +
+          '   本协议适用于用户通过华为IAP服务购买的所有续期订阅商品的连续包期服务，涵盖订阅激活、服务使用、自动续期、订阅管理（取消、恢复、切换）、费用支付、退款处理等全流程相关权利义务约定。\n' +
+          '   用户可随时取消连续包期服务，取消操作不影响当期订阅服务的使用，仅停止下一期自动续期。取消路径：打开华为应用市场/相关应用 → 进入“我的”→ 找到“支付与购买”→ 选择“订阅管理”→ 找到对应订阅商品 → 点击“取消订阅”，按提示完成操作（也可通过应用内提供的“订阅管理”入口跳转至华为订阅管理页面）。\n' +
+          '   取消订阅后，用户仍可在当期订阅周期结束前享受完整服务，周期结束后服务自动终止，不再产生续期扣费。',
+      },
+      {
+        type: iap?.ProductType.AUTORENEWABLE,
+        productId: 'F0007',
+        privileges: [
+          {
+            id: 'privilege_1',
+            icon: $r('app.media.privilege'),
+            title: '商品3-权益1',
+            des: '商品3-权益介绍1',
+          },
+          {
+            id: 'privilege_2',
+            icon: $r('app.media.privilege'),
+            title: '商品3-权益2',
+            des: '商品3-权益介绍2',
+          },
+        ],
+        privacyName: '连续包季服务协议',
+        privacyContent: '   本协议是您（以下简称“用户”）与xxx（以下简称“开发者”）就您通过华为应用内支付（HUAWEI IAP）服务购买开发者提供的续期订阅商品（以下简称“订阅商品”）所订立的具有法律约束力的服务协议。华为服务（香港）有限公司（以下简称“华为”）为您提供应用内支付技术支持服务，您在使用本连续包期服务前，应仔细阅读并充分理解本协议所有条款，尤其是涉及您重大权益的条款（包括但不限于续期规则、取消方式、费用条款、免责声明等）。您通过华为应用内支付完成订阅商品购买或激活连续包期服务，即视为您已完全接受本协议全部内容，同意受本协议约束。\n' +
+          '   本协议适用于用户通过华为IAP服务购买的所有续期订阅商品的连续包期服务，涵盖订阅激活、服务使用、自动续期、订阅管理（取消、恢复、切换）、费用支付、退款处理等全流程相关权利义务约定。\n' +
+          '   用户可随时取消连续包期服务，取消操作不影响当期订阅服务的使用，仅停止下一期自动续期。取消路径：打开华为应用市场/相关应用 → 进入“我的”→ 找到“支付与购买”→ 选择“订阅管理”→ 找到对应订阅商品 → 点击“取消订阅”，按提示完成操作（也可通过应用内提供的“订阅管理”入口跳转至华为订阅管理页面）。\n' +
+          '   取消订阅后，用户仍可在当期订阅周期结束前享受完整服务，周期结束后服务自动终止，不再产生续期扣费。',
+      },
+      {
+        type: iap?.ProductType.NONRENEWABLE,
+        productId: 'F0003',
+        privileges: [
+          {
+            id: 'privilege_1',
+            icon: $r('app.media.privilege'),
+            title: '商品4-权益1',
+            des: '商品4-权益介绍1',
+          },
+          {
+            id: 'privilege_2',
+            icon: $r('app.media.privilege'),
+            title: '商品4-权益2',
+            des: '商品4-权益介绍2',
+          },
+        ],
+      },
+      {
+        type: iap?.ProductType.NONRENEWABLE,
+        productId: 'F0002',
+        privileges: [
+          {
+            id: 'privilege_1',
+            icon: $r('app.media.privilege'),
+            title: '商品5-权益1',
+            des: '商品5-权益介绍1',
+          },
+          {
+            id: 'privilege_2',
+            icon: $r('app.media.privilege'),
+            title: '商品5-权益2',
+            des: '商品5-权益介绍2',
+          },
+        ],
+      },
+      {
+        type: iap?.ProductType.NONRENEWABLE,
+        productId: 'F0005',
+        privileges: [
+          {
+            id: 'privilege_1',
+            icon: $r('app.media.privilege'),
+            title: '商品6-权益1',
+            des: '商品6-权益介绍1',
+          },
+          {
+            id: 'privilege_2',
+            icon: $r('app.media.privilege'),
+            title: '商品6-权益2',
+            des: '商品6-权益介绍2',
+          },
+        ],
+      },
+      {
+        type: iap?.ProductType.NONCONSUMABLE,
+        productId: 'F0008',
+        privileges: [
+          {
+            id: 'privilege_1',
+            icon: $r('app.media.privilege'),
+            title: '商品8-权益1',
+            des: '商品8-权益介绍1',
+          },
+          {
+            id: 'privilege_2',
+            icon: $r('app.media.privilege'),
+            title: '商品8-权益2',
+            des: '商品8-权益介绍2',
+          },
+        ],
+      }],
+    privacyContent: '   欢迎您使用“xxxx”。“xxxx”采用收费与免费结合的方式。您须注册华为账号后，才能继续进行购买服务。通过购买程序支付费用后，您就可以使用会员所提供的收费服务。在开始购买程序之前，请您首先同意并接受以下服务条款。\n' +
+      '   本协议是您与华为软件技术有限公司（以下统称“华为”）之间关于“xxxx"提供的各种付费服务签订的服务协议，描述了华为与xxxx付费服务用户之间关于软件许可以及服务使用及相关方面的权利义务。同意本协议，您可享受会员权益。 \n' +
+      '   您同意本“xxxx"付费服务协议条款即表示同意遵守《xxxx用户协议》《关于xxxx与隐私的声明》（以下称“基础协议"），本协议未涉及事项以《xxxx用户协议》为准，若您拒绝接受本协议，不影响已同意的基础协议。 \n' +
+      '   华为在此特别提醒，请事先仔细阅读本服务协议中各项条款，包括但不限于免除或者限制华为责任的免责条款以及对用户的权利限制条款。请您仔细审阅并决定接受或不接受本服务协议。',
+    lastPurchaseProductExpireTime: '',
+    subscribeCallBack: this.subscribeEvent,
+    queryExpireTime: this.queryExpireTime,
+    ownedMemberCallBack: this.ownedMemberEvent,
+  };
+
+  queryMemberStatus() {
+    MemberStatusUtil.queryPurchase(this.getUIContext().getHostContext() as common.UIAbilityContext).then((res) => {
+      let autoRenewPurchasedList = res.renewList;
+      let nonAutoRenewPurchasedList = res.nonRenewList;
+
+      if (autoRenewPurchasedList?.length || nonAutoRenewPurchasedList?.length) {
+        this.getUIContext().getPromptAction().showToast({ message: '您已开通会员' });
+      } else {
+        MemberSheetUtils.open(this.productsInfo, this.getUIContext());
+      }
+    }).catch((err: BusinessError) => {
+      hilog.error(0xFF00, 'MemberShip',
+        `Failed to query purchase record. Code is ${err.code}, message is ${err.message}`);
+    });
+  }
 
   private cashierPicker: CashierPicker = new CashierPicker(this.uiContext)
     .onRealPayment(async (type: PaymentType) => {
@@ -118,7 +321,7 @@ export struct LockedLayer {
           height: 468,
           showClose: true,
           title: { title: '解锁剧集' },
-          preferType: SheetType.BOTTOM,
+          preferType: SheetType.CENTER,
         })
         .onClick(() => {
           if (this.userInfo.isPhoneAssociated) {
@@ -132,15 +335,15 @@ export struct LockedLayer {
         Text('开通会员看全集 >')
           .font({ weight: 500, size: 16 })
           .fontColor('#fff')
-          .bindSheet($$this.isShowVIPSheet, this.vipSheet(), {
-            height: 468,
-            showClose: true,
-            title: { title: '开通会员' },
-            preferType: SheetType.BOTTOM,
-          })
+          // .bindSheet($$this.isShowVIPSheet, this.vipSheet(), {
+          //   height: 468,
+          //   showClose: true,
+          //   title: { title: '开通会员' },
+          //   preferType: SheetType.BOTTOM,
+          // })
           .onClick(() => {
             if (this.userInfo.isPhoneAssociated) {
-              this.isShowVIPSheet = !this.isShowVIPSheet
+              this.queryMemberStatus();
             } else {
               WindowManager.setWindowSystemBarProperties({ statusBarContentColor: '#e6000000' })
               appRouter.push({ builderName: NAV_PAGE_NAME.LoginPage.name, params: { isChange: true } })
@@ -151,7 +354,7 @@ export struct LockedLayer {
     .zIndex(200)
     .width('100%')
     .height(this.breakPoint.value === 'sm' ? '93%' : '100%')
-    .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
+    // .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
     .id('LockLayer')
   }
 
@@ -263,14 +466,14 @@ export struct LockedLayer {
       .width('100%')
 
       Button(this.unIndex === 0 ? '立即开通' : '立即购买')
-        .backgroundColor('#BD9164')
+        .backgroundColor(this.unIndex === 0 && this.userInfo.bonus < 100 ? '#D6C6B6' : '#BD9164')
         .fontColor($r('sys.color.font_on_primary'))
         .fontWeight(FontWeight.Medium)
         .fontSize($r('sys.float.Body_L'))
         .width('100%')
         .height(40)
         .margin({ bottom: 8 })
-        .enabled(this.unIndex === 0 ? this.userInfo.bonus >= 100 ? true : false : true)
+        // .enabled(this.unIndex === 0 ? this.userInfo.bonus >= 100 ? true : false : true)
         .onClick(() => {
           if (this.unIndex === 0 && this.userInfo.bonus >= 100) {
             // 单集解锁
@@ -285,7 +488,7 @@ export struct LockedLayer {
               .setTradeSummary('单集购买') // 订单摘要 (可选，不填则不显示)
               .open();
           } else if (this.userInfo.bonus < 100) {
-            promptAction.showToast({ message: '看点余额不足' })
+            this.getUIContext().getPromptAction().showToast({ message: '看点余额不足' })
           }
         })
 
@@ -294,23 +497,12 @@ export struct LockedLayer {
           .fontColor('#BD9164')
           .fontWeight(FontWeight.Medium)
           .fontSize(16)
-          .bindSheet($$this._isShowVIPSheet, this.vipSheet(), {
-            height: 468,
-            showClose: true,
-            title: this.titleBuilder,
-            preferType: SheetType.BOTTOM,
-            onWillDismiss: (callback: DismissSheetAction) => {
-              if (callback.reason === 2) {
-                this.isShowUnlockSheet = false
-              }
-            }
-          })
       }
       .width('100%')
       .height(40)
       .justifyContent(FlexAlign.Center)
       .onClick(() => {
-        this._isShowVIPSheet = true
+        this.queryMemberStatus();
       })
     }
     .padding({ left: 16, right: 16 })

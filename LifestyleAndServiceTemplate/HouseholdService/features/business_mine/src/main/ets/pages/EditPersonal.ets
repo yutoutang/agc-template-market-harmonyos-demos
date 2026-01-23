@@ -12,18 +12,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { CommonUtils } from 'module_base';
+import { AppStorageV2 } from '@kit.ArkUI';
+import { BusinessError } from '@kit.BasicServicesKit';
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
+import { UtilLog } from '@hw-agconnect/util-log';
+import { CommonUtils, WindowUtil } from 'module_base';
 import {
   AppStorageBank,
   CommonConstants,
+  confirmRebindMobileWithSecret,
+  GridRowColSetting,
   IUserInfo,
-  PHONE_REG,
-  RouterModule,
+  LoginUtil,
+  sendCode,
   updateUserInfo,
   UserInfo,
+  verifyCode
 } from 'lib_foundation';
-import { FormItem, FormType } from 'module_form';
-import { AppStorageV2, LengthMetrics } from '@kit.ArkUI';
+import { ApiHandler, DataType, PersonalInfo, PersonalInfoView } from 'collect_personal_info';
 
 @Builder
 export function EditPersonalBuilder() {
@@ -32,151 +38,102 @@ export function EditPersonalBuilder() {
 
 @ComponentV2
 export struct EditPersonal {
+  @Local breakpoint: string = '';
   userInfo: UserInfo = AppStorageV2.connect(UserInfo, () => new UserInfo())!;
-  @Local avatarUrl: string = '';
-  @Local nickName: string = '';
-  @Local name: string = '';
-  @Local gender: number = 0;
-  @Local phone: string = '';
-  @Local birthDate: Date | null = null;
+  @Local personalInfo: PersonalInfo = {};
+  @Local apiInfo: ApiHandler = {};
 
   aboutToAppear(): void {
+    WindowUtil.initWindowUtil(this.getUIContext());
     this.assignInfo();
+    this.assignApiInfo();
   }
 
   assignInfo() {
-    this.avatarUrl = CommonUtils.handleImgUrl(this.userInfo.avatar ?? '');
-    this.nickName = this.userInfo.nickName ?? '';
-    this.name = this.userInfo.name ?? '';
-    this.gender = this.userInfo.gender ?? 0;
-    this.phone = this.userInfo.mobile ?? '';
+    this.personalInfo.avatar = CommonUtils.handleImgUrl(this.userInfo.avatar ?? '');
+    this.personalInfo.nickName = this.userInfo.nickName ?? '';
+    this.personalInfo.fullName = this.userInfo.name ?? '';
+    this.personalInfo.gender = this.userInfo.gender ?? 0;
+    this.personalInfo.phoneNumber = this.userInfo.mobile ?? '';
     if (this.userInfo.birth) {
-      this.birthDate = new Date(this.userInfo.birth);
+      this.personalInfo.birthDate = new Date(this.userInfo.birth);
+    }
+  }
+
+  updateInfo() {
+    const user: IUserInfo = {
+      userId: this.userInfo.userId,
+      nickName: this.personalInfo.nickName as string,
+      avatar: this.personalInfo.avatar as string,
+      name: this.personalInfo.fullName as string,
+      gender: this.personalInfo.gender,
+      mobile: this.personalInfo.phoneNumber,
+      birth: this.personalInfo.birthDate?.getTime(),
+    };
+    updateUserInfo(user).then(() => {
+      AppStorageBank.updateUserInfo(user);
+    })
+  }
+
+  assignApiInfo() {
+    this.apiInfo.updatePhoneInfo = {
+      codeLength: 6,
+      // todo 发送验证码的接口方法
+      sendCode: async (phone: string) => {
+        sendCode(phone).then((code) => {
+          promptAction.showToast({ message: `验证码${code}` });
+        })
+      },
+      // todo 校验验证码正确性的接口方法
+      verifyCode: async (phone: string, code: string): Promise<boolean> => {
+        const result = await verifyCode(phone, code);
+        const message: string = result ? '验证成功' : '验证失败';
+        promptAction.showToast({ message: message });
+        return result;
+      },
     }
   }
 
   build() {
     NavDestination() {
-      Column() {
-        Scroll() {
-          this.FormCard()
+      GridRow(GridRowColSetting.DEFAULT_GRID_ROW_OPTIONS) {
+        GridCol({ span: GridRowColSetting.GRID_ROW_OPTIONS_COLUMNS, }) {
+          Column() {
+            PersonalInfoView({
+              switchInfo: { showIntroDesc: false },
+              personalInfo: this.personalInfo,
+              apiInfo: this.apiInfo,
+              onChange: (type: DataType, data: PersonalInfo) => {
+                this.personalInfo = data;
+                this.updateInfo();
+                if (type === DataType.PHONE_NUMBER) {
+                    confirmRebindMobileWithSecret(data.phoneNumber!).then(() => {
+                      LoginUtil.cancelAuthorization();
+                      LoginUtil.queryUserInfo();
+                    }).catch((error: BusinessError) => {
+                      LoginUtil.cancelAuthorization();
+                      UtilLog.error('[PersonalInfoView]', 'EnterReBindPhone error:' + JSON.stringify(error));
+                      promptAction.showToast({ message: '解绑手机号失败，请稍后重试~' });
+                    })
+                }
+              }
+            })
+          }
+          .width(CommonConstants.FULL_PERCENT)
+          .height(CommonConstants.FULL_PERCENT)
+          .padding({
+            left: GridRowColSetting.getPageMargin(this.breakpoint),
+            right: GridRowColSetting.getPageMargin(this.breakpoint)
+          })
         }
-        .layoutWeight(1)
-        .align(Alignment.Top)
-        .scrollBar(BarState.Off)
-        .edgeEffect(EdgeEffect.Spring)
-        .padding({ top: 10, bottom: 10 })
-
-        this.BottomBar()
       }
-      .width(CommonConstants.FULL_PERCENT)
-      .height(CommonConstants.FULL_PERCENT)
-    }
-    .title('编辑资料', { paddingStart: new LengthMetrics(10) })
-    .backgroundColor($r('app.color.common_page_bg'))
-  }
-
-  isValid() {
-    if (this.phone && !PHONE_REG.test(this.phone)) {
-      this.getUIContext().getPromptAction().showToast({ message: '请填写正确的手机号码' });
-      return false;
-    }
-
-    return true;
-  }
-
-  buildParam() {
-    const user: IUserInfo = {
-      userId: this.userInfo.userId,
-      nickName: this.nickName,
-      avatar: this.avatarUrl,
-      name: this.name,
-      gender: this.gender,
-      mobile: this.phone,
-      birth: this.birthDate?.getTime(),
-    };
-
-    return user;
-  }
-
-  onSubmit() {
-    if (!this.isValid()) {
-      return;
-    }
-    const user = this.buildParam();
-    updateUserInfo(user).then(() => {
-      AppStorageBank.updateUserInfo(user);
-      RouterModule.pop();
-    });
-  }
-
-  @Builder
-  FormCard() {
-    Column() {
-      FormItem({
-        param: {
-          type: FormType.AVATAR,
-          label: '头像',
-        },
-        value: this.avatarUrl!!,
-      })
-
-      FormItem({
-        param: {
-          type: FormType.INPUT,
-          label: '昵称',
-        },
-        value: this.nickName!!,
-      })
-      FormItem({
-        param: {
-          type: FormType.INPUT,
-          label: '姓名',
-        },
-        value: this.name!!,
-      })
-      FormItem({
-        param: {
-          type: FormType.GENDER,
-          label: '性别',
-        },
-        numberV: this.gender!!,
-      })
-      FormItem({
-        param: {
-          type: FormType.INPUT,
-          inputType: InputType.PhoneNumber,
-          label: '手机号',
-        },
-        value: this.phone!!,
-      })
-      FormItem({
-        param: {
-          type: FormType.DATE,
-          label: '生日',
-          last: true,
-        },
-        dateV: this.birthDate!!,
+      .onBreakpointChange((bp) => {
+        this.breakpoint = bp;
       })
     }
-    .padding({ left: 10, right: 10 })
-    .backgroundColor(Color.White)
-  }
-
-  @Builder
-  BottomBar() {
-    Row() {
-      Button('保存')
-        .fontColor($r('sys.color.font_on_primary'))
-        .fontSize($r('sys.float.Body_L'))
-        .fontWeight(500)
-        .width(CommonConstants.FULL_PERCENT)
-        .height(40)
-        .onClick(() => {
-          this.onSubmit();
-        })
-    }
-    .width(CommonConstants.FULL_PERCENT)
-    .padding(10)
+    .title('编辑资料', {
+      paddingStart: { value: GridRowColSetting.getPageMargin(this.breakpoint), unit: 1 }
+    })
+    .backgroundColor($r('sys.color.background_secondary'))
   }
 }

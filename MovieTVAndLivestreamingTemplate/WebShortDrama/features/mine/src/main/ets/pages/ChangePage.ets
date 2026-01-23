@@ -41,12 +41,12 @@ export struct ChangePage {
 
             Button(getString('app.string.confirm'))
               .onClick(() => {
-                this.vm.userInfo.nickname = this.name ? this.name :
-                this.vm.userInfo.nickname;
-                this.vm.localInfo.nickname = this.name ? this.name :
-                this.vm.localInfo.nickname;
-                appRouter.back(true)
-                appRouter.back(true)
+                if (this.vm.saveEdit(this.name)) {
+                  this.vm.userInfo.nickname = this.name ? this.name : this.vm.userInfo.nickname;
+                  this.vm.localInfo.nickname = this.name ? this.name : this.vm.localInfo.nickname;
+                  appRouter.back(true)
+                  appRouter.back(true)
+                }
               })
               .backgroundColor(0xffffff)
               .fontColor($r('sys.color.warning'))

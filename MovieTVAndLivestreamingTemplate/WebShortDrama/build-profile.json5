@@ -6,7 +6,7 @@
         "name": "default",
         "signingConfig": "default",
         "compatibleSdkVersion": "5.0.3(15)",
-        "targetSdkVersion": "5.0.3(15)",
+        "targetSdkVersion": "6.0.1(21)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
           "arkOptions": {
@@ -189,15 +189,7 @@
     },
     {
       "name": "video_swiper",
-      "srcPath": "./components/video_swiper",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
+      "srcPath": "./components/video_swiper"
     },
     {
       "name": "award",
@@ -213,51 +205,19 @@
     },
     {
       "name": "feedback",
-      "srcPath": "./components/feedback",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
+      "srcPath": "./components/feedback"
     },
     {
       "name": "vip_center",
-      "srcPath": "./components/vip_center",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
+      "srcPath": "./components/vip_center"
     },
     {
       "name": "base_apis",
-      "srcPath": "./components/base_apis",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
+      "srcPath": "./components/base_apis"
     },
     {
       "name": "open_ads",
-      "srcPath": "./components/open_ads",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
+      "srcPath": "./components/open_ads"
     },
     {
       "name": "favor",
@@ -273,39 +233,15 @@
     },
     {
       "name": "aggregated_share",
-      "srcPath": "./components/aggregated_share",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
+      "srcPath": "./components/aggregated_share"
     },
     {
       "name": "aggregated_login",
-      "srcPath": "./components/aggregated_login",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
+      "srcPath": "./components/aggregated_login"
     },
     {
       "name": "module_cast",
-      "srcPath": "./components/module_cast",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
+      "srcPath": "./components/module_cast"
     },
     {
       "name": "module_pip",
@@ -313,55 +249,35 @@
     },
     {
       "name": "day_signin",
-      "srcPath": "./components/day_signin",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
+      "srcPath": "./components/day_signin"
     },
     {
       "name": "look_ad",
-      "srcPath": "./components/look_ad",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
+      "srcPath": "./components/look_ad"
     },
     {
       "name": "task_list",
-      "srcPath": "./components/task_list",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
+      "srcPath": "./components/task_list"
     },
     {
       "name": "wheel",
-      "srcPath": "./components/wheel",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
+      "srcPath": "./components/wheel"
     },
     {
       "name": "aggregated_payment",
       "srcPath": "./components/aggregated_payment"
+    },
+    {
+      "name": "search",
+      "srcPath": "./components/search"
+    },
+    {
+      "name": "dial_panel",
+      "srcPath": "./components/dial_panel"
+    },
+    {
+      "name": "membership",
+      "srcPath": "./components/membership"
     }
   ]
 }

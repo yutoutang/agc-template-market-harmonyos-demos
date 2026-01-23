@@ -15,10 +15,11 @@
 
 import { AxiosRequestConfig } from '@ohos/axios';
 import { IGoodCategory, IGoodInfo } from 'module_base';
+import { FilterTagAndList, SearchItem, SearchSource, SearchWordItem } from 'search';
 import request from './AxiosBase';
-import { QueryGoodListSource, URL_MAP, OrderStatus } from '../common/Constant';
+import { OrderStatus, QueryGoodListSource, URL_MAP } from '../common/Constant';
 import { ILoginWithHuaweiIDRequest, IOrderUpdate, ISubmitOrderRequest, IUpdateCity, } from '../model/IRequest';
-import { IHomeInfo, IUserInfo, LoginWithHuaweiIDResp, } from '../model/IResponse';
+import { BindMobileWithCodeResp, IHomeInfo, IUserInfo, LoginWithHuaweiIDResp, } from '../model/IResponse';
 import { FullOrderInfo } from '../model/ObserveModel';
 
 /**
@@ -36,6 +37,30 @@ export const loginWithHuaweiID =
 export const getUserInfo = (): Promise<IUserInfo> => {
   const url = URL_MAP.GET_USER_INFO;
   return request.get(url);
+};
+
+/**
+ * 绑定手机号
+ */
+export const bindMobileWithCode = (code: string, config?: AxiosRequestConfig): Promise<BindMobileWithCodeResp> => {
+  const url = URL_MAP.BIND_MOBILE_WITH_CODE;
+  return request.post(url, code, config);
+};
+
+/**
+ * 绑定手机号-确认换绑
+ */
+export const confirmRebindMobileWithSecret = (rebindSecret: string, config?: AxiosRequestConfig) => {
+  const url = URL_MAP.CONFIRM_REBIND_MOBILE;
+  return request.post(url, rebindSecret, config);
+};
+
+/**
+ * 手机号解绑
+ */
+export const unbindMobile = (): Promise<boolean> => {
+  const url = URL_MAP.UNBIND_MOBILE;
+  return request.post(url);
 };
 
 /**
@@ -146,3 +171,69 @@ export const cancelOrder = (orderId: string) => {
   const data: IOrderUpdate = { orderId };
   return request.post(url, data);
 };
+
+/**
+ * 订阅通知
+ */
+export const subscribeNotification = (orderId: string) => {
+  const url = URL_MAP.SUBSCRIBE_NOTIFICATION;
+  const data: IOrderUpdate = { orderId };
+  return request.post(url, data);
+};
+
+/**
+ * 发送验证码
+ */
+export const sendCode = (data: string): Promise<string> => {
+  const url = URL_MAP.SEND_CODE;
+  return request.post(url, data);
+};
+
+/**
+ * 校验验证码
+ */
+export const verifyCode = (phone: string, code: string): Promise<boolean> => {
+  const url = URL_MAP.VERIFY_CODE;
+  return request.get(url, { params: { phone, code } });
+};
+
+/**
+ * 获取历史词条
+ */
+export const getHistoryList = (): Promise<SearchWordItem[]> => {
+  const url = URL_MAP.GET_HISTORY_LIST;
+  return request.get(url);
+};
+
+/**
+ * 获取猜你想搜
+ */
+export const getGuessList = (isRefresh: boolean): Promise<SearchWordItem[]> => {
+  const url = URL_MAP.GET_GUESS_LIKE_LIST;
+  return request.get(url, { params: { isRefresh } });
+}
+
+/**
+ * 获取搜索结果
+ */
+export const getResultList = (keyWord: string | SearchWordItem | SearchItem,
+  searchSource: SearchSource): Promise<FilterTagAndList[]> => {
+  const url = URL_MAP.GET_RESULT_LIST;
+  return request.get(url, { params: { keyWord, searchSource } });
+}
+
+/**
+ * 获取搜索联想
+ */
+export const getSearchSuggestion = (keyWord: string): Promise<[SearchWordItem[], string[]]> => {
+  const url = URL_MAP.GET_SUGGESTION_LIST;
+  return request.get(url, { params: { keyWord } });
+}
+
+/**
+ * 清空历史记录
+ */
+export const deleteHistoryList = (): Promise<SearchWordItem[]> => {
+  const url = URL_MAP.DELETE_HISTORY;
+  return request.get(url);
+}

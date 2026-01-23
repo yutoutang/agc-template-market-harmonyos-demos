@@ -1,11 +1,16 @@
-import { cartoonPageData } from '@ohos_agcit/children_education_datasource';
-import { CommonConstants, FeedTitle, TwoColumn, NoMoreTab,
-  CommonOneColumn } from '@ohos_agcit/children_education_utils';
+import { DataGenerator } from '@ohos_agcit/children_education_datasource';
+import {
+  CommonConstants,
+  CommonOneColumn,
+  FeedTitle,
+  NoMoreTab,
+  TwoColumn
+} from '@ohos_agcit/children_education_utils';
 import { CoreButtons } from '../components/CoreButtons';
 
 @ComponentV2
 export struct CartoonPage {
-  private cartoonPageData = cartoonPageData;
+  private cartoonPageData = DataGenerator.getCartoonPageData(this.getUIContext());
   @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
 
   build() {
@@ -30,6 +35,7 @@ export struct CartoonPage {
               left: '4%'
             })
         }
+
         ListItemGroup({
           header: FeedTitle('app.media.feed_head_video', '<多米益智乐园2>每周更新',
             () => {
@@ -51,7 +57,7 @@ export struct CartoonPage {
             () => {
               this.appPathStack.pushPathByName('PremiumInteractiveVideoListView', undefined);
             })
-        }){
+        }) {
           TwoColumn({
             videoCardArray: this.cartoonPageData.funEncyclopedia
           });

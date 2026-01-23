@@ -28,7 +28,7 @@ export function CountLoc(anchorName: string, updateCount: number, totalCount: nu
       Button()
         .backgroundColor($r('sys.color.black'))
         .width(countCompletePercent)
-        .height(20)
+        .height(16)
         .opacity(0.4)
         .zIndex(1);
     }
@@ -75,6 +75,6 @@ function iconStyle(anchorName: string, percent: string) {
 @Extend(Text)
 function textStyle() {
   .fontColor($r('sys.color.white'))
-  .fontSize(12)
+  .fontSize(10)
   .zIndex(2);
 }

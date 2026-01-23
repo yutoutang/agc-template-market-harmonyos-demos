@@ -1,6 +1,8 @@
 import { BusinessError } from '@kit.BasicServicesKit';
 import { util } from '@kit.ArkTS';
+import { window } from '@kit.ArkUI';
 
+const windowStage: window.WindowStage = AppStorage.get('windowStage')!
 
 export function getWeekday(dateStr: Date) {
   const days = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
@@ -20,7 +22,9 @@ function bufferToString(buffer: ArrayBufferLike): string {
 export function getDataFromJSON<T>(rawFileName: string, component?: Object): T[] {
   let result: T[] = [];
   try {
-    let value: Uint8Array = getContext(component).resourceManager.getRawFileContentSync(rawFileName);
+    let value: Uint8Array = windowStage.getMainWindowSync()
+      .getUIContext()
+      .getHostContext()!.resourceManager.getRawFileContentSync(rawFileName);
     result = JSON.parse(bufferToString(value.buffer)) as T[];
   } catch (error) {
     let code = (error as BusinessError).code;

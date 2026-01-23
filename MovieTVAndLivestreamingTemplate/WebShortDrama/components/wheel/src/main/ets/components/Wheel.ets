@@ -136,7 +136,7 @@ export struct Wheel {
    */
   animateRotation(randomAngle: number) {
     this.isAnimateFinish = false
-    animateTo({
+    this.getUIContext().animateTo({
       duration: CommonConstants.DURATION,
       curve: Curve.Ease,
       delay: 0,

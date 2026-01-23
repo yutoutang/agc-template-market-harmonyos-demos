@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-import { AtomicServiceWeb, AtomicServiceWebController, LengthMetrics } from '@kit.ArkUI';
-import { CommonConstants, RouterModule } from 'lib_foundation';
+import { AtomicServiceWeb, AtomicServiceWebController } from '@kit.ArkUI';
+import { CommonConstants, GridRowColSetting, RouterModule } from 'lib_foundation';
 
 @Builder
 export function OfficialWebBuilder() {
@@ -23,22 +23,37 @@ export function OfficialWebBuilder() {
 
 @Component
 export struct OfficialWeb {
+  @State breakpoint: string = '';
   @State controller: AtomicServiceWebController = new AtomicServiceWebController();
 
   build() {
     NavDestination() {
-      Column() {
-        AtomicServiceWeb({
-          src: $rawfile('official_web.html'),
-          controller: this.controller,
-          navPathStack: RouterModule.getStack(),
-        })
+      GridRow(GridRowColSetting.DEFAULT_GRID_ROW_OPTIONS) {
+        GridCol({ span: GridRowColSetting.GRID_ROW_OPTIONS_COLUMNS, }) {
+          Column() {
+            AtomicServiceWeb({
+              src: $rawfile('official_web.html'),
+              controller: this.controller,
+              navPathStack: RouterModule.getStack(),
+            })
+          }
+          .padding({
+            top: 8,
+            bottom: 8,
+            left: GridRowColSetting.getPageMargin(this.breakpoint),
+            right: GridRowColSetting.getPageMargin(this.breakpoint)
+          })
+          .height(CommonConstants.FULL_PERCENT)
+          .borderRadius(20)
+        }
       }
-      .padding(10)
-      .height(CommonConstants.FULL_PERCENT)
-      .borderRadius(4)
+      .onBreakpointChange((bp) => {
+        this.breakpoint = bp;
+      })
     }
-    .title('官网', { backgroundColor: Color.White, paddingStart: new LengthMetrics(10) })
-    .backgroundColor($r('app.color.common_page_bg'))
+    .title('官网', {
+      paddingStart: { value: GridRowColSetting.getPageMargin(this.breakpoint), unit: 1 }
+    })
+    .backgroundColor($r('sys.color.background_secondary'))
   }
 }

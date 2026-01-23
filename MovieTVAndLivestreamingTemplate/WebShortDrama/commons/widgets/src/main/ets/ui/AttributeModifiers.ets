@@ -1,5 +1,5 @@
 import { AiBarHeight, StatusBarHeight } from './avoid_area/AvoidArea';
-import { AppStorageV2 } from '@kit.ArkUI';
+import { AppStorageV2, window } from '@kit.ArkUI';
 import { AppStorageKeys } from '../const/AppStorageKeys';
 
 export class MainTitleModifier implements AttributeModifier<TextAttribute> {
@@ -41,6 +41,7 @@ export class RowModifier implements AttributeModifier<RowAttribute> {
 
 @ObservedV2
 export class NavDestinationModifier implements AttributeModifier<NavDestinationAttribute> {
+  windowStage: window.WindowStage = AppStorage.get('windowStage')!
   @Trace aiBarHeight: AiBarHeight = AppStorageV2.connect(AiBarHeight, AppStorageKeys.AI_BAR_HEIGHT,
     () => new AiBarHeight())!;
   @Trace statusBarHeight: StatusBarHeight = AppStorageV2.connect(StatusBarHeight, AppStorageKeys.STATUS_BAR_HEIGHT,
@@ -48,6 +49,9 @@ export class NavDestinationModifier implements AttributeModifier<NavDestinationA
 
   applyNormalAttribute(instance: NavDestinationAttribute): void {
     instance
-      .padding({ top: `${px2vp(this.statusBarHeight.value)}vp`, bottom: `${px2vp(this.aiBarHeight.value)}vp` })
+      .padding({
+        top: `${this.windowStage.getMainWindowSync().getUIContext().px2vp(this.statusBarHeight.value)}vp`,
+        bottom: `${this.windowStage.getMainWindowSync().getUIContext().px2vp(this.aiBarHeight.value)}vp`
+      })
   }
 }

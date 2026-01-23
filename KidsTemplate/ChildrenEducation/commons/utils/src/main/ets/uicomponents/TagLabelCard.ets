@@ -4,7 +4,7 @@ import { CommonConstants } from '../constants/CommonConstants';
 @Builder
 export function TagLabelCard(text : string){
   Text(text)
-    .fontSize($r('app.float.12fp'))
+    .fontSize(10)
     .fontColor($r('sys.color.black'))
     .opacity(0.9)
     .textAlign(TextAlign.Center)
@@ -16,7 +16,6 @@ export function TagLabelCard(text : string){
       left: $r('app.float.8vp'),
       right: $r('app.float.8vp'),
       top: $r('app.float.2vp'),
-      bottom: $r('app.float.2vp')
     })
     .margin({right:5})
 }

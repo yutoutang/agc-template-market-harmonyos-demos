@@ -1,7 +1,9 @@
 import { WindowManager } from '@agctemplate/utils'
+import { AppStorageKeys, BreakPoint, BreakPointType, BreakPointValue } from '@agctemplate/widgets'
 import { DramaCoverVM } from '../viewmodels/DramaCoverVM'
 import { onDramaClick } from './BannerPanel'
 import { DramaCover } from './DramaCover'
+import { AppStorageV2 } from '@kit.ArkUI'
 
 @ComponentV2
 export struct RankList {
@@ -9,6 +11,8 @@ export struct RankList {
   @Param scroller: Scroller | undefined = undefined
   @Event loadNextPage: Function
   @Param @Require isVertical: boolean
+  @Local currentBreakpoint: BreakPoint = AppStorageV2.connect(BreakPoint, AppStorageKeys.CURRENT_BREAK_POINT,
+    () => new BreakPoint(BreakPointValue.SM))!;
 
   build() {
     List({ space: this.isVertical ? 16 : 0 }) {
@@ -40,7 +44,8 @@ export struct RankList {
     .width('100%')
     .height(this.isVertical ? 'auto' : 176)
     .listDirection(this.isVertical ? Axis.Vertical : Axis.Horizontal)
-    .lanes(this.isVertical ? 1 : 2)
+    .lanes(new BreakPointType<number>({ sm: 1, md: 2, lg: 3 }).getValue(this.currentBreakpoint.value),
+      new BreakPointType<number>({ sm: 0, md: 16, lg: 12 }).getValue(this.currentBreakpoint.value))
     .scrollBar(BarState.Off)
     .nestedScroll({
       scrollForward: NestedScrollMode.PARENT_FIRST,

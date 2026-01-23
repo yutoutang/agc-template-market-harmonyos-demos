@@ -2,6 +2,7 @@ import { OnlineInfo, OnlineInfoClass } from '../model/OnlineInfoModel'
 import { common } from '@kit.AbilityKit'
 import StrConstants from '../constants/StrConstants'
 import PreferencesManager from '../utils/PreferencesManager'
+import { window } from '@kit.ArkUI'
 
 export class OnlineCheckInViewModel {
   onlineInfoArr: OnlineInfoClass[] = []
@@ -10,9 +11,12 @@ export class OnlineCheckInViewModel {
   intervalId: number | null = null
   prefsManager: PreferencesManager
   onlineTimeList: OnlineTime[] = []
+  windowStage: window.WindowStage = AppStorage.get('windowStage')!
 
   constructor() {
-    this.prefsManager = PreferencesManager.getInstance(getContext(this) as common.UIAbilityContext)
+    this.prefsManager = PreferencesManager.getInstance(this.windowStage.getMainWindowSync()
+      .getUIContext()
+      .getHostContext() as common.UIAbilityContext)
   }
 
   async init(callback?: (progressValue: number) => void) {

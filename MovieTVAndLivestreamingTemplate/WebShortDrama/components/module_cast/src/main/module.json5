@@ -3,7 +3,8 @@
     "name": "module_cast",
     "type": "har",
     "deviceTypes": [
-      "default"
+      "default",
+      "tablet"
     ],
     "requestPermissions": [
       {

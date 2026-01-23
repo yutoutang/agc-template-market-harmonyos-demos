@@ -14,9 +14,14 @@ export const mineCommonService: Array<CommonServiceModel> = [
     pageName: 'ViewHistory',
   },
   {
-    symbol:'sys.symbol.message_on_message',
+    symbol:'app.media.message',
     serviceName: 'app.string.contact_us',
     pageName: 'ContactUs',
+  },
+  {
+    symbol:'sys.symbol.doc_plaintext_and_pencil',
+    serviceName: 'app.string.feed_back',
+    pageName: 'FeedbackPage',
   },
   {
     symbol:'sys.symbol.gearshape',

@@ -3,13 +3,13 @@
     "name":"跑步",
     "typeEnum": 1,
     "icon": "app.media.run",
-    "advImage": ["app.media.material1","app.media.material5"]
+    "advImage": ["app.media.material5"]
   },
   {
     "name":"瑜伽",
     "typeEnum": 2,
     "icon": "app.media.yoga",
-    "advImage": ["app.media.material7","app.media.material8"]
+    "advImage": ["app.media.material2","app.media.material8"]
   },
   {
     "name":"拳击",
@@ -33,13 +33,13 @@
     "name":"健美",
     "typeEnum": 6,
     "icon": "app.media.bodybuilding",
-    "advImage": ["app.media.material9","app.media.material6"]
+    "advImage": ["app.media.material9","app.media.material2"]
   },
   {
     "name":"普拉提",
     "typeEnum": 7,
     "icon": "app.media.pilates",
-    "advImage": ["app.media.material6","app.media.material3"]
+    "advImage": ["app.media.material2","app.media.material3"]
   },
   {
     "name":"壶铃",

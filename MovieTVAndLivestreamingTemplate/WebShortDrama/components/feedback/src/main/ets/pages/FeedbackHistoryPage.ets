@@ -42,13 +42,13 @@ struct FeedbackHistoryPage {
             span: {
               xs: 12,
               sm: 12,
-              md: 10,
+              md: 12,
               lg: 12
             },
             offset: {
               xs: 0,
               sm: 0,
-              md: 1,
+              md: 0,
               lg: 0
             }
           }) {
@@ -106,7 +106,7 @@ struct FeedbackHistoryPage {
           } else if (breakpoints === BreakpointType.MD) {
             this.templateForGrid = '1fr '.repeat(6);
             this.imagesGap = 12;
-            this.templateForWaterFlow = '1fr';
+            this.templateForWaterFlow = '1fr 1fr';
           } else {
             this.templateForGrid = '1fr '.repeat(4);
             this.imagesGap = 8;

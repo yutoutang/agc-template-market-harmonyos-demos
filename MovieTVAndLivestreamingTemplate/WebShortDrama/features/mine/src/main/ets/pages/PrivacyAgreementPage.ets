@@ -1,11 +1,12 @@
 import { common } from '@kit.AbilityKit';
 import { getMedia, NAV_PAGE_NAME } from '@agctemplate/resources';
 import { appRouter, PreferConstant, PreferenceUtil, WindowManager } from '@agctemplate/utils';
-import { ComponentContent } from '@kit.ArkUI';
+import { ComponentContent, window } from '@kit.ArkUI';
 
 export class PromptActionClass {
   static ctx: UIContext;
   static contentNode: ComponentContent<Object>;
+
   static setContext(context: UIContext) {
     PromptActionClass.ctx = context;
   }
@@ -50,7 +51,7 @@ export struct PrivacyAgreementPage {
         Image($r('app.media.ic_launch'))
           .width(72)
           .height(72)
-          .margin({ bottom: 24, top: 136 })
+          .margin({ bottom: 24, top: '17%' })
         Text('短剧')
           .fontSize($r('sys.float.Title_L'))
           .height(40)
@@ -113,7 +114,7 @@ export struct PrivacyAgreementPage {
         Row() {
           Button('取消')
             .id('cancel')
-            .width(158)
+            .width('48%')
             .height(40)
             .fontColor('#EC6E45')
             .fontSize($r('sys.float.Body_L'))
@@ -122,13 +123,13 @@ export struct PrivacyAgreementPage {
               PromptActionClass.openDialog()
             })
           Button('同意')
-            .width(158)
+            .width('48%')
             .height(40)
             .fontColor($r('sys.color.font_on_primary'))
             .fontSize($r('sys.float.Body_L'))
             .backgroundColor('#EC6E45')
             .onClick(() => {
-              PreferenceUtil.getInstance(getContext()).put(PreferConstant.FIRSTLAUNCH, false)
+              PreferenceUtil.getInstance(this.getUIContext().getHostContext()).put(PreferConstant.FIRSTLAUNCH, false)
               appRouter.replace({ builderName: NAV_PAGE_NAME.LaunchAdPage.name })
             })
         }
@@ -137,16 +138,23 @@ export struct PrivacyAgreementPage {
       }
       .width('100%')
       .height('100%')
-      .padding({ left: 16, right: 16, top: 56, bottom: 36 })
+      .padding({
+        left: 16,
+        right: 16,
+        top: '9%',
+        bottom: 36
+      })
       .justifyContent(FlexAlign.Start)
     }
     .hideTitleBar(true)
     .onBackPressed(() => {
-      (getContext() as common.UIAbilityContext).terminateSelf()
+      (this.getUIContext().getHostContext() as common.UIAbilityContext).terminateSelf()
       return true
     })
   }
 }
+
+const windowStage: window.WindowStage = AppStorage.get('windowStage')!
 
 @Builder
 export function privacyDialog() {
@@ -201,7 +209,7 @@ export function privacyDialog() {
       Row() {
         Button('退出应用')
           .onClick(() => {
-            (getContext() as common.UIAbilityContext).terminateSelf()
+            (windowStage.getMainWindowSync().getUIContext().getHostContext() as common.UIAbilityContext).terminateSelf()
           })
           .width(140)
           .height(40)
@@ -213,7 +221,8 @@ export function privacyDialog() {
         Button('同意并继续')
           .onClick(() => {
             PromptActionClass.closeDialog()
-            PreferenceUtil.getInstance(getContext()).put(PreferConstant.FIRSTLAUNCH, false)
+            PreferenceUtil.getInstance(windowStage.getMainWindowSync().getUIContext().getHostContext())
+              .put(PreferConstant.FIRSTLAUNCH, false)
             appRouter.replace({ builderName: NAV_PAGE_NAME.LaunchAdPage.name })
           })
           .width(140)

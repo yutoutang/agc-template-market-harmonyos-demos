@@ -2,9 +2,15 @@ import { jumpDetailPage, ParamsModel } from '@agctemplate/detail';
 import { getMedia, getString } from '@agctemplate/resources';
 import { MyWatchRecordData, MyWatchRecordRes, RequestAPI } from '@agctemplate/server';
 import { appRouter, container, WindowManager } from '@agctemplate/utils';
-import { NavDestinationModifier } from '@agctemplate/widgets'
+import {
+  AppStorageKeys,
+  BreakPoint,
+  BreakPointType,
+  BreakPointValue,
+  NavDestinationModifier
+} from '@agctemplate/widgets'
 import { VideoSeries } from '../component/VideoSeries';
-import { AlertDialog } from '@kit.ArkUI'
+import { AlertDialog, AppStorageV2 } from '@kit.ArkUI'
 import {
   getDramaInfo,
   setMyWatchRecord,
@@ -19,7 +25,10 @@ export struct WatchRecordsPage {
   @Local selectCount: number = 0
   @Local selectedIds: string[] = []
   @Local deletePromptMsg: string | Resource = '此条'
-  @Local isFirstTime:boolean = AppStorage.get('isFirstTime')!
+  @Local currentBreakpoint: BreakPoint = AppStorageV2.connect(BreakPoint, AppStorageKeys.CURRENT_BREAK_POINT,
+    () => new BreakPoint(BreakPointValue.SM))!;
+  @Local trackSize: number =
+    new BreakPointType<number>({ sm: 104, md: 164, lg: 211 }).getValue(this.currentBreakpoint.value)!
   deleteDialogController: CustomDialogController = new CustomDialogController({
     builder: AlertDialog({
       content: getString('app.string.delete_watched_prompt', this.deletePromptMsg.toString()),
@@ -49,22 +58,18 @@ export struct WatchRecordsPage {
     }),
   })
 
+  @Monitor('currentBreakpoint.value')
+  onBreakChange(monitor: IMonitor) {
+    this.trackSize = new BreakPointType<number>({ sm: 104, md: 164, lg: 211 }).getValue(this.currentBreakpoint.value)!
+  }
+
   aboutToAppear(): void {
-    if(this.isFirstTime){
-      container.resolve(RequestAPI).getMyWatchRecord({
-        pageSize: 1,
-        pageNum: 20
-      }).then((res) => {
-        this.myWatchRecordRes = new MyWatchRecordRes(res.getBody());
-        this.myWatchRecordRes.myWatchRecord.forEach((item) => {
-          container.resolve(RequestAPI).unsetMyWatchRecord(item.id)
-        })
-        AppStorage.set('isFirstTime',false)
-        this.updateWatchedRecords()
-      })
-    }else{
-      this.updateWatchedRecords()
-    }
+    container.resolve(RequestAPI).getMyWatchRecord({
+      pageSize: 1,
+      pageNum: 20
+    }).then((res) => {
+      this.myWatchRecordRes = new MyWatchRecordRes(res.getBody());
+    })
   }
 
   build() {
@@ -141,7 +146,7 @@ export struct WatchRecordsPage {
         }) // 打开virtualScroll模式，totalCount为期望加载的数据长度
     }
     .edgeEffect(EdgeEffect.Spring)
-    .columnsTemplate('1fr 1fr 1fr')
+    .columnsTemplate(`repeat(auto-stretch, ${this.trackSize})`)
     .scrollBar(BarState.Off)
     .cachedCount(4) // 容器组件的预加载区域大小
     .margin({ bottom: this.isDeleting ? 0 : 60 })

@@ -9,6 +9,7 @@
     "@agctemplate/common": "1.0.0",
     "@agctemplate/server": "1.0.0",
     "@agctemplate/utils": "1.0.0",
-    "@agctemplate/resources": "1.0.0"
+    "@agctemplate/resources": "1.0.0",
+    "@ohos/axios": "2.2.4"
   }
 }

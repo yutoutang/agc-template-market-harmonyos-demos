@@ -53,7 +53,7 @@ export struct ShareView {
 
   generatePixelmap() {
     const id = this.data.extComponentId ? this.data.extComponentId : CommonConstants.DEFAULT_SNAPSHOT_ID;
-    componentSnapshot.get(id, ((err: BusinessError, pixmap: image.PixelMap) => {
+    this.getUIContext().getComponentSnapshot().get(id, ((err: BusinessError, pixmap: image.PixelMap) => {
       if (err) {
         Logger.error(TAG, `componentSnapshot get ${id} fail, error: ` + JSON.stringify(err));
         return;

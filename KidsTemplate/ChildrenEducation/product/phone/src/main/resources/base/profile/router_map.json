@@ -1,0 +1,9 @@
+{
+  "routerMap": [
+    {
+      "name": "AdPage",
+      "pageSourceFile": "src/main/ets/ad/SplashAdPage.ets",
+      "buildFunction": "SplashAdPageBuilder"
+    }
+  ]
+}

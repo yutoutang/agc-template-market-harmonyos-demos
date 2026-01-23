@@ -5,10 +5,6 @@
       "value": "description"
     },
     {
-      "name": "privacyAgreementPath",
-      "value": "https://privacy.consumer.huawei.com/legal/id/authentication-terms.htm?code=CN&language=zh-CN"
-    },
-    {
       "name": "get_mobile_number_error",
       "value": "获取匿名手机号失败"
     },
@@ -35,6 +31,10 @@
     {
       "name": "contact_us",
       "value": "联系我们"
+    },
+    {
+      "name": "feed_back",
+      "value": "意见反馈"
     },
     {
       "name": "app_user_agreement",

@@ -9,6 +9,7 @@ import { CastSessionListener, CastStatusModel } from '../model/CastStatusModel'
 import { media } from '@kit.MediaKit';
 import { fileIo } from '@kit.CoreFileKit';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { window } from '@kit.ArkUI';
 
 const TAG = '[CastService]'
 const DOMAIN = 0x000
@@ -22,6 +23,7 @@ export class CastService {
   private sessionListener?: CastSessionListener;
   private curSource?: VideoData;
   @Trace castStatusModel: CastStatusModel = CastStatusModel.instance
+  windowStage: window.WindowStage = AppStorage.get('windowStage')!
 
   constructor() {
   }
@@ -102,7 +104,7 @@ export class CastService {
           this.sessionListener?.onStartCasting()
         }
       } else {
-        promptAction.showToast({ message: '获取投播资源失败' })
+        this.windowStage.getMainWindowSync().getUIContext().getPromptAction().showToast({ message: '获取投播资源失败' })
         hilog.error(DOMAIN, TAG, 'can not get video source')
         this.castController?.endCasting()
         this.castStatusModel.isCasting = false
@@ -273,7 +275,7 @@ export class CastService {
         }
       }
     }else{
-      promptAction.showToast({ message: '获取投播资源失败' })
+      this.windowStage.getMainWindowSync().getUIContext().getPromptAction().showToast({ message: '获取投播资源失败' })
       return false
     }
     if (castItem) {
@@ -296,6 +298,7 @@ export class CastService {
       this.castStatusModel.isCasting = false
       this.sessionListener?.onEndCasting()
       hilog.debug(DOMAIN, TAG, `user cast endCasting`)
+      this.sessionListener?.onPause()
     }
   }
 

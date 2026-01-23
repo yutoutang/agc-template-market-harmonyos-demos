@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import { CommonUtils, IServiceDetailItem } from 'module_base'
+import { CommonUtils, IServiceDetailItem } from 'module_base';
 
 @ComponentV2
 export struct ServiceText {
@@ -27,11 +27,11 @@ export struct ServiceText {
 
   build() {
     Text() {
-      Span(this.descList[0] ?? '')
-      Span(CommonUtils.handleCash(this.content.price)).fontColor($r('app.color.common_red'))
-      Span(this.descList[1] ?? '')
+      Span(this.descList[0] ?? '').fontSize($r('sys.float.Body_M'))
+      Span(CommonUtils.handleCash(this.content.price))
+        .fontSize($r('sys.float.Body_M'))
+        .fontColor($r('sys.color.multi_color_08'))
+      Span(this.descList[1] ?? '').fontSize($r('sys.float.Body_M'))
     }
-    .fontSize(12)
-    .fontWeight(500)
   }
 }

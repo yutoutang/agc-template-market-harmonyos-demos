@@ -1,9 +1,15 @@
 {
-  "modelVersion": "5.0.4",
+  "modelVersion": "5.1.0",
   "description": "Please describe the basic information.",
   "dependencies": {
+    "dayjs": "^1.11.13",
+    "@hw-agconnect/util-log": "^1.0.0",
+    "@hw-agconnect/ui-toast": "^1.0.0",
+    "membership": "file:./components/membership"
   },
   "devDependencies": {
+    "@ohos/hypium": "1.0.24",
   },
   "dynamicDependencies": {}
 }
+

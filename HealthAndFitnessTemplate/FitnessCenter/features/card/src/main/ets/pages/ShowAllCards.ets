@@ -1,74 +1,63 @@
 import { CardInfo, MockService, SportType } from 'external_interactions';
-import { TitleBar } from 'uicomponents';
-import { Card } from '../components/Card';
-import { SymbolGlyphModifier } from '@kit.ArkUI';
-import { JSON } from '@kit.ArkTS';
+import { CardContent } from '../components/CardContent'
+import { SearchFilterContent, Type } from 'module_search_filter';
+import { TitleBar } from 'module_recharge/src/main/ets/components/TitleBar';
+import { ScreenPropStorage} from 'external_interactions'
+import { AppStorageV2 } from '@kit.ArkUI';
 
-@Component
+@ComponentV2
 export struct ShowAllCards {
-  @StorageProp('topRectHeight') topRectHeight: number = 0;
-  @StorageProp('bottomRectHeight') bottomRectHeight: number = 0;
-  @Prop pathStack: NavPathStack;
-  @State showCardList: CardInfo[] = MockService.cardList;
+  @Local screenPropStorage : ScreenPropStorage = AppStorageV2.connect(ScreenPropStorage, 'ScreenPropStorage', () =>new ScreenPropStorage())!
+  @Local topRectHeight: number = this.screenPropStorage.topRectHeight;
+  @Local bottomRectHeight: number = this.screenPropStorage.bottomRectHeight;
+  @Param @Once pathStack: NavPathStack = new NavPathStack();
+  @Local showCardList: CardInfo[] = MockService.cardList;
+  @Local cardList: CardInfo[] = this.showCardList
+  @Local listLength: number = 0;
+  @Local sportType: number = 0
   sportTypeList: SportType[] = [{
     name: '全部',
     typeEnum: 0,
     icon: '',
     advImage: []
   }];
-  @State sportSelectIndex: number = 0;
-  @State searchWord: string = ''
-
+  cardNatureList: string[] = ['全部']
+  @Param @Once list: string[] = []
+  @Local sportSelectIndex: number = 0;
+  @Local searchWord: string = ''
+  aboutToAppear(): void {
+    this.sportTypeList = this.sportTypeList.concat(MockService.sportTypeList)
+    this.cardNatureList = this.cardNatureList.concat(MockService.cardNatureList)
+    this.list = this.cardNatureList
+    this.listLength = this.showCardList.length
+  }
+  private handleBack(nature: string, index: number, searchWord: string){
+    this.showCardList = MockService.getCardListBySearchAndFilter(this.cardList, searchWord, index, nature)
+    this.listLength = this.showCardList?.length
+  }
   build() {
     NavDestination() {
-      TitleBar({ title: '本店卡项', pathStack: this.pathStack })
+      TitleBar({ title: '本店卡项',
+        onBackClick:()=>{
+          this.pathStack.pop()
+        }
+      })
         .margin({ left: 16, right: 16 })
       Scroll() {
         Column() {
-          Search({ placeholder: '请输入卡项名称', value: $$this.searchWord })
-            .width('100%')
-            .backgroundColor('#E5E7E8')
-            .placeholderColor($r('sys.color.font_tertiary'))
-            .placeholderFont({ size: $r('sys.float.Body_M'), weight: FontWeight.Regular })
-            .cancelButton({
-              style: CancelButtonStyle.CONSTANT,
-              icon: new SymbolGlyphModifier($r('sys.symbol.xmark_circle')).fontColor([Color.Gray])
-                .outlineColor(Color.Gray)
-            })
-            .margin({ bottom: 15 })
-            .borderRadius(20)
-            .onChange(() => {
-              this.showCardList =
-                MockService.getCardListBySearch(this.searchWord, this.sportTypeList[this.sportSelectIndex]);
-            })
-
-          List({ space: 16 }) {
-            ForEach(this.sportTypeList, (item: SportType, index: number) => {
-              ListItem() {
-                Row() {
-                  Text(item.name)
-                    .fontSize(14)
-                    .fontWeight(this.sportSelectIndex === index ? FontWeight.Bold : FontWeight.Regular)
-                }
-                .justifyContent(FlexAlign.Center)
-                .borderRadius(16)
-                .backgroundColor('#E5E7E8')
-                .width(60)
-                .height(40)
-                .onClick(() => {
-                  this.sportSelectIndex = index;
-                  this.showCardList =
-                    MockService.getCardListBySearch(this.searchWord, this.sportTypeList[this.sportSelectIndex]);
-                })
-              }
-            }, (item: SportType) => JSON.stringify(item))
-          }
-          .listDirection(Axis.Horizontal)
-          .scrollBar(BarState.Off)
-          .width('100%')
-          .height(40)
-          .margin({ bottom: 15 })
-
+          SearchFilterContent({
+            placeHolder: '请输入卡项名称',
+            typeList: this.list,
+            onContentChange: (nature: string, index: number, searchWord: string) => {
+              this.handleBack(nature, index, searchWord)
+            }
+          })
+          CardContent({
+            cardList: this.showCardList,
+            onChildClick: (id: string)=>{
+              this.pathStack.pushPath({name: 'card/cardDetail', param: MockService.cardIdMap.get(id)})
+            }
+          })
           Column() {
             Image($r('app.media.no_result'))
               .width(144)
@@ -82,37 +71,31 @@ export struct ShowAllCards {
           .height('50%')
           .justifyContent(FlexAlign.Center)
           .alignItems(HorizontalAlign.Center)
-          .visibility(this.showCardList.length > 0 ? Visibility.None : Visibility.Visible)
-
-          Grid() {
-            ForEach(this.showCardList, (item: CardInfo) => {
-              GridItem() {
-                Card({ pathStack: this.pathStack, cardInfo: item })
-              }
-            }, (item: CardInfo) => JSON.stringify(item))
-          }
-          .width('100%')
-          .columnsTemplate('1fr 1fr')
-          .columnsGap(15)
-          .rowsGap(15)
-          .backgroundColor(Color.White)
-          .borderRadius(16)
-          .margin({ bottom: 15 })
-          .padding(15)
-          .visibility(this.showCardList.length > 0 ? Visibility.Visible : Visibility.None)
+          .visibility(
+            this.listLength > 0 ? Visibility.None : Visibility.Visible
+          )
         }
+        .margin({ bottom: 50 })
       }
       .margin({ left: 16, right: 16 })
       .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
     }
     .onReady((ctx: NavDestinationContext) => {
       this.pathStack = ctx.pathStack
-      this.sportTypeList = this.sportTypeList.concat(MockService.sportTypeList)
+      if (ctx.pathInfo.param) {
+        this.showCardList = ctx?.pathInfo?.param as CardInfo[]
+      } else {
+        this.showCardList = MockService.cardList
+      }
+      this.cardList = this.showCardList
     })
     .hideTitleBar(true)
-    .padding({ top: px2vp(this.topRectHeight), bottom: px2vp(this.bottomRectHeight)})
+    .padding({ top: this.getUIContext().px2vp(this.topRectHeight),
+      bottom: this.getUIContext().px2vp(this.bottomRectHeight) })
     .height('100%')
     .width('100%')
     .backgroundColor($r('app.color.main_background_color'))
+    .onAppear(()=>this.handleBack('', 0, ''))
   }
 }

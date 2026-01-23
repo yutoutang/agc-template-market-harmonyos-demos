@@ -1,6 +1,5 @@
-
-
 import bundleManager from '@ohos.bundle.bundleManager';
+import { SafeJson } from '../json/SafeJson';
 
 /**
  * @description 获取应用包信息

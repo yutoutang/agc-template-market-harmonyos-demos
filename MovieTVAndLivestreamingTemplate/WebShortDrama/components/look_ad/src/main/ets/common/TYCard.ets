@@ -48,9 +48,7 @@ export struct TYCard {
       left: this.leftPadding,
       right: this.rightPadding
     })
-    .borderRadius(12)
-    .backgroundImage($r('app.media.award_bg_linearGradient'))
-    .backgroundImageSize(ImageSize.FILL)
-
+    .borderRadius(16)
+    .backgroundColor($r('sys.color.comp_background_primary'))
   }
 }

@@ -3,7 +3,8 @@
     "name": "look_ad",
     "type": "har",
     "deviceTypes": [
-      "default"
+      "default",
+      "tablet"
     ]
   }
 }

@@ -20,6 +20,7 @@ import { util } from '@kit.ArkTS';
 export struct FormAvatar {
   @Param url: ResourceStr = '';
   @Event onAvatarSelect: (url: ResourceStr) => void;
+  context: Context | undefined = this.getUIContext().getHostContext();
 
   build() {
     FunctionalButton({
@@ -44,7 +45,10 @@ export struct FormAvatar {
         let avatarFile: fs.File | null = null;
         try {
           avatarFile = fs.openSync(url, fs.OpenMode.READ_ONLY);
-          let newPath: string = getContext().cacheDir + `/${util.generateRandomUUID(false)}.png`;
+          if (!this.context) {
+            return;
+          }
+          let newPath: string = this.context.cacheDir + `/${util.generateRandomUUID(false)}.png`;
           fs.copyFileSync(avatarFile.fd, newPath);
           url = 'file://' + newPath;
         } finally {

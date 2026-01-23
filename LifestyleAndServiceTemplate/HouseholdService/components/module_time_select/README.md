@@ -4,7 +4,7 @@
 
 - [简介](#简介)
 - [约束与限制](#约束与限制)
-- [快速入门](#快速入门)
+- [使用](#使用)
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
@@ -12,7 +12,7 @@
 
 本组件提供通过底部弹窗选择日期时间的功能。
 
-<img src="screenshots/timeselect.jpg" width="300">
+<img src="screenshots/time_select.jpeg" width="300">
 
 ## 约束与限制
 
@@ -23,7 +23,11 @@
 * 设备类型：华为手机（包括双折叠和阔折叠）
 * 系统版本：HarmonyOS 5.0.0(12)及以上
 
-## 快速入门
+### 权限
+
+* 无
+
+## 使用
 
 1. 安装组件。
 
@@ -76,12 +80,12 @@ TimeSelect(option?: [TimeSelectOptions](#TimeSelectOptions对象说明))
 
 ### TimeSelectOptions对象说明
 
-| 参数名          | 类型                                | 是否必填 | 说明           |
-|:-------------|:----------------------------------|:-----|:-------------|
-| label        | ResourceStr                       | 否    | 时间文本         |
-| timeOptions  | [TimeOptions](#TimeOptions类型说明)   | 否    | 天数、起止时间等时间选项 |
-| styleOptions | [StyleOptions](#StyleOptions类型说明) | 否    | 样式选项         |
-| onTimeSelect | (dateTime: Date) => void          | 否    | 选择时间的回调      |
+| 参数名          | 类型                                                  | 是否必填 | 说明           |
+|:-------------|:----------------------------------------------------|:-----|:-------------|
+| label        | ResourceStr                                         | 否    | 时间文本         |
+| timeOptions  | [TimeOptions](#TimeOptions类型说明)                     | 否    | 天数、起止时间等时间选项 |
+| styleOptions | [StyleOptions](#StyleOptions类型说明)                   | 否    | 样式选项         |
+| onTimeSelect | (dateTime: Date                    \| null) => void | 否    | 选择时间的回调      |
 
 ### TimeOptions类型说明
 
@@ -105,7 +109,7 @@ TimeSelect(option?: [TimeSelectOptions](#TimeSelectOptions对象说明))
 ## 示例代码
 
 ```
-import { TimeSelect } from 'module_time_select'
+import { TimeSelect } from 'module_time_select';
 
 @Entry
 @ComponentV2
@@ -122,37 +126,29 @@ struct TimeSelectSample {
 
   build() {
     NavDestination() {
-      Column() {
-        Row() {
-          Text('上门时间')
-            .fontSize(14)
-            .fontWeight(500)
-            .margin({ left: 8 })
-          Blank()
-          TimeSelect({
-            label: this.getTimeText,
-            timeOptions: {
-              days: 7,
-              startTime: '06:59:00',
-              endTime: '19:30:00',
-            },
-            styleOptions: {
-              dayFgSelected: '#0A59F7',
-              timeBgSelected: '#F2F6FE',
-              timeBorderSelected: '#2269F7',
-            },
-            onTimeSelect: (dateTime: Date) => {
-              this.date = dateTime;
-            },
-          })
-        }
-        .width('100%')
-        .height(48)
-        .padding(10)
-        .backgroundColor(Color.White)
-        .borderRadius(4)
+      Column({ space: 12 }) {
+        Text('请选择上门时间')
+          .fontSize($r('sys.float.Subtitle_M'))
+          .fontWeight(FontWeight.Bold)
+          .lineHeight(21)
+
+        TimeSelect({
+          label: this.getTimeText,
+          timeOptions: {
+            days: 7,
+            startTime: '06:59:00',
+            endTime: '19:30:00',
+          },
+          onTimeSelect: (dateTime: Date | null) => {
+            this.date = dateTime;
+          },
+        })
       }
-      .padding(10)
+      .width('100%')
+      .padding(12)
+      .borderRadius(16)
+      .backgroundColor(Color.White)
+      .alignItems(HorizontalAlign.Start)
     }
     .title('时间选择弹窗组件')
     .backgroundColor('#F1F3F5')

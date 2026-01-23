@@ -22,9 +22,11 @@ import {
 } from '@agctemplate/utils';
 import { DramaInfo, MyWatchRecordRes, RequestAPI } from '@agctemplate/server';
 import { MyStorage } from '../models/SpeedData';
-import { getDramaInfo,
+import {
+  getDramaInfo,
   setMyWatchRecord,
-  unsetMyWatchRecord } from '@agctemplate/server/src/main/ets/api/mock/mockData/mockDramaFactory';
+  unsetMyWatchRecord
+} from '@agctemplate/server/src/main/ets/api/mock/mockData/mockDramaFactory';
 import { emitter } from '@kit.BasicServicesKit';
 import { CastListenerImpl } from '../listener/CastListenerImpl';
 import { CastService, CastStatusModel } from 'module_cast';
@@ -34,6 +36,7 @@ import { PipManager, PipVideoConfig } from 'module_pip';
 import { MediaSource } from 'video_swiper/src/main/ets/constant/MediaSource';
 import { DetailVideoData } from '../models/DetailVideoData';
 import { JSON } from '@kit.ArkTS';
+import { common } from '@kit.AbilityKit';
 
 const TAG: string = 'ShortVideo';
 
@@ -47,7 +50,7 @@ export struct ShortDramaDetailPage {
   @Local statusBarHeight: StatusBarHeight = AppStorageV2.connect(StatusBarHeight, AppStorageKeys.STATUS_BAR_HEIGHT,
     () => new StatusBarHeight())!;
   // 初始化当前视频的下标
-  @Local currentVideoIndex: number = 0;
+  @Provider('currentIndex') currentVideoIndex: number = 0;
   // 首视频标志
   @Local firstFlag: boolean = true;
   // 当前播放视频的索引
@@ -55,6 +58,8 @@ export struct ShortDramaDetailPage {
   @Local layoutSize: PlayerLayoutSize = new PlayerLayoutSize()
   @Local storage: MyStorage = MyStorage.instance();
   @Param @Require continueVideoData: ContinueVideoData;
+  @Local continueVideoDataTra: ContinueVideoData = this.continueVideoData
+  @Provider('currentTime') currentTime: number = 0
   // 短视频数据
   @Local vm: ShortDramaDetailListVM = ShortDramaDetailListVM.instance;
   @Local playController: PlayController = new PlayController()
@@ -127,6 +132,18 @@ export struct ShortDramaDetailPage {
     }
   };
 
+  @Monitor('currentTime')
+  onTimeChange(monitor: IMonitor){
+    this.continueVideoDataTra.playTime = monitor.value()?.now as number
+    this.vm.setContinueData(this.continueVideoDataTra)
+  }
+
+  @Monitor('currentVideoIndex')
+  onIndexChange(monitor: IMonitor){
+    this.continueVideoDataTra.currentIndex = monitor.value()?.now as number
+    this.vm.setContinueData(this.continueVideoDataTra)
+  }
+
   @Monitor('playController.curentIndex',)
   onStrChange(monitor: IMonitor) {
     monitor.dirty.forEach((path: string) => {
@@ -188,15 +205,15 @@ export struct ShortDramaDetailPage {
     }).then((res) => {
       this.myWatchRecordRes = new MyWatchRecordRes(res.getBody());
     })
-    this.enablePip = PreferenceUtil.getInstance(getContext())
+    this.enablePip = PreferenceUtil.getInstance(this.getUIContext().getHostContext())
       .get(PreferConstant.BACKGROUND_MINI_WINDOW_PLAYBACK, false) as boolean
     Logger.info(TAG, `enablePip:${this.enablePip}`)
     if (this.enablePip) {
       PipManager.getInstance().setAutoStart(true)
     }
     this.getFavoriteEmitter()
-    this.storage.selectSpeed =
-      PreferenceUtil.getInstance(getContext()).get(PreferConstant.PLAY_SPEED_SETTINGS, '1.0x') as string
+    this.storage.selectSpeed = PreferenceUtil.getInstance(this.getUIContext().getHostContext())
+      .get(PreferConstant.PLAY_SPEED_SETTINGS, '1.0x') as string
     this.playController.autoPlay = true
 
     this.vm.deinit()
@@ -214,6 +231,7 @@ export struct ShortDramaDetailPage {
       mediaSource.push(new MediaSource(item.getId(), item.getUrl() as string, item.isLocked()))
     })
     this.playController.setPlayList(mediaSource)
+    this.vm.setContinueData(this.continueVideoData)
   }
 
   registerEmitter() {
@@ -267,7 +285,7 @@ export struct ShortDramaDetailPage {
     CastService.getInstance().unregisterSessionListener(this.castListener)
     CastService.getInstance().deinit()
     this.storage.selectSpeed =
-      PreferenceUtil.getInstance(getContext()).get(PreferConstant.PLAY_SPEED_SETTINGS, '1.0x') as string
+      PreferenceUtil.getInstance(this.getUIContext().getHostContext()).get(PreferConstant.PLAY_SPEED_SETTINGS, '1.0x') as string
     // 观看记录
     let isWatched: boolean = false
     let isWatchedId: string = ''
@@ -300,7 +318,10 @@ export struct ShortDramaDetailPage {
             videoPlayDataSource: this.vm.data,
             contentBuilder: wrapBuilder(VideoDetailComponent),
             currentVideoIndex: this.currentVideoIndex,
-            inPage: 'Detail'
+            inPage: 'Detail',
+            updateContinueModel: (index: number) => {
+              this.vm.continueModel.currentIndex = index
+            }
           })
             .width('100%')
             .height('100%')
@@ -309,7 +330,8 @@ export struct ShortDramaDetailPage {
         .height('100%')
         .backgroundColor(Color.Black)
         .padding({
-          bottom: this.currentBreakpoint.value === BreakPointValue.LG ? 0 : `${px2vp(this.aiBarHeight.value)}vp`
+          bottom: this.currentBreakpoint.value === BreakPointValue.LG ? 0 :
+            `${this.getUIContext().px2vp(this.aiBarHeight.value)}vp`
         })
       }
     }
@@ -330,6 +352,7 @@ export struct ShortDramaDetailPage {
       }
     })
     .onShown(() => {
+      this.vm.enableContinue(this.getUIContext().getHostContext() as common.UIAbilityContext);
       Logger.info(TAG, 'onShown')
       if (this.enablePip) {
         if (this.isStart) {

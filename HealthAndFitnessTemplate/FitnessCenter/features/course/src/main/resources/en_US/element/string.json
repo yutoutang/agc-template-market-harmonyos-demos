@@ -11,6 +11,10 @@
     {
       "name": "internet",
       "value": "internet"
+    },
+    {
+      "name": "agcit_huawei_fitness_center",
+      "value": "1.0.0"
     }
   ]
 }

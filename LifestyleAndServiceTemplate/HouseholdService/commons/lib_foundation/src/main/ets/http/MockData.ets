@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-import { IntroType, TypeGood, IGoodCategory, IGoodInfo } from 'module_base';
-import { IHomeInfo, IUserInfo, LoginWithHuaweiIDResp } from '../model/IResponse';
+import { IGoodCategory, IGoodInfo, IntroType, TypeGood } from 'module_base';
+import { IHomeInfo, ISearchWordItem, IUserInfo, LoginWithHuaweiIDResp } from '../model/IResponse';
 
 /**
  * Mock数据类
@@ -27,7 +27,8 @@ export class MockData {
   };
   static USER_INFO: IUserInfo = {
     userId: MockData.USER_ID,
-    nickName: '',
+    nickName: '华为用户',
+    mobile: '130****0000',
     avatar: 'resourceImage://ic_user_default',
   };
   static HOME_INFO: IHomeInfo = {
@@ -37,6 +38,20 @@ export class MockData {
     officialWebsite: 'https://www.example.com',
     bannerGoods: [],
   };
+  static HISTORY_LIST: ISearchWordItem[] = [
+    { content: '日常保洁', id: '001' },
+    { content: '修理水龙头', id: '002' },
+  ];
+  static RECOMMEND_LIST: ISearchWordItem[] = [
+    { content: '日常保洁', id: '1' },
+    { content: '开荒清洁', id: '2' },
+    { content: '住家保姆', id: '3' },
+    { content: '金牌月嫂', id: '4' },
+    { content: '家电维修', id: '5' },
+    { content: '数码维修', id: '6' },
+    { content: '衣柜收纳', id: '7' },
+    { content: '全屋擦窗', id: '8' },
+  ];
   static ALL_CATEGORY_SERVICES: IGoodCategory[] = [
     {
       categoryId: 'season_hot',
@@ -101,12 +116,24 @@ export class MockData {
       id: 'home_clean_0',
       title: '日常保洁',
       subTitle: '高温消毒｜除尘除垢',
-      image: 'mockImage://good_1.png?token=99d85e3f-668f-4340-9ef7-a55d7542dc7c',
+      image: 'mockImage://good_detail_1.png',
       intro: [
         {
           type: IntroType.IMAGE,
-          value: 'mockImage://good_detail_1.png?token=8598078d-d2e7-46e1-9812-14632225193c',
+          value: 'mockImage://good_detail_2.png',
         },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_1.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_detail_3.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_detail_4.png',
+        }
       ],
       price: 119,
       vipPrice: 41,
@@ -114,7 +141,7 @@ export class MockData {
       serviceContentList: [
         {
           title: '基础保洁：',
-          content: '适合日常维护，快速清洁，保持家居整洁。',
+          content: '适合日常维护，快速清洁，保持家居整洁无浮灰脏污。',
         },
         {
           title: '清洁范围：',
@@ -220,11 +247,15 @@ export class MockData {
       id: 'pipe_clear_0',
       title: '厨房下水道疏通',
       subTitle: '菜渣油污堵塞，一次搞定',
-      image: 'mockImage://good_4.png?token=0a57ae15-13e0-4aba-abf3-8b9ed5db9340',
+      image: 'mockImage://good_4.png',
       intro: [
         {
           type: IntroType.IMAGE,
-          value: 'mockImage://good_detail_2.png?token=44733de0-7696-46d3-bdc7-2c26d429bf7b',
+          value: 'mockImage://good_4_detail.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_1.png',
         },
       ],
       price: 165,
@@ -272,15 +303,26 @@ export class MockData {
       type: TypeGood.CONSULT,
       classId: 'domestic_repair',
       id: 'domestic_repair_1',
-      title: '家用空调维修',
+      title: '空调（内外机）维修',
       subTitle: '空调不制冷/制热检测维修',
-      image: 'mockImage://good_ac.png?token=6525cbe3-4446-4534-a772-30068d79c783',
+      image: 'mockImage://good_ac.png',
       intro: [
         {
           type: IntroType.IMAGE,
-          value: 'mockImage://good_ac_detail.png?token=8b8b7f33-c823-4b06-a359-a31ac3b21c37',
+          value: 'mockImage://good_ac_detail_1.png',
         },
-
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_ac_detail_2.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_ac_detail_3.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_ac_detail_4.png',
+        },
       ],
       price: 170,
       vipPrice: 80,
@@ -319,13 +361,25 @@ export class MockData {
       type: TypeGood.CONSULT,
       classId: 'domestic_repair',
       id: 'domestic_repair_2',
-      title: '家用洗衣机维修',
+      title: '洗衣机维修',
       subTitle: '上下水故障/电机检测维修',
-      image: 'mockImage://good_washing.png?token=610038ff-52fe-48a8-9905-0ffbf48e893b',
+      image: 'mockImage://good_washing.png',
       intro: [
         {
           type: IntroType.IMAGE,
-          value: 'mockImage://good_washing_detail.png?token=b0dab1c6-609b-43f4-9563-ffb43baa293f',
+          value: 'mockImage://good_washing_detail_1.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_washing_detail_2.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_washing_detail_3.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_washing_detail_4.png',
         },
       ],
       price: 0,
@@ -373,11 +427,23 @@ export class MockData {
       id: 'house_repair_0',
       title: '水龙头安装/维修',
       subTitle: '服务专业，安全放心',
-      image: 'mockImage://good_house_repair.png?token=64d120f6-2cd3-41cc-8312-1eb80cd2a0ba',
+      image: 'mockImage://good_house_repair.png',
       intro: [
         {
           type: IntroType.IMAGE,
-          value: 'mockImage://good_house_repair_detail.png?token=96b1e188-1258-4c30-aba7-a68f1108103d',
+          value: 'mockImage://good_house_repair_detail_1.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_house_repair_detail_2.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_house_repair_detail_3.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_house_repair_detail_4.png',
         },
       ],
       price: 99,
@@ -433,12 +499,24 @@ export class MockData {
       id: 'digital_product_repair_0',
       title: '手机换屏',
       subTitle: '服务专业，安全放心',
-      image: 'mockImage://good_phone.png?token=1cbf1c85-941e-4b68-b99d-73c6cc5ce143',
+      image: 'mockImage://good_phone.png',
       intro: [
         {
           type: IntroType.IMAGE,
-          value: 'mockImage://good_phone_detail.png?token=4d80e4b0-c7a0-41b5-9368-f475301edb92',
+          value: 'mockImage://good_phone_detail_1.png',
         },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_phone_detail_2.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_phone_detail_3.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_phone_detail_4.png',
+        }
       ],
       price: 60,
       vipPrice: 39,
@@ -488,11 +566,23 @@ export class MockData {
       id: 'baby_care_0',
       title: '住家保姆',
       subTitle: '适合工作繁忙，需要长期看护的家庭',
-      image: 'mockImage://good_care.png?token=30f540b2-22d6-4902-8cca-a659bbca858b',
+      image: 'mockImage://good_care.png',
       intro: [
         {
           type: IntroType.IMAGE,
-          value: 'mockImage://good_care_detail.png?token=7e7d5ff2-33c1-42cf-95d0-81283c26426c',
+          value: 'mockImage://good_care_detail_1.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_care_detail_2.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_care_detail_3.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_care_detail_4.png',
         },
       ],
       price: 0,
@@ -549,12 +639,24 @@ export class MockData {
       id: 'baby_care_1',
       title: '月嫂',
       subTitle: '科学坐月子，呵护新生儿',
-      image: 'mockImage://good_baby.png?token=b6fe3aa6-d514-4c0a-8744-aeccb23f35dd',
+      image: 'mockImage://good_baby.png',
       intro: [
         {
           type: IntroType.IMAGE,
-          value: 'mockImage://good_baby_detail.png?token=b85a4d82-bc56-484e-bb48-51c03614d8d3',
+          value: 'mockImage://good_baby_detail_1.png',
         },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_baby_detail_2.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_baby_detail_3.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_baby_detail_4.png',
+        }
       ],
       price: 0,
       vipPrice: 0,
@@ -594,12 +696,24 @@ export class MockData {
       id: 'digital_product_repair_1',
       title: '电脑重装系统',
       subTitle: '服务专业，安全放心',
-      image: 'mockImage://good_pc.png?token=a3f2c8b0-7edb-4e1d-b3e1-b00e64086e0c',
+      image: 'mockImage://good_pc.png',
       intro: [
         {
           type: IntroType.IMAGE,
-          value: 'mockImage://good_pc_detail.png?token=78baeb2a-90c8-4c93-94f4-eafb1401b416',
+          value: 'mockImage://good_pc_detail_1.png',
         },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_pc_detail_2.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_pc_detail_3.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_pc_detail_4.png',
+        }
       ],
       price: 99,
       vipPrice: 59,
@@ -651,13 +765,25 @@ export class MockData {
       type: TypeGood.CONSULT,
       classId: 'window_clean',
       id: 'window_clean_0',
-      title: '擦窗户',
+      title: '全屋擦窗',
       subTitle: '明码标价，拒绝乱收费',
-      image: 'mockImage://good_window.png?token=8f43d071-fd69-4a7c-b7e5-995418a5d34f',
+      image: 'mockImage://good_window.png',
       intro: [
         {
           type: IntroType.IMAGE,
-          value: 'mockImage://good_window_detail.png?token=35a8a3d0-0cc6-4706-926f-63db8acdd326',
+          value: 'mockImage://good_window_detail_1.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_window_detail_2.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_window_detail_3.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_window_detail_4.png',
         },
       ],
       price: 0,
@@ -717,13 +843,25 @@ export class MockData {
       type: TypeGood.CONSULT,
       classId: 'refrigerator_clean',
       id: 'refrigerator_clean_0',
-      title: '家用冰箱蒸洗',
+      title: '冰箱蒸洗',
       subTitle: '冰箱不制冷/异响漏水检测维修',
-      image: 'mockImage://good_refrigerator.png?token=ffb24f46-8b32-4b59-8cff-79fc2c9fca90',
+      image: 'mockImage://good_refrigerator_detail_1.png',
       intro: [
         {
           type: IntroType.IMAGE,
-          value: 'mockImage://good_refrigerator_detail.png?token=df39b585-604a-482f-bda9-b8cc8d26e99a',
+          value: 'mockImage://good_refrigerator.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_refrigerator_detail_2.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_refrigerator_detail_3.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_refrigerator_detail_4.png',
         },
       ],
       price: 0,
@@ -775,11 +913,11 @@ export class MockData {
       id: 'refrigerator_clean_00',
       title: '风冷冰箱蒸洗',
       subTitle: '冰箱不制冷/异响漏水检测维修',
-      image: 'mockImage://good_refrigerator_detail.png?token=df39b585-604a-482f-bda9-b8cc8d26e99a',
+      image: 'mockImage://good_refrigerator_detail_4.png',
       intro: [
         {
           type: IntroType.IMAGE,
-          value: 'mockImage://good_refrigerator.png?token=ffb24f46-8b32-4b59-8cff-79fc2c9fca90',
+          value: 'mockImage://good_refrigerator.png',
         },
       ],
       price: 0,
@@ -831,12 +969,24 @@ export class MockData {
       id: 'closet_storage_organization_0',
       title: '衣物收纳',
       subTitle: '专业收纳师上门服务',
-      image: 'mockImage://good_organize.png?token=83783b11-8441-4a87-a128-00f74de023a9',
+      image: 'mockImage://good_organize.png',
       intro: [
         {
           type: IntroType.IMAGE,
-          value: 'mockImage://good_organize_detail.png?token=ed22b849-0c16-4315-b9d5-c94ffc4dd6de',
+          value: 'mockImage://good_organize_detail_1.png',
         },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_organize_detail_2.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_organize_detail_3.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_organize_detail_4.png',
+        }
       ],
       price: 0,
       vipPrice: 0,
@@ -883,12 +1033,16 @@ export class MockData {
       id: 'home_clean_1',
       title: '深度保洁',
       subTitle: '每月一次，省心洁净',
-      image: 'mockImage://good_deep_clean.png?token=bac111f3-a92c-4108-91e4-d1e93855a6d7',
+      image: 'mockImage://good_clean.png',
       intro: [
         {
           type: IntroType.IMAGE,
-          value: 'mockImage://good_deep_clean_detail.png?token=fabd01b9-4929-48b6-8535-e47ce18b09a2',
+          value: 'mockImage://good_detail_2.png',
         },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_detail_1.png',
+        }
       ],
       price: 128,
       vipPrice: 43,
@@ -996,12 +1150,24 @@ export class MockData {
       id: 'clothes_wash_0',
       title: '洗衣',
       subTitle: '懒人福音，上门取送包邮',
-      image: 'mockImage://good_clothes.png?token=6ef90d59-3421-47cf-a025-30c790cb39e6',
+      image: 'mockImage://good_clothes.png',
       intro: [
         {
           type: IntroType.IMAGE,
-          value: 'mockImage://good_clothes_detail.png?token=a4e49ffa-4ffd-47fa-a742-f2dad97cb697',
+          value: 'mockImage://good_clothes_detail_1.png',
         },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_clothes_detail_2.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_clothes_detail_3.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_clothes_detail_4.png',
+        }
       ],
       price: 129,
       vipPrice: 30,
@@ -1103,12 +1269,24 @@ export class MockData {
       id: 'clothes_wash_1',
       title: '洗鞋',
       subTitle: '懒人福音，上门取送包邮',
-      image: 'mockImage://good_shoe.png?token=8b574da2-dca4-410e-b879-1fa6f3cb2673',
+      image: 'mockImage://good_shoe.png',
       intro: [
         {
           type: IntroType.IMAGE,
-          value: 'mockImage://good_shoe_detail.png?token=45fed3c6-9507-4aba-a727-2081b171d359',
+          value: 'mockImage://good_shoe_detail_1.png',
         },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_shoe_detail_2.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_shoe_detail_3.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_shoe.png',
+        }
       ],
       price: 89,
       vipPrice: 20,
@@ -1176,24 +1354,36 @@ export class MockData {
       id: 'window_clean_1',
       title: '落地窗擦洗',
       subTitle: '明码标价，拒绝乱收费',
-      image: 'mockImage://good_window_2.png?token=07e1be46-0b12-4751-a1f4-2530a50971ef',
+      image: 'mockImage://good_window_2_detail_4.png',
       intro: [
         {
           type: IntroType.IMAGE,
-          value: 'mockImage://good_window_2_detail.png?token=521dad7a-aee0-4862-bfee-5041b02163d5',
+          value: 'mockImage://good_window_2_detail_1.png',
         },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_window_2_detail_2.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_window_2_detail_3.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_window_2.png',
+        }
       ],
       price: 0,
       vipPrice: 0,
       soldNum: 800,
       serviceContentList: [
         {
-          title: '细节处理',
-          content: '窗框、窗槽、轨道深度清洁，避免积灰残留。',
-        },
-        {
           title: '全面清洁',
           content: '室内外玻璃双面擦拭，彻底清除灰尘、水渍、油污及顽固污渍。',
+        },
+        {
+          title: '细节处理',
+          content: '窗框、窗槽、轨道深度清洁，避免积灰残留。',
         },
         {
           title: '安全防护',
@@ -1236,11 +1426,11 @@ export class MockData {
       id: 'window_clean_2',
       title: '高空窗户擦洗',
       subTitle: '明码标价，拒绝乱收费',
-      image: 'mockImage://good_window_2_detail.png?token=521dad7a-aee0-4862-bfee-5041b02163d5',
+      image: 'mockImage://good_window_2_detail_1.png',
       intro: [
         {
           type: IntroType.IMAGE,
-          value: 'mockImage://good_window_2.png?token=07e1be46-0b12-4751-a1f4-2530a50971ef',
+          value: 'mockImage://good_window_2.png',
         },
       ],
       price: 0,
@@ -1296,12 +1486,24 @@ export class MockData {
       id: 'closet_storage_organization_1',
       title: '包饰收纳整理',
       subTitle: '专业收纳师上门服务',
-      image: 'mockImage://good_bag.png?token=8fbcd82c-b3ee-4a5f-a274-6d1becaca8b8',
+      image: 'mockImage://good_bag.png',
       intro: [
         {
           type: IntroType.IMAGE,
-          value: 'mockImage://good_bag_detail.png?token=49906a75-7a8d-4362-a633-16bc1d927dc9',
+          value: 'mockImage://good_bag_detail_1.png',
         },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_bag_detail_2.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_bag_detail_3.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_bag_detail_4.png',
+        }
       ],
       price: 0,
       vipPrice: 0,
@@ -1351,12 +1553,24 @@ export class MockData {
       id: 'house_repair_1',
       title: '花洒安装/维修',
       subTitle: '服务专业，安全放心',
-      image: 'mockImage://good_shower.png?token=40ac2f2f-1f1c-4b58-bc08-3dfffaf42276',
+      image: 'mockImage://good_shower.png',
       intro: [
         {
           type: IntroType.IMAGE,
-          value: 'mockImage://good_shower_detail.png?token=c9c412a9-f2f2-4d65-8cd6-49b61ebd508d',
+          value: 'mockImage://good_shower_detail_1.png',
         },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_shower_detail_2.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_shower_detail_3.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_shower_detail_4.png',
+        }
       ],
       price: 0,
       vipPrice: 0,
@@ -1405,12 +1619,24 @@ export class MockData {
       id: 'pipe_clear_1',
       title: '卫生间马桶下水道疏通',
       subTitle: '服务专业，安全放心',
-      image: 'mockImage://good_toilet.png?token=abff0e4a-8fc5-4763-84fc-104c73ed14ec',
+      image: 'mockImage://good_toilet.png',
       intro: [
         {
           type: IntroType.IMAGE,
-          value: 'mockImage://good_toilet_detail.png?token=29a7bf51-5592-4ea3-b0f3-1ac930d532e8',
+          value: 'mockImage://good_toilet_detail_1.png',
         },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_toilet_detail_2.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_toilet_detail_3.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_toilet_detail_4.png',
+        }
       ],
       price: 0,
       vipPrice: 0,
@@ -1462,11 +1688,11 @@ export class MockData {
       id: 'refrigerator_clean_1',
       title: '对开门大冰箱清洗',
       subTitle: '冰箱不制冷/异响漏水检测维修',
-      image: 'mockImage://good_fridge2.png?token=bdfa614b-f27a-4a60-a335-228612e9f5bb',
+      image: 'mockImage://good_fridge2.jpg',
       intro: [
         {
           type: IntroType.IMAGE,
-          value: 'mockImage://good_fridge2_detail.png?token=e95a6303-b129-40a3-a315-94c7bc36f558',
+          value: 'mockImage://good_fridge2_detail.jpg',
         },
       ],
       price: 0,
@@ -1518,11 +1744,11 @@ export class MockData {
       id: 'refrigerator_clean_2',
       title: '三门冰箱清洗',
       subTitle: '冰箱不制冷/异响漏水检测维修',
-      image: 'mockImage://good_fridge2_detail.png?token=e95a6303-b129-40a3-a315-94c7bc36f558',
+      image: 'mockImage://good_fridge2_detail.jpg',
       intro: [
         {
           type: IntroType.IMAGE,
-          value: 'mockImage://good_fridge2.png?token=bdfa614b-f27a-4a60-a335-228612e9f5bb',
+          value: 'mockImage://good_fridge2.jpg',
         },
       ],
       price: 0,
@@ -1574,12 +1800,16 @@ export class MockData {
       id: 'home_clean_banner1',
       title: '全屋清洁',
       subTitle: '除尘除垢 | 又快又好',
-      image: 'mockImage://banner_1.png?token=1cbd9490-1234-49f7-a566-9b1c38c7d9f6',
+      image: 'mockImage://good_2.png',
       intro: [
         {
           type: IntroType.IMAGE,
-          value: 'mockImage://good_3.png?token=244ed841-7210-4a62-8e32-1e537194088d',
+          value: 'mockImage://good_window_2_detail_1.png',
         },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_detail_1.png',
+        }
       ],
       price: 210,
       vipPrice: 169,
@@ -1637,11 +1867,15 @@ export class MockData {
       id: 'window_clean_banner2',
       title: '全屋擦亮',
       subTitle: '玻璃焕新 | 干净明亮',
-      image: 'mockImage://banner_2.jpeg?token=4a8a7b49-2e25-4110-a308-96606842818f',
+      image: 'mockImage://good_window_detail_4.png',
       intro: [
         {
           type: IntroType.IMAGE,
-          value: 'mockImage://good_window_detail.png?token=35a8a3d0-0cc6-4706-926f-63db8acdd326',
+          value: 'mockImage://good_window.png',
+        },
+        {
+          type: IntroType.IMAGE,
+          value: 'mockImage://good_window_detail_3.png',
         },
       ],
       price: 195,

@@ -2,13 +2,17 @@ import { fromPlain, SignIn, SignInClass, toPlainObject } from '../model/SignInMo
 import { common } from '@kit.AbilityKit'
 import StrConstants from '../constants/StrConstants'
 import PreferencesManager from '../utils/PreferencesManager'
+import { window } from '@kit.ArkUI'
 
 export class DaySignInViewModel {
   signInList: SignInClass[] = []
   prefsManager: PreferencesManager
+  windowStage: window.WindowStage = AppStorage.get('windowStage')!
 
   constructor(coinarray: number[]) {
-    this.prefsManager = PreferencesManager.getInstance(getContext(this) as common.UIAbilityContext)
+    this.prefsManager = PreferencesManager.getInstance(this.windowStage.getMainWindowSync()
+      .getUIContext()
+      .getHostContext() as common.UIAbilityContext)
     coinarray.forEach((ca) => {
       this.signInList.push(new SignInClass(ca))
     })

@@ -187,23 +187,17 @@ export class StringUtil {
     return result;
   }
 
-
-  /**
-   * 16进制字符串转换unit8Array
-   * @param hexStr
-   * @returns
-   */
-  static strToHex(hexStr: string): Uint8Array {
-    return new Uint8Array(buffer.from(hexStr, 'hex').buffer);
-  }
-
   /**
    * 16进制unit8Array转字符串
    * @param arr
    * @returns
    */
   static hexToStr(arr: Uint8Array): string {
-    return buffer.from(arr).toString('hex');
+    try {
+      return buffer.from(arr).toString('hex');
+    } catch (error) {
+      return ''
+    }
   }
 
 
@@ -234,26 +228,6 @@ export class StringUtil {
     return new Uint8Array(byteArray);
   }
 
-  /**
-   * 字符串转ArrayBuffer
-   * @param str
-   * @returns
-   */
-  static strToBuffer(src: string, encoding: buffer.BufferEncoding = 'utf-8'): ArrayBuffer {
-    const buf = buffer.from(src, encoding);
-    return buf.buffer;
-  }
-
-  /**
-   * ArrayBuffer转字符串
-   * @param str
-   * @returns
-   */
-  static bufferToStr(src: ArrayBuffer, encoding: buffer.BufferEncoding = 'utf-8'): string {
-    const buf = buffer.from(src);
-    const result = buf.toString(encoding);
-    return result;
-  }
 
 
   /**
@@ -271,7 +245,6 @@ export class StringUtil {
    * @returns
    */
   static unit8ArrayToBuffer(src: Uint8Array): ArrayBuffer {
-    // return buffer.from(src).buffer;
     return src.buffer as ArrayBuffer;
   }
 
@@ -283,5 +256,16 @@ export class StringUtil {
    */
   static getErrnoToString(errno: number): string {
     return util.errnoToString(errno);
+  }
+
+  static getProtocolUrl(urlKey: string, context:Context,  fileName: string = 'data.json'): string {
+    try {
+      // Read files from /AppScope/resources/rawfile.
+      const value: Uint8Array = context.resourceManager.getRawFileContentSync(fileName);
+      // Return the link to the HUAWEI ID User Authentication Agreement.
+      return JSON.parse(buffer.from(value.buffer).toString())[urlKey] as string;
+    } catch (error) {
+      return '';
+    }
   }
 }

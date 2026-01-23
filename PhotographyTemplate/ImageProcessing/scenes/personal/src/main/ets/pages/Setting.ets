@@ -1,4 +1,4 @@
-import { TitleBar } from 'common';
+import { TitleBar } from 'commonlib';
 import { CustomContentDialog } from '@kit.ArkUI';
 
 @Component
@@ -7,6 +7,7 @@ export struct SettingPage {
   @StorageProp('bottomRectHeight') bottomRectHeight: number = 0;
   @Prop pathStack: NavPathStack;
   @StorageLink('loginState') loginState: boolean = true
+  ctx:UIContext = this.getUIContext()
   dialogController: CustomDialogController = new CustomDialogController({
     builder: CustomContentDialog({
       primaryTitle: '账号解除关联',
@@ -112,8 +113,8 @@ export struct SettingPage {
     .hideTitleBar(true)
     .backgroundColor($r('app.color.main_background_color'))
     .padding({
-      top: px2vp(this.topRectHeight),
-      bottom: px2vp(this.bottomRectHeight)
+      top: this.ctx.px2vp(this.topRectHeight),
+      bottom: this.ctx.px2vp(this.bottomRectHeight)
     })
   }
 }

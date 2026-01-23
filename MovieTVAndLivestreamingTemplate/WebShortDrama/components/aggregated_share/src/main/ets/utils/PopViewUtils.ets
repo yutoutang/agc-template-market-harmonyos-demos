@@ -1,5 +1,4 @@
-import { common } from '@kit.AbilityKit';
-import { ComponentContent } from '@kit.ArkUI';
+import { ComponentContent, window } from '@kit.ArkUI';
 
 enum PopViewShowType {
   OPEN
@@ -11,7 +10,7 @@ interface PopViewModel {
 }
 
 async function getUIContext() {
-  return (await (getContext() as common.UIAbilityContext).windowStage.getMainWindow()).getUIContext();
+  return AppStorage.get('UIContext') as UIContext
 }
 
 /**

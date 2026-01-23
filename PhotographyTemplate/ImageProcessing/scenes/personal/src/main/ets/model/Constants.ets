@@ -1,4 +1,4 @@
-import { ImageShowModel } from 'common';
+import { ImageShowModel } from 'commonlib';
 import { loginComponentManager } from '@kit.AccountKit';
 
 export class Constants {

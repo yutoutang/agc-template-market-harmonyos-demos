@@ -1,5 +1,5 @@
-import { cartoonPageData, videoDetail, VideoDetail } from '@ohos_agcit/children_education_datasource';
-import { CommonConstants, IconLoc, PlateType, TagLabelCard } from '@ohos_agcit/children_education_utils';
+import { DataGenerator, VideoDetail } from '@ohos_agcit/children_education_datasource';
+import { CommonConstants, IconLoc, TagLabelCard } from '@ohos_agcit/children_education_utils';
 
 @ComponentV2
 export struct SingStory {
@@ -15,41 +15,24 @@ export struct SingStory {
             Row() {
               RelativeContainer() {
                 Image(item.videoCard.imageUrl)
-                  .width('35%')
+                  .width(96)
                   .borderRadius(10)
                   .id(CommonConstants.IMAGE);
-                IconLoc(CommonConstants.IMAGE, item.videoCard.isVip, '10%');
+                IconLoc(CommonConstants.IMAGE, item.videoCard.isVip, '35%');
               }
-              .width('auto')
-              .height('auto');
+              .height(54)
+              .width(96)
+
+              Blank().width(12)
 
               Column() {
                 Row() {
-                  Text(item.videoCard.plateType)
-                    .fontSize(10)
-                    .fontWeight(FontWeight.Regular)
-                    .fontColor('#53B5FF')
-                    .borderColor('#53B5FF')
-                    .borderWidth(1)
-                    .position({ x: 0, y: 4 })
-                    .padding({
-                      top: '1vp',
-                      bottom: '1vp',
-                      left: '4vp',
-                      right: '4vp',
-                    })
-                    .borderRadius(5)
-                    .onAreaChange((oldValue, newValue: Area) => {
-                      this.textWidth = Number(newValue.width);
-                    });
-
                   Text(item.videoCard.title)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
                     .maxLines(2)
                     .fontWeight(FontWeight.Bold)
                     .fontSize(14)
-                    .textIndent(this.textWidth + 5)
-                    .lineHeight('22vp');
+                    .lineHeight(19)
                 }
 
                 Blank()
@@ -59,29 +42,35 @@ export struct SingStory {
                     TagLabelCard(tag);
                   }, (item: string) => item);
                 }
-                .align(Alignment.BottomStart);
+                .alignSelf(ItemAlign.Start)
               }
-              .layoutWeight(1)
-              .height(100)
               .alignItems(HorizontalAlign.Start)
-              .padding({ left: 10, top :'4%', bottom:'4%' });
+              .justifyContent(FlexAlign.SpaceBetween)
+              .height(56)
+              .layoutWeight(1)
             };
 
-            Divider()
-              .width('62%')
-              .alignSelf(ItemAlign.End);
-          };
+            Blank().height(16)
 
+            Divider()
+              .width('70%')
+              .alignSelf(ItemAlign.End);
+
+            if (index !== this.singStory.length - 1) {
+              Blank().height(16)
+            }
+          }
         }
         .onClick(() => {
-          item.videoCardDetail = videoDetail.videoCardDetail;
+          item.videoCardDetailList = DataGenerator.getVideoDetail(this.getUIContext()).videoCardDetailList;
           this.appPathStack.pushPathByName('VideoDetailListView', item);
         });
-      }, (item:VideoDetail) => JSON.stringify(item));
+      }, (item: VideoDetail) => JSON.stringify(item));
     }
+    .margin({ top: 16 })
     .padding({
-      left: '4%',
-      right: '4%',
-    });
+      left: 16,
+      right: 16,
+    })
   }
 }

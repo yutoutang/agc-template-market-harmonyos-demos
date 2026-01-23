@@ -12,71 +12,92 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { AppStorageV2, CircleShape } from '@kit.ArkUI';
+import { AppStorageV2 } from '@kit.ArkUI';
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
+import { goToAddressListPage } from 'address_management';
+import { AtomicserviceLogin } from 'atomicservice_login';
 import {
   CommonConstants,
+  GridRowColSetting,
   IMenuItem,
+  LinkState,
+  LoginBtnInMine,
+  LoginUtil,
   MY_ORDER_LIST,
   MY_TOOL_LIST,
   RouterModule,
   UserInfo,
 } from 'lib_foundation';
-import { CommonUtils, IGoodInfo, RouterMap, GoodCard, GoodCardSize } from 'module_base';
+import { GoodCard, GoodCardSize, IGoodInfo, RouterMap, WindowUtil } from 'module_base';
 import { MineVM } from '../viewmodel/MineVM';
 
 @ComponentV2
 export struct Mine {
+  @Local breakpoint: string = '';
   userInfo: UserInfo = AppStorageV2.connect(UserInfo, () => new UserInfo())!;
+  linkState: LinkState = AppStorageV2.connect(LinkState, () => new LinkState())!;
   mineVM: MineVM = new MineVM();
 
   aboutToAppear(): void {
+    WindowUtil.initWindowUtil(this.getUIContext());
     this.mineVM.init();
   }
 
   build() {
     NavDestination() {
-      Stack() {
-        Scroll(this.mineVM.scroller) {
-          Column() {
-            Column() {
-              this.titleInside()
-              this.TopPersonInfo()
+      GridRow(GridRowColSetting.DEFAULT_GRID_ROW_OPTIONS) {
+        GridCol({ span: GridRowColSetting.GRID_ROW_OPTIONS_COLUMNS, }) {
+          Stack() {
+            Scroll(this.mineVM.scroller) {
+              Column() {
+                Column() {
+                  this.titleInside()
+                  this.TopPersonInfo()
+                  this.SubTitle('我的订单')
+                  this.MineOrder()
+                }
+                .padding({
+                  left: GridRowColSetting.getPageMargin(this.breakpoint),
+                  right: GridRowColSetting.getPageMargin(this.breakpoint)
+                })
+                .linearGradient({
+                  angle: 0,
+                  colors: [['rgba(242, 204, 206, 0)', 0], ['rgba(242, 204, 206, 1)', 1]],
+                })
+                .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
+
+                Column() {
+                  this.SubTitle('服务与工具')
+                  this.ToolCard()
+                  this.SubTitle('为您推荐')
+                  this.WaterFlowList()
+                }
+                .padding({
+                  left: GridRowColSetting.getPageMargin(this.breakpoint),
+                  right: GridRowColSetting.getPageMargin(this.breakpoint)
+                })
+              }
             }
-            .padding({ left: 10, right: 10 })
-            .backgroundImage($r('app.media.mine_top_bg'))
-            .backgroundImageSize(ImageSize.Cover)
             .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
-
-            Column({ space: 10 }) {
-              this.MineOrder()
-              this.ToolCard()
-              this.WaterFlowList()
-            }
-            .padding({
-              left: 10,
-              right: 10,
-              top: 10,
-              bottom: 10,
+            .width(CommonConstants.FULL_PERCENT)
+            .height(CommonConstants.FULL_PERCENT)
+            .scrollBar(BarState.Off)
+            .align(Alignment.Top)
+            .edgeEffect(EdgeEffect.Spring)
+            .onDidScroll(() => {
+              this.mineVM.titleBgOpacity = this.mineVM.scroller.currentOffset().yOffset / 56;
             })
-          }
-          .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
-        }
-        .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
-        .width(CommonConstants.FULL_PERCENT)
-        .height(CommonConstants.FULL_PERCENT)
-        .scrollBar(BarState.Off)
-        .align(Alignment.Top)
-        .edgeEffect(EdgeEffect.Spring)
-        .onDidScroll(() => {
-          this.mineVM.titleBgOpacity = this.mineVM.scroller.currentOffset().yOffset / 56;
-        })
 
-        this.titleBuilder()
+            this.titleBuilder()
+          }
+          .width(CommonConstants.FULL_PERCENT)
+          .height(CommonConstants.FULL_PERCENT)
+          .alignContent(Alignment.Top)
+        }
       }
-      .width(CommonConstants.FULL_PERCENT)
-      .height(CommonConstants.FULL_PERCENT)
-      .alignContent(Alignment.Top)
+      .onBreakpointChange((bp) => {
+        this.breakpoint = bp;
+      })
     }
     .hideTitleBar(true)
     .backgroundColor($r('app.color.common_page_bg'))
@@ -85,8 +106,9 @@ export struct Mine {
   @Builder
   titleBuilder() {
     Row() {
-      Text('个人中心').fontSize(20).fontWeight(FontWeight.Bold).padding({ left: 10 }).height(56)
+      Text('我的').fontSize(26).fontWeight(FontWeight.Bold).height(56)
     }
+    .padding({ left: 16, right: 16 })
     .width(CommonConstants.FULL_PERCENT)
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
     .backgroundColor(Color.White)
@@ -95,8 +117,8 @@ export struct Mine {
 
   @Builder
   titleInside() {
-    Text('个人中心')
-      .fontSize(20)
+    Text('我的')
+      .fontSize(26)
       .fontWeight(FontWeight.Bold)
       .height(56)
       .alignSelf(ItemAlign.Start)
@@ -105,76 +127,125 @@ export struct Mine {
 
   @Builder
   TopPersonInfo() {
-    Row({ space: 6 }) {
-      Image(CommonUtils.handleImgUrl(this.userInfo.avatar) || $r('app.media.ic_user_default'))
-        .width(56)
-        .height(56)
-        .clipShape(new CircleShape({ width: 56, height: 56 }))
-      Text(this.userInfo.nickName || '华为用户')
-        .fontSize(18)
-        .fontWeight(500)
-        .maxLines(1)
-        .textOverflow({ overflow: TextOverflow.Ellipsis })
-        .layoutWeight(1)
-        .textAlign(TextAlign.Start)
-    }
-    .width(CommonConstants.FULL_PERCENT)
-    .margin({ top: 20, bottom: 30 })
-    .onClick(() => {
-      RouterModule.push({ url: RouterMap.EDIT_PERSONAL });
+    AtomicserviceLogin({
+      userInfo: this.userInfo,
+      isLink: this.linkState.isLink,
+      bindPhone: (code: string | undefined) => {
+        LoginUtil.bindPhone(code);
+      },
+      onGetPhoneError: (err) => {
+        LoginUtil.onGetPhoneNumberFail();
+      },
+      unBindPhone: async (): Promise<void> => {
+        LoginUtil.unBindPhone();
+      }
     })
+      .backgroundColor($r('sys.color.comp_background_list_card'))
+      .borderRadius(16)
+      .margin({ top: 8 })
+      .onClick(() => {
+        if (!this.linkState.isLink) {
+          promptAction.showToast({ message: '请先关联账户~' });
+        } else {
+          RouterModule.push({ url: RouterMap.EDIT_PERSONAL });
+        }
+      })
   }
 
   @Builder
   MineOrder() {
-    Column({ space: 10 }) {
-      Text('我的订单').fontSize(14).fontWeight(500)
-
+    Column() {
       Grid() {
         ForEach(MY_ORDER_LIST, (v: IMenuItem, index: number) => {
           GridItem() {
-            Column({ space: 4 }) {
-              Image(v.imgUrl).width(24).height(24).objectFit(ImageFit.Contain)
-              Text(v.textLabel).fontSize(12).height(16)
+            Stack() {
+              Column({ space: 4 }) {
+                SymbolGlyph(v.imgUrl as Resource).fontSize(24)
+                Text(v.textLabel)
+                  .fontSize($r('sys.float.Caption_L'))
+                  .fontWeight(FontWeight.Medium)
+                  .height(16)
+              }
+              .onClick(() => {
+                RouterModule.push({ url: RouterMap.MY_ORDER_LIST, param: index });
+              })
+
+              LoginBtnInMine({
+                btnHeight: 44,
+                btnWidth: '100%',
+                fontSize: $r('sys.float.Caption_L'),
+                onBind: () => {
+                  RouterModule.push({ url: RouterMap.MY_ORDER_LIST, param: index });
+                }
+              })
+                .visibility(this.linkState.isLink ? Visibility.None : Visibility.Visible)
             }
-            .onClick(() => {
-              RouterModule.push({ url: RouterMap.MY_ORDER_LIST, param: index });
-            })
           }
         }, (v: IMenuItem) => v.imgUrl + v.textLabel)
       }
       .columnsTemplate('1fr 1fr 1fr 1fr')
     }
     .width(CommonConstants.FULL_PERCENT)
-    .padding(10)
-    .borderRadius(8)
+    .padding({ top: 8, bottom: 8 })
+    .borderRadius(16)
     .backgroundColor(Color.White)
     .alignItems(HorizontalAlign.Start)
   }
 
   @Builder
   ToolCard() {
-    Column({ space: 10 }) {
-      Text('服务与工具').fontSize(14).fontWeight(500)
+    Column() {
+      ForEach(MY_TOOL_LIST, (v: IMenuItem, index: number) => {
+        Stack() {
+          Row({ space: 16 }) {
+            SymbolGlyph(v.imgUrl as Resource).fontSize(24)
+            Column() {
+              Row() {
+                Text(v.textLabel)
+                  .lineHeight(21)
+                  .fontSize($r('sys.float.Subtitle_M'))
+                  .fontWeight(FontWeight.Medium)
+                SymbolGlyph($r('sys.symbol.chevron_right'))
+                  .fontColor([$r('sys.color.icon_fourth')])
+                  .fontSize(24)
+              }
+              .margin({ top: 17, bottom: 17 })
+              .width('100%')
+              .justifyContent(FlexAlign.SpaceBetween)
 
-      Grid() {
-        ForEach(MY_TOOL_LIST, (v: IMenuItem) => {
-          GridItem() {
-            Column({ space: 4 }) {
-              Image(v.imgUrl).width(24).height(24).objectFit(ImageFit.Contain)
-              Text(v.textLabel).fontSize(12).height(16)
+              if (index !== MY_TOOL_LIST.length - 1) {
+                Divider().strokeWidth('1px')
+              }
             }
-            .onClick(() => {
-              RouterModule.push({ url: v.routerUrl! });
-            })
+            .height('100%')
+            .layoutWeight(1)
           }
-        }, (item: IMenuItem) => item.imgUrl + item.textLabel)
-      }
-      .columnsTemplate('1fr 1fr 1fr 1fr')
+          .height(56)
+          .onClick(() => {
+              v.textLabel === '地址管理' ? goToAddressListPage(RouterModule.getStack()) :
+                RouterModule.push({ url: v.routerUrl! });
+          })
+          LoginBtnInMine({
+            btnHeight: 56,
+            btnWidth: '100%',
+            fontSize: $r('sys.float.Subtitle_M'),
+            onBind: () => {
+              v.textLabel === '地址管理' ? goToAddressListPage(RouterModule.getStack()) :
+                RouterModule.push({ url: v.routerUrl! });
+            }
+          })
+            .visibility(this.linkState.isLink ? Visibility.None : Visibility.Visible)
+        }
+      }, (item: IMenuItem) => item.imgUrl + item.textLabel)
     }
     .width(CommonConstants.FULL_PERCENT)
-    .padding(10)
-    .borderRadius(8)
+    .padding({
+      top: 4,
+      bottom: 4,
+      right: 12,
+      left: 12
+    })
+    .borderRadius(16)
     .backgroundColor(Color.White)
     .alignItems(HorizontalAlign.Start)
   }
@@ -198,9 +269,10 @@ export struct Mine {
         })
       }, (v: IGoodInfo) => v.id.toString() + v.subIndex)
     }
-    .columnsTemplate('1fr 1fr')
-    .columnsGap(10)
-    .rowsGap(6)
+    .cachedCount(10)
+    .columnsTemplate(this.breakpoint === 'sm' ? '1fr 1fr' : '1fr 1fr 1fr 1fr')
+    .columnsGap(this.breakpoint === 'sm' ? 8 : 16)
+    .rowsGap(this.breakpoint === 'sm' ? 8 : 16)
     .width(CommonConstants.FULL_PERCENT)
     .scrollBar(BarState.Off)
     .cachedCount(2)
@@ -209,4 +281,19 @@ export struct Mine {
       scrollBackward: NestedScrollMode.SELF_FIRST,
     })
   }
+
+  @Builder
+  SubTitle(text: string) {
+    Column() {
+      Text(text)
+        .fontSize($r('sys.float.Subtitle_L'))
+        .fontWeight(FontWeight.Bold)
+        .lineHeight(24)
+    }
+    .width('100%')
+    .height(56)
+    .padding({ top: 24, bottom: 8 })
+    .alignItems(HorizontalAlign.Start)
+  }
+
 }

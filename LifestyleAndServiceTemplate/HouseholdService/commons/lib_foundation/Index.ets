@@ -13,19 +13,30 @@
  * limitations under the License.
  */
 
+// 启动axios-mock
+import('./src/main/ets/http/MockAdapter');
+
 export { RouterModule, NavRouterInfo } from './src/main/ets/router/RouterModule';
 
 export { GoodDataSource } from './src/main/ets/common/GoodDataSource';
 
-export { LoginUtil } from './src/main/ets/login/LoginUtil';
+export { AppPrivacyUtils } from './src/main/ets/common/AppPrivacyUtils';
+
+export { PushUtils } from './src/main/ets/common/PushUtils';
 
 export { UIBackBtn } from './src/main/ets/uicomponent/UIBackBtn';
 
 export { CardContainer } from './src/main/ets/uicomponent/CommonCard';
 
+export { ServiceCard } from './src/main/ets/uicomponent/ServiceCard';
+
 export { UIOrderPart } from './src/main/ets/uicomponent/UIOrderPart';
 
-export { DialogCallBuilder, callPhone, PhoneParams } from './src/main/ets/uicomponent/DialogCall';
+export { CommonConfirmDialog } from './src/main/ets/uicomponent/UIDialog';
+
+export { GridRowColSetting } from './src/main/ets/common/GridRowColSetting';
+
+export * from './src/main/ets/login/LoginUtil';
 
 export * from './src/main/ets/common/Constant';
 

@@ -9,11 +9,13 @@ export class SignInClass {
   coinNumber: number
   @Trace isClaim: boolean
   @Trace isLookAD: boolean
+  @Trace isFirstClick: boolean
 
-  constructor(coinNumber: number, isClaim: boolean = false, isLookAD: boolean = false) {
+  constructor(coinNumber: number, isClaim: boolean = false, isLookAD: boolean = false, isFirstClick: boolean = true) {
     this.coinNumber = coinNumber
     this.isClaim = isClaim
     this.isLookAD = isLookAD
+    this.isFirstClick = isFirstClick
   }
 }
 

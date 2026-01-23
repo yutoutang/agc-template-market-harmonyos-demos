@@ -1,9 +1,10 @@
 import {
-  GlobalContext,
   CommonConstants,
-  Title,
-  TimeControl,
+  GlobalContext,
+  LogUtil,
   NoMoreTab,
+  TimeControl,
+  Title,
 } from '@ohos_agcit/children_education_utils';
 import { ArrayList } from '@kit.ArkTS';
 import { History, VideoCardDetail, VideoDetail } from '@ohos_agcit/children_education_datasource';
@@ -27,12 +28,12 @@ export struct ViewHistory {
               history: item,
             });
           }.onClick(() => {
-            if (TimeControl.timeControl()) {
+            if (TimeControl.timeControl(this.getUIContext())) {
               return;
             }
             let videoDetail: VideoDetail = {
               videoCard: item.videoCard,
-              videoCardDetail: item.videoCardList,
+              videoCardDetailList: item.videoCardList,
             };
             GlobalContext.getContext().setObject(CommonConstants.GLOBAL_VIDEO_LIST, videoDetail);
             let pathInfo: NavPathInfo;
@@ -43,7 +44,7 @@ export struct ViewHistory {
             }
             this.appPathStack.pushDestination(pathInfo, true);
           });
-        }, (item:History) => JSON.stringify(item));
+        }, (item: History) => JSON.stringify(item));
 
         if (this.historyList.length >= 20) {
           ListItem() {
@@ -64,15 +65,13 @@ export struct ViewHistory {
       return true;
     })
     .onShown(() => {
-      let aaaa = GlobalContext.getContext().getObject(CommonConstants.HISTORY_LIST) as ArrayList<History>;
-      let c = aaaa.length;
-      let bbb = aaaa.convertToArray();
-      let ccc = bbb.reverse();
-
-      this.historyList =
-        (GlobalContext.getContext().getObject(CommonConstants.HISTORY_LIST) as ArrayList<History>).convertToArray()
-          .reverse();
-      let a = 0;
+      let list: ArrayList<History> =
+        GlobalContext.getContext().getObject(CommonConstants.HISTORY_LIST) as ArrayList<History>
+      try {
+        this.historyList = list.convertToArray().reverse()
+      } catch (error) {
+        LogUtil.error(`convertToArray fail, code: ${error.code}, message: ${error.message}`)
+      }
     });
   }
 }

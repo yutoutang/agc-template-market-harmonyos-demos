@@ -5,7 +5,8 @@
       {
         "name": "default",
         "signingConfig": "default",
-        "compatibleSdkVersion": "5.0.4(16)",
+        "compatibleSdkVersion": "5.1.0(18)",
+        "targetSdkVersion": "6.0.1(21)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
           "strictMode": {
@@ -17,7 +18,7 @@
     ],
     "buildModeSet": [
       {
-        "name": "debug",
+        "name": "debug"
       },
       {
         "name": "release"
@@ -38,24 +39,52 @@
       ]
     },
     {
-      "name": "picture_beautification",
-      "srcPath": "./scenes/picture_beautification",
+      "name": "commonlib",
+      "srcPath": "./commons/commonlib"
     },
     {
-      "name": "collage",
-      "srcPath": "./scenes/collage",
+      "name": "mine",
+      "srcPath": "./scenes/mine"
     },
     {
-      "name": "common",
-      "srcPath": "./common",
+      "name": "home",
+      "srcPath": "./scenes/home"
+    },
+    {
+      "name": "login_info",
+      "srcPath": "./components/login_info"
+    },
+    {
+      "name": "feed_back",
+      "srcPath": "./components/feed_back"
     },
     {
       "name": "personal",
-      "srcPath": "./scenes/personal",
+      "srcPath": "./scenes/personal"
     },
     {
-      "name": "picture_collage",
-      "srcPath": "./components/picture_collage",
+      "name": "membership",
+      "srcPath": "./components/membership"
+    },
+    {
+      "name": "camera_lut",
+      "srcPath": "./commons/camera_lut",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "camera",
+      "srcPath": "./scenes/camera"
+    },
+    {
+      "name": "photo_editing",
+      "srcPath": "./scenes/photo_editing"
     }
   ]
 }

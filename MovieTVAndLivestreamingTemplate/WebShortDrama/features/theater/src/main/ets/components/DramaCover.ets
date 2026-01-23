@@ -170,7 +170,8 @@ export struct DramaCover {
           .padding({ right: 16 })
 
         }
-        .width(this.isVertical ? 244 : 84)
+        .layoutWeight(1)
+        // .width(this.isVertical ? 244 : 84)
         .margin({
           left: this.isVertical ? 16 : 8
         })

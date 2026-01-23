@@ -27,6 +27,7 @@ export struct PersonalInfoPage {
             })
           }
         }
+        .alignListItem(ListItemAlign.Center)
       }.width('100%')
       .height('100%')
       .padding({ left: 16, right: 16 })

@@ -18,6 +18,7 @@
     'aggregated_payment': "file:../../components/aggregated_payment",
     'module_cast': "file:../../components/module_cast",
     'module_pip': 'file:../../components/module_pip',
-    "aggregated_share": "file:../../components/aggregated_share"
+    "aggregated_share": "file:../../components/aggregated_share",
+    "membership": "file:../../components/membership"
   }
 }

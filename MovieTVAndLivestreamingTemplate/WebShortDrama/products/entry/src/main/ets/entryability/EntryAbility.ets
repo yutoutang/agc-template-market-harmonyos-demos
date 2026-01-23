@@ -15,10 +15,15 @@ import { PipManager } from 'module_pip';
 import { Preferences } from '@agctemplate/detail'
 import { WXLoginService } from 'aggregated_login';
 import { ShareService } from 'aggregated_share';
+import { ContinueUtils } from '../common/ContinueUtils';
+import { WantUtils } from '../common/WantUtils';
+import { CloudPrefetchUtils } from '../common/CloudPrefetchUtils';
 
 const TAG = 'EntryAbility'
 
 export default class EntryAbility extends UIAbility {
+  // 标记是否需要执行windowStage.loadContent
+  private needLoadContent: boolean = false;
   // 实例化分享服务
   private shareServiceImpl: ShareService =
     ShareService.create()
@@ -40,56 +45,51 @@ export default class EntryAbility extends UIAbility {
   private aiBarHeight = AppStorageV2.connect(AiBarHeight, AppStorageKeys.AI_BAR_HEIGHT,
     () => new AiBarHeight(0))!;
 
-  onNewWant(want: Want): void {
+  onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     this.loginServiceImpl.handleWant(want);
     this.shareServiceImpl.handleWant(want, this.context);
+    this.setNeedLoadContent(false);//热启动不加载接续页面
+    WantUtils.handlePushWant(want);
+    WantUtils.handleRestoreCall(want, launchParam);//热启动加载传来的接续数据
   }
 
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     this.loginServiceImpl.handleWant(want);
     this.shareServiceImpl.handleWant(want, this.context);
+    this.setNeedLoadContent(true);//冷启动加载接续页面
+    ContinueUtils.disableContinue(this.context);//冷启动关闭接续功能
+    WantUtils.handlePushCall(want);
+    WantUtils.handleRestoreCall(want, launchParam);//冷启动加载传来的接续数据
     const bundleName = this.context.abilityInfo.bundleName
     AppStorage.setOrCreate('bundleName',bundleName)
-    let isFirstTime:boolean = true
-    AppStorage.setOrCreate('isFirstTime',isFirstTime)
     Logger.info(TAG, 'Ability onCreate');
     let applicationContext = this.context.getApplicationContext();
     applicationContext.setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT);
     CastService.getInstance().init(this.context)
     this.contextInit();
+    CloudPrefetchUtils.functionPreload();
+  }
+
+  //接续功能，传入迁移数据
+  onContinue(wantParam: Record<string, Object>) {
+    Logger.info(TAG, 'Ability onContinue');
+    return ContinueUtils.handleContinue(wantParam, this.context);
   }
 
   onDestroy(): void {
     Logger.info(TAG, 'Ability onDestroy');
   }
 
-  async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
-    AppStorage.setOrCreate('windowStage',windowStage);
-    // Main window is created, set main page for this ability
+  onWindowStageRestore(windowStage: window.WindowStage): void {
+    Logger.info(TAG, 'Ability onWindowStageRestore');
+    if (this.needLoadContent) {
+      this.handleWindowStageCreateOrRestore(windowStage);
+    }
+  }
+
+  onWindowStageCreate(windowStage: window.WindowStage): void {
     Logger.info(TAG, 'Ability onWindowStageCreate');
-    WindowManager.initWindowStage(windowStage);
-    let windowClass = windowStage.getMainWindowSync();
-    // 获取应用启动时的窗口尺寸
-    this.updateBreakpoint(windowClass.getWindowProperties().windowRect.width);
-    this.updateAvoidArea(windowClass);
-    this.windowClassListenEvent(windowClass);
-    await WindowManager.setWindowLayoutFullScreen(true)
-    windowStage.loadContent('pages/Index', (err) => {
-      if (err.code) {
-        Logger.error(TAG, `Failed to load the content. Cause: ${JSON.stringify(err) ?? ''}`);
-        return;
-      }
-      Logger.info(TAG, 'Succeeded in loading the content.');
-    });
-    windowStage.getMainWindow().then((window) => {
-      let ctx = window.getUIContext();
-      AppStorage.setOrCreate('UIContext', ctx);
-      // 通过主窗口UIContext创建typeNode节点
-      PipManager.getInstance().makeTypeNode(ctx);
-    })
-    Preferences.createPreferences(this.context)
-    Preferences.writeData('showControl',false)
-    Preferences.writeData('isShowBullet',true)
+    this.handleWindowStageCreateOrRestore(windowStage);
   }
 
   onWindowStageDestroy(): void {
@@ -170,5 +170,38 @@ export default class EntryAbility extends UIAbility {
       // 使用状态变量记录当前断点值
       this.breakPoint.value = this.curBp
     }
+  }
+
+  async handleWindowStageCreateOrRestore(windowStage: window.WindowStage) {
+    AppStorage.setOrCreate('windowStage',windowStage);
+    // Main window is created, set main page for this ability
+    Logger.info(TAG, 'Ability onWindowStageCreate');
+    WindowManager.initWindowStage(windowStage);
+    let windowClass = windowStage.getMainWindowSync();
+    // 获取应用启动时的窗口尺寸
+    this.updateBreakpoint(windowClass.getWindowProperties().windowRect.width);
+    this.updateAvoidArea(windowClass);
+    this.windowClassListenEvent(windowClass);
+    await WindowManager.setWindowLayoutFullScreen(true)
+    windowStage.loadContent('pages/Index', (err) => {
+      if (err.code) {
+        Logger.error(TAG, `Failed to load the content. Cause: ${JSON.stringify(err) ?? ''}`);
+        return;
+      }
+      Logger.info(TAG, 'Succeeded in loading the content.');
+    });
+    windowStage.getMainWindow().then((window) => {
+      let ctx = window.getUIContext();
+      AppStorage.setOrCreate('UIContext', ctx);
+      // 通过主窗口UIContext创建typeNode节点
+      PipManager.getInstance().makeTypeNode(ctx);
+    })
+    Preferences.createPreferences(this.context)
+    Preferences.writeData('showControl',false)
+    Preferences.writeData('isShowBullet',true)
+  }
+
+  setNeedLoadContent(value: boolean) {
+    this.needLoadContent = value;
   }
 }

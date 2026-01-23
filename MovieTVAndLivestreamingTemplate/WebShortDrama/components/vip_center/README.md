@@ -4,7 +4,7 @@
 
 - [简介](#简介)
 - [约束与限制](#约束与限制)
-- [快速入门](#快速入门)
+- [使用](#使用)
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
@@ -19,13 +19,14 @@
 
 * DevEco Studio版本：DevEco Studio 5.0.0 Release及以上
 * HarmonyOS SDK版本：HarmonyOS 5.0.0 Release及以上
-
-### 硬件
-
-* 设备类型：华为手机（直板机）
+* 设备类型：华为手机（直板机）、平板
 * HarmonyOS版本：HarmonyOS 5.0.0 Release及以上
 
-## 快速入门
+### 权限
+
+无
+
+## 使用
 
 1. 安装组件。
 
@@ -86,7 +87,7 @@
            avatar:'',
            routerModule:this.pageInfo,
            onVipOpen: () => {
-             promptAction.showToast({ message: '兑换成功' })
+             this.getUIContext().getPromptAction().showToast({ message: '兑换成功' })
            },
          })
        }

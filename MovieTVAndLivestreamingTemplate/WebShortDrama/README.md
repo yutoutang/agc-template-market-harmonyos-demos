@@ -14,14 +14,22 @@
 
 此模板提供如下组件，所有组件存放在工程根目录的components下，如果您仅需使用组件，可参考对应组件的指导链接；如果您使用此模板，请参考本文档。
 
-| 组件                           | 描述                               | 使用指导                                      |
-| ------------------------------ | ---------------------------------- | --------------------------------------------- |
-| 竖屏滑动视频组件(video_swiper) | 提供滑动视频，视频播放的控制等功能 | [使用指导](components/video_swiper/README.md) |
-| 投屏组件(module_cast)          | 提供投屏播放控制功能               | [使用指导](components/module_cast/README.md)  |
-| 福利签到组件(day_signin)       | 提供福利页面的打卡功能             | [使用指导](components/day_signin/README.md)   |
-| 看广告领奖励组件(look_ad)      | 提供看广告领取奖励的功能           | [使用指导](components/look_ad/README.md)      |
-| 日常任务组件(task_list)        | 提供做日常任务的功能               | [使用指导](components/task_list/README.md)    |
-| 转盘组件(wheel)                | 提供福利转盘的功能                 | [使用指导](components/wheel/README.md)        |
+| 组件                                  | 描述                                         | 使用指导                                            |
+|-------------------------------------|--------------------------------------------|-------------------------------------------------|
+| 竖屏滑动视频组件(video_swiper) | 提供滑动视频，视频播放的控制等功能                          | [使用指导](components/video_swiper/README.md)       |
+| 投屏组件(module_cast)      | 提供投屏播放控制功能                                 | [使用指导](components/module_cast/README.md)        |
+| 福利签到组件(day_signin)     | 提供福利页面的打卡功能                                | [使用指导](components/day_signin/README.md)         |
+| 看广告领奖励组件(look_ad)      | 提供看广告领取奖励的功能                               | [使用指导](components/look_ad/README.md)            |
+| 日常任务组件(task_list)      | 提供做日常任务的功能                                 | [使用指导](components/task_list/README.md)          |
+| 转盘组件(wheel)            | 提供福利转盘的功能                                  | [使用指导](components/wheel/README.md)              |
+| 通用登录组件(aggregated_login)   | 支持华为账号一键登录及其他方式登录（微信、手机号登录）                | [使用指导](components/aggregated_login/README.md)   |
+| 通用分享组件(aggregated_share)   | 支持分享到微信好友、朋友圈、QQ、微博等方式，支持碰一碰分享、生成海报、系统分享等功能 | [使用指导](components/aggregated_share/README.md)   |
+| 通用支付组件(aggregated_payment)      | 支持微信、支付宝、华为支付等多方的支付能力                      | [使用指导](components/aggregated_payment/README.md) |
+| 通用问题反馈组件(feedback)            | 支持提交问题反馈、查看反馈记录                            | [使用指导](components/feedback/README.md)           |
+| 通用搜索组件(search)      | 提供了搜索功能，包括搜索历史，可选的猜你想搜和热搜榜，搜索联想，搜索结果                                 | [使用指导](components/search/README.md)             |
+| 通用会员组件(membership)     | 提供了通过应用内支付实现会员开通的能力（自动续期订阅会员及非续期订阅会员）                               | [使用指导](components/membership/README.md)         |
+| 通用拨号组件(dial_panel)      | 提供了拉起拨号面板以及一键拨号的能力                          | [使用指导](components/dial_panel/README.md)         |
+
 
 本模板为短剧类应用提供了常用功能的开发样例，模板主要分首页、剧场、我的及详情播放页六大模块：
 
@@ -37,7 +45,7 @@
 
 * 详情：沉浸式观看短剧，支持剧集播放常用功能(上下滑切换剧集，选集，社交交互等)
 
-本模板已集成华为账号等服务，只需做少量配置和定制即可快速实现华为账号的登录功能。
+本模板已集成华为账号、推送、预加载、会员订阅等服务，适配平板和折叠的一多布局，支持不同设备间同步短剧浏览进度，只需做少量配置和定制即可快速实现华为账号的登录功能。
 
 | 首页                         | 剧场                         | 福利                         | 追剧                         | 我的                         | 详情                         |
 |----------------------------|----------------------------|----------------------------|----------------------------|----------------------------|----------------------------|
@@ -190,9 +198,9 @@ WebShortDrama
 
 ### 环境
 
-- DevEco Studio版本：DevEco Studio 5.0.5 Release及以上
-- HarmonyOS SDK版本：HarmonyOS 5.0.5 Release SDK及以上
-- 设备类型：华为手机（包括双折叠和阔折叠）
+- DevEco Studio版本：DevEco Studio 6.0.1 Release及以上
+- HarmonyOS SDK版本：HarmonyOS 6.0.1 Release SDK及以上
+- 设备类型：华为手机（包括双折叠和阔折叠）和华为平板
 - 系统版本：HarmonyOS 5.0.3(15)及以上
 
 ### 权限
@@ -216,6 +224,13 @@ WebShortDrama
 }
 ```
 
+### 使用约束
+- 跨设备同步新闻浏览进度，使用约束如下，详细参考：[应用接续开发指导](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/app-continuation-guide#section17575828642)
+   1. 双端设备需要登录同一华为账号
+   2. 双端设备需要打开 WLAN 和蓝牙开关，或者在设置中的“多设备协同 > 高级”中启用“多设备协同增强服务”功能
+   3. 双端设备需要在“设置”应用中开启“多设备协同 > 接续”功能
+   4. 双端设备都需要安装该应用
+
 ## 快速入门
 
 ### 配置工程
@@ -235,13 +250,52 @@ WebShortDrama
 
    b. 申请华为账号一键登录所需的quickLoginMobilePhone权限，详细参考：[配置scope权限](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-config-permissions)。
 
-3. 配置支付服务。
+3. 配置应用内支付服务。
 
-   华为支付当前仅支持商户接入，在使用服务前，需要完成商户入网、开发服务等相关配置，本模板仅提供了端侧集成的示例。详细参考：[支付服务接入准备](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/payment-preparations)。
+   a. 您需[开通商户服务](https://developer.huawei.com/consumer/cn/doc/start/merchant-service-0000001053025967)才能开启应用内购买服务。商户服务里配置的银行卡账号、币种，用于接收华为分成收益。
 
-4. 对应用进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing#section297715173233)。
+   b. 使用应用内购买服务前，需要打开应用内购买服务(HarmonyOS NEXT) 开关，此开关是应用级别的，即所有使用IAP Kit功能的应用均需执行此步骤，详情请参考[打开应用内购买服务API开关](https://developer.huawei.com/consumer/cn/doc/app/switch-0000001958955097)。
 
-5. 添加手工签名所用证书对应的公钥指纹。详细参考：[配置应用签名证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-cert-fingerprint-0000002278002933)
+   c. 开启应用内购买服务(HarmonyOS NEXT) 开关后，开发者需进一步激活应用内购买服务 (HarmonyOS NEXT)，具体请参见[激活服务和配置事件通知](https://developer.huawei.com/consumer/cn/doc/app/parameters-0000001931995692)。
+
+4. （可选）用户购买商品后，IAP服务器会在订单（消耗型/非消耗型商品）和订阅场景的某些关键事件发生时发送通知至开发者配置的订单/订阅通知接收地址，您可以根据关键事件的通知进行服务端的开发，详情请参考[激活服务和配置事件通知](https://developer.huawei.com/consumer/cn/doc/app/parameters-0000001931995692)。
+
+5. 配置商品信息，详情请参考[配置商品信息](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/iap-config-product)。
+
+6. 配置预加载服务。
+
+   a. [开通预加载](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/cloudfoundation-enable-prefetch)。
+
+   b. [开通云函数](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/cloudfoundation-enable-function)。
+
+   c. 打包云函数包：进入工程preload目录，将目录下的文件压缩为zip文件，注意进入文件夹中，全选文件，右击压缩。
+
+   d. [创建云函数](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/cloudfoundation-create-and-config-function)。
+
+   * “函数名称”为“preload”
+   * “触发方式”为“事件调用”
+   * “触发器类型”为“HTTP触发器”，其他保持默认
+   * “代码输入类型”为“*.zip文件”，代码文件上传上一步打包的zip文件
+
+    <img src="./screenshots/clound_function.png" width="1200">
+
+   e. [配置安装预加载](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/cloudfoundation-prefetch-config)
+
+   安装预加载函数名称配置为上一步创建的云函数
+
+    <img src="./screenshots/preload.png" width="1200">
+
+7. 配置推送服务。
+
+   a. [开启推送服务](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/push-config-setting)。
+
+   b. 按照需要的权益[申请通知消息自分类权益](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/push-apply-right)。
+
+   c. [端云调试](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/push-server)。
+
+8. 对应用进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing#section297715173233)。
+
+9. 添加手工签名所用证书对应的公钥指纹。详细参考：[配置应用签名证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-cert-fingerprint-0000002278002933)
 
 ### 运行调试工程
 

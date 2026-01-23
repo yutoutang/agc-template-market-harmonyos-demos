@@ -1,12 +1,16 @@
 import { getMedia } from '@agctemplate/resources'
+import { AppStorageKeys, BreakPoint, BreakPointType, BreakPointValue } from '@agctemplate/widgets'
 import { DramaCoverVM } from '../viewmodels/DramaCoverVM'
 import { getCoverEpisodeShowText } from './DramaCover'
+import { AppStorageV2 } from '@kit.ArkUI'
 
 @ComponentV2
 export struct DramaRecommendInfo {
   @Param @Require drama: DramaCoverVM
   @Param @Require onItemClick: Function
   @Param inPage: string = ''
+  @Local currentBreakpoint: BreakPoint = AppStorageV2.connect(BreakPoint, AppStorageKeys.CURRENT_BREAK_POINT,
+    () => new BreakPoint(BreakPointValue.SM))!;
 
   @Builder
   episodeInfoBuilder(latestUpdate: number, episodes: number) {
@@ -33,10 +37,18 @@ export struct DramaRecommendInfo {
 
   build() {
     Column() {
-      Stack() {
+      Stack({ alignContent: Alignment.TopEnd }) {
         Image(this.drama.imagePath)
-          .height(140)
-          .width(104)
+          .height(new BreakPointType<number>({
+            sm: 138,
+            md: 210,
+            lg: 249
+          }).getValue(this.currentBreakpoint.value))//推荐短剧封面高度
+          .width(new BreakPointType<number>({
+            sm: 104,
+            md: 159,
+            lg: 189
+          }).getValue(this.currentBreakpoint.value))//推荐短剧封面宽度
           .borderRadius(8)
           .objectFit(ImageFit.Cover)
           .overlay(this.episodeInfoBuilder(this.drama.episodes, this.drama.latestUpdate),
@@ -46,12 +58,12 @@ export struct DramaRecommendInfo {
           Image(getMedia('app.media.new'))
             .width(28)
             .height(16)
-            .position({ left: 76 })
+          // .position({ left: 76 })
         } else if (this.drama.isVip === true) {
           Image(getMedia('app.media.vip'))
             .width(28)
             .height(16)
-            .position({ left: 76 })
+          // .position({ left: 76 })
         }
       }
 
@@ -67,9 +79,9 @@ export struct DramaRecommendInfo {
           if (index === 0) {
             Span(tag)
           } else {
-            Span('·'+tag)
+            Span('·' + tag)
           }
-        },(tag: string) => tag)
+        }, (tag: string) => tag)
       }
       .width(104)
       .height(16)

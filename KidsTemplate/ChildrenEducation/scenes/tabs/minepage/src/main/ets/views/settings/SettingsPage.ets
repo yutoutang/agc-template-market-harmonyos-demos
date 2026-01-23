@@ -1,6 +1,18 @@
-import { AuthUtil, CommonConstants, rightArrow } from '@ohos_agcit/children_education_utils';
+import { AuthUtil, CommonConstants, ResourceUtil } from '@ohos_agcit/children_education_utils';
+import {
+  AboutModel,
+  SettingGroup,
+  SettingItem,
+  SettingType,
+  SettingView,
+  SupportedSetting,
+  WebModel
+} from 'app_setting';
 import { userAuth } from '@kit.UserAuthenticationKit';
 import { CustomContentDialog } from '@kit.ArkUI';
+import { emitter } from '@kit.BasicServicesKit';
+import { AuthOptions } from '@ohos_agcit/children_education_utils/src/main/ets/model/AuthOptions';
+import { User } from '@ohos_agcit/children_education_datasource';
 
 @Builder
 export function SettingsPageBuilder() {
@@ -10,31 +22,26 @@ export function SettingsPageBuilder() {
 
 @ComponentV2
 export struct SettingsPage {
+  @Consumer(CommonConstants.USER_INFO) user: User = new User();
   @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
+  @Local group1: SettingGroup = new SettingGroup()
+    .setList([
+      new SettingItem()
+        .setType(SettingType.ROUTER)
+        .setLabel('个人信息')
+        .setRouterParam({ routerName: 'PersonalInformation' }),
+    ])
+  @Local group2: SettingGroup = new SettingGroup()
+    .setList([
+      new SettingItem()
+        .setType(SettingType.ROUTER)
+        .setLabel('时长控制')
+        .setClickEvent(() => {
+          const options: AuthOptions = new AuthOptions();
+          options.showTip = true
+          options.uiContext = this.getUIContext()
 
-  build() {
-    NavDestination() {
-      Column({ space: 17 }) {
-        Row() {
-          Text('隐私协议')
-            .textExtend();
-          Blank();
-          rightArrow()
-        }.width(CommonConstants.FULL_PERCENT)
-        .onClick(() => {
-          this.appPathStack.pushPathByName('PrivacyAgreement', undefined);
-        });
-
-        Divider();
-
-        Row() {
-          Text('时长控制')
-            .textExtend();
-          Blank();
-          rightArrow()
-        }.width(CommonConstants.FULL_PERCENT)
-        .onClick(() => {
-          AuthUtil.onStartEasy(true, (result: userAuth.UserAuthResult) => {
+          AuthUtil.onStartEasy(options, (result: userAuth.UserAuthResult) => {
             if (result.result === 12500000) {
               this.appPathStack.pushPathByName('TimeCtrl', undefined);
             } else if (result.result === 12500010) {
@@ -42,12 +49,114 @@ export struct SettingsPage {
               this.appPathStack.pushPathByName('TimeCtrl', undefined);
             }
           });
-        });
+        })
+    ])
+  @Local group3: SettingGroup = new SettingGroup()
+    .setList([
+      new SettingItem()
+        .setSupportedType(SupportedSetting.CLEAR_CACHE),
+    ])
+  @Local group4: SettingGroup = new SettingGroup()
+    .setList([
+      new SettingItem()
+        .setSupportedType(SupportedSetting.PUSH_SWITCH),
+    ])
+  @Local group5: SettingGroup = new SettingGroup()
+    .setTitle('了解我们如何使用您的数据')
+    .setList([
+      new SettingItem()
+        .setType(SettingType.ROUTER)
+        .setLabel('业务与隐私的声明')
+        .setClickEvent(() => {
+          let url = ResourceUtil.getString(this.getUIContext(), 'privacyAgreementPath')
+          this.appPathStack.pushPathByName('PrivacyAgreement', url);
+        }),
+      new SettingItem()
+        .setSupportedType(SupportedSetting.WEB)
+        .setLabel('第三方共享信息清单')
+        .setClickEvent(() => {
+          let url = ResourceUtil.getString(this.getUIContext(), 'example_website')
+          this.appPathStack.pushPathByName('PrivacyAgreement', url);
+        }),
+      new SettingItem()
+        .setSupportedType(SupportedSetting.WEB)
+        .setLabel('第三方 SDK 列表')
+        .setClickEvent(() => {
+          let url = ResourceUtil.getString(this.getUIContext(), 'example_website')
+          this.appPathStack.pushPathByName('PrivacyAgreement', url);
+        }),
+      new SettingItem()
+        .setSupportedType(SupportedSetting.WEB)
+        .setLabel('已收集个人信息清单')
+        .setClickEvent(() => {
+          let url = ResourceUtil.getString(this.getUIContext(), 'example_website')
+          this.appPathStack.pushPathByName('PrivacyAgreement', url);
+        }),
+      new SettingItem()
+        .setSupportedType(SupportedSetting.WEB)
+        .setLabel('隐私声明摘要')
+        .setClickEvent(() => {
+          let url = ResourceUtil.getString(this.getUIContext(), 'example_website')
+          this.appPathStack.pushPathByName('PrivacyAgreement', url);
+        }),
+    ])
+  @Local group6: SettingGroup = new SettingGroup()
+    .setTitle('更多')
+    .setList([
+      new SettingItem()
+        .setSupportedType(SupportedSetting.CHECK_VERSION),
+      new SettingItem()
+        .setSupportedType(SupportedSetting.ABOUT)
+        .setExtraParams({
+          icpText: '苏ICP备17040376号-135A',
+          copyrightText: '华为xx 版权所有 © 2019-2025',
+          hotline: '00000000',
+        } as AboutModel),
+      new SettingItem()
+        .setSupportedType(SupportedSetting.WEB)
+        .setLabel('服务协议与规则')
+        .setClickEvent(() => {
+          let url = ResourceUtil.getString(this.getUIContext(), 'example_website')
+          this.appPathStack.pushPathByName('PrivacyAgreement', url);
+        })
+    ])
 
-        Divider();
-      }.padding({ right: 16, left: 16, top: 34 });
+  build() {
+    NavDestination() {
+      Column() {
+        SettingView({
+          pathStack: this.appPathStack,
+          settingList: this.user.isLogin ?
+            [this.group1, this.group2, this.group3, this.group4, this.group5, this.group6] :
+            [this.group2, this.group3, this.group4, this.group5, this.group6],
+          themeColor: $r('sys.color.confirm'),
+          pagePadding: {
+            bottom: 10,
+          },
+          isLogin: this.user.isLogin,
+          signOutApi: () => {
+            return new Promise((resolve) => {
+              let userName: emitter.EventData = {
+                data: {
+                  isLogin: false,
+                  userName: '点击登录',
+                  userAvatar: '',
+                  phone: '',
+                },
+              };
+              emitter.emit(CommonConstants.USER_INFO, userName);
+              this.appPathStack.pop();
+              resolve();
+            });
+          }
+        })
+      }
+      .backgroundColor('#F1F3F5')
+      .width('100%')
+      .height('100%')
     }
     .title('设置')
+    .backgroundColor($r('sys.color.background_secondary'))
     .onBackPressed(() => {
       this.appPathStack.pop();
       return true;
@@ -80,13 +189,4 @@ export struct SettingsPage {
     }
     .width(CommonConstants.FULL_PERCENT);
   }
-}
-
-@Extend(Text)
-function textExtend() {
-  .fontSize(16)
-  .fontFamily('鸿蒙黑体')
-  .fontWeight(FontWeight.Medium)
-  .opacity(0.9)
-  .fontColor($r('sys.color.black'));
 }

@@ -25,3 +25,11 @@ export * from './src/main/ets/ui/viewmodel/MinePageVM'
 export * from './src/main/ets/util/AccountUtil'
 
 export * from './src/main/ets/util/Utils'
+
+export { ContinueModel } from './src/main/ets/models/ContinueModel';
+
+export { PushUtils } from './src/main/ets/push/PushUtils';
+
+export { PushActionParams } from './src/main/ets/push/Model';
+
+export { RouterToNews } from './src/main/ets/push/NewsPushUtils';

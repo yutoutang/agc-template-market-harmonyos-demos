@@ -4,7 +4,7 @@
 
 - [简介](#简介)
 - [约束与限制](#约束与限制)
-- [快速入门](#快速入门)
+- [使用](#使用)
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
@@ -22,7 +22,7 @@
 
 - DevEco Studio版本：DevEco Studio 5.0.0 Release及以上
 - HarmonyOS SDK版本：HarmonyOS 5.0.0 Release SDK及以上
-- 设备类型：华为手机
+- 设备类型：华为手机（直板机、双折叠）、平板
 - 系统版本：HarmonyOS 5.0.0(12)及以上
 
 ### 权限
@@ -33,7 +33,7 @@
 
 进行投屏调试时，需保证两端的设备同时打开蓝牙和Wifi，并且可以访问网络。
 
-## 快速入门
+## 使用
 
 1. 安装组件。
 
@@ -387,7 +387,11 @@ import { CastingLayer, CastPicker, CastService, CastSessionListener, VideoData }
    
      onPlayPre(): void {
        hilog.info(DOMAIN, TAG, 'onPlayPre')
-       this.currentIndex = (this.currentIndex - 1) % this.videoList.length
+       if(this.currentIndex > 0){
+         this.currentIndex = this.currentIndex - 1
+       }else {
+         this.currentIndex = this.videoList.length - 1 
+       }  
        CastService.getInstance().setAVMetadata(this.videoList[this.currentIndex], 100000)
        CastService.getInstance().play()
      }

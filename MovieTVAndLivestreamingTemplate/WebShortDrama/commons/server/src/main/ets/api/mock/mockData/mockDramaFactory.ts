@@ -8,6 +8,8 @@ class MockDramaFactory {
   likeDramas: Array<Drama> = []
   tags: Array<string> = ['古装', '家庭', '年代', '穿越', '职场', '重生', '权谋', '情感', '悬疑', '搞笑']
   watchedDramas: Array<Drama> = []
+  randNum1: number = 0
+  randNum2: number = 0
   dramaNames: Array<string> = [
     '这次到你看我爱着别人',
     '千金驾到',
@@ -133,8 +135,8 @@ class MockDramaFactory {
 
   getOneDrama(vip: boolean = false): Drama {
     let dramaId = 'drama_' + this.uniqueId++
-    let randDrama = this.random(0, 5)
-    let randIndex = this.random(0, 5)
+    let randDrama = (this.randNum1++)%6
+    let randIndex = (this.randNum2++)%6
     let drama: Drama = {
       id: dramaId,
       promotionalUrl: this.videoUrl[randIndex%3],

@@ -52,6 +52,7 @@ export function routerInterceptor(target: any, propertyKey: string,
 
 class AppRouter {
   optionActionClient?: OptionActionClient;
+  windowStage: window.WindowStage = AppStorage.get('windowStage')
 
   private navStackAction?: (actionType: NavRouterActionType, options: navStackActionOptions) => boolean;
   systemBarProperties?: window.SystemBarProperties;
@@ -112,7 +113,7 @@ class AppRouter {
       return;
     }
     if (!options) {
-      router.back();
+      this.windowStage.getMainWindowSync().getUIContext().getRouter().back();
       return;
     }
   }

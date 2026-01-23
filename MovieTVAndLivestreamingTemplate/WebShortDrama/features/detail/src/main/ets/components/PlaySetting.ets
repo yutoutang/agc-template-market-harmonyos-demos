@@ -19,13 +19,12 @@ export struct PlaySetting {
       Row() {
         Row() {
           Text(getString('app.string.play_speed_setting'))
-            .textStyle(14, FontWeight.Regular)
-            .width(56)
-            .height(19)
+            .textStyle()
           Column() {
             SpeedSegmentButton({ onSpeedSet: this.onSpeedSet })
-              .width(270)
+              .width('100%')
           }
+          .layoutWeight(1)
           .margin({ left:12 })
           .height('100%')
         }

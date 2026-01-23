@@ -4,7 +4,7 @@ import { Header } from '../component/Header';
 import { UserInfoRow } from '../component/UserInfoRow';
 import { getString, NAV_PAGE_NAME } from '@agctemplate/resources';
 import { AppStorageKeys, AssociateUtil, ListItemModel, MinePageVM, StatusBarHeight } from '@agctemplate/widgets';
-import { appRouter, PreferConstant, PreferenceUtil } from '@agctemplate/utils';
+import { appRouter, PreferConstant, PreferenceUtil, SafeJson } from '@agctemplate/utils';
 import { TipsDialog } from '@kit.ArkUI';
 
 @ComponentV2
@@ -20,7 +20,7 @@ export struct SetUpPage {
   @Local userPhone: ListItemModel = new ListItemModel(getString('app.string.phone_number'))
   @Local textValue: string = '';
   dialogController: CustomDialogController | null = new CustomDialogController({
-    builder:TipsDialog({
+    builder: TipsDialog({
       content: '是否退出登录',
       primaryButton: {
         value: '取消',
@@ -41,7 +41,7 @@ export struct SetUpPage {
 
   async onAccept() {
     console.info('Callback when the second button is clicked');
-    await AssociateUtil.disassociateAccount(getContext(this))
+    await AssociateUtil.disassociateAccount(this.getUIContext().getHostContext()!)
     appRouter.back()
 
   }
@@ -52,7 +52,8 @@ export struct SetUpPage {
 
   aboutToAppear(): void {
     this.currentSpeed =
-      PreferenceUtil.getInstance(getContext()).get(PreferConstant.PLAY_SPEED_SETTINGS, '1.0x') as string
+      PreferenceUtil.getInstance(this.getUIContext().getHostContext())
+        .get(PreferConstant.PLAY_SPEED_SETTINGS, '1.0x') as string
   }
 
   @Builder
@@ -97,7 +98,7 @@ export struct SetUpPage {
                           })
                         }),
                         this.userPhone.setContentText(this.vm.userInfo.cellphone).setHandle(() => {
-                          promptAction.showToast({
+                          this.getUIContext().getPromptAction().showToast({
                             message: getString('app.string.phone_tip'),
                             alignment: Alignment.Center
                           });
@@ -133,12 +134,17 @@ export struct SetUpPage {
                   preferType: SheetType.BOTTOM,
                   title: titleBuilder(getString('app.string.play_speed_settings')),
                   onWillAppear: () => {
-                    emitter.on('SpeedSelected', (event: emitter.EventData) => {
-                      this.currentSpeed = event.data!.speed
-                    })
+                    try {
+                      emitter.on('SpeedSelected', (event: emitter.EventData) => {
+                        this.currentSpeed = event.data!.speed
+                      })
+                    }catch (error) {
+                      console.error('Failed. Cause:' + SafeJson.ohAegJsonStringify(error));
+                    }
                   },
                   onWillDisappear: () => {
-                    PreferenceUtil.getInstance(getContext()).put(PreferConstant.PLAY_SPEED_SETTINGS, this.currentSpeed)
+                    PreferenceUtil.getInstance(this.getUIContext().getHostContext())
+                      .put(PreferConstant.PLAY_SPEED_SETTINGS, this.currentSpeed)
                   }
                 })
               this.line()
@@ -147,7 +153,7 @@ export struct SetUpPage {
                 isSwitch: true,
                 switchButton: (isOn) => {
                   this.isBackgroundPlay = isOn
-                  PreferenceUtil.getInstance(getContext())
+                  PreferenceUtil.getInstance(this.getUIContext().getHostContext())
                     .put(PreferConstant.BACKGROUND_MINI_WINDOW_PLAYBACK, this.isBackgroundPlay)
                   let event: emitter.InnerEvent = {
                     eventId: 4,
@@ -158,7 +164,11 @@ export struct SetUpPage {
                       id: 4
                     }
                   };
-                  emitter.emit(event, eventData);
+                  try {
+                    emitter.emit(event, eventData);
+                  }catch (error) {
+                    console.error('Failed. Cause:' + SafeJson.ohAegJsonStringify(error));
+                  }
                 }
               })
 
@@ -181,6 +191,9 @@ export struct SetUpPage {
             .fontSize($r('sys.float.Body_L'))
             .fontWeight(500)
             .width('100%')
+            .constraintSize({
+              maxWidth: 448
+            })
             .height(40)
             .onClick(() => {
               if (this.dialogController != null) {
@@ -191,6 +204,9 @@ export struct SetUpPage {
         .justifyContent(FlexAlign.SpaceBetween)
         .layoutWeight(1)
         .width('100%')
+        .constraintSize({
+          maxWidth: 837
+        })
         .padding({
           left: 16,
           right: 16,
@@ -201,7 +217,7 @@ export struct SetUpPage {
       .height('100%')
     }
     .backgroundColor($r('sys.color.comp_background_gray'))
-    .padding({ top: `${px2vp(this.statusBarHeight.value)}vp`, bottom: 36 })
+    .padding({ top: `${this.getUIContext().px2vp(this.statusBarHeight.value)}vp`, bottom: 36 })
     .hideTitleBar(true)
   }
 }

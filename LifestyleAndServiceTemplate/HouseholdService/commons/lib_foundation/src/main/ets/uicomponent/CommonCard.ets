@@ -21,15 +21,15 @@ export struct CardContainer {
   @BuilderParam buildParam: () => void;
 
   build() {
-    Column({ space: 10 }) {
-      Text(this.title).fontSize(14).fontWeight(500)
+    Column({ space: 4 }) {
+      Text(this.title).fontSize($r('sys.float.Body_L')).fontWeight(FontWeight.Medium)
       if (this.buildParam) {
         this.buildParam()
       }
     }
     .width(CommonConstants.FULL_PERCENT)
-    .padding(10)
-    .borderRadius(8)
+    .padding(12)
+    .borderRadius(16)
     .backgroundColor(Color.White)
     .alignItems(HorizontalAlign.Start)
   }

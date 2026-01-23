@@ -1,6 +1,12 @@
 import { MineInfoPage } from '../pages/MineInfoPage';
-import { RechargePage } from '../pages/RechargePage';
+import { SettingPage } from '../pages/SettingPage';
+import { Recharge } from 'module_recharge';
+import { qrCodeDialog } from '../components/QrCodeDialog'
 
+@Builder
+export function SettingPageBuilder() {
+  SettingPage();
+}
 
 @Builder
 export function MineInfoBuilder() {
@@ -9,6 +15,12 @@ export function MineInfoBuilder() {
 
 @Builder
 export function VipRechargeBuilder() {
-  RechargePage();
+  Recharge();
 }
+
+@Builder
+export function qrCodeDialogBuilder() {
+  qrCodeDialog();
+}
+
 

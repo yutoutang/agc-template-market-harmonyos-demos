@@ -1,5 +1,5 @@
 import { LevelMode, promptAction } from '@kit.ArkUI';
-import { TitleBar } from 'common';
+import { TitleBar } from 'commonlib';
 import { AgreementDialog } from '../components/AgreementView';
 import { Constants } from '../model/Constants';
 import { PrivacyTextSpan } from '../components/PrivacyTextSpan';
@@ -66,7 +66,7 @@ export struct OtherLogin {
     })
     .hideTitleBar(true)
     .padding({
-      top: px2vp(this.topRectHeight)
+      top: this.getUIContext().px2vp(this.topRectHeight)
     })
   }
 
@@ -119,10 +119,14 @@ export struct OtherLogin {
             .fontSize($r('sys.float.Body_L'))
             .textAlign(TextAlign.End)
             .onClick(() => {
-              promptAction.showDialog({
-                title: '提示',
-                message: '获取验证码为模拟场景，真实获取验证码以业务实现为准',
-              })
+              try {
+                this.getUIContext().getPromptAction().showDialog({
+                  title: '提示',
+                  message: '获取验证码为模拟场景，真实获取验证码以业务实现为准',
+                })
+              } catch (e) {
+                console.error(`Failed to showDialog. error: ${JSON.stringify(e)}`)
+              }
               this.verifyCodeTime = 60;
               this.getVerifyCode();
             });
@@ -232,7 +236,7 @@ export struct OtherLogin {
    **/
   validateLogin(): boolean {
     if (this.verifyCode === '' || this.phoneNum === '') {
-      promptAction.showToast({ message: '手机号或验证码不能为空！' })
+      this.getUIContext().getPromptAction().showToast({ message: '手机号或验证码不能为空！' })
       return false
     }
     return true

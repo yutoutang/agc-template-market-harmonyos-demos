@@ -12,23 +12,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import { AppStorageV2 } from '@kit.ArkUI';
+import { UtilLog as Logger } from '@hw-agconnect/util-log';
 import {
+  AppPrivacyUtils,
+  AppStorageBank,
   getAllCategoryServices,
   getGoodList,
   getHomeInfo,
   GoodDataSource,
-  AppStorageBank,
-  updateCitySelected,
   HomeBaseInfo,
+  LoginUtil,
   QueryGoodListSource,
+  updateCitySelected,
   updateCurrentCity,
 } from 'lib_foundation';
 import { SystemSceneUtils } from 'module_base';
-import { AppStorageV2 } from '@kit.ArkUI';
+
+const TAG = 'HomeVM';
 
 @ObservedV2
 export class HomeVM {
+  @Trace privacyImpl: AppPrivacyUtils = AppPrivacyUtils.instance;
+  // 横幅广告是否可见
+  @Trace adVisibilityState: boolean = true;
   homeBaseInfo: HomeBaseInfo = AppStorageV2.connect(HomeBaseInfo, () => new HomeBaseInfo())!;
   goodDataSource: GoodDataSource = new GoodDataSource();
   static _instance: HomeVM;
@@ -41,24 +48,34 @@ export class HomeVM {
     return HomeVM._instance;
   }
 
+  @Monitor('privacyImpl.agreeFlag')
+  agreeFlagChange() {
+    if (this.privacyImpl.agreeFlag) {
+      Logger.info(TAG, 'user has agree the privacy, start silent login and apply permission');
+      LoginUtil.silentLogin();
+      this.applyLocationPermission();
+    }
+  }
+
   init() {
-    this.applyLocationPermission()
+    this.agreeFlagChange();
     this.queryHomeBaseInfo();
     this.queryGoodList();
     this.queryCategoryList();
   }
 
   applyLocationPermission() {
-    SystemSceneUtils.applyLocationPermission().then((isGranted) => {
-      if (isGranted) {
-        SystemSceneUtils.getCurrentCityInfo().then((city: string) => {
-          if (city) {
-            this.updateCityCurrentInfo(city);
-            this.updateCitySelectedInfo(city);
-          }
-        });
-      }
-    });
+    SystemSceneUtils.applyLocationPermission()
+      .then((isGranted) => {
+        if (isGranted) {
+          SystemSceneUtils.getCurrentCityInfo().then((city: string) => {
+            if (city) {
+              this.updateCityCurrentInfo(city);
+              this.updateCitySelectedInfo(city);
+            }
+          });
+        }
+      });
   }
 
   queryHomeBaseInfo() {

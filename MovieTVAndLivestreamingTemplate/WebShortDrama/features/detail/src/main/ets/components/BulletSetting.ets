@@ -1,14 +1,38 @@
+import { ComponentUtils } from '@kit.ArkUI';
+
+@ObservedV2
+class NodeParams {
+  @Trace value: number
+  @Trace isBlock: boolean
+
+  constructor(value: number, isBlock: boolean) {
+    this.value = value;
+    this.isBlock = isBlock
+  }
+}
+
+let offsetX: number = 0
+
 @ComponentV2
 export struct BulletSetting {
-
   @Param rowsNum: number = 2;
-  @Param notOpacity: number = 80;
+  @Param @Once notOpacity: number = 80;
   @Param danMuSpeed: string = '适中';
   @Param danMuSize: string = '适中';
-  @Event setRowsNum: Function = (set: number) => {};
-  @Event setNotOpacity: Function = (set: number) => {};
-  @Event setDanMuSpeed: Function = (set: string) => {};
-  @Event setDanMuSize: Function = (set: string) => {};
+  @Local blockNodeParams: NodeParams = new NodeParams(this.notOpacity, true)
+  @Event setRowsNum: Function = (set: number) => {
+  };
+  @Event setNotOpacity: Function = (set: number) => {
+  };
+  @Event setDanMuSpeed: Function = (set: string) => {
+  };
+  @Event setDanMuSize: Function = (set: string) => {
+  };
+  private uiContext: UIContext = this.getUIContext();
+  @Monitor('blockNodeParams.value')
+  onChange(monitor:IMonitor){
+    this.setNotOpacity(monitor.value()?.now)
+  }
 
   build() {
     Column({ space: 16 }) {
@@ -40,14 +64,15 @@ export struct BulletSetting {
             (item: number) => item.toString()
           )
         }
-        .width(260)
+        .justifyContent(FlexAlign.SpaceBetween)
+        .layoutWeight(1)
         .height(36)
         .padding({ left: 1, right: 1 })
         .margin({ left: 12 })
         .borderRadius(18)
         .backgroundColor('#0d000000')
       }
-      .width(328)
+      .width('100%')
       .height(48)
 
       // 不透明度
@@ -58,34 +83,35 @@ export struct BulletSetting {
           .fontSize(14)
           .fontWeight(FontWeight.Regular)
         Row() {
-          ForEach(
-            [20, 40, 60, 80, 100],
-            (item: number) => {
-              Text(item === 0 ? '' : `${item}%`)
-                .width(52)
-                .height(36)
-                .fontSize(14)
-                .fontWeight(FontWeight.Medium)
-                .borderRadius(18)
-                .textAlign(TextAlign.Center)
-                .fontColor(this.notOpacity === item ? '#000' : '#9000')
-                .backgroundColor(this.notOpacity === item ? '#fff' : 'transparent')
-                .shadow(this.notOpacity === item ? { color: '#3000', radius: 3 } : { color: 'transparent', radius: 0 })
-                .onClick(() => {
-                  this.setNotOpacity(item)
-                })
-            },
-            (item: number) => item.toString()
-          )
+          Stack({ alignContent: Alignment.Start }) {
+            Slider({
+              value: $$this.blockNodeParams.value,
+              style: SliderStyle.NONE,
+            })
+              .id('slider')
+              .trackColor('#0d000000')
+              .trackThickness(36)
+              .trackBorderRadius(18)
+              .selectedColor('#0d000000')
+              .margin({ left: 12 })
+              .padding({ right: 12 })
+              .width('100%')
+            Row(){
+              textBuilder(new NodeParams(0, false))
+              textBuilder(new NodeParams(100, false))
+            }
+            .width('100%')
+            .justifyContent(FlexAlign.SpaceBetween)
+            Row() {
+              textBuilder(this.blockNodeParams)
+            }
+            .width('100%')
+            .padding({ left: 12, right: 52 })
+          }
         }
-        .width(260)
-        .height(36)
-        .padding({ left: 1, right: 1 })
-        .margin({ left: 12 })
-        .borderRadius(18)
-        .backgroundColor('#0d000000')
+        .layoutWeight(1)
       }
-      .width(328)
+      .width('100%')
       .height(48)
 
       // 弹幕速度
@@ -118,14 +144,15 @@ export struct BulletSetting {
             (item: string, index: number) => item + '_' + index.toString()
           )
         }
-        .width(260)
+        .justifyContent(FlexAlign.SpaceBetween)
+        .layoutWeight(1)
         .height(36)
         .padding({ left: 1, right: 1 })
         .margin({ left: 12 })
         .borderRadius(18)
         .backgroundColor('#0d000000')
       }
-      .width(328)
+      .width('100%')
       .height(48)
 
       // 弹幕字号
@@ -158,15 +185,53 @@ export struct BulletSetting {
             (item: string, index: number) => item + '_' + index.toString()
           )
         }
-        .width(260)
+        .justifyContent(FlexAlign.SpaceBetween)
+        .layoutWeight(1)
         .height(36)
         .padding({ left: 1, right: 1 })
         .margin({ left: 12 })
         .borderRadius(18)
         .backgroundColor('#0d000000')
       }
-      .width(328)
+      .width('100%')
       .height(48)
     }
   }
+}
+
+@Builder
+function textBuilder(param: NodeParams) {
+  Text(`${param.value}%`)
+    .width(52)
+    .height(36)
+    .fontSize(14)
+    .fontWeight(FontWeight.Medium)
+    .borderRadius(18)
+    .textAlign(TextAlign.Center)
+    .fontColor(param.isBlock ? '#000' : '#9000')
+    .backgroundColor(param.isBlock ? '#fff' : 'transparent')
+    .shadow(param.isBlock ? { color: '#3000', radius: 3 } : { color: 'transparent', radius: 0 })
+    .offset({ x: param.isBlock ? `${param.value}%` : param.value === 0 ? 11 : 0 })
+    .gesture(
+      PanGesture({ fingers: 1, direction: PanDirection.Horizontal, distance: 5 })
+        .onActionStart((event: GestureEvent) => {
+          offsetX = param.value
+        })
+        .onActionUpdate((event: GestureEvent) => {
+          if (param.isBlock) {
+            const uiContext: UIContext = AppStorage.get('UIContext')!
+            let componentUtils: ComponentUtils = uiContext.getComponentUtils();
+            let width: number = uiContext.px2vp(componentUtils.getRectangleById('slider').size.width);
+            let offsetPercent: number = Math.round((event.offsetX / width) * 100)
+            let temp: number = offsetX + offsetPercent
+            if (temp > 100) {
+              param.value = 100
+            } else if (temp < 0) {
+              param.value = 0
+            } else {
+              param.value = temp
+            }
+          }
+        })
+    )
 }

@@ -39,6 +39,10 @@
     {
       "name": "speed_text_color",
       "value": "#DDDDDD"
+    },
+    {
+      "name": "color_member",
+      "value": "#D3B685"
     }
   ]
 }

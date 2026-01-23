@@ -1,6 +1,6 @@
 import * as wxopensdk from '@tencent/wechat_open_sdk';
 import { common } from '@kit.AbilityKit';
-import { PersistenceV2, promptAction } from '@kit.ArkUI';
+import { PersistenceV2, promptAction, window } from '@kit.ArkUI';
 import { util } from '@kit.ArkTS';
 import { authentication, loginComponentManager } from '@kit.AccountKit';
 import { BusinessError } from '@kit.BasicServicesKit';
@@ -15,6 +15,7 @@ import { WXLoginService } from '../utils/WXLoginService'
 
 @ObservedV2
 export class AggregatedLoginVM {
+  windowStage: window.WindowStage = AppStorage.get('windowStage')!
   private static _instance: AggregatedLoginVM | null;
   @Trace isSelected: boolean = false;
   // 控制登录中不可点击协议和复选框的状态变量
@@ -43,7 +44,6 @@ export class AggregatedLoginVM {
   domainId: number = 0x0000;
   obtainVerifyCode: () => Promise<void> = () => new Promise(() => {
   });
-
   controller: loginComponentManager.LoginWithHuaweiIDButtonController =
     new loginComponentManager.LoginWithHuaweiIDButtonController()
     // 需要用户同意协议才能完成华为账号登录，请先设置协议状态为NOT_ACCEPTED，当用户同意协议后设置协议状态为ACCEPTED，才可以完成华为账号登录
@@ -52,7 +52,6 @@ export class AggregatedLoginVM {
         response: loginComponentManager.HuaweiIDCredential) => {
         this.handleLoginWithHuaweiIDButton(error, response);
       });
-
   // 定义固定文本部分
   fixedTexts: loginComponentManager.PrivacyText[] = [
     {
@@ -80,7 +79,7 @@ export class AggregatedLoginVM {
     this.isSelected = false
     this.enableStatus = true
     this.phoneNum = ''
-    this.verifyCode  = ''
+    this.verifyCode = ''
     this.verifyCodeTime = 0
     clearInterval(this.timer)
   }
@@ -102,9 +101,14 @@ export class AggregatedLoginVM {
     req.state = extraInfo.state;
     req.transaction = extraInfo.transaction;
 
-    let finished = await this.loginService.wxApi.sendReq(getContext(this) as common.UIAbilityContext, req);
+    let finished = await this.loginService.wxApi.sendReq(this.windowStage.getMainWindowSync()
+      .getUIContext()
+      .getHostContext() as common.UIAbilityContext, req);
     if (!finished) {
-      promptAction.showToast({ message: '未安装微信' });
+      this.windowStage.getMainWindowSync()
+        .getUIContext()
+        .getPromptAction()
+        .showToast({ message: '未安装微信' });
     }
   }
 
@@ -113,11 +117,14 @@ export class AggregatedLoginVM {
     if (this.isSelected) {
       this.wxLogin(extraInfo);
     } else {
-      promptAction.showToast({
-        message: $r('app.string.select_the_agreement'),
-        duration: 1500,
-        bottom: 80,
-      })
+      this.windowStage.getMainWindowSync()
+        .getUIContext()
+        .getPromptAction()
+        .showToast({
+          message: $r('app.string.select_the_agreement'),
+          duration: 1500,
+          bottom: 80,
+        })
     }
   }
 
@@ -139,15 +146,24 @@ export class AggregatedLoginVM {
    **/
   validateLogin(): boolean {
     if (this.verifyCode === '' || (this.isPersistence ? this.persistenceData.phoneNumber : this.phoneNum) === '') {
-      promptAction.showToast({ message: '手机号或验证码不能为空！' })
+      this.windowStage.getMainWindowSync()
+        .getUIContext()
+        .getPromptAction()
+        .showToast({ message: '手机号或验证码不能为空！' })
       return false
     }
     if (!/^\d{6}$/.test(this.verifyCode)) {
-      promptAction.showToast({ message: '验证码不正确！' })
+      this.windowStage.getMainWindowSync()
+        .getUIContext()
+        .getPromptAction()
+        .showToast({ message: '验证码不正确！' })
       return false
     }
     if (!/^1[3-9]\d{9}$/.test(this.isPersistence ? this.persistenceData.phoneNumber : this.phoneNum)) {
-      promptAction.showToast({ message: '手机号码不正确！' })
+      this.windowStage.getMainWindowSync()
+        .getUIContext()
+        .getPromptAction()
+        .showToast({ message: '手机号码不正确！' })
       return false
     }
     return true
@@ -158,7 +174,7 @@ export class AggregatedLoginVM {
    **/
   clickLogInButton(): void {
     if (!this.isSelected) {
-      promptAction.showToast({
+      this.windowStage.getMainWindowSync().getUIContext().getPromptAction().showToast({
         message: $r('app.string.select_the_agreement'),
         duration: 1500,
         bottom: 80,
@@ -187,7 +203,10 @@ export class AggregatedLoginVM {
   getVerifyCode(): void {
     if ((this.isPersistence ? this.persistenceData.phoneNumber : this.phoneNum) === '' ||
       !/^1[3-9]\d{9}$/.test(this.isPersistence ? this.persistenceData.phoneNumber : this.phoneNum)) {
-      promptAction.showToast({ message: '请输入正确的手机号' })
+      this.windowStage.getMainWindowSync()
+        .getUIContext()
+        .getPromptAction()
+        .showToast({ message: '请输入正确的手机号' })
     } else {
       this.obtainVerifyCode().then(() => {
         this.verifyCodeTime = 60;
@@ -303,11 +322,14 @@ export class AggregatedLoginVM {
       hilog.error(this.domainId, this.logTag,
         `Failed to click LoginWithHuaweiIDButton. errCode is ${error.code}, errMessage is ${error.message}`);
       if (error.code === LoginErrorCode.ERROR_CODE_AGREEMENT_STATUS_NOT_ACCEPTED) {
-        promptAction.showToast({
-          message: $r('app.string.select_the_agreement'),
-          duration: 1500,
-          bottom: 80,
-        });
+        this.windowStage.getMainWindowSync()
+          .getUIContext()
+          .getPromptAction()
+          .showToast({
+            message: $r('app.string.select_the_agreement'),
+            duration: 1500,
+            bottom: 80,
+          });
         return;
       } else {
         LoginEventDispatcher.dispatchToLoginFail(LoginChannelType.HUAWEI, error)
@@ -330,11 +352,14 @@ export class AggregatedLoginVM {
           })
         }
       } else {
-        promptAction.showToast({
-          message: $r('app.string.select_the_agreement'),
-          duration: 1500,
-          bottom: 80,
-        });
+        this.windowStage.getMainWindowSync()
+          .getUIContext()
+          .getPromptAction()
+          .showToast({
+            message: $r('app.string.select_the_agreement'),
+            duration: 1500,
+            bottom: 80,
+          });
       }
     } catch (err) {
       hilog.error(this.domainId, this.logTag,

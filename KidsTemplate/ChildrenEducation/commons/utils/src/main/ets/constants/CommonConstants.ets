@@ -6,15 +6,13 @@ export class CommonConstants {
   static readonly dialogThemeColorMode: string = 'harmony-dialog_ThemeColorMode';
 
   static readonly APP_PATH_STACK : string = 'appPathStack';
-  static readonly IS_VIP : string = 'isVip';
-  static readonly VALID_TIME : string = 'validTime';
   static readonly TIME_CONTROL : string = 'timeControl';
-  static readonly TAB_INDEX : string = 'tabIndex';
   static readonly USER_INFO : string = 'userInfo';
+  static readonly VIP_RECORD : string = 'vipRecord';
 
   static readonly VIDEO_PLAY_PAGE : string = 'VideoPlayPage';
   static readonly AUDIO_PLAY_PAGE : string = 'AudioPlayPage';
-  static readonly VIP_PAGE_VIEW : string = 'VipPageView';
+  static readonly VIP_PAGE_VIEW : string = 'MemberShipCenterPage';
   static readonly EMPTY_STRING : string = '';
   static readonly APP_INFO : string = 'appInfo';
 

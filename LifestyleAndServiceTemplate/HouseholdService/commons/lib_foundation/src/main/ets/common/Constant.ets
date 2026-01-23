@@ -16,9 +16,20 @@ import { RouterMap } from 'module_base';
 
 /**
  * 和元服务本身相关的信息
+ * todo
  */
 export enum CurAppInfo {
-  BASE_URL = '', // 服务端请求基础url
+  BASE_URL = '', // todo 服务端请求基础url
+  CLIENT_ID = '', // todo client_id
+  PUSH_TEMPLATE_ID = '', // todo 推送服务通知模板ID，多个以,相隔
+}
+
+/**
+ * banner广告信息
+ * todo
+ */
+export enum AdInfo {
+  AD_INFO = 'testw6vs28auh3', // todo 广告位ID
 }
 
 /**
@@ -33,7 +44,7 @@ export enum AppStorageMap {
  */
 export enum OrderStatus {
   ALL = '全部',
-  TO_PAY = '待付款',
+  TO_PAY = '待支付',
   TO_USE = '待使用',
   NORMAL_FINISH = '已完成',
   REFUND = '退款标识',
@@ -45,6 +56,7 @@ export enum OrderStatus {
 export interface IMenuItem {
   imgUrl: ResourceStr;
   textLabel: string;
+  backgroundColor?: ResourceColor;
   tabLabel?: string;
   routerUrl?: string;
   status?: OrderStatus;
@@ -57,11 +69,10 @@ export interface IMenuItem {
 export enum QueryGoodListSource {
   HOME = 0,
   MINE = 1,
-  SEARCH = 2,
 }
 
 /**
- * 跳转main页面的参数
+ * 跳转全部服务页面的参数
  */
 export interface IJumpCategoryParam {
   tabIndex: number;
@@ -70,32 +81,36 @@ export interface IJumpCategoryParam {
 
 export const MENU_LIST: IMenuItem[] = [
   {
-    imgUrl: $r('app.media.ic_home_daily'),
+    imgUrl: $r('sys.symbol.clean_fill'),
     textLabel: '日常清洁',
+    backgroundColor: $r('sys.color.multi_color_04'),
     mainParam: {
       tabIndex: 1,
       listInitialIndex: 1,
     },
   },
   {
-    imgUrl: $r('app.media.ic_repair'),
+    imgUrl: $r('sys.symbol.spanner'),
     textLabel: '家电维修',
+    backgroundColor: $r('sys.color.multi_color_02'),
     mainParam: {
       tabIndex: 1,
       listInitialIndex: 4,
     },
   },
   {
-    imgUrl: $r('app.media.ic_baby'),
+    imgUrl: $r('sys.symbol.children'),
     textLabel: '保姆月嫂',
+    backgroundColor: $r('sys.color.multi_color_06'),
     mainParam: {
       tabIndex: 1,
       listInitialIndex: 2,
     },
   },
   {
-    imgUrl: $r('app.media.ic_home_pipe'),
+    imgUrl: $r('sys.symbol.rush_pipe'),
     textLabel: '管道疏通',
+    backgroundColor: $r('sys.color.multi_color_03'),
     mainParam: {
       tabIndex: 1,
       listInitialIndex: 3,
@@ -105,23 +120,23 @@ export const MENU_LIST: IMenuItem[] = [
 
 export const MY_ORDER_LIST: IMenuItem[] = [
   {
-    imgUrl: $r('app.media.ic_mine_whole_order'),
+    imgUrl: $r('sys.symbol.text_clipboard'),
     textLabel: '全部订单',
     tabLabel: '全部',
     status: OrderStatus.ALL,
   },
   {
-    imgUrl: $r('app.media.ic_mine_to_pay'),
-    textLabel: '待付款',
+    imgUrl: $r('sys.symbol.wallet'),
+    textLabel: '待支付',
     status: OrderStatus.TO_PAY,
   },
   {
-    imgUrl: $r('app.media.ic_mine_to_use'),
+    imgUrl: $r('sys.symbol.swipe'),
     textLabel: '待使用',
     status: OrderStatus.TO_USE,
   },
   {
-    imgUrl: $r('app.media.ic_mine_refund'),
+    imgUrl: $r('sys.symbol.yuansign_shield'),
     textLabel: '退款售后',
     status: OrderStatus.REFUND,
   },
@@ -129,12 +144,12 @@ export const MY_ORDER_LIST: IMenuItem[] = [
 
 export const MY_TOOL_LIST: IMenuItem[] = [
   {
-    imgUrl: $r('app.media.ic_location'),
+    imgUrl: $r('sys.symbol.circle_below_local_filled'),
     textLabel: '地址管理',
-    routerUrl: RouterMap.ADDRESS_MANAGE,
+    routerUrl: '',
   },
   {
-    imgUrl: $r('app.media.ic_call'),
+    imgUrl: $r('sys.symbol.phone'),
     textLabel: '公共服务',
     routerUrl: RouterMap.COMMON_SERVICE,
   },
@@ -213,6 +228,17 @@ export enum URL_MAP {
   PAY_ORDER = '/api/hw-atomic/pay/order',
   REFUND = '/api/hw-atomic/group/refund',
   CANCEL_ORDER = '/api/hw-atomic/cancel/order',
+  SUBSCRIBE_NOTIFICATION = '/api/hw-atomic/subscribe/notification',
+  SEND_CODE = '/api/hw-atomic/cancel/send/code',
+  VERIFY_CODE = '/api/hw-atomic/cancel/verifyCode',
+  BIND_MOBILE_WITH_CODE = '/api/hw-atomic/bind/mobile/with/code',
+  CONFIRM_REBIND_MOBILE = '/api/hw-atomic/confirm/rebind/mobile/with/secret',
+  UNBIND_MOBILE = '/api/hw-atomic/unbind/mobile',
+  GET_HISTORY_LIST = '/api/hw-atomic/get/history/list',
+  GET_GUESS_LIKE_LIST = '/api/hw-atomic/get/guess/list',
+  GET_RESULT_LIST = '/api/hw-atomic/get/result/list',
+  GET_SUGGESTION_LIST = '/api/hw-atomic/get/search/suggestion',
+  DELETE_HISTORY = '/api/hw-atomic/delete/history/list',
 }
 
 // 手机号正则

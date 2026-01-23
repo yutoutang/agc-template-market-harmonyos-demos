@@ -9,7 +9,7 @@ const TAG = '[AvatarButton]';
 @ComponentV2
 export struct AvatarButton {
   vm: MinePageVM = MinePageVM.instance;
-  bundleName:string = AppStorage.get('bundleName')!
+  bundleName: string = AppStorage.get('bundleName')!
 
   build() {
     FunctionalButton({
@@ -19,8 +19,9 @@ export struct AvatarButton {
         styleOption: {
           styleConfig: new functionalButtonComponentManager.ButtonConfig()
             .type(ButtonType.Normal)
-            .backgroundImage(this.vm.localInfo.avatar ? this.vm.localInfo.avatar : this.vm.userInfo.avatar === '' ? getMedia('app.media.user_login_img') :
-            this.vm.userInfo.avatar)
+            .backgroundImage(this.vm.localInfo.avatar ? this.vm.localInfo.avatar :
+              this.vm.userInfo.avatar === '' ? getMedia('app.media.user_login_img') :
+                this.vm.userInfo.avatar)
             .backgroundImageSize(ImageSize.Cover)
             .backgroundColor(Color.Transparent)
             .width(80)
@@ -34,19 +35,20 @@ export struct AvatarButton {
           return;
         }
         if (data.avatarUri) {
-          let pathDir = getContext().filesDir;
-          let file:fs.File = null!
-          let file2:fs.File = null!
+          let pathDir = this.getUIContext().getHostContext()!.filesDir;
+          let file: fs.File = null!
+          let file2: fs.File = null!
           try {
             file = fs.openSync(data.avatarUri, fs.OpenMode.READ_ONLY)
-            file2 = fs.openSync(`${pathDir}/picture${data.avatarUri.slice(-9,-4)}.jpg`, fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE)
+            file2 = fs.openSync(`${pathDir}/picture${data.avatarUri.slice(-9, -4)}.jpg`,
+              fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE)
             fs.copyFileSync(file.fd, file2.fd)
-          }catch (e) {
-          }finally {
+          } catch (e) {
+          } finally {
             fs.closeSync(file);
             fs.closeSync(file2);
           }
-          this.vm.updateAvatar(`file://${this.bundleName}${pathDir}/picture${data.avatarUri.slice(-9,-4)}.jpg`);
+          this.vm.updateAvatar(`file://${this.bundleName}${pathDir}/picture${data.avatarUri.slice(-9, -4)}.jpg`);
           Logger.info(TAG, 'succeeded in choosing avatar');
         } else {
           Logger.error(TAG, 'Failed: the uri is empty.');

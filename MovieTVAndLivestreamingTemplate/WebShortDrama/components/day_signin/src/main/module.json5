@@ -3,7 +3,8 @@
     "name": "day_signin",
     "type": "har",
     "deviceTypes": [
-      "default"
+      "default",
+      "tablet"
     ]
   }
 }

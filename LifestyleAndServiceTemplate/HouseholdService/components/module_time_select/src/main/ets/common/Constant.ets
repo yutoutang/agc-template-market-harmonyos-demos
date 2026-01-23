@@ -42,6 +42,7 @@ export interface StyleOptions {
   dayFg?: ResourceColor;
   dayFgSelected?: ResourceColor;
   timeBg?: ResourceColor;
+  timeBgDisabled?: ResourceColor;
   timeBgSelected?: ResourceColor;
   timeBorder?: ResourceColor;
   timeBorderSelected?: ResourceColor;
@@ -54,10 +55,11 @@ export const TIME_OPTIONS_DEFAULT: TimeOptions = {
 };
 
 export const STYLE_OPTIONS_DEFAULT: StyleOptions = {
-  dayFg: Color.Black,
-  dayFgSelected: Color.Blue,
-  timeBg: Color.White,
-  timeBgSelected: Color.Blue,
+  dayFg: $r('sys.color.font_primary'),
+  dayFgSelected: $r('sys.color.font_on_primary'),
+  timeBg: $r('sys.color.comp_background_primary'),
+  timeBgDisabled: $r('sys.color.comp_background_tertiary'),
+  timeBgSelected: $r('app.color.common_theme_color_5'),
   timeBorder: '#D9D9D9',
-  timeBorderSelected: Color.Blue,
+  timeBorderSelected: $r('sys.color.comp_background_emphasize'),
 };

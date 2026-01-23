@@ -141,7 +141,7 @@ export struct UserLogin {
       .height(28)
       .borderRadius(14)
       .onClick(async () => {
-        await AssociateUtil.disassociateAccount(getContext(this)); //  container.resolve(LoginAPI).logout();
+        await AssociateUtil.disassociateAccount(this.getUIContext().getHostContext()!);
       })
     } else {
       Stack() {

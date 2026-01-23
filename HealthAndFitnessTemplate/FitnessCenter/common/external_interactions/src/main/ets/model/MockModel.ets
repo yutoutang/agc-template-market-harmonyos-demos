@@ -1,28 +1,30 @@
-@Observed
+@ObservedV2
 export class CourseDetailModel {
   id: string;
   price: number;
   advImage: string;
   courseName: string;
   sportsType: SportTypeEnum[]
+  courseNature: string
   avaiCard: string[];
   teachType: TeachType;
   serviceDetail: string;
 
   constructor(id: string, price: number, advImage: string, courseName: string, sportsType: SportTypeEnum[],
-    avaiCard: string[], teachType: TeachType, serviceDetail: string) {
+  courseNature: string, avaiCard: string[], teachType: TeachType, serviceDetail: string) {
     this.id = id;
     this.price = price;
     this.advImage = advImage;
     this.courseName = courseName;
     this.sportsType = sportsType;
+    this.courseNature = courseNature
     this.avaiCard = avaiCard;
     this.teachType = teachType;
     this.serviceDetail = serviceDetail;
   }
 }
 
-@Observed
+@ObservedV2
 export class CourseBookingInfo {
   id: string;
   courseId: string;
@@ -48,7 +50,7 @@ export class CourseBookingInfo {
   }
 }
 
-@Observed
+@ObservedV2
 export class CoachCourseInfo {
   id: string;
   name: string;
@@ -65,7 +67,7 @@ export class CoachCourseInfo {
   }
 }
 
-@Observed
+@ObservedV2
 export class CardInfo {
   id: string;
   price: number;
@@ -74,6 +76,7 @@ export class CardInfo {
   shortName: string;
   useInstruction: string;
   sportsType: SportTypeEnum[];
+  cardNature: string
   avaiCourse: string;
   consumeType: ConsumeType;
   quota: number;
@@ -81,8 +84,8 @@ export class CardInfo {
   originPrice: number;
 
   constructor(id: string, price: number, name: string, advImage: string, shortName: string, useInstruction: string,
-    sportsType: SportTypeEnum[], avaiCourse: string, consumeType: ConsumeType, quota: number, saveMoney: number,
-    originPrice: number) {
+    sportsType: SportTypeEnum[], cardNature: string, avaiCourse: string, consumeType: ConsumeType, quota: number,
+    saveMoney: number, originPrice: number) {
     this.id = id;
     this.price = price;
     this.name = name;
@@ -90,6 +93,7 @@ export class CardInfo {
     this.shortName = shortName;
     this.useInstruction = useInstruction;
     this.sportsType = sportsType;
+    this.cardNature = cardNature
     this.avaiCourse = avaiCourse;
     this.consumeType = consumeType;
     this.quota = quota;
@@ -168,7 +172,8 @@ export enum BookState {
 export enum OrderState {
   ALL = 0,
   COMPLETED = 1,
-  TO_BE_PAY = 2
+  TO_BE_PAY = 2,
+  CANCELED = 3
 }
 
 export enum SportTypeEnum {

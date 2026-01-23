@@ -1,4 +1,3 @@
-import { BusinessError } from '@kit.BasicServicesKit';
 import { util } from '@kit.ArkTS';
 import { CardInfo, CourseDetailModel, DateUtil, SportTypeEnum } from '../../../../Index';
 import {
@@ -17,12 +16,15 @@ import {
 } from '../model/MockModel';
 import { cryptoFramework } from '@kit.CryptoArchitectureKit';
 import { preferences } from '@kit.ArkData';
+import { common } from '@kit.AbilityKit';
 
 export class MockService {
   static courseList: CourseDetailModel[] = [];
   static courseIdMap: Map<string, CourseDetailModel> = new Map();
-  static homeSwiperImageList: string[] = ['app.media.material12', 'app.media.material10']
+  static homeSwiperImageList: string[] = ['app.media.material11', 'app.media.material10']
   static sportTypeList: SportType[] = []
+  static cardNatureList: string[] = []
+  static courseNatureList: string[] = []
   static cardList: CardInfo[] = []
   static cardIdMap: Map<string, CardInfo> = new Map();
   static userCardList: UserCard[] = []
@@ -45,22 +47,22 @@ export class MockService {
   };
   static dataPreferences: preferences.Preferences;
 
-  static init() {
-    MockService.dataPreferences = preferences.getPreferencesSync(getContext(), { name: 'myStore' })
-    MockService.getRawFile<CourseDetailModel[]>('course.json').then((rsp: CourseDetailModel[]) => {
-      MockService.courseList = rsp;
-      rsp.forEach((item: CourseDetailModel) => {
-        MockService.courseIdMap.set(item.id, item);
-      })
+  static init(context: common.UIAbilityContext) {
+    MockService.dataPreferences = preferences.getPreferencesSync(context, { name: 'myStore' })
+    MockService.courseList = MockService.getRawFile<CourseDetailModel[]>(context, 'course.json') as CourseDetailModel[];
+    MockService.courseList.forEach((item: CourseDetailModel) => {
+      MockService.courseIdMap.set(item.id, item);
     })
-    MockService.getRawFile<SportType[]>('sportTypes.json').then((rsp: SportType[]) => {
-      MockService.sportTypeList = rsp;
-    })
-    MockService.getRawFile<CardInfo[]>('card.json').then((rsp: CardInfo[]) => {
-      MockService.cardList = rsp;
-      rsp.forEach((item: CardInfo) => {
-        MockService.cardIdMap.set(item.id, item);
-      })
+
+    MockService.sportTypeList = MockService.getRawFile<SportType[]>(context, 'sportTypes.json') as SportType[];
+
+    MockService.courseNatureList = ['有氧', '力量', '塑形', '燃脂']
+
+    MockService.cardNatureList = ['有氧', '力量', '塑形', '燃脂']
+
+    MockService.cardList = MockService.getRawFile<CardInfo[]>(context, 'card.json') as CardInfo[];
+    MockService.cardList.forEach((item: CardInfo) => {
+      MockService.cardIdMap.set(item.id, item);
     })
 
     let courseBooking = MockService.getPreferences<CourseBookingInfo[]>('courseBooking')
@@ -78,19 +80,19 @@ export class MockService {
         MockService.courseBookingMap.set(item.id, item);
       })
     } else {
-      MockService.getRawFile<CourseBookingInfo[]>('course_booking.json').then((rsp: CourseBookingInfo[]) => {
-        rsp.forEach((item: CourseBookingInfo) => {
-          item.date = weekdayDateMap.get(item.weekday)!
-          MockService.courseBookingList.push(item)
-          MockService.courseBookingMap.set(item.id, item);
-        })
+      let courseInfos: CourseBookingInfo[] =
+        MockService.getRawFile<CourseBookingInfo[]>(context, 'course_booking.json') as CourseBookingInfo[];
+      courseInfos.forEach((item: CourseBookingInfo) => {
+        item.date = weekdayDateMap.get(item.weekday)!
+        MockService.courseBookingList.push(item)
+        MockService.courseBookingMap.set(item.id, item);
       })
     }
 
-    MockService.getRawFile<CoachCourseInfo[]>('coach.json').then((rsp: CoachCourseInfo[]) => {
-      rsp.forEach((item: CoachCourseInfo) => {
-        MockService.coachMap.set(item.id, item);
-      })
+
+    let coachInfos: CoachCourseInfo[] = MockService.getRawFile<CoachCourseInfo[]>(context, 'coach.json') as CoachCourseInfo[];
+    coachInfos.forEach((item: CoachCourseInfo) => {
+      MockService.coachMap.set(item.id, item);
     })
 
     let account = MockService.getPreferences<Account>('account')
@@ -102,9 +104,7 @@ export class MockService {
     if (booking) {
       MockService.bookingList = booking
     } else {
-      MockService.getRawFile<BookingRecordInfo[]>('booking.json').then((rsp: BookingRecordInfo[]) => {
-        MockService.bookingList = rsp;
-      })
+      MockService.bookingList = MockService.getRawFile<BookingRecordInfo[]>(context, 'booking.json') as BookingRecordInfo[];
     }
     MockService.bookingList.forEach((item: BookingRecordInfo) => {
       MockService.bookingMap.set(item.id, item);
@@ -158,6 +158,18 @@ export class MockService {
     return list
   }
 
+  static getCourseListBySearchAndFilter(courseList: CourseDetailModel[], searchWord: string, index: number,
+    searchCourseNature: string): CourseDetailModel[] {
+    let list: CourseDetailModel[] = []
+    courseList?.forEach((item: CourseDetailModel) => {
+      if (item.courseName.includes(searchWord) &&
+        (index === 0 || item.courseNature === searchCourseNature)) {
+        list.push(item)
+      }
+    })
+    return list
+  }
+
   static getCourseById(courseId: string): CourseDetailModel {
     return MockService.courseIdMap.get(courseId)!
   }
@@ -185,6 +197,18 @@ export class MockService {
     MockService.cardList.forEach((item: CardInfo) => {
       if (item.name.includes(searchWord) &&
         (searchSportType.typeEnum.valueOf() === 0 || item.sportsType.includes(searchSportType.typeEnum))) {
+        list.push(item)
+      }
+    })
+    return list
+  }
+
+  static getCardListBySearchAndFilter(cardList: CardInfo[], searchWord: string, index: number,
+    searchCardNature: string): CardInfo[] {
+    let list: CardInfo[] = []
+    cardList?.forEach((item: CardInfo) => {
+      if (item.name.includes(searchWord) &&
+        (index === 0 || item.cardNature === searchCardNature)) {
         list.push(item)
       }
     })
@@ -253,7 +277,7 @@ export class MockService {
     MockService.courseBookingList.forEach((item: CourseBookingInfo) => {
       let courseDetail = MockService.getCourseById(item.courseId)
       if (courseDetail.courseName.includes(searchWord) &&
-        (searchSportType.typeEnum.valueOf() === 0 || courseDetail.sportsType.includes(searchSportType.typeEnum)) &&
+        (searchSportType?.typeEnum.valueOf() === 0 || courseDetail.sportsType.includes(searchSportType?.typeEnum)) &&
         courseDetail.teachType === TeachType.GROUP && DateUtil.formatDate(date, '-') === item.date &&
         DateUtil.parseDateString(item.date + ' ' + item.timeStart).getTime() > now.getTime()) {
         list.push(item)
@@ -357,6 +381,8 @@ export class MockService {
         return '已完成'
       case OrderState.TO_BE_PAY:
         return '待支付'
+      case OrderState.CANCELED:
+        return '已取消'
       default:
         return ''
     }
@@ -384,6 +410,9 @@ export class MockService {
     }
     if (orderType === OrderType.CARD) {
       order.cardId = cardId
+      if (order.cardId?.length === 0) {
+        order.bookingId = bookingId
+      }
     } else {
       order.bookingId = bookingId
     }
@@ -421,22 +450,39 @@ export class MockService {
   }
 
   static addUserCard(cardId: string, restQuota: number): UserCard {
-    let userCard: UserCard = {
-      id: MockService.generateDigitString(11),
-      cardId: cardId,
-      restQuota: restQuota,
-      buyTime: DateUtil.formatDate(new Date(), '-', undefined, 'medium'),
+    const existingCardIndex = MockService.userCardList.findIndex(card => card.cardId === cardId);
+    if (existingCardIndex !== -1) {
+      // 如果已持有，叠加卡项次数或有效期
+      const existingCard = MockService.userCardList[existingCardIndex];
+      existingCard.restQuota += restQuota; // 叠加剩余次数
+
+      // 更新映射表
+      MockService.userCardMap.set(existingCard.id, existingCard);
+
+      // 保存到持久化存储
+      MockService.dataPreferences.putSync('userCard', JSON.stringify(MockService.userCardList));
+      MockService.dataPreferences.flush();
+
+      return existingCard;
+    } else {
+      // 如果未持有，创建新卡项
+      let userCard: UserCard = {
+        id: MockService.generateDigitString(11),
+        cardId: cardId,
+        restQuota: restQuota,
+        buyTime: DateUtil.formatDate(new Date(), '-', undefined, 'medium'),
+      }
+      MockService.userCardList.push(userCard);
+      MockService.userCardMap.set(userCard.id, userCard);
+      MockService.dataPreferences.putSync('userCard', JSON.stringify(MockService.userCardList));
+      MockService.dataPreferences.flush();
+      return userCard;
     }
-    MockService.userCardList.push(userCard);
-    MockService.userCardMap.set(userCard.id, userCard);
-    MockService.dataPreferences.putSync('userCard', JSON.stringify(MockService.userCardList))
-    MockService.dataPreferences.flush()
-    return userCard;
   }
 
   static userCardCanUse(userCard: UserCard): boolean {
     let cardInfo: CardInfo = MockService.getCardById(userCard.cardId)
-    if (cardInfo.consumeType === ConsumeType.TIMES) {
+    if (cardInfo?.consumeType === ConsumeType.TIMES) {
       return userCard.restQuota > 0
     } else {
       let now = new Date()
@@ -470,15 +516,13 @@ export class MockService {
     return 0
   }
 
-  static getRawFile<T>(filePath: string): Promise<T> {
-    return getContext().resourceManager.getRawFileContent(filePath)
-      .then((value: Uint8Array) => {
-        let res: string = MockService.bufferToString(value);
-        return JSON.parse(res) as T;
-      }).catch((e: BusinessError) => {
-        console.error(`MockService.getRawFileContent failed, error code: ${e.code}, message: ${e.message}.`);
-        return Promise.reject(e);
-      });
+  static getRawFile<T>(context: common.UIAbilityContext, filePath: string): T | null {
+    if (typeof context.resourceManager.getRawFileContentSync === 'function') {
+      const value = context.resourceManager.getRawFileContentSync(filePath);
+      return JSON.parse(MockService.bufferToString(value)) as T;
+    }
+    console.error('Sync API not available');
+    return null;
   }
 
   static getPreferences<T>(key: string): T | undefined {

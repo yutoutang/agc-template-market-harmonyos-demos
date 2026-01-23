@@ -10,6 +10,6 @@
     "@ohos_agcit/children_education_utils": "../../commons/utils",
     "@ohos_agcit/children_education_homepage": "../../scenes/tabs/homepage",
     "@ohos_agcit/children_education_minepage": "../../scenes/tabs/minepage",
-    "@ohos_agcit/children_education_vippage": "../../scenes/tabs/vippage"
+    "aggregated_ads": "file:../../components/aggregated_ads"
   }
 }

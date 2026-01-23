@@ -1,9 +1,9 @@
-import { englishChildrenSongsData } from '@ohos_agcit/children_education_datasource';
-import { CommonConstants, FeedTitle, TwoColumn, NoMoreTab } from '@ohos_agcit/children_education_utils';
+import { DataGenerator } from '@ohos_agcit/children_education_datasource';
+import { CommonConstants, FeedTitle, NoMoreTab, TwoColumn } from '@ohos_agcit/children_education_utils';
 
 @ComponentV2
 export struct EnglishZonePage {
-  private englishChildrenSongsData = englishChildrenSongsData;
+  private englishChildrenSongsData = DataGenerator.getEnglishChildrenSongsData(this.getUIContext());
   @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
 
   build() {
@@ -15,7 +15,7 @@ export struct EnglishZonePage {
           })
         }) {
           TwoColumn({
-            videoCardArray: this.englishChildrenSongsData.englishChildrenSongs
+            videoCardArray: this.englishChildrenSongsData
           })
         }
 

@@ -1,12 +1,14 @@
 import { image } from '@kit.ImageKit';
+import { window } from '@kit.ArkUI';
+
+const windowStage: window.WindowStage = AppStorage.get('windowStage')!
 
 export class ImageUtil {
   public static async getPixmapFromMedia(resource: Resource) {
-    let unit8Array = await getContext()?.resourceManager?.getMediaContent({
-      bundleName: resource.bundleName,
-      moduleName: resource.moduleName,
-      id: resource.id
-    });
+    let unit8Array =
+      await windowStage.getMainWindowSync()
+        .getUIContext()
+        .getHostContext()!.resourceManager?.getMediaContent(resource.id)
     let imageSource = image.createImageSource(unit8Array.buffer.slice(0, unit8Array.buffer.byteLength));
     let pixelMap: image.PixelMap = await imageSource.createPixelMap({
       desiredPixelFormat: image.PixelMapFormat.RGBA_8888

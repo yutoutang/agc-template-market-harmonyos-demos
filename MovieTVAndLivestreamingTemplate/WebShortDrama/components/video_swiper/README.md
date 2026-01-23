@@ -20,7 +20,7 @@
 
 - DevEco Studio版本：DevEco Studio 5.0.0 Release及以上
 - HarmonyOS SDK版本：HarmonyOS 5.0.0 Release SDK及以上
-- 设备类型：华为手机（直板机、双折叠）
+- 设备类型：华为手机（直板机、双折叠）、平板
 - HarmonyOS版本：HarmonyOS 5.0.0 Release及以上
 
 ### 权限
@@ -556,6 +556,7 @@ onTimeUpdate(key: string, callback: (time: number) => void): void
             new EpisodeData(item,`this is episode for http ${index}`, String(this.videoIndex++))
          this.data.pushData(videoData);
       })
+      length = this.data.totalCount()
 
       this.rawUrls = ['XX.mp4','XX.mp4']//1、将本地视频放在模块的resources/rawfile文件夹下 2、数组中填写本地视频文件名称(本地视频必须为mp4格式)
       this.context = this.getUIContext().getHostContext() as common.UIAbilityContext;

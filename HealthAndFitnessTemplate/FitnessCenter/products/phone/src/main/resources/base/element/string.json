@@ -31,14 +31,30 @@
     {
       "name": "PhoneFormAbility_desc",
       "value": "健身房卡片组件"
-    },{
+    },
+    {
       "name": "PhoneFormAbility_label",
       "value": "健身房卡片"
-    },{
+    },
+    {
       "name": "form_desc",
       "value": "健身办卡，课程预约"
-    },{
+    },
+    {
       "name": "form_display_name",
       "value": "健身房"
-    }]
+    },
+    {
+      "name": "agcit_huawei_fitness_center",
+      "value": "1.0.0"
+    },
+    {
+      "name": "widget_desc",
+      "value": "This is a service widget."
+    },
+    {
+      "name": "widget_display_name",
+      "value": "widget"
+    }
+  ]
 }

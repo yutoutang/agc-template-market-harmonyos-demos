@@ -12,15 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import { BusinessError } from '@kit.BasicServicesKit';
 import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from '@ohos/axios';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { AppStorageMap, CurAppInfo } from '../common/Constant';
-import { getMockResponse } from './HttpMockMap';
-
-/**
- * 是否使用mock数据
- */
-const useMock: boolean = true;
 
 const instance = axios.create({
   baseURL: CurAppInfo.BASE_URL,
@@ -37,27 +32,20 @@ instance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   return Promise.reject(error);
 });
 
-
-const onRejectedNormal = (error: AxiosError) => {
-  return Promise.reject(error.response?.data);
-};
-
-const onRejectedMock = (error: AxiosError): Promise<Object> => {
-  const resp: Object | undefined = getMockResponse(error.config);
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(resp ?? '');
-    }, 300)
-  })
-};
-
 // Add a response interceptor.
-instance.interceptors.response.use((response: AxiosResponse) => {
-
-  if (response.status === 200 && response.data?.error_code === 0) {
-    return response.data?.data;
-  }
-  return Promise.reject(response.data);
-}, useMock ? onRejectedMock : onRejectedNormal);
+instance.interceptors.response.use(
+  (response: AxiosResponse) => {
+    if (response.status === 200) {
+      return Promise.resolve(response.data);
+    } else {
+      UtilLog.error('[Network]', `https request failed：${response.config.url}. error:` +
+      JSON.stringify(response.status));
+      return Promise.reject(response);
+    }
+  },
+  (error: BusinessError) => {
+    UtilLog.error('[Network]', `https request failed：. error:` + JSON.stringify(error));
+    return Promise.reject(error);
+  });
 
 export default instance;

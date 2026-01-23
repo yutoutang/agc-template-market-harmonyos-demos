@@ -6,8 +6,11 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "uicomponents": "file:../../common/uiComponents",
     "external_interactions": "file:../../common/external_interactions",
-
+    "module_search_filter": "file:../../components/module_search_filter",
+    "module_recharge": "file:../../components/module_recharge",
+    "course": "file:../course",
+    "dial_panel": "file:../../components/dial_panel",
+    "payment": "file:../../components/payment"
   }
 }

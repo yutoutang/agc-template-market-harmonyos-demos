@@ -5,7 +5,8 @@
       {
         "name": "default",
         "signingConfig": "default",
-        "compatibleSdkVersion": "5.0.1(13)",
+        "compatibleSdkVersion": "6.0.1(21)",
+        "targetSdkVersion": "6.0.1(21)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
           "strictMode": {
@@ -25,6 +26,102 @@
     ]
   },
   "modules": [
+    {
+      "name": "feed_back",
+      "srcPath": "./components/feed_back",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "collect_personal_info",
+      "srcPath": "./components/collect_personal_info",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "app_setting",
+      "srcPath": "./components/app_setting",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "membership",
+      "srcPath": "./components/membership",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "recorded_player",
+      "srcPath": "./components/recorded_player",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dial_panel",
+      "srcPath": "./components/dial_panel",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "aggregated_share",
+      "srcPath": "./components/aggregated_share",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "aggregated_ads",
+      "srcPath": "./components/aggregated_ads",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
     {
       "name": "datasource",
       "srcPath": "./commons/datasource",
@@ -124,18 +221,6 @@
     {
       "name": "chinese",
       "srcPath": "./scenes/services/chinese",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
-    },
-    {
-      "name": "vippage",
-      "srcPath": "./scenes/tabs/vippage",
       "targets": [
         {
           "name": "default",

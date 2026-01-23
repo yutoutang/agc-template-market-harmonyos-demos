@@ -1,15 +1,21 @@
-import { TabItem, TabStyle } from './Type'
-import { getMedia, NAV_PAGE_NAME } from '@agctemplate/resources'
-import { appRouter } from '@agctemplate/utils'
-import { AppStorageV2, LengthMetrics } from '@kit.ArkUI'
+import { TabStyle } from './Type'
+import { AppStorageV2 } from '@kit.ArkUI'
 import { AppStorageKeys, BreakPoint } from '@agctemplate/widgets'
+import { SearchItem, SearchView, SearchViewController } from 'search'
+import { getRankList } from '../mapper/DramaCoverMapper'
+import { DramaCoverVM } from '../viewmodels/DramaCoverVM'
+
 
 export const DEFAULT_SMALL_HEIGHT = 48
 
 export const DEFAULT_LARGE_HEIGHT = 60
 
+const HOT_SEARCH_CATEGORY: string = '热搜榜'
+
 @ComponentV2
 export struct UIStickyScroll {
+  @Consumer('navStack') navPathStack: NavPathStack = new NavPathStack();
+  controller: SearchViewController = new SearchViewController();
   @Param @Once headerHeight: number = DEFAULT_SMALL_HEIGHT
   @Param @Once mainHeight: number = DEFAULT_LARGE_HEIGHT
   @Require @Param tabList: string[] = []
@@ -36,6 +42,8 @@ export struct UIStickyScroll {
   @Consumer('sTabs') actIndex: number = 0
   // 上滑的比率
   @Local ratio: number = 0
+  @Provider('hot') rankList: SearchItem[] = []
+  @Local currentPageNum: number = 1
   @BuilderParam contentBuilderParam: () => void = this.contentBuilder;
   @BuilderParam mainBuilderParam: () => void = this.mainBuilder;
   @BuilderParam backgroundBuilderParam: () => void = this.backgroundBuilder;
@@ -67,7 +75,7 @@ export struct UIStickyScroll {
 
   }
 
-  aboutToAppear(): void {
+  async aboutToAppear(): Promise<void> {
     //  传入宽高异常处理
     if (this.headerHeight <= 0) {
       this.headerHeight = DEFAULT_SMALL_HEIGHT
@@ -79,6 +87,18 @@ export struct UIStickyScroll {
       this.tabStyle.tabHeight = DEFAULT_SMALL_HEIGHT
     }
     this.tabItemWidthList = new Array(this.tabList.length).fill(0)
+    const tempList: DramaCoverVM[] = await getRankList(HOT_SEARCH_CATEGORY, this.currentPageNum)
+    tempList.forEach((value: DramaCoverVM) => {
+      this.rankList.push({
+        title: value.title,
+        episodes: value.episodes,
+        latestUpdate: value.latestUpdate,
+        tags: value.tags,
+        id: value.dramaId,
+        image: value.imagePath,
+        intro: value.content
+      })
+    })
   }
 
   build() {
@@ -114,16 +134,30 @@ export struct UIStickyScroll {
 
 
           Row({ space: 8 }) {
-            Image(getMedia('app.media.search'))
-              .width(40)
-              .height(40)
-              .borderRadius(20)
-              .backgroundColor('#F1F3F5')
-              .onClick(() => {
-                appRouter.push({
-                  builderName: NAV_PAGE_NAME.SearchPage.name
-                })
-              })
+            // Image(getMedia('app.media.search'))
+            //   .width(40)
+            //   .height(40)
+            //   .borderRadius(20)
+            //   .backgroundColor('#F1F3F5')
+            //   .onClick(() => {
+            //     appRouter.push({
+            //       builderName: NAV_PAGE_NAME.SearchPage.name
+            //     })
+            //   })
+            SearchView({
+              routerStack: this.navPathStack,
+              themeColor: '#EC6E45',
+              controller: this.controller,
+              placeholder: ['输入剧名搜索'],
+              showGuessLike: false,
+              isShallowWindow: true,
+              onClickGetMore: () => {
+                this.getUIContext().getPromptAction().showToast({ message: '前往更多页，暂未开发' })
+              },
+              onClickResultItem: (listItem: SearchItem) => {
+                this.getUIContext().getPromptAction().showToast({ message: '前往详情页，暂未开发' })
+              }
+            })
           }
           .justifyContent(FlexAlign.End)
           .margin({ right: 8 })
@@ -166,7 +200,7 @@ export struct UIStickyScroll {
                             .height('100%')
                             .textAlign(TextAlign.Center)
                             .fontColor(this.actIndex === index ? this.tabStyle.tabActiveColor :
-                            this.tabStyle.tabFontColor)
+                              this.tabStyle.tabFontColor)
                             .fontWeight(this.tabStyle.tabFontWeight)
                             .fontSize(this.tabStyle.tabFontSize)
                             .maxLines(1)
@@ -251,7 +285,7 @@ export struct UIStickyScroll {
           }.height(`calc(100% - ${this.headerHeight}vp)`)
         }.width('100%')
       }
-      .edgeEffect(EdgeEffect.None)
+      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
       .friction(0.6)
       .scrollBar(BarState.Off)
       .width('100%')

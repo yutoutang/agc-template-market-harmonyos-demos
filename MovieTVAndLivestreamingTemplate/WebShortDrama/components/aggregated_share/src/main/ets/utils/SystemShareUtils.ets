@@ -1,4 +1,4 @@
-import { promptAction } from '@kit.ArkUI';
+import { promptAction, window } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
 import { harmonyShare, systemShare } from '@kit.ShareKit';
 import { uniformTypeDescriptor as utd } from '@kit.ArkData';
@@ -13,6 +13,7 @@ const TAG = 'SystemShareUtils';
  * 系统分享
  */
 export class SystemShareUtils {
+  windowStage: window.WindowStage = AppStorage.get('windowStage')!
   private static _instance: SystemShareUtils;
   private shareData: systemShare.SharedData = new systemShare.SharedData({
     utd: utd.UniformDataType.TEXT,
@@ -44,14 +45,19 @@ export class SystemShareUtils {
   public share(): Promise<void> {
     return new Promise((resolve, reject) => {
       const controller: systemShare.ShareController = new systemShare.ShareController(this.shareData);
-      return controller.show(getContext(this) as common.UIAbilityContext, {
+      return controller.show(this.windowStage.getMainWindowSync()
+        .getUIContext()
+        .getHostContext() as common.UIAbilityContext, {
         selectionMode: systemShare.SelectionMode.SINGLE,
         previewMode: systemShare.SharePreviewMode.DEFAULT,
       }).then(() => {
         resolve();
       }).catch((error: BusinessError) => {
         Logger.error(TAG, `ShareController show error. code: ${error.code}, message: ${error.message}`);
-        promptAction.showToast({ message: '拉起系统分享出错' });
+        this.windowStage.getMainWindowSync()
+          .getUIContext()
+          .getPromptAction()
+          .showToast({ message: '拉起系统分享出错' });
         reject();
       });
     });
@@ -127,7 +133,9 @@ export class SystemShareUtils {
         if (typeof thumbUrl === 'string') {
           thumbBuffer = await downloadImage(thumbUrl);
         } else {
-          const content = await getContext(this).resourceManager.getMediaContent(thumbUrl);
+          const content = await this.windowStage.getMainWindowSync()
+            .getUIContext()
+            .getHostContext()!.resourceManager.getMediaContent(thumbUrl.id);
           thumbBuffer = content.buffer as ArrayBuffer;
         }
         thumbUri = await saveToSandbox(thumbBuffer);
@@ -148,6 +156,9 @@ export class SystemShareUtils {
       pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, `${data.title} | ${data.landingPageUrl}`);
     const systemPasteboard = pasteboard.getSystemPasteboard();
     systemPasteboard.setData(pasteboardData);
-    promptAction.showToast({ message: '复制成功' });
+    this.windowStage.getMainWindowSync()
+      .getUIContext()
+      .getPromptAction()
+      .showToast({ message: '复制成功' });
   }
 }

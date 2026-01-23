@@ -5,7 +5,8 @@
     "description": "$string:module_desc",
     "mainElement": "EntryAbility",
     "deviceTypes": [
-      "phone"
+      "phone",
+      "tablet"
     ],
     "querySchemes": [
       "weixin",
@@ -28,10 +29,20 @@
         "description": "$string:EntryAbility_desc",
         "icon": "$media:layered_image",
         "label": "$string:EntryAbility_label",
-        "startWindowIcon": "$media:icon",
+        "startWindowIcon": "$media:icons",
         "startWindowBackground": "$color:start_window_background",
         "exported": true,
+        "continuable": true,
         "skills": [
+          {
+            "entities": [
+              "entity.system.home"
+            ],
+            "actions": [
+// "action.system.home"为API19以下版本配置，已废弃
+              "ohos.want.action.home"
+            ]
+          },
           {
             "entities": [
               "entity.system.home",

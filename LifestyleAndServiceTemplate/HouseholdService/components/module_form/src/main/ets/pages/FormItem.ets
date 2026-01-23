@@ -63,6 +63,7 @@ export struct FormItem {
             .fontSize($r('sys.float.Body_L'))
             .fontWeight(500)
             .fontColor($r('sys.color.font_primary'))
+            .width(128)
         }
 
         Row() {
@@ -124,7 +125,9 @@ export struct FormItem {
       .width('100%')
       .height(48)
 
-      Divider().visibility(this.param.last ? Visibility.None : Visibility.Visible)
+      Divider()
+        .strokeWidth('1px')
+        .visibility(this.param.last ? Visibility.None : Visibility.Visible)
     }
   }
 }

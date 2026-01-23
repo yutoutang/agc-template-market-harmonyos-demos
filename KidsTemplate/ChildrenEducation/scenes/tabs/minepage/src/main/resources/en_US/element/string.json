@@ -5,10 +5,6 @@
       "value": "description"
     },
     {
-      "name": "privacyAgreementPath",
-      "value": "https://privacy.consumer.huawei.com/legal/id/authentication-terms.htm?code=CN&language=zh-CN"
-    },
-    {
       "name": "get_mobile_number_error",
       "value": "Failed to obtain the anonymous mobile number."
     },
@@ -35,6 +31,10 @@
     {
       "name": "contact_us",
       "value": "contact_us"
+    },
+    {
+      "name": "feed_back",
+      "value": "Feedback"
     },
     {
       "name": "app_user_agreement",

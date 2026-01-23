@@ -1,13 +1,11 @@
 import {
   CommonConstants,
-  DateUtil,
   DialogUtils,
   GlobalContext,
   rightArrow,
-  StringUtil,
+  StringUtil
 } from '@ohos_agcit/children_education_utils';
-import { BusinessError, emitter } from '@kit.BasicServicesKit';
-import { JSON } from '@kit.ArkTS';
+import { emitter } from '@kit.BasicServicesKit';
 
 @Builder
 export function TimeCtrlBuilder() {
@@ -51,7 +49,7 @@ export struct TimeCtrl {
         .rowExtend(12, 14)
         .height(56)
         .onClick(() => {
-          DialogUtils.textPickerDialog(this.timeArray, (sexValue: string) => {
+          DialogUtils.textPickerDialog(this.getUIContext(), this.timeArray, (sexValue: string) => {
             this.timeLimit = sexValue;
           });
         });
@@ -80,7 +78,7 @@ export struct TimeCtrl {
                 }
               });
           }
-          .rowExtend(12,12);
+          .rowExtend(12, 12);
 
           divider();
 
@@ -92,7 +90,7 @@ export struct TimeCtrl {
           }
           .rowExtend(12, 12)
           .onClick(() => {
-            TimePickerDialog.show({
+            this.getUIContext().showTimePickerDialog({
               selected: this.selectTime,
               useMilitaryTime: true,
               disappearTextStyle: { color: Color.Black, font: { size: 14, weight: 400 } },
@@ -114,9 +112,9 @@ export struct TimeCtrl {
             Text(this.nightEndTime).padding({ right: 4 });
             rightArrow()
           }
-          .rowExtend(12,12)
+          .rowExtend(12, 12)
           .onClick(() => {
-            TimePickerDialog.show({
+            this.getUIContext().showTimePickerDialog({
               selected: this.selectTime,
               useMilitaryTime: true,
               disappearTextStyle: { color: Color.Black, font: { size: 14, weight: 400 } },
@@ -155,7 +153,7 @@ export struct TimeCtrl {
                 }
               });
           }
-          .rowExtend(12,12)
+          .rowExtend(12, 12)
 
           divider();
 
@@ -165,9 +163,9 @@ export struct TimeCtrl {
             Text(this.lunchStartTime).padding({ right: 4 });
             rightArrow()
           }
-          .rowExtend(12,12)
+          .rowExtend(12, 12)
           .onClick(() => {
-            TimePickerDialog.show({
+            this.getUIContext().showTimePickerDialog({
               selected: this.selectTime,
               useMilitaryTime: true,
               disappearTextStyle: { color: Color.Black, font: { size: 14, weight: 400 } },
@@ -189,9 +187,9 @@ export struct TimeCtrl {
             Text(this.lunchEndTime).padding({ right: 4 });
             rightArrow()
           }
-          .rowExtend(12,12)
+          .rowExtend(12, 12)
           .onClick(() => {
-            TimePickerDialog.show({
+            this.getUIContext().showTimePickerDialog({
               selected: this.selectTime,
               useMilitaryTime: true,
               disappearTextStyle: { color: Color.Black, font: { size: 14, weight: 400 } },
@@ -238,7 +236,6 @@ export struct TimeCtrl {
                   'nightEndTime': this.nightEndTime,
                 },
               };
-              console.log('开始发送时长控制消息:', JSON.stringify(timeControl));
               emitter.emit(CommonConstants.TIME_CONTROL, timeControl);
 
               DialogUtils.showToast('保存成功', {
@@ -264,7 +261,7 @@ export struct TimeCtrl {
       this.nightTimeState = GlobalContext.getContext().getObject(CommonConstants.NIGHT_TIME_STATE) as boolean;
     })
     .margin({
-      top: px2vp(this.topRectHeight),
+      top: this.getUIContext().px2vp(this.topRectHeight),
     })
     .title('时长控制')
     .onBackPressed(() => {

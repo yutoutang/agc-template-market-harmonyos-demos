@@ -1,9 +1,10 @@
-import { CourseDetail } from '../components/course/CourseDetail'
-import { AddBooking } from '../components/book/AddBooking'
-import { BookingDetail } from '../components/book/BookingDetail'
-import { BookingRecord } from '../components/book/BookingRecord'
-import { ConfirmBooking } from '../components/book/ConfirmBooking'
-import { ShowAllCourse } from '../components/course/ShowAllCourse'
+import { CourseDetail } from '../course/CourseDetail'
+import { AddBooking } from '../book/AddBooking'
+import { BookingDetail } from '../book/BookingDetail'
+import { BookingRecord } from '../book/BookingRecord'
+import { ConfirmBooking } from '../book/ConfirmBooking'
+import { StoreSelectPage } from '../components/StoreSelect'
+import { ShowAllCourse } from '../course/ShowAllCourse'
 
 @Builder
 export function CourseDetailBuilder() {
@@ -28,6 +29,11 @@ export function BookingRecordBuilder() {
 @Builder
 export function ConfirmBookingBuilder() {
   ConfirmBooking();
+}
+
+@Builder
+export function StoreSelectBuilder() {
+  StoreSelectPage();
 }
 
 @Builder

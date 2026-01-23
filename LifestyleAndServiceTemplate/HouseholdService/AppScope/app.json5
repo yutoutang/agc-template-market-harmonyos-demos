@@ -1,7 +1,7 @@
 {
   "app": {
 /**
-     * todo: 替换包名
+     * todo: 替换为实际的包名
      */
     "bundleName": "com.atomicservice.xxxxxx",
     "bundleType": "atomicService",

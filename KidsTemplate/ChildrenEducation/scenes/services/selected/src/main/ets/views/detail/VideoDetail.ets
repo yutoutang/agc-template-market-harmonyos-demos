@@ -1,12 +1,13 @@
-import { VideoCardDetail, VideoDetail } from '@ohos_agcit/children_education_datasource';
+import { User, VideoCardDetail, VideoDetail, VipRecord } from '@ohos_agcit/children_education_datasource';
 import {
   CommonConstants,
+  GlobalContext,
   IconAndCount,
+  QuickLoginUtil,
   TagLabelCard,
   TimeControl,
   Title,
 } from '@ohos_agcit/children_education_utils';
-import { GlobalContext } from '@ohos_agcit/children_education_utils';
 
 @Builder
 export function VideoDetailBuilder() {
@@ -17,6 +18,9 @@ export function VideoDetailBuilder() {
 @ComponentV2
 export struct VideoDetailListView {
   @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
+  @Consumer(CommonConstants.USER_INFO) user: User = new User();
+  @Consumer(CommonConstants.VIP_RECORD) vipRecord: VipRecord = new VipRecord();
+  @Local navigationTitle: string = ''
   @Local videoDetail: VideoDetail = {
     videoCard: {
       id: CommonConstants.EMPTY_STRING,
@@ -29,7 +33,7 @@ export struct VideoDetailListView {
       imageUrl: CommonConstants.EMPTY_STRING,
       isVip: false,
     },
-    videoCardDetail: [],
+    videoCardDetailList: [],
   };
 
   build() {
@@ -62,7 +66,7 @@ export struct VideoDetailListView {
             Row() {
               ForEach(this.videoDetail.videoCard.tags, (item: string) => {
                 TagLabelCard(item);
-              },(item:string) => item);
+              }, (item: string) => item);
             };
           }
           .width('50%')
@@ -75,27 +79,21 @@ export struct VideoDetailListView {
         .shadow(ShadowStyle.OUTER_DEFAULT_SM)
 
         List({ space: 20 }) {
-          ForEach(this.videoDetail.videoCardDetail, (item: VideoCardDetail, index ?: number) => {
+          ForEach(this.videoDetail.videoCardDetailList, (item: VideoCardDetail, index ?: number) => {
             VideoListItem({
               title: item.title,
               imageUrl: item.imageUrl,
               isVip: item.isVip,
             })
               .onClick(() => {
-                let vipInfo = GlobalContext.getContext().getObject(CommonConstants.IS_VIP) as boolean;
-                if (item.isVip && !vipInfo) {
-                  let pathInfo: NavPathInfo = new NavPathInfo(CommonConstants.VIP_PAGE_VIEW, item);
-                  this.appPathStack.pushDestination(pathInfo, true);
-                } else {
-                  if (TimeControl.timeControl()) {
-                    return;
-                  }
-                  GlobalContext.getContext().setObject(CommonConstants.GLOBAL_VIDEO_LIST, this.videoDetail);
-                  let pathInfo: NavPathInfo = new NavPathInfo(CommonConstants.VIDEO_PLAY_PAGE, item);
-                  this.appPathStack.pushDestination(pathInfo, true);
+                if (TimeControl.timeControl(this.getUIContext())) {
+                  return;
                 }
+                GlobalContext.getContext().setObject(CommonConstants.GLOBAL_VIDEO_LIST, this.videoDetail);
+                let pathInfo: NavPathInfo = new NavPathInfo(CommonConstants.VIDEO_PLAY_PAGE, item);
+                this.appPathStack.pushDestination(pathInfo, true);
               });
-          }, (item:VideoCardDetail) => JSON.stringify(item));
+          }, (item: VideoCardDetail) => JSON.stringify(item));
         }
         .scrollBar(BarState.Off)
         .width('105%')
@@ -114,8 +112,9 @@ export struct VideoDetailListView {
     }
     .onReady((cxt: NavDestinationContext) => {
       this.videoDetail = cxt.pathInfo.param as VideoDetail;
+      this.navigationTitle = this.videoDetail.videoCard.title
     })
-    .title(Title('视频专辑'))
+    .title(Title(this.navigationTitle))
     .onBackPressed(() => {
       this.appPathStack.pop();
       return true;

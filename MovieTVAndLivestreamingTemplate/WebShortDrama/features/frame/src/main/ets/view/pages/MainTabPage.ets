@@ -9,7 +9,7 @@ import {
   StatusBarHeight,
 } from '@agctemplate/widgets';
 import { appRouter, Logger, WindowManager } from '@agctemplate/utils';
-import { AppStorageV2 } from '@kit.ArkUI';
+import { AppStorageV2, window } from '@kit.ArkUI';
 
 export interface TabInfo {
   tabHeaderInfo: TabHeaderInfo;
@@ -69,11 +69,11 @@ export struct MainTabPage {
       .flexShrink(1)
       .flexGrow(1)
       .vertical(new BreakPointType<boolean>({ sm: false, md: false, lg: true }).getValue(this.currentBreakpoint.value))
-      .barWidth(new BreakPointType<number | string>({
+      .barWidth(this.tabState ? new BreakPointType<number | string>({
         sm: '100%',
         md: '100%',
         lg: 96
-      }).getValue(this.currentBreakpoint.value))
+      }).getValue(this.currentBreakpoint.value) : 0)
       .barHeight(this.tabState ? new BreakPointType<number | string>({
         sm: 48,
         md: 48,
@@ -93,11 +93,31 @@ export struct MainTabPage {
       $r('sys.color.ohos_id_background_secondary'))
       .padding({
         top: 0,
-        bottom: this.currentBreakpoint.value === BreakPointValue.LG ? 0 : `${px2vp(this.aiBarHeight.value)}vp`
+        bottom: this.currentBreakpoint.value === BreakPointValue.LG ? 0 : `${this.getUIContext().px2vp(this.aiBarHeight.value)}vp`
       })
     }.onBackPressed(() => {
       appRouter.back(true)
-      return true;
+      try {
+        window.getLastWindow(this.getUIContext().getHostContext(), (err: BusinessError, win) => {
+          const errCode: number = err.code;
+          if (errCode) {
+            console.error(`Failed to obtain the top window. Cause code: ${err.code}, message: ${err.message}`);
+            return;
+          }
+          win.minimize((err: BusinessError) => {
+            const errCode: number = err.code;
+            if (errCode) {
+              console.error(`Failed to minimize the window. Cause code: ${err.code}, message: ${err.message}`);
+              return;
+            }
+            console.info('Succeeded in minimizing the window.');
+          });
+          console.info('Succeeded in obtaining the top window. Data: ' + JSON.stringify(win));
+        });
+      } catch (exception) {
+        console.error(`Failed to obtain the top window. Cause code: ${exception.code}, message: ${exception.message}`);
+      }
+      return true
     }).hideTitleBar(true)
     .onWillHide(()=>{
       Logger.info(TAG, 'onWillHide')

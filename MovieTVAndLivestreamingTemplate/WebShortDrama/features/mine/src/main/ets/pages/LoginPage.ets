@@ -1,8 +1,7 @@
 import { getMedia } from '@agctemplate/resources';
 import { appRouter, NavParams, WindowManager } from '@agctemplate/utils';
-import { AssociateUtil, MinePageVM } from '@agctemplate/widgets';
-
-import { PromptAction } from '@kit.ArkUI';
+import { AiBarHeight, AppStorageKeys, StatusBarHeight, AssociateUtil, MinePageVM } from '@agctemplate/widgets';
+import { AppStorageV2, PromptAction } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import {
   AggregatedLogin,
@@ -19,9 +18,13 @@ import {
 export struct LoginPage {
   @Param isChange: boolean = false
   @Local vm: MinePageVM = MinePageVM.instance;
+  @Local aiBarHeight: AiBarHeight = AppStorageV2.connect(AiBarHeight, AppStorageKeys.AI_BAR_HEIGHT,
+    () => new AiBarHeight())!;
+  @Local statusBarHeight: StatusBarHeight = AppStorageV2.connect(StatusBarHeight, AppStorageKeys.STATUS_BAR_HEIGHT,
+    () => new StatusBarHeight())!;
   promptAction: PromptAction = this.getUIContext().getPromptAction();
   controller: LoginController = new LoginController()
-  navPathStack: NavPathStack = new NavPathStack()
+  @Consumer('navStack') navPathStack: NavPathStack = new NavPathStack();
   huaweiLogin = async (loginParams: LoginParams): Promise<void> => {
     this.getUIContext().getPromptAction().showToast({ message: '华为一键登录成功' })
     this.loginSuccess()
@@ -43,7 +46,7 @@ export struct LoginPage {
       if (data.index === 1) {
         this.getUIContext().getPromptAction().showToast({ message: '验证码登录成功' })
         this.controller.clearLoginInfo();
-        this.navPathStack.clear();
+        this.navPathStack.pop();
         this.loginSuccess()
       }
     } catch (err) {
@@ -86,46 +89,46 @@ export struct LoginPage {
 
   build() {
     NavDestination() {
-      Navigation(this.navPathStack) {
-        Column() {
-          // 登录使用
-          AggregatedLogin({
-            routerModule: this.navPathStack,
-            icon: getMedia('app.media.icon'), // todo 需要替换为开发者所需的图像资源文件。
-            themeColor: '#EC6E45',
-            isSheet: false,
-            autoSheet: false,
-            isPersistence: false,
-            loginTypes: [new Channel(LoginType.WECHAT, '微信', {
-              appId: 'xxx',
-              scope: 'snsapi_userinfo,snsapi_friend,snsapi_message,snsapi_contact',
-              transaction: 'test123',
-              state: 'none',
-            }, $r('app.media.wx_count'))],
-            privacyContent: [{
-              privacyLabel: '《用户协议》',
-              privacyUrl: ProtocolData.termOfServiceProtocol,
-              privacyTag: '用户协议'
-            }, {
-              privacyLabel: '《xxxx隐私政策》',
-              privacyUrl: ProtocolData.privacyProtocol,
-              privacyTag: '隐私政策'
-            }, {
-              privacyLabel: '《华为账号用户认证协议》',
-              privacyUrl: ProtocolData.huaweiUserProtocol,
-              privacyTag: '华为账号用户认证协议'
-            }],
-            apiController: new ApiController(this.huaweiLogin, this.wxLogin, this.verifyCodeLogin),
-            handleLoginFail: this.handleLoginFail,
-            obtainVerifyCode: this.obtainVerifyCode,
-            loginController: this.controller,
-          });
-        }
-        .backgroundColor($r('sys.color.background_secondary')).height('100%')
+      Column() {
+        // 登录使用
+        AggregatedLogin({
+          routerModule: this.navPathStack,
+          icon: getMedia('app.media.icon'),
+          themeColor: '#EC6E45',
+          isSheet: false,
+          autoSheet: false,
+          isPersistence: false,
+          loginTypes: [new Channel(LoginType.WECHAT, '微信', {
+            appId: 'xxx',
+            scope: 'snsapi_userinfo,snsapi_friend,snsapi_message,snsapi_contact',
+            transaction: 'test123',
+            state: 'none',
+          }, $r('app.media.wx_count'))],
+          privacyContent: [{
+            privacyLabel: '《用户协议》',
+            privacyUrl: ProtocolData.termOfServiceProtocol,
+            privacyTag: '用户协议'
+          }, {
+            privacyLabel: '《xxxx隐私政策》',
+            privacyUrl: ProtocolData.privacyProtocol,
+            privacyTag: '隐私政策'
+          }, {
+            privacyLabel: '《华为账号用户认证协议》',
+            privacyUrl: ProtocolData.huaweiUserProtocol,
+            privacyTag: '华为账号用户认证协议'
+          }],
+          apiController: new ApiController(this.huaweiLogin, this.wxLogin, this.verifyCodeLogin),
+          handleLoginFail: this.handleLoginFail,
+          obtainVerifyCode: this.obtainVerifyCode,
+          loginController: this.controller,
+        });
       }
-      .hideTitleBar(true)
+      .backgroundColor($r('sys.color.background_secondary')).height('100%')
     }
-    .padding({ top: 40, bottom: 30 })
+    .padding({
+      top: `${this.getUIContext().px2vp(this.statusBarHeight.value)}vp`,
+      bottom: `${this.getUIContext().px2vp(this.aiBarHeight.value)}vp`
+    })
     .width('100%')
     .height('100%')
     .backgroundColor($r('sys.color.background_secondary'))

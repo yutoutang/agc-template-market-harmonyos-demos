@@ -9,12 +9,8 @@
       "value": "预约"
     },
     {
-      "name": "agcit_huawei_household_module_base",
-      "value": "1.0.1"
-    },
-    {
-      "name": "agcittype_huawei_household_module_base",
-      "value": "serviceComponent"
+      "name": "good_card_consult_btn",
+      "value": "咨询"
     }
   ]
 }

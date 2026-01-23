@@ -1,10 +1,10 @@
-import { chinesePageData } from '@ohos_agcit/children_education_datasource';
-import { CommonConstants, FeedTitle, TwoColumn, NoMoreTab } from '@ohos_agcit/children_education_utils';
+import { DataGenerator } from '@ohos_agcit/children_education_datasource';
+import { CommonConstants, FeedTitle, NoMoreTab, TwoColumn } from '@ohos_agcit/children_education_utils';
 import { SingStory } from '../components/SingStory';
 
 @ComponentV2
 export struct ChinesePage {
-  private chinesePageData = chinesePageData;
+  private chinesePageData = DataGenerator.getChinesePageData(this.getUIContext());
   @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
 
   build() {

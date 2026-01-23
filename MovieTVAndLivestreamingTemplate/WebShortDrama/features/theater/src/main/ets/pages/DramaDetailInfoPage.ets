@@ -147,8 +147,8 @@ export struct DramaDetailInfoPage {
                                 'rgba(236, 110, 69, 0.05)' : 'rgba(0, 0, 0, 0.05)')
                             if (this.currentIndex === (index * this.spliceNum + indexIndex)) {
                               Image(getMedia('app.media.playing'))
-                                .width(10)
-                                .height(8)
+                                .width(12)
+                                .height(10)
                                 .margin({ bottom: 3, right: 3 })
                             }
                           }
@@ -186,8 +186,8 @@ export struct DramaDetailInfoPage {
                                 'rgba(236, 110, 69, 0.05)' : 'rgba(0, 0, 0, 0.05)')
                             if (this.currentIndex === (index * this.spliceNum + indexIndex)) {
                               Image(getMedia('app.media.playing'))
-                                .width(10)
-                                .height(8)
+                                .width(12)
+                                .height(10)
                                 .margin({ bottom: 3, right: 3 })
                             }
 
@@ -381,8 +381,9 @@ export struct DramaDetailInfoPage {
                 })
                 .bindSheet($$this.isShowSerialPickerSheet, this.serialPickerBuilder(), {
                   height: 736,
+                  detents:[SheetSize.LARGE],
                   showClose: false,
-                  preferType: SheetType.BOTTOM
+                  preferType: SheetType.CENTER
                 })
               }
               .width('100%')
@@ -428,8 +429,8 @@ export struct DramaDetailInfoPage {
                                       'rgba(236, 110, 69, 0.05)' : $r('sys.color.background_secondary'))
                                   if (this.currentIndex === (index * this.spliceNum + indexIndex)) {
                                     Image(getMedia('app.media.playing'))
-                                      .width(10)
-                                      .height(8)
+                                      .width(12)
+                                      .height(10)
                                       .margin({ bottom: 3, right: 3 })
                                   }
                                 }
@@ -467,8 +468,8 @@ export struct DramaDetailInfoPage {
                                       'rgba(236, 110, 69, 0.05)' : $r('sys.color.background_secondary'))
                                   if (this.currentIndex === (index * this.spliceNum + indexIndex)) {
                                     Image(getMedia('app.media.playing'))
-                                      .width(10)
-                                      .height(8)
+                                      .width(12)
+                                      .height(10)
                                       .margin({ bottom: 3, right: 3 })
                                   }
                                 }
@@ -563,10 +564,10 @@ export struct DramaDetailInfoPage {
               if (this.userInfo.isPhoneAssociated) {
                 if (this.isFavorite) {
                   unsetFavorite(this.dramaInfo!.id)
-                  promptAction.showToast({ message: '取消收藏成功' })
+                  this.getUIContext().getPromptAction().showToast({ message: '取消收藏成功' })
                 } else {
                   setFavorite(this.dramaInfo!.id)
-                  promptAction.showToast({ message: '收藏成功' })
+                  this.getUIContext().getPromptAction().showToast({ message: '收藏成功' })
                 }
                 this.isFavorite = this.dramaInfo!.isFavorite
                 this.detailInfoSendFavoriteEmitter()
@@ -611,8 +612,8 @@ export struct DramaDetailInfoPage {
     })
     .backgroundColor(getColor('app.color.normal_background_color'))
     .padding({
-      top: `${px2vp(this.statusBarHeight.value)}vp`,
-      bottom: `${px2vp(this.aiBarHeight.value)}vp`
+      top: `${this.getUIContext().px2vp(this.statusBarHeight.value)}vp`,
+      bottom: `${this.getUIContext().px2vp(this.aiBarHeight.value)}vp`
     })
   }
 }

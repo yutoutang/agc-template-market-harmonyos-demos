@@ -13,29 +13,33 @@
  * limitations under the License.
  */
 
-import { TypeGood, GoodCardSize, STYLE_GOOD_NORMAL, STYLE_GOOD_SMALL, IGoodCardParam } from '../common/Constant';
+import { GoodCardSize, IGoodCardParam, STYLE_GOOD_NORMAL, STYLE_GOOD_SMALL, TypeGood } from '../common/Constant';
 import { GoodInfo } from '../common/ObserveModel';
-import { CommonUtils } from '../common/Utils';
+import { CommonUtils } from '../common/CommonUtils';
+import { WindowUtil } from '../common/WindowUtils';
 
 @ComponentV2
 export struct GoodCard {
   @Param goodInfo: GoodInfo = new GoodInfo();
   @Param type: GoodCardSize = GoodCardSize.NORMAL;
-  @Event onBtnClick: () => void = () => {
-  };
-  @Event onCardClick: () => void = () => {
-  };
   @Local styleGood: IGoodCardParam = STYLE_GOOD_NORMAL;
-
-  aboutToAppear(): void {
-    if (this.type === GoodCardSize.SMALL) {
-      this.styleGood = STYLE_GOOD_SMALL;
-    }
-  }
 
   @Computed
   get isTypePay() {
     return this.goodInfo.type === TypeGood.PAY;
+  }
+
+  @Event onBtnClick: () => void = () => {
+  };
+
+  @Event onCardClick: () => void = () => {
+  };
+
+  aboutToAppear(): void {
+    WindowUtil.initWindowUtil(this.getUIContext());
+    if (this.type === GoodCardSize.SMALL) {
+      this.styleGood = STYLE_GOOD_SMALL;
+    }
   }
 
   build() {
@@ -43,70 +47,44 @@ export struct GoodCard {
       Image(CommonUtils.handleImgUrl(this.goodInfo.image))
         .width('100%')
         .aspectRatio(this.styleGood.imgAspectRatio)
+        .objectFit(ImageFit.Cover)
         .alt($r('app.media.ic_placeholder_img'))
 
-      Column({ space: 10 }) {
+      Column({ space: 4 }) {
         Text(this.goodInfo.title)
           .fontSize(this.styleGood.titleFg)
           .fontWeight(this.styleGood.titleWeight)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .maxLines(2)
 
-        if (this.styleGood.showSubTitle) {
-          Text(this.goodInfo.subTitle)
-            .fontSize(14)
-            .fontColor($r('app.color.common_grey'))
-            .textOverflow({ overflow: TextOverflow.Ellipsis })
-            .maxLines(1)
-        }
-
-        Row({ space: 6 }) {
-          if (this.isTypePay) {
-            Text() {
-              Span('￥').fontSize(this.styleGood.symbolFg)
-              Span(CommonUtils.handleCash(this.goodInfo.vipPrice)).fontSize(this.styleGood.vipPriceFg)
-            }
+        if (this.isTypePay) {
+          Text() {
+            Span('￥').fontSize(this.styleGood.symbolFg)
+            Span(CommonUtils.handleCash(this.goodInfo.vipPrice)).fontSize(this.styleGood.vipPriceFg)
+            Span(this.goodInfo.serviceDetailList?.length ? '起' : '').fontSize(this.styleGood.symbolFg)
+          }
+          .fontWeight(this.styleGood.vipPriceWeight)
+          .fontColor($r('sys.color.multi_color_08'))
+        } else {
+          Text('咨询报价')
+            .fontSize(this.styleGood.textConsultFg)
             .fontWeight(this.styleGood.vipPriceWeight)
-            .fontColor($r('app.color.common_red'))
-          } else {
-            Text('咨询报价')
-              .fontSize(this.styleGood.textConsultFg)
-              .fontWeight(this.styleGood.vipPriceWeight)
-              .fontColor($r('app.color.common_red'))
-          }
-
-          Blank()
-          if (this.styleGood.showBtn) {
-            Button() {
-              Text(this.isTypePay ? $r('app.string.good_card_appoint_btn') : '咨询')
-                .fontSize($r('sys.float.Body_M'))
-                .fontWeight(500)
-                .fontColor($r('sys.color.font_on_primary'))
-                .width(56)
-                .height(20)
-                .textAlign(TextAlign.Center)
-            }
-            .backgroundColor($r('app.color.common_theme_color'))
-            .padding({
-              left: 8,
-              right: 8,
-              top: 4,
-              bottom: 4,
-            })
-            .onClick(() => {
-              this.onBtnClick();
-            })
-          }
+            .fontColor($r('sys.color.multi_color_08'))
         }
-        .width('100%')
       }
+      .width('100%')
       .alignItems(HorizontalAlign.Start)
-      .padding(10)
+      .padding({
+        top: 8,
+        bottom: 8,
+        left: 12,
+        right: 12
+      })
     }
     .width('100%')
     .clip(true)
     .backgroundColor($r('app.color.common_card_bg'))
-    .borderRadius(8)
+    .borderRadius(16)
     .onClick(() => {
       this.onCardClick();
     })

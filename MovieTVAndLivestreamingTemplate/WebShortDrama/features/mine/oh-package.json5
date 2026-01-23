@@ -15,6 +15,8 @@
     "vip_center": "file:../../components/vip_center",
     "@agctemplate/open_ads": "1.0.0",
     "aggregated_login": "file:../../components/aggregated_login",
-    "feedback": "file:../../components/feedback"
+    "feedback": "file:../../components/feedback",
+    "membership": "file:../../components/membership",
+    "dial_panel": "file:../../components/dial_panel"
   }
 }

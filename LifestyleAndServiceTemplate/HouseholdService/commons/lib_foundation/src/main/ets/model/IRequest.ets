@@ -13,7 +13,8 @@
  * limitations under the License.
  */
 
-import { QueryGoodListSource, OrderStatus } from '../common/Constant';
+import { SearchItem, SearchSource, SearchWordItem } from 'search';
+import { OrderStatus, QueryGoodListSource } from '../common/Constant';
 
 export interface ILoginWithHuaweiIDRequest {
   clientId: string;
@@ -71,5 +72,15 @@ export interface IQueryGood {
 export interface IQueryGoodList {
   source: QueryGoodListSource;
   keyword: string;
+}
+
+export interface IVerifyCode {
+  phone: string;
+  code: string
+}
+
+export interface ISearchResultParams {
+  keyWord: string | SearchWordItem | SearchItem;
+  searchSource: SearchSource
 }
 

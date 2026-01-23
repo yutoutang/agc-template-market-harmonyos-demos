@@ -1,4 +1,4 @@
-import { audioDetail, VideoCard, VideoDetail } from '@ohos_agcit/children_education_datasource';
+import { DataGenerator, VideoCard, VideoDetail } from '@ohos_agcit/children_education_datasource';
 import { CommonConstants, IconAndCount } from '@ohos_agcit/children_education_utils';
 
 @ComponentV2
@@ -15,7 +15,7 @@ export struct AudioStoryZone {
               Image(item.imageUrl)
                 .borderRadius(8)
                 .id(CommonConstants.IMAGE);
-              IconAndCount(CommonConstants.IMAGE, item.isVip, item.updateCount, item.totalCount, '30%', '60%', '70%');
+              IconAndCount(CommonConstants.IMAGE, item.isVip, item.updateCount, item.totalCount, '30%', '50%', '70%');
             }
             .height('auto')
             .width('auto');
@@ -26,11 +26,11 @@ export struct AudioStoryZone {
           right: '5%',
         })
         .onClick(() => {
-          let detail: VideoDetail = audioDetail;
+          let detail: VideoDetail = DataGenerator.getAudioDetail(this.getUIContext());
           detail.videoCard = item;
           this.appPathStack.pushPathByName('AudioDetailListView', detail);
         });
-      },(item:VideoCard) => JSON.stringify(item));
+      }, (item: VideoCard) => JSON.stringify(item));
     }
     .lanes(3)
     .width(CommonConstants.FULL_PERCENT)

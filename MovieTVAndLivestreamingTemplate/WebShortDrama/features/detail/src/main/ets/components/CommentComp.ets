@@ -1,5 +1,5 @@
 import { getMedia, NAV_PAGE_NAME } from '@agctemplate/resources'
-import { UserInfoModel } from '@agctemplate/widgets';
+import { AppStorageKeys, BreakPoint, BreakPointType, BreakPointValue, UserInfoModel } from '@agctemplate/widgets';
 import { AppStorageV2, ComponentContent, display } from '@kit.ArkUI'
 import { commentInputDialogBuilder } from './CommentInputDialog'
 import { BusinessError, deviceInfo } from '@kit.BasicServicesKit';
@@ -26,9 +26,13 @@ export struct CommentComp {
   @Local commentId: number = 1
   @Local replyPerson: string = ''
   @Local replyContent: string = ''
+  @Local currentBreakpoint: BreakPoint = AppStorageV2.connect(BreakPoint, AppStorageKeys.CURRENT_BREAK_POINT,
+    () => new BreakPoint(BreakPointValue.SM))!;
   @Local myMessageStorage: MyMessageStorage = MyMessageStorage.instance()
+  @Local isExpanded: boolean = display.getFoldStatus() === display.FoldStatus.FOLD_STATUS_EXPANDED
   @Local isTabletLandScape: boolean = deviceInfo.deviceType === 'tablet' &&
-    display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE
+    (display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE ||
+      display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE_INVERTED)
   private scroller: Scroller = new Scroller()
   @Event commentNum: Function = () => {
   }
@@ -36,12 +40,21 @@ export struct CommentComp {
   }
   callback:Callback<number> = (data:number) =>{
     if(deviceInfo.deviceType === 'tablet' &&
-      display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE){
+      (display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE ||
+        display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE_INVERTED)){
       this.isTabletLandScape = true
     }else{
       this.isTabletLandScape = false
     }
   }
+  callback2: Callback<display.FoldStatus> = (data: display.FoldStatus) => {
+    if (data === display.FoldStatus.FOLD_STATUS_EXPANDED) {
+      this.isExpanded = true
+    } else {
+      this.isExpanded = false
+    }
+  }
+
   // 发布评论
   publishComment(textComment: string): void {
     if (this.contentNode !== null) {
@@ -118,6 +131,7 @@ export struct CommentComp {
   }
 
   aboutToAppear(): void {
+    display.on('foldStatusChange', this.callback2)
     display.on('change',this.callback)
     container.resolve(RequestAPI).getCommentList({
       pageSize: 1,
@@ -150,6 +164,7 @@ export struct CommentComp {
   }
 
   aboutToDisappear(): void {
+    display.off('foldStatusChange', this.callback2)
     display.off('change',this.callback)
     this.myMessageStorage.scrollIndex = 0
     for (let i = 0; i < this.myMessageStorage.moreList.length; i++) {
@@ -429,7 +444,7 @@ export struct CommentComp {
         )
       }
       .width('100%')
-      .height(310)
+      .layoutWeight(1)
       .scrollBar(BarState.Off)
 
       Row() {
@@ -454,9 +469,14 @@ export struct CommentComp {
         }
       })
     }
-    .width(this.isTabletLandScape ? '40%' : '100%')
-    .height(this.isTabletLandScape ? '90%' : '40%')
-    .padding({ left: 16, top: 8, right: 16 })
+    .width(this.isTabletLandScape ? '40%' : this.isExpanded ? '50%' : '100%')
+    .height(this.isTabletLandScape || this.isExpanded ? '90%' : '60%')
+    .padding({
+      left: new BreakPointType<number>({ sm: 16, md: 24, lg: 32 }).getValue(this.currentBreakpoint.value),
+      top: 8,
+      right: new BreakPointType<number>({ sm: 16, md: 24, lg: 32 }).getValue(this.currentBreakpoint.value),
+      bottom: 16
+    })
     .backgroundColor('#F1F3F5')
   }
 }

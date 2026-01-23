@@ -12,69 +12,98 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { AppStorageV2, LengthMetrics } from '@kit.ArkUI';
+import { AppStorageV2 } from '@kit.ArkUI';
+import { CategoryController, CategoryList } from 'category_list';
 import {
   AppStorageBank,
+  ClickId,
+  CommonConstants,
+  deleteHistoryList,
+  getGood,
+  getGuessList,
+  getHistoryList,
+  getResultList,
+  getSearchSuggestion,
+  GridRowColSetting,
   HomeBaseInfo,
+  JumpCategoryParam,
   RouterModule,
   updateCitySelected,
-  CommonConstants,
-  JumpCategoryParam,
 } from 'lib_foundation';
-import { IGoodCategory, IGoodInfo, RouterMap, CommonUtils } from 'module_base'
-import { CategoryController, CategoryLayout } from 'module_category';
+import { CommonUtils, IGoodCategory, IGoodInfo, RouterMap, WindowUtil } from 'module_base';
+import { PresentationType, SearchItem, SearchView, SearchViewController } from 'search';
 
 @ComponentV2
 export struct AllCategory {
+  @Local breakpoint: string = '';
   @Local contentList: IGoodCategory[] = [];
   @Local homeBaseInfo: HomeBaseInfo = AppStorageV2.connect(HomeBaseInfo, () => new HomeBaseInfo())!;
+  @Local clickId: ClickId = AppStorageV2.connect(ClickId, () => new ClickId())!;
   @Local jumpCategoryParam: JumpCategoryParam = AppStorageV2.connect(JumpCategoryParam, () => new JumpCategoryParam())!;
   controller: CategoryController = new CategoryController();
+  searchController: SearchViewController = new SearchViewController();
 
-  @Monitor('jumpCategoryParam.listInitialIndex')
+  aboutToAppear(): void {
+    WindowUtil.initWindowUtil(this.getUIContext());
+    this.contentList = AppStorageBank.allCategoryList;
+  }
+
+  @Monitor('clickId.clickId')
   onChange(monitor: IMonitor) {
     this.controller.scrollToIndex(this.jumpCategoryParam.listInitialIndex);
   }
 
-  aboutToAppear(): void {
-    this.contentList = AppStorageBank.allCategoryList;
-  }
-
   build() {
     NavDestination() {
-      Column() {
-        this.topBar()
-        CategoryLayout({
-          contentList: this.contentList,
-          initIndex: this.jumpCategoryParam.listInitialIndex,
-          controller: this.controller,
-          itemBuilderParam: (good: IGoodInfo) => {
-            this.buildItem(good)
-          },
-        })
-          .height('calc(100% - 40vp)')
-          .padding({ top: 10 })
+      GridRow(GridRowColSetting.DEFAULT_GRID_ROW_OPTIONS) {
+        GridCol({ span: GridRowColSetting.GRID_ROW_OPTIONS_COLUMNS, }) {
+          Column() {
+            this.topBar()
+            CategoryList({
+              categoryTabs: this.contentList,
+              initIndex: this.jumpCategoryParam.listInitialIndex,
+              controller: this.controller,
+              layoutType: 1,
+              itemBuilderParam: this.itemBuilder,
+              onItemClick: (itemDetail: IGoodInfo) => {
+                RouterModule.push({ url: RouterMap.GOOD_DETAIL, param: itemDetail });
+              }
+            })
+              .layoutWeight(1)
+              .width(CommonConstants.FULL_PERCENT)
+          }
           .width(CommonConstants.FULL_PERCENT)
+          .height(CommonConstants.FULL_PERCENT)
+        }
       }
-      .width(CommonConstants.FULL_PERCENT)
-      .height(CommonConstants.FULL_PERCENT)
+      .onBreakpointChange((bp) => {
+        this.breakpoint = bp;
+      })
     }
-    .title('全部服务', { backgroundColor: Color.White, paddingStart: new LengthMetrics(10) })
+    .onBackPressed(() => {
+      return this.searchController.onBackPressed();
+    })
+    .title('全部服务', {
+      paddingStart: { value: GridRowColSetting.getPageMargin(this.breakpoint), unit: 1 }
+    })
+    .backgroundColor($r('sys.color.background_secondary'))
   }
 
   @Builder
   topBar() {
-    Row({ space: 10 }) {
+    Row({ space: 40 }) {
       Row({ space: 4 }) {
         Text(this.homeBaseInfo.citySelected)
+          .fontSize(16)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
-          .constraintSize({ maxWidth: 120 })
+          .constraintSize({ maxWidth: 92 })
         Image($r('app.media.ic_public_spinner_small')).width(10)
       }
+      .width(108)
       .onClick(() => {
         RouterModule.push({
-          url: RouterMap.CITY_LIST,
+          url: RouterMap.CITY_SELECT_PAGE,
           onPop: (info: PopInfo) => {
             if (!info.result) {
               return;
@@ -86,42 +115,66 @@ export struct AllCategory {
         });
       })
 
-      Search({
-        placeholder: '请输入你想要查找的',
-      })
-        .layoutWeight(1)
-        .focusable(false)
-        .onClick(() => {
-          RouterModule.push({ url: RouterMap.SEARCH_PAGE });
+      Row() {
+        SearchView({
+          presentationType: PresentationType.SEARCH_BOX,
+          entranceText: ['保洁', '保姆月嫂', '维修'],
+          routerStack: RouterModule.getStack(),
+          showHotSearch: false,
+          showFilterTag: false,
+          controller: this.searchController,
+          queryHistoryList: getHistoryList,
+          queryGuessList: getGuessList,
+          handleSearch: getResultList,
+          searchSuggestion: getSearchSuggestion,
+          deleteHistoryList: deleteHistoryList,
+          onClickResultItem: async (listItem: SearchItem) => {
+            const selectedGood = await getGood(listItem.id as string);
+            RouterModule.push({ url: RouterMap.GOOD_DETAIL, param: selectedGood });
+          },
         })
+      }
+      .layoutWeight(1)
+      .justifyContent(FlexAlign.End)
     }
+    .padding({
+      left: GridRowColSetting.getPageMargin(this.breakpoint),
+      right: GridRowColSetting.getPageMargin(this.breakpoint)
+    })
     .width(CommonConstants.FULL_PERCENT)
     .height(40)
-    .padding({ left: 10, right: 10 })
+    .margin({ top: 8 })
   }
 
   @Builder
-  buildItem(good: IGoodInfo) {
-    Column() {
-      Row({ space: 10 }) {
-        Image(CommonUtils.handleImgUrl(good.image))
-          .width(60)
-          .height(50)
-          .borderRadius(4)
-          .alt($r('app.media.ic_placeholder_img'))
-        Column({ space: 10 }) {
-          Text(good.title).fontSize(14).fontWeight(500)
-          Text(good.subTitle).fontSize(12).fontColor($r('app.color.common_grey'))
-        }
-        .alignItems(HorizontalAlign.Start)
-      }
-      .width(CommonConstants.FULL_PERCENT)
-      .padding({ top: 10, bottom: 10 })
-      .onClick(() => {
-        RouterModule.push({ url: RouterMap.GOOD_DETAIL, param: good });
-      })
+  itemBuilder(item: IGoodInfo) {
+    Row() {
+      Image(CommonUtils.handleImgUrl(item.image))
+        .width(80)
+        .objectFit(ImageFit.Cover)
+        .aspectRatio(1)
+        .borderRadius(8)
+        .margin({ right: 8 })
 
-      Divider()
+      Column({ space: 4 }) {
+        Text(item.title)
+          .fontSize($r('sys.float.Body_M'))
+          .fontWeight(FontWeight.Medium)
+          .fontColor($r('sys.color.font_primary'))
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .maxLines(1)
+          .width('100%')
+        Text(item.subTitle)
+          .fontSize($r('sys.float.Body_S'))
+          .fontWeight(FontWeight.Regular)
+          .fontColor($r('sys.color.font_secondary'))
+          .maxLines(3)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .width('100%')
+      }
+      .layoutWeight(1)
+      .alignItems(HorizontalAlign.Start)
+      .justifyContent(FlexAlign.Start)
     }
   }
 }

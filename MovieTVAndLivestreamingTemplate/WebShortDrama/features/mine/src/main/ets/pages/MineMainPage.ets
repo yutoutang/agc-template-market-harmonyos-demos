@@ -1,11 +1,11 @@
 import { getMedia, getString, NAV_PAGE_NAME } from '@agctemplate/resources'
 import { AppStorageKeys, ListItemModel, Mine, MinePageVM, StatusBarHeight, UserInfoModel } from '@agctemplate/widgets'
 import { appRouter, container, PreferConstant, PreferenceUtil } from '@agctemplate/utils';
-import { AppStorageV2, promptAction } from '@kit.ArkUI';
-import { call } from '@kit.TelephonyKit';
+import { AppStorageV2 } from '@kit.ArkUI';
 import { CommentInfo, CommentListRes, RequestAPI } from '@agctemplate/server';
 import { CommentData } from '../models/messageData';
-
+import { DialPanel } from 'dial_panel';
+import { BusinessError } from '@kit.BasicServicesKit';
 
 @ComponentV2
 export struct MineMainPage {
@@ -42,14 +42,25 @@ export struct MineMainPage {
     }),
     new ListItemModel(getString('app.string.my_customer_service'),
       getMedia('app.media.icon_customer_service')).setHandle(() => {
-      this.isOpen = !this.isOpen
+      this.dialPanel
+        .setTitle('联系客服')
+        .setPhoneNumber('12345678901')
+        .setAutoClosePanel(false) // 成功跳转后不自动关闭模态窗
+        .open();
     }),
     new ListItemModel(getString('app.string.my_setting'), getMedia('app.media.icon_setting')).setHandle(() => {
       this.goToPage(NAV_PAGE_NAME.SetUpPage.name)
     }),
   ]
+  private uiContext: UIContext = this.getUIContext();
+  private dialPanel: DialPanel = new DialPanel(this.uiContext)
+    .onMakeCall((e: BusinessError<void>): void => {
+      if (e.code) {
+        this.uiContext.getPromptAction().showToast({message:`拨号页面跳转失败 -> code: ${e.code}, msg: ${e.message}`});
+      }
+    })
 
-  @Monitor('vm.userInfo.isPhoneAssociated','myMessageList')
+  @Monitor('vm.userInfo.isPhoneAssociated', 'myMessageList')
   onMyMessageListChange() {
     if (this.vm.userInfo.isPhoneAssociated) {
       const tempMessageCount = this.myMessageList.reduce((count, item) => {
@@ -72,9 +83,10 @@ export struct MineMainPage {
         if (commentInfo.name === this.userInfo.nickname) {
           const tempMessageList: Array<CommentData> = []
           tempMessageList.push(commentInfo as CommentData)
-          this.myMessageList = PreferenceUtil.getInstance(getContext())
+          this.myMessageList = PreferenceUtil.getInstance(this.getUIContext().getHostContext())
             .get(PreferConstant.MY_MESSAGE_LIST_SETTINGS, tempMessageList) as Array<CommentData>
-          PreferenceUtil.getInstance(getContext()).put(PreferConstant.MY_MESSAGE_LIST_SETTINGS, this.myMessageList)
+          PreferenceUtil.getInstance(this.getUIContext().getHostContext())
+            .put(PreferConstant.MY_MESSAGE_LIST_SETTINGS, this.myMessageList)
         }
       })
     })
@@ -101,7 +113,9 @@ export struct MineMainPage {
                 })
               }),
               this.userPhone.setContentText(this.vm.userInfo.cellphone).setHandle(() => {
-                promptAction.showToast({ message: getString('app.string.phone_tip'), alignment: Alignment.Center });
+                this.getUIContext()
+                  .getPromptAction()
+                  .showToast({ message: getString('app.string.phone_tip'), alignment: Alignment.Center });
               })]
           }
         })
@@ -109,12 +123,7 @@ export struct MineMainPage {
       commonServicesContents: this.commonServicesContents,
       commonServicesContents_2: this.commonServicesContents_2
     })
-      .padding({ top: `${px2vp(this.statusBarHeight.value)}vp` })
-      .bindSheet($$this.isOpen, this.buildMakeCallComponent(), {
-        title: this.buildTitle(),
-        height: 265,
-        preferType: SheetType.CENTER
-      })
+      .padding({ top: `${this.getUIContext().px2vp(this.statusBarHeight.value)}vp` })
       .onVisibleAreaChange([0], () => {
         this.onUserLoginChange()
       })
@@ -125,68 +134,6 @@ export struct MineMainPage {
     Text('联系客服')
       .fontSize($r('sys.float.Title_S'))
       .fontWeight(FontWeight.Medium)
-  }
-
-  @Builder
-  buildMakeCallComponent() {
-    Column() {
-      Column() {
-        Text('0000-00000000')
-          .fontSize(18)
-          .fontColor('#E6000000')
-          .lineHeight(30)
-          .halfLeading(true)
-        Button() {
-          Row() {
-            Image(getMedia('app.media.path_1'))
-              .height(14)
-              .objectFit(ImageFit.Contain)
-              .margin({ right: 5 })
-            Text('一键拨号')
-              .fontColor($r('sys.color.font_on_primary'))
-              .fontWeight(600)
-          }
-        }
-        .width('100%')
-        .height(45)
-        .type(ButtonType.Normal)
-        .backgroundColor($r('sys.color.alert'))
-        .borderRadius($r('sys.float.corner_radius_level10'))
-        .onClick(() => {
-          if (canIUse('SystemCapability.Applications.Contacts')) {
-            call.makeCall('0000-00000000');
-          }
-          this.isOpen = false;
-        })
-
-        Button() {
-          Text('取消')
-            .fontColor($r('sys.color.font_tertiary'))
-            .fontWeight(600)
-        }
-        .width('100%')
-        .height(45)
-        .type(ButtonType.Normal)
-        .backgroundColor($r('sys.color.comp_background_tertiary'))
-        .borderRadius(20)
-        .onClick(() => this.isOpen = false)
-      }
-      .width('100%')
-      .height(170)
-      .backgroundColor(Color.White)
-      .borderRadius(16)
-      .padding({ left: 16, right: 16 })
-      .justifyContent(FlexAlign.SpaceEvenly)
-    }
-    .width('100%')
-    .alignItems(HorizontalAlign.Center)
-    .justifyContent(FlexAlign.Start)
-    .padding({
-      left: 16,
-      right: 16,
-      bottom: 56,
-      top: 8
-    })
   }
 
   goToPage(url: string) {

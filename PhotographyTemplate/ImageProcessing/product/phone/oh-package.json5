@@ -6,11 +6,12 @@
   "author": "",
   "license": "",
   "dependencies": {
-    "common": "file:../../common/",
-    "picture_beautification": "file:../../scenes/picture_beautification",
-    "personal": "file:../../scenes/personal",
-    "collage": "file:../../scenes/collage"
-  },
-  "devDependencies": {},
-  "dynamicDependencies": {}
+    "commonlib": "file:../../commons/commonlib",
+    "home": "file:../../scenes/home",
+    "mine": "file:../../scenes/mine",
+    "camera": "file:../../scenes/camera",
+    "login_info": "file:../../components/login_info",
+    "photo_editing": "file:../../scenes/photo_editing"
+  }
 }
+

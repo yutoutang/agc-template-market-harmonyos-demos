@@ -1,12 +1,16 @@
+import { AppStorageKeys, BreakPoint, BreakPointValue } from '@agctemplate/widgets'
 import { BannerPanel } from '../components/BannerPanel'
 import { RecommendPanel } from '../components/RecommendPanel'
 import { DramaCoverVM } from '../viewmodels/DramaCoverVM'
+import { AppStorageV2 } from '@kit.ArkUI'
 
 @ComponentV2
 export struct NewDrama {
   @Param @Require bannerList: Array<DramaCoverVM>
   @Param @Require recommendList: Array<DramaCoverVM>
   @Param @Require gutter: number
+  @Local currentBreakpoint: BreakPoint = AppStorageV2.connect(BreakPoint, AppStorageKeys.CURRENT_BREAK_POINT,
+    () => new BreakPoint(BreakPointValue.SM))!;
 
   build() {
     Column() {
@@ -17,7 +21,7 @@ export struct NewDrama {
         .fontWeight(700)
         .fontColor('#e6000000')
         .textAlign(TextAlign.Start)
-      BannerPanel({ bannerList: this.bannerList, inPage: 'new' })
+      BannerPanel({ bannerList: this.bannerList, inPage: 'new', breakPoint: this.currentBreakpoint.value })
 
       Text('今日上新')
         .width('100%')

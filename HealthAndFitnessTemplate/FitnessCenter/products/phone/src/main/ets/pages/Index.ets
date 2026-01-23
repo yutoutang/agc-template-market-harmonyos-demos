@@ -1,19 +1,45 @@
 import { BookMain } from 'course';
-import { MockService } from 'external_interactions';
+import { MockService, EmitterConstant, BreakpointUtils } from 'external_interactions';
 import { Home } from './Home';
 import { Mine } from './Mine';
+import { AppStorageV2 } from '@kit.ArkUI';
+import { ScreenPropStorage , JumpLogin, LoginState, BookJumpSearch} from 'external_interactions'
+import { emitter } from '@kit.BasicServicesKit';
+import { common } from '@kit.AbilityKit';
 
 @Entry
-@Component
+@ComponentV2
 struct Index {
-  @State currentIndex: number = 0
+  @Local currentIndex: number = 0
   pathStack: NavPathStack = new NavPathStack()
   tabController: TabsController = new TabsController()
-  @StorageLink('bookJumpSearch') @Watch('changeIndex') bookJumpSearch: string = '';
-  @StorageLink('jumpLogin') @Watch('changeIndex') jumpLogin: boolean = false
+  @Local screenPropStorage : ScreenPropStorage = AppStorageV2.connect(ScreenPropStorage, 'ScreenPropStorage', () =>new ScreenPropStorage())!
+  @Local jumpLoginStorage : JumpLogin = AppStorageV2.connect(JumpLogin, 'JumpLogin', () =>new JumpLogin())!
+  @Local bookJumpSearchStorage : BookJumpSearch = AppStorageV2.connect(BookJumpSearch, 'BookJumpSearch', () =>new BookJumpSearch())!
+  @Local bookJumpSearch: string = this.bookJumpSearchStorage.bookJumpSearch;
+  @Local jumpLogin: boolean = this.jumpLoginStorage.jumpLogin
+  @Local loginStateStorage : LoginState = AppStorageV2.connect(LoginState, 'LoginState', () =>new LoginState())!
+  breakpoint: BreakpointUtils | null = null;
 
   aboutToAppear(): void {
-    MockService.init();
+    MockService.init(this.getUIContext().getHostContext() as common.UIAbilityContext);
+    this.breakpoint = new BreakpointUtils(this.getUIContext().getMediaQuery());
+    this.breakpoint?.register()
+    try {
+      emitter.on(EmitterConstant.CLICK_BOOK_DETAIL, () =>{
+        if(this.loginStateStorage.loginState === false){
+          this.changeIndex('jumpLogin')
+        }else{
+          this.changeIndex('bookJumpSearch')
+        }
+      })
+    } catch (e) {
+      console.error(`emitter on failed. error: ${JSON.stringify(e)}`)
+    }
+  }
+
+  aboutToDisappear(): void {
+    this.breakpoint?.unRegister();
   }
 
   @Builder
@@ -61,14 +87,15 @@ struct Index {
     .hideTitleBar(true)
     .width('100%')
     .height('100%')
+    .mode(NavigationMode.Stack)
   }
 
+  @Monitor('jumpLoginStorage.jumpLogin', 'bookJumpSearchStorage.bookJumpSearch', 'this.bookJumpSearchStorage', 'bookJumpSearchStorage')
   changeIndex(propertyName: string) {
     if (propertyName === 'bookJumpSearch') {
-      if (this.bookJumpSearch !== undefined && this.bookJumpSearch.length > 0) {
-        this.tabController.changeIndex(1)
-      }
+      this.tabController.changeIndex(1)
     } else if (propertyName === 'jumpLogin') {
+      this.getUIContext().getPromptAction().showToast({message: '请先关联账号', duration: 2000})
       this.tabController.changeIndex(2)
     }
   }

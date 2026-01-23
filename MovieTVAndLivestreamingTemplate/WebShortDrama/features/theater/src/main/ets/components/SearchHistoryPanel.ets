@@ -30,15 +30,6 @@ export struct SearchHistoryPanel {
                     .fontSize(16)
                     .fontColor([getColor('app.color.normal_font_color')])
                 }
-
-                Column() {
-                  Text(getString('app.string.drama_search_result_clear_btn'))
-                    .fontSize(14)
-                    .fontColor(getColor('app.color.normal_font_color'))
-                    .margin({
-                      left: 4
-                    })
-                }
               }
               .onClick(() => {
                 this.searchRecords.records = []

@@ -120,12 +120,12 @@ export struct DetailMaskLayer {
         this.locked = false
         this.videoDetailMaskVM.isLocked = false
       }
-      if (this.userInfo.bonus > 100 && this.bonusAgree) {
-        this.userInfo.bonus = this.userInfo.bonus - 100
-        promptAction.showToast({ message: '自动解锁成功' })
-        this.locked = false
-        this.videoDetailMaskVM.isLocked = false
-      }
+      // if (this.userInfo.bonus > 100 && this.bonusAgree) {
+      //   this.userInfo.bonus = this.userInfo.bonus - 100
+      //   this.getUIContext().getPromptAction().showToast({ message: '自动解锁成功' })
+      //   this.locked = false
+      //   this.videoDetailMaskVM.isLocked = false
+      // }
     }
     if (this.locked) {
       this.playControl.pause()
@@ -225,10 +225,27 @@ export struct DetailMaskLayer {
         title: `第${this.playControl.curentIndex + 1}集`,
         castService: CastService.getInstance(),
         onPlayNext: () => {
-          this.playControl.changeIndex(this.playControl.curentIndex + 1);
+          if (this.playControl.curentIndex > 9) {
+            this.getUIContext().showAlertDialog({
+              title: '提示',
+              message: '当前视频解锁后，可投屏观看？',
+              autoCancel: true,
+              alignment: DialogAlignment.Center,
+              buttons: [{
+                value: '知道了',
+                action: () => {
+                  console.info('Callback when the first button is clicked');
+                }
+              }]
+            })
+          } else {
+            this.playControl.changeIndex(this.playControl.curentIndex + 1);
+          }
         },
         onPlayPre: () => {
-          this.playControl.changeIndex(this.playControl.curentIndex - 1);
+          if (this.playControl.curentIndex > 0) {
+            this.playControl.changeIndex(this.playControl.curentIndex - 1);
+          }
         },
         onBack: () => {
           this.onBack();
@@ -389,9 +406,7 @@ export struct DetailMaskLayer {
           preferType: SheetType.BOTTOM
         });
 
-        if (!this.playControl.isLocked) {
-          CastPicker();
-        }
+        CastPicker({ isLocked: this.videoDetailMaskVM.isLocked });
 
         Image(getMedia('app.media.four'))
           .width(40)
@@ -545,6 +560,7 @@ export struct DetailMaskLayer {
           .fontSize(20)
           .fontWeight(700)
           .margin({ left: 8, right: 8 })
+        Blank()
         Image(getMedia('app.media.chevron_backward'))
           .width(40)
           .height(40)
@@ -561,7 +577,7 @@ export struct DetailMaskLayer {
             this.isShowBulletSettingSheet = !this.isShowBulletSettingSheet
           })
       }
-      .width(328)
+      .width('100%')
       .height(56)
       .margin({ bottom: 16 })
 
@@ -586,6 +602,7 @@ export struct DetailMaskLayer {
     }
     .borderRadius({ topLeft: 32, topRight: 32 })
     .backgroundColor('#F1F3F5')
+    .padding({ left: 16, right: 16 })
   }
 
   isLocked(index: number): boolean {

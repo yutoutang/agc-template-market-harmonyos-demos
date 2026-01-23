@@ -12,11 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { UIEmpty } from 'module_base';
-import { CommonConstants, IMenuItem, MY_ORDER_LIST, FullOrderInfo } from 'lib_foundation'
-import { OrderCard } from '../components/OrderCard';
-import { MyOrderVM } from '../viewmodel/MyOrderVM';
-import { LengthMetrics } from '@kit.ArkUI';
+import { CommonConstants, GridRowColSetting, IMenuItem, MY_ORDER_LIST } from 'lib_foundation';
+import { WindowUtil } from 'module_base';
+import { OrderList } from '../components/OrderList';
+import { IQueryListParam, MyOrderVM } from '../viewmodel/MyOrderVM';
 
 @Builder
 export function MyOrderListBuilder() {
@@ -25,100 +24,81 @@ export function MyOrderListBuilder() {
 
 @ComponentV2
 export struct MyOrderList {
+  @Local breakpoint: string = '';
   orderVM: MyOrderVM = MyOrderVM.instance;
 
   aboutToAppear(): void {
+    WindowUtil.initWindowUtil(this.getUIContext());
     this.orderVM.init();
   }
 
   build() {
     NavDestination() {
-      Column() {
-        Divider()
-        Tabs({ barPosition: BarPosition.Start, index: this.orderVM.selectedIndex }) {
-          ForEach(MY_ORDER_LIST, (v: IMenuItem, index: number) => {
-            TabContent() {
-              this.contentBuilder(index)
-            }.tabBar(this.tabBuilder(index, v.tabLabel || v.textLabel))
-          }, (v: IMenuItem) => v.imgUrl + v.textLabel)
-        }
-        .barMode(BarMode.Fixed)
-        .barHeight(40)
-        .barBackgroundColor(Color.White)
-        .scrollable(false)
-        .animationDuration(600)
-        .onAnimationStart((index: number, targetIndex: number) => {
-          if (index === targetIndex) {
-            return
+      GridRow(GridRowColSetting.DEFAULT_GRID_ROW_OPTIONS) {
+        GridCol({ span: GridRowColSetting.GRID_ROW_OPTIONS_COLUMNS, }) {
+          Column() {
+            Tabs({ barPosition: BarPosition.Start, index: this.orderVM.selectedIndex }) {
+              ForEach(MY_ORDER_LIST, (v: IMenuItem, index: number) => {
+                TabContent() {
+                  OrderList({
+                    breakpoint: this.breakpoint,
+                    data: this.orderVM.allList[index],
+                    isRefreshing: this.orderVM.isRefreshing,
+                    isLoading: this.orderVM.isLoading,
+                    queryOrderList: (param?: IQueryListParam) => {
+                      this.orderVM.queryOrderList(true, param);
+                    },
+                  })
+                }.tabBar(this.tabBuilder(index, v.tabLabel || v.textLabel))
+              }, (v: IMenuItem) => v.imgUrl + v.textLabel)
+            }
+            .barMode(BarMode.Scrollable)
+            .barHeight(56)
+            .barWidth('calc(100% - 48vp)')
+            .scrollable(false)
+            .animationDuration(600)
+            .onAnimationStart((index: number, targetIndex: number) => {
+              if (index === targetIndex) {
+                return
+              }
+              this.orderVM.queryOrderList(true, {
+                tabIndex: targetIndex,
+                showFullLoading: true,
+              });
+            })
+            .height(CommonConstants.FULL_PERCENT)
           }
-          this.orderVM.queryOrderList({
-            tabIndex: targetIndex,
-            showFullLoading: true,
-          });
-        })
-        .width(CommonConstants.FULL_PERCENT)
-        .height(CommonConstants.FULL_PERCENT)
+        }
       }
+      .onBreakpointChange((bp) => {
+        this.breakpoint = bp;
+      })
     }
-    .title('订单管理', { backgroundColor: Color.White, paddingStart: new LengthMetrics(10) })
-    .backgroundColor($r('app.color.common_page_bg'))
+    .title('我的订单', {
+      paddingStart: { value: GridRowColSetting.getPageMargin(this.breakpoint), unit: 1 }
+    })
+    .backgroundColor($r('sys.color.background_secondary'))
   }
 
   @Builder
   tabBuilder(index: number, name: string) {
-    Column({ space: 6 }) {
+    Column({ space: 8 }) {
       Text(name)
-        .fontSize(14)
-        .fontWeight(this.orderVM.selectedIndex === index ? 500 : 400)
-        .lineHeight(20)
+        .fontSize($r('sys.float.Body_L'))
+        .fontWeight(this.orderVM.selectedIndex === index ? 700 : 400)
+        .lineHeight(22)
+        .fontColor(this.orderVM.selectedIndex === index ? $r('sys.color.font_emphasize') :
+          $r('sys.color.font_secondary'))
+        .onSizeChange((oldSize, newSize) => {
+          this.orderVM.textWidth[index] = newSize.width as number - 8;
+        })
       Row()
         .height(2)
-        .backgroundColor($r('app.color.common_theme_color'))
+        .backgroundColor(this.orderVM.selectedIndex === index ? $r('sys.color.font_emphasize') :
+          $r('sys.color.font_secondary'))
         .opacity(this.orderVM.selectedIndex === index ? 1 : 0)
-        .width('80%')
+        .width(this.orderVM.textWidth[index])
     }
-    .width(CommonConstants.FULL_PERCENT)
-  }
-
-  @Builder
-  contentBuilder(index: number) {
-    if (this.orderVM.allList[index].list.length) {
-      Refresh({ refreshing: $$this.orderVM.isRefreshing }) {
-        Scroll() {
-          Column({ space: 10 }) {
-            ForEach(this.orderVM.allList[index].list, (v: FullOrderInfo) => {
-              OrderCard({
-                fullOrderInfo: v,
-                refreshList: () => {
-                  this.orderVM.queryOrderList({
-                    showFullLoading: true,
-                  });
-                },
-                jumpTab: (tabIndex: number) => {
-                  this.orderVM.queryOrderList({
-                    tabIndex,
-                    showFullLoading: true,
-                  });
-                },
-              })
-            }, (item: FullOrderInfo) => JSON.stringify(item))
-          }.width(CommonConstants.FULL_PERCENT)
-        }
-        .width(CommonConstants.FULL_PERCENT)
-        .height(CommonConstants.FULL_PERCENT)
-        .padding(10)
-        .align(Alignment.Top)
-        .scrollBar(BarState.Off)
-        .edgeEffect(EdgeEffect.Spring)
-      }
-      .onRefreshing(() => {
-        this.orderVM.queryOrderList({
-          showFullLoading: false,
-        });
-      })
-    }
-    if (!this.orderVM.isLoading && this.orderVM.allList[index].list.length === 0) {
-      UIEmpty({ emptyDesc: '暂无订单', fg: 12 }).margin({ bottom: 100 })
-    }
+    .width('calc(25% - 12vp)')
   }
 }

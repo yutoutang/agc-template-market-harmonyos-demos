@@ -1,11 +1,11 @@
 {
   "name": "video_swiper",
-  "version": "1.0.0",
+  "version": "1.0.4",
   "description": "Please describe the basic information.",
   "main": "Index.ets",
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    'module_cast': "file:../../components/module_cast"
+    'module_cast': "file:../module_cast"
   }
 }

@@ -21,6 +21,18 @@
       "value": "https://sis-sample-audio.obs.cn-north-1.myhuaweicloud.com/16k16bit.mp3"
     },
     {
+      "name": "avatar_uri",
+      "value": "https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/avatar%2Favatar_12.jpg"
+    },
+    {
+      "name": "example_website",
+      "value": "https://www.example.com"
+    },
+    {
+      "name": "privacyAgreementPath",
+      "value": "https://privacy.consumer.huawei.com/legal/id/authentication-terms.htm?code=CN&language=zh-CN"
+    },
+    {
       "name": "agcit_huawei_children_education",
       "value": "1.0.0"
     }

@@ -1,12 +1,6 @@
 {
-  "modelVersion": "5.0.1",
+  "modelVersion": "5.0.4",
   "dependencies": {
-    "tar": "^7.4.3",
-    "archiver": "^7.0.1",
-    "tar-stream": "^3.1.7",
-    "adm-zip": "^0.5.16",
-    // "@ohos/hvigor-ohos-online-sign-plugin": "4.0.2",
-    // "@hw-agconnect/template-plugin": "0.0.17"
   },
   "execution": {
     // "analyze": "normal",                     /* Define the build analyze mode. Value: [ "normal" | "advanced" | false ]. Default: "normal" */

@@ -72,5 +72,8 @@
   },
   "FeedbackHistoryPage": {
     "name": "FeedbackHistoryPage"
+  },
+  "ResultPage": {
+    "name": "ResultPage"
   }
 }

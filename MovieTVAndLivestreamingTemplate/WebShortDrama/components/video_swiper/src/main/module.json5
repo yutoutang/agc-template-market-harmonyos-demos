@@ -3,7 +3,8 @@
     "name": "video_swiper",
     "type": "har",
     "deviceTypes": [
-      "phone"
+      "default",
+      "tablet"
     ],
     "installationFree":true
   }

@@ -86,7 +86,7 @@ export struct VipOperation {
       .alignItems(HorizontalAlign.Center)
       .onClick(() => {
         if (!this.redemptionValue) {
-          promptAction.showToast({ message: '请输入兑换码' })
+          this.getUIContext().getPromptAction().showToast({ message: '请输入兑换码' })
           return
         }
         this.onVerifyNow()

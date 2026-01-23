@@ -1,0 +1,14 @@
+{
+  "routerMap": [
+    {
+      "name": "ImageDownloadPage",
+      "pageSourceFile": "src/main/ets/pages/ImageDownloadPage.ets",
+      "buildFunction": "ImageDownloadBuilder"
+    },
+    {
+      "name": "LutCameraPage",
+      "pageSourceFile": "src/main/ets/pages/LutCameraPage.ets",
+      "buildFunction": "LutCameraPageBuilder"
+    }
+  ]
+}

@@ -1,6 +1,8 @@
 import { webview } from '@kit.ArkWeb';
 import { ProtocolRouterParams } from '../model/Index';
 import { Constants } from '../common/Constant';
+import { AppStorageKeys, StatusBarHeight } from '@agctemplate/widgets'
+import { AppStorageV2 } from '@kit.ArkUI';
 
 @Builder
 export function ProtocolWebViewBuilder() {
@@ -12,13 +14,15 @@ struct ProtocolWebView {
   @Local content: string = '';
   @Local isSheet: boolean = false;
   @Local sheetType: SheetType = SheetType.BOTTOM;
+  @Local statusBarHeight: StatusBarHeight = AppStorageV2.connect(StatusBarHeight, AppStorageKeys.STATUS_BAR_HEIGHT,
+    () => new StatusBarHeight())!;
   webViewController: webview.WebviewController = new webview.WebviewController();
   stack: NavPathStack = new NavPathStack();
 
   @Computed
   get headerPaddingTop() {
     if (!this.isSheet) {
-      return undefined;
+      return `${this.getUIContext().px2vp(this.statusBarHeight.value)}vp`;
     }
     if (this.sheetType === SheetType.CENTER) {
       return Constants.PADDING_L;

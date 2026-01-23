@@ -48,7 +48,7 @@ struct LaunchAdPage {
     }
     .hideTitleBar(true)
     .onBackPressed(() => {
-      (getContext() as common.UIAbilityContext).terminateSelf()
+      (this.getUIContext().getHostContext() as common.UIAbilityContext).terminateSelf()
       return true
     })
   }

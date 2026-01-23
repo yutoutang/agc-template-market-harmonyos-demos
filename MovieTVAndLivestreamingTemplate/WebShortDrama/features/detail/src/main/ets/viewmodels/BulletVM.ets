@@ -1,6 +1,6 @@
 import { BulletItem } from '../models/BulletItem'
 import { BulletSettingItem, BulletSettingStorage } from '../models/BulletSettingData';
-import { MeasureText } from '@kit.ArkUI';
+import { MeasureText, window } from '@kit.ArkUI';
 
 const comments: Array<string> = [
   '我来组成弹幕大军', '第一次发有点小激动哦', '战争的确太残酷了', '说真的看不懂现在的电影了',
@@ -14,6 +14,7 @@ export class BulletVM {
   @Trace storage: BulletSettingStorage = BulletSettingStorage.instance();
   private createBullet: number = -1
   private timer: number = -1
+  windowStage: window.WindowStage = AppStorage.get('windowStage')!
 
   // 生成弹幕
   createBulletComment() {
@@ -30,11 +31,16 @@ export class BulletVM {
         this.xTrans = [...this.xTrans, this.xTrans.length < this.storage.setting.get('setting')?.rowsNum! ?
           400 + 10 * (this.xTrans.length % this.storage.setting.get('setting')?.rowsNum!) :
           (this.xTrans[this.xTrans.length -
-            this.storage.setting.get('setting')?.rowsNum!] + 30 + px2vp(MeasureText.measureText({
-            textContent: this.bulletComments[this.bulletComments.length - 1 -
-              this.storage.setting.get('setting')?.rowsNum!].content,
-            fontSize: `20vp`
-          })))]
+            this.storage.setting.get('setting')?.rowsNum!] + 30 + this.windowStage.getMainWindowSync()
+            .getUIContext()
+            .px2vp(this.windowStage.getMainWindowSync()
+              .getUIContext()
+              .getMeasureUtils()
+              .measureText({
+                textContent: this.bulletComments[this.bulletComments.length - 1 -
+                  this.storage.setting.get('setting')?.rowsNum!].content,
+                fontSize: `20vp`
+              })))]
       }
     }
   }

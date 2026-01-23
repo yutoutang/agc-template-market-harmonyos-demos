@@ -5,7 +5,8 @@
       {
         "name": "default",
         "signingConfig": "default",
-        "compatibleSdkVersion": "5.0.0(12)",
+        "targetSdkVersion": "6.0.1(21)",
+        "compatibleSdkVersion": "5.0.3(15)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
           "strictMode": {
@@ -50,32 +51,60 @@
       "srcPath": "./components/module_time_select"
     },
     {
-      "name": "module_search",
-      "srcPath": "./components/module_search"
-    },
-    {
-      "name": "module_category",
-      "srcPath": "./components/module_category"
+      "name": "category_list",
+      "srcPath": "./components/category_list"
     },
     {
       "name": "module_form",
       "srcPath": "./components/module_form"
     },
     {
-      "name": "module_city_select",
-      "srcPath": "./components/module_city_select"
-    },
-    {
-      "name": "module_address_manage",
-      "srcPath": "./components/module_address_manage"
+      "name": "address_management",
+      "srcPath": "./components/address_management"
     },
     {
       "name": "business_home",
-      "srcPath": "./features/business_home"
+      "srcPath": "./features/business_home",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
     },
     {
       "name": "business_mine",
-      "srcPath": "./features/business_mine"
+      "srcPath": "./features/business_mine",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "city_select",
+      "srcPath": "./components/city_select"
+    },
+    {
+      "name": "atomicservice_login",
+      "srcPath": "./components/atomicservice_login"
+    },
+    {
+      "name": "collect_personal_info",
+      "srcPath": "./components/collect_personal_info"
+    },
+    {
+      "name": "dial_panel",
+      "srcPath": "./components/dial_panel"
+    },
+    {
+      "name": "search",
+      "srcPath": "./components/search"
     }
   ]
 }

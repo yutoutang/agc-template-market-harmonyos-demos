@@ -1,9 +1,11 @@
 import { common, contextConstant } from '@kit.AbilityKit';
 import { fileUri, fileIo as fs } from '@kit.CoreFileKit';
-import { UIContext } from '@kit.ArkUI';
+import { UIContext, window } from '@kit.ArkUI';
 import { util } from '@kit.ArkTS';
 
 import { StandardCharsets } from '../common/CustomTypes';
+
+const windowStage: window.WindowStage = AppStorage.get('windowStage')!
 
 export class FileUtils {
   /**
@@ -12,7 +14,8 @@ export class FileUtils {
    * @param uiContext UI 上下文实例 (可选，不传将尝试通过追溯当前方法的调用链获取 UI Ability Context)
    */
   public static getUIAbilityContext(uiContext?: UIContext): common.UIAbilityContext | null {
-    const context: common.Context | undefined = uiContext ? uiContext.getHostContext() : getContext();
+    const context: common.Context | undefined = uiContext ? uiContext.getHostContext() : windowStage.getMainWindowSync()
+      .getUIContext().getHostContext();
     if (context) {
       return context as common.UIAbilityContext;
     } else {
@@ -149,7 +152,10 @@ export class FileUtils {
 
   private static safeClose(file: fs.File | null): void {
     if (file) {
-      try { fs.closeSync(file); } catch {}
+      try {
+        fs.closeSync(file);
+      } catch {
+      }
     }
   }
 }

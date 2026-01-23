@@ -76,8 +76,9 @@
     ],
     "metadata": [
       {
+// TODO: 替换Client ID
         "name": "client_id",
-        "value": "XXX"
+        "value": "******"
       }
     ]
   }

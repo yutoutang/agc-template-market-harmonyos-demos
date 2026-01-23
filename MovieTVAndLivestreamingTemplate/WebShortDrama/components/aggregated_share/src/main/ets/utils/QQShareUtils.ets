@@ -1,4 +1,4 @@
-import { promptAction } from '@kit.ArkUI';
+import { promptAction, window } from '@kit.ArkUI';
 import { ShareResultType, ShareData } from '@tencent/qq-open-sdk';
 import { QQShareContent, ShareViewData } from '../common/ShareParams';
 import { ShareService } from '../ShareService';
@@ -10,6 +10,7 @@ export class QQShareUtils {
   private static _instance: QQShareUtils;
   private shareService = ShareService.instance;
   shareData: ShareData = new ShareData();
+  windowStage: window.WindowStage = AppStorage.get('windowStage')!
 
   /**
    * 获取实例
@@ -28,7 +29,7 @@ export class QQShareUtils {
    */
   public async share(data: ShareViewData) {
     if (!this.shareService.qqOpenApi.isQQInstalled()) {
-      AlertDialog.show({ message: '请先安装QQ' });
+      this.windowStage.getMainWindowSync().getUIContext().showAlertDialog({ message: '请先安装QQ' });
       return;
     }
     const shareData: QQShareContent = {
@@ -43,16 +44,25 @@ export class QQShareUtils {
     let result = await this.shareService.qqOpenApi.share(2, signedShareData as ShareData);
     switch (result.resultType) {
       case ShareResultType.Success:
-        promptAction.showToast({ message: '分享成功' });
+        this.windowStage.getMainWindowSync()
+          .getUIContext()
+          .getPromptAction()
+          .showToast({ message: '分享成功' });
         if (data.autoClose) {
           data.closeSheet();
         }
         break;
       case ShareResultType.Cancel:
-        promptAction.showToast({ message: result.message ?? '分享取消' });
+        this.windowStage.getMainWindowSync()
+          .getUIContext()
+          .getPromptAction()
+          .showToast({ message: result.message ?? '分享取消' });
         break;
       case ShareResultType.Error:
-        promptAction.showToast({ message: '分享失败: ' + result.message });
+        this.windowStage.getMainWindowSync()
+          .getUIContext()
+          .getPromptAction()
+          .showToast({ message: '分享失败: ' + result.message });
         break;
     }
   }

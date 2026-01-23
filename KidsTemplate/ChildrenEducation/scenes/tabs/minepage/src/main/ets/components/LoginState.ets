@@ -1,21 +1,19 @@
-import { BusinessError, emitter } from '@kit.BasicServicesKit';
-import { CommonConstants, StringUtil } from '@ohos_agcit/children_education_utils';
-import { authentication } from '@kit.AccountKit';
-import { hilog } from '@kit.PerformanceAnalysisKit';
-import { User } from '@ohos_agcit/children_education_datasource';
+import { CommonConstants, QuickLoginUtil, StringUtil, rightArrow } from '@ohos_agcit/children_education_utils';
+import { User, VipRecord } from '@ohos_agcit/children_education_datasource';
 
 @ComponentV2
 export struct LoginState {
-  logTag: string = 'PrepareLoginPage';
+  logTag: string = 'LoginState';
   domainId: number = 0x0000;
   @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
-  @Consumer(CommonConstants.IS_VIP) isVip: boolean = false;
+  @Consumer(CommonConstants.VIP_RECORD) vipRecord: VipRecord = new VipRecord();
   @Consumer(CommonConstants.USER_INFO) user: User = new User();
 
   build() {
-    Row() {
+    Column() {
       Row() {
-        Image(this.user.isLogin && StringUtil.isNotEmpty(this.user.userAvatar) ? this.user.userAvatar : $r('app.media.avatar'))
+        Image(this.user.isLogin && StringUtil.isNotEmpty(this.user.userAvatar) ? this.user.userAvatar :
+          $r('app.media.avatar'))
           .width(45)
           .height(45)
           .borderRadius(100)
@@ -24,135 +22,66 @@ export struct LoginState {
             if (this.user.isLogin) {
               this.appPathStack.pushPathByName('PersonalInformation', undefined);
             } else {
-              this.getQuickLoginAnonymousPhone();
+              QuickLoginUtil.getQuickLoginAnonymousPhone(this.getUIContext(), this.appPathStack)
             }
           });
 
         Column({ space: 5 }) {
           Text(this.user.isLogin ? this.user.userName : '点击登录')
-            .fontSize(16)
+            .fontSize(18)
+            .lineHeight(24)
             .fontFamily('鸿蒙黑体')
             .fontWeight(FontWeight.Medium)
             .fontColor($r('sys.color.black'))
             .maxLines(1)
             .textOverflow({
-              overflow:TextOverflow.Ellipsis
+              overflow: TextOverflow.Ellipsis
             })
-            .onClick(() => {
-              if (this.user.isLogin) {
-                this.appPathStack.pushPathByName('PersonalInformation', undefined);
-              } else {
-                this.getQuickLoginAnonymousPhone();
-              }
-            });
         }
         .alignItems(HorizontalAlign.Start)
         .layoutWeight(1)
+        
+        Blank()
 
-        if (this.isVip) {
-          Row() {
-            Image($r('app.media.non_members'))
-              .width('4%')
-              .fillColor($r('sys.color.black'));
-
-            Text($r('app.string.is_vip'))
-              .fontSize(10)
-              .fontWeight(FontWeight.Regular)
-              .fontFamily('鸿蒙黑体')
-              .padding({
-                left: 2,
-              });
-          }
-          .margin({
-            left: '2%',
-          })
-          .border({
-            radius: 4,
-            width: {
-              top: 2,
-              bottom: 2,
-              left: 4,
-              right: 4,
-            },
-            color: '#F8E6CE',
-          })
-          .backgroundColor('#F8E6CE');
+        rightArrow()
+      }
+      .height(72)
+      .width(CommonConstants.FULL_PERCENT)
+      .onClick(() => {
+        if (this.user.isLogin) {
+          this.appPathStack.pushPathByName('PersonalInformation', undefined);
+        } else {
+          QuickLoginUtil.getQuickLoginAnonymousPhone(this.getUIContext(), this.appPathStack)
         }
-        Blank();
-        if (!this.isVip) {
-          Button($r('app.string.start_vip'))
-            .backgroundColor('#F8E6CE')
+      })
+      
+      if (this.user.isLogin) {
+        Divider()
+        
+        Row() {
+          Text('开通VIP后享受更多服务')
+            .fontSize(14)
             .fontColor($r('sys.color.font_primary'))
-            .fontSize($r('sys.float.Body_S'))
+          Button('会员中心')
+            .backgroundColor('#D3B685')
+            .fontColor($r('sys.color.font_primary'))
+            .fontSize($r('sys.float.Body_M'))
             .width('30%')
             .height(28)
             .onClick(() => {
-              let tabIndexData: emitter.EventData = {
-                data: {
-                  'tabIndex': 1,
-                },
-              };
-              emitter.emit(CommonConstants.TAB_INDEX, tabIndexData);
+              this.appPathStack.pushPathByName('MemberShipCenterPage', undefined);
             });
         }
+        .justifyContent(FlexAlign.SpaceBetween)
+        .height(56)
+        .width(CommonConstants.FULL_PERCENT)
       }
-      .width(CommonConstants.FULL_PERCENT)
-      .padding({ right: 12, left: 12 });
+
     }
-    .margin({ left: 8, right: 12 })
-    .height(72)
+    .height(this.user.isLogin ? 128 : 72)
     .backgroundColor($r('sys.color.comp_background_list_card'))
     .borderRadius(16)
+    .padding({ left: 12, right: 12 })
     .width(CommonConstants.FULL_PERCENT);
-  }
-
-  // Obtain the anonymous mobile number.
-  getQuickLoginAnonymousPhone() {
-    // Create an authorization request.
-    const authRequest = new authentication.HuaweiIDProvider().createAuthorizationWithHuaweiIDRequest();
-    // User information requested by the app.
-    authRequest.scopes = ['quickLoginAnonymousPhone'];
-    // In the one-tap sign-in scenario, forceAuthorization must be set to false.
-    authRequest.forceAuthorization = false;
-    const controller = new authentication.AuthenticationController();
-    try {
-      controller.executeRequest(authRequest).then((response: authentication.AuthorizationWithHuaweiIDResponse) => {
-        // Obtain the UnionID, OpenID, and anonymous mobile number.
-        const unionID = response.data?.unionID;
-        const openID = response.data?.openID;
-        const quickLoginAnonymousPhone = response.data?.extraInfo?.quickLoginAnonymousPhone as string;
-        AppStorage.setOrCreate('quickLoginAnonymousPhone', quickLoginAnonymousPhone);
-        this.jumpLoginPage(quickLoginAnonymousPhone);
-        hilog.info(this.domainId, this.logTag,
-          `Succeeded in authorizing. QuickLoginAnonymousPhone is ${quickLoginAnonymousPhone}`);
-      }).catch((error: BusinessError) => {
-        hilog.error(this.domainId, this.logTag,
-          `Failed to authorize. errCode is ${error.code}, errMessage is ${error.message}`);
-        this.getUIContext().getPromptAction().showToast({
-          message: '获取匿名手机号失败，使用mock登录'
-        })
-        const quickLoginAnonymousPhone = 'a00****0000';
-        AppStorage.setOrCreate('quickLoginAnonymousPhone', quickLoginAnonymousPhone);
-        this.jumpLoginPage(quickLoginAnonymousPhone);
-        // dealAllError(error);
-        // showToast(error);
-      });
-    } catch (error) {
-      hilog.error(this.domainId, this.logTag,
-        `Failed to authorize. errCode is ${error.code}, errMessage is ${error.message}`);
-    }
-  }
-
-  // Redirect to another page.
-  private jumpLoginPage(quickLoginAnonymousPhone: string) {
-    if (quickLoginAnonymousPhone) {
-      // Obtain the anonymous mobile number, pass it, and redirect to the one-tap sign-in screen.
-      const params: Record<string, Object> = { 'anonymousPhone': quickLoginAnonymousPhone };
-      this.appPathStack.pushPathByName('QuickLoginPage', params, true);
-    } else {
-      // If the anonymous mobile number cannot be obtained, an error message is displayed.
-      const hint: string = getContext().resourceManager.getStringSync($r('app.string.get_mobile_number_error'));
-      // showToast(hint);
-    }
   }
 }

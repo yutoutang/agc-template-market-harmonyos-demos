@@ -1,7 +1,7 @@
 import { AppStorageV2 } from '@kit.ArkUI'
 import { AiBarHeight, AppStorageKeys, StatusBarHeight } from '@agctemplate/widgets'
 import { appRouter, StringUtil } from '@agctemplate/utils'
-import { getColor, getString, NAV_PAGE_NAME } from '@agctemplate/resources'
+import { NAV_PAGE_NAME } from '@agctemplate/resources'
 import { DramaInfo } from '@agctemplate/server'
 import { DramaCoverVM } from '../viewmodels/DramaCoverVM'
 import { getRankList, getSearchList } from '../mapper/DramaCoverMapper'
@@ -143,7 +143,13 @@ struct SearchPage {
     }
     .title(this.titleBuilder())
     .backgroundColor('#F1F3F5')
-    .padding({ top: `${px2vp(this.statusBarHeight.value)}vp`, bottom: `${px2vp(this.aiBarHeight.value)}vp` })
+    .padding({ top: `${this.getUIContext().px2vp(this.statusBarHeight.value)}vp`, bottom: `${this.getUIContext().px2vp(this.aiBarHeight.value)}vp` })
+    .onReady((context:NavDestinationContext)=>{
+      const text = context.pathInfo.param as string
+      if(text){
+        this.doSearch(text, this.textController)
+      }
+    })
   }
 
   onDramaClick(option: DramaCoverVM, callback?: (popInfo: PopInfo) => void) {

@@ -102,7 +102,7 @@ export struct SearchPanel {
       }
       .width('100%')
     }
-    .margin({ left: 8 })
-    .width(280)
+    .padding({ left: 8,right: 8 })
+    .layoutWeight(1)
   }
 }

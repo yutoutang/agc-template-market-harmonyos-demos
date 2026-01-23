@@ -1,7 +1,13 @@
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit';
 import { BusinessError, emitter } from '@kit.BasicServicesKit';
-import { CommonConstants, dealQuickLoginError, showToast, QuickLoginErrorCode } from '@ohos_agcit/children_education_utils';
+import {
+  CommonConstants,
+  dealQuickLoginError,
+  QuickLoginErrorCode,
+  showToast,
+  ResourceUtil
+} from '@ohos_agcit/children_education_utils';
 import { connection } from '@kit.NetworkKit';
 import { common } from '@kit.AbilityKit';
 import { buffer } from '@kit.ArkTS';
@@ -17,6 +23,7 @@ const PRIVACY_URL = 'privacy_url';
 export struct QuickLoginPage {
   logTag: string = 'QuickLoginPage';
   domainId: number = 0x0000;
+  message: string = ''
   // File used to configure the link to the HUAWEI ID User Authentication Agreement.
   private readonly srcPath = 'data.json';
   // params?: Record<string, Object>;
@@ -50,9 +57,9 @@ export struct QuickLoginPage {
   }];
   controller: loginComponentManager.LoginWithHuaweiIDButtonController =
     new loginComponentManager.LoginWithHuaweiIDButtonController()
-      // Users need to accept relevant agreements before they can sign in wth HUAWEI IDs.
-      // Set the agreement status to NOT_ACCEPTED first. Once the user accepts the agreements,
-      // change the agreement status to ACCEPTED to complete HUAWEI ID sign-in.
+    // Users need to accept relevant agreements before they can sign in wth HUAWEI IDs.
+    // Set the agreement status to NOT_ACCEPTED first. Once the user accepts the agreements,
+    // change the agreement status to ACCEPTED to complete HUAWEI ID sign-in.
       .setAgreementStatus(loginComponentManager.AgreementStatus.NOT_ACCEPTED)
       .onClickLoginWithHuaweiIDButton((error: BusinessError, response: loginComponentManager.HuaweiIDCredential) => {
         // Process the logic of a tap on the one-tap sign-in button.
@@ -60,14 +67,19 @@ export struct QuickLoginPage {
         if (error) {
           if (this.isSelected) {
             // mock登录
-            let uerInfo: emitter.EventData = {
+            let userInfo: emitter.EventData = {
               data: {
                 isLogin: true,
-                userName: '华为用户',
-                phone: this.quickLoginAnonymousPhone
+                userName: '飞翔的猪',
+                fullName: '张三锋',
+                phone: this.quickLoginAnonymousPhone,
+                userAvatar: ResourceUtil.getString(this.getUIContext(), 'avatar_uri'),
+                gender: 0,
+                birthDate: '1996-01-01',
+                introDesc: '在自己的小世界里，做一个快乐的普通人，把节奏放慢，享受生活！十六岁的青春张扬 十八岁的未来可期，携零零碎碎的美好奔赴未知的将来！'
               },
             };
-            emitter.emit(CommonConstants.USER_INFO, uerInfo);
+            emitter.emit(CommonConstants.USER_INFO, userInfo);
 
             this.appPathStack.pop();
           } else {
@@ -90,6 +102,15 @@ export struct QuickLoginPage {
   @Local enableStatus: boolean = true;
   @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
 
+  aboutToAppear(): void {
+    try {
+      this.message =
+        this.getUIContext().getHostContext()!.resourceManager.getStringSync($r('app.string.read_and_agree_protocol').id)
+    } catch (error) {
+      this.message = ''
+    }
+  }
+
   // Method that processes a tap on the one-tap sign-in button.
   handleLoginWithHuaweiIDButton(error: BusinessError | undefined, response: loginComponentManager.HuaweiIDCredential) {
     this.enableStatus = false;
@@ -100,7 +121,7 @@ export struct QuickLoginPage {
         // If the agreements are not accepted, a pop-up message is displayed.
         this.showPopUp = true;
       } else {
-        showToast(error);
+        showToast(this.getUIContext(), error);
       }
       this.enableStatus = true;
       return;
@@ -120,14 +141,14 @@ export struct QuickLoginPage {
           // this.appPathStack?.pushPathByName('PersonalInfoPage', null, true);
 
 
-          let uerInfo: emitter.EventData = {
+          let userInfo: emitter.EventData = {
             data: {
               isLogin: true,
               userName: '华为用户',
               phone: this.quickLoginAnonymousPhone
             },
           };
-          emitter.emit(CommonConstants.USER_INFO, uerInfo);
+          emitter.emit(CommonConstants.USER_INFO, userInfo);
 
           this.appPathStack.pop();
         }
@@ -138,7 +159,7 @@ export struct QuickLoginPage {
     } catch (error) {
       hilog.error(this.domainId, this.logTag,
         `Failed to login with LoginWithHuaweiIDButton. errCode is ${error.code}, errMessage is ${error.message}`);
-      showToast(error as BusinessError);
+      showToast(this.getUIContext(), error as BusinessError);
     } finally {
       this.enableStatus = true;
     }
@@ -146,15 +167,24 @@ export struct QuickLoginPage {
 
   // Redirect to the HUAWEI ID User Authentication Agreement page.
   jumpToPrivacyWebView(privacyText: loginComponentManager.PrivacyText) {
-    const hasNet: boolean = connection.hasDefaultNetSync();
-    if (!hasNet) {
-      const hint: string = getContext().resourceManager.getStringSync($r('app.string.hwid_no_internet_connect'));
-      showToast(hint);
-      return;
+    try {
+      const hasNet: boolean = connection.hasDefaultNetSync();
+      if (!hasNet) {
+        const hint: string =
+          this.getUIContext().getHostContext()!.resourceManager.getStringSync($r('app.string.hwid_no_internet_connect')
+            .id);
+        showToast(this.getUIContext(), hint);
+        return;
+      }
+    } catch (error) {
+      hilog.error(this.domainId, this.logTag,
+        `Error occurred. errCode is ${error.code}, errMessage is ${error.message}`);
     }
+
     if (privacyText.tag && privacyText.tag !== '') {
       // Obtain the multi-language environment information of the system.
-      const systemLanguage: string = (getContext() as common.UIExtensionContext).config.language ?? '';
+      const systemLanguage: string =
+        (this.getUIContext().getHostContext() as common.UIExtensionContext).config.language ?? '';
       hilog.info(this.domainId, this.logTag, `systemLanguage is ${systemLanguage}`);
       const params: Record<string, Object> = { 'protocolUrl': privacyText.tag + systemLanguage };
       // Concatenate link parameters.
@@ -166,7 +196,8 @@ export struct QuickLoginPage {
   getProtocolUrl(privacyUrl: string): string {
     try {
       // Read files from /AppScope/resources/rawfile.
-      const value: Uint8Array = getContext().resourceManager.getRawFileContentSync(this.srcPath);
+      const value: Uint8Array =
+        this.getUIContext().getHostContext()!.resourceManager.getRawFileContentSync(this.srcPath);
       // Return the link to the HUAWEI ID User Authentication Agreement.
       return JSON.parse(buffer.from(value.buffer).toString())[privacyUrl] as string;
     } catch (error) {
@@ -281,7 +312,7 @@ export struct QuickLoginPage {
             }
             .padding({ right: 12 })
             .bindPopup(this.showPopUp, {
-              message: getContext().resourceManager.getStringSync($r('app.string.read_and_agree_protocol')),
+              message: this.message,
               onStateChange: (event) => {
                 this.showPopUp = event.isVisible;
               },

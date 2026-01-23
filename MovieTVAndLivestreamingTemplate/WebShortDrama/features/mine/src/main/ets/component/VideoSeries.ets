@@ -1,4 +1,6 @@
 import { getColor, getMedia, getString } from '@agctemplate/resources';
+import { AppStorageKeys, BreakPoint, BreakPointType, BreakPointValue } from '@agctemplate/widgets';
+import { AppStorageV2 } from '@kit.ArkUI';
 
 @ComponentV2
 export struct VideoSeries {
@@ -13,6 +15,8 @@ export struct VideoSeries {
   @Local isSelect: boolean = false
   @Event onContinueWatch: () => void
   @Event isSelectBack: (isSelect: boolean) => void
+  @Local currentBreakpoint: BreakPoint = AppStorageV2.connect(BreakPoint, AppStorageKeys.CURRENT_BREAK_POINT,
+    () => new BreakPoint(BreakPointValue.SM))!;
 
   @Monitor('isDeleting')
   onChange() {
@@ -43,15 +47,20 @@ export struct VideoSeries {
 
         Stack({ alignContent: Alignment.BottomEnd }) {
           Image(this.cover)
-            .width(104).height(138)
+            .width(new BreakPointType<number>({ sm: 99, md: 159, lg: 189 }).getValue(this.currentBreakpoint.value))
+            .height(new BreakPointType<number>({ sm: 131, md: 210, lg: 249 }).getValue(this.currentBreakpoint.value))
 
           if (this.isDeleting) {
             Row()
-              .width(104)
-              .height(138)
+              .width(new BreakPointType<number>({ sm: 99, md: 159, lg: 189 }).getValue(this.currentBreakpoint.value))
+              .height(new BreakPointType<number>({ sm: 131, md: 210, lg: 249 }).getValue(this.currentBreakpoint.value))
               .backgroundColor('#000000')
               .opacity(0.4)
-              .borderRadius(8)
+              .borderRadius(14)
+              .onClick(() => {
+                this.isSelect = !this.isSelect
+                this.isSelectBack(this.isSelect)
+              })
           }
 
           if (!this.isLike) {
@@ -91,9 +100,13 @@ export struct VideoSeries {
               x: -2, y: -10
             })
           }
-
         }
       }
+      .onClick(() => {
+        if (this.onContinueWatch) {
+          this.onContinueWatch()
+        }
+      })
 
       Column() {
         Text(this.title)
@@ -121,13 +134,8 @@ export struct VideoSeries {
       .layoutWeight(1)
 
     }
-    .width(104)
-    .height(183)
+    .width(new BreakPointType<number>({ sm: 97, md: 159, lg: 189 }).getValue(this.currentBreakpoint.value))
+    .height(new BreakPointType<number>({ sm: 176, md: 255, lg: 294 }).getValue(this.currentBreakpoint.value))
     .margin({ top: 8, bottom: 8 })
-    .onClick(() => {
-      if (this.onContinueWatch) {
-        this.onContinueWatch()
-      }
-    })
   }
 }

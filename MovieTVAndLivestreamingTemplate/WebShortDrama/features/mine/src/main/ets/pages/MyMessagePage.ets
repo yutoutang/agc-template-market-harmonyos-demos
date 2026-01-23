@@ -31,7 +31,7 @@ export struct MyMessagePage {
   @Local currentIndex: number = 0
   @Local commentDataList: Array<CommentData> = []
   @Local userInfo: UserInfoModel = AppStorageV2.connect(UserInfoModel, 'userInfo', () => new UserInfoModel())!
-  @Local myMessageList: Array<CommentData> = PreferenceUtil.getInstance(getContext())
+  @Local myMessageList: Array<CommentData> = PreferenceUtil.getInstance(this.getUIContext().getHostContext())
     .get(PreferConstant.MY_MESSAGE_LIST_SETTINGS, []) as Array<CommentData>
   @Local flagStorage: FlagStorage = FlagStorage.instance()
   @Local myMessageStorage: MyMessageStorage = MyMessageStorage.instance()
@@ -55,15 +55,17 @@ export struct MyMessagePage {
           if (this.currentIndex === 0) {
             this.myMessageList.map(item => item.replyList = [])
             this.isReplyListShow = false
-            PreferenceUtil.getInstance(getContext()).put(PreferConstant.MY_MESSAGE_LIST_SETTINGS, this.myMessageList)
+            PreferenceUtil.getInstance(this.getUIContext().getHostContext())
+              .put(PreferConstant.MY_MESSAGE_LIST_SETTINGS, this.myMessageList)
             this.myMessageList = [...this.myMessageList]
-            promptAction.showToast({ message: '操作成功' })
+            this.getUIContext().getPromptAction().showToast({ message: '操作成功' })
           } else {
             this.myMessageList.map(item => item.likeList = [])
             this.isLikeListShow = false
-            PreferenceUtil.getInstance(getContext()).put(PreferConstant.MY_MESSAGE_LIST_SETTINGS, this.myMessageList)
+            PreferenceUtil.getInstance(this.getUIContext().getHostContext())
+              .put(PreferConstant.MY_MESSAGE_LIST_SETTINGS, this.myMessageList)
             this.myMessageList = [...this.myMessageList]
-            promptAction.showToast({ message: '操作成功' })
+            this.getUIContext().getPromptAction().showToast({ message: '操作成功' })
           }
         },
       },
@@ -109,7 +111,7 @@ export struct MyMessagePage {
             if (this.myMessageList.length > 0) {
               this.deleteDialogController.open()
             } else {
-              promptAction.showToast({ message: '暂无未读消息' })
+              this.getUIContext().getPromptAction().showToast({ message: '暂无未读消息' })
             }
           }
         })

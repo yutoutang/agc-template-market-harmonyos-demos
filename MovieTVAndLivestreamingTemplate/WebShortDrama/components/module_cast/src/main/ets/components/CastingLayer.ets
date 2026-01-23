@@ -66,7 +66,7 @@ struct Header {
         .aspectRatio(1)
         .margin({ right: 8 })
         .onClick(() => {
-          promptAction.showToast({ message: '返回' })
+          this.getUIContext().getPromptAction().showToast({ message: '返回' })
           this.onBack?.()
         })
       Text(this.title)
@@ -103,7 +103,7 @@ struct ExitCastView {
     .height(40)
     .width(128)
     .onClick(() => {
-      promptAction.showToast({ message: 'exit' })
+      this.getUIContext().getPromptAction().showToast({ message: 'exit' })
       this.castService.endCasting()
     })
   }
@@ -167,14 +167,14 @@ struct ControlView {
           .fontSize(32)
           .fontColor([$r('sys.color.icon_on_primary')])
           .onClick(() => {
-            promptAction.showToast({ message: '音量+' })
+            this.getUIContext().getPromptAction().showToast({ message: '音量+' })
             this.castService.setVolumeByOffset(1)
           })
         SymbolGlyph($r('sys.symbol.speaker_minus'))
           .fontSize(32)
           .fontColor([$r('sys.color.icon_on_primary')])
           .onClick(() => {
-            promptAction.showToast({ message: '音量-' })
+            this.getUIContext().getPromptAction().showToast({ message: '音量-' })
             this.castService.setVolumeByOffset(-1)
           })
       }.height('100%')

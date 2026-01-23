@@ -8,10 +8,10 @@
   "dependencies": {
     "lib_foundation": "file:../../commons/lib_foundation",
     "module_base": "file:../../components/module_base",
-    "module_address_manage": "file:../../components/module_address_manage",
-    "module_category": "file:../../components/module_category",
+    "category_list":  "file:../../components/category_list",
     "business_home": "file:../../features/business_home",
-    "business_mine": "file:../../features/business_mine"
+    "business_mine": "file:../../features/business_mine",
+    "search": "file:../../components/search"
   }
 }
 

@@ -1,10 +1,6 @@
-import {
-  premiumInteractiveVideoData,
-  VideoCard,
-  videoDetail,
-  VideoDetail,
-} from '@ohos_agcit/children_education_datasource';
-import { CommonConstants, IconAndCount, TagLabelCard, Title } from '@ohos_agcit/children_education_utils';
+import { DataGenerator, VideoCard, VideoDetail } from '@ohos_agcit/children_education_datasource';
+import { CommonConstants, TagLabelCard, Title } from '@ohos_agcit/children_education_utils';
+import { VideoCover } from '../../components/VideoCover';
 
 @Builder
 export function PremiumInteractiveVideoListBuilder() {
@@ -18,30 +14,31 @@ export struct PremiumInteractiveVideoListView {
   private videoArray: Array<VideoCard> = [];
 
   aboutToAppear(): void {
-    this.videoArray = premiumInteractiveVideoData;
+    this.videoArray = DataGenerator.getPremiumInteractiveVideoData(this.getUIContext());
   }
 
   build() {
     NavDestination() {
-      List({ space: 18 }) {
+      List({ space: 16 }) {
         ForEach(this.videoArray, (item: VideoCard) => {
           ListItem() {
-            PremiumInteractiveVideoListItem({
-              videoCard: item,
-            });
+            Row() {
+              PremiumInteractiveVideoListItem({
+                videoCard: item,
+              })
+            }
+            .width('100%')
+            .justifyContent(FlexAlign.Center)
           }
-          .margin({
-            bottom: $r('app.float.12vp')
-          });
-
-        }, (item:VideoCard) => JSON.stringify(item));
+          .align(Alignment.Center)
+        }, (item: VideoCard) => JSON.stringify(item));
       }
       .width(CommonConstants.FULL_PERCENT)
       .scrollBar(BarState.Off)
       .layoutWeight(1)
       .padding({
-        right: '4%',
-        left: '4%'
+        right: 16,
+        left: 16
       })
     }
     .title(Title($r('app.string.interactive_section')))
@@ -60,38 +57,42 @@ struct PremiumInteractiveVideoListItem {
 
   build() {
     Column({ space: 10 }) {
-      RelativeContainer() {
-        Image(this.videoCard.imageUrl)
-          .aspectRatio(1.78)
-          .borderRadius(12)
-          .id(CommonConstants.IMAGE);
-        IconAndCount(CommonConstants.IMAGE, this.videoCard.isVip, this.videoCard.updateCount, this.videoCard.totalCount, '13%', '20%',
-          '25%');
-      }
-      .width('auto')
-      .height('auto')
-      .onClick(() => {
-        let detail: VideoDetail = videoDetail;
-        detail.videoCard = this.videoCard;
-        this.appPathStack.pushPathByName('VideoDetailListView', detail);
-      });
+      VideoCover({
+        imageUrl: this.videoCard.imageUrl,
+        isVip: this.videoCard.isVip,
+        updateCount: this.videoCard.updateCount,
+        totalCount: this.videoCard.totalCount,
+        imageWidth: 328,
+        imageHeight: 186
+      })
+        .onClick(() => {
+          let detail: VideoDetail = DataGenerator.getVideoDetail(this.getUIContext());
+          detail.videoCard = this.videoCard;
+          this.appPathStack.pushPathByName('VideoDetailListView', detail);
+        });
 
-      Row() {
-        Text(this.videoCard.title);
-      }
-      .width(CommonConstants.FULL_PERCENT)
-      .justifyContent(FlexAlign.Start);
+      Column() {
+        Text(this.videoCard.title)
+          .height(21)
+          .lineHeight(21)
+          .width('100%')
+        
+        Blank().height(2)
 
-      Row() {
-        ForEach(this.videoCard.tags, (item: string) => {
-          TagLabelCard(item);
-        }, (item:string) => item);
+        Row() {
+          ForEach(this.videoCard.tags, (item: string) => {
+            TagLabelCard(item);
+          }, (item: string) => item);
+        }
       }
+      .alignItems(HorizontalAlign.Start)
+      .height(41)
       .width(CommonConstants.FULL_PERCENT)
-      .justifyContent(FlexAlign.Start);
     }
+    .width(328)
+    .height(235)
+    .alignItems(HorizontalAlign.Start)
     .borderRadius($r('sys.float.corner_radius_level8'))
     .backgroundColor($r('sys.color.comp_background_list_card'))
-    .width(CommonConstants.FULL_PERCENT);
   }
 }

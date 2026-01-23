@@ -1,12 +1,16 @@
 import { MockService } from 'external_interactions';
-import { TitleBar } from 'uicomponents';
 import { window } from '@kit.ArkUI';
+import { TitleBar } from 'module_recharge/src/main/ets/components/TitleBar';
+import { ScreenPropStorage, AccountUpdate } from 'external_interactions'
+import { AppStorageV2 } from '@kit.ArkUI';
 
-@Component
+@ComponentV2
 export struct ClubEnvironmentDetail {
-  @StorageProp('topRectHeight') topRectHeight: number = 0;
-  @StorageProp('bottomRectHeight') bottomRectHeight: number = 0;
-  @Prop pathStack: NavPathStack;
+  @Local screenPropStorage: ScreenPropStorage =
+    AppStorageV2.connect(ScreenPropStorage, 'ScreenPropStorage', () => new ScreenPropStorage())!
+  @Local topRectHeight: number = this.screenPropStorage.topRectHeight;
+  @Local bottomRectHeight: number = this.screenPropStorage.bottomRectHeight;
+  @Param @Once pathStack: NavPathStack = new NavPathStack();
   controller: VideoController = new VideoController()
 
   @Builder
@@ -20,49 +24,31 @@ export struct ClubEnvironmentDetail {
       })
         .width('100%')
         .height(148)
-        .borderRadius(8)
-        .margin({ bottom: 5 })
-        .onFullscreenChange((event) => {
+        .borderRadius({ topLeft: 16, topRight: 16 })
+        .onFullscreenChange(async (event) => {
           // 改变设备横竖屏状态
-          window.getLastWindow(getContext(this)).then((lastWindow) => {
+          try {
+            let lastWindow = await window.getLastWindow(this.getUIContext().getHostContext()!)
             lastWindow.setPreferredOrientation(event.fullscreen ? window.Orientation.LANDSCAPE :
-            window.Orientation.PORTRAIT)
-          });
+              window.Orientation.PORTRAIT)
+          } catch (e) {
+            console.error(`Failed to get last window. error: ${JSON.stringify(e)}`)
+          }
         })
       Text('力健健身房配备齐全的器械设备，其中包括力量训练器械、有氧运动器械、功能性训练器械以及高科技健身设备等，满足不同健身需求。')
-        .fontSize(10)
+        .width('100%')
+        .fontSize(12)
+        .borderRadius({ bottomLeft: 16, bottomRight: 16 })
+        .backgroundColor(Color.White)
+        .padding({
+          top: 8,
+          right: 12,
+          bottom: 16,
+          left: 12
+        })
     }
     .width('100%')
-    .backgroundColor(Color.White)
-    .borderRadius(16)
-    .margin({ bottom: 15 })
-    .padding(16)
-  }
-
-  @Builder
-  swiperBuilder() {
-    Column() {
-      Swiper() {
-        ForEach(MockService.homeSwiperImageList, (item: string) => {
-          Image($r(item))
-            .width('100%')
-            .height('100%')
-        }, (item: string) => item)
-      }
-      .width('100%')
-      .height(148)
-      .borderRadius(8)
-      .margin({ bottom: 5 })
-      .curve(Curve.Smooth)
-
-      Text('力量训练；适当的力量训练，可以增强身体肌肉含量，保证身体足够蛋白质，提高免疫力，我们的力量区有优秀的教练，专业的器材。')
-        .fontSize(10)
-    }
-    .width('100%')
-    .backgroundColor(Color.White)
-    .borderRadius(16)
-    .margin({ bottom: 15 })
-    .padding(16)
+    .margin({ bottom: 12 })
   }
 
   @Builder
@@ -71,29 +57,39 @@ export struct ClubEnvironmentDetail {
       Image($r(imageStr))
         .width('100%')
         .height(148)
-        .borderRadius(8)
-        .margin({ bottom: 5 })
+        .borderRadius({ topLeft: 16, topRight: 16 })
       Text(text)
-        .fontSize(10)
+        .width('100%')
+        .fontSize(12)
+        .borderRadius({ bottomLeft: 16, bottomRight: 16 })
+        .backgroundColor(Color.White)
+        .padding({
+          top: 8,
+          right: 12,
+          bottom: 16,
+          left: 12
+        })
     }
     .width('100%')
-    .backgroundColor(Color.White)
-    .borderRadius(16)
-    .margin({ bottom: 15 })
-    .padding(16)
+    .margin({ bottom: 12 })
   }
 
   build() {
     NavDestination() {
       Column() {
-        TitleBar({ title: '俱乐部环境', pathStack: this.pathStack })
+        TitleBar({
+          title: '俱乐部环境', onBackClick: () => {
+            this.pathStack.pop()
+          }
+        })
           .margin({ left: 16, right: 16 })
         Scroll() {
           Column() {
             this.videoBuilder()
-            this.imageBuilder('app.media.material1',
+            this.imageBuilder('app.media.material5',
               '有氧训练；专业的有氧训练器材，宽敞的有氧训练场地，可以让你安全放松的完成一场有益身心的有氧训练。')
-            this.swiperBuilder()
+            this.imageBuilder('app.media.material11',
+              '力量训练；适当的力量训练，可以增强身体肌肉含量，保证身体足够蛋白质，提高免疫力，我们的力量区有优秀的教练，专业的器材。')
             this.imageBuilder('app.media.material8',
               '力量训练；适当的力量训练，可以增强身体肌肉含量，保证身体足够蛋白质，提高免疫力，我们的力量区有优秀的教练，专业的器材。')
           }
@@ -108,6 +104,7 @@ export struct ClubEnvironmentDetail {
     })
     .hideTitleBar(true)
     .backgroundColor($r('app.color.main_background_color'))
-    .padding({ top: px2vp(this.topRectHeight), bottom: px2vp(this.bottomRectHeight) })
+    .padding({ top: this.getUIContext().px2vp(this.topRectHeight),
+      bottom: this.getUIContext().px2vp(this.bottomRectHeight) })
   }
 }

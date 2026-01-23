@@ -85,12 +85,7 @@ export struct AboutPage {
             .width('100%')
             .height(64)
             .onClick(() => {
-              promptAction.showToast({ message: '已是最新版本' })
-              // if(this.needUpdate){
-              //   AppGalleryUtils.showUpdateDialog(getContext() as common.UIAbilityContext)
-              // } else {
-              //   promptAction.showToast({message:'已是最新版本'})
-              // }
+              this.getUIContext().getPromptAction().showToast({ message: '已是最新版本' })
             })
 
             Divider().width('100%').height(0.5).color($r('sys.color.comp_divider'))
@@ -130,7 +125,7 @@ export struct AboutPage {
         .backgroundColor($r('sys.color.background_secondary'))
         .width('100%')
         .height('100%')
-        .padding({ top: `${px2vp(this.statusBarHeight.value)}vp`, bottom: 36 })
+        .padding({ top: `${this.getUIContext().px2vp(this.statusBarHeight.value)}vp`, bottom: 36 })
 
         Column() {
           Text('苏ICP备17040376号-135A')

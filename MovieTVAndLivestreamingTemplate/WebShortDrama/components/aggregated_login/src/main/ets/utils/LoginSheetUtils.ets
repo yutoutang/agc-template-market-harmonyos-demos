@@ -2,6 +2,7 @@ import { Constants, LoginChannelType } from '../common/Constant';
 import { Channel, LoginFailError, LoginSheetParams, PrivacyContent } from '../model/Index';
 import { PopViewUtils } from './PopViewUtils';
 import { LoginController, ApiController } from './Utils';
+import { window } from '@kit.ArkUI';
 
 @Builder
 function loginSheetBuilder(params: LoginInfoOptions) {
@@ -57,6 +58,8 @@ export class LoginInfoOptions {
 /**
  * 统一登录半模态弹窗
  */
+const windowStage: window.WindowStage = AppStorage.get('windowStage')!
+
 export class LoginSheetUtils {
   static sheetParams: LoginSheetParams = new LoginSheetParams();
 
@@ -69,7 +72,7 @@ export class LoginSheetUtils {
       dragBar: true,
       scrollSizeMode: ScrollSizeMode.CONTINUOUS,
       onHeightDidChange: (height: number) => {
-        LoginSheetUtils.sheetParams.height = px2vp(height);
+        LoginSheetUtils.sheetParams.height = windowStage.getMainWindowSync().getUIContext().px2vp(height);
       },
       onTypeDidChange: (type: SheetType) => {
         LoginSheetUtils.sheetParams.sheetType = type;

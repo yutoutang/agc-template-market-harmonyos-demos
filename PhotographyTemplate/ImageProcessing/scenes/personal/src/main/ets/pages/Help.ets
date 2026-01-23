@@ -1,37 +1,39 @@
-import { TitleBar } from 'common';
+import { TitleBar } from 'commonlib';
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { promptAction } from '@kit.ArkUI';
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
+
 export const PHONE_REG = /^[1][3,4,5,6,7,8,9][0-9]{9}$/;
+
 @Component
 export struct HelpPage {
   @StorageProp('topRectHeight') topRectHeight: number = 0;
   @StorageProp('bottomRectHeight') bottomRectHeight: number = 0;
   @Prop pathStack: NavPathStack;
-  @State imageUri?: string = undefined
-  @State inputValue: string = ''
-  @State inputNumber: string = ''
+  @State imageUri?: string = undefined;
+  @State inputValue: string = '';
+  @State inputNumber: string = '';
 
   build() {
     NavDestination() {
       TitleBar({
         pathStack: this.pathStack,
         isBack: true,
-        title: '帮助与反馈'
-      }).margin({ bottom: 20, left: 16, right: 16 })
+        title: '帮助与反馈',
+      }).margin({ bottom: 20, left: 16, right: 16 });
       Column() {
         Text() {
           Span('*')
             .fontSize(12)
-            .fontColor('#DB6B42')
+            .fontColor('#DB6B42');
           Span('反馈内容')
             .fontSize(16)
-            .opacity(0.6)
+            .opacity(0.6);
         }
         .width('100%')
         .margin({ top: 13 })
         .padding({ left: 8 })
-        .textAlign(TextAlign.Start)
+        .textAlign(TextAlign.Start);
 
         TextArea({ placeholder: '请输入详细内容，以便我们更好的理解您的诉求', text: $$this.inputValue })
           .fontSize(14)
@@ -39,11 +41,11 @@ export struct HelpPage {
           .margin(12)
           .borderRadius(16)
           .height(162)
-          .showCounter(true)
+          .showCounter(true);
       }
       .backgroundColor($r('sys.color.comp_background_list_card'))
       .borderRadius(16)
-      .margin({ left: 16, right: 16, bottom: 16 })
+      .margin({ left: 16, right: 16, bottom: 16 });
 
       Column() {
         Text('附加图片/视频')
@@ -51,25 +53,25 @@ export struct HelpPage {
           .opacity(0.6)
           .width('100%')
           .textAlign(TextAlign.Start)
-          .margin({ bottom: 12 })
+          .margin({ bottom: 12 });
 
         if (this.imageUri) {
           Image(this.imageUri)
             .width(64)
             .height(64)
-            .borderRadius(8)
+            .borderRadius(8);
         } else {
           Row() {
             Image($r('app.media.add_image'))
               .width(24)
-              .height(24)
+              .height(24);
           }
           .justifyContent(FlexAlign.Center)
           .alignItems(VerticalAlign.Center)
           .width(64)
           .height(64)
           .borderRadius(8)
-          .backgroundColor('#E5E5EA')
+          .backgroundColor('#E5E5EA');
         }
       }
       .alignItems(HorizontalAlign.Start)
@@ -78,37 +80,37 @@ export struct HelpPage {
       .padding(12)
       .margin({ left: 16, right: 16, bottom: 16 })
       .onClick(() => {
-        this.choosePicture()
-      })
+        this.choosePicture();
+      });
 
       Column() {
         Text() {
           Span('*')
             .fontSize(12)
-            .fontColor('#DB6B42')
+            .fontColor('#DB6B42');
           Span('联系方式')
             .fontSize(16)
-            .opacity(0.6)
+            .opacity(0.6);
         }
         .width('100%')
         .margin({ top: 13 })
         .padding({ left: 8 })
-        .textAlign(TextAlign.Start)
+        .textAlign(TextAlign.Start);
 
-        TextInput({ placeholder: '请输入',text: $$this.inputNumber  })
+        TextInput({ placeholder: '请输入', text: $$this.inputNumber })
           .fontSize(16)
           .margin(12)
           .borderRadius(0)
           .backgroundColor(Color.White)
           .padding(0)
           .maxLength(11)
-          .type(InputType.Number)
+          .type(InputType.Number);
         Divider()
-          .margin({ left: 12, right: 12, bottom: 12 })
+          .margin({ left: 12, right: 12, bottom: 12 });
       }
       .backgroundColor($r('sys.color.comp_background_list_card'))
       .borderRadius(16)
-      .margin({ left: 16, right: 16, bottom: 107 })
+      .margin({ left: 16, right: 16, bottom: 107 });
 
       Row() {
         Text('保存')
@@ -116,7 +118,7 @@ export struct HelpPage {
           .fontWeight(FontWeight.Medium)
           .fontColor(Color.White)
           .width('100%')
-          .textAlign(TextAlign.Center)
+          .textAlign(TextAlign.Center);
       }
       .height(40)
       .backgroundColor('#ED6F21')
@@ -124,26 +126,26 @@ export struct HelpPage {
       .borderRadius(20)
       .onClick(() => {
         if (!this.inputValue) {
-          promptAction.showToast({ message: '请输入反馈内容' })
+          promptAction.showToast({ message: '请输入反馈内容' });
         } else if (!this.inputNumber) {
-          promptAction.showToast({ message: '请输入联系方式' })
+          promptAction.showToast({ message: '请输入联系方式' });
         } else if (!PHONE_REG.test(this.inputNumber)) {
-          promptAction.showToast({ message: '手机号格式不正确' })
+          promptAction.showToast({ message: '手机号格式不正确' });
         } else {
-          promptAction.showToast({ message: '保存成功' })
-          this.pathStack.pop()
+          promptAction.showToast({ message: '保存成功' });
+          this.pathStack.pop();
         }
-      })
+      });
     }
     .onReady((ctx: NavDestinationContext) => {
-      this.pathStack = ctx.pathStack
+      this.pathStack = ctx.pathStack;
     })
     .hideTitleBar(true)
     .backgroundColor($r('app.color.main_background_color'))
     .padding({
-      top: px2vp(this.topRectHeight),
-      bottom: px2vp(this.bottomRectHeight)
-    })
+      top: this.getUIContext().px2vp(this.topRectHeight),
+      bottom: this.getUIContext().px2vp(this.bottomRectHeight),
+    });
   }
 
   choosePicture() {
@@ -157,7 +159,7 @@ export struct HelpPage {
       // 选择图片并获取图片URI
       photoViewPicker.select(photoSelectOptions).then((result: photoAccessHelper.PhotoSelectResult) => {
         if (result.photoUris.length > 0) {
-          this.imageUri = result.photoUris[0]
+          this.imageUri = result.photoUris[0];
         }
       }).catch((err: BusinessError) => {
         console.error(`PhotoViewPicker.select failed with err: ${err.code}, ${err.message}`);

@@ -1,7 +1,14 @@
-import { AlertDialog, AppStorageV2 } from '@kit.ArkUI'
-import { appRouter, PreferConstant, PreferenceUtil } from '@agctemplate/utils'
+import { AlertDialog, AppStorageV2, LengthMetrics } from '@kit.ArkUI'
+import { appRouter } from '@agctemplate/utils'
 import { TopBar } from '../component/TopBar'
-import { AppStorageKeys, MinePageVM, StatusBarHeight } from '@agctemplate/widgets';
+import {
+  AppStorageKeys,
+  BreakPoint,
+  BreakPointType,
+  BreakPointValue,
+  MinePageVM,
+  StatusBarHeight
+} from '@agctemplate/widgets';
 import { getMedia } from '@agctemplate/resources';
 
 @Preview
@@ -16,6 +23,8 @@ export struct MyPreferencesPage {
   @Local category: CardItem[] = this.categoryName.map(item => new CardItem(item))
   @Local vm: MinePageVM = MinePageVM.instance
   @Local btnState: boolean = false
+  @Local currentBreakpoint: BreakPoint = AppStorageV2.connect(BreakPoint, AppStorageKeys.CURRENT_BREAK_POINT,
+    () => new BreakPoint(BreakPointValue.SM))!;
   deleteDialogController: CustomDialogController = new CustomDialogController({
     builder: AlertDialog({
       content: '是否清除偏好?',
@@ -109,7 +118,7 @@ export struct MyPreferencesPage {
               })
               .clip(true)
               .justifyContent(FlexAlign.SpaceBetween)
-              .width(160)
+              .width('48%')
               .height(64)
               .borderRadius(16)
               .backgroundColor(item.isSelect ? 'rgba(236, 110, 69, 0.2)' : $r('sys.color.comp_background_tertiary'))
@@ -132,7 +141,17 @@ export struct MyPreferencesPage {
           }
           .height(56)
 
-          Flex({ wrap: FlexWrap.Wrap, justifyContent: FlexAlign.Start }) {
+          Flex({
+            wrap: FlexWrap.Wrap,
+            justifyContent: FlexAlign.Start,
+            space: {
+              main: new BreakPointType<LengthMetrics>({
+                sm: LengthMetrics.vp(8),
+                md: LengthMetrics.vp(10),
+                lg: LengthMetrics.vp(16)
+              }).getValue(this.currentBreakpoint.value)
+            }
+          }) {
             ForEach(this.category, (item: CardItem, index: number) => {
               Column() {
                 Text(item.name)
@@ -141,43 +160,54 @@ export struct MyPreferencesPage {
                   .fontWeight(500)
                   .lineHeight(19)
                   .fontColor($r('sys.color.font_primary'))
-                  .margin({ left: 12 })
                   .onClick(() => {
                     item.isSelect = !item.isSelect
                     this.updateBtnState()
                   })
-                  .width(76)
+                  .width(new BreakPointType<number>({
+                    sm: 76,
+                    md: 76,
+                    lg: 86
+                  }).getValue(this.currentBreakpoint.value))
                   .height(28)
                   .borderRadius(14)
                   .backgroundColor(item.isSelect ? 'rgba(236, 110, 69, 0.2)' : $r('sys.color.comp_background_tertiary'))
               }
               .margin({ bottom: 8 })
-              .width('25%')
             }, (item: CardItem, index: number) => item.name + index)
           }
 
           Blank()
-          Button('保存')
-            .borderRadius(20)
-            .fontColor($r('sys.color.font_on_primary'))
-            .backgroundColor('#EE5D1A')
-            .fontSize($r('sys.float.Body_L'))
-            .fontWeight(FontWeight.Medium)
-            .width('100%')
-            .height(40)
-            .enabled(this.btnState)
-            .onClick(() => {
-              this.vm.userInfo.channels =
-                new Set(this.channels.filter(channel => channel.isSelect).map(channel => channel.name))
-              this.vm.userInfo.category =
-                new Set(this.category.filter(category => category.isSelect).map(category => category.name))
-              this.getUIContext().getPromptAction().showToast({ message: '保存成功' })
-              this.updateBtnState()
-            })
-
+          Column() {
+            Button('保存')
+              .borderRadius(20)
+              .fontColor($r('sys.color.font_on_primary'))
+              .backgroundColor('#EE5D1A')
+              .fontSize($r('sys.float.Body_L'))
+              .fontWeight(FontWeight.Medium)
+              .width('100%')
+              .constraintSize({
+                maxWidth: 448
+              })
+              .height(40)
+              .enabled(this.btnState)
+              .onClick(() => {
+                this.vm.userInfo.channels =
+                  new Set(this.channels.filter(channel => channel.isSelect).map(channel => channel.name))
+                this.vm.userInfo.category =
+                  new Set(this.category.filter(category => category.isSelect).map(category => category.name))
+                this.getUIContext().getPromptAction().showToast({ message: '保存成功' })
+                this.updateBtnState()
+              })
+          }
+          .width('100%')
+          .justifyContent(FlexAlign.Center)
         }
         .alignItems(HorizontalAlign.Start)
         .width('100%')
+        .constraintSize({
+          maxWidth: 805
+        })
         .layoutWeight(1)
       }
       .width('100%')
@@ -189,7 +219,7 @@ export struct MyPreferencesPage {
     }
     .backgroundColor($r('sys.color.background_secondary'))
     .hideTitleBar(true)
-    .padding({ top: `${px2vp(this.statusBarHeight.value)}vp`, bottom: 36 })
+    .padding({ top: `${this.getUIContext().px2vp(this.statusBarHeight.value)}vp`, bottom: 36 })
   }
 
   @Builder

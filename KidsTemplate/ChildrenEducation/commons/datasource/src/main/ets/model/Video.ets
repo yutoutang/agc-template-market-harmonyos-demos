@@ -1,9 +1,3 @@
-export interface Category {
-  imageUrl: string,
-  text: string,
-  categoryId: string
-}
-
 export interface VideoCard {
   id: string,
   title: string,

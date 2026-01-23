@@ -35,7 +35,8 @@ class ActionSheetOption {
   /**
    * 自定义内容
    */
-  customContent?: () => void = () => {}
+  customContent?: () => void = () => {
+  }
   /**
    * 打开回调
    */
@@ -92,6 +93,7 @@ interface contentNodeMapVal {
 class ActionSheet {
   private uiContext: UIContext | null = null
   private contentNodeMap: Map<string, contentNodeMapVal> = new Map()
+  windowStage: window.WindowStage = AppStorage.get('windowStage')!
 
   /*
    * 展示actionSheet
@@ -99,7 +101,8 @@ class ActionSheet {
   public async show(option: ActionSheetOption) {
     let key = option.id ?? this.getUniKey()
     if (this.uiContext === null) {
-      let windowClass: window.Window = await window.getLastWindow(getContext())
+      let windowClass: window.Window =
+        await window.getLastWindow(this.windowStage.getMainWindowSync().getUIContext().getHostContext())!
       this.uiContext = windowClass.getUIContext()
     }
     let params = new ActionSheetParams(option)
@@ -123,7 +126,7 @@ class ActionSheet {
       onDisappear: () => {
         params.onClose?.()
       },
-      onWillAppear:() => {
+      onWillAppear: () => {
         params.onWillAppear?.()
       }
     }

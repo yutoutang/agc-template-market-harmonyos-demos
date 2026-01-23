@@ -1,0 +1,11 @@
+{
+  "module": {
+    "name": "camera_lut",
+    "type": "shared",
+    "description": "$string:shared_desc",
+    "deviceTypes": [
+      "phone",
+    ],
+    "deliveryWithInstall": true,
+  }
+}

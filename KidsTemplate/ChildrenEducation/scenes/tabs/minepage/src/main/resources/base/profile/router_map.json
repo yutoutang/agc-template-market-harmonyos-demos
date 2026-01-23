@@ -26,14 +26,24 @@
       "buildFunction": "ContactUsBuilder"
     },
     {
+      "name": "FeedbackPage",
+      "pageSourceFile": "src/main/ets/views/feedback/FeedbackPage.ets",
+      "buildFunction": "FeedbackBuilder"
+    },
+    {
       "name": "QuickLoginPage",
       "pageSourceFile": "src/main/ets/views/login/QuickLoginPage.ets",
       "buildFunction": "QuickLoginPageBuilder"
     },
     {
       "name": "PersonalInformation",
-      "pageSourceFile": "src/main/ets/views/login/PersonalInformation.ets",
+      "pageSourceFile": "src/main/ets/views/login/PersonalInformationPage.ets",
       "buildFunction": "PersonalInformationBuilder"
+    },
+    {
+      "name": "MemberShipCenterPage",
+      "pageSourceFile": "src/main/ets/views/membership/MemberShipCenterPage.ets",
+      "buildFunction": "MemberShipBuilder"
     }
   ]
 }

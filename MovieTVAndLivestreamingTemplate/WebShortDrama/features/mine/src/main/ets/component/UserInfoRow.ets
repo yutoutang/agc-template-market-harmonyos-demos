@@ -11,7 +11,7 @@ export struct UserInfoRow {
   @Param isSwitch: boolean = false
 
   aboutToAppear(): void {
-    this.isToggleOn = PreferenceUtil.getInstance(getContext()).get(
+    this.isToggleOn = PreferenceUtil.getInstance(this.getUIContext().getHostContext()).get(
       PreferConstant.BACKGROUND_MINI_WINDOW_PLAYBACK, false) as boolean
   }
 

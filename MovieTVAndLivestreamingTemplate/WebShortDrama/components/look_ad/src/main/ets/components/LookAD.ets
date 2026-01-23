@@ -12,15 +12,14 @@ export struct LookAD {
     new SignInClass(100),
     new SignInClass(100),
     new SignInClass(100)]
-  @Event onLookSuccess: (balance:number) => void
+  @Event onLookSuccess: (balance: number) => void
   @Provider('leftCount') claimedCount: number = 0
-  @Param adId:string = 'testx9dtjwj8hp'
-  @Param adType:number = 7
-  @Param award:string = '领看点'
+  @Param adId: string = 'testx9dtjwj8hp'
+  @Param adType: number = 7
+  @Param award: string = '领看点'
   private context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
   windowStage: window.WindowStage = AppStorage.get('windowStage') as window.WindowStage;
   mainWin: window.Window = this.windowStage.getMainWindowSync();
-
   // 广告请求参数
   private adRequestParams: advertising.AdRequestParams = {
     // 'testx9dtjwj8hp'为测试专用的广告位ID，App正式发布时需要改为正式的广告位ID
@@ -49,7 +48,7 @@ export struct LookAD {
 
   build() {
     TYCard({
-      award:this.award
+      award: this.award
     }) {
       Row() {
         ForEach(this.list, (item: SignInClass, index: number) => {
@@ -68,13 +67,14 @@ export struct LookAD {
             .margin({ bottom: 12 })
 
             Button(item.isClaim ? $r('app.string.completed') : this.award)
-              .enabled(!item.isClaim)
+              .enabled(!item.isClaim && item.isFirstClick)
               .fontWeight(FontWeight.Medium)
               .fontColor(item.isClaim ? $r('sys.color.font_tertiary') : '#EC6E45')
               .width(72)
               .height(28)
               .backgroundColor(item.isClaim ? $r('sys.color.comp_background_tertiary') : 'rgba(236,110,69,0.1)')
               .onClick(() => {
+                item.isFirstClick = false
                 this.handleButtonClick(item, index)
                 let sysBarProps: window.SystemBarProperties = {
                   statusBarColor: '#00000000',
@@ -107,7 +107,7 @@ export struct LookAD {
    * 去看广告
    */
   toAD(item: SignInClass, index: number) {
-    promptAction.showToast({ message: `去看广告${index + 1}` })
+    this.getUIContext().getPromptAction().showToast({ message: `去看广告${index + 1}` })
     this.loadAd(item)
   }
 

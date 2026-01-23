@@ -1,11 +1,28 @@
 import { CommonServiceModel, mineCommonService } from '@ohos_agcit/children_education_datasource';
 import { CommonConstants, rightArrow } from '@ohos_agcit/children_education_utils';
+import { DialPanel } from 'dial_panel';
 
 @ComponentV2
 export struct CommonServices {
-  isLogin: string = '未登录';
   @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
+  private uiContext: UIContext = this.getUIContext();
   private mineCommonService: Array<CommonServiceModel> = mineCommonService;
+  private dialPanel: DialPanel = new DialPanel(this.uiContext)
+    .onMakeCall((e: BusinessError<void>): void => {
+      if (e.code) {
+        this.showToast(`拨号页面跳转失败 -> code: ${e.code}, msg: ${e.message}`);
+      }
+    })
+    .onWillDismiss((reason: DismissReason): void => {
+      this.dialPanel.close();
+    });
+
+  private showToast(msg: string): void {
+    try {
+      this.uiContext.getPromptAction().showToast({ message: msg });
+    } catch (error) {
+    }
+  }
 
   build() {
     Row() {
@@ -25,6 +42,15 @@ export struct CommonServices {
           .width(CommonConstants.FULL_PERCENT)
           .padding({ bottom: index !== mineCommonService.length - 1 ? 0 :25 })
           .onClick(() => {
+            if (item.pageName === 'ContactUs') {
+              this.dialPanel
+                .setTitle('联系客服')
+                .setPhoneNumber('12345678901')
+                .setAutoClosePanel(true)
+                .open();
+              return
+            }
+            
             this.appPathStack.pushPathByName(item.pageName, undefined);
           });
 

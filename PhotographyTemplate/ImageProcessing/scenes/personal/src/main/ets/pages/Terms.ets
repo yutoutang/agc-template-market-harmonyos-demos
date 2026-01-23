@@ -1,10 +1,11 @@
-import { TitleBar } from 'common';
+import { TitleBar } from 'commonlib';
 
 @Component
 export struct TermsPage {
   @StorageProp('topRectHeight') topRectHeight: number = 0;
   @StorageProp('bottomRectHeight') bottomRectHeight: number = 0;
   @Prop pathStack: NavPathStack;
+  ctx:UIContext = this.getUIContext()
 
   build() {
     NavDestination() {
@@ -35,8 +36,8 @@ export struct TermsPage {
     .hideTitleBar(true)
     .backgroundColor($r('app.color.main_background_color'))
     .padding({
-      top: px2vp(this.topRectHeight),
-      bottom: px2vp(this.bottomRectHeight)
+      top: this.getUIContext().px2vp(this.topRectHeight),
+      bottom: this.getUIContext().px2vp(this.bottomRectHeight)
     })
   }
 }

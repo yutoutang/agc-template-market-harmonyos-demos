@@ -9,7 +9,7 @@ export function FeedTitle(imgUrl: string, title: string, callback: Callback<void
       .padding({ right: 5 });
 
     Text(title)
-      .fontSize(20)
+      .fontSize($r('sys.float.Subtitle_L'))
       .alignSelf(ItemAlign.Center)
       .fontWeight(FontWeight.Bold);
 
@@ -35,7 +35,7 @@ export function FeedTitle(imgUrl: string, title: string, callback: Callback<void
 }
 
 @Builder
-export function rightArrow (){
+export function rightArrow() {
   SymbolGlyph($r('sys.symbol.chevron_right'))
     .fontColor([$r('sys.color.ohos_id_color_foreground')])
     .opacity(0.3)

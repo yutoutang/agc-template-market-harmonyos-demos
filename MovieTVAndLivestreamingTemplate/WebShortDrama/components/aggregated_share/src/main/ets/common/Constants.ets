@@ -14,7 +14,7 @@ export class CommonConstants {
   public static readonly DEFAULT_AUTO = 'auto';
   public static readonly DEFAULT_IMG_RATIO = 4 / 3;
   public static readonly DEFAULT_IMG_MAX_WIDTH = 240;
-  public static readonly DEFAULT_IMG_MAX_HEIGHT = 320;
+  public static readonly DEFAULT_IMG_MAX_HEIGHT = 290;
   public static readonly DEFAULT_POSTER_MAX_WIDTH = 264;
   public static readonly DEFAULT_POSTER_MAX_HEIGHT = 535;
   public static readonly DEFAULT_LONG_IMG_RATIO = 1 / 2;

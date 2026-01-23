@@ -1,5 +1,5 @@
 import { getMedia, NAV_PAGE_NAME } from '@agctemplate/resources'
-import { UserInfoModel } from '@agctemplate/widgets';
+import { AppStorageKeys, BreakPoint, BreakPointType, BreakPointValue, UserInfoModel } from '@agctemplate/widgets';
 import { AppStorageV2, ComponentContent, display } from '@kit.ArkUI'
 import { commentInputDialogBuilder } from './CommentInputDialog'
 import { BusinessError, deviceInfo } from '@kit.BasicServicesKit';
@@ -11,7 +11,6 @@ const TAG = '[CommentComp]'
 
 @ComponentV2
 export struct CommentComp {
-
   @Param @Require dramaInfo: DramaInfo
   @Local userInfo: UserInfoModel = AppStorageV2.connect(UserInfoModel, 'userInfo', () => new UserInfoModel())!;
   private contentNode: ComponentContent<Object> =
@@ -27,24 +26,39 @@ export struct CommentComp {
   @Local commentId: number = 1
   @Local replyPerson: string = ''
   @Local replyContent: string = ''
+  @Local currentBreakpoint: BreakPoint = AppStorageV2.connect(BreakPoint, AppStorageKeys.CURRENT_BREAK_POINT,
+    () => new BreakPoint(BreakPointValue.SM))!;
+  @Local isExpanded: boolean = display.getFoldStatus() === display.FoldStatus.FOLD_STATUS_EXPANDED
   @Local isTabletLandScape: boolean = deviceInfo.deviceType === 'tablet' &&
-    display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE
+    (display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE ||
+      display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE_INVERTED)
   @Event commentNum: Function = () => {
   }
   @Event closeSheet: Function = () => {
   }
-  callback:Callback<number> = (data:number) =>{
-    if(deviceInfo.deviceType === 'tablet' &&
-      display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE){
+  callback: Callback<number> = (data: number) => {
+    if (deviceInfo.deviceType === 'tablet' &&
+      (display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE ||
+        display.getDefaultDisplaySync().orientation === display.Orientation.LANDSCAPE_INVERTED)) {
       this.isTabletLandScape = true
-    }else{
+    } else {
       this.isTabletLandScape = false
     }
   }
+  callback2: Callback<display.FoldStatus> = (data: display.FoldStatus) => {
+    if (data === display.FoldStatus.FOLD_STATUS_EXPANDED) {
+      this.isExpanded = true
+    } else {
+      this.isExpanded = false
+    }
+  }
+
   // 发布评论
   publishComment(textComment: string): void {
     if (this.contentNode !== null) {
-      this.getUIContext().getPromptAction().closeCustomDialog(this.contentNode)
+      this.getUIContext()
+        .getPromptAction()
+        .closeCustomDialog(this.contentNode)
         .then(() => {
           Logger.info(TAG, 'CloseCustomDialog complete.')
         })
@@ -76,7 +90,9 @@ export struct CommentComp {
   // 回复评论
   replyComment(textComment: string): void {
     if (this.replyNode !== null) {
-      this.getUIContext().getPromptAction().closeCustomDialog(this.replyNode)
+      this.getUIContext()
+        .getPromptAction()
+        .closeCustomDialog(this.replyNode)
         .then(() => {
           Logger.info(TAG, 'CloseCustomDialog complete.')
         })
@@ -88,7 +104,7 @@ export struct CommentComp {
     }
     let index: number = -1
     this.commentDataList.forEach((item) => {
-      if(item.id === this.commentId) {
+      if (item.id === this.commentId) {
         index = this.commentDataList.indexOf(item)
       }
     })
@@ -112,9 +128,9 @@ export struct CommentComp {
     })
   }
 
-
   aboutToAppear(): void {
-    display.on('change',this.callback)
+    display.on('foldStatusChange', this.callback2)
+    display.on('change', this.callback)
     container.resolve(RequestAPI).getCommentList({
       pageSize: 1,
       pageNum: 20
@@ -141,7 +157,8 @@ export struct CommentComp {
   }
 
   aboutToDisappear(): void {
-    display.off('change',this.callback)
+    display.off('foldStatusChange', this.callback2)
+    display.off('change', this.callback)
   }
 
   openReplyDialog() {
@@ -162,7 +179,6 @@ export struct CommentComp {
       })
   }
 
-
   openDialog() {
     this.getUIContext().getPromptAction().openCustomDialog(this.contentNode, {
       onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
@@ -180,7 +196,6 @@ export struct CommentComp {
         Logger.error(TAG, `openCustomDialog error code is ${error.code}, message is ${error.message}`)
       })
   }
-
 
   build() {
     Column() {
@@ -265,10 +280,10 @@ export struct CommentComp {
                         .fontColor('rgba(0, 0, 0, 0.4)')
                     }
                     .onClick(() => {
-                      if(item.isLike) {
+                      if (item.isLike) {
                         this.commentDataList[index].likeCount--
                         this.commentDataList[index].isLike = false
-                      }else {
+                      } else {
                         this.commentDataList[index].likeCount++
                         this.commentDataList[index].isLike = true
                       }
@@ -283,13 +298,13 @@ export struct CommentComp {
                 .padding({ left: 24 })
 
                 // 更多评论
-                if(item.replyList) {
+                if (item.replyList) {
                   Column({ space: 8 }) {
-                    if(this.moreList[index] > 0) {
+                    if (this.moreList[index] > 0) {
                       List({ space: 8 }) {
                         ForEach(
                           this.moreList[index] <= item.replyList.length ?
-                          item.replyList.slice(0, this.moreList[index]) : item.replyList,
+                            item.replyList.slice(0, this.moreList[index]) : item.replyList,
                           (each: Reply, replyIndex: number) => {
                             ListItem() {
                               Column({ space: 8 }) {
@@ -308,7 +323,7 @@ export struct CommentComp {
 
                                 Row() {
                                   Text() {
-                                    if(each.replyPeople !== item.name) {
+                                    if (each.replyPeople !== item.name) {
                                       Span('回复')
                                       Span(`@${each.replyPeople}`)
                                         .fontColor('rgba(0, 0, 0, 0.6)')
@@ -346,15 +361,17 @@ export struct CommentComp {
                                             WindowManager.setWindowSystemBarProperties({
                                               statusBarContentColor: '#e6000000'
                                             })
-                                            appRouter.push({ builderName: NAV_PAGE_NAME.LoginPage.name,
-                                              params: { isChange: true } })
+                                            appRouter.push({
+                                              builderName: NAV_PAGE_NAME.LoginPage.name,
+                                              params: { isChange: true }
+                                            })
                                           }
                                         })
                                     }
 
                                     Row({ space: 4 }) {
                                       Image(each.replyIsLike ? getMedia('app.media.thumb_select') :
-                                      getMedia('app.media.hand_thumbsup'))
+                                        getMedia('app.media.hand_thumbsup'))
                                         .width(16)
                                         .height(16)
                                       Text(`${each.replyLikeCount}`)
@@ -363,9 +380,9 @@ export struct CommentComp {
                                         .fontColor('rgba(0, 0, 0, 0.4)')
                                     }
                                     .onClick(() => {
-                                      if(each.replyIsLike) {
+                                      if (each.replyIsLike) {
                                         this.commentDataList[index].replyList[replyIndex].replyLikeCount--
-                                      }else {
+                                      } else {
                                         this.commentDataList[index].replyList[replyIndex].replyLikeCount++
                                       }
                                       this.commentDataList[index].replyList[replyIndex].replyIsLike =
@@ -393,7 +410,7 @@ export struct CommentComp {
                       .width('100%')
                     }
 
-                    if(item.replyList.length - this.moreList[index] > 0) {
+                    if (item.replyList.length - this.moreList[index] > 0) {
                       Row() {
                         Text(`展开更多${item.replyList.length - this.moreList[index]}条`)
                           .lineHeight(16)
@@ -421,7 +438,7 @@ export struct CommentComp {
         )
       }
       .width('100%')
-      .height(310)
+      .layoutWeight(1)
       .scrollBar(BarState.Off)
 
       Row() {
@@ -446,9 +463,14 @@ export struct CommentComp {
         }
       })
     }
-    .width(this.isTabletLandScape ? '40%' : '100%')
-    .height(this.isTabletLandScape ? '90%' : '40%')
-    .padding({ left: 16, top: 8, right: 16 })
+    .width(this.isTabletLandScape ? '40%' : this.isExpanded ? '50%' : '100%')
+    .height(this.isTabletLandScape || this.isExpanded ? '90%' : '60%')
+    .padding({
+      left: new BreakPointType<number>({ sm: 16, md: 24, lg: 32 }).getValue(this.currentBreakpoint.value),
+      top: 8,
+      right: new BreakPointType<number>({ sm: 16, md: 24, lg: 32 }).getValue(this.currentBreakpoint.value),
+      bottom: 16
+    })
     .backgroundColor('#F1F3F5')
   }
 }

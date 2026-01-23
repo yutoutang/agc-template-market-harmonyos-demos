@@ -1,4 +1,4 @@
-import { AppStorageV2, promptAction } from '@kit.ArkUI';
+import { AppStorageV2, promptAction, window } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
 import { ArrayList } from '@kit.ArkTS';
 import { BusinessError } from '@kit.BasicServicesKit';
@@ -14,26 +14,37 @@ const TAG = 'WeiboShareUtils';
  * 分享到微博
  */
 export class WeiboShareUtils {
+  windowStage: window.WindowStage = AppStorage.get('windowStage')!
   private static _instance: WeiboShareUtils;
   private mWBAPI: IWBAPI | null = null;
-  private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+  private context: common.UIAbilityContext =
+    this.windowStage.getMainWindowSync().getUIContext().getHostContext() as common.UIAbilityContext;
   private configModel: ShareConfigModel = AppStorageV2.connect(ShareConfigModel, () => new ShareConfigModel())!;
   private shareData: ShareViewData = new ShareViewData();
   private listener: WbASListener = {
     onComplete: () => {
       this.configModel.restoreWindowLayout();
-      promptAction.showToast({ message: '分享成功', duration: 2000 });
+      this.windowStage.getMainWindowSync()
+        .getUIContext()
+        .getPromptAction()
+        .showToast({ message: '分享成功', duration: 2000 });
       if (this.shareData.autoClose) {
         this.shareData.closeSheet();
       }
     },
     onError: (error: UiError) => {
       this.configModel.restoreWindowLayout();
-      promptAction.showToast({ message: '分享失败: ' + error.errorMessage, duration: 2000 });
+      this.windowStage.getMainWindowSync()
+        .getUIContext()
+        .getPromptAction()
+        .showToast({ message: '分享失败: ' + error.errorMessage, duration: 2000 });
     },
     onCancel: () => {
       this.configModel.restoreWindowLayout();
-      promptAction.showToast({ message: '分享取消', duration: 2000 });
+      this.windowStage.getMainWindowSync()
+        .getUIContext()
+        .getPromptAction()
+        .showToast({ message: '分享取消', duration: 2000 });
     },
   };
 

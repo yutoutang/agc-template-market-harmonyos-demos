@@ -1,4 +1,4 @@
-import { DraftModel, MockService } from 'common'
+import { DraftModel, MockService } from 'commonlib'
 
 @Component
 export struct DraftCard {

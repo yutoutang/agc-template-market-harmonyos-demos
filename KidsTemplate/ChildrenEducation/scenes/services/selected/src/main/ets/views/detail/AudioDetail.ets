@@ -1,11 +1,12 @@
-import { VideoCardDetail, VideoDetail } from '@ohos_agcit/children_education_datasource';
+import { User, VideoCardDetail, VideoDetail, VipRecord } from '@ohos_agcit/children_education_datasource';
 import {
   CommonConstants,
+  GlobalContext,
   IconAndCount,
+  QuickLoginUtil,
   TimeControl,
   Title,
 } from '@ohos_agcit/children_education_utils';
-import { GlobalContext } from '@ohos_agcit/children_education_utils';
 
 @Builder
 export function AudioDetailBuilder() {
@@ -16,6 +17,8 @@ export function AudioDetailBuilder() {
 @ComponentV2
 export struct AudioDetailListView {
   @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
+  @Consumer(CommonConstants.USER_INFO) user: User = new User();
+  @Consumer(CommonConstants.VIP_RECORD) vipRecord: VipRecord = new VipRecord();
   @Local audioDetail: VideoDetail = {
     videoCard: {
       id: CommonConstants.EMPTY_STRING,
@@ -28,7 +31,7 @@ export struct AudioDetailListView {
       imageUrl: CommonConstants.EMPTY_STRING,
       isVip: false,
     },
-    videoCardDetail: [],
+    videoCardDetailList: [],
   };
 
   build() {
@@ -39,29 +42,34 @@ export struct AudioDetailListView {
             Column() {
               RelativeContainer() {
                 Image(this.audioDetail.videoCard.imageUrl)
-                  .borderRadius(5)
-                  .margin('8vp')
+                  .borderRadius(8)
                   .id(CommonConstants.IMAGE);
                 IconAndCount(CommonConstants.IMAGE,
                   this.audioDetail.videoCard.isVip,
                   this.audioDetail.videoCard.updateCount,
                   this.audioDetail.videoCard.totalCount
                   , '25%', '50%', '60%');
-              };
+              }
+              .width(104)
+              .height(104)
             }
-            .width('30%');
+            .margin({ left: 12 })
 
-            Column({ space: 10 }) {
+            Blank().width(12)
+
+            Column() {
               Text(this.audioDetail.videoCard.title)
-                .fontSize(20)
+                .fontSize(16)
                 .fontWeight(FontWeight.Medium);
+              Blank().height(4)
               Text(this.audioDetail.videoCard.describe)
                 .maxLines(2)
                 .textOverflow({ overflow: TextOverflow.Ellipsis })
                 .fontColor('#ff949191')
                 .fontSize(12);
             }
-            .width('68%')
+            .margin({ right: 12 })
+            .layoutWeight(1)
             .alignItems(HorizontalAlign.Start);
           }
           .width(CommonConstants.FULL_PERCENT)
@@ -71,26 +79,33 @@ export struct AudioDetailListView {
           .shadow(ShadowStyle.OUTER_DEFAULT_SM);
 
           List({ space: 10 }) {
-            ForEach(this.audioDetail.videoCardDetail, (item: VideoCardDetail, index: number) => {
+            ForEach(this.audioDetail.videoCardDetailList, (item: VideoCardDetail, index: number) => {
               AudioListItem({
                 audioItem: item,
                 index: index,
               })
                 .onClick(() => {
-                  let vipInfo = GlobalContext.getContext().getObject(CommonConstants.IS_VIP) as boolean;
-                  if (item.isVip && !vipInfo) {
+                  // 是否登录
+                  if (item.isVip && this.user.isLogin === false) {
+                    QuickLoginUtil.getQuickLoginAnonymousPhone(this.getUIContext(), this.appPathStack)
+                    return
+                  }
+
+                  // 是否开通VIP
+                  if (item.isVip && !this.vipRecord.isVip) {
                     let pathInfo: NavPathInfo = new NavPathInfo(CommonConstants.VIP_PAGE_VIEW, item);
                     this.appPathStack.pushDestination(pathInfo, true);
-                  } else {
-                    if (TimeControl.timeControl()) {
-                      return;
-                    }
-                    GlobalContext.getContext().setObject(CommonConstants.GLOBAL_VIDEO_LIST, this.audioDetail);
-                    let pathInfo: NavPathInfo = new NavPathInfo(CommonConstants.AUDIO_PLAY_PAGE, item);
-                    this.appPathStack.pushDestination(pathInfo, true);
+                    return;
                   }
+                  if (TimeControl.timeControl(this.getUIContext())) {
+                    return;
+                  }
+                  GlobalContext.getContext().setObject(CommonConstants.GLOBAL_VIDEO_LIST, this.audioDetail);
+                  let pathInfo: NavPathInfo = new NavPathInfo(CommonConstants.AUDIO_PLAY_PAGE, item);
+                  this.appPathStack.pushDestination(pathInfo, true);
+
                 });
-            }, (item:VideoCardDetail) => JSON.stringify(item));
+            }, (item: VideoCardDetail) => JSON.stringify(item));
           }
           .alignListItem(ListItemAlign.Start)
           .margin({
@@ -144,7 +159,7 @@ export struct AudioListItem {
             Text(this.audioItem.title)
               .fontWeight(FontWeight.Regular)
               .fontColor(Color.Black)
-              .fontSize(16)
+              .fontSize(12)
               .padding({
                 left: '2%',
               });

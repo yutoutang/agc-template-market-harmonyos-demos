@@ -13,12 +13,17 @@
  * limitations under the License.
  */
 import { AppStorageV2 } from '@kit.ArkUI';
-import { IGoodInfo, IGoodCategory, } from 'module_base';
-import { OrderStatus, IJumpCategoryParam } from '../common/Constant';
-import {
-  IHomeInfo,
-  IUserInfo,
-} from './IResponse';
+import { IGoodCategory, IGoodInfo, } from 'module_base';
+import { IJumpCategoryParam, OrderStatus } from '../common/Constant';
+import { IFullOrderInfo, IHomeInfo, IUserInfo, } from './IResponse';
+
+@ObservedV2
+export class CustomShareParams {
+  @Trace id: number = 0;
+  @Trace pageName: string = '';
+  @Trace goodId: string = '';
+  @Trace goodName: string = '';
+}
 
 @ObservedV2
 export class SimpleGoodInfo {
@@ -30,7 +35,22 @@ export class SimpleGoodInfo {
 }
 
 @ObservedV2
-export class FullOrderInfo extends SimpleGoodInfo {
+export class FullOrderInfo implements IFullOrderInfo {
+  // 订单ID
+  @Trace id: string = '';
+
+  // 订单标题
+  @Trace title: string = '';
+
+  // 订单副标题
+  @Trace subTitle?: string = '';
+
+  // 会员价格
+  @Trace vipPrice: number = 0;
+
+  // 图片链接
+  @Trace image: string = '';
+
   // 预约地址
   @Trace addressName: string = '';
   // 手机号
@@ -53,7 +73,16 @@ export class FullOrderInfo extends SimpleGoodInfo {
   @Trace consumeTime?: number;
   // 退款时间
   @Trace refundTime?: number;
+  // 是否订阅推送
+  @Trace setSubscription: boolean = false;
 }
+
+@ObservedV2
+export class OrderToPayParam {
+  @Trace orderInfo: FullOrderInfo = new FullOrderInfo();
+  @Trace isFromOrderCard: boolean = false;
+}
+
 
 @ObservedV2
 export class OrderDetailList {
@@ -89,6 +118,21 @@ export class RecentVisitList {
 }
 
 @ObservedV2
+export class LinkState {
+  @Trace isLink: boolean = false;
+}
+
+@ObservedV2
+export class ClickId {
+  @Trace clickId: number = 0;
+}
+
+@ObservedV2
+export class OpenId {
+  @Trace openId: string = '';
+}
+
+@ObservedV2
 export class JumpCategoryParam implements IJumpCategoryParam {
   @Trace tabIndex: number = 0;
   @Trace listInitialIndex: number = 0;
@@ -98,11 +142,22 @@ export class JumpCategoryParam implements IJumpCategoryParam {
  * AppStorageV2应用全局缓存库
  */
 export class AppStorageBank {
+  static openId: OpenId = AppStorageV2.connect(OpenId, () => new OpenId())!;
+  static linkState: LinkState = AppStorageV2.connect(LinkState, () => new LinkState())!;
+  static clickId: ClickId = AppStorageV2.connect(ClickId, () => new ClickId())!;
   static userInfo: UserInfo = AppStorageV2.connect(UserInfo, () => new UserInfo())!;
   static homeBaseInfo: HomeBaseInfo = AppStorageV2.connect(HomeBaseInfo, () => new HomeBaseInfo())!;
   static allCategoryList: IGoodCategory[] = [];
   static recentVisitList: RecentVisitList = AppStorageV2.connect(RecentVisitList, () => new RecentVisitList())!;
   static jumpCategoryParam: JumpCategoryParam = AppStorageV2.connect(JumpCategoryParam, () => new JumpCategoryParam())!;
+
+  static setLinkState(status: boolean) {
+    AppStorageBank.linkState.isLink = status;
+  }
+
+  static setOpenId(id: string) {
+    AppStorageBank.openId.openId = id;
+  }
 
   static updateUserInfo(v: IUserInfo) {
     AppStorageBank.userInfo.userId = v.userId;
@@ -142,6 +197,7 @@ export class AppStorageBank {
   }
 
   static updateJumpCategoryParam(param: IJumpCategoryParam) {
+    AppStorageBank.clickId.clickId = (AppStorageBank.clickId.clickId + 1) % 101;
     AppStorageBank.jumpCategoryParam.tabIndex = param.tabIndex;
     AppStorageBank.jumpCategoryParam.listInitialIndex = param.listInitialIndex;
   }

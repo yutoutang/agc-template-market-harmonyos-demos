@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import { Logger } from 'module_base';
+import { UtilLog as Logger } from '@hw-agconnect/util-log';
 
 const TAG = '[RouterModule]';
 

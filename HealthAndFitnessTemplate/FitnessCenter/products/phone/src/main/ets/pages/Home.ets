@@ -1,17 +1,48 @@
-import { Card } from 'card';
-import { Course } from 'course';
 import { CardInfo, CourseDetailModel, MockService, SportType } from 'external_interactions';
 import { window } from '@kit.ArkUI';
+import { CardContent } from 'card'
+import { CourseContent } from 'course'
+import { ScreenPropStorage, AccountUpdate } from 'external_interactions'
+import { AppStorageV2 } from '@kit.ArkUI';
+import { emitter } from '@kit.BasicServicesKit';
+import  EventData  from '@ohos.events.emitter';
 
-@Component
+@ComponentV2
 export struct Home {
-  @StorageProp('topRectHeight') topRectHeight: number = 0;
+  @Local screenPropStorage: ScreenPropStorage =
+    AppStorageV2.connect(ScreenPropStorage, 'ScreenPropStorage', () => new ScreenPropStorage())!
+  @Local topRectHeight: number = this.screenPropStorage.topRectHeight;
   scroller: Scroller = new Scroller()
   controller: VideoController = new VideoController()
-  pathStack: NavPathStack = new NavPathStack()
+  @Param @Once pathStack: NavPathStack = new NavPathStack()
   courseList: CourseDetailModel[] = MockService.getHomeCourseList()
   cardList: CardInfo[] = MockService.getHomeCardList()
   private swiperController: SwiperController = new SwiperController()
+  cardIdMap: Map<string, CardInfo> = MockService.cardIdMap
+  courseIdMap: Map<string, CourseDetailModel> = MockService.courseIdMap
+  @Local currentIndex: number = 0
+  @Local currentCity: string = '北京'
+
+  aboutToAppear(): void {
+    try {
+      emitter.on('currentCity', (data: EventData.EventData) => {
+        if(data.data){
+          let currentCity: string = data.data.currentCity
+          this.currentCity = currentCity
+        }
+      })
+    } catch (e) {
+      console.error(`emitter on failed. error: ${JSON.stringify(e)}`)
+    }
+  }
+
+  aboutToDisappear(): void {
+    try {
+      emitter.off('currentCity')
+    } catch (e) {
+      console.error(`emitter off failed. error: ${JSON.stringify(e)}`)
+    }
+  }
 
   @Builder
   homeAdvBuilder() {
@@ -28,6 +59,24 @@ export struct Home {
     .width('100%')
     .borderRadius(16)
     .curve(Curve.Smooth)
+    .indicator(false) // 关闭默认指示器
+    .onChange((index) => {
+      this.currentIndex = index // 同步当前索引
+    })
+
+    // 自定义指示器
+    Row({ space: 6 }) {
+      ForEach(MockService.homeSwiperImageList, (item: string, index) => {
+        // 动态改变选中项样式
+        Column()
+          .width(this.currentIndex === index ? 12 : 6)
+          .height(6)
+          .borderRadius(3)
+          .backgroundColor(this.currentIndex === index ? '#0A59F7' : 'rgba(0, 0, 0, 0.1)')
+          .animation({ duration: 200, curve: Curve.EaseOut }) // 平滑过渡动画
+      }, (item: string) => item)
+    }
+    .margin({ top: 12, bottom: 12 }) // 底部间距
   }
 
   @Builder
@@ -91,11 +140,11 @@ export struct Home {
     Column() {
       Row() {
         Text('本店卡项')
-          .fontWeight(FontWeight.Medium)
-          .fontSize(14)
+          .fontWeight(FontWeight.Bold)
+          .fontSize(18)
         Row() {
           Text('更多')
-            .fontSize(10)
+            .fontSize(14)
             .margin({ right: 3 })
             .fontColor($r('sys.color.black'))
 
@@ -110,26 +159,20 @@ export struct Home {
           this.pathStack.pushPath({ name: 'card/showAllCards' })
         })
       }
-      .padding({ top: 10, bottom: 15 })
-      .width('90%')
+      .padding({ top: 10, bottom: 10 })
+      .width('100%')
       .justifyContent(FlexAlign.SpaceBetween)
 
-      Grid() {
-        ForEach(this.cardList, (item: CardInfo) => {
-          GridItem() {
-            Card({ pathStack: this.pathStack, cardInfo: item })
-          }
-        }, (item: CardInfo) => JSON.stringify(item))
-      }
-      .width('90%')
-      .columnsTemplate('1fr 1fr')
-      .columnsGap(15)
-      .rowsGap(15)
+      CardContent({
+        cardList: this.cardList,
+        onChildClick: (id: string) => {
+          this.pathStack.pushPath({ name: 'card/cardDetail', param: this.cardIdMap.get(id) })
+        }
+      })
     }
     .width('100%')
-    .backgroundColor(Color.White)
-    .borderRadius(16)
-    .margin({ bottom: 15 })
+    .margin({ bottom: 12 })
+    .padding({ bottom: 10 })
   }
 
   @Builder
@@ -137,11 +180,11 @@ export struct Home {
     Column() {
       Row() {
         Text('课程列表')
-          .fontWeight(FontWeight.Medium)
-          .fontSize(14)
+          .fontWeight(FontWeight.Bold)
+          .fontSize(18)
         Row() {
           Text('更多')
-            .fontSize(10)
+            .fontSize(14)
             .margin({ right: 3 })
           Image($r('app.media.chevron_right'))
             .width(8)
@@ -153,26 +196,25 @@ export struct Home {
           this.pathStack.pushPath({ name: 'course/ShowAllCourse' })
         })
       }
-      .padding({ top: 10, bottom: 15 })
-      .width('90%')
+      .padding({ top: 10, bottom: 10 })
+      .width('100%')
       .justifyContent(FlexAlign.SpaceBetween)
 
-      Grid() {
-        ForEach(this.courseList, (item: CourseDetailModel) => {
-          GridItem() {
-            Course({ pathStack: this.pathStack, courseDetail: item })
-          }
-        }, (item: CourseDetailModel) => JSON.stringify(item))
-      }
-      .width('90%')
-      .columnsTemplate('1fr 1fr')
-      .columnsGap(15)
-      .rowsGap(15)
+      CourseContent({
+        courseList: this.courseList,
+        onBackClick:(msg: string) => {
+          this.pathStack.pushPath(
+            {
+              name: 'course/CourseDetail',
+              param: this.courseIdMap.get(msg)
+            }
+          )
+        }
+      })
+
     }
     .width('100%')
-    .backgroundColor(Color.White)
-    .borderRadius(16)
-    .margin({ bottom: 15 })
+    .margin({ bottom: 12 })
     .padding({ bottom: 10 })
   }
 
@@ -181,14 +223,15 @@ export struct Home {
     Column() {
       Row() {
         Text('俱乐部环境')
-          .fontWeight(FontWeight.Medium)
-          .fontSize(14)
+          .fontWeight(FontWeight.Bold)
+          .fontSize(18)
         Row() {
           Text('更多')
-            .fontSize(10)
+            .fontSize(14)
             .margin({ right: 3 })
           Image($r('app.media.chevron_right'))
-            .width('3%')
+            .width(8)
+            .height(8)
         }
         .opacity(0.4)
         .alignItems(VerticalAlign.Center)
@@ -196,8 +239,8 @@ export struct Home {
           this.pathStack.pushPath({ name: 'clubEnvironmentDetail' })
         })
       }
-      .padding({ top: 10, bottom: 15 })
-      .width('90%')
+      .padding({ top: 10, bottom: 10 })
+      .width('100%')
       .justifyContent(FlexAlign.SpaceBetween)
 
       Video({
@@ -206,43 +249,61 @@ export struct Home {
         controller: this.controller,
         currentProgressRate: PlaybackSpeed.Speed_Forward_1_00_X
       })
-        .width('90%')
+        .width('100%')
         .height('25%')
         .borderRadius(8)
-        .onFullscreenChange((event) => {
+        .onFullscreenChange(async (event) => {
           // 改变设备横竖屏状态
-          window.getLastWindow(getContext(this)).then((lastWindow) => {
+          try {
+            let lastWindow = await window.getLastWindow(this.getUIContext().getHostContext()!)
             lastWindow.setPreferredOrientation(event.fullscreen ? window.Orientation.LANDSCAPE :
-            window.Orientation.PORTRAIT)
-          });
+              window.Orientation.PORTRAIT)
+          } catch (e) {
+            console.error(`Failed to get last window. error: ${JSON.stringify(e)}`)
+          }
         })
       Text('了解俱乐部的详情')
-        .width('90%')
+        .width('100%')
         .padding({ top: 10, bottom: 10 })
         .fontSize(12)
     }
     .width('100%')
-    .backgroundColor(Color.White)
-    .borderRadius(16)
     .margin({ bottom: 15 })
   }
 
   build() {
     Column() {
-      Row() {
-        Text('首页')
-          .fontSize(20)
-          .width('100%')
-          .fontWeight(FontWeight.Medium)
+      Column() {
+        Row() {
+          Text(this.currentCity)
+            .fontSize(16)
+            .width(16 * this.currentCity.length)
+            .fontWeight(FontWeight.Medium)
+            .margin({ right: 2 })
+
+          Image($r('app.media.Arrow_bottom_filled'))
+            .width(24)
+        }
+        .margin({ left: 16, right: 16 })
+        .borderRadius(20)
+        .backgroundColor($r('sys.color.background_tertiary'))
+        .padding({
+          top: 8,
+          bottom: 8,
+          left: 16,
+          right: 8
+        })
+        .onClick(() => {
+          this.pathStack.pushPath({ name: 'CitySelect' })
+        })
       }
-      .justifyContent(FlexAlign.Start)
-      .height(40)
       .margin({
         top: 8,
-        bottom: 8,
-        left: 16,
-        right: 16
+        bottom: 8
       })
+      .height(40)
+      .width('100%')
+      .alignItems(HorizontalAlign.Start)
 
       Scroll(this.scroller) {
         Column() {
@@ -265,8 +326,9 @@ export struct Home {
       }
       .padding({ bottom: 56 })
       .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring)
     }
-    .padding({ top: px2vp(this.topRectHeight) })
+    .padding({ top: this.getUIContext().px2vp(this.topRectHeight) })
     .height('100%')
     .width('100%')
     .backgroundColor($r('app.color.main_background_color'))

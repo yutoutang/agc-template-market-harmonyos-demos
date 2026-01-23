@@ -26,6 +26,7 @@ export class TimeSelectVM {
   @Trace _selectDateIndex: number = 0;
   @Trace _selectTimeIndex: number = -1;
   @Trace showTimeSheet: boolean = false;
+  @Trace selectTime: boolean = false;
   scroller: Scroller = new Scroller();
   timeOptions: TimeOptions = TIME_OPTIONS_DEFAULT;
   styleOptions: StyleOptions = STYLE_OPTIONS_DEFAULT;
@@ -67,7 +68,7 @@ export class TimeSelectVM {
       selectedDate.setSeconds(0);
       return selectedDate;
     } catch (e) {
-      return new Date();
+      return null;
     }
   }
 
@@ -76,12 +77,16 @@ export class TimeSelectVM {
       return;
     }
     this._selectDateIndex = index;
+    this.onRefreshDay();
+    this._selectTimeIndex = -1;
+  }
+
+  onRefreshDay() {
     if (this._selectDateIndex === 0) {
       this.getTodayTimes();
     } else {
       this.getOtherDayTimes();
     }
-    this._selectTimeIndex = -1;
   }
 
   onClickTime(index: number) {
@@ -101,7 +106,13 @@ export class TimeSelectVM {
   confirmSelectDateTime() {
     this.selectDateIndex = this._selectDateIndex;
     this.selectTimeIndex = this._selectTimeIndex;
+    if (this.selectTimeIndex === -1) {
+      this.closeDateTimeSheet();
+      this.selectTime = false;
+      return;
+    }
     this.closeDateTimeSheet();
+    this.selectTime = true;
   }
 
   isTimeEnableSelect(index: number) {
@@ -113,11 +124,11 @@ export class TimeSelectVM {
   }
 
   dateFgWeight(index: number) {
-    return this._selectDateIndex === index ? 500 : 400;
+    return this._selectDateIndex === index ? 400 : 400;
   }
 
   dateBgColor(index: number) {
-    return this._selectDateIndex === index ? '#E7EEFE' : Color.White;
+    return this._selectDateIndex === index ? $r('sys.color.background_emphasize') : Color.White;
   }
 
   timeBgColor(index: number) {
@@ -126,7 +137,20 @@ export class TimeSelectVM {
       return this.styleOptions.timeBgSelected;
     }
 
+    if (!this.isTimeEnableSelect(index)) {
+      return this.styleOptions.timeBgDisabled;
+    }
+
     return this.styleOptions.timeBg;
+  }
+
+  timeBorderWidth(index: number) {
+    // 选中场景
+    if (this._selectTimeIndex === index) {
+      return 2;
+    }
+
+    return 1;
   }
 
   timeBorderColor(index: number) {

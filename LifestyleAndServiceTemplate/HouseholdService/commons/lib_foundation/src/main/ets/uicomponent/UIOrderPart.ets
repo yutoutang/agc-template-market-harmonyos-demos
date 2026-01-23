@@ -12,15 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { CommonUtils } from 'module_base';
+import { CommonUtils, WindowUtil } from 'module_base';
 import { CommonConstants, OrderStatus } from '../common/Constant';
-import { FullOrderInfo, SimpleGoodInfo } from '../model/ObserveModel'
+import { FullOrderInfo, SimpleGoodInfo } from '../model/ObserveModel';
 
 @ComponentV2
 export struct UIOrderPart {
   @Param simpleGoodInfo: SimpleGoodInfo = new SimpleGoodInfo();
   @Param simpleOrderInfo: FullOrderInfo = new FullOrderInfo();
-  @Param isFromMine: boolean = false;
 
   @Computed
   get isToPay() {
@@ -28,59 +27,48 @@ export struct UIOrderPart {
   }
 
   @Computed
-  get goodPrice() {
-    if (this.isFromMine) {
-      return CommonUtils.handleCash(this.simpleOrderInfo.actualPay);
-    }
-    return CommonUtils.handleCash(this.simpleGoodInfo.vipPrice || this.simpleOrderInfo.vipPrice);
-  }
-
-  @Computed
   get actualPayLabel() {
     return CommonUtils.handleCash(this.simpleOrderInfo.actualPay || this.simpleGoodInfo.vipPrice);
   }
 
+  aboutToAppear(): void {
+    WindowUtil.initWindowUtil(this.getUIContext());
+  }
+
   build() {
-    Row({ space: 8 }) {
+    Row({ space: 12 }) {
       Image(CommonUtils.handleImgUrl(this.simpleGoodInfo.image || this.simpleOrderInfo.image))
-        .width(86)
+        .width(80)
         .aspectRatio(1)
         .borderRadius(8)
       Column() {
         Text(this.simpleGoodInfo.title || this.simpleOrderInfo.title)
           .fontSize(16)
           .fontWeight(500)
+          .lineHeight(21)
           .maxLines(2)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
-          .margin({ top: 4 })
         Text(this.simpleGoodInfo.subTitle || this.simpleOrderInfo.subTitle)
           .fontSize(12)
           .fontWeight(400)
-          .fontColor($r('app.color.common_grey'))
-          .margin({ top: 8 })
+          .lineHeight(16)
+          .fontColor($r('sys.color.font_tertiary'))
+          .margin({ top: 4 })
         Blank()
         Row() {
           Text() {
-            Span('￥').fontSize(10)
-            Span(this.goodPrice).fontSize(14)
+            Span(this.actualPayLabel)
+            Span('元')
           }
-          .fontColor(Color.Black)
           .fontWeight(500)
-
-          Blank()
-          if (!this.isFromMine) {
-            Text() {
-              Span('实付款 ').fontSize(12)
-              Span('￥').fontSize(10)
-              Span(this.actualPayLabel).fontSize(12)
-            }
-            .fontColor(Color.Black)
-          }
+          .fontColor($r('sys.color.multi_color_08'))
+          .fontSize(16)
         }
+        .justifyContent(FlexAlign.End)
         .width(CommonConstants.FULL_PERCENT)
       }
       .layoutWeight(1)
-      .height(86)
+      .height(80)
       .alignItems(HorizontalAlign.Start)
     }
     .width(CommonConstants.FULL_PERCENT)

@@ -1,5 +1,5 @@
 import { common } from '@kit.AbilityKit';
-import { promptAction } from '@kit.ArkUI';
+import { promptAction, window } from '@kit.ArkUI';
 import * as wxopensdk from '@tencent/wechat_open_sdk';
 import { Logger } from '../common/Logger';
 import { ShareAppType } from '../common/ShareEnum';
@@ -14,6 +14,7 @@ const TAG = 'WXShareUtils';
  * 微信分享
  */
 export class WXShareUtils {
+  windowStage: window.WindowStage = AppStorage.get('windowStage')!
   private static _instance: WXShareUtils;
   private shareService = ShareService.instance;
   private shareData: ShareViewData = new ShareViewData();
@@ -35,7 +36,7 @@ export class WXShareUtils {
    */
   private isWXAPPCallback(callback: Function) {
     if (!this.shareService.wxApi.isWXAppInstalled()) {
-      AlertDialog.show({ message: '请先安装微信' });
+      this.windowStage.getMainWindowSync().getUIContext().showAlertDialog({ message: '请先安装微信' });
     } else {
       callback();
     }
@@ -63,7 +64,9 @@ export class WXShareUtils {
         req.scene = wxopensdk.SendMessageToWXReq.WXSceneTimeline;
       }
 
-      this.shareService.wxApi.sendReq(getContext(this) as common.UIAbilityContext, req);
+      this.shareService.wxApi.sendReq(this.windowStage.getMainWindowSync()
+        .getUIContext()
+        .getHostContext() as common.UIAbilityContext, req);
     })
   }
 
@@ -88,7 +91,9 @@ export class WXShareUtils {
           const thumbRawData = await downloadImage(data.thumbUrl);
           thumbBuffer = await compressImage(thumbRawData);
         } else {
-          const thumbRawData = await getContext(this).resourceManager.getMediaContent(data.thumbUrl);
+          const thumbRawData = await this.windowStage.getMainWindowSync()
+            .getUIContext()
+            .getHostContext()!.resourceManager.getMediaContent(data.thumbUrl.id);
           thumbBuffer = await compressImage(thumbRawData.buffer as ArrayBuffer);
         }
         if (thumbBuffer.byteLength / 1024 > 64) {
@@ -107,7 +112,9 @@ export class WXShareUtils {
         req.scene = wxopensdk.SendMessageToWXReq.WXSceneTimeline;
       }
 
-      this.shareService.wxApi.sendReq(getContext(this) as common.UIAbilityContext, req);
+      this.shareService.wxApi.sendReq(this.windowStage.getMainWindowSync()
+        .getUIContext()
+        .getHostContext() as common.UIAbilityContext, req);
     })
   }
 
@@ -133,16 +140,25 @@ export class WXShareUtils {
   private handleResp: OnWXResp = (err) => {
     switch (err.errCode) {
       case wxopensdk.ErrCode.ERR_OK:
-        promptAction.showToast({ message: '分享成功' });
+        this.windowStage.getMainWindowSync()
+          .getUIContext()
+          .getPromptAction()
+          .showToast({ message: '分享成功' });
         if (this.shareData.autoClose) {
           this.shareData.closeSheet();
         }
         break;
       case wxopensdk.ErrCode.ERR_USER_CANCEL:
-        promptAction.showToast({ message: '分享取消' });
+        this.windowStage.getMainWindowSync()
+          .getUIContext()
+          .getPromptAction()
+          .showToast({ message: '分享取消' });
         break;
       default:
-        promptAction.showToast({ message: '分享失败: ' + err.errStr });
+        this.windowStage.getMainWindowSync()
+          .getUIContext()
+          .getPromptAction()
+          .showToast({ message: '分享失败: ' + err.errStr });
         break;
     }
   }

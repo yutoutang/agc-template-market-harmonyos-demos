@@ -1,59 +1,48 @@
-import { MockService } from 'common';
-import { MainPage } from './MainPage';
-import { MinePage } from './Mine';
+/*
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import { window } from '@kit.ArkUI';
+import {RouterMap, RouterModule } from 'commonlib';
+import { common } from '@kit.AbilityKit';
+
 
 @Entry
-@Component
+@ComponentV2
 struct Index {
-  @State currentIndex: number = 0
-  pathStack: NavPathStack = new NavPathStack()
+  uiContext = this.getUIContext().getHostContext() as common.UIAbilityContext
+
+  async aboutToAppear(): Promise<void>{
+    try {
+      let windowClass = await window.getLastWindow(this.uiContext)
+      windowClass.setWindowLayoutFullScreen(true)
+    } catch (e) {
+      console.error(`Failed to get last window. error: ${JSON.stringify(e)}`)
+    }
+    RouterModule.replace({ url: RouterMap.LAUNCH_PAGE })
+  }
+
+
+
 
   build() {
-    Navigation(this.pathStack) {
-      Tabs({ barPosition: BarPosition.End }) {
-        TabContent() {
-          MainPage({ pathStack: this.pathStack })
-        }
-        .backgroundColor($r('app.color.main_background_color'))
-        .tabBar(this.tabBuilder('首页', 0, $r('app.media.homepage_fill'), $r('app.media.homepage')))
-
-        TabContent() {
-          MinePage({ pathStack: this.pathStack })
-        }
-        .backgroundColor($r('app.color.main_background_color'))
-        .tabBar(this.tabBuilder('我的', 1, $r('app.media.mine_fill'), $r('app.media.mine')))
-      }
-      .barHeight(70)
-      .scrollable(false)
-      .onChange((index: number) => {
-        this.currentIndex = index
-      })
+    Navigation(RouterModule.stack) {
     }
+    .hideNavBar(true)
+    .hideToolBar(true)
     .hideTitleBar(true)
-    .width('100%')
-    .height('100%')
+    .hideBackButton(true)
+    .mode(NavigationMode.Stack)
   }
-
-  aboutToAppear() {
-    MockService.init()
-  }
-
-  @Builder
-  tabBuilder(text: string, targetIndex: number, selectedImg: Resource, normalImg: Resource) {
-    Column() {
-      Image(this.currentIndex === targetIndex ? selectedImg : normalImg)
-        .size({ width: 25, height: 25 })
-
-      Text(text)
-        .fontFamily('鸿蒙黑体')
-        .fontWeight(FontWeight.Regular)
-        .fontSize(12)
-        .fontColor(this.currentIndex === targetIndex ? '#ED6F21' : '#000000')
-        .margin({ top: '2%' })
-    }
-    .width('100%')
-    .height(50)
-    .justifyContent(FlexAlign.Center)
-  }
-
 }

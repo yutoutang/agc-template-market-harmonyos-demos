@@ -1,4 +1,4 @@
-import { promptAction } from '@kit.ArkUI';
+import { promptAction, window } from '@kit.ArkUI';
 import { http } from '@kit.NetworkKit';
 import { image } from '@kit.ImageKit';
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
@@ -7,6 +7,7 @@ import { Logger } from '../common/Logger';
 import { BusinessError } from '@kit.BasicServicesKit';
 
 const TAG = 'FileUtils';
+const windowStage: window.WindowStage = AppStorage.get('windowStage')!
 
 /**
  * 写入数据到沙箱
@@ -16,7 +17,8 @@ const TAG = 'FileUtils';
 export async function saveToSandbox(buffer: ArrayBuffer): Promise<string> {
   let file: fs.File | null = null;
   try {
-    const savePath = `${getContext().cacheDir}/${new Date().getTime()}.png`;
+    const savePath =
+      `${windowStage.getMainWindowSync().getUIContext().getHostContext()!.cacheDir}/${new Date().getTime()}.png`;
     file = fs.openSync(savePath, fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE);
     fs.writeSync(file.fd, buffer);
 
@@ -61,7 +63,8 @@ export async function saveImgToSandbox(img: PixelMap): Promise<string> {
 export async function saveImgToAlbum(img: PixelMap): Promise<void> {
   return new Promise(async (resolve, reject) => {
     const uri = await saveImgToSandbox(img);
-    const phAccessHelper = photoAccessHelper.getPhotoAccessHelper(getContext());
+    const phAccessHelper =
+      photoAccessHelper.getPhotoAccessHelper(windowStage.getMainWindowSync().getUIContext().getHostContext());
     let srcFile: fs.File | null = null;
     let desFile: fs.File | null = null;
     try {
@@ -85,11 +88,11 @@ export async function saveImgToAlbum(img: PixelMap): Promise<void> {
       srcFile = fs.openSync(srcFileUris[0], fs.OpenMode.READ_ONLY);
       desFile = fs.openSync(desFileUris[0], fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE);
       fs.copyFileSync(srcFile.fd, desFile.fd);
-      promptAction.showToast({ message: '保存成功' });
+      windowStage.getMainWindowSync().getUIContext().getPromptAction().showToast({ message: '保存成功' });
       resolve();
     } catch (err) {
       Logger.error(TAG, 'saveImgToAlbum fail, error: ' + JSON.stringify(err));
-      promptAction.showToast({ message: '保存失败' });
+      windowStage.getMainWindowSync().getUIContext().getPromptAction().showToast({ message: '保存失败' });
       reject();
     } finally {
       if (srcFile) {

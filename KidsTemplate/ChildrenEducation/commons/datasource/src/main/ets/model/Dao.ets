@@ -11,6 +11,10 @@ export class UsedLimit {
 
 @ObservedV2
 export class VipRecord {
+  @Trace
+  isVip: boolean = false;
+  @Trace
+  validTime: string = '';
   /**
    * 60 * 24
    */
@@ -21,7 +25,4 @@ export class VipRecord {
   lunchEndTime: string = '';
   nightStartTime: string = '';
   nightEndTime: string = '';
-  isVip: boolean = false;
-  validTime: string = '';
-  // historyList: ArrayList<History> = new ArrayList();
 }

@@ -1,7 +1,7 @@
 import { BusinessError, commonEventManager } from '@kit.BasicServicesKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { UserInfo } from './UserInfo';
-import { router } from '@kit.ArkUI';
+import { router, window } from '@kit.ArkUI';
 import { SignInClass } from './SignInModel';
 
 
@@ -10,6 +10,7 @@ const KEY_REWARD_STATUS = 'reward_ad_status';
 
 
 export class RewardAdStatusHandler {
+  windowStage: window.WindowStage = AppStorage.get('windowStage')!
   // 用于保存创建成功的订阅者对象，后续使用其完成订阅及退订的动作
   private subscriber: commonEventManager.CommonEventSubscriber | null = null;
   private userInfoFromStorage: UserInfo = AppStorage.get('userInfo') as UserInfo;
@@ -56,6 +57,7 @@ export class RewardAdStatusHandler {
               break;
             case AdStatus.AD_CLOSED:
               hilog.info(0x0000, 'testTag', 'Status is onAdClose');
+              item.isFirstClick = true
               this.unRegisterPPSReceiver();
               break;
             case AdStatus.AD_REWARDED:
@@ -70,7 +72,8 @@ export class RewardAdStatusHandler {
               break;
             case AdStatus.AD_COMPLETED:
               hilog.info(0x0000, 'testTag', 'Status is onAdCompleted');
-              router.replace({ url: 'components/LookAD' })
+              item.isFirstClick = true
+              this.windowStage.getMainWindowSync().getUIContext().getRouter().replaceUrl({ url: 'components/LookAD' })
               break;
             default:
               break;

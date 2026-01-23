@@ -6,7 +6,6 @@ import { LoginState } from '../components/LoginState';
 @ComponentV2
 export struct MinePage {
   @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
-  @Consumer(CommonConstants.IS_VIP) isVip: boolean = false;
   @Consumer(CommonConstants.USER_INFO) user: User = new User();
 
   build() {

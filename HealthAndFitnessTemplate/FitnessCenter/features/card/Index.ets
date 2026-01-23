@@ -1,1 +1,1 @@
-export { Card } from './src/main/ets/components/Card'
+export { CardContent, CardGrid} from './src/main/ets/components/CardContent'

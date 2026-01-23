@@ -1,6 +1,6 @@
 import { authentication } from '@kit.AccountKit';
 import { util } from '@kit.ArkTS';
-import { promptAction } from '@kit.ArkUI';
+import { promptAction, window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { appRouter, container, Logger } from '@agctemplate/utils';
 import { RequestAPI } from '@agctemplate/server';
@@ -10,6 +10,8 @@ const TAG = '[AssociateAccount]';
 
 // 用户取消授权
 const ERROR_CODE_CANCEL = 1001502012;
+
+const windowStage: window.WindowStage = AppStorage.get('windowStage')!
 
 export class AssociateUtil {
   /** 检查是否关联 **/
@@ -77,7 +79,7 @@ export class AssociateUtil {
 
   /** 模拟账号关联 **/
   public static _mockAssociateAccount() {
-    AlertDialog.show({
+    windowStage.getMainWindowSync().getUIContext().showAlertDialog({
       title: '提示',
       message: '元服务未获取phone权限或用户授权，点击确定将模拟创建关联账号？',
       height: 170,
@@ -108,13 +110,13 @@ export class AssociateUtil {
         userInfo.cellphone = res.getBody().cellphone;
         userInfo.isMock = isMock;
       } else {
-        promptAction.showToast({ message: '账号关联失败' });
+        windowStage.getMainWindowSync().getUIContext().getPromptAction().showToast({ message: '账号关联失败' });
       }
   }
 
   private static _dealAllError(error: BusinessError, text: string): void {
     Logger.error(TAG, `Failed to login, errorCode is ${error.code}, errorMessage is ${error.message}`);
-    promptAction.showToast({ message: text });
+    windowStage.getMainWindowSync().getUIContext().getPromptAction().showToast({ message: text });
   }
 }
 

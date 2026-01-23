@@ -4,18 +4,24 @@ import { CustomContentDialog } from '@kit.ArkUI';
 import { authentication } from '@kit.AccountKit';
 import { util } from '@kit.ArkTS';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { LoginState ,GlobalBalance, AccountUpdate, EmitterConstant} from 'external_interactions'
+import { AppStorageV2 } from '@kit.ArkUI';
+import { emitter } from '@kit.BasicServicesKit';
 
-@Component
+@ComponentV2
 export struct UserInfoCard {
   // qrCode弹窗
+  @Local accountUpdateStorage : AccountUpdate = AppStorageV2.connect(AccountUpdate, 'AccountUpdate', () =>new AccountUpdate())!
+  @Local globalBalanceStorage : GlobalBalance = AppStorageV2.connect(GlobalBalance, 'GlobalBalance', () =>new GlobalBalance())!
+  @Local loginStateStorage : LoginState = AppStorageV2.connect(LoginState, 'LoginState', () =>new LoginState())!
   private qrCodeDialogController?: CustomDialogController;
-  @State pathStack: NavPathStack = new NavPathStack();
-  @StorageLink('loginState') loginState: boolean = false;
-  @State cardNumber: string = '';
-  @State balance: number = 0;
-  @State nickname: string = '';
-  @State avatar: ResourceStr = '';
-  @StorageLink('accountUpdate') @Watch('refreshUserInfo') accountUpdate: boolean = false;
+  @Param @Once pathStack: NavPathStack = new NavPathStack();
+  @Local loginState: boolean = this.loginStateStorage.loginState;
+  @Local cardNumber: string = '';
+  @Local nickname: string = '';
+  @Local avatar: ResourceStr = '';
+  @Local balance: number = this.globalBalanceStorage.globalBalance;
+  @Local accountUpdate: boolean = this.accountUpdateStorage.accountUpdate;
   dialogController: CustomDialogController = new CustomDialogController({
     builder: CustomContentDialog({
       primaryTitle: '账号解除关联',
@@ -33,7 +39,7 @@ export struct UserInfoCard {
           value: '确定',
           buttonStyle: ButtonStyleMode.TEXTUAL,
           action: () => {
-            this.loginState = false;
+            this.loginStateStorage.loginState = false
             MockService.dataPreferences.putSync('loginState', false)
             MockService.dataPreferences.flush()
             this.refreshUserInfo();
@@ -51,17 +57,33 @@ export struct UserInfoCard {
       .fontSize(14)
   }
 
+  @Monitor('accountUpdateStorage')
   refreshUserInfo() {
-    if (this.loginState) {
+    if (this.loginStateStorage.loginState) {
       this.cardNumber = MockService.account.memberId
-      this.balance = MockService.account.balance
+      this.globalBalanceStorage.globalBalance = MockService.account.balance
       this.nickname = MockService.account.nickname
       this.avatar = MockService.account.avatar
     }
   }
 
   aboutToAppear(): void {
+    try {
+      emitter.on(EmitterConstant.CANCEL_BOOK, () => {
+        this.refreshUserInfo()
+      })
+    } catch (e) {
+      console.error(`emitter on failed. error: ${JSON.stringify(e)}`)
+    }
     this.refreshUserInfo();
+  }
+
+  aboutToDisappear(): void {
+    try {
+      emitter.off(EmitterConstant.CANCEL_BOOK)
+    } catch (e) {
+      console.error(`emitter off failed. error: ${JSON.stringify(e)}`)
+    }
   }
 
   build() {
@@ -69,7 +91,7 @@ export struct UserInfoCard {
       Row() {
         Row() {
           Row() {
-            Image(this.loginState ? (this.avatar ? this.avatar : $r('app.media.avatar_no_login')) :
+            Image(this.loginStateStorage.loginState ? (this.avatar ? this.avatar : $r('app.media.avatar_no_login')) :
             $r('app.media.avatar_no_login'))
               .width(72)
               .height(72)
@@ -78,7 +100,7 @@ export struct UserInfoCard {
               Image($r('app.media.associate_avator'))
                 .width(12)
                 .height(12)
-              Text(this.loginState ? '解除关联' : '关联账号')
+              Text(this.loginStateStorage.loginState ? '解除关联' : '关联账号')
                 .fontSize(10)
                 .fontColor(Color.White)
                 .margin({ left: 5 })
@@ -90,16 +112,15 @@ export struct UserInfoCard {
             .backgroundColor('#FF9019')
             .margin({ left: 12 })
             .onClick(() => {
-              if (this.loginState) {
+              if (this.loginStateStorage.loginState) {
                 this.dialogController.open()
               } else {
-                // 取消授权重新获取，强制弹窗
                 this.cancelAuthorization()
               }
             })
           }
           .onClick(() => {
-            if (this.loginState) {
+            if (this.loginStateStorage.loginState) {
               if (this.pathStack) {
                 this.pathStack.pushPath({ name: 'vip/MineInfoPage', param: this.loginState })
               }
@@ -107,7 +128,7 @@ export struct UserInfoCard {
           })
 
           Column() {
-            if (this.loginState) {
+            if (this.loginStateStorage.loginState) {
               Row() {
                 Image($r('app.media.qr_icon'))
                   .width(24)
@@ -118,13 +139,13 @@ export struct UserInfoCard {
               .margin({ bottom: 4 })
             }
 
-            Text(this.loginState ? '会员码' : '无会员码')
+            Text(this.loginStateStorage.loginState ? '会员码' : '无会员码')
               .fontSize(12)
               .fontColor($r('sys.color.comp_background_list_card'))
           }
           .onClick(() => {
-            if (this.loginState) {
-              this.openQrCodeConfirmDialog();
+            if (this.loginStateStorage.loginState) {
+              this.pathStack.pushPath({name: 'userInfo/qrCode'})
             }
           })
         }
@@ -134,11 +155,11 @@ export struct UserInfoCard {
       }
 
       Row() {
-        Text('卡号：' + (this.loginState ? this.cardNumber : '无'))
+        Text('卡号：' + (this.loginStateStorage.loginState ? this.cardNumber : '无'))
           .fontSize(12)
           .fontColor($r('sys.color.comp_background_list_card'))
 
-        Text('余额：' + (this.loginState ? this.balance : '无'))
+        Text('余额：' + (this.loginStateStorage.loginState ? this.globalBalanceStorage.globalBalance : '无'))
           .fontSize(12)
           .fontColor($r('sys.color.comp_background_list_card'))
       }
@@ -162,12 +183,7 @@ export struct UserInfoCard {
    * 创建删除提示弹框的Controller
    */
   private openQrCodeConfirmDialog(): void {
-    this.qrCodeDialogController = new CustomDialogController({
-      builder: qrCodeDialog(),
-      autoCancel: true,
-      offset: { dx: 0, dy: -16 }
-    })
-    this.qrCodeDialogController.open();
+    qrCodeDialog({ pathStack: this.pathStack })
   }
 
   private getPhone() {
@@ -179,7 +195,7 @@ export struct UserInfoCard {
     authRequest.state = util.generateRandomUUID();
     try {
       const controller: authentication.AuthenticationController =
-        new authentication.AuthenticationController(getContext(this));
+        new authentication.AuthenticationController(this.getUIContext().getHostContext());
       controller.executeRequest(authRequest)
         .then((data: authentication.AuthenticationResponse) => {
           const authorizationWithHuaweiIDResponse = data as authentication.AuthorizationWithHuaweiIDResponse;
@@ -227,7 +243,7 @@ export struct UserInfoCard {
   }
 
   updateLogin() {
-    this.loginState = true;
+    this.loginStateStorage.loginState = true
     MockService.dataPreferences.putSync('loginState', true)
     MockService.dataPreferences.flush()
     this.refreshUserInfo();

@@ -1,5 +1,6 @@
 import { ListItemModel } from '../../model/ListItemModel'
 import { RowModifier } from '../../AttributeModifiers'
+import { deviceInfo } from '@kit.BasicServicesKit'
 
 @Extend(Text)
 function mainTextDescStyles() {
@@ -101,17 +102,23 @@ export struct CommonServices {
                     Text(item.redDot)
                       .redDotStyles()
                   }
-                  SymbolGlyph($r('sys.symbol.chevron_right'))
-                    .fontSize(24)
-                    .renderingStrategy(SymbolRenderingStrategy.SINGLE)
-                    .fontColor([$r('sys.color.icon_fourth')])
+                  if (this.commonServicesContents.length !== 2 || index !== 1) {
+                    SymbolGlyph($r('sys.symbol.chevron_right'))
+                      .fontSize(24)
+                      .renderingStrategy(SymbolRenderingStrategy.SINGLE)
+                      .fontColor([$r('sys.color.icon_fourth')])
+                  }
                 }
               }.layoutWeight(1)
               .height('100%')
               .justifyContent(FlexAlign.SpaceBetween)
               .border({
                 color: { bottom: $r('sys.color.comp_divider') },
-                width: { bottom: index === this.commonServicesContents.length - 1 ? 0 : '1px' }
+                width: {
+                  bottom: index === this.commonServicesContents.length - 1 ||
+                    (index === this.commonServicesContents.length - 2 && deviceInfo.deviceType === 'tablet' &&
+                      this.commonServicesContents.length > 2) ? 0 : '1px'
+                }
               })
             }
             .justifyContent(FlexAlign.SpaceBetween)
@@ -131,8 +138,12 @@ export struct CommonServices {
           .height(56)
         }, (item: ListItemModel, index: number) => item.mainText + '_' + index)
       }
-      .columnsTemplate('1fr')
+      .columnsTemplate(deviceInfo.deviceType === 'tablet' && this.commonServicesContents.length > 2 ? '1fr 1fr' :
+        '1fr')
       .width('100%')
+      .constraintSize({
+        maxWidth: this.commonServicesContents.length < 3 ? 805 : '100%'
+      })
       .height('auto')
       .padding({ bottom: 4 })
     }

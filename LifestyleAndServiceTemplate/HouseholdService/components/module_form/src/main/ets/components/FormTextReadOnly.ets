@@ -19,7 +19,7 @@ export struct FormTextReadOnly {
 
   build() {
     Text(this.value)
-      .fontSize($r('sys.float.Body_L'))
+      .fontSize($r('sys.float.Body_M'))
       .fontWeight(400)
       .fontColor($r('sys.color.font_primary'))
       .maxLines(1)

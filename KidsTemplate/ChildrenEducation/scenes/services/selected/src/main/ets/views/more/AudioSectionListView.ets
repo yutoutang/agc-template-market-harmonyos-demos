@@ -1,4 +1,4 @@
-import { VideoCard, audioListData, VideoDetail, audioDetail } from '@ohos_agcit/children_education_datasource';
+import { DataGenerator, VideoCard, VideoDetail } from '@ohos_agcit/children_education_datasource';
 import { CommonConstants, IconAndCount, Title } from '@ohos_agcit/children_education_utils';
 
 @Builder
@@ -13,12 +13,12 @@ export struct AudioSectionListView {
   private audioList: Array<VideoCard> = [];
 
   aboutToAppear(): void {
-    this.audioList = audioListData;
+    this.audioList = DataGenerator.getAudioListData(this.getUIContext());
   }
 
   build() {
     NavDestination() {
-      List({ space: 20 }) {
+      List({ space: 12 }) {
         ForEach(this.audioList, (item: VideoCard) => {
           ListItem() {
             AudioSectionListItem({
@@ -30,18 +30,19 @@ export struct AudioSectionListView {
               describe: item.describe,
             })
               .onClick(() => {
-                let detail: VideoDetail = audioDetail;
+                let detail: VideoDetail = DataGenerator.getAudioDetail(this.getUIContext());
                 detail.videoCard = item;
                 this.appPathStack.pushPathByName('AudioDetailListView', detail);
               });
           };
-        }, (item:VideoCard) => JSON.stringify(item));
+        }, (item: VideoCard) => JSON.stringify(item));
       }
       .scrollBar(BarState.Off)
       .width(CommonConstants.FULL_PERCENT)
       .padding({
-        right: '4%',
-        left: '4%'
+        top: 8,
+        right: 16,
+        left: 16
       })
     }
     .title(Title('音频故事专区'))
@@ -66,33 +67,32 @@ struct AudioSectionListItem {
       Column() {
         RelativeContainer() {
           Image(this.imageUrl)
-            .borderRadius(12)
+            .borderRadius(8)
             .id(CommonConstants.IMAGE);
           IconAndCount(CommonConstants.IMAGE, this.isVip, this.updateCount, this.totalCount, '30%', '45%', '50%');
         }
-        .width('auto')
-        .height('auto');
+        .width(104)
+        .height(104)
       }
-      .width('40%')
 
+      Blank().width(12)
 
-      Column({ space: 10 }) {
+      Column() {
         Text(this.title)
           .fontWeight(FontWeight.Medium)
-          .fontSize(20);
+          .fontSize(16);
+
+        Blank().height(4)
 
         Text(this.describe)
-          .fontSize(13)
+          .fontSize(12)
           .fontColor('#ff817e7e')
           .textAlign(TextAlign.Start)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .maxLines(3)
       }
-      .width('60%')
+      .layoutWeight(1)
       .alignItems(HorizontalAlign.Start)
-      .padding({
-        left: 10,
-      });
     };
   }
 }

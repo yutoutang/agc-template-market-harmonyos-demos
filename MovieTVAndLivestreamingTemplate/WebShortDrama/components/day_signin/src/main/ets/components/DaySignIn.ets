@@ -78,7 +78,7 @@ export struct DaySignIn {
             $r('app.string.check_in'))
             .fontSize($r('sys.float.Body_L'))
             .fontWeight(FontWeight.Medium)
-            .backgroundColor('#EC6E45')
+            .backgroundColor(this.signInList[this.currentDay].isClaim ? '#D5633E' : '#EC6E45')
             .enabled(!this.signInList[this.currentDay].isClaim)
             .height(40)
             .width('100%')

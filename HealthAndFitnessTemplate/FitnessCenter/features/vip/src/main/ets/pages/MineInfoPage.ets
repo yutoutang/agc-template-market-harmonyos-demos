@@ -1,22 +1,33 @@
 import { MockService } from 'external_interactions';
-import { TitleBar } from 'uicomponents';
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
 import { CustomContentDialog } from '@kit.ArkUI';
+import { TitleBar } from 'module_recharge/src/main/ets/components/TitleBar';
+import { ScreenPropStorage , AccountUpdate} from 'external_interactions'
+import { AppStorageV2, promptAction } from '@kit.ArkUI';
+import { common } from '@kit.AbilityKit';
 
-@Component
 @Preview
+@ComponentV2
 export struct MineInfoPage {
-  @StorageProp('topRectHeight') topRectHeight: number = 0;
-  @StorageProp('bottomRectHeight') bottomRectHeight: number = 0;
+  @Local screenPropStorage : ScreenPropStorage = AppStorageV2.connect(ScreenPropStorage, 'ScreenPropStorage', () =>new ScreenPropStorage())!
+  @Local accountUpdateStorage : AccountUpdate = AppStorageV2.connect(AccountUpdate, 'AccountUpdate', () =>new AccountUpdate())!
+  @Local topRectHeight: number = this.screenPropStorage.topRectHeight;
+  @Local bottomRectHeight: number = this.screenPropStorage.bottomRectHeight;
+  @Local accountUpdate: boolean = this.accountUpdateStorage.accountUpdate;
   pathStack: NavPathStack = new NavPathStack();
-  @State nickname: string = '';
-  @State phone: string = ''
-  @State sex: string = ''
-  @State birthday: string = ''
-  @State avatar: ResourceStr = ''
-  @StorageLink('accountUpdate') accountUpdate: boolean = false
-  @State inputType: number = 0;
-  @State inputValue: string = ''
+  @Local context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext
+  @Local nickname: string = '';
+  @Local phone: string = ''
+  @Local sex: string = ''
+  @Local birthday: string = ''
+  @Local avatar: ResourceStr = ''
+  @Local inputType: number = 0;
+  @Local inputValue: string = ''
+  @Monitor('screenPropStorage.topRectHeight', 'screenPropStorage.bottomRectHeight')
+  onScreenPropStorage(mon: IMonitor) {
+    this.topRectHeight = this.screenPropStorage.topRectHeight;
+    this.bottomRectHeight = this.screenPropStorage.bottomRectHeight
+  }
   dialogController: CustomDialogController = new CustomDialogController({
     builder: CustomContentDialog({
       primaryTitle: '',
@@ -40,6 +51,8 @@ export struct MineInfoPage {
               this.phone = this.inputValue
             }
             MockService.saveAccountInfo(this.nickname, this.phone, this.sex, this.birthday, this.avatar);
+            this.refreshUserInfo()
+            this.context.eventHub.emit('refreshUserInfo');
             this.accountUpdate = !this.accountUpdate
           },
         },
@@ -64,7 +77,11 @@ export struct MineInfoPage {
 
   build() {
     NavDestination() {
-      TitleBar({ title: '个人中心', pathStack: this.pathStack })
+      TitleBar({ title: '个人中心',
+        onBackClick:()=>{
+          this.pathStack.pop()
+        }
+      })
         .margin({ left: 16, right: 16 })
       Stack() {
         Scroll() {
@@ -104,7 +121,7 @@ export struct MineInfoPage {
                     .fontWeight(FontWeight.Regular)
                     .fontSize(14)
                     .margin({ right: 9 })
-                  Image($r('app.media.edit_avator'))
+                  Image($r('app.media.chevron_right'))
                     .width(18)
                     .height(18)
                     .fillColor(Color.Gray)
@@ -175,7 +192,8 @@ export struct MineInfoPage {
       this.refreshUserInfo()
     })
     .backgroundColor($r('app.color.main_background_color'))
-    .padding({ top: px2vp(this.topRectHeight), bottom: px2vp(this.bottomRectHeight) })
+    .padding({ top: this.getUIContext().px2vp(this.topRectHeight),
+      bottom: this.getUIContext().px2vp(this.bottomRectHeight) })
   }
 
   refreshUserInfo() {
@@ -202,8 +220,15 @@ export struct MineInfoPage {
       }
       this.avatar = uris.photoUris[0];
       MockService.saveAccountInfo(this.nickname, this.phone, this.sex, this.birthday, this.avatar);
+      this.refreshUserInfo()
+      this.getUIContext().getHostContext()?.eventHub.emit('refreshUserInfo');
       this.accountUpdate = !this.accountUpdate
     } catch (error) {
     }
   }
+}
+
+@Builder
+export function MineInfoPageBuilder(): void {
+  MineInfoPage()
 }

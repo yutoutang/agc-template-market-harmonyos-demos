@@ -1,9 +1,9 @@
-import { singSongPageData } from '@ohos_agcit/children_education_datasource';
-import { CommonConstants, FeedTitle, TwoColumn, NoMoreTab } from '@ohos_agcit/children_education_utils';
+import { DataGenerator } from '@ohos_agcit/children_education_datasource';
+import { CommonConstants, FeedTitle, NoMoreTab, TwoColumn } from '@ohos_agcit/children_education_utils';
 
 @ComponentV2
 export struct SingPage {
-  private singSongPageData = singSongPageData;
+  private singSongPageData = DataGenerator.getSingSongPageData(this.getUIContext());
   @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
 
   build() {
@@ -11,12 +11,12 @@ export struct SingPage {
       List({ space: 30 }) {
 
         ListItemGroup({
-          header: FeedTitle('app.media.feed_head_video', '律动儿歌',() => {
-          this.appPathStack.pushPathByName('HotAnimationListView', undefined);
-        })
+          header: FeedTitle('app.media.feed_head_video', '律动儿歌', () => {
+            this.appPathStack.pushPathByName('HotAnimationListView', undefined);
+          })
         }) {
           TwoColumn({
-            videoCardArray: this.singSongPageData.childrenSong,
+            videoCardArray: this.singSongPageData,
           });
         };
 
@@ -26,7 +26,7 @@ export struct SingPage {
           }),
         }) {
           TwoColumn({
-            videoCardArray: this.singSongPageData.childrenSong,
+            videoCardArray: this.singSongPageData,
           });
         };
 

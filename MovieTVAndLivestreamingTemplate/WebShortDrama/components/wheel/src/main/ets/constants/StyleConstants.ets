@@ -1,6 +1,10 @@
+import { window } from '@kit.ArkUI'
 /**
  * 所有组件的样式常量
  */
+
+const windowStage: window.WindowStage = AppStorage.get('windowStage')!
+
 export default class StyleConstants {
   /**
    * 字体粗细
@@ -25,5 +29,5 @@ export default class StyleConstants {
   /**
    * 弧形文本大小
    */
-  static readonly ARC_TEXT_SIZE: number = fp2px(10)
+  static readonly ARC_TEXT_SIZE: number = windowStage.getMainWindowSync().getUIContext().fp2px(10)
 }

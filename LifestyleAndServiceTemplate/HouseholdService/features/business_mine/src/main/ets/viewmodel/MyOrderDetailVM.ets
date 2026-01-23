@@ -12,27 +12,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import { CommonUtils, RouterMap, SystemSceneUtils } from 'module_base';
-import { FullOrderInfo, getOrder, payOrder, RouterModule, } from 'lib_foundation';
-import { common } from '@kit.AbilityKit';
+import {
+  cancelOrder,
+  CurAppInfo,
+  FullOrderInfo,
+  getOrder,
+  OrderStatus,
+  OrderToPayParam,
+  payOrder,
+  refund,
+  RouterModule,
+} from 'lib_foundation';
+import { CountDownVM } from './CountDownVM';
+import { MyOrderVM } from './MyOrderVM';
+
+const CANCEL_TIME: number = 1800000;
 
 @ObservedV2
 export class MyOrderDetailVM {
   @Trace fullOrderInfo: FullOrderInfo = new FullOrderInfo();
+  @Trace isFromOrderCard: boolean = false;
   @Trace isRefreshing: boolean = false;
-  uiAbilityContext: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+  @Trace leftTime: string = '00:00:00';
+  countDownVM: CountDownVM = CountDownVM.instance;
+  orderVM: MyOrderVM = MyOrderVM.instance;
 
   init() {
-    const paramList: FullOrderInfo[] = RouterModule.getNavParam({ url: RouterMap.MY_ORDER_DETAIL });
+    const paramList: OrderToPayParam[] = RouterModule.getNavParam({ url: RouterMap.MY_ORDER_DETAIL });
     if (paramList.length && paramList[paramList.length - 1]) {
-      this.fullOrderInfo = paramList[paramList.length - 1];
+      this.fullOrderInfo = paramList[paramList.length - 1].orderInfo;
+      this.isFromOrderCard = paramList[paramList.length - 1].isFromOrderCard;
     }
   }
 
+  // todo 开发者可根据实际时间修改待支付倒计时
+  getLeftTime = () => {
+    let diffTime = this.fullOrderInfo.orderTime + CANCEL_TIME - Date.now();
+    this.leftTime = CommonUtils.convertMillisToTime(diffTime);
+  }
+
   payOrder() {
+    this.countDownVM.stopCountdown(this.fullOrderInfo.orderId);
     CommonUtils.showLoading();
     // todo: 传入false，不走mock
-    SystemSceneUtils.requestPaymentPromise(true, this.uiAbilityContext).then(() => {
+    SystemSceneUtils.requestPaymentPromise(true).then(() => {
       payOrder(this.fullOrderInfo.orderId).then(() => {
         CommonUtils.hideLoading();
         this.onRefreshing();
@@ -40,6 +65,40 @@ export class MyOrderDetailVM {
     })
   }
 
+  cancelOrder() {
+    this.countDownVM.stopCountdown(this.fullOrderInfo.orderId);
+    CommonUtils.showLoading();
+    cancelOrder(this.fullOrderInfo.orderId).then(() => {
+      CommonUtils.hideLoading();
+      this.onRefreshing();
+    })
+  }
+
+  applyRefund() {
+    CommonUtils.showLoading();
+    refund(this.fullOrderInfo.orderId).then(() => {
+      CommonUtils.hideLoading();
+      this.onRefreshing();
+    });
+  }
+
+  autoCancelOrder() {
+    if (this.fullOrderInfo.status === OrderStatus.TO_PAY) {
+      this.countDownVM.stopCountdown(this.fullOrderInfo.orderId);
+      this.countDownVM.startCountdown(this.fullOrderInfo.orderId, this.cancelByTime);
+    }
+  }
+
+  cancelByTime = () => {
+    this.getLeftTime();
+    if (this.leftTime <= '00:00:00') {
+      cancelOrder(this.fullOrderInfo.orderId).then(() => {
+        this.onRefreshing();
+        this.orderVM.queryOrderList(false, { showFullLoading: true });
+      })
+      this.countDownVM.stopCountdown(this.fullOrderInfo.orderId);
+    }
+  }
 
   onRefreshing() {
     getOrder(this.fullOrderInfo.orderId).then(async (resp: FullOrderInfo) => {
@@ -47,5 +106,4 @@ export class MyOrderDetailVM {
       this.isRefreshing = false;
     })
   }
-
 }

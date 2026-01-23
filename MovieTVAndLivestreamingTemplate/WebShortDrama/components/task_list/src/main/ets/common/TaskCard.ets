@@ -69,11 +69,11 @@ export struct TaskCard {
     let WARN_TEXT = '未识别的标题:'
     switch (this.title) {
       case StrConstants.WATCH_REWARD:
-        promptAction.showToast({ message: StrConstants.WATCH_REWARD })
+        this.getUIContext().getPromptAction().showToast({ message: StrConstants.WATCH_REWARD })
         this.button()
         break
       default:
-        promptAction.showToast({ message: this.title })
+        this.getUIContext().getPromptAction().showToast({ message: this.title })
         this.updateBalanceAndClaim()
         break
     }

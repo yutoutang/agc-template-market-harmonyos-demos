@@ -4,6 +4,13 @@ import { PlayErrorLayer } from '../components/PlayErrorLayer';
 import { DramaListVM } from '../viewmodel/DramaListVM';
 import { emitter } from '@kit.BasicServicesKit';
 import { Logger } from '@agctemplate/utils';
+import { notificationManager } from '@kit.NotificationKit';
+import { PushUtils } from '@agctemplate/widgets';
+import { BusinessError } from '@kit.BasicServicesKit'
+import { DramaInfo } from '@agctemplate/server';
+import { jumpDetailPage } from '@agctemplate/detail';
+import { WindowManager } from '@agctemplate/utils';
+import { common } from '@kit.AbilityKit';
 
 const TAG = 'HomeMainPage'
 
@@ -39,8 +46,31 @@ export struct HomeMainPage {
     setTimeout(() => {
       this.noFlash = false;
     }, 1000);
-    this.vm.init()
+    this.vm.init().then(() => {
+      let requestEnableNotificationCallback = (err: BusinessError): void => {
+        if (err) {
+          console.error(`requestEnableNotification fail: ${JSON.stringify(err)}`);
+        } else {
+          PushUtils.randomPushMessage(this.vm.data)
+          console.info('requestEnableNotification success');
+        }
+      };
+      notificationManager.requestEnableNotification(this.getUIContext().getHostContext() as common.UIAbilityContext,
+        requestEnableNotificationCallback)
+      if (AppStorage.get('pushCardEntry')) {
+        let dramaData = AppStorage.get('pushCardEntry') as string
+        // let routerParams: DramaInfo = {
+        //   id: dramaData
+        // }
+        // jumpDetailPage(routerParams ,0, 0, () => {
+        //   WindowManager.setWindowSystemBarProperties({ statusBarContentColor: '#e6000000' })
+        // })
+        AppStorage.setOrCreate('isPushCardEntry', '')
+      }
+    })
     this.playController.autoPlay = false
+    this.vm.checkContinueScene();
+
   }
 
   getDeleteEmitter() {
@@ -48,7 +78,7 @@ export struct HomeMainPage {
       eventId: 6
     };
     let callback: Callback<emitter.EventData> = (eventData: emitter.EventData) => {
-      this.vm.refresh()
+      // this.vm.refresh()
     }
     emitter.on(event, callback);
   }

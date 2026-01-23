@@ -1,19 +1,19 @@
-import { Title } from '../uicomponents/Title';
+import { TitleShare } from '../uicomponents/TitleShare';
 import { PlayConstants } from './common/constants/PlayConstants';
 import { GlobalContext } from '../utils/GlobalContext';
-import { ArrayList } from '@kit.ArkTS';
-import { History, VideoCardDetail, VideoDetail } from '@ohos_agcit/children_education_datasource';
-import { CustomContentDialog, promptAction } from '@kit.ArkUI';
+import { User, VideoCardDetail, VideoDetail, VipRecord } from '@ohos_agcit/children_education_datasource';
+import { CustomContentDialog } from '@kit.ArkUI';
 import { TimeControl } from './common/util/TimeControl';
 import { DateFormatUtil } from '../utils/DateFormatUtil';
 import { CommonConstants } from '../constants/CommonConstants';
-import { emitter } from '@kit.BasicServicesKit';
 import { historyRecord } from './PlayControl';
-
+import { QuickLoginUtil } from '../quicklogin/QuickLoginUtil';
 
 @ComponentV2
 export struct AudioPlayPage {
   @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
+  @Consumer(CommonConstants.USER_INFO) user: User = new User();
+  @Consumer(CommonConstants.VIP_RECORD) vipRecord: VipRecord = new VipRecord();
   @Local title: string = '';
   @Local imageUrl: string = '';
   @Local index: number = 1;
@@ -24,8 +24,8 @@ export struct AudioPlayPage {
   private audioDetailInfo = GlobalContext.getContext().getObject(CommonConstants.GLOBAL_VIDEO_LIST) as VideoDetail;
   private jumpReturnPlayState: number = PlayConstants.STATUS_PAUSE;
   controller: VideoController = new VideoController();
-
-  private audioInfo : VideoCardDetail = {
+  private uiContext: UIContext = this.getUIContext() as UIContext;
+  private audioInfo: VideoCardDetail = {
     id: '',
     cardId: '',
     title: '',
@@ -71,7 +71,7 @@ export struct AudioPlayPage {
             Text(this.title)
               .fontWeight(FontWeight.Regular)
               .padding({
-                top : 16
+                top: 16
               })
 
             Column() {
@@ -100,17 +100,16 @@ export struct AudioPlayPage {
       this.index = audioCardDetail.videoNumber - 1;
     })
     .onShown(() => {
-      if (TimeControl.timeControl()) {
+      if (TimeControl.timeControl(this.uiContext)) {
         this.appPathStack.pop();
         return;
       }
       if (this.totalTime !== 0 && this.currentTime === this.totalTime) {
-        let globalVideoList = this.audioDetailInfo.videoCardDetail;
+        let globalVideoList = this.audioDetailInfo.videoCardDetailList;
         let curIndex = this.index + PlayConstants.CONTROL_NEXT;
         this.audioInfo = globalVideoList[curIndex];
         let isVip = this.audioInfo.isVip;
-        let vipInfo = GlobalContext.getContext().getObject(CommonConstants.IS_VIP) as boolean;
-        if (isVip && !vipInfo) {
+        if (isVip && !this.vipRecord.isVip) {
           return;
         }
 
@@ -136,7 +135,7 @@ export struct AudioPlayPage {
         this.jumpReturnPlayState = PlayConstants.STATUS_PAUSE;
       }
     })
-    .title(Title(this.title))
+    .title(TitleShare(this.title, this.imageUrl))
     .onBackPressed(() => {
       this.status = PlayConstants.STATUS_PAUSE;
       this.controller.pause();
@@ -148,30 +147,32 @@ export struct AudioPlayPage {
   }
 
   playNextAudio() {
-    if (TimeControl.timeControl()) {
+    if (TimeControl.timeControl(this.uiContext)) {
       this.appPathStack.pop();
       return;
     }
 
-    let globalVideoList = this.audioDetailInfo.videoCardDetail;
+    let globalVideoList = this.audioDetailInfo.videoCardDetailList;
     let curIndex = this.index + PlayConstants.CONTROL_NEXT;
     if (curIndex === globalVideoList.length) {
       if (this.currentTime === this.totalTime) {
         this.switchPlayOrPause();
       }
-      promptAction.showToast({
-        message: PlayConstants.LAST_NUMBER,
-        alignment: Alignment.Center,
-      });
+      try {
+        this.uiContext.getPromptAction().showToast({
+          message: PlayConstants.LAST_NUMBER,
+          alignment: Alignment.Center,
+        });
+      } catch (error) {
+      }
       return;
     }
 
     this.audioInfo = globalVideoList[curIndex];
     let isVip = this.audioInfo.isVip;
-    let vipInfo = GlobalContext.getContext().getObject(CommonConstants.IS_VIP) as boolean;
 
-    if (isVip && !vipInfo) {
-      this.status = PlayConstants.STATUS_PAUSE;
+    if (isVip && !this.vipRecord.isVip) {
+      this.switchPlayOrPause()
       this.dialogController.open();
       return;
     }
@@ -184,18 +185,21 @@ export struct AudioPlayPage {
   }
 
   playPreviousAudio() {
-    if (TimeControl.timeControl()) {
+    if (TimeControl.timeControl(this.uiContext)) {
       this.appPathStack.pop();
       return;
     }
-    let globalVideoList = this.audioDetailInfo.videoCardDetail;
+    let globalVideoList = this.audioDetailInfo.videoCardDetailList;
     let curIndex = this.index - PlayConstants.CONTROL_NEXT;
 
     if (curIndex < 0) {
-      promptAction.showToast({
-        message: PlayConstants.FIRST_NUMBER,
-        alignment: Alignment.Center,
-      });
+      try {
+        this.uiContext.getPromptAction().showToast({
+          message: PlayConstants.FIRST_NUMBER,
+          alignment: Alignment.Center,
+        });
+      } catch (error) {
+      }
       return;
     }
 
@@ -245,7 +249,7 @@ export struct AudioPlayPage {
         .backgroundColor('#FFD15D');
 
         SymbolGlyph(this.status === PlayConstants.STATUS_START ? $r('sys.symbol.pause') :
-        $r('sys.symbol.play_fill'))
+          $r('sys.symbol.play_fill'))
           .fontColor([$r('sys.color.white')])
           .fontSize('30vp');
       }
@@ -262,7 +266,7 @@ export struct AudioPlayPage {
         .backgroundColor('#fff6f3f3');
 
         SymbolGlyph($r('sys.symbol.forward_end_fill'))
-          .fontColor(this.index === this.audioDetailInfo.videoCardDetail.length-1 ? [Color.Gray] : [Color.Black])
+          .fontColor(this.index === this.audioDetailInfo.videoCardDetailList.length - 1 ? [Color.Gray] : [Color.Black])
           .fontSize('30vp');
       }
       .onClick(() => {
@@ -304,7 +308,7 @@ export struct AudioPlayPage {
   @Builder
   buildContent(): void {
     Column() {
-      Text('下一视频需要开通VIP，即将跳转到VIP页面');
+      Text('下一内容需要开通VIP，即将跳转到' + (this.user.isLogin ? 'VIP' : '登录') + '页面');
     }
     .width(CommonConstants.FULL_PERCENT);
   }
@@ -327,9 +331,12 @@ export struct AudioPlayPage {
           buttonStyle: ButtonStyleMode.TEXTUAL,
           role: ButtonRole.ERROR,
           action: () => {
+            if (!this.user.isLogin) {
+              QuickLoginUtil.getQuickLoginAnonymousPhone(this.getUIContext(), this.appPathStack)
+              return
+            }
             let pathInfo: NavPathInfo = new NavPathInfo(CommonConstants.VIP_PAGE_VIEW, this.audioInfo);
             this.appPathStack.pushDestination(pathInfo, true);
-            return;
           },
         },
       ],

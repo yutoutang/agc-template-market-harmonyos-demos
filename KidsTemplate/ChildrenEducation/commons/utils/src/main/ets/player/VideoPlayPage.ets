@@ -1,35 +1,43 @@
 import { Title } from '../uicomponents/Title';
 import { GlobalContext } from '../utils/GlobalContext';
-import { ArrayList } from '@kit.ArkTS';
-import { History, VideoCardDetail, VideoDetail } from '@ohos_agcit/children_education_datasource';
-import { PlayConstants } from './common/constants/PlayConstants';
-import { CustomContentDialog, display, promptAction, window } from '@kit.ArkUI';
+import { User, VideoCardDetail, VideoDetail, VipRecord } from '@ohos_agcit/children_education_datasource';
+import { display } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
 import { BusinessError, emitter } from '@kit.BasicServicesKit';
 import { TimeControl } from './common/util/TimeControl';
 import { LogUtil } from '../utils/LogUtil';
-import { DateFormatUtil } from '../utils/DateFormatUtil';
 import { CommonConstants } from '../constants/CommonConstants';
 import { historyRecord } from './PlayControl';
+import { MovieItem, PlayerComponent } from 'recorded_player';
+import { SharePicker } from 'aggregated_share';
+import { QuickLoginUtil } from '../quicklogin/QuickLoginUtil';
+import { FinishStatus, MemberList, MemberParams, MemberSheetUtils,
+  PRIVACY_CONTENT,
+  ProductInfo, ProductsInfoOptions,
+  PRODUCTS_INFO } from 'membership';
+import { iap } from '@kit.IAPKit';
+import { DateUtil } from '../utils/DateUtil';
+import { DateConstants } from '../constants/DateConstants';
+
 
 @ComponentV2
 export struct VideoPlayPage {
+  private videoDetailInfo = GlobalContext.getContext().getObject(CommonConstants.GLOBAL_VIDEO_LIST) as VideoDetail;
+  private uiContext: UIContext = this.getUIContext() as UIContext;
+  private hostContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
+  private windowClass = this.hostContext.windowStage.getMainWindowSync();
   @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
+  @Consumer(CommonConstants.USER_INFO) user: User = new User();
+  @Consumer(CommonConstants.VIP_RECORD) userVipRecord: VipRecord = new VipRecord();
   @Local title: string = '';
-  @Local videoUrl: string = '';
   @Local index: number = 0;
   @Local totalTime: number = 0;
   @Local currentTime: number = 0;
-  controller: VideoController = new VideoController();
-  @Local status: number = PlayConstants.STATUS_START;
-  @Local isLandscape: boolean = false; // 是否横屏状态
-  private videoDetailInfo = GlobalContext.getContext().getObject(CommonConstants.GLOBAL_VIDEO_LIST) as VideoDetail;
-  private jumpReturnPlayState: number = PlayConstants.STATUS_PAUSE;
-  private windowClass = (getContext(this) as common.UIAbilityContext).windowStage.getMainWindowSync();
   @Local aspect: number = 9 / 16; // default video height/width ratio value
-  @Local xComponentWidth: number = px2vp(display.getDefaultDisplaySync().width);
-  @Local xComponentHeight: number = px2vp(display.getDefaultDisplaySync().width * this.aspect);
+  @Local xComponentWidth: number = this.getUIContext().px2vp(display.getDefaultDisplaySync().width);
+  @Local xComponentHeight: number = this.getUIContext().px2vp(display.getDefaultDisplaySync().width * this.aspect);
   @Local isShowVip: boolean = false;
+  @Local isLayoutFullScreen: boolean = false; // 是否横屏状态
   private videoInfo: VideoCardDetail = {
     id: '',
     cardId: '',
@@ -40,21 +48,28 @@ export struct VideoPlayPage {
     videoUrl: '',
     isVip: false,
   };
+  shareEvent = () => {
+    const picker = new SharePicker({
+      title: this.videoInfo.title,
+      coverUrl: this.videoInfo.imageUrl
+    });
+    picker.show();
+  };
 
   aboutToAppear(): void {
     this.windowClass.on('windowSizeChange', (size) => {
-      let viewWidth = px2vp(size.width);
-      let viewHeight = px2vp(size.height);
+      let viewWidth = this.getUIContext().px2vp(size.width);
+      let viewHeight = this.getUIContext().px2vp(size.height);
       if (viewWidth > viewHeight) {
         this.xComponentWidth = viewHeight / this.aspect;
         this.xComponentHeight = viewHeight;
-        this.isLandscape = true;
+        this.isLayoutFullScreen = true;
         this.windowClass.setSpecificSystemBarEnabled('navigationIndicator', false);
       } else {
         this.xComponentHeight = viewWidth * this.aspect;
         this.xComponentWidth = viewWidth;
         this.windowClass.setSpecificSystemBarEnabled('navigationIndicator', true);
-        this.isLandscape = false;
+        this.isLayoutFullScreen = false;
       }
     });
   }
@@ -68,7 +83,7 @@ export struct VideoPlayPage {
   }
 
   aboutToDisappear(): void {
-    this.isLandscape = false;
+    this.isLayoutFullScreen = false;
   }
 
   build() {
@@ -76,289 +91,254 @@ export struct VideoPlayPage {
       Column() {
         Stack() {
           Column() {
-            Video({
-              src: this.videoUrl,
-              controller: this.controller,
-            })
-              .aspectRatio(PlayConstants.ASPECT_RATIO)
-              .height(this.isLandscape ? '250' : CommonConstants.FULL_PERCENT)
-              .width(this.isLandscape ? CommonConstants.FULL_PERCENT : CommonConstants.FULL_PERCENT)
-              .autoPlay(true)
-              .controls(false)
-              .onPrepared((e) => {
-                this.currentTime = 0;
-                this.totalTime = e.duration;
-                this.xComponentHeight = px2vp(display.getDefaultDisplaySync().width * this.aspect);
-                this.xComponentWidth = px2vp(display.getDefaultDisplaySync().width);
-                console.info('onPrepared is ' + e.duration);
-              })
-              .onStart(() => {
-                if (this.isShowVip === true) {
-                  this.switchPlayOrPause();
+            if (this.videoInfo.isVip && !this.userVipRecord.isVip) {
+              VipPrompt(
+                {
+                  isLayoutFullScreen: this.isLayoutFullScreen,
+                  xComponentWidth: this.xComponentWidth,
+                  xComponentHeight: this.xComponentHeight,
+                  shareEvent: this.shareEvent
+                }
+              )
+            } else {
+              PlayerComponent({
+                movieItems: [new MovieItem('01', this.videoInfo.title, 0, this.videoInfo.videoUrl)],
+                playerIndex: 0,
+                fullScreen: (isLayoutFullScreen: boolean) => {
+                  this.isLayoutFullScreen = isLayoutFullScreen
+                },
+                exitEvent: () => this.appPathStack.pop(),
+                shareEvent: this.shareEvent,
+                callbackTimeUpdate: (nol: number, total: number) => {
+                  // 播放完成
+                  if (nol === total) {
+
+                  }
                 }
               })
-              .onUpdate((e) => {
-                this.currentTime = e.time;
-                console.info('onUpdate is ' + e.time);
-              })
-              .onFinish(() => {
-                this.playNextVideo();
-              })
-              .width(this.xComponentWidth)
-              .height(this.xComponentHeight);
+                .width('100%')
+                .height(this.isLayoutFullScreen ? '100%' : 'auto')
+                .clip(true)
+            }
           };
-
-          this.playControl();
         }
         .width(CommonConstants.FULL_PERCENT)
-        .height(this.isLandscape ? CommonConstants.FULL_PERCENT :
+        .height(this.isLayoutFullScreen ? CommonConstants.FULL_PERCENT :
           this.xComponentHeight + (AppStorage.get<number>('statusBarHeight') ?? 0))
         .backgroundColor(Color.Black)
-        .padding({ top: this.isLandscape ? 0 : (AppStorage.get<number>('statusBarHeight') || 0) });
+        .padding({ top: this.isLayoutFullScreen ? 0 : (AppStorage.get<number>('statusBarHeight') || 0) });
+
 
         Row() {
-          Text(this.title)
-            .fontSize(16);
+          Text(this.videoInfo.title)
+            .fontSize(16)
+            .fontWeight(500)
+            .lineHeight(21)
         }
-        .padding({
-          left: '4%',
-        })
-        .height(35)
-        .width(CommonConstants.FULL_PERCENT);
-
-        Row() {
-        }
-        .height(15)
+        .padding({ left: 16 })
+        .height(48)
         .width(CommonConstants.FULL_PERCENT)
-        .backgroundColor('#F1F3F5');
 
-        VideoCardDetailShow({
-          controller: this.controller,
-          globalVideoList: this.videoDetailInfo.videoCardDetail,
-        });
+        Blank()
+          .height(8)
+          .width(CommonConstants.FULL_PERCENT)
+          .backgroundColor($r('sys.color.background_secondary'));
+
+        VideoCollection({
+          globalVideoList: this.videoDetailInfo.videoCardDetailList,
+        })
       };
     }
     .onReady((cxt: NavDestinationContext) => {
-      let videoCardDetail = cxt.pathInfo.param as VideoCardDetail;
-      this.title = videoCardDetail.title;
-      this.videoUrl = videoCardDetail.videoUrl;
-      this.index = videoCardDetail.videoNumber - 1;
+      let detail = cxt.pathInfo.param as VideoCardDetail;
+      this.videoInfo.id = detail.id
+      this.videoInfo.cardId = detail.cardId
+      this.videoInfo.title = detail.title
+      this.videoInfo.imageUrl = detail.imageUrl
+      this.videoInfo.iconUrl = detail.iconUrl
+      this.videoInfo.videoUrl = detail.videoUrl
+      this.videoInfo.videoNumber = detail.videoNumber
+      this.videoInfo.isVip = detail.isVip
     })
     .onHidden(() => {
-      if (this.status === PlayConstants.STATUS_START) {
-        this.controller.pause();
-        this.status = PlayConstants.STATUS_PAUSE;
-        this.jumpReturnPlayState = PlayConstants.STATUS_START;
-      } else {
-        this.jumpReturnPlayState = PlayConstants.STATUS_PAUSE;
-      }
     })
     .onShown(() => {
-      if (TimeControl.timeControl()) {
+      if (TimeControl.timeControl(this.uiContext)) {
         this.appPathStack.pop();
         return;
       }
-      // 判断是否已经开通VIP，如果已开通，去除开通会员页面，开始播放
-      let vipInfo = GlobalContext.getContext().getObject(CommonConstants.IS_VIP) as boolean;
-      if (this.videoInfo.isVip && vipInfo) {
-        this.isShowVip = false;
-        this.switchPlayOrPause();
-      }
-      if (this.status === PlayConstants.STATUS_PAUSE && this.jumpReturnPlayState === PlayConstants.STATUS_START) {
-        this.switchPlayOrPause();
-      }
     })
-    .hideTitleBar(this.isLandscape)
-    .title(Title(this.title))
+    .hideTitleBar(true)
+    .title(Title(this.videoInfo.title))
     .onBackPressed(() => {
-      this.status = PlayConstants.STATUS_PAUSE;
-      this.controller.pause();
-      this.controller.stop();
-      historyRecord(this.videoDetailInfo, this.index);
+      historyRecord(this.videoDetailInfo, this.videoInfo.videoNumber - 1);
       this.appPathStack.pop();
       return true;
     });
   }
+}
 
-  @Builder
-  landScapeTitle() {
-    Row() {
-      Image($r('app.media.video_screen_direction_switching_ic_back1'))
-        .width(24)
-        .height(24)
-        .margin({ right: 10 })
-        .onClick(() => {
-          this.setOrientation(window.Orientation.USER_ROTATION_PORTRAIT);
-          this.isLandscape = !this.isLandscape;
-        });
-      Text(this.title)
-        .textAlign(TextAlign.Start)
-        .fontFamily('HarmonyHeiTi-Medium')
-        .textOverflow({ overflow: TextOverflow.Ellipsis })
-        .fontSize(18)
-        .fontColor(Color.White);
-    }
-    .padding({
-      left: '3%',
-      top: '2%',
-    })
-    .zIndex(10)
-    .width(CommonConstants.FULL_PERCENT)
-    .visibility(this.isLandscape ? Visibility.Visible : Visibility.Hidden);
+@ComponentV2
+struct VipPrompt {
+  @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
+  @Consumer(CommonConstants.USER_INFO) user: User = new User();
+  @Consumer(CommonConstants.VIP_RECORD) vipRecord: VipRecord = new VipRecord();
+  @Param isLayoutFullScreen: boolean = false
+  @Param xComponentWidth: number = 0
+  @Param xComponentHeight: number = 0
+  @Param shareEvent: () => void = () => {
   }
+  // 购买会员商品结果回调函数
+  private subscribeEvent = async (params: MemberParams): Promise<void> => {
+    this.getUIContext().getPromptAction().showToast({ message: this.getSubscribeMsg(params) });
+    if (params.type === iap.ProductType.NONRENEWABLE && params.status === FinishStatus.FINISHED) {
 
-  playNextVideo() {
-    if (TimeControl.timeControl()) {
-      this.appPathStack.pop();
-      return;
-    }
+      let validTimeTmp = DateUtil.getTodayStr(DateConstants.DATE_FORMAT4);
 
-    let globalVideoList = this.videoDetailInfo.videoCardDetail;
-
-    let curIndex = this.index + PlayConstants.CONTROL_NEXT;
-    if (curIndex === globalVideoList.length) {
-      this.switchPlayOrPause();
-      promptAction.showToast({
-        message: PlayConstants.LAST_NUMBER,
-        alignment: Alignment.Center,
-      });
-      return;
-    }
-
-    this.videoInfo = globalVideoList[curIndex];
-    this.index = curIndex;
-    this.title = this.videoInfo.title;
-    this.videoUrl = this.videoInfo.videoUrl;
-    let isVip = this.videoInfo.isVip;
-    let vipInfo = GlobalContext.getContext().getObject(CommonConstants.IS_VIP) as boolean;
-
-    if (isVip && !vipInfo) {
-      if (this.isLandscape) {
-        this.setOrientation(window.Orientation.USER_ROTATION_PORTRAIT);
-        this.isLandscape = !this.isLandscape;
+      if (params.productId === '20254') {
+        validTimeTmp = DateUtil.getAmountDayStr(validTimeTmp, 365, DateConstants.DATE_FORMAT4);
+      } else if (params.productId === '20253') {
+        validTimeTmp = DateUtil.getAmountDayStr(validTimeTmp, 92, DateConstants.DATE_FORMAT4);
+      } else {
+        validTimeTmp = DateUtil.getAmountDayStr(validTimeTmp, 31, DateConstants.DATE_FORMAT4);
       }
-      this.isShowVip = true;
+
+      let vipRecord: emitter.EventData = {
+        data: {
+          'isVip': true,
+          'validTime': validTimeTmp,
+        },
+      };
+      emitter.emit(CommonConstants.VIP_RECORD, vipRecord);
+
+      this.queryExpireTime(params.productId, params.purchaseTime, validTimeTmp);
     }
-    this.controller.reset();
+  };
+  // 查询用户开通的会员种类列表，沙盒场景下，已发货状态的非消耗型商品订单信息不返回
+  private ownedMemberEvent = async (list: MemberList): Promise<void> => {
+    if (list.renewList.length || list.nonRenewList.length) {
+      this.getUIContext().getPromptAction().showToast({ message: `您已拥有会员` });
+    }
+  };
+  // 购买非周期订阅商品后从开发者服务器查询商品到期时间
+  private queryExpireTime = (productId: string, time?: number, validTime?: string): Promise<void> => {
+    // 请求开发者服务器获取非周期订阅商品到期时间（涉及商品id、购买次数）
+    return new Promise(() => {
+      if (validTime !== undefined) {
+        this.vipRecord.validTime = validTime
+      }
+    });
+  };
+
+  private getSubscribeMsg(param: MemberParams) {
+    let message = '';
+    if (param.status === FinishStatus.FINISHED) {
+      message = '会员订阅成功';
+    } else if (param.status === FinishStatus.UNFINISHED) {
+      message = `会员订阅失败，订阅错误码为${param.errCode}，错误原因为${param.errMsg}`;
+    }
+    return message;
   }
 
-  @Builder
-  showVip() {
+  private readonly productsInfo: ProductsInfoOptions = {
+    isSheet: true,
+    themeColor: $r('app.color.color_member'),
+    btnFontColor: $r('sys.color.font_on_primary'),
+    linearColors: [['#FFFFFF', 0.0], ['#F5F1E5', 0.0], ['#F1D1A5', 1.0]],
+    productsInfo: PRODUCTS_INFO,
+    privacyContent: PRIVACY_CONTENT,
+    lastPurchaseProductExpireTime: this.vipRecord.validTime,
+    subscribeCallBack: this.subscribeEvent,
+    queryExpireTime: this.queryExpireTime,
+    ownedMemberCallBack: this.ownedMemberEvent,
+  };
+
+  build() {
     Column() {
+      Row() {
+        Stack({ alignContent: Alignment.Center }) {
+          Circle()
+            .width(40)
+            .height(40)
+            .fill($r('sys.color.comp_background_tertiary'))
+
+          SymbolGlyph($r('sys.symbol.chevron_left'))
+            .fontSize(24)
+            .fontColor([$r('sys.color.icon_on_primary')])
+        }
+        .margin({ left: 16, top: 8 })
+        .onClick(() => {
+          this.appPathStack.pop();
+        })
+
+        Stack({ alignContent: Alignment.Center }) {
+          Circle()
+            .width(40)
+            .height(40)
+            .fill($r('sys.color.comp_background_tertiary'))
+
+          SymbolGlyph($r('sys.symbol.share'))
+            .fontSize(24)
+            .fontColor([$r('sys.color.icon_on_primary')])
+        }
+        .margin({ right: 16, top: 8 })
+        .onClick(() => {
+          this.shareEvent()
+        })
+      }
+      .height(56)
+      .width('100%')
+      .alignItems(VerticalAlign.Center)
+      .justifyContent(FlexAlign.SpaceBetween)
+
       Text('该视频内容为VIP会员专享，查看请先开通会员')
+        .fontSize(14)
         .fontColor(Color.White)
-        .padding({
-          top: this.isLandscape ? 150 : 74,
-          bottom: 30,
-        });
+        .lineHeight(19)
+
+      Blank().height(12)
+
       Button('开通会员')
-        .width(this.isLandscape ? 100 : 80)
+        .width(this.isLayoutFullScreen ? 120 : 90)
         .aspectRatio(2.57)
+        .fontSize($r('sys.float.Body_M'))
         .fontColor($r('sys.color.font_primary'))
-        .backgroundColor('#F8E6CF')
+        .backgroundColor('#D3B685')
         .borderRadius(14)
         .onClick(() => {
-          let pathInfo: NavPathInfo = new NavPathInfo(CommonConstants.VIP_PAGE_VIEW, this.videoInfo);
-          this.appPathStack.pushDestination(pathInfo, true);
-          return;
-        });
+          if (!this.user.isLogin) {
+            QuickLoginUtil.getQuickLoginAnonymousPhone(this.getUIContext(), this.appPathStack)
+            return
+          }
+          // 半模态弹窗
+          MemberSheetUtils.open(this.productsInfo, this.getUIContext());
+        })
+
+      Blank().height(12)
+
+      if (!this.user.isLogin) {
+        Text('已是会员？点击登录查看')
+          .fontSize(14)
+          .fontColor('#D3B685')
+          .onClick(() => {
+            QuickLoginUtil.getQuickLoginAnonymousPhone(this.getUIContext(), this.appPathStack)
+          })
+      }
     }
     .width(this.xComponentWidth)
     .height(this.xComponentHeight)
-    .backgroundColor(Color.Black)
+    .backgroundColor($r('sys.color.comp_foreground_primary'))
     .zIndex(1)
-    .visibility(this.isShowVip ? Visibility.Visible : Visibility.Hidden);
-  }
-
-  switchPlayOrPause() {
-    if (this.status === PlayConstants.STATUS_START) {
-      this.controller.pause();
-      this.status = PlayConstants.STATUS_PAUSE;
-    } else {
-      this.controller.start();
-      this.status = PlayConstants.STATUS_START;
-    }
-  }
-
-  @Builder
-  playControl() {
-    RelativeContainer() {
-      this.landScapeTitle();
-      this.showVip();
-      Row() {
-        Image(this.status === PlayConstants.STATUS_START ?
-        $r('app.media.ic_play') : $r('app.media.ic_pause'))
-          .fillColor(Color.Black)
-          .width($r('app.float.26vp'))
-          .onClick(() => {
-            this.switchPlayOrPause();
-          });
-
-        Text(DateFormatUtil.secondToTime(this.currentTime))
-          .fontSize($r('app.float.14fp'))
-          .fontColor(Color.White)
-          .margin({ left: PlayConstants.PROGRESS_MARGIN_LEFT });
-
-        Slider({
-          value: this.currentTime,
-          min: 0,
-          max: this.totalTime,
-          step: 1,
-          style: SliderStyle.OutSet,
-        })
-          .blockColor(Color.White)
-          .trackColor($r('sys.color.comp_background_secondary'))
-          .selectedColor($r('sys.color.comp_background_emphasize'))
-          .trackThickness('4vp')
-          .layoutWeight(1)
-          .margin({ left: '2.2%' })
-          .onChange((value: number, mode: SliderChangeMode) => {
-            this.currentTime = value;
-            this.controller.setCurrentTime(value, SeekMode.PreviousKeyframe);
-          });
-
-        Text(DateFormatUtil.secondToTime(this.totalTime))
-          .fontSize($r('app.float.14fp'))
-          .fontColor(Color.White)
-          .margin({ left: PlayConstants.PROGRESS_MARGIN_LEFT });
-
-        if (this.isLandscape) {
-          Image($r('app.media.ic_video_menu_detail'))
-            .width($r('app.float.24vp'))
-            .margin({ left: PlayConstants.PROGRESS_MARGIN_LEFT })
-            .onClick(() => {
-              this.setOrientation(window.Orientation.USER_ROTATION_PORTRAIT);
-              this.isLandscape = !this.isLandscape;
-            });
-        } else {
-          Image($r('app.media.ic_video_menu_landscape_fullscreen'))
-            .width($r('app.float.24vp'))
-            .margin({ left: PlayConstants.PROGRESS_MARGIN_LEFT })
-            .onClick(() => {
-              this.setOrientation(window.Orientation.USER_ROTATION_LANDSCAPE);
-              this.isLandscape = !this.isLandscape;
-            });
-        }
-      }
-      .padding({
-        left: '2%',
-        right: '4%',
-      })
-      .alignRules({
-        bottom: { anchor: '__container__', align: VerticalAlign.Bottom },
-      });
-    }
-    .width(CommonConstants.FULL_PERCENT)
-    .height(CommonConstants.FULL_PERCENT)
-    .zIndex(10);
+    .visibility(Visibility.Visible);
   }
 }
 
 @ComponentV2
-struct VideoCardDetailShow {
-  @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
+struct VideoCollection {
   @Param @Once @Require globalVideoList: Array<VideoCardDetail>;
-  @Param @Once @Require controller: VideoController;
+  @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
+  @Consumer(CommonConstants.USER_INFO) user: User = new User();
+  @Consumer(CommonConstants.VIP_RECORD) vipRecord: VipRecord = new VipRecord();
 
   build() {
     Column() {
@@ -387,18 +367,15 @@ struct VideoCardDetailShow {
             right: '4%',
           })
           .onClick(() => {
-            let vipInfo = GlobalContext.getContext().getObject(CommonConstants.IS_VIP) as boolean;
-            if (item.isVip && !vipInfo) {
-              let pathInfo: NavPathInfo = new NavPathInfo(CommonConstants.VIP_PAGE_VIEW, item);
-              this.appPathStack.pushDestination(pathInfo, true);
-            } else {
-              this.controller.pause();
-              this.controller.stop();
+            if (!item.isVip) {
               let pathInfo: NavPathInfo = new NavPathInfo(CommonConstants.VIDEO_PLAY_PAGE, item);
               this.appPathStack.replacePath(pathInfo, true);
+              return
             }
+            let pathInfo: NavPathInfo = new NavPathInfo(CommonConstants.VIDEO_PLAY_PAGE, item);
+            this.appPathStack.replacePath(pathInfo, true);
           });
-        }, (item:VideoCardDetail) => JSON.stringify(item));
+        }, (item: VideoCardDetail) => JSON.stringify(item));
       }
       .scrollBar(BarState.Off)
       .width(CommonConstants.FULL_PERCENT)

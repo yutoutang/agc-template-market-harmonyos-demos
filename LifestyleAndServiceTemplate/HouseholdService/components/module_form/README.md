@@ -4,7 +4,7 @@
 
 - [简介](#简介)
 - [约束与限制](#约束与限制)
-- [快速入门](#快速入门)
+- [使用](#使用)
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
@@ -23,7 +23,11 @@
 * 设备类型：华为手机（包括双折叠和阔折叠）
 * 系统版本：HarmonyOS 5.0.0(12)及以上
 
-## 快速入门
+### 权限
+
+* 无
+
+## 使用
 
 1. 安装组件。
 
@@ -59,8 +63,7 @@
     import { FormItem, FormType } from 'module_form';
     ```
 
-3. 如需使用选择头像功能，请[配置签名和指纹](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-sign-fingerprints)
-和[配置Client ID](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-client-id)。
+3. 配置华为账号服务。如需使用选择头像功能，将Client ID配置到entry模块下的src/main/module.json5文件，详细参考：[配置签名和指纹](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-sign-fingerprints)和[配置Client ID](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-client-id)
 
 4. 如需使用选择地点功能，请[开通地图服务](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/map-config-agc)。
 
@@ -107,7 +110,7 @@ FormItem(option: [FormItemOptions](#FormItemOptions对象说明))
 | INPUT   | 基础输入框 |
 | GENDER  | 性别选择  |
 | DATE    | 日期选择  |
-| AVATAR  | 头像头像  |
+| AVATAR  | 头像    |
 | ADDRESS | 地点选择  |
 | TEXT    | 文本只读  |
 | OTHER   | 其他    |

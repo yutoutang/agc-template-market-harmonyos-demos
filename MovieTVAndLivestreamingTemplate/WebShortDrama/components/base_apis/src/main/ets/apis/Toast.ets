@@ -191,6 +191,7 @@ class Toast {
   private loadingDialog: ComponentContent<ToastOption> | null = null
   private promptAction: PromptAction | null = null
   private uiObserver: UIObserver | null = null
+  windowStage: window.WindowStage = AppStorage.get('windowStage')!
 
   constructor() {
   }
@@ -211,7 +212,7 @@ class Toast {
    * 根据参数打开弹框
    */
   private async open(option: ToastOption) {
-    let windowClass = await window.getLastWindow(getContext())
+    let windowClass = await window.getLastWindow(this.windowStage.getMainWindowSync().getUIContext().getHostContext()!)
     let uiContext = windowClass.getUIContext()
     let loadingDialog = new ComponentContent(uiContext, wrapBuilder(defaultBuilder), option)
     let promptAction = uiContext.getPromptAction()

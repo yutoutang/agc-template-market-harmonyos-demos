@@ -10,6 +10,7 @@ import { NewDrama } from '../views/NewDrama'
 import { VIP } from '../views/VIP'
 import { BillboardPageBuilder } from './BillboardPage'
 import { RecommendPanel } from '../components/RecommendPanel'
+import { SafeJson } from '@agctemplate/utils'
 
 const reTabs = ['精选', '古装', '家庭', '年代', '穿越', '职场', '重生', '权谋', '其他']
 const chaTabs = ['热播榜', '飙升榜', '新剧榜', '热搜榜']
@@ -32,6 +33,7 @@ struct TheaterMainPage {
   @Provider('sTabs') selIndex: number = 0
   @Provider('rank') rankTab: string = reTabs[this.selIndex]
   @Provider('scroll') scroller: Scroller = new Scroller()
+
   @Computed
   get _rankTab(): string {
     if (this.selectedIndex === 0) {
@@ -40,7 +42,7 @@ struct TheaterMainPage {
     if (this.selectedIndex === 1) {
       return chaTabs[this.selIndex]
     }
-   return ''
+    return ''
   }
 
   @Monitor('_rankTab')
@@ -75,18 +77,24 @@ struct TheaterMainPage {
   async aboutToAppear() {
     await this.initViewData()
     // 计算优选短剧的间距
-    this.gutter = await this.calcRecommendGutter(getContext(this))
+    this.gutter = await this.calcRecommendGutter(this.getUIContext().getHostContext()!)
   }
 
   async calcRecommendGutter(context: Context): Promise<number> {
     const padding = 48, coverWidth = 104
-    let windowClass = await window.getLastWindow(context)
-    let properties = windowClass.getWindowProperties()
-    let width = px2vp(properties.windowRect.width)
+    let width: number = 0
+    try {
+      let windowClass = await window.getLastWindow(context)
+      let properties = windowClass.getWindowProperties()
+      width = this.getUIContext().px2vp(properties.windowRect.width)
+    } catch (error) {
+      console.error('Failed. Cause:' + SafeJson.ohAegJsonStringify(error));
+    }
     let num = Math.floor((width - padding) / coverWidth)
-    return (width - padding - num * coverWidth) / (num-1)
+    return (width - padding - num * coverWidth) / (num - 1)
   }
 
+  //剧场里推荐、排行榜、新剧、VIP专区等内容
   @Builder
   contentBuilder() {
     List({ scroller: this.scroller }) {
@@ -103,6 +111,7 @@ struct TheaterMainPage {
     .borderColor(Color.Red)
     .padding({ left: 8, right: 8 })
     .edgeEffect(EdgeEffect.Spring)
+    .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
     .scrollBar(BarState.Off)
     .nestedScroll({
       scrollForward: NestedScrollMode.PARENT_FIRST,
@@ -114,15 +123,15 @@ struct TheaterMainPage {
         this.vipRecommendList = this.vipRecommendList.concat(list)
       } else if (this.selectedIndex !== 1) {
         const list = await getRecommendList(++this.currentRecommendPageNum)
-          this.recommendList = this.recommendList.concat(list)
-          if (this.selectedIndex === 0) {
-            if (this.rankTab === '精选' || this.rankTab === '其他') {
-              this.recommendTagList = this.recommendTagList.concat(list)
-            } else {
-              this.recommendTagList = this.recommendList.filter(drama => {
-                return drama.tags.includes(this.rankTab);
-              });
-            }
+        this.recommendList = this.recommendList.concat(list)
+        if (this.selectedIndex === 0) {
+          if (this.rankTab === '精选' || this.rankTab === '其他') {
+            this.recommendTagList = this.recommendTagList.concat(list)
+          } else {
+            this.recommendTagList = this.recommendList.filter(drama => {
+              return drama.tags.includes(this.rankTab);
+            });
+          }
         }
       }
     })
@@ -145,7 +154,7 @@ struct TheaterMainPage {
 
       Flex() {
         List({ space: 8 }) {
-          ForEach(['推荐','排行榜','新剧','VIP专区'],(title: string, index: number) => {
+          ForEach(['推荐', '排行榜', '新剧', 'VIP专区'], (title: string, index: number) => {
             ListItem() {
               Text(title)
                 .width(76)
@@ -173,7 +182,6 @@ struct TheaterMainPage {
     .padding({ top: 9 })
   }
 
-
   build() {
     NavDestination() {
       Column() {
@@ -197,7 +205,7 @@ struct TheaterMainPage {
       }.backgroundColor('#F1F3F5')
     }
     .backgroundColor(getColor('app.color.common_background_color'))
-    .padding({ top: `${px2vp(this.statusBarHeight.value)}vp` })
+    .padding({ top: `${this.getUIContext().px2vp(this.statusBarHeight.value)}vp` })
   }
 }
 

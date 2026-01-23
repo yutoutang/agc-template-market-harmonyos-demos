@@ -7,9 +7,12 @@
   "license": "",
   "dependencies": {
     "external_interactions": "file:../../common/external_interactions",
-    "uicomponents": "file:../../common/uiComponents",
     "course": "file:../../features/course",
     "card": "file:../../features/card",
-    "vip": "file:../../features/vip"
+    "vip": "file:../../features/vip",
+    "module_recharge": "file:../../components/module_recharge",
+    "atomicservice_login": "file:../../components/atomicservice_login",
+    "feedback": "file:../../components/feedback",
+    "city_select": "file:../../components/city_select"
   }
 }

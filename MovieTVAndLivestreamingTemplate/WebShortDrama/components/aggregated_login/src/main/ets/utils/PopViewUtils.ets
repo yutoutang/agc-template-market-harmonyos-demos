@@ -1,5 +1,4 @@
-import { ComponentContent, promptAction } from '@kit.ArkUI';
-import { common } from '@kit.AbilityKit';
+import { ComponentContent, promptAction, window } from '@kit.ArkUI';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 
 const logTag = 'PopViewUtils';
@@ -10,7 +9,7 @@ enum PopViewShowType {
 }
 
 async function getUIContext() {
-  return (await (getContext() as common.UIAbilityContext).windowStage.getMainWindow()).getUIContext();
+  return AppStorage.get('UIContext') as UIContext
 }
 
 interface PopViewModel {

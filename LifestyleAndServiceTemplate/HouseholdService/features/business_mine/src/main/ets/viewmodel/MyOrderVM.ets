@@ -13,14 +13,7 @@
  * limitations under the License.
  */
 import { AppStorageV2 } from '@kit.ArkUI';
-import {
-  getOrderList,
-  HomeBaseInfo,
-  MY_ORDER_LIST,
-  OrderDetailList,
-  RouterModule,
-  OrderStatus,
-} from 'lib_foundation';
+import { getOrderList, HomeBaseInfo, MY_ORDER_LIST, OrderDetailList, OrderStatus, RouterModule, } from 'lib_foundation';
 import { CommonUtils, RouterMap } from 'module_base';
 
 export interface IQueryListParam {
@@ -41,6 +34,7 @@ export class MyOrderVM {
   ];
   @Trace isRefreshing: boolean = false;
   @Trace isLoading: boolean = false;
+  @Trace textWidth: number[] = [0, 0, 0, 0];
   static _instance: MyOrderVM;
 
   static get instance() {
@@ -53,7 +47,7 @@ export class MyOrderVM {
 
   init() {
     this.getRouteParam();
-    this.queryOrderList({
+    this.queryOrderList(true, {
       showFullLoading: true,
     });
   }
@@ -66,13 +60,19 @@ export class MyOrderVM {
     }
   }
 
-  queryOrderList(param?: IQueryListParam) {
-    if (param?.showFullLoading) {
-      this.isLoading = true;
-    }
+  queryOrderList(showLoading: boolean, param?: IQueryListParam) {
+    if (showLoading) {
+      if (param?.showFullLoading) {
+        this.isLoading = true;
+      }
 
-    if (param?.showFullLoading) {
-      CommonUtils.showLoading();
+      if (!this.isLoading) {
+        this.isRefreshing = true;
+      }
+
+      if (param?.showFullLoading) {
+        CommonUtils.showLoading();
+      }
     }
     if (param?.tabIndex !== undefined) {
       this.setSelectedIndex(param?.tabIndex);

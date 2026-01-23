@@ -5,12 +5,16 @@
       "value": "模块描述"
     },
     {
-      "name": "EntryAbility_desc",
+      "name": "PhoneAbility_desc",
       "value": "description"
     },
     {
-      "name": "EntryAbility_label",
+      "name": "PhoneAbility_label",
       "value": "拍摄美化行业模版"
+    },
+    {
+      "name": "agcit_huawei_image_processing",
+      "value": "1.0.0"
     }
   ]
 }

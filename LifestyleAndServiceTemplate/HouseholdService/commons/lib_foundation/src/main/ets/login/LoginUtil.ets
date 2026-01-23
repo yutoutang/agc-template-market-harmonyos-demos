@@ -13,13 +13,23 @@
  * limitations under the License.
  */
 import { authentication } from '@kit.AccountKit';
+import { AppStorageV2 } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { util } from '@kit.ArkTS';
-import { promptAction } from '@kit.ArkUI';
-import { Logger } from 'module_base';
-import { getUserInfo, loginWithHuaweiID, } from '../http/ApiManage';
-import { AppStorageMap } from '../common/Constant';
-import { AppStorageBank } from '../model/ObserveModel';
+import { FunctionalButton, functionalButtonComponentManager } from '@kit.ScenarioFusionKit';
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
+import { UtilLog as Logger } from '@hw-agconnect/util-log';
+import { CommonUtils } from 'module_base';
+import {
+  bindMobileWithCode,
+  confirmRebindMobileWithSecret,
+  getUserInfo,
+  loginWithHuaweiID,
+  unbindMobile,
+} from '../http/ApiManage';
+import { AppStorageMap, CurAppInfo } from '../common/Constant';
+import { AppStorageBank, OpenId } from '../model/ObserveModel';
+import { CommonConfirmDialog } from '../uicomponent/UIDialog';
 
 const TAG = '[LoginUtil]';
 
@@ -41,12 +51,13 @@ export class LoginUtil {
         Logger.info(TAG, `loginResponse=${JSON.stringify(loginWithHuaweiIDCredential)}`);
 
         const resp = await loginWithHuaweiID({
-          clientId: 'xxx',
+          clientId: CurAppInfo.CLIENT_ID,
           code: loginWithHuaweiIDCredential?.authorizationCode || '',
           idToken: loginWithHuaweiIDCredential?.idToken || '',
           openId: loginWithHuaweiIDCredential?.openID || '',
           unionId: loginWithHuaweiIDCredential?.unionID || '',
         });
+        AppStorageBank.setOpenId(loginWithHuaweiIDCredential?.openID || '',)
         Logger.info(TAG, 'loginWithHuaweiID success, token:' + resp.token);
         AppStorage.setOrCreate(AppStorageMap.TOKEN, resp.token);
         await LoginUtil.queryUserInfo();
@@ -58,7 +69,7 @@ export class LoginUtil {
         return true;
       });
     } catch (e) {
-      promptAction.showToast({ message: $r('app.string.login_in_error') });
+      promptAction.showToast({ message: '华为账号登录异常，请稍后重试~' });
       return false;
     }
   }
@@ -96,6 +107,198 @@ export class LoginUtil {
       AppStorageBank.updateUserInfo(userInfo);
     } catch (e) {
       Logger.error(TAG, 'queryUserInfo error:' + JSON.stringify(e));
+    }
+  }
+
+  /**
+   * 解绑手机号
+   */
+  static unBindPhone = () => {
+    CommonUtils.showLoading();
+    unbindMobile().then((linkStatus) => {
+      AppStorageBank.setLinkState(linkStatus);
+      LoginUtil.queryUserInfo();
+      CommonUtils.hideLoading();
+    }).catch((error: BusinessError) => {
+      LoginUtil.cancelAuthorization();
+      Logger.error(TAG, 'UnBindPhone error:' + JSON.stringify(error));
+      promptAction.showToast({ message: '解绑手机号失败，请稍后重试~' });
+    });
+  }
+  /**
+   * 关联手机号
+   */
+  static bindPhone = async (code: string | undefined, onBind?: () => void) => {
+    CommonUtils.showLoading();
+    if (!code) {
+      CommonUtils.hideLoading();
+      return;
+    }
+    bindMobileWithCode(code).then((resp) => {
+      AppStorageBank.setLinkState(true);
+      if (resp.rebindSecret) {
+        CommonUtils.hideLoading();
+        const rebindPhone = async () => {
+          try {
+            CommonUtils.showLoading();
+            await confirmRebindMobileWithSecret(resp.rebindSecret);
+            if (onBind) {
+              onBind();
+            }
+            LoginUtil.cancelAuthorization();
+            LoginUtil.queryUserInfo();
+            CommonUtils.hideLoading();
+          } catch (e) {
+            CommonUtils.hideLoading();
+            LoginUtil.cancelAuthorization();
+            Logger.error(TAG, 'ReBindPhone error:' + JSON.stringify(e));
+            promptAction.showToast({ message: '解绑手机号失败，请稍后重试~' });
+          }
+        };
+
+        const cancelCB = () => {
+          LoginUtil.cancelAuthorization();
+        };
+        CommonConfirmDialog.show({
+          content: '您提供的手机号码已与其他元服务用户关联，是否替换关联至当前元服务用户',
+          confirmButton: '使用其他号码',
+          cancelButton: '替换并关联',
+          confirm: cancelCB,
+          cancel: rebindPhone,
+        })
+      } else {
+        if (onBind) {
+          onBind();
+        }
+        LoginUtil.cancelAuthorization();
+        LoginUtil.queryUserInfo();
+      }
+    }).catch((err: BusinessError) => {
+      LoginUtil.cancelAuthorization();
+      CommonUtils.hideLoading();
+      Logger.error(TAG, 'BindPhone error:' + JSON.stringify(err));
+      promptAction.showToast({ message: '关联手机号失败，请稍后重试~' });
+    });
+    CommonUtils.hideLoading();
+  }
+  /**
+   * 获取手机号失败，模拟成功
+   */
+  static onGetPhoneNumberFail = (callback?: () => void) => {
+    CommonConfirmDialog.show({
+      contentBuilder: ContentBuilder,
+      confirmButton: '确定',
+      cancelButtonColor: $r('sys.color.font_emphasize'),
+      cancelButton: '取消',
+      confirm: () => {
+        this.bindPhone('123', callback)
+      },
+    })
+  }
+}
+
+@Builder
+export function ContentBuilder() {
+  Column() {
+    Text('提示')
+      .fontSize($r('sys.float.Title_S'))
+      .fontWeight(FontWeight.Bold)
+      .height(56)
+    Text('元服务未获取phone权限或用户授权，点击确定创建一个mock账号')
+      .fontSize($r('sys.float.Body_M'))
+      .margin({ bottom: 8 })
+  }
+  .padding({ right: 24, left: 24 })
+}
+
+/**
+ * 登录按钮样式Button
+ */
+@ComponentV2
+export struct LoginBtnInCard {
+  @Param btnHeight: Length = 28;
+  @Param btnWidth: Length = 76;
+  @Param fontSize: ResourceStr = $r('sys.float.Body_M');
+  @Event onBind?: () => void = () => {
+  };
+
+  build() {
+    Row() {
+      FunctionalButton({
+        params: {
+          openType: functionalButtonComponentManager.OpenType.GET_PHONE_NUMBER,
+          label: '预约',
+          styleOption: {
+            styleConfig: new functionalButtonComponentManager
+              .ButtonConfig()
+              .fontSize(this.fontSize)
+              .fontWeight(500)
+              .fontColor($r('sys.color.font_on_primary'))
+              .backgroundColor($r('app.color.common_theme_color'))
+              .size({ height: this.btnHeight, width: this.btnWidth })
+              .constraintSize({ maxWidth: 448 })
+          },
+        },
+        controller: new functionalButtonComponentManager.FunctionalButtonController()
+          .onGetPhoneNumber((err, data) => {
+            if (err) {
+              Logger.error(TAG, 'fail to get phone number, error: ' + JSON.stringify(err));
+              LoginUtil.onGetPhoneNumberFail(this.onBind);
+              return;
+            }
+            Logger.info(TAG, 'succeeded in getting phone number. data.code = ' + data.code);
+            LoginUtil.bindPhone(data.code, this.onBind);
+          }),
+      })
+        .onClick(() => {
+          // 阻断事件冒泡
+        })
+    }
+  }
+}
+
+/**
+ * 登录按钮样式Text
+ */
+@ComponentV2
+export struct LoginBtnInMine {
+  @Param btnHeight: Length = 28;
+  @Param btnWidth: Length = 76;
+  @Param fontSize: ResourceStr = $r('sys.float.Body_M');
+  @Event onBind?: () => void = () => {
+  };
+
+  build() {
+    Row() {
+      FunctionalButton({
+        params: {
+          openType: functionalButtonComponentManager.OpenType.GET_PHONE_NUMBER,
+          label: '',
+          styleOption: {
+            plain: true,
+            hoverClass: functionalButtonComponentManager.HoverClassType.NONE,
+            styleConfig: new functionalButtonComponentManager
+              .ButtonConfig()
+              .type(ButtonType.Normal)
+              .fontSize(this.fontSize)
+              .fontColor($r('sys.color.font_primary'))
+              .fontWeight(500)
+              .padding(0)
+              .borderWidth(0)
+              .size({ height: this.btnHeight, width: this.btnWidth })
+          },
+        },
+        controller: new functionalButtonComponentManager.FunctionalButtonController()
+          .onGetPhoneNumber((err, data) => {
+            if (err) {
+              Logger.error(TAG, 'fail to get phone number, error: ' + JSON.stringify(err));
+              LoginUtil.onGetPhoneNumberFail(this.onBind);
+              return;
+            }
+            Logger.info(TAG, 'succeeded in getting phone number. data.code = ' + data.code);
+            LoginUtil.bindPhone(data.code, this.onBind);
+          }),
+      })
     }
   }
 }
