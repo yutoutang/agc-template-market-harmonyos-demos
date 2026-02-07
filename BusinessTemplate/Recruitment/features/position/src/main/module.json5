@@ -1,9 +1,0 @@
-{
-  "module": {
-    "name": "position",
-    "type": "har",
-    "deviceTypes": [
-      "phone"
-    ]
-  }
-}

@@ -1,9 +1,0 @@
-{
-  "module": {
-    "name": "resume",
-    "type": "har",
-    "deviceTypes": [
-      "phone"
-    ],
-  }
-}

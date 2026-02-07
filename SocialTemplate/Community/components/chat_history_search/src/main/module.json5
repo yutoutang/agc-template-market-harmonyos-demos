@@ -1,9 +1,0 @@
-{
-  "module": {
-    "name": "chat_history_search",
-    "type": "har",
-    "deviceTypes": [
-      "phone"
-    ]
-  }
-}

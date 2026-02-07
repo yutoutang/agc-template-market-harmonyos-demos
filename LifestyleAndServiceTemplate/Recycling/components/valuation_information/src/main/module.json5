@@ -1,7 +1,0 @@
-{
-  "module": {
-    "name": "valuation_information",
-    "type": "har",
-    "deviceTypes": ["phone"]
-  }
-}

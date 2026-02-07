@@ -1,3 +1,0 @@
-export const TEXT_CONTENT_DEFAULT_LINES = 2;
-
-export const TEXT_CONTENT_MAX_LINES = 100;

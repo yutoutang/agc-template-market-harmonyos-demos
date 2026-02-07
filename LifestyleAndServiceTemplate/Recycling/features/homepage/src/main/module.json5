@@ -1,9 +1,0 @@
-{
-  "module": {
-    "name": "homepage",
-    "type": "har",
-    "deviceTypes": [
-      "phone"
-    ]
-  }
-}

@@ -1,9 +1,0 @@
-{
-  "module": {
-    "name": "message_manager",
-    "type": "har",
-    "deviceTypes": [
-      "phone"
-    ],
-  }
-}

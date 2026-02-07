@@ -1,1 +1,0 @@
-export type TValueTypes = string | boolean | number | null | Array<TValueTypes> | Object | Object[] | (() => void)

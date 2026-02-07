@@ -1,9 +1,0 @@
-{
-  "module": {
-    "name": "instant_messaging",
-    "type": "har",
-    "deviceTypes": [
-      "phone"
-    ]
-  }
-}
