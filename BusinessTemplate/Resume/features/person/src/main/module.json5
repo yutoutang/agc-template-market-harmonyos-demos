@@ -1,9 +1,0 @@
-{
-  "module": {
-    "name": "person",
-    "type": "har",
-    "deviceTypes": [
-      "phone"
-    ]
-  }
-}

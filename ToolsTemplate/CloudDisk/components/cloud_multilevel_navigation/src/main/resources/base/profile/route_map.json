@@ -1,9 +1,0 @@
-{
-  "routerMap": [
-    {
-      "name": "MultiLevelNavigationPage",
-      "pageSourceFile": "src/main/ets/components/MultiLevelNavigationPage.ets",
-      "buildFunction": "MultiLevelNavigationPageBuilder"
-    }
-  ]
-}

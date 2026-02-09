@@ -1,9 +1,0 @@
-{
-  "module": {
-    "name": "journey",
-    "type": "har",
-    "deviceTypes": [
-      "phone"
-    ]
-  }
-}

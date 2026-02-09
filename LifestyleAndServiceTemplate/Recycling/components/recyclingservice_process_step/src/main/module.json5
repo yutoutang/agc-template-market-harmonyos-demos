@@ -1,9 +1,0 @@
-{
-  "module": {
-    "name": "recyclingservice_process_step",
-    "type": "har",
-    "deviceTypes": [
-      "phone"
-    ]
-  }
-}
