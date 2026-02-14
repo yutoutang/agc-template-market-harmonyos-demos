@@ -1,9 +1,0 @@
-{
-  "routerMap": [
-    {
-      "name": "ARMeasure",
-      "pageSourceFile": "src/main/ets/pages/ARMeasure.ets",
-      "buildFunction": "ARMeasureBuilder"
-    }
-  ]
-}

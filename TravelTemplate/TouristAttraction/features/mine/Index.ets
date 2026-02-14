@@ -1,1 +1,0 @@
-export { MineView, MineBuilder } from './src/main/ets/pages/MineView'

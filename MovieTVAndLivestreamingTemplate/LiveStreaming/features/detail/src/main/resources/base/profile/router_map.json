@@ -1,9 +1,0 @@
-{
-  "routerMap": [
-    {
-      "name": "ShortDramaDetailPage",
-      "pageSourceFile": "src/main/ets/page/DetailPage.ets",
-      "buildFunction": "DetailPageBuilder"
-    }
-  ]
-}

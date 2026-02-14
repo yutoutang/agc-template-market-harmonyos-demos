@@ -1,9 +1,0 @@
-{
-  "routerMap": [
-    {
-      "name": "PurchasePage",
-      "pageSourceFile": "src/main/ets/pages/PurchasePage.ets",
-      "buildFunction": "PurchasePageBuilder"
-    }
-  ]
-}

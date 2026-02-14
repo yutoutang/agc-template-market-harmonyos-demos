@@ -1,9 +1,0 @@
-{
-  "routerMap": [
-    {
-      "name": "PensionPage",
-      "pageSourceFile": "src/main/ets/pages/PensionPage.ets",
-      "buildFunction": "PensionPageBuilder"
-    }
-  ]
-}

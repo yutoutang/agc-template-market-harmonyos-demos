@@ -1,9 +1,0 @@
-{
-  "module": {
-    "name": "live_interaction",
-    "type": "har",
-    "deviceTypes": [
-      "phone"
-    ]
-  }
-}

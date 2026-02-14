@@ -1,9 +1,0 @@
-{
-  "module": {
-    "name": "my_wallet",
-    "type": "har",
-    "deviceTypes": [
-      "default"
-    ]
-  }
-}
