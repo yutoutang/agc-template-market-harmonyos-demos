@@ -13,6 +13,22 @@ export class CreateUserRequest {
   originFrom: string | null = null;
 }
 
+// 性别枚举
+export enum GenderType {
+  MALE = 0,
+  FEMALE = 1,
+  CONFIDENTIALITY = 2,
+}
+
+export interface Account {
+  avatar: ResourceStr;
+  nickname: string;
+  phone: string;
+  sex: GenderType;
+  birthday: Date;
+  marital: string;
+}
+
 export class UserFullInfo {
   userInfo: UserInfo | null = null;
   mateSelectionCriteria: MateSelectionCriteria | null = null;

@@ -32,4 +32,4 @@ export class Config {
   public static readonly REQUEST_TIMEOUT: number = 8 * 1000;
 }
 
-export const LOG_TAG:string = '[Feedback]'
+export const LOG_TAG:string = '[Feedback]';

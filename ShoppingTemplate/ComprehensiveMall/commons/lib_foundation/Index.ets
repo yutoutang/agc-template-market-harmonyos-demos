@@ -1,5 +1,3 @@
-export { cache } from './src/main/ets/utils/Caches';
-
 export { iData, GlobalStateMgr } from './src/main/ets/utils/IData';
 
 export { routerStack } from './src/main/ets/utils/RouterStack';
@@ -22,10 +20,18 @@ export { PopViewUtil } from './src/main/ets/utils/PopViewUtil';
 
 export { UserInfoModel } from './src/main/ets/models/UserInfoModel';
 
-export { Formatter } from './src/main/ets/utils/Formatter'
+export { Formatter } from './src/main/ets/utils/Formatter';
 
-export { PushUtil } from './src/main/ets/push/PushUtil'
+export { PushUtil } from './src/main/ets/push/PushUtil';
 
-export { PermissionUtil } from './src/main/ets/utils/PermissionUtil'
+export { PermissionUtil } from './src/main/ets/utils/PermissionUtil';
 
-export { SafeJson } from './src/main/ets/utils/SafeJson'
+export { SafeJson } from './src/main/ets/utils/SafeJson';
+
+export { TelUtil } from './src/main/ets/utils/TelUtil';
+
+export { MotionUtil } from './src/main/ets/utils/MotionUtil';
+
+export { FileUtil } from './src/main/ets/utils/FileUtil';
+
+export { CalendarUtil } from './src/main/ets/utils/CalendarUtil';

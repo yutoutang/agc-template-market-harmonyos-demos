@@ -98,7 +98,8 @@ export struct MemberShipPage {
         Image($r('app.media.membership_back')).size({ width: 40, height: 40 }).onClick(() => {
           this.routerModule.pop();
         });
-        Text('会员中心').fontSize(20).fontWeight(FontWeight.Bold).fontColor($r('sys.color.font_primary'));
+        Text('会员中心').fontSize(20).fontWeight(FontWeight.Bold).fontColor($r('sys.color.font_primary'))
+          .maxFontScale(1);
       }.position({ left: 16 }).zIndex(2);
     }
   }
@@ -131,13 +132,15 @@ export struct MemberShipPage {
               .fontSize(18)
               .fontColor($r('sys.color.font_primary'));
             Span(this.memberStatus).fontSize(14).fontColor($r('sys.color.font_secondary'));
-          };
+          }
+          .maxFontScale(1);
 
           Text(this.vm.isMember ?
             (this.vm.isRenewMember ? `${this.vm.getFormatTime(this.vm.expiresTime)}到期` :
               `${this.lastPurchaseProductExpireTime}到期`) :
             '购买并开通会员后可查看有效期')
             .fontSize(12)
+            .maxFontScale(1)
             .fontColor($r('sys.color.font_primary'));
         }.width('calc(100% - 84vp)').alignItems(HorizontalAlign.Start);
 
@@ -148,6 +151,7 @@ export struct MemberShipPage {
             $r('sys.color.comp_background_tertiary'))
           .fontSize(12)
           .size({ height: 28 })
+          .maxFontScale(1)
           .onClick(() => {
             if (this.vm.isMember) {
               this.vm.manageSubscribe(this.getUIContext().getHostContext() as common.UIAbilityContext);
@@ -167,7 +171,8 @@ export struct MemberShipPage {
   EmptyHint() {
     Column({ space: 8 }) {
       Image($r('app.media.member_empty')).size({ width: 120, height: 120 });
-      Text('暂无会员套餐').fontSize(14).fontColor($r('sys.color.font_secondary'));
+      Text('暂无会员套餐').fontSize(14).fontColor($r('sys.color.font_secondary'))
+        .maxFontScale(1);
     }.margin({ top: 120 }).width('100%');
   }
 
@@ -179,6 +184,7 @@ export struct MemberShipPage {
         .fontWeight(FontWeight.Bold)
         .fontColor($r('sys.color.font_primary'))
         .width('100%')
+        .maxFontScale(1)
         .textAlign(TextAlign.Start);
       List({ space: 8 }) {
         ForEach(this.vm.productInfoList, (item: iap.Product, index: number) => {
@@ -189,10 +195,12 @@ export struct MemberShipPage {
                   .fontWeight(FontWeight.Medium)
                   .fontSize(14)
                   .maxLines(2)
+                  .maxFontScale(1)
                   .textOverflow({ overflow: TextOverflow.Ellipsis });
                 Text(`${item.localPrice?.split('.')[0]}`)
                   .fontWeight(FontWeight.Bold)
                   .fontSize(24)
+                  .maxFontScale(1)
                   .fontColor($r('sys.color.font_primary'));
               }
               .height('100%')
@@ -216,6 +224,7 @@ export struct MemberShipPage {
                   .textOverflow({ overflow: TextOverflow.MARQUEE })
                   .width('100%')
                   .textAlign(TextAlign.Center)
+                  .maxFontScale(1)
                   .fontSize(12)
                   .fontColor($r('sys.color.font_primary'));
               }
@@ -252,6 +261,7 @@ export struct MemberShipPage {
         .fontWeight(FontWeight.Bold)
         .fontColor($r('sys.color.font_primary'))
         .width('100%')
+        .maxFontScale(1)
         .textAlign(TextAlign.Start);
       List({ space: 12 }) {
         ForEach(this.privilegeByProductId, (item: MemberShipPrivilege) => {
@@ -264,8 +274,10 @@ export struct MemberShipPage {
                   .fontSize(14)
                   .fontWeight(FontWeight.Medium)
                   .maxLines(1)
+                  .maxFontScale(1)
                   .textOverflow({ overflow: TextOverflow.Ellipsis });
-                Text(item.des).fontSize(14).maxLines(3).textOverflow({ overflow: TextOverflow.Ellipsis });
+                Text(item.des).fontSize(14).maxLines(3).textOverflow({ overflow: TextOverflow.Ellipsis })
+                  .maxFontScale(1);
               }.alignItems(HorizontalAlign.Start).width('calc(100% - 48vp)');
             }.width('100%');
           };
@@ -312,6 +324,7 @@ export struct MemberShipPage {
         .opacity(0.6)
         .width(`calc(100% - 64vp)`)
         .maxLines(2)
+        .maxFontScale(1)
         .bindSheet($$this.vm.isShow, MemberPrivacy(this.privacy.content), {
           title: { title: this.privacy.title },
           height: SheetSize.MEDIUM,

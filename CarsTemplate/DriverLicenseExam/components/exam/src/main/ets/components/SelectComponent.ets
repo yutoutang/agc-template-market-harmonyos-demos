@@ -82,11 +82,11 @@ export struct SelectComponent {
   questionType(){
     Row() {
       Text(getQuestionType(this.item.questionType))
-        .fontSize(this.examController.fontSize - 2)
+        .fontSize(this.examController.getFg(this.examController.fontSize - 2))
         .fontColor(Color.White);
     }
-    .width(this.examController.fontSize + 62)
-    .height(this.examController.fontSize + 14)
+    .width(this.examController.getFg(this.examController.fontSize + 62))
+    .height(this.examController.getFg(this.examController.fontSize + 14))
     .justifyContent(FlexAlign.Center)
     .borderRadius(8)
     .backgroundColor('rgba(0,0,0,0.40)')
@@ -96,7 +96,7 @@ export struct SelectComponent {
   @Builder
   question(){
     Text(this.item.question)
-      .fontSize(this.examController.fontSize)
+      .fontSize(this.examController.getFg(this.examController.fontSize))
       .fontColor('rgba(0,0,0,0.90)')
       .alignSelf(ItemAlign.Start)
       .padding({
@@ -119,14 +119,14 @@ export struct SelectComponent {
             this.showAnswer ? getCheckBoxClickImage(option, this.item.selected, this.item.answer) :
             getCheckBoxUnClickImage(option, this.item.selected) :
           getCheckBoxUnClickImage(option, this.item.selected))
-            .width(this.examController.fontSize + 6)
-            .height(this.examController.fontSize + 6);
+            .width(this.examController.getFg(this.examController.fontSize + 6))
+            .height(this.examController.getFg(this.examController.fontSize + 6));
 
           Text(String.fromCharCode(optionIndex + 65) + ': ')
-            .fontSize(this.examController.fontSize)
+            .fontSize(this.examController.getFg(this.examController.fontSize))
             .fontColor('rgba(0,0,0,0.90)');
           Text(option)
-            .fontSize(this.examController.fontSize)
+            .fontSize(this.examController.getFg(this.examController.fontSize))
             .fontColor('rgba(0,0,0,0.90)');
         }
         .width('100%')
@@ -178,13 +178,13 @@ export struct SelectComponent {
             Image(this.showAnswer ?
             this.getRadioImage(option, this.item.answer[0]) :
             $r('app.media.no_select'))
-              .width(this.examController.fontSize + 6)
-              .height(this.examController.fontSize + 6);
+              .width(this.examController.getFg(this.examController.fontSize + 6))
+              .height(this.examController.getFg(this.examController.fontSize + 6));
             Text(String.fromCharCode(optionIndex + 65) + ': ')
-              .fontSize(this.examController.fontSize)
+              .fontSize(this.examController.getFg(this.examController.fontSize))
               .fontColor('rgba(0,0,0,0.90)');
             Text(option)
-              .fontSize(this.examController.fontSize)
+              .fontSize(this.examController.getFg(this.examController.fontSize))
               .fontColor('rgba(0,0,0,0.90)');
           }
           .width('100%')
@@ -213,7 +213,7 @@ export struct SelectComponent {
   answer() {
     Row() {
       Text('答案:  ')
-        .fontSize(this.examController.fontSize - 2)
+        .fontSize(this.examController.getFg(this.examController.fontSize - 2))
         .fontColor('rgba(0,0,0,0.90)')
         .padding({
           left: 12,
@@ -221,7 +221,7 @@ export struct SelectComponent {
 
       ForEach(this.ansIndexList.sort(), (item: number) => {
         Text(String.fromCharCode(item + 65))
-          .fontSize(this.examController.fontSize - 2)
+          .fontSize(this.examController.getFg(this.examController.fontSize - 2))
           .fontWeight(FontWeight.Bold)
           .fontColor('#64BB5C');
       }, (item: number) => {
@@ -234,12 +234,12 @@ export struct SelectComponent {
 
       if (this.item.isCorrect === false) {
         Text('      您的选择:  ')
-          .fontSize(this.examController.fontSize - 2)
+          .fontSize(this.examController.getFg(this.examController.fontSize - 2))
           .fontColor('rgba(0,0,0,0.90)');
 
         ForEach(this.selectIndexList.sort(), (item: number) => {
           Text(String.fromCharCode(item + 65))
-            .fontSize(this.examController.fontSize - 2)
+            .fontSize(this.examController.getFg(this.examController.fontSize - 2))
             .fontColor('#E84026')
             .fontWeight(FontWeight.Bold);
         }, (item: number) => {
@@ -262,9 +262,9 @@ export struct SelectComponent {
     Column({ space: 12 }) {
       this.analysisTitle('题目解析');
       Text(this.item.analysis)
-        .fontSize(this.examController.fontSize)
+        .fontSize(this.examController.getFg(this.examController.fontSize))
         .fontColor('rgba(0,0,0,0.90)')
-        .lineHeight(this.examController.fontSize + 4);
+        .lineHeight(this.examController.getFg(this.examController.fontSize + 4));
     }
     .width('100%')
     .alignItems(HorizontalAlign.Start)
@@ -311,7 +311,7 @@ export struct SelectComponent {
         .height(12);
 
       Text(titleName)
-        .fontSize(12)
+        .fontSize(this.examController.getFg(this.examController.fontSize - 2))
         .fontColor('rgba(0,0,0,0.90)')
         .padding({
           left: '2%',

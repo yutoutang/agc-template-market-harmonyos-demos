@@ -13,7 +13,7 @@ export interface CategoryProductListResp extends BaseResponse {
 export interface CategoryItem {
   id: string;
   label: string;
-  iconUrl: ResourceStr;
+  iconUrl: string;
   subCategory?: SubCategoryItem[];
 }
 
@@ -23,7 +23,7 @@ export interface SubCategoryItem {
 }
 
 export interface ProductSummaryItem {
-  banner: ResourceStr;
+  banner: string;
   title: string;
   subCategoryId: string;
   id: string;

@@ -3,12 +3,13 @@ import ConfigurationConstant from '@ohos.app.ability.ConfigurationConstant';
 import UIAbility from '@ohos.app.ability.UIAbility';
 import { KeyboardAvoidMode } from '@ohos.arkui.UIContext';
 import window from '@ohos.window';
-import { UtilLog } from '@hw-agconnect/util-log';
 import { ShareService } from 'aggregated_share';
 import { PushUtil } from 'lib_foundation';
 import { LoneTakeAnimationsTransition } from 'module_transition';
+import { UtilLog } from '@hw-agconnect/util-log';
+import { SetupUtil } from '../utils/SetupUtil';
 
-const TAG: string = '[EntryAbility]'
+const TAG: string = '[EntryAbility]';
 
 export default class EntryAbility extends UIAbility {
   private shareServiceImpl: ShareService =
@@ -24,16 +25,17 @@ export default class EntryAbility extends UIAbility {
       domain: 0xff00,
       open: true,
       showStack: false,
-    })
-    UtilLog.info(TAG, 'set global log config success.')
+    });
+    UtilLog.info(TAG, 'set global log config success.');
     try {
       this.context
         .getApplicationContext()
         .setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT);
     } catch (err) {
-      UtilLog.error(TAG, JSON.stringify(err))
+      UtilLog.error(TAG, JSON.stringify(err));
     }
     this.shareServiceImpl.handleWant(want, this.context);
+    SetupUtil.handleWant(want);
   }
 
   onWindowStageCreate(windowStage: window.WindowStage): void {
@@ -43,15 +45,16 @@ export default class EntryAbility extends UIAbility {
           .getMainWindowSync()
           .getUIContext()
           .setKeyboardAvoidMode(KeyboardAvoidMode.OFFSET_WITH_CARET);
-        PushUtil.getTokenSyn()
+        PushUtil.getTokenSyn();
         LoneTakeAnimationsTransition.init(windowStage);
       } catch (err) {
-        UtilLog.error(TAG, JSON.stringify(err))
+        UtilLog.error(TAG, JSON.stringify(err));
       }
     });
   }
 
   onNewWant(want: Want): void {
-    this.shareServiceImpl.handleWant(want, this.context);
+    SetupUtil.handleWant(want);
+    SetupUtil.jumpToTarget();
   }
 }

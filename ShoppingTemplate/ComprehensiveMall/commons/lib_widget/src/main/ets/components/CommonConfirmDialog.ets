@@ -34,12 +34,12 @@ export class CommonConfirmDialog {
       closeOnBackPress: true,
       onConfirm: () => {
         UIDialog.closeLast();
-        param.confirm?.()
+        param.confirm?.();
       },
       onCancel: () => {
         UIDialog.closeLast();
-        param.cancel?.()
+        param.cancel?.();
       },
-    })
+    });
   }
 }

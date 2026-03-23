@@ -17,7 +17,7 @@ export class TelephoneUtils {
         })
         .catch((err: BusinessError) => {
           Logger.error(TAG, 'make call fail, err is:' + err.code);
-        })
+        });
     } else {
       Logger.error(TAG, 'Contacts not available by this device.');
     }

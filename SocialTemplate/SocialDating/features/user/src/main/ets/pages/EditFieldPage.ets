@@ -9,16 +9,16 @@ export function EditFieldPageBuilder() {
 /**
  * 提供一个简单的修改某个数据项的页面，页面中提供一个文本输入框。
  */
-@Component
+@ComponentV2
 export struct EditFieldPage {
-  @Consume('pageStack') pageStack: NavPathStack;
+  @Consumer('pageStack') pageStack: NavPathStack = new NavPathStack();
   private pageTitle: string = '';
-  @State val: string = '';
+  @Local val: string = '';
   private controller: TextInputController = new TextInputController()
   private textMaxLength: number = Constants.NICK_NAME_MAX_LENGTH;
   private inputCheckFunc?: (input: string) => string;
   private inputType: InputType = InputType.Normal;
-  @State errorStr: string = '';
+  @Local errorStr: string = '';
 
   aboutToAppear(): void {
     let params: EditFieldPageParam[] = this.pageStack.getParamByName('EditFieldPage') as EditFieldPageParam[];

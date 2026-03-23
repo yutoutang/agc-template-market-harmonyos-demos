@@ -1,4 +1,8 @@
+import { BusinessError } from '@kit.BasicServicesKit';
+import * as wxopensdk from '@tencent/wechat_open_sdk';
 import { Constants, LoginType } from '../common/Constant';
+
+export type LoginFailError = BusinessError | wxopensdk.BaseResp;
 
 export class Channel {
   type: LoginType;
@@ -22,21 +26,22 @@ export class ExtraInfo {
 }
 
 export class PrivacyContent {
-  privacyLabel: ResourceStr = ''
-  privacyUrl: ResourceStr = ''
-  privacyTag: string = ''
+  privacyLabel: ResourceStr = '';
+  privacyUrl: ResourceStr = '';
+  privacyTag: string = '';
 }
 
 export class LoginParams {
-  phoneNumbers?: string = ''
-  verifyCode?: string = ''
-  unionID?: string = ''
-  authorizationCode?: string = ''
+  anonymousPhone?: string = '';
+  phoneNumbers?: string = '';
+  verifyCode?: string = '';
+  unionID?: string = '';
+  authorizationCode?: string = '';
 }
 
 @ObservedV2
 export class NavParam {
-  @Trace privacyContent: PrivacyContent[] = []
+  @Trace privacyContent: PrivacyContent[] = [];
   @Trace themeColor: ResourceColor = '#0A59F7';
   @Trace isSheet: boolean = false;
   @Trace isPersistence: boolean = false;

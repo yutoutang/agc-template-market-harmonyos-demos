@@ -1,10 +1,10 @@
-import { window } from '@kit.ArkUI'
+import { window } from '@kit.ArkUI';
 import { ComponentAttrUtils } from './ComponentAttrUtils';
 import { AnimateCallback, CustomTransition } from './CustomNavigationUtils';
 import { LongTakeTransitionParam } from './LongTakeTransitionParam';
 import { CustomTransitionOptions, LongTakeTransitionOptions } from './Options';
 import { SnapShotImage } from './SnapShotImage';
-import { WindowUtils } from './WindowUtils'
+import { WindowUtils } from './WindowUtils';
 import { LongTakeTransitionType } from '../constants/LongTakeTransitionConstants';
 
 const TAG: string = 'ezCustomTransition';
@@ -33,7 +33,7 @@ export class LoneTakeAnimationsTransition {
     }
 
     let cardRectInfo = ComponentAttrUtils.getRectInfoById(uiContext, cardId, cornerRadius);
-    console.info(TAG, 'getRectInfoById value is ' + JSON.stringify(cardRectInfo))
+    console.info(TAG, 'getRectInfoById value is ' + JSON.stringify(cardRectInfo));
     if (!cardRectInfo) {
       return undefined;
     }
@@ -84,7 +84,7 @@ export class LoneTakeAnimationsTransition {
           }
         },
         isInteractive: CustomTransition.getInstance().interactive,
-      }
+      };
       return customAnimation;
     }
 

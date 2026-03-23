@@ -1,12 +1,10 @@
 import { routerStack, RouterMap } from 'lib_foundation';
-import { NavTitleBar } from 'lib_widget';
+import { CommonSymbol, NavTitleBar } from 'lib_widget';
 import { CategoryItem, HomeApis, ProductSummaryItem } from 'lib_network';
 import { ProductCategory } from 'module_product_category';
 
 @ComponentV2
 export struct CategoryPageContent {
-  @Param
-  public pageName: string | undefined = '';
   @Param
   public initId: string = '';
   @Local
@@ -17,8 +15,8 @@ export struct CategoryPageContent {
   curIndex: number = 0;
   @Local
   productList: ProductSummaryItem[] = []
-
-  private readonly SEARCH_ID = 'category_search'
+  @Local
+  isChildRoute: boolean = false
 
   async getCategoryProductData(id: string) {
     this.isLoading = true;
@@ -55,18 +53,17 @@ export struct CategoryPageContent {
           title: '分类',
         }) {
           Row() {
-            Image($r('app.media.ic_search_filled'))
-              .width(40)
-              .height(40)
-              .id(this.SEARCH_ID)
+            CommonSymbol({ src: $r('sys.symbol.magnifyingglass') })
               .onClick(() => {
-                routerStack.pushPath({name: RouterMap.PRODUCT_SEARCH});
+                routerStack.pushPath({ name: RouterMap.PRODUCT_SEARCH });
               })
           }
           .layoutWeight(1)
           .justifyContent(FlexAlign.End)
         }
+
         ProductCategory({
+          isChildRoute:this.isChildRoute,
           initIndex: this.curIndex,
           categoryTabs: this.categoryTabs,
           productList: this.productList,
@@ -81,14 +78,20 @@ export struct CategoryPageContent {
       }
       .width('100%')
       .height('100%')
-      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP]);
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
+      .transition(TransitionEffect.OPACITY.animation({ duration: 600 }))
     }
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background_color_grey'))
+    .onReady((context)=>{
+      if(context.pathInfo.param){
+        this.isChildRoute = true
+      }
+    })
   }
 }
 
 @Builder
-export function buildCategoryPage(pageName?: string, initId?: string) {
-  CategoryPageContent({ pageName: pageName, initId: initId })
+export function buildCategoryPage(initId?: string) {
+  CategoryPageContent({ initId: initId })
 }

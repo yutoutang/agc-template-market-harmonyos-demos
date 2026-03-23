@@ -2,7 +2,7 @@
   "string": [
     {
       "name": "agcit_huawei_common_login",
-      "value": "1.0.0"
+      "value": "1.0.2"
     },
     {
       "name": "agcittype_huawei_common_login",
@@ -30,7 +30,7 @@
     },
     {
       "name": "mobile_number",
-      "value": "请输入手机号"
+      "value": "请输入账号"
     },
     {
       "name": "verification_code",

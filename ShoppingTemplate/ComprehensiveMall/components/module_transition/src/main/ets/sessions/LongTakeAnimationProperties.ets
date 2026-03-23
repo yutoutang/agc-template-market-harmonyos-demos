@@ -48,7 +48,7 @@ export class LongTakeAnimationProperties {
   @Trace navDestinationId: string = '';
   @Trace navPathStack: NavPathStack = new NavPathStack();
   @Trace transitionParam: LongTakeTransitionParam = new LongTakeTransitionParam(new RectInfoPx());
-  private _uiContext: UIContext = WindowUtils.uiContext
+  private _uiContext: UIContext = WindowUtils.uiContext;
 
   private initParams(): void {
     try {
@@ -198,7 +198,7 @@ export class LongTakeAnimationProperties {
       this.positionXValue = 0;
       this.navDestinationBgColor = this.finalBgColor;
       this.radius = DEFAULT_SCREEN_RADIUS;
-    })
+    });
 
     this._uiContext.animateTo({
       delay: 50,
@@ -206,14 +206,14 @@ export class LongTakeAnimationProperties {
       curve: Curve.Sharp,
     }, () => {
       this.snapShotOpacity = 0;
-    })
+    });
 
     this._uiContext.animateTo({
       duration: 100,
       curve: Curve.Sharp,
     }, () => {
       this.postPageOpacity = 1.0;
-    })
+    });
   }
 
   public doBackAnimation(transitionProxy?: NavigationTransitionProxy, isChanged?: boolean): void {
@@ -239,21 +239,21 @@ export class LongTakeAnimationProperties {
         this.translateY = 0;
         this.radius = (this.cardItemInfoPx.cornerRadius ?? 0) / this.initScale;
         this.navDestinationBgColor = INIT_BG_COLOR;
-      })
+      });
 
       this._uiContext.animateTo({
         duration: 250,
         curve: Curve.EaseOut,
       }, () => {
         this.snapShotOpacity = 0;
-      })
+      });
 
       this._uiContext.animateTo({
         duration: 250,
         curve: Curve.EaseInOut,
       }, () => {
         this.postPageOpacity = 0;
-      })
+      });
     } else {
       this._uiContext.animateTo({
         duration: 250,
@@ -274,7 +274,7 @@ export class LongTakeAnimationProperties {
         this.positionXValue = this.initPositionValueX;
         this.positionYValue = this.initPositionValueY;
         this.navDestinationBgColor = INIT_BG_COLOR;
-      })
+      });
 
       this._uiContext.animateTo({
         delay: 80,
@@ -282,7 +282,7 @@ export class LongTakeAnimationProperties {
         curve: Curve.Friction,
       }, () => {
         this.snapShotOpacity = 1;
-      })
+      });
 
       this._uiContext.animateTo({
         delay: 130,
@@ -290,7 +290,7 @@ export class LongTakeAnimationProperties {
         curve: Curve.Friction,
       }, () => {
         this.postPageOpacity = 0;
-      })
+      });
     }
   }
 

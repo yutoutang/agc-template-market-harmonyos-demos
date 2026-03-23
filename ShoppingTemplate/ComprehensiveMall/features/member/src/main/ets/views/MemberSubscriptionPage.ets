@@ -1,6 +1,5 @@
 import { iap } from '@kit.IAPKit';
-import { ToastDialog } from '@hw-agconnect/ui-toast';
-import { BreakpointSystem, routerStack } from 'lib_foundation';
+import { BreakpointSystem, routerStack, WindowUtil } from 'lib_foundation';
 import { MembershipInfo, UserApis } from 'lib_network';
 import { FinishStatus, MemberList, MemberParams, MemberSheetUtils, MemberShipPage } from 'membership';
 import { PRIVACY_CONTENT, PRODUCTS_INFO } from '../commons/Constants';
@@ -24,7 +23,7 @@ export struct MemberSubscriptionPage {
       routerStack.pop()
       MemberSheetUtils.open({
         themeColor: $r('app.color.theme_color'),
-        linearColors: [['#FFFFFF', 0.0], ['#FFE64566', 1.0]],
+        linearColors: [[$r('app.color.background_color_primary'), 0.0], [$r('app.color.theme_color'), 1.0]],
         isSheet: true,
         lastPurchaseProductExpireTime: this.expireDate,
         productsInfo: PRODUCTS_INFO,
@@ -41,7 +40,7 @@ export struct MemberSubscriptionPage {
       MemberShipPage({
         routerModule: routerStack,
         themeColor: $r('app.color.theme_color'),
-        linearColors: [['#FFFFFF', 0.0], ['#FFE64566', 1.0]],
+        linearColors: [[$r('app.color.background_color_primary'), 0.0], ['#FFE64566', 1.0]],
         isSheet: false,
         lastPurchaseProductExpireTime: this.expireDate,
         productsInfo: PRODUCTS_INFO,
@@ -57,7 +56,7 @@ export struct MemberSubscriptionPage {
     if (params.type === iap.ProductType.NONRENEWABLE && params.status === FinishStatus.FINISHED) {
       const res = await UserApis.subscribeMembership()
       if (res.code === 0) {
-        ToastDialog.showToast({ message: '会员订阅成功！' })
+        WindowUtil.toast('会员订阅成功！')
         this.getMembershipInfo()
       }
     }

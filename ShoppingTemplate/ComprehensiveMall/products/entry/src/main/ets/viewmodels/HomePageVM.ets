@@ -13,6 +13,8 @@ import {
   BreakpointTypeEnum,
   PushUtil,
   PermissionUtil,
+  ProductInfoPageParam,
+  ProductSearchResultsPageParam,
 } from 'lib_foundation';
 import { CategoryItem } from 'lib_network';
 import { CustomScanOptions, ScanRouterMap } from 'module_product_scan';
@@ -32,7 +34,7 @@ export class HomePageVM {
   @Trace
   public isRefreshing: boolean = false;
   @Trace
-  bannerList:string[] = []
+  bannerList: string[] = [];
   @Trace
   categoryList: CategoryItem[] = [];
   @Trace
@@ -42,7 +44,7 @@ export class HomePageVM {
 
   @Computed
   get isTablet() {
-    return BreakpointSystem.currentBreakpoint.value === BreakpointTypeEnum.LG
+    return BreakpointSystem.currentBreakpoint.value === BreakpointTypeEnum.LG;
   }
 
   public onRefreshStateChange(state: RefreshStatus): void {
@@ -67,10 +69,10 @@ export class HomePageVM {
       this.loadingStatus = LoadingStatus.FAIL;
     }
     this.isRefreshing = false;
-    PermissionUtil.requestNotificationPermission(()=>{
+    PermissionUtil.requestNotificationPermission(() => {
       // push能力测试
-      PushUtil.pushMessageMock()
-    })
+      PushUtil.pushMessageMock();
+    });
   }
 
   public jumpToCategoryPage(id: string) {
@@ -88,7 +90,7 @@ export class HomePageVM {
           if (id) {
             routerStack.pushPath({
               name: RouterMap.PRODUCT_INFO,
-              param: id,
+              param: { productId: id } as ProductInfoPageParam,
             });
           } else {
             WindowUtil.toast('未识别到有效商品，请重新扫描');
@@ -137,10 +139,12 @@ export class HomePageVM {
       .doSegmentation(visionInfo, config)
       .then((data: subjectSegmentation.SegmentationResult) => {
         if (data.fullSubject && data.fullSubject.foregroundImage) {
-          const segmentedImage = data.fullSubject.foregroundImage;
+          const searchImg = data.fullSubject.foregroundImage;
           routerStack.pushPath({
             name: RouterMap.PRODUCT_SEARCH_RESULTS,
-            param: segmentedImage,
+            param: {
+              searchImg,
+            } as ProductSearchResultsPageParam,
           });
         } else {
           Logger.warn(TAG, 'No foreground image in segmentation result');

@@ -6,7 +6,6 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "router_module": "file:../../commons/router_module",
     "commonlib": "file:../../commons/commonLib",
     "login_info": "file:../../components/login_info",
     "search": "file:../../components/search",

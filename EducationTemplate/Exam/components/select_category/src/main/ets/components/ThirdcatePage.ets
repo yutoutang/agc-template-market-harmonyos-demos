@@ -43,10 +43,11 @@ export struct ThirdCategory {
       // 三级导航内容
       this.thirdContentBuilder()
     }
-    .height('100%')
     .justifyContent(FlexAlign.Start)
     .alignItems(HorizontalAlign.Start)
-    .width('100%')
+    .backgroundColor($r('sys.color.comp_background_primary'))
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
+    .layoutWeight(1);
   }
 
   /**
@@ -77,14 +78,17 @@ export struct ThirdCategory {
           // 返回页面
           this.goBack(item)
         })
-        .backgroundColor($r('sys.color.comp_background_gray'))
+        .backgroundColor($r('sys.color.comp_background_tertiary'))
         .borderRadius(10)
         .padding($r('app.float.vp_12'))
         .margin({ top: $r('app.float.vp_12') })
         .width('100%')
         .justifyContent(FlexAlign.SpaceBetween)
       }, (item: string , index: number) => item + index);
-    }.padding({ left: $r('app.float.vp_16'), right: $r('app.float.vp_16') })
+    }
+    .padding({ left: $r('app.float.vp_16'), right: $r('app.float.vp_16') })
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
+    .layoutWeight(1);
   }
 
   /**

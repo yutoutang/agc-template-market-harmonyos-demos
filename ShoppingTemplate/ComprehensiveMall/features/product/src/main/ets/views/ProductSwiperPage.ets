@@ -1,17 +1,17 @@
-import { SharePicker, ShareRecordData } from 'aggregated_share'
+import { SharePicker } from 'aggregated_share'
 import {
   BreakpointStorage,
   BreakpointSystem,
   iData,
+  ProductInfoPageParam,
   RouterMap,
   routerStack,
-  WindowUtil,
 } from 'lib_foundation'
-import { PreOrderInfoReq, ProductCardItem } from 'lib_network'
+import { ProductApis, ProductCardItem, ProductDetailInfo, ProductInfo } from 'lib_network'
 import { CommonSymbol, NavTitleBar } from 'lib_widget'
-import { ProductOperationType, ProductSaleUtil } from 'module_product_detail'
-import { CartApi } from 'module_shopping_cart';
 import { CardLongTakeDelegate, LongTakeAnimationProperties, LongTakeTransitionParam } from 'module_transition'
+import { ProductOperationButton } from '../components/ProductOperationButton'
+import { ShareUtil } from '../utils/ShareUtil'
 
 @Builder
 export function buildProductSwiperPage() {
@@ -31,10 +31,11 @@ export struct ProductSwiperPage {
   @Local
   curBreakpoint: BreakpointStorage = BreakpointSystem.currentBreakpoint
   @Local
+  productInfo?: ProductInfo
+  @Local
   longTakeSession: LongTakeAnimationProperties = new LongTakeAnimationProperties();
   @Local
   longTakeTransitionParam: LongTakeTransitionParam | undefined = undefined;
-  util: ProductSaleUtil = new ProductSaleUtil()
 
   @Computed
   get curProduct() {
@@ -42,19 +43,6 @@ export struct ProductSwiperPage {
       return undefined
     }
     return this.dataList[this.curIndex]
-  }
-
-  @Computed
-  get shareOptions() {
-    if (!this.curProduct) {
-      return undefined
-    }
-    const resource: ShareRecordData = {
-      coverUrl: this.curProduct.banner,
-      title: this.curProduct.title,
-      landingPageUrl: `http://test/${this.curProduct.productId}`,
-    }
-    return resource;
   }
 
   build() {
@@ -81,6 +69,9 @@ export struct ProductSwiperPage {
           .displayCount(1)
           .nextMargin(32, true)
           .expandSafeArea([SafeAreaType.SYSTEM])
+          .onChange(async () => {
+            this.getProductInfo(this.curProduct?.productId)
+          })
         }
         .height('100%')
       }
@@ -97,7 +88,7 @@ export struct ProductSwiperPage {
         });
       }
       this.dataList = param.dataList as ProductCardItem[]
-      this.initUtil()
+      this.getProductInfo(this.dataList[0]?.productId)
     })
     .onSizeChange((oldValue: SizeOptions, newValue: SizeOptions) => {
       this.longTakeSession.setNewSize(newValue);
@@ -109,20 +100,17 @@ export struct ProductSwiperPage {
     NavTitleBar({
       title: '推荐商品',
     }) {
-      Row({ space: 8 }) {
+      Row({ space: 16 }) {
         CommonSymbol({ src: $r('sys.symbol.cart') })
           .onClick(() => {
             routerStack.pushPath({
               name: RouterMap.PRODUCT_CART,
             })
           })
-        if (this.shareOptions) {
-          CommonSymbol({ src: $r('sys.symbol.share') })
-            .onClick(() => {
-              const picker: SharePicker = new SharePicker(this.shareOptions!);
-              picker.show();
-            })
-        }
+        CommonSymbol({ src: $r('sys.symbol.share') })
+          .onClick(() => {
+            this.handleShare()
+          })
       }
       .justifyContent(FlexAlign.End)
       .layoutWeight(1)
@@ -140,8 +128,8 @@ export struct ProductSwiperPage {
         .onClick(() => {
           routerStack.pushPath({
             name: RouterMap.PRODUCT_INFO,
-            param: card.productId,
-          })
+            param: { productId: card.productId } as ProductInfoPageParam,
+          });
         })
         .backgroundColor($r('app.color.background_color_grey'))
 
@@ -166,7 +154,7 @@ export struct ProductSwiperPage {
           .onClick(() => {
             routerStack.pushPath({
               name: RouterMap.PRODUCT_INFO,
-              param: card.productId,
+              param: { productId: card.productId } as ProductInfoPageParam,
             })
           })
         }
@@ -204,93 +192,41 @@ export struct ProductSwiperPage {
         .width($r('app.string.size_percent_full'))
         .margin({ bottom: $r('app.float.space_m') })
 
-        Row() {
-          Button('加入购物车')
-            .bottomButtonStyle()
-            .borderColor($r('app.color.background_color_grey_light'))
-            .fontColor($r('app.color.theme_color'))
-            .backgroundColor($r('app.color.background_color_grey_light'))
-            .borderRadius({
-              topLeft: $r('sys.float.corner_radius_level10'),
-              bottomLeft: $r('sys.float.corner_radius_level10'),
-              topRight: 0,
-              bottomRight: 0,
-            })
-            .onClick(() => {
-              this.util.options.productId = card.productId;
-              this.util.options.isLogin = this.isLogin;
-              this.util.handleButtonClick(ProductOperationType.ADD_TO_CART, true)
-            });
-
-          Button('立即购买')
-            .bottomButtonStyle()
-            .borderColor($r('app.color.theme_color'))
-            .backgroundColor($r('app.color.theme_color'))
-            .borderRadius({
-              topLeft: 0,
-              bottomLeft: 0,
-              topRight: 20,
-              bottomRight: 20,
-            })
-            .onClick(() => {
-              this.util.options.productId = card.productId;
-              this.util.options.isLogin = iData.global.isLogin;
-              this.util.handleButtonClick(ProductOperationType.PAY_NOW, true)
-            });
-        }
-        .width($r('app.string.size_percent_full'))
-        .justifyContent(FlexAlign.End)
+        ProductOperationButton({
+          productInfo: this.productInfo,
+        })
       }
       .alignItems(HorizontalAlign.Start)
-      .backgroundColor($r('app.color.background_color_white'))
+      .backgroundColor($r('app.color.background_color_primary'))
       .padding({
         left: $r('app.float.space_l'),
         right: $r('app.float.space_l'),
       })
       .margin({ bottom: $r('app.float.space_l') })
     }
-    .backgroundColor($r('app.color.background_color_white'))
+    .backgroundColor($r('app.color.background_color_primary'))
     // .padding({ bottom: $r('app.float.space_l') })
     .margin({ bottom: $r('app.float.space_l') })
   }
 
-  initUtil(uiContext?: UIContext) {
-    this.util.init(
-      {
-        productId: this.curProduct?.productId ?? '',
-        isLogin: this.isLogin,
-        handleAddCart: (skuCode, count) => {
-          CartApi.addSkuToCart({ skuCode, count }).then(async () => {
-            const newCartData = await CartApi.getCartData()
-            iData.global.cartVersion = newCartData.version;
-            iData.global.cartTotal = newCartData.total;
-            WindowUtil.toast('成功加入购物车');
-          });
-        },
-        handlePayNow: (skuCode, count) => {
-          const preOrderRequest: PreOrderInfoReq = {
-            items: [{
-              skuCode,
-              count,
-            }],
-          };
-          routerStack.pushPathByName(RouterMap.ORDER_SUBMIT, preOrderRequest);
-        },
-        handleNotLogin: () => {
-          routerStack.pushPathByName(RouterMap.USER_LOGIN, () => {
-            this.isLogin = iData.global.isLogin;
-          });
-        },
-      },
-      this.getUIContext()
-    )
+  async getProductInfo(productId?: string) {
+    if (productId) {
+      const res = await ProductApis.getProductDetail(productId)
+      if (res.code === 0) {
+        this.productInfo = res.data;
+      }
+    }
   }
-}
 
-@Extend(Button)
-function bottomButtonStyle() {
-  .fontSize($r('sys.float.Body_M'))
-  .borderWidth(1)
-  .height(40)
-  .type(ButtonType.Normal);
+  handleShare() {
+    if (this.curProduct) {
+      const picker: SharePicker = new SharePicker({
+        title: this.curProduct.title,
+        coverUrl: this.curProduct.banner,
+        thumbUrl: this.curProduct.banner,
+        landingPageUrl: ShareUtil.getShareLink(this.curProduct.productId),
+      });
+      picker.show(this.getUIContext());
+    }
+  }
 }

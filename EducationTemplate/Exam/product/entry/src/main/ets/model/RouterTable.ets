@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import { RouterMap } from 'router_module';
+import { RouterMap } from 'commonlib';
 
 import {
   ChapterPracticeBuilder,
@@ -46,8 +46,6 @@ import {
   CollectionBuilder,
   CoursePageBuilder,
   EditPersonalCenterBuilder,
-  FeedbackPageBuilder,
-  FeedbackRecordPageBuilder,
   MessageCenterBuilder,
   MyOrderBuilder,
   OneDayPracticeRecordsBuilder,
@@ -65,6 +63,8 @@ import {
 
 import { LoginPageBuilder } from '../pages/LoginPage';
 import { MainEntryBuilder } from '../pages/MainEntry';
+import { buildFeedbackSubmitPage } from 'feedback/src/main/ets/pages/FeedbackSubmitPage';
+import { buildFeedbackHistoryPage } from 'feedback/src/main/ets/pages/FeedbackHistoryPage';
 
 export class RouterTable {
   static builderMap: Map<string, WrappedBuilder<[object]>> = new Map<string, WrappedBuilder<[object]>>();
@@ -96,8 +96,8 @@ export class RouterTable {
     RouterTable.builderMap.set(RouterMap.Level_ONE_PAGE, wrapBuilder(TopicHomePageBuilder));
     // --------------------------------------------------我的
     RouterTable.builderMap.set(RouterMap.SET_UP_PAGE, wrapBuilder(SetUpPageBuilder));
-    RouterTable.builderMap.set(RouterMap.FEEDBACK_PAGE, wrapBuilder(FeedbackPageBuilder));
-    RouterTable.builderMap.set(RouterMap.FEEDBACK_RECORD_PAGE, wrapBuilder(FeedbackRecordPageBuilder));
+    RouterTable.builderMap.set(RouterMap.FEEDBACK_PAGE, wrapBuilder(buildFeedbackSubmitPage));
+    RouterTable.builderMap.set(RouterMap.FEEDBACK_RECORD_PAGE, wrapBuilder(buildFeedbackHistoryPage));
     RouterTable.builderMap.set(RouterMap.ABOUT_PAGE, wrapBuilder(AboutPageBuilder));
     RouterTable.builderMap.set(RouterMap.PERSONAL_CENTER_PAGE, wrapBuilder(EditPersonalCenterBuilder));
     RouterTable.builderMap.set(RouterMap.PRIVACY_STATEMENT_PAGE, wrapBuilder(PrivacyStatementPageBuilder));

@@ -1,4 +1,4 @@
-import { CommonConstants } from './Constants'
+import { CommonConstants } from './Constants';
 
 export class CustomScrollModifier implements AttributeModifier<ScrollAttribute> {
   applyNormalAttribute(instance: ScrollAttribute): void {
@@ -7,16 +7,16 @@ export class CustomScrollModifier implements AttributeModifier<ScrollAttribute> 
       .align(Alignment.Start)
       .scrollable(ScrollDirection.Horizontal)
       .scrollBar(BarState.Off)
-      .edgeEffect(EdgeEffect.Spring)
+      .edgeEffect(EdgeEffect.Spring);
   }
 }
 
 export class CustomTouchModifier implements AttributeModifier<CommonAttribute> {
   applyNormalAttribute(instance: CommonAttribute): void {
-    instance.backgroundColor(Color.Transparent)
+    instance.backgroundColor(Color.Transparent);
   }
 
   applyPressedAttribute(instance: CommonAttribute): void {
-    instance.backgroundColor($r('sys.color.interactive_pressed'))
+    instance.backgroundColor($r('sys.color.interactive_pressed'));
   }
 }

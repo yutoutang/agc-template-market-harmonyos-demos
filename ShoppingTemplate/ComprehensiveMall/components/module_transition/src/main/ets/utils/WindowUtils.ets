@@ -5,7 +5,7 @@ const TAG = 'WindowUtils';
 
 export class WindowUtils {
   public static window: window.Window;
-  public static uiContext:UIContext
+  public static uiContext:UIContext;
   public static windowWidthPx: number;
   public static windowHeightPx: number;
   public static topAvoidAreaHeightPx: number;
@@ -37,7 +37,7 @@ export class WindowUtils {
         WindowUtils.windowHeightPx = data.height;
         AppStorage.setOrCreate(LongTakeTransitionConstants.ON_WINDOW_SIZE_CHANGED, Date.now());
         AppStorage.setOrCreate(LongTakeTransitionConstants.WINDOW_SIZE, { width: data.width, height: data.height });
-      })
+      });
 
       WindowUtils.window.on('avoidAreaChange', (data) => {
         if (data.type === window.AvoidAreaType.TYPE_SYSTEM) {
@@ -49,7 +49,7 @@ export class WindowUtils {
           console.info(TAG, 'on avoidAreaChange, the navigation indicator height is ' + bottomRectHeight);
           WindowUtils.navigationIndicatorHeightPx = bottomRectHeight;
         }
-      })
+      });
     } catch (exception) {
       console.info(TAG, 'register failed ' + JSON.stringify(exception));
     }

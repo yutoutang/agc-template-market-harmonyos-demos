@@ -26,13 +26,13 @@ export struct PanelItem {
     switch (this.value.kindId) {
       case ShareAppType.WECHAT_SESSION:
       case ShareAppType.WECHAT_TIMELINE:
-        this.wxShare.shareWebpage(this.data, this.value.kindId);
+        this.wxShare.shareWebpage(this.getUIContext(), this.data, this.value.kindId);
         break;
       case ShareAppType.QQ:
-        this.qqShare.share(this.data);
+        this.qqShare.share(this.getUIContext(), this.data);
         break;
       case ShareAppType.WEIBO:
-        this.weiboShare.share(this.data);
+        this.weiboShare.share(this.getUIContext(), this.data);
         break;
       case ShareWay.POSTER:
         this.showPoster();
@@ -42,7 +42,7 @@ export struct PanelItem {
         this.handleAutoClose();
         break;
       case ShareWay.SYSTEM:
-        this.systemShare.share().then(() => {
+        this.systemShare.share(this.getUIContext(), ).then(() => {
           this.handleAutoClose();
         });
         break;
@@ -53,13 +53,13 @@ export struct PanelItem {
     switch (this.value.kindId) {
       case ShareAppType.WECHAT_SESSION:
       case ShareAppType.WECHAT_TIMELINE:
-        this.wxShare.shareImage(this.pixmap, this.value.kindId);
+        this.wxShare.shareImage(this.getUIContext(), this.pixmap, this.value.kindId);
         break;
       case ShareAppType.WEIBO:
-        this.weiboShare.share(this.data, this.pixmap);
+        this.weiboShare.share(this.getUIContext(), this.data, this.pixmap);
         break;
       case ShareWay.SAVE_TO_ALBUM:
-        saveImgToAlbum(this.pixmap).then(() => {
+        saveImgToAlbum(this.getUIContext(), this.pixmap).then(() => {
           this.handleAutoClose();
         });
         break;

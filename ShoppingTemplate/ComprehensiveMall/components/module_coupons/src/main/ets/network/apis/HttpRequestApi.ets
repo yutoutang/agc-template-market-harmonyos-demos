@@ -1,6 +1,6 @@
-import { BusinessError } from '@kit.BasicServicesKit'
+import { BusinessError } from '@kit.BasicServicesKit';
 import axios, { AxiosResponse } from '@ohos/axios';
-import { UtilLog } from '@hw-agconnect/util-log'
+import { UtilLog } from '@hw-agconnect/util-log';
 import { LOG_TAG } from '../../constants/Contants';
 import { GetCouponsRequest } from '../types/AxiosRequestParam';
 import { BaseSuccessResponse } from '../types/BaseSuccessResponse';

@@ -13,33 +13,32 @@
  * limitations under the License.
  */
 
-import { JSON } from '@kit.ArkTS';
 import { AppStorageV2 } from '@kit.ArkUI';
-import { RouterMap, RouterModule } from 'router_module';
-import { TopTabsBuilder } from 'commonlib';
-import { MockObj, MockItem } from '../viewModel/CourseHomeModel'
+import { TopTabsBuilder, RouterMap, RouterModule, BreakpointType } from 'commonlib';
+import { MockObj, MockItem } from '../viewModel/CourseHomeModel';
+import { TopicVM } from '../viewModel/TopicVM';
 
 @ComponentV2
 struct MockItemComponent {
-  @Require @Param item: MockItem
+  @Require @Param item: MockItem;
 
   build() {
     Row() {
       // 试卷详情
-      this.examDetailsBuilder()
+      this.examDetailsBuilder();
 
       Image($r('app.media.chevron_right'))
         .height($r('app.float.vp_16'))
         .width($r('app.float.vp_16'))
-        .margin({ top: $r('app.float.vp_3') })
+        .margin({ top: $r('app.float.vp_3') });
     }
     .justifyContent(FlexAlign.SpaceBetween)
     .alignItems(VerticalAlign.Top)
-    .backgroundColor($r('sys.color.background_primary'))
+    .backgroundColor($r('sys.color.comp_background_list_card'))
     .width('100%')
     .padding($r('app.float.vp_12'))
     .borderRadius($r('app.float.vp_16'))
-    .margin({ bottom: $r('app.float.vp_12') })
+    .margin({ bottom: $r('app.float.vp_12') });
   }
 
   /**
@@ -51,7 +50,7 @@ struct MockItemComponent {
       Image(this.item.imageSrc)
         .height($r('app.float.vp_40'))
         .width($r('app.float.vp_40'))
-        .margin({ right: $r('app.float.vp_8') })
+        .margin({ right: $r('app.float.vp_8') });
       Column() {
         Text(this.item.text)
           .fontColor($r('sys.color.font_primary'))
@@ -60,25 +59,26 @@ struct MockItemComponent {
           .maxLines(2)
           .lineHeight($r('app.float.vp_19'))
           .textOverflow({ overflow: TextOverflow.Ellipsis })
-          .margin({ bottom: $r('app.float.vp_4') })
+          .margin({ bottom: $r('app.float.vp_4') });
         Text(`已有 ${this.item.num}人 做过`)
           .fontColor($r('sys.color.font_tertiary'))
           .fontSize($r('sys.float.Body_S'))
-          .fontWeight(FontWeight.Regular)
-      }.width('65%').alignItems(HorizontalAlign.Start)
-    }
+          .fontWeight(FontWeight.Regular);
+      }.width('65%').alignItems(HorizontalAlign.Start);
+    };
   }
 }
 
 @ComponentV2
 export struct MockTestPage {
-  @Local mockTestList: MockItem[] = []
-  @Local navType: number = 1
+  @Local mockTestList: MockItem[] = [];
+  @Local navType: number = 1;
   @Local prop: MockObj = AppStorageV2.connect(MockObj, () => new MockObj())!;
+  topicVM: TopicVM = TopicVM.instance;
 
   aboutToAppear(): void {
-    this.mockTestList = this.prop.mockList
-    this.navType = RouterModule.getNavParam({ url: RouterMap.Mock_PAGE }) as number
+    this.mockTestList = this.prop.mockList;
+    this.navType = RouterModule.getNavParam({ url: RouterMap.Mock_PAGE }) as number;
   }
 
   build() {
@@ -86,16 +86,17 @@ export struct MockTestPage {
       TopTabsBuilder({
         title: this.navType === 1 ? '模拟试卷' : '全真试卷',
         showBackButton: true,
-        bgColor: $r('sys.color.background_primary'),
-      }).padding({ left: $r('app.float.vp_16'), right: $r('app.float.vp_16') })
+        bgColor: $r('sys.color.background_secondary'),
+      }).padding({ left: $r('app.float.vp_16'), right: $r('app.float.vp_16') });
       // 试卷列表
-      this.examListBuilder()
+      this.examListBuilder();
     }
-    .backgroundColor($r('sys.color.background_primary'))
+    .backgroundColor($r('sys.color.background_secondary'))
     .width('100%')
     .height('100%')
     .alignItems(HorizontalAlign.Start)
     .justifyContent(FlexAlign.Start)
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM]);
   }
 
   /**
@@ -103,21 +104,23 @@ export struct MockTestPage {
    */
   @Builder
   examListBuilder() {
-    Column() {
+    Grid() {
       ForEach(this.mockTestList, (item: MockItem) => {
         //模拟试卷子项
-        MockItemComponent({ item: item })
-          .onClick(() => {
-            // 跳转项的num+1
-            this.prop = AppStorageV2.connect(MockObj, () => new MockObj())!;
-            this.prop.mockList.forEach((it: MockItem) => {
-              if (it.id === item.id) {
-                it.num = it.num + 1
-              }
-            })
-            RouterModule.push({ url: RouterMap.ANSWER_QUESTIONS_TWO_PAGE });
-          })
-      }, (item: MockItem ,index: number) => item.id + index)
+        GridItem() {
+          MockItemComponent({ item: item })
+            .onClick(() => {
+              // 跳转项的num+1
+              this.prop = AppStorageV2.connect(MockObj, () => new MockObj())!;
+              this.prop.mockList.forEach((it: MockItem) => {
+                if (it.id === item.id) {
+                  it.num = it.num + 1;
+                }
+              });
+              RouterModule.push({ url: RouterMap.ANSWER_QUESTIONS_TWO_PAGE });
+            });
+        };
+      }, (item: MockItem, index: number) => item.id + index);
     }
     .width('100%')
     .height('100%')
@@ -128,12 +131,20 @@ export struct MockTestPage {
       bottom: $r('app.float.vp_12')
     })
     .backgroundColor($r('sys.color.comp_background_gray'))
+    .columnsTemplate('1fr '.repeat(new BreakpointType<number>({
+      sm: 1,
+      md: 2,
+      lg: 3,
+      xl: 3
+    }).getValue(this.topicVM.breakPointModel.currentBreakpoint)))
+    .columnsGap($r('app.float.vp_12'))
+    .rowsGap($r('app.float.vp_6'));
   }
 }
 
 @Builder
 export function MockTestPageBuilder() {
-  MockTestPage()
+  MockTestPage();
 }
 
 

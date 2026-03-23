@@ -54,7 +54,7 @@ export class FileUtils {
       .catch((err: BusinessError) => {
         Logger.info(TAG, 'getCurrentBundleStats failed. error:' + JSON.stringify(err));
         return 0;
-      })
+      });
   }
 
   /**
@@ -86,7 +86,7 @@ export class FileUtils {
       // 恢复默认的安全级别
       context.area = contextConstant.AreaMode.EL2;
     } catch (err) {
-      Logger.error(TAG, 'get paths failed. ' + SafeJson.jsonStringify(err))
+      Logger.error(TAG, 'get paths failed. ' + SafeJson.jsonStringify(err));
     }
     return paths;
   }
@@ -125,8 +125,8 @@ export class FileUtils {
         }
       })
       .catch((err: BusinessError) => {
-        Logger.error(TAG, 'delete file failed. error: ' + JSON.stringify(err))
-      })
+        Logger.error(TAG, 'delete file failed. error: ' + JSON.stringify(err));
+      });
   }
 
   /**

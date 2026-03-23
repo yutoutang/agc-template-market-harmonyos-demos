@@ -3,6 +3,7 @@ import { CommonConstants, CommonModel } from '@ohos_agcit/driver_license_exam_co
 import { Video } from '@ohos_agcit/driver_license_exam_datasource';
 import { SharePicker } from 'aggregated_share';
 import { window } from '@kit.ArkUI';
+import { ExamController } from 'exam'
 
 @Builder
 export function VideoDetailViewBuilder() {
@@ -17,6 +18,7 @@ struct VideoDetailView {
   @Local videoParam: Video | undefined = undefined;
   @Local bottomRectHeight: number = 0;
   @Local topRectHeight: number = 0;
+  examController:ExamController = ExamController.instance;
 
   aboutToAppear(): void {
     this.bottomRectHeight = AppStorage.get('bottomRectHeight') || 0;
@@ -83,17 +85,17 @@ struct VideoDetailView {
 
             Column({space:24}) {
               Text(this.videoParam.simpleDescription)
-                .fontSize(18)
+                .fontSize(this.examController.getFg(18))
                 .fontColor('rgba(0,0,0,0.9)')
                 .fontWeight(FontWeight.Bold)
                 .width(CommonConstants.FULL_WIDTH)
               Text(this.videoParam.description)
-                .fontSize(14)
+                .fontSize(this.examController.getFg(14))
                 .fontColor('rgba(0,0,0,0.9)')
-                .lineHeight(21)
+                .lineHeight(this.examController.getFg(21))
                 .width(CommonConstants.FULL_WIDTH)
               Text(this.videoParam.copyrightNotice)
-                .fontSize(14)
+                .fontSize(this.examController.getFg(14))
                 .fontColor('rgba(0,0,0,0.6)')
                 .width(CommonConstants.FULL_WIDTH)
             }

@@ -79,7 +79,7 @@ export struct SettingPage {
       .alignItems(HorizontalAlign.Start)
       .justifyContent(FlexAlign.Start)
       .expandSafeArea([SafeAreaType.SYSTEM, SafeAreaType.CUTOUT], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
-      .backgroundColor('#FFF1F3F5')
+      .backgroundColor($r('app.color.background_color_grey'))
     }
     .hideTitleBar(true)
   }

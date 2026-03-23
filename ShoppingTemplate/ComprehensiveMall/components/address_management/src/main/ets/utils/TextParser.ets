@@ -119,7 +119,7 @@ export class TextParser {
         }
       }
     } catch (err) {
-      UtilLog.error(LOG_TAG, 'get text entity failed. error:' + JSON.stringify(err))
+      UtilLog.error(LOG_TAG, 'get text entity failed. error:' + JSON.stringify(err));
     }
 
     return parsedAddress;

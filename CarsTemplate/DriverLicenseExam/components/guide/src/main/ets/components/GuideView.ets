@@ -23,6 +23,7 @@ export struct GuideView {
       .width(CommonConstants.FULL_WIDTH)
       .fontColor('rgba(0,0,0,0.9)')
       .fontSize(14)
+      .maxFontScale(1)
       .margin({
         bottom:12,
         top: 24,
@@ -39,6 +40,7 @@ export struct GuideView {
       .fontColor(id === this.activeId?'#fff':'rgba(0,0,0,0.9)')
       .fontSize(14)
       .textAlign(TextAlign.Center)
+      .maxFontScale(1)
       .onClick(() => {
         this.activeId = id;
         this.guideService.updateDriveStage(id)
@@ -58,6 +60,7 @@ export struct GuideView {
         Text(this.guideService.getGuideData().city || $r('app.string.please_select_city'))
           .fontSize(14)
           .fontColor('rgba(0,0,0,0.9)')
+          .maxFontScale(1)
       }
       Row() {
         Text($r('app.string.go_select'))
@@ -66,6 +69,7 @@ export struct GuideView {
           .margin({
             right:4
           })
+          .maxFontScale(1)
         Image($r('app.media.ic_right_arrow_lined'))
           .height(16)
           .width(16)
@@ -98,6 +102,7 @@ export struct GuideView {
               .width(CommonConstants.FULL_WIDTH)
               .fontSize(24)
               .fontColor('rgba(0,0,0,0.9)')
+              .maxFontScale(1)
               .margin({
                 top: this.getUIContext().px2vp(this.topRectHeight) + 12
               })
@@ -123,10 +128,12 @@ export struct GuideView {
                       Text(item.name)
                         .fontColor('rgba(0,0,0,0.9)')
                         .fontSize(12)
+                        .maxFontScale(1)
 
                       Text(item.description)
                         .fontColor('rgba(0,0,0,0.6)')
                         .fontSize(12)
+                        .maxFontScale(1)
                         .margin({
                           left:10
                         })
@@ -162,12 +169,14 @@ export struct GuideView {
                     Text(item.name)
                       .fontSize(12)
                       .fontColor('rgba(0,0,0,0.9)')
+                      .maxFontScale(1)
                       .margin({
                         bottom:4
                       })
 
                     Text(item.description)
                       .fontSize(12)
+                      .maxFontScale(1)
                       .fontColor('rgba(0,0,0,0.6)')
                   }
                   .width(CommonConstants.FULL_WIDTH)
@@ -198,6 +207,7 @@ export struct GuideView {
             .fontColor(Color.White)
             .backgroundColor('#64BB5C')
             .textAlign(TextAlign.Center)
+            .maxFontScale(1)
             .onClick(() => {
               this.guideService.changeGuidanceStatus(this.getUIContext());
               if (this.guideService.isCompleteGuidance()) {

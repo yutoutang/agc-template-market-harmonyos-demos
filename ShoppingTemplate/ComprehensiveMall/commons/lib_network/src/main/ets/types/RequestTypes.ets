@@ -1,6 +1,6 @@
-import {
-  AddressInfo, DiscountItem, OrderSkuItem, SkuReview,
-} from './responses/OrderResponse';
+import { PriceType } from './EnumTypes';
+import { AddressInfo, SkuReview, OrderSkuItem } from './OrderTypes';
+import { BaseID, CartProductInfo, DiscountItem, PreOrderItem } from './ProductTypes';
 
 export interface OrderUpdateReq {
   status?: number;
@@ -13,11 +13,6 @@ export interface OrderReviewReq {
 
 export interface PreOrderInfoReq {
   items: PreOrderItem[];
-}
-
-export interface PreOrderItem {
-  skuCode: string;
-  count: number;
 }
 
 export interface OrderCreateReq {
@@ -41,6 +36,7 @@ export interface ProductListReq {
   filterList?: FilterSelectionItem[];
   categoryId?: string;
   keyword?: string;
+  slotId?: string;
 }
 
 export interface FilterSelectionItem {
@@ -64,4 +60,68 @@ export interface UserLoginReq {
   verifyCode?: string
   unionID?: string
   authorizationCode?: string
+}
+
+/** 秒杀场次列表请求 */
+export interface SeckillSessionReq {
+  /** 日期 格式: YYYY-MM-DD，默认今天 */
+  date?: string;
+}
+
+/** 秒杀商品列表请求 */
+export interface SeckillProductListReq {
+  /** 时段ID */
+  slotId: string;
+
+  /** 当前页码 */
+  curPage?: number;
+
+  /** 每页数量 */
+  pageSize?: number;
+}
+
+/** 商品详情请求 */
+export interface ProductDetailReq extends BaseID {
+}
+
+/** 预约/取消预约请求 */
+export interface SeckillReserveReq {
+  /** 商品ID */
+  productId: string;
+
+  /** 秒杀ID */
+  slotId: string;
+
+  /** 日程ID */
+  eventId?: number;
+}
+
+/** 购物车操作的最小单元 Key */
+export interface CartItemKey {
+  skuCode: string;
+  priceType: PriceType;
+}
+
+/** 更新购物车请求 */
+export interface UpdateCartReq extends PreOrderItem {}
+
+/** 删除购物车商品请求 */
+export interface DeleteCartReq {
+  skuList: CartItemKey[];
+  isRemain: boolean;
+}
+
+/** 计算购物车价格请求 */
+export interface CalcCartPriceReq {
+  isMember: boolean;
+  skuList: CartProductInfo[];
+  extraDiscount?: DiscountItem[];
+}
+
+/** 商品收藏请求 */
+export interface ProductCollectionReq extends BaseID{
+}
+
+/** 商品浏览请求 */
+export interface ProductViewReq extends BaseID{
 }

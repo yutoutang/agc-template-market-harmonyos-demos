@@ -253,8 +253,16 @@
       "value": "https://developer.huawei.com/"
     },
     {
+      "name": "widget_desc",
+      "value": "驾考服务卡片"
+    },
+    {
+      "name": "widget_display_name",
+      "value": "驾考"
+    },
+    {
       "name": "agcit_huawei_driver_license_exam",
-      "value": "1.0.5"
+      "value": "1.0.6"
     }
   ]
 }

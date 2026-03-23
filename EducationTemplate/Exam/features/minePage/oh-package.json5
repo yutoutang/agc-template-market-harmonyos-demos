@@ -7,8 +7,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "commonlib": "file:../../commons/commonLib",
-    "router_module": "file:../../commons/router_module",
     "login_info": "file:../../components/login_info",
-    "feed_back": "file:../../components/feed_back",
+    "feedback": "file:../../components/feedback"
   }
 }

@@ -1,4 +1,4 @@
-import { GenderOption, GenderType } from './Types';
+import { GenderOption, GenderType } from './DataModel';
 
 // 通用常量
 export class Constants {
@@ -22,7 +22,7 @@ export class Constants {
   static readonly PADDING_5XL: number = 36;
   static readonly PADDING_6XL: number = 40;
   static readonly PADDING_7XL: number = 44;
-  static readonly THEME_COLOR: ResourceColor = '#E64566'
+  static readonly THEME_COLOR: ResourceColor = '#E64566';
 }
 
 // 性别
@@ -43,5 +43,3 @@ export const GENDER_OPTIONS: GenderOption[] = [
     label: '保密',
   },
 ];
-
-export const LOG_TAG: string = '[CollectPersonalInfo]'

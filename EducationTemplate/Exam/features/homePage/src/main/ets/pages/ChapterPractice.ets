@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import { RouterMap, RouterModule } from 'router_module';
+import { RouterMap, RouterModule } from 'commonlib';
 import { ChapterContent } from '../model/ChapterPractice'
 
 @ComponentV2
@@ -36,9 +36,10 @@ export struct ChapterPractice {
   @Builder
   topBuilder(str: string) {
     Row() {
-      Image($r('app.media.ic_backward'))
+      Image($r('app.media.ic_back'))
         .height($r('app.float.vp_40'))
         .width($r('app.float.vp_40'))
+        .borderRadius($r('app.float.vp_20'))
         .margin({ right: $r('app.float.vp_8') })
         .onClick(() => {
           RouterModule.pop()
@@ -89,7 +90,7 @@ export struct ChapterPractice {
     })
     .margin({ bottom: $r('app.float.vp_12') })
     .width('100%')
-    .backgroundColor($r('sys.color.comp_background_gray'))
+    .backgroundColor($r('sys.color.comp_background_tertiary'))
     .onClick(() => {
       RouterModule.push({ url: RouterMap.ANSWER_QUESTIONS_PAGE })
     })
@@ -108,9 +109,10 @@ export struct ChapterPractice {
     }
     .width('100%')
     .height('100%')
-    .backgroundColor($r('sys.color.background_primary'))
+    .backgroundColor($r('sys.color.comp_background_primary'))
     .alignItems(HorizontalAlign.Start)
     .justifyContent(FlexAlign.Start)
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
   }
 
   /**

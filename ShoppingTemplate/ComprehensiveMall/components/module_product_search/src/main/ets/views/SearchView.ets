@@ -11,6 +11,10 @@ export struct SearchView {
   defaultSearch: string = '';
   @Param
   routerStack: NavPathStack = new NavPathStack();
+  @Param
+  showGuessLike: boolean = true
+  @Param
+  showHotSearch: boolean = true
   @Event
   handleSearch: (value: string) => void = () => {
   };
@@ -32,7 +36,6 @@ export struct SearchView {
 
   build() {
     Column() {
-
       SearchBar({
         placeholder: this.defaultSearch,
         searchWords: this.vm.searchWords,
@@ -64,15 +67,23 @@ export struct SearchView {
                 this.vm.updateHistoryList(list);
               },
             });
-            this.guessLikeBuilder();
-            this.hotSearchBuilder();
+            if (this.showGuessLike) {
+              this.guessLikeBuilder();
+            }
+            if (this.showHotSearch) {
+              this.hotSearchBuilder();
+            }
+
+            Blank().height(56)
           };
         }
       }
       .layoutWeight(1)
       .width('100%')
       .align(Alignment.Top)
-      .padding(Constants.SPACE_L);
+      .padding(Constants.SPACE_L)
+      .edgeEffect(EdgeEffect.Spring)
+      .scrollBar(BarState.Off)
     }
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
     .backgroundColor(Constants.BACKGROUND_COLOR_GREY);

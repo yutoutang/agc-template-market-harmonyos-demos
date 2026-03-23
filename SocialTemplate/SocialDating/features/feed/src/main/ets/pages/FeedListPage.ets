@@ -11,7 +11,8 @@ import {
   FollowType,
   QueryFeedResponse,
   LikeOperType,
-  buildRealNameLabelForList
+  buildRealNameLabelForList,
+  LoginState
 } from 'commons';
 import { FeedDetailPageRouteParam } from '../model/FeedDetailPageRouteParam';
 import { FeedListPageRouteParam } from '../model/FeedListPageRouteParam';
@@ -19,6 +20,7 @@ import Logger from 'commons/src/main/ets/utils/Logger';
 import FeedService from '../service/FeedService';
 import LikeService from '../service/LikeService';
 import CommentService from '../service/CommentService';
+import { AppStorageV2 } from '@kit.ArkUI';
 
 @Builder
 export function FeedListPageBuilder() {
@@ -29,19 +31,19 @@ const ADD_BUTTON_DRAG_MAX_X = 280;
 const ADD_BUTTON_DRAG_MIN_Y = 60;
 const ADD_BUTTON_DRAG_MAX_Y = 550;
 
-@Component
+@ComponentV2
 export struct FeedListPage {
-  @Consume('pageStack') pageStack: NavPathStack;
-  @State feedInfos: Feed[] | null = null;
-  @State currentIndex: number = 0
-  @State noMoreFlag: boolean = false;
-  @State theUserToQueryFeed: BasicUserInfo | null = null;
-  @State addButtonX: number = 270;
-  @State addButtonY: number = 500;
-  @State offsetX: number = 0;
-  @State offsetY: number = 0;
-  @Prop @Watch('onChange') index: number = 0;
-  @State noFeedAtAll: boolean = false;
+  @Consumer('pageStack') pageStack: NavPathStack = new NavPathStack();
+  @Local feedInfos: Feed[] | null = null;
+  @Local currentIndex: number = 0
+  @Local noMoreFlag: boolean = false;
+  @Local theUserToQueryFeed: BasicUserInfo | null = null;
+  @Local addButtonX: number = 270;
+  @Local addButtonY: number = 500;
+  @Local offsetX: number = 0;
+  @Local offsetY: number = 0;
+  @Param index: number = 0;
+  @Local noFeedAtAll: boolean = false;
   private pageTitle: string = '';
   private needAutoGetFeeds: boolean = true;
   private currentUser: BasicUserInfo | null = null;
@@ -80,6 +82,7 @@ export struct FeedListPage {
     }
   }
 
+  @Monitor('index')
   onChange() {
     if (this.index === Constants.PAGE_INDEX_FEED) {
       // 对于用户注销后重新创建的场景，在页面切换时需要刷新currentUser
@@ -346,32 +349,33 @@ function oneFeedImag(resourceUrl: string | Resource, gridItemHeight: number) {
 
 const FEED_INTERACTION_MASK_HEIGHT = 160;
 
-@Component
+@ComponentV2
 export struct FeedBasic {
-  @State item: Feed | null = null;
-  @State showFollowButton: boolean = false;
-  @State currentPageType: number = Constants.FEED_PAGE_TYPE_LIST
-  @State pageStack: NavPathStack | null = null;
-  @State currentUser: BasicUserInfo | null = null;
-  @State showCommentSheet: boolean = false;
-  @State replyComment: boolean = false;
-  @State newCommentTxt: string = '';
-  @State clickLike: boolean = false;
-  @State showInteraction: boolean = false;
-  @State showUserInfo: boolean = true;
-  @State showLikeDetail: boolean = false;
-  @State blurRadius: number = 0;
-  @State theCommentToReply: Comment | null = null;
-  @State likes: BasicUserInfo[] | null = [];
-  @State comments: Comment[] | null = [];
-  @State likedNickNames: string = '';
-  @State likedNickNamesExpandFlag: boolean = false;
-  @State needShowNickNameExpand: boolean = false;
-  @State feedMsgMeasuredHeight: number | Length = 0
-  @State commentSheetHeight: number = Constants.COMMENT_SHEET_HEIGHT_DEFAULT;
-  @State feedLikesHeight: number = 0
-  @State feedCommentsHeight: number = 0
-  feedChange?: () => void;
+  @Param @Once item: Feed | null = null;
+  @Param @Once showFollowButton: boolean = false;
+  @Param @Once currentPageType: number = Constants.FEED_PAGE_TYPE_LIST
+  @Param @Once pageStack: NavPathStack | null = null;
+  @Param @Once currentUser: BasicUserInfo | null = null;
+  @Local showCommentSheet: boolean = false;
+  @Local replyComment: boolean = false;
+  @Local newCommentTxt: string = '';
+  @Local clickLike: boolean = false;
+  @Param @Once showInteraction: boolean = false;
+  @Param @Once showUserInfo: boolean = true;
+  @Local showLikeDetail: boolean = false;
+  @Local blurRadius: number = 0;
+  @Local theCommentToReply: Comment | null = null;
+  @Local likes: BasicUserInfo[] | null = [];
+  @Local comments: Comment[] | null = [];
+  @Local likedNickNames: string = '';
+  @Local likedNickNamesExpandFlag: boolean = false;
+  @Local needShowNickNameExpand: boolean = false;
+  @Local feedMsgMeasuredHeight: number | Length = 0
+  @Local commentSheetHeight: number = Constants.COMMENT_SHEET_HEIGHT_DEFAULT;
+  @Local feedLikesHeight: number = 0
+  @Local feedCommentsHeight: number = 0
+  @Local loginStateStorage : LoginState = AppStorageV2.connect(LoginState, 'LoginState', () =>new LoginState())!
+  @Event feedChange?: () => void;
 
   aboutToAppear(): void {
     this.setClickLike();
@@ -559,17 +563,21 @@ export struct FeedBasic {
               .fontColor($r('app.color.text_font_color_black'))
               .fontWeight(FontWeight.Regular)
               .onClick(() => {
-                if (pageStack != null) {
-                  pageStack.pushPathByName('Member', null, (popInfo: PopInfo) => {
-                    let basicUserInfo = popInfo.result as BasicUserInfo;
-                    if (this.currentUser != null) {
-                      Logger.debug('subscribe membership, currentUser=' + JSON.stringify(basicUserInfo))
-                      this.currentUser.isVip = basicUserInfo.isVip;
-                      if (this.isCurrentUserVip()) {
-                        this.blurRadius = 0;
+                if (!this.loginStateStorage.loginState) {
+                  this.getUIContext().getPromptAction().showToast({ message: '请先关联账号' })
+                } else {
+                  if (pageStack != null) {
+                    pageStack.pushPathByName('Member', null, (popInfo: PopInfo) => {
+                      let basicUserInfo = popInfo.result as BasicUserInfo;
+                      if (this.currentUser != null) {
+                        Logger.debug('subscribe membership, currentUser=' + JSON.stringify(basicUserInfo))
+                        this.currentUser.isVip = basicUserInfo.isVip;
+                        if (this.isCurrentUserVip()) {
+                          this.blurRadius = 0;
+                        }
                       }
-                    }
-                  });
+                    });
+                  }
                 }
               })
           }.width('60%')
@@ -588,7 +596,7 @@ export struct FeedBasic {
         this.buildFeedTime();
       }.width('92%').justifyContent(FlexAlign.Start).alignItems(VerticalAlign.Center).margin({ top: 6, bottom: 12 })
 
-      Divider().strokeWidth(1).width('92%').color('#E5E5E5')
+      Divider().strokeWidth('1px').width('92%').color($r('sys.color.comp_divider'))
       Row() {
         this.buildLikeSummary()
         this.buildMsgSummary()

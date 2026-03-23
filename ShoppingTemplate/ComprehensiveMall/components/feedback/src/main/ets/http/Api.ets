@@ -42,7 +42,7 @@ export class Api {
       const cacheImageUriObj =
         await FileUtils.saveFileToCache(uri);
       if (!cacheImageUriObj) {
-        return ''
+        return '';
       }
       const config: AxiosRequestConfig<FormData> = {
         headers: { 'Content-Type': 'multipart/form-data' },

@@ -13,6 +13,7 @@
     "app_setting": "file:../../components/app_setting",
     "aggregated_login": "file:../../components/aggregated_login",
     "collect_personal_info": "file:../../components/collect_personal_info",
+    "membership": "file:../../components/membership",
     "@tencent/wechat_open_sdk": "1.0.14"
   }
 }

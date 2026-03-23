@@ -1,3 +1,4 @@
+import { UtilLog } from '@hw-agconnect/util-log';
 import { Constants } from '../commons/Constants';
 
 @ComponentV2
@@ -76,7 +77,11 @@ export struct SearchBar {
           .id(this.SEARCH_BAR_ID)
           .onVisibleAreaChange([1], (_isExpanding: boolean, currentRatio: number) => {
             if (currentRatio === 1) {
-              this.getUIContext().getFocusController().requestFocus(this.SEARCH_BAR_ID);
+              try {
+                this.getUIContext().getFocusController().requestFocus(this.SEARCH_BAR_ID);
+              } catch {
+                UtilLog.error('request focus failed.')
+              }
             }
           })
           .onChange((value) => {

@@ -1,7 +1,7 @@
 import { AppStorageV2 } from '@kit.ArkUI';
-import { WindowUtil } from 'module_ui_base';
 import { ConfigInfo } from '../common/ConfigModel';
 import { ObservedInfoItem } from '../common/FormModel';
+import { WindowModel } from '../common/WindowModel';
 import { Constants } from '../common/Constant';
 import { ConfirmButtonModifier, SheetColumnModifier } from '../common/CustomModifier';
 import { encryptPhone, isPhoneNumberValid } from '../common/Util';
@@ -33,8 +33,8 @@ export struct EnterPhoneNumber {
               TextInput({ text: $$this.oldPhoneValue })
                 .fontSize($r('sys.float.Body_L'))
                 .fontColor($r('sys.color.font_primary'))
-                .caretColor(Constants.THEME_COLOR)
                 .backgroundColor($r('sys.color.background_primary'))
+                .caretColor(Constants.THEME_COLOR)
                 .constraintSize({ minHeight: 48 })
                 .enabled(false)
             }
@@ -68,6 +68,7 @@ export struct EnterPhoneNumber {
             }
             .layoutWeight(1)
             .justifyContent(FlexAlign.End)
+
           }
         }
         .layoutWeight(1)
@@ -76,7 +77,6 @@ export struct EnterPhoneNumber {
       }
       .attributeModifier(this.sheetColumnModifier)
       .alignItems(HorizontalAlign.Start)
-      .padding(16)
     }
     .hideTitleBar(true)
     .hideBackButton(true)
@@ -161,12 +161,13 @@ export struct EnterPhoneNumberCore {
   @Param phoneReadonly: boolean = false;
   @Param confirmBtnLabel: string = '';
   @Event sendCode: (phone: string) => Promise<void> = () => Promise.resolve();
-  @Event verifyCode: (phone: string, code: string) => Promise<void> = () => Promise.resolve();
+  @Event verifyCode: (phone: string, code: string) => Promise<boolean> = () => Promise.resolve(false);
   @Event confirmBtnEvent: (phone?: string) => void = (phone?: string) => {
   };
   @Local phoneValue: string = '';
   @Local codeValue: string = '';
   @Local sheetColumnModifier: SheetColumnModifier = new SheetColumnModifier();
+  @Local windowModel: WindowModel = AppStorageV2.connect(WindowModel, () => new WindowModel())!;
   @Local configInfo: ConfigInfo = AppStorageV2.connect(ConfigInfo, () => new ConfigInfo())!
   @Local receivingCode: boolean = false;
   @Local countdown: number = 60;
@@ -183,12 +184,12 @@ export struct EnterPhoneNumberCore {
     if (this.phoneReadonly) {
       this.phoneValue = encryptPhone(this.oldValue);
     }
-    WindowUtil.registerKeyboardListener(this.onKeyBoardCB);
+    this.windowModel.registerKeyboardListener(this.onKeyBoardCB);
   }
 
   aboutToDisappear(): void {
     this.codeValue = '';
-    WindowUtil.unRegisterKeyboardListener(this.onKeyBoardCB);
+    this.windowModel.unRegisterKeyboardListener(this.onKeyBoardCB);
   }
 
   onKeyBoardCB: (height: number) => void = (height: number) => {
@@ -197,197 +198,194 @@ export struct EnterPhoneNumberCore {
   };
 
   build() {
-    Column() {
-      Scroll() {
-        Column() {
-          Row() {
-            if (this.phoneReadonly) {
-              Text(this.phoneValue)
-                .width(Constants.FULL_PERCENT)
-                .constraintSize({ minHeight: 48 })
-                .fontSize($r('sys.float.Body_L'))
-                .caretColor(Constants.THEME_COLOR)
-                .fontColor($r('sys.color.font_tertiary'))
-                .backgroundColor($r('sys.color.background_primary'))
-                .borderRadius(20)
-                .enabled(false)
-                .padding({
-                  left: 16,
-                  right: 16,
-                })
-            } else {
-              TextInput({ text: $$this.phoneValue, placeholder: '请输入新手机号码' })
-                .type(InputType.PhoneNumber)
-                .fontSize($r('sys.float.Body_L'))
-                .fontColor($r('sys.color.font_primary'))
-                .caretColor(Constants.THEME_COLOR)
-                .backgroundColor($r('sys.color.background_primary'))
-                .placeholderColor($r('sys.color.font_secondary'))
-                .borderWidth(1)
-                .borderColor(this.phoneErrorTip.length ? $r('sys.color.warning') :
-                  Color.Transparent)
-                .cancelButton({
-                  style: this.focusPhoneInput ? CancelButtonStyle.INPUT : CancelButtonStyle.INVISIBLE,
-                  icon: { size: 24 },
-                })
-                .constraintSize({ minHeight: 48 })
-                .onFocus(() => {
-                  this.focusPhoneInput = true;
-                })
-                .onBlur(() => {
-                  this.focusPhoneInput = false;
-                  this.checkPhoneErrorTip();
-                })
-                .onChange(() => {
-                  this.phoneErrorTip = '';
-                })
-            }
-          }
-          .width(Constants.FULL_PERCENT)
-          .padding({
-            top: Constants.SPACE_S,
-            bottom: Constants.SPACE_S,
-          })
-
-          Text(this.phoneErrorTip)
-            .fontSize(10)
-            .fontColor($r('sys.color.warning'))
-            .alignSelf(ItemAlign.Start)
-            .padding({
-              left: Constants.SPACE_S,
-              right: Constants.SPACE_S,
-            })
-            .visibility(this.phoneErrorTip.length ? Visibility.Visible : Visibility.None)
-            .caretColor(Constants.THEME_COLOR)
-
-          Stack() {
-            TextInput({ text: $$this.codeValue, placeholder: '请输入验证码' })
-              .type(InputType.Number)
+    Scroll() {
+      Column() {
+        Row() {
+          if (this.phoneReadonly) {
+            Text(this.phoneValue)
+              .width(Constants.FULL_PERCENT)
+              .constraintSize({ minHeight: 48 })
+              .fontSize($r('sys.float.Body_L'))
+              .fontColor($r('sys.color.font_tertiary'))
               .caretColor(Constants.THEME_COLOR)
+              .backgroundColor($r('sys.color.background_primary'))
+              .borderRadius(20)
+              .enabled(false)
+              .padding({
+                left: 16,
+                right: 16,
+              })
+          } else {
+            TextInput({ text: $$this.phoneValue, placeholder: '请输入新手机号码' })
+              .type(InputType.PhoneNumber)
               .fontSize($r('sys.float.Body_L'))
               .fontColor($r('sys.color.font_primary'))
               .backgroundColor($r('sys.color.background_primary'))
+              .caretColor(Constants.THEME_COLOR)
               .placeholderColor($r('sys.color.font_secondary'))
               .borderWidth(1)
-              .borderColor(this.verifyCodeValid ? Color.Transparent : $r('sys.color.warning'))
-              .maxLength(this.codeLength)
-              .constraintSize({ minHeight: 48 })
-              .onChange(() => {
-                this.verifyCodeValid = true;
+              .borderColor(this.phoneErrorTip.length ? $r('sys.color.warning') :
+              Color.Transparent)
+              .cancelButton({
+                style: this.focusPhoneInput ? CancelButtonStyle.INPUT : CancelButtonStyle.INVISIBLE,
+                icon: { size: 24 },
               })
+              .constraintSize({ minHeight: 48 })
+              .onFocus(() => {
+                this.focusPhoneInput = true;
+              })
+              .onBlur(() => {
+                this.focusPhoneInput = false;
+                this.checkPhoneErrorTip();
+              })
+              .onChange(() => {
+                this.phoneErrorTip = '';
+              })
+          }
+        }
+        .width(Constants.FULL_PERCENT)
+        .padding({
+          top: Constants.SPACE_S,
+          bottom: Constants.SPACE_S,
+        })
 
-            Button() {
-              Row() {
-                if (this.sendCodeLoading) {
-                  LoadingProgress()
-                    .width(20)
-                    .aspectRatio(1)
-                    .color(this.configInfo.themeColor)
-                } else {
-                  Text(this.codeBtnLabel)
-                    .fontSize($r('sys.float.Body_M'))
-                    .fontColor(this.codeBtnFgColor)
-                }
+        Text(this.phoneErrorTip)
+          .fontSize(10)
+          .fontColor($r('sys.color.warning'))
+          .alignSelf(ItemAlign.Start)
+          .padding({
+            left: Constants.SPACE_S,
+            right: Constants.SPACE_S,
+          })
+          .visibility(this.phoneErrorTip.length ? Visibility.Visible : Visibility.None)
+
+        Stack() {
+          TextInput({ text: $$this.codeValue, placeholder: '请输入验证码' })
+            .caretColor(Constants.THEME_COLOR)
+            .type(InputType.Number)
+            .fontSize($r('sys.float.Body_L'))
+            .fontColor($r('sys.color.font_primary'))
+            .backgroundColor($r('sys.color.background_primary'))
+            .placeholderColor($r('sys.color.font_secondary'))
+            .borderWidth(1)
+            .borderColor(this.verifyCodeValid ? Color.Transparent : $r('sys.color.warning'))
+            .maxLength(this.codeLength)
+            .constraintSize({ minHeight: 48 })
+            .onChange(() => {
+              this.verifyCodeValid = true;
+            })
+
+          Button() {
+            Row() {
+              if (this.sendCodeLoading) {
+                LoadingProgress()
+                  .width(20)
+                  .aspectRatio(1)
+                  .color(this.configInfo.themeColor)
+              } else {
+                Text(this.codeBtnLabel)
+                  .fontSize($r('sys.float.Body_M'))
+                  .fontColor(this.codeBtnFgColor)
               }
             }
-            .width(72)
-            .height(28)
-            .padding(0)
-            .backgroundColor($r('sys.color.comp_background_tertiary'))
-            .margin({ right: 12 })
-            .enabled(this.allowSendCode)
-            .onClick(() => {
-              this.codeValue = '';
-              this.checkPhoneErrorTip();
-              if (this.phoneErrorTip.length) {
-                return;
-              }
-              this.sendCodeLoading = true;
-              this.sendCode(this.realPhoneValue)
-                .then(() => {
-                  this.verifyCodeValid = true;
-                  this.receivingCode = true;
-                  this.countdown = 60;
-                  this.timer = setInterval(() => {
-                    if (this.countdown === 1) {
-                      clearInterval(this.timer);
-                      this.reGetCode = true;
-                      this.receivingCode = false;
-                    } else {
-                      this.countdown--;
-                    }
-                  }, 1000)
-                })
-                .catch(() => {
-                  this.getUIContext().getPromptAction().showToast({ message: '获取验证码出现异常，请重试' });
-                })
-                .finally(() => {
-                  this.sendCodeLoading = false;
-                })
-            })
           }
-          .alignContent(Alignment.End)
-          .width(Constants.FULL_PERCENT)
+          .width(72)
+          .height(28)
+          .padding(0)
+          .backgroundColor($r('sys.color.comp_background_tertiary'))
+          .margin({ right: 12 })
+          .enabled(this.allowSendCode)
+          .onClick(() => {
+            this.codeValue = '';
+            this.checkPhoneErrorTip();
+            if (this.phoneErrorTip.length) {
+              return;
+            }
+            this.sendCodeLoading = true;
+            this.sendCode(this.realPhoneValue)
+              .then(() => {
+                this.verifyCodeValid = true;
+                this.receivingCode = true;
+                this.countdown = 60;
+                this.timer = setInterval(() => {
+                  if (this.countdown === 1) {
+                    clearInterval(this.timer);
+                    this.reGetCode = true;
+                    this.receivingCode = false;
+                  } else {
+                    this.countdown--;
+                  }
+                }, 1000)
+              })
+              .catch(() => {
+                this.getUIContext().getPromptAction().showToast({ message: '获取验证码出现异常，请重试' });
+              })
+              .finally(() => {
+                this.sendCodeLoading = false;
+              })
+          })
+        }
+        .alignContent(Alignment.End)
+        .width(Constants.FULL_PERCENT)
+        .padding({
+          top: Constants.SPACE_S,
+          bottom: Constants.SPACE_S,
+        })
+
+        Text('验证码错误或已过期')
+          .fontSize(10)
+          .fontColor($r('sys.color.warning'))
+          .alignSelf(ItemAlign.Start)
           .padding({
-            top: Constants.SPACE_S,
-            bottom: Constants.SPACE_S,
+            left: Constants.SPACE_S,
+            right: Constants.SPACE_S,
           })
+          .visibility(this.verifyCodeValid ? Visibility.None : Visibility.Visible)
 
-          Text('验证码错误或已过期')
-            .fontSize(10)
-            .fontColor($r('sys.color.warning'))
-            .alignSelf(ItemAlign.Start)
-            .padding({
-              left: Constants.SPACE_S,
-              right: Constants.SPACE_S,
+        Blank()
+
+        Button() {
+          Row({ space: Constants.SPACE_XS }) {
+            LoadingProgress()
+              .width(20)
+              .aspectRatio(1)
+              .color($r('sys.color.icon_on_primary'))
+              .visibility(this.confirmLoading ? Visibility.Visible : Visibility.None)
+            Text(this.confirmBtnLabel)
+              .fontSize($r('sys.float.Body_L'))
+              .fontColor($r('sys.color.font_on_primary'))
+              .fontWeight(FontWeight.Medium)
+          }
+        }
+        .width(Constants.FULL_PERCENT)
+        .height(40)
+        .backgroundColor(this.configInfo.themeColor)
+        .enabled(this.allowSubmit)
+        .onClick(() => {
+          this.checkPhoneErrorTip();
+          if (this.phoneErrorTip.length) {
+            return;
+          }
+          this.confirmLoading = true;
+          this.verifyCode(this.realPhoneValue, this.codeValue)
+            .then((result) => {
+              if (result) {
+                this.confirmBtnEvent(this.phoneValue);
+              }
             })
-            .visibility(this.verifyCodeValid ? Visibility.None : Visibility.Visible)
-        }
-        .attributeModifier(this.sheetColumnModifier)
+            .catch(() => {
+              this.verifyCodeValid = false;
+            })
+            .finally(() => {
+              this.confirmLoading = false;
+            })
+        })
       }
-      .layoutWeight(1)
-      .edgeEffect(EdgeEffect.Spring)
-      .scrollBar(BarState.Off)
-      .align(Alignment.TopStart)
-
-      Button() {
-        Row({ space: Constants.SPACE_XS }) {
-          LoadingProgress()
-            .width(20)
-            .aspectRatio(1)
-            .color($r('sys.color.icon_on_primary'))
-            .visibility(this.confirmLoading ? Visibility.Visible : Visibility.None)
-          Text(this.confirmBtnLabel)
-            .fontSize($r('sys.float.Body_L'))
-            .fontColor($r('sys.color.font_on_primary'))
-            .fontWeight(FontWeight.Medium)
-        }
-      }
-      .width(Constants.FULL_PERCENT)
-      .height(40)
-      .backgroundColor(this.configInfo.themeColor)
-      .enabled(this.allowSubmit)
-      .onClick(() => {
-        this.checkPhoneErrorTip();
-        if (this.phoneErrorTip.length) {
-          return;
-        }
-        this.confirmLoading = true;
-        this.verifyCode(this.realPhoneValue, this.codeValue)
-          .then(() => {
-            this.confirmBtnEvent(this.phoneValue);
-          })
-          .catch(() => {
-            this.verifyCodeValid = false;
-          })
-          .finally(() => {
-            this.confirmLoading = false;
-          })
-      })
-      .margin({ bottom: 16 })
+      .attributeModifier(this.sheetColumnModifier)
     }
-    .height('100%')
-    .padding(16)
+    .layoutWeight(1)
+    .edgeEffect(EdgeEffect.Spring)
+    .scrollBar(BarState.Off)
   }
 
   checkPhoneErrorTip() {

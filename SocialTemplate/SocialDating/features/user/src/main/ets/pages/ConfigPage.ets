@@ -1,6 +1,7 @@
-import { CommonRsp, Constants, NavigationTitleBuilder,UserFullInfo } from 'commons';
+import { CommonRsp, Constants, LoginState, NavigationTitleBuilder,UserFullInfo } from 'commons';
 import UserService from '../service/UserService';
 import Logger from 'commons/src/main/ets/utils/Logger';
+import { AppStorageV2 } from '@kit.ArkUI';
 
 @Builder
 export function ConfigPageBuilder() {
@@ -8,15 +9,18 @@ export function ConfigPageBuilder() {
 }
 
 @Preview
-@Component
+@ComponentV2
 export struct ConfigPage {
-  @Consume('pageStack') pageStack: NavPathStack;
-  @State userFullInfo: UserFullInfo = new UserFullInfo();
-  @State isPublic: boolean = true;
+  @Consumer('pageStack') pageStack: NavPathStack = new NavPathStack();
+  @Local userFullInfo: UserFullInfo = new UserFullInfo();
+  @Local loginStateStorage : LoginState = AppStorageV2.connect(LoginState, 'LoginState', () => new LoginState())!
+  @Local isPublic: boolean = true;
 
   build() {
     NavDestination() {
       Column() {
+        this.buildPersonalInfo()
+        this.buildRealNameAuth()
         this.buildPublicSettingRow()
         this.buildAccountDeregister()
       }
@@ -24,6 +28,80 @@ export struct ConfigPage {
       this.pageStack = context.pathStack
     }).backgroundColor($r('app.color.page_background_color'))
     .title(NavigationTitleBuilder('设置'))
+  }
+
+  @Builder
+  buildPersonalInfo() {
+    Row() {
+      Column() {
+        Text('个人信息')
+          .margin({ left: 12, top: 12, bottom: 12 })
+          .align(Alignment.Start)
+          .fontSize($r('sys.float.Body_M'))
+          .fontWeight(FontWeight.Bold)
+          .fontColor($r('app.color.text_font_color_black'))
+      }
+      .width('50%')
+      .alignItems(HorizontalAlign.Start)
+
+      Column() {
+        Image($r('app.media.ic_right_arrow')).width(24).height(24).margin({ right: 12, top: 12, bottom: 12 })
+      }
+      .width('50%')
+      .alignItems(HorizontalAlign.End)
+    }
+    .justifyContent(FlexAlign.SpaceAround)
+    .margin({
+      left: 16,
+      right: 16,
+      bottom: 12,
+      top: 12
+    })
+    .backgroundColor(Color.White)
+    .borderRadius(16)
+    .height(56)
+    .onClick(() => {
+      if (this.loginStateStorage.loginState) {
+        this.pageStack.pushPathByName('PersonalInfoPage', null);
+      } else {
+        this.getUIContext().getPromptAction().showToast({ message: '请先关联账号' })
+      }
+    })
+  }
+
+  @Builder
+  buildRealNameAuth() {
+    Row() {
+      Column() {
+        Text('实名认证')
+          .margin({ left: 12, top: 12, bottom: 12 })
+          .align(Alignment.Start)
+          .fontSize($r('sys.float.Body_M'))
+          .fontWeight(FontWeight.Bold)
+          .fontColor($r('app.color.text_font_color_black'))
+      }
+      .width('50%')
+      .alignItems(HorizontalAlign.Start)
+
+      Column() {
+        Image($r('app.media.ic_right_arrow')).width(24).height(24).margin({ right: 12, top: 12, bottom: 12 })
+      }
+      .width('50%')
+      .alignItems(HorizontalAlign.End)
+    }
+    .justifyContent(FlexAlign.SpaceAround)
+    .margin({
+      left: 16,
+      right: 16
+    })
+    .backgroundColor(Color.White)
+    .borderRadius(16)
+    .height(56)
+    .onClick(() => {
+      this.pageStack.pushPathByName('RealNameAuthPage', null, (pop: PopInfo) => {
+        // this.refreshUserInfo(pop); // todo 刷新个人信息
+      });
+    })
   }
 
   @Builder
@@ -68,7 +146,7 @@ export struct ConfigPage {
     .margin({
       left: 16,
       right: 16,
-      bottom: 16,
+      bottom: 12,
       top: 12
     })
     .borderRadius(16)
@@ -105,7 +183,7 @@ export struct ConfigPage {
               style: DialogButtonStyle.HIGHLIGHT,
               value: '确定',
               action: () => {
-                UserService.deleteUser(this.userFullInfo).then((data: CommonRsp | null) => {
+                UserService.deleteUser(this.getUIContext(), this.userFullInfo).then((data: CommonRsp | null) => {
                   if (data != null && data.retCode === Constants.RET_SUCCESS_CODE) {
                     AppStorage.delete(Constants.CURRENT_USER_BASIC);
                     AppStorage.delete(Constants.UNION_ID);

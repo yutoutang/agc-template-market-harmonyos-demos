@@ -52,15 +52,15 @@ export interface HintParam {
 export class MemberList {
   renewList: string[] = [];
   nonRenewList: string[] = [];
-  nonConsumeList: string[] = []
+  nonConsumeList: string[] = [];
 }
 
 export class ProductInfo {
   type: iap.ProductType = iap?.ProductType.AUTORENEWABLE;
   productId: string = '';
   privileges: MemberShipPrivilege[] = [];
-  privacyName?:string =  ''
-  privacyContent?: string = ''
+  privacyName?:string =  '';
+  privacyContent?: string = '';
 }
 
 export class MemberParams {
@@ -69,7 +69,7 @@ export class MemberParams {
   status: FinishStatus = FinishStatus.FINISHED;
   purchaseTime: number = 0;
   errCode?: number = 0;
-  errMsg?: string = ''
+  errMsg?: string = '';
 }
 
 @ObservedV2

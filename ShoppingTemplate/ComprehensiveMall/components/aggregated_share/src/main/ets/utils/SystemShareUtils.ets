@@ -2,12 +2,12 @@ import { common } from '@kit.AbilityKit';
 import { uniformTypeDescriptor as utd } from '@kit.ArkData';
 import { BusinessError, pasteboard } from '@kit.BasicServicesKit';
 import { harmonyShare, systemShare } from '@kit.ShareKit';
-import { Logger, SafeJson, WindowUtil } from 'module_ui_base';
-import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast'
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { downloadImage, saveToSandbox } from './FileUtils';
 import { ShareViewData } from '../common/ShareParams';
 
-const TAG = 'SystemShareUtils';
+const TAG = '[SystemShareUtils]';
 
 /**
  * 系统分享
@@ -17,6 +17,7 @@ export class SystemShareUtils {
   private shareData: systemShare.SharedData = new systemShare.SharedData({
     utd: utd.UniformDataType.TEXT,
   });
+  private uiContext: UIContext | undefined = undefined;
 
   /**
    * 获取实例
@@ -33,7 +34,8 @@ export class SystemShareUtils {
    * 初始化数据
    * @param data
    */
-  public async init(data: ShareViewData) {
+  public async init(uiContext: UIContext, data: ShareViewData) {
+    this.uiContext = uiContext;
     this.shareData = await this.getShareData(data);
   }
 
@@ -41,16 +43,16 @@ export class SystemShareUtils {
    * 拉起系统分享面板
    * @param data
    */
-  public share(): Promise<void> {
+  public share(uiContext: UIContext): Promise<void> {
     return new Promise((resolve, reject) => {
       const controller: systemShare.ShareController = new systemShare.ShareController(this.shareData);
-      return controller.show(WindowUtil.context as common.UIAbilityContext, {
+      return controller.show(uiContext.getHostContext() as common.UIAbilityContext, {
         selectionMode: systemShare.SelectionMode.SINGLE,
         previewMode: systemShare.SharePreviewMode.DEFAULT,
       }).then(() => {
         resolve();
       }).catch((error: BusinessError) => {
-        Logger.error(TAG, `ShareController show error. code: ${error.code}, message: ${error.message}`);
+        UtilLog.error(TAG, `ShareController show error. code: ${error.code}, message: ${error.message}`);
         promptAction.showToast({ message: '拉起系统分享出错' });
         reject();
       });
@@ -62,7 +64,7 @@ export class SystemShareUtils {
    */
   private callback = async (sharableTarget: harmonyShare.SharableTarget) => {
     sharableTarget.share(this.shareData);
-  }
+  };
 
   /**
    * 监听碰一碰
@@ -127,15 +129,18 @@ export class SystemShareUtils {
         if (typeof thumbUrl === 'string') {
           thumbBuffer = await downloadImage(thumbUrl);
         } else {
-          if (WindowUtil.context) {
-            const content = WindowUtil.context.resourceManager.getMediaContentSync(thumbUrl.id);
+          if (this.uiContext) {
+            const context = this.uiContext.getHostContext() as Context;
+            const content = await context.resourceManager.getMediaContent(thumbUrl.id);
             thumbBuffer = content.buffer as ArrayBuffer;
           }
         }
-        thumbUri = await saveToSandbox(thumbBuffer);
+        if (this.uiContext) {
+          thumbUri = await saveToSandbox(this.uiContext, thumbBuffer);
+        }
       }
     } catch (e) {
-      Logger.error(TAG, 'getThumbnail failed, error: ' + JSON.stringify(e));
+      UtilLog.error(TAG, 'getThumbnail failed, error: ' + JSON.stringify(e));
     }
 
     return thumbUri;
@@ -145,17 +150,15 @@ export class SystemShareUtils {
    * 复制内容到剪切板
    * @param data
    */
-  public copy(data: ShareViewData) {
+  public async copy(data: ShareViewData) {
     try {
       const pasteboardData =
         pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, `${data.title} | ${data.landingPageUrl}`);
       const systemPasteboard = pasteboard.getSystemPasteboard();
-      systemPasteboard.setData(pasteboardData).catch((err: BusinessError) => {
-        Logger.error(TAG, 'set pasteboard data failed, error: ' + JSON.stringify(err));
-      })
+      await systemPasteboard.setData(pasteboardData);
       promptAction.showToast({ message: '复制成功' });
     } catch (err) {
-      Logger.error(TAG, 'copy failed. error:' + SafeJson.jsonStringify(err))
+      UtilLog.error(TAG, `Failed to creat data, errCode: ${err.code}, errMessage: ${err.message}`);
     }
   }
 }

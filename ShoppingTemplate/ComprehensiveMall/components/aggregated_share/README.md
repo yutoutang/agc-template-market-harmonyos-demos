@@ -46,7 +46,7 @@
 - 网络权限：ohos.permission.INTERNET
 
 ### 使用约束
-- 碰一碰分享：任意一端设备不支持碰一碰能力时，轻碰无任何响应，详细参考：[手机与手机碰一碰分享](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/knock-share-phone-to-phone#section15384182281511)。
+- 碰一碰分享：任意一端设备不支持碰一碰能力时，轻碰无任何响应，详细参考：[手机与手机碰一碰分享](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/knock-share-between-phones-overview#section184317615456)。
 
 ## 使用
 
@@ -99,7 +99,7 @@
              const picker: SharePicker = new SharePicker({
                title: 'HarmonyOS官方模板集成创新活动',
              });
-             picker.show();
+             picker.show(this.getUIContext());
            })
        }
      }
@@ -257,7 +257,14 @@
 
 构造函数。
 
-#### show(options?: [ShareOptions](#ShareOptions)): void
+#### show(uiContext: UIContext, options?: [ShareOptions](#ShareOptions)): void
+
+**参数**
+
+| 参数名       | 类型                                                                                                            | 是否必填 | 说明        |
+|-----------|---------------------------------------------------------------------------------------------------------------|------|-----------|
+| uiContext | [UIContext](https://developer.huawei.com/consumer/cn/doc/harmonyos-references/arkts-apis-uicontext-uicontext) | 是    | 应用 UI 上下文 |
+| options   | [ShareOptions](#ShareOptions)                                                                                 | 否    | 分享数据记录    |
 
 拉起分享半模态弹窗。
 
@@ -383,7 +390,7 @@ struct ShareSample1 {
               return Promise.resolve(signData);
             })
 
-            picker.show({
+            picker.show(this.getUIContext(), {
               autoClose: true,
             });
           })
@@ -434,7 +441,7 @@ struct ShareSample2 {
                 createTime: new Date('2025/09-15 08:00:00').getTime(),
                 landingPageUrl: 'https://developer.huawei.com/consumer/cn/activity/301757474300821213',
               });
-              picker.show({
+              picker.show(this.getUIContext(), {
                 extComponentId: 'customSnapshotId',
                 directPoster: true,
               });

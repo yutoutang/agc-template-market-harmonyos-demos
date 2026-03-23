@@ -1,10 +1,10 @@
-import { PopViewUtil } from 'module_ui_base'
-import { FILTER_TYPE_LIST } from '../commons/Constants'
-import { ProductFilterOptions } from '../commons/Types'
-import { buildProductFilter } from '../views/ProductFilterView'
+import { PopViewUtil } from 'module_ui_base';
+import { FILTER_TYPE_LIST } from '../commons/Constants';
+import { ProductFilterOptions } from '../commons/Types';
+import { buildProductFilter } from '../views/ProductFilterView';
 
 export class ProductFilter {
-  public static show(options: ProductFilterOptions) {
+  public static show(options: ProductFilterOptions, uiContext: UIContext) {
     PopViewUtil.openSheet(
       wrapBuilder(buildProductFilter),
       {
@@ -17,14 +17,15 @@ export class ProductFilter {
         filterTypeList: options.filterTypeList ?? FILTER_TYPE_LIST,
         initFilter: options?.initFilter ?? [],
         handleConfirm: (res) => {
-          options.handleConfirm?.(res)
-          ProductFilter.hide()
+          options.handleConfirm?.(res);
+          ProductFilter.hide();
         },
       } as ProductFilterOptions,
-    )
+      uiContext,
+    );
   }
 
   public static hide() {
-    PopViewUtil.closeSheet()
+    PopViewUtil.closeSheet();
   }
 }

@@ -11,6 +11,10 @@
     {
       "name": "MemberAbility_label",
       "value": "label"
+    },
+    {
+      "name": "agcit_huawei_social_dating",
+      "value": "1.0.0"
     }
   ]
 }

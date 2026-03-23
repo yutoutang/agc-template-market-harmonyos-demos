@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+import { BreakpointType } from 'commonlib';
 import { TabListItem } from '../model/TabListItem';
 import { MainVM } from '../viewmodels/MainVM';
 
@@ -25,41 +26,64 @@ struct MainPage {
     Column({ space: 2 }) {
       Image(this.vm.curIndex === index ? item.iconChecked : item.icon)
         .width(TabStyle.ICON_SIZE)
-        .height(TabStyle.ICON_SIZE)
+        .height(TabStyle.ICON_SIZE);
       Text(item.label)
         .fontWeight(FontWeight.Medium)
         .fontSize($r('sys.float.Caption_M'))
         .fontColor(this.vm.curIndex === index ?
-        $r('app.color.icon_bg_blue') : $r('sys.color.icon_secondary'))
+          $r('app.color.icon_bg_blue') : $r('sys.color.icon_secondary'));
     }
     .justifyContent(FlexAlign.Center)
     .width('100%')
-    .height(TabStyle.BAR_HEIGHT)
+    .height(TabStyle.BAR_HEIGHT);
   }
 
   build() {
-    Column() {
-      Tabs({ barPosition: BarPosition.End, index: $$this.vm.curIndex, controller: this.vm.controller }) {
-        ForEach(this.vm.tabList, (item: TabListItem, index: number) => {
-          TabContent() {
-            item.component.builder();
-          }
-          .tabBar(this.tabBarBuilder(item, index))
-        }, (item: TabListItem, index) => JSON.stringify(item) + '_' + index)
-      }
-      .scrollable(false)
-      .barMode(BarMode.Fixed)
-      .barHeight(TabStyle.BAR_HEIGHT)
-      .height('100%')
-      .animationDuration(TabStyle.ANIMATION_DURATION)
+    Tabs({index: $$this.vm.curIndex, controller: this.vm.controller }) {
+      ForEach(this.vm.tabList, (item: TabListItem, index: number) => {
+        TabContent() {
+          item.component.builder();
+        }
+        .tabBar(this.tabBarBuilder(item, index));
+      }, (item: TabListItem, index) => JSON.stringify(item) + '_' + index);
     }
-    .backgroundColor($r('app.color.system_color_background_white'))
+    .vertical(new BreakpointType<boolean>({
+      sm: false,
+      md: false,
+      lg: true,
+      xl: true
+    }).getValue(this.vm.breakPointModel.currentBreakpoint))
+    .barPosition(new BreakpointType<number>({
+      sm: BarPosition.End,
+      md: BarPosition.End,
+      lg: BarPosition.Start,
+      xl: BarPosition.Start,
+    }).getValue(this.vm.breakPointModel.currentBreakpoint))
+    .scrollable(false)
+    .barMode(BarMode.Fixed)
+    .barHeight(new BreakpointType<Length>({
+      sm: TabStyle.BAR_HEIGHT,
+      md: TabStyle.BAR_HEIGHT,
+      lg: 300,
+      xl: 300,
+    }).getValue(this.vm.breakPointModel.currentBreakpoint))
+    .barWidth(new BreakpointType<Length>({
+      sm: '100%',
+      md: '100%',
+      lg: TabStyle.BAR_HEIGHT,
+      xl: TabStyle.BAR_HEIGHT,
+    }).getValue(this.vm.breakPointModel.currentBreakpoint))
+    .animationDuration(TabStyle.ANIMATION_DURATION)
+    .width('100%')
+    .height('100%')
+    .backgroundColor($r('sys.color.background_secondary'))
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM]);
   }
 }
 
 @Builder
 export function MainEntryBuilder() {
-  MainPage()
+  MainPage();
 }
 
 export class TabStyle {

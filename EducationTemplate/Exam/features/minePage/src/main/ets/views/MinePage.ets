@@ -13,69 +13,74 @@
  * limitations under the License.
  */
 
-import { AppStorageV2 } from '@kit.ArkUI'
-import { call } from '@kit.TelephonyKit'
-import { UserInfo } from 'login_info'
-import { RouterMap, RouterModule } from 'router_module'
-import { NumbObj } from '../viewModel/MessageModel'
-import { MineItem } from '../viewModel/MineModel'
+import { AppStorageV2 } from '@kit.ArkUI';
+import { call } from '@kit.TelephonyKit';
+import { FeedbackVM } from 'feedback';
+import { UserInfo } from 'login_info';
+import { BreakpointType, RouterMap, RouterModule } from 'commonlib';
+import { NumbObj } from '../viewModel/MessageModel';
+import { MineItem } from '../viewModel/MineModel';
+import { MineVM } from '../viewModel/MineVM';
 
 @Builder
 export function MinePageBuilder() {
-  MinePage()
+  MinePage();
 }
 
 @ComponentV2
 struct UserItem {
-  @Param title: string = ''
-  @Param image: ResourceStr = ''
-  @Param url: string = ''
+  @Param title: string = '';
+  @Param image: ResourceStr = '';
+  @Param url: string = '';
 
   build() {
     Row() {
       Image(this.image)
-        .size({ width: 24, height: 24 })
+        .size({ width: 24, height: 24 });
       Text(this.title)
         .fontSize($r('sys.float.Subtitle_M'))
         .fontWeight(FontWeight.Medium)
         .fontColor($r('sys.color.font_primary'))
-        .margin({ left: 12 })
-      Blank()
+        .margin({ left: 12 });
+      Blank();
       Image($r('app.media.iconRight'))
-        .size({ width: 18, height: 18 })
+        .size({ width: 18, height: 18 });
     }
     .size({ width: '100%', height: 48 })
     .padding({ left: 10, right: 10 })
     .alignItems(VerticalAlign.Center)
-    .backgroundColor($r('sys.color.background_primary'))
-    .borderRadius(16)
+    .backgroundColor($r('sys.color.comp_background_list_card'))
+    .borderRadius(16);
   }
 }
 
 @ComponentV2
 export struct MinePage {
-  @Local isOpen: boolean = false
-  @Local logoUser: UserInfo = AppStorageV2.connect(UserInfo, () => new UserInfo())!
+  @Local isOpen: boolean = false;
+  @Local logoUser: UserInfo = AppStorageV2.connect(UserInfo, () => new UserInfo())!;
   // 在AppStorageV2中创建一个key为Sample的键值对（如果存在，则返回AppStorageV2中的数据），并且和prop关联
   @Local propNumber: NumbObj = AppStorageV2.connect(NumbObj, () => new NumbObj())!;
   @Local mineArr: MineItem[] = [
     new MineItem('练习记录', $r('app.media.icon_practice'), RouterMap.PRACTICE_RECORDS_PAGE),
     new MineItem('浏览记录', $r('app.media.ic_ict_configuration_history'), RouterMap.BROWSING_HISTORY_PAGE),
     new MineItem('联系客服', $r('app.media.ic_public_headphones_mic'), ''),
+    new MineItem('意见反馈', $r('app.media.ic_feedback'), RouterMap.FEEDBACK_PAGE),
     new MineItem('设置', $r('app.media.icon_Setting'), RouterMap.SET_UP_PAGE)
-  ]
+  ];
+  feedBackVM: FeedbackVM = FeedbackVM.instance;
+  mineVM: MineVM = MineVM.instance;
 
   @Builder
   perMine() {
     Row() {
       Image(this.logoUser.isLogin ?
         (this.logoUser.avatar && this.logoUser.avatar !== '') ? this.logoUser.avatar : $r('app.media.path2x') :
-      $r('app.media.person'))
+        $r('app.media.person'))
         .borderRadius(40)
         .width(48)
         .aspectRatio(1)
         .onClick(() => {
-        })
+        });
       Row() {
         Column() {
           Text(this.logoUser.isLogin ? this.logoUser.name : '点击登录')
@@ -86,43 +91,43 @@ export struct MinePage {
             .margin({ left: 16, bottom: 2 })
             .onClick(() => {
               if (!this.logoUser.isLogin) {
-                RouterModule.push({ url: RouterMap.LOGIN_PAGE, param: true })
+                RouterModule.push({ url: RouterMap.LOGIN_PAGE, param: true });
               }
-            })
+            });
           Row() {
             if (this.logoUser.isLogin) {
-              Image($r('app.media.iphone')).height(14).width(10).margin({ right: 10 })
+              Image($r('app.media.iphone')).height(14).width(10).margin({ right: 10 });
             }
             Text(this.logoUser.isLogin ? this.logoUser.cellphone : '登录后享受更多服务')
               .height(16)
               .textAlign(TextAlign.Center)
               .fontSize($r('sys.float.Body_S'))
               .fontColor($r('sys.color.font_primary'))
-              .fontWeight(FontWeight.Regular)
-          }.margin({ left: 16 }).alignItems(VerticalAlign.Center).height(16)
+              .fontWeight(FontWeight.Regular);
+          }.margin({ left: 16 }).alignItems(VerticalAlign.Center).height(16);
         }
-        .alignItems(HorizontalAlign.Start)
+        .alignItems(HorizontalAlign.Start);
 
-        Blank()
+        Blank();
         Image($r('app.media.iconRight'))
           .width(18)
           .aspectRatio(1)
           .margin({ right: 2 })
           .onClick(() => {
             if (this.logoUser.isLogin) {
-              RouterModule.push({ url: RouterMap.PERSONAL_CENTER_PAGE })
+              RouterModule.push({ url: RouterMap.PERSONAL_CENTER_PAGE });
             } else {
-              RouterModule.push({ url: RouterMap.LOGIN_PAGE })
+              RouterModule.push({ url: RouterMap.LOGIN_PAGE });
             }
-          })
+          });
       }
-      .layoutWeight(1)
+      .layoutWeight(1);
     }
     .width('100%')
     .height(72)
     .padding(12)
-    .backgroundColor($r('sys.color.background_primary'))
-    .borderRadius(16)
+    .backgroundColor($r('sys.color.comp_background_list_card'))
+    .borderRadius(16);
   }
 
   @Builder
@@ -131,56 +136,56 @@ export struct MinePage {
       Column() {
         Image($r('app.media.icon_order'))
           .width(24)
-          .aspectRatio(1)
+          .aspectRatio(1);
         Text('我的订单')
           .fontSize($r('sys.float.Body_S'))
           .fontColor($r('sys.color.font_primary'))
-          .margin({ top: 4 })
+          .margin({ top: 4 });
       }
       .width('25%')
       .onClick(() => {
         if (this.logoUser.isLogin) {
-          RouterModule.push({ url: RouterMap.MY_ORDER_PAGE })
+          RouterModule.push({ url: RouterMap.MY_ORDER_PAGE });
         } else {
-          RouterModule.push({ url: RouterMap.LOGIN_PAGE })
+          RouterModule.push({ url: RouterMap.LOGIN_PAGE });
         }
-      })
+      });
 
       Column() {
         Image($r('app.media.icon_my_wrong_question'))
           .width(24)
-          .aspectRatio(1)
+          .aspectRatio(1);
         Text('我的课程')
           .fontSize($r('sys.float.Body_S'))
           .fontColor($r('sys.color.font_primary'))
-          .margin({ top: 4 })
+          .margin({ top: 4 });
       }
       .width('25%')
       .onClick(() => {
         if (this.logoUser.isLogin) {
-          RouterModule.push({ url: RouterMap.COURSE_PAGE })
+          RouterModule.push({ url: RouterMap.COURSE_PAGE });
         } else {
-          RouterModule.push({ url: RouterMap.LOGIN_PAGE })
+          RouterModule.push({ url: RouterMap.LOGIN_PAGE });
         }
-      })
+      });
 
       Column() {
         Image($r('app.media.star'))
           .width(24)
-          .aspectRatio(1)
+          .aspectRatio(1);
         Text('我的收藏')
           .fontSize($r('sys.float.Body_S'))
           .fontColor($r('sys.color.font_primary'))
-          .margin({ top: 4 })
+          .margin({ top: 4 });
       }
       .width('25%')
       .onClick(() => {
         if (this.logoUser.isLogin) {
-          RouterModule.push({ url: RouterMap.COLLECTION_PAGE })
+          RouterModule.push({ url: RouterMap.COLLECTION_PAGE });
         } else {
-          RouterModule.push({ url: RouterMap.LOGIN_PAGE })
+          RouterModule.push({ url: RouterMap.LOGIN_PAGE });
         }
-      })
+      });
 
       Column() {
         if (this.logoUser.isLogin) {
@@ -190,32 +195,32 @@ export struct MinePage {
           }) {
             Image($r('app.media.ic_public_message_point'))
               .width(24)
-              .aspectRatio(1)
-          }
+              .aspectRatio(1);
+          };
         } else {
           Image($r('app.media.ic_public_message_point'))
             .width(24)
-            .aspectRatio(1)
+            .aspectRatio(1);
         }
         Text('消息通知')
           .fontSize($r('sys.float.Body_S'))
           .fontColor($r('sys.color.font_primary'))
-          .margin({ top: 4 })
+          .margin({ top: 4 });
       }
       .width('25%')
       .onClick(() => {
         if (this.logoUser.isLogin) {
-          RouterModule.push({ url: RouterMap.MESSAGE_CENTER_PAGE })
+          RouterModule.push({ url: RouterMap.MESSAGE_CENTER_PAGE });
         } else {
-          RouterModule.push({ url: RouterMap.LOGIN_PAGE })
+          RouterModule.push({ url: RouterMap.LOGIN_PAGE });
         }
-      })
+      });
     }
     .width('100%')
     .height(76)
     .justifyContent(FlexAlign.SpaceBetween)
-    .backgroundColor($r('sys.color.background_primary'))
-    .borderRadius(16)
+    .backgroundColor($r('sys.color.comp_background_list_card'))
+    .borderRadius(16);
   }
 
   @Builder
@@ -224,20 +229,20 @@ export struct MinePage {
       Column() {
         Text('0000-00000000')
           .fontSize(18)
-          .fontColor('#E6000000')
+          .fontColor($r('sys.color.font_primary'))
           .lineHeight(30)
-          .halfLeading(true)
+          .halfLeading(true);
         Button() {
           Row() {
             Image($r('app.media.path_1'))
               .height(14)
               .objectFit(ImageFit.Contain)
-              .margin({ right: 5 })
+              .margin({ right: 5 });
             Text('一键拨号')
               .fontSize($r('sys.float.Body_L'))
               .fontColor($r('sys.color.font_on_primary'))
-              .fontWeight(600)
-          }
+              .fontWeight(600);
+          };
         }
         .width('100%')
         .height(45)
@@ -248,48 +253,49 @@ export struct MinePage {
           if (canIUse('SystemCapability.Applications.Contacts')) {
             try {
               call.makeCall('0000-00000000');
-            }catch (e) {
+            } catch (e) {
             }
           }
           this.isOpen = false;
-        })
+        });
 
         Button() {
           Text('取消')
             .fontSize($r('sys.float.Body_L'))
             .fontColor($r('sys.color.font_primary'))
-            .fontWeight(600)
+            .fontWeight(600);
         }
         .width('100%')
         .height(45)
         .type(ButtonType.Normal)
         .backgroundColor($r('sys.color.comp_background_tertiary'))
         .borderRadius($r('sys.float.corner_radius_level10'))
-        .onClick(() => this.isOpen = false)
+        .onClick(() => this.isOpen = false);
       }
       .width('100%')
       .height(170)
-      .backgroundColor(Color.White)
+      .backgroundColor($r('sys.color.comp_background_list_card'))
       .borderRadius(16)
       .padding({ left: 16, right: 16 })
-      .justifyContent(FlexAlign.SpaceEvenly)
+      .justifyContent(FlexAlign.SpaceEvenly);
     }
     .width('100%')
+    .height(170)
     .alignItems(HorizontalAlign.Center)
     .justifyContent(FlexAlign.Start)
     .padding({
       left: 16,
       right: 16,
-      bottom: 56,
+      bottom: 16,
       top: 8
-    })
+    });
   }
 
   @Builder
   buildTitle() {
     Text('联系客服')
       .fontSize($r('sys.float.Title_S'))
-      .fontWeight(FontWeight.Medium)
+      .fontWeight(FontWeight.Medium);
   }
 
   build() {
@@ -300,60 +306,80 @@ export struct MinePage {
           .fontSize($r('sys.float.Title_M'))
           .fontWeight(FontWeight.Bold)
           .fontColor($r('sys.color.font_primary'))
-          .margin({ top: 12, bottom: 12 })
-      }
+          .margin({ top: 12, bottom: 12 });
+      };
 
       Scroll() {
         Column({ space: 12 }) {
-          this.perMine()
-          this.minMine()
-          Text('常用服务').fontSize($r('sys.float.Subtitle_L')).fontWeight(FontWeight.Medium)
-          Column({ space: 12 }) {
+          this.perMine();
+          this.minMine();
+          Text('常用服务').fontSize($r('sys.float.Subtitle_L')).fontWeight(FontWeight.Medium);
+          Grid() {
             ForEach(this.mineArr, (item: MineItem) => {
-              if (item.titleName === '联系客服') {
-                UserItem({ title: item.titleName, image: item.icon, url: item.url })
-                  .bindSheet($$this.isOpen, this.buildMakeCallComponent(), {
-                    title: this.buildTitle(),
-                    height: 265
-                  })
-                  .onClick(() => {
-                    this.isOpen = true
-                  })
-              } else {
-                UserItem({ title: item.titleName, image: item.icon, url: item.url })
-                  .onClick(() => {
-                    if (this.logoUser.isLogin && item.url &&
-                      (item.titleName === '浏览记录' || item.titleName === '练习记录')) {
-                      RouterModule.push({ url: item.url, param: this.logoUser });
-                    } else if (this.logoUser.isLogin && item.url && (item.titleName === '设置')) {
-                      RouterModule.push({ url: item.url });
-                    } else {
-                      RouterModule.push({ url: RouterMap.LOGIN_PAGE })
-                    }
-                  })
+              GridItem() {
+                if (item.titleName === '联系客服') {
+                  UserItem({ title: item.titleName, image: item.icon, url: item.url })
+                    .bindSheet($$this.isOpen, this.buildMakeCallComponent(), {
+                      height: 270, // 半模态高度
+                      title: this.buildTitle(),
+                      dragBar: true, // 是否显示控制条
+                      showClose: true, // 是否显示关闭图标
+                      maskColor: $r('sys.color.ohos_id_color_mask_thin'),
+                      blurStyle: BlurStyle.Regular,
+                      preferType: SheetType.CENTER,
+                      shouldDismiss: ((sheetDismiss: SheetDismiss) => { // 半模态页面交互式关闭回调函数
+                        sheetDismiss.dismiss();
+                      })
+                    })
+                    .onClick(() => {
+                      this.isOpen = true;
+                    });
+                } else {
+                  UserItem({ title: item.titleName, image: item.icon, url: item.url })
+                    .onClick(() => {
+                      if (this.logoUser.isLogin && item.url &&
+                        (item.titleName === '浏览记录' || item.titleName === '练习记录')) {
+                        RouterModule.push({ url: item.url, param: this.logoUser });
+                      } else if (this.logoUser.isLogin && item.url && (item.titleName === '设置')) {
+                        RouterModule.push({ url: item.url });
+                      } else if (this.logoUser.isLogin && item.url) {
+                        this.feedBackVM.navPathStack = RouterModule.stack;
+                        RouterModule.push({ url: item.url });
+                      } else {
+                        RouterModule.push({ url: RouterMap.LOGIN_PAGE, param: RouterModule.stack });
+                      }
+                    });
+                }
               }
-            }, (item: MineItem) => JSON.stringify(item))
+            }, (item: MineItem) => JSON.stringify(item));
           }
-          .size({ width: '100%' })
-          .borderRadius(16)
+          .columnsTemplate('1fr '.repeat(new BreakpointType<number>({
+            sm: 1,
+            md: 1,
+            lg: 2,
+            xl: 2
+          }).getValue(this.mineVM.breakPointModel.currentBreakpoint)))
+          .columnsGap($r('app.float.vp_12'))
+          .rowsGap($r('app.float.vp_12'))
+          .borderRadius(16);
 
           Blank()
-            .layoutWeight(1)
+            .layoutWeight(1);
         }
         .alignItems(HorizontalAlign.Start)
-        .padding({ bottom: 12 })
+        .padding({ bottom: 12 });
 
       }
       .alignSelf(ItemAlign.Start)
       .scrollBar(BarState.Off)
       .edgeEffect(EdgeEffect.Spring)
-      .layoutWeight(1)
+      .layoutWeight(1);
     }
     .backgroundColor($r('sys.color.background_secondary'))
     .alignItems(HorizontalAlign.Start)
     .width('100%')
     .height('100%')
-    .padding({ left: 16, right: 16 })
+    .padding({ left: 16, right: 16 });
   }
 }
 

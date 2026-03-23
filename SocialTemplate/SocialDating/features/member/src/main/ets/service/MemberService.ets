@@ -16,9 +16,9 @@ export class MemberService extends BaseService {
     }
   }
 
-  async subscribeMember(uid: number, membershipId: number, membershipStartTime: number): Promise<CommonRsp | null> {
+  async subscribeMember(uid: number): Promise<CommonRsp | null> {
     if (this.serviceConfig.isMock) {
-      return MockService.subscribeMember(uid, membershipId, membershipStartTime);
+      return MockService.subscribeMember(uid);
     }
     let subscribeMemberRsp =
       await this.doRequest<CommonRsp>('/membership/subscribe',

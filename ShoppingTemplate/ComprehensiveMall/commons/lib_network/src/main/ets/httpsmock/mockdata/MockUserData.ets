@@ -19,7 +19,7 @@ export const MOCK_POINTS_RECORD_LIST: UserPointsRecordItem[] = [
     label: '签到',
     points: 5,
   },
-]
+];
 
 export const MOCK_POINTS_REDEMPTION_LIST: UserPointRedemptionSku[] = [
   {
@@ -46,4 +46,4 @@ export const MOCK_POINTS_REDEMPTION_LIST: UserPointRedemptionSku[] = [
     title: '简约纯色咖啡杯',
     banner: $r('app.media.mock_redemption_4'),
   },
-]
+];

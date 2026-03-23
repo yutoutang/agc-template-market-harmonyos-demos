@@ -1,5 +1,6 @@
 import { Formatter } from 'lib_foundation'
 import { UserPointsRecordItem } from 'lib_network'
+import { buildCommonEmptyStatus } from 'lib_widget'
 import { UserPointsUsedType } from '../commons/Enums'
 import { MonthPicker } from '../components/MonthPicker'
 import { PointsRecordVM } from '../viewmodels/PointsRecordVM'
@@ -15,26 +16,30 @@ struct PointsRecordPage {
 
   build() {
     NavDestination() {
-      Column() {
-        Text('积分余额').fontColor($r('app.color.font_color_level1')).fontSize($r('app.float.font_size_14'))
-        Text((this.vm.totalPoints ?? 0).toString()).fontWeight(FontWeight.Bold)
+      Scroll() {
         Column() {
-          this.buildRecordHeader()
-          this.buildRecordList()
+          Text('积分余额').fontColor($r('app.color.font_color_level1')).fontSize($r('app.float.font_size_14'))
+          Text((this.vm.totalPoints ?? 0).toString()).fontWeight(FontWeight.Bold)
+          Column() {
+            this.buildRecordHeader()
+            this.buildRecordList()
+          }
+          .backgroundColor($r('app.color.background_color_primary'))
+          .width($r('app.string.size_percent_full'))
+          .borderRadius($r('app.float.border_radius_l'))
+          .padding($r('app.float.space_m'))
+          .margin({ top: $r('app.float.space_m') })
         }
-        .backgroundColor($r('app.color.background_color_white'))
+        .alignItems(HorizontalAlign.Center)
         .width($r('app.string.size_percent_full'))
-        .borderRadius($r('app.float.border_radius_l'))
-        .padding($r('app.float.space_m'))
-        .margin({ top: $r('app.float.space_m') })
       }
-      .alignItems(HorizontalAlign.Center)
-      .width($r('app.string.size_percent_full'))
+      .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring)
       .padding($r('app.float.space_l'))
     }
     .title('积分记录')
     .linearGradient({
-      colors: [['#33e64566', 0], ['#f1f3f5', 0.3]],
+      colors: [['#33e64566', 0], [$r('app.color.background_color_grey'), 0.3]],
     })
     .onReady(() => {
       this.vm.getPointRecord()
@@ -69,6 +74,7 @@ struct PointsRecordPage {
           .fontSize($r('app.float.font_size_14'))
           .fontColor($r('app.color.font_color_level1'))
         SymbolGlyph($r('sys.symbol.chevron_down'))
+          .fontColor([$r('app.color.font_color_level1')])
       }
       .onClick(() => {
         this.vm.showMonthPicker = true
@@ -86,34 +92,46 @@ struct PointsRecordPage {
 
   @Builder
   buildRecordList() {
-    List({ space: 32 }) {
-      ForEach(this.vm.recordList, (record: UserPointsRecordItem) => {
-        ListItem() {
-          Column({ space: 12 }) {
-            Text(record.label)
-              .fontSize($r('app.float.font_size_14'))
-              .fontColor($r('app.color.font_color_level1'))
-            Row() {
-              Text(Formatter.formatFullDate(new Date(record.time)))
-                .fontSize($r('app.float.font_size_12'))
-                .fontColor($r('app.color.font_color_level2'))
-              Text() {
-                Span(record.points > 0 ? '+' : '')
-                Span(record.points.toString())
+    if (this.vm.isLoading) {
+      LoadingProgress().width(32)
+    } else {
+      List({ space: 32 }) {
+        if (!this.vm.recordList.length) {
+          buildCommonEmptyStatus()
+        }
+        ForEach(this.vm.recordList, (record: UserPointsRecordItem) => {
+          ListItem() {
+            Column({ space: 12 }) {
+              Text(record.label)
+                .fontSize($r('app.float.font_size_14'))
+                .fontColor($r('app.color.font_color_level1'))
+              Row() {
+                Text(Formatter.formatFullDate(new Date(record.time)))
+                  .fontSize($r('app.float.font_size_12'))
+                  .fontColor($r('app.color.font_color_level2'))
+                Text() {
+                  Span(record.points > 0 ? '+' : '')
+                  Span(record.points.toString())
+                }
+                .fontSize($r('app.float.font_size_14'))
+                .fontColor($r('app.color.theme_color'))
               }
-              .fontSize($r('app.float.font_size_14'))
-              .fontColor($r('app.color.theme_color'))
+              .width($r('app.string.size_percent_full'))
+              .justifyContent(FlexAlign.SpaceBetween)
             }
             .width($r('app.string.size_percent_full'))
-            .justifyContent(FlexAlign.SpaceBetween)
-          }
-          .width($r('app.string.size_percent_full'))
-          .alignItems(HorizontalAlign.Start)
+            .alignItems(HorizontalAlign.Start)
 
-        }
-      }, (record: UserPointsRecordItem) => record.type + record.label)
+          }
+        }, (record: UserPointsRecordItem) => record.type + record.label)
+      }
+      .divider({ strokeWidth: 1 })
+      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+      .nestedScroll({
+        scrollForward: NestedScrollMode.PARENT_FIRST,
+        scrollBackward: NestedScrollMode.SELF_FIRST,
+      })
     }
-    .divider({ strokeWidth: 1 })
 
     Divider()
       .margin({ top: $r('app.float.space_l'), bottom: $r('app.float.space_l') })
@@ -128,6 +146,7 @@ struct PointsRecordPage {
       initMonth: this.vm.month,
       handleConfirm: (dateStr: string) => {
         this.vm.handleMonthChange(dateStr)
+        this.vm.showMonthPicker = false;
       },
       handleCancel: () => {
         this.vm.showMonthPicker = false;

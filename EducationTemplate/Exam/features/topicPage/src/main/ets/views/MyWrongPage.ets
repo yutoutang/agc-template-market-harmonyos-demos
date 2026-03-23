@@ -14,30 +14,29 @@
  */
 
 import { QuestionsRouterModel, TopicItemType } from 'answer_questions';
-import { PreferenceUtil, PreferConstant, TopBar } from 'commonlib';
-import { RouterMap, RouterModule } from 'router_module';
+import { PreferenceUtil, PreferConstant, TopBar, RouterMap, RouterModule } from 'commonlib';
 
 @ComponentV2
 export struct MyWrongItem {
   @Event changeCollectionItem: (idx: number) => void = () => {
   };
-  @Param @Require item: WrongModel
-  @Param @Require isSelectDelete: boolean
-  @Param @Require idx: number
+  @Param @Require item: WrongModel;
+  @Param @Require isSelectDelete: boolean;
+  @Param @Require idx: number;
 
   build() {
     Column() {
       // 单选
-      this.singleChoiceBuilder()
+      this.singleChoiceBuilder();
       // 错题标题
-      this.titleBuilder()
+      this.titleBuilder();
     }
     .alignItems(HorizontalAlign.Start)
     .padding($r('app.float.vp_16'))
-    .backgroundColor(Color.White)
+    .backgroundColor($r('sys.color.comp_background_primary'))
     .borderRadius($r('app.float.vp_16'))
     .margin({ bottom: $r('app.float.vp_8') })
-    .width('100%')
+    .width('100%');
   }
 
   /**
@@ -51,7 +50,7 @@ export struct MyWrongItem {
       .fontWeight(FontWeight.Regular)
       .lineHeight($r('app.float.vp_20'))
       .maxLines(2)
-      .textOverflow({ overflow: TextOverflow.Ellipsis })
+      .textOverflow({ overflow: TextOverflow.Ellipsis });
   }
 
   /**
@@ -69,36 +68,36 @@ export struct MyWrongItem {
         .width($r('app.float.vp_40'))
         .height($r('app.float.vp_24'))
         .borderRadius($r('app.float.vp_8'))
-        .backgroundColor('#4c5dc5')
+        .backgroundColor('#4c5dc5');
       // 是否删除按钮
       Row() {
         Image(this.item.isDelete ? $r('app.media.icon_Checked') : $r('app.media.icon_ans_common'))
           .width($r('app.float.vp_20'))
-          .height($r('app.float.vp_20'))
+          .height($r('app.float.vp_20'));
       }
       .width($r('app.float.vp_50'))
       .height($r('app.float.vp_24'))
       .visibility(this.isSelectDelete ? Visibility.Visible : Visibility.None)
       .justifyContent(FlexAlign.End)
       .onClick(() => {
-        this.changeCollectionItem(this.idx)
-      })
+        this.changeCollectionItem(this.idx);
+      });
     }.width('100%')
-    .justifyContent(FlexAlign.SpaceBetween)
+    .justifyContent(FlexAlign.SpaceBetween);
   }
 }
 
 @ComponentV2
 export struct MyWrongIndexPage {
-  @Local isSelectDelete: boolean = false
-  @Local wrongQues: WrongModel[] = []
-  wrongArr: TopicItemType[] = []
-  @Local isSelectAll: boolean = false
-  @Local selectCount: number = 0
-  @Local swipeDelete: boolean = false
+  @Local isSelectDelete: boolean = false;
+  @Local wrongQues: WrongModel[] = [];
+  wrongArr: TopicItemType[] = [];
+  @Local isSelectAll: boolean = false;
+  @Local selectCount: number = 0;
+  @Local swipeDelete: boolean = false;
 
   aboutToAppear(): void {
-    this.initData()
+    this.initData();
   }
 
   @Builder
@@ -107,71 +106,84 @@ export struct MyWrongIndexPage {
       // 我的错题
       TopBar({
         onClickBack: () => {
-          RouterModule.pop()
+          RouterModule.pop();
         },
         title: $r('app.string.my_wrong')
-      })
+      });
       Row() {
         Image(!this.isSelectAll ? $r('app.media.icon_select_all_off') : $r('app.media.icon_select_all'))
           .height($r('app.float.vp_40'))
           .width($r('app.float.vp_40'))
           .onClick(() => {
-            this.isSelAll()
+            this.isSelAll();
           })
-          .visibility(this.isSelectDelete ? Visibility.Visible : Visibility.Hidden)
+          .visibility(this.isSelectDelete ? Visibility.Visible : Visibility.Hidden);
         Image($r('app.media.ic_public_trash'))
           .width($r('app.float.vp_40'))
           .height($r('app.float.vp_40'))
           .opacity(this.swipeDelete ? 0.4 : 1)
-          .margin({ left: $r('app.float.vp_8') })
+          .margin({ left: $r('app.float.vp_8') });
       }
       .onClick(() => {
         if (!this.swipeDelete && this.wrongQues.length > 0) {
-          this.isSelectDelete = !this.isSelectDelete
-          this.selectCount = 0
-          this.isSelectAll = false
+          this.isSelectDelete = !this.isSelectDelete;
+          this.selectCount = 0;
+          this.isSelectAll = false;
           this.wrongQues.forEach((item: WrongModel) => {
             item.isDelete = false;
-          })
+          });
         }
-      })
+      });
     }
     .width('100%')
     .height($r('app.float.vp_56'))
     .padding({ left: $r('app.float.vp_16'), right: $r('app.float.vp_16') })
     .justifyContent(FlexAlign.SpaceBetween)
+    .backgroundColor($r('sys.color.comp_background_primary'));
   }
 
   @Builder
   itemEndComponent(idx: number) {
     Row() {
       Image($r('app.media.ic_public_trash_red'))
-        .width($r('app.float.vp_24'))
-        .height($r('app.float.vp_24'))
+        .width($r('app.float.vp_40'))
+        .height($r('app.float.vp_40'))
+        .margin({ left: $r('app.float.vp_12') })
         .onClick(() => {
-          this.swipeDelete = false
-          this.deleteData(idx)
-        })
-    }.margin({ right: $r('app.float.vp_16') })
-    .justifyContent(FlexAlign.SpaceEvenly)
+          this.swipeDelete = false;
+          this.deleteData(idx);
+        });
+    }
+    .padding($r('app.float.vp_4'))
+    .justifyContent(FlexAlign.SpaceEvenly);
   }
 
   build() {
     Column() {
-      this.topBuilder()
-      Divider().color($r('sys.color.comp_divider'))
-      if (this.wrongQues.length <= 0) {
-        Text('暂无错题记录')
-          .fontSize($r('sys.float.Body_S'))
-          .fontColor($r('sys.color.icon_secondary'))
-          .height('100%')
-      } else {
-        // 错题列表
-        this.wrongListBuilder()
+      this.topBuilder();
+      Divider().color($r('sys.color.comp_divider'));
+      Column() {
+        if (this.wrongQues.length <= 0) {
+          Text('暂无错题记录')
+            .fontSize($r('sys.float.Body_S'))
+            .fontColor($r('sys.color.icon_secondary'))
+            .height('100%');
+        } else {
+          // 错题列表
+          this.wrongListBuilder();
+          // 删除
+          this.deleteBuilder();
+        }
       }
+      .width('100%')
+      .layoutWeight(1)
+      .backgroundColor($r('sys.color.background_secondary'))
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM]);
     }
-    .layoutWeight(1)
     .height('100%')
+    .width('100%')
+    .backgroundColor($r('sys.color.comp_background_primary'))
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM]);
   }
 
   /**
@@ -187,20 +199,20 @@ export struct MyWrongIndexPage {
               isSelectDelete: this.isSelectDelete,
               item: item,
               changeCollectionItem: () => {
-                item.isDelete = !item.isDelete
+                item.isDelete = !item.isDelete;
                 if (item.isDelete) {
                   this.selectCount++;
                 } else {
                   this.selectCount--;
                 }
                 if (this.selectCount < this.wrongQues.length) {
-                  this.isSelectAll = false
+                  this.isSelectAll = false;
                 } else {
-                  this.isSelectAll = true
+                  this.isSelectAll = true;
                 }
               },
               idx: idx
-            }).margin({ left: $r('app.float.vp_16'), right: $r('app.float.vp_16'), })
+            })
           }
           .transition({ type: TransitionType.Delete, opacity: 0 })
           .swipeAction({
@@ -208,38 +220,38 @@ export struct MyWrongIndexPage {
             end: {
               actionAreaDistance: 26,
               builder: () => {
-                this.itemEndComponent(idx)
+                this.itemEndComponent(idx);
               },
               onStateChange: (state: SwipeActionState) => {
                 if (state === SwipeActionState.EXPANDED) {
-                  this.isSelectDelete = false
-                  this.swipeDelete = true
+                  this.isSelectDelete = false;
+                  this.swipeDelete = true;
                 } else if (state === SwipeActionState.COLLAPSED) {
-                  this.swipeDelete = false
+                  this.swipeDelete = false;
                 }
               }
             }
           })
           .onClick(() => {
             if (this.wrongArr.length > 0) {
-              let routerModel: QuestionsRouterModel = new QuestionsRouterModel()
-              routerModel.datalist = [this.wrongArr[idx]]
-              routerModel.sourceType = '我的错题'
-              RouterModule.push({ url: RouterMap.ANSWER_QUESTIONS_PAGE, param: routerModel })
+              let routerModel: QuestionsRouterModel = new QuestionsRouterModel();
+              routerModel.datalist = [this.wrongArr[idx]];
+              routerModel.sourceType = '我的错题';
+              RouterModule.push({ url: RouterMap.ANSWER_QUESTIONS_PAGE, param: routerModel });
             }
-          })
-        }, (item: WrongModel, idx: number) => JSON.stringify(item.keyID + idx + ''))
-        // 删除
-        this.deleteBuilder()
+          });
+        }, (item: WrongModel, idx: number) => JSON.stringify(item.keyID + idx + ''));
       }
+      .clip(true)
+      .margin({ left: $r('app.float.vp_16'), right: $r('app.float.vp_16'), })
       .width('auto')
       .height('auto')
       .layoutWeight(1)
       .listDirection(Axis.Vertical)
       .scrollBar(BarState.Off)
-      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
-
-    }.layoutWeight(1)
+      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true });
+    }
+    .layoutWeight(1)
     .backgroundColor($r('sys.color.background_secondary'))
     .padding({
       top: $r('app.float.vp_12'),
@@ -251,35 +263,30 @@ export struct MyWrongIndexPage {
    */
   @Builder
   deleteBuilder() {
-    ListItem() {
-      Row() {
-        Row() {
-          Image($r('app.media.icon_delete'))
-            .width($r('app.float.vp_25'))
-            .height($r('app.float.vp_25'))
-            .margin($r('app.float.vp_8'))
-          Text('删除')
-            .fontWeight(FontWeight.Medium)
-            .fontColor($r('sys.color.font_on_primary'))
-            .fontSize($r('sys.float.Body_L'))
-            .textAlign(TextAlign.Center)
-        }
-        .opacity(this.selectCount > 0 ? 1 : 0.4)
-        .justifyContent(FlexAlign.Center)
-        .alignItems(VerticalAlign.Center)
-        .width('100%')
-        .borderRadius($r('app.float.vp_20'))
-        .backgroundColor('#4c5dc4')
-      }
-      .visibility(this.isSelectDelete ? Visibility.Visible : Visibility.Hidden)
-      .height($r('app.float.vp_40'))
-      .padding({ left: $r('app.float.vp_16'), right: $r('app.float.vp_16'), })
-      .margin({ top: $r('app.float.vp_38') })
-      .onClick(() => {
-        // 删除选中
-        this.deleteSelectData()
-      })
+    Row() {
+      Image($r('app.media.icon_delete'))
+        .width($r('app.float.vp_25'))
+        .height($r('app.float.vp_25'))
+        .margin($r('app.float.vp_8'));
+      Text('删除')
+        .fontWeight(FontWeight.Medium)
+        .fontColor($r('sys.color.font_on_primary'))
+        .fontSize($r('sys.float.Body_L'))
+        .textAlign(TextAlign.Center);
     }
+    .opacity(this.selectCount > 0 ? 1 : 0.4)
+    .justifyContent(FlexAlign.Center)
+    .alignItems(VerticalAlign.Center)
+    .borderRadius($r('app.float.vp_20'))
+    .backgroundColor('#4c5dc4')
+    .width($r('app.float.vp_312'))
+    .height(40)
+    .visibility(this.isSelectDelete ? Visibility.Visible : Visibility.None)
+    .margin({ top: $r('app.float.vp_8'), bottom: $r('app.float.vp_8') })
+    .onClick(() => {
+      // 删除选中
+      this.deleteSelectData();
+    });
   }
 
   /**
@@ -289,51 +296,51 @@ export struct MyWrongIndexPage {
     try {
       let arr: TopicItemType[] =
         PreferenceUtil.getInstance().get(PreferConstant.ERROR_RECORDS, []) as TopicItemType[];
-      arr.sort((a, b) => b.jlStamp - a.jlStamp)
+      arr.sort((a, b) => b.jlStamp - a.jlStamp);
       this.wrongArr = arr;
       if (arr && arr.length > 0) {
         arr.forEach((element: TopicItemType) => {
-          let model: WrongModel = new WrongModel()
-          model.isDelete = false
-          model.keyID = element.keyID
-          model.title = element.title
-          this.wrongQues.push(model)
-        })
+          let model: WrongModel = new WrongModel();
+          model.isDelete = false;
+          model.keyID = element.keyID;
+          model.title = element.title;
+          this.wrongQues.push(model);
+        });
       }
-      this.swipeDelete = this.wrongQues.length === 0
+      this.swipeDelete = this.wrongQues.length === 0;
     } catch (e) {
       this.wrongArr = [];
-      this.wrongQues = []
-      this.swipeDelete = true
+      this.wrongQues = [];
+      this.swipeDelete = true;
     }
   }
 
   // 移除
   deleteData(idx: number) {
-    this.wrongQues.splice(idx, 1)
-    this.swipeDelete = this.wrongQues.length === 0
-    this.wrongArr.splice(idx, 1)
-    PreferenceUtil.getInstance().put(PreferConstant.ERROR_RECORDS, this.wrongArr)
+    this.wrongQues.splice(idx, 1);
+    this.swipeDelete = this.wrongQues.length === 0;
+    this.wrongArr.splice(idx, 1);
+    PreferenceUtil.getInstance().put(PreferConstant.ERROR_RECORDS, this.wrongArr);
   }
 
   // 移除所选中的
   deleteSelectData() {
     if (this.selectCount === 0) {
-      return
+      return;
     }
-    let arr: string[] = []
+    let arr: string[] = [];
     this.wrongQues.forEach((model: WrongModel) => {
       if (model.isDelete) {
-        arr.push(model.keyID)
+        arr.push(model.keyID);
       }
-    })
-    this.wrongQues = this.wrongQues.filter((it: WrongModel) => !it.isDelete)
-    this.wrongArr = this.wrongArr.filter((it: TopicItemType) => !arr.includes(it.keyID))
-    PreferenceUtil.getInstance().put(PreferConstant.ERROR_RECORDS, this.wrongArr)
+    });
+    this.wrongQues = this.wrongQues.filter((it: WrongModel) => !it.isDelete);
+    this.wrongArr = this.wrongArr.filter((it: TopicItemType) => !arr.includes(it.keyID));
+    PreferenceUtil.getInstance().put(PreferConstant.ERROR_RECORDS, this.wrongArr);
     if (this.wrongQues.length === 0) {
-      this.isSelectDelete = false
+      this.isSelectDelete = false;
     }
-    this.swipeDelete = this.wrongQues.length === 0
+    this.swipeDelete = this.wrongQues.length === 0;
   }
 
   // 是否全选
@@ -341,27 +348,27 @@ export struct MyWrongIndexPage {
     if (!this.isSelectAll) {
       this.wrongQues.forEach((item: WrongModel) => {
         item.isDelete = true;
-      })
-      this.isSelectAll = true
+      });
+      this.isSelectAll = true;
       this.selectCount = this.wrongQues.length;
     } else {
       this.wrongQues.forEach((item: WrongModel) => {
         item.isDelete = false;
-      })
-      this.isSelectAll = false
-      this.selectCount = 0
+      });
+      this.isSelectAll = false;
+      this.selectCount = 0;
     }
   }
 }
 
 @Builder
 export function MyWrongPageBuilder() {
-  MyWrongIndexPage()
+  MyWrongIndexPage();
 }
 
 @ObservedV2
 class WrongModel {
-  title: string = ''
-  keyID: string = ''
-  @Trace isDelete: boolean = false
+  title: string = '';
+  keyID: string = '';
+  @Trace isDelete: boolean = false;
 }

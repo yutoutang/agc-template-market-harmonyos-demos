@@ -214,6 +214,7 @@ export struct QuickLoginPage {
               .height(48)
               .textAlign(TextAlign.Center)
               .maxLines(1)
+              .maxFontScale(1)
               .constraintSize({ maxWidth: CommonConstants.FULL_PERCENT, minHeight: 48 });
 
             Text($r('app.string.bind_huaweiId_number'))
@@ -225,6 +226,7 @@ export struct QuickLoginPage {
               .height(16)
               .textAlign(TextAlign.Center)
               .maxLines(1)
+              .maxFontScale(1)
               .constraintSize({ maxWidth: CommonConstants.FULL_PERCENT })
               .margin({ top: 8 });
           }
@@ -330,7 +332,8 @@ export struct QuickLoginPage {
                     }
                   }, (item: loginComponentManager.PrivacyText, index: number) => `${item.text}_${index}}`);
                 }
-              };
+              }
+              .maxFontScale(1)
             }
             .constraintSize({ minHeight: 24 });
           }

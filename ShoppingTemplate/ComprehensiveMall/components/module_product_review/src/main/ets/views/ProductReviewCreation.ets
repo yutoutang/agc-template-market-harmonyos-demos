@@ -1,13 +1,10 @@
-import { BusinessError } from '@kit.BasicServicesKit';
-import { photoAccessHelper } from '@kit.MediaLibraryKit'
 import { Constants } from '../commons/Constants'
 import { SkuReviewModel, ReviewDraftModel } from '../commons/Models'
 import { OrderSkuItem, ReviewDraft, ReviewMediaItem } from '../commons/Types'
 import { CommonRating } from '../components/CommonRating'
 import { ReviewMediaType } from '../commons/Enums';
-import { Logger } from 'module_ui_base';
-
-const TAG: string = '[ProductReviewCreation]'
+import { MediaFileUtil } from '../commons/MediaFileUtil';
+import { ImagePreview, ImagePreviewOptions, SourceImageModel } from 'image_preview';
 
 @ComponentV2
 export struct ProductReviewCreation {
@@ -81,7 +78,7 @@ export struct ProductReviewCreation {
         .onClick(() => {
           this.handleSubmit?.(this.draft)
         })
-        .expandSafeArea([SafeAreaType.KEYBOARD],[SafeAreaEdge.BOTTOM])
+        .expandSafeArea([SafeAreaType.KEYBOARD], [SafeAreaEdge.BOTTOM])
     }
     .backgroundColor($r('app.color.background_color_grey'))
     .height($r('app.string.size_percent_full'))
@@ -107,7 +104,7 @@ export struct ProductReviewCreation {
         ForEach(this.draft.reviewList, (item: SkuReviewModel, index: number) => {
           ListItem() {
             Column() {
-              this.buildProductCard(this.skuList[index], item, index)
+              this.buildProductCard(this.skuList[index], item)
               this.buildMediaPicker(item)
             }
           }
@@ -148,7 +145,7 @@ export struct ProductReviewCreation {
   }
 
   @Builder
-  buildInput(isSummary: boolean = true, text: string, model?: SkuReviewModel, index?: number) {
+  buildInput(isSummary: boolean = true, text: string, model?: SkuReviewModel) {
     TextArea({
       placeholder: '请在此留下您的宝贵意见',
       text,
@@ -173,7 +170,7 @@ export struct ProductReviewCreation {
   }
 
   @Builder
-  buildProductCard(skuItem: OrderSkuItem, model: SkuReviewModel, index: number = 0) {
+  buildProductCard(skuItem: OrderSkuItem, model: SkuReviewModel) {
     Column({ space: 16 }) {
       Row() {
         Image(skuItem.banner)
@@ -202,7 +199,7 @@ export struct ProductReviewCreation {
         },
       })
 
-      this.buildInput(false, model.content, model, index)
+      this.buildInput(false, model.content, model)
     }
 
   }
@@ -230,7 +227,7 @@ export struct ProductReviewCreation {
           .justifyContent(FlexAlign.Center)
           .borderRadius($r('app.string.border_radius_16'))
           .onClick(() => {
-            this.getMediaFromAlbum(model)
+            MediaFileUtil.getMediaFromAlbum(model, this.getUIContext())
           })
         }
       }
@@ -245,8 +242,19 @@ export struct ProductReviewCreation {
               .aspectRatio(1)
               .borderRadius($r('app.string.border_radius_16'))
               .onClick(() => {
-                // this.previewItem = item
-                // this.openPreview = true
+                const options = new ImagePreviewOptions()
+                const mediaList: SourceImageModel[] = model.mediaList.map((item) => {
+                  if (item.type === ReviewMediaType.MOVING_PHOTO && item.movingPhotoUri) {
+                    return new SourceImageModel({
+                      imageUrl: item.movingPhotoUri.imageUri,
+                      videoUrl: item.movingPhotoUri.videoUri,
+                    })
+                  } else {
+                    return new SourceImageModel({ imageUrl: item.uri })
+                  }
+                })
+                options.setImageList(mediaList).setInitIndex(index)
+                ImagePreview.open(this.getUIContext(), options)
               })
             Image($r('app.media.ic_delete_circle'))
               .width(24)
@@ -256,6 +264,10 @@ export struct ProductReviewCreation {
               .onClick(() => {
                 model.mediaList.splice(index, 1)
               });
+            if (item.type === ReviewMediaType.MOVING_PHOTO) {
+              SymbolGlyph($r('sys.symbol.livephoto'))
+                .position({ left: 8, bottom: 8 })
+            }
           }
         }
       }, (item: ReviewMediaItem, index: number) => index + '__' + item.uri)
@@ -298,7 +310,7 @@ export struct ProductReviewCreation {
       .margin({ top: 36, bottom: $r('app.string.space_l') })
       .justifyContent(FlexAlign.Start)
       .alignItems(VerticalAlign.Center)
-      .backgroundColor($r('app.color.background_color_white'))
+      .backgroundColor($r('app.color.background_color_primary'))
       .padding({ left: $r('app.string.space_l') });
 
       if (this.previewItem?.uri) {
@@ -323,29 +335,7 @@ export struct ProductReviewCreation {
       }
     }
     .height($r('app.string.size_percent_full'))
-    .backgroundColor($r('app.color.background_color_white'))
+    .backgroundColor($r('app.color.background_color_primary'))
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
-  }
-
-  getMediaFromAlbum(model: SkuReviewModel) {
-    let photoSelectOptions = new photoAccessHelper.PhotoSelectOptions();
-    photoSelectOptions.MIMEType = photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE;
-    photoSelectOptions.maxSelectNumber = Constants.MAX_MEDIA_LENGTH - model.mediaList.length;
-    let photoPicker = new photoAccessHelper.PhotoViewPicker();
-    return photoPicker.select(photoSelectOptions).then((photoSelectResult) => {
-      if (photoSelectResult !== null && photoSelectResult !== undefined) {
-        photoSelectResult.photoUris.forEach((uri) => {
-          console.log(uri)
-          model.mediaList.push({
-            type: ReviewMediaType.IMAGE,
-            uri,
-          })
-        });
-      }
-      Logger.info(TAG, 'PhotoViewPicker.select successfully, PhotoSelectResult uri: ' +
-      JSON.stringify(model.mediaList));
-    }).catch((err: BusinessError) => {
-      Logger.error(TAG, `PhotoViewPicker select failed, code is ${err.code}, message is ${err.message}.`);
-    });
   }
 }

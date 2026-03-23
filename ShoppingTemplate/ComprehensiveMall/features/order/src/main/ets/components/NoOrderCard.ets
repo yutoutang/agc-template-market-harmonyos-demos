@@ -12,11 +12,11 @@ export function buildNoOrderCard(canJump: boolean = false) {
       .margin({ bottom: $r('app.float.space_l') })
     Text('还没有相关的订单哟')
       .fontSize($r('app.float.font_size_14'))
-      .fontColor($r('sys.color.mask_secondary'))
+      .fontColor($r('app.color.font_color_level2'))
     if (canJump) {
       Text('快去商城选购心仪的商品吧~')
         .fontSize($r('app.float.font_size_14'))
-        .fontColor($r('sys.color.mask_secondary'))
+        .fontColor($r('app.color.font_color_level2'))
         .margin({ bottom: $r('app.float.space_xl') })
       Button('去商城')
         .backgroundColor($r('app.color.theme_color'))

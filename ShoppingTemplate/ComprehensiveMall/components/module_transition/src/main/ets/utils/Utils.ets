@@ -1,4 +1,4 @@
-import { componentUtils, ComponentUtils, window } from '@kit.ArkUI'
+import { componentUtils, ComponentUtils, window } from '@kit.ArkUI';
 
 /**
  * 组件信息类型
@@ -22,8 +22,8 @@ export interface ComInfoType {
  * @param {key} 组件id
  * */
 export const getComponentsInfo = (context: UIContext, key: string): ComInfoType => {
-  let comUtils: ComponentUtils = context.getComponentUtils()
-  let info: componentUtils.ComponentInfo = comUtils.getRectangleById(key)
+  let comUtils: ComponentUtils = context.getComponentUtils();
+  let info: componentUtils.ComponentInfo = comUtils.getRectangleById(key);
   return {
     width: px2vp(info.size.width),
     height: px2vp(info.size.height),
@@ -33,13 +33,13 @@ export const getComponentsInfo = (context: UIContext, key: string): ComInfoType 
     screenTop: px2vp(info.screenOffset.y),
     windowLeft: px2vp(info.windowOffset.x),
     windowTop: px2vp(info.windowOffset.y),
-  }
-}
+  };
+};
 
 /**
  * 获取区间值
  */
-export const clamp = (num: number, min: number, max: number): number => Math.min(Math.max(num, min), max)
+export const clamp = (num: number, min: number, max: number): number => Math.min(Math.max(num, min), max);
 
 
 /**
@@ -47,10 +47,10 @@ export const clamp = (num: number, min: number, max: number): number => Math.min
  */
 export function getSizeByUnit(val: string | number, isFont?: boolean): string {
   if (typeof val === 'string') {
-    return val
+    return val;
   }
-  let unit = 'vp'
-  return `${val}${unit}`
+  let unit = 'vp';
+  return `${val}${unit}`;
 }
 
 /**
@@ -58,6 +58,6 @@ export function getSizeByUnit(val: string | number, isFont?: boolean): string {
  */
 export function setWindowSystemBarProp(properties: window.SystemBarProperties) {
   const windowStage = AppStorage.get('windowStage') as window.WindowStage;
-  const windowClass = windowStage.getMainWindowSync()
-  windowClass.setWindowSystemBarProperties(properties)
+  const windowClass = windowStage.getMainWindowSync();
+  windowClass.setWindowSystemBarProperties(properties);
 }

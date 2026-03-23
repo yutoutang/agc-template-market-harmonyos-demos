@@ -76,9 +76,9 @@ export struct OtherLoginPage {
           Stack({ alignContent: Alignment.End }) {
             TextInput({ text: $$this.vm.verifyCode, placeholder: $r('app.string.verification_code') })
               .layoutWeight(1)
-              .caretColor(this.pageParam.themeColor)
               .fontSize($r('sys.float.Body_L'))
               .fontColor($r('sys.color.font_primary'))
+              .caretColor(this.vm.themeColor)
               .backgroundColor(Color.Transparent)
               .placeholderColor($r('sys.color.font_secondary'))
               .placeholderFont({ size: $r('sys.float.Body_L') })

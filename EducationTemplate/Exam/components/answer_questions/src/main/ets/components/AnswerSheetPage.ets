@@ -23,22 +23,22 @@ export struct AnswerSheetPage {
   };
   @Param viewReport: () => void = () => {
   };
-  @Param ques: TopicItemModel[] = []
+  @Param ques: TopicItemModel[] = [];
   @Param selectIndex: (index: number) => void = () => {
-  }
+  };
   // 1练习模式 2答题模式
-  @Param quesType: number = 1
+  @Param quesType: number = 1;
   // 练习时长
   @Param practiceDuration: number = 0;
 
   aboutToAppear(): void {
     try {
       // 获取导航条高度，手动进行避让
-      window.getLastWindow(getContext(), (_err, data) => {
+      window.getLastWindow(this.getUIContext()?.getHostContext(), (_err, data) => {
         const avoidAreaBottom = data.getWindowAvoidArea(window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR);
         this.bottomHeight = avoidAreaBottom.bottomRect.height;
-      })
-    }catch (e) {
+      });
+    } catch (e) {
     }
   }
 
@@ -46,24 +46,28 @@ export struct AnswerSheetPage {
     Column() {
       Column() {
         // 答题卡手势处理
-        this.gestureHandleBuilder()
+        this.gestureHandleBuilder();
         // 答题卡标题
-        this.titleBuilder()
+        this.titleBuilder();
         // 答题卡次标题
-        this.subtitleBuilder()
+        this.subtitleBuilder();
         // 题目列表
-        this.topicListBuilder()
+        this.topicListBuilder();
       }
-      .width('92%')
-
+      .padding(20)
+      .width('92%');
+      Blank()
+        .layoutWeight(1)
       // 查看报告
-      this.viewReportBuilder()
+      this.viewReportBuilder();
     }
-    .backgroundColor(Color.White)
-    .borderRadius({ topLeft: $r('sys.float.corner_radius_level16'),
-      topRight: $r('sys.float.corner_radius_level16') })
+    .backgroundColor($r('app.color.answer_sheet_bg'))
+    .borderRadius({
+      topLeft: $r('sys.float.corner_radius_level16'),
+      topRight: $r('sys.float.corner_radius_level16')
+    })
     .width('100%')
-    .height('100%')
+    .height('100%');
   }
 
   // 答题卡手势处理
@@ -75,9 +79,9 @@ export struct AnswerSheetPage {
         .height($r('app.float.vp_5'))
         .backgroundColor($r('app.color.gesture_handle'))
         .borderRadius(3)
-        .margin({ top: $r('app.float.vp_8') })
+        .margin({ top: $r('app.float.vp_8') });
     }
-    .justifyContent(FlexAlign.Center)
+    .justifyContent(FlexAlign.Center);
   }
 
   // 答题卡标题
@@ -88,16 +92,16 @@ export struct AnswerSheetPage {
         .fontSize($r('sys.float.Title_S'))
         .fontColor($r('sys.color.font_primary'))
         .fontWeight(FontWeight.Bold)
-        .textAlign(TextAlign.Center)
+        .textAlign(TextAlign.Center);
       Image($r('app.media.close_btn'))
         .width($r('app.float.vp_40'))
         .height($r('app.float.vp_40'))
         .onClick(this.close)
-        .id('close_button')
+        .id('close_button');
     }
     .width('100%')
     .height($r('app.float.vp_56'))
-    .justifyContent(FlexAlign.SpaceBetween)
+    .justifyContent(FlexAlign.SpaceBetween);
   }
 
   // 答题卡次标题
@@ -106,10 +110,10 @@ export struct AnswerSheetPage {
     Row() {
       Text($r('app.string.single_choice_topic'))
         .fontSize($r('sys.float.Subtitle_M'))
-        .fontColor($r('sys.color.font_primary'))
+        .fontColor($r('sys.color.font_primary'));
     }
     .width('100%')
-    .margin({ top: $r('app.float.vp_5'), bottom: $r('app.float.vp_15') })
+    .margin({ top: $r('app.float.vp_5'), bottom: $r('app.float.vp_15') });
   }
 
   // 题目列表
@@ -123,19 +127,19 @@ export struct AnswerSheetPage {
               Text(`${index + 1}`)
                 .fontSize($r('sys.float.Body_S'))
                 .fontWeight(FontWeight.Medium)
-                .fontColor(item.showState === 0 ? $r('sys.color.font_primary') : $r('sys.color.font_on_primary'))
+                .fontColor(item.showState === 0 ? $r('sys.color.font_primary') : $r('sys.color.font_on_primary'));
             }
             .width($r('app.float.vp_45'))
             .height($r('app.float.vp_45'))
             .backgroundColor(item.showState === 1 ? $r('sys.color.multi_color_08') :
-              (item.showState === 2 ? $r('sys.color.multi_color_04') : $r('sys.color.background_secondary')))
+              (item.showState === 2 ? $r('sys.color.multi_color_04') : $r('sys.color.comp_background_tertiary')))
             .borderRadius(40)
             .justifyContent(FlexAlign.Center)
             .onClick(() => {
-              this.selectIndex(index)
-            })
-          }
-        }, (item: TopicItemModel, index: number) => item.keyID + index)
+              this.selectIndex(index);
+            });
+          };
+        }, (item: TopicItemModel, index: number) => item.keyID + index);
       } else if (this.quesType === 2) {
         ForEach(this.ques, (item: TopicItemModel, index: number) => {
           GridItem() {
@@ -143,19 +147,19 @@ export struct AnswerSheetPage {
               Text(`${index + 1}`)
                 .fontSize($r('sys.float.Body_S'))
                 .fontWeight(FontWeight.Medium)
-                .fontColor(item.showState === 0 ? $r('sys.color.font_primary') : $r('sys.color.font_on_primary'))
+                .fontColor(item.showState === 0 ? $r('sys.color.font_primary') : $r('sys.color.font_on_primary'));
             }
             .width($r('app.float.vp_45'))
             .height($r('app.float.vp_45'))
             .backgroundColor(item.isAnswer ? $r('app.color.view_report_btn') :
-            $r('app.color.topic_page_background_gray'))
+              $r('sys.color.comp_background_tertiary'))
             .borderRadius(40)
             .justifyContent(FlexAlign.Center)
             .onClick(() => {
-              this.selectIndex(index)
-            })
-          }
-        }, (item: TopicItemModel, index: number) => item.keyID + index)
+              this.selectIndex(index);
+            });
+          };
+        }, (item: TopicItemModel, index: number) => item.keyID + index);
 
       }
     }
@@ -163,7 +167,7 @@ export struct AnswerSheetPage {
     .rowsGap($r('app.float.vp_16'))
     .columnsGap($r('app.float.vp_24'))
     .scrollBar(BarState.Off)
-    .height('68%')
+    .height(200);
   }
 
   // 查看报告
@@ -172,13 +176,13 @@ export struct AnswerSheetPage {
     Row() {
       Button(this.quesType === 1 ? '查看报告' : '交卷', { type: ButtonType.Capsule, stateEffect: true })
         .backgroundColor($r('app.color.view_report_btn'))
-        .width($r('app.float.vp_300'))
+        .width('80%')
         .onClick(() => {
-          this.viewReport()
-        })
+          this.viewReport();
+        });
     }
     .width('100%')
     .height($r('app.float.vp_70'))
-    .justifyContent(FlexAlign.Center)
+    .justifyContent(FlexAlign.Center);
   }
 }

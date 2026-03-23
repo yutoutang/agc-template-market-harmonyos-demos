@@ -71,8 +71,8 @@ class BreakpointSystem {
           });
         })
         .catch((err: BusinessError) => {
-          Logger.error(TAG, 'get window failed. error:' + JSON.stringify(err))
-        })
+          Logger.error(TAG, 'get window failed. error:' + JSON.stringify(err));
+        });
     }
   }
 

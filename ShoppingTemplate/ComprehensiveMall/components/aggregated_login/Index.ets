@@ -4,8 +4,8 @@ export { LoginSheetUtils, LoginInfoOptions } from './src/main/ets/utils/LoginShe
 
 export { LoginType, LoginChannelType } from './src/main/ets/common/Constant';
 
-export { Channel, LoginParams } from './src/main/ets/model/Index'
+export { Channel, LoginParams, LoginFailError } from './src/main/ets/model/Index';
 
 export { ApiController, LoginController } from './src/main/ets/utils/Utils';
 
-export { wxEventHandler } from './src/main//ets/utils/WXApiUtils';
+export { WXLoginService } from './src/main/ets/utils/WXLoginService';

@@ -13,21 +13,27 @@
  * limitations under the License.
  */
 
-import { AlertDialog } from '@kit.ArkUI';
-import { RouterMap, RouterModule } from 'router_module';
-import { PreferenceUtil, PreferConstant } from 'commonlib';
+import { AlertDialog, window } from '@kit.ArkUI';
+import { PreferenceUtil, PreferConstant, GlobalContextUtils, RouterMap, RouterModule } from 'commonlib';
 import { QuestionsRouterModel } from 'answer_questions';
 import { RouterTable } from '../model/RouterTable';
+import { MainVM } from '../viewmodels/MainVM';
+import { common } from '@kit.AbilityKit';
+import { UtilLog } from '@hw-agconnect/util-log';
+
+const TAG = '[Index]';
 
 @Entry
 @ComponentV2
 struct Index {
   // 弹框页
-  dialogPages: string[] = [RouterMap.PRIVACY_USE_PAGE, RouterMap.LOGIN_PAGE]
+  dialogPages: string[] = [RouterMap.PRIVACY_USE_PAGE, RouterMap.LOGIN_PAGE];
   backPageDialogController?: CustomDialogController;
-  content = ''
-  leftButtonText = ''
-  rightButtonText = ''
+  content = '';
+  leftButtonText = '';
+  rightButtonText = '';
+  mainVM: MainVM = MainVM.instance;
+  private ctx: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
 
   backPageDialogOpen(content: string, leftButtonText: string, rightButtonText: string) {
     this.backPageDialogController = new CustomDialogController({
@@ -43,35 +49,45 @@ struct Index {
           value: leftButtonText,
           fontColor: $r('sys.color.font_tertiary'),
           action: () => {
-            RouterModule.pop()
+            RouterModule.pop();
           },
         },
       }),
-    })
-    this.backPageDialogController.open()
+    });
+    this.backPageDialogController.open();
   }
 
   aboutToAppear() {
+    GlobalContextUtils.setUIContext('entry', this.getUIContext());
+    try {
+      let colorMode = PreferenceUtil.getInstance().get(PreferConstant.COLOR_MODE, -1) as number;
+      this.handleDark(colorMode);
+      this.mainVM.registerBreakpointListener(this.ctx.windowStage.getMainWindowSync());
+    } catch (e) {
+      UtilLog.error(TAG, 'registerBreakpointListener, error: ' + JSON.stringify(e));
+    }
     //读取状态值，如果为空设置为true
-    let isFirstLaunch = PreferenceUtil.getInstance().get(PreferConstant.FIRSTLAUNCH, true) as boolean
+    let isFirstLaunch = PreferenceUtil.getInstance().get(PreferConstant.FIRST_LAUNCH, true) as boolean;
     if (isFirstLaunch) {
       //隐私政策
-      RouterModule.replace({ url: RouterMap.PRIVACY_AGREEMENT_PAGE })
+      RouterModule.replace({ url: RouterMap.PRIVACY_AGREEMENT_PAGE });
       return;
     }
-    RouterModule.replace({ url: RouterMap.MAIN_PAGE })
+    RouterModule.replace({ url: RouterMap.MAIN_PAGE });
   }
 
   @Builder
   pageMap(name: string) {
     NavDestination() {
-      RouterTable.getBuilder(name).builder()
+      RouterTable.getBuilder(name).builder();
     }
     .mode(this.dialogPages.includes(name) ? NavDestinationMode.DIALOG : NavDestinationMode.STANDARD)
     .hideTitleBar(true)
+    .width('100%')
+    .height('100%')
     .onBackPressed(() => {
-      return this.backPress(name)
-    })
+      return this.backPress(name);
+    });
   }
 
   build() {
@@ -84,35 +100,62 @@ struct Index {
       .hideBackButton(true)
       .mode(NavigationMode.Stack)
       .navDestination(this.pageMap)
+      .width('100%')
+      .height('100%')
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM]);
     }
+    .width('100%')
+    .height('100%')
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM]);
   }
 
   // 侧滑返回拦截
   backPress(name: string): boolean {
     if (this.isIntercept(name)) {
-      this.backPageDialogOpen(this.content, this.leftButtonText, this.rightButtonText)
-      return true
+      this.backPageDialogOpen(this.content, this.leftButtonText, this.rightButtonText);
+      return true;
     }
-    return false
+    return false;
   }
 
   isIntercept(name: string): boolean {
     if (name === 'AnswerQuestionsTwoPage') {
-      this.content = '您还有题目没有作答是否直接交卷结束考试！'
-      this.leftButtonText = '结束考试'
-      this.rightButtonText = '继续考试'
-      return true
+      this.content = '您还有题目没有作答是否直接交卷结束考试！';
+      this.leftButtonText = '结束考试';
+      this.rightButtonText = '继续考试';
+      return true;
     } else if (name === 'AnswerQuestionsPage') {
       let param: QuestionsRouterModel | undefined =
-        RouterModule.getNavParam({ url: RouterMap.ANSWER_QUESTIONS_PAGE })
+        RouterModule.getNavParam({ url: RouterMap.ANSWER_QUESTIONS_PAGE });
       if (param?.sourceType === '我的错题' || param?.sourceType === '我的收藏') {
-        return false
+        return false;
       }
-      this.content = '您的练习计划还没有完成！确定需要退出本次练习训练吗？'
-      this.leftButtonText = '结束练习'
-      this.rightButtonText = '继续练习'
-      return true
+      this.content = '您的练习计划还没有完成！确定需要退出本次练习训练吗？';
+      this.leftButtonText = '结束练习';
+      this.rightButtonText = '继续练习';
+      return true;
     }
-    return false
+    return false;
+  }
+
+  handleDark(colorMode: number) {
+    try {
+      this.getUIContext()?.getHostContext()?.getApplicationContext()
+        .setColorMode(colorMode);
+    } catch (e) {
+    }
+  }
+
+  setStatusBarColor(statusContentColor: string) {
+    const ctx: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
+    try {
+      let windowClass = ctx.windowStage.getMainWindowSync();
+      let sysBarProperties = {
+        statusBarContentColor: statusContentColor,
+      } as window.SystemBarProperties;
+      windowClass.setWindowSystemBarProperties(sysBarProperties).then().catch();
+    } catch (error) {
+      UtilLog.error(TAG, `setStatusBarTextColor error: ${JSON.stringify(error)}`);
+    }
   }
 }

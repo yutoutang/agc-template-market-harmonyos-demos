@@ -2,6 +2,8 @@ import AxiosMockAdapter from '@hw-agconnect/axios-mock-adapter';
 import { HomeMockApis } from './mockapis/HomeMock';
 import { OrderMockApis } from './mockapis/OrderMock';
 import { ProductMockApis } from './mockapis/ProductMock';
+import { SeckillMockApis } from './mockapis/SeckillMock';
+import { ShoppingCartMockApis } from './mockapis/ShoppingCartMock';
 import { UserMockApis } from './mockapis/UserMock';
 import instance from '../https/Request';
 
@@ -19,6 +21,8 @@ if (enableMock) {
     new OrderMockApis(),
     new ProductMockApis(),
     new UserMockApis(),
+    new SeckillMockApis(),
+    new ShoppingCartMockApis(),
   ];
   mockApis.forEach((api) => {
     api.start(mockAdapter);

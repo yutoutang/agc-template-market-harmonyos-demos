@@ -14,8 +14,8 @@
     "metadata": [
       {
 /**
-         * todo
-         */
+                 * todo
+                 */
         "name": "client_id",
         "value": "******"
       }
@@ -118,6 +118,21 @@
       "wxopensdk",
       "qqopenapi",
       "https"
+    ],
+    "extensionAbilities": [
+      {
+        "name": "EntryFormAbility",
+        "srcEntry": "./ets/entryformability/EntryFormAbility.ets",
+        "label": "$string:EntryFormAbility_label",
+        "description": "$string:EntryFormAbility_desc",
+        "type": "form",
+        "metadata": [
+          {
+            "name": "ohos.extension.form",
+            "resource": "$profile:form_config"
+          }
+        ]
+      }
     ]
   }
 }

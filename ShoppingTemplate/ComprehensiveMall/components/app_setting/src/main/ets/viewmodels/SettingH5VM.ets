@@ -24,7 +24,7 @@ export class SettingH5VM extends BaseViewModel {
     try {
       this.webViewController.loadUrl(this.content);
     } catch (error) {
-      Logger.error(LOG_TAG, 'load url failed. error: ' + JSON.stringify(error))
+      Logger.error(LOG_TAG, 'load url failed. error: ' + JSON.stringify(error));
     }
   }
 

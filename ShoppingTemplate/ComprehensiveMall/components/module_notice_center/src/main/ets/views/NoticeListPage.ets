@@ -46,11 +46,14 @@ export struct NoticeListPage {
                 end: this.buildDeleteIcon(ri.item.id),
               })
             })
+          ListItem().height($r('app.string.space_l'))
         }
         .padding({
           left: $r('app.string.space_l'),
           right: $r('app.string.space_l'),
         })
+        .scrollBar(BarState.Off)
+        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
       }
 
     }
@@ -72,7 +75,7 @@ export struct NoticeListPage {
     Row() {
       Row() {
         SymbolGlyph($r('sys.symbol.trash_fill'))
-          .fontColor([$r('app.color.background_color_white')])
+          .fontColor([$r('app.color.background_color_primary')])
           .fontSize(20)
       }
       .backgroundColor($r('sys.color.warning'))
@@ -108,7 +111,7 @@ export struct NoticeListPage {
         Text(message.title).titleStyle()
         Text(message.content).contentStyle()
       }
-      .backgroundColor($r('app.color.background_color_white'))
+      .backgroundColor($r('app.color.background_color_primary'))
       .borderRadius($r('app.string.border_radius_16'))
       .padding($r('app.string.space_m'))
       .width($r('app.string.size_percent_full'))

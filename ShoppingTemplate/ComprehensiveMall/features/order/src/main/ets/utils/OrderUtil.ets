@@ -1,12 +1,14 @@
-import { common } from '@kit.AbilityKit';
 import { BusinessError, pasteboard } from '@kit.BasicServicesKit';
-import { paymentService } from '@kit.PaymentKit';
+import { CashierPicker, PaymentType, aggregatedPaymentService } from 'aggregated_payment';
 import { RouterMap, routerStack, SafeJson, WindowUtil } from 'lib_foundation';
-import { AddressInfo, OrderApis, OrderItem, OrderSkuItem } from 'lib_network';
+import { AddressInfo, LogisticsItem, OrderApis, OrderItem, OrderSkuItem,
+  OrderStatus,
+  ProductApis,
+  ShoppingCartApis } from 'lib_network';
 import { OrderReviewReq } from 'lib_network';
+import { CartUpdateResp } from 'lib_network/src/main/ets/types/responses/CartResponse';
 import { CommonConfirmDialog, CustomServiceSheet } from 'lib_widget';
-import { CartApi } from 'module_shopping_cart';
-import { UtilLog as Logger } from '@hw-agconnect/util-log';
+import { UtilLog as Logger, UtilLog } from '@hw-agconnect/util-log';
 import {
   ORDER_STATUS_COMPLETE,
   ORDER_STATUS_PENDING_PAYMENT,
@@ -20,7 +22,7 @@ import {
 import {
   OrderActionMap, OrderShipmentMap, OrderStatusMap,
 } from '../common/Enums';
-import { OrderActionReq, OrderStatusInfo } from '../common/Types';
+import { CourierInfo, OrderActionReq, OrderStatusInfo } from '../common/Types';
 
 const TAG: string = '[OrderUtil]';
 
@@ -50,12 +52,33 @@ export class OrderUtil {
 
   public static getLogisticStatusLabel(status: number) {
     const labelMap: Map<number, string> = new Map([
-      [1, '待确认'],
-      [2, '已发货'],
-      [3, '运输中'],
-      [4, '已签收'],
-    ])
-    return labelMap.get(status) ?? ''
+      [101, '待确认'],
+      [102, '待发货'],
+      [201, '已发货'],
+      [202, '已揽收'],
+      [203, '运输中'],
+      [204, '派件中'],
+      [205, '待取件'],
+      [301, '已签收'],
+    ]);
+    return labelMap.get(status) ?? '';
+  }
+
+  public static getLogisticStatusTime(node:LogisticsItem){
+    if(node.details.length){
+      return node.details[node.details.length-1].time;
+    }
+    return '';
+  }
+
+  public static getCourierInfo(info?:LogisticsItem[]){
+    if(info?.length && info[0].courier && info[0].contactPhone) {
+      return {
+        name:info[0].courier,
+        contactPhone:info[0].contactPhone,
+      } as CourierInfo;
+    }
+    return undefined;
   }
 
   public static getButtonList(status: number) {
@@ -107,13 +130,38 @@ export class OrderUtil {
    * @param param
    */
   public static handleImmediatePayment(param: OrderActionReq) {
-    const context = WindowUtil.globalContext as common.UIAbilityContext;
-    paymentService
-      .requestPayment(context, '')
-      .then(() => {
+    const order = param.data as OrderItem;
+    const cashierPicker: CashierPicker = new CashierPicker(WindowUtil.globalUIContext)
+      .onRealPayment(async (type: PaymentType) => {
+        await OrderUtil._startPayment(type);
       })
-      .catch(() => {
+      .onWillDismiss((reason: DismissReason) => {
+        if (reason !== DismissReason.TOUCH_OUTSIDE) {
+          routerStack.replacePathByName(RouterMap.ORDER_INFO, param.orderNo);
+          cashierPicker.close();
+        }
       });
+    aggregatedPaymentService.registerPaymentCallback(
+      (type: PaymentType, isSuccess: boolean) => {
+        if (!isSuccess) {
+          WindowUtil.toast('本地调试阶段，模拟支付成功回调');
+        }
+        OrderApis.updateDetail(param.orderNo, {
+          status: OrderStatus.PENDING_SHIPMENT,
+        }).then((res)=>{
+          if(res.code === 0){
+            WindowUtil.toast('订单支付成功！');
+          }
+        }).finally(()=>{
+          routerStack.replacePathByName(RouterMap.ORDER_INFO, param.orderNo);
+          cashierPicker.close();
+        });
+      },
+    );
+    cashierPicker
+      .reset()
+      .setAmount(order.orderInfo.finalPrice * 100)
+      .open();
   }
 
   /**
@@ -186,7 +234,8 @@ export class OrderUtil {
    * @param param
    */
   public static handleReview(param: OrderActionReq) {
-    OrderApis.addComment(param.orderNo, param.data as OrderReviewReq).then(
+    const data = param.data as OrderReviewReq;
+    OrderApis.addComment(param.orderNo, data).then(
       (res) => {
         if (res.code === 0) {
           WindowUtil.toast('添加评论成功！');
@@ -194,6 +243,7 @@ export class OrderUtil {
         }
       },
     );
+    ProductApis.createProductReview(data.reviews);
   }
 
   /**
@@ -242,11 +292,11 @@ export class OrderUtil {
    */
   public static handleCancelRefund(param: OrderActionReq) {
     const data = param.data as OrderItem;
-    let status: number = 0
+    let status: number = 0;
     if (data?.logisticInfo?.length === 1) {
-      status = OrderStatusMap.PENDING_SHIPMENT
+      status = OrderStatusMap.PENDING_SHIPMENT;
     } else {
-      status = OrderStatusMap.PENDING_RECEIPT
+      status = OrderStatusMap.PENDING_RECEIPT;
     }
     CommonConfirmDialog.show({
       primaryTitle: '提示',
@@ -273,11 +323,15 @@ export class OrderUtil {
   public static handleReorder(param: OrderActionReq) {
     const data = param.data as OrderSkuItem[];
     if (data?.length) {
-      let promises: Promise<number>[] = [];
+      let promises: Promise<CartUpdateResp>[] = [];
       let skuTable: Record<string, string | number> = {};
       data.forEach((item) => {
         skuTable[item.skuCode] = item.count;
-        const promise = CartApi.addSkuToCart({ skuCode: item.skuCode, count: item.count });
+        const promise = ShoppingCartApis.addSkuToCart({
+          skuCode: item.skuCode,
+          count: item.count,
+          priceType:item.priceType,
+        });
         promises.push(promise);
       });
       Promise.all(promises).then(() => {
@@ -331,7 +385,46 @@ export class OrderUtil {
         });
     } catch (err) {
       WindowUtil.toast('复制失败!');
-      Logger.error(TAG, 'copy order number failed. err' + SafeJson.jsonStringify(err))
+      Logger.error(TAG, 'copy order number failed. err' + SafeJson.jsonStringify(err));
+    }
+  }
+
+  private static async _startPayment(type: PaymentType){
+    // todo: 根据支付类型向服务器请求支付所需参数
+    try {
+      if (type === PaymentType.ALIPAY) {
+        /**
+         * 请求拉起支付宝
+         *
+         * 临时测试时，orderInfo 不推荐传入空字符串，这会导致跳转至支付宝行为仅仅是跳转，不会有支付相关的交互
+         * 未安装支付宝且参数真实时，SDK 会尝试使用 this.navPathStack 跳转至 H5 页面继续支付，该参数可不传
+         */
+        aggregatedPaymentService.requestPaymentByAliPay({ orderInfo: 'ORDER_INFO' }, routerStack);
+      } else if (type === PaymentType.HUAWEI) {
+        /**
+         * 请求拉起华为支付
+         */
+        aggregatedPaymentService.requestPaymentByHuawei(WindowUtil.globalUIContext, { orderStr: '' });
+      } else if (type === PaymentType.WECHAT) {
+        /**
+         * 请求拉起微信支付
+         *
+         * 微信支持获取拉起结果，如果拉起成功，则可以进一步尝试等待支付回调。如果拉起失败，则不会有支付回调。
+         */
+        const isWeChatOpenSuccess: boolean =
+          await aggregatedPaymentService.requestPaymentByWeChat(WindowUtil.globalUIContext, {
+            partnerId: '',
+            prepayId: '',
+            nonceStr: '',
+            timeStamp: '',
+            sign: '',
+          });
+        if (!isWeChatOpenSuccess) {
+          WindowUtil.toast('微信拉起失败');
+        }
+      }
+    } catch (err) {
+      UtilLog.error('[OrderSubmitVM]', 'start payment failed. error: ' + JSON.stringify(err));
     }
   }
 }

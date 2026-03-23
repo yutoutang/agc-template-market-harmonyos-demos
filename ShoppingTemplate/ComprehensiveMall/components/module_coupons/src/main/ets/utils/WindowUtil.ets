@@ -12,7 +12,7 @@ export class AvoidAreaSize {
 }
 
 export class WindowUtil {
-  private static _uiContext: UIContext
+  private static _uiContext: UIContext;
   private static _currentWindow: window.Window | null = null;
   private static _avoidAreaSize: AvoidAreaSize = AppStorageV2.connect(
     AvoidAreaSize,
@@ -51,7 +51,7 @@ export class WindowUtil {
         WindowUtil._avoidAreaSize.bottom = WindowUtil._uiContext.px2vp(bottomArea.bottomRect.height);
       }
     } catch (err) {
-      Logger.error(LOG_TAG, 'add window avoid area failed. error: ' + JSON.stringify(err))
+      Logger.error(LOG_TAG, 'add window avoid area failed. error: ' + JSON.stringify(err));
     }
   }
 

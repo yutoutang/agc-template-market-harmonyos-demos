@@ -25,34 +25,34 @@ export function MyDetailPageBuilder() {
   MyDetailPage()
 }
 
-@Component
+@ComponentV2
 export struct MyDetailPage {
-  @Consume('pageStack') pageStack: NavPathStack;
+  @Consumer('pageStack') pageStack: NavPathStack = new NavPathStack();
   private controller: TextInputController = new TextInputController()
-  @State userFullInfo: UserFullInfo = new UserFullInfo();
-  @State selfIntroInput: string = '';
-  @State inputValue: string = '';
-  @State marriageStatus: string = Constants.TO_BE_SET;
-  @State monthlyIncome: string = Constants.TO_BE_SET;
-  @State edu: string = Constants.TO_BE_SET;
-  @State gender: string = '';
-  @State hasChildren: string = Constants.TO_BE_SET;
-  @State expectationOfChildren: string = Constants.TO_BE_SET;
-  @State smoking: string = Constants.TO_BE_SET;
-  @State drinking: string = Constants.TO_BE_SET;
-  @State hasBuyCar: string = Constants.TO_BE_SET;
-  @State hasBuyHouse: string = Constants.TO_BE_SET;
-  @State whenToMarry: string = Constants.TO_BE_SET;
-  @State heightStr: string = '';
-  @State weightStr: string = '';
-  @State member: boolean = false;
-  @State userInfo: UserInfo = new UserInfo();
-  @State mateCriteria: MateSelectionCriteria = new MateSelectionCriteria();
-  @State hasReadAgreement: boolean = false;
-  @State isShowUploadProfilePicDialog: boolean = false;
-  @State profileImage: string = 'app.media.head_image_default';
-  @State isShowAlbumImageDialog: boolean = false;
-  @State selectedBirth: Date = DateUtils.getYearsBefore(Constants.DATE_PICKER_DEFAULT);
+  @Local userFullInfo: UserFullInfo = new UserFullInfo();
+  @Local selfIntroInput: string = '';
+  @Local inputValue: string = '';
+  @Local marriageStatus: string = Constants.TO_BE_SET;
+  @Local monthlyIncome: string = Constants.TO_BE_SET;
+  @Local edu: string = Constants.TO_BE_SET;
+  @Local gender: string = '';
+  @Local hasChildren: string = Constants.TO_BE_SET;
+  @Local expectationOfChildren: string = Constants.TO_BE_SET;
+  @Local smoking: string = Constants.TO_BE_SET;
+  @Local drinking: string = Constants.TO_BE_SET;
+  @Local hasBuyCar: string = Constants.TO_BE_SET;
+  @Local hasBuyHouse: string = Constants.TO_BE_SET;
+  @Local whenToMarry: string = Constants.TO_BE_SET;
+  @Local heightStr: string = '';
+  @Local weightStr: string = '';
+  @Local member: boolean = false;
+  @Local userInfo: UserInfo = new UserInfo();
+  @Local mateCriteria: MateSelectionCriteria = new MateSelectionCriteria();
+  @Local hasReadAgreement: boolean = false;
+  @Local isShowUploadProfilePicDialog: boolean = false;
+  @Local profileImage: string = 'app.media.head_image_default';
+  @Local isShowAlbumImageDialog: boolean = false;
+  @Local selectedBirth: Date = DateUtils.getYearsBefore(Constants.DATE_PICKER_DEFAULT);
 
   aboutToAppear(): void {
     UserService.getUserFullInfoByUnionId(AppStorage.get(Constants.UNION_ID)).then((data: GetUserResponse | null) => {
@@ -442,7 +442,7 @@ export struct MyDetailPage {
     .height('6%')
     .alignItems(VerticalAlign.Center)
     .onClick(() => {
-      TextPickerDialog.show(buildTextPickerDialogOption(
+      this.getUIContext().showTextPickerDialog(buildTextPickerDialogOption(
         Constants.WHEN_TO_MARRY_DISPLAY_VALUES,
         (pickResult: TextPickerResult) => {
           this.whenToMarry = pickResult.value as string
@@ -473,7 +473,7 @@ export struct MyDetailPage {
     .height('6%')
     .alignItems(VerticalAlign.Center)
     .onClick(() => {
-      TextPickerDialog.show(buildTextPickerDialogOption(
+      this.getUIContext().showTextPickerDialog(buildTextPickerDialogOption(
         Constants.DRINKING_DISPLAY_VALUES,
         (pickResult: TextPickerResult) => {
           this.drinking = pickResult.value as string
@@ -503,7 +503,7 @@ export struct MyDetailPage {
     .height('6%')
     .alignItems(VerticalAlign.Center)
     .onClick(() => {
-      TextPickerDialog.show(buildTextPickerDialogOption(
+      this.getUIContext().showTextPickerDialog(buildTextPickerDialogOption(
         Constants.SMOKING_DISPLAY_VALUES,
         (pickResult: TextPickerResult) => {
           this.smoking = pickResult.value as string
@@ -533,7 +533,7 @@ export struct MyDetailPage {
     .height('6%')
     .alignItems(VerticalAlign.Center)
     .onClick(() => {
-      TextPickerDialog.show(buildTextPickerDialogOption(
+      this.getUIContext().showTextPickerDialog(buildTextPickerDialogOption(
         Constants.EXPECTATION_OF_CHILDREN_DISPLAY_VALUES,
         (pickResult: TextPickerResult) => {
           this.expectationOfChildren = pickResult.value as string
@@ -683,7 +683,7 @@ export struct MyDetailPage {
           .onClick(
             async () => {
               this.isShowUploadProfilePicDialog = !this.isShowUploadProfilePicDialog;
-              let pathDir = getContext().filesDir;
+              let pathDir = this.getUIContext().getHostContext()?.filesDir;
               let fileName = `${new Date().getTime()}`
               let filePath = pathDir + `/${fileName}.tmp`
               fileIo.open(filePath, fileIo.OpenMode.CREATE);
@@ -691,7 +691,7 @@ export struct MyDetailPage {
                 cameraPosition: camera.CameraPosition.CAMERA_POSITION_FRONT,
               };
               let result: picker.PickerResult =
-                await picker.pick(getContext(), [picker.PickerMediaType.PHOTO],
+                await picker.pick(this.getUIContext().getHostContext(), [picker.PickerMediaType.PHOTO],
                   pickerProfile);
               if (result.resultCode === 0) {
                 if (result.mediaType === picker.PickerMediaType.PHOTO) {
@@ -749,7 +749,7 @@ export struct MyDetailPage {
       Image($r('app.media.ic_right_arrow')).width(24).height(24).margin({ left: 10, right: 16 })
 
     }.width('92%').margin({ top: 10, bottom: 10 }).height('6%').onClick(() => {
-      DatePickerDialog.show({
+      this.getUIContext().showDatePickerDialog({
         start: DateUtils.getYearsBefore(Constants.MAX_AGE),
         end: DateUtils.getYearsBefore(Constants.ADULT_AGE),
         selected: this.selectedBirth,
@@ -805,7 +805,7 @@ export struct MyDetailPage {
       Image($r('app.media.ic_right_arrow')).width(24).height(24).margin({ left: 10 })
 
     }.width('92%').margin({ top: 10, bottom: 10 }).height('6%').onClick(() => {
-      TextPickerDialog.show(buildTextPickerDialogOption(
+      this.getUIContext().showTextPickerDialog(buildTextPickerDialogOption(
         Constants.CITY_PICKER,
         (result: TextPickerResult) => {
           Logger.debug('buildOriginFrom enter onAccept')
@@ -832,7 +832,7 @@ export struct MyDetailPage {
 
     }.width('92%').margin({ top: 10, bottom: 10 }).height('6%').onClick(() => {
       try {
-        TextPickerDialog.show(buildTextPickerDialogOption(
+        this.getUIContext().showTextPickerDialog(buildTextPickerDialogOption(
           Constants.CITY_PICKER,
           (result: TextPickerResult) => {
             let newResidence = getPicResult(result);
@@ -866,7 +866,7 @@ export struct MyDetailPage {
     .height('6%')
     .alignItems(VerticalAlign.Center)
     .onClick(() => {
-      TextPickerDialog.show(buildTextPickerDialogOption(
+      this.getUIContext().showTextPickerDialog(buildTextPickerDialogOption(
         Constants.MONTHLY_INCOME_DISPLAY_VALUES,
         (pickResult: TextPickerResult) => {
           this.monthlyIncome = pickResult.value as string
@@ -896,7 +896,7 @@ export struct MyDetailPage {
     .height('6%')
     .alignItems(VerticalAlign.Center)
     .onClick(() => {
-      TextPickerDialog.show(buildTextPickerDialogOption(
+      this.getUIContext().showTextPickerDialog(buildTextPickerDialogOption(
         Constants.MARRIAGE_STATUS_DISPLAY_VALUES,
         (pickRes: TextPickerResult) => {
           let newValue = pickRes.value as string
@@ -940,7 +940,7 @@ export struct MyDetailPage {
     .height('6%')
     .alignItems(VerticalAlign.Center)
     .onClick(() => {
-      TextPickerDialog.show(buildTextPickerDialogOption(
+      this.getUIContext().showTextPickerDialog(buildTextPickerDialogOption(
         Constants.EDUCATION_DISPLAY_VALUES,
         (picResult: TextPickerResult) => {
           this.edu = picResult.value as string;
@@ -968,7 +968,7 @@ export struct MyDetailPage {
     .height('6%')
     .alignItems(VerticalAlign.Center)
     .onClick(() => {
-      TextPickerDialog.show(buildTextPickerDialogOption(
+      this.getUIContext().showTextPickerDialog(buildTextPickerDialogOption(
         Constants.HAS_CAR_VALUES,
         (pickResult: TextPickerResult) => {
           this.hasBuyCar = pickResult.value as string
@@ -996,7 +996,7 @@ export struct MyDetailPage {
     .height('6%')
     .alignItems(VerticalAlign.Center)
     .onClick(() => {
-      TextPickerDialog.show(buildTextPickerDialogOption(
+      this.getUIContext().showTextPickerDialog(buildTextPickerDialogOption(
         Constants.HOUSE_DISPLAY_VALUES,
         (pickResult: TextPickerResult) => {
           this.hasBuyHouse = pickResult.value as string
@@ -1023,7 +1023,7 @@ export struct MyDetailPage {
     .height('6%')
     .alignItems(VerticalAlign.Center)
     .onClick(() => {
-      TextPickerDialog.show(buildTextPickerDialogOption(
+      this.getUIContext().showTextPickerDialog(buildTextPickerDialogOption(
         Constants.HAS_CHILDREN_DISPLAY_VALUES,
         (pickResult: TextPickerResult) => {
           this.hasChildren = pickResult.value as string
@@ -1051,7 +1051,7 @@ export struct MyDetailPage {
     .height('6%')
     .alignItems(VerticalAlign.Center)
     .onClick(() => {
-      TextPickerDialog.show(buildTextPickerDialogOption(
+      this.getUIContext().showTextPickerDialog(buildTextPickerDialogOption(
         Constants.WORK_DISPLAY_VALUES,
         (result: TextPickerResult) => {
           if (typeof result.value === 'string') {
@@ -1081,7 +1081,7 @@ export struct MyDetailPage {
     .height('6%')
     .alignItems(VerticalAlign.Center)
     .onClick(() => {
-      TextPickerDialog.show(buildTextPickerDialogOption(
+      this.getUIContext().showTextPickerDialog(buildTextPickerDialogOption(
         Constants.ETHNIC_GROUPS,
         (result: TextPickerResult) => {
           if (typeof result.value === 'string') {

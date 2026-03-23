@@ -1,4 +1,4 @@
-import { RouterMap, RouterModule } from 'router_module';
+import { RouterMap, RouterModule } from 'commonlib';
 import { SearchPage } from 'search';
 
 @ComponentV2

@@ -21,26 +21,27 @@ import { TopicItemModel } from '../viewModel/TopicItemModel';
  * 底部弹框沉浸式适配
  * 1、设置弹框尾部元素对导航条避让
  */
-@CustomDialog
+@ComponentV2
 export struct AnswerSheetDialog {
-  customController: CustomDialogController;
-  ques: TopicItemModel[] = [];
-  @State bottomHeight: number = 0;
-  selectIndex: (index: number) => void = () => {
-  }
-  quesType: number = 1
-  practiceDuration: number = 0;
-  textTimerController: TextTimerController = new TextTimerController();
-  viewReport: () => void = () => {
-  }
+  @Param ques: TopicItemModel[] = [];
+  @Param quesType: number = 1;
+  @Param practiceDuration: number = 0;
+  @Param textTimerController: TextTimerController = new TextTimerController();
+  @Event selectIndex: (index: number) => void = () => {
+  };
+  @Event close: () => void = () => {
+  };
+  @Event viewReport: () => void = () => {
+  };
+  @Local bottomHeight: number = 0;
 
   aboutToAppear(): void {
     try {
-      window.getLastWindow(getContext(), (_err, data) => {
+      window.getLastWindow(this.getUIContext()?.getHostContext(), (_err, data) => {
         const avoidAreaBottom = data.getWindowAvoidArea(window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR);
         this.bottomHeight = avoidAreaBottom.bottomRect.height;
-      })
-    }catch (e) {
+      });
+    } catch (e) {
     }
   }
 
@@ -50,17 +51,17 @@ export struct AnswerSheetDialog {
       quesType: this.quesType,
       ques: this.ques,
       close: () => {
-        this.customController.close();
+        this.close();
         this.textTimerController.start();
       },
       selectIndex: (index) => {
-        this.selectIndex(index)
-        this.customController.close();
+        this.selectIndex(index);
+        this.close();
       },
       viewReport: () => {
-        this.viewReport()
+        this.viewReport();
       }
     })
-      .height('76%')
+      .height('100%');
   }
 }

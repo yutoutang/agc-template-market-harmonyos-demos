@@ -5,7 +5,8 @@
       {
         "name": "default",
         "signingConfig": "default",
-        "compatibleSdkVersion": "5.0.1(13)",
+        "compatibleSdkVersion": "5.0.5(17)",
+        "targetSdkVersion": "6.0.2(22)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
           "strictMode": {
@@ -74,12 +75,8 @@
       "srcPath": "./components/aggregated_payment"
     },
     {
-      "name": "router_module",
-      "srcPath": "./commons/router_module"
-    },
-    {
-      "name": "feed_back",
-      "srcPath": "./components/feed_back"
+      "name": "feedback",
+      "srcPath": "./components/feedback"
     },
     {
       "name": "search",

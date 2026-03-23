@@ -9,16 +9,16 @@ export function FeedDetailPageBuilder() {
   FeedDetailPage()
 }
 
-@Component
+@ComponentV2
 struct FeedDetailPage {
-  @Consume('pageStack') pageStack: NavPathStack;
-  @State feedInfo: Feed | null = null;
-  @State isShowFollow: boolean = false;
-  @State showCommentSheet: boolean = false;
-  @State showCommentSheets: boolean[] = [];
-  @State theCommentToReply: Comment | null = null;
-  @State newCommentTxt: string = '';
-  @State currentUser: BasicUserInfo | null = null;
+  @Consumer('pageStack') pageStack: NavPathStack = new NavPathStack();
+  @Local feedInfo: Feed | null = null;
+  @Local isShowFollow: boolean = false;
+  @Local showCommentSheet: boolean = false;
+  @Local showCommentSheets: boolean[] = [];
+  @Local theCommentToReply: Comment | null = null;
+  @Local newCommentTxt: string = '';
+  @Local currentUser: BasicUserInfo | null = null;
 
   aboutToAppear(): void {
     let params: FeedDetailPageRouteParam[] = this.pageStack.getParamByName('FeedDetail') as FeedDetailPageRouteParam[];

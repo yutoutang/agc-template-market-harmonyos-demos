@@ -13,41 +13,42 @@
  * limitations under the License.
  */
 
-import { TopTabsBuilder } from 'commonlib'
+import { BreakpointType, TopTabsBuilder } from 'commonlib';
 import { Course } from '../model/Course';
 import { CourseComponent } from '../components/CourseComponent';
+import { HomeVM } from '../viewmodels/HomeVM';
 
 // 精选课程页面
 @ComponentV2
 export struct FeaturedCourses {
-  @Local textInput: string = ''
+  @Local textInput: string = '';
   controller: TextInputController = new TextInputController();
   @Local coursesSource: Course[] = [new Course('111', '华为用户', '一级建造师精华题库中级班', 423, 288),
-    new Course('222', '华为用户', '一级建造师精华题库中级班', 423, 288)]
-  @Local courses: Course[] = []
+    new Course('222', '华为用户', '一级建造师精华题库中级班', 423, 288)];
+  @Local courses: Course[] = [];
   @Local enterTypes: Array<EnterKeyType> =
     [EnterKeyType.Go, EnterKeyType.Search, EnterKeyType.Send, EnterKeyType.Done, EnterKeyType.Next,
       EnterKeyType.PREVIOUS, EnterKeyType.NEW_LINE];
   @Local index: number = 0;
+  homeVM: HomeVM = HomeVM.instance;
 
   aboutToAppear(): void {
-    this.courses = this.coursesSource
+    this.courses = this.coursesSource;
   }
 
   build() {
     Column() {
-      Column() {
-        TopTabsBuilder({ title: '精选课程', bgColor: $r('sys.color.background_primary'), showBackButton: true })
-          .margin({ bottom: '8vp' })
-          .padding({ left: '16vp', right: '16vp' })
+      TopTabsBuilder({ title: '精选课程', bgColor: $r('sys.color.comp_background_primary'), showBackButton: true })
+        .margin({ bottom: '8vp' })
+        .padding({ left: '16vp', right: '16vp' });
 
-        Divider().width('100%')
-        // 资料列表
-        this.courseListBuilder()
-      }
-      .width('100%')
-      .height('100%')
+      Divider().width('100%');
+      this.courseListBuilder();
     }
+    .width('100%')
+    .height('100%')
+    .backgroundColor($r('sys.color.comp_background_primary'))
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM]);
   }
 
   /**
@@ -55,21 +56,31 @@ export struct FeaturedCourses {
    */
   @Builder
   courseListBuilder() {
-    Column() {
+    Grid() {
       ForEach(this.courses, (item: Course, index: number) => {
-        CourseComponent({ course: item })
-          .width('100%')
-          .margin({ bottom: index === 0 ? '8vp' : '0vp' })
-      }, (item: Course, index: number) => item.courseName + index)
+        GridItem() {
+          CourseComponent({ course: item })
+            .width('100%')
+            .margin({ bottom: index === 0 ? '8vp' : '0vp' });
+        }
+      }, (item: Course, index: number) => item.courseName + index);
     }
     .backgroundColor($r('sys.color.background_secondary'))
     .width('100%')
     .height('100%')
     .padding({ left: '16vp', right: '16vp', top: '12vp' })
+    .columnsTemplate('1fr '.repeat(new BreakpointType<number>({
+      sm: 1,
+      md: 2,
+      lg: 3,
+      xl: 3
+    }).getValue(this.homeVM.breakPointModel.currentBreakpoint)))
+    .columnsGap($r('app.float.vp_6'))
+    .rowsGap($r('app.float.vp_6'))
   }
 }
 
 @Builder
 export function FeaturedCoursesBuilder() {
-  FeaturedCourses()
+  FeaturedCourses();
 }

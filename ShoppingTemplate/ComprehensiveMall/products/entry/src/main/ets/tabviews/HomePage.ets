@@ -1,5 +1,5 @@
 import { LoadingStatus } from 'lib_foundation';
-import { NavTitleBar } from 'lib_widget';
+import { CommonSymbol, NavTitleBar } from 'lib_widget';
 import { HomePageContent } from '../components/HomePageContent';
 import { HomePageVM } from '../viewmodels/HomePageVM';
 
@@ -7,6 +7,10 @@ import { HomePageVM } from '../viewmodels/HomePageVM';
 export struct HomePage {
   private vm: HomePageVM = new HomePageVM();
   scroller: Scroller = new Scroller();
+  // 定义搜索框的最大高度
+  private readonly MAX_SEARCH_HEIGHT: number = 60;
+  // 控制搜索框区域的高度
+  @Local searchAreaHeight: number = this.MAX_SEARCH_HEIGHT;
 
   aboutToAppear(): void {
     this.vm.loadHomePage()
@@ -14,20 +18,7 @@ export struct HomePage {
 
   build(): void {
     Column() {
-      NavTitleBar({
-        title: '首页',
-        bgColor: this.vm.isTablet ? $r('app.color.background_color_transparent') :
-          $r('app.color.background_color_white'),
-      }) {
-        if (this.vm.isTablet) {
-          Blank()
-          this.buildSearchBar()
-        }
-      }
-
-      if (!this.vm.isTablet) {
-        this.buildSearchBar()
-      }
+      this.buildHeader()
 
       Refresh({
         refreshing: $$this.vm.isRefreshing,
@@ -63,15 +54,35 @@ export struct HomePage {
           .justifyContent(FlexAlign.Center)
           .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
         }
-        .nestedScroll({
-          scrollForward: NestedScrollMode.PARENT_FIRST,
-          scrollBackward: NestedScrollMode.SELF_FIRST,
-        })
         .scrollBar(BarState.Off)
-        .edgeEffect(EdgeEffect.Spring)
         .align(Alignment.Top)
         .layoutWeight(1)
         .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
+        .onDidScroll((xOffset: number, yOffset: number) => {
+          // 下拉刷新时保持展开
+          if (this.scroller.currentOffset().yOffset <= 0) {
+            this.searchAreaHeight = this.MAX_SEARCH_HEIGHT;
+            return;
+          }
+          if (this.scroller.currentOffset().yOffset > 100) {
+            this.searchAreaHeight = 0
+            return;
+          }
+
+          let newHeight = this.searchAreaHeight - yOffset;
+          if (newHeight < 0) {
+            newHeight = 0;
+          } else if (newHeight > this.MAX_SEARCH_HEIGHT) {
+            newHeight = this.MAX_SEARCH_HEIGHT;
+          }
+          this.searchAreaHeight = newHeight;
+        })
+        .onScrollStop(() => {
+          // 只有在非刷新状态，且高度处于中间状态时才触发吸附
+          if (this.scroller.currentOffset().yOffset > 0) {
+            this._snapSearchHeader();
+          }
+        })
       }
       .layoutWeight(1)
       .onStateChange((state) => {
@@ -86,15 +97,66 @@ export struct HomePage {
     .backgroundColor($r('app.color.background_color_grey'))
     .alignItems(HorizontalAlign.Start)
     .justifyContent(FlexAlign.Start)
+    .transition(TransitionEffect.OPACITY.animation({ duration: 600 }))
     .expandSafeArea([SafeAreaType.SYSTEM, SafeAreaType.CUTOUT], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM]);
+  }
+
+  @Builder
+  buildHeader() {
+    Column(){
+      Row() {
+        Text('首页')
+          .fontSize($r('sys.float.Title_M'))
+          .fontColor($r('app.color.font_color_level1'))
+          .fontWeight(FontWeight.Bold)
+        Blank()
+        if (this.vm.isTablet) {
+          this.buildSearchBar()
+        } else if (this.searchAreaHeight === 0) {
+          CommonSymbol({
+            src: $r('sys.symbol.magnifyingglass'),
+          })
+            .onClick(() => {
+              this.vm.jumpToSearchPage(this.getUIContext(), 'search')
+            })
+            .transition(TransitionEffect.OPACITY.animation({ duration: 600, curve: Curve.Ease }).combine(
+              TransitionEffect.move(TransitionEdge.END),
+            ))
+        }
+      }
+      .height($r('app.float.nav_header_height'))
+      .width('100%')
+    }
+    .backgroundColor(this.vm.isTablet ? $r('app.color.background_color_transparent') :
+      $r('app.color.background_color_primary'))
+    .expandSafeArea()
+    .padding({
+      left: $r('app.float.space_l'),
+      right: $r('app.float.space_l'),
+    })
+    .width('100%')
+
+    if (!this.vm.isTablet) {
+      Column() {
+        this.buildSearchBar()
+      }
+      .width('100%')
+      .height(this.searchAreaHeight)
+      .justifyContent(FlexAlign.Center)
+      // 容器整体透明度
+      .opacity(this.searchAreaHeight / this.MAX_SEARCH_HEIGHT)
+      .visibility(this.searchAreaHeight <= 0 ? Visibility.None : Visibility.Visible)
+      .backgroundColor($r('app.color.background_color_primary'))
+      .clip(true)
+    }
   }
 
   @Builder
   buildSearchBar() {
     Row() {
       Row() {
-        Image($r('app.media.ic_home_search'))
-          .width(16)
+        SymbolGlyph($r('sys.symbol.magnifyingglass'))
+          .fontColor([$r('app.color.font_color_level1')])
           .margin({
             right: $r('app.float.space_l'),
           })
@@ -130,15 +192,17 @@ export struct HomePage {
         this.vm.jumpToSearchPage(this.getUIContext(), 'search')
       })
 
-      Image($r('app.media.ic_scan'))
-        .width(40)
+      CommonSymbol({
+        src: $r('sys.symbol.line_viewfinder'),
+      })
         .onClick(() => {
           this.vm.jumpToScanPage()
         })
     }
     .width(this.vm.isTablet ? 400 : $r('app.string.size_percent_full'))
     .height(56)
-    .backgroundColor(this.vm.isTablet ? $r('app.color.background_color_grey') : $r('app.color.background_color_white'))
+    .backgroundColor(this.vm.isTablet ? $r('app.color.background_color_grey') :
+      $r('app.color.background_color_primary'))
     .alignItems(VerticalAlign.Center)
     .padding({
       left: $r('app.float.space_l'),
@@ -149,9 +213,7 @@ export struct HomePage {
   @Builder
   buildRefreshingContent() {
     Stack() {
-      if (this.vm.refreshStatus === RefreshStatus.Refresh) {
-        LoadingProgress().width($r('app.float.loading_icon_size'))
-      } else if (this.vm.refreshStatus === RefreshStatus.OverDrag) {
+      if (this.vm.refreshStatus === RefreshStatus.OverDrag) {
         Text('释放可刷新页面')
           .fontColor($r('sys.color.font_secondary'))
           .fontSize($r('sys.float.Body_M'))
@@ -170,6 +232,24 @@ export struct HomePage {
     .constraintSize({ minHeight: 32 })
     .width('100%')
     .backgroundColor($r('app.color.background_color_grey'))
+  }
+
+  private _snapSearchHeader() {
+    let targetHeight: number;
+    if (this.searchAreaHeight > this.MAX_SEARCH_HEIGHT / 2) {
+      targetHeight = this.MAX_SEARCH_HEIGHT; // 恢复展开
+    } else {
+      targetHeight = 0; // 完全收起
+    }
+    if (this.searchAreaHeight === targetHeight) {
+      return;
+    }
+    this.getUIContext().animateTo({
+      duration: 300,
+      curve: Curve.FastOutSlowIn,
+    }, () => {
+      this.searchAreaHeight = targetHeight;
+    })
   }
 }
 

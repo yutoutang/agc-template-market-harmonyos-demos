@@ -23,18 +23,18 @@ export struct TopBar {
   build() {
     Row() {
       Row() {
-        Image($r('app.media.chevron_backward'))
-          .width($r('app.float.vp_24'))
-          .height($r('app.float.vp_24'))
+        Image($r('app.media.ic_back'))
+          .width($r('app.float.vp_40'))
+          .height($r('app.float.vp_40'))
+          .borderRadius($r('app.float.vp_20'))
           .onClick(() => {
             this.onClickBack()
           })
       }
       .width($r('app.float.vp_40'))
       .height($r('app.float.vp_40'))
+      .borderRadius($r('app.float.vp_20'))
       .backgroundColor($r('sys.color.background_secondary'))
-      .padding($r('app.float.vp_8'))
-      .borderRadius($r('app.float.vp_40'))
 
       Text(this.title)
         .fontSize($r('sys.float.Title_S'))

@@ -98,7 +98,9 @@
 
    您如果跳过该项配置，仅会导致地址编辑页面的 '从华为账号导入' 按钮不可用。
 
-4. 引入组件。
+4. 智能填充服务（可选），需要[申请接入智能填充服务](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/scenario-fusion-introduction-to-smart-fill#section1167564853816)。
+
+5. 引入组件。
 
     ```
     import { AddressDTO, AddressVM, goToAddressListPage } from 'address_management';
@@ -112,16 +114,26 @@
 
 ### 接口
 
-**goToAddressListPage(navPathStack: NavPathStack, onAddressSelected?: (dto: AddressDTO) => void): void**
+**goToAddressListPage(navPathStack: NavPathStack, options?: AddressManagementOptions): void**
 
 前往地址列表页。
 
 **参数：**
 
-| 参数名               | 类型                                                                                                                              | 是否必填  | 说明               |
-|-------------------|---------------------------------------------------------------------------------------------------------------------------------|-------|------------------|
-| navPathStack      | [NavPathStack](https://developer.huawei.com/consumer/cn/doc/harmonyos-references/ts-basic-components-navigation#navpathstack10) | 是     | Navigation 导航控制器 |
-| onAddressSelected | (dto: [AddressDTO](#AddressDTO)) => void                                                                                        | 否     | 地址选择回调           |
+| 参数名          | 类型                                                                                                                              | 是否必填 | 说明               |
+|--------------|---------------------------------------------------------------------------------------------------------------------------------|------|------------------|
+| navPathStack | [NavPathStack](https://developer.huawei.com/consumer/cn/doc/harmonyos-references/ts-basic-components-navigation#navpathstack10) | 是    | Navigation 导航控制器 |
+| options      | [AddressManagementOptions](#AddressManagementOptions)                                                                           | 否    | 地址处理选项参数         |
+
+### AddressManagementOptions
+
+地址处理选项参数。
+
+| 字段名               | 类型                                       | 是否必填 | 说明       |
+|-------------------|------------------------------------------|------|----------|
+| onAddressSelected | (dto: [AddressDTO](#AddressDTO)) => void | 否    | 地址选择回调   |
+| updateAddress     | (dto: [AddressDTO](#AddressDTO)) => void | 否    | 地址内容更新回调 |
+| deleteAddress     | (dto: [AddressDTO](#AddressDTO)) => void | 否    | 地址删除回调   |
 
 ### AddressDTO
 
@@ -241,11 +253,13 @@ struct Index {
       Column() {
         Button('地址管理')
           .onClick(() => {
-            goToAddressListPage(this.navPathStack, (dto: AddressDTO): void => {
-              const address: AddressVM = new AddressVM(dto);
-              this.getUIContext().getPromptAction().showToast({
-                message: `${address.name}  |  ${address.phone}  |  ${address.fullAddress}`
-              });
+            goToAddressListPage(this.navPathStack, {
+              onAddressSelected: (dto: AddressDTO): void => {
+                const address: AddressVM = new AddressVM(dto);
+                this.getUIContext().getPromptAction().showToast({
+                  message: `${address.name}  |  ${address.phone}  |  ${address.fullAddress}`
+                });
+              }
             });
           })
       }

@@ -1,14 +1,16 @@
 import { window } from '@kit.ArkUI';
-import { BusinessError } from '@kit.BasicServicesKit'
-import { WindowUtil } from 'module_ui_base';
+import { BusinessError } from '@kit.BasicServicesKit';
 import { UtilLog } from '@hw-agconnect/util-log';
-import { CommonConstants, LOG_TAG } from '../common/Constants';
+import { CommonConstants } from '../common/Constants';
+
+const TAG = '[ShareConfigModel]';
 
 @ObservedV2
 export class ShareConfigModel {
   @Trace sheetType: SheetType = SheetType.BOTTOM;
   @Trace windowBottomPadding: number = 0;
   @Trace isLayoutFullScreen: boolean = false;
+  @Trace uiContext: UIContext | undefined = undefined;
 
   @Computed
   get bottomPadding() {
@@ -18,77 +20,69 @@ export class ShareConfigModel {
     return CommonConstants.PADDING_L;
   }
 
-  private async _getLastWindow() {
-    return window.getLastWindow(WindowUtil.context).then((win) => {
-      return win
-    }).catch((err: BusinessError) => {
-      UtilLog.error(LOG_TAG, 'get last window failed. error: ' + JSON.stringify(err))
-      return undefined
-    })
-  }
-
   /**
    * 主动获取底部避让区域高度
    */
   public queryWindowBottomPadding: () => void = () => {
-    this._getLastWindow().then(currentWindow => {
-      if (!currentWindow) {
-        return;
-      }
-      try {
+    try {
+      window.getLastWindow(this.uiContext?.getHostContext()).then(currentWindow => {
         const area = currentWindow.getWindowAvoidArea(window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR);
-        this.windowBottomPadding = WindowUtil.px2vp(area.bottomRect.height);
-      } catch (err) {
-        UtilLog.error(LOG_TAG, 'get window avoid area failed. error: ' + JSON.stringify(err))
-      }
-    })
-  }
+        this.windowBottomPadding = this.uiContext?.px2vp(area.bottomRect.height) ?? 0;
+      }).catch((e: BusinessError) => {
+        UtilLog.error(TAG, 'getLastWindow fail, error: ' + JSON.stringify(e));
+      });
+    } catch (e) {
+      UtilLog.error(TAG, 'getWindowAvoidArea fail, error: ' + JSON.stringify(e));
+    }
+  };
   /**
    * 监听avoidAreaChange的回调函数
    * @param options
    */
   private setWindowBottomPadding: (options: window.AvoidAreaOptions) => void = (options: window.AvoidAreaOptions) => {
     if (options.type === window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR) {
-      this.windowBottomPadding = WindowUtil.px2vp(options.area.bottomRect.height)
+      this.windowBottomPadding = this.uiContext?.px2vp(options.area.bottomRect.height) ?? 0;
     }
-  }
+  };
 
   /**
    * 监听底部避让区域变化
    */
-  public registerWindowBottomPadding() {
+  public registerWindowBottomPadding(uiContext: UIContext) {
+    this.uiContext = uiContext;
     this.queryWindowBottomPadding();
-    this._getLastWindow().then(currentWindow => {
-      if (!currentWindow) {
-        return;
-      }
+    window.getLastWindow(uiContext.getHostContext()).then(currentWindow => {
       currentWindow.on('avoidAreaChange', this.setWindowBottomPadding);
-    })
+    }).catch((e: BusinessError) => {
+      UtilLog.error(TAG, 'getLastWindow fail, error: ' + JSON.stringify(e));
+    });
   }
 
   /**
    * 取消监听底部避让区域变化
    */
-  public unRegisterWindowBottomPadding() {
-    this._getLastWindow().then(currentWindow => {
-      if (!currentWindow) {
-        return;
-      }
+  public unRegisterWindowBottomPadding(uiContext: UIContext) {
+    this.uiContext = uiContext;
+    window.getLastWindow(uiContext.getHostContext()).then(currentWindow => {
       currentWindow.off('avoidAreaChange', this.setWindowBottomPadding);
-    })
+    }).catch((e: BusinessError) => {
+      UtilLog.error(TAG, 'getLastWindow fail, error: ' + JSON.stringify(e));
+    });
   }
 
   /**
    * 还原应用窗口模式
    */
-  public restoreWindowLayout() {
-    this._getLastWindow().then(currentWindow => {
-      if (!currentWindow) {
-        return;
-      }
-      currentWindow.setWindowLayoutFullScreen(this.isLayoutFullScreen).catch((err: BusinessError) => {
-        UtilLog.error(LOG_TAG, 'set window layout full screen failed. error: ' + JSON.stringify(err))
-      })
-    })
+  public restoreWindowLayout(uiContext: UIContext | undefined) {
+    if (!uiContext) {
+      return;
+    }
+    window.getLastWindow(uiContext.getHostContext()).then(currentWindow => {
+      currentWindow.setWindowLayoutFullScreen(this.isLayoutFullScreen).catch((e: BusinessError) => {
+        UtilLog.error(TAG, 'setWindowLayoutFullScreen fail, error: ' + JSON.stringify(e));
+      });
+    }).catch((e: BusinessError) => {
+      UtilLog.error(TAG, 'getLastWindow fail, error: ' + JSON.stringify(e));
+    });
   }
 }

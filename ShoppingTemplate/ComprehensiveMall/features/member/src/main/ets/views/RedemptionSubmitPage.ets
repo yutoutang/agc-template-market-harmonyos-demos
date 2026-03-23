@@ -18,6 +18,7 @@ struct RedemptionSubmitPage {
       NavTitleBar({
         title: '确认订单',
         titleColor: $r('app.color.font_color_level1_invert'),
+        arrowColor: $r('app.color.font_color_level1_invert'),
       })
       Scroll() {
         Column() {
@@ -37,7 +38,7 @@ struct RedemptionSubmitPage {
     }
     .hideTitleBar(true)
     .linearGradient({
-      colors: [[0xFFE64566, 0.1], [0x00f1f3f5, 0.5]],
+      colors: [[$r('app.color.theme_color'), 0.1], [$r('app.color.background_color_grey'), 0.5]],
     })
     .onReady((context) => {
       this.vm.product = context.pathInfo.param as UserPointRedemptionSku | undefined;
@@ -145,7 +146,7 @@ struct RedemptionSubmitPage {
     }
     .width('100%')
     .justifyContent(FlexAlign.End)
-    .backgroundColor($r('app.color.background_color_white'))
+    .backgroundColor($r('app.color.background_color_primary'))
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
     .padding({
       top: 12,

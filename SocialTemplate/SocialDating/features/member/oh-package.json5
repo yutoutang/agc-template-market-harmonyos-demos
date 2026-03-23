@@ -6,7 +6,8 @@
   "author": "",
   "license": "",
   "dependencies": {
-    "commons": "file:../../commons"
+    "commons": "file:../../commons",
+    "membership": "file:../../components/membership"
   }
 }
 

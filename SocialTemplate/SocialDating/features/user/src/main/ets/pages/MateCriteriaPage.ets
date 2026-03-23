@@ -16,7 +16,7 @@ import {
   EnumRow,
   RangeRow,
 } from './UserSearchPage';
-import { PromptAction } from '@kit.ArkUI';
+import { PromptAction, UIContext } from '@kit.ArkUI';
 import Logger from 'commons/src/main/ets/utils/Logger';
 import { EnumField } from '../model/EnumField';
 import UserService from '../service/UserService';
@@ -27,12 +27,15 @@ export function MateCriteriaPageBuilder() {
 }
 
 @Preview
-@Component
+@ComponentV2
 export struct MateCriteriaPage {
-  @Consume('pageStack') pageStack: NavPathStack;
-  @State userFullInfo: UserFullInfo | null = null;
-  @State mateCriteria: MateSelectionCriteria | null = null;
-  private promptAction: PromptAction = this.getUIContext().getPromptAction();
+  @Consumer('pageStack') pageStack: NavPathStack = new NavPathStack();
+  @Local userFullInfo: UserFullInfo | null = null;
+  @Local mateCriteria: MateSelectionCriteria | null = null;
+  @Local currentResidence: string = '';
+  @Local originFrom: string = '';
+  @Local ethnicGroup: string = '';
+  private uiContext: UIContext = this.getUIContext()
 
   aboutToAppear(): void {
     let params: UserFullInfo[] = this.pageStack.getParamByName('MateCriteriaPage') as UserFullInfo[];
@@ -121,7 +124,8 @@ export struct MateCriteriaPage {
     if (this.mateCriteria != null) {
       return checkAgeRangeAndHeightRange(this.mateCriteria.ageStart, this.mateCriteria.ageEnd,
         this.mateCriteria.heightStart,
-        this.mateCriteria.heightEnd, this.promptAction, getContext(this).resourceManager);
+        this.mateCriteria.heightEnd, this.uiContext.getPromptAction(),
+        this.uiContext.getHostContext()!.resourceManager);
     }
     return false;
   }
@@ -210,22 +214,25 @@ export struct MateCriteriaPage {
     Row() {
       this.buildItemTitle('现居地')
 
-      Text((this.mateCriteria == null || this.mateCriteria.currentResidence === undefined) ? '' :
-        `${this.mateCriteria.currentResidence}`)
+      Text(`${this.currentResidence}`)
         .fontSize($r('sys.float.Body_M'))
         .width('50%')
         .textAlign(TextAlign.End)
         .textOverflow({ overflow: TextOverflow.MARQUEE })
 
       Image($r('app.media.ic_right_arrow')).width(24).height(24).margin({ left: 10 })
-    }.width('92%').height('6%').onClick(() => {
-      TextPickerDialog.show(buildTextPickerDialogOption(
+    }
+    .width('92%')
+    .height('6%')
+    .onClick(() => {
+      this.getUIContext().showTextPickerDialog(buildTextPickerDialogOption(
         Constants.CITY_PICKER,
         (result: TextPickerResult) => {
           let newResidence = getPicResult(result);
           if (this.mateCriteria != null) {
             let tmp = this.mateCriteria.currentResidence;
             this.mateCriteria.currentResidence = this.appendSelectValue(tmp, newResidence)
+            this.currentResidence = this.mateCriteria.currentResidence as string
           }
         }
       ))
@@ -251,21 +258,21 @@ export struct MateCriteriaPage {
     Row() {
       this.buildItemTitle(Constants.ETHNIC_GROUP_PREFIX)
 
-      Text(this.mateCriteria == null || this.mateCriteria.ethnicGroup === undefined ? '' :
-        `${this.mateCriteria.ethnicGroup}`)
+      Text(`${this.ethnicGroup}`)
         .fontSize($r('sys.float.Body_M'))
         .width('50%')
         .textAlign(TextAlign.End)
 
       Image($r('app.media.ic_right_arrow')).width(24).height(24).margin({ left: 10 })
     }.width('92%').height('6%').onClick(() => {
-      TextPickerDialog.show(buildTextPickerDialogOption(
+      this.getUIContext().showTextPickerDialog(buildTextPickerDialogOption(
         Constants.ETHNIC_GROUPS,
         (result: TextPickerResult) => {
           if (typeof result.value === 'string') {
             if (this.mateCriteria != null) {
               let tmp = this.mateCriteria.ethnicGroup;
               this.mateCriteria.ethnicGroup = this.appendSelectValue(tmp, result.value);
+              this.ethnicGroup = this.mateCriteria.ethnicGroup as string
             }
           }
         }
@@ -280,7 +287,7 @@ export struct MateCriteriaPage {
         '1fr 1fr', '1fr 1fr', 90, (result: CheckboxGroupResult) => {
           if (this.mateCriteria != null) {
             this.mateCriteria.drinking =
-              assembleSelectedResult(result, Constants.DRINKING_DISPLAY_VALUES, this.getUIContext());
+              assembleSelectedResult(result, Constants.DRINKING_DISPLAY_VALUES, this.uiContext);
           }
         }),
       selectedVal: this.mateCriteria?.drinking
@@ -295,7 +302,7 @@ export struct MateCriteriaPage {
         '1fr', '1fr 1fr 1fr 1fr', 45, (result: CheckboxGroupResult) => {
           if (this.mateCriteria != null) {
             this.mateCriteria.marriageStatus =
-              assembleSelectedResult(result, Constants.MARRIAGE_STATUS_DISPLAY_VALUES, this.getUIContext());
+              assembleSelectedResult(result, Constants.MARRIAGE_STATUS_DISPLAY_VALUES, this.uiContext);
           }
         }),
       selectedVal: this.mateCriteria?.marriageStatus
@@ -309,7 +316,7 @@ export struct MateCriteriaPage {
         '1fr 1fr 1fr 1fr 1fr 1fr 1fr', '1fr 1fr', 240, (result: CheckboxGroupResult) => {
           if (this.mateCriteria != null) {
             this.mateCriteria.job =
-              assembleSelectedResult(result, Constants.WORK_DISPLAY_VALUES, this.getUIContext());
+              assembleSelectedResult(result, Constants.WORK_DISPLAY_VALUES, this.uiContext);
           }
         }),
       selectedVal: this.mateCriteria?.job
@@ -324,7 +331,7 @@ export struct MateCriteriaPage {
         '1fr 1fr 1fr', '1fr 1fr', 90, (result: CheckboxGroupResult) => {
           if (this.mateCriteria != null) {
             this.mateCriteria.hasChildren =
-              assembleSelectedResult(result, Constants.HAS_CHILDREN_DISPLAY_VALUES, this.getUIContext());
+              assembleSelectedResult(result, Constants.HAS_CHILDREN_DISPLAY_VALUES, this.uiContext);
           }
         }),
       selectedVal: this.mateCriteria?.hasChildren
@@ -339,7 +346,7 @@ export struct MateCriteriaPage {
         '1fr 1fr', '1fr 1fr', 90, (result: CheckboxGroupResult) => {
           if (this.mateCriteria != null) {
             this.mateCriteria.expectationOfChildren =
-              assembleSelectedResult(result, Constants.EXPECTATION_OF_CHILDREN_DISPLAY_VALUES, this.getUIContext());
+              assembleSelectedResult(result, Constants.EXPECTATION_OF_CHILDREN_DISPLAY_VALUES, this.uiContext);
           }
         }),
       selectedVal: this.mateCriteria?.expectationOfChildren
@@ -353,7 +360,7 @@ export struct MateCriteriaPage {
         '1fr 1fr', '1fr 1fr', 90, (result: CheckboxGroupResult) => {
           if (this.mateCriteria != null) {
             this.mateCriteria.smoking =
-              assembleSelectedResult(result, Constants.SMOKING_DISPLAY_VALUES, this.getUIContext());
+              assembleSelectedResult(result, Constants.SMOKING_DISPLAY_VALUES, this.uiContext);
           }
         }),
       selectedVal: this.mateCriteria?.smoking
@@ -367,7 +374,7 @@ export struct MateCriteriaPage {
         '1fr 1fr', '1fr 1fr 1fr', 90, (result: CheckboxGroupResult) => {
           if (this.mateCriteria != null) {
             this.mateCriteria.education =
-              assembleSelectedResult(result, Constants.EDU_FOR_SEARCH_DISPLAY_VALUES, this.getUIContext());
+              assembleSelectedResult(result, Constants.EDU_FOR_SEARCH_DISPLAY_VALUES, this.uiContext);
           }
         }),
       selectedVal: this.mateCriteria?.education
@@ -382,7 +389,7 @@ export struct MateCriteriaPage {
         '1fr 1fr', '1fr 1fr 1fr', 90, (result: CheckboxGroupResult) => {
           if (this.mateCriteria != null) {
             this.mateCriteria.monthlyIncome =
-              assembleSelectedResult(result, Constants.INCOME_FOR_SEARCH_DISPLAY_VALUES, this.getUIContext());
+              assembleSelectedResult(result, Constants.INCOME_FOR_SEARCH_DISPLAY_VALUES, this.uiContext);
           }
         }),
       selectedVal: this.mateCriteria?.monthlyIncome
@@ -394,7 +401,7 @@ export struct MateCriteriaPage {
     Row() {
       this.buildItemTitle('籍贯地')
 
-      Text(this.mateCriteria == null ? '' : `${this.mateCriteria.originFrom}`)
+      Text(`${this.originFrom}`)
         .fontSize($r('sys.float.Body_M'))
         .width('50%')
         .textAlign(TextAlign.End)
@@ -402,7 +409,7 @@ export struct MateCriteriaPage {
 
       Image($r('app.media.ic_right_arrow')).width(24).height(24).margin({ left: 10 })
     }.width('92%').height('6%').onClick(() => {
-      TextPickerDialog.show(buildTextPickerDialogOption(
+      this.getUIContext().showTextPickerDialog(buildTextPickerDialogOption(
         Constants.CITY_PICKER,
         (result: TextPickerResult) => {
           let newResidence = getPicResult(result);
@@ -410,6 +417,7 @@ export struct MateCriteriaPage {
           if (this.mateCriteria != null) {
             let tmp = this.mateCriteria.originFrom;
             this.mateCriteria.originFrom = this.appendSelectValue(tmp, newResidence)
+            this.originFrom = this.mateCriteria.originFrom as string
           }
         }
       ))

@@ -1,4 +1,4 @@
-import { BaseTitle } from './basic/BaseTitle';
+import { CommonSymbol, NavTitleBar } from 'lib_widget';
 
 @ComponentV2
 export struct CartPageHeader {
@@ -9,44 +9,37 @@ export struct CartPageHeader {
   // 是否编辑态
   @Param isEdit: boolean = false;
   // 切换编辑的回调
-  @Event changeEdit: () => void = () => {};
+  @Event changeEdit: () => void = () => {
+  };
   // 作为子页面时，返回事件回调
-  @Event onBack: () => void = () => {};
+  @Event onBack: () => void = () => {
+  };
 
-  @Builder
-  titleContentView() {
-    Row() {
-      Text('购物车')
-        .fontSize(this.isChildRoute ? $r('sys.float.Title_S') : $r('sys.float.Title_M'))
-        .fontColor($r('sys.color.font_primary'))
-        .fontWeight(FontWeight.Bold)
-
+  build() {
+    NavTitleBar({
+      title: '购物车',
+      bgColor: $r('app.color.background_color_grey'),
+    }) {
       if (this.showEdit) {
-        Column() {
-          Text(this.isEdit ? '退出管理' : '管理')
-            .fontColor($r('sys.color.mask_secondary'))
-            .fontSize(14)
+        Row() {
+          if (this.isEdit) {
+            CommonSymbol({
+              src: $r('sys.symbol.checkmark'),
+            })
+              .transition(TransitionEffect.OPACITY.animation({ duration: 200, curve: Curve.Ease }))
+          } else {
+            CommonSymbol({
+              src: $r('sys.symbol.square_and_pencil'),
+            })
+              .transition(TransitionEffect.OPACITY.animation({ duration: 200, curve: Curve.Ease }))
+          }
         }
-        .justifyContent(FlexAlign.Center)
+        .layoutWeight(1)
+        .justifyContent(FlexAlign.End)
         .onClick(() => {
           this.changeEdit();
         })
       }
     }
-    .width('100%')
-    .height('100%')
-    .padding({left: this.isChildRoute ? 0 : 12, right: 12})
-    .justifyContent(FlexAlign.SpaceBetween)
-  }
-  build() {
-    BaseTitle({
-      showBackBtn: this.isChildRoute,
-      onBack: () => {
-        this.onBack && this.onBack();
-      },
-      titleContentBuilder: () => {
-        this.titleContentView();
-      },
-    })
   }
 }

@@ -25,7 +25,7 @@ export struct ContainerColumn {
     .alignItems(HorizontalAlign.Center)
     .justifyContent(FlexAlign.Center)
     .margin({ bottom: this.bottomGap ? $r('app.float.space_m') : 0 })
-    .backgroundColor($r('app.color.background_color_white'))
+    .backgroundColor($r('app.color.background_color_primary'))
     .borderRadius($r('app.float.border_radius_l'))
     .width($r('app.string.size_percent_full'))
     .padding($r('app.float.space_m'))

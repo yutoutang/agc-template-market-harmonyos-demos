@@ -1,4 +1,4 @@
-import { RequestUrlMap } from '../../constants/Enums';
+import { RequestUrlMap } from '../../constants/RequestUrlMap';
 import {
   PreOrderInfoReq, OrderCreateReq, OrderUpdateReq, OrderReviewReq,
 } from '../../types/RequestTypes';
@@ -54,7 +54,7 @@ class OrderApis {
   public async getExpressInfo(orderId: string): Promise<OrderExpressResp> {
     return request.get(RequestUrlMap.ORDER_EXPRESS, {
       params: { orderId },
-    })
+    });
   }
 
   /**

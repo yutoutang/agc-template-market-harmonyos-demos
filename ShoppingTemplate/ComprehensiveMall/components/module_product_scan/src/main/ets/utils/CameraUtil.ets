@@ -237,7 +237,7 @@ class CameraUtil {
       };
       await this.photoOutput?.capture(photoSettings);
     } catch (err) {
-      Logger.error(TAG, 'take picture failed. error:' + SafeJson.jsonStringify(err))
+      Logger.error(TAG, 'take picture failed. error:' + SafeJson.jsonStringify(err));
     }
     Logger.info(TAG, 'takePicture end');
   }
@@ -677,7 +677,7 @@ class CameraUtil {
       }
       this.session?.setFocusMode(focusMode);
     } catch (err) {
-      Logger.error(TAG, 'set focus mode failed. error:' + SafeJson.jsonStringify(err))
+      Logger.error(TAG, 'set focus mode failed. error:' + SafeJson.jsonStringify(err));
     }
   }
 }

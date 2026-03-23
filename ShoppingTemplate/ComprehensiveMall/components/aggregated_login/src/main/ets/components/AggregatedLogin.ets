@@ -1,13 +1,10 @@
-import * as wxopensdk from '@tencent/wechat_open_sdk';
-import { BusinessError } from '@kit.BasicServicesKit';
 import { loginComponentManager, LoginWithHuaweiIDButton } from '@kit.AccountKit';
 import { Constants, LoginChannelType } from '../common/Constant';
 import { AggregatedLoginVM } from '../viewmodel/AggregatedLoginVM';
-import { Channel, PrivacyContent } from '../model/Index';
+import { Channel, LoginFailError, PrivacyContent } from '../model/Index';
 import { LoginController, ApiController, LoginEventDispatcher } from '../utils/Utils';
 import { AgreePrivacyBox } from './AgreePrivacyBox';
 import { LoginSheetUtils } from '../utils/LoginSheetUtils';
-import { WindowUtil } from 'module_ui_base';
 
 
 @Builder
@@ -18,7 +15,6 @@ export function AggregatedLoginBuilder() {
 @ComponentV2
 export struct AggregatedLogin {
   @Local vm: AggregatedLoginVM = AggregatedLoginVM.getInstance(false);
-  @Param wxApi: wxopensdk.WXApi = wxopensdk.WXAPIFactory.createWXAPI('xxx')
   @Param routerModule: NavPathStack = new NavPathStack()
   @Param icon: ResourceStr = '';
   @Param themeColor: ResourceColor = '#0A59F7';
@@ -31,24 +27,23 @@ export struct AggregatedLogin {
     () => new Promise(() => {
     }), () => new Promise(() => {
   }), () => new Promise(() => {
-  }),
+  })
   )
   @Param loginController: LoginController = new LoginController();
-  @Event handleLoginFail: (loginChannelType: LoginChannelType, error: BusinessError | wxopensdk.BaseResp) => void =
-    () => {
-    }
-  @Event obtainVerifyCode: () => Promise<void> = () => new Promise(() => {
+  @Event handleLoginFail: (loginChannelType: LoginChannelType, error: LoginFailError) => void =
+    () => {}
+  @Event obtainVerifyCode: (phone: string) => Promise<void> = () => new Promise(() => {
   });
 
   aboutToAppear(): void {
-    WindowUtil.initWindowUtil(this.getUIContext())
+    this.vm.themeColor = this.themeColor;
     this.vm.getQuickLoginAnonymousPhone();
     LoginEventDispatcher.loginFailCallback =
-      (loginChannelType: LoginChannelType, error: BusinessError | wxopensdk.BaseResp) => {
+      (loginChannelType: LoginChannelType, error: LoginFailError) => {
         this.handleLoginFail(loginChannelType, error)
       }
-    this.vm.setValue(this.wxApi, this.isSheet, this.autoSheet,
-      this.loginTypes, this.isPersistence, this.apiController, this.obtainVerifyCode)
+    this.vm.setValue(this.isSheet, this.autoSheet, this.isPersistence, this.apiController, this.getUIContext(),
+      this.obtainVerifyCode)
     this.loginController.clearLoginInfo = () => {
       this.vm.resetInstance()
     }
@@ -69,7 +64,7 @@ export struct AggregatedLogin {
             Column()
               .layoutWeight(1)
               .constraintSize({
-                minHeight: Constants.MIN_HEIGHT_8,
+                minHeight: Constants.MIN_HEIGHT_8
               })
           }
 
@@ -176,7 +171,7 @@ export struct AggregatedLogin {
     .backgroundColor($r('sys.color.background_secondary'))
     .padding({
       left: Constants.PADDING_L, right: Constants.PADDING_L,
-      bottom: this.isSheet ? Constants.WINDOW_BOTTOM_PADDING : Constants.ZERO,
+      bottom: this.isSheet ? Constants.WINDOW_BOTTOM_PADDING : Constants.ZERO
     })
     .layoutWeight(1)
   }

@@ -1,9 +1,10 @@
 import {
   common, ConfigurationConstant, EnvironmentCallback,
 } from '@kit.AbilityKit';
-import { BusinessError } from '@kit.BasicServicesKit'
+import { BusinessError } from '@kit.BasicServicesKit';
 import { notificationManager } from '@kit.NotificationKit';
-import { ToastDialog as promptAction, ToastDialog } from '@hw-agconnect/ui-toast'
+import { Logger } from 'module_ui_base';
+import { ToastDialog as promptAction, ToastDialog } from '@hw-agconnect/ui-toast';
 import { AppGalleryUtils } from '../common/AppGalleryUtils';
 import { FileUtils } from '../common/FileUtils';
 import { CommonConfirmDialog } from '../components/CommonConfirmDialog';
@@ -17,7 +18,6 @@ import { SettingItem, SettingGroup } from '../types/SettingItem';
 import {
   SettingPageEnum, SettingType, SupportedSetting,
 } from '../types/SettingType';
-import { Logger } from 'module_ui_base';
 
 const TAG = '[SettingViewModel]';
 
@@ -73,7 +73,7 @@ export class SettingViewModel extends BaseViewModel {
 
   handlePush(item: SettingItem) {
     try {
-      const isOn = notificationManager.isNotificationEnabledSync()
+      const isOn = notificationManager.isNotificationEnabledSync();
       item
         .setType(SettingType.SWITCH)
         .setLabel(item.label ?? '通知开关')
@@ -83,12 +83,12 @@ export class SettingViewModel extends BaseViewModel {
           notificationManager.openNotificationSettings(
             this.uiContext?.getHostContext() as common.UIAbilityContext,
           ).catch((err: BusinessError) => {
-            Logger.error(LOG_TAG, 'set notification status failed. error:' + JSON.stringify(err))
+            Logger.error(LOG_TAG, 'set notification status failed. error:' + JSON.stringify(err));
 
-          })
+          });
         });
     } catch (err) {
-      Logger.error(LOG_TAG, 'get notification status failed. error:' + JSON.stringify(err))
+      Logger.error(LOG_TAG, 'get notification status failed. error:' + JSON.stringify(err));
     }
 
   }
@@ -133,7 +133,7 @@ export class SettingViewModel extends BaseViewModel {
         ?.getApplicationContext()
           .setColorMode(colorMode);
       } catch (err) {
-        Logger.error(LOG_TAG, 'set color mode failed. error: ' + JSON.stringify(err))
+        Logger.error(LOG_TAG, 'set color mode failed. error: ' + JSON.stringify(err));
       }
     }
 
@@ -153,7 +153,7 @@ export class SettingViewModel extends BaseViewModel {
             item.onChange(colorMode);
           }
         } catch (err) {
-          Logger.error(LOG_TAG, 'set color mode failed. error: ' + JSON.stringify(err))
+          Logger.error(LOG_TAG, 'set color mode failed. error: ' + JSON.stringify(err));
         }
       });
   }
@@ -261,7 +261,7 @@ export class SettingViewModel extends BaseViewModel {
         });
       });
     } catch (err) {
-      Logger.error(LOG_TAG, 'get notification status failed. error:' + JSON.stringify(err))
+      Logger.error(LOG_TAG, 'get notification status failed. error:' + JSON.stringify(err));
     }
   }
 

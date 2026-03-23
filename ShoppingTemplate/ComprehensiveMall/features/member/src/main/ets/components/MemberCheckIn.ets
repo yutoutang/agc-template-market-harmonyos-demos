@@ -15,7 +15,7 @@ export struct MemberCheckIn {
   build() {
     Column({ space: 16 }) {
       Row() {
-        Text('签到7天 赚积分')
+         Text('签到7天 赚积分')
           .fontColor($r('app.color.font_color_level1'))
           .fontWeight(FontWeight.Bold)
         Text() {
@@ -35,7 +35,7 @@ export struct MemberCheckIn {
             Stack({ alignContent: Alignment.Bottom }) {
               Image(index < this.checkedDays ? $r('app.media.ic_checked_bg') : $r('app.media.ic_check_bg'))
                 .width('100%')
-                .opacity(index < this.checkedDays ? 0.4 : 1)
+                .opacity(index < this.checkedDays ? 0.6 : 1)
               Text(points.toString())
                 .fontSize($r('app.float.font_size_12'))
                 .fontColor($r('app.color.font_color_level1_invert'))
@@ -62,8 +62,6 @@ export struct MemberCheckIn {
     .constraintSize({ maxWidth: 720 })
     .borderRadius($r('app.float.border_radius_l'))
     .padding($r('app.float.space_m'))
-    .linearGradient({
-      colors: [['#FEE0F8', 0], ['#ffffff', 0.4]],
-    })
+    .backgroundColor($r('app.color.background_color_primary'))
   }
 }

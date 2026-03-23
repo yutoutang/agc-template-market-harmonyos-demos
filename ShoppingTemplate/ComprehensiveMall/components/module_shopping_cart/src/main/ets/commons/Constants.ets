@@ -6,4 +6,4 @@ export enum LoadingStatus {
   FAILED = 'failed',
 }
 
-export const LOG_TAG:string = '[ShoppingCart]'
+export const LOG_TAG:string = '[ShoppingCart]';

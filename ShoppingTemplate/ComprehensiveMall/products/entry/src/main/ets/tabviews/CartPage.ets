@@ -1,17 +1,16 @@
-import { ToastDialog } from '@hw-agconnect/ui-toast';
 import {
-  iData, routerStack, RouterMap, Style,
+  iData, routerStack, RouterMap, ProductInfoPageParam, WindowUtil,
 } from 'lib_foundation';
-import { PreOrderInfoReq, PreOrderItem } from 'lib_network';
-import { Product, ShoppingCart } from 'module_shopping_cart';
+import { CartProductInfo, PreOrderInfoReq, PreOrderItem, PriceType } from 'lib_network';
+import { ShoppingCart } from 'module_shopping_cart';
 import { ProductWaterFlow } from 'product';
-import { CartPageVM } from '../viewmodels/CartPageVM';
+import { ShoppingCartVM } from '../viewmodels/CartPageVM';
 
 @ComponentV2
 struct CartPage {
   @Param
   public pageName?: string = undefined;
-  private vm: CartPageVM = new CartPageVM()
+  private vm: ShoppingCartVM = new ShoppingCartVM()
   @Local isChildRoute: boolean = false;
 
   aboutToAppear(): void {
@@ -19,9 +18,9 @@ struct CartPage {
     this.vm.isSubPage = this.isChildRoute;
   }
 
-  private handleCheckout(list: Product[]): void {
+  private handleCheckout(list: CartProductInfo[]): void {
     if (!list.length) {
-      ToastDialog.showToast({ message: '您还没有选择商品' });
+      WindowUtil.toast('您还没有选择商品')
       return;
     }
     const orders: PreOrderItem[] = [];
@@ -29,7 +28,15 @@ struct CartPage {
       const preOrderItem: PreOrderItem = {
         skuCode: product.skuCode,
         count: product.count,
+        priceType: product.priceType,
       };
+      if (product.priceType === PriceType.SECKILL && product.slotId) {
+        preOrderItem.seckillInfo = {
+          slotId: product.slotId,
+          productId: product.productId,
+          seckillPrice: product.price,
+        }
+      }
       orders.push(preOrderItem);
     }
     const preOrderRequest: PreOrderInfoReq = {
@@ -55,22 +62,26 @@ struct CartPage {
             this.vm.global.isLogin = iData.global.isLogin;
           });
         },
-        onCardClick: (id: string) => {
+        onCardClick: (id: string, slotId?: string) => {
           // 点击购物车卡片
           routerStack.pushPath({
             name: RouterMap.PRODUCT_INFO,
-            param: id,
+            param: {
+              productId: id,
+              slotId,
+            } as ProductInfoPageParam,
           });
         },
         onBack: () => {
           routerStack.pop();
         },
-        onCheckout: (selectedGoodList: Product[]) => {
+        onCheckout: (selectedGoodList: CartProductInfo[]) => {
           // 结算逻辑
           this.handleCheckout(selectedGoodList);
         },
       })
     }
+    .transition(TransitionEffect.OPACITY.animation({ duration: 600 }))
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background_color_grey'))
     .onShown(() => {
@@ -89,11 +100,11 @@ struct CartPage {
     buildSpecialDivider();
     Column() {
       ProductWaterFlow({
-        bgColor: Style.BACKGROUND_COLOR_GREY,
+        bgColor: $r('app.color.background_color_grey'),
         handleProductClick: (id) => {
           routerStack.pushPath({
             name: RouterMap.PRODUCT_INFO,
-            param: id,
+            param: { productId: id } as ProductInfoPageParam,
           });
         },
       })
@@ -133,7 +144,7 @@ function buildSpecialDivider() {
       })
     Text('推荐商品')
       .fontSize(15)
-      .fontColor('#E6000000')
+      .fontColor($r('app.color.font_color_level1'))
       .margin({ left: 15, right: 15 })
     Column()
       .width(7)

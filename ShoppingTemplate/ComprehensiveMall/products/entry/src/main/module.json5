@@ -14,6 +14,9 @@
     "requestPermissions": [
       {
         "name": "ohos.permission.INTERNET"
+      },
+      {
+        "name": "ohos.permission.DETECT_GESTURE"
       }
     ],
     "metadata": [
@@ -40,17 +43,29 @@
           "fullscreen",
           "floating"
         ],
+        "metadata": [
+          {
+            "name": "ohos.ability.shortcuts",
+            "resource": "$profile:shortcuts_config"
+          }
+        ],
         "startWindowIcon": "$media:app_icon",
         "startWindowBackground": "$color:start_window_background",
         "exported": true,
         "skills": [
           {
             "entities": [
-              "entity.system.home",
+              "entity.system.home"
+            ],
+            "actions": [
+              "ohos.want.action.home"
+            ]
+          },
+          {
+            "entities": [
               "entity.system.browser"
             ],
             "actions": [
-              "action.system.home",
               "wxentity.action.open",
               "ohos.want.action.viewData"
             ],
@@ -61,6 +76,12 @@
 // todo 填写业务申请的QQ互联AppId，如果填错会导致QQ无法回调
                 "host": "102061317",
                 "pathRegex": "\\b(auth|share)\\b"
+              },
+              {
+                "scheme": "https",
+// todo host配置为App Linking关联的网址域名
+                "host": "linking.xiaobingtang.cn",
+                "pathRegex": "comprehensive-mall(/.*)?"
               }
             ],
             "domainVerify": true

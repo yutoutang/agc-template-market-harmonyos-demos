@@ -1,15 +1,12 @@
-import { BusinessError } from '@kit.BasicServicesKit';
-import * as wxopensdk from '@tencent/wechat_open_sdk';
 import { LoginChannelType } from '../common/Constant';
-import { LoginParams } from '../model/Index';
+import { LoginFailError, LoginParams } from '../model/Index';
 
 export class LoginEventDispatcher {
 
-  static loginFailCallback?: (loginChannelType: LoginChannelType,
-    error: BusinessError | wxopensdk.BaseResp) => void; // 登录失败回调
+  static loginFailCallback?: (loginChannelType: LoginChannelType, error: LoginFailError) => void; // 登录失败回调
 
 
-  static dispatchToLoginFail(loginChannelType: LoginChannelType, error: BusinessError | wxopensdk.BaseResp) {
+  static dispatchToLoginFail(loginChannelType: LoginChannelType, error: LoginFailError) {
     if (LoginEventDispatcher.loginFailCallback) {
       LoginEventDispatcher.loginFailCallback(loginChannelType, error);
     }
@@ -35,5 +32,5 @@ export class ApiController {
 }
 
 export class LoginController {
-  clearLoginInfo: () => void = () => {}
+  clearLoginInfo: () => void = () => {};
 }

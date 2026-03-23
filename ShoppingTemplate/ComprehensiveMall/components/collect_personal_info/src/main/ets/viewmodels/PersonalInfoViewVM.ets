@@ -1,17 +1,19 @@
 import { AppStorageV2 } from '@kit.ArkUI';
 import { ConfigInfo } from '../common/ConfigModel';
 import { GENDER_OPTIONS } from '../common/Constant';
-import { PersonalInfo, DataType, SwitchInfo, ApiHandler, GenderType, FormType } from '../common/Types';
-import { ObservedInfoItem } from '../common/FormModel';
+import { PersonalInfo, DataType, SwitchInfo, ApiHandler, GenderType } from '../common/DataModel';
+import { FormType, ObservedInfoItem } from '../common/FormModel';
+import { WindowModel } from '../common/WindowModel';
 
 @ObservedV2
 export class PersonalInfoViewVM {
-  @Trace switchInfo: SwitchInfo = {}
+  @Trace switchInfo: SwitchInfo = {};
   @Trace personalData: PersonalInfo = {};
-  @Trace apiInfo: ApiHandler = {}
+  @Trace apiInfo: ApiHandler = {};
   @Trace onChange: (type: DataType, data: PersonalInfo) => void = () => {
   };
   @Trace configInfo: ConfigInfo = AppStorageV2.connect(ConfigInfo, () => new ConfigInfo())!;
+  @Trace windowModel: WindowModel = AppStorageV2.connect(WindowModel, () => new WindowModel())!;
   @Trace avatarItem: ObservedInfoItem = new ObservedInfoItem({
     type: FormType.CHOOSE_AVATAR,
     label: '头像',
@@ -20,7 +22,7 @@ export class PersonalInfoViewVM {
       this.personalData.avatar = param as string;
       this.onChange(DataType.AVATAR, this.personalData);
     },
-  })
+  });
   @Trace nickNameItem: ObservedInfoItem = new ObservedInfoItem({
     type: FormType.TEXT_INPUT,
     label: '昵称',
@@ -33,7 +35,7 @@ export class PersonalInfoViewVM {
       this.personalData.nickName = param as string;
       this.onChange(DataType.NICK_NAME, this.personalData);
     },
-  })
+  });
   @Trace fullNameItem: ObservedInfoItem = new ObservedInfoItem({
     type: FormType.TEXT_INPUT,
     label: '姓名',
@@ -46,7 +48,7 @@ export class PersonalInfoViewVM {
       this.personalData.fullName = param as string;
       this.onChange(DataType.FULL_NAME, this.personalData);
     },
-  })
+  });
   @Trace genderItem: ObservedInfoItem = new ObservedInfoItem({
     type: FormType.DROP_SELECT,
     label: '性别',
@@ -81,7 +83,7 @@ export class PersonalInfoViewVM {
       this.personalData.phoneNumber = param as string;
       this.onChange(DataType.PHONE_NUMBER, this.personalData);
     },
-  })
+  });
   @Trace introItem: ObservedInfoItem = new ObservedInfoItem({
     type: FormType.TEXTAREA,
     maxLength: 70,
@@ -130,16 +132,16 @@ export class PersonalInfoViewVM {
       sendCode: (phone: string) => {
         return new Promise((resolve, reject) => {
           setTimeout(() => {
-            resolve()
-          }, 100)
-        })
+            resolve();
+          }, 100);
+        });
       },
       verifyCode: (phone: string, code: string) => {
         return new Promise((resolve, reject) => {
           setTimeout(() => {
-            resolve()
-          }, 100)
-        })
+            resolve(false);
+          }, 100);
+        });
       },
     };
     this.apiInfo.updateIntro = apiInfo.updateIntro ?? (() => new Promise((resolve) => resolve()));

@@ -1,7 +1,5 @@
 export { MemberPage,
-  MemberPageBuilder,
-  contactMatchmakerBuilder,
-  bindSheetTitleBuilder } from './src/main/ets/pages/Member';
+  MemberPageBuilder } from './src/main/ets/pages/Member';
 
 export { Matchmaker } from './src/main/ets/model/Matchmaker';
 

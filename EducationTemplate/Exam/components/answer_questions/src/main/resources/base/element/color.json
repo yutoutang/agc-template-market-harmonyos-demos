@@ -23,6 +23,10 @@
     {
       "name": "gesture_handle",
       "value": "#CCCCCC"
+    },
+    {
+      "name": "answer_sheet_bg",
+      "value": "#F1F3F5"
     }
   ]
 }

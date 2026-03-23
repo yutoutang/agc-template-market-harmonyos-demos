@@ -3,7 +3,7 @@ import { ProductModel } from '../commons/Model';
 import { CartControlPanel } from '../components/CartControlPanel';
 import { CartListView } from '../components/CartListView';
 import { CartPageHeader } from '../components/CartPageHeader';
-import { CartPageVM } from '../viewmodel/CartPageVM';
+import { CartPageVM } from '../viewmodel/ShoppingCartVM';
 
 @ComponentV2
 export struct ShoppingCart {
@@ -26,7 +26,7 @@ export struct ShoppingCart {
   @Event onBack: () => void = () => {
   };
   // 商品卡片事件回调
-  @Event onCardClick: (id: string) => void = () => {
+  @Event onCardClick: (id: string, slotId?: string) => void = () => {
   };
   vm: CartPageVM = new CartPageVM();
 
@@ -42,130 +42,125 @@ export struct ShoppingCart {
   }
 
   build() {
-    Stack({ alignContent: Alignment.TopStart }) {
+    Column() {
       // 用户已登录
       if (this.vm.isLogin) {
         // 页面加载
         if (this.vm.loading === LoadingStatus.LOADING) {
           this.loadingBuilder();
         } else if (this.vm.loading === LoadingStatus.SUCCESS) { // 加载完成
-          Stack({ alignContent: Alignment.BottomStart }) {
-            Column() {
-              // 头部
-              CartPageHeader({
-                isChildRoute: this.isChildRoute,
-                isEdit: this.vm.isEdit,
-                showEdit: this.vm.cartCards.length > 0,
-                changeEdit: () => {
-                  this.vm.isEdit = !this.vm.isEdit;
-                },
-                onBack: () => {
-                  this.onBack && this.onBack();
-                },
-              })
+          Column() {
+            // 头部
+            CartPageHeader({
+              isChildRoute: this.isChildRoute,
+              isEdit: this.vm.isEdit,
+              showEdit: this.vm.cartCards.length > 0,
+              changeEdit: () => {
+                this.vm.isEdit = !this.vm.isEdit;
+              },
+              onBack: () => {
+                this.onBack && this.onBack();
+              },
+            })
 
-              Refresh({
-                refreshing: $$this.vm.isRefreshing,
-                builder: this.customRefreshComponent,
-              }) {
-                Scroll() {
+            Refresh({
+              refreshing: $$this.vm.isRefreshing,
+              builder: this.customRefreshComponent,
+            }) {
+              Scroll() {
+                Column() {
                   Column() {
-                    Column() {
-                      // 购物车列表不为空
-                      if (this.vm.cartCards.length) {
-                        CartListView({
-                          listData: this.vm.cartCards,
-                          isEdit: this.vm.isEdit,
-                          onCardClick: (id: string) => {
-                            this.onCardClick && this.onCardClick(id);
-                          },
-                          onChangeCount: (skuCode: string) => {
-                            // 更新购物车商品的数量
-                            this.vm.updateProductCount(skuCode);
-                          },
-                          onDelete: (skuCode: string) => {
-                            this.vm.onDeleteProduct(skuCode);
-                          },
-                        })
-                      } else {
-                        // 购物车列表为空
-                        this.cartEmptyBuilder();
-                      }
-                    }
-                    .width('100%')
-                    .alignItems(HorizontalAlign.Center)
-                    .justifyContent(FlexAlign.Start)
-
-                    // 自定义模块，推荐商品
-                    if (this.customContentBuilder) {
-                      this.customContentBuilder();
+                    // 购物车列表不为空
+                    if (this.vm.cartCards.length) {
+                      CartListView({
+                        listData: this.vm.cartCards,
+                        isEdit: this.vm.isEdit,
+                        onCardClick: (id: string, slotId?: string) => {
+                          this.onCardClick && this.onCardClick(id, slotId);
+                        },
+                        onChangeCount: (skuCode: string) => {
+                          // 更新购物车商品的数量
+                          this.vm.updateProductCount(skuCode);
+                        },
+                        onDelete: (skuCode: string) => {
+                          this.vm.onDeleteProduct(skuCode);
+                        },
+                      })
+                    } else {
+                      // 购物车列表为空
+                      this.cartEmptyBuilder();
                     }
                   }
                   .width('100%')
-                  .constraintSize({ minHeight: '100%' })
                   .alignItems(HorizontalAlign.Center)
                   .justifyContent(FlexAlign.Start)
-                  .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
+
+                  // 自定义模块，推荐商品
+                  if (this.customContentBuilder) {
+                    this.customContentBuilder();
+                  }
                 }
-                .height('100%')
-                .scrollBar(BarState.Off)
+                .width('100%')
+                .constraintSize({ minHeight: '100%' })
+                .alignItems(HorizontalAlign.Center)
+                .justifyContent(FlexAlign.Start)
                 .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
               }
               .layoutWeight(1)
-              .onRefreshing(() => {
-                setTimeout(() => {
-                  this.vm.init();
-                  this.vm.isRefreshing = false;
-                }, 1000);
-              })
-              .pullToRefresh(true)
-              .pullDownRatio(this.vm.ratio)
-              .refreshOffset(64)
-              .onStateChange((state: RefreshStatus) => {
-                this.vm.onRefreshStateChange(state);
-              })
-              .onOffsetChange((offset: number) => {
-                // 越接近最大距离，下拉跟手系数越小
-                this.vm.ratio = 1 - Math.pow(offset / this.vm.maxRefreshingHeight, 3);
-              })
+              .scrollBar(BarState.Off)
               .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
             }
-            .width('100%')
-            .height('100%')
-            .onClick(() => {
-              // 用来清空步进器的焦点
-              this.getUIContext().getFocusController().clearFocus();
+            .layoutWeight(1)
+            .onRefreshing(() => {
+              setTimeout(() => {
+                this.vm.init();
+                this.vm.isRefreshing = false;
+              }, 1000);
+            })
+            .pullToRefresh(true)
+            .pullDownRatio(this.vm.ratio)
+            .refreshOffset(64)
+            .onStateChange((state: RefreshStatus) => {
+              this.vm.onRefreshStateChange(state);
+            })
+            .onOffsetChange((offset: number) => {
+              // 越接近最大距离，下拉跟手系数越小
+              this.vm.ratio = 1 - Math.pow(offset / this.vm.maxRefreshingHeight, 3);
             })
             .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
-
-            // 底部结算面板
-            if (this.vm.cartCards.length) {
-              CartControlPanel({
-                isEdit: this.vm.isEdit,
-                isChildRoute: this.isChildRoute,
-                cartPrice: this.vm.cartPrice,
-                quantity: this.vm.quantity,
-                onSelectAll: () => {
-                  // 计算选择的商品个数
-                  this.vm.calcQuantity();
-                  // 计算总价
-                  this.vm.calcTotalPrice();
-                },
-                onDelete: () => {
-                  // 删除
-                  this.vm.onDeleteProduct();
-                },
-                onCheckout: () => {
-                  // 结算
-                  const selectedGoodList: ProductModel[] = this.vm.onCheckout();
-                  this.onCheckout && this.onCheckout(selectedGoodList);
-                },
-              })
-            }
           }
           .width('100%')
-          .height('100%')
+          .layoutWeight(1)
+          .onClick(() => {
+            // 用来清空步进器的焦点
+            this.getUIContext().getFocusController().clearFocus();
+          })
           .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
+
+          // 底部结算面板
+          if (this.vm.cartCards.length) {
+            CartControlPanel({
+              isEdit: this.vm.isEdit,
+              isChildRoute: this.isChildRoute,
+              cartPrice: this.vm.cartPrice,
+              quantity: this.vm.quantity,
+              onSelectAll: () => {
+                // 计算选择的商品个数
+                this.vm.calcQuantity();
+                // 计算总价
+                this.vm.calcTotalPrice();
+              },
+              onDelete: () => {
+                // 删除
+                this.vm.onDeleteProduct();
+              },
+              onCheckout: () => {
+                // 结算
+                const selectedGoodList: ProductModel[] = this.vm.onCheckout();
+                this.onCheckout && this.onCheckout(selectedGoodList);
+              },
+            })
+          }
         }
       } else {
         // 用户未登录
@@ -192,35 +187,39 @@ export struct ShoppingCart {
           this.onBack && this.onBack();
         },
       })
-      Column() {
-        Image($r('app.media.empty_status_logo'))
-          .width(160)
-          .height(160)
-          .draggable(false)
-          .objectFit(ImageFit.Cover)
-          .margin({ bottom: 12 })
-        Text('登录后可同步购物车中的商品')
-          .fontSize(14)
-          .fontColor($r('sys.color.mask_secondary'))
-          .margin({ bottom: 12 })
-        Button() {
-          Text('登录')
+      Scroll(){
+        Column() {
+          Image($r('app.media.empty_status_logo'))
+            .width(160)
+            .height(160)
+            .draggable(false)
+            .objectFit(ImageFit.Cover)
+            .margin({ bottom: 12 })
+          Text('登录后可同步购物车中的商品')
             .fontSize(14)
-            .fontColor(Color.White)
-            .fontWeight(600)
+            .fontColor($r('sys.color.mask_secondary'))
+            .margin({ bottom: 12 })
+          Button() {
+            Text('登录')
+              .fontSize(14)
+              .fontColor(Color.White)
+              .fontWeight(600)
+          }
+          .width(100)
+          .height(38)
+          .type(ButtonType.Normal)
+          .backgroundColor('#FFE64566')
+          .borderRadius(21)
+          .onClick(() => {
+            this.onLogin && this.onLogin();
+          })
         }
-        .width(100)
-        .height(38)
-        .type(ButtonType.Normal)
-        .backgroundColor('#FFE64566')
-        .borderRadius(21)
-        .onClick(() => {
-          this.onLogin && this.onLogin();
-        })
+        .justifyContent(FlexAlign.Center)
+        .margin({ bottom: 80 })
       }
+      .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring)
       .layoutWeight(1)
-      .justifyContent(FlexAlign.Center)
-      .margin({ bottom: 80 })
     }
     .width('100%')
     .height('100%')
@@ -277,13 +276,13 @@ export struct ShoppingCart {
           .margin({ bottom: 16 })
         Text('购物车空空如也，去逛逛吧~')
           .fontSize(12)
-          .fontColor($r('sys.color.mask_secondary'))
-          .margin({ bottom: 24 })
+          .fontColor($r('app.color.font_color_level2'))
       }
-      .backgroundColor(Color.White)
+      .backgroundColor($r('app.color.background_color_primary'))
       .borderRadius(16)
       .width('100%')
       .height('100%')
+      .justifyContent(FlexAlign.Center)
     }
     .width('100%')
     .height('45%')

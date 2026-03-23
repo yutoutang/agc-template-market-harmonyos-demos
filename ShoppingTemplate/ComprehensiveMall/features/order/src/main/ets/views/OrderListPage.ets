@@ -6,7 +6,7 @@ import { OrderTabsMap } from '../common/Enums';
 import { OrderType } from '../common/Types';
 import { buildNoOrderCard } from '../components/NoOrderCard';
 import { buildButtonList, buildOrderInfoCard } from '../components/OrderInfoCard';
-import { OrderListPageVM } from '../viewModels/OrderListPageVM';
+import { OrderListPageVM } from '../viewmodels/OrderListPageVM';
 
 @Builder
 export function buildOrderListPage() {
@@ -24,7 +24,7 @@ export struct OrderListPageNew {
       NavTitleBar({
         title: '我的订单',
         showSearchIcon: true,
-        bgColor: $r('app.color.background_color_white'),
+        bgColor: $r('app.color.background_color_primary'),
         onSearchClick: () => {
           routerStack.pushPath({ name: RouterMap.ORDER_SEARCH })
         },
@@ -43,23 +43,19 @@ export struct OrderListPageNew {
   buildSearchBar() {
     Row() {
       Row() {
-        Image($r('app.media.ic_search'))
-          .width(16)
-          .fillColor($r('app.color.font_color_level2'))
-          .margin({ right: $r('app.float.space_s') })
+        SymbolGlyph($r('sys.symbol.magnifyingglass'))
+          .fontColor([$r('app.color.font_color_level2')])
+          .margin({
+            right: $r('app.float.space_s'),
+          })
         Text('搜索订单')
           .fontSize($r('app.float.font_size_14'))
           .fontColor($r('app.color.font_color_level2'))
       }
       .width($r('app.string.size_percent_full'))
-      .backgroundColor($r('app.color.background_color_grey'))
+      .backgroundColor($r('sys.color.comp_background_tertiary'))
       .borderRadius($r('app.float.border_radius_capsule'))
-      .padding({
-        top: $r('app.float.space_s'),
-        bottom: $r('app.float.space_s'),
-        left: $r('app.float.space_m'),
-        right: $r('app.float.space_m'),
-      })
+      .padding( $r('app.float.space_m'))
     }
     .padding({
       left: $r('app.float.space_l'),
@@ -67,6 +63,7 @@ export struct OrderListPageNew {
       bottom: $r('app.float.space_m'),
       top: $r('app.float.space_m'),
     })
+    .backgroundColor($r('app.color.background_color_primary'))
     .onClick(() => {
       routerStack.pushPath({ name: RouterMap.ORDER_SEARCH })
     })
@@ -119,20 +116,21 @@ export struct OrderListPageNew {
   buildCommonOrderList(tabIndex: number) {
     Refresh({ refreshing: this.vm.isRefreshing }) {
       Column() {
-        if (!this.vm.orderList.totalCount() && !this.vm.isRefreshing) {
+        if (!this.vm.orderList.length && !this.vm.isRefreshing) {
           buildNoOrderCard(tabIndex === 0)
         } else {
           List() {
-            LazyForEach(this.vm.orderList, (order: OrderItem) => {
-              ListItem() {
-                ContainerColumn() {
-                  buildOrderInfoCard(order)
-                  buildButtonList(order.orderInfo, ControlSize.SMALL, (actionType) => {
-                    this.vm.handleOrderItem(order, actionType)
-                  })
+            Repeat(this.vm.orderList)
+              .each((ri: RepeatItem<OrderItem>) => {
+                ListItem() {
+                  ContainerColumn() {
+                    buildOrderInfoCard(ri.item)
+                    buildButtonList(ri.item.orderInfo, ControlSize.SMALL, (actionType) => {
+                      this.vm.handleOrderItem(ri.item, actionType)
+                    })
+                  }
                 }
-              }
-            }, (item: OrderItem, index: number) => index + '__' + JSON.stringify(item.orderInfo))
+              })
           }
           .lanes(this.curBreakpoint.value === BreakpointTypeEnum.LG ? 2 : 1, 12)
           .layoutWeight(1)
@@ -191,7 +189,7 @@ export struct OrderListPageNew {
         .borderRadius($r('app.float.border_radius_capsule'))
         .opacity(this.vm.currentIndex === index ? 1 : 0);
     }
-    .backgroundColor($r('app.color.background_color_white'))
+    .backgroundColor($r('app.color.background_color_primary'))
     .padding({
       left: $r('app.float.space_m'),
       right: $r('app.float.space_m'),

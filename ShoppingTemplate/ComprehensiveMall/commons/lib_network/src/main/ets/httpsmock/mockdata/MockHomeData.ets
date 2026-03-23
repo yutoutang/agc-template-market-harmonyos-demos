@@ -1,3 +1,4 @@
+import { MockImageMap } from './MockImageMap';
 import {
   CategoryItem,
   ProductSummaryItem,
@@ -25,139 +26,133 @@ export class MockHomeConfig {
     {
       id: '1',
       label: '精选',
-      iconUrl: 'icon1.png',
+      iconUrl: MockImageMap.HOME_CATEGORY_1,
       subCategory: subCategoryMock,
     },
     {
       id: '2',
       label: '清洁用品',
-      iconUrl: 'icon2.png',
+      iconUrl: MockImageMap.HOME_CATEGORY_2,
       subCategory: subCategoryMock,
     },
     {
       id: '3',
       label: '全棉用品',
-      iconUrl: 'icon3.png',
+      iconUrl: MockImageMap.HOME_CATEGORY_3,
       subCategory: subCategoryMock,
     },
     {
       id: '4',
       label: '安睡香氛',
-      iconUrl: 'icon4.png',
-    },
-    {
-      id: '5',
-      label: '福利',
-      subCategory: subCategoryMock,
-      iconUrl: 'icon5.png',
+      iconUrl: MockImageMap.HOME_CATEGORY_4,
     },
     {
       id: '6',
       label: '运动休闲',
-      iconUrl: 'icon6.png',
+      iconUrl: MockImageMap.HOME_CATEGORY_6,
     },
     {
       id: '7',
       label: '成人服装',
-      iconUrl: 'icon7.png',
+      iconUrl: MockImageMap.HOME_CATEGORY_7,
     },
     {
       id: '8',
       label: '折扣商品',
-      iconUrl: 'icon8.png',
+      iconUrl: MockImageMap.HOME_CATEGORY_8,
     },
     {
       id: '9',
       label: '美妆彩妆',
-      iconUrl: 'icon9.png',
+      iconUrl: MockImageMap.HOME_CATEGORY_9,
     },
     {
       id: '10',
       label: '饰品首饰',
-      iconUrl: 'icon10.png',
+      iconUrl: MockImageMap.HOME_CATEGORY_10,
     },
   ];
   static readonly categoryDataList: ProductSummaryItem[] = [
     {
-      banner: 'mock2_spec_white.png',
+      banner: MockImageMap.PRODUCT_20001_BLACK,
       title: '经典休闲短袖',
       id: '1002_001',
       subCategoryId: '1002',
     },
     {
-      banner: 'mock2_spec_black.png',
+      banner: MockImageMap.PRODUCT_20001_BLUE,
       title: '经典舒适短袖',
       id: '1002_002',
       subCategoryId: '1002',
     },
     {
-      banner: 'mock2_spec_shirt.png',
+      banner: MockImageMap.PRODUCT_20001_SHIRT,
       title: '经典休闲衬衫',
       subCategoryId: '1002',
       id: '1002_003',
     },
     {
-      banner: 'mock2_spec_blue.png',
+      banner: MockImageMap.PRODUCT_20001_WHITE,
       title: '经典商务衬衫',
       subCategoryId: '1002',
       id: '1002_004',
     },
     {
-      banner: 'mock2_spec_white.png',
+      banner: MockImageMap.PRODUCT_20001_BLACK,
       title: '经典休闲短袖',
       subCategoryId: '1002',
       id: '1002_005',
     },
     {
-      banner: 'mock2_spec_black.png',
+      banner: MockImageMap.PRODUCT_20001_BLUE,
       title: '经典舒适短袖',
       subCategoryId: '1002',
       id: '1002_006',
     },
     {
-      banner: 'mock_spec_white.jpg',
+      banner: MockImageMap.PRODUCT_10001_GREEN,
       title: '经典针织打底',
       id: '1001_001',
       subCategoryId: '1001',
     },
     {
-      banner: 'mock_spec_pink.jpg',
+      banner: MockImageMap.PRODUCT_10001_PINK,
       title: '时尚针织打底',
       id: '1001_002',
       subCategoryId: '1001',
     },
     {
-      banner: 'mock_spec_green.jpg',
+      banner: MockImageMap.PRODUCT_10001_STRIPE,
       title: '纯羊毛内搭',
       subCategoryId: '1001',
       id: '1001_003',
     },
     {
-      banner: 'mock_spec_yellow.png',
+      banner: MockImageMap.PRODUCT_10001_YELLOW,
       title: '轻商务系列',
       subCategoryId: '1001',
       id: '1001_004',
     },
     {
-      banner: 'mock_spec_white.jpg',
+      banner: MockImageMap.PRODUCT_10001_GREEN,
       title: '经典针织打底',
       id: '1001_001',
       subCategoryId: '1001',
     },
     {
-      banner: 'mock_spec_pink.jpg',
+      banner: MockImageMap.PRODUCT_10001_PINK,
       title: '时尚针织打底',
       id: '1001_002',
       subCategoryId: '1001',
     },
     {
-      banner: 'mock_spec_green.jpg',
+      banner: MockImageMap.PRODUCT_10001_STRIPE,
       title: '纯羊毛内搭',
       subCategoryId: '1001',
       id: '1001_003',
     },
     {
-      banner: 'mock_spec_yellow.png',
+      banner: MockImageMap.PRODUCT_10001_YELLOW,
       title: '轻商务系列',
       subCategoryId: '1001',
       id: '1001_004',
@@ -170,7 +165,7 @@ export class MockHomeConfig {
     '衬衫',
   ];
   static readonly bannerList:string[] = [
-    'mock_homepage_banner1.png',
-    'mock_homepage_banner2.jpg',
-  ]
+    MockImageMap.HOME_BANNER_1,
+    MockImageMap.HOME_BANNER_2,
+  ];
 }

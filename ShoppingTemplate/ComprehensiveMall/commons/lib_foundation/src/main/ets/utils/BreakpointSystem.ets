@@ -71,8 +71,8 @@ class BreakpointSystem {
           });
         })
         .catch((err: BusinessError) => {
-          UtilLog.error(TAG, 'get last window failed. error: ' + JSON.stringify(err))
-        })
+          UtilLog.error(TAG, 'get last window failed. error: ' + JSON.stringify(err));
+        });
     }
   }
 

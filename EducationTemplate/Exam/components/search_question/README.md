@@ -17,6 +17,7 @@
 ## 约束与限制
 
 ### 环境
+
 * DevEco Studio版本：DevEco Studio 5.0.3 Release及以上
 * HarmonyOS SDK版本：HarmonyOS 5.0.3 Release SDK及以上
 * 设备类型：华为手机（直板机）
@@ -24,6 +25,7 @@
 
 ### 权限
 无
+
 ## 使用
 
 1. 安装组件。
@@ -39,10 +41,10 @@
    ```
    // 在项目根目录build-profile.json5填写search_question路径。其中XXX为组件存放的目录名。
    "modules": [
-   {
-   "name": "search_question",
-   "srcPath": "./XXX/search_question",
-   }
+     {
+       "name": "search_question",
+       "srcPath": "./XXX/search_question",
+     }
    ]
    ```
    c. 在项目根目录oh-package.json5中添加依赖。
@@ -50,7 +52,7 @@
    // XXX为组件存放的目录名称
    "dependencies": {
       "search_question": "file:./XXX/search_question"
-     }
+   }
    ```
 
 2. 引入一键搜题组件句柄
@@ -60,28 +62,17 @@
    ```
 
 3. 调用组件，详细参数配置说明参见[API参考](#API参考)
+
    ```
-   import { SearchQuestionPage } from 'search_question';
-   
-   @Entry
-   @Component
-   struct Index {
-     build() {
-       Column() {
-         SearchQuestionPage({
-           //返回搜索框中的data值
-           search: (data) => {
-             console.log("点击搜索按钮")
-           },
-           back: () => {
-             console.log("点击返回按钮回调事件")
-           },
-         })
-       }
-       .width('100%')
-       .height('100%')
+   SearchQuestionPage({
+     //返回搜索框中的data值
+     search: (data) => {
+       this.getUIContext().getPromptAction().showToast({ message: '点击搜索事件', duration: 2000 });
+     },
+     back: () => {
+       this.getUIContext().getPromptAction().showToast({ message: '返回事件', duration: 2000 });
      }
-   }
+   })
    ```
 
 ## API参考
@@ -132,5 +123,4 @@ struct Index {
     .height('100%')
   }
 }
-
 ```

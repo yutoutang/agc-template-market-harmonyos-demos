@@ -1,11 +1,6 @@
 import { LengthMetrics } from '@kit.ArkUI';
 import {
-  iData,
-  routerStack,
-  RouterMap,
-  Style,
-  BreakpointSystem,
-  BreakpointTypeEnum,
+  iData, routerStack, RouterMap, BreakpointSystem, BreakpointTypeEnum,
 } from 'lib_foundation';
 import { ContainerColumn, NavTitleBar } from 'lib_widget';
 import { MainMenuItem, SubMenuItem } from '../commons/Types';
@@ -48,7 +43,8 @@ export struct ProfilePage {
 
           buildOrderInfoArea()
           buildSubMenuArea()
-        };
+        }
+        .margin({ bottom: 80 })
       }
       .layoutWeight(1)
       .align(Alignment.Top)
@@ -61,9 +57,10 @@ export struct ProfilePage {
     .linearGradient({
       colors: [['#33e64566', 0], ['#00E64566', 0.4]],
     })
-    .backgroundColor(Style.BACKGROUND_COLOR_GREY)
+    .backgroundColor($r('app.color.background_color_grey'))
     .alignItems(HorizontalAlign.Start)
-    .expandSafeArea([SafeAreaType.SYSTEM, SafeAreaType.CUTOUT], [SafeAreaEdge.TOP]);
+    .expandSafeArea([SafeAreaType.SYSTEM, SafeAreaType.CUTOUT], [SafeAreaEdge.TOP])
+    .transition(TransitionEffect.OPACITY.animation({ duration: 600 }))
   }
 }
 
@@ -74,6 +71,7 @@ function buildUserInfoArea() {
       Image(iData.global.userInfo.avatar ? iData.global.userInfo.avatar : $r('app.media.default_avatar'))
         .width(48)
         .height(48)
+        .backgroundColor(Color.White)
         .borderRadius(48)
         .draggable(false)
         .margin({ right: 16 });
@@ -88,7 +86,7 @@ function buildUserInfoArea() {
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
             .textAlign(TextAlign.Start)
-            .fontColor(Style.FONT_COLOR_LEVEL1)
+            .fontColor($r('app.color.font_color_level1'))
             .margin({ right: 8 })
           if (iData.global.isLogin) {
             Row() {
@@ -113,7 +111,7 @@ function buildUserInfoArea() {
           } else {
             Text('登录后享受更多服务')
               .commonLabelStyle()
-              .fontColor(Style.FONT_COLOR_LEVEL1);
+              .fontColor($r('app.color.font_color_level1'));
           }
         }
         .justifyContent(FlexAlign.Start)
@@ -162,6 +160,7 @@ function buildCheckInArea() {
           .margin({ right: $r('app.float.space_xs') })
           .width(16)
           .height(16)
+          .fillColor($r('app.color.font_color_level2'))
         Text('签到可领取积分兑换好物')
           .fontSize($r('app.float.font_size_14'))
           .fontColor($r('app.color.font_color_level1'))
@@ -204,7 +203,7 @@ function buildOrderInfoArea() {
       Text('我的订单')
         .fontSize(16)
         .fontWeight(FontWeight.Medium)
-        .fontColor(Style.FONT_COLOR_LEVEL1);
+        .fontColor($r('app.color.font_color_level1'));
       Blank();
       Text('全部').commonLabelStyle().margin({ right: 4 }).fontColor($r('app.color.font_color_level2'))
       Image($r('app.media.ic_arrow_right')).commonIconStyle();
@@ -291,7 +290,7 @@ function buildOrderTab(icon: ResourceStr, label: string, type: number) {
 @Styles
 function containerStyle() {
   .width('100%')
-  .backgroundColor(Style.BACKGROUND_COLOR)
+  .backgroundColor($r('app.color.background_color_primary'))
   .borderRadius(16)
   .padding(12);
 }
@@ -301,7 +300,7 @@ function commonLabelStyle() {
   .fontSize(12)
   .maxLines(1)
   .textOverflow({ overflow: TextOverflow.Ellipsis })
-  .fontColor(Style.FONT_COLOR_LEVEL1);
+  .fontColor($r('app.color.font_color_level1'));
 }
 
 @Extend(Text)
@@ -316,12 +315,12 @@ function commonIconStyle() {
   .draggable(false)
   .height(16)
   .width(16)
-  .fillColor(Style.FONT_COLOR_LEVEL2);
+  .fillColor($r('app.color.font_color_level2'));
 }
 
 @Extend(Column)
 function tabletContainerStyle(isLogin: boolean) {
-  .backgroundColor($r('app.color.background_color_white'))
+  .backgroundColor($r('app.color.background_color_primary'))
   .borderRadius(16)
   .height(isLogin ? 128 : 78)
   .justifyContent(FlexAlign.Center)

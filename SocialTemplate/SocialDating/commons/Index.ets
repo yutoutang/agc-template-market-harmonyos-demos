@@ -31,3 +31,7 @@ export { navigationTitleBuilder as NavigationTitleBuilder,
   getPicResult } from './src/main/ets/utils/UiUtils'
 
 export { PhotoPickerPageParam } from './src/main/ets/page/PhotoPicker'
+
+export { BaseViewModel } from './src/main/ets/model/BaseViewModel'
+
+export { LoginState } from  './src/main/ets/constant/ClassConstant'

@@ -15,17 +15,17 @@
 
 import { AppStorageV2 } from '@kit.ArkUI';
 import { QuickLogin, UserInfo } from 'login_info';
-import { RouterMap, RouterModule } from 'router_module';
+import { GlobalContextUtils, RouterMap, RouterModule } from 'commonlib';
 
 @ComponentV2
 export struct LoginPage {
   // 半模态or全模态
-  isBindContentCover: boolean = false
+  isBindContentCover: boolean = false;
 
   aboutToAppear(): void {
-    let temp = RouterModule.getNavParam({ url: RouterMap.LOGIN_PAGE })
+    let temp = RouterModule.getNavParam({ url: RouterMap.LOGIN_PAGE });
     if (temp) {
-      this.isBindContentCover = temp as boolean
+      this.isBindContentCover = temp as boolean;
     }
   }
 
@@ -38,43 +38,43 @@ export struct LoginPage {
         appName: '备考',
         // 登录回调方法
         onLoginWithHuaweiID: (flag: boolean, phone?: string) => {
-          RouterModule.pop(false)
-          let prop: UserInfo = AppStorageV2.connect(UserInfo, () => new UserInfo())! as UserInfo
+          RouterModule.pop(false);
+          let prop: UserInfo = AppStorageV2.connect(UserInfo, () => new UserInfo())! as UserInfo;
           if (!prop.name) {
-            prop.name = '华为用户'
+            prop.name = '华为用户';
           }
-          prop.isLogin = true
-          prop.id = 0
-          prop.cellphone = phone ?? '177******96'
-          prop.address = 'xxx省xxx市'
+          prop.isLogin = true;
+          prop.id = 0;
+          prop.cellphone = phone ?? '177******96';
+          prop.address = 'xxx省xxx市';
           if (flag) {
-            this.getUIContext().getPromptAction().showToast({ message: '登录成功', duration: 2000 });
+            GlobalContextUtils.showToast({ message: '登录成功' });
           } else {
-            this.getUIContext().getPromptAction().showToast({ message: 'mock登录', duration: 2000 });
+            GlobalContextUtils.showToast({ message: 'mock登录' });
           }
 
         },
         // 备考隐私协议方法
         onPrivacyPolicy: () => {
-          RouterModule.replace({ url: RouterMap.PRIVACY_PAGE })
+          RouterModule.replace({ url: RouterMap.PRIVACY_PAGE });
         },
         // 用户服务协议方法
         onServicePolicy: () => {
-          RouterModule.replace({ url: RouterMap.TERMS_SERVICE_PAGE })
+          RouterModule.replace({ url: RouterMap.TERMS_SERVICE_PAGE });
         },
         // 华为账号用户认证协议
         onHYAccountRouter: () => {
-          RouterModule.replace({ url: RouterMap.AUTHENTICATION_PAGE })
+          RouterModule.replace({ url: RouterMap.AUTHENTICATION_PAGE });
         },
         // 模态消失回调
         shouldDismiss: () => {
-          let paths: string[] = RouterModule.stack.getAllPathName()
-          let isExit = paths.includes(RouterMap.LOGIN_PAGE)
+          let paths: string[] = RouterModule.stack.getAllPathName();
+          let isExit = paths.includes(RouterMap.LOGIN_PAGE);
           if (isExit) {
-            RouterModule.pop()
+            RouterModule.pop();
           }
         }
-      })
+      });
     }
     .height('100%')
     .width('100%')
@@ -83,5 +83,5 @@ export struct LoginPage {
 
 @Builder
 export function LoginPageBuilder() {
-  LoginPage()
+  LoginPage();
 }

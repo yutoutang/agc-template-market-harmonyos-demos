@@ -43,7 +43,6 @@ export struct CourseBookComponent {
     }
     .borderRadius(16)
     .padding({ top: 8 })
-    .backgroundColor($r('sys.color.background_primary'))
     .height(68)
     .width(281)
   }

@@ -29,6 +29,6 @@ class Logger {
   }
 }
 
-const logger = new Logger()
+const logger = new Logger();
 
-export { logger as Logger }
+export { logger as Logger };

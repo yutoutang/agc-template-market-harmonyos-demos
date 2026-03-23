@@ -14,7 +14,7 @@
  */
 
 import { AppStorageV2 } from '@kit.ArkUI';
-import { RouterMap, RouterModule } from 'router_module'
+import { RouterMap, RouterModule } from 'commonlib'
 import { ThirdParam, ThirdCategory, ItemDetail } from 'select_category'
 import { TopTabsBuilder } from 'commonlib';
 import { Sample } from '../model/Course';
@@ -32,7 +32,7 @@ export struct ThirdListPage {
   build() {
     Column() {
       // 标题组件
-      TopTabsBuilder({ showBackButton: true, bgColor: $r('sys.color.background_primary') })
+      TopTabsBuilder({ showBackButton: true, bgColor: $r('sys.color.comp_background_primary') })
         .padding({ left: $r('app.float.vp_16'), right: $r('app.float.vp_16') })
       Divider().color($r('sys.color.comp_divider'))
       // 三级分类组件
@@ -56,6 +56,8 @@ export struct ThirdListPage {
     .width('100%')
     .alignItems(HorizontalAlign.Start)
     .justifyContent(FlexAlign.Start)
+    .backgroundColor($r('sys.color.comp_background_primary'))
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
   }
 }
 

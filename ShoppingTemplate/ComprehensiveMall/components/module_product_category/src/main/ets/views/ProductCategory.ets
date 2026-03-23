@@ -5,6 +5,8 @@ import { AnimateType, UISkeleton, SkeletonTheme } from '@hw-agconnect/ui-skeleto
 @ComponentV2
 export struct ProductCategory {
   @Param
+  isChildRoute: boolean = false;
+  @Param
   public initIndex: number = 0;
   @Param
   categoryTabs: CategoryItem[] = [];
@@ -75,15 +77,14 @@ export struct ProductCategory {
       .constraintSize({ maxWidth: 240 })
       .height('100%')
       .borderWidth({ right: 1 })
-      .borderColor($r('app.color.background_color_grey'));
+      .borderColor($r('sys.color.comp_divider'))
+      .scrollBar(BarState.Off)
 
       Column() {
         if (this.curSubCategoryList.length) {
           this.subCategoryBarBuilder()
         }
-        if (!this.categoryTabs.length) {
-          LoadingProgress().width(32)
-        } else if (this.categoryTabs && !this.isLoading && !this.productList.length) {
+        if (this.categoryTabs && !this.isLoading && !this.productList.length) {
           Column() {
             Image($r('app.media.ic_search_empty'))
               .width(120)
@@ -99,11 +100,11 @@ export struct ProductCategory {
         }
       }
       .padding({ left: $r('app.string.space_l'), right: $r('app.string.space_l') })
-      .height('100%')
       .layoutWeight(1)
     }
     .width('100%')
-    .height('100%')
+    .layoutWeight(1)
+    .padding({ bottom: this.isChildRoute ? 0 : 56 })
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP]);
   }
 

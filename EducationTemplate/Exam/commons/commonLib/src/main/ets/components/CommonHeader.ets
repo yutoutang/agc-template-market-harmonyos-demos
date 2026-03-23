@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import { RouterMap, RouterModule } from 'router_module';
+import { RouterMap, RouterModule } from '../utils/RouterModule';
 
 @ComponentV2
 export struct TopTabsBuilder {
@@ -30,7 +30,11 @@ export struct TopTabsBuilder {
       Row() {
         // 是否有返回键判断
         if (this.showBackButton) {
-          Image($r('app.media.ic_backward')).height('40vp').width('40vp').margin({ right: '8vp' })
+          Image($r('app.media.ic_back'))
+            .height($r('app.float.vp_40'))
+            .width($r('app.float.vp_40'))
+            .borderRadius($r('app.float.vp_20'))
+            .margin({ right: '8vp' })
             .onClick(() => {
               RouterModule.pop()
             })
@@ -41,6 +45,7 @@ export struct TopTabsBuilder {
             .font({ size: $r('sys.float.Body_L'), weight: FontWeight.Medium })
             .space(8)
             .arrowPosition(ArrowPosition.END)
+            .backgroundColor($r('sys.color.comp_background_tertiary'))
             .onClick(() => {
               RouterModule.push({ url: RouterMap.Level_ONE_PAGE })
             })

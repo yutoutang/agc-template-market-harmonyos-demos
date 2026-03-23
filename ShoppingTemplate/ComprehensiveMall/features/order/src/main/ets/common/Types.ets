@@ -1,8 +1,5 @@
 import {
-  OrderTabsMap,
-  OrderStatusMap,
-  OrderButtonStyleMap,
-  OrderActionMap,
+  OrderTabsMap, OrderStatusMap, OrderButtonStyleMap, OrderActionMap,
 } from './Enums';
 
 /**
@@ -41,6 +38,17 @@ export interface OrderActionReq {
   data?: object;
 }
 
+export interface TextSegment {
+  text: string;
+  isPhone: boolean;
+}
+
+
+export interface CourierInfo {
+  name: string
+  contactPhone: string
+}
+
 
 export class MyButtonModifier implements AttributeModifier<ButtonAttribute> {
   buttonStyle: OrderButtonStyleMap = OrderButtonStyleMap.FULFILL;
@@ -71,11 +79,10 @@ export class MyButtonModifier implements AttributeModifier<ButtonAttribute> {
       .constraintSize({ minWidth: this.size === ControlSize.NORMAL ? 96 : 64 });
 
     if (this.buttonStyle === OrderButtonStyleMap.FULFILL) {
-      // 支持业务逻辑的编写
       instance.backgroundColor($r('app.color.theme_color'));
     } else {
       instance
-        .backgroundColor($r('app.color.background_color_white'))
+        .backgroundColor($r('app.color.background_color_primary'))
         .borderWidth(1);
       if (this.buttonStyle === OrderButtonStyleMap.OUTLINE) {
         instance

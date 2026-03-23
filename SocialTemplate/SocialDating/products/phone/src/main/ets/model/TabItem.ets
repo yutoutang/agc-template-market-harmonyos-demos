@@ -1,7 +1,6 @@
 import { HomePageBuilder } from 'composite/src/main/ets/pages/Home';
 import { PersonalPageBuilder } from 'composite/src/main/ets/pages/Personal';
 import { FeedListPageBuilder } from 'feed';
-import { MemberPageBuilder } from 'member';
 
 export interface  TabItem {
   index: number;
@@ -31,15 +30,6 @@ const tabItems: TabItem[] = [
   },
   {
     index: 2,
-    img: $r('app.media.member_0'),
-    selectedImage: $r('app.media.member_1'),
-    title: '会员',
-    selectedTitleColor: $r('app.color.button_background_color'),
-    component: wrapBuilder(MemberPageBuilder)
-
-  },
-  {
-    index: 3,
     img: $r('app.media.personal_0'),
     selectedImage: $r('app.media.personal_1'),
     title: '我的',

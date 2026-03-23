@@ -89,6 +89,8 @@ export struct SearchPage {
     .padding({ left: '16vp', right: '16vp' })
     .width('100%')
     .height('100%')
+    .backgroundColor($r('sys.color.comp_background_primary'))
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
   }
 
   // 未搜索状态
@@ -182,7 +184,11 @@ export struct SearchPage {
   @Builder
   topSearchBuilder() {
     Row() {
-      Image($r('app.media.ic_backward')).height('40vp').width('40vp').margin({ right: '8vp' })
+      Image($r('app.media.ic_back'))
+        .height('40vp')
+        .width('40vp')
+        .borderRadius(20)
+        .margin({ right: '8vp' })
         .onClick(() => {
           this.back()
         })
@@ -204,7 +210,7 @@ export struct SearchPage {
           this.searchText()
         })
     }
-    .backgroundColor($r('sys.color.background_primary'))
+    .backgroundColor($r('sys.color.comp_background_primary'))
     .height(56)
     .width('100%')
   }

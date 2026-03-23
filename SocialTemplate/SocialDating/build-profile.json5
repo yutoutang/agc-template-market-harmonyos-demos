@@ -1,12 +1,12 @@
 {
   "app": {
-    "signingConfigs": [
-    ],
+    "signingConfigs": [],
     "products": [
       {
         "name": "default",
         "signingConfig": "default",
-        "compatibleSdkVersion": "5.0.1(13)",
+        "compatibleSdkVersion": "5.0.5(17)",
+        "targetSdkVersion": "6.0.2(22)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
           "strictMode": {
@@ -18,7 +18,7 @@
     ],
     "buildModeSet": [
       {
-        "name": "debug",
+        "name": "debug"
       },
       {
         "name": "release"
@@ -88,7 +88,55 @@
     },
     {
       "name": "commons",
-      "srcPath": "./commons",
+      "srcPath": "./commons"
+    },
+    {
+      "name": "atomicservice_login",
+      "srcPath": "./components/atomicservice_login",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dial_panel",
+      "srcPath": "./components/dial_panel",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "collect_personal_info",
+      "srcPath": "./components/collect_personal_info",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "membership",
+      "srcPath": "./components/membership",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
     },
     {
       "name": "composite",

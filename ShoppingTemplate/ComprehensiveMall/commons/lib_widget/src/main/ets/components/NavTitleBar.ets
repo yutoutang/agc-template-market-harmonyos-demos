@@ -1,4 +1,5 @@
 import { routerStack } from 'lib_foundation';
+import { CommonSymbol } from './CommonSymbol';
 
 @ComponentV2
 export struct NavTitleBar {
@@ -6,6 +7,8 @@ export struct NavTitleBar {
   title: string = ''
   @Param
   titleColor: ResourceColor = $r('app.color.font_color_level1')
+  @Param
+  arrowColor: ResourceColor = $r('app.color.font_color_level1')
   @Param
   showSearchIcon: boolean = false
   @Param
@@ -30,19 +33,11 @@ export struct NavTitleBar {
     Column() {
       Row() {
         if (this.isSubTitle || this.showBackBtn) {
-          Image($r('app.media.ic_back'))
-            .width($r('app.float.head_icon_width'))
-            .height($r('app.float.head_icon_width'))
-            .aspectRatio(1)
-            .draggable(false)
-            .margin({ right: $r('app.float.space_s') })
-            .borderRadius($r('app.float.border_radius_capsule'))
-            .stateStyles({
-              normal: { .backgroundColor($r('app.color.background_color_transparent'))
-              },
-              pressed: { .backgroundColor($r('sys.color.interactive_pressed'))
-              },
-            })
+          CommonSymbol({
+            src: $r('sys.symbol.chevron_left'),
+            color: this.arrowColor,
+          })
+            .margin({ right: $r('app.float.space_l') })
             .onClick(() => {
               this.onBack();
             })

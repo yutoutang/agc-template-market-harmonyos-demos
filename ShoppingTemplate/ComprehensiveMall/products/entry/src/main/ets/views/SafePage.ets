@@ -1,5 +1,6 @@
 import { routerStack, RouterMap } from 'lib_foundation'
 import { PrivacyAgreementView } from 'module_privacy_agreement'
+import { SetupUtil } from '../utils/SetupUtil'
 
 @Builder
 export function SafePageBuilder() {
@@ -19,9 +20,15 @@ struct SafePage {
         appDesc: '这是一个适用于网络购物的综合商城应用模板',
         stack: routerStack,
         handleConfirm: () => {
-          routerStack.replacePath({
-            name: RouterMap.SPLASH_PAGE,
-          })
+          if (SetupUtil.navInfo) {
+            routerStack.replacePath({
+              name: RouterMap.MAIN_ENTRY,
+            })
+          } else {
+            routerStack.replacePath({
+              name: RouterMap.SPLASH_PAGE,
+            })
+          }
         },
       })
     }

@@ -16,6 +16,7 @@
 
 import { AppStorageV2, window } from '@kit.ArkUI';
 import { FunctionalButton, functionalButtonComponentManager } from '@kit.ScenarioFusionKit';
+import { GlobalContextUtils } from 'commonlib';
 import { UserInfo } from 'login_info';
 import { Header } from '../components/Header';
 
@@ -30,16 +31,16 @@ export struct EditPersonalCenterPage {
 
   aboutToAppear(): void {
     try {
-      window.getLastWindow(getContext(this)).then(currentWindow => {
+      window.getLastWindow(this.getUIContext()?.getHostContext()).then(currentWindow => {
         // 监视软键盘的弹出和收起
         currentWindow.on('avoidAreaChange', async data => {
           if (data.type !== window.AvoidAreaType.TYPE_KEYBOARD) {
             return;
           }
-          this.keyboardHeight = px2vp(data.area.bottomRect.height);
+          this.keyboardHeight = this.getUIContext().px2vp(data.area.bottomRect.height);
         })
       })
-    }catch (e) {
+    } catch (e) {
     }
   }
 
@@ -56,7 +57,7 @@ export struct EditPersonalCenterPage {
           // 手机号
           this.phoneNumberBuilder()
         }
-        .backgroundColor(Color.White)
+        .backgroundColor($r('sys.color.comp_background_list_card'))
         .width('100%')
         .height(104)
         .borderRadius(16)
@@ -75,6 +76,9 @@ export struct EditPersonalCenterPage {
     .backgroundColor($r('sys.color.background_secondary'))
     .width('100%')
     .height('100%')
+    .onClick(() => {
+      this.isShowNickname = false;
+    })
   }
 
   /**
@@ -129,8 +133,14 @@ export struct EditPersonalCenterPage {
     .bindSheet($$this.isShowNickname, this.setNickNameBuilder(), {
       height: 744,
       backgroundColor: $r('sys.color.background_secondary'),
-      showClose: false,
       maskColor: $r('sys.color.mask_fourth'),
+      blurStyle: BlurStyle.Regular,
+      showClose: true, // 是否显示关闭图标
+      mode: SheetMode.OVERLAY,
+      // dragBar: true, // 是否显示控制条
+      shouldDismiss: ((sheetDismiss: SheetDismiss) => { // 半模态页面交互式关闭回调函数
+        sheetDismiss.dismiss();
+      })
     })
   }
 
@@ -155,7 +165,7 @@ export struct EditPersonalCenterPage {
               styleConfig: new functionalButtonComponentManager.ButtonConfig()
                 .type(ButtonType.Normal)
                 .backgroundImage((this.loginUser.avatar && this.loginUser.avatar !== '') ? this.loginUser.avatar :
-                $r('app.media.path2x'))
+                  $r('app.media.path2x'))
                 .backgroundImageSize(ImageSize.Cover)
                 .width(40)
                 .height(40)
@@ -217,6 +227,7 @@ export struct EditPersonalCenterPage {
           .backgroundColor($r('sys.color.comp_background_primary'))
           .margin({ top: $r('app.float.vp_12') })
           .type(InputType.Normal)
+          .maxLength(12)
           .cancelButton({
             style: CancelButtonStyle.CONSTANT,
             icon: { size: $r('app.float.vp_16'), color: $r('sys.color.icon_primary') }
@@ -240,12 +251,12 @@ export struct EditPersonalCenterPage {
         .onClick(() => {
           if (this.textName.trim() !== '' && this.textName.length <= 12) {
             this.loginUser.name = this.textName
-            this.showToast('昵称修改成功');
+            GlobalContextUtils.showToast({ message: '昵称修改成功' })
             this.isShowNickname = false
           } else if (this.textName.trim() === '') {
-            this.showToast('您还未填写');
+            GlobalContextUtils.showToast({ message: '您还未填写' })
           } else {
-            this.showToast('昵称禁止超过12位');
+            GlobalContextUtils.showToast({ message: '昵称禁止超过12位' })
           }
         })
     }
@@ -261,16 +272,6 @@ export struct EditPersonalCenterPage {
   @Styles
   pressedStyles(): void {
     .backgroundColor($r('sys.color.interactive_pressed'))
-  }
-
-  showToast(message: ResourceStr) {
-    try {
-      this.getUIContext().getPromptAction().showToast({
-        message: message,
-        duration: 2000
-      });
-    } catch (error) {
-    }
   }
 }
 

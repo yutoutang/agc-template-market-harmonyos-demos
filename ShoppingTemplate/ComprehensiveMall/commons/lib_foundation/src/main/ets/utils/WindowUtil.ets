@@ -1,8 +1,8 @@
+import { common } from '@kit.AbilityKit';
 import { UIContext, window } from '@kit.ArkUI';
+import { BusinessError } from '@kit.BasicServicesKit';
 import { ToastDialog } from '@hw-agconnect/ui-toast';
 import { UtilLog as Logger } from '@hw-agconnect/util-log';
-import { common } from '@kit.AbilityKit';
-import { BusinessError } from '@kit.BasicServicesKit';
 
 const TAG: string = '[WindowUtil]';
 
@@ -57,10 +57,6 @@ class WindowUtil {
    * 打开toast
    * @param options
    */
-  public showToast(message: string) {
-    ToastDialog.showToast({ message })
-  }
-
   public toast(message: string) {
     ToastDialog.showToast({ message });
   }
@@ -68,11 +64,11 @@ class WindowUtil {
   public async setWindowScreen(isFull: boolean) {
     window.getLastWindow(this._context).then((win) => {
       win.setWindowLayoutFullScreen(isFull).catch((err: BusinessError) => {
-        Logger.error(TAG, 'set window layout failed. error: ' + JSON.stringify(err))
-      })
+        Logger.error(TAG, 'set window layout failed. error: ' + JSON.stringify(err));
+      });
     }).catch((err: BusinessError) => {
-      Logger.error(TAG, 'get last window failed. error: ' + JSON.stringify(err))
-    })
+      Logger.error(TAG, 'get last window failed. error: ' + JSON.stringify(err));
+    });
   }
 }
 

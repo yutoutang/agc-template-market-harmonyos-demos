@@ -6,10 +6,13 @@ import { WantUtils } from '../util/WantUtils';
 import { ShareService } from 'aggregated_share';
 import { notificationManager } from '@kit.NotificationKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { CommonModel, CommonConstants } from '@ohos_agcit/driver_license_exam_commonlib';
+import { EXAM_MANAGER_TYPE, ROUTE_PARAM, Video, ExamService } from '@ohos_agcit/driver_license_exam_datasource'
 
 const TAG: string = '[EntryAbility]';
 
 export default class EntryAbility extends UIAbility {
+
   public onWindowStageCreate(windowStage: window.WindowStage): void {
     Logger.info(TAG, '%{public}s', 'Ability onWindowStageCreate');
 
@@ -19,6 +22,8 @@ export default class EntryAbility extends UIAbility {
         return;
       }
       Logger.info(TAG, 'Succeeded in loading the content.');
+
+      AppStorage.setOrCreate('windowStage', windowStage);
 
       // 获取应用主窗口
       let windowClass: window.Window = windowStage.getMainWindowSync();
@@ -75,6 +80,29 @@ export default class EntryAbility extends UIAbility {
 
   onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     Logger.info(TAG, 'Ability onNewWant');
+    if (want.parameters && want.parameters.params) {
+      let param:ESObject =  {};
+      try {
+        param = JSON.parse(want.parameters.params as string)
+      } catch (e) {
+      }
+
+      if (param.message === 'practiceView') {
+        const examService = ExamService.instance(this.context as Context)
+        const par:ROUTE_PARAM = {
+          title:'模拟考试',
+          type: EXAM_MANAGER_TYPE.mock_exam,
+          examManager: examService.getMockExamManager('模拟考试')
+        }
+        CommonModel.instance.navStack.replacePathByName('practiceView', par)
+      } else if (param.message === 'orderPractice') {
+        const param:ROUTE_PARAM = {
+          title:'顺序练习',
+          type: EXAM_MANAGER_TYPE.sequence
+        }
+        CommonModel.instance.navStack.replacePathByName('practiceView', param)
+      }
+    }
     WantUtils.handlePushWant(want);
     this.shareServiceImpl.handleWant(want, this.context);
   }

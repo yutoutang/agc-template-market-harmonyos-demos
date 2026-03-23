@@ -1,5 +1,5 @@
 import { AppStorageV2, window } from '@kit.ArkUI';
-import { BusinessError } from '@kit.BasicServicesKit'
+import { BusinessError } from '@kit.BasicServicesKit';
 import { WindowUtil } from 'module_ui_base';
 import { UtilLog } from '@hw-agconnect/util-log';
 import { BreakpointModel } from './BreakpointModel';
@@ -63,11 +63,11 @@ export class CustomWindowModel {
 
   public async getLastWindow() {
     return window.getLastWindow(WindowUtil.context).then((win) => {
-      return win
+      return win;
     }).catch((err: BusinessError) => {
-      UtilLog.error(LOG_TAG, 'get last window failed. error: ' + JSON.stringify(err))
-      return undefined
-    })
+      UtilLog.error(LOG_TAG, 'get last window failed. error: ' + JSON.stringify(err));
+      return undefined;
+    });
   }
 
   /**
@@ -84,7 +84,7 @@ export class CustomWindowModel {
         );
         this.avoidBottomPadding = WindowUtil.px2vp(area.bottomRect.height);
       } catch (err) {
-        UtilLog.error('[Setting]', 'get window avoid area failed. error: ' + JSON.stringify(err))
+        UtilLog.error('[Setting]', 'get window avoid area failed. error: ' + JSON.stringify(err));
       }
     });
   };

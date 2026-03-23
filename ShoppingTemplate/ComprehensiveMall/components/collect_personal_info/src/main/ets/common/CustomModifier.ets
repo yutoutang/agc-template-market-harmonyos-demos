@@ -1,12 +1,13 @@
 import { AppStorageV2 } from '@kit.ArkUI';
-import { WindowUtil } from 'module_ui_base';
 import { ConfigInfo } from './ConfigModel';
-import { Constants } from './Constant'
+import { Constants } from './Constant';
+import { WindowModel } from './WindowModel';
 
 // 半模态column
 @ObservedV2
 export class SheetColumnModifier implements AttributeModifier<ColumnAttribute> {
   @Trace configInfo: ConfigInfo = AppStorageV2.connect(ConfigInfo, () => new ConfigInfo())!;
+  @Trace windowModel: WindowModel = AppStorageV2.connect(WindowModel, () => new WindowModel())!;
   @Trace needAvoidBottom: boolean = true;
   @Trace paddingTop: number = Constants.PADDING_L;
 
@@ -16,8 +17,7 @@ export class SheetColumnModifier implements AttributeModifier<ColumnAttribute> {
     }
   }
 
-  async applyNormalAttribute(instance: ColumnAttribute) {
-    const bottomPadding: number = await WindowUtil.getWindowBottomPadding()
+  applyNormalAttribute(instance: ColumnAttribute): void {
     instance
       .width(Constants.FULL_PERCENT)
       .height(Constants.FULL_PERCENT)
@@ -27,15 +27,15 @@ export class SheetColumnModifier implements AttributeModifier<ColumnAttribute> {
         top: this.paddingTop,
         bottom: this.configInfo.sheetType === SheetType.CENTER
           ? Constants.PADDING_L
-          : Constants.PADDING_L + (this.needAvoidBottom ? bottomPadding : 0),
-      })
+          : Constants.PADDING_L + (this.needAvoidBottom ? this.windowModel.windowBottomPadding : 0),
+      });
   }
 }
 
 // 确定按钮
 @ObservedV2
 export class ConfirmButtonModifier implements AttributeModifier<ButtonAttribute> {
-  @Trace configInfo: ConfigInfo = AppStorageV2.connect(ConfigInfo, () => new ConfigInfo())!
+  @Trace configInfo: ConfigInfo = AppStorageV2.connect(ConfigInfo, () => new ConfigInfo())!;
 
   applyNormalAttribute(instance: ButtonAttribute): void {
     instance
@@ -43,8 +43,7 @@ export class ConfirmButtonModifier implements AttributeModifier<ButtonAttribute>
       .fontSize($r('sys.float.Body_L'))
       .fontColor($r('sys.color.font_on_primary'))
       .fontWeight(FontWeight.Medium)
-      .backgroundColor(this.configInfo.themeColor)
-      .margin({ bottom: 16 })
+      .backgroundColor(this.configInfo.themeColor);
   }
 }
 
@@ -61,6 +60,6 @@ export class InnerTitleModifier implements AttributeModifier<TextAttribute> {
       })
       .transition(TransitionEffect.OPACITY
         .animation({ duration: 150, curve: Curve.Sharp, delay: 50 }),
-      )
+      );
   }
 }

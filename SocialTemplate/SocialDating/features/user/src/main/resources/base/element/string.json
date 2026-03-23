@@ -15,6 +15,10 @@
     {
       "name": "invalid_age_tip",
       "value": "输入的年龄值不支持，请输入18-99的数字"
+    },
+    {
+      "name": "agcit_huawei_social_dating",
+      "value": "1.0.0"
     }
   ]
 }

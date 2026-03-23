@@ -17,3 +17,5 @@ export { AgreementModel, AboutModel, IFontModel, WebModel } from './src/main/ets
 export { fp2pxUtil } from './src/main/ets/common/FontUtils';
 
 export { CustomWindowModel } from './src/main/ets/models/WindowModel'
+
+export { FontModel } from './src/main/ets/models/FontModel'

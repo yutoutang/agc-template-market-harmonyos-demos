@@ -1,0 +1,20 @@
+{
+  "string": [
+    {
+      "name": "page_show",
+      "value": "page from package"
+    },
+    {
+      "name": "microphone_reason",
+      "value": "语音识别"
+    },
+    {
+      "name": "agcit_huawei_exam_login_info",
+      "value": "1.0.1"
+    },
+    {
+      "name": "agcittype_huawei_exam_login_info",
+      "value": "serviceComponent"
+    }
+  ]
+}

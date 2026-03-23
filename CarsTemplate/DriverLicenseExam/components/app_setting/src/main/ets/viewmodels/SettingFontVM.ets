@@ -5,6 +5,14 @@ import { BaseViewModel } from '../models/BaseViewModel';
 export class SettingFontViewModel extends BaseViewModel {
   @Trace currentRatio: number = this.fontModel.fontSizeRatio;
   @Trace uiContext: UIContext | null = null;
+  static _instance:SettingFontViewModel
+
+  static get instance() {
+    if (!SettingFontViewModel._instance) {
+      SettingFontViewModel._instance = new SettingFontViewModel();
+    }
+    return SettingFontViewModel._instance;
+  }
 
   confirm(ratio: number) {
     this.currentRatio = ratio;

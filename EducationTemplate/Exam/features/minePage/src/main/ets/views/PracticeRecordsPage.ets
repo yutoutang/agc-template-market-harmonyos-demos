@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-import { RouterMap, RouterModule } from 'router_module';
-import { PracticeModel, PracticeRecordModel, PRACTICE_RECORD_DATA, TopBar } from 'commonlib';
+import { RouterMap, RouterModule } from 'commonlib';
+import { GlobalContextUtils, PracticeModel, PracticeRecordModel, PRACTICE_RECORD_DATA, TopBar } from 'commonlib';
 import dayjs from 'dayjs';
 
 /**
@@ -22,7 +22,7 @@ import dayjs from 'dayjs';
  */
 @ComponentV2
 export struct PracticeRecordsPage {
-  practiceModels: PracticeModel[] = []
+  practiceModels: PracticeModel[] = [];
   practiceRecordModels: PracticeRecordModel[] = [];
   todayPracticeRecord: PracticeRecordModel = new PracticeRecordModel();
 
@@ -36,73 +36,80 @@ export struct PracticeRecordsPage {
   build() {
     Column() {
       // 顶部
-      this.topBuilder()
-      Divider().color($r('sys.color.comp_divider'))
+      this.topBuilder();
+      Divider().color($r('sys.color.comp_divider'));
       Column() {
         // 当天练习
-        this.todayPracticeBuilder()
+        this.todayPracticeBuilder();
         // 练习明细
-        this.practiceDetailsBuilder()
+        this.practiceDetailsBuilder();
         // 明细表
-        this.tableBuilder()
+        this.tableBuilder();
       }
       .padding({ left: $r('app.float.vp_16'), right: $r('app.float.vp_16') })
       .width('100%')
+      .layoutWeight(1)
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM]);
     }
     .height('100%')
     .width('100%')
+    .backgroundColor($r('sys.color.comp_background_primary'))
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM]);
   }
 
   @Builder
   tableCell(text: Resource | string) {
     Text(text)
       .textAlign(TextAlign.Center)
-      .width($r('app.float.vp_82'))
+      .width($r('app.float.vp_70'))
       .fontSize($r('sys.float.Caption_L'))
       .fontColor($r('sys.color.font_secondary'))
-      .fontWeight(FontWeight.Regular)
+      .fontWeight(FontWeight.Regular);
   }
 
   @Builder
   tableBuilder() {
     Column() {
       Row() {
-        this.tableCell($r('app.string.practice_date'))
-        this.tableCell($r('app.string.practice_duration'))
-        this.tableCell($r('app.string.practice_count'))
-        this.tableCell($r('app.string.correct_rate'))
+        this.tableCell($r('app.string.practice_date'));
+        this.tableCell($r('app.string.practice_duration'));
+        this.tableCell($r('app.string.practice_count'));
+        this.tableCell($r('app.string.correct_rate'));
       }
       .height($r('app.float.vp_40'))
       .width('100%')
       .justifyContent(FlexAlign.SpaceBetween)
-      .backgroundColor($r('sys.color.background_secondary'))
+      .backgroundColor($r('sys.color.comp_background_tertiary'));
 
-      Column() {
-        ForEach(this.practiceRecordModels,
-          (item: PracticeRecordModel, index: number) => {
+      List() {
+        ForEach(this.practiceRecordModels, (item: PracticeRecordModel, index: number) => {
+          ListItem() {
             Row() {
-              this.tableCell(item.date)
-              this.tableCell(item.practiceDuration ?? '-')
-              this.tableCell(item.practiceCount ?? '-')
-              this.tableCell(item.correctRate ?? '-')
+              this.tableCell(item.date);
+              this.tableCell(item.practiceDuration ?? '-');
+              this.tableCell(item.practiceCount ?? '-');
+              this.tableCell(item.correctRate ?? '-');
             }
             .width('100%')
             .height($r('app.float.vp_40'))
-            .backgroundColor(index % 2 === 0 ? $r('sys.color.background_primary') :
-            $r('sys.color.background_secondary'))
             .justifyContent(FlexAlign.SpaceBetween)
+            .backgroundColor(index % 2 === 0 ? $r('sys.color.comp_background_primary') :
+              $r('sys.color.comp_background_tertiary'))
             .onClick(() => {
               if (item.practiceCount) {
-                RouterModule.push({ url: RouterMap.DAY_PRACTICE_DETAILS_PAGE, param: item })
+                RouterModule.push({ url: RouterMap.DAY_PRACTICE_DETAILS_PAGE, param: item });
               } else {
-                this.getUIContext().getPromptAction().showToast({
-                  message: item.date + '无练习记录'
-                })
+                GlobalContextUtils.showToast({ message: '无练习记录' });
               }
-            })
-          }, (item: PracticeRecordModel, index: number) => item.date + index)
+            });
+          };
+        }, (item: PracticeRecordModel, index: number) => item.date + index);
       }
+      .layoutWeight(1)
+      .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false });
     }
+    .layoutWeight(1);
   }
 
   /**
@@ -114,24 +121,24 @@ export struct PracticeRecordsPage {
       Text($r('app.string.practice_details'))
         .fontSize($r('sys.float.Subtitle_L'))
         .fontWeight(FontWeight.Medium)
-        .fontColor($r('sys.color.font_primary'))
+        .fontColor($r('sys.color.font_primary'));
       Row() {
         Text($r('app.string.more'))
           .fontSize($r('sys.float.Caption_L'))
           .fontWeight(FontWeight.Regular)
-          .fontColor($r('sys.color.font_secondary'))
+          .fontColor($r('sys.color.font_secondary'));
         Image($r('app.media.icon_right'))
           .width($r('app.float.vp_16'))
           .height($r('app.float.vp_16'))
-          .margin({ left: $r('app.float.vp_4') })
+          .margin({ left: $r('app.float.vp_4') });
       }
       .onClick(() => {
-        RouterModule.push({ url: RouterMap.PRACTICE_DETAILS_PAGE })
-      })
+        RouterModule.push({ url: RouterMap.PRACTICE_DETAILS_PAGE });
+      });
     }
     .width('100%')
     .justifyContent(FlexAlign.SpaceBetween)
-    .margin({ top: $r('app.float.vp_16'), bottom: $r('app.float.vp_28') })
+    .margin({ top: $r('app.float.vp_16'), bottom: $r('app.float.vp_28') });
   }
 
   /**
@@ -144,78 +151,76 @@ export struct PracticeRecordsPage {
         .fontSize($r('sys.float.Subtitle_L'))
         .fontWeight(FontWeight.Medium)
         .fontColor($r('sys.color.font_primary'))
-        .margin({ top: $r('app.float.vp_16'), bottom: $r('app.float.vp_16') })
+        .margin({ top: $r('app.float.vp_16'), bottom: $r('app.float.vp_16') });
       Text('(模拟数据：设定当天为2025-5-29)')
         .fontSize($r('sys.float.Caption_L'))
-        .fontColor($r('sys.color.font_secondary'))
+        .fontColor($r('sys.color.font_secondary'));
     }
     .width('100%')
-    .justifyContent(FlexAlign.SpaceBetween)
+    .justifyContent(FlexAlign.SpaceBetween);
 
     Row() {
       Column() {
         Text(this.todayPracticeRecord.practiceDuration ?? '-')
           .fontColor($r('sys.color.font_primary'))
           .fontSize($r('sys.float.Body_L'))
-          .fontWeight(FontWeight.Medium)
+          .fontWeight(FontWeight.Medium);
         Text($r('app.string.practice_duration'))
           .margin({ top: $r('app.float.vp_4') })
           .fontSize($r('sys.float.Caption_L'))
-          .fontColor($r('sys.color.font_secondary'))
+          .fontColor($r('sys.color.font_secondary'));
       }
       .height($r('app.float.vp_56'))
       .width($r('app.float.vp_80'))
       .justifyContent(FlexAlign.Center)
       .borderRadius(12)
-      .backgroundColor($r('sys.color.background_primary'))
+      .backgroundColor($r('sys.color.background_primary'));
 
       Column() {
         Text(this.todayPracticeRecord.practiceCount ?? '-')
           .fontWeight(FontWeight.Medium)
           .fontSize($r('sys.float.Body_L'))
-          .fontColor($r('sys.color.font_primary'))
+          .fontColor($r('sys.color.font_primary'));
         Text($r('app.string.practice_count'))
           .fontSize($r('sys.float.Caption_L'))
           .margin({ top: $r('app.float.vp_4') })
-          .fontColor($r('sys.color.font_secondary'))
+          .fontColor($r('sys.color.font_secondary'));
       }
       .height($r('app.float.vp_56'))
       .width($r('app.float.vp_80'))
       .justifyContent(FlexAlign.Center)
       .borderRadius(12)
-      .backgroundColor($r('sys.color.background_primary'))
+      .backgroundColor($r('sys.color.background_primary'));
 
       Column() {
         Text(this.todayPracticeRecord.correctRate ?? '-')
           .fontWeight(FontWeight.Medium)
           .fontColor($r('sys.color.font_primary'))
-          .fontSize($r('sys.float.Body_L'))
+          .fontSize($r('sys.float.Body_L'));
         Text($r('app.string.correct_rate'))
           .margin({ top: $r('app.float.vp_4') })
           .fontSize($r('sys.float.Caption_L'))
-          .fontColor($r('sys.color.font_secondary'))
+          .fontColor($r('sys.color.font_secondary'));
       }
       .height($r('app.float.vp_56'))
       .width($r('app.float.vp_80'))
       .justifyContent(FlexAlign.Center)
       .borderRadius(12)
-      .backgroundColor($r('sys.color.background_primary'))
+      .backgroundColor($r('sys.color.background_primary'));
     }
     .height($r('app.float.vp_80'))
     .width('100%')
-    .justifyContent(FlexAlign.SpaceBetween)
+    .justifyContent(FlexAlign.SpaceAround)
     .backgroundColor($r('sys.color.background_secondary'))
     .borderRadius($r('app.float.vp_16'))
-    .padding({ left: $r('app.float.vp_24'), right: $r('app.float.vp_24') })
+    .padding({ left: $r('app.float.vp_16'), right: $r('app.float.vp_16') })
     .onClick(() => {
       if (this.todayPracticeRecord.practiceCount) {
-        RouterModule.push({ url: RouterMap.DAY_PRACTICE_DETAILS_PAGE, param: this.todayPracticeRecord })
+        RouterModule.push({ url: RouterMap.DAY_PRACTICE_DETAILS_PAGE, param: this.todayPracticeRecord });
       } else {
-        this.getUIContext().getPromptAction().showToast({
-          message: this.todayPracticeRecord.date + '无练习记录'
-        })
+        GlobalContextUtils.showToast({ message: '无练习记录' });
       }
-    })
+    });
   }
 
   /**
@@ -227,14 +232,14 @@ export struct PracticeRecordsPage {
       // 练习记录
       TopBar({
         onClickBack: () => {
-          RouterModule.pop()
+          RouterModule.pop();
         },
         title: $r('app.string.practice_records')
-      })
+      });
     }
     .width('100%')
     .height($r('app.float.vp_56'))
-    .padding({ left: $r('app.float.vp_16'), right: $r('app.float.vp_16') })
+    .padding({ left: $r('app.float.vp_16'), right: $r('app.float.vp_16') });
   }
 
   /**
@@ -242,12 +247,12 @@ export struct PracticeRecordsPage {
    */
   initData() {
     for (let index = 0; index < 7; index++) {
-      let date: string = dayjs('2025/5/29').subtract(index, 'day').format('YYYY-MM-DD')
+      let date: string = dayjs('2025/5/29').subtract(index, 'day').format('YYYY-MM-DD');
       let record: PracticeRecordModel = new PracticeRecordModel();
       let practiceDuration: number = 0;
       let topicCount: number = 0;
       let rightCount: number = 0;
-      let onDayPracticeModels: PracticeModel[] = []
+      let onDayPracticeModels: PracticeModel[] = [];
       let practiceCount: number = 0;
       this.practiceModels.forEach((item: PracticeModel) => {
         if (date === item.date) {
@@ -257,14 +262,14 @@ export struct PracticeRecordsPage {
           practiceDuration += item.practiceDuration;
           onDayPracticeModels.push(item);
         }
-      })
+      });
       record.date = date;
       if (practiceCount > 0) {
         let h = Math.floor(practiceDuration / 3600) < 10 ? '0' + Math.floor(practiceDuration / 3600) :
-        Math.floor(practiceDuration / 3600)
+          Math.floor(practiceDuration / 3600);
         let m = Math.floor(practiceDuration % 3600 / 60) < 10 ? '0' + Math.floor(practiceDuration % 3600 / 60) :
-        Math.floor(practiceDuration % 3600 / 60)
-        let s = (practiceDuration % 60) < 10 ? '0' + (practiceDuration % 60) : (practiceDuration % 60)
+          Math.floor(practiceDuration % 3600 / 60);
+        let s = (practiceDuration % 60) < 10 ? '0' + (practiceDuration % 60) : (practiceDuration % 60);
         record.practiceDuration = h + ':' + m + ':' + s;
         record.practiceCount = practiceCount.toString();
         record.correctRate = (rightCount / topicCount * 100).toFixed(2) + '%';
@@ -280,5 +285,5 @@ export struct PracticeRecordsPage {
 
 @Builder
 export function PracticeRecordsBuilder() {
-  PracticeRecordsPage()
+  PracticeRecordsPage();
 }

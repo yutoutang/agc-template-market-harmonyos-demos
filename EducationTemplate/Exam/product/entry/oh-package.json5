@@ -6,13 +6,14 @@
   "author": "",
   "license": "",
   "dependencies": {
+    "@hw-agconnect/util-log": "1.0.0",
     "homepage": "file:../../features/homePage",
     "topicpage": "file:../../features/topicPage",
     "minepage": "file:../../features/minePage",
     "commonlib": "file:../../commons/commonLib",
-    "router_module": "file:../../commons/router_module",
     "login_info": "file:../../components/login_info",
-    "answer_questions": "file:../../components/answer_questions"
+    "answer_questions": "file:../../components/answer_questions",
+    "feedback": "file:../../components/feedback"
   }
 }
 

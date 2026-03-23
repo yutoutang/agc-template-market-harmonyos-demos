@@ -1,5 +1,5 @@
 import { UIContext, window } from '@kit.ArkUI';
-import { BusinessError } from '@kit.BasicServicesKit'
+import { BusinessError } from '@kit.BasicServicesKit';
 import { ToastDialog } from '@hw-agconnect/ui-toast';
 import { UtilLog } from '@hw-agconnect/util-log';
 
@@ -32,19 +32,19 @@ export class WindowUtil {
 
   public static px2vp(value: number) {
     if (!WindowUtil._uiContext) {
-      UtilLog.error(TAG, 'px2vp failed. cannot get ui context.')
-      return 0
+      UtilLog.error(TAG, 'px2vp failed. cannot get ui context.');
+      return 0;
     }
-    return WindowUtil._uiContext.px2vp(value)
+    return WindowUtil._uiContext.px2vp(value);
   }
 
   private static async _getLastWindow() {
     return window.getLastWindow(WindowUtil.context).then((win) => {
-      return win
+      return win;
     }).catch((err: BusinessError) => {
-      UtilLog.error(TAG, 'get last window failed. error: ' + JSON.stringify(err))
-      return undefined
-    })
+      UtilLog.error(TAG, 'get last window failed. error: ' + JSON.stringify(err));
+      return undefined;
+    });
   }
 
   /**
@@ -52,9 +52,9 @@ export class WindowUtil {
    */
   public static async getWindowBottomPadding(): Promise<number> {
     try {
-      const currentWindow = await WindowUtil._getLastWindow()
+      const currentWindow = await WindowUtil._getLastWindow();
       if (!currentWindow) {
-        return 0
+        return 0;
       }
       const area = currentWindow.getWindowAvoidArea(window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR);
       return WindowUtil.px2vp(area.bottomRect.height);
@@ -74,7 +74,7 @@ export class WindowUtil {
         return;
       }
       currentWindow.on('avoidAreaChange', WindowUtil.getWindowBottomPadding);
-    })
+    });
   }
 
   /**
@@ -86,7 +86,7 @@ export class WindowUtil {
         return;
       }
       currentWindow.off('avoidAreaChange', WindowUtil.getWindowBottomPadding);
-    })
+    });
   }
 
   /**
@@ -102,9 +102,9 @@ export class WindowUtil {
         callback(keyboardH);
         currentWindow.on('keyboardHeightChange', callback);
       } catch (err) {
-        UtilLog.error(TAG, 'get window avoid area failed. error: ' + JSON.stringify(err))
+        UtilLog.error(TAG, 'get window avoid area failed. error: ' + JSON.stringify(err));
       }
-    })
+    });
   }
 
   /**
@@ -116,6 +116,6 @@ export class WindowUtil {
         return;
       }
       currentWindow.off('keyboardHeightChange', callback);
-    })
+    });
   }
 }

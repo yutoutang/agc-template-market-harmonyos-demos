@@ -19,5 +19,3 @@ export class CommonConstants {
   public static readonly DEFAULT_POSTER_MAX_HEIGHT = 535;
   public static readonly DEFAULT_LONG_IMG_RATIO = 1 / 2;
 }
-
-export const LOG_TAG:string = '[AggregatedShare]'

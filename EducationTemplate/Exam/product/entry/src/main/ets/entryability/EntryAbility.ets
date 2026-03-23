@@ -13,49 +13,49 @@
  * limitations under the License.
  */
 
-import { ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
-import { hilog } from '@kit.PerformanceAnalysisKit';
-import { KeyboardAvoidMode, window } from '@kit.ArkUI';
+import { UIAbility } from '@kit.AbilityKit';
+import { window } from '@kit.ArkUI';
 import { RouterTable } from '../model/RouterTable';
+import { UtilLog } from '@hw-agconnect/util-log';
 
-const DOMAIN = 0x0000;
+const TAG = '[EntryAbility]';
 
 export default class EntryAbility extends UIAbility {
-  onCreate(want: Want): void {
-    // 初始化路由表
-    RouterTable.routerInit()
-    this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
-    // 全局设置为浅色模式
-    let applicationContext = this.context.getApplicationContext();
-    applicationContext.setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT);
 
+  onCreate(): void {
+    // 初始化路由表
+    RouterTable.routerInit();
   }
 
   onDestroy(): void {
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onDestroy');
+    UtilLog.info(TAG, 'Ability onDestroy');
   }
 
   onWindowStageCreate(windowStage: window.WindowStage): void {
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
-    windowStage.loadContent('pages/Index', (err) => {
-      windowStage.getMainWindowSync().getUIContext().setKeyboardAvoidMode(KeyboardAvoidMode.OFFSET);
-      if (err.code) {
-        hilog.error(DOMAIN, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err));
-        return;
-      }
-      hilog.info(DOMAIN, 'testTag', 'Succeeded in loading the content.');
-    });
+    UtilLog.info(TAG, 'Ability onWindowStageCreate');
+    try {
+      windowStage.loadContent('pages/Index', (err) => {
+        if (err.code) {
+          UtilLog.error(TAG, 'Failed to load the content. Cause: %{public}s', JSON.stringify(err));
+          return;
+        }
+        UtilLog.info(TAG, 'Succeeded in loading the content.');
+      });
+    }catch (e) {
+      UtilLog.info(TAG, 'Ability onWindowStageCreate error');
+    }
   }
 
   onWindowStageDestroy(): void {
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageDestroy');
+    UtilLog.info(TAG, 'onWindowStageDestroy.');
   }
 
   onForeground(): void {
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onForeground');
+    UtilLog.info(TAG, 'Ability onForeground.');
   }
 
   onBackground(): void {
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onBackground');
+    UtilLog.info(TAG, 'Ability onBackground.');
   }
-}
+
+};

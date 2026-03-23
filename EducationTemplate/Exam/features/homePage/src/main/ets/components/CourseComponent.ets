@@ -14,7 +14,7 @@
  */
 
 import { Course } from '../model/Course'
-import { RouterMap, RouterModule } from 'router_module'
+import { RouterMap, RouterModule } from 'commonlib'
 
 // 精选课程卡片组件
 @ComponentV2
@@ -31,7 +31,7 @@ export struct CourseComponent {
     }
     .borderRadius(16)
     .padding({ top: '16vp', bottom: '16vp' })
-    .backgroundColor($r('sys.color.background_primary'))
+    .backgroundColor($r('sys.color.comp_background_list_card'))
     .height('138vp')
     .width('100%')
   }
@@ -66,6 +66,7 @@ export struct CourseComponent {
           .width('100%')
           .fontSize($r('sys.float.Body_M'))
           .fontWeight(FontWeight.Medium)
+          .fontColor($r('sys.color.font_primary'))
       }
       .width('100%')
       .justifyContent(FlexAlign.Start)
@@ -80,8 +81,8 @@ export struct CourseComponent {
             .textAlign(TextAlign.Start)
             .width('100%')
           Text(`已有 ${this.course.buyNumbers}人 购买`)
-            .fontWeight(FontWeight.Lighter)
-            .fontColor($r('sys.color.black'))
+            .fontWeight(FontWeight.Regular)
+            .fontColor($r('sys.color.font_tertiary'))
             .fontSize($r('sys.float.Body_S'))
             .textAlign(TextAlign.Start)
             .width('100%')

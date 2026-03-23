@@ -1,4 +1,5 @@
-import { Logger } from 'module_ui_base';
+import { UtilLog as Logger } from '@hw-agconnect/util-log';
+import { CommonSymbol } from 'lib_widget';
 import { LOG_TAG } from '../commons/Constants';
 import { PopupSheetController } from '../commons/Model';
 
@@ -8,10 +9,6 @@ export struct PopupSheet {
   @Param @Require visible: boolean = false;
   // 蒙层高度
   @Param maskHeight: Length = '100%';
-  // 弹框背景颜色
-  @Param bgColor: ResourceColor = '#fff';
-  // 弹框圆角
-  @Param cornerRadius: string | number = '';
   // 弹框标题
   @Param title: ResourceStr = '标题';
   // 自定义内容
@@ -91,8 +88,6 @@ export struct PopupSheet {
   @Builder
   ContentBuilder() {
     PopupSheetContent({
-      bgColor: this.bgColor,
-      cornerRadius: this.cornerRadius,
       title: this.title,
       popupController: this.popupController,
       customContentBuilder: this.customContentBuilder,
@@ -105,10 +100,6 @@ export struct PopupSheet {
 
 @ComponentV2
 export struct PopupSheetContent {
-  // 弹框背景颜色
-  @Param bgColor: ResourceColor = '#fff';
-  // 弹框圆角
-  @Param cornerRadius: string | number = '';
   // 弹框标题
   @Param title: ResourceStr = '标题';
   @Param popupController: PopupSheetController = new PopupSheetController();
@@ -131,7 +122,7 @@ export struct PopupSheetContent {
 
   build() {
     Column() {
-      Column({ space: 38 }) {
+      Column({ space: 16 }) {
         this.Header();
 
         if (this.customContentBuilder) {
@@ -141,8 +132,11 @@ export struct PopupSheetContent {
       .alignItems(HorizontalAlign.Start)
       .width('100%')
       .height('80%')
-      .backgroundColor(this.bgColor)
-      .borderRadius(this.cornerRadius)
+      .backgroundColor($r('app.color.background_color_primary'))
+      .borderRadius({
+        topLeft: $r('app.float.border_radius_xl'),
+        topRight: $r('app.float.border_radius_xl'),
+      })
       .padding(16)
       .translate({ x: 0, y: this.translateY })
       .animation({ duration: 200, curve: Curve.EaseInOut })
@@ -163,16 +157,16 @@ export struct PopupSheetContent {
         .fontWeight(FontWeight.Bold)
         .layoutWeight(1);
 
-      Button({ type: ButtonType.Circle, stateEffect: true }) {
-        Image($r('app.media.ic_close')).fillColor('#191919')
-          .width(18).height(18);
-      }
-      .width(32)
-      .height(32)
-      .backgroundColor('#F3F3F3')
-      .onClick(() => {
-        this.close && this.close();
-      });
-    };
+      CommonSymbol({
+        src: $r('sys.symbol.xmark'),
+        fontSize: 16,
+      })
+        .onClick(() => {
+          this.close && this.close();
+        });
+    }
+    .padding({
+      bottom: $r('app.float.space_s'),
+    })
   }
 }

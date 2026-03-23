@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-import { PracticeModel, PracticeRecordModel, PRACTICE_RECORD_DATA, TopBar } from 'commonlib';
-import { RouterMap, RouterModule } from 'router_module';
+import { GlobalContextUtils, PracticeModel, PracticeRecordModel, PRACTICE_RECORD_DATA, TopBar } from 'commonlib';
+import { RouterMap, RouterModule } from 'commonlib';
 import dayjs from 'dayjs';
 
 /**
@@ -31,25 +31,28 @@ export struct PracticeDetailsPage {
     // 练习记录测试数据
     this.practiceModels = PRACTICE_RECORD_DATA;
     // 初始化数据
-    this.initData()
+    this.initData();
   }
 
   build() {
     Column() {
       // 顶部
-      this.topBuilder()
-      Divider().color($r('sys.color.comp_divider'))
+      this.topBuilder();
+      Divider().color($r('sys.color.comp_divider'));
       Column() {
         // 时间
-        this.timeBuilder()
+        this.timeBuilder();
         // 明细表
-        this.tableBuilder()
+        this.tableBuilder();
       }
-      .width('100%')
+      .layoutWeight(1)
       .padding({ left: $r('app.float.vp_16'), right: $r('app.float.vp_16') })
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM]);
     }
     .width('100%')
     .height('100%')
+    .backgroundColor($r('sys.color.comp_background_primary'))
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM]);
   }
 
   /**
@@ -58,11 +61,11 @@ export struct PracticeDetailsPage {
   @Builder
   tableCellStyle(text: Resource | string) {
     Text(text)
-      .width($r('app.float.vp_82'))
+      .width($r('app.float.vp_70'))
       .textAlign(TextAlign.Center)
       .fontSize($r('sys.float.Caption_L'))
       .fontWeight(FontWeight.Regular)
-      .fontColor($r('sys.color.font_secondary'))
+      .fontColor($r('sys.color.font_secondary'));
   }
 
   /**
@@ -72,48 +75,46 @@ export struct PracticeDetailsPage {
   tableBuilder() {
     Column() {
       Row() {
-        this.tableCellStyle($r('app.string.practice_date'))
-        this.tableCellStyle($r('app.string.practice_duration'))
-        this.tableCellStyle($r('app.string.practice_count'))
-        this.tableCellStyle($r('app.string.correct_rate'))
+        this.tableCellStyle($r('app.string.practice_date'));
+        this.tableCellStyle($r('app.string.practice_duration'));
+        this.tableCellStyle($r('app.string.practice_count'));
+        this.tableCellStyle($r('app.string.correct_rate'));
       }
       .width('100%')
       .height($r('app.float.vp_40'))
-      .backgroundColor($r('sys.color.background_secondary'))
-      .justifyContent(FlexAlign.SpaceBetween)
+      .backgroundColor($r('sys.color.comp_background_tertiary'))
+      .justifyContent(FlexAlign.SpaceBetween);
 
       List() {
         ForEach(this.practiceRecordModels,
           (item: PracticeRecordModel, index: number) => {
             ListItem() {
               Row() {
-                this.tableCellStyle(item.date)
-                this.tableCellStyle(item.practiceDuration ?? '-')
-                this.tableCellStyle(item.practiceCount ?? '-')
-                this.tableCellStyle(item.correctRate ?? '-')
+                this.tableCellStyle(item.date);
+                this.tableCellStyle(item.practiceDuration ?? '-');
+                this.tableCellStyle(item.practiceCount ?? '-');
+                this.tableCellStyle(item.correctRate ?? '-');
               }
               .width('100%')
               .height($r('app.float.vp_40'))
-              .backgroundColor(index % 2 === 0 ? $r('sys.color.background_primary') :
-              $r('sys.color.background_secondary'))
+              .backgroundColor(index % 2 === 0 ? $r('sys.color.comp_background_primary') :
+                $r('sys.color.comp_background_tertiary'))
               .justifyContent(FlexAlign.SpaceBetween)
               .onClick(() => {
                 if (item.practiceCount) {
-                  RouterModule.push({ url: RouterMap.DAY_PRACTICE_DETAILS_PAGE, param: item })
+                  RouterModule.push({ url: RouterMap.DAY_PRACTICE_DETAILS_PAGE, param: item });
                 } else {
-                  this.getUIContext().getPromptAction().showToast({
-                    message: item.date + '无练习记录'
-                  })
+                  GlobalContextUtils.showToast({ message: '无练习记录' });
                 }
-              })
-            }
-          }, (item: PracticeRecordModel, index: number) => item.date + index)
+              });
+            };
+          }, (item: PracticeRecordModel, index: number) => item.date + index);
       }
-      .width('100%')
-      .height('82%')
+      .layoutWeight(1)
       .scrollBar(BarState.Off)
-      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
+      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false });
     }
+    .layoutWeight(1);
   }
 
   /**
@@ -127,32 +128,32 @@ export struct PracticeDetailsPage {
           .fontSize($r('sys.float.Body_M'))
           .fontColor($r('sys.color.font_on_primary'))
           .fontWeight(FontWeight.Medium)
-          .margin({ left: $r('app.float.vp_8') })
+          .margin({ left: $r('app.float.vp_8') });
         Image($r('app.media.arrow_bottom_filled'))
           .width($r('app.float.vp_20'))
           .height($r('app.float.vp_20'))
-          .rotate({ angle: this.descOrder ? 0 : 180 })
+          .rotate({ angle: this.descOrder ? 0 : 180 });
       }
       .width($r('app.float.vp_58'))
       .height($r('app.float.vp_28'))
       .backgroundColor($r('app.color.time_btn'))
       .borderRadius(8)
       .onClick(() => {
-        this.descOrder = !this.descOrder
+        this.descOrder = !this.descOrder;
         if (this.descOrder) {
-          this.practiceRecordModels.sort((a, b) => dayjs(b.date).valueOf() - dayjs(a.date).valueOf())
+          this.practiceRecordModels.sort((a, b) => dayjs(b.date).valueOf() - dayjs(a.date).valueOf());
         } else {
-          this.practiceRecordModels.sort((a, b) => dayjs(a.date).valueOf() - dayjs(b.date).valueOf())
+          this.practiceRecordModels.sort((a, b) => dayjs(a.date).valueOf() - dayjs(b.date).valueOf());
         }
-      })
+      });
 
       Text($r('app.string.recent_30_days_practice'))
         .fontSize($r('sys.float.Body_S'))
-        .fontColor($r('sys.color.font_secondary'))
+        .fontColor($r('sys.color.font_secondary'));
     }
     .width('100%')
     .justifyContent(FlexAlign.SpaceBetween)
-    .margin({ top: $r('app.float.vp_12'), bottom: $r('app.float.vp_12') })
+    .margin({ top: $r('app.float.vp_12'), bottom: $r('app.float.vp_12') });
   }
 
   /**
@@ -164,14 +165,14 @@ export struct PracticeDetailsPage {
       // 练习明细
       TopBar({
         onClickBack: () => {
-          RouterModule.pop()
+          RouterModule.pop();
         },
         title: $r('app.string.practice_details')
-      })
+      });
     }
     .width('100%')
     .height($r('app.float.vp_56'))
-    .padding({ left: $r('app.float.vp_16'), right: $r('app.float.vp_16') })
+    .padding({ left: $r('app.float.vp_16'), right: $r('app.float.vp_16') });
   }
 
   /**
@@ -180,12 +181,12 @@ export struct PracticeDetailsPage {
   initData() {
     for (let index = 0; index < 30; index++) {
       let record: PracticeRecordModel = new PracticeRecordModel();
-      let date: string = dayjs('2025/5/29').subtract(index, 'day').format('YYYY-MM-DD')
+      let date: string = dayjs('2025/5/29').subtract(index, 'day').format('YYYY-MM-DD');
       let practiceDuration: number = 0;
       let rightCount: number = 0;
       let topicCount: number = 0;
       let practiceCount: number = 0;
-      let onDayPracticeModels: PracticeModel[] = []
+      let onDayPracticeModels: PracticeModel[] = [];
       this.practiceModels.forEach((item: PracticeModel) => {
         if (date === item.date) {
           practiceDuration += item.practiceDuration;
@@ -194,17 +195,17 @@ export struct PracticeDetailsPage {
           practiceCount++;
           onDayPracticeModels.push(item);
         }
-      })
+      });
       record.date = date;
       let h = Math.floor(practiceDuration / 3600) < 10 ? '0' + Math.floor(practiceDuration / 3600) :
-      Math.floor(practiceDuration / 3600)
+        Math.floor(practiceDuration / 3600);
       let m = Math.floor(practiceDuration % 3600 / 60) < 10 ? '0' + Math.floor(practiceDuration % 3600 / 60) :
-      Math.floor(practiceDuration % 3600 / 60)
-      let s = (practiceDuration % 60) < 10 ? '0' + (practiceDuration % 60) : (practiceDuration % 60)
+        Math.floor(practiceDuration % 3600 / 60);
+      let s = (practiceDuration % 60) < 10 ? '0' + (practiceDuration % 60) : (practiceDuration % 60);
       if (practiceCount > 0) {
         record.practiceDuration = h + ':' + m + ':' + s;
         record.practiceCount = practiceCount.toString();
-        record.correctRate = (rightCount / topicCount * 100).toFixed(2) + '%'
+        record.correctRate = (rightCount / topicCount * 100).toFixed(2) + '%';
         record.practiceModels = onDayPracticeModels;
       }
       this.practiceRecordModels.push(record);
@@ -214,5 +215,5 @@ export struct PracticeDetailsPage {
 
 @Builder
 export function PracticeDetailsBuilder() {
-  PracticeDetailsPage()
+  PracticeDetailsPage();
 }

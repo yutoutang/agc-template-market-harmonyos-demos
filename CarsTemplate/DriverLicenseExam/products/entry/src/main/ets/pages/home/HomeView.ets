@@ -55,10 +55,12 @@ export struct HomeView {
   @Local videoList:Video[] = this.examService.getVideList();
   @Local guideData: GuideData = GuideData.instance;
   swiperController: SwiperController = new SwiperController();
+  @Event tabChange:(index:number) => void = () => {};
 
   @Monitor('guideData.driveStage')
   dirveStage() {
     this.currentTab = this.guideData.driveStage as number - 1;
+    this.tabChange(this.currentTab)
   }
 
 
@@ -77,6 +79,7 @@ export struct HomeView {
         .fontWeight(FontWeight.Medium)
         .textAlign(TextAlign.Center)
         .width('100%')
+        .maxFontScale(1)
     }
     .width(CommonConstants.FULL_WIDTH)
     .height(136)
@@ -100,6 +103,7 @@ export struct HomeView {
           .fontSize(16)
           .fontColor('rgba(0,0,0,0.9)')
           .width(CommonConstants.FULL_WIDTH)
+          .maxFontScale(1)
         List({space:12}) {
           ForEach(this.videoList, (item:Video) => {
             ListItem() {
@@ -130,6 +134,7 @@ export struct HomeView {
                   .fontSize(14)
                   .fontColor('rgba(0,0,0,0.6)')
                   .width(CommonConstants.FULL_WIDTH)
+                  .maxFontScale(1)
               }
               .width(104)
             }
@@ -169,13 +174,15 @@ export struct HomeView {
             .fontSize(14)
             .fontColor('#FFFFFF')
             .fontWeight(FontWeight.Bold)
+            .maxFontScale(1)
 
           Blank();
 
           Text('前往练习')
             .fontSize(12)
             .fontColor('#FFFFFF')
-            .margin({ right: 4 });
+            .margin({ right: 4 })
+            .maxFontScale(1)
 
           Image($r('app.media.right_triangle'))
             .width(16)
@@ -198,6 +205,7 @@ export struct HomeView {
           Text('练习进度')
             .fontSize(10)
             .fontColor('rgba(0,0,0,0.6)')
+            .maxFontScale(1)
 
           Stack({ alignContent: Alignment.Center }) {
             CanvasView({
@@ -213,6 +221,7 @@ export struct HomeView {
           Text(`${this.didCount}/${this.totalCount}`)
             .fontSize(10)
             .fontColor('rgba(0,0,0,0.6)')
+            .maxFontScale(1)
         }
         .width(CommonConstants.FULL_WIDTH)
       }
@@ -234,6 +243,7 @@ export struct HomeView {
             .fontSize(14)
             .fontColor('#FFFFFF')
             .fontWeight(FontWeight.Bold)
+            .maxFontScale(1)
 
           Blank();
 
@@ -243,6 +253,7 @@ export struct HomeView {
             .margin({
               right:4
             })
+            .maxFontScale(1)
 
           Image($r('app.media.right_triangle'))
             .width(16)
@@ -281,6 +292,7 @@ export struct HomeView {
             .fontSize(14)
             .lineHeight(19)
             .fontColor('rgba(0,0,0,0.9)')
+            .maxFontScale(1)
         }
         .justifyContent(FlexAlign.Center)
         .onClick(() => {
@@ -298,6 +310,7 @@ export struct HomeView {
             .fontSize(14)
             .lineHeight(19)
             .fontColor('rgba(0,0,0,0.9)')
+            .maxFontScale(1)
         }
         .justifyContent(FlexAlign.Center)
         .onClick(() => {
@@ -314,6 +327,7 @@ export struct HomeView {
             .fontSize(14)
             .lineHeight(19)
             .fontColor('rgba(0,0,0,0.9)')
+            .maxFontScale(1)
         }
         .justifyContent(FlexAlign.Center)
         .onClick(() => {
@@ -340,7 +354,8 @@ export struct HomeView {
               'rgba(0,0,0,0.6)')
             .fontSize(14)
             .fontWeight(this.currentTab === index ? FontWeight.Bold : FontWeight.Normal)
-            .margin({ top: 4, bottom: 4 });
+            .margin({ top: 4, bottom: 4 })
+            .maxFontScale(1)
 
           if (this.currentTab === index) {
             Divider()
@@ -355,6 +370,7 @@ export struct HomeView {
         .justifyContent(FlexAlign.Start)
         .onClick(() => {
           this.swiperController.changeIndex(index);
+          this.tabChange(index);
         })
       }, (item:KEMUTabListItem) => JSON.stringify(item))
     }
@@ -373,6 +389,7 @@ export struct HomeView {
         .fontSize(24)
         .fontWeight(FontWeight.Medium)
         .fontColor('rgba(0,0,0,0.9)')
+        .maxFontScale(1)
     }
     .width(CommonConstants.FULL_PERCENT)
     .padding({
@@ -400,6 +417,7 @@ export struct HomeView {
                 .margin({
                   right:4
                 })
+                .maxFontScale(1)
 
               Image($r('app.media.city_triangle'))
                 .width(12)
@@ -415,6 +433,7 @@ export struct HomeView {
             Row({ space: 8 }) {
               Image($r('app.media.ic_glass')).width(16);
               Text('请输入关键字搜索').fontSize(14).fontColor('#999999')
+                .maxFontScale(1)
             }
             .backgroundColor('#0D000000')
             .height(40)

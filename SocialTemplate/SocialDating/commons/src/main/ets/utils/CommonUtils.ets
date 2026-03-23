@@ -1,4 +1,3 @@
-import { intl } from '@kit.LocalizationKit';
 import i18n from '@ohos.i18n';
 import { Constants } from './Constants';
 import { Decimal } from '@kit.ArkTS';
@@ -11,7 +10,7 @@ export class CommonUtils {
   static YI = 100000000;
 
   static formatDateToMinutes(date: Date): string {
-    let dateFormat2 = new intl.DateTimeFormat('zh-CN', { dateStyle: 'short', timeStyle: 'short' });
+    let dateFormat2 = new Intl.DateTimeFormat('zh-CN', { dateStyle: 'short', timeStyle: 'short' });
     return dateFormat2.format(date);
   }
 

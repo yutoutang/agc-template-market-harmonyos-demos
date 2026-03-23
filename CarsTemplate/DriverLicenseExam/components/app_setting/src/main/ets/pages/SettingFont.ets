@@ -11,30 +11,45 @@ export function SettingFontBuilder() {
 
 @ComponentV2
 struct SettingFont {
-  @Local vm: SettingFontViewModel = new SettingFontViewModel();
+  @Local vm: SettingFontViewModel = SettingFontViewModel.instance;
+
+  @Local bottomRectHeight: number = 0;
+  @Local topRectHeight: number = 0;
 
   aboutToAppear(): void {
     this.vm.setUIContext(this.getUIContext());
+    this.bottomRectHeight = AppStorage.get('bottomRectHeight') || 0;
+    this.topRectHeight = AppStorage.get('topRectHeight') || 0;
   }
 
   build() {
     NavDestination() {
-      NavHeaderBar({ title: '字体大小' })
-
-      if (this.vm.configInfo.isSheet) {
-        this.coreView()
-      } else {
-        GridRow(GridRowColSetting.DEFAULT_GRID_ROW_OPTIONS) {
-          GridCol({
-            span: GridRowColSetting.DEFAULT_CENTER_COL_SPAN,
-            offset: GridRowColSetting.DEFAULT_CENTER_COL_OFFSET,
-          }) {
+      Scroll() {
+        Column() {
+          if (this.vm.configInfo.isSheet) {
             this.coreView()
+          } else {
+            GridRow(GridRowColSetting.DEFAULT_GRID_ROW_OPTIONS) {
+              GridCol({
+                span: GridRowColSetting.DEFAULT_CENTER_COL_SPAN,
+                offset: GridRowColSetting.DEFAULT_CENTER_COL_OFFSET,
+              }) {
+                this.coreView()
+              }
+            }
           }
         }
+        .padding({
+          left:16,
+          right:16
+        })
       }
     }
-    .attributeModifier(this.vm.pageModifier)
+    .title('字体大小')
+    .padding({
+      top:this.getUIContext().px2vp(this.topRectHeight),
+      bottom: this.getUIContext().px2vp(this.bottomRectHeight)
+    })
     .backgroundColor(this.vm.configInfo.isSheet ? $r('app.color.page_bg') : $r('sys.color.background_secondary'))
   }
 
@@ -76,7 +91,7 @@ struct SettingFont {
   followSwitch() {
     Row() {
       Text('跟随系统')
-        .fontSize(this.vm.getDescFg(14))
+        .fontSize(this.vm.getDescFg(16))
         .fontColor($r('sys.color.font_primary'))
         .fontWeight(FontWeight.Medium)
       Toggle({ type: ToggleType.Switch, isOn: this.vm.fontModel.followSystem })
@@ -106,8 +121,7 @@ struct SettingFont {
       disabled: this.vm.fontModel.followSystem,
       themeColor: this.vm.configInfo.themeColor,
       onRatioChange: (ratio: number) => {
-        this.vm.currentRatio = ratio;
-        this.vm.fontModel.fontSizeRatio = ratio;
+        this.vm.confirm(ratio);
       },
     })
   }

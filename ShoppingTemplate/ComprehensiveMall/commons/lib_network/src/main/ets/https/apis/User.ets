@@ -1,4 +1,4 @@
-import { RequestUrlMap } from '../../constants/Enums';
+import { RequestUrlMap } from '../../constants/RequestUrlMap';
 import { UpdateUserInfoReq, UpdateUserPointsReq, UserLoginReq } from '../../types/RequestTypes';
 import { BaseResponse } from '../../types/responses/BaseResponse';
 import {
@@ -15,21 +15,21 @@ class UserApis {
    * 用户登录
    */
   public login(params?: UserLoginReq): Promise<BaseResponse> {
-    return request.get(RequestUrlMap.USER_LOGIN, { params })
+    return request.get(RequestUrlMap.USER_LOGIN, { params });
   }
 
   /**
    * 用户登出
    */
   public logout(): Promise<BaseResponse> {
-    return request.get(RequestUrlMap.USER_LOGOUT)
+    return request.get(RequestUrlMap.USER_LOGOUT);
   }
 
   /**
    * 修改用户信息
    */
   public updateUserInfo(data: UpdateUserInfoReq): Promise<BaseResponse> {
-    return request.put(RequestUrlMap.USER_INFO, data)
+    return request.put(RequestUrlMap.USER_INFO, data);
   }
 
   /**
@@ -44,7 +44,7 @@ class UserApis {
    * @param date YYYY-DD
    */
   public getUserPointsRecord(date: string): Promise<UserPointsRecordResp> {
-    return request.get(RequestUrlMap.USER_POINTS_DETAIL, { params: { date } })
+    return request.get(RequestUrlMap.USER_POINTS_DETAIL, { params: { date } });
   }
 
   /**
@@ -58,28 +58,28 @@ class UserApis {
    * 获取积分可兑换的商品列表
    */
   public getProductForPoints(): Promise<ProductForPointsResp> {
-    return request.get(RequestUrlMap.USER_POINTS_PRODUCT)
+    return request.get(RequestUrlMap.USER_POINTS_PRODUCT);
   }
 
   /**
    * 积分兑换商品
    */
   public redeemPointsForProducts(product: UserPointRedemptionSku): Promise<BaseResponse> {
-    return request.post(RequestUrlMap.USER_POINTS_REDEMPTION, product)
+    return request.post(RequestUrlMap.USER_POINTS_REDEMPTION, product);
   }
 
   /**
    * 开通/续费年卡会员
    */
   public subscribeMembership(): Promise<BaseResponse> {
-    return request.post(RequestUrlMap.USER_MEMBERSHIP)
+    return request.post(RequestUrlMap.USER_MEMBERSHIP);
   }
 
   /**
    * 查询会员信息
    */
   public getMembershipInfo(): Promise<MembershipInfoResp> {
-    return request.get(RequestUrlMap.USER_MEMBERSHIP)
+    return request.get(RequestUrlMap.USER_MEMBERSHIP);
   }
 }
 

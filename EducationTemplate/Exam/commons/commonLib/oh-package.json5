@@ -6,7 +6,6 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "router_module": "file:../router_module",
     "answer_questions": "file:../../components/answer_questions"
   }
 }

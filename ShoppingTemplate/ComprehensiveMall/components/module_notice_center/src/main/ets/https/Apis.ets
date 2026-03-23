@@ -69,7 +69,7 @@ class NoticeApis {
    * 删除消息
    */
   deleteNotice(id: string): Promise<number> {
-    return request.delete(RequestUrlMap.NOTICE_DETAIL, { params: { id } })
+    return request.delete(RequestUrlMap.NOTICE_DETAIL, { params: { id } });
   }
 }
 

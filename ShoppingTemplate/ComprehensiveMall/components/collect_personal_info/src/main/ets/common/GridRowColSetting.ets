@@ -14,7 +14,7 @@ export class GridRowColSetting {
     md: 8,
     lg: 12,
     xl: 12,
-  }
+  };
   /**
    * 栅格布局-x间距
    */
@@ -23,7 +23,7 @@ export class GridRowColSetting {
     md: 12,
     lg: 16,
     xl: 20,
-  }
+  };
   /**
    * 栅格布局-margin
    */

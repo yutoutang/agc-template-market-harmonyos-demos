@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+import { ConfigurationConstant } from '@kit.AbilityKit';
+
 @ObservedV2
 export class SetupItem {
   @Trace msg: string
@@ -42,3 +44,27 @@ export class CollectionItem {
     this.isDelete = isDelete
   }
 }
+
+export interface ISelectOption {
+  id: number | string;
+  label: string;
+  value?: Object;
+}
+
+export const lightDarkOptions: ISelectOption[] = [
+  {
+    id: 0,
+    label: '跟随系统',
+    value: ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET,
+  },
+  {
+    id: 1,
+    label: '普通模式',
+    value: ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT,
+  },
+  {
+    id: 2,
+    label: '夜间模式',
+    value: ConfigurationConstant.ColorMode.COLOR_MODE_DARK,
+  }
+];

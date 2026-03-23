@@ -1,8 +1,6 @@
-import { BusinessError } from '@kit.BasicServicesKit';
-import * as wxopensdk from '@tencent/wechat_open_sdk';
-import { PopViewUtil, WindowUtil } from 'module_ui_base';
 import { Constants, LoginChannelType } from '../common/Constant';
-import { Channel, LoginSheetParams, PrivacyContent } from '../model/Index';
+import { Channel, LoginFailError, LoginSheetParams, PrivacyContent } from '../model/Index';
+import { PopViewUtils } from './PopViewUtils';
 import { LoginController, ApiController } from './Utils';
 
 @Builder
@@ -35,7 +33,6 @@ export struct loginSheet {
 
 @ObservedV2
 export class LoginInfoOptions {
-  @Trace wxApi: wxopensdk.WXApi = wxopensdk.WXAPIFactory.createWXAPI('xxx')
   @Trace routerModule?: NavPathStack = new NavPathStack()
   @Trace icon: ResourceStr = '';
   @Trace themeColor: ResourceColor = '#0A59F7';
@@ -51,7 +48,7 @@ export class LoginInfoOptions {
   })
   )
   @Trace loginController: LoginController = new LoginController();
-  handleLoginFail: (loginChannelType: LoginChannelType, error: BusinessError | wxopensdk.BaseResp) => void = () => {
+  handleLoginFail: (loginChannelType: LoginChannelType, error: LoginFailError) => void = () => {
   }
   obtainVerifyCode: () => Promise<void> = () => new Promise(() => {
   });
@@ -63,17 +60,13 @@ export class LoginInfoOptions {
 export class LoginSheetUtils {
   static sheetParams: LoginSheetParams = new LoginSheetParams();
 
-  static open(params: LoginInfoOptions) {
-    PopViewUtil.openSheet(wrapBuilder(loginSheetBuilder), {
+  static open(uiContext: UIContext, params: LoginInfoOptions) {
+    PopViewUtils.showSheet(uiContext, wrapBuilder(loginSheetBuilder), {
       showClose: true,
       height: Constants.DEFAULT_LOGIN_SHEET_HEIGHT,
       backgroundColor: $r('sys.color.background_secondary'),
-      detents: [Constants.DEFAULT_LOGIN_SHEET_HEIGHT, SheetSize.LARGE],
       dragBar: true,
       scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-      onHeightDidChange: (height: number) => {
-        LoginSheetUtils.sheetParams.height = WindowUtil.px2vp(height);
-      },
       onTypeDidChange: (type: SheetType) => {
         LoginSheetUtils.sheetParams.sheetType = type;
       },
@@ -81,6 +74,6 @@ export class LoginSheetUtils {
   }
 
   static close() {
-    PopViewUtil.closeSheet()
+    PopViewUtils.closeSheet()
   }
 }

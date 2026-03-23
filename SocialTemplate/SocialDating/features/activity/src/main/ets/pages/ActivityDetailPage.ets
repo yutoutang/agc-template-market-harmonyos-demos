@@ -7,10 +7,10 @@ export function ActivityDetailPageBuilder() {
   ActivityDetailPage()
 }
 
-@Component
+@ComponentV2
 export struct ActivityDetailPage {
-  @Consume('pageStack') pageStack: NavPathStack;
-  @Prop detail: ActivityInfo | undefined = undefined;
+  @Consumer('pageStack') pageStack: NavPathStack = new NavPathStack();
+  @Param @Once detail: ActivityInfo | undefined = undefined;
 
   aboutToAppear(): void {
     let params: ActivityInfo[] = this.pageStack.getParamByName('ActivityDetail') as ActivityInfo[];
@@ -78,7 +78,7 @@ export struct ActivityDetailPage {
                 .width('90%')
             }.margin({ bottom: 12 }).justifyContent(FlexAlign.Start)
           }
-          Divider().strokeWidth(1).margin({ bottom: 16 }).width('92%')
+          Divider().strokeWidth('1px').margin({ bottom: 16 }).width('92%')
 
           Swiper() {
             if (!this.isNullOrEmpty(this.detail?.resource1Url)) {
@@ -114,10 +114,10 @@ export struct ActivityDetailPage {
               (!this.isNullOrEmpty(this.detail?.resource2Url) && !this.isNullOrEmpty(this.detail?.resource3Url)) ||
               (!this.isNullOrEmpty(this.detail?.resource1Url) && !this.isNullOrEmpty(this.detail?.resource3Url))) ?
             Indicator.dot()
-              .itemWidth(4)
-              .itemHeight(4)
-              .color('#99000000')
-              .selectedColor('#DBFFFFFF') : false
+              .itemWidth('6vp')
+              .itemHeight('6vp')
+              .color($r('sys.color.comp_background_secondary'))
+              .selectedColor('sys.color.comp_background_emphasize') : false
           )
           .margin({ bottom: 12 })
         }.backgroundColor(Color.White).borderRadius(16).margin({ left: 16, right: 16, top: 16 })
