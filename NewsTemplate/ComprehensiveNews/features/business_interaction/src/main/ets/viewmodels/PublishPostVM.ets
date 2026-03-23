@@ -48,9 +48,18 @@ export class PublishPostViewModel extends BaseViewModel {
     setTimeout(async () => {
       const list: PostImgList[] = [];
       for (let item of this.mediaList) {
-        const picVideoUrl = await FileUtils.handleUri(this.contextModel.globalUIContext, item.picVideoUrl);
+        let picVideoUrl = '';
+        let movingVideoUrl = '';
+        if (item.movingPhoto) {
+          const files = await FileUtils.saveMovingPhotoToSandbox(this.contextModel.globalContext, item.movingPhoto);
+          picVideoUrl = files[0] ?? '';
+          movingVideoUrl = files[1] ?? '';
+        } else {
+          picVideoUrl = await FileUtils.handleUri(this.contextModel.globalUIContext, item.picVideoUrl);
+        }
         list.push({
           picVideoUrl: picVideoUrl,
+          movingVideoUrl: movingVideoUrl,
           surfaceUrl: item.surfaceUrl,
         });
       }

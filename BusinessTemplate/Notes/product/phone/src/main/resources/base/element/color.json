@@ -15,6 +15,10 @@
     {
       "name": "bg_gradient_E4E1D1",
       "value": "#E4E1D1"
+    },
+    {
+      "name": "item_title_font",
+      "value": "#E6000000"
     }
   ]
 }

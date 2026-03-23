@@ -57,15 +57,16 @@ export struct WonderfulReviewPage {
         .fontSize(20)
         .lineHeight(27)
         .fontWeight(500)
-        .fontColor(Color.Black)
+        .fontColor($r('sys.color.font_secondary'))
         .opacity(0.9)
         .margin({ bottom: 16 })
 
       Row({ space: 4 }) {
         ForEach(Array.from<number, number>({ length: 5 }, (_, index) => index + 1), (star: number) => {
-          Image($r('app.media.Stroke'))
+          Image($r('app.media.ic_book_star'))
             .width(20)
             .height(20)
+            .fillColor($r('sys.color.comp_background_secondary'))
         }, (item: string) => JSON.stringify(item))
       }
       .margin({ bottom: 16 })
@@ -82,12 +83,12 @@ export struct WonderfulReviewPage {
           .fontSize(14)
           .lineHeight(19)
           .fontWeight(500)
-          .fontColor(Color.Black)
+          .fontColor($r('sys.color.font_secondary'))
           .opacity(0.9)
 
-        Image($r('app.media.ic_public_right_arrow'))
-          .width(16)
-          .height(16)
+        Image($r('app.media.arrow_right_small'))
+          .width(12)
+          .height(24)
           .margin({ left: 8 })
       }
       .alignItems(VerticalAlign.Center)
@@ -115,7 +116,7 @@ export struct WonderfulReviewPage {
     }
     .width('100%')
     .height(127)
-    .backgroundColor(Color.White)
+    .backgroundColor($r('sys.color.comp_background_list_card'))
     .borderRadius(16)
     .justifyContent(FlexAlign.Center)
     .alignItems(HorizontalAlign.Center)
@@ -253,7 +254,7 @@ export struct WonderfulReviewPage {
     }
     .width('100%')
     .padding({ left: 16, right: 16 })
-    .backgroundColor(Color.White)
+    .backgroundColor($r('sys.color.comp_background_list_card'))
     .alignItems(HorizontalAlign.Start)
     .margin({
       top: 5

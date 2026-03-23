@@ -1,13 +1,16 @@
 import {
+  AvoidArea,
+  BreakpointType,
   CommonConstants,
   GlobalContext,
+  GlobalInfoModel,
   LogUtil,
-  NoMoreTab,
   TimeControl,
-  Title,
+  Title
 } from '@ohos_agcit/children_education_utils';
 import { ArrayList } from '@kit.ArkTS';
-import { History, VideoCardDetail, VideoDetail } from '@ohos_agcit/children_education_datasource';
+import { History, VideoCardDetail, VideoCollection } from '@ohos_agcit/children_education_datasource';
+import { AppStorageV2 } from '@kit.ArkUI';
 
 @Builder
 export function ViewHistoryBuilder() {
@@ -16,59 +19,78 @@ export function ViewHistoryBuilder() {
 
 @ComponentV2
 export struct ViewHistory {
-  @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
   @Local historyList: Array<History> = [];
+  @Local avoidArea: AvoidArea = AppStorageV2.connect(AvoidArea, () => new AvoidArea(0, 0))!;
+  @Local globalInfo: GlobalInfoModel =
+    AppStorageV2.connect<GlobalInfoModel>(GlobalInfoModel, () => new GlobalInfoModel())!;
 
   build() {
     NavDestination() {
-      List() {
-        ForEach(this.historyList, (item: History) => {
-          ListItem() {
-            ViewHistoryItem({
-              history: item,
+      Column() {
+        Grid() {
+          ForEach(this.historyList, (item: History) => {
+            GridItem() {
+              ViewHistoryItem({
+                history: item,
+              });
+            }
+            .onClick(() => {
+              if (TimeControl.timeControl(this.getUIContext())) {
+                return;
+              }
+              let videoDetail: VideoCollection = {
+                videoCard: item.videoCard,
+                videoCardDetailList: item.videoCardList,
+              };
+              GlobalContext.getContext().setObject(CommonConstants.GLOBAL_VIDEO_LIST, videoDetail);
+              let pathInfo: NavPathInfo;
+              if (item.videoCard.videoType === 0) {
+                pathInfo = new NavPathInfo(CommonConstants.VIDEO_PLAY_PAGE, item.lastWatch);
+              } else {
+                pathInfo = new NavPathInfo(CommonConstants.AUDIO_PLAY_PAGE, item.lastWatch);
+              }
+              this.globalInfo.navStack.pushDestination(pathInfo, true);
             });
-          }.onClick(() => {
-            if (TimeControl.timeControl(this.getUIContext())) {
-              return;
-            }
-            let videoDetail: VideoDetail = {
-              videoCard: item.videoCard,
-              videoCardDetailList: item.videoCardList,
-            };
-            GlobalContext.getContext().setObject(CommonConstants.GLOBAL_VIDEO_LIST, videoDetail);
-            let pathInfo: NavPathInfo;
-            if (item.videoCard.videoType === 0) {
-              pathInfo = new NavPathInfo(CommonConstants.VIDEO_PLAY_PAGE, item.lastWatch);
-            } else {
-              pathInfo = new NavPathInfo(CommonConstants.AUDIO_PLAY_PAGE, item.lastWatch);
-            }
-            this.appPathStack.pushDestination(pathInfo, true);
-          });
-        }, (item: History) => JSON.stringify(item));
-
-        if (this.historyList.length >= 20) {
-          ListItem() {
-            NoMoreTab($r('app.string.twenty_record'));
-          };
+          }, (item: History) => JSON.stringify(item));
         }
+        .scrollBar(BarState.Off)
+        .columnsGap(new BreakpointType<number>({
+          sm: 8,
+          md: 12,
+          lg: 16,
+        }).getValue(this.globalInfo.currentBreakpoint))
+        .columnsTemplate('1fr '.repeat(new BreakpointType<number>({
+          sm: 1,
+          md: 2,
+          lg: 3,
+        }).getValue(this.globalInfo.currentBreakpoint)))
       }
-      .scrollBar(BarState.Off)
-      .margin({
-        top: '6%',
-        left: '3%',
-        right: '3%',
-      });
+      .padding({
+        left: new BreakpointType<number>({
+          sm: 16,
+          md: 24,
+          lg: 32,
+        }).getValue(this.globalInfo.currentBreakpoint),
+        right: new BreakpointType<number>({
+          sm: 16,
+          md: 24,
+          lg: 32,
+        }).getValue(this.globalInfo.currentBreakpoint)
+      })
     }
     .title(Title('观看历史'))
+    .padding({
+      top: this.getUIContext().px2vp(this.avoidArea.topRectHeight),
+    })
     .onBackPressed(() => {
-      this.appPathStack.pop();
+      this.globalInfo.navStack.pop();
       return true;
     })
     .onShown(() => {
-      let list: ArrayList<History> =
-        GlobalContext.getContext().getObject(CommonConstants.HISTORY_LIST) as ArrayList<History>
+      let list: History[] =
+        GlobalContext.getContext().getObject(CommonConstants.HISTORY_LIST) as History[];
       try {
-        this.historyList = list.convertToArray().reverse()
+        this.historyList = list.reverse()
       } catch (error) {
         LogUtil.error(`convertToArray fail, code: ${error.code}, message: ${error.message}`)
       }
@@ -78,6 +100,9 @@ export struct ViewHistory {
 
 @ComponentV2
 struct ViewHistoryItem {
+  stackWidth: number = 96
+  @Local dividerWidth: number = 0
+  @Local rowWidth: number = 0
   @Param @Once @Require history: History;
   @Local videoCardDetail: VideoCardDetail = {
     id: CommonConstants.EMPTY_STRING,
@@ -99,47 +124,75 @@ struct ViewHistoryItem {
       Row() {
         Stack({ alignContent: Alignment.TopEnd }) {
           Image(this.history.videoCard.imageUrl)
-            .width('35%')
-            .aspectRatio(1.78)
-            .borderRadius(8);
+            .height(56)
+            .width(this.stackWidth)
+            .borderRadius(10)
+            .aspectRatio(16 / 9)
           Image($r('app.media.icon_vip'))
-            .width('11%');
-        };
+            .width(32)
+            .height(16)
+        }
 
-        Column({ space: 10 }) {
+        Column() {
           Text(this.history.videoCard.title)
-            .fontWeight(FontWeight.Medium)
             .fontSize(14)
+            .fontColor($r('sys.color.font_primary'))
+            .lineHeight(19)
+            .fontWeight(FontWeight.Medium)
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis });
           Text('已更新: ' + this.history.videoCard.updateCount + '/' + this.history.videoCard.totalCount)
-            .fontWeight(FontWeight.Regular)
             .fontSize(12)
-            .fontColor(Color.Gray);
+            .lineHeight(16)
+            .fontWeight(FontWeight.Regular)
+            .fontColor('rgba(0, 0, 0, 0.6)')
+            .margin({ top: 2 })
           Text(this.history.videoCard.videoType === 0 ? '上次观看: ' + this.videoCardDetail.title
             : '上次收听: ' + this.videoCardDetail.title)
             .fontWeight(FontWeight.Regular)
             .fontSize(12)
-            .fontColor(Color.Gray)
+            .lineHeight(16)
+            .fontColor('rgba(0, 0, 0, 0.6)')
             .maxLines(1)
-            .textOverflow({ overflow: TextOverflow.Ellipsis });
+            .margin({ top: 2 })
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
         }
-        .width('62%')
+        .layoutWeight(1)
         .alignItems(HorizontalAlign.Start)
-        .margin({
-          left: '3%',
-        });
+        .justifyContent(FlexAlign.SpaceBetween)
+        .height(56)
+        .margin({ left: 12 })
       }
-      .width(CommonConstants.FULL_PERCENT);
+      .height(56)
+      .width(CommonConstants.FULL_PERCENT)
+      .margin({ top: 12, bottom: 11 })
+      .onAreaChange((_, area) => {
+        this.rowWidth = Number(area.width)
+        this.calcDividerWidth()
+      })
 
-      Divider()
-        .width('65%')
-        .margin({
-          top: '4%',
-          bottom: '4%',
-        })
-        .alignSelf(ItemAlign.End);
+      Row() {
+        Divider().width(this.dividerWidth).strokeWidth('1px')
+      }
+      .justifyContent(FlexAlign.End)
+      .height(1)
+      .width(CommonConstants.FULL_PERCENT)
     }
+    .justifyContent(FlexAlign.Center)
+    .height(80)
     .width(CommonConstants.FULL_PERCENT);
+  }
+
+  private calcDividerWidth() {
+    if (this.rowWidth <= 0 || this.stackWidth <= 0) {
+      return
+    }
+
+    const margin = 12
+    const width = this.rowWidth - this.stackWidth - margin
+
+    if (Math.abs(width - this.dividerWidth) > 1) {
+      this.dividerWidth = width
+    }
   }
 }

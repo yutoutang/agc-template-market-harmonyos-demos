@@ -6,6 +6,8 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "richeditor": "../../components/richeditor"
+    "richeditor": "../../components/richeditor",
+    "serializer": "../../components/serializer",
+    "feed_back": "../../components/feed_back"
   }
 }

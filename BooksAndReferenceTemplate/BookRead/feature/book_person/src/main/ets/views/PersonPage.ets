@@ -69,18 +69,27 @@ export struct PersonPage {
           .fontSize($r('sys.float.Title_M'))
           .fontWeight(FontWeight.Medium)
         Row() {
-          Image($r('app.media.ic_message'))
-            .height(40)
-            .width(40)
+          SymbolGlyph($r('sys.symbol.message'))
+            .fontSize($r('sys.float.Title_M'))
+            .fontColor([$r('sys.color.icon_primary')])
             .margin({ right: 8 })
+            .width(40)
+            .height(40)
+            .borderRadius(1000)
+            .padding(8)
+            .backgroundColor($r('sys.color.comp_background_tertiary'))
             .onClick(() => {
               TCRouter.push(Constants.MESSAGE_PAGE_ROUTE);
             });
 
-          Image($r('app.media.icon_setting_circle'))
-            .height(40)
+          SymbolGlyph($r('sys.symbol.gearshape'))
+            .fontSize($r('sys.float.Title_M'))
+            .fontColor([$r('sys.color.icon_primary')])
             .width(40)
-            .objectFit(ImageFit.Contain)
+            .height(40)
+            .borderRadius(1000)
+            .padding(8)
+            .backgroundColor($r('sys.color.comp_background_tertiary'))
             .onClick(() => {
               TCRouter.push(Constants.SETTING_ROUTE);
             })

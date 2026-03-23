@@ -20,7 +20,8 @@ export interface VideoCardDetail {
   videoNumber: number,
   iconUrl: string,
   videoUrl: string,
-  isVip: boolean
+  isVip: boolean,
+  currentTime?: number,
 }
 
 

@@ -26,12 +26,13 @@ export class WindowUtils {
    */
   public static setAvoidArea(windowClass: window.Window) {
     let windowModel: WindowModel = AppStorageV2.connect(WindowModel, () => new WindowModel())!;
+    const uiContext = windowClass.getUIContext();
     let type = window.AvoidAreaType.TYPE_SYSTEM;
     let avoidArea = windowClass.getWindowAvoidArea(type);
-    windowModel.windowTopPadding = px2vp(avoidArea.topRect.height);
+    windowModel.windowTopPadding = uiContext.px2vp(avoidArea.topRect.height);
     type = window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR;
     avoidArea = windowClass.getWindowAvoidArea(type);
-    windowModel.windowBottomPadding = px2vp(avoidArea.bottomRect.height);
+    windowModel.windowBottomPadding = uiContext.px2vp(avoidArea.bottomRect.height);
   }
 
   /**

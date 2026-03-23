@@ -1,13 +1,11 @@
-import { CheckinStatusDTO, CheckinInfoDTO } from '../models/ApiModels';
-
-import HashMap from '@ohos.util.HashMap';
+import { CheckinRequest, CheckinResponse, GetCheckinInfoResponse } from '../models/ApiModels';
+import { ErrorCode } from '../common/CustomTypes';
 
 export const MOCK_CHECKIN_CODE: string = '1111';
 
 export class Api {
 
-  // key: 学号_课程号, value: 签到信息
-  private static checkinRecordMock: HashMap<string, CheckinInfoDTO> = new HashMap();
+  private static isMockCheckin: boolean = false;
 
   private static withDelay<T>(callback: () => T | Promise<T>, delay = 300): Promise<T> {
     return new Promise((resolve, reject) => {
@@ -22,27 +20,31 @@ export class Api {
     });
   }
 
-  public static async requestCheckinStatus(studentId: string, courseId: string): Promise<CheckinStatusDTO> {
-    return Api.withDelay(() => {
-      const key: string = studentId + '_' + courseId;
-      const status: CheckinStatusDTO = {
-        isCheckedIn: Api.checkinRecordMock.hasKey(key),
-        checkinInfo: Api.checkinRecordMock.get(key)
-      };
-      return status;
-    });
+  public static async getCheckinInfo(): Promise<GetCheckinInfoResponse> {
+    return Api.withDelay(() => ({
+      code: ErrorCode.NO_ERROR,
+      message: 'success',
+      courseId: 'MOCK_COURSE_ID',
+      courseName: '概率论与数理统计',
+      isCheckedIn: Api.isMockCheckin,
+      checkinCode: Api.isMockCheckin ? MOCK_CHECKIN_CODE : ''
+    } as GetCheckinInfoResponse));
   }
 
-  public static async submitCheckin(checkinInfo: CheckinInfoDTO): Promise<boolean> {
+  public static async checkin(request: CheckinRequest): Promise<CheckinResponse> {
     return Api.withDelay(() => {
-      if (checkinInfo.checkinCode !== MOCK_CHECKIN_CODE) {
-        return false;
+      if (request.checkinCode !== MOCK_CHECKIN_CODE) {
+        return {
+          code: ErrorCode.UNKNOWN_ERROR,
+          message: 'unknown error'
+        } as CheckinResponse;
       }
-      // 当前 Mock 逻辑使用 Name 代表 Id
-      const key: string = checkinInfo.studentId + '_' + checkinInfo.courseName;
-      checkinInfo.checkinTime = new Date().getTime();
-      Api.checkinRecordMock.set(key, checkinInfo);
-      return true;
+      Api.isMockCheckin = true;
+      return {
+        code: ErrorCode.NO_ERROR,
+        message: 'success',
+        checkinTime: Date.now()
+      } as CheckinResponse;
     });
   }
 }

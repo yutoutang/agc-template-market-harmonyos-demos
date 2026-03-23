@@ -135,10 +135,10 @@ export struct BookLittleCard {
         Row() {
           Text(this.info?.rate)
             .fontSize(12)
-            .fontColor($r('sys.color.mask_secondary'))
+            .fontColor($r('sys.color.font_secondary'))
           Text(this.info?.category)
             .fontSize(12)
-            .fontColor($r('sys.color.mask_secondary'))
+            .fontColor($r('sys.color.font_secondary'))
         }
 
         Row() {
@@ -172,7 +172,6 @@ export struct BookLittleCard {
 export struct BookLikeCard {
   @Param @Require info: BookInfo;
   @Event showEvent: (isShow: boolean) => void = (isShow: boolean) => {
-
   }
 
   build() {
@@ -186,9 +185,7 @@ export struct BookLikeCard {
         .textOverflow({ overflow: TextOverflow.Ellipsis })
         .width(104)
         .textAlign(TextAlign.Start)
-        .padding({ top: 5 })
-
-
+        .padding({ left: 5, right: 5, top: 5 })
     }
     .width(104)
     .align(Alignment.Start)
@@ -364,7 +361,7 @@ export struct BookCategoryItem {
         .height(28)
         .width(70)
         .borderRadius(14)
-        .backgroundColor('#0d000000')
+        .backgroundColor($r('sys.color.comp_background_tertiary'))
         .justifyContent(FlexAlign.Center)
         .onClick(() => {
           this.pushParam = { category: this.categoryInfo?.subcategoryName!, isCategory: true }
@@ -441,9 +438,10 @@ export struct GroupListCard {
 export struct GroupBookCheckCard {
   @Local curBreakpoint: BreakpointStorage = BreakpointSystem.currentBreakpoint
   @Param info: BookInfo | undefined = undefined;
-  @Local isSelect: boolean = false;
+  @Param isSelect: boolean = false;
   @Event manageGroupEvent: (book: BookInfo, isShowM: boolean) => void = (book: BookInfo, isShowM: boolean) => {
   };
+  @Event changeSelect: (val: boolean) => void;
 
   build() {
     Flex({
@@ -478,25 +476,24 @@ export struct GroupBookCheckCard {
             }.justifyContent(FlexAlign.Start).width(200)
 
             Row() {
-              Image(this.isSelect ? $r('app.media.selected_yes') : $r('app.media.selected_no'))
+              Checkbox()
                 .height(20)
                 .width(20)
+                .selectedColor('#E84026')
+                .select(this.isSelect)
+                .onChange((val: boolean) => {
+                  // 触发事件通知父组件
+                  this.changeSelect(val);
+                  this.manageGroupEvent(this.info as BookInfo, val);
+                })
             }.width(30).height(30).margin({ right: 5 })
 
           }
           .width(Constants.FULL_SIZE)
           .justifyContent(FlexAlign.SpaceBetween)
-          .onClick(() => {
-            if (this.isSelect) {
-              this.isSelect = false
-            } else {
-              this.isSelect = true
-            }
-            this.manageGroupEvent(this.info as BookInfo, this.isSelect);
-          })
           .margin({ top: 10, right: 0 })
-
         }
+        .onClick(()=>{}) //防穿
 
         Column() {
           Row() {

@@ -1,4 +1,4 @@
-import { RouterUtils } from 'lib_common'
+import { AppConstants, RouterUtils } from 'lib_common'
 import { LoneTakeAnimationsTransition } from 'module_transition';
 import { IndexVM } from '../viewmodels/IndexVM';
 
@@ -24,7 +24,7 @@ struct Index {
   build() {
     Navigation(RouterUtils.getStack()) {
     }
-    .id('navigationId')
+    .id(AppConstants.NAVIGATION_ID)
     .hideNavBar(true)
     .enabled(this.vm.isEnabled)
     .hideTitleBar(true)
@@ -36,7 +36,7 @@ struct Index {
         },
         onTransitionEnd: () => {
           this.vm.isEnabled = true;
-        }
+        },
       });
     })
   }

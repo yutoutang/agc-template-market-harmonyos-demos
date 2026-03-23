@@ -52,5 +52,7 @@ export enum RouterMap {
   PROFILE_WATCH = 'WatchPage',
   PROFILE_FOLLOWER = 'FollowerPage',
   // 意见反馈模块
-  FEEDBACK_SUBMIT_PAGE = 'FeedbackSubmitPage'
+  FEEDBACK_SUBMIT_PAGE = 'FeedbackSubmitPage',
+  // 会员模块
+  MEMBERSHIP_PAGE = 'MemberShipView',
 }

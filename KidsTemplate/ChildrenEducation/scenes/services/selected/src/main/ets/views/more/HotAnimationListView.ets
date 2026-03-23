@@ -1,5 +1,14 @@
 import { DataGenerator, VideoCard } from '@ohos_agcit/children_education_datasource';
-import { CommonConstants, CommonOneColumn, Title } from '@ohos_agcit/children_education_utils';
+import {
+  AvoidArea,
+  BreakpointType,
+  CommonConstants,
+  GlobalInfoModel,
+  StandardCardComponent,
+  Title
+} from '@ohos_agcit/children_education_utils';
+import { AppStorageV2 } from '@kit.ArkUI';
+import { common } from '@kit.AbilityKit';
 
 @Builder
 export function HotAnimationBuilder() {
@@ -9,41 +18,48 @@ export function HotAnimationBuilder() {
 
 @ComponentV2
 struct HotAnimationListView {
-  @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
-  @Local private title: string = '';
+  @Local title: string = '';
+  @Local avoidArea: AvoidArea = AppStorageV2.connect(AvoidArea, () => new AvoidArea(0, 0))!;
+  @Local globalInfo: GlobalInfoModel =
+    AppStorageV2.connect<GlobalInfoModel>(GlobalInfoModel, () => new GlobalInfoModel())!;
   private hotAnimationArray: Array<VideoCard> = [];
 
   aboutToAppear(): void {
-    this.hotAnimationArray = DataGenerator.getHotAnimationData(this.getUIContext());
+    const uiContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
+    this.hotAnimationArray = DataGenerator.getHotAnimationData(uiContext);
   }
 
   build() {
     NavDestination() {
-      List({ space: 18 }) {
-        ForEach(this.hotAnimationArray, (item: VideoCard) => {
-          ListItem() {
-            CommonOneColumn({
-              videoCard: item
-            })
-          }
-          .margin({
-            bottom: $r('app.float.12vp')
-          });
-        }, (item: VideoCard) => JSON.stringify(item));
+      Column() {
+        StandardCardComponent({
+          videoArray: this.hotAnimationArray
+        })
       }
       .width(CommonConstants.FULL_PERCENT)
-      .scrollBar(BarState.Off)
       .padding({
-        right: '4%',
-        left: '4%'
+        left: new BreakpointType<number>({
+          sm: 16,
+          md: 24,
+          lg: 32,
+        }).getValue(this.globalInfo.currentBreakpoint),
+        right: new BreakpointType<number>({
+          sm: 16,
+          md: 24,
+          lg: 32,
+        }).getValue(this.globalInfo.currentBreakpoint)
       })
     }
+    .padding({
+      top: this.getUIContext().px2vp(this.avoidArea.topRectHeight),
+      bottom: this.getUIContext().px2vp(this.avoidArea.bottomRectHeight),
+    })
     .title(Title(this.title))
     .onReady((cxt: NavDestinationContext) => {
       this.title = cxt.pathInfo.param as string
     })
     .onBackPressed(() => {
-      this.appPathStack.pop();
+      this.globalInfo.navStack.pop();
       return true;
     });
   }

@@ -115,7 +115,7 @@ export class GridRowColSetting {
    */
   public static readonly SMALL_CENTER_COL_SPAN: GridColColumnOption = {
     sm: 4,
-    md: 8,
+    md: 6,
     lg: 6,
     xl: 6,
   };
@@ -124,7 +124,7 @@ export class GridRowColSetting {
    */
   public static readonly SMALL_CENTER_COL_OFFSET: GridColColumnOption = {
     sm: 0,
-    md: 0,
+    md: 1,
     lg: 3,
     xl: 3,
   };

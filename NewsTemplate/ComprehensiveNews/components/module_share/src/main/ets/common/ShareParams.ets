@@ -44,6 +44,7 @@ export class ShareViewData {
   @Trace coverUrl: string = '';
   @Trace thumbUrl: ResourceStr = '';
   @Trace landingPageUrl: string = '';
+  @Trace type: number = 0;
   @Trace createTime: number = 0;
   @Trace sheetType: SheetType = SheetType.BOTTOM;
   @Trace extComponentId: string = '';
@@ -70,8 +71,9 @@ export class ShareViewData {
     this.subTitle = data.subTitle ?? '';
     this.coverUrl = data.coverUrl ?? '';
     this.thumbUrl = data.thumbUrl ?? '';
-    this.landingPageUrl = data.landingPageUrl ?? JSON.stringify({ newsId: data.recordId, type: data.type ?? 0 });
+    this.landingPageUrl = data.landingPageUrl ?? '';
     this.createTime = data.createTime ?? 0;
+    this.type = data.type ?? 0;
   }
 
   /**

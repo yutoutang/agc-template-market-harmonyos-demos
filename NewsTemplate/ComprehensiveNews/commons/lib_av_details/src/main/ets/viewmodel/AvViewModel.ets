@@ -1,15 +1,13 @@
-import { AppStorageV2 } from '@kit.ArkUI';
-import { BaseViewModel, BreakpointModel, CommonConfirmDialog } from 'lib_common';
+import { BaseViewModel, CommonConfirmDialog } from 'lib_common';
 import { AvModel, MineServiceApi } from 'lib_news_api';
 import { LoginSheetUtils } from 'lib_account';
 import { LongTakeAnimationProperties, LongTakeTransitionParam } from 'module_transition';
 
-const TAG = '[AvViewModel]'
+const TAG = '[AvViewModel]';
 
 @ObservedV2
 export class AvViewModel extends BaseViewModel {
-  @Trace curAudioInfo: AvModel = new AvModel()
-  @Trace breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
+  @Trace curAudioInfo: AvModel = new AvModel();
 
   public registerCustomTransition(navDestContext: NavDestinationContext, longTakeSession: LongTakeAnimationProperties) {
     let param = navDestContext.pathInfo?.param as Record<string, Object>;

@@ -102,11 +102,10 @@ export struct SearchPage {
             })
               .enableKeyboardOnFocus(this.isCategory ? false : true)
               .layoutWeight(1)
-              .backgroundColor('#F5F5F5')
               .defaultFocus(this.isCategory ? false : true)
               .placeholderColor($r('sys.color.font_secondary'))
-              .placeholderFont({ size: $r('sys.float.Body_L'), weight: 400 })
-              .textFont({ size: $r('sys.float.Body_L'), weight: 400 })
+              .placeholderFont({ size: $r('sys.float.Body_L') })
+              .textFont({ size: $r('sys.float.Body_L') })
               .onSubmit(async (value: string) => {
                 this.submitValue = value;
                 this.isSubmit = true;

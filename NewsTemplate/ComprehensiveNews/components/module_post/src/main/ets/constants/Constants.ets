@@ -16,10 +16,16 @@ export class Constants {
   static readonly MAX_VIDEO_SIZE: number = 500;
 }
 
+export interface ImageContent {
+  src: string;
+  movingPhoto?: photoAccessHelper.MovingPhoto;
+}
+
 export class PostImgVideoItem {
   id: number = 0
   picVideoUrl: string = ''
   surfaceUrl: string = ''
+  movingPhoto?: photoAccessHelper.MovingPhoto;
 }
 
 export interface MediaParams {

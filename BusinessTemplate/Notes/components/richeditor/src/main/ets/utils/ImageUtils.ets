@@ -24,7 +24,7 @@ export class ImageUtils {
    * @returns {image.PositionArea} Picture buffer area
    */
   // [Start get_snapshot_area]
-  static async getSnapshotArea(pixelMap: PixelMap, scrollYOffsets: number[], listWidth: number,
+  static async getSnapshotArea(uiContext: UIContext, pixelMap: PixelMap, scrollYOffsets: number[], listWidth: number,
     listHeight: number): Promise<image.PositionArea> {
     // Gets the number of bytes per line of image pixels.
     let stride = pixelMap.getBytesNumberPerRow();
@@ -41,11 +41,11 @@ export class ImageUtils {
       if (listHeight - realScrollHeight > 0) {
         let cropRegion: image.Region = {
           x: 0,
-          y: vp2px(listHeight - realScrollHeight),
+          y: uiContext.vp2px(listHeight - realScrollHeight),
           size: {
-            height: vp2px(realScrollHeight),
-            width: vp2px(listWidth)
-          }
+            height: uiContext.vp2px(realScrollHeight),
+            width: uiContext.vp2px(listWidth),
+          },
         };
         // Crop roll area
         await pixelMap.crop(cropRegion);
@@ -61,16 +61,17 @@ export class ImageUtils {
       region: {
         size: {
           width: imgInfo.size.width,
-          height: imgInfo.size.height
+          height: imgInfo.size.height,
         },
         x: 0,
-        y: 0
-      }
-    }
+        y: 0,
+      },
+    };
     // Write data to a specified area
     pixelMap.readPixelsSync(area);
     return area;
   }
+
   // [End get_snapshot_area]
 
   /**
@@ -82,18 +83,26 @@ export class ImageUtils {
    * @returns {PixelMap} Long image after merge
    */
   // [Start merge_image]
-  static async mergeImage(areaArray: image.PositionArea[], lastOffsetY: number, listWidth: number,
+  static async mergeImage(uiContext: UIContext, areaArray: image.PositionArea[], lastOffsetY: number, listWidth: number,
     listHeight: number): Promise<PixelMap> {
     // Create a long screenshot PixelMap
     let opts: image.InitializationOptions = {
       editable: true,
       pixelFormat: 4,
       size: {
-        width: vp2px(listWidth),
-        height: vp2px(lastOffsetY + listHeight)
-      }
+        width: uiContext.vp2px(listWidth),
+        height: uiContext.vp2px(lastOffsetY + listHeight),
+      },
     };
-    let longPixelMap = image.createPixelMapSync(opts);
+
+    let longPixelMap: PixelMap | null = null;
+    try {
+      longPixelMap = image.createPixelMapSync(opts);
+    } catch (err) {
+      console.error(`createPixelMapSync失败: ${(err as Error).message}`);
+      throw new Error(`创建长截图失败: ${(err as Error).message}`);
+    }
+
     let imgPosition: number = 0;
 
     for (let i = 0; i < areaArray.length; i++) {
@@ -105,16 +114,17 @@ export class ImageUtils {
         region: {
           size: {
             width: readArea.region.size.width,
-            height: readArea.region.size.height
+            height: readArea.region.size.height,
           },
           x: 0,
-          y: imgPosition
-        }
-      }
+          y: imgPosition,
+        },
+      };
       imgPosition += readArea.region.size.height;
       longPixelMap.writePixelsSync(area);
     }
     return longPixelMap;
   }
+
   // [End merge_image]
 }

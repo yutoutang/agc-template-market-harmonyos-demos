@@ -6,7 +6,7 @@
     },
     {
       "name": "agcit_huawei_school_life",
-      "value": "1.0.1"
+      "value": "1.0.2"
     },
     {
       "name": "agcittype_huawei_school_life",
@@ -14,7 +14,7 @@
     },
     {
       "name": "agcitkid_huawei_school_life",
-      "value": "agcit_huawei_school_life_module_course_schedule/1.0.0,agcit_huawei_school_life_module_secure_checkin/1.0.0"
+      "value": "agcit_huawei_school_life_module_course_schedule/1.0.1,agcit_huawei_school_life_module_secure_checkin/1.0.1,agcit_huawei_common_atomicservice_login/1.0.1"
     }
   ]
 }

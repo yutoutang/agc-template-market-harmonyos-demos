@@ -13,6 +13,7 @@ let filter: string[] = [];
 @ComponentV2
 struct RecommendationCoursePage {
   vm: PlanPageVM = new PlanPageVM();
+  scroller: Scroller = new Scroller()
   @Local isShowCourseFilterDialog: boolean = false
 
   @Builder
@@ -30,7 +31,7 @@ struct RecommendationCoursePage {
             }
             .margin({ top: 10 })
             .padding({ left: 16, right: 16, top: 9, bottom: 9 })
-            .width(328)
+            .width('100%')
             .height(40)
             .borderRadius(20)
             .justifyContent(FlexAlign.Center)
@@ -55,6 +56,8 @@ struct RecommendationCoursePage {
       .height('100%')
     }
     .padding({
+      left: 16,
+      right: 16,
       bottom: 30
     })
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
@@ -107,7 +110,7 @@ struct RecommendationCoursePage {
               height: '90%',
               dragBar: false,
               showClose: true,
-              preferType: SheetType.BOTTOM,
+              preferType: SheetType.CENTER,
               title: { title: '筛选' },
               backgroundColor: '#fff',
               onDisappear: () => {
@@ -122,11 +125,20 @@ struct RecommendationCoursePage {
           })
         }
 
-        Column() {
-          HotCourse()
+        Scroll(this.scroller) {
+          Column() {
+            HotCourse()
+          }
+          .height('100%')
+          .margin({ left: 16, right: 16 })
         }
-        .height('100%')
-        .margin({ left: 16, right: 16 })
+        .layoutWeight(1)
+        .align(Alignment.Top)
+        .scrollBar(BarState.Off)
+        .scrollable(ScrollDirection.Vertical)
+        .edgeEffect(EdgeEffect.Spring)
+        .margin({ bottom: 30 })
+        .width('100%')
       }
       .height('100%')
       .backgroundColor($r('app.color.plan_background'))

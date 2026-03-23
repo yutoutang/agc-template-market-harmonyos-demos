@@ -33,7 +33,9 @@ export class AvSection {
   @Trace duration: number = 0
   @Trace updateTime: string = ''
   @Trace sectionUrl: string = ''
-  @Trace coverUrl?: string = ''
+  @Trace coverUrl: string = ''
+  @Trace needVip: boolean = false
+
   constructor(broadcastSection?: AvSection) {
     if (broadcastSection) {
       this.id = broadcastSection.id
@@ -42,6 +44,7 @@ export class AvSection {
       this.updateTime = broadcastSection.updateTime
       this.sectionUrl = broadcastSection.sectionUrl
       this.coverUrl = broadcastSection.coverUrl
+      this.needVip = broadcastSection.needVip
     }
   }
 }

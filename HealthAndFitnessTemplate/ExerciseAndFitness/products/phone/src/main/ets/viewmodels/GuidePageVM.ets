@@ -1,5 +1,7 @@
 import { BaseViewModel, PreferenceUtils, RouterMap, RouterUtils } from 'lib_common';
 import { skipGuide } from '../common/Constants';
+import { preferences } from '@kit.ArkData';
+import { common } from '@kit.AbilityKit';
 
 @ObservedV2
 export class GuidePageVM extends BaseViewModel {
@@ -21,28 +23,41 @@ export class GuidePageVM extends BaseViewModel {
     RouterUtils.replacePathByName(RouterMap.INDEX_PAGE);
   }
 
-  saveAge(age: string) {
-    AppStorage.setOrCreate<string>('userAge', age);
+  saveAge(context: common.UIAbilityContext, age: string) {
+    const pref = preferences.getPreferencesSync(context, { name: 'prefData' });
+    pref.putSync('userAge', age); // 同步写入内存
+    pref.flushSync(); // 持久化到磁盘（建议在onBackground调用）
   }
 
-  saveGender(gender: string) {
-    AppStorage.setOrCreate<string>('userGender', gender);
+  saveGender(context: common.UIAbilityContext, gender: string) {
+    const pref = preferences.getPreferencesSync(context, { name: 'prefData' });
+    pref.putSync('userGender', gender); // 同步写入内存
+    pref.flushSync(); // 持久化到磁盘（建议在onBackground调用）
   }
 
-  saveBody(body: string[]) {
+  saveBody(context: common.UIAbilityContext, body: string[]) {
+    const pref = preferences.getPreferencesSync(context, { name: 'prefData' });
+    pref.putSync('userBody', body); // 同步写入内存
+    pref.flushSync(); // 持久化到磁盘（建议在onBackground调用）
     AppStorage.setOrCreate<string[]>('userBody', body);
   }
 
-  savePurpose(purpose: string[]) {
-    AppStorage.setOrCreate<string[]>('userPurpose', purpose);
+  savePurpose(context: common.UIAbilityContext, purpose: string[]) {
+    const pref = preferences.getPreferencesSync(context, { name: 'prefData' });
+    pref.putSync('userPurpose', purpose); // 同步写入内存
+    pref.flushSync(); // 持久化到磁盘（建议在onBackground调用）
   }
 
-  saveHeight(height: string) {
-    AppStorage.setOrCreate<string>('userHeight', height);
+  saveHeight(context: common.UIAbilityContext, height: string) {
+    const pref = preferences.getPreferencesSync(context, { name: 'prefData' });
+    pref.putSync('userHeight', height); // 同步写入内存
+    pref.flushSync(); // 持久化到磁盘（建议在onBackground调用）
   }
 
-  saveWeight(weight: string) {
-    AppStorage.setOrCreate<string>('userWeight', weight);
+  saveWeight(context: common.UIAbilityContext, weight: string) {
+    const pref = preferences.getPreferencesSync(context, { name: 'prefData' });
+    pref.putSync('userWeight', weight); // 同步写入内存
+    pref.flushSync(); // 持久化到磁盘（建议在onBackground调用）
   }
 
   saveTargetWeight(target: string) {

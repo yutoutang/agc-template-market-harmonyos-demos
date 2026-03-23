@@ -18,7 +18,7 @@ import { media } from '@kit.MediaKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 
 // AVPlayer的状态机
-enum AVPlayerState {
+export enum AVPlayerState {
   IDLE = 'idle',
   INITIALIZED = 'initialized',
   PREPARED = 'prepared',
@@ -61,7 +61,7 @@ export class AVPlayer {
   isResetPause: boolean = false;
   videoUrl: string = '';
 
-  async init(url: string, seekTime: number): Promise<void> {
+  async init(url: string, seekTime: number, stateCallback:Function): Promise<void> {
     await this.release();
     // 创建avPlayer实例对象
     try {
@@ -71,7 +71,7 @@ export class AVPlayer {
         `Error occurred. errCode is ${error.code}, errMessage is ${error.message}`);
     }
     // 创建状态机变化回调函数
-    await this.setStateChangeCallback();
+    await this.setStateChangeCallback(stateCallback);
     await this.setSourceInfoCallback();
     this.isCreate = true;
     this.isResetPause = false;
@@ -79,6 +79,7 @@ export class AVPlayer {
     this.avPlayer.url = url;
     this.isLoading = true;
     this.seekTime = seekTime;
+
   }
 
   getPlay() {
@@ -238,7 +239,7 @@ export class AVPlayer {
   }
 
   // 状态机
-  async setStateChangeCallback(): Promise<void> {
+  async setStateChangeCallback(callBack:Function): Promise<void> {
     this.avPlayer.on('stateChange', async (state: string, reason: media.StateChangeReason) => {
       if (this.avPlayer == null) {
         return;
@@ -302,6 +303,7 @@ export class AVPlayer {
         default:
           break;
       }
+      callBack(state)
     })
   }
 }

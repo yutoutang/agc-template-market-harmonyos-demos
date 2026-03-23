@@ -1,5 +1,4 @@
-export {
-  VideoDetail, SelectedPageData, DataGenerator
+export { VideoCollection , SelectedPageData, DataGenerator
 } from './src/main/ets/components/homepage/DataGenerator';
 
 export { VideoCard, VideoCardDetail, History } from './src/main/ets/model/Video';

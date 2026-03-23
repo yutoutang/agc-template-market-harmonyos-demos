@@ -1,4 +1,3 @@
-import { promptAction } from '@kit.ArkUI';
 import { loginComponentManager } from '@kit.AccountKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { common } from '@kit.AbilityKit';
@@ -11,6 +10,7 @@ import { OnWXResp, wxApi, wxEventHandler } from '../utils/WXApiUtils';
 import { Constants } from '../constants/Constants';
 import { LoginRouterParams, LoginSheetParams } from '../constants/Types';
 import { getAccountErrorMsg } from '../utils/ErrorCodeHelper';
+import { ContextUtils } from '../utils/ContextUtils';
 
 const TAG = '[LoginVM]';
 
@@ -73,7 +73,7 @@ export class LoginVM extends BaseViewModel {
     Logger.error(TAG, 'onClickLoginWithHuaweiIDButton fail, error: ' + JSON.stringify(error));
 
     if (error.code === ErrorCode.ERROR_CODE_AGREEMENT_STATUS_NOT_ACCEPTED) {
-      promptAction.showToast({ message: '请先勾选同意协议' });
+      this.contextModel.showToast({ message: '请先勾选同意协议' });
       return;
     }
     let errorMsg: string = getAccountErrorMsg(error.code);
@@ -144,15 +144,15 @@ export class LoginVM extends BaseViewModel {
 
   accountPasswordLogin() {
     if (!this.isAgreePrivacy) {
-      promptAction.showToast({ message: '请先勾选同意协议' });
+      this.contextModel.showToast({ message: '请先勾选同意协议' });
       return;
     }
     if (!this.accountInput) {
-      promptAction.showToast({ message: '请输入账号' });
+      this.contextModel.showToast({ message: '请输入账号' });
       return;
     }
     if (!this.passwordInput) {
-      promptAction.showToast({ message: '请输入密码' });
+      this.contextModel.showToast({ message: '请输入密码' });
       return;
     }
     this.accountInstance.accountPasswordLogin()
@@ -180,10 +180,10 @@ export class LoginVM extends BaseViewModel {
     req.state = 'none';
     req.transaction = 'test123';
 
-    const isJumpSuccess = await wxApi.sendReq(getContext() as common.UIAbilityContext, req);
+    const isJumpSuccess = await wxApi.sendReq(ContextUtils.globalUIAbilityContext, req);
     Logger.info(TAG, 'jump wechat result: ' + isJumpSuccess);
     if (!isJumpSuccess) {
-      promptAction.showToast({ message: '未安装微信' });
+      this.contextModel.showToast({ message: '未安装微信' });
     }
   }
 

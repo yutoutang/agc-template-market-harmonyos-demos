@@ -79,14 +79,14 @@ export struct ArticleDetailsFooter {
         .margin({ left: 5 })
         .accessibilityText('分享到微信')
         .onClick(() => {
-          const instance = new ShareUtils({
+          const instance = new ShareUtils();
+          instance.shareToWX(this.getUIContext(), {
             recordId: this.newsFeedVM.articleDetails.id,
             title: this.newsFeedVM.articleDetails.title,
             subTitle: this.newsFeedVM.articleDetails.articleFrom,
             createTime: this.newsFeedVM.articleDetails.createTime,
             coverUrl: handlerCoverImage(this.newsFeedVM.articleDetails),
-          })
-          instance.shareToWX(this.getUIContext());
+          });
         })
       }
     }

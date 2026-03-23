@@ -50,7 +50,7 @@ export struct SettingPage {
                   Text(this.appCache+'M')
                     .fontSize(16)
                     .fontWeight(400)
-                    .fontColor('#99000000')
+                    .fontColor($r('sys.color.font_secondary'))
                   Image($r('app.media.ic_arrow_right'))
                     .width(8)
                     .height(14)
@@ -60,7 +60,7 @@ export struct SettingPage {
               }
               .width(Constants.FULL_SIZE)
               .height(61)
-              .backgroundColor('#FFFFFF')
+              .backgroundColor($r('sys.color.comp_background_list_card'))
               .borderRadius(16)
               .justifyContent(FlexAlign.SpaceBetween)
               .padding({
@@ -124,7 +124,7 @@ export struct SettingPage {
     }
     .width(Constants.FULL_SIZE)
     .height(61)
-    .backgroundColor('#FFFFFF')
+    .backgroundColor($r('sys.color.comp_background_list_card'))
     .borderRadius(16)
     .justifyContent(FlexAlign.SpaceBetween)
     .padding({

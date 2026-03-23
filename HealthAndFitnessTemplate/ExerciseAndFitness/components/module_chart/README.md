@@ -131,39 +131,61 @@
 
 ```TS
 // MockData.ets
-import { BillBarItem, BillPieChartItem, ReportTableItem } from 'module_chart';
+import { BarItem } from 'module_chart';
 
-export const MOCK_BAR_CHART_LIST: BillBarItem[] = [
+export const MOCK_BAR_CHART_LIST: BarItem[] = [
   {
-    date: '05-01',
-    value: 400.5,
-  },
-  {
-    date: '05-05',
-    value: 50.5,
-  },
-  {
-    date: '05-09',
-    value: 200,
-  },
-  {
-    date: '05-24',
-    value: 120,
+    date: '14:00',
+    value: 50,
   },
 ];
 
-export const MOCK_BAR_CHART_LIST2: BillBarItem[] = [
+export const MOCK_BAR_CHART_LIST1: BarItem[] = [
   {
-    date: '05-06',
-    value: 100,
+    date: '周四',
+    value: 50,
   },
   {
-    date: '05-14',
-    value: 198.9,
+    date: '周六',
+    value: 20,
+  },
+];
+
+export const MOCK_BAR_CHART_LIST2: BarItem[] = [
+  {
+    date: '8-14',
+    value: 50,
   },
   {
-    date: '05-30',
-    value: 3000,
+    date: '8-16',
+    value: 20,
+  },
+  {
+    date: '8-29',
+    value: 30,
+  },
+];
+
+export const MOCK_BAR_CHART_LIST3: BarItem[] = [
+  {
+    date: '2月',
+    value: 200,
+  },
+  {
+    date: '3月',
+    value: 200,
+  },
+  {
+    date: '6月',
+    value: 620,
+  },
+  {
+    date: '7月',
+    value: 200,
+  },
+  {
+    date: '11月',
+    value: 300,
   },
 ];
 
@@ -174,76 +196,17 @@ export const MOCK_COLOR_LIST: number[] = [
 export const MOCK_COLOR_LIST2: number[] = [
   0xd77525, 0xf2992c, 0xfbb935, 0xffce52, 0xffe38e, 0xfff1ca, 0xfffbef,
 ];
-
-export const MOCK_PIE_CHART_LIST: BillPieChartItem[] = [
-  {
-    label: '购物',
-    value: 400.5,
-    resource: 104,
-  },
-  {
-    label: '交通',
-    value: 50.5,
-    resource: 102,
-  },
-  {
-    label: '生活缴费',
-    value: 200,
-    resource: 109,
-  },
-];
-
-export const MOCK_PIE_CHART_LIST2: BillPieChartItem[] = [
-  {
-    label: '工资',
-    value: 3000,
-    resource: 201,
-  },
-  {
-    label: '理财',
-    value: 200,
-    resource: 202,
-  },
-];
-
-export const MOCK_TABLE_DATA: ReportTableItem[] = [
-  {
-    date: '05-01',
-    totalIncome: 0,
-    totalExpense: 524,
-  },
-  {
-    date: '05-04',
-    totalIncome: 3000,
-    totalExpense: 50.25,
-  },
-  {
-    date: '05-09',
-    totalIncome: 200.8,
-    totalExpense: 1000,
-  },
-];
-
 ```
 
 ```ts
 import {
-  MOCK_PIE_CHART_LIST,
-  MOCK_PIE_CHART_LIST2,
   MOCK_BAR_CHART_LIST,
   MOCK_BAR_CHART_LIST2,
   MOCK_COLOR_LIST,
-  MOCK_COLOR_LIST2,
-  MOCK_TABLE_DATA,
+  MOCK_COLOR_LIST2
 } from './Mockdata';
 import {
-    BillPieChart,
-    BillRanking,
-    BillBarChart,
-    BillReportTable,
-    BillCalendar,
-    BillBarChartData,
-    CalendarBillSummaryModel
+  MonthBarChart, MonthBarChartData
 } from 'module_chart';
 
 
@@ -252,10 +215,9 @@ import {
 struct PreviewPage {
   @Local showChart: boolean = true;
   @Local isExpense: boolean = true;
-  @Local summary: CalendarBillSummaryModel = new CalendarBillSummaryModel();
 
   @Computed
-  get barData(): BillBarChartData {
+  get barData(): MonthBarChartData {
     const list = this.isExpense ? MOCK_BAR_CHART_LIST : MOCK_BAR_CHART_LIST2;
     return {
       month: '2025-05',
@@ -273,70 +235,37 @@ struct PreviewPage {
     return this.isExpense ? MOCK_COLOR_LIST : MOCK_COLOR_LIST2;
   }
 
-  @Computed
-  get pieData() {
-    return this.isExpense ? MOCK_PIE_CHART_LIST : MOCK_PIE_CHART_LIST2;
-  }
-
   build() {
     Column({ space: 16 }) {
       Row() {
-        Text(this.showChart ? '图表' : '日历').fontSize(18).fontWeight(FontWeight.Medium);
-        Button('切换展示')
-          .onClick(() => {
-            this.showChart = !this.showChart;
+        Text('图表').fontSize(18).fontWeight(FontWeight.Medium);
+      }.width('100%')
+
+      Row() {
+        Radio({ value: 'Radio1', group: 'radioGroup' }).checked(true)
+          .onChange((isChecked: boolean) => {
+            this.isExpense = isChecked;
           });
-      }.width('100%').justifyContent(FlexAlign.SpaceBetween);
+        Text('支出');
+        Blank().width(30);
+        Radio({ value: 'Radio2', group: 'radioGroup' }).checked(false)
+          .onChange((isChecked: boolean) => {
+            this.isExpense = !isChecked;
+          });
+        Text('收入');
+      };
 
-      if (this.showChart) {
-        Row() {
-          Radio({ value: 'Radio1', group: 'radioGroup' }).checked(true)
-            .onChange((isChecked: boolean) => {
-              this.isExpense = isChecked;
-            });
-          Text('支出');
-          Blank().width(30);
-          Radio({ value: 'Radio2', group: 'radioGroup' }).checked(false)
-            .onChange((isChecked: boolean) => {
-              this.isExpense = !isChecked;
-            });
-          Text('收入');
+      Scroll() {
+        Column() {
+          //柱状图
+          MonthBarChart({
+            chartData: this.barData,
+            initColor: this.barColor,
+          });
         };
-
-        Scroll() {
-          Column({ space: 16 }) {
-            // 饼图
-            BillPieChart({
-              chartData: this.pieData,
-              colorList: this.colorList,
-            });
-            // 账单列表图
-            BillRanking({
-              chartData: this.pieData,
-              colorList: this.colorList,
-            });
-            //柱状图
-            BillBarChart({
-              chartData: this.barData,
-              initColor: this.barColor,
-            });
-            // 报表
-            BillReportTable({
-              tableData: MOCK_TABLE_DATA,
-            });
-          };
-        }
-        .layoutWeight(1)
-        .scrollBar(BarState.Off)
-      } else {
-        // 日历视图
-        BillCalendar({
-          selectedDateSummary: this.summary,
-          handleDateClick: (date) => {
-            this.summary.date = date;
-          },
-        });
       }
+      .layoutWeight(1)
+      .scrollBar(BarState.Off)
     }
     .padding(16);
   }

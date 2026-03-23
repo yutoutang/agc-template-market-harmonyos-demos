@@ -21,9 +21,9 @@
       "buildFunction": "RecordPageBuilder"
     },
     {
-      "name": "VIPPage",
-      "pageSourceFile": "src/main/ets/pages/VIPPage.ets",
-      "buildFunction": "VIPPageBuilder"
+      "name": "Member",
+      "pageSourceFile": "src/main/ets/pages/Member.ets",
+      "buildFunction": "MemberPageBuilder"
     }
   ]
 }

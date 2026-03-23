@@ -1,6 +1,5 @@
-import fs from '@ohos.file.fs';
 import { util } from '@kit.ArkTS';
-import { storageStatistics } from '@kit.CoreFileKit';
+import { fileIo as fs, storageStatistics } from '@kit.CoreFileKit';
 import { application, common, Context, contextConstant } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { Logger } from './Logger';

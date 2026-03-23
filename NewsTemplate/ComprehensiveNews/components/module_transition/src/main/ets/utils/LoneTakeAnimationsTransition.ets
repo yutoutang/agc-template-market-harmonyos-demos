@@ -8,7 +8,7 @@ import { CustomTransitionOptions, LongTakeTransitionOptions } from './Options';
 import { SnapShotImage } from './SnapShotImage';
 import { WindowUtils } from './WindowUtils'
 
-const TAG: string = 'ezCustomTransition';
+const TAG: string = '[ezCustomTransition]';
 
 export class LoneTakeAnimationsTransition {
   static animationCount: number = 0;

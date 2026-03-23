@@ -1,52 +1,8 @@
 {
   "string": [
     {
-      "name": "page_show",
-      "value": "page from package"
-    },
-    {
-      "name": "month",
-      "value": "月"
-    },
-    {
-      "name": "am",
-      "value": "上午"
-    },
-    {
-      "name": "pm",
-      "value": "下午"
-    },
-    {
-      "name": "week_1",
-      "value": "周一"
-    },
-    {
-      "name": "week_2",
-      "value": "周二"
-    },
-    {
-      "name": "week_3",
-      "value": "周三"
-    },
-    {
-      "name": "week_4",
-      "value": "周四"
-    },
-    {
-      "name": "week_5",
-      "value": "周五"
-    },
-    {
-      "name": "week_6",
-      "value": "周六"
-    },
-    {
-      "name": "week_7",
-      "value": "周日"
-    },
-    {
       "name": "agcit_huawei_school_life_module_course_schedule",
-      "value": "1.0.0"
+      "value": "1.0.1"
     },
     {
       "name": "agcittype_huawei_school_life_module_course_schedule",

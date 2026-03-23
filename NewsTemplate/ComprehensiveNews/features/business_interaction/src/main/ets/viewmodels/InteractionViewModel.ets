@@ -2,7 +2,7 @@ import { UIUtils } from '@kit.ArkUI';
 import { emitter } from '@kit.BasicServicesKit';
 import { LoginSheetUtils } from 'lib_account';
 import { BaseViewModel, RouterParams, RouterToNews } from 'lib_common';
-import { CommentServiceApi, MineServiceApi, NewsResponse, PostServiceApi } from 'lib_news_api';
+import { MineServiceApi, NewsResponse, PostServiceApi } from 'lib_news_api';
 import { LoneTakeAnimationsTransition, LongTakeTransitionParam } from 'module_transition';
 import { TabEnum } from '../common/Constants';
 
@@ -15,16 +15,12 @@ export class InteractionViewModel extends BaseViewModel {
   @Trace isLoading: boolean = false
   @Trace currentIndex: number = 10
   @Trace currentPage: number = 0
+  @Trace selectId: number = 0
   private uiContext: UIContext
 
   constructor(uiContext: UIContext) {
     super()
     this.uiContext = uiContext
-  }
-
-  @Monitor('resourceId')
-  tabChange() {
-    this.tabSwitch()
   }
 
   setAuthorId(authorId: string) {
@@ -36,19 +32,41 @@ export class InteractionViewModel extends BaseViewModel {
   }
 
   public init(resourceId: TabEnum) {
-    this.isRefreshing = true
     this.resourceId = resourceId
-    this.setActionData(PostServiceApi.queryPostFollowList)
-    if (this.resourceId === TabEnum.Recommend) {
-      emitter.on('recommendRefresh', () => {
-        this.refresh()
-      })
-    }
+    this.refresh()
+    this.setOnListenRefresh()
   }
 
+  setOnListenRefresh() {
+    emitter.on('recommendRefresh', () => {
+      this.refresh()
+    })
+  }
+
+  setOffListenRefresh() {
+    emitter.off('recommendRefresh')
+  }
+
+  public setSelectId(selectId: number) {
+    this.selectId = selectId
+  }
 
   public emitterOff() {
-    emitter.off('recommendRefresh')
+    this.setOffListenRefresh()
+  }
+
+  // 懒加载id，会根据枚举值进行页面刷新
+  public getEachId(newsData: NewsResponse) {
+    return [
+      newsData.id,
+      newsData.likeCount,
+      newsData.isLiked,
+      newsData.commentCount,
+      newsData.markCount,
+      newsData.isMarked,
+    ]
+      .map(value => value?.toString() ?? '')
+      .join('+');
   }
 
   public async setActionData(actionAPi: () => Promise<NewsResponse[]>) {
@@ -72,7 +90,11 @@ export class InteractionViewModel extends BaseViewModel {
   }
 
   public refresh() {
-    this.tabSwitch()
+    this.isRefreshing = true
+    const apiMap: Map<number, () => Promise<NewsResponse[]>> =
+      new Map([[0, PostServiceApi.queryPostFollowList], [1, PostServiceApi.queryPostRecommendList],
+        [2, PostServiceApi.queryPostRecommendList]])
+    this.setActionData(apiMap.get(this.resourceId)!)
   }
 
   public watchOperation() {
@@ -102,7 +124,7 @@ export class InteractionViewModel extends BaseViewModel {
     isQueryCardData: boolean = false) {
     let params: RouterParams<NewsResponse> = {
       newsId: cardData.id,
-      authorId: cardData.author.authorId,
+      authorId: resourceId === TabEnum.Watch ? cardData.author.authorId : '',
       type: cardData.type,
       surfaceUrl: cardData.postImgList?.[0]?.surfaceUrl,
       cardData: cardData,
@@ -124,11 +146,11 @@ export class InteractionViewModel extends BaseViewModel {
     }
     cardInfo.isLiked = !cardInfo.isLiked
     if (cardInfo.isLiked) {
-      CommentServiceApi.addPosterLike(cardInfo.id)
+      MineServiceApi.addLike(cardInfo.id)
       cardInfo.likeCount += 1
       return
     }
-    CommentServiceApi.cancelPosterLike(cardInfo.id)
+    MineServiceApi.cancelLike(cardInfo.id)
     cardInfo.likeCount -= 1
   }
 

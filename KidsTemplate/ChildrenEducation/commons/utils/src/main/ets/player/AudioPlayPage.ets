@@ -1,19 +1,24 @@
 import { TitleShare } from '../uicomponents/TitleShare';
 import { PlayConstants } from './common/constants/PlayConstants';
 import { GlobalContext } from '../utils/GlobalContext';
-import { User, VideoCardDetail, VideoDetail, VipRecord } from '@ohos_agcit/children_education_datasource';
-import { CustomContentDialog } from '@kit.ArkUI';
+import { User, VideoCardDetail, VideoCollection, VipRecord } from '@ohos_agcit/children_education_datasource';
+import { AppStorageV2, CustomContentDialog } from '@kit.ArkUI';
 import { TimeControl } from './common/util/TimeControl';
 import { DateFormatUtil } from '../utils/DateFormatUtil';
 import { CommonConstants } from '../constants/CommonConstants';
 import { historyRecord } from './PlayControl';
 import { QuickLoginUtil } from '../quicklogin/QuickLoginUtil';
+import { AvoidArea } from '../model/AvoidArea';
+import { GlobalInfoModel } from '../model/GlobalInfoModel';
+import { BreakpointType } from '../utils/BreakpointSystem';
 
 @ComponentV2
 export struct AudioPlayPage {
-  @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
   @Consumer(CommonConstants.USER_INFO) user: User = new User();
   @Consumer(CommonConstants.VIP_RECORD) vipRecord: VipRecord = new VipRecord();
+  @Local avoidArea: AvoidArea = AppStorageV2.connect(AvoidArea, () => new AvoidArea(0, 0))!;
+  @Local globalInfo: GlobalInfoModel =
+    AppStorageV2.connect<GlobalInfoModel>(GlobalInfoModel, () => new GlobalInfoModel())!;
   @Local title: string = '';
   @Local imageUrl: string = '';
   @Local index: number = 1;
@@ -21,7 +26,7 @@ export struct AudioPlayPage {
   @Local currentTime: number = 0;
   @Local audioUrl: string = '';
   @Local status: number = PlayConstants.STATUS_START;
-  private audioDetailInfo = GlobalContext.getContext().getObject(CommonConstants.GLOBAL_VIDEO_LIST) as VideoDetail;
+  private audioDetailInfo = GlobalContext.getContext().getObject(CommonConstants.GLOBAL_VIDEO_LIST) as VideoCollection;
   private jumpReturnPlayState: number = PlayConstants.STATUS_PAUSE;
   controller: VideoController = new VideoController();
   private uiContext: UIContext = this.getUIContext() as UIContext;
@@ -35,63 +40,92 @@ export struct AudioPlayPage {
     videoUrl: '',
     isVip: false
   };
+  private currentAudioInfo: VideoCardDetail = {
+    id: '',
+    cardId: '',
+    title: '',
+    imageUrl: '',
+    videoNumber: 0,
+    iconUrl: '',
+    videoUrl: '',
+    isVip: false
+  };
 
   build() {
     NavDestination() {
-      Column() {
-        Stack() {
-          Video({
-            src: this.audioUrl,
-            controller: this.controller,
+      Stack({ alignContent: Alignment.Top }) {
+        Video({
+          src: this.audioUrl,
+          controller: this.controller,
+        })
+          .autoPlay(this.status === PlayConstants.STATUS_START)
+          .visibility(Visibility.Hidden)
+          .onPrepared((e) => {
+            this.currentTime = 0;
+            this.totalTime = e.duration;
           })
-            .autoPlay(this.status === PlayConstants.STATUS_START)
-            .visibility(Visibility.Hidden)
-            .backgroundColor(Color.White)
-            .onPrepared((e) => {
-              this.currentTime = 0;
-              this.totalTime = e.duration;
-            })
-            .onUpdate((e) => {
-              this.currentTime = e.time;
-              console.info('onUpdate is ' + e.time);
-            })
-            .onFinish(() => {
-              this.playNextAudio();
-            })
-            .zIndex(0);
+          .onUpdate((e) => {
+            this.currentTime = e.time;
+            console.info('onUpdate is ' + e.time);
+          })
+          .onFinish(() => {
+            this.playNextAudio();
+          })
+          .zIndex(0)
 
-          Column() {
-            Image(this.imageUrl)
-              .width(200)
-              .height(200)
-              .borderRadius(10)
-              .padding({
-                bottom: '5%'
-              });
-            Text(this.title)
-              .fontWeight(FontWeight.Regular)
-              .padding({
-                top: 16
-              })
+          Scroll() {
 
             Column() {
-              this.playTimeControl();
+              Blank().height(56)
 
-              this.playStatusControl();
+              Image(this.imageUrl)
+                .width(new BreakpointType<number>({
+                  sm: 160,
+                  md: 240,
+                  lg: 240,
+                }).getValue(this.globalInfo.currentBreakpoint))
+                .height(new BreakpointType<number>({
+                  sm: 160,
+                  md: 240,
+                  lg: 240,
+                }).getValue(this.globalInfo.currentBreakpoint))
+                .borderRadius(10)
+                .padding({
+                  bottom: '5%'
+                })
+
+              Text(this.title)
+                .fontSize(14)
+                .lineHeight(19)
+                .fontWeight(FontWeight.Regular)
+                .margin({ top: 16 })
+                .width(288)
+                .height(19)
+                .textAlign(TextAlign.Center)
+
+              Blank()
+                .height(289)
+
+              Column() {
+                this.playTimeControl();
+
+                this.playStatusControl();
+              }
+              .margin({ bottom: 24 })
             }
-            .padding({
-              top: 200,
-            });
+            .justifyContent(FlexAlign.Start)
+            .alignItems(HorizontalAlign.Center)
+            .width(CommonConstants.FULL_PERCENT)
+            .zIndex(1);
           }
-          .padding({
-            top: 100,
-          })
-          .zIndex(1);
-        };
       }
       .width(CommonConstants.FULL_PERCENT)
-      .height(CommonConstants.FULL_PERCENT);
+      .height(CommonConstants.FULL_PERCENT)
     }
+    .padding({
+      top: this.getUIContext().px2vp(this.avoidArea.topRectHeight),
+      bottom: this.getUIContext().px2vp(this.avoidArea.bottomRectHeight),
+    })
     .onReady((cxt: NavDestinationContext) => {
       let audioCardDetail = cxt.pathInfo.param as VideoCardDetail;
       this.title = audioCardDetail.title;
@@ -101,7 +135,7 @@ export struct AudioPlayPage {
     })
     .onShown(() => {
       if (TimeControl.timeControl(this.uiContext)) {
-        this.appPathStack.pop();
+        this.globalInfo.navStack.pop();
         return;
       }
       if (this.totalTime !== 0 && this.currentTime === this.totalTime) {
@@ -140,15 +174,17 @@ export struct AudioPlayPage {
       this.status = PlayConstants.STATUS_PAUSE;
       this.controller.pause();
       this.controller.stop();
-      historyRecord(this.audioDetailInfo, this.index);
-      this.appPathStack.pop();
+      // 异步执行历史记录保存，不阻塞返回
+      void historyRecord(this.audioDetailInfo, this.index, 1).then(() => {
+        this.globalInfo.navStack.pop();
+      });
       return true;
     });
   }
 
   playNextAudio() {
     if (TimeControl.timeControl(this.uiContext)) {
-      this.appPathStack.pop();
+      this.globalInfo.navStack.pop();
       return;
     }
 
@@ -186,7 +222,7 @@ export struct AudioPlayPage {
 
   playPreviousAudio() {
     if (TimeControl.timeControl(this.uiContext)) {
-      this.appPathStack.pop();
+      this.globalInfo.navStack.pop();
       return;
     }
     let globalVideoList = this.audioDetailInfo.videoCardDetailList;
@@ -332,11 +368,11 @@ export struct AudioPlayPage {
           role: ButtonRole.ERROR,
           action: () => {
             if (!this.user.isLogin) {
-              QuickLoginUtil.getQuickLoginAnonymousPhone(this.getUIContext(), this.appPathStack)
+              QuickLoginUtil.getQuickLoginAnonymousPhone(this.getUIContext(), this.globalInfo.navStack)
               return
             }
             let pathInfo: NavPathInfo = new NavPathInfo(CommonConstants.VIP_PAGE_VIEW, this.audioInfo);
-            this.appPathStack.pushDestination(pathInfo, true);
+            this.globalInfo.navStack.pushDestination(pathInfo, true);
           },
         },
       ],

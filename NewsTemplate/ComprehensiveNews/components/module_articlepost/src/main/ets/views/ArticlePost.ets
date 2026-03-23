@@ -24,6 +24,7 @@ export struct ArticlePost {
           .defaultFocus(true)
           .placeholderFont({ size: 18 * this.fontSizeRatio, weight: FontWeight.Bold })
           .fontSize(16 * this.fontSizeRatio)
+          .fontColor($r('sys.color.font_primary'))
           .fontWeight(FontWeight.Bold)
           .onFocus(() => {
             this.hideRichOperation = true

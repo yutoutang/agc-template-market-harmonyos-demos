@@ -1,43 +1,61 @@
 import { Title } from '../uicomponents/Title';
 import { GlobalContext } from '../utils/GlobalContext';
-import { User, VideoCardDetail, VideoDetail, VipRecord } from '@ohos_agcit/children_education_datasource';
-import { display } from '@kit.ArkUI';
-import { common } from '@kit.AbilityKit';
-import { BusinessError, emitter } from '@kit.BasicServicesKit';
+import {
+  DataGenerator,
+  User, VideoCardDetail, VideoCollection, VipRecord } from '@ohos_agcit/children_education_datasource';
+import { AppStorageV2, display, window } from '@kit.ArkUI';
+import { AbilityConstant, common } from '@kit.AbilityKit';
 import { TimeControl } from './common/util/TimeControl';
-import { LogUtil } from '../utils/LogUtil';
 import { CommonConstants } from '../constants/CommonConstants';
 import { historyRecord } from './PlayControl';
 import { MovieItem, PlayerComponent } from 'recorded_player';
 import { SharePicker } from 'aggregated_share';
+import { AvoidArea } from '../model/AvoidArea';
+import { GlobalInfoModel } from '../model/GlobalInfoModel';
+import { BreakpointType } from '../utils/BreakpointSystem';
+import { VideoPlaylist } from './VideoPlaylist';
+import { emitter } from '@kit.BasicServicesKit';
+import { DeviceUtil } from '../utils/DeviceUtil';
 import { QuickLoginUtil } from '../quicklogin/QuickLoginUtil';
-import { FinishStatus, MemberList, MemberParams, MemberSheetUtils,
+import {
+  FinishStatus,
+  MemberList,
+  MemberParams,
+  MemberSheetUtils,
   PRIVACY_CONTENT,
-  ProductInfo, ProductsInfoOptions,
-  PRODUCTS_INFO } from 'membership';
-import { iap } from '@kit.IAPKit';
+  PRODUCTS_INFO,
+  ProductsInfoOptions
+} from 'membership';
 import { DateUtil } from '../utils/DateUtil';
 import { DateConstants } from '../constants/DateConstants';
+import { iap } from '@kit.IAPKit';
+import { PipManager } from 'recorded_player/src/main/ets/tools/PipManager';
+import { LogUtil } from '../utils/LogUtil';
+import { media } from '@kit.MediaKit';
+import { AVPlayerState } from 'recorded_player'
 
 
 @ComponentV2
 export struct VideoPlayPage {
-  private videoDetailInfo = GlobalContext.getContext().getObject(CommonConstants.GLOBAL_VIDEO_LIST) as VideoDetail;
+  private videoDetailInfo = GlobalContext.getContext().getObject(CommonConstants.GLOBAL_VIDEO_LIST) as VideoCollection;
   private uiContext: UIContext = this.getUIContext() as UIContext;
   private hostContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
   private windowClass = this.hostContext.windowStage.getMainWindowSync();
-  @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
   @Consumer(CommonConstants.USER_INFO) user: User = new User();
-  @Consumer(CommonConstants.VIP_RECORD) userVipRecord: VipRecord = new VipRecord();
+  @Consumer(CommonConstants.VIP_RECORD) vipRecord: VipRecord = new VipRecord();
   @Local title: string = '';
   @Local index: number = 0;
   @Local totalTime: number = 0;
   @Local currentTime: number = 0;
   @Local aspect: number = 9 / 16; // default video height/width ratio value
-  @Local xComponentWidth: number = this.getUIContext().px2vp(display.getDefaultDisplaySync().width);
-  @Local xComponentHeight: number = this.getUIContext().px2vp(display.getDefaultDisplaySync().width * this.aspect);
+  @Local playerWidth: number = this.getUIContext().px2vp(display.getDefaultDisplaySync().width);
+  @Local playerHeight: number = this.getUIContext().px2vp(display.getDefaultDisplaySync().width * this.aspect);
   @Local isShowVip: boolean = false;
-  @Local isLayoutFullScreen: boolean = false; // 是否横屏状态
+  @Local isLayoutFullScreen: boolean = false; // 是否全屏
+  @Local avoidArea: AvoidArea = AppStorageV2.connect(AvoidArea, () => new AvoidArea(0, 0))!;
+  @Local globalInfo: GlobalInfoModel =
+    AppStorageV2.connect<GlobalInfoModel>(GlobalInfoModel, () => new GlobalInfoModel())!;
+  private sideBarWidth = 400
   private videoInfo: VideoCardDetail = {
     id: '',
     cardId: '',
@@ -57,161 +75,184 @@ export struct VideoPlayPage {
   };
 
   aboutToAppear(): void {
+    let viewWidth = this.getUIContext().px2vp(display.getDefaultDisplaySync().width)
+    let viewHeight = this.getUIContext().px2vp(display.getDefaultDisplaySync().height)
+    this.resizeScreen(viewWidth, viewHeight)
+
     this.windowClass.on('windowSizeChange', (size) => {
       let viewWidth = this.getUIContext().px2vp(size.width);
       let viewHeight = this.getUIContext().px2vp(size.height);
-      if (viewWidth > viewHeight) {
-        this.xComponentWidth = viewHeight / this.aspect;
-        this.xComponentHeight = viewHeight;
-        this.isLayoutFullScreen = true;
-        this.windowClass.setSpecificSystemBarEnabled('navigationIndicator', false);
-      } else {
-        this.xComponentHeight = viewWidth * this.aspect;
-        this.xComponentWidth = viewWidth;
-        this.windowClass.setSpecificSystemBarEnabled('navigationIndicator', true);
-        this.isLayoutFullScreen = false;
-      }
-    });
-  }
 
-  setOrientation(orientation: number) {
-    this.windowClass.setPreferredOrientation(orientation).then(() => {
-      LogUtil.info('setWindowOrientation: ' + orientation + ' Succeeded.');
-    }).catch((err: BusinessError) => {
-      LogUtil.info('setWindowOrientation: ' + orientation + ' Failed. Cause: ' + JSON.stringify(err));
+      this.resizeScreen(viewWidth, viewHeight)
+    })
+
+    try {
+      display.on('foldStatusChange', (data: display.FoldStatus) => {
+        // 折叠屏展开态全屏状态下，进入折叠态，退出全屏
+        if (this.isLayoutFullScreen && data === FoldStatus.FOLD_STATUS_FOLDED) {
+          this.exitFullScreen()
+          return
+        }
+        if (this.isLayoutFullScreen && data === FoldStatus.FOLD_STATUS_EXPANDED)
+        // 折叠屏折叠态全屏状态下，进入展开态，需要解除横屏
+        {
+          window.getLastWindow(this.hostContext)
+            .then((win) => {
+              win.setPreferredOrientation(13)
+            })
+            .catch((err: BusinessError) => {
+              LogUtil.error(`getLastWindow failed: ${err.code}, ${err.message}`)
+            })
+        }
+      })
+    } catch (err) {
+      LogUtil.error(`display.on failed: ${err.code}, ${err.message}`)
+    }
+
+    // 打开迁移能力
+    const uiContext = (this.getUIContext().getHostContext() as common.UIAbilityContext);
+    uiContext.setMissionContinueState(AbilityConstant.ContinueState.ACTIVE, (result) => {
+      console.info('setMissionContinueState ACTIVE result: ', JSON.stringify(result));
     });
   }
 
   aboutToDisappear(): void {
-    this.isLayoutFullScreen = false;
+    this.exitFullScreen();
   }
 
-  build() {
-    NavDestination() {
-      Column() {
-        Stack() {
-          Column() {
-            if (this.videoInfo.isVip && !this.userVipRecord.isVip) {
-              VipPrompt(
-                {
-                  isLayoutFullScreen: this.isLayoutFullScreen,
-                  xComponentWidth: this.xComponentWidth,
-                  xComponentHeight: this.xComponentHeight,
-                  shareEvent: this.shareEvent
-                }
-              )
-            } else {
-              PlayerComponent({
-                movieItems: [new MovieItem('01', this.videoInfo.title, 0, this.videoInfo.videoUrl)],
-                playerIndex: 0,
-                fullScreen: (isLayoutFullScreen: boolean) => {
-                  this.isLayoutFullScreen = isLayoutFullScreen
-                },
-                exitEvent: () => this.appPathStack.pop(),
-                shareEvent: this.shareEvent,
-                callbackTimeUpdate: (nol: number, total: number) => {
-                  // 播放完成
-                  if (nol === total) {
+  exitFullScreen() {
+    emitter.emit('exitFullScreen', undefined);
+  }
 
-                  }
-                }
-              })
-                .width('100%')
-                .height(this.isLayoutFullScreen ? '100%' : 'auto')
-                .clip(true)
-            }
-          };
-        }
-        .width(CommonConstants.FULL_PERCENT)
-        .height(this.isLayoutFullScreen ? CommonConstants.FULL_PERCENT :
-          this.xComponentHeight + (AppStorage.get<number>('statusBarHeight') ?? 0))
-        .backgroundColor(Color.Black)
-        .padding({ top: this.isLayoutFullScreen ? 0 : (AppStorage.get<number>('statusBarHeight') || 0) });
-
-
-        Row() {
-          Text(this.videoInfo.title)
-            .fontSize(16)
-            .fontWeight(500)
-            .lineHeight(21)
-        }
-        .padding({ left: 16 })
-        .height(48)
-        .width(CommonConstants.FULL_PERCENT)
-
-        Blank()
-          .height(8)
-          .width(CommonConstants.FULL_PERCENT)
-          .backgroundColor($r('sys.color.background_secondary'));
-
-        VideoCollection({
-          globalVideoList: this.videoDetailInfo.videoCardDetailList,
-        })
-      };
-    }
-    .onReady((cxt: NavDestinationContext) => {
-      let detail = cxt.pathInfo.param as VideoCardDetail;
-      this.videoInfo.id = detail.id
-      this.videoInfo.cardId = detail.cardId
-      this.videoInfo.title = detail.title
-      this.videoInfo.imageUrl = detail.imageUrl
-      this.videoInfo.iconUrl = detail.iconUrl
-      this.videoInfo.videoUrl = detail.videoUrl
-      this.videoInfo.videoNumber = detail.videoNumber
-      this.videoInfo.isVip = detail.isVip
-    })
-    .onHidden(() => {
-    })
-    .onShown(() => {
-      if (TimeControl.timeControl(this.uiContext)) {
-        this.appPathStack.pop();
-        return;
+  resizeScreen(viewWidth: number, viewHeight: number) {
+    if (this.isLayoutFullScreen) {
+      if (DeviceUtil.isLandSpace()) {
+        this.playerWidth = viewWidth
+        this.playerHeight =
+          DeviceUtil.isPhone() || (DeviceUtil.isFoldablePhone() &&
+            display.getFoldStatus() === FoldStatus.FOLD_STATUS_FOLDED) ? viewHeight :
+            viewHeight - this.getUIContext().px2vp(this.avoidArea.topRectHeight) -
+            this.getUIContext().px2vp(this.avoidArea.bottomRectHeight)
+      } else {
+        this.playerWidth = viewWidth
+        this.playerHeight = viewHeight - this.getUIContext().px2vp(this.avoidArea.topRectHeight) -
+        this.getUIContext().px2vp(this.avoidArea.bottomRectHeight)
       }
-    })
-    .hideTitleBar(true)
-    .title(Title(this.videoInfo.title))
-    .onBackPressed(() => {
-      historyRecord(this.videoDetailInfo, this.videoInfo.videoNumber - 1);
-      this.appPathStack.pop();
-      return true;
-    });
-  }
-}
 
-@ComponentV2
-struct VipPrompt {
-  @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
-  @Consumer(CommonConstants.USER_INFO) user: User = new User();
-  @Consumer(CommonConstants.VIP_RECORD) vipRecord: VipRecord = new VipRecord();
-  @Param isLayoutFullScreen: boolean = false
-  @Param xComponentWidth: number = 0
-  @Param xComponentHeight: number = 0
-  @Param shareEvent: () => void = () => {
+      this.windowClass.setWindowSystemBarProperties({
+        statusBarColor: '#000000',
+        statusBarContentColor: '#FFFFFF',
+      });
+      return
+    }
+
+    if (this.getShowSideBar()) {
+      this.playerWidth = viewWidth - this.sideBarWidth
+      this.playerHeight = viewHeight - this.getUIContext().px2vp(this.avoidArea.topRectHeight) -
+      this.getUIContext().px2vp(this.avoidArea.bottomRectHeight)
+      this.windowClass.setWindowSystemBarProperties({
+        statusBarColor: '#000000',
+        statusBarContentColor: '#FFFFFF',
+      })
+      return
+    }
+
+    this.playerWidth = viewWidth
+    this.playerHeight = this.playerWidth * this.aspect
+    this.windowClass.setWindowSystemBarProperties({
+      statusBarColor: '#FFFFFF',
+      statusBarContentColor: '#000000',
+    })
   }
+
+  private showPlaylistVisibility(): Visibility {
+    if (this.isLayoutFullScreen) {
+      return Visibility.None
+    }
+    return new BreakpointType<Visibility>({
+      sm: Visibility.Visible,
+      md: Visibility.Visible,
+      lg: Visibility.None,
+    }).getValue(this.globalInfo.currentBreakpoint);
+  }
+
+  getShowSideBar(): boolean {
+    if (this.isLayoutFullScreen) {
+      return false
+    }
+    return new BreakpointType<boolean>({
+      sm: false,
+      md: false,
+      lg: true,
+    }).getValue(this.globalInfo.currentBreakpoint);
+  }
+
+  getBackgroundColor(): Resource {
+    if (this.isLayoutFullScreen) {
+      return $r('sys.color.comp_foreground_primary')
+    }
+    return new BreakpointType<Resource>({
+      sm: $r('sys.color.background_primary'),
+      md: $r('sys.color.background_primary'),
+      lg: $r('sys.color.comp_foreground_primary'),
+    }).getValue(this.globalInfo.currentBreakpoint);
+  }
+
+  private needRotationToLandSpace(): boolean {
+    let isDeviceComplies = DeviceUtil.isPhone() || (DeviceUtil.isFoldablePhone() &&
+      display.getFoldStatus() === FoldStatus.FOLD_STATUS_FOLDED);
+
+    let isStatusComplies = DeviceUtil.isPortrait()
+    if (isDeviceComplies && isStatusComplies) {
+      return true
+    }
+    return false;
+  }
+
+  private hasAuth() {
+    if (!this.videoInfo.isVip) {
+      return true
+    }
+    return this.vipRecord.isVip
+  }
+
+  private needRotationToPortrait(): boolean {
+    let isDeviceComplies = DeviceUtil.isPhone() || (DeviceUtil.isFoldablePhone() &&
+      display.getFoldStatus() === FoldStatus.FOLD_STATUS_FOLDED);
+
+    let isStatusComplies = DeviceUtil.isLandSpace()
+    if (isDeviceComplies && isStatusComplies) {
+      return true
+    }
+    return false;
+  }
+
   // 购买会员商品结果回调函数
   private subscribeEvent = async (params: MemberParams): Promise<void> => {
     this.getUIContext().getPromptAction().showToast({ message: this.getSubscribeMsg(params) });
     if (params.type === iap.ProductType.NONRENEWABLE && params.status === FinishStatus.FINISHED) {
-
-      let validTimeTmp = DateUtil.getTodayStr(DateConstants.DATE_FORMAT4);
-
+      // mock计算商品到期时间
+      let today = DateUtil.getTodayStr(DateConstants.DATE_FORMAT4);
+      let validDate = '';
       if (params.productId === '20254') {
-        validTimeTmp = DateUtil.getAmountDayStr(validTimeTmp, 365, DateConstants.DATE_FORMAT4);
+        validDate = DateUtil.getAmountDayStr(today, 365, DateConstants.DATE_FORMAT4);
       } else if (params.productId === '20253') {
-        validTimeTmp = DateUtil.getAmountDayStr(validTimeTmp, 92, DateConstants.DATE_FORMAT4);
+        validDate = DateUtil.getAmountDayStr(today, 92, DateConstants.DATE_FORMAT4);
       } else {
-        validTimeTmp = DateUtil.getAmountDayStr(validTimeTmp, 31, DateConstants.DATE_FORMAT4);
+        validDate = DateUtil.getAmountDayStr(today, 31, DateConstants.DATE_FORMAT4);
       }
-
-      let vipRecord: emitter.EventData = {
+      emitter.emit(CommonConstants.VIP_RECORD, {
         data: {
           'isVip': true,
-          'validTime': validTimeTmp,
+          'validTime': validDate,
         },
-      };
-      emitter.emit(CommonConstants.VIP_RECORD, vipRecord);
+      });
 
-      this.queryExpireTime(params.productId, params.purchaseTime, validTimeTmp);
+      // 刷新页面
+      let pathInfo: NavPathInfo = new NavPathInfo(CommonConstants.VIDEO_PLAY_PAGE, this.videoInfo);
+      this.globalInfo.navStack.replacePath(pathInfo, true);
+
+      PipManager.getInstance().player.isPlaying = true;
     }
   };
   // 查询用户开通的会员种类列表，沙盒场景下，已发货状态的非消耗型商品订单信息不返回
@@ -251,167 +292,190 @@ struct VipPrompt {
     subscribeCallBack: this.subscribeEvent,
     queryExpireTime: this.queryExpireTime,
     ownedMemberCallBack: this.ownedMemberEvent,
-  };
+  }
 
-  build() {
+  @Builder
+  vipPrompt() {
     Column() {
-      Row() {
-        Stack({ alignContent: Alignment.Center }) {
-          Circle()
-            .width(40)
-            .height(40)
-            .fill($r('sys.color.comp_background_tertiary'))
+      Column() {
+        Text('该视频内容为VIP会员专享，查看请先开通会员')
+          .fontSize(14)
+          .fontColor(Color.White)
+          .lineHeight(19)
 
-          SymbolGlyph($r('sys.symbol.chevron_left'))
-            .fontSize(24)
-            .fontColor([$r('sys.color.icon_on_primary')])
-        }
-        .margin({ left: 16, top: 8 })
-        .onClick(() => {
-          this.appPathStack.pop();
-        })
+        Blank().height(12)
 
-        Stack({ alignContent: Alignment.Center }) {
-          Circle()
-            .width(40)
-            .height(40)
-            .fill($r('sys.color.comp_background_tertiary'))
+        Button('开通会员')
+          .width(this.isLayoutFullScreen ? 120 : 90)
+          .aspectRatio(2.57)
+          .fontSize($r('sys.float.Body_M'))
+          .fontColor($r('sys.color.font_primary'))
+          .backgroundColor('#D3B685')
+          .borderRadius(14)
+          .onClick(() => {
+            if (!this.user.isLogin) {
+              QuickLoginUtil.getQuickLoginAnonymousPhone(this.getUIContext(), this.globalInfo.navStack)
+              return
+            }
+            MemberSheetUtils.open(this.productsInfo, this.getUIContext()); // 半模态弹窗
+          })
 
-          SymbolGlyph($r('sys.symbol.share'))
-            .fontSize(24)
-            .fontColor([$r('sys.color.icon_on_primary')])
-        }
-        .margin({ right: 16, top: 8 })
-        .onClick(() => {
-          this.shareEvent()
-        })
-      }
-      .height(56)
-      .width('100%')
-      .alignItems(VerticalAlign.Center)
-      .justifyContent(FlexAlign.SpaceBetween)
+        Blank().height(12)
 
-      Text('该视频内容为VIP会员专享，查看请先开通会员')
-        .fontSize(14)
-        .fontColor(Color.White)
-        .lineHeight(19)
-
-      Blank().height(12)
-
-      Button('开通会员')
-        .width(this.isLayoutFullScreen ? 120 : 90)
-        .aspectRatio(2.57)
-        .fontSize($r('sys.float.Body_M'))
-        .fontColor($r('sys.color.font_primary'))
-        .backgroundColor('#D3B685')
-        .borderRadius(14)
-        .onClick(() => {
-          if (!this.user.isLogin) {
-            QuickLoginUtil.getQuickLoginAnonymousPhone(this.getUIContext(), this.appPathStack)
-            return
-          }
-          // 半模态弹窗
-          MemberSheetUtils.open(this.productsInfo, this.getUIContext());
-        })
-
-      Blank().height(12)
-
-      if (!this.user.isLogin) {
         Text('已是会员？点击登录查看')
           .fontSize(14)
           .fontColor('#D3B685')
           .onClick(() => {
-            QuickLoginUtil.getQuickLoginAnonymousPhone(this.getUIContext(), this.appPathStack)
+            QuickLoginUtil.getQuickLoginAnonymousPhone(this.getUIContext(), this.globalInfo.navStack)
           })
       }
+      .height(90)
+      .width(288)
     }
-    .width(this.xComponentWidth)
-    .height(this.xComponentHeight)
+    .height('100%')
+    .width('100%')
+    .justifyContent(FlexAlign.Center)
+    .alignItems(HorizontalAlign.Center)
     .backgroundColor($r('sys.color.comp_foreground_primary'))
-    .zIndex(1)
     .visibility(Visibility.Visible);
   }
-}
-
-@ComponentV2
-struct VideoCollection {
-  @Param @Once @Require globalVideoList: Array<VideoCardDetail>;
-  @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
-  @Consumer(CommonConstants.USER_INFO) user: User = new User();
-  @Consumer(CommonConstants.VIP_RECORD) vipRecord: VipRecord = new VipRecord();
 
   build() {
-    Column() {
-      Row() {
-        Text('选集')
-          .fontWeight(FontWeight.Bold)
-          .fontSize(24);
-      }
-      .margin({
-        top: 20,
-        left: 10,
-      })
-      .alignSelf(ItemAlign.Start);
-
-      List({ space: '16vp' }) {
-        ForEach(this.globalVideoList, (item: VideoCardDetail) => {
-          ListItem() {
-            VideoCardDetailItem({
-              title: item.title,
-              imageUrl: item.imageUrl,
-              isVip: item.isVip,
-            });
-          }
-          .padding({
-            left: '4%',
-            right: '4%',
-          })
-          .onClick(() => {
-            if (!item.isVip) {
-              let pathInfo: NavPathInfo = new NavPathInfo(CommonConstants.VIDEO_PLAY_PAGE, item);
-              this.appPathStack.replacePath(pathInfo, true);
-              return
+    NavDestination() {
+        SideBarContainer() {
+          // sidebar area
+          Column() {
+            Scroll() {
+              VideoPlaylist({
+                title: this.videoInfo.title,
+                globalVideoList: DataGenerator.getVideoDetail(this.getUIContext()).videoCardDetailList
+              })
             }
-            let pathInfo: NavPathInfo = new NavPathInfo(CommonConstants.VIDEO_PLAY_PAGE, item);
-            this.appPathStack.replacePath(pathInfo, true);
-          });
-        }, (item: VideoCardDetail) => JSON.stringify(item));
-      }
-      .scrollBar(BarState.Off)
-      .width(CommonConstants.FULL_PERCENT)
-      .lanes(2)
-      .alignListItem(ListItemAlign.Center)
-      .padding({
-        top: 20,
-      });
+          }
+          .height('100%')
+          .width('100%')
+
+          // content area
+          Column() {
+            Scroll() {
+              Column() {
+                PlayerComponent({
+                  movieItems: [new MovieItem('01', this.videoInfo.title, 0, this.videoInfo.videoUrl)],
+                  playerIndex: 0,
+                  showMaskLayer: !this.hasAuth(),
+                  stateChange:(state:string) => {
+                    if (state === AVPlayerState.PREPARED && this.currentTime) {
+                      PipManager.getInstance().player.changeSeek(this.currentTime, 2)
+                    }
+                  },
+                  customBuilderParam: () => {
+                    this.vipPrompt()
+                  },
+                  fullScreenEvent: (isLayoutFullScreen: boolean) => {
+                    this.isLayoutFullScreen = isLayoutFullScreen
+                    let viewWidth = this.getUIContext().px2vp(display.getDefaultDisplaySync().width)
+                    let viewHeight = this.getUIContext().px2vp(display.getDefaultDisplaySync().height)
+
+                    // 开启全屏事件
+                    if (isLayoutFullScreen) {
+                      // 开启强制横屏，通过windowSizeChange回调修改尺寸
+                      if (this.needRotationToLandSpace()) {
+                        window.getLastWindow(this.hostContext).then((win) => {
+                          win.setPreferredOrientation(2)
+                        })
+                          .catch((err: BusinessError) => {
+                            LogUtil.error(`getLastWindow failed: ${err.code}, ${err.message}`)
+                          })
+                        return
+                      }
+                      // 直接修改尺寸
+                      this.resizeScreen(viewWidth, viewHeight)
+                      return;
+                    }
+
+                    // 关闭全屏事件
+                    if (this.needRotationToPortrait()) {
+                      // 关闭强制横屏，通过windowSizeChange回调修改尺寸
+                      window.getLastWindow(this.hostContext)
+                        .then((win) => {
+                          win.setPreferredOrientation(1)
+                        })
+                        .catch((err: BusinessError) => {
+                          LogUtil.error(`getLastWindow failed: ${err.code}, ${err.message}`)
+                        })
+                      return
+                    }
+                    // 直接修改尺寸
+                    this.resizeScreen(viewWidth, viewHeight)
+                  },
+                  exitEvent: () => {
+                    this.globalInfo.navStack.pop()
+                  },
+                  shareEvent: this.shareEvent,
+                })
+                  .width(this.playerWidth)
+                  .height(this.playerHeight)
+                  .backgroundColor(Color.Black)
+
+                VideoPlaylist({
+                  title: this.videoInfo.title,
+                  globalVideoList: DataGenerator.getVideoDetail(this.getUIContext()).videoCardDetailList,
+                })
+                  .visibility(this.showPlaylistVisibility())
+              }
+
+            }
+
+          }
+          .backgroundColor(this.getBackgroundColor())
+          .height('100%')
+          .width('100%')
+        }
+        .sideBarWidth(this.sideBarWidth)
+        .sideBarPosition(SideBarPosition.End)
+        .autoHide(false)
+        .showControlButton(false)
+        .showSideBar(this.getShowSideBar())
+
     }
     .padding({
-      left: '3%',
-      right: '3%',
-    });
+      top: this.getUIContext().px2vp(this.avoidArea.topRectHeight),
+    })
+    .onReady((cxt: NavDestinationContext) => {
+      let detail = cxt.pathInfo.param as VideoCardDetail;
+      this.videoInfo.id = detail.id
+      this.videoInfo.cardId = detail.cardId
+      this.videoInfo.title = detail.title
+      this.videoInfo.imageUrl = detail.imageUrl
+      this.videoInfo.iconUrl = detail.iconUrl
+      this.videoInfo.videoUrl = detail.videoUrl
+      this.videoInfo.videoNumber = detail.videoNumber
+      this.videoInfo.isVip = detail.isVip
+      if (detail.currentTime) {
+        this.currentTime = detail.currentTime;
+      }
+    })
+    .onHidden(() => {
+    })
+    .onShown(() => {
+      if (TimeControl.timeControl(this.uiContext)) {
+        this.globalInfo.navStack.pop();
+        return;
+      }
+    })
+    .hideTitleBar(true)
+    .title(Title(this.videoInfo.title))
+    .onBackPressed(() => {
+      if (this.isLayoutFullScreen) {
+        this.exitFullScreen()
+        return true
+      }
+      // 异步执行历史记录保存，不阻塞返回
+      void historyRecord(this.videoDetailInfo, this.videoInfo.videoNumber - 1, 0).then(() => {
+        this.globalInfo.navStack.pop();
+      });
+      return true;
+    })
   }
 }
 
-@ComponentV2
-struct VideoCardDetailItem {
-  @Param @Require title: string;
-  @Param @Require imageUrl: string;
-  @Param @Require isVip: boolean;
-
-  build() {
-    Column({ space: 10 }) {
-      Stack({ alignContent: Alignment.TopStart }) {
-        Image(this.imageUrl)
-          .aspectRatio(1.78)
-          .borderRadius(10);
-        Image(this.isVip ? $r('app.media.icon_vip_top_start') : $r('app.media.icon_free_top_start'))
-          .width('20%');
-      };
-
-      Text(this.title)
-        .fontWeight(FontWeight.Medium)
-        .fontSize(16);
-    }
-    .alignItems(HorizontalAlign.Start);
-  }
-}

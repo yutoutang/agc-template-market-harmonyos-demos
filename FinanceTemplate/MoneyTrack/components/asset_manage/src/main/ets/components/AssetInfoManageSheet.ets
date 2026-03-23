@@ -1,3 +1,5 @@
+import { UIDialog } from '@hw-agconnect/ui-dialog';
+import { ToastDialog } from '@hw-agconnect/ui-toast';
 import {
   AssetCategory,
   AssetRecordItemModel,
@@ -6,7 +8,6 @@ import {
   AssetType,
   Constants,
 } from 'asset_base';
-import { promptAction } from '@kit.ArkUI';
 
 export interface AssetInfoManageOptions {
   assetTypeItem?: AssetDisplayTypeItem;
@@ -65,7 +66,7 @@ export struct AssetInfoManageSheet {
           .onClick(() => {
             const num = Number(this.amount);
             if (typeof num !== 'number') {
-              promptAction.showToast({ message: '请检查输入金额' });
+              ToastDialog.showToast({ message: '请检查输入金额' });
               return;
             }
             this.formData.amount = num;
@@ -79,25 +80,26 @@ export struct AssetInfoManageSheet {
             .enabled(this.formData.amount !== 0)
             .margin({ top: 16 })
             .onClick(() => {
-              promptAction.showDialog({
-                message: '删除资产账户会取消所有该账户名下的记账数据关联，并且无法恢复关联。请确认是否删除？',
-                buttons: [
-                  {
-                    text: '取消',
-                    color: Constants.FONT_COLOR_LEVEL1,
-                  },
-                  {
-                    text: '删除',
-                    color: Constants.WARNING_COLOR,
-                  },
-                ],
-                alignment: DialogAlignment.Bottom,
+              UIDialog.open({
+                contentOptions: {
+                  content: '删除资产账户会取消所有该账户名下的记账数据关联，并且无法恢复关联。请确认是否删除？',
+                  contentTextAlign: TextAlign.Center,
+                },
+                showConfirmButton: true,
+                showCancelButton: true,
+                confirmButtonOptions: {
+                  button: '删除',
+                  buttonFontColor: Constants.WARNING_COLOR,
+                },
+                cancelButtonOptions: {
+                  button: '取消',
+                  buttonFontColor:  Constants.FONT_COLOR_LEVEL1,
+                },
+                onConfirm: () => {
+                  this.handleDelete?.(this.initAsset!.assetId);
+                  UIDialog.closeLast();
+                }
               })
-                .then(data => {
-                  if (data.index === 1) {
-                    this.handleDelete?.(this.initAsset!.assetId);
-                  }
-                });
             });
         }
       }

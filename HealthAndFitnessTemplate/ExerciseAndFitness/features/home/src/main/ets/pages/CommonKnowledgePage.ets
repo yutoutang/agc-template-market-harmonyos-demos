@@ -1,15 +1,44 @@
-import { RouterMap, RouterUtils, CommonConstants } from 'lib_common';
+import { RouterMap, RouterUtils, CommonConstants, KNOWLEDGE_DRAW_DATA, Course, BreakpointNameEnum,
+  BreakpointModel } from 'lib_common';
 import { NavHeaderBar } from 'lib_widget';
 import { CommonKnowledgePageVM } from '../viewmodels/CommonKnowledgePageVM';
+import { AppStorageV2 } from '@kit.ArkUI';
 
 @Builder
 export function CommonKnowledgePageBuilder() {
   CommonKnowledgePage()
 }
 
+interface GridSettingInfo {
+  template: string;
+  colGap: number;
+  rowGap: number;
+}
+
 @ComponentV2
 struct CommonKnowledgePage {
   vm: CommonKnowledgePageVM = new CommonKnowledgePageVM();
+  @Local breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
+
+  @Computed
+  get gridSetting() {
+    const gridSettingInfo: GridSettingInfo  = {
+      template: '1fr 1fr',
+      colGap: 8,
+      rowGap: 8,
+    }
+    if ([BreakpointNameEnum.MD].includes((this.breakPointModel.currentBreakpoint))) {
+      gridSettingInfo.template = '1fr 1fr 1fr 1fr'
+      gridSettingInfo.colGap = 12
+      gridSettingInfo.rowGap = 12
+    }
+    if ([BreakpointNameEnum.LG, BreakpointNameEnum.XL].includes((this.breakPointModel.currentBreakpoint))) {
+      gridSettingInfo.template = '1fr 1fr 1fr 1fr 1fr 1fr'
+      gridSettingInfo.colGap = 16
+      gridSettingInfo.rowGap = 16
+    }
+    return gridSettingInfo
+  }
 
   build() {
     NavDestination() {
@@ -17,124 +46,35 @@ struct CommonKnowledgePage {
         NavHeaderBar({
           title: '运动健身常识普及',
         })
-
-        Column() {
-          Row({ space: 8 }) {
-            Column() {
-              Image($r('app.media.common_knowledge1'))
-                .width(144)
-                .height(144)
-                .padding({ top: 8 })
-                .borderRadius(8)
-              Text('普通瑜伽与普拉提的区别其实并不大')
-                .fontWeight(FontWeight.Medium)
-                .fontSize($r('sys.float.Body_S'))
-                .padding({ top: 8, left:8, right: 8 })
+        Grid() {
+          ForEach(KNOWLEDGE_DRAW_DATA, (item: Course) => {
+            GridItem() {
+              Column() {
+                Image(item.cover)
+                  .width('100%')
+                  .borderRadius(8)
+                Text(item.courseTitle)
+                  .fontWeight(FontWeight.Medium)
+                  .fontSize($r('sys.float.Body_S'))
+                  .padding({ top: 8 })
+              }
+              .width('100%')
+              .backgroundColor($r('sys.color.white'))
+              .padding(8)
+              .borderRadius(8)
+              .alignItems(HorizontalAlign.Center)
+              .onClick(() => RouterUtils.pushPathByName(RouterMap.COMMON_KNOWLEDGE_DETAIL, item.id))
             }
-            .backgroundColor($r('sys.color.white'))
-            .borderRadius(16)
-            .width(160)
-            .height(200)
-            .onClick(() => RouterUtils.pushPathByName(RouterMap.COMMON_KNOWLEDGE_YOGA))
-            // .onClick(() => RouterUtils.pushPathByName(RouterMap.COMMON_KNOWLEDGE_DETAIL, '06'))
-
-            Column() {
-              Image($r('app.media.common_knowledge2'))
-                .width(144)
-                .height(144)
-                .borderRadius(8)
-                .padding({ top: 8 })
-              Text('运动完腰椎损伤是什么造成的？')
-                .fontWeight(FontWeight.Medium)
-                .fontSize($r('sys.float.Body_S'))
-                .padding({ top: 8, left:8, right: 8 })
-            }
-            .backgroundColor($r('sys.color.white'))
-            .borderRadius(16)
-            .width(160)
-            .height(200)
-            .onClick(() => RouterUtils.pushPathByName(RouterMap.COMMON_KNOWLEDGE_STRAIN))
-            // .onClick(() => RouterUtils.pushPathByName(RouterMap.COMMON_KNOWLEDGE_DETAIL, '04'))
-          }
-
-          Row({ space: 8 }) {
-            Column() {
-              Image($r('app.media.common_knowledge3'))
-                .width(144)
-                .height(144)
-                .borderRadius(8)
-                .padding({ top: 8 })
-              Text('腿部训练前的热身和激活动作，不可忽视')
-                .fontWeight(FontWeight.Medium)
-                .fontSize($r('sys.float.Body_S'))
-                .padding({ top: 8, left:8, right: 8 })
-            }
-            .backgroundColor($r('sys.color.white'))
-            .borderRadius(16)
-            .width(160)
-            .height(200)
-            .onClick(() => RouterUtils.pushPathByName(RouterMap.COMMON_KNOWLEDGE_ACTIVATE))
-            // .onClick(() => RouterUtils.pushPathByName(RouterMap.COMMON_KNOWLEDGE_DETAIL, '01'))
-
-            Column() {
-              Image($r('app.media.common_knowledge4'))
-                .width(144)
-                .height(144)
-                .borderRadius(8)
-                .padding({ top: 8 })
-              Text('你知道如何在跑后有效拉伸吗？')
-                .fontWeight(FontWeight.Medium)
-                .fontSize($r('sys.float.Body_S'))
-                .padding({ top: 8, left:8, right: 8 })
-            }
-            .backgroundColor($r('sys.color.white'))
-            .borderRadius(16)
-            .width(160)
-            .height(200)
-            .onClick(() => RouterUtils.pushPathByName(RouterMap.COMMON_KNOWLEDGE_DRAW))
-            // .onClick(() => RouterUtils.pushPathByName(RouterMap.COMMON_KNOWLEDGE_DETAIL, '02'))
-          }
-          .margin({ bottom:8, top:8 })
-
-          Row({ space: 8 }) {
-            Column() {
-              Image($r('app.media.common_knowledge5'))
-                .width(144)
-                .height(144)
-                .borderRadius(8)
-                .padding({ top: 8 })
-              Text('运动装备的重要性，你知道哪些？')
-                .fontWeight(FontWeight.Medium)
-                .fontSize($r('sys.float.Body_S'))
-                .padding({ top: 8, left:8, right: 8 })
-            }
-            .backgroundColor($r('sys.color.white'))
-            .borderRadius(16)
-            .width(160)
-            .height(200)
-            .onClick(() => RouterUtils.pushPathByName(RouterMap.COMMON_KNOWLEDGE_EQUIP))
-            // .onClick(() => RouterUtils.pushPathByName(RouterMap.COMMON_KNOWLEDGE_DETAIL, '03'))
-
-            Column() {
-              Image($r('app.media.common_knowledge6'))
-                .width(144)
-                .height(144)
-                .borderRadius(8)
-                .padding({ top: 8 })
-              Text('合理且适当的热身，可以让你的运动表现更好')
-                .fontWeight(FontWeight.Medium)
-                .fontSize($r('sys.float.Body_S'))
-                .padding({ top: 8, left:8, right: 8 })
-            }
-            .backgroundColor($r('sys.color.white'))
-            .borderRadius(16)
-            .width(160)
-            .height(200)
-            .onClick(() => RouterUtils.pushPathByName(RouterMap.COMMON_KNOWLEDGE_WARM))
-            // .onClick(() => RouterUtils.pushPathByName(RouterMap.COMMON_KNOWLEDGE_DETAIL, '05'))
-          }
+          })
         }
-        .width('100%')
+        .scrollBar(BarState.Off)
+        .edgeEffect(EdgeEffect.Spring)
+        .columnsTemplate(this.gridSetting.template)
+        .columnsGap(this.gridSetting.colGap)
+        .rowsGap(this.gridSetting.rowGap)
+        .padding({ left: 24, right: 24 })
+        .margin({ bottom: 30 })
+        .layoutWeight(1)  // 添加布局权重
       }
       .height(CommonConstants.FULL_PERCENT)
       .width(CommonConstants.FULL_PERCENT)

@@ -1,4 +1,3 @@
-import { promptAction } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import {
   BaseViewModel,
@@ -11,6 +10,8 @@ import {
 } from 'lib_common';
 import { MineServiceApi } from 'lib_api';
 import { getAccountErrorMsg, ErrorCode } from 'lib_account';
+import { common } from '@kit.AbilityKit';
+import { preferences } from '@kit.ArkData';
 
 const TAG = '[SettingPersonalVM]';
 
@@ -40,7 +41,7 @@ export class SettingPersonalVM extends BaseViewModel {
 
   modifyNickName() {
     if (!this.nickName) {
-      promptAction.showToast({ message: '昵称不能为空' });
+      this.contextModel.showToast({ message: '昵称不能为空' });
       return
     }
     MineServiceApi.modifyPersonalInfo({ authorNickName: this.nickName });
@@ -57,12 +58,22 @@ export class SettingPersonalVM extends BaseViewModel {
     this.hasModify = true;
   }
 
+  getGender(context: common.UIAbilityContext) {
+    const pref = preferences.getPreferencesSync(context, { name: 'prefData' });
+    return pref.getSync('userGender', '');
+  }
+
   modifyAge(age: string) {
     this.age = age
     MineServiceApi.modifyPersonalInfo({ authorAge: this.age });
     this.userInfoModel.authorAge = this.age;
     this.showAgeSheet = false;
     this.hasModify = true;
+  }
+
+  getAge(context: common.UIAbilityContext) {
+    const pref = preferences.getPreferencesSync(context, { name: 'prefData' });
+    return pref.getSync('userAge', '');
   }
 
   modifyHeight() {
@@ -72,11 +83,21 @@ export class SettingPersonalVM extends BaseViewModel {
     this.hasModify = true;
   }
 
+  getHeight(context: common.UIAbilityContext) {
+    const pref = preferences.getPreferencesSync(context, { name: 'prefData' });
+    return pref.getSync('userHeight', '');
+  }
+
   modifyWeight() {
     MineServiceApi.modifyPersonalInfo({ authorWeight: this.weight });
     this.userInfoModel.authorWeight = this.weight;
     this.showWeightSheet = false;
     this.hasModify = true;
+  }
+
+  getWeight(context: common.UIAbilityContext) {
+    const pref = preferences.getPreferencesSync(context, { name: 'prefData' });
+    return pref.getSync('userWeight', '');
   }
 
   modifyPurpose(purpose: string[]) {
@@ -87,6 +108,12 @@ export class SettingPersonalVM extends BaseViewModel {
     this.hasModify = true;
   }
 
+  getPurpose(context: common.UIAbilityContext) {
+    const pref = preferences.getPreferencesSync(context, { name: 'prefData' });
+    let userPurpose: string[] = pref.getSync('userPurpose', []) as string[];
+    return userPurpose
+  }
+
   modifyBody(body: string[]) {
     this.body = body
     MineServiceApi.modifyPersonalInfo({ authorBody: this.body });
@@ -95,13 +122,19 @@ export class SettingPersonalVM extends BaseViewModel {
     this.hasModify = true;
   }
 
+  getBody(context: common.UIAbilityContext) {
+    const pref = preferences.getPreferencesSync(context, { name: 'prefData' });
+    let userBody: string[] = pref.getSync('userBody', []) as string[];
+    return userBody
+  }
+
   modifyContactPhone() {
     if (!this.contactPhone) {
-      promptAction.showToast({ message: '手机号码不能为空' });
+      this.contextModel.showToast({ message: '手机号码不能为空' });
       return;
     }
     if (!PhoneNumberUtils.isPhoneNumberValid(this.contactPhone)) {
-      promptAction.showToast({ message: '请输入正确的手机号码' });
+      this.contextModel.showToast({ message: '请输入正确的手机号码' });
       return;
     }
     MineServiceApi.modifyPersonalInfo({ authorPhone: this.contactPhone });
@@ -117,11 +150,11 @@ export class SettingPersonalVM extends BaseViewModel {
     this.hasModify = true;
   }
 
-  saveUserIcon(uri: string) {
+  saveUserIcon(context: common.UIAbilityContext, uri: string) {
     if (!uri) {
       return;
     }
-    const resp = FileUtils.handleUri(uri);
+    const resp = FileUtils.handleUri(context, uri);
     Logger.info(TAG, 'user icon saved success, url:' + resp);
     MineServiceApi.modifyPersonalInfo({ authorIcon: resp });
     this.userInfoModel.authorIcon = resp;

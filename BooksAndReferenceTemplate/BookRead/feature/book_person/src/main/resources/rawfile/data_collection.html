@@ -5,79 +5,95 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>个人信息收集清单</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+         --bg-color: #f5f5f5;
+         --content-bg: #fff;
+         --card-color: #ffffff;
+         --font-color: #333;
+         --effective-color: #888;
         }
-
-        body {
-            font-family: "HarmonyOS Sans", "Helvetica Neue", Arial, sans-serif;
-            background-color: #f9f9f9;
-            color: #333;
-            line-height: 1.6;
-            padding: 0;
-            margin: 0;
-            font-size: 16px;
+        @media (prefers-color-scheme: dark) {
+          :root {
+            --bg-color: #e5e5e5;
+            --content-bg: #000;
+            --card-color: #191919;
+            --font-color: #fff;
+            --effective-color: #eee;
+          }
         }
+       * {
+           margin: 0;
+           padding: 0;
+           box-sizing: border-box;
+       }
 
-        .container {
-            max-width: 100%;
-            padding: 20px;
-            margin: 0 auto;
-        }
+       body {
+           font-family: "HarmonyOS Sans", "Helvetica Neue", Arial, sans-serif;
+           background: var(--bg-color);
+           color: var(--font-color);
+           line-height: 1.6;
+           padding: 0;
+           margin: 0;
+           font-size: 16px;
+       }
 
-        header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+       .container {
+           max-width: 100%;
+           padding: 20px;
+           margin: 0 auto;
+       }
 
-        h1 {
-            font-size: 24px;
-            margin-bottom: 10px;
-            color: #333;
-        }
+       header {
+           text-align: center;
+           margin-bottom: 20px;
+       }
 
-        .content {
-            text-align: left;
-            font-size: 16px;
-            line-height: 1.8;
-            margin-bottom: 20px;
-        }
+       h1 {
+           font-size: 24px;
+           margin-bottom: 10px;
+           color: var(--font-color);
+       }
 
-        footer {
-            text-align: center;
-            font-size: 14px;
-            color: #777;
-            margin-top: 20px;
-            padding-top: 10px;
-            border-top: 1px solid #eee;
-        }
+       .content {
+           text-align: left;
+           font-size: 16px;
+           line-height: 1.8;
+           margin-bottom: 20px;
+       }
 
-        /* 响应式设计 */
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 22px;
-            }
+       footer {
+           text-align: center;
+           font-size: 14px;
+           color: #777;
+           margin-top: 20px;
+           padding-top: 10px;
+           border-top: 1px solid #eee;
+       }
 
-            .content {
-                font-size: 15px;
-            }
-        }
+       /* 响应式设计 */
+       @media (max-width: 768px) {
+           h1 {
+               font-size: 22px;
+           }
 
-        @media (min-width: 769px) {
-            body {
-                font-size: 17px;
-            }
+           .content {
+               font-size: 15px;
+           }
+       }
 
-            h1 {
-                font-size: 28px;
-            }
+       @media (min-width: 769px) {
+           body {
+               font-size: 17px;
+           }
 
-            .content {
-                font-size: 17px;
-            }
-        }
+           h1 {
+               font-size: 28px;
+           }
+
+           .content {
+               font-size: 17px;
+           }
+       }
     </style>
 </head>
 <body>

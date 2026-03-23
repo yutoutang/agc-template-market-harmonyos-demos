@@ -20,13 +20,24 @@
         "startWindowIcon": "$media:startIcon",
         "startWindowBackground": "$color:start_window_background",
         "exported": true,
+        "continuable": true,
+// 启用接续能力
         "skills": [
           {
             "entities": [
-              "entity.system.home"
+              "entity.system.home",
+              "entity.system.browsable"
             ],
             "actions": [
-              "action.system.home"
+              "ohos.want.action.home",
+              "ohos.want.action.viewData"
+            ],
+            "uris": [
+              {
+                "scheme": "https",
+                "host": "notes.app",
+                "path": "/import"
+              }
             ]
           }
         ]
@@ -43,10 +54,26 @@
     "metadata": [
       {
 /**
-        * todo
-        */
+                * todo
+                */
         "name": "client_id",
         "value": "******"
+      }
+    ],
+    "extensionAbilities": [
+      {
+        "name": "EntryFormAbility",
+        "srcEntry": "./ets/notecardability/noteCardAbility.ets",
+        "label": "$string:noteCardAbility_label",
+        "description": "$string:noteCardAbility_desc",
+        "type": "form",
+        "metadata": [
+          {
+            "name": "ohos.extension.form",
+            "resource": "$profile:form_config"
+          }
+        ],
+        "exported": true
       }
     ]
   }

@@ -54,7 +54,7 @@ export struct InteractionFeedCard {
   build() {
     Column() {
       FeedCard({
-        componentId: 'interaction_news' + this.resource.label,
+        componentId: 'interaction_news' + this.resource.id,
         feedCardInfo: this.cardInfo,
         isAll: true,
         isDark: this.settingInfo.darkSwitch,
@@ -77,7 +77,7 @@ export struct InteractionFeedCard {
           this.interactionViewModel.watchOperation()
         },
         onComment: () => {
-          this.interactionViewModel.actionToNewsDetails(this.cardInfo, this.index, this.resource.id, 'comment')
+          this.interactionViewModel.actionToNewsDetails(this.cardInfo, this.index, this.resource.id, 'comment', true)
         },
         onLike: () => {
           this.interactionViewModel.addLike(this.cardInfo)

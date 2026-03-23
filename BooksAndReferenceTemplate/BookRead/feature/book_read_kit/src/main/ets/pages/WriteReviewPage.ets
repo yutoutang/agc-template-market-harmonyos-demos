@@ -38,7 +38,6 @@ export struct WriteReviewPage {
     } catch (e) {
       console.error('Failed to emitter on login change. Cause: ' + JSON.stringify(e));
     }
-
   }
 
   onPageShow(): void {
@@ -85,12 +84,12 @@ export struct WriteReviewPage {
         Text($r('app.string.all'))
           .fontSize(14)
           .fontColor(this.vm.currentFilter === ReviewFilterType.ALL ?
-            Color.White : $r('sys.color.ohos_id_color_text_secondary'))
+            $r('sys.color.ohos_id_color_background') : $r('sys.color.font_primary'))
       }
       .width(60)
       .height(32)
       .backgroundColor(this.vm.currentFilter === ReviewFilterType.ALL ?
-        Color.Black : '#f1f3f5')
+        $r('sys.color.comp_foreground_primary') : $r('sys.color.comp_background_tertiary'))
       .borderRadius(16)
       .justifyContent(FlexAlign.Center)
       .onClick(() => {
@@ -101,7 +100,7 @@ export struct WriteReviewPage {
         Text($r('app.string.latest'))
           .fontSize(14)
           .fontColor(this.vm.currentFilter === ReviewFilterType.LATEST ?
-            Color.White : $r('sys.color.ohos_id_color_text_secondary'))
+            $r('sys.color.ohos_id_color_background') : $r('sys.color.font_primary'))
 
         Image($r('app.media.time_interval'))
           .width(12)
@@ -110,7 +109,7 @@ export struct WriteReviewPage {
       .width(70)
       .height(32)
       .backgroundColor(this.vm.currentFilter === ReviewFilterType.LATEST ?
-        Color.Black : '#f1f3f5')
+        $r('sys.color.comp_foreground_primary') : $r('sys.color.comp_background_tertiary'))
       .borderRadius(16)
       .justifyContent(FlexAlign.Center)
       .onClick(() => {
@@ -227,6 +226,7 @@ export struct WriteReviewPage {
           .layoutWeight(1)
           .scrollable(ScrollDirection.Vertical)
           .edgeEffect(EdgeEffect.Spring)
+          .scrollBar(BarState.Off)
           .padding({ left: 16, right: 16, bottom: 40 })
 
           Blank()

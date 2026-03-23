@@ -1,7 +1,9 @@
 import { CommonConstants, GridRowColSetting } from 'lib_common';
 import { NavHeaderBar } from 'lib_widget';
+import { ContextUtils } from '../components/ContextUtils';
 import { SettingCard } from '../components/SettingCard';
 import { SettingViewModel } from '../viewmodels/SettingVM';
+import { common } from '@kit.AbilityKit';
 
 @Builder
 export function SettingPageBuilder() {
@@ -14,6 +16,13 @@ struct SettingPage {
 
   aboutToAppear(): void {
     this.vm.getCache();
+    this.initParams();
+    ContextUtils.setUIContext(this.getUIContext());
+  }
+
+  initParams() {
+    this.vm.uiContext = this.getUIContext();
+    this.vm.context = this.getUIContext().getHostContext() as common.UIAbilityContext;
   }
 
   build() {

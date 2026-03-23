@@ -5,6 +5,7 @@ export class Constants {
   public static readonly VIDEO_SIZE_LG_W: number = 320;
   public static readonly VIDEO_SIZE_SM_H: number = 214;
   public static readonly VIDEO_SIZE_LG_H: number = 428;
+  public static readonly MAX_HISTORY_COUNT:number = 15
 }
 
   export interface KindsList {

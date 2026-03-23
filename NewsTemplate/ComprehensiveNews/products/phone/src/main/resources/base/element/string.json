@@ -27,6 +27,18 @@
     {
       "name": "widget_display_name",
       "value": "新闻阅读"
+    },
+    {
+      "name": "go_to_tv",
+      "value": "电视"
+    },
+    {
+      "name": "go_to_audio",
+      "value": "广播"
+    },
+    {
+      "name": "go_to_digital_news",
+      "value": "报纸"
     }
   ]
 }

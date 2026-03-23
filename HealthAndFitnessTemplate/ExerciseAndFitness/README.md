@@ -15,22 +15,21 @@
 
 此模板提供如下组件，所有组件存放在工程根目录的components下，如果您仅需使用组件，可参考对应组件的指导链接；如果您使用此模板，请参考本文档。
 
-| 组件                          | 描述                                   | 使用指导                                                                                                                                                                                                            |
-|:----------------------------| :------------------------------------- |:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 通用支付组件（aggregated_payment） | 本组件聚合了多方的支付能力       | [使用指导](components/aggregated_payment/README.md)                                                                                                                                                                                   |
-| 图表组件（module_chart）          | 支持按照日、周、月、年统计运动记录     | [使用指导](components/module_chart/README.md)         |
-| 意见反馈组件（module_feedback）     | 支持提交问题反馈、查看反馈记录         | [使用指导](components/module_feedback/README.md)      |
-| 图片预览组件（module_imagepreview） | 支持预览图片、双指放大、缩小，滑动预览 | [使用指导](components/module_imagepreview/README.md)  |
-| 播放组件（module_player）         | 视频播放支持加解锁、画中画、倍速、分辨率等功能   | [使用指导](components/module_player/README.md)        |
-| 搜索组件（module_search）         | 搜索能力   | [使用指导](components/module_search/README.md)        |
-| 一镜到底组件（module_transition）   | 支持卡片展开、搜索、查看大图一镜到底   | [使用指导](components/module_transition/README.md)    |
+| 组件                        | 描述                                   | 使用指导                                             |
+|:--------------------------| :------------------------------------- |:-------------------------------------------------|
+| 通用会员组件（membership）        | 提供通过应用内支付实现会员开通的能力       | [使用指导](components/membership/README.md)          |
+| 图表组件（module_chart）        | 支持按照日、周、月、年统计运动记录     | [使用指导](components/module_chart/README.md)        |
+| 通用问题反馈组件（feedback）        | 支持提交问题反馈、查看反馈记录         | [使用指导](components/feedback/README.md)     |
+| 播放组件（module_player）       | 视频播放支持加解锁、画中画、倍速、分辨率等功能   | [使用指导](components/module_player/README.md)       |
+| 搜索组件（module_search）       | 搜索能力   | [使用指导](components/module_search/README.md)       |
+| 一镜到底组件（module_transition） | 支持卡片展开、搜索、查看大图一镜到底   | [使用指导](components/module_transition/README.md)   |
 
 本模板为运动健身类应用提供了常用功能的开发样例，模板主要分首页、课程、计划和我的四大模块：
 
 * 首页：提供运动健身常识普及、热门课程、进阶课程等功能。
 * 课程：提供搜索筛选、课程详情、添加日历、VIP课程、课程视频等功能。
 * 计划：提供一周计划、本周目标、推荐课程、制定计划等功能。
-* 我的：提供个人信息查看、运动记录、意见反馈、设置等功能。
+* 我的：提供个人信息查看、运动记录、问题反馈、设置等功能。
 
 本模板已集成华为账号等服务，只需做少量配置和定制即可快速实现华为账号的登录、媒体播放等功能。
 
@@ -138,7 +137,7 @@
       └──常用服务    
           ├── 我的足迹    
           ├── 我的收藏                                    
-          ├── 意见反馈                   
+          ├── 问题反馈                   
           └── 设置
                ├── 编辑个人信息             
                ├── 隐私设置           
@@ -191,10 +190,9 @@ ExerciseAndFitness
 │           └──NavHeaderBar.ets                           // 自定义标题栏
 │
 ├──components
-│  ├──aggregated_payment                                  // 通用支付组件
+│  ├──membership                                          // 通用会员组件
 │  ├──module_chart                                        // 图表组件 
-│  ├──module_feedback                                     // 意见反馈组件 
-│  ├──module_imagepreview                                 // 图片预览组件 
+│  ├──feedback                                            // 通用问题反馈组件 
 │  ├──module_player                                       // 播放组件 
 │  ├──module_search                                       // 搜索组件
 │  └──module_transition                                   // 动画组件         
@@ -297,12 +295,12 @@ ExerciseAndFitness
 ## 约束和限制
 
 ### 环境
-* DevEco Studio版本：DevEco Studio 5.1.1 Release及以上
-* HarmonyOS SDK版本：HarmonyOS 5.0.3 Release SDK及以上
-* 设备类型：华为手机（包括双折叠和阔折叠）
-* 系统版本：HarmonyOS 5.0.3 (15)及以上
+* DevEco Studio版本：DevEco Studio 6.0.2 Release及以上
+* HarmonyOS SDK版本：HarmonyOS 6.0.2 Release SDK及以上
+* 设备类型：华为手机（包括双折叠和阔折叠）、平板
+* HarmonyOS版本：HarmonyOS 6.0.0(20)及以上
 ### 权限
-* 网络权限: ohos.permission.INTERNET, ohos.permission.GET_NETWORK_INFO, ohos.permission.GET_WIFI_INFO
+* 网络权限: ohos.permission.INTERNET, ohos.permission.GET_NETWORK_INFO
 
 
 ## 快速入门
@@ -323,12 +321,24 @@ ExerciseAndFitness
 
    b. 申请华为账号一键登录所需的quickLoginMobilePhone权限，详细参考：[配置scope权限](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-config-permissions)。
 
-3. 接入微信SDK。
+3. 配置应用内支付服务。
+
+   a. 您需[开通商户服务](https://developer.huawei.com/consumer/cn/doc/start/merchant-service-0000001053025967)才能开启应用内购买服务。商户服务里配置的银行卡账号、币种，用于接收华为分成收益。
+
+   b. 使用应用内购买服务前，需要打开应用内购买服务(HarmonyOS NEXT) 开关，此开关是应用级别的，即所有使用IAP Kit功能的应用均需执行此步骤，详情请参考[打开应用内购买服务API开关](https://developer.huawei.com/consumer/cn/doc/app/switch-0000001958955097)。
+
+   c. 开启应用内购买服务(HarmonyOS NEXT) 开关后，开发者需进一步激活应用内购买服务 (HarmonyOS NEXT)，具体请参见[激活服务和配置事件通知](https://developer.huawei.com/consumer/cn/doc/app/parameters-0000001931995692)。
+
+4. （可选）用户购买商品后，IAP服务器会在订单（消耗型/非消耗型商品）和订阅场景的某些关键事件发生时发送通知至开发者配置的订单/订阅通知接收地址，您可以根据关键事件的通知进行服务端的开发，详情请参考[激活服务和配置事件通知](https://developer.huawei.com/consumer/cn/doc/app/parameters-0000001931995692)。
+
+5. 配置会员商品信息，详情请参考[配置商品信息](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/iap-config-product)。
+
+6. 接入微信SDK。
    前往微信开放平台申请AppID并配置鸿蒙应用信息，详情参考：[鸿蒙接入指南](https://developers.weixin.qq.com/doc/oplatform/Mobile_App/Access_Guide/ohos.html)。
 
-4. 对应用进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing#section297715173233)。
+7. 对应用进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing#section297715173233)。
 
-5. 添加手工签名所用证书对应的公钥指纹，详细参考：[配置应用签名证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-cert-fingerprint-0000002278002933)。
+8. 添加手工签名所用证书对应的公钥指纹，详细参考：[配置应用签名证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-cert-fingerprint-0000002278002933)。
 
 ###  运行调试工程
 1. 连接调试手机和PC。

@@ -1,12 +1,6 @@
 import { AppStorageV2 } from '@kit.ArkUI';
 import { LoginSheetUtils } from 'lib_account';
-import {
-  BaseViewModel,
-  BreakpointModel,
-  CommonConfirmDialog,
-  RouterParams,
-  RouterToNews,
-} from 'lib_common';
+import { BaseViewModel, BreakpointModel, CommonConfirmDialog, RouterParams, RouterToNews } from 'lib_common';
 import { CommentServiceApi, MineServiceApi, NewsResponse } from 'lib_news_api';
 import { LayoutParams } from 'module_flexlayout';
 import { PiPWindowModel } from 'module_swipeplayer';
@@ -71,7 +65,7 @@ export class CardViewModel extends BaseViewModel {
       content: '确定不再关注TA？',
       confirm: () => {
         MineServiceApi.cancelWatch(this.authorId);
-        let watchIndex = this.userInfoModel.watchers.findIndex(v => v === this.authorId)
+        const watchIndex = this.userInfoModel.watchers.findIndex(v => v === this.authorId)
         this.userInfoModel.watchers.splice(watchIndex, 1)
       },
     })
@@ -87,7 +81,7 @@ export class CardViewModel extends BaseViewModel {
 
   public pushToNewsDetails(cardData: LayoutParams, formType?: string, componentId?: string,
     isQueryCardData: boolean = false) {
-    let params: RouterParams<NewsResponse> = {
+    const params: RouterParams<NewsResponse> = {
       newsId: cardData.nativeCardData.id,
       type: cardData.nativeCardData.type,
       surfaceUrl: cardData.nativeCardData.postImgList?.[0]?.surfaceUrl,
@@ -95,7 +89,10 @@ export class CardViewModel extends BaseViewModel {
       isQueryCardData: isQueryCardData,
       formType: formType ?? '',
     }
-    let longTakeTransitionParam: LongTakeTransitionParam | undefined =
+    if (cardData.extraInfo.authorId) {
+      params.authorId = cardData.extraInfo.authorId as string;
+    }
+    const longTakeTransitionParam: LongTakeTransitionParam | undefined =
       LoneTakeAnimationsTransition.generateLongTakeParam(this.uiContext,
         componentId ? componentId :
           'news_flow_' + cardData.extraInfo.channelId + '_' + cardData.extraInfo.flowIndex + '_' +
@@ -105,6 +102,4 @@ export class CardViewModel extends BaseViewModel {
     }
     RouterToNews.pushToNewsDetails<NewsResponse>(params)
   }
-
-
 }

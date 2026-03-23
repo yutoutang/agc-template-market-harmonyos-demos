@@ -1,43 +1,34 @@
-import { media } from '@kit.MediaKit';
 import { AVVolumePanel } from '@kit.AudioKit';
-import { BusinessError, emitter } from '@kit.BasicServicesKit';
-import { LongTakeAnimationProperties } from 'module_transition';
+import { emitter } from '@kit.BasicServicesKit';
 import { Battery } from '../components/Battery';
 import { VideoProgressBar } from '../components/VideoProgressBar';
-import { AVPlayerSession } from '../controller/AVPlayerManager';
-import { Constants } from '../constants/Constants';
-import { AVPlayerState, BreakpointNameEnum } from '../type/Index';
-import { LandscapeVideoVM } from '../viewmodel/LandscapeVideoVM';
 import { PlayerSpeedRateView } from '../components/PlayerSpeedRateView';
 import { PlayerSlider } from '../components/PlayerSlider';
+import { Constants } from '../constants/Constants';
+import { EventKey } from '../constants/EventKey';
+import { LandscapeVideoVM } from '../viewmodel/LandscapeVideoVM';
 import { PlayerSliderModel, SliderType } from '../models/PlayerSliderModel';
-import { BreakpointModel } from '../models/BreakpointModel';
-import { Logger } from '../utils/Logger';
 
 @Builder
 export function LandscapeVideoBuilder() {
   LandscapeVideo()
 }
 
-const TAG = '[LandscapeVideo]';
-
 @ComponentV2
 export struct LandscapeVideo {
-  xComponentController: XComponentController = new XComponentController();
-  vm: LandscapeVideoVM = new LandscapeVideoVM(this.getUIContext())
+  vm: LandscapeVideoVM = new LandscapeVideoVM(this.getUIContext());
   @Provider() playerSliderModel: PlayerSliderModel = this.vm.volumeUtil.playerSliderModel;
-  @Local longTakeSession: LongTakeAnimationProperties = new LongTakeAnimationProperties();
 
   aboutToAppear(): void {
     this.vm.init();
   }
 
   aboutToDisappear(): void {
-    this.vm.disappear()
+    this.vm.disappear();
   }
 
   private onBackPressed(): boolean {
-    this.vm.onBack()
+    this.vm.onBack();
     return true;
   }
 
@@ -48,17 +39,15 @@ export struct LandscapeVideo {
           XComponent({
             id: 'xmComponent',
             type: XComponentType.SURFACE,
-            controller: this.xComponentController,
+            controller: this.vm.xComponentController,
           })
             .aspectRatio(this.vm.videoWidth / this.vm.videoHeight)
             .onLoad(() => {
-              const surfaceId = this.xComponentController.getXComponentSurfaceId();
+              const surfaceId = this.vm.xComponentController.getXComponentSurfaceId();
               if (this.vm.player) {
                 this.vm.player.surfaceId = surfaceId;
               }
-              this.vm.player?.play().catch((e: BusinessError) => {
-                Logger.error(TAG, 'play fail, error: ' + JSON.stringify(e));
-              });
+              this.vm.avPlayerController?.play();
             })
         }
         .height('100%')
@@ -66,6 +55,19 @@ export struct LandscapeVideo {
         .justifyContent(FlexAlign.Center)
         .id('upperVideoPlayer')
 
+        // 提示开通会员，视频上层内容
+        Stack({ alignContent: Alignment.TopStart }) {
+          this.vm.membershipBuilder?.builder(() => {
+            this.vm.avPlayerController?.seek(0);
+            this.vm.avPlayerController?.play();
+          })
+          this.topRegionView()
+        }
+        .width(Constants.FULL_PERCENT)
+        .height(Constants.FULL_PERCENT)
+        .visibility(this.vm.showMembershipOverlay ? Visibility.Visible : Visibility.None)
+
+        // 常规情况，视频上层内容
         Stack({ alignContent: Alignment.TopStart }) {
           // 音量、亮度、倍速
           this.videoExtraView()
@@ -78,6 +80,7 @@ export struct LandscapeVideo {
             .width('100%')
             .alignRules({
               middle: { anchor: '__container__', align: HorizontalAlign.Center },
+              top: { anchor: '__container__', align: VerticalAlign.Top },
             })
             .visibility(this.vm.showBar ? Visibility.Visible : Visibility.Hidden)
             .animation({ duration: 200 })
@@ -96,7 +99,7 @@ export struct LandscapeVideo {
             // 底部进度条
             Row() {
               VideoProgressBar({
-                playerSession: this.vm.playerSession,
+                avPlayerController: this.vm.avPlayerController,
                 showProgressBarLeft: true,
                 showProgressBarRight: true,
                 selectedColor: Color.White,
@@ -125,8 +128,8 @@ export struct LandscapeVideo {
             .padding({ bottom: Constants.BOTTOM_PADDING_HEIGHT })
             .justifyContent(FlexAlign.SpaceBetween)
             .alignRules({
-              bottom: { anchor: '__container__', align: VerticalAlign.Bottom },
               left: { anchor: '__container__', align: HorizontalAlign.Start },
+              bottom: { anchor: '__container__', align: VerticalAlign.Bottom },
             })
             .visibility(this.vm.showBar && !this.vm.isLockScreen ? Visibility.Visible : Visibility.Hidden)
             .animation({ duration: 200 })
@@ -135,7 +138,7 @@ export struct LandscapeVideo {
             Column() {
               // 视频的进度控制器
               VideoProgressBar({
-                playerSession: this.vm.playerSession,
+                avPlayerController: this.vm.avPlayerController,
                 canChangeSlide: false,
                 isProgressFullWidth: true,
                 showSlideBlock: false,
@@ -147,8 +150,8 @@ export struct LandscapeVideo {
             .width(Constants.FULL_PERCENT)
             .padding({ left: Constants.PADDING_L, right: Constants.PADDING_L })
             .alignRules({
-              bottom: { anchor: '__container__', align: VerticalAlign.Bottom },
               left: { anchor: '__container__', align: HorizontalAlign.Start },
+              bottom: { anchor: '__container__', align: VerticalAlign.Bottom },
             })
           }
           .width(Constants.FULL_PERCENT)
@@ -156,92 +159,8 @@ export struct LandscapeVideo {
         }
         .width(Constants.FULL_PERCENT)
         .height(Constants.FULL_PERCENT)
-        .gesture(
-          // 组合手势，互斥识别
-          GestureGroup(GestureMode.Exclusive,
-            // 长按加速
-            LongPressGesture({ repeat: true, duration: 300 })
-              .onAction((event: GestureEvent) => {
-                // 页面锁住时，不能进行操作
-                if (!this.vm.isLockScreen) {
-                  this.vm.onLongPress(event)
-                }
-              })
-              .onActionCancel(() => {
-                // 页面锁住时，不能进行操作
-                if (!this.vm.isLockScreen) {
-                  this.vm.offLongPress()
-                }
-              })
-              .onActionEnd(() => {
-                // 页面锁住时，不能进行操作
-                if (!this.vm.isLockScreen) {
-                  this.vm.offLongPress()
-                }
-              }),
-            // 双击暂停或播放
-            TapGesture({ count: 2 })
-              .onAction((event: GestureEvent) => {
-                if (!event) {
-                  return
-                }
-                // 页面锁住时，不能进行操作
-                if (this.vm.isLockScreen) {
-                  return
-                }
-                if (!this.vm.isBuffering) {
-                  this.vm.switchPlayOrPause()
-                }
-              }),
-            // 单击显隐外层视图
-            TapGesture({ count: 1 })
-              .onAction((event: GestureEvent) => {
-                if (event) {
-                  this.vm.handleClickScreen()
-                }
-              }),
-            // 竖直滑动修改音量或亮度
-            PanGesture({ direction: PanDirection.Vertical })
-              .onActionStart((event?: GestureEvent) => {
-                this.vm.handleBrightAndVolumePanStart(event)
-              })
-              .onActionUpdate((event?: GestureEvent) => {
-                this.vm.handleBrightAndVolumePanUpdate(event)
-              })
-              .onActionCancel(() => {
-                this.vm.onActionEnd();
-              })
-              .onActionEnd(() => {
-                this.vm.onActionEnd();
-              }),
-            // 横向滑动更新进度条
-            PanGesture({ direction: PanDirection.Horizontal })
-              .onActionStart((event?: GestureEvent) => {
-                if (this.vm.isHideSlide) {
-                  return
-                }
-                this.vm.handleProgressStart(event)
-              })
-              .onActionUpdate((event?: GestureEvent) => {
-                if (this.vm.isHideSlide) {
-                  return
-                }
-                this.vm.handleProgressUpdate(event)
-              })
-              .onActionCancel(() => {
-                if (this.vm.isHideSlide) {
-                  return
-                }
-                this.vm.handleProgressEnd();
-              })
-              .onActionEnd(() => {
-                if (this.vm.isHideSlide) {
-                  return
-                }
-                this.vm.handleProgressEnd()
-              }),
-          ),
-        )
+        .visibility(this.vm.showMembershipOverlay ? Visibility.None : Visibility.Visible)
+        .gestureStyle()
       }
       .enableAnimation(false)
       .alignContent(Alignment.Center)
@@ -249,55 +168,20 @@ export struct LandscapeVideo {
     .backgroundColor(Color.Black)
     .hideTitleBar(true)
     .onReady((context: NavDestinationContext) => {
-      this.vm.pathStack = context.pathStack
-      let param = context.pathInfo?.param as Record<string, Object | AVPlayerSession | BreakpointNameEnum>;
-      this.vm.playerSession = (param.playerSession as AVPlayerSession)
-      this.vm.player = (param.playerSession as AVPlayerSession).getAVPlayer() as media.AVPlayer;
-      this.vm.videoWidth = param.videoWidth as number
-      this.vm.videoHeight = param.videoHeight as number
-      this.vm.videoTitle = param.videoTitle as string
-      this.vm.breakpointModel = param.breakpointModel as BreakpointModel
-      this.vm.isMute = param.isMute as boolean
-      this.vm.isHideSlide = param.isHideSlide as boolean
-      // 音量初始化
-      this.vm.volumeUtil.init()
-      this.vm.setMute()
-      // 设置亮度
-      this.vm.volumeUtil.updateBrightness(this.getUIContext().getHostContext() as Context)
-      // 状态监听
-      this.vm.playerSession?.onEvent('stateChange', (state: string) => {
-        // 横屏时，播放完之后会重头播放，需要保持播放状态
-        this.vm.isPlaying = state === AVPlayerState.PLAYING || state === AVPlayerState.COMPLETED
-      });
-      this.vm.playerSession?.onEvent('bufferingUpdate', (infoType: media.BufferingInfoType) => {
-        if (infoType === media.BufferingInfoType.BUFFERING_START) {
-          this.vm.isBuffering = true;
-        }
-        if (infoType === media.BufferingInfoType.BUFFERING_END) {
-          this.vm.isBuffering = false
-        }
-      });
-      this.vm.registerCustomTransition(context, this.longTakeSession)
+      this.vm.handleContextInfo(context);
     })
     // 返回后继续播放
     .onBackPressed(() => {
       return this.onBackPressed();
     })
     .onAppear(async () => {
-      try {
-        await this.vm.windowClass!.setSpecificSystemBarEnabled('navigationIndicator', false);
-        await this.vm.windowClass!.setSpecificSystemBarEnabled('status', false);
-      } catch (e) {
-        Logger.error(TAG, 'onAppear setSpecificSystemBarEnabled fail, error: ' + JSON.stringify(e));
-      }
+      emitter.emit(EventKey.DISABLE_PREVIOUS_NEXT);
+      this.vm.setSystemConfig();
     })
     .onDisAppear(async () => {
-      try {
-        await this.vm.windowClass!.setSpecificSystemBarEnabled('navigationIndicator', true);
-        await this.vm.windowClass!.setSpecificSystemBarEnabled('status', true);
-      } catch (e) {
-        Logger.error(TAG, 'onDisAppear setSpecificSystemBarEnabled fail, error: ' + JSON.stringify(e));
-      }
+      emitter.emit(EventKey.ENABLE_PREVIOUS_NEXT);
+      clearTimeout(this.vm.time);
+      this.vm.resetSystemConfig();
     })
   }
 
@@ -330,28 +214,39 @@ export struct LandscapeVideo {
 
       Row() {
         Row() {
-          Row() {
-            Image($r('app.media.ic_left_arrow')).width(9).height(16)
+          // 返回按钮
+          Button() {
+            SymbolGlyph($r('sys.symbol.chevron_backward'))
+              .fontColor([$r('sys.color.font_on_primary')])
+              .fontWeight(FontWeight.Normal)
+              .fontSize(24)
           }
           .width(40)
           .height(40)
-          .justifyContent(FlexAlign.Center)
+          .type(ButtonType.Circle)
+          .backgroundColor($r('app.color.circle_btn_bg'))
           .accessibilityText('退出全屏')
           .onClick(() => {
             this.vm.onBack()
           })
 
           // 标题
-          Text(this.vm.videoTitle ?? '').fontSize(14)
-            .fontColor(Color.White)
-            .accessibilityLevel('yes')
+          if (!this.vm.showMembershipOverlay) {
+            Text(this.vm.videoTitle ?? '')
+              .fontSize(14)
+              .fontColor(Color.White)
+              .accessibilityLevel('yes')
+              .margin({ left: Constants.PADDING_S })
+          }
         }
 
-        // 电池
-        Battery()
+        if (!this.vm.showMembershipOverlay) {
+          // 电池
+          Battery()
+        }
       }
       .width(Constants.FULL_PERCENT)
-      .padding({ left: 16, right: 16 })
+      .padding({ left: 16, right: 16, top: 32 })
       .justifyContent(FlexAlign.SpaceBetween)
     }
     .width(Constants.FULL_PERCENT)
@@ -442,17 +337,112 @@ export struct LandscapeVideo {
     .offset({ top: 80 })
     .zIndex(2)
   }
+
+  @Styles
+  gestureStyle() {
+    .gesture(
+      // 组合手势，互斥识别
+      GestureGroup(GestureMode.Exclusive,
+        // 长按加速
+        LongPressGesture({ repeat: true, duration: 300 })
+          .onAction((event: GestureEvent) => {
+            // 页面锁住时，不能进行操作
+            if (!this.vm.isLockScreen) {
+              this.vm.onLongPress(event)
+            }
+          })
+          .onActionCancel(() => {
+            // 页面锁住时，不能进行操作
+            if (!this.vm.isLockScreen) {
+              this.vm.offLongPress()
+            }
+          })
+          .onActionEnd(() => {
+            // 页面锁住时，不能进行操作
+            if (!this.vm.isLockScreen) {
+              this.vm.offLongPress()
+            }
+          }),
+        // 双击暂停或播放
+        TapGesture({ count: 2 })
+          .onAction((event: GestureEvent) => {
+            if (!event) {
+              return
+            }
+            // 页面锁住时，不能进行操作
+            if (this.vm.isLockScreen) {
+              return
+            }
+            if (!this.vm.isBuffering) {
+              this.vm.switchPlayOrPause()
+            }
+          }),
+        // 单击显隐外层视图
+        TapGesture({ count: 1 })
+          .onAction((event: GestureEvent) => {
+            if (event) {
+              this.vm.handleClickScreen()
+            }
+          }),
+        // 竖直滑动修改音量或亮度
+        PanGesture({ direction: PanDirection.Vertical })
+          .onActionStart((event?: GestureEvent) => {
+            this.vm.handleBrightAndVolumePanStart(event)
+          })
+          .onActionUpdate((event?: GestureEvent) => {
+            this.vm.handleBrightAndVolumePanUpdate(event)
+          })
+          .onActionCancel(() => {
+            this.vm.onActionEnd();
+          })
+          .onActionEnd(() => {
+            this.vm.onActionEnd();
+          }),
+        // 横向滑动更新进度条
+        PanGesture({ direction: PanDirection.Horizontal })
+          .onActionStart((event?: GestureEvent) => {
+            if (this.vm.isHideSlide) {
+              return
+            }
+            this.vm.handleProgressStart(event)
+          })
+          .onActionUpdate((event?: GestureEvent) => {
+            if (this.vm.isHideSlide) {
+              return
+            }
+            this.vm.handleProgressUpdate(event)
+          })
+          .onActionCancel(() => {
+            if (this.vm.isHideSlide) {
+              return
+            }
+            this.vm.handleProgressEnd();
+          })
+          .onActionEnd(() => {
+            if (this.vm.isHideSlide) {
+              return
+            }
+            this.vm.handleProgressEnd()
+          }),
+      ),
+    )
+  }
 }
 
 // 用来设置音量同步系统音量
 @Component
 struct VolumePanelView {
-  @State volume: number = 0
+  @State volume: number = 0;
+  private onSystemVolumeChange: (eventData: emitter.EventData) => void = (eventData) => {
+    this.volume = eventData.data!.volume * 15
+  };
 
   aboutToAppear(): void {
-    emitter.on('systemVolumeChange', (eventData: emitter.EventData) => {
-      this.volume = eventData.data!.volume * 15
-    })
+    emitter.on(EventKey.SYSTEM_VOLUME_CHANGE, this.onSystemVolumeChange);
+  }
+
+  aboutToDisappear(): void {
+    emitter.off(EventKey.SYSTEM_VOLUME_CHANGE, this.onSystemVolumeChange);
   }
 
   build() {

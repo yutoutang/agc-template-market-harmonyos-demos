@@ -1,4 +1,5 @@
 import { ComponentContent, PromptAction, UIObserver, window } from '@kit.ArkUI'
+import { common } from '@kit.AbilityKit'
 
 /**
  * custom builder
@@ -210,34 +211,38 @@ class Toast {
   /**
    * 根据参数打开弹框
    */
-  private async open(option: ToastOption) {
-    let windowClass = await window.getLastWindow(getContext())
-    let uiContext = windowClass.getUIContext()
-    let loadingDialog = new ComponentContent(uiContext, wrapBuilder(defaultBuilder), option)
-    let promptAction = uiContext.getPromptAction()
-    let uiObserver = uiContext.getUIObserver()
-    Toast._instance = Toast.getInstance(loadingDialog, promptAction, uiObserver)
-    await promptAction.openCustomDialog(loadingDialog, {
-      alignment: DialogAlignment.Center,
-      autoCancel: false,
-      isModal: true,
-      transition: TransitionEffect.IDENTITY,
-      onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
-        if (dismissDialogAction.reason === DismissReason.PRESS_BACK) {
-          dismissDialogAction.dismiss()
-        }
-        if (dismissDialogAction.reason === DismissReason.TOUCH_OUTSIDE) {
-          dismissDialogAction.dismiss()
-        }
-      },
-    })
+  private async open(context: common.UIAbilityContext, option: ToastOption) {
+    try {
+      let windowClass = context.windowStage.getMainWindowSync();
+      let uiContext = windowClass.getUIContext()
+      let loadingDialog = new ComponentContent(uiContext, wrapBuilder(defaultBuilder), option)
+      let promptAction = uiContext.getPromptAction()
+      let uiObserver = uiContext.getUIObserver()
+      Toast._instance = Toast.getInstance(loadingDialog, promptAction, uiObserver)
+      await promptAction.openCustomDialog(loadingDialog, {
+        alignment: DialogAlignment.Center,
+        autoCancel: false,
+        isModal: true,
+        transition: TransitionEffect.IDENTITY,
+        onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
+          if (dismissDialogAction.reason === DismissReason.PRESS_BACK) {
+            dismissDialogAction.dismiss()
+          }
+          if (dismissDialogAction.reason === DismissReason.TOUCH_OUTSIDE) {
+            dismissDialogAction.dismiss()
+          }
+        },
+      })
+    } catch (e) {
+      console.error(`Failed to get last window. error: ${JSON.stringify(e)}`)
+    }
   }
 
   /**
    * 显示toast
    */
-  public show(option: ToastOption) {
-    this.open(option)
+  public show(context: common.UIAbilityContext, option: ToastOption) {
+    this.open(context, option)
   }
 
   private async autoHide() {

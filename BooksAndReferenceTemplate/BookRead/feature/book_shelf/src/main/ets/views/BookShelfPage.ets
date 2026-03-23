@@ -185,14 +185,14 @@ export struct BookShelfPage {
           .width(24)
         Text($r('app.string.today_read'))
           .fontSize($r('sys.float.Body_L'))
-          .fontColor($r('sys.color.font_primary'))
+          .fontColor($r('app.color.90per_000000'))
           .margin({ left: 10 })
         Text(`${this.userInfo ? this.userInfo.totalReading : 0}`)
           .fontSize($r('sys.float.Body_L'))
           .fontColor($r('app.color.free_color'))
         Text($r('app.string.minute'))
           .fontSize($r('sys.float.Body_L'))
-          .fontColor($r('sys.color.font_primary'))
+          .fontColor($r('app.color.90per_000000'))
       }
       .alignSelf(ItemAlign.Start)
     }
@@ -200,6 +200,7 @@ export struct BookShelfPage {
     .justifyContent(FlexAlign.SpaceBetween)
     .backgroundColor($r('sys.color.comp_background_list_card'))
     .backgroundImage($r('app.media.reading_info_bg'))
+    .backgroundImageSize({ width: '100%' })
     .borderRadius(16)
     .padding({
       left: 16,
@@ -265,7 +266,7 @@ export struct BookShelfPage {
                       })
                   ))
                   .onClick(() => {
-                    TCRouter.push(Constants.GROUP_ROUTE, { group: info, groups: this.favBooks }) //////
+                    TCRouter.push(Constants.GROUP_ROUTE, { group: info, groups: this.favBooks })
                   })
               }
             }
@@ -406,10 +407,10 @@ export struct BookShelfPage {
                 Row() {
                   Text(this.bookManage?.singleBook?.rate)
                     .fontSize(12)
-                    .fontColor($r('sys.color.mask_secondary'))
+                    .fontColor($r('sys.color.font_secondary'))
                   Text(this.bookManage?.singleBook?.category)
                     .fontSize(12)
-                    .fontColor($r('sys.color.mask_secondary'))
+                    .fontColor($r('sys.color.font_secondary'))
                 }
               }.padding({ top: 10 })
             }
@@ -424,7 +425,7 @@ export struct BookShelfPage {
               .backgroundColor($r('sys.color.multi_color_08'))
               .margin({ right: 10 })
               .onClick(() => {
-                TCRouter.pushByLogin(Constants.READ_KIT_ROUTER, this.bookManage);
+                TCRouter.pushByLogin(Constants.READ_KIT_ROUTER, this.bookManage.singleBook);
                 this.isShowBind = false;
               })
           }.alignItems(VerticalAlign.Bottom)
@@ -597,7 +598,7 @@ export struct BookShelfPage {
                     Text('共' + 0 + '本')
                       .fontSize($r('sys.float.Caption_L'))
                       .fontWeight(FontWeight.Regular)
-                      .fontColor($r('sys.color.font_secondary'))
+                      .fontColor($r('sys.color.comp_background_list_card'))
                       .height('100%')
                   }
                 }
@@ -607,7 +608,7 @@ export struct BookShelfPage {
                 .height(48)
                 .margin({ top: 12 })
                 .padding({ right: 16 })
-                .backgroundColor($r('sys.color.white'))
+                .backgroundColor($r('sys.color.comp_background_list_card'))
                 .borderRadius(10)
               }
             }, (item: GroupBook) => item.timestamp.toString())

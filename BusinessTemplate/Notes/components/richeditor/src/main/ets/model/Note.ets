@@ -1,8 +1,5 @@
-/**
- * 笔记
- */
 @ObservedV2
-export class Note{
+export class Note {
   /**
    * id
    */
@@ -19,6 +16,11 @@ export class Note{
    * 内容
    */
   styledString: MutableStyledString
+
+  /**
+   * 序列化后的属性字符串
+   */
+  serializedStyledString: string
   /**
    * 创建时间
    */
@@ -37,14 +39,22 @@ export class Note{
    */
   @Trace description: string = '';
 
+  /**
+   * 手写数据文件名
+   */
+  handwriteFileName: string = '';
+
   constructor(styledString: MutableStyledString, title?: string, categoryId?: string) {
     this.styledString = styledString;
+    this.serializedStyledString = '';
     this.title = title || '';
     this.categoryId = categoryId || '';
     this.id = new Date().getTime().toString();
     this.createTime = new Date().getTime().toString();
     this.updateTime = this.createTime
     this.description = this.styledString.getString()
+    // 初始化手写文件名
+    this.handwriteFileName = `handwrite_${this.id}`;
   }
 
   updateContent(styledString: MutableStyledString, title?: string, category?: string): boolean {

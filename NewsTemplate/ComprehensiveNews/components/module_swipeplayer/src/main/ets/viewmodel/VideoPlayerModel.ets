@@ -1,13 +1,20 @@
 import { common } from '@kit.AbilityKit';
-import { window } from '@kit.ArkUI';
+import { AppStorageV2, display, window } from '@kit.ArkUI';
 import { media } from '@kit.MediaKit';
 import { audio } from '@kit.AudioKit';
+import { LoneTakeAnimationsTransition, LongTakeTransitionParam } from 'module_transition';
 import { Constants } from '../constants/Constants';
-import { AVPlayerManager, AVPlayerSession, registerAVPlayerCallback } from '../controller/AVPlayerManager';
-import { VideoPlayerData } from '../type/Index';
-import { Logger } from '../utils/Logger';
+import { AVPlayerManager } from '../controller/AVPlayerManager';
+import { AVPlayerController } from '../controller/AVPlayerController';
+import { VideoSessionController } from '../controller/VideoSessionController';
+import { VideoCastController } from '../controller/VideoCastController';
 import { VideoNetworkModel } from '../models/VideoNetworkModel';
-import { handleSandboxVideoUrl } from '../utils/Util';
+import { GlobalConfigModel } from '../models/GlobalConfigModel';
+import { BreakpointModel } from '../models/BreakpointModel';
+import { PiPWindowModel } from '../models/PiPWindowModel';
+import { closeFileSync, handleSandboxVideoUrl, registerAVPlayerCallback, setOrientation } from '../utils/Util';
+import { AVPlayerState, PageNameEnum, VideoPlayerData } from '../type/Index';
+import { Logger } from '../utils/Logger';
 
 const TAG = '[VideoPlayerModel]'
 
@@ -24,18 +31,28 @@ export class VideoPlayerModel {
   @Trace isBuffering: boolean = false;
   @Trace isPause: boolean = false;
   @Trace isCompleted: boolean = false;
+  @Trace isHideSlide: boolean = false;
   // 是否是通过点击全屏播放按钮跳转到横屏页面
   @Trace isClickFullScreenBtn: boolean = false;
+  @Trace videoFileFD: number = 0;
+  @Trace globalConfigModel: GlobalConfigModel = AppStorageV2.connect(GlobalConfigModel, () => new GlobalConfigModel())!;
+  @Trace pipWindowModel: PiPWindowModel = AppStorageV2.connect(PiPWindowModel, () => new PiPWindowModel())!;
   // AVPlayer管理器
   avPlayerManager: AVPlayerManager = AVPlayerManager.getInstance()
   // 播放器id
   playerId: string = ''
   // videoIndex
   index: number = 0
-  // 视频播放会话
-  playerSession: AVPlayerSession = new AVPlayerSession();
+  // AVPlayer控制器
+  avPlayerController: AVPlayerController = new AVPlayerController();
+  // 播控中心控制器
+  avSessionController: VideoSessionController = VideoSessionController.instance;
+  // 投屏控制器
+  videoCastController: VideoCastController | null = null;
   network?: VideoNetworkModel
   uiContext?: UIContext
+  context?: Context
+  pathStack: NavPathStack = new NavPathStack()
   windowClass?: window.Window
   // 视频数据
   private videoData?: VideoPlayerData
@@ -54,6 +71,7 @@ export class VideoPlayerModel {
   constructor(uiContext: UIContext, index: number = 0) {
     try {
       this.uiContext = uiContext;
+      this.context = this.uiContext.getHostContext();
       this.windowClass = (uiContext.getHostContext() as common.UIAbilityContext).windowStage.getMainWindowSync();
       this.index = index
     } catch (e) {
@@ -61,16 +79,12 @@ export class VideoPlayerModel {
     }
   }
 
+  setPathStack(pathStack: NavPathStack) {
+    this.pathStack = pathStack;
+  }
+
   setSurfaceId(surfaceId: string) {
     this.surfaceId = surfaceId
-  }
-
-  // 初始化播放管理器
-  initPlayerManager(data: VideoPlayerData) {
-  }
-
-  // 初始化AVPlayer实例
-  initAVPlayer() {
   }
 
   initPlayerListener(avPlayer: media.AVPlayer) {
@@ -82,15 +96,28 @@ export class VideoPlayerModel {
     this.setAVPlayerInterruptCallback(avPlayer)
   }
 
+  // 播控中心监听avplayer事件
+  onAVPlayerChangeBySession() {
+    this.onPlayerStateListener(this.avSessionController.setState);
+    this.onTimeUpdateListener(this.avSessionController.setProgress);
+  }
+
+  // 播控中心取消监听avplayer事件
+  offAVPlayerChangeBySession() {
+    this.popPlayerStateListener(this.avSessionController.setState);
+    this.popTimeUpdateListener(this.avSessionController.setProgress);
+  }
+
   setVideoData(data: VideoPlayerData) {
     this.videoData = data
   }
 
   setDataSource() {
     if (this.videoData!.getVideoUrl().startsWith('http')) {
-      this.playerSession!.getAVPlayer()!.url = this.videoData!.getVideoUrl()
+      this.avPlayerController!.getAVPlayer()!.url = this.videoData!.getVideoUrl()
     } else {
-      this.playerSession!.getAVPlayer()!.url = handleSandboxVideoUrl(this.videoData!.getVideoUrl())
+      this.videoFileFD = handleSandboxVideoUrl(this.videoData!.getVideoUrl())
+      this.avPlayerController!.getAVPlayer()!.url = 'fd://' + this.videoFileFD
     }
   }
 
@@ -98,8 +125,47 @@ export class VideoPlayerModel {
     return this.videoData!
   }
 
+  // 设置窗口旋转
+  async handleOrientation() {
+    try {
+      const displayClass = display.getDefaultDisplaySync();
+      const orientation = displayClass.orientation;
+      if (orientation === display.Orientation.LANDSCAPE) {
+        await setOrientation(this.uiContext, window.Orientation.USER_ROTATION_LANDSCAPE_INVERTED)
+      } else if (orientation === display.Orientation.LANDSCAPE_INVERTED) {
+        await setOrientation(this.uiContext, window.Orientation.USER_ROTATION_LANDSCAPE)
+      } else if (orientation === display.Orientation.PORTRAIT) {
+        await setOrientation(this.uiContext, window.Orientation.USER_ROTATION_LANDSCAPE)
+      } else if (orientation === display.Orientation.PORTRAIT_INVERTED) {
+        await setOrientation(this.uiContext, window.Orientation.USER_ROTATION_LANDSCAPE_INVERTED)
+      }
+    } catch (e) {
+      Logger.error(TAG, 'handleOrientation fail, error: ' + JSON.stringify(e));
+    }
+  }
+
+  // 跳转到横屏页
+  pushToLandscapePage(
+    param: Record<string, Object | AVPlayerController | BreakpointModel | LongTakeTransitionParam | undefined>,
+    cardId: string,
+  ) {
+    const longTakeTransitionParam: LongTakeTransitionParam | undefined =
+      LoneTakeAnimationsTransition.generateLongTakeParam(this.uiContext!, cardId, 9);
+    if (longTakeTransitionParam) {
+      param.longTakeTransitionParam = longTakeTransitionParam;
+    }
+    this.pathStack?.pushPathByName(PageNameEnum.VIDEO_LANDSCAPE_PAGE, param);
+  }
+
   onPlayerStateListener(listener: (state: string) => void) {
     this.playerStateListeners.push(listener)
+  }
+
+  popPlayerStateListener(listener: (state: string) => void) {
+    const index = this.playerStateListeners.findIndex(v => v === listener);
+    if (index !== -1) {
+      this.playerStateListeners.splice(index, 1);
+    }
   }
 
   onPreparedListener(listener: () => void) {
@@ -138,8 +204,16 @@ export class VideoPlayerModel {
     this.timeUpdateListeners.push(listener)
   }
 
+  popTimeUpdateListener(listener: (timeMs: number) => void) {
+    const index = this.timeUpdateListeners.findIndex(v => v === listener);
+    if (index !== -1) {
+      this.timeUpdateListeners.splice(index, 1);
+    }
+  }
+
+
   onStateChangeListener(avPlayer: media.AVPlayer) {
-    this.playerSession.avPlayer!.on('stateChange', async (state: string, reason: media.StateChangeReason) => {
+    this.avPlayerController.avPlayer!.on('stateChange', async (state: string, reason: media.StateChangeReason) => {
       this.playerStateListeners.forEach((callback) => {
         callback(state);
       })
@@ -152,18 +226,18 @@ export class VideoPlayerModel {
           case 'initialized':
             Logger.debug(TAG, 'player state is initialized');
             this.showCover = true;
-            this.playerSession.avPlayer!.surfaceId = this.surfaceId;
+            this.avPlayerController.avPlayer!.surfaceId = this.surfaceId;
             this.initializedListeners.forEach((callback) => {
               callback(avPlayer)
             })
-            await this.playerSession.avPlayer!.prepare();
+            await this.avPlayerController.avPlayer!.prepare();
             break;
           case 'prepared':
             Logger.debug(TAG, 'player state is prepared index: ' + this.index);
             this.showCover = true;
             this.isCompleted = false;
-            this.playerSession.avPlayer!.loop = false;
-            this.playerSession.avPlayer!.audioInterruptMode = audio.InterruptMode.INDEPENDENT_MODE;
+            this.avPlayerController.avPlayer!.loop = false;
+            this.avPlayerController.avPlayer!.audioInterruptMode = audio.InterruptMode.INDEPENDENT_MODE;
             this.preparedListeners.forEach((callback) => {
               Logger.debug(TAG, 'prepared preparedListeners callback index: ' + this.index)
               callback()
@@ -175,6 +249,13 @@ export class VideoPlayerModel {
             this.showCover = false;
             this.isBuffering = false;
             this.isCompleted = false;
+            // mock数据中的duration不准确，需要以avplayer.duration为准
+            this.videoData?.setVideoDuration(this.avPlayerController.avPlayer!.duration);
+            // 隐藏进度条的场景
+            if (this.isHideSlide) {
+              this.videoData?.setVideoDuration(0);
+            }
+            this.avSessionController.setAVMetadata(this.videoData!);
             this.playingListeners.forEach((callback) => {
               callback()
             })
@@ -213,7 +294,7 @@ export class VideoPlayerModel {
             this.errorListeners.forEach((callback) => {
               callback()
             })
-            await this.playerSession.avPlayer!.reset();
+            await this.avPlayerController.avPlayer!.reset();
             break;
           default:
             break;
@@ -222,7 +303,7 @@ export class VideoPlayerModel {
         Logger.error(TAG, 'onStateChangeListener fail, error: ' + JSON.stringify(e));
       }
 
-      let callArr = this.playerSession.avPlayerCallback.get('stateChange');
+      const callArr = this.avPlayerController.avPlayerCallback.get('stateChange');
       callArr?.forEach((item) => {
         item(state, reason);
       });
@@ -238,30 +319,34 @@ export class VideoPlayerModel {
         callback()
       })
 
-      let callArr = this.playerSession.avPlayerCallback.get('videoSizeChange');
+      const callArr = this.avPlayerController.avPlayerCallback.get('videoSizeChange');
       callArr?.forEach((item) => {
         item(width, height);
       });
     });
 
-    registerAVPlayerCallback(avPlayer, this.playerSession.avPlayerCallback)
+    avPlayer.on('timeUpdate', (time: number) => {
+      this.timeUpdateListeners.forEach((callback) => {
+        callback(time)
+      });
+      const callArr = this.avPlayerController.avPlayerCallback.get('timeUpdate');
+      callArr?.forEach((item) => {
+        item(time);
+      });
+    })
 
-    this.playerSession.onEvent('bufferingUpdate', (infoType: media.BufferingInfoType, value: number) => {
+    registerAVPlayerCallback(avPlayer, this.avPlayerController.avPlayerCallback)
+
+    this.avPlayerController.onEvent('bufferingUpdate', (infoType: media.BufferingInfoType, _value: number) => {
       this.bufferingUpdateListeners.forEach((callback) => {
         callback(infoType)
       })
     });
-    this.playerSession.onEvent('startRenderFrame', () => {
+    this.avPlayerController.onEvent('startRenderFrame', () => {
       this.startRendFrameListeners.forEach((callback) => {
         callback()
       })
     });
-    // 时间进度回调
-    this.playerSession.onEvent('timeUpdate', (time: number) => {
-      this.timeUpdateListeners.forEach((callback) => {
-        callback(time)
-      })
-    })
   }
 
   setAVPlayerInterruptCallback(avPlayer: media.AVPlayer) {
@@ -271,11 +356,11 @@ export class VideoPlayerModel {
           switch (info.hintType) {
             case audio.InterruptHint.INTERRUPT_HINT_PAUSE:
               this.isPause = true;
-              await this.playerSession?.avPlayer?.pause();
+              await this.avPlayerController?.avPlayer?.pause();
               break;
             case audio.InterruptHint.INTERRUPT_HINT_STOP:
               this.isPause = true;
-              await this.playerSession?.avPlayer?.pause();
+              await this.avPlayerController?.avPlayer?.pause();
               break;
             case audio.InterruptHint.INTERRUPT_HINT_DUCK:
               break;
@@ -287,7 +372,7 @@ export class VideoPlayerModel {
         } else {
           switch (info.hintType) {
             case audio.InterruptHint.INTERRUPT_HINT_RESUME:
-              await this.playerSession?.avPlayer?.play();
+              await this.avPlayerController?.avPlayer?.play();
               break;
             default:
               break;
@@ -297,7 +382,7 @@ export class VideoPlayerModel {
         Logger.error(TAG, 'setAVPlayerInterruptCallback fail, error: ' + JSON.stringify(e));
       }
 
-      let callArr = this.playerSession.avPlayerCallback.get('audioInterrupt');
+      const callArr = this.avPlayerController.avPlayerCallback.get('audioInterrupt');
       callArr?.forEach((item) => {
         item(info);
       });
@@ -308,35 +393,60 @@ export class VideoPlayerModel {
   adaptiveVideoSize() {
   }
 
+  async releaseAVPlayer() {
+    try {
+      closeFileSync(this.videoFileFD);
+      if (this.avPlayerController?.avPlayer) {
+        Logger.debug(TAG, 'releaseAVPlayer start');
+        // 停止播放音视频资源，只能在prepared/playing/paused/completed状态调用。
+        if ([
+          AVPlayerState.PREPARED,
+          AVPlayerState.PLAYING,
+          AVPlayerState.PAUSED,
+          AVPlayerState.COMPLETED,
+        ].includes(this.avPlayerController.avPlayer.state as AVPlayerState)) {
+          await this.avPlayerController.avPlayer.stop();
+        }
+        // 销毁播放资源，除released状态外，均可以调用。
+        if (this.avPlayerController.avPlayer.state !== AVPlayerState.RELEASED) {
+          Logger.debug(TAG, 'release the avplayer')
+          await this.avPlayerController.avPlayer.release();
+        }
+        this.avPlayerController.avPlayer.off('stateChange');
+        this.avPlayerController.avPlayer.off('videoSizeChange');
+        this.avPlayerController.avPlayer.off('timeUpdate');
+        this.avPlayerController.avPlayer.off('error');
+        this.avPlayerController.avPlayer.off('durationUpdate');
+        this.avPlayerController.avPlayer.off('seekDone');
+        this.avPlayerController.avPlayer.off('speedDone');
+        this.avPlayerController.avPlayer.off('bitrateDone');
+        this.avPlayerController.avPlayer.off('availableBitrates');
+        this.avPlayerController.avPlayer.off('volumeChange');
+        this.avPlayerController.avPlayer.off('endOfStream');
+        this.avPlayerController.avPlayer.off('bufferingUpdate');
+        this.avPlayerController.avPlayer.off('startRenderFrame');
+        this.avPlayerController.avPlayer.off('audioInterrupt');
+        this.avPlayerController.avPlayer.off('mediaKeySystemInfoUpdate');
+        this.avPlayerController.avPlayer.off('audioOutputDeviceChangeWithInfo');
+        this.avPlayerController.avPlayer.off('subtitleUpdate');
+        this.avPlayerController.avPlayer.off('trackChange');
+        this.avPlayerController.avPlayer.off('trackInfoUpdate');
+        this.avPlayerController.avPlayer = undefined;
+        this.avPlayerController!.avPlayerCallback = new Map();
+        this.avPlayerManager?.deleteAVPlayerController(this.playerId);
+      }
+    } catch (e) {
+      Logger.error(TAG, 'releaseAVPlayer fail, error: ' + JSON.stringify(e));
+    }
+  }
+
   // 处理页面销毁
   async handlerDisappear() {
     try {
-      if (this.playerSession?.avPlayer) {
-        await this.playerSession.avPlayer.stop();
-        this.playerSession.avPlayer.off('stateChange');
-        this.playerSession.avPlayer.off('videoSizeChange');
-        this.playerSession.avPlayer.off('timeUpdate');
-        this.playerSession.avPlayer.off('error');
-        this.playerSession.avPlayer.off('durationUpdate');
-        this.playerSession.avPlayer.off('seekDone');
-        this.playerSession.avPlayer.off('speedDone');
-        this.playerSession.avPlayer.off('bitrateDone');
-        this.playerSession.avPlayer.off('availableBitrates');
-        this.playerSession.avPlayer.off('volumeChange');
-        this.playerSession.avPlayer.off('endOfStream');
-        this.playerSession.avPlayer.off('bufferingUpdate');
-        this.playerSession.avPlayer.off('startRenderFrame');
-        this.playerSession.avPlayer.off('audioInterrupt');
-        this.playerSession.avPlayer.off('mediaKeySystemInfoUpdate');
-        this.playerSession.avPlayer.off('audioOutputDeviceChangeWithInfo');
-        this.playerSession.avPlayer.off('subtitleUpdate');
-        this.playerSession.avPlayer.off('trackChange');
-        this.playerSession.avPlayer.off('trackInfoUpdate');
-        await this.playerSession.avPlayer.release();
-        this.playerSession.avPlayer = undefined;
-        this.playerSession!.avPlayerCallback = new Map();
-        this.avPlayerManager?.deleteSession(this.playerId);
-      }
+      this.offAVPlayerChangeBySession();
+      this.avSessionController.destroy(this.context!);
+      this.videoCastController?.offPlaybackEvent();
+      this.releaseAVPlayer();
     } catch (e) {
       Logger.error(TAG, 'handlerDisappear fail, error: ' + JSON.stringify(e));
     }

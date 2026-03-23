@@ -59,9 +59,10 @@ export struct WriteCommentPage {
     Column() {
       Row({ space: 8 }) {
         ForEach(Array.from<number, number>({ length: 5 }, (_, index) => index + 1), (star: number) => {
-          Image(star <= this.currentRating ? $r('app.media.Stroke1') : $r('app.media.Stroke'))
+          Image($r('app.media.ic_book_star'))
             .width(32)
             .height(32)
+            .fillColor(star <= this.currentRating ? $r('sys.color.multi_color_11'):$r('sys.color.comp_background_secondary'))
             .onClick(() => {
               this.currentRating = star;
             })
@@ -91,7 +92,6 @@ export struct WriteCommentPage {
         .width('100%')
         .height(216)
         .borderRadius(16)
-        .backgroundColor(Color.White)
         .fontSize(14)
         .fontColor($r('sys.color.ohos_id_color_text_primary'))
         .placeholderColor($r('sys.color.ohos_id_color_text_hint'))
@@ -244,7 +244,6 @@ export struct WriteCommentPage {
       .width('100%')
       .height('100%')
       .padding({ left: 12, right: 12 })
-      .backgroundColor($r('sys.color.ohos_id_color_sub_background'))
     }
     .hideTitleBar(true)
   }

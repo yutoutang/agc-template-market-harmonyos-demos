@@ -1,8 +1,9 @@
 import AxiosMockAdapter from '@hw-agconnect/axios-mock-adapter';
 import { AxiosRequestConfig, HttpStatusCode } from '@ohos/axios';
-import { BaseAuthor } from '../database/AuthorType';
-import { SignInRequest, UserRequest } from '../params/request/CommonRequest';
+import { BaseAuthor, MyAuthor } from '../database/AuthorType';
+import { MemberExpireTimeRequest, SignInRequest, UserRequest } from '../params/request/CommonRequest';
 import { AuthorResponse } from '../params/response/AuthorResponse';
+import { Utils } from '../utils/Utils';
 import { MockUser } from './mockdata/MockUser';
 
 /**
@@ -34,6 +35,27 @@ export class AuthorServiceMock {
         resp = this.handleRawInfo(raw);
       }
       return [HttpStatusCode.Ok, resp];
+    });
+
+    // 查询会员到期时间
+    adapter.onGet('/membership/expire/time/query').reply(() => {
+      const raw = this.queryAuthorRaw() as MyAuthor;
+      const result = Utils.formatDate(raw.memExpireTime);
+      return [HttpStatusCode.Ok, result];
+    });
+
+    // 设置会员到期时间
+    adapter.onPost('/membership/expire/time/set').reply((config: AxiosRequestConfig) => {
+      const data = JSON.parse(config.data) as MemberExpireTimeRequest;
+      const raw = this.queryAuthorRaw() as MyAuthor;
+      let result = raw.memExpireTime;
+      if (data.productId === '20254') {
+        result = new Date(result).setFullYear(new Date(result).getFullYear() + 1); // 年卡
+      } else if (data.productId === '20253') {
+        result = new Date(result).setMonth(new Date(result).getMonth() + 1); // 月卡
+      }
+      raw.memExpireTime = result;
+      return [HttpStatusCode.Ok];
     });
 
     // 获取短信验证码

@@ -1,8 +1,8 @@
 import { webview } from '@kit.ArkWeb';
 import { controllerMap, updateWeb, webOptionMap } from '@hw-agconnect/fast-web';
-import { ImagePreview, PreviewVerticalAlign } from 'module_imagepreview';
-import { BaseViewModel, FileUtils, GlobalContextUtils, Logger, RouterMap, RouterUtils } from 'lib_common';
+import { BaseViewModel, FileUtils, Logger, RouterMap, RouterUtils } from 'lib_common';
 import { AuthorModel, ChatInfoDetailResponse, MessageServiceApi, SendMessageRequest } from 'lib_news_api';
+import { ImagePreview, ImagePreviewOptions, SourceImageModel } from 'module_imagepreview';
 import { ChatInfoDetailModel } from '../common/ObservedModel';
 import { WebIdMap } from '../constants/Constants';
 
@@ -31,6 +31,7 @@ export class MsgIMChatViewModel extends BaseViewModel {
     super();
     this.chatAuthor = RouterUtils.getParamByName(RouterMap.MINE_MSG_IM_CHAT) as AuthorModel;
     MessageServiceApi.setSingleChatRead(this.chatAuthor.authorId);
+
   }
 
   queryList(): Promise<ChatModel> {
@@ -68,13 +69,13 @@ export class MsgIMChatViewModel extends BaseViewModel {
     if (index === -1) {
       index = 0;
     }
-    ImagePreview.show(GlobalContextUtils.globalUIContext, this.imageList.map(v => v.content), {
-      startIndex: index,
-      showIndex: false,
-      loop: false,
-      isBasicMode: true,
-      indexPosition: PreviewVerticalAlign.Top,
-    })
+    const options = new ImagePreviewOptions()
+    options
+      .setImageList(this.imageList.map(v => new SourceImageModel({ imageUrl: v.content })))
+      .setInitIndex(index)
+      .setLoop(false)
+      .setLongTake(false)
+    ImagePreview.open(this.contextModel.globalUIContext, options)
   }
 
   setWebDebuggingAccess(enableDebug: boolean) {

@@ -329,7 +329,20 @@ export class MemberShipVM {
       .padStart(2, '0')}`;
   }
 
-  async getWindowAvoidArea(context: common.UIAbilityContext): Promise<number> {
+  async getTopWindowAvoidArea(context: common.UIAbilityContext): Promise<number> {
+    try {
+      const mainWindow = await window.getLastWindow(context);
+      const avoidAreaType = window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR;
+      const avoidArea = mainWindow.getWindowAvoidArea(avoidAreaType);
+      const height = avoidArea.topRect.height;
+      return this.uiContext?.px2vp(height) ?? 28;
+    } catch (e) {
+      hilog.error(0xFF00, 'MemberShip', `Failed to get avoid height. Code is ${e.code}, message is ${e.message}`);
+      return 28;
+    }
+  }
+
+  async getBottomWindowAvoidArea(context: common.UIAbilityContext): Promise<number> {
     try {
       const mainWindow = await window.getLastWindow(context);
       const avoidAreaType = window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR;
@@ -341,6 +354,7 @@ export class MemberShipVM {
       return 28;
     }
   }
+  
 
   manageSubscribe(uIAbilityContext: common.UIAbilityContext) {
     const uiWindowParameter: iap.UIWindowParameter = {

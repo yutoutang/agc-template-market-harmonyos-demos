@@ -123,10 +123,8 @@ export struct AboutPage {
         Row(){
           Text('正在更新')
             .fontSize(14)
-            .fontColor('#E5000000')
           Text(this.updateProgress+'%')
             .fontSize(14)
-            .fontColor('#E5000000')
         }
         .width(244)
         .justifyContent(FlexAlign.SpaceBetween)
@@ -196,7 +194,7 @@ export struct AboutPage {
       top: 16
     })
     .margin({ bottom: 40, left: 16, right: 16 })
-    .backgroundColor($r('app.color.pure_white'))
+    .backgroundColor($r('sys.color.ohos_id_color_toolbar_bg'))
     .borderRadius(16)
   }
 
@@ -303,7 +301,8 @@ export struct AboutPage {
         id: 'PhoneSheetBuilder',
         title: { title: '联系客服' },
         height: SheetSize.FIT_CONTENT,
-        backgroundColor: $r('app.color.pure_white'),
+        preferType: SheetType.CENTER,
+        backgroundColor: $r('sys.color.ohos_id_color_toolbar_bg'),
         customContent: () => {
           this.PhoneSheetBuilder()
         },
@@ -372,7 +371,7 @@ export struct AboutPage {
     }
     .width(Constants.FULL_SIZE)
     .borderRadius(32)
-    .backgroundColor('#ffffff')
+    .backgroundColor($r('sys.color.comp_background_list_card'))
     .padding({
       top:16,
       bottom:16,
@@ -413,10 +412,10 @@ export struct AboutPage {
             .fontColor('#0A59F7')
           Text('xxxx 版权所有 © xxxx-xxxx')
             .fontSize(12)
-            .fontColor('#99000000')
+            .fontColor($r('sys.color.font_secondary'))
           Text('技术支持：xxxxxxxx')
             .fontSize(12)
-            .fontColor('#99000000')
+            .fontColor($r('sys.color.font_secondary'))
         }
       }
       .padding({

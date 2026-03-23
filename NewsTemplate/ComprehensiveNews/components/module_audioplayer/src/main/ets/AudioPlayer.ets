@@ -30,15 +30,20 @@ export struct AudioPlayer {
    * */
   @Param canRedirect: boolean = true
   @Param fontSizeRatio: number = 1
-  @Event onAudioTitle: (audioInfo:AudioItem) => void = () => {}
+  @Event checkPlayPrevious: (currentIndex: number) => boolean = () => true;
+  @Event checkPlayNext: (currentIndex: number, isAutoNext: boolean) => boolean = () => true;
+  @Event onAudioTitle: (audioInfo: AudioItem) => void = () => {
+  }
+  @Event onAudioStateChange: (state: AudioPlayerState) => void = () => {
+  }
+  // 播放前置动作
+  @Event preAction: () => Promise<void> = () => Promise.resolve();
   @Local start: boolean = true;
   private step: number = 5;
   private loop: number = Number.POSITIVE_INFINITY;
   private fromStart: boolean = true;
   @Local mediaService: MediaViewModel = MediaViewModel.getInstance()
   @Local playerAnimation: PlayerAnimation = new PlayerAnimation()
-  @Event onAudioStateChange: (state: AudioPlayerState) => void = () => {
-  }
 
   @Monitor('audioGroupIndex')
   async audioGroupIndexChange() {
@@ -49,6 +54,16 @@ export struct AudioPlayer {
   @Monitor('mediaService.state')
   audioStateChange() {
     this.onAudioStateChange(this.mediaService.state)
+  }
+
+  aboutToAppear(): void {
+    MediaViewModel.getInstance().checkPlayPrevious = (currentIndex) => {
+      return this.checkPlayPrevious(currentIndex);
+    }
+
+    MediaViewModel.getInstance().checkPlayNext = (currentIndex, isAutoNext) => {
+      return this.checkPlayNext(currentIndex, isAutoNext);
+    };
   }
 
   build() {
@@ -79,11 +94,13 @@ export struct AudioPlayer {
       }
       .borderRadius('50%')
       .onClick(() => {
-        if (this.mediaService.getFirst()) {
-          this.mediaService.loadAssent(0);
-        } else {
-          this.mediaService.isPlaying ? this.mediaService.pause() : this.mediaService.play();
-        }
+        this.preAction().then(() => {
+          if (this.mediaService.getFirst()) {
+            this.mediaService.loadAssent(0);
+          } else {
+            this.mediaService.isPlaying ? this.mediaService.pause() : this.mediaService.play();
+          }
+        })
       })
       .border({
         width: 4,

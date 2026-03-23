@@ -25,8 +25,24 @@
       "value": "The usage time for today has reached the set time"
     },
     {
+      "name": "PhoneFormAbility_desc",
+      "value": "form_description"
+    },
+    {
+      "name": "PhoneFormAbility_label",
+      "value": "form_label"
+    },
+    {
+      "name": "widget_desc",
+      "value": "This is a service widget."
+    },
+    {
+      "name": "widget_display_name",
+      "value": "widget"
+    },
+    {
       "name": "agcit_huawei_children_education",
-      "value": "1.0.0"
+      "value": "1.0.3"
     }
   ]
 }

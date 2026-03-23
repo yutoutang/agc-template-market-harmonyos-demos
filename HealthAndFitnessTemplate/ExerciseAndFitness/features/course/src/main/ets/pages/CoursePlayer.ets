@@ -39,7 +39,7 @@ export struct CoursePlayer {
   private scroller: ListScroller = new ListScroller();
   private movieItems: MovieItem[] = [];
 
-  aboutToAppear() {
+  async aboutToAppear() {
     let course: Course1 = COURSE_DATA1[0]
     switch (this.courseId) {
       case '0001':
@@ -101,7 +101,8 @@ export struct CoursePlayer {
       this.courseDetail.watchTime = Date.now()
     }
 
-    window.getLastWindow(getContext(this)).then((currentWindow: window.Window) => {
+    try {
+      let currentWindow = await window.getLastWindow(this.getUIContext().getHostContext()!)
       // 获取窗口属性
       let properties = currentWindow.getWindowProperties();
       let rect = properties.windowRect;
@@ -120,7 +121,9 @@ export struct CoursePlayer {
           }
         }
       })
-    })
+    } catch (e) {
+      console.error(`Failed to get last window. error: ${JSON.stringify(e)}`)
+    }
   }
 
   aboutToDisappear(): void {

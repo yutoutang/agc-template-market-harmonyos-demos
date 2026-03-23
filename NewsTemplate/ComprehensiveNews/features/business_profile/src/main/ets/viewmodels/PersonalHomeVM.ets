@@ -1,7 +1,9 @@
+import { emitter } from '@kit.BasicServicesKit';
 import { BaseViewModel, BreakpointType, CircleButtonModifier, RouterMap, RouterUtils } from 'lib_common';
 import { AuthorModel, AuthorServiceApi, BaseNewsServiceApi } from 'lib_news_api';
 import { LayoutNewsDataSource } from '../common/DataSource';
 import { ListModel } from '../common/ListModel';
+
 
 @ObservedV2
 export class PersonalPageViewModel extends BaseViewModel {
@@ -34,6 +36,16 @@ export class PersonalPageViewModel extends BaseViewModel {
     await this.queryArticleList();
     await this.queryVideoList();
     await this.queryPostList();
+  }
+
+  onRefreshPost() {
+    emitter.on('recommendRefresh', () => {
+      this.queryPostList();
+    })
+  }
+
+  offRefreshPost() {
+    emitter.off('recommendRefresh')
   }
 
   async onRefreshing() {

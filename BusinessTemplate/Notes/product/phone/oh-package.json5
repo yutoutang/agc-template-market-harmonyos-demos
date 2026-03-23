@@ -13,6 +13,12 @@
     "richeditor": "../../components/richeditor",
     "check_app_update": "../../components/check_app_update",
     "feed_back": "../../components/feed_back",
+    "serializer": "../../components/serializer",
+    "grabthransfer": "../../common/grabthransfer",
+    "continue": "../../common/continue",
+    "aggregated_ads": "../../components/aggregated_ads"
+
+
   }
 }
 

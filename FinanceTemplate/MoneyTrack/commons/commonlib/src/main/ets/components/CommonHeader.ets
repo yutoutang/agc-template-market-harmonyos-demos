@@ -5,6 +5,9 @@ import { RouterModule } from '../utils/router/Router';
 export struct CommonHeader {
   @Param title: string = '';
   @Param bgColor: ResourceStr = $r('app.color.system_color_background_transparent');
+  @Param icon: ResourceStr = '';
+  @Event backButtonClick: () => void = () => {};
+  @Event iconClick: () => void = () => {};
   private _topBannerHeight: number = 56;
 
   @Computed
@@ -28,6 +31,7 @@ export struct CommonHeader {
         .justifyContent(FlexAlign.Center)
         .alignItems(VerticalAlign.Center)
         .onClick(() => {
+          this.backButtonClick();
           RouterModule.pop();
         });
       }
@@ -36,6 +40,12 @@ export struct CommonHeader {
         .fontColor($r('app.color.font_color_level1'))
         .margin({left:$r('app.string.space_m')})
         .fontWeight(this.showBackButton ? FontWeight.Medium : FontWeight.Bold);
+      Blank()
+        .layoutWeight(1)
+      Image(this.icon)
+        .height(40)
+        .margin({right:$r('app.string.space_m')})
+        .onClick(this.iconClick)
     }
     .width($r('app.string.width_percent_full'))
     .backgroundColor(this.bgColor)

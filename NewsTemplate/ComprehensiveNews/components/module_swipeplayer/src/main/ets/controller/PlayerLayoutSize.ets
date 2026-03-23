@@ -7,51 +7,51 @@ export class PlayerLayoutSize {
   @Trace private layoutSizeChangeFlag: boolean = false;
   @Trace private slideMovingFlag: boolean = false;
 
-  updatePlayerWidth(playerWidth: Length): void {
+  public updatePlayerWidth(playerWidth: Length): void {
     this.playerWidth = playerWidth;
   }
 
-  getPlayerWidth(): Length {
+  public getPlayerWidth(): Length {
     return this.playerWidth;
   }
 
-  updatePlayerHeight(playerHeight: Length): void {
+  public updatePlayerHeight(playerHeight: Length): void {
     this.playerHeight = playerHeight;
   }
 
-  getPlayerHeight(): Length {
+  public getPlayerHeight(): Length {
     return this.playerHeight;
   }
 
-  updateXComponentWidth(xComponentWidth: Length): void {
+  public updateXComponentWidth(xComponentWidth: Length): void {
     this.xComponentWidth = xComponentWidth;
   }
 
-  getXComponentWidth(): Length {
+  public getXComponentWidth(): Length {
     return this.xComponentWidth;
   }
 
-  updateXComponentHeight(xComponentHeight: Length): void {
+  public updateXComponentHeight(xComponentHeight: Length): void {
     this.xComponentHeight = xComponentHeight;
   }
 
-  getXComponentHeight(): Length {
+  public getXComponentHeight(): Length {
     return this.xComponentHeight;
   }
 
-  updateLayoutSizeChangeFlag(flag: boolean) {
+  public updateLayoutSizeChangeFlag(flag: boolean): void {
     this.layoutSizeChangeFlag = flag
   }
 
-  getLayoutSizeChangeFlag(): boolean {
+  public getLayoutSizeChangeFlag(): boolean {
     return this.layoutSizeChangeFlag
   }
 
-  updateSlideMovingFlag(flag: boolean) {
+  public updateSlideMovingFlag(flag: boolean): void {
     this.slideMovingFlag = flag
   }
 
-  getSlideMovingFlag(): boolean {
+  public getSlideMovingFlag(): boolean {
     return this.slideMovingFlag
   }
 }

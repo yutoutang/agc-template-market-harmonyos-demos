@@ -1,12 +1,9 @@
 import { BillCardItem } from 'bill_base';
 import {
-  resourceManageSheetBuilder,
-  ResourceManageSheetOptions,
-} from 'bill_manage';
-import {
   billManageSheetBuilder,
-  BillManageSheetOptions,
-} from 'bill_manage/src/main/ets/components/BillManageSheet';
+  BillManageSheetOptions
+} from 'bill_manage';
+import { RouterMap, RouterModule } from 'commonlib';
 import { AccountingDB } from './accountingdb/AccountingDB';
 import { UserTransaction, TransactionTableBasis } from './accountingdb/Types';
 import { PopViewUtil } from './PopViewUtil';
@@ -15,6 +12,7 @@ class BillManageUtil {
   public manageBill(
     initBill: BillCardItem | undefined = undefined,
     assetId: number | undefined = undefined,
+    accountId: number,
     callback?: (data: UserTransaction) => void,
   ) {
     PopViewUtil.openSheet(
@@ -27,6 +25,7 @@ class BillManageUtil {
       {
         initBill,
         handleConfirm: (data: UserTransaction) => {
+          data.accountId = accountId;
           if (!initBill) {
             this._addBill(data, assetId, callback);
           } else {
@@ -34,26 +33,10 @@ class BillManageUtil {
           }
         },
         handleResourceManage: () => {
-          this.openResourceManageSheet();
+          PopViewUtil.closeSheet();
+          RouterModule.push({ url: RouterMap.HOME_RESOURCE_MANAGE });
         },
       } as BillManageSheetOptions,
-    );
-  }
-
-  public openResourceManageSheet() {
-    PopViewUtil.openSheet(
-      wrapBuilder(resourceManageSheetBuilder),
-      {
-        detents: [SheetSize.FIT_CONTENT],
-        title: { title: '分类管理' },
-        backgroundColor: '#ffffff',
-        preferType:SheetType.BOTTOM,
-      },
-      {
-        handleDeleteSuccess: async (key) => {
-          await AccountingDB.deleteTransactionsByResource(key);
-        },
-      } as ResourceManageSheetOptions,
     );
   }
 

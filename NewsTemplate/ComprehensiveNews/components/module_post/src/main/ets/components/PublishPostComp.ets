@@ -1,7 +1,7 @@
 import { KeyboardAvoidMode, promptAction } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
 import { UtilLog } from '@hw-agconnect/util-log';
-import { ImagePreview, PreviewVerticalAlign } from 'module_imagepreview';
+import { ImagePreview, ImagePreviewOptions, SourceImageModel } from 'module_imagepreview';
 import {
   Constants,
   DEFAULT_IMAGE_PARAM,
@@ -12,6 +12,7 @@ import {
   GRID_ROW_OPTIONS,
   COL_SPAN,
   COL_OFFSET,
+  ImageContent,
 } from '../constants/Constants';
 import { MediaUtils } from '../utils/MediaUtils';
 import { FileUtils } from '../utils/FileUtils';
@@ -120,6 +121,10 @@ export struct PublishPostComp {
     return `最多支持上传${this.videoParams.maxLimit}个视频`;
   }
 
+  getImageId(v: PostImgVideoItem) {
+    return `image_${v.picVideoUrl}_${v.id}`;
+  }
+
   @Builder
   textArea() {
     TextArea({
@@ -128,6 +133,7 @@ export struct PublishPostComp {
       controller: this.controller,
     })
       .fontSize(16 * this.fontRatio)
+      .fontColor($r('sys.color.font_primary'))
       .placeholderColor($r('sys.color.font_tertiary'))
       .placeholderFont({ size: 16 * this.fontRatio })
       .backgroundColor(Color.Transparent)
@@ -147,17 +153,17 @@ export struct PublishPostComp {
           }
         }
 
-        ForEach(this.imgList, (v: PostImgVideoItem, index: number) => {
+        ForEach(this.imgList, (v: PostImgVideoItem) => {
           GridItem() {
-            this.imageBox(v.picVideoUrl, index)
+            this.imageBox(v)
           }
-        }, (v: PostImgVideoItem, _index: number) => v.picVideoUrl + v.id)
+        }, (v: PostImgVideoItem) => v.picVideoUrl + v.id)
 
-        ForEach(this.videoList, (v: PostImgVideoItem, index: number) => {
+        ForEach(this.videoList, (v: PostImgVideoItem) => {
           GridItem() {
-            this.videoBox(v.surfaceUrl, index)
+            this.videoBox(v)
           }
-        }, (v: PostImgVideoItem, _index: number) => v.picVideoUrl + v.id)
+        }, (v: PostImgVideoItem) => v.picVideoUrl + v.id)
       }
       .columnsTemplate(this.getColumnsTemplate)
       .columnsGap(12)
@@ -232,45 +238,71 @@ export struct PublishPostComp {
   }
 
   @Builder
-  imageBox(v: string, index: number) {
-    Stack() {
-      Image(v)
+  imageBox(v: PostImgVideoItem) {
+    RelativeContainer() {
+      Image(v.picVideoUrl)
         .width(Constants.FULL_PERCENT)
         .aspectRatio(1)
         .draggable(false)
         .autoResize(true)
+        .id(this.getImageId(v))
       Image($r('app.media.ic_public_close_circle'))
         .width(Constants.ICON_WIDTH)
         .aspectRatio(1)
         .draggable(false)
-        .borderRadius(16)
         .margin({
           top: Constants.SPACE_8,
           right: Constants.SPACE_8,
         })
+        .alignRules({
+          top: { anchor: this.getImageId(v), align: VerticalAlign.Top },
+          right: { anchor: this.getImageId(v), align: HorizontalAlign.End },
+        })
         .onClick(() => {
-          this.imgList.splice(index, 1);
+          const index = this.imgList.findIndex(item => item.id === v.id && item.picVideoUrl === v.picVideoUrl);
+          if (index !== -1) {
+            this.imgList.splice(index, 1);
+          }
+        })
+
+      SymbolGlyph($r('sys.symbol.livephoto'))
+        .fontColor([$r('sys.color.font_on_primary')])
+        .fontWeight(FontWeight.Normal)
+        .fontSize(16)
+        .visibility(v.movingPhoto ? Visibility.Visible : Visibility.None)
+        .margin({
+          left: Constants.SPACE_8,
+          bottom: Constants.SPACE_8,
+        })
+        .alignRules({
+          bottom: { anchor: this.getImageId(v), align: VerticalAlign.Bottom },
+          left: { anchor: this.getImageId(v), align: HorizontalAlign.Start },
         })
     }
+    .width('auto')
+    .height('auto')
     .borderRadius(16)
-    .alignContent(Alignment.TopEnd)
     .clip(true)
     .onClick(() => {
-      ImagePreview.show(this.getUIContext(), this.imgList.map(v => v.picVideoUrl), {
-        startIndex: index,
-        showIndex: true,
-        loop: false,
-        isBasicMode: true,
-        indexPosition: PreviewVerticalAlign.Top,
-      })
+      const index = this.imgList.findIndex(item => item.id === v.id && item.picVideoUrl === v.picVideoUrl);
+      const options = new ImagePreviewOptions()
+      options
+        .setImageList(this.imgList.map(v => new SourceImageModel({
+          imageUrl: v.picVideoUrl,
+          movingPhoto: v.movingPhoto,
+        })))
+        .setLoop(false)
+        .setLongTake(false)
+        .setInitIndex(index)
+      ImagePreview.open(this.getUIContext(), options)
     })
   }
 
   @Builder
-  videoBox(v: string, index: number) {
+  videoBox(v: PostImgVideoItem) {
     Stack() {
       Stack() {
-        Image(v)
+        Image(v.surfaceUrl)
           .width(Constants.FULL_PERCENT)
           .aspectRatio(1)
           .draggable(false)
@@ -289,7 +321,10 @@ export struct PublishPostComp {
             right: Constants.SPACE_8,
           })
           .onClick(() => {
-            this.videoList.splice(index, 1);
+            const index = this.videoList.findIndex(item => item.id === v.id && item.picVideoUrl === v.picVideoUrl);
+            if (index !== -1) {
+              this.videoList.splice(index, 1);
+            }
           })
       }
       .alignContent(Alignment.TopEnd)
@@ -359,17 +394,18 @@ export struct PublishPostComp {
     let params = isUploadImage ? this.imageParams : this.videoParams;
     let list = isUploadImage ? this.imgList : this.videoList;
 
-    const uriList = await MediaUtils.selectMedia({
+    const uriList = await MediaUtils.selectMedia(this.getUIContext().getHostContext() as Context, {
       type: params.type,
       maxLimit: params.maxLimit - list.length,
       maxSize: params.maxSize,
     });
-    uriList.forEach(async (v: string) => {
+    uriList.forEach(async (v: ImageContent) => {
       const item = new PostImgVideoItem();
       item.id = new Date().getTime();
-      item.picVideoUrl = v;
+      item.movingPhoto = v.movingPhoto;
+      item.picVideoUrl = v.src;
       if (!isUploadImage) {
-        const thumbnail = await MediaUtils.getVideoThumbnail(v);
+        const thumbnail = await MediaUtils.getVideoThumbnail(v.src);
         item.surfaceUrl = await FileUtils.writePixelMap(this.getUIContext(), thumbnail);
       }
       list.push(item);

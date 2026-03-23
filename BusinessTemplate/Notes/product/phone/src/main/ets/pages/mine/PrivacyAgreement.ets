@@ -10,8 +10,7 @@ export function PrivacyAgreementBuilder() {
 export struct PrivacyAgreement {
   @Consumer('appPathStack') appPathStack: NavPathStack = new NavPathStack()
   controller: webview.WebviewController = new webview.WebviewController();
-  privacyAgreementPath : string = this.getUIContext().getHostContext()!.
-    resourceManager.getStringSync($r('app.string.privacyAgreementPath'));
+  privacyAgreementPath : string = (this.getUIContext().getHostContext() as Context).resourceManager.getStringSync($r('app.string.privacyAgreementPath').id);
 
   build() {
     NavDestination() {

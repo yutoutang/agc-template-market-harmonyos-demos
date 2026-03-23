@@ -1,4 +1,4 @@
-import { promptAction } from '@kit.ArkUI';
+import { ToastDialog } from '@hw-agconnect/ui-toast';
 import {
   BalanceChangeType,
   BalanceResourceItem,
@@ -74,10 +74,10 @@ export class AddBillVM {
       }
     }
     if (amount < 0) {
-      promptAction.showToast({ message: '金额不得小于0，请检查输入~' });
+      ToastDialog.showToast({ message: '金额不得小于0，请检查输入~' });
       return false;
     } else if (amount > 999999) {
-      promptAction.showToast({ message: '金额过大，请检查输入~' });
+      ToastDialog.showToast({ message: '金额过大，请检查输入~' });
       return false;
     } else {
       this.billData.amount = amount;

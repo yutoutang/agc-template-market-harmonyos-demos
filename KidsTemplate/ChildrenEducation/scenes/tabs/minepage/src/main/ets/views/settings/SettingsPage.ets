@@ -1,15 +1,16 @@
-import { AuthUtil, CommonConstants, ResourceUtil } from '@ohos_agcit/children_education_utils';
+import { AuthUtil, AvoidArea, CommonConstants,
+  GlobalInfoModel,
+  ResourceUtil } from '@ohos_agcit/children_education_utils';
 import {
   AboutModel,
   SettingGroup,
   SettingItem,
   SettingType,
   SettingView,
-  SupportedSetting,
-  WebModel
+  SupportedSetting
 } from 'app_setting';
 import { userAuth } from '@kit.UserAuthenticationKit';
-import { CustomContentDialog } from '@kit.ArkUI';
+import { AppStorageV2, CustomContentDialog } from '@kit.ArkUI';
 import { emitter } from '@kit.BasicServicesKit';
 import { AuthOptions } from '@ohos_agcit/children_education_utils/src/main/ets/model/AuthOptions';
 import { User } from '@ohos_agcit/children_education_datasource';
@@ -23,7 +24,9 @@ export function SettingsPageBuilder() {
 @ComponentV2
 export struct SettingsPage {
   @Consumer(CommonConstants.USER_INFO) user: User = new User();
-  @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
+  @Local avoidArea: AvoidArea = AppStorageV2.connect(AvoidArea, () => new AvoidArea(0, 0))!;
+  @Local globalInfo: GlobalInfoModel =
+    AppStorageV2.connect<GlobalInfoModel>(GlobalInfoModel, () => new GlobalInfoModel())!;
   @Local group1: SettingGroup = new SettingGroup()
     .setList([
       new SettingItem()
@@ -43,10 +46,10 @@ export struct SettingsPage {
 
           AuthUtil.onStartEasy(options, (result: userAuth.UserAuthResult) => {
             if (result.result === 12500000) {
-              this.appPathStack.pushPathByName('TimeCtrl', undefined);
+              this.globalInfo.navStack.pushPathByName('TimeCtrl', undefined);
             } else if (result.result === 12500010) {
               this.dialogController.open();
-              this.appPathStack.pushPathByName('TimeCtrl', undefined);
+              this.globalInfo.navStack.pushPathByName('TimeCtrl', undefined);
             }
           });
         })
@@ -69,35 +72,35 @@ export struct SettingsPage {
         .setLabel('业务与隐私的声明')
         .setClickEvent(() => {
           let url = ResourceUtil.getString(this.getUIContext(), 'privacyAgreementPath')
-          this.appPathStack.pushPathByName('PrivacyAgreement', url);
+          this.globalInfo.navStack.pushPathByName('PrivacyAgreement', url);
         }),
       new SettingItem()
         .setSupportedType(SupportedSetting.WEB)
         .setLabel('第三方共享信息清单')
         .setClickEvent(() => {
           let url = ResourceUtil.getString(this.getUIContext(), 'example_website')
-          this.appPathStack.pushPathByName('PrivacyAgreement', url);
+          this.globalInfo.navStack.pushPathByName('PrivacyAgreement', url);
         }),
       new SettingItem()
         .setSupportedType(SupportedSetting.WEB)
         .setLabel('第三方 SDK 列表')
         .setClickEvent(() => {
           let url = ResourceUtil.getString(this.getUIContext(), 'example_website')
-          this.appPathStack.pushPathByName('PrivacyAgreement', url);
+          this.globalInfo.navStack.pushPathByName('PrivacyAgreement', url);
         }),
       new SettingItem()
         .setSupportedType(SupportedSetting.WEB)
         .setLabel('已收集个人信息清单')
         .setClickEvent(() => {
           let url = ResourceUtil.getString(this.getUIContext(), 'example_website')
-          this.appPathStack.pushPathByName('PrivacyAgreement', url);
+          this.globalInfo.navStack.pushPathByName('PrivacyAgreement', url);
         }),
       new SettingItem()
         .setSupportedType(SupportedSetting.WEB)
         .setLabel('隐私声明摘要')
         .setClickEvent(() => {
           let url = ResourceUtil.getString(this.getUIContext(), 'example_website')
-          this.appPathStack.pushPathByName('PrivacyAgreement', url);
+          this.globalInfo.navStack.pushPathByName('PrivacyAgreement', url);
         }),
     ])
   @Local group6: SettingGroup = new SettingGroup()
@@ -117,7 +120,7 @@ export struct SettingsPage {
         .setLabel('服务协议与规则')
         .setClickEvent(() => {
           let url = ResourceUtil.getString(this.getUIContext(), 'example_website')
-          this.appPathStack.pushPathByName('PrivacyAgreement', url);
+          this.globalInfo.navStack.pushPathByName('PrivacyAgreement', url);
         })
     ])
 
@@ -125,7 +128,7 @@ export struct SettingsPage {
     NavDestination() {
       Column() {
         SettingView({
-          pathStack: this.appPathStack,
+          pathStack: this.globalInfo.navStack,
           settingList: this.user.isLogin ?
             [this.group1, this.group2, this.group3, this.group4, this.group5, this.group6] :
             [this.group2, this.group3, this.group4, this.group5, this.group6],
@@ -136,16 +139,23 @@ export struct SettingsPage {
           isLogin: this.user.isLogin,
           signOutApi: () => {
             return new Promise((resolve) => {
-              let userName: emitter.EventData = {
+              emitter.emit(CommonConstants.USER_INFO, {
                 data: {
                   isLogin: false,
                   userName: '点击登录',
                   userAvatar: '',
                   phone: '',
                 },
-              };
-              emitter.emit(CommonConstants.USER_INFO, userName);
-              this.appPathStack.pop();
+              });
+
+              emitter.emit(CommonConstants.VIP_RECORD, {
+                data: {
+                  'isVip': false,
+                  'validTime': '1970-01-01 00:00:00',
+                },
+              });
+
+              this.globalInfo.navStack.pop();
               resolve();
             });
           }
@@ -157,8 +167,12 @@ export struct SettingsPage {
     }
     .title('设置')
     .backgroundColor($r('sys.color.background_secondary'))
+    .padding({
+      top: this.getUIContext().px2vp(this.avoidArea.topRectHeight),
+      bottom: this.getUIContext().px2vp(this.avoidArea.bottomRectHeight),
+    })
     .onBackPressed(() => {
-      this.appPathStack.pop();
+      this.globalInfo.navStack.pop();
       return true;
     });
   }

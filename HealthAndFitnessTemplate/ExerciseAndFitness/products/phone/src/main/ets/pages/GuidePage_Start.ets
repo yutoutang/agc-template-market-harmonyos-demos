@@ -1,6 +1,6 @@
-import { CommonConstants, PreferenceUtils, RouterMap, RouterUtils } from 'lib_common';
-import { NavHeaderBar } from 'lib_widget';
+import { PreferenceUtils, RouterMap, RouterUtils } from 'lib_common';
 import { skipGuide } from '../common/Constants';
+import { CommonGuidePage } from '../components/CommonGuidePage';
 import { GuidePageVM } from '../viewmodels/GuidePageVM';
 
 @Builder
@@ -12,47 +12,32 @@ export function GuidePageStartBuilder() {
 struct GuidePage {
   vm: GuidePageVM = new GuidePageVM();
 
-  build() {
-    NavDestination() {
-      Column() {
-        NavHeaderBar({
-        })
-      }
+  onNextButtonClick() {
+    PreferenceUtils.getInstance().put(skipGuide, true);
+    RouterUtils.pushPathByName(RouterMap.INDEX_PAGE)
+  }
 
-      Column() {
-        Image($r('app.media.running'))
-          .width(350)
-          .height(350)
-          .draggable(false)
-          .margin({
-            left: 9,
-            right: 9,
-            top: 58,
-          })
-      }
+  @Builder
+  contentBuilder() {
+    Image($r('app.media.running'))
       .width(350)
-      .height('60%')
-
-      Column() {
-        // 只在非第一页显示下一步按钮
-        Button('开启您的运动之旅', { type: ButtonType.Capsule })
-          .width(328)
-          .height(40)
-          .fontColor($r('sys.color.font_on_primary'))
-          .backgroundColor($r('app.color.app_theme'))
-          .onClick(() => {
-            PreferenceUtils.getInstance().put(skipGuide, true);
-            RouterUtils.pushPathByName(RouterMap.INDEX_PAGE)
-          })
-          .margin({ bottom: CommonConstants.PADDING_M })
-      }
-      .height('40%')
-      .width('100%')
-      .justifyContent(FlexAlign.End)
-      .padding({ bottom: 20 })
-      .layoutWeight(1)
-    }
-    .backgroundColor($r('sys.color.ohos_id_color_background'))
-    .hideTitleBar(true)
+      .height(350)
+      .draggable(false)
+      .margin({
+        left: 9,
+        right: 9,
+        top: 58,
+      })
+  }
+  build() {
+    CommonGuidePage({
+      guideTitle: '',
+      guideDesc: '',
+      nextButtonDesc: '开启您的运动之旅',
+      isShowSkipButton: false,
+      customBuilderParam: () => this.contentBuilder(),
+      onNextButtonClick: (): void => this.onNextButtonClick(),
+      backColor: '#FFFFFF'
+    })
   }
 }

@@ -3,9 +3,23 @@ import { IButtonItem, NavInfo, PostImgList } from '../params/base/BaseModel';
 
 export interface SimpleNews {
   // 新闻id
-  newsId: string
+  newsId: string;
   // 新闻类型
-  newsType: NewsEnum
+  newsType: NewsEnum;
+}
+
+export interface KeyWordPair {
+  // 新闻关键字
+  keyword: string;
+  // 新闻关键字解释
+  explain: string;
+}
+
+export interface QuestionsAndAnswer {
+  // 新闻问题
+  question: string;
+  // 新闻回答
+  answer: string;
 }
 
 /**
@@ -59,5 +73,7 @@ export interface BaseNews {
   totalCount?: number
   publishTime?: string
   playCount?: string
-  isLocalPublish?:boolean
+  isLocalPublish?: boolean
+  questionAndAnswer?: QuestionsAndAnswer
+  keywordPairs?: KeyWordPair[]
 }

@@ -1,9 +1,8 @@
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { media } from '@kit.MediaKit';
-import { fileIo } from '@kit.CoreFileKit';
+import { fileIo as fs } from '@kit.CoreFileKit';
 import { image } from '@kit.ImageKit';
-import fs from '@ohos.file.fs';
 import { util } from '@kit.ArkTS';
 import { MediaParams, VideoSizeData } from '../models/MediaModel';
 import { GlobalContextUtils } from './ContextUtils';
@@ -43,10 +42,11 @@ export class MediaUtils {
     if (!uri) {
       return undefined;
     }
+    let file: fs.File | null = null;
     try {
       let avImageGenerator: media.AVImageGenerator = await media.createAVImageGenerator();
-      const fileAlbum = fileIo.openSync(uri, fileIo.OpenMode.READ_ONLY);
-      const avFileDescriptor = { fd: fileAlbum.fd } as media.AVFileDescriptor;
+      file = fs.openSync(uri, fs.OpenMode.READ_ONLY);
+      const avFileDescriptor = { fd: file.fd } as media.AVFileDescriptor;
       const videoSize = await MediaUtils.getVideoData(avFileDescriptor);
       if (avImageGenerator) {
         avImageGenerator.fdSrc = avFileDescriptor;
@@ -60,6 +60,14 @@ export class MediaUtils {
     } catch (e) {
       Logger.error(TAG, 'getVideoThumbnail fail, error: ' + JSON.stringify(e));
       return undefined;
+    } finally {
+      try {
+        if (file) {
+          fs.closeSync(file);
+        }
+      } catch (e) {
+        Logger.error(TAG, `Failed to closeSync. Code: ${e.code}, message: ${e.message}`);
+      }
     }
   }
 

@@ -48,7 +48,7 @@ export struct PlayerComponent {
 
   // 设置窗口方向
   setR(orientation: number) {
-    window.getLastWindow(getContext(this)).then((win) => {
+    window.getLastWindow(this.getUIContext().getHostContext()).then((win) => {
       win.setPreferredOrientation(orientation).then(() => {
       }).catch(() => {
       })
@@ -58,7 +58,7 @@ export struct PlayerComponent {
 
   // 设置沉浸式窗口
   setFullScreen(isLayoutFullScreen: boolean) {
-    window.getLastWindow(getContext(this)).then((win: window.Window) => {
+    window.getLastWindow(this.getUIContext().getHostContext()).then((win: window.Window) => {
       win.setWindowLayoutFullScreen(isLayoutFullScreen).then(() => {
       }).catch(() => {
       })
@@ -69,14 +69,18 @@ export struct PlayerComponent {
   }
 
   regDisplayListener(): void {
-    display.on('foldStatusChange', async (curFoldStatus: display.FoldStatus) => {
-      // 同一个状态重复触发不做处理
-      if (this.curFoldStatus === curFoldStatus) {
-        return;
-      }
-      this.curFoldStatus = curFoldStatus;
-      this.setComponentHeight()
-    })
+    try {
+      display.on('foldStatusChange', async (curFoldStatus: display.FoldStatus) => {
+        // 同一个状态重复触发不做处理
+        if (this.curFoldStatus === curFoldStatus) {
+          return;
+        }
+        this.curFoldStatus = curFoldStatus;
+        this.setComponentHeight()
+      })
+    } catch (e) {
+      console.error(`display on foldStatusChange failed. error: ${JSON.stringify(e)}`)
+    }
   }
 
   setComponentHeight() {
@@ -99,8 +103,9 @@ export struct PlayerComponent {
       this.playerVM.movieItemList = this.movieItems
       this.playerVM.movieItem = this.playerVM.movieItemList[this.playerIndex]
     }
-    PipManager.getInstance().init(getContext(this), this.playerVM.navId)
-    window.getLastWindow(getContext(this)).then((currentWindow: window.Window) => {
+    PipManager.getInstance().init(this.getUIContext().getHostContext()!, this.playerVM.navId)
+    try {
+      let currentWindow = await window.getLastWindow(this.getUIContext().getHostContext()!)
       this.mWindow = currentWindow;
       // 获取窗口属性
       let properties = currentWindow.getWindowProperties();
@@ -121,42 +126,56 @@ export struct PlayerComponent {
           this.setFullScreen(false)
         }
       });
-    })
+    } catch (e) {
+      console.error(`Failed to get last window. error: ${JSON.stringify(e)}`)
+    }
     this.isLayoutFullScreen = true
     this.setR(this.isLayoutFullScreen ? 2 : 1)
     this.setFullScreen(this.isLayoutFullScreen)
-    emitter.on('playerPause', (event: emitter.EventData) => {
-      let isPlaying = event.data!.isPlaying as boolean
-      if (isPlaying) {
-        PipManager.getInstance().player.isResetPause = false
-        PipManager.getInstance().player.isPlaying = true
-      } else {
-        PipManager.getInstance().player.isResetPause = true
-        PipManager.getInstance().player.isPlaying = false
-      }
-    })
-    emitter.on('autoStartPip', () => {
-      if (this.playerVM.autoStartEnabled) {
-        if (PipManager.getInstance().player.isPipOpen) {
+    try {
+      emitter.on('playerPause', (event: emitter.EventData) => {
+        let isPlaying = event.data!.isPlaying as boolean
+        if (isPlaying) {
+          PipManager.getInstance().player.isResetPause = false
+          PipManager.getInstance().player.isPlaying = true
         } else {
-          PipManager.getInstance().startPip()
-          PipManager.getInstance().updatePiPControlStatus();
-        }
-      } else {
-        if (PipManager.getInstance().player.isPipOpen) {
-        } else {
+          PipManager.getInstance().player.isResetPause = true
           PipManager.getInstance().player.isPlaying = false
         }
-      }
-    })
-    emitter.on('chapterDetailBack', () => {
-      if (!PipManager.getInstance().player.isPipOpen) {
-        // 释放AVPlayer资源
-        PipManager.getInstance().stopPip()
-        PipManager.getInstance().player.isCreate = true
-        PipManager.getInstance().player.release();
-      }
-    })
+      })
+    } catch (e) {
+      console.error(`Emitter on playerPause failed. error: ${JSON.stringify(e)}`)
+    }
+    try {
+      emitter.on('autoStartPip', () => {
+        if (this.playerVM.autoStartEnabled) {
+          if (PipManager.getInstance().player.isPipOpen) {
+          } else {
+            PipManager.getInstance().startPip()
+            PipManager.getInstance().updatePiPControlStatus();
+          }
+        } else {
+          if (PipManager.getInstance().player.isPipOpen) {
+          } else {
+            PipManager.getInstance().player.isPlaying = false
+          }
+        }
+      })
+    } catch (e) {
+      console.error(`Emitter on autoStartPip failed. error: ${JSON.stringify(e)}`)
+    }
+    try {
+      emitter.on('chapterDetailBack', () => {
+        if (!PipManager.getInstance().player.isPipOpen) {
+          // 释放AVPlayer资源
+          PipManager.getInstance().stopPip()
+          PipManager.getInstance().player.isCreate = true
+          PipManager.getInstance().player.release();
+        }
+      })
+    } catch (e) {
+      console.error(`Emitter on chapterDetailBack failed. error: ${JSON.stringify(e)}`)
+    }
     if (display.isFoldable()) {
       this.regDisplayListener();
     }
@@ -186,8 +205,8 @@ export struct PlayerComponent {
           this.surfaceId = PipManager.getInstance().getXComponentController().getXComponentSurfaceId();
           // 将surfaceId设置给媒体源
           PipManager.getInstance().getXComponentController().onSurfaceCreated(this.surfaceId)
-          PipManager.getInstance().player.init(this.courseId, this.playerVM.movieItem.movieUrl,
-            this.playerVM.movieItem.learnProgress)
+          PipManager.getInstance().player.init(this.getUIContext(),
+            this.courseId, this.playerVM.movieItem.movieUrl, this.playerVM.movieItem.learnProgress)
           PipManager.getInstance().player.callbackTimeUpdate = (vol: number, total: number) => {
             this.callbackTimeUpdate(vol, total)
             this.playerVM.movieItem.learnProgress = Math.floor(vol / total * 100)

@@ -33,6 +33,10 @@
       "value": "#0D000000"
     },
     {
+      "name": "background_color_transparent",
+      "value": "#00000000"
+    },
+    {
       "name": "system_color_background_shadow",
       "value": "#1A000000"
     },
@@ -123,6 +127,10 @@
     {
       "name": "button_color_yellow",
       "value": "#F2992C"
+    },
+    {
+      "name": "v_diamond_theme",
+      "value": "#D3B685"
     }
   ]
 }

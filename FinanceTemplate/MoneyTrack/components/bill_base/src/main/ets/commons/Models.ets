@@ -29,7 +29,7 @@ export class BalanceResourceModel {
 
 @ObservedV2
 export class BillCardItemModel implements BillCardItem {
-  @Trace accountId: number = -1;
+  @Trace accountId: number = 0;
   @Trace date: string = '';
   @Trace transactionId: number = -1;
   @Trace resource: number = 0;

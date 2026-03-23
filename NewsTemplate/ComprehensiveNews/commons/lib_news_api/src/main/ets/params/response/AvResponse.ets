@@ -45,5 +45,6 @@ export interface AvSectionModel {
   duration: number
   updateTime: string
   sectionUrl: string
-  coverUrl?: string
+  coverUrl: string
+  needVip: boolean
 }

@@ -1,3 +1,4 @@
+import { emitter } from '@kit.BasicServicesKit';
 import { BaseViewModel, LoadingModel, PopViewUtils } from 'lib_common';
 import { MineServiceApi, NewsModel, NewsResponse } from 'lib_news_api';
 import { cancelDialogBuilder, CancelDialogParams } from '../components/CancelDialogBuilder';
@@ -26,6 +27,7 @@ export class MarkViewModel extends BaseViewModel {
     PopViewUtils.closePopView();
     this.contextModel.showToast({ message: '取消收藏成功' });
     this.queryList(false);
+    emitter.emit('recommendRefresh')
   }
 
   popDialog(v: NewsModel) {

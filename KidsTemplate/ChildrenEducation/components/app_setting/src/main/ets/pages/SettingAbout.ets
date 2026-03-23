@@ -2,6 +2,7 @@ import { CommonConstants } from '../constants/CommonConstants';
 import { GridRowColSetting } from '../common/GridRowColSetting';
 import { NavHeaderBar } from '../components/NavHeaderBar';
 import { SettingAboutVM } from '../viewmodels/SettingAboutVM';
+import { window } from '@kit.ArkUI';
 
 @Builder
 export function SettingAboutBuilder() {
@@ -11,10 +12,21 @@ export function SettingAboutBuilder() {
 @ComponentV2
 struct SettingAbout {
   vm: SettingAboutVM = new SettingAboutVM(this.getUIContext());
+  @Local topAvoidArea: number = 0
+
+  aboutToAppear(): void {
+    window.getLastWindow(this.getUIContext().getHostContext())
+      .then(currentWindow => {
+        this.topAvoidArea = currentWindow.getWindowAvoidArea(window.AvoidAreaType.TYPE_SYSTEM).topRect.height
+      })
+      .catch((err: BusinessError) => {
+        console.error(`getLastWindow failed: ${err.code}, ${err.message}`);
+      })
+  }
 
   build() {
     NavDestination() {
-      NavHeaderBar({ title: '关于' })
+      NavHeaderBar({ title: '关于', customPadding: { top: this.getUIContext().px2vp(this.topAvoidArea) } })
       if (!this.vm.configInfo.isSheet) {
         GridRow(GridRowColSetting.DEFAULT_GRID_ROW_OPTIONS) {
           GridCol({

@@ -1,7 +1,13 @@
 import { Logger } from '@hw-agconnect/ui-base';
-import { BreakpointStorage, BreakpointSystem,
+import {
+  BreakpointStorage,
+  BreakpointSystem,
   BreakpointTypeEnum,
-  Constants, NavHeaderBar, ReturnButton, TCRouter } from 'common';
+  Constants,
+  NavHeaderBar,
+  ReturnButton,
+  TCRouter
+} from 'common';
 import { baseActionSheet, UserInfo } from 'base_common';
 
 @ComponentV2
@@ -41,7 +47,6 @@ export struct ReadSettingPage {
               }
               .width(Constants.FULL_SIZE)
               .height(56)
-              .backgroundColor('#FFFFFF')
               .justifyContent(FlexAlign.SpaceBetween)
 
               Divider()
@@ -63,11 +68,10 @@ export struct ReadSettingPage {
               }
               .width(Constants.FULL_SIZE)
               .height(56)
-              .backgroundColor('#FFFFFF')
               .justifyContent(FlexAlign.SpaceBetween)
             }
             .width(Constants.FULL_SIZE)
-            .backgroundColor('#FFFFFF')
+            .backgroundColor($r('sys.color.comp_background_list_card'))
             .padding({
               left: 12,
               right: 12
@@ -99,7 +103,7 @@ export struct ReadSettingPage {
               Row({ space: 6.6 }) {
                 Text(this.reminderTime === 0 ? '关闭' : this.reminderTime + '分钟')
                   .fontSize(16)
-                  .fontColor('#99000000')
+                  .fontColor($r('sys.color.font_primary'))
                 Image($r('app.media.ic_arrow_right'))
                   .width(7)
                   .height(14)
@@ -113,7 +117,7 @@ export struct ReadSettingPage {
                 id: 'ReminderSheetBuilder',
                 showClose: false,
                 height: SheetSize.FIT_CONTENT,
-                backgroundColor: $r('app.color.pure_white'),
+                backgroundColor: $r('sys.color.background_primary'),
                 customContent: () => {
                   this.ReminderSheetBuilder()
                 },
@@ -144,7 +148,7 @@ export struct ReadSettingPage {
   settingStyle() {
     .width(Constants.FULL_SIZE)
     .height(61)
-    .backgroundColor('#FFFFFF')
+    .backgroundColor($r('sys.color.comp_background_list_card'))
     .borderRadius(16)
     .padding({
       left: 12,
@@ -159,40 +163,32 @@ export struct ReadSettingPage {
     Column() {
       Row() {
         Row({ space: 8 }) {
-          Button() {
-            SymbolGlyph($r('sys.symbol.xmark'))
-              .fontSize(18)
-          }
-          .width(40)
-          .height(40)
-          .padding({
-            top: 11,
-            left: 11,
-            right: 11,
-            bottom: 11
-          })
-          .borderRadius(1000)
-          .backgroundColor('#0D000000')
-          .onClick(() => {
-            baseActionSheet.close('ReminderSheetBuilder')
-            this.optionTime = this.reminderTime
-          })
+          SymbolGlyph($r('sys.symbol.xmark'))
+            .fontSize($r('sys.float.Title_M'))
+            .fontColor([$r('sys.color.icon_primary')])
+            .width(40)
+            .height(40)
+            .borderRadius(1000)
+            .padding(8)
+            .backgroundColor($r('sys.color.comp_background_tertiary'))
+            .onClick(() => {
+              baseActionSheet.close('ReminderSheetBuilder')
+              this.optionTime = this.reminderTime
+            })
 
           Text('休息时间提醒')
             .fontSize(20)
             .fontWeight(FontWeight.Bold)
         }
 
-        // Button() {
-        //   Image($r('app.media.ic_tick'))
-        //     .width(18)
-        //     .height(18)
-        //     .objectFit(ImageFit.Contain)
-        // }
-        Image($r('app.media.affirm'))
+        SymbolGlyph($r('sys.symbol.checkmark'))
+          .fontSize($r('sys.float.Title_M'))
+          .fontColor([$r('sys.color.icon_primary')])
           .width(40)
           .height(40)
           .borderRadius(1000)
+          .padding(8)
+          .backgroundColor($r('sys.color.comp_background_tertiary'))
           .onClick(() => {
             baseActionSheet.close('ReminderSheetBuilder')
             this.reminderTime = this.optionTime
@@ -218,7 +214,7 @@ export struct ReadSettingPage {
       right: 16,
       top: 8
     })
-    .backgroundColor($r('app.color.pure_white'))
+    .backgroundColor($r('sys.color.background_tertiary'))
     .borderRadius(16)
   }
 

@@ -11,9 +11,25 @@
     "installationFree": true,
     "pages": "$profile:main_pages",
     "metadata": [
+// todo: 填写正确的 Client Id
       {
         "name": "client_id",
-        "value": "xxx" // todo: 填写正确的 Client Id
+        "value": "******"
+      },
+// todo: 本地模拟接入隐私管理服务，上架打包时删除
+      {
+        "name": "appgallery_privacy_hosted",
+        "value": "1"
+      },
+// todo: 本地模拟接入隐私管理服务，上架打包时删除
+      {
+        "name": "appgallery_privacy_link_privacy_statement",
+        "value": "https://www.example.com/"
+      },
+// todo: 本地模拟接入隐私管理服务，上架打包时删除
+      {
+        "name": "appgallery_privacy_link_user_agreement",
+        "value": "https://www.example.com/"
       }
     ],
     "requestPermissions": [
@@ -21,24 +37,7 @@
         "name": "ohos.permission.INTERNET"
       },
       {
-        "name": 'ohos.permission.APPROXIMATELY_LOCATION',
-        "reason": '$string:permission_reason_location',
-        "usedScene": {
-          "abilities": [
-            "EntryAbility"
-          ],
-          "when": "inuse"
-        }
-      },
-      {
-        "name": "ohos.permission.LOCATION",
-        "reason": '$string:permission_reason_location',
-        "usedScene": {
-          "abilities": [
-            "EntryAbility"
-          ],
-          "when": "inuse"
-        }
+        "name": "ohos.permission.VIBRATE"
       }
     ],
     "abilities": [

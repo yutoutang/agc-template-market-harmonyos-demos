@@ -17,6 +17,8 @@ export struct DataCollectionPage {
         })
         Column(){
           Web({ src: $rawfile('data_collection.html'), controller: this.controller })
+            .darkMode(WebDarkMode.Auto)
+            .forceDarkAccess(true)
             .fileAccess(false)
             .geolocationAccess(false)
         }

@@ -22,7 +22,7 @@ export struct ReaderToolBar {
   @Local screenLight: number = 0.5;
   @Local fontSize: number = 0;
   @Local autoLight: boolean = true;
-  @Local nightMode: boolean = false;
+  @Consumer('nightMode') nightMode: boolean = false;
   @Local price: number = 10
   @Local isReadingBySingle: boolean = true;
   @Local selectState: SelectState = AppStorageV2.connect(SelectState, () => new SelectState())!;
@@ -32,10 +32,8 @@ export struct ReaderToolBar {
 
   aboutToAppear(): void {
     this.fontSize = this.readerSetting.fontSize
-    this.nightMode = this.readerSetting.nightMode
-    if (this.nightMode) {
-      this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_DARK)
-    }
+    this.nightMode = AppStorage.get<boolean>('bookNightMode') ??
+      this.context.config.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK
   }
 
   private async jumpToCatalogItem(catalogItem: bookParser.CatalogItem) {
@@ -53,7 +51,7 @@ export struct ReaderToolBar {
   // 处理书币扣费和更新
   private updateBookCoinsAndSave(price: number): void {
     if (this.userInfo) {
-      try{
+      try {
         this.userInfo.bookCoins -= price;
         AppStorage.set('userInfo', this.userInfo);
         emitter.emit({ eventId: 14 });
@@ -101,6 +99,7 @@ export struct ReaderToolBar {
         Text(`余额：${this.userInfo!.bookCoins}书币`)
         Row() {
           Checkbox()
+            .selectedColor($r('sys.color.multi_color_08'))
             .onChange((value) => {
               this.userInfo!.continuousBuy = value
             })
@@ -110,6 +109,7 @@ export struct ReaderToolBar {
       .alignItems(HorizontalAlign.Start)
 
       Button('购买')
+        .backgroundColor($r('sys.color.multi_color_08'))
         .onClick(() => {
           if (this.price > this.userInfo!.bookCoins!) {
             this.getUIContext().getPromptAction().showToast({
@@ -126,10 +126,17 @@ export struct ReaderToolBar {
         .width('100%')
     }
     .height(260)
-    .padding({ bottom: 30, left: 16, right: 16 })
+    .padding({
+      bottom: 30,
+      left: 16,
+      right: 16,
+      top: 14
+    })
     .alignItems(HorizontalAlign.Start)
+    .backgroundColor($r('sys.color.comp_background_primary'))
     .justifyContent(FlexAlign.SpaceBetween)
-    .width('100%')
+    .margin({ left: 16, right: 16 })
+    .borderRadius({ topLeft: 16, topRight: 16 })
   }
 
   @Builder
@@ -143,11 +150,11 @@ export struct ReaderToolBar {
       })
       .borderRadius(14)
       .fontColor(this.selectState.fontSelectedIndex === index ? $r('sys.color.ohos_id_color_text_primary_contrary') :
-        $r('sys.color.ohos_id_color_text_secondary'))
+        (this.nightMode ? $r('app.color.90per_ffffff') : $r('app.color.40per_000000')))
       .fontSize(14)
       .fontWeight('medium')
       .backgroundColor(this.selectState.fontSelectedIndex === index ? $r('sys.color.ohos_id_color_handup') :
-        $r('sys.color.ohos_id_color_button_normal'))
+        this.nightMode ? $r('app.color.5per_ffffff') : $r('app.color.5per_000000'))
       .onClick(() => {
         this.selectState.fontSelectedIndex = index
         this.readerSetting.fontName = name;
@@ -161,8 +168,9 @@ export struct ReaderToolBar {
     Column({ space: 25 }) {
       Row({ space: 8 }) {
         Text('字号')
+          .fontColor(this.nightMode ? $r('app.color.90per_ffffff') : $r('app.color.60per_182431'))
 
-        Image($r('app.media.ic_font_sub'))
+        Image(this.nightMode ? $r('app.media.ic_font_sub_dark') : $r('app.media.ic_font_sub'))
           .height(28)
           .width(48)
           .onClick(() => {
@@ -175,9 +183,9 @@ export struct ReaderToolBar {
 
         Text(this.fontSize.toString())
           .fontSize(16)
-          .fontColor($r('sys.color.ohos_id_color_text_secondary'))
+          .fontColor(this.nightMode ? $r('app.color.90per_ffffff') : $r('app.color.60per_182431'))
 
-        Image($r('app.media.ic_font_add'))
+        Image(this.nightMode ? $r('app.media.ic_font_add_dark') : $r('app.media.ic_font_add'))
           .height(28)
           .width(48)
           .onClick(() => {
@@ -191,7 +199,7 @@ export struct ReaderToolBar {
 
       Row({ space: 8 }) {
         Text('字体')
-
+          .fontColor(this.nightMode ? $r('app.color.90per_ffffff') : $r('app.color.60per_182431'))
         Row({ space: 10 }) {
           this.fontChoice('系统', 'fonts/HarmonyOS_Sans_Regular.ttf', 0)
           this.fontChoice('鸿蒙黑体', 'fonts/HarmonyOS_Sans_Black.ttf', 1)
@@ -200,9 +208,9 @@ export struct ReaderToolBar {
 
       Row({ space: 8 }) {
         Text('行间')
-
+          .fontColor(this.nightMode ? $r('app.color.90per_ffffff') : $r('app.color.60per_182431'))
         Row({ space: 12 }) {
-          Image($r('app.media.ic_space_min'))
+          Image(this.nightMode ? $r('app.media.ic_space_min_dark') : $r('app.media.ic_space_min'))
             .height(24)
             .width(24)
 
@@ -214,7 +222,7 @@ export struct ReaderToolBar {
             style: SliderStyle.InSet
           })
             .blockColor($r('app.color.font_modifier_inner_color'))
-            .trackColor($r('sys.color.comp_background_secondary'))
+            .trackColor(this.nightMode ? $r('app.color.10per_ffffff') : $r('app.color.10per_000000'))
             .selectedColor($r('app.color.slider_selected_color'))
             .onChange((value: number) => {
               this.readerSetting.lineHeight = value
@@ -222,7 +230,7 @@ export struct ReaderToolBar {
             })
             .layoutWeight(1)
 
-          Image($r('app.media.ic_space_max'))
+          Image(this.nightMode ? $r('app.media.ic_space_max_dark') : $r('app.media.ic_space_max'))
             .height(24)
             .width(24)
         }
@@ -233,7 +241,7 @@ export struct ReaderToolBar {
 
       Row({ space: 12 }) {
         Text('背景')
-
+          .fontColor(this.nightMode ? $r('app.color.90per_ffffff') : $r('app.color.60per_182431'))
         Row({ space: 8 }) {
           this.colorCircle($r('app.color.reader_view_background_0'), 0)
           this.colorCircle($r('app.color.reader_view_background_1'), 1)
@@ -245,7 +253,7 @@ export struct ReaderToolBar {
 
       Row({ space: 12 }) {
         Text('翻页')
-
+          .fontColor(this.nightMode ? $r('app.color.90per_ffffff') : $r('app.color.60per_182431'))
         Row({ space: 10 }) {
           Text('仿真')
             .padding({
@@ -276,11 +284,11 @@ export struct ReaderToolBar {
             })
             .borderRadius(14)
             .fontColor(this.selectState.isReadingBySwiper ? $r('sys.color.ohos_id_color_text_primary_contrary') :
-              $r('sys.color.ohos_id_color_text_secondary'))
+              (this.nightMode ? $r('app.color.90per_ffffff') : $r('app.color.40per_000000')))
             .fontSize(14)
             .fontWeight('medium')
             .backgroundColor(this.selectState.isReadingBySwiper ? $r('sys.color.ohos_id_color_handup') :
-              $r('sys.color.ohos_id_color_button_normal'))
+              this.nightMode ? $r('app.color.5per_ffffff') : $r('app.color.5per_000000'))
             .onClick(() => {
               this.readerSetting.flipMode = '1'
               this.selectState.isReadingBySwiper = true
@@ -302,7 +310,7 @@ export struct ReaderToolBar {
   @Builder
   buildLightModifySlider() {
     Row({ space: 5 }) {
-      Image($r('app.media.light_min'))
+      Image(this.nightMode ? $r('app.media.light_min_dark') : $r('app.media.light_min'))
         .height(16)
         .width(16)
 
@@ -314,7 +322,7 @@ export struct ReaderToolBar {
         style: SliderStyle.OutSet
       })
         .blockColor($r('app.color.font_modifier_inner_color'))
-        .trackColor($r('sys.color.comp_background_secondary'))
+        .trackColor(this.nightMode ? $r('app.color.10per_ffffff') : $r('app.color.10per_000000'))
         .selectedColor($r('app.color.slider_selected_color'))
         .onChange((value: number) => {
           this.autoLight = false
@@ -323,7 +331,7 @@ export struct ReaderToolBar {
         })
         .layoutWeight(1)
 
-      Image($r('app.media.light_min'))
+      Image(this.nightMode ? $r('app.media.light_min_dark') : $r('app.media.light_min'))
         .height(20)
         .width(20)
     }
@@ -339,7 +347,7 @@ export struct ReaderToolBar {
       Row() {
         Text(`共${this.catalogItemList.length}章`)
           .fontSize($r('sys.float.Body_L'))
-          .fontColor($r('sys.color.font_secondary'))
+          .fontColor(this.nightMode ? $r('app.color.90per_ffffff') : $r('app.color.60per_182431'))
           .width('100%')
       }
       .padding({
@@ -358,7 +366,7 @@ export struct ReaderToolBar {
                 .fontSize(14)
                 .width('100%')
                 .fontColor(this.curChapterId === ri.item.catalogId ? $r('sys.color.ohos_id_color_warning') :
-                  $r('sys.color.ohos_fa_text_primary'))
+                  this.nightMode ? '#dbffffff' : '#ff182431')
                 .textOverflow({ overflow: TextOverflow.Ellipsis })
                 .maxLines(1)
             }
@@ -378,11 +386,11 @@ export struct ReaderToolBar {
                   .fontWeight('medium')
                   .width('80%')
                   .textOverflow({ overflow: TextOverflow.Ellipsis })
-                  .fontColor($r('sys.color.ohos_id_color_text_tertiary'))
+                  .fontColor(this.nightMode ? '#66ffffff' : '#66182431')
                   .textOverflow({ overflow: TextOverflow.Ellipsis })
                   .maxLines(1)
 
-                Image($r('app.media.ic_public_locked'))
+                Image(this.nightMode ? $r('app.media.ic_public_locked_dark') : $r('app.media.ic_public_locked'))
                   .height(24)
                   .width(24)
               }
@@ -395,6 +403,8 @@ export struct ReaderToolBar {
                 title: { title: '购买' },
                 height: SheetSize.FIT_CONTENT,
                 preferType: SheetType.CENTER,
+                blurStyle: BlurStyle.COMPONENT_ULTRA_THICK,
+                backgroundColor: $r('app.color.20per_f1f3f5'),
                 customContent: () => {
                   this.buildBuyChapter(ri)
                 }
@@ -404,7 +414,7 @@ export struct ReaderToolBar {
       }
       .edgeEffect(EdgeEffect.Spring)
       .padding({ left: 28, right: 28, bottom: 15 })
-      .divider({ strokeWidth: 1, color: $r('sys.color.ohos_id_color_list_separator') })
+      .divider({ strokeWidth: 1, color: this.nightMode ? $r('app.color.20per_f1f3f5') : $r('app.color.20per_191a1c') })
     }
   }
 
@@ -419,6 +429,7 @@ export struct ReaderToolBar {
         this.context.resourceManager.getColor(color.id).then((value) => {
           // 转成16进制
           let colorStr = '#' + value.toString(16).substring(2)
+          this.readerSetting.fontColor = 'rgba(0,0,0,0.90)'
           this.readerSetting.themeColor = colorStr
           this.readerComponentController.setPageConfig(this.readerSetting)
           this.selectState.colorSelectedIndex = index;
@@ -436,7 +447,7 @@ export struct ReaderToolBar {
 
       Row() {
         Text('系统亮度')
-
+          .fontColor(this.nightMode ? $r('app.color.90per_ffffff') : $r('app.color.60per_182431'))
         Toggle({ type: ToggleType.Switch, isOn: $$this.autoLight })
           .onChange((isOn) => {
             if (isOn) {
@@ -466,12 +477,12 @@ export struct ReaderToolBar {
 
       Row() {
         Column({ space: 2 }) {
-          Image($r('app.media.ic_public_lists'))
+          Image(this.nightMode ? $r('app.media.ic_public_lists_dark') : $r('app.media.ic_public_lists'))
             .width(24)
             .height(24)
 
           Text('目录')
-            .fontColor($r('sys.color.ohos_id_color_text_secondary'))
+            .fontColor(this.nightMode ? $r('app.color.90per_ffffff') : $r('app.color.60per_182431'))
         }
         .onClick(() => {
           baseActionSheet.show({
@@ -479,6 +490,7 @@ export struct ReaderToolBar {
             title: { title: '目录' },
             height: '90%',
             preferType: SheetType.CENTER,
+            backgroundColor: this.nightMode ? $r('app.color.100per_000000') : $r('app.color.100per_f1f3f5'),
             customContent: () => {
               this.buildCatalogCard()
             },
@@ -486,12 +498,12 @@ export struct ReaderToolBar {
         })
 
         Column({ space: 2 }) {
-          Image($r('app.media.ic_light'))
+          Image(this.nightMode ? $r('app.media.ic_light_dark') : $r('app.media.ic_light'))
             .width(24)
             .height(24)
 
           Text('亮度')
-            .fontColor($r('sys.color.ohos_id_color_text_secondary'))
+            .fontColor(this.nightMode ? $r('app.color.90per_ffffff') : $r('app.color.60per_182431'))
         }
         .onClick(() => {
           this.isShowSetTool = false
@@ -499,36 +511,35 @@ export struct ReaderToolBar {
         })
 
         Column({ space: 2 }) {
-          Image($r('app.media.night_mode'))
+          Image(this.nightMode ? $r('app.media.night_mode_dark') : $r('app.media.night_mode'))
             .width(24)
             .height(24)
 
           Text(this.nightMode ? '日间' : '夜间')
-            .fontColor($r('sys.color.ohos_id_color_text_secondary'))
+            .fontColor(this.nightMode ? $r('app.color.90per_ffffff') : $r('app.color.60per_182431'))
         }
         .onClick(() => {
           this.nightMode = !this.nightMode
+          AppStorage.setOrCreate<boolean>('bookNightMode', this.nightMode)
           this.readerSetting.nightMode = this.nightMode
           if (this.nightMode) {
             this.selectState.colorSelectedIndex = 0
             this.readerSetting.fontColor = 'rgba(255,255,255,0.60)'
             this.readerSetting.themeColor = '#000000'
-            this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_DARK)
           } else {
             this.readerSetting.fontColor = 'rgba(0,0,0,0.90)'
             this.readerSetting.themeColor = 'rgba(251, 240, 219, 1)'
-            this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT)
           }
           this.readerComponentController.setPageConfig(this.readerSetting)
         })
 
         Column({ space: 2 }) {
-          Image($r('app.media.book_setting'))
+          Image(this.nightMode ? $r('app.media.book_setting_dark') : $r('app.media.book_setting'))
             .width(24)
             .height(24)
 
           Text('设置')
-            .fontColor($r('sys.color.ohos_id_color_text_secondary'))
+            .fontColor(this.nightMode ? $r('app.color.90per_ffffff') : $r('app.color.60per_182431'))
         }
         .onClick(() => {
           this.isShowSetTool = !this.isShowSetTool
@@ -546,7 +557,7 @@ export struct ReaderToolBar {
     }
     .borderRadius((this.isShowSetTool || this.isShowLight) ? { topLeft: 16, topRight: 16 } : 0)
     .width('100%')
-    .backgroundColor($r('sys.color.ohos_id_color_sub_background'))
+    .backgroundColor(this.nightMode ? $r('app.color.100per_000000') : $r('app.color.100per_f1f3f5'))
     .align(Alignment.BottomEnd)
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
   }

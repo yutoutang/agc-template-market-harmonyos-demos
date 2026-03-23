@@ -1,19 +1,24 @@
-import { DataGenerator, VideoCard, VideoDetail } from '@ohos_agcit/children_education_datasource';
+import { DataGenerator, VideoCard, VideoCollection } from '@ohos_agcit/children_education_datasource';
 import { CommonConstants } from '../constants/CommonConstants';
-import { IconAndCount } from './IconAndCount';
+import { GlobalInfoModel } from '../model/GlobalInfoModel';
+import { AppStorageV2 } from '@kit.ArkUI';
+import { BreakpointType } from '../utils/BreakpointSystem';
 import { TagLabelCard } from './TagLabelCard';
 
+
 @ComponentV2
-export struct TwoColumn {
-  @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
+export struct CompactCardComponent {
   @Param @Once @Require videoCardArray: Array<VideoCard>;
+  @Param showVideoType: boolean = false
+  @Local globalInfo: GlobalInfoModel =
+    AppStorageV2.connect<GlobalInfoModel>(GlobalInfoModel, () => new GlobalInfoModel())!;
 
   build() {
-    List({ space: '16vp' }) {
+    Grid() {
       ForEach(this.videoCardArray, (item: VideoCard) => {
-        ListItem() {
+        GridItem() {
           Column() {
-            RelativeContainer() {
+            Column() {
               Image(item.imageUrl)
                 .aspectRatio(1.78)
                 .borderRadius(10)
@@ -24,13 +29,27 @@ export struct TwoColumn {
             .width('auto');
 
             Column({ space: 4 }) {
-              Text(item.title)
-                .textAlign(TextAlign.Start)
-                .textOverflow({ overflow: TextOverflow.Ellipsis })
-                .maxLines(1)
-                .fontSize('14fp')
-                .width(CommonConstants.FULL_PERCENT)
-                .fontWeight(FontWeight.Medium);
+              Row() {
+                if (this.showVideoType) {
+                  Text(item.videoType === 0 ? '视频' : '音频')
+                    .fontSize(10)
+                    .fontColor('#FF783F')
+                    .fontWeight(FontWeight.Regular)
+                    .lineHeight(13)
+                    .border({ width: 1, color: '#FF783F' })
+                    .borderRadius(4)
+                    .margin({ right: 4 })
+                }
+                Text(item.title)
+                  .textAlign(TextAlign.Start)
+                  .textOverflow({ overflow: TextOverflow.Ellipsis })
+                  .maxLines(1)
+                  .fontSize('14fp')
+                  .width(CommonConstants.FULL_PERCENT)
+                  .fontWeight(FontWeight.Medium);
+              }
+              .justifyContent(FlexAlign.Start)
+
               Text(item.describe)
                 .textAlign(TextAlign.Start)
                 .fontColor($r('sys.color.ohos_id_color_text_secondary'))
@@ -42,68 +61,98 @@ export struct TwoColumn {
             .padding({ top: '8vp' });
           };
         }
-        .padding({
-          left: '4%',
-          right: '4%'
-        })
         .onClick(() => {
-          let detail: VideoDetail = DataGenerator.getVideoDetail(this.getUIContext());
+          let detail: VideoCollection = DataGenerator.getVideoDetail(this.getUIContext());
           detail.videoCard = item;
-          this.appPathStack.pushPathByName('VideoDetailListView', detail);
+          this.globalInfo.navStack.pushPathByName('VideoDetailListView', detail);
         });
       }, (item: VideoCard) => JSON.stringify(item));
     }
-    .lanes(2)
+    .rowsGap(new BreakpointType<number>({
+      sm: 8,
+      md: 12,
+      lg: 16,
+    }).getValue(this.globalInfo.currentBreakpoint))
+    .columnsGap(new BreakpointType<number>({
+      sm: 8,
+      md: 12,
+      lg: 16,
+    }).getValue(this.globalInfo.currentBreakpoint))
+    .columnsTemplate('1fr '.repeat(new BreakpointType<number>({
+      sm: 2,
+      md: 3,
+      lg: 4,
+    }).getValue(this.globalInfo.currentBreakpoint)))
     .width(CommonConstants.FULL_PERCENT)
-    .padding({
-      top: '10vp',
-      left: '3%',
-      right: '3%',
-    });
   }
 }
 
 @ComponentV2
-export struct CommonOneColumn {
-  @Param @Once @Require videoCard: VideoCard;
-  @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
+export struct StandardCardComponent {
+  @Param @Once @Require videoArray: Array<VideoCard>
+  @Local globalInfo: GlobalInfoModel =
+    AppStorageV2.connect<GlobalInfoModel>(GlobalInfoModel, () => new GlobalInfoModel())!;
 
   build() {
-    Column({ space: 10 }) {
-      RelativeContainer() {
-        Image(this.videoCard.imageUrl)
-          .borderRadius(12)
-          .id(CommonConstants.IMAGE);
-      }
-      .width('auto')
-      .height('auto')
-      .onClick(() => {
-        let detail: VideoDetail = DataGenerator.getVideoDetail(this.getUIContext());
-        detail.videoCard = this.videoCard;
-        this.appPathStack.pushPathByName('VideoDetailListView', detail);
-      });
+    Grid() {
+      ForEach(this.videoArray, (item: VideoCard, index: number) => {
+        GridItem() {
+          Column() {
+            Image(item.imageUrl)
+              .borderRadius(12)
+              .onClick(() => {
+                let detail: VideoCollection = DataGenerator.getVideoDetail(this.getUIContext());
+                detail.videoCard = item;
+                this.globalInfo.navStack.pushPathByName('VideoDetailListView', detail);
+              })
 
-      Row() {
-        Text(this.videoCard.title)
-          .fontWeight(FontWeight.Bold)
-          .freeze(true)
-          .maxLines(1)
-          .textOverflow({ overflow: TextOverflow.Ellipsis })
+            Row() {
+              Text(item.title)
+                .fontSize(16)
+                .fontWeight(FontWeight.Bold)
+                .lineHeight(21)
+                .freeze(true)
+                .maxLines(1)
+                .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-        Blank();
-        ForEach(this.videoCard.tags, (item: string) => {
-          TagLabelCard(item);
-        }, (item: string) => item);
-      }
-      .width(CommonConstants.FULL_PERCENT)
-      .justifyContent(FlexAlign.SpaceAround);
+              Blank();
+              ForEach(item.tags, (item: string) => {
+                TagLabelCard(item);
+              }, (item: string) => item);
+            }
+            .margin({ top: 8 })
+            .width(CommonConstants.FULL_PERCENT)
+            .justifyContent(FlexAlign.SpaceAround)
 
-      Row() {
-        Text(this.videoCard.describe)
-          .fontSize(12)
-          .fontColor('#ff969191');
-      }.width(CommonConstants.FULL_PERCENT)
-      .justifyContent(FlexAlign.Start);
-    };
+            Row() {
+              Text(item.describe)
+                .fontSize(12)
+                .lineHeight(16)
+                .fontColor('#ff969191');
+            }
+            .margin({ top: 2 })
+            .width(CommonConstants.FULL_PERCENT)
+            .justifyContent(FlexAlign.Start);
+          }
+        }
+      }, (item: VideoCard, index) => JSON.stringify(item) + index)
+    }
+    .width('100%')
+    .rowsGap(new BreakpointType<number>({
+      sm: 8,
+      md: 12,
+      lg: 16,
+    }).getValue(this.globalInfo.currentBreakpoint))
+    .columnsGap(new BreakpointType<number>({
+      sm: 8,
+      md: 12,
+      lg: 16,
+    }).getValue(this.globalInfo.currentBreakpoint))
+    .columnsTemplate('1fr '.repeat(new BreakpointType<number>({
+      sm: 1,
+      md: 2,
+      lg: 3,
+    }).getValue(this.globalInfo.currentBreakpoint)))
+    .scrollBar(BarState.Off)
   }
 }

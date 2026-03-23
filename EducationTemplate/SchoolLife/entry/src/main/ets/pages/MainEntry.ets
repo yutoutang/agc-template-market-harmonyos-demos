@@ -1,65 +1,65 @@
-import { TAB_LIST } from '../constants/Constants';
-import { TabListItem } from '../types/Types';
+import { stores, routerStack, TabsItem } from 'foundation';
+
+import { MainEntryConfig as Config } from '../common/MainEntryConfig';
 import { MainEntryVM } from '../viewmodels/MainEntryVM';
 
 @Entry
 @ComponentV2
 struct MainEntry {
-  vm: MainEntryVM = MainEntryVM.instance;
-  @Provider('mainTabController') mainTabController: TabsController = new TabsController();
 
-  build() {
-    Navigation(this.vm.navStack) {
-      RelativeContainer() {
-        Tabs({ barPosition: BarPosition.End, index: this.vm.curIndex, controller: this.mainTabController }) {
-          ForEach(TAB_LIST, (item: TabListItem, index: number) => {
-            TabContent() {
-              item.component.builder();
-            }
-            .tabBar(this.tabBarBuilder(TAB_LIST[index], index))
-            .clip(index !== 0)
-            .expandSafeArea([SafeAreaType.SYSTEM, SafeAreaType.CUTOUT], [SafeAreaEdge.TOP])
-          }, (item: TabListItem) => item.label)
-        }
-        .scrollable(false)
-        .height('100%')
-        .animationDuration(0)
-        .barMode(BarMode.Fixed)
-        .onChange((index: number) => {
-          this.vm.curIndex = index;
-        })
-        .id('main_tab_container')
-        .expandSafeArea([SafeAreaType.SYSTEM, SafeAreaType.CUTOUT], [SafeAreaEdge.TOP])
-      }
-      .backgroundColor($r('sys.color.background_secondary'))
-      .expandSafeArea([SafeAreaType.SYSTEM, SafeAreaType.CUTOUT], [SafeAreaEdge.TOP])
-    }
-    .hideTitleBar(true)
-    .hideToolBar(true)
-    .hideBackButton(true)
-    .hideToolBar(true)
-    .mode(NavigationMode.Stack);
+  private model: MainEntryVM = MainEntryVM.getInstance();
+
+  public aboutToAppear(): void {
+    this.model.init();
   }
 
-  async aboutToAppear() {
-    await this.vm.init();
+  public build(): void {
+    Navigation(routerStack) {
+      Tabs({ index: this.model.activeMainTabIndex }) {
+        ForEach(Config.TAB_LIST, (item: TabsItem, index: number) => {
+          TabContent() {
+            item.content.builder()
+          }
+          .tabBar(this.buildTabBar(item, index))
+          .backgroundColor($r('sys.color.comp_background_tertiary'))
+          .expandSafeArea([SafeAreaType.SYSTEM, SafeAreaType.CUTOUT], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
+        }, (item: TabsItem, index: number) => index + JSON.stringify(item))
+      }
+      .width('100%')
+      .height('100%')
+      .scrollable(false)
+      .barMode(BarMode.Fixed)
+      .barHeight(48)
+      .animationMode(AnimationMode.NO_ANIMATION)
+      .animationDuration(0)
+      .barPosition(BarPosition.End)
+      .barBackgroundColor(Color.Transparent)
+      .backgroundColor($r('sys.color.comp_background_primary'))
+      .onChange((index: number) => stores.cache.activeMainTabId = Config.TAB_LIST[index].id)
+      .expandSafeArea([SafeAreaType.SYSTEM, SafeAreaType.CUTOUT], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
+    }
+    .mode(NavigationMode.Stack)
+    .hideTitleBar(true)
+    .hitTestBehavior(stores.cache.hasAcceptedPrivacyPolicy ? HitTestMode.Default : HitTestMode.Block)
   }
 
   @Builder
-  tabBarBuilder(item: TabListItem, index: number) {
+  private buildTabBar(item: TabsItem, index: number): void {
     Column() {
-      Image(this.vm.curIndex === index ? item.iconChecked : item.icon)
+      Image(this.model.activeMainTabIndex === index ? item.activeIcon : item.icon)
         .width(24)
-        .height(24);
+        .height(24)
+        .draggable(false)
       Text(item.label)
-        .fontColor(this.vm.curIndex === index ? $r('sys.color.multi_color_09') :
-        $r('app.color.system_color_grey_60'))
-        .fontSize($r('app.string.font_size_10'))
-        .margin({ top: $r('app.string.margin_s') });
+        .fontColor(this.model.activeMainTabIndex === index ?
+          $r('sys.color.multi_color_09') : $r('sys.color.font_secondary')
+        )
+        .fontSize($r('sys.float.Caption_M'))
+        .fontWeight(FontWeight.Regular)
+        .margin({ top: 4 })
     }
-    .padding({ top: $r('app.string.padding_xs'), bottom: $r('app.string.padding_xs') })
     .width('100%')
     .height('100%')
-    .backgroundColor(Color.White);
+    .justifyContent(FlexAlign.Center)
   }
 }

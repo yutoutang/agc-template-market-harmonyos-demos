@@ -27,6 +27,16 @@ export struct BillPieChart {
   @Param
   labelSize: number = 10;
   @Param
+  showCenterText: boolean = false;
+  @Param
+  centerText: string = '';
+  @Param
+  centerTextSize: number = 14;
+  @Param
+  holeRadius: number = 75;
+  @Param
+  centerTextColor: number = 0x000000;
+  @Param
   valueLineColor: number = 0xd0d0d0;
   @Param
   chartHeight: Length = 200;
@@ -36,7 +46,7 @@ export struct BillPieChart {
     return this.chartData.reduce((pre, cur) => pre + cur.value, 0);
   }
 
-  @Monitor('chartData')
+  @Monitor('chartData','centerText')
   refreshChart() {
     this._setData();
   }
@@ -46,6 +56,8 @@ export struct BillPieChart {
     this.model.animateX(1000);
     // 使用百分比值
     this.model.setUsePercentValues(true);
+    // 显示中心文本
+    this.model.setDrawCenterText(this.showCenterText);
     // 显示图例
     this.model.getLegend()?.setEnabled(false);
     // 显示描述
@@ -58,8 +70,14 @@ export struct BillPieChart {
     this.model.setEntryLabelColor(this.labelColor);
     // 标签文字尺寸
     this.model.setEntryLabelTextSize(this.labelSize);
+    // 中心文本
+    this.model.setCenterText(this.centerText);
+    // 中心文本大小
+    this.model.setCenterTextSize(this.centerTextSize);
+    // 中心文本颜色
+    this.model.setCenterTextColor(this.centerTextColor);
     // 中心孔半径
-    this.model.setHoleRadius(75);
+    this.model.setHoleRadius(this.holeRadius);
     // 数据的最小角度
     this.model.setMinAngleForSlices(25);
     this._setData();
@@ -81,22 +99,23 @@ export struct BillPieChart {
     // 引出线距离饼图偏移距离
     dataSet.setValueLinePart1OffsetPercentage(120);
     // 引出线第一段的长度
-    dataSet.setValueLinePart1Length(0.6);
+    dataSet.setValueLinePart1Length(0.5);
     // 引出线第二段的长度
-    dataSet.setValueLinePart2Length(0.4);
+    dataSet.setValueLinePart2Length(0.3);
     // 引出线颜色
     dataSet.setValueLineColor(this.valueLineColor);
     // 百分比文字大小
     dataSet.setValueTextSize(this.valueSize);
     // 百分比文字颜色
     dataSet.setValueTextColor(this.valueColor);
-
     // 显示数据格式化
     dataSet.setValueFormatter(new MyAxisValueFormatter());
     // 百分比文字显示在饼图外
     dataSet.setYValuePosition(ValuePosition.OUTSIDE_SLICE);
     // 标签文字显示在饼图外
     dataSet.setXValuePosition(ValuePosition.OUTSIDE_SLICE);
+    // 中心文本
+    this.model.setCenterText(this.centerText);
 
     let colors: JArrayList<number> = new JArrayList();
     for (let index = 0; index < this.colorList.length; index++) {
@@ -116,11 +135,10 @@ export struct BillPieChart {
       } else {
         Image($r('app.media.ic_data_empty')).width(80).height(80)
         Text('暂无内容')
-          .fontColor('#99000000')
+          .fontColor($r('sys.color.mask_secondary'))
           .fontSize(14)
           .fontWeight(FontWeight.Regular)
       }
-
     }
     .width('100%')
     .height(this.chartHeight)

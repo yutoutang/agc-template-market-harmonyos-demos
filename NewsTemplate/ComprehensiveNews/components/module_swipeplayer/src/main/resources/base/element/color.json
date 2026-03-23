@@ -19,6 +19,18 @@
     {
       "name": "landscape_slide_track_color",
       "value": "#33FFFFFF"
+    },
+    {
+      "name": "cast_play_pause_bg",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "cast_slider_block",
+      "value": "#E5E5E5"
+    },
+    {
+      "name": "circle_btn_bg",
+      "value": "#19FFFFFF"
     }
   ]
 }

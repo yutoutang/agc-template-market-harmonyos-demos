@@ -2,6 +2,8 @@ export { IButtonItem } from './src/main/ets/constants/Constants';
 
 export { NavHeaderBar } from './src/main/ets/components/NavHeaderBar';
 
+export { BaseAgent } from './src/main/ets/components/BaseAgent';
+
 export { ButtonGroup } from './src/main/ets/components/ButtonGroup';
 
 export { CustomBadge } from './src/main/ets/components/CustomBadge';

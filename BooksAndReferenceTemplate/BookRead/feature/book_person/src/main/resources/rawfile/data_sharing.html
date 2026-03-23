@@ -5,54 +5,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>第三方共享信息清单</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: "HarmonyOS Sans", "Helvetica Neue", Arial, sans-serif;
-            background: #f9f9f9;
-            color: #333;
-            line-height: 1.6;
-            padding: 10px;
-            font-size: 16px;
+        :root {
+          --bg-color: #f5f5f5;
+          --content-bg: #fff;
+          --card-color: #ffffff;
+          --font-color: #333;
+          --effective-color: #888;
         }
-        .container {
-            max-width: 100%;
-            margin: 0 auto;
-            padding: 10px;
+        @media (prefers-color-scheme: dark) {
+          :root {
+            --bg-color: #e5e5e5;
+            --content-bg: #000;
+            --card-color: #191919;
+            --font-color: #fff;
+            --effective-color: #eee;
+          }
         }
-        header {
-            text-align: center;
-            margin-bottom: 10px;
-        }
-        h1 {
-            font-size: 20px;
-            margin-bottom: 5px;
-            color: #333;
-        }
-        .effective-time {
-            font-size: 13px;
-            color: #888;
-            font-weight: bold;
-            margin: 5px 0;
-            display: block;
-            text-align: center;
-        }
-        .content {
-            text-align: left;
-            font-size: 15px;
-            line-height: 1.6;
-            margin-bottom: 10px;
-            padding: 10px;
-            background: #fff;
-            border-radius: 4px;
-        }
-        .footer {
-            text-align: center;
-            font-size: 13px;
-            color: #777;
-            margin-top: 10px;
-            padding-top: 5px;
-            border-top: 1px solid #eee;
-        }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: "HarmonyOS Sans", "Helvetica Neue", Arial, sans-serif;
+        background: var(--bg-color);
+        color: var(--font-color);
+        line-height: 1.6;
+        padding: 10px;
+        font-size: 16px;
+    }
+    .container {
+        max-width: 100%;
+        margin: 0 auto;
+        padding: 10px;
+    }
+    header {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+    h1 {
+        font-size: 20px;
+        margin-bottom: 5px;
+        color: var(--font-color);
+    }
+    .effective-time {
+        font-size: 13px;
+        color: var(--effective-color);
+        font-weight: bold;
+        margin: 5px 0;
+        display: block;
+        text-align: center;
+    }
+    .content {
+        text-align: left;
+        font-size: 15px;
+        line-height: 1.6;
+        margin-bottom: 10px;
+        padding: 10px;
+        background: var(--content-bg);
+        border-radius: 4px;
+    }
+    .footer {
+        text-align: center;
+        font-size: 13px;
+        color: #777;
+        margin-top: 10px;
+        padding-top: 5px;
+        border-top: 1px solid #eee;
+    }
     </style>
 </head>
 <body>

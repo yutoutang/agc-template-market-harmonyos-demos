@@ -13,27 +13,26 @@ export struct Banner {
         ForEach(this.bannerArray, (item: string, index: number) => {
           Image(item)
             .borderRadius(16)
-            .margin({ left: 8, right: 8 })
-            .width(new BreakpointType<number>({
-              sm: 336,
-              md: 496,
-              lg: 496,
-            }).getValue(this.globalInfo.currentBreakpoint))
-            .height(new BreakpointType<number>({
-              sm: 189,
-              md: 189,
-              lg: 189,
-            }).getValue(this.globalInfo.currentBreakpoint))
+            .aspectRatio(16 / 9)
+            .width('100%')
         }, (item: string) => item)
       }
+      .itemSpace(
+        new BreakpointType<number>({
+          sm: 0,
+          md: 12,
+          lg: 16,
+        }).getValue(this.globalInfo.currentBreakpoint)
+      )
+      .interval(3000)
       .nextMargin(new BreakpointType<number>({
         sm: 0,
-        md: 36,
+        md: 24,
         lg: 36,
       }).getValue(this.globalInfo.currentBreakpoint))
       .prevMargin(new BreakpointType<number>({
         sm: 0,
-        md: 36,
+        md: 24,
         lg: 36,
       }).getValue(this.globalInfo.currentBreakpoint))
       .displayCount(new BreakpointType<number>({

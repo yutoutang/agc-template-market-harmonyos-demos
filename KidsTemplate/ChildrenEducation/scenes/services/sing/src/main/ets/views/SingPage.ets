@@ -1,31 +1,34 @@
 import { DataGenerator } from '@ohos_agcit/children_education_datasource';
-import { CommonConstants, FeedTitle, NoMoreTab, TwoColumn } from '@ohos_agcit/children_education_utils';
+import { CommonConstants, FeedTitle, NoMoreTab, CompactCardComponent,
+  BreakpointType,
+  GlobalInfoModel} from '@ohos_agcit/children_education_utils';
+import { AppStorageV2 } from '@kit.ArkUI';
 
 @ComponentV2
 export struct SingPage {
   private singSongPageData = DataGenerator.getSingSongPageData(this.getUIContext());
-  @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
-
+  @Local globalInfo: GlobalInfoModel =
+    AppStorageV2.connect<GlobalInfoModel>(GlobalInfoModel, () => new GlobalInfoModel())!;
+  
   build() {
     Column() {
-      List({ space: 30 }) {
-
+      List() {
         ListItemGroup({
           header: FeedTitle('app.media.feed_head_video', '律动儿歌', () => {
-            this.appPathStack.pushPathByName('HotAnimationListView', undefined);
+            this.globalInfo.navStack.pushPathByName('HotAnimationListView', '律动儿歌');
           })
         }) {
-          TwoColumn({
+          CompactCardComponent({
             videoCardArray: this.singSongPageData,
           });
         };
 
         ListItemGroup({
           header: FeedTitle('app.media.feed_head_video', '经典童谣', () => {
-            this.appPathStack.pushPathByName('HotAnimationListView', undefined);
+            this.globalInfo.navStack.pushPathByName('HotAnimationListView', '经典童谣');
           }),
         }) {
-          TwoColumn({
+          CompactCardComponent({
             videoCardArray: this.singSongPageData,
           });
         };
@@ -37,7 +40,19 @@ export struct SingPage {
       .scrollBar(BarState.Off)
       .layoutWeight(1)
       .height(CommonConstants.FULL_PERCENT)
-      .width(CommonConstants.FULL_PERCENT);
-    };
+      .width(CommonConstants.FULL_PERCENT)
+      .padding({
+        left: new BreakpointType<number>({
+          sm: 16,
+          md: 24,
+          lg: 32,
+        }).getValue(this.globalInfo.currentBreakpoint),
+        right: new BreakpointType<number>({
+          sm: 16,
+          md: 24,
+          lg: 32,
+        }).getValue(this.globalInfo.currentBreakpoint)
+      })
+    }
   }
 }

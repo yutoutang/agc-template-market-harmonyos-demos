@@ -2,10 +2,13 @@ export { Logger } from './src/main/ets/utils/logger/Index';
 
 export { WindowUtil } from './src/main/ets/utils/window/Index';
 
-export {
-  FrameworkUtil, TabIndexMap } from './src/main/ets/utils/framework/Index';
+export { FrameworkUtil, TabIndexMap } from './src/main/ets/utils/framework/Index';
 
 export { EventBus, EventKey } from './src/main/ets/utils/eventbus/Index';
+
+export { contextUtil } from './src/main/ets/utils/ContextUtil';
+
+export * from './src/main/ets/utils/userinfo/Index';
 
 // 路由工具
 export * from './src/main/ets/utils/router/Index';
@@ -24,8 +27,9 @@ export { CommonHeader } from './src/main/ets/components/CommonHeader';
 
 export { CommonMonthPicker } from './src/main/ets/components/CommonMonthPicker';
 
-export {
-  CommonButton, CustomButtonType } from './src/main/ets/components/CommonButton';
+export { CommonDayPicker } from './src/main/ets/components/CommonDayPicker';
+
+export { CommonButton, CustomButtonType } from './src/main/ets/components/CommonButton';
 
 export { ContainerRow } from './src/main/ets/components/ContainerRow';
 

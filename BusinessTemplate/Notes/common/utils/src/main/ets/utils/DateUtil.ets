@@ -392,9 +392,9 @@ export class DateUtil {
    * @returns
    */
   static getFormatTime(date: Date,
-    options: intl.DateTimeOptions = { dateStyle: 'short', timeStyle: 'short', hourCycle: 'h24' },
+    options: Intl.DateTimeFormatOptions = { dateStyle: 'short', timeStyle: 'short', hourCycle: 'h24' },
     locale: string = 'zh-CN'): string {
-    const dateTimeFormat = new intl.DateTimeFormat(locale, options);
+    const dateTimeFormat = new Intl.DateTimeFormat(locale, options);
     return dateTimeFormat.format(date);
   }
 
@@ -407,9 +407,9 @@ export class DateUtil {
    * @returns
    */
   static getFormatRange(startDate: Date, endDate: Date,
-    options: intl.DateTimeOptions = { dateStyle: 'short', timeStyle: 'short', hourCycle: 'h24' },
+    options: Intl.DateTimeFormatOptions = { dateStyle: 'short', timeStyle: 'short', hourCycle: 'h24' },
     locale: string = 'zh-CN'): string {
-    const dateTimeFormat = new intl.DateTimeFormat(locale, options);
+    const dateTimeFormat = new Intl.DateTimeFormat(locale, options);
     return dateTimeFormat.formatRange(startDate, endDate);
   }
 
@@ -421,9 +421,10 @@ export class DateUtil {
    * @param locale 包含区域设置信息的字符串，包括语言以及可选的脚本和区域
    * @returns
    */
-  static getFormatRelativeTime(value: number, unit: string, options?: intl.RelativeTimeFormatInputOptions,
+  static getFormatRelativeTime(value: number, unit: Intl.RelativeTimeFormatUnit,
+    options?: Intl.RelativeTimeFormatOptions,
     locale: string = 'zh-CN'): string {
-    let relativeTimeFormat = new intl.RelativeTimeFormat(locale, options);
+    let relativeTimeFormat = new Intl.RelativeTimeFormat(locale, options);
     return relativeTimeFormat.format(value, unit);
   }
 

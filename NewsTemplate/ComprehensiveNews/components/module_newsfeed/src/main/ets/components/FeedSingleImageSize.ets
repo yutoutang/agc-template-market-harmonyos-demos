@@ -12,10 +12,14 @@ export struct FeedSingleImageSize {
   @Require @Param componentId: string = ''
   @Require @Param curFeedCardInfo: FeedCardInfoModel
   @Require @Param postImgListItem: PostImgList
+  @Param clickedIndex: number = -1;
+  @Param index: number = 0
   @Param isLast: boolean = false
   @Param truncatedCount: number = 0
-  @Event onVideo: () => void = () => {}
-  @Event onImageClick: () => void = () => {}
+  @Event onVideo: () => void = () => {
+  }
+  @Event onImageClick: () => void = () => {
+  }
   @Local modifier: FeedImageModifier | undefined = undefined;
 
   aboutToAppear(): void {
@@ -37,9 +41,8 @@ export struct FeedSingleImageSize {
             .autoResize(true)
             .visibility(this.postImgListItem.surfaceUrl ? Visibility.None : Visibility.Visible)
             .borderRadius(12)
+            .id(`${this.componentId}${this.curFeedCardInfo.id}${this.postImgListItem.picVideoUrl}${this.index}`)
             .clip(true)
-            .geometryTransition(this.curFeedCardInfo.id + this.postImgListItem.picVideoUrl + this.componentId)
-            .transition(TransitionEffect.opacity(0.99))
             .onClick(() => {
               this.onImageClick()
             })

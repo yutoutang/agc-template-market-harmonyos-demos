@@ -1,4 +1,4 @@
-import { promptAction } from '@kit.ArkUI';
+import { ToastDialog } from '@hw-agconnect/ui-toast';
 import { emitter } from '@kit.BasicServicesKit';
 import {
   AssetType,
@@ -12,11 +12,11 @@ import {
   AssetInfoManageParams,
   assetInfoManageSheetBuilder,
 } from 'asset_manage';
-import { ASSET_CREATE_EVENT_ID } from '../commons/Constants';
+import { Logger } from 'bill_base';
+import { RouterMap, RouterModule } from 'commonlib';
+import { ASSET_CHANGE_EVENT_ID } from '../commons/Constants';
 import { AccountingDB } from './accountingdb/AccountingDB';
 import { AssetTableBasis, UserAsset } from './accountingdb/Types';
-
-import { Logger } from 'bill_base';
 import { PopViewUtil } from './PopViewUtil';
 
 const TAG = '[AssetManageUtil]';
@@ -31,13 +31,15 @@ class AssetManageUtil {
       wrapBuilder(assetCreateSheetBuilder),
       {
         detents: [SheetSize.MEDIUM],
+        preferType: SheetType.CENTER,
         title: { title: '选择资产类型' },
         backgroundColor: $r('sys.color.background_primary'),
       },
       {
         assetTypeList: this.typeList,
         handleClick: (type: AssetType, subType?: number) => {
-          this.openManageSheet({ type }, subType);
+          PopViewUtil.closeAllSheet();
+          this._navigateToAddAssetPage(type, subType);
         },
       } as AssetCreateSheetOptions,
     );
@@ -50,6 +52,7 @@ class AssetManageUtil {
       wrapBuilder(assetInfoManageSheetBuilder),
       {
         detents: [SheetSize.MEDIUM],
+        preferType: SheetType.CENTER,
         title: { title: params.initAsset ? '编辑资产' : '添加资产' },
         backgroundColor: '#f1f3f5',
         onWillDismiss: (action) => {
@@ -81,6 +84,13 @@ class AssetManageUtil {
     );
   }
 
+  private _navigateToAddAssetPage(type: AssetType, subType?: number) {
+    RouterModule.push({
+      url: RouterMap.ADD_ASSET,
+      param: { type, subType },
+    });
+  }
+
   private async _createAssetAccount(data: AssetRecordItemModel) {
     const userData: UserAsset = {
       name: data.name,
@@ -92,8 +102,8 @@ class AssetManageUtil {
     };
     try {
       await AccountingDB.addAssetAccount(userData);
-      emitter.emit({ eventId: ASSET_CREATE_EVENT_ID });
-      promptAction.showToast({ message: '资产账户添加成功~' });
+      emitter.emit({ eventId: ASSET_CHANGE_EVENT_ID });
+      ToastDialog.showToast({ message: '资产账户添加成功~' });
       PopViewUtil.closeAllSheet();
     } catch (err) {
       Logger.error(TAG, 'create asset account failed.' + JSON.stringify(err));
@@ -112,7 +122,8 @@ class AssetManageUtil {
     };
     try {
       await AccountingDB.editAssetAccount(userData);
-      promptAction.showToast({ message: '资产账户编辑成功~' });
+      emitter.emit({ eventId: ASSET_CHANGE_EVENT_ID });
+      ToastDialog.showToast({ message: '资产账户编辑成功~' });
       PopViewUtil.closeAllSheet();
     } catch (err) {
       Logger.error(TAG, 'edit asset account failed.' + JSON.stringify(err));

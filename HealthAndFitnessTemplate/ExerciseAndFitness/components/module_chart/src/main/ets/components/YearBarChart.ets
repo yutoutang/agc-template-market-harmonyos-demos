@@ -74,7 +74,7 @@ export struct YearBarChart {
 
   build() {
     Column() {
-      if (this.chartData.data.length) {
+      if (this.chartData.data.length !== 0) {
         Text() {
           if (this.selectedData) {
             Span(this.selectedData.date as string);

@@ -3,25 +3,36 @@ import { MinePage } from '@ohos_agcit/children_education_minepage';
 import {
   AudioPlayPage,
   AuthUtil,
+  AvoidArea,
   BreakpointType,
   CommonConstants,
   DateConstants,
   DateUtil,
+  DeviceUtil,
   GlobalContext,
   GlobalInfoModel,
   ObjectUtil,
+  PreferencesUtil,
   PushActionParams,
   PushUtils,
   StringUtil,
   VideoPlayPage
 } from '@ohos_agcit/children_education_utils';
-import { emitter } from '@kit.BasicServicesKit';
-import { History, UsedLimit, User, VipRecord } from '@ohos_agcit/children_education_datasource';
-import { AppStorageV2, CustomContentDialog, PersistenceV2 } from '@kit.ArkUI';
+import { emitter, request } from '@kit.BasicServicesKit';
+import { History, UsedLimit, User, VideoCard, VipRecord } from '@ohos_agcit/children_education_datasource';
+import { AppStorageV2, CustomContentDialog, display, PersistenceV2, window } from '@kit.ArkUI';
 import { ArrayList } from '@kit.ArkTS';
 import { userAuth } from '@kit.UserAuthenticationKit';
 import { AuthOptions } from '@ohos_agcit/children_education_utils/src/main/ets/model/AuthOptions';
 import { notificationManager } from '@kit.NotificationKit';
+import { common } from '@kit.AbilityKit';
+import { DataGenerator } from '@ohos_agcit/children_education_datasource';
+import { formBindingData, formInfo, formProvider } from '@kit.FormKit';
+import { fileIo as fs, fileUri} from '@kit.CoreFileKit';
+import { harmonyShare, systemShare } from '@kit.ShareKit';
+import { uniformTypeDescriptor as utd } from '@kit.ArkData';
+import { RouterModule } from '@ohos_agcit/children_education_utils'
+import { PipManager } from 'recorded_player';
 
 
 @Entry
@@ -29,9 +40,12 @@ import { notificationManager } from '@kit.NotificationKit';
 struct Index {
   private tabsController: TabsController = new TabsController();
   private timerID: number = -1;
-  @Provider(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
+  private uiContext: UIContext = this.getUIContext() as UIContext;
+  private hostContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
+
   @Provider(CommonConstants.USER_INFO) user: User = PersistenceV2.connect(User, () => new User())!;
   @Provider(CommonConstants.VIP_RECORD) vipRecord: VipRecord = PersistenceV2.connect(VipRecord, () => new VipRecord())!;
+  @Local avoidArea: AvoidArea = AppStorageV2.connect(AvoidArea, () => new AvoidArea(0, 0))!;
   @Local currentIndex: number = 0;
   @Local usedLimit: UsedLimit = PersistenceV2.connect(UsedLimit, () => new UsedLimit())!;
   @Local dialogOpen: boolean = false;
@@ -56,7 +70,7 @@ struct Index {
   }
 
   sendPushMessage() {
-    let pushArticle:PushActionParams = {
+    let pushArticle: PushActionParams = {
       picVideoUrl: '',
       title: '儿童教育模板',
       id: '461323198429547557'
@@ -121,7 +135,67 @@ struct Index {
       PersistenceV2.save(User);
     })
 
-    this.appPathStack.pushPathByName('AdPage', undefined);
+    
+    if (DeviceUtil.isFoldablePhone() && DeviceUtil.isPortrait()) {
+      window.getLastWindow(this.hostContext).then((win) => {
+        win.setPreferredOrientation(13)
+      })
+    }
+    if (DeviceUtil.isFoldablePhone() && DeviceUtil.isLandSpace()) {
+      window.getLastWindow(this.hostContext).then((win) => {
+        win.setPreferredOrientation(14)
+      })
+    }
+    display.on('foldStatusChange', (data: display.FoldStatus) => {
+      if (data === FoldStatus.FOLD_STATUS_FOLDED) {
+        window.getLastWindow(this.hostContext).then((win) => {
+          win.setPreferredOrientation(1)
+        })
+        return
+      }
+      if (data === FoldStatus.FOLD_STATUS_EXPANDED) {
+        let orientation = DeviceUtil.isPortrait() ? 13 : 14
+        window.getLastWindow(this.hostContext).then((win) => {
+          win.setPreferredOrientation(orientation)
+        })
+      }
+    });
+
+    // 添加路由拦截器
+    RouterModule.registerInterception();
+    harmonyShare.on('gesturesShare',this.gesturesShareCallback)
+    harmonyShare.on('knockShare', this.nockShareCallback);
+
+  }
+
+  aboutToDisappear(): void {
+    harmonyShare.off('gesturesShare',this.gesturesShareCallback)
+    harmonyShare.off('knockShare', this.nockShareCallback);
+  }
+
+  nockShareCallback = (sharableTarget: harmonyShare.SharableTarget) => {
+    const currentTime = PipManager.getInstance().player.currentTime || 0;
+    let shareData: systemShare.SharedData = new systemShare.SharedData({
+      utd: utd.UniformDataType.HYPERLINK,
+      content: `https://linking.xiaobingtang.cn?name=${RouterModule.routerName}&param=${JSON.stringify(RouterModule.param)}&currentTime=${currentTime}`,
+      // 根据title,description,thumbnailUri会生成不同的卡片模板，具体可参考设置配套的卡片样式。
+      title: '碰一碰分享卡片标题',
+      description: '碰一碰分享卡片描述'
+    });
+
+    sharableTarget.share(shareData);
+  }
+
+  gesturesShareCallback = (sharableTarget: harmonyShare.SharableTarget) => {
+    const currentTime = PipManager.getInstance().player.currentTime || 0;
+    let shareData: systemShare.SharedData = new systemShare.SharedData({
+      utd: utd.UniformDataType.HYPERLINK,
+      content: `https://linking.xiaobingtang.cn?name=${RouterModule.routerName}&param=${JSON.stringify(RouterModule.param)}&currentTime=${currentTime}`,
+    // thumbnailUri: fileUri.getUriFromPath(filePath),
+      title: '隔空传送分享卡片标题',
+      description: '隔空传送分享卡片描述'
+    });
+    sharableTarget.share(shareData);
   }
 
   onPageShow(): void {
@@ -161,12 +235,6 @@ struct Index {
    * 初始化数据
    */
   initAppData() {
-    GlobalContext.getContext().setObject(CommonConstants.LUNCH_TIME_STATE, this.vipRecord.lunchTimeState);
-    GlobalContext.getContext().setObject(CommonConstants.NIGHT_TIME_STATE, this.vipRecord.nightTimeState);
-    GlobalContext.getContext().setObject(CommonConstants.LUNCH_START_TIME, this.vipRecord.lunchStartTime);
-    GlobalContext.getContext().setObject(CommonConstants.LUNCH_END_TIME, this.vipRecord.lunchEndTime);
-    GlobalContext.getContext().setObject(CommonConstants.NIGHT_START_TIME, this.vipRecord.nightStartTime);
-    GlobalContext.getContext().setObject(CommonConstants.NIGHT_END_TIME, this.vipRecord.nightEndTime);
     if (this.vipRecord.timeLimit === 1440) {
       GlobalContext.getContext().setObject(CommonConstants.TIME_LIMIT, CommonConstants.NO_LIMIT);
     } else if (this.vipRecord.timeLimit >= 60) {
@@ -176,7 +244,6 @@ struct Index {
       GlobalContext.getContext()
         .setObject(CommonConstants.TIME_LIMIT, this.vipRecord.timeLimit + CommonConstants.MINUTE);
     }
-    GlobalContext.getContext().setObject(CommonConstants.HISTORY_LIST, new ArrayList<History>());
   }
 
   /**
@@ -235,7 +302,7 @@ struct Index {
   }
 
   build() {
-    Navigation(this.appPathStack) {
+    Navigation(this.globalInfo.navStack) {
       Column() {
         Tabs({
           barPosition: this.isVertical ? BarPosition.Start : BarPosition.End,
@@ -264,7 +331,10 @@ struct Index {
           this.currentIndex = targetIndex;
         })
         .vertical(this.isVertical)
-      };
+      }
+      .padding({
+        bottom: this.getUIContext().px2vp(this.avoidArea.bottomRectHeight),
+      })
     }
     .hideTitleBar(true)
     .mode(NavigationMode.Stack)
@@ -299,13 +369,13 @@ struct Index {
                 this.dialogOpen = false;
                 this.usedLimit.isTimeOut = false;
                 PersistenceV2.save(UsedLimit);
-                this.appPathStack.pushPathByName('TimeCtrl', undefined);
+                this.globalInfo.navStack.pushPathByName('TimeCtrl', undefined);
               } else if (result.result === 12500010) {
                 this.dialogOpen = false;
                 this.usedLimit.isTimeOut = false;
                 PersistenceV2.save(UsedLimit);
                 this.dialogRemindController.open();
-                this.appPathStack.pushPathByName('TimeCtrl', undefined);
+                this.globalInfo.navStack.pushPathByName('TimeCtrl', undefined);
               } else {
                 this.dialogOpen = true;
                 this.dialogController.open();

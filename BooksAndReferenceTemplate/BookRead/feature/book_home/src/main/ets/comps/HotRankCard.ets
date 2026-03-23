@@ -14,14 +14,14 @@ export struct HotRankCard {
       Row() {
         Text(this.info?.rankName)
           .fontSize($r('sys.float.Body_L'))
-          .fontColor($r('sys.color.font_primary'))
+          .fontColor('#e6000000')
           .fontWeight(FontWeight.Medium)
           .height(22)
           .padding({ left: '12vp' })
         Row() {
           Text($r('app.string.more'))
             .fontSize($r('sys.float.Caption_L'))
-            .fontColor($r('sys.color.font_secondary'))
+            .fontColor('#99000000')
 
           Image($r('app.media.arrow_right'))
             .height(16)
@@ -85,7 +85,7 @@ export struct HotRankCard {
       .edgeEffect(EdgeEffect.Spring)
       .cachedCount(3)
       .layoutWeight(1)
-      .backgroundColor('#FFF5F5')
+      .backgroundColor($r('sys.color.ohos_id_normalbtn_unfocus_bg'))
     }
     .width(300)
     .layoutWeight(1)

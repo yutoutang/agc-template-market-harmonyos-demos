@@ -47,7 +47,7 @@ export struct SnapshotPreview {
   // The image generated after taking a screenshot
   @Param mergedImage: PixelMap | undefined = undefined;
   @Event changeMergedImage:(mergedImage:PixelMap | undefined) => void;
-  private context: Context = getContext(this);
+  @Param @Require context: Context ;
   // Saves the position information before sliding
   private xPositionBefore: number = 0;
   // Pan to the left gesture
@@ -137,8 +137,7 @@ export struct SnapshotPreview {
 
   setShareData(fileName: string) {
     // 构造ShareData，需配置一条有效数据信息
-    const contextFaker: Context = getContext(this);
-    let filePath = contextFaker.filesDir + `/${fileName}`; // 仅为示例 请替换正确的文件路径
+    let filePath = this.context.filesDir + `/${fileName}`; // 仅为示例 请替换正确的文件路径
     // 获取精准的utd类型
     let utdTypeId = utd.getUniformDataTypeByFilenameExtension('.png', utd.UniformDataType.IMAGE);
     let shareData: systemShare.SharedData = new systemShare.SharedData({
@@ -151,8 +150,7 @@ export struct SnapshotPreview {
 
     // 进行分享面板显示
     let controller: systemShare.ShareController = new systemShare.ShareController(shareData);
-    let context = getContext(this) as common.UIAbilityContext;
-    controller.show(context, {
+    controller.show(this.context as common.UIAbilityContext, {
       selectionMode: systemShare.SelectionMode.SINGLE,
       previewMode: systemShare.SharePreviewMode.DETAIL,
     }).then(() => {
@@ -195,7 +193,7 @@ export struct SnapshotPreview {
         .onActionEnd((event) => {
           // Swipe left will trigger a pop-up window when it exceeds a certain threshold, improving user experience
           if (event.offsetX < -30) {
-            animateTo({
+            this.getUIContext().animateTo({
               duration: 500,
               curve: Curve.Ease,
               onFinish: () => {
@@ -244,7 +242,7 @@ export struct SnapshotPreview {
     .onClick(() => {
       // Click to enlarge the preview window and display it flat and centered
       if (!this.isLargePreview) {
-        animateTo({
+        this.getUIContext().animateTo({
           duration: 500,
           curve: Curve.Ease,
           onFinish: () => {

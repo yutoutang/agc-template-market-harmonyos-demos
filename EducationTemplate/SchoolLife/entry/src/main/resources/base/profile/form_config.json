@@ -4,7 +4,7 @@
       "name": "school_life_widget",
       "displayName": "$string:school_lift_widget_display_name",
       "description": "$string:school_lift_widget_desc",
-      "src": "./ets/school_life_widget/pages/SchoolLifeWidgetCard.ets",
+      "src": "./ets/widget/pages/SchoolLifeWidgetCard.ets",
       "uiSyntax": "arkts",
       "window": {
         "designWidth": 720,

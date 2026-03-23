@@ -1,6 +1,6 @@
 import { uiObserver, window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { AVPlayerSession, VideoCard, VideoNetworkModel, VideoNetworkSetting } from 'module_swipeplayer';
+import { AVPlayerController, VideoCard, VideoNetworkModel, VideoNetworkSetting } from 'module_swipeplayer';
 import { CommonConstants, Logger, NetworkUtil, RouterMap, RouterUtils, TimeUtils } from 'lib_common';
 import { NetworkExceptionView } from 'lib_widget';
 import { VideoNewsData } from '../models/VideoModel';
@@ -35,7 +35,9 @@ export struct RecommendPage {
   @Monitor('currentTabIndex')
   onChangeTabIndex() {
     if (this.currentTabIndex === this.index) {
-      this.vm.avPlayerManager.play(this.vm.currentIndex);
+      if (this.vm.settingInfo.network.autoPlayTabRecommend) {
+        this.vm.avPlayerManager.play(this.vm.currentIndex);
+      }
     } else {
       this.vm.avPlayerManager.pause(this.vm.currentIndex);
     }
@@ -130,12 +132,12 @@ export struct RecommendPage {
                   videoInfoViewBuilder: () => {
                     this.videoCardInfoView(item)
                   },
-                  onClickEvent: (playerSession: AVPlayerSession | undefined, callback: Function) => {
-                    let param: Record<string, string | AVPlayerSession | undefined> = {
+                  onClickEvent: (avPlayerController: AVPlayerController | undefined, callback: Function) => {
+                    let param: Record<string, string | AVPlayerController | undefined> = {
                       'newsId': item.getVideoId(),
-                      'playerSession': playerSession,
+                      'avPlayerController': avPlayerController,
                     }
-                    playerSession!.avPlayer?.pause().catch((e: BusinessError) => {
+                    avPlayerController!.avPlayer?.pause().catch((e: BusinessError) => {
                       Logger.error(TAG, 'pause fail, error: ' + JSON.stringify(e));
                     });
                     // 监听页面跳转

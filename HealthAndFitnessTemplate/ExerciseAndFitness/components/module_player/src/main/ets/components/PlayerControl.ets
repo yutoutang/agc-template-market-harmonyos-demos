@@ -101,17 +101,21 @@ export struct PlayerControl {
   }
 
   switchEmitter() {
-    emitter.on('movieSelections', (event: emitter.EventData) => {
-      let idx = this.playerVM.movieItemList.indexOf(this.playerVM.movieItem)
-      let indexNumber = event.data!.movieSelection as number
-      if (idx === indexNumber) {
-        return
-      }
-      this.playerVM.movieItem = this.playerVM.movieItemList[indexNumber]
-      this.getUIContext().getPromptAction().showToast({ message: `${this.playerVM.movieItem.movieTitle}正在播放` })
-      PipManager.getInstance().player.changePlay(this.playerVM.movieItem.movieUrl,
-        this.playerVM.movieItem.learnProgress)
-    })
+    try {
+      emitter.on('movieSelections', (event: emitter.EventData) => {
+        let idx = this.playerVM.movieItemList.indexOf(this.playerVM.movieItem)
+        let indexNumber = event.data!.movieSelection as number
+        if (idx === indexNumber) {
+          return
+        }
+        this.playerVM.movieItem = this.playerVM.movieItemList[indexNumber]
+        this.getUIContext().getPromptAction().showToast({ message: `${this.playerVM.movieItem.movieTitle}正在播放` })
+        PipManager.getInstance().player.changePlay(this.playerVM.movieItem.movieUrl,
+          this.playerVM.movieItem.learnProgress)
+      })
+    } catch (e) {
+      console.error(`emitter on movieSelections failed. error: ${JSON.stringify(e)}`)
+    }
   }
 
   build() {

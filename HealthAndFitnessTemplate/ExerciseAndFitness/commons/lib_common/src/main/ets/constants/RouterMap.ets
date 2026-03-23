@@ -85,8 +85,8 @@ export enum RouterMap {
   SETTING_ABOUT = 'SettingAbout',
   SETTING_H5 = 'SettingH5',
   // 个人主页模块
-  VIP_PAGE = 'VIPPage',
+  VIP_PAGE = 'Member',
   RECORD_PAGE = 'RecordPage',
   // 意见反馈模块
-  FEEDBACK_PAGE = 'FeedbackPage',
+  FEEDBACK_PAGE = 'FeedbackSubmitPage',
 }

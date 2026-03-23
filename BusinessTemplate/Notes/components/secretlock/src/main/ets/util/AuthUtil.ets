@@ -35,11 +35,11 @@ export class AuthUtil {
    * @param showTip 是否显示提示语
    * @param callBack
    */
-  static onStartEasy(showTip: boolean = false, callBack: Callback<userAuth.UserAuthResult>,
+  static onStartEasy(uiContext: UIContext,showTip: boolean = false, callBack: Callback<userAuth.UserAuthResult>,
     type ?: userAuth.UserAuthType) {
     const options: AuthOptions = new AuthOptions();
     options.showTip = showTip;
-    AuthUtil.onStart(options, callBack, type);
+    AuthUtil.onStart(uiContext, options, callBack, type);
   }
 
   /**
@@ -47,7 +47,8 @@ export class AuthUtil {
    * @param options
    * @param callBack
    */
-  static onStart(options: AuthOptions, callBack: Callback<userAuth.UserAuthResult>, type ?: userAuth.UserAuthType) {
+  static onStart(uiContext: UIContext, options: AuthOptions,
+    callBack: Callback<userAuth.UserAuthResult>, type ?: userAuth.UserAuthType) {
     try {
       if (options.challenge === undefined) {
         // 挑战值，用来防重放攻击。最大长度为32字节，可传Uint8Array([])
@@ -87,7 +88,7 @@ export class AuthUtil {
           if (userAuth.UserAuthResultCode.SUCCESS === result.result && options.showTip) {
             const errorTip = AuthUtil.getErrorMsg(result.result, '');
             if (errorTip !== undefined && errorTip!== null && errorTip !== '') {
-              promptAction.showToast({
+              uiContext.getPromptAction().showToast({
                 message: errorTip,
                 alignment: Alignment.Center,
               });
@@ -99,7 +100,7 @@ export class AuthUtil {
     } catch (err) {
       let error = err as BusinessError;
       if (options.showTip) {
-        promptAction.showToast({
+        uiContext.getPromptAction().showToast({
           message: AuthUtil.getErrorMsg(error.code, '认证失败：' + error.message),
           alignment: Alignment.Center,
         });

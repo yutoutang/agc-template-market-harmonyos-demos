@@ -8,6 +8,7 @@ struct Index {
   vm: IndexVM = new IndexVM();
   @Local isEnabled: boolean = true;
   aboutToAppear(): void {
+    this.vm.contextModel.setUIContext('phone', this.getUIContext());
     this.vm.setInterception();
     this.vm.redirect();
     this.vm.navDestinationListener()

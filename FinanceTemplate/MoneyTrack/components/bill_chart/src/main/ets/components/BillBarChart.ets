@@ -24,6 +24,8 @@ export struct BillBarChart {
   chartData: BillBarChartData = {
     month: '',
     data: [],
+    startDate: '',
+    endDate: '',
   };
   @Param
   chartHeight: Length = 200;
@@ -59,7 +61,7 @@ export struct BillBarChart {
     onValueSelected: (e: EntryOhos, h: Highlight) => {
       const idx = h.getX();
       const value = h.getY();
-      const date = this.displayData[idx]?.date;
+      const date = this.displayData[(idx - 1)]?.date;
       if (typeof date === 'string' && typeof value === 'number') {
         this.selectedData = {
           date,
@@ -189,28 +191,41 @@ export struct BillBarChart {
   }
 
   async getChartData() {
-    const month = new Date(this.chartData.month);
-    this.model.getXAxis()?.setValueFormatter(new MyAxisValueFormatter(this.chartData.month));
-    const totalDayNum = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
+    // 使用传入的起止日期
+    const start = this.chartData.startDate ? dayjs(this.chartData.startDate) : dayjs().startOf('month');
+    const end = this.chartData.endDate ? dayjs(this.chartData.endDate) : dayjs().endOf('month');
+
+    // 计算天数差
+    const totalDays = end.diff(start, 'day') + 1;
+
     this.displayData = [];
-    for (let i = 1; i <= totalDayNum; i++) {
+
+    // 循环生成从 startDate 到 endDate 的每一天
+    for (let i = 0; i < totalDays; i++) {
+      const currentDate = start.add(i, 'day');
+      const dateStr = currentDate.format('YYYY-MM-DD');
+
+      // 查找当天是否有数据
       const bill = this.chartData.data.find((item) => {
-        const day = item.date.split('-')[2];
-        return Number(day) === i;
+        return item.date === dateStr;
       });
+
       if (bill) {
         this.displayData.push({
           date: bill.date,
           value: bill.value,
         });
       } else {
-        const date = dayjs().set('month', month.getMonth()).set('date', i);
         this.displayData.push({
-          date: date.format('YYYY-MM-DD'),
+          date: dateStr,
           value: 0,
         });
       }
     }
+
+    this.model.getXAxis()?.setValueFormatter(
+      new MyAxisValueFormatter(this.chartData.startDate || this.chartData.month)
+    );
     await this.setData();
   }
 
@@ -238,14 +253,14 @@ export struct BillBarChart {
 }
 
 class MyAxisValueFormatter implements IAxisValueFormatter {
-  month: string;
+  referenceDate: string;
 
-  constructor(month: string) {
-    this.month = month;
+  constructor(referenceDate: string) {
+    this.referenceDate = referenceDate;
   }
 
   public getFormattedValue(value: number): string {
-    const date = dayjs(this.month ? this.month : new Date()).set('date', value);
+    const date = dayjs(this.referenceDate).add(value - 1, 'day');
     return date.format('M.D');
   }
 }

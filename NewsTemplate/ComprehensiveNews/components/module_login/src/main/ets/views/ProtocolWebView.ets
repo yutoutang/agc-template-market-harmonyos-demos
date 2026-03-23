@@ -16,6 +16,8 @@ struct ProtocolWebView {
   @Local isSheet: boolean = false;
   @Local sheetType: SheetType = SheetType.BOTTOM;
   @Local pagePadding: Padding = {};
+  @Local rootWindowOffset: number = 0;
+  private readonly ROOT_ID = 'ProtocolWebViewRootId';
   webViewController: webview.WebviewController = new webview.WebviewController();
   stack: NavPathStack = new NavPathStack();
 
@@ -24,11 +26,9 @@ struct ProtocolWebView {
     if (!this.isSheet) {
       return undefined;
     }
-    if (this.sheetType === SheetType.CENTER) {
+    // 顶部没有dragBar的场景
+    if (this.rootWindowOffset <= 0) {
       return Constants.PADDING_L;
-    }
-    if (this.sheetType === SheetType.BOTTOM) {
-      return Constants.ZERO;
     }
     return 0;
   }
@@ -70,6 +70,7 @@ struct ProtocolWebView {
       .height(Constants.FULL_PERCENT)
       .width(Constants.FULL_PERCENT)
     }
+    .id(this.ROOT_ID)
     .hideTitleBar(true)
     .backgroundColor($r('app.color.login_page_bg'))
     .padding({
@@ -84,6 +85,14 @@ struct ProtocolWebView {
         this.isSheet = params.isSheet ?? false;
         this.sheetType = params.sheetType ?? SheetType.BOTTOM;
         this.pagePadding = params.pagePadding ?? {};
+      }
+    })
+    .onAreaChange(() => {
+      try {
+        const info = this.getUIContext().getComponentUtils().getRectangleById(this.ROOT_ID);
+        this.rootWindowOffset = info.windowOffset.y;
+      } catch (e) {
+        UtilLog.error(TAG, 'getRectangleById fail, error: ' + JSON.stringify(e));
       }
     })
   }

@@ -1,10 +1,7 @@
 export class Params {
-  text: number;
-  bgColor: ResourceStr;
+  text: number = -1;
 
-
-  constructor(text: number, bgColor: ResourceStr) {
+  constructor(text: number) {
     this.text = text;
-    this.bgColor = bgColor
   }
 }

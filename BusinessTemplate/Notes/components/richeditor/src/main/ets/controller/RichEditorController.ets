@@ -5,10 +5,10 @@ import { PickerUtil } from '../utils/PickerUtil';
 import { COLOR_LIST } from '../common/Constants';
 import { ChangeRecord } from '../model/ChangeRecord';
 import { display, LengthMetrics } from '@kit.ArkUI';
+import { common } from '@kit.AbilityKit';
 
 @ObservedV2
 export class RichEditorController {
-
   private static _instance: RichEditorController;
 
   public static get instance() {
@@ -18,14 +18,18 @@ export class RichEditorController {
     return RichEditorController._instance;
   }
 
+  private static readonly MAX_IMAGE_COUNT: number = 20;
+  private static readonly MAX_IMAGE_SIZE_BYTES: number = 20 * 1024 * 1024;
+
   textInputController: TextInputController = new TextInputController();
   controller: RichEditorStyledStringController = new RichEditorStyledStringController();
   options: RichEditorStyledStringOptions = { controller: this.controller };
-
   // 当前文本是否加粗
   @Trace currentBold: boolean = false;
   // 当前文本是否斜体
   @Trace currentItalics: boolean = false;
+  // 是否手写笔模式
+  @Trace isHandwriteMode: boolean = false;
   // 当前文本是否有阴影
   @Trace currentShadow: boolean = false;
   // 当前文本装饰线
@@ -38,14 +42,12 @@ export class RichEditorController {
   @Trace fontSize: LengthMetrics = LengthMetrics.vp(18);
   // 当前段落对齐样式
   @Trace currentAlignment: number = 0;
-
   // 指向当前操作记录
   @Trace currentIndex: number = -1;
   // 操作记录
   @Trace historyRecordArray: Array<ChangeRecord> = [];
   // 是否展示
   @Trace showMoreFunction: boolean = true;
-
   // 段落对齐样式以及点击回调
   paragraphAlignments: AlignmentInfo[] = [
     {
@@ -82,7 +84,7 @@ export class RichEditorController {
     },
   ];
 
-  onDo(){
+  onDo() {
     if (this.currentIndex < 1) {
       return;
     }
@@ -90,7 +92,7 @@ export class RichEditorController {
     this.controller.setStyledString(this.historyRecordArray[--this.currentIndex].styledString);
   }
 
-  reDo(){
+  reDo() {
     if (this.currentIndex >= this.historyRecordArray.length - 1) {
       return;
     }
@@ -103,7 +105,7 @@ export class RichEditorController {
    * @param start
    * @param end
    */
-  onDidChange(start: number | undefined, end: number | undefined){
+  onDidChange(start: number | undefined, end: number | undefined) {
     if (start !== undefined && end !== undefined) {
       if (end - start <= 0) {
         return;
@@ -121,11 +123,16 @@ export class RichEditorController {
       });
       // 设置文本阴影
       let textShadowStyle = this.currentShadow ?
-        new TextShadowStyle({ radius: 2, type: ShadowType.BLUR, offsetX: 3, offsetY: 3, })
+        new TextShadowStyle({
+          radius: 2,
+          type: ShadowType.BLUR,
+          offsetX: 3,
+          offsetY: 3,
+        })
         : new TextShadowStyle({ radius: 0 });
 
       let textAlign = TextAlign.Start;
-      switch (this.currentAlignment){
+      switch (this.currentAlignment) {
         case 0:
           textAlign = TextAlign.Start;
           break;
@@ -191,9 +198,9 @@ export class RichEditorController {
    * 增加历史记录
    * @param styledString
    */
-  addHistoryRecord(styledString: MutableStyledString){
+  addHistoryRecord(styledString: MutableStyledString) {
     this.currentIndex++;
-    this.historyRecordArray.push(new ChangeRecord(styledString))
+    this.historyRecordArray.push(new ChangeRecord(styledString));
   }
 
   /**
@@ -201,7 +208,7 @@ export class RichEditorController {
    * @param styledKey
    * @param styledValue
    */
-  onSelectionStyleChange(styledKey: StyledStringKey, styledValue: StyledStringValue){
+  onSelectionStyleChange(styledKey: StyledStringKey, styledValue: StyledStringValue) {
     let richEditorSelection = this.controller.getSelection();
     let start = richEditorSelection.start ? richEditorSelection.start : 0;
     let end = richEditorSelection.end ? richEditorSelection.end : 0;
@@ -215,7 +222,7 @@ export class RichEditorController {
       start: start,
       length: end - start,
       styledKey: styledKey,
-      styledValue: styledValue
+      styledValue: styledValue,
     });
 
     // 获取选中范围，用于视图渲染后重新选中
@@ -224,7 +231,7 @@ export class RichEditorController {
     this.controller.setStyledString(richEditorStyledString);
     this.currentIndex++;
     this.addHistoryRecord(richEditorStyledString);
-    this.reSelect(selectRange.start, selectRange.end)
+    this.reSelect(selectRange.start, selectRange.end);
   }
 
   /**
@@ -240,7 +247,7 @@ export class RichEditorController {
       return;
     }
     // 光标选中范围
-    let selectRange: Range = {start: -1, end: -1}
+    let selectRange: Range = { start: -1, end: -1 };
     // 段落移动范围
     let range = this.getParagraphRange(selectRange);
 
@@ -270,7 +277,7 @@ export class RichEditorController {
     let start = this.controller.getSelection().start;
     let end = this.controller.getSelection().end;
 
-    if (start === undefined || end === undefined){
+    if (start === undefined || end === undefined) {
       selectRange.start = 0;
       selectRange.end = content.length;
       return { start: 0, end: content.length };
@@ -281,20 +288,20 @@ export class RichEditorController {
     selectRange.end = end;
 
     // 中间独占一行
-    if (start === end && content.charAt(start-1) === '\n' && content.charAt(end) === '\n'){
+    if (start === end && content.charAt(start - 1) === '\n' && content.charAt(end) === '\n') {
       return { start: start, end: start + 1 };
     }
     // 末尾独占一行
-    if (start === end && content.charAt(start-1) === '\n' && end === content.length){
-      return { start: start-1, end: start };
+    if (start === end && content.charAt(start - 1) === '\n' && end === content.length) {
+      return { start: start - 1, end: start };
     }
 
     // 找到段落起始位置
-    while (content.charAt(start - 1) !== '\n' && start !== 0){
+    while (content.charAt(start - 1) !== '\n' && start !== 0) {
       start--;
     }
     // 找到段落结束位置
-    while (content.charAt(end) !== '\n' && end < content.length){
+    while (content.charAt(end) !== '\n' && end < content.length) {
       end++;
     }
     return { start: start, end: end };
@@ -371,52 +378,118 @@ export class RichEditorController {
     );
   }
 
+  private getImageCount(): number {
+    const styledString = this.controller.getStyledString();
+    const content = styledString.getString();
+    if (!content || content.length === 0) {
+      return 0;
+    }
+    const styles: Array<SpanStyle> = styledString.getStyles(0, content.length);
+    let count = 0;
+    for (let style of styles) {
+      if (style.styledKey === StyledStringKey.IMAGE) {
+        count++;
+      }
+    }
+    return count;
+  }
+
   /**
    * 选择图片
    */
   selectImage(uiContext: UIContext) {
+    const currentImageCount = this.getImageCount();
+    if (currentImageCount >= RichEditorController.MAX_IMAGE_COUNT) {
+      uiContext.getPromptAction().showToast({
+        message: `最多只能插入${RichEditorController.MAX_IMAGE_COUNT}张图片`,
+        duration: 1500
+      });
+      return;
+    }
+
     PickerUtil.selectPhoto({
       maxSelectNumber: 1,
     }).then((uris) => {
-      let imageUri = uris[0];
-      let pixelMap: image.PixelMap = RichEditorController.loadImage(imageUri);
-      if (pixelMap) {
-        let info = pixelMap.getImageInfoSync();
-        let width = info.size.width;
-        let height = info.size.height;
-        // 宽度超过最大尺寸时，等比例缩放 占屏幕的90%
-        let displayWidth = uiContext.px2vp(display.getDefaultDisplaySync().width) * 0.9;
-        if (width > displayWidth) {
-          width = displayWidth;
-          height = width / info.size.width * height;
-        }
-
-        let imageStyledString = new MutableStyledString(new ImageAttachment({
-          value: pixelMap,
-          objectFit: ImageFit.Auto,
-          size: { width: width, height: height },
-        }));
-        let richEditorStyledString: MutableStyledString = this.controller.getStyledString();
-        let currentOffset = this.controller.getCaretOffset()
-        richEditorStyledString.insertStyledString(currentOffset, imageStyledString);
-        // 添加图片后自动向下插入一行
-        richEditorStyledString.insertString(currentOffset + 1, '\n');
-        // 使插入图片后的属性字符串展示在组件上
-        this.controller.setStyledString(richEditorStyledString)
-        this.controller.setCaretOffset(currentOffset+2)
+      console.info('select photo successfully, uri: ' + uris);
+      if (!uris || uris.length === 0) {
+        return;
       }
+      let imageUri = uris[0];
+
+      try {
+        const stat = fileIo.statSync(imageUri);
+        if (stat && stat.size > RichEditorController.MAX_IMAGE_SIZE_BYTES) {
+          uiContext.getPromptAction().showToast({
+            message: '单张图片大小不能超过20MB',
+            duration: 1500
+          });
+          return;
+        }
+      } catch (err) {
+        console.error('获取图片大小失败', err);
+      }
+
+      const imageCountAfterInsert = this.getImageCount() + 1;
+      if (imageCountAfterInsert > RichEditorController.MAX_IMAGE_COUNT) {
+        uiContext.getPromptAction().showToast({
+          message: `图片数量不能超过${RichEditorController.MAX_IMAGE_COUNT}张`,
+          duration: 1500
+        });
+        return;
+      }
+
+      // 获取图片信息
+      let pixelMap: image.PixelMap = RichEditorController.loadImage(imageUri);
+      let info = pixelMap.getImageInfoSync();
+      let width = info.size.width;
+      let height = info.size.height;
+
+      // 宽度超过最大尺寸时，等比例缩放 占屏幕的90%
+      let displayWidth = uiContext.px2vp(display.getDefaultDisplaySync().width) * 0.9;
+      if (width > displayWidth) {
+        width = displayWidth;
+        height = width / info.size.width * height;
+      }
+
+      // 创建图片富文本对象
+      let imageStyledString = new MutableStyledString(new ImageAttachment({
+        value: pixelMap,
+        objectFit: ImageFit.Auto,
+        size: { width: width, height: height },
+      }));
+      // 获取当前的富文本内容
+      let richEditorStyledString: MutableStyledString = this.controller.getStyledString();
+
+      // 获取当前光标位置
+      let currentOffset = this.controller.getCaretOffset();
+
+      // 在光标位置插入图片
+      richEditorStyledString.insertStyledString(currentOffset, imageStyledString);
+
+      // 添加图片后自动向下插入一行
+      richEditorStyledString.insertString(currentOffset + 1, '\n');
+
+      // 使插入图片后的属性字符串展示在组件上
+      this.controller.setStyledString(richEditorStyledString);
+      this.controller.setCaretOffset(currentOffset + 2);
     });
   }
 
   private static loadImage(name: string): image.PixelMap {
     let imageSource: image.ImageSource;
     let fileSource = fileIo.openSync(name, fileIo.OpenMode.READ_ONLY);
-    imageSource = image.createImageSource(fileSource.fd);
+    try {
+      imageSource = image.createImageSource(fileSource.fd);
+    } catch (err) {
+      let error = err as BusinessError;
+      console.error(`创建ImageSource失败 ~ code: ${error.code} -·- message: ${error.message}`);
+      throw new Error(`创建ImageSource失败: ${error.message}`);
+    }
     return imageSource.createPixelMapSync();
   }
 }
 
 interface Range {
   start: number;
-  end: number
+  end: number;
 }

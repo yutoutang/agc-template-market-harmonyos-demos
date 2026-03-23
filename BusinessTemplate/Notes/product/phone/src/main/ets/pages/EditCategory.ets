@@ -1,8 +1,9 @@
 import { Category, CategoryService, NoteService } from '@ohos_agcit/notes_datasource';
 import { BreakpointType, DialogUtil, GlobalInfoModel, StringUtil } from '@ohos_agcit/notes_utils';
-import { AppStorageV2, ComponentContent, promptAction } from '@kit.ArkUI';
+import { AppStorageV2, ComponentContent, UIContext } from '@kit.ArkUI';
 import { SelectedController } from '../controller/SelectedController';
 import { Note } from 'richeditor';
+import { KVStore } from 'serializer';
 
 @Builder
 export function EditCategoryBuilder() {
@@ -14,6 +15,8 @@ export function EditCategoryBuilder() {
 export struct EditCategory {
   private scroller: ListScroller = new ListScroller();
   @Consumer('appPathStack') appPathStack: NavPathStack = new NavPathStack();
+  @Consumer() kvStore: KVStore | undefined = undefined;
+  uiContext: UIContext = this.getUIContext() as UIContext;
   categoryService: CategoryService = CategoryService.instance;
   noteService: NoteService = NoteService.instance;
   private selectedController: SelectedController = SelectedController.instance;
@@ -23,15 +26,16 @@ export struct EditCategory {
   @Local categoryId: string = '';
   @Local isEditCategoryName: boolean = true;
   @Local isEditCategory: boolean = true;
-  @Local currentCategory: Category = this.categoryService.getFirstCategory();;
+  @Local currentCategory: Category = this.categoryService.getFirstCategory();
+  ;
   @Local noteList: Note[] | undefined;
 
   selectFontColor(item: Category): ResourceStr {
-   if (this.isEditCategory) {
-       return this.currentCategory.id === item.id ? $r('sys.color.font_primary') : $r('sys.color.font_secondary');
-   }
+    if (this.isEditCategory) {
+      return this.currentCategory.id === item.id ? $r('sys.color.font_primary') : $r('sys.color.font_secondary');
+    }
 
-   return this.noteList?.find(note => note.categoryId === item.id) ?
+    return this.noteList?.find(note => note.categoryId === item.id) ?
       $r('sys.color.font_tertiary') : $r('sys.color.font_secondary');
   }
 
@@ -47,20 +51,20 @@ export struct EditCategory {
    * @param item
    */
   @Builder
-  categoryEnd(item: Category){
+  categoryEnd(item: Category) {
     Row() {
       Image($r('app.media.edit_category'))
         .width(40)
         .height(40)
-        .margin({ left: 16, right: 16})
+        .margin({ left: 16, right: 16 })
         .onClick(() => {
           this.isEditCategoryName = true;
           this.categoryId = item.id;
 
           let contentNode: ComponentContent<object> =
-            new ComponentContent(this.getUIContext(),wrapBuilder(editCategoryDialog),
+            new ComponentContent(this.getUIContext(), wrapBuilder(editCategoryDialog),
               new EditCategoryParam(this.isEditCategoryName,
-                this.categoryService.getCategoryById(this.categoryId), this.scroller));
+                this.categoryService.getCategoryById(this.categoryId), this.scroller, this.kvStore!, this.uiContext));
           DialogUtil.openDialog(this.getUIContext(), contentNode);
         })
 
@@ -70,8 +74,8 @@ export struct EditCategory {
         .onClick(() => {
           this.categoryId = item.id;
           let contentNode: ComponentContent<object> =
-            new ComponentContent(this.getUIContext(),wrapBuilder(deleteCategoryDialog),
-              new DeleteCategoryParam(this.categoryId, this.scroller));
+            new ComponentContent(this.getUIContext(), wrapBuilder(deleteCategoryDialog),
+              new DeleteCategoryParam(this.categoryId, this.scroller, this.kvStore!, this.uiContext));
           DialogUtil.openDialog(this.getUIContext(), contentNode);
         })
     }
@@ -81,8 +85,8 @@ export struct EditCategory {
 
   build() {
     NavDestination() {
-      Scroll(){
-        Column({space: 15}) {
+      Scroll() {
+        Column({ space: 15 }) {
           List({ space: 12, scroller: this.scroller }) {
             ForEach(this.categoryList, (item: Category, index: number) => {
               ListItem() {
@@ -121,7 +125,7 @@ export struct EditCategory {
                 if (!this.isEditCategory && this.noteList) {
                   // 移动分类
                   this.noteList.forEach(note => {
-                    this.categoryService.moveCategory(note.categoryId, item.id);
+                    this.categoryService.moveCategory(note, item.id, this.kvStore!, this.uiContext);
                     note.categoryId = item.id;
                     note.isSelected = false;
                   })
@@ -151,9 +155,9 @@ export struct EditCategory {
           .onClick(() => {
             this.isEditCategoryName = false;
             let contentNode: ComponentContent<object> =
-              new ComponentContent(this.getUIContext(),wrapBuilder(editCategoryDialog),
+              new ComponentContent(this.getUIContext(), wrapBuilder(editCategoryDialog),
                 new EditCategoryParam(this.isEditCategoryName,
-                  this.categoryService.getCategoryById(this.categoryId), this.scroller));
+                  this.categoryService.getCategoryById(this.categoryId), this.scroller, this.kvStore!, this.uiContext));
             DialogUtil.openDialog(this.getUIContext(), contentNode);
           });
         }
@@ -199,7 +203,7 @@ export struct EditCategory {
     })
   }
 
-  partOfNoteList(categoryId: string): boolean{
+  partOfNoteList(categoryId: string): boolean {
     if (this.noteList) {
       return this.noteList.find(item => item.categoryId === categoryId) ? true : false;
     }
@@ -207,15 +211,20 @@ export struct EditCategory {
   }
 }
 
-class EditCategoryParam{
+class EditCategoryParam {
   isEdit: boolean;
   category: Category | undefined
   scroller: ListScroller
+  kvStore: KVStore
+  uiContext: UIContext
 
-  constructor(isEdit: boolean, category: Category | undefined, scroller: ListScroller) {
+  constructor(isEdit: boolean, category: Category | undefined, scroller: ListScroller, kvStore: KVStore,
+    uiContext: UIContext) {
     this.isEdit = isEdit;
     this.category = category;
     this.scroller = scroller
+    this.kvStore = kvStore
+    this.uiContext = uiContext
   }
 }
 
@@ -290,11 +299,13 @@ struct EditCategoryDialog {
           if (this.params.isEdit) {
             if (this.params.category) {
               this.params.category.name = this.newName;
+              this.categoryService.updateCategory(this.params.category, this.params.kvStore)
             }
             DialogUtil.closeDialog();
             return;
           }
-          if (this.categoryService.addCategory(new Category(this.newName, 0))) {
+          if (this.categoryService.addCategory(new Category(this.newName, 0), this.params.kvStore,
+            this.params.uiContext)) {
             DialogUtil.closeDialog();
           }
         });
@@ -308,18 +319,22 @@ struct EditCategoryDialog {
 }
 
 
-class DeleteCategoryParam{
+class DeleteCategoryParam {
   categoryId: string
   scroller: ListScroller
+  kvStore: KVStore
+  uiContext: UIContext
 
-  constructor(categoryId: string, scroller: ListScroller) {
+  constructor(categoryId: string, scroller: ListScroller, kvStore: KVStore, uiContext: UIContext) {
     this.categoryId = categoryId;
     this.scroller = scroller
+    this.kvStore = kvStore
+    this.uiContext = uiContext
   }
 }
 
 @Builder
-function deleteCategoryDialog(params: DeleteCategoryParam){
+function deleteCategoryDialog(params: DeleteCategoryParam) {
   DeleteCategoryDialog({
     params: params
   })
@@ -337,10 +352,10 @@ struct DeleteCategoryDialog {
         Text('仅删除分类')
           .fontSize(16)
           .onClick(() => {
-            this.noteService.moveNotesCategory(this.params.categoryId);
-            this.categoryService.deleteCategoryById(this.params.categoryId);
+            this.noteService.moveNotesCategory(this.params.categoryId, this.params.kvStore, this.params.uiContext);
+            this.categoryService.deleteCategoryById(this.params.categoryId, this.params.kvStore);
 
-            promptAction.showToast({
+            this.getUIContext().getPromptAction().showToast({
               message: '删除成功 ~',
               alignment: Alignment.Center,
               duration: 1500,
@@ -361,11 +376,11 @@ struct DeleteCategoryDialog {
             // 删除笔记
             let notes = this.noteService.getNoteList(this.params.categoryId);
             notes.forEach((item) => {
-              this.noteService.deleteNote(item.id);
+              this.noteService.deleteNoteToTrash(item.id, item.categoryId, this.params.kvStore, this.params.uiContext);
             });
             // 删除分类
-            this.categoryService.deleteCategoryById(this.params.categoryId);
-            promptAction.showToast({
+            this.categoryService.deleteCategoryById(this.params.categoryId, this.params.kvStore);
+            this.getUIContext().getPromptAction().showToast({
               message: '删除成功 ~',
               alignment: Alignment.Center,
               duration: 1500,
@@ -399,7 +414,6 @@ struct DeleteCategoryDialog {
     });
   }
 }
-
 
 
 @Extend(Text)

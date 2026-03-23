@@ -6,7 +6,7 @@ import { WindowUtils } from '../utils/WindowUtils';
 import { CustomTransition } from '../utils/CustomNavigationUtils';
 import { LongTakeSessionOptions } from '../utils/Options';
 
-const TAG: string = 'LongTakeSession';
+const TAG: string = '[LongTakeSession]';
 
 const INIT_BG_COLOR = '#00000000';
 

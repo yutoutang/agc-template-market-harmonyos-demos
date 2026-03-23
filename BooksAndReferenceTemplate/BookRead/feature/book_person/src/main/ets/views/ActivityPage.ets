@@ -10,6 +10,8 @@ export struct ActivityPage {
     NavDestination() {
       Column() {
         Web({ src: $rawfile('reading_app_activity.html'), controller: this.controller })
+          .darkMode(WebDarkMode.Auto)
+          .forceDarkAccess(true)
           .fileAccess(false)
           .geolocationAccess(false)
       }

@@ -1,5 +1,5 @@
-import { UIContext, KeyboardAvoidMode, AppStorageV2 } from '@kit.ArkUI';
-import { ImagePreview, PreviewVerticalAlign } from 'module_imagepreview';
+import { UIContext, KeyboardAvoidMode, AppStorageV2, window } from '@kit.ArkUI';
+import { ImagePreview, ImagePreviewOptions, SourceImageModel } from 'module_imagepreview';
 import { BreakpointType, PageName } from '../common/CustomTypes';
 import { Config } from '../common/Config';
 import { pickImage } from '../utils/PickImageUtils';
@@ -140,13 +140,13 @@ struct FeedbackSubmitPage {
                         .backgroundColor($r('sys.color.comp_background_primary'))
                         .clip(true)
                         .onClick(() => {
-                          ImagePreview.show(this.getUIContext(), this.form.selectedUris, {
-                            startIndex: index,
-                            showIndex: true,
-                            loop: false,
-                            isBasicMode: true,
-                            indexPosition: PreviewVerticalAlign.Top,
-                          })
+                          const options = new ImagePreviewOptions()
+                          options
+                            .setImageList(this.form.selectedUris.map(v => new SourceImageModel({ imageUrl:v })))
+                            .setInitIndex(index)
+                            .setLoop(false)
+                            .setLongTake(false)
+                          ImagePreview.open(this.getUIContext(), options)
                         })
                       }
                     }, (uri: string, index: number) => index + '_' + uri)

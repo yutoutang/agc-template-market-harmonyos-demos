@@ -40,7 +40,7 @@ export class IndexPageViewModel extends BaseViewModel {
       return false;
     } else {
       this.firstBackTime = nowTime;
-      promptAction.showToast({ message: '再按一次退出' });
+      this.contextModel.showToast({ message: '再按一次退出' });
       return true;
     }
   }
@@ -87,7 +87,7 @@ export class IndexPageViewModel extends BaseViewModel {
 
   @Computed
   get getBgColor(): ResourceColor {
-    return $r('sys.color.background_secondary');
+    return '#FFFFFF';
   }
 
   @Computed

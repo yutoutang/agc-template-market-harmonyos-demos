@@ -34,15 +34,51 @@
         ],
         "exported": true,
         "continuable": true,
+        "backgroundModes": [
+          "audioPlayback"
+        ],
         "skills": [
+// 应用首页
           {
             "entities": [
-              "entity.system.home",
+              "entity.system.home"
+            ],
+            "actions": [
+              "ohos.want.action.home"
+            ]
+          },
+// AppLinking
+          {
+            "entities": [
+              "entity.system.browsable"
+            ],
+            "actions": [
+              "ohos.want.action.viewData"
+            ],
+            "uris": [
+              {
+// scheme须配置为https
+                "scheme": "https",
+// todo 配置为关联的网址域名
+                "host": "linking.xiaobingtang.cn",
+// todo 配置路径
+                "path": "newsDetail"
+              }
+            ],
+            "domainVerify": true
+          },
+// 微信
+          {
+            "actions": [
+              "wxentity.action.open"
+            ]
+          },
+// QQ
+          {
+            "entities": [
               "entity.system.browser"
             ],
             "actions": [
-              "action.system.home",
-              "wxentity.action.open",
               "ohos.want.action.viewData"
             ],
             "uris": [
@@ -55,6 +91,12 @@
               }
             ],
             "domainVerify": true
+          }
+        ],
+        "metadata": [
+          {
+            "name": "ohos.ability.shortcuts",
+            "resource": "$profile:shortcuts_config"
           }
         ]
       }

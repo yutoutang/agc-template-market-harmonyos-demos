@@ -1,10 +1,7 @@
 import {
   Constants,
   FeedbackItem,
-  FeedbackItemType,
-  ReturnButton,
   FeedbackRecord,
-  TCInvoke,
   TCRouter,
   NavHeaderBar,
   BreakpointTypeEnum,
@@ -53,7 +50,7 @@ export struct FeedbackPage {
               Text(`${this.issueCharNum}/${this.maxIssueCharNum}`)
                 .fontSize(14)
                 .fontWeight(FontWeight.Regular)
-                .fontColor('#99000000')
+                .fontColor($r('sys.color.font_secondary'))
                 .textAlign(TextAlign.End)
             }
             .width(Constants.FULL_SIZE)
@@ -63,7 +60,7 @@ export struct FeedbackPage {
             TextArea({ placeholder: '请输入问题描述' })
               .width('100%')
               .height(122)
-              .backgroundColor($r('sys.color.background_primary'))
+              .backgroundColor($r('sys.color.comp_background_primary'))
               .maxLength(100)
               .onChange((value: string) => {
                 this.feedbackItem.description = value
@@ -78,7 +75,7 @@ export struct FeedbackPage {
               Text(`${this.feedbackItem.stageImageUris.length}/${this.maxPhotoNum}`)
                 .fontSize(14)
                 .fontWeight(FontWeight.Regular)
-                .fontColor('#99000000')
+                .fontColor($r('sys.color.font_secondary'))
                 .textAlign(TextAlign.End)
             }
             .width(Constants.FULL_SIZE)
@@ -125,7 +122,7 @@ export struct FeedbackPage {
             }
             .width('100%')
             .height(104)
-            .backgroundColor($r('sys.color.background_primary'))
+            .backgroundColor($r('sys.color.comp_background_primary'))
             .borderRadius(16)
             .justifyContent(FlexAlign.Center)
 
@@ -137,7 +134,7 @@ export struct FeedbackPage {
               Text(`${this.phoneCharNum}/${this.maxPhoneCharNum}`)
                 .fontSize(14)
                 .fontWeight(FontWeight.Regular)
-                .fontColor('#99000000')
+                .fontColor($r('sys.color.font_secondary'))
                 .textAlign(TextAlign.End)
             }
             .width(Constants.FULL_SIZE)
@@ -173,7 +170,6 @@ export struct FeedbackPage {
         .width(Constants.FULL_SIZE)
         .layoutWeight(1)
         .justifyContent(FlexAlign.SpaceBetween)
-        .backgroundColor($r('sys.color.background_secondary'))
         .padding({
           left: 16,
           right: 16,

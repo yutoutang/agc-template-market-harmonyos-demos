@@ -1,4 +1,4 @@
-import { ComponentContent, promptAction } from '@kit.ArkUI';
+import { AppStorageV2, ComponentContent, promptAction, UIContext } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
 import { Logger } from './Logger';
 
@@ -9,7 +9,8 @@ enum PopViewShowType {
 }
 
 async function getUIContext() {
-  return (await (getContext() as common.UIAbilityContext).windowStage.getMainWindow()).getUIContext();
+  let context = AppStorageV2.connect(UIContext, 'uiContext', () => new UIContext());
+  return (await (context!.getHostContext() as common.UIAbilityContext).windowStage.getMainWindow()).getUIContext();
 }
 
 interface PopViewModel {

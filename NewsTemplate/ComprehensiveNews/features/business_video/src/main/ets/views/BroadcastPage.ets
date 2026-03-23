@@ -1,6 +1,5 @@
-import { PersistenceV2 } from '@kit.ArkUI'
-import { AudioUtils, AvRouter, VideoPipViewModel } from 'lib_av_details'
-import { CommonConstants, NewsEnum, SettingModel, VideoType } from 'lib_common'
+import { AudioUtils, AvRouter } from 'lib_av_details'
+import { CommonConstants, NewsEnum, VideoType } from 'lib_common'
 import { AvModel } from 'lib_news_api'
 import { MediaController, AudioPlayer, AudioItem } from 'module_audioplayer'
 import { BroadcastLikeView } from '../components/BroadcastLikeView'
@@ -13,22 +12,20 @@ export struct BroadcastPage {
   @Param index: number = 5
   // 视频页里面的头部tabIndex
   @Param currentTabIndex: VideoType = VideoType.BROADCAST;
-  @Local settingInfo: SettingModel = PersistenceV2.connect(SettingModel, () => new SettingModel())!
   @Local vm: BroadcastViewModel = new BroadcastViewModel(this.getUIContext())
-  @Local videoPipModel: VideoPipViewModel = new VideoPipViewModel()
   private avRouter: AvRouter = new AvRouter(this.getUIContext())
 
   aboutToAppear(): void {
     this.vm.requestBroadcast()
   }
 
-  @Monitor('currentTabIndex','vm.tabModel.selectedIndex')
+  @Monitor('currentTabIndex', 'vm.tabModel.selectedIndex')
   selectedIndexChange() {
     if (this.vm.tabModel.selectedIndex === 1 && this.currentTabIndex === VideoType.BROADCAST) {
-      this.vm.enableSession()
+      this.vm.destroySubWindow()
     } else {
       // 非广播页面，开启广播小窗
-      if (this.settingInfo.network.enableAudioSub) {
+      if (this.vm.settingInfo.network.enableAudioSub) {
         this.vm.createSubWindow()
       } else {
         this.vm.pause()
@@ -90,6 +87,9 @@ export struct BroadcastPage {
                       this.avRouter.pushToAvDetails(params,
                         'broadcast_audio_tb')
                     },
+                    preAction: () => {
+                      return this.vm.destroyOtherSession();
+                    },
                   })
                 }
                 .width('100%')
@@ -114,7 +114,7 @@ export struct BroadcastPage {
         }
         .height(CommonConstants.FULL_PERCENT)
         .scrollBar(BarState.Off)
-        .edgeEffect(EdgeEffect.Spring, {alwaysEnabled: true})
+        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
       }
       .onRefreshing(() => {
         this.vm.refreshData()

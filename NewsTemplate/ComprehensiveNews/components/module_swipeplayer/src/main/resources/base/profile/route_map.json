@@ -4,6 +4,11 @@
       "name": "LandscapeVideo",
       "pageSourceFile": "src/main/ets/views/LandscapeVideo.ets",
       "buildFunction": "LandscapeVideoBuilder"
+    },
+    {
+      "name": "PageCastControl",
+      "pageSourceFile": "src/main/ets/views/PageCastControl.ets",
+      "buildFunction": "PageCastControlBuilder"
     }
   ]
 }

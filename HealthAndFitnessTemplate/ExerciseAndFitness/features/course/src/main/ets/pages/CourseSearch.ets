@@ -5,6 +5,12 @@ import { MyScrollModifier } from 'lib_common';
 import { AppStorageV2 } from '@kit.ArkUI';
 import { NavHeaderBar } from 'lib_widget';
 
+interface HotWordInfo {
+  id: string,
+  path: RouterMap,
+  desc: string
+}
+
 @ComponentV2
 export struct CourseSearch {
   // 模拟后端数据源
@@ -12,7 +18,14 @@ export struct CourseSearch {
   @Local scrollModifier: MyScrollModifier = new MyScrollModifier()
   @Local searchCourse: Course[] = []
   @Local loginUser: UserInfo = AppStorageV2.connect(UserInfo, () => new UserInfo())!
-
+  @Local hotWord: HotWordInfo[] = [
+    { id: '0010', path: RouterMap.COURSE_DETAIL_PAGE, desc: '马甲线' },
+    { id: '0012', path: RouterMap.COMMON_KNOWLEDGE_DETAIL, desc: 'crossfit' },
+    { id: '0001', path: RouterMap.COURSE_DETAIL_PAGE, desc: '背阔肌' },
+    { id: '0013', path: RouterMap.COMMON_KNOWLEDGE_DETAIL, desc: '如何握推' },
+    { id: '0004', path: RouterMap.COURSE_DETAIL_PAGE, desc: '提高握力的方法' },
+    { id: '0015', path: RouterMap.COMMON_KNOWLEDGE_DETAIL, desc: '腰肌劳损' },
+  ]
   aboutToAppear(): void {
     // 搜索数据源数据
     this.searchCourse = COURSE_DATA
@@ -38,84 +51,26 @@ export struct CourseSearch {
         bottom: 12
       })
 
-      Row({ space: 8 }) {
-        Text('马甲线')
-          .width(58)
-          .height(28)
-          .fontSize($r('sys.float.Body_M'))
-          .textAlign(TextAlign.Center)
-          .fontColor('rgba(0, 0, 0, 0.9)')
-          .backgroundColor('rgba(0, 0, 0, 0.05)')
-          .borderRadius(14)
-          .onClick(() => {
-            RouterUtils.pushPathByName(RouterMap.COURSE_DETAIL_PAGE, '0010');
-          })
-        Text('crossfit')
-          .width(76)
-          .height(28)
-          .fontSize($r('sys.float.Body_M'))
-          .textAlign(TextAlign.Center)
-          .fontColor('rgba(0, 0, 0, 0.9)')
-          .backgroundColor('rgba(0, 0, 0, 0.05)')
-          .borderRadius(14)
-          .onClick(() => {
-            RouterUtils.pushPathByName(RouterMap.COMMON_KNOWLEDGE_ACTIVATE);
-          })
-        Text('背阔肌')
-          .width(76)
-          .height(28)
-          .fontSize($r('sys.float.Body_M'))
-          .textAlign(TextAlign.Center)
-          .fontColor('rgba(0, 0, 0, 0.9)')
-          .backgroundColor('rgba(0, 0, 0, 0.05)')
-          .borderRadius(14)
-          .onClick(() => {
-            RouterUtils.pushPathByName(RouterMap.COURSE_DETAIL_PAGE, '0001');
-          })
-        Text('如何拉伸')
-          .width(72)
-          .height(28)
-          .fontSize($r('sys.float.Body_M'))
-          .textAlign(TextAlign.Center)
-          .fontColor('rgba(0, 0, 0, 0.9)')
-          .backgroundColor('rgba(0, 0, 0, 0.05)')
-          .borderRadius(14)
-          .onClick(() => {
-            RouterUtils.pushPathByName(RouterMap.COMMON_KNOWLEDGE_DRAW);
-          })
+      Flex({ wrap: FlexWrap.Wrap, justifyContent: FlexAlign.Start }) {
+        ForEach(this.hotWord, (word: HotWordInfo) => {
+          Text(word.desc)
+            .fontSize($r('sys.float.Body_M'))
+            .textAlign(TextAlign.Center)
+            .fontColor('rgba(0, 0, 0, 0.9)')
+            .backgroundColor('rgba(0, 0, 0, 0.05)')
+            .borderRadius(14)
+            .padding({ left: 8, right: 8, top: 4.5, bottom: 4.5 })
+            .margin({ right: 8, bottom: 8 })
+            .onClick(() => {
+              RouterUtils.pushPathByName(word.path, word.id);
+            })
+        })
       }
       .width('100%')
-
-      Row({ space: 8 }) {
-        Text('提高握力的方法')
-          .width(114)
-          .height(28)
-          .fontSize($r('sys.float.Body_M'))
-          .textAlign(TextAlign.Center)
-          .fontColor('rgba(0, 0, 0, 0.9)')
-          .backgroundColor('rgba(0, 0, 0, 0.05)')
-          .borderRadius(14)
-          .onClick(() => {
-            RouterUtils.pushPathByName(RouterMap.COURSE_DETAIL_PAGE, '0004');
-          })
-        Text('腰肌劳损')
-          .width(76)
-          .height(28)
-          .fontSize($r('sys.float.Body_M'))
-          .textAlign(TextAlign.Center)
-          .fontColor('rgba(0, 0, 0, 0.9)')
-          .backgroundColor('rgba(0, 0, 0, 0.05)')
-          .borderRadius(14)
-          .onClick(() => {
-            RouterUtils.pushPathByName(RouterMap.COMMON_KNOWLEDGE_STRAIN);
-          })
-      }
-      .width('100%')
-      .margin({ top: 8 })
     }
     .width('100%')
     .justifyContent(FlexAlign.Start)
-    .margin({ top: 28, bottom: 12 })
+    .margin({ top: 28, bottom: 4 })
   }
 
   @Builder
@@ -243,58 +198,13 @@ export struct CourseSearch {
           searchSourceData: this.searchSourceData,
           clickSearchResult: (searchData) => {
             let item = this.searchCourse.find(course => course.courseTitle === searchData)
-            switch (item?.courseTitle) {
-              case '腿部训练前的热身和激活动作，不可忽视':
-                RouterUtils.pushPathByName(RouterMap.COMMON_KNOWLEDGE_ACTIVATE);
-                break;
-              case '你知道如何在跑后有效拉伸吗？':
-                RouterUtils.pushPathByName(RouterMap.COMMON_KNOWLEDGE_DRAW);
-                break;
-              case '运动装备的重要性，你知道哪些？':
-                RouterUtils.pushPathByName(RouterMap.COMMON_KNOWLEDGE_EQUIP);
-                break;
-              case '运动完腰椎损伤是什么造成的？':
-                RouterUtils.pushPathByName(RouterMap.COMMON_KNOWLEDGE_STRAIN);
-                break;
-              case '合理且适当的热身，让你的运动表现更好':
-                RouterUtils.pushPathByName(RouterMap.COMMON_KNOWLEDGE_WARM);
-                break;
-              case '普通瑜伽与普拉提的区别其实并不大':
-                RouterUtils.pushPathByName(RouterMap.COMMON_KNOWLEDGE_YOGA);
-                break;
-              case '背部舒展，提高内脏健康活力度':
-                RouterUtils.pushPathByName(RouterMap.COURSE_DETAIL_PAGE, '0001');
-                break;
-              case '居家健身的优质动作一览':
-                RouterUtils.pushPathByName(RouterMap.COURSE_DETAIL_PAGE, '0002');
-                break;
-              case '”你真的会跑步吗？“关于跑步机的正确使用训练课程':
-                RouterUtils.pushPathByName(RouterMap.COURSE_DETAIL_PAGE, '0003');
-                break;
-              case '暴汗自重力量训练':
-                RouterUtils.pushPathByName(RouterMap.COURSE_DETAIL_PAGE, '0004');
-                break;
-              case '舒缓腰部，促进血液循环':
-                RouterUtils.pushPathByName(RouterMap.COURSE_DETAIL_PAGE, '0005');
-                break;
-              case '哑铃练手臂“21响礼炮”':
-                RouterUtils.pushPathByName(RouterMap.COURSE_DETAIL_PAGE, '0006');
-                break;
-              case '双人健身，提高心肺':
-                RouterUtils.pushPathByName(RouterMap.COURSE_DETAIL_PAGE, '0007');
-                break;
-              case '静心打坐训练':
-                RouterUtils.pushPathByName(RouterMap.COURSE_DETAIL_PAGE, '0008');
-                break;
-              case '跳绳进阶训练':
-                RouterUtils.pushPathByName(RouterMap.COURSE_DETAIL_PAGE, '0009');
-                break;
-              case '提升核心力量':
-                RouterUtils.pushPathByName(RouterMap.COURSE_DETAIL_PAGE, '0010');
-                break;
-              case '腰背体态改善':
-                RouterUtils.pushPathByName(RouterMap.COURSE_DETAIL_PAGE, '0011');
-                break;
+            const knowLedgeIdList = ['0012', '0013', '0014', '0015', '0016', '0017']
+            if (item?.id) {
+              if (knowLedgeIdList.includes(item.id)) {
+                RouterUtils.pushPathByName(RouterMap.COMMON_KNOWLEDGE_DETAIL, item.id);
+                return
+              }
+              RouterUtils.pushPathByName(RouterMap.COURSE_DETAIL_PAGE, item.id);
             }
           },
           back: () => {

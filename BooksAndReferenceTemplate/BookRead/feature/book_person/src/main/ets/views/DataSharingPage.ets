@@ -17,6 +17,8 @@ export struct DataSharingPage {
         })
         Column(){
           Web({ src: $rawfile('data_sharing.html'), controller: this.controller })
+            .darkMode(WebDarkMode.Auto)
+            .forceDarkAccess(true)
             .fileAccess(false)
             .geolocationAccess(false)
         }

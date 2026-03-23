@@ -5,13 +5,13 @@ export class Constants {
   public static readonly BACK_BACKGROUND_HEIGHT: number = 40;
   public static readonly BTN_HEIGHT: number = 40;
   public static readonly MAX_WIDTH: number = 448;
-  public static readonly SHEET_TITLE_H: number = 56;
+  public static readonly SHEET_TITLE_H: number = 48;
   public static readonly ICON_WIDTH: number = 72;
   public static readonly ICON_HEIGHT: number = 72;
   public static readonly IMAGE_WIDTH: number = 48;
   public static readonly IMAGE_HEIGHT: number = 48;
   public static readonly COMB_WIDTH: number = 80;
-  public static readonly CONTENT_MARGIN_TOP: number = 64;
+  public static readonly CONTENT_MARGIN_TOP: number = 56;
   public static readonly LOGIN_MARGIN_TOP: number = 24;
   public static readonly FONT_LINES: number = 1;
   public static readonly BOX_WIDTH: number = 20;

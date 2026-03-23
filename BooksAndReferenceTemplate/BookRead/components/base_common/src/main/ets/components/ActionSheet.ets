@@ -59,6 +59,10 @@ class ActionSheetOption {
    * 背景
    */
   backgroundColor?: ResourceStr = ''
+  /**
+   * 背景模糊
+   */
+  blurStyle?: BlurStyle
 }
 
 class ActionSheetParams extends ActionSheetOption {
@@ -71,6 +75,7 @@ class ActionSheetParams extends ActionSheetOption {
     this.height = option.height || SheetSize.FIT_CONTENT
     this.detents = option.detents
     this.backgroundColor = option.backgroundColor
+    this.blurStyle = option.blurStyle || BlurStyle.Thin
     this.title = option.title
     this.showClose = option.showClose
     this.preferType = option.preferType || SheetType.BOTTOM
@@ -115,6 +120,7 @@ class ActionSheet {
       preferType: params.preferType,
       backgroundColor: params.backgroundColor ? params.backgroundColor : ($r('sys.color.background_primary')),
       showClose: params.showClose,
+      blurStyle: params.blurStyle
     }
     if (params.title) {
       sheetOption.title = params.title

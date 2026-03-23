@@ -7,7 +7,7 @@ import { ControlStateModel } from '../model/ControlStateModel';
 import { MediaViewModel } from './MediaViewModel';
 import { PlayerAnimation } from '../animation/PlayerAnimation';
 import { AudioConstants } from '../constants/Constants';
-import { MediaTools } from '../utils/MediaTools';
+import { Utils } from '../utils/Utils';
 
 const TAG = '[AudioViewModel]';
 
@@ -48,7 +48,7 @@ export class AudioViewModel {
   }
 
   public initSubWindow() {
-    MediaTools.changeFocus(MediaViewModel.windowStage!, AudioConstants.AUDIO_SUB_NAME)
+    Utils.changeFocus(MediaViewModel.windowStage!, AudioConstants.AUDIO_SUB_NAME)
     this.taskId = setTimeout(() => {
       this.viewState = 1
       this.resetPosition()
@@ -109,7 +109,7 @@ export class AudioViewModel {
       };
       emitter.emit('on_sub_window', eventData)
     }
-    MediaTools.changeFocus(MediaViewModel.windowStage!, AudioConstants.AUDIO_SUB_NAME)
+    Utils.changeFocus(MediaViewModel.windowStage!, AudioConstants.AUDIO_SUB_NAME)
   }
 
   public audioPlay() {
@@ -123,7 +123,7 @@ export class AudioViewModel {
       }
     }
     this.controlState.pageShowTime = 0;
-    MediaTools.changeFocus(MediaViewModel.windowStage!, AudioConstants.AUDIO_SUB_NAME)
+    Utils.changeFocus(MediaViewModel.windowStage!, AudioConstants.AUDIO_SUB_NAME)
   }
 
   public async onActionUpdate(event: GestureEvent) {
@@ -162,7 +162,7 @@ export class AudioViewModel {
         this.windowPosition.y = bottom;
       }
       await this.subWindow.moveWindowTo(this.windowPosition.x, this.windowPosition.y);
-      MediaTools.changeFocus(MediaViewModel.windowStage!, AudioConstants.AUDIO_SUB_NAME)
+      Utils.changeFocus(MediaViewModel.windowStage!, AudioConstants.AUDIO_SUB_NAME)
       //清空倒计时任务
       clearTimeout(this.taskId)
       this.taskId = setTimeout(() => {

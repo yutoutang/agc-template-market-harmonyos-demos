@@ -4,7 +4,8 @@ export { TagLabelCard } from './src/main/ets/uicomponents/TagLabelCard'
 export { FeedTitle, rightArrow } from './src/main/ets/uicomponents/FeedTitle'
 export { IconAndCount,IconLoc, Icon} from './src/main/ets/uicomponents/IconAndCount'
 export { Title } from './src/main/ets/uicomponents/Title'
-export { TwoColumn, CommonOneColumn } from './src/main/ets/uicomponents/GridLine'
+export { VideoCover } from './src/main/ets/uicomponents/VideoCover'
+export { CompactCardComponent , StandardCardComponent } from './src/main/ets/uicomponents/GridLine'
 export { NoMoreTab } from './src/main/ets/uicomponents/NoMore'
 export { VideoPlayPage } from './src/main/ets/player/VideoPlayPage'
 export { AudioPlayPage } from './src/main/ets/player/AudioPlayPage'
@@ -22,11 +23,15 @@ export { LogUtil } from './src/main/ets/utils/LogUtil'
 export { ObjectUtil } from './src/main/ets/utils/ObjectUtil'
 export { PickerUtil } from './src/main/ets/utils/PickerUtil'
 export { StringUtil } from './src/main/ets/utils/StringUtil'
+export { DeviceUtil } from './src/main/ets/utils/DeviceUtil'
 export { AuthUtil } from './src/main/ets/utils/AuthUtil'
 export { ResourceUtil } from './src/main/ets/utils/ResourceUtil'
 export { PushUtils } from './src/main/ets/push/PushUtils'
 export { PushActionParams } from './src/main/ets/push/Model'
 export { BreakpointType } from './src/main/ets/utils/BreakpointSystem';
-export { GlobalInfoModel } from './src/main/ets/model/GlobalInfoModel';
+export { GlobalInfoModel, BreakpointTypeEnum } from './src/main/ets/model/GlobalInfoModel';
+export { AvoidArea } from './src/main/ets/model/AvoidArea';
 export { WindowUtil } from './src/main/ets/utils/WindowUtil';
 export { CloudPrefetchUtils } from './src/main/ets/utils/CloudPrefetchUtils';
+export { PreferencesUtil } from './src/main/ets/utils/PreferencesUtil'
+export { RouterModule } from './src/main/ets/utils/RouterModule'

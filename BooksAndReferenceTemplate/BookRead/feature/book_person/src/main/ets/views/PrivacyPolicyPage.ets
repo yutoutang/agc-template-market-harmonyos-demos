@@ -16,6 +16,8 @@ export struct PrivacyPolicyPage {
         })
         Column(){
           Web({ src: $rawfile('privacy_policy.html'), controller: this.controller })
+            .darkMode(WebDarkMode.Auto)
+            .forceDarkAccess(true)
             .fileAccess(false)
             .geolocationAccess(false)
         }

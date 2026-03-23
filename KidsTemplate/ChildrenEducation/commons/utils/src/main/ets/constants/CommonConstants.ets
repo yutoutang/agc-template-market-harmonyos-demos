@@ -41,4 +41,7 @@ export class CommonConstants {
 
   // Percent
   static readonly FULL_PERCENT: string = '100%';
+  
+  // Tabs
+  static readonly TABS: Array<string> = ['精选', '看动画', '英语乐园', '儿歌', '学汉语']
 }

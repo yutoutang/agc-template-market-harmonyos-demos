@@ -1,30 +1,41 @@
-import { intl } from '@kit.LocalizationKit';
-
 export class DateUtil {
-  static formatDate(date: Date, split?: string, myWeekday?: string, myTimeStyle?: string): string {
-    let options: DateTimeOptions = {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    };
-    let dateFormatter: intl.DateTimeFormat = new intl.DateTimeFormat('zh-CN', options);
-    let formattedDate = dateFormatter.format(date);
-    if (split) {
-      formattedDate = formattedDate.replace(/\//g, split)
-    }
+  static formatDate(
+    date: Date,
+    split: string = '-',
+    myWeekday?: string,
+    myTimeStyle?: string
+  ): string {
+    let result = '';
+
+    // 格式化日期 (YYYY-MM-DD)
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    result = `${year}${split}${month}${split}${day}`;
+
+    // 添加星期
     if (myWeekday) {
-      let weekdayOptions: DateTimeOptions = { weekday: myWeekday };
-      let weekdayFormatter: intl.DateTimeFormat = new intl.DateTimeFormat('zh-CN', weekdayOptions);
-      let formattedWeekday = weekdayFormatter.format(date);
-      formattedDate = formattedDate + ' ' + formattedWeekday
+      const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+      const weekday = weekdays[date.getDay()];
+      result += ` 周${weekday}`;
     }
+
+    // 添加时间
     if (myTimeStyle) {
-      let timeOptions: DateTimeOptions = { timeStyle: myTimeStyle, hourCycle: 'h24' };
-      let timeFormatter: intl.DateTimeFormat = new intl.DateTimeFormat('zh-CN', timeOptions);
-      let formattedTime = timeFormatter.format(date);
-      formattedDate = formattedDate + ' ' + formattedTime
+      const hour = String(date.getHours()).padStart(2, '0');
+      const minute = String(date.getMinutes()).padStart(2, '0');
+      const second = String(date.getSeconds()).padStart(2, '0');
+
+      if (myTimeStyle === 'short') {
+        result += ` ${hour}:${minute}`;
+      } else if (myTimeStyle === 'long') {
+        result += ` ${hour}:${minute}:${second}`;
+      } else {
+        result += ` ${hour}:${minute}:${second}`;
+      }
     }
-    return formattedDate
+
+    return result;
   }
 
   static parseDateString(dateTimeStr: string): Date {

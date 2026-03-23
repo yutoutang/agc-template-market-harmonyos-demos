@@ -1,11 +1,9 @@
 {
   "name": "check_app_update",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Please describe the basic information.",
   "main": "Index.ets",
   "author": "",
   "license": "Apache-2.0",
-  "dependencies": {
-    "@ohos_agcit/notes_utils": "../../common/utils"
-  }
+  "dependencies": {}
 }

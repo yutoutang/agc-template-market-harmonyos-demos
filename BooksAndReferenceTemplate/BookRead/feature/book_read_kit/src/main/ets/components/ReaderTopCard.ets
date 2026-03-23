@@ -7,11 +7,13 @@ import { common } from '@kit.AbilityKit';
 import { Logger } from '@hw-agconnect/ui-base';
 import { BusinessError, emitter } from '@kit.BasicServicesKit';
 import { UserInfo } from 'base_common';
+
 @ComponentV2
 export struct ReaderTopCard {
   @Param @Require book: BookInfo
   @Local isAddSuccess: boolean = false;
   @Local isLogin: boolean = false;
+  @Consumer('nightMode') nightMode: boolean = AppStorage.get<boolean>('bookNightMode') ?? false;
   windowTopHeight: number = AppStorage.get('windowTopHeight') as number || 38.77;
 
   setShareData() {
@@ -94,7 +96,7 @@ export struct ReaderTopCard {
 
   build() {
     Row() {
-      Image($r('app.media.ic_back'))
+      Image(this.nightMode ? $r('app.media.ic_back_dark') : $r('app.media.ic_back_book'))
         .width(35)
         .height(35)
         .onClick(() => {
@@ -102,8 +104,11 @@ export struct ReaderTopCard {
         })
 
 
-      Row({space: 8}) {
-        Image(this.isAddSuccess ? $r('app.media.ic_add_book_shelf_success') : $r('app.media.ic_add_book_shelf'))
+      Row({ space: 8 }) {
+        Image(this.isAddSuccess ?
+          (this.nightMode ? $r('app.media.ic_add_book_shelf_success_dark') :
+            $r('app.media.ic_add_book_shelf_success')) :
+          (this.nightMode ? $r('app.media.ic_add_book_shelf_dark') : $r('app.media.ic_add_book_shelf')))
           .width(35)
           .height(35)
           .onClick(async () => {
@@ -118,11 +123,14 @@ export struct ReaderTopCard {
             }
           })
 
-        ShareBookCard({ book: this.book })
+        ShareBookCard({
+          book: this.book,
+          shareImage: this.nightMode ? $r('app.media.ic_share_top_card_dark') : $r('app.media.ic_share_top_card')
+        })
       }
     }
     .justifyContent(FlexAlign.SpaceBetween)
-    .backgroundColor($r('sys.color.ohos_id_color_sub_background'))
+    .backgroundColor(this.nightMode ? $r('app.color.100per_000000') : $r('app.color.100per_f1f3f5'))
     .width(Constants.FULL_SIZE)
     .padding({
       top: this.windowTopHeight + 8,

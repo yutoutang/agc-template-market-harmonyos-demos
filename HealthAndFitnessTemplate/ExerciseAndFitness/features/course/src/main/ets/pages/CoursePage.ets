@@ -1,8 +1,9 @@
-import { RouterMap, RouterUtils, PlanInfo, CourseDetailModel, DateUtil } from 'lib_common';
+import { RouterMap, RouterUtils, PlanInfo, CourseDetailModel, BreakpointNameEnum, BreakpointModel } from 'lib_common';
 import { NavHeaderBar } from 'lib_widget';
 import { CourseFilterDialog } from '../viewmodels/CustomDialog';
 import { AdvancedCourse } from './AdvancedCoursePage';
 import { HotCourse } from './HotCoursePage';
+import { AppStorageV2 } from '@kit.ArkUI';
 
 let filter: string[] = [];
 
@@ -26,11 +27,22 @@ AppStorage.setOrCreate<boolean>('0011', false)
 @ComponentV2
 export struct CoursePage {
   @Local isShowCourseFilterDialog: boolean = false
+  @Local isShowCourseFilterDialogOnTop: boolean = false
+  @Local breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
   scroller: Scroller = new Scroller()
 
   async aboutToAppear() {
     AppStorage.setOrCreate<String[]>('FilterList', [])
     filter = []
+  }
+
+  @Computed
+  get searchOnBetween() {
+    if ([BreakpointNameEnum.MD, BreakpointNameEnum.LG,
+      BreakpointNameEnum.XL].includes(this.breakPointModel.currentBreakpoint)) {
+      return false;
+    }
+    return true;
   }
 
   @Builder
@@ -50,7 +62,7 @@ export struct CoursePage {
             .justifyContent(FlexAlign.Center)
             .margin({ top: 10 })
             .padding({ left: 16, right: 16, top: 9, bottom: 9 })
-            .width(328)
+            .width('100%')
             .height(40)
             .borderRadius(20)
             .backgroundColor($r('app.color.app_theme'))
@@ -58,8 +70,10 @@ export struct CoursePage {
               if (filter.length === 0) {
                 AppStorage.setOrCreate<String[]>('FilterList', [])
                 this.isShowCourseFilterDialog = false;
+                this.isShowCourseFilterDialogOnTop = false;
               } else {
                 this.isShowCourseFilterDialog = false;
+                this.isShowCourseFilterDialogOnTop = false;
                 AppStorage.setOrCreate<String[]>('FilterList', filter)
                 RouterUtils.pushPathByName(RouterMap.FILTER_PAGE)
               }
@@ -72,6 +86,8 @@ export struct CoursePage {
       }
       .height('100%')
       .padding({
+        left: 16,
+        right: 16,
         bottom: 18
       })
     }
@@ -130,65 +146,131 @@ export struct CoursePage {
     AdvancedCourse()
   }
 
+  @Builder
+  searchAndFilterOnTop() {
+    Row() {
+      Row() {
+        Image($r('app.media.ic_search'))
+          .margin({ right: 6 })
+          .width(16)
+        Text('搜索')
+          .fontSize($r('sys.float.Body_L'))
+          .fontColor($r('sys.color.dialog_outer_border_color'))
+          .lineHeight(21)
+      }
+      .backgroundColor('#0d000000')
+      .borderRadius(20)
+      .layoutWeight(1)
+      .margin({
+        right: 8
+      })
+      .padding({
+        left: 12,
+        right: 54,
+        top: 7,
+        bottom: 10
+      })
+      .onClick(() => {
+        RouterUtils.pushPathByName(RouterMap.COURSE_SEARCH)
+      })
+
+      Column() {
+        Image($r('app.media.ic_filter'))
+          .width(40)
+          .height(40)
+      }
+      .onClick(() => {
+        this.isShowCourseFilterDialogOnTop = true
+      })
+      .bindSheet($$this.isShowCourseFilterDialogOnTop, this.CourseFilterDialogBuilder(), {
+        dragBar: false,
+        showClose: true,
+        preferType: SheetType.CENTER,
+        title: { title: '筛选' },
+        height: '90%',
+        backgroundColor: '#fff',
+        onDisappear: () => {
+          this.isShowCourseFilterDialogOnTop = false;
+        }
+      })
+    }
+    .width('60%')
+    .margin({
+      bottom: 12
+    })
+    .padding({ left: 16, right: 16 })
+    .visibility(this.searchOnBetween ? Visibility.None : Visibility.Visible)
+  }
+
+  @Builder
+  searchAndFilter() {
+    Row() {
+      Row() {
+        Image($r('app.media.ic_search'))
+          .width(16)
+          .margin({ right: 6 })
+        Text('搜索')
+          .lineHeight(21)
+          .fontSize($r('sys.float.Body_L'))
+          .fontColor($r('sys.color.dialog_outer_border_color'))
+      }
+      .margin({
+        right: 8
+      })
+      .onClick(() => {
+        RouterUtils.pushPathByName(RouterMap.COURSE_SEARCH)
+      })
+      .padding({
+        left: 12,
+        right: 54,
+        top: 7,
+        bottom: 10
+      })
+      .borderRadius(20)
+      .layoutWeight(1)
+      .backgroundColor('#0d000000')
+
+      Column() {
+        Image($r('app.media.ic_filter'))
+          .width(40)
+          .height(40)
+      }
+      .bindSheet($$this.isShowCourseFilterDialog, this.CourseFilterDialogBuilder(), {
+        dragBar: false,
+        showClose: true,
+        height: '90%',
+        title: { title: '筛选' },
+        backgroundColor: '#fff',
+        preferType: SheetType.CENTER,
+        onDisappear: () => {
+          this.isShowCourseFilterDialog = false;
+        }
+      })
+      .onClick(() => {
+        this.isShowCourseFilterDialog = true
+      })
+    }
+    .width('100%')
+    .margin({
+      bottom: 12
+    })
+    .padding({ left: 16, right: 16 })
+  }
+
   build() {
     NavDestination() {
       Column() {
         NavHeaderBar({
           title: '课程',
           isSubTitle: false,
+          rightPartBuilder: () => {
+            this.searchAndFilterOnTop()
+          },
         })
 
-        Row() {
-          Row() {
-            Image($r('app.media.ic_search'))
-              .margin({ right: 6 })
-              .width(16)
-            Text('搜索')
-              .fontSize($r('sys.float.Body_L'))
-              .fontColor($r('sys.color.dialog_outer_border_color'))
-              .lineHeight(21)
-          }
-          .backgroundColor('#0d000000')
-          .borderRadius(20)
-          .layoutWeight(1)
-          .margin({
-            right: 8
-          })
-          .padding({
-            left: 12,
-            right: 54,
-            top: 7,
-            bottom: 10
-          })
-          .onClick(() => {
-            RouterUtils.pushPathByName(RouterMap.COURSE_SEARCH)
-          })
-
-          Column() {
-            Image($r('app.media.ic_filter'))
-              .width(40)
-              .height(40)
-          }
-          .onClick(() => {
-            this.isShowCourseFilterDialog = true
-          })
-          .bindSheet($$this.isShowCourseFilterDialog, this.CourseFilterDialogBuilder(), {
-            dragBar: false,
-            showClose: true,
-            preferType: SheetType.BOTTOM,
-            title: { title: '筛选' },
-            height: '90%',
-            backgroundColor: '#fff',
-            onDisappear: () => {
-              this.isShowCourseFilterDialog = false;
-            }
-          })
+        if (this.searchOnBetween) {
+          this.searchAndFilter()
         }
-        .width('100%')
-        .margin({
-          bottom: 12
-        })
-        .padding({ left: 16, right: 16 })
 
         Scroll(this.scroller) {
           Column() {
@@ -198,9 +280,10 @@ export struct CoursePage {
             // 进阶课程
             this.advancedCourseListBuilder()
           }
-          .margin({ left: 16, right: 16 })
+          .margin({ left: 16, right: 16, bottom: 20 })
         }
-        .margin({ bottom: 150 })
+        .edgeEffect(EdgeEffect.Spring)
+        .layoutWeight(1)
         .scrollBar(BarState.Off)
       }
       .height('100%')

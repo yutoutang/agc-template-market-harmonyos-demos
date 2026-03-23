@@ -130,6 +130,30 @@ export class AccountApi {
   }
 
   /**
+   * 设置会员标识符
+   * @param isMembership
+   */
+  public setMembershipFlag(isMembership: boolean) {
+    this.userInfoModel.isMembership = isMembership;
+  }
+
+  /**
+   * 设置会员到期时间
+   * @param productId
+   */
+  public setMemExpireTime(productId: string): Promise<void> {
+    return MineServiceApi.setMemExpireTime(productId);
+  }
+
+  /**
+   * 查询会员到期时间
+   * @returns
+   */
+  public queryMemExpireTime(): Promise<string> {
+    return MineServiceApi.queryMemExpireTime();
+  }
+
+  /**
    * 查询用户协议内容
    * @returns
    */

@@ -99,7 +99,11 @@ export class PlayerVM {
     let eventData: emitter.EventData = {
       data: { autoStartEnabled: autoStart }
     }
-    emitter.emit('autoStartEnabled', eventData)
+    try {
+      emitter.emit('autoStartEnabled', eventData)
+    } catch (e) {
+      console.error(`emitter emit autoStartEnabled failed. error: ${JSON.stringify(e)}`)
+    }
   }
 
 }

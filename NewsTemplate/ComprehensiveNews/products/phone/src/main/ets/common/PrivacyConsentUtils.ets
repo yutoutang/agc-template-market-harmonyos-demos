@@ -70,7 +70,7 @@ export class PrivacyConsentUtils {
       })
       .onReject(() => {
         const ctx: common.UIAbilityContext = uiContext.getHostContext() as common.UIAbilityContext;
-        ctx.getApplicationContext().killAllProcesses().catch((e: BusinessError<void>) => {
+        ctx.terminateSelf().catch((e: BusinessError<void>) => {
           Logger.error(TAG, 'terminateSelf fail, error: ' + JSON.stringify(e))
         });
       });

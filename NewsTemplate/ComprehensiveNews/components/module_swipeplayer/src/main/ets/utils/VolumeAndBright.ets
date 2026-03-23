@@ -20,7 +20,17 @@ export class VolumeAndBright {
     this.getCurrentVolume();
     // 监听系统音量变化
     this.onVolumeChangeListen()
+  }
 
+  // 清理资源
+  public destroy() {
+    // 清理音量监听器
+    this.offVolumeChangeListen();
+    // 清理定时器
+    if (this.hideTimer) {
+      clearTimeout(this.hideTimer);
+      this.hideTimer = null;
+    }
   }
 
   // 获取当前系统音量

@@ -1,15 +1,18 @@
 import { PersistenceV2 } from '@kit.ArkUI'
 import { webview } from '@kit.ArkWeb'
+import { image } from '@kit.ImageKit'
 import { BusinessError } from '@kit.BasicServicesKit'
 import { FormatCount, Logger, RouterMap, RouterUtils, SettingModel, TimeUtils } from 'lib_common'
-import { Share } from 'lib_widget'
-import { ImagePreview, PreviewVerticalAlign } from 'module_imagepreview'
+import { BaseAgent, Share } from 'lib_widget'
+import { ImagePreview, ImagePreviewOptions, SourceImageModel } from 'module_imagepreview'
 import { handlerCoverImage } from '../utils/Utils'
 import NewsFeedVM from '../viewmodel/NewsFeedVM'
 import { FeedBreakPointVM } from '../viewmodel/FeedBreakPointVM'
 
 class Native {
   preview = (srcList: string[], index: number) => {
+  }
+  keywordExplain = (keyword: string) => {
   }
 }
 
@@ -29,6 +32,10 @@ export struct NewsContent {
   }
   @Event onComment: () => void = () => {
   }
+  @Event onQuestionExpand: (isShow: boolean) => void = (isShow: boolean) => {
+  };
+  @Local isQuestionExpanded: boolean = false;
+  @Local isShow: boolean = false;
   @Local timer: number = 0
   @Local richTextHeight: number = 300
   @Local newsBreakPoint: FeedBreakPointVM = new FeedBreakPointVM()
@@ -120,7 +127,7 @@ export struct NewsContent {
             .fontSize(10 * this.fontSizeRatio)
         }
         .onClick(() => {
-          ImagePreview.hide()
+          ImagePreview.close()
           this.onComment()
         })
 
@@ -144,22 +151,22 @@ export struct NewsContent {
 
   aboutToAppear(): void {
     this.nativeObj.preview = this.preview
+    this.nativeObj.keywordExplain = this.showKeywordSheet
   }
 
   preview = (srcList: string[], index: number) => {
-    ImagePreview.show(this.getUIContext(), srcList, {
-      indexPosition: PreviewVerticalAlign.Top,
-      startIndex: index,
-      authorBuilder: () => {
-        this.authorBuilder()
-      },
-      operationBuilder: () => {
-        this.operationBuilder()
-      },
-      onCloseExpand: () => {
-        this.expandAnimation()
-      },
-    })
+    const options = new ImagePreviewOptions()
+    options
+      .setImageList(srcList.map(v => new SourceImageModel({ imageUrl: v })))
+      .setInitIndex(index)
+      .setLoop(true)
+      .setLongTake(false)
+    ImagePreview.open(this.getUIContext(), options)
+  }
+
+  showKeywordSheet = (keyword: string) => {
+    this.newsFeedVM.keyword = keyword;
+    this.isShow = true;
   }
 
   @Builder
@@ -248,6 +255,63 @@ export struct NewsContent {
     .margin({ top: 12, bottom: 12 })
   }
 
+  @Builder
+  sheetBuilder() {
+    Column() {
+      Text(this.newsFeedVM.findKeywordExplain())
+        .fontColor($r('sys.color.font_primary'))
+        .lineHeight(20).margin({ bottom: 24 });
+      BaseAgent({ queryText: this.newsFeedVM.keyword });
+    }.layoutWeight(1).justifyContent(FlexAlign.SpaceBetween).padding(16);
+  }
+
+  @Builder
+  questionAndAnswerInfoBuilder() {
+    Column() {
+      Row() {
+        Stack({ alignContent: Alignment.TopStart }) {
+          Text(`·${this.newsFeedVM.articleDetails.questionAndAnswer.question}`)
+            .fontColor($r('sys.color.font_primary'))
+            .textIndent(32);
+
+          Row() {
+            Text('问AI')
+              .fontWeight(FontWeight.Medium)
+              .blendMode(BlendMode.DST_IN, BlendApplyType.OFFSCREEN);
+          }
+          .linearGradient({
+            angle: 90,
+            direction: GradientDirection.Right,
+            colors: [['rgb(61, 125, 231)', 0.0], ['rgb(70, 179, 251)', 1.0]],
+          })
+          .blendMode(BlendMode.SRC_OVER, BlendApplyType.OFFSCREEN);
+        }.constraintSize({ maxWidth: 'calc(100% - 36vp)' });
+
+        SymbolGlyph(this.isQuestionExpanded ? $r('sys.symbol.chevron_up') : $r('sys.symbol.chevron_down'))
+          .fontSize(24)
+          .fontColor([$r('sys.color.font_primary')])
+          .fontWeight(FontWeight.Normal).onClick(() => {
+          this.isQuestionExpanded = !this.isQuestionExpanded;
+          this.onQuestionExpand(this.isQuestionExpanded);
+        });
+      }.width('100%').justifyContent(FlexAlign.SpaceBetween).alignItems(VerticalAlign.Top);
+
+      if (this.isQuestionExpanded) {
+        Text(this.newsFeedVM.articleDetails.questionAndAnswer.answer)
+          .fontSize(14).lineHeight(20)
+          .fontColor($r('sys.color.font_primary')).margin({ top: 16, bottom: 16 });
+
+        Row() {
+          BaseAgent({ queryText: this.newsFeedVM.articleDetails.questionAndAnswer.question });
+        };
+      }
+    }
+    .backgroundColor($r('sys.color.comp_background_tertiary'))
+    .margin({ top: 8 })
+    .padding(12)
+    .borderRadius(16);
+  }
+
   build() {
     Column() {
       Column() {
@@ -271,6 +335,10 @@ export struct NewsContent {
       }
       .backgroundColor($r('sys.color.background_primary'))
 
+      if (this.newsFeedVM.articleDetails?.questionAndAnswer) {
+        this.questionAndAnswerInfoBuilder();
+      }
+
       Column() {
         Web({
           src: '',
@@ -290,13 +358,17 @@ export struct NewsContent {
                 'text/html',
                 'UTF-8',
               );
-              this.webViewController.registerJavaScriptProxy(this.nativeObj, 'native', ['preview']);
+              this.webViewController.registerJavaScriptProxy(this.nativeObj, 'native', ['preview', 'keywordExplain']);
             } catch (error) {
               Logger.error(TAG,
                 `ErrorCode: ${(error as BusinessError).code},  Message: ${(error as BusinessError).message}`);
             }
           })
           .onPageEnd(async () => {
+            this.webViewController.runJavaScript(`setKeywordColor()`)
+              .catch((e: BusinessError) => {
+                Logger.error(TAG, 'runJavaScript fail, error: ' + JSON.stringify(e));
+              });
             this.webViewController.runJavaScript(`getSize()`)
               .then((result: string) => {
                 let res: Record<string, number> = JSON.parse(result)
@@ -309,7 +381,12 @@ export struct NewsContent {
                 Logger.error(TAG, 'runJavaScript fail, error: ' + JSON.stringify(e));
               });
           })
-      }
+      }.bindSheet($$this.isShow, this.sheetBuilder(), {
+        height: SheetSize.FIT_CONTENT,
+        title: { title: this.newsFeedVM.keyword },
+        preferType: SheetType.CENTER,
+        showClose: true,
+      })
     }
     .padding({
       left: this.newsBreakPoint.breakpointModel.pagePadding,

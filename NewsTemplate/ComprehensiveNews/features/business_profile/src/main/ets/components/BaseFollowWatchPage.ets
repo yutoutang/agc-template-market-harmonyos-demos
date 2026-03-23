@@ -31,6 +31,7 @@ export struct BaseFollowWatchPage {
         }
         .width(CommonConstants.FULL_PERCENT)
         .height(CommonConstants.FULL_PERCENT)
+        .scrollBar(BarState.Off)
         .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
         .columnsTemplate(this.vm.getColumnsTemplate())
         .columnsGap(CommonConstants.SPACE_XXL)

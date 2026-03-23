@@ -1,5 +1,6 @@
 import { relationalStore } from '@kit.ArkData';
 import { Logger } from 'bill_base';
+import { WindowUtil } from 'commonlib';
 import { DBOperationErrorCode, DBOperator } from './Constants';
 import {
   TableOrderByParams,
@@ -267,7 +268,11 @@ export abstract class BaseDB {
       this.rdbStore.commit();
       return result;
     } catch (err) {
-      this.rdbStore.rollBack();
+      try {
+        this.rdbStore.rollBack();
+      } catch (error) {
+        WindowUtil.dealAllError(error);
+      }
       const errMsg = `${TAG} database start transaction failed. error: ${JSON.stringify(err)}`;
       throw new Error(errMsg);
     }

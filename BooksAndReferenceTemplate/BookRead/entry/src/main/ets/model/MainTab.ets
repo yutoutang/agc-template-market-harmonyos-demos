@@ -9,28 +9,28 @@ export class IndexData {
     {
       index: Constants.TAB_INDEX_ZERO,
       label: '书架',
-      activeIcon: $r('app.media.shelf_tab_active'),
+      activeIcon: $r('sys.symbol.bookshelf_1'),
       defaultIcon: $r('app.media.shelf_tab'),
       component: wrapBuilder(BookShelfPageBuilder)
     },
     {
       index: Constants.TAB_INDEX_ONE,
       label: '书城',
-      activeIcon: $r('app.media.mall_tab_active'),
-      defaultIcon: $r('app.media.mall_tab'),
+      activeIcon: $r('sys.symbol.book_pages'),
+      defaultIcon: $r('app.media.icon_book_mall_off'),
       component: wrapBuilder(BookListPageBuilder)
     },
     {
       index: Constants.TAB_INDEX_TWO,
       label: '分类',
-      activeIcon: $r('app.media.sort_tab_active'),
+      activeIcon: $r('sys.symbol.square_grid_2x2'),
       defaultIcon: $r('app.media.sort_tab'),
       component: wrapBuilder(BookSortPageBuilder)
     },
     {
       index: Constants.TAB_INDEX_THREE,
       label: '我的',
-      activeIcon: $r('app.media.person_tab_active'),
+      activeIcon: $r('sys.symbol.person'),
       defaultIcon: $r('app.media.person_tab'),
       component: wrapBuilder(PersonPageBuilder)
     },

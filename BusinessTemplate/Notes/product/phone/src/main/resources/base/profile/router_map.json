@@ -77,6 +77,11 @@
       "name": "AboutUs",
       "pageSourceFile": "src/main/ets/pages/mine/AboutUs.ets",
       "buildFunction": "AboutUsBuilder"
+    },
+    {
+      "name": "SplashPage",
+      "pageSourceFile": "src/main/ets/pages/SplashPage.ets",
+      "buildFunction": "buildSplashPage"
     }
   ]
 }

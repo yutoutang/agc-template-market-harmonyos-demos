@@ -1,4 +1,5 @@
 import { window } from '@kit.ArkUI';
+import { contextUtil, WindowUtil } from 'commonlib';
 
 @ComponentV2
 export struct FloatingButton {
@@ -38,7 +39,7 @@ export struct FloatingButton {
 
   async aboutToAppear() {
     try {
-      this.windowClass = await window.getLastWindow(getContext());
+      this.windowClass = await window.getLastWindow(contextUtil.getContext()!);
       this.getWindowInfo();
       if (this.windowClass) {
         this.windowClass.on('windowSizeChange', () => {
@@ -83,18 +84,24 @@ export struct FloatingButton {
     if (!this.windowClass) {
       return;
     }
-    //状态栏高度
-    this.statusHeight = px2vp(this.windowClass.getWindowAvoidArea(window.AvoidAreaType.TYPE_SYSTEM).topRect.height);
-    //获取手机底部规避区域高度，额外避让底部tab栏
-    this.bottomAvoidAreaHeight =
-      px2vp(this.windowClass.getWindowAvoidArea(window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR)
-        .bottomRect
-        .height) + 70;
+    try {
+      const uiContext = contextUtil.getUiContext();
+      //状态栏高度
+      this.statusHeight =
+        uiContext?.px2vp(this.windowClass.getWindowAvoidArea(window.AvoidAreaType.TYPE_SYSTEM).topRect.height) ?? 0;
+      //获取手机底部规避区域高度，额外避让底部tab栏
+      this.bottomAvoidAreaHeight =
+        (uiContext?.px2vp(this.windowClass.getWindowAvoidArea(window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR)
+          .bottomRect
+          .height) ?? 0) + 70;
 
-    //获取窗口宽高
-    let windowProperties = this.windowClass.getWindowProperties();
-    this._winWidth = px2vp(windowProperties.windowRect.width);
-    this._winHeight = px2vp(windowProperties.windowRect.height);
+      //获取窗口宽高
+      let windowProperties = this.windowClass.getWindowProperties();
+      this._winWidth = uiContext?.px2vp(windowProperties.windowRect.width) ?? 0;
+      this._winHeight = uiContext?.px2vp(windowProperties.windowRect.height) ?? 0;
+    } catch (error) {
+      WindowUtil.dealAllError(error);
+    }
 
     //设置初始位置位于屏幕右下角，演示设置可根据实际调整
     const minRight = Math.max(24, this._winWidth * 0.20);

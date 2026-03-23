@@ -141,15 +141,16 @@ export struct WelfareCenter {
 
               Image((this.userInfo?.totalReading || 0) >= item.time ? $r('app.media.circle_red') :
                 $r('app.media.circle_grey'))
-                .height(8)
-                .width(8)
+                .height(9)
+                .width(9)
                 .margin({ bottom: 4 })
               Text() {
                 Span(item.time.toString())
                 Span('分钟')
               }
               .fontSize(12)
-              .fontColor((this.userInfo?.totalReading || 0) >= item.time ? '#000000' : '#66000000')
+              .fontColor($r('sys.color.font_secondary'))
+              .opacity((this.userInfo?.totalReading || 0) >= item.time ? 1 : 0.4)
             }
             .width('25%')
           }, (item: TimeCoins) => item.time + new Date().toString())
@@ -166,7 +167,7 @@ export struct WelfareCenter {
       top: 15,
       bottom: 15
     })
-    .backgroundColor($r('sys.color.white'))
+    .backgroundColor($r('sys.color.comp_background_primary'))
     .borderRadius(16)
   }
 
@@ -238,7 +239,7 @@ export struct WelfareCenter {
     })
     .width(Constants.FULL_SIZE)
     .borderRadius(12)
-    .backgroundColor($r('sys.color.white'))
+    .backgroundColor($r('sys.color.comp_background_primary'))
   }
 
   build() {
@@ -247,6 +248,7 @@ export struct WelfareCenter {
         Stack({ alignContent: Alignment.TopStart }) {
           Image($r('app.media.welfare_bg'))
             .width(Constants.FULL_SIZE)
+            .backgroundColor($r('sys.color.comp_background_gray'))
           Column() {
             NavHeaderBar({
               title: $r('app.string.welfare_center'),
@@ -281,7 +283,7 @@ export struct WelfareCenter {
           .height(Constants.FULL_SIZE)
         }
       }
-      .backgroundColor('#F1F3F5')
+      .backgroundColor($r('sys.color.comp_background_gray'))
       .width(Constants.FULL_SIZE)
       .height(Constants.FULL_SIZE)
 

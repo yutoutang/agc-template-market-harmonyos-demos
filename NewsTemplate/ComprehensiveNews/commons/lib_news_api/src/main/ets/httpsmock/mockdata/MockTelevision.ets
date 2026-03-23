@@ -18,7 +18,8 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/news_3.jpg',
           updateTime: '2025/10/03',
-          sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/daa381bc66604878bd403ef77c1c458d.mp4',
+          sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/a20e0965e56a4dc498fc33ee23750c0d.mp4',
+          needVip: false,
         },
         {
           id: 'section_2',
@@ -27,6 +28,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/news_3.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: false,
         },
         {
           id: 'section_3',
@@ -34,7 +36,8 @@ export class MockTelevision {
           updateTime: '2025/10/01',
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/news_3.jpg',
           duration: 425386,
-          sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/a20e0965e56a4dc498fc33ee23750c0d.mp4',
+          sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/daa381bc66604878bd403ef77c1c458d.mp4',
+          needVip: true,
         },
         {
           id: 'section_4',
@@ -43,6 +46,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/news_3.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/daa381bc66604878bd403ef77c1c458d.mp4',
+          needVip: true,
         },
         {
           id: 'section_5',
@@ -51,6 +55,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/news_3.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/95c55588cbdb4b999eeae0c069dbc5d9.mp4',
+          needVip: true,
         },
         {
           id: 'section_6',
@@ -59,6 +64,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/news_3.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/73253951779340a39a7763e29f40ccb8.mp4',
+          needVip: true,
         },
         {
           id: 'section_7',
@@ -67,6 +73,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/news_3.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_8',
@@ -75,6 +82,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/news_3.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_9',
@@ -83,6 +91,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/news_3.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_10',
@@ -91,6 +100,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/news_3.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
       ],
     },
@@ -110,6 +120,7 @@ export class MockTelevision {
           updateTime: '2025/10/03',
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/news_5.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: false,
         },
         {
           id: 'section_2',
@@ -118,6 +129,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/news_5.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: false,
         },
         {
           id: 'section_3',
@@ -126,6 +138,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/news_5.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/a20e0965e56a4dc498fc33ee23750c0d.mp4',
+          needVip: true,
         },
         {
           id: 'section_4',
@@ -134,6 +147,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/news_5.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/daa381bc66604878bd403ef77c1c458d.mp4',
+          needVip: true,
         },
         {
           id: 'section_5',
@@ -142,6 +156,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/news_5.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/95c55588cbdb4b999eeae0c069dbc5d9.mp4',
+          needVip: true,
         },
         {
           id: 'section_6',
@@ -150,6 +165,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/news_5.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/73253951779340a39a7763e29f40ccb8.mp4',
+          needVip: true,
         },
         {
           id: 'section_7',
@@ -158,6 +174,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/news_5.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_8',
@@ -166,6 +183,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/news_5.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_9',
@@ -174,6 +192,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/news_5.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_10',
@@ -182,6 +201,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/news_5.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
       ],
     },
@@ -201,6 +221,7 @@ export class MockTelevision {
           updateTime: '2025/10/03',
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_1.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/a20e0965e56a4dc498fc33ee23750c0d.mp4',
+          needVip: false,
         },
         {
           id: 'section_2',
@@ -209,6 +230,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_1.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: false,
         },
         {
           id: 'section_3',
@@ -217,6 +239,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_1.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/a20e0965e56a4dc498fc33ee23750c0d.mp4',
+          needVip: true,
         },
         {
           id: 'section_4',
@@ -225,6 +248,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_1.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/daa381bc66604878bd403ef77c1c458d.mp4',
+          needVip: true,
         },
         {
           id: 'section_5',
@@ -233,6 +257,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_1.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/95c55588cbdb4b999eeae0c069dbc5d9.mp4',
+          needVip: true,
         },
         {
           id: 'section_6',
@@ -241,6 +266,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_1.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/73253951779340a39a7763e29f40ccb8.mp4',
+          needVip: true,
         },
         {
           id: 'section_7',
@@ -249,6 +275,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_1.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_8',
@@ -257,6 +284,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_1.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_9',
@@ -265,6 +293,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_1.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_10',
@@ -273,6 +302,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_1.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
       ],
     },
@@ -292,6 +322,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_2.jpg',
           updateTime: '2025/10/03',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/95c55588cbdb4b999eeae0c069dbc5d9.mp4',
+          needVip: false,
         },
         {
           id: 'section_2',
@@ -300,6 +331,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_2.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: false,
         },
         {
           id: 'section_3',
@@ -308,6 +340,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_2.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/a20e0965e56a4dc498fc33ee23750c0d.mp4',
+          needVip: true,
         },
         {
           id: 'section_4',
@@ -316,6 +349,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_2.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/daa381bc66604878bd403ef77c1c458d.mp4',
+          needVip: true,
         },
         {
           id: 'section_5',
@@ -324,6 +358,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_2.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/95c55588cbdb4b999eeae0c069dbc5d9.mp4',
+          needVip: true,
         },
         {
           id: 'section_6',
@@ -332,6 +367,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_2.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/73253951779340a39a7763e29f40ccb8.mp4',
+          needVip: true,
         },
         {
           id: 'section_7',
@@ -340,6 +376,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_2.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_8',
@@ -348,6 +385,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_2.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_9',
@@ -356,6 +394,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_2.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_10',
@@ -364,6 +403,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_2.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
       ],
     },
@@ -383,6 +423,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_3.jpg',
           updateTime: '2025/10/03',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: false,
         },
         {
           id: 'section_2',
@@ -391,6 +432,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_3.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: false,
         },
         {
           id: 'section_3',
@@ -399,6 +441,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_3.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/a20e0965e56a4dc498fc33ee23750c0d.mp4',
+          needVip: true,
         },
         {
           id: 'section_4',
@@ -407,6 +450,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_3.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/daa381bc66604878bd403ef77c1c458d.mp4',
+          needVip: true,
         },
         {
           id: 'section_5',
@@ -415,6 +459,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_3.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/95c55588cbdb4b999eeae0c069dbc5d9.mp4',
+          needVip: true,
         },
         {
           id: 'section_6',
@@ -423,6 +468,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_3.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/73253951779340a39a7763e29f40ccb8.mp4',
+          needVip: true,
         },
         {
           id: 'section_7',
@@ -431,6 +477,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_3.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_8',
@@ -439,6 +486,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_3.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_9',
@@ -447,6 +495,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_3.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_10',
@@ -455,6 +504,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_3.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
       ],
     },
@@ -474,6 +524,7 @@ export class MockTelevision {
           duration: 425386,
           updateTime: '2025/10/03',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/73253951779340a39a7763e29f40ccb8.mp4',
+          needVip: false,
         },
         {
           id: 'section_2',
@@ -482,6 +533,7 @@ export class MockTelevision {
           updateTime: '2025/10/02',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: false,
         },
         {
           id: 'section_3',
@@ -490,6 +542,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_4.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/a20e0965e56a4dc498fc33ee23750c0d.mp4',
+          needVip: true,
         },
         {
           id: 'section_4',
@@ -498,6 +551,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_4.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/daa381bc66604878bd403ef77c1c458d.mp4',
+          needVip: true,
         },
         {
           id: 'section_5',
@@ -506,6 +560,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_4.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/95c55588cbdb4b999eeae0c069dbc5d9.mp4',
+          needVip: true,
         },
         {
           id: 'section_6',
@@ -514,6 +569,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_4.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/73253951779340a39a7763e29f40ccb8.mp4',
+          needVip: true,
         },
         {
           id: 'section_7',
@@ -522,6 +578,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_4.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_8',
@@ -530,6 +587,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_4.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_9',
@@ -538,6 +596,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_4.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_10',
@@ -546,6 +605,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_4.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
       ],
     },
@@ -565,6 +625,7 @@ export class MockTelevision {
           updateTime: '2025/10/03',
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_5.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/a20e0965e56a4dc498fc33ee23750c0d.mp4',
+          needVip: false,
         },
         {
           id: 'section_2',
@@ -573,6 +634,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_5.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: false,
         },
         {
           id: 'section_3',
@@ -581,6 +643,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_5.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/a20e0965e56a4dc498fc33ee23750c0d.mp4',
+          needVip: true,
         },
         {
           id: 'section_4',
@@ -589,6 +652,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_5.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/daa381bc66604878bd403ef77c1c458d.mp4',
+          needVip: true,
         },
         {
           id: 'section_5',
@@ -597,6 +661,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_5.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/95c55588cbdb4b999eeae0c069dbc5d9.mp4',
+          needVip: true,
         },
         {
           id: 'section_6',
@@ -605,6 +670,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_5.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/73253951779340a39a7763e29f40ccb8.mp4',
+          needVip: true,
         },
         {
           id: 'section_7',
@@ -613,6 +679,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_5.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_8',
@@ -621,6 +688,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_5.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_9',
@@ -629,6 +697,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_5.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_10',
@@ -637,6 +706,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_5.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
       ],
     },
@@ -656,6 +726,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_6.jpg',
           updateTime: '2025/10/03',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/daa381bc66604878bd403ef77c1c458d.mp4',
+          needVip: false,
         },
         {
           id: 'section_2',
@@ -664,6 +735,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_6.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: false,
         },
         {
           id: 'section_3',
@@ -672,6 +744,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_6.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/a20e0965e56a4dc498fc33ee23750c0d.mp4',
+          needVip: true,
         },
         {
           id: 'section_4',
@@ -680,6 +753,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_6.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/daa381bc66604878bd403ef77c1c458d.mp4',
+          needVip: true,
         },
         {
           id: 'section_5',
@@ -688,6 +762,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_6.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/95c55588cbdb4b999eeae0c069dbc5d9.mp4',
+          needVip: true,
         },
         {
           id: 'section_6',
@@ -696,6 +771,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_6.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/73253951779340a39a7763e29f40ccb8.mp4',
+          needVip: true,
         },
         {
           id: 'section_7',
@@ -704,6 +780,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_6.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_8',
@@ -712,6 +789,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_6.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_9',
@@ -720,6 +798,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_6.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_10',
@@ -728,6 +807,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_6.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
       ],
     },
@@ -747,6 +827,7 @@ export class MockTelevision {
           updateTime: '2025/10/03',
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_7.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/73253951779340a39a7763e29f40ccb8.mp4',
+          needVip: false,
         },
         {
           id: 'section_2',
@@ -755,6 +836,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_7.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: false,
         },
         {
           id: 'section_3',
@@ -763,6 +845,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_7.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/a20e0965e56a4dc498fc33ee23750c0d.mp4',
+          needVip: true,
         },
         {
           id: 'section_4',
@@ -771,6 +854,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_7.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/daa381bc66604878bd403ef77c1c458d.mp4',
+          needVip: true,
         },
         {
           id: 'section_5',
@@ -779,6 +863,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_7.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/95c55588cbdb4b999eeae0c069dbc5d9.mp4',
+          needVip: true,
         },
         {
           id: 'section_6',
@@ -787,6 +872,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_7.jpg',
           duration: 425386,
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/73253951779340a39a7763e29f40ccb8.mp4',
+          needVip: true,
         },
         {
           id: 'section_7',
@@ -795,6 +881,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_7.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_8',
@@ -803,6 +890,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_7.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_9',
@@ -811,6 +899,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_7.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_10',
@@ -819,6 +908,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_7.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
       ],
     },
@@ -838,6 +928,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_8.jpg',
           updateTime: '2025/10/03',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/73253951779340a39a7763e29f40ccb8.mp4',
+          needVip: false,
         },
         {
           id: 'section_2',
@@ -846,6 +937,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_8.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: false,
         },
         {
           id: 'section_3',
@@ -854,6 +946,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_8.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/a20e0965e56a4dc498fc33ee23750c0d.mp4',
+          needVip: true,
         },
         {
           id: 'section_4',
@@ -862,6 +955,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_8.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/daa381bc66604878bd403ef77c1c458d.mp4',
+          needVip: true,
         },
         {
           id: 'section_5',
@@ -870,6 +964,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_8.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/95c55588cbdb4b999eeae0c069dbc5d9.mp4',
+          needVip: true,
         },
         {
           id: 'section_6',
@@ -878,6 +973,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_8.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/73253951779340a39a7763e29f40ccb8.mp4',
+          needVip: true,
         },
         {
           id: 'section_7',
@@ -886,6 +982,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_8.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_8',
@@ -894,6 +991,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_8.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_9',
@@ -902,6 +1000,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_8.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_10',
@@ -910,6 +1009,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_8.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
       ],
     },
@@ -929,6 +1029,7 @@ export class MockTelevision {
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_9.jpg',
           updateTime: '2025/10/03',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/73253951779340a39a7763e29f40ccb8.mp4',
+          needVip: false,
         },
         {
           id: 'section_2',
@@ -937,6 +1038,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_9.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: false,
         },
         {
           id: 'section_3',
@@ -945,6 +1047,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_9.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/a20e0965e56a4dc498fc33ee23750c0d.mp4',
+          needVip: true,
         },
         {
           id: 'section_4',
@@ -953,6 +1056,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_9.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/daa381bc66604878bd403ef77c1c458d.mp4',
+          needVip: true,
         },
         {
           id: 'section_5',
@@ -961,6 +1065,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_9.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/95c55588cbdb4b999eeae0c069dbc5d9.mp4',
+          needVip: true,
         },
         {
           id: 'section_6',
@@ -969,6 +1074,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_9.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/73253951779340a39a7763e29f40ccb8.mp4',
+          needVip: true,
         },
         {
           id: 'section_7',
@@ -977,6 +1083,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_9.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_8',
@@ -985,6 +1092,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_9.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_9',
@@ -993,6 +1101,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_9.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
         {
           id: 'section_10',
@@ -1001,6 +1110,7 @@ export class MockTelevision {
           duration: 425386,
           coverUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fbroadcast_9.jpg',
           sectionUrl: 'https://www-file.huawei.com/admin/asset/v1/pro/view/1fe450a626db4fc9ad86a960c60ea993.mp4',
+          needVip: true,
         },
       ],
     },

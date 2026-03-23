@@ -1,6 +1,6 @@
 import { AppStorageV2 } from '@kit.ArkUI';
 import { webview } from '@kit.ArkWeb';
-import { BreakpointModel, CommonConstants, GridRowColSetting, WindowModel } from 'lib_common';
+import { BreakpointModel, BreakpointNameEnum, CommonConstants, GridRowColSetting, WindowModel } from 'lib_common';
 import { NavHeaderBar } from 'lib_widget';
 import { ProtocolRouterParams } from '../constants/Types';
 
@@ -17,6 +17,16 @@ struct ProtocolWebView {
   breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
   webViewController: webview.WebviewController = new webview.WebviewController();
   stack: NavPathStack = new NavPathStack();
+
+  @Computed
+  get contentWidth() {
+    if ([BreakpointNameEnum.MD].includes(this.breakPointModel.currentBreakpoint)) {
+      return 516;
+    } else if ([BreakpointNameEnum.LG, BreakpointNameEnum.XL].includes(this.breakPointModel.currentBreakpoint)) {
+      return 805;
+    }
+    return '100%';
+  }
 
   build() {
     NavDestination() {
@@ -71,6 +81,7 @@ struct ProtocolWebView {
       src: '',
       controller: this.webViewController,
     })
+      .width(this.contentWidth)
       .fileAccess(false)
       .geolocationAccess(false)
       .darkMode(WebDarkMode.Auto)

@@ -17,6 +17,7 @@ import { emitter } from '@kit.BasicServicesKit';
 import { display, uiObserver, window } from '@kit.ArkUI';
 import { PipManager } from '../tools/PipManager';
 import { PlayerControl } from '../components/PlayerControl';
+import { PlayerView } from '../components/PlayerView';
 import { PlayerVM } from '../viewModels/PlayerVM';
 import { AVPlayer } from '../tools/AVPlayer';
 import { MovieItem } from '../models/Type';
@@ -29,17 +30,19 @@ const controllerDelay = 2000; // 控制器时延
 export struct PlayerComponent {
   logTag: string = 'PlayerComponent';
   domainId: number = 0x0000;
+  @Local videoHeight: number = 100
   @Param @Require movieItems: MovieItem[] = []
   @Param @Require playerIndex: number = 0
+  @Param showMaskLayer: boolean = false
   // 选集
   @Param selectionEvent: (idx: number) => void = () => {
   }
-  @Param fullScreen: (isLayoutFullScreen: boolean) => void = () => {
+  @Param fullScreenEvent: (isLayoutFullScreen: boolean) => void = () => {
   }
   @Param callbackTimeUpdate: (nol: number, total: number) => void = () => {
   };
   // 退出事件
-  @Param exitEvent: () => void = () => {
+  @Event exitEvent: () => void = () => {
   }
   // 分享事件
   @Param shareEvent: () => void = () => {
@@ -59,10 +62,16 @@ export struct PlayerComponent {
   @Local componentHeight: string = '100%';
   curFoldStatus: display.FoldStatus = display.FoldStatus.FOLD_STATUS_UNKNOWN;
   mWindow?: window.Window;
-  private surfaceId: string = '';
   private timer: number = -1;
   private uiContext: UIContext = this.getUIContext() as UIContext;
   private context: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
+  private windowClass = this.context.windowStage.getMainWindowSync();
+  @BuilderParam customBuilderParam: () => void = this.customBuilder;
+  @Event stateChange:(state:string) => void = (state:string) => {};
+
+  @Builder
+  customBuilder() {
+  }
 
   @Monitor('player.isPlaying')
   onNameChange() {
@@ -76,24 +85,12 @@ export struct PlayerComponent {
 
   // 设置窗口方向
   setR(orientation: number) {
-    window.getLastWindow(this.context).then((win) => {
-      win.setPreferredOrientation(orientation).then(() => {
-      }).catch(() => {
-      })
-    }).catch(() => {
-    })
-  }
-
-  // 设置沉浸式窗口
-  setFullScreen(isLayoutFullScreen: boolean) {
-    window.getLastWindow(this.context).then((win: window.Window) => {
-      win.setWindowLayoutFullScreen(isLayoutFullScreen).then(() => {
-      }).catch(() => {
-      })
-    }).catch(() => {
-    })
-    this.fullScreen(isLayoutFullScreen)
-    this.setComponentHeight()
+    // window.getLastWindow(this.context).then((win) => {
+    //   win.setPreferredOrientation(orientation).then(() => {
+    //   }).catch(() => {
+    //   })
+    // }).catch(() => {
+    // })
   }
 
   regDisplayListener(): void {
@@ -104,32 +101,10 @@ export struct PlayerComponent {
           return;
         }
         this.curFoldStatus = curFoldStatus;
-        this.setComponentHeight()
       })
     } catch (error) {
       hilog.error(this.domainId, this.logTag,
         `Error occurred. errCode is ${error.code}, errMessage is ${error.message}`);
-    }
-  }
-
-  setComponentHeight() {
-    let screenWidth = 0
-    try {
-      screenWidth = display.getDefaultDisplaySync().width
-    } catch (error) {
-      hilog.error(this.domainId, this.logTag,
-        `Error occurred. errCode is ${error.code}, errMessage is ${error.message}`);
-    }
-    if (this.curFoldStatus === display.FoldStatus.FOLD_STATUS_FOLDED ||
-      this.curFoldStatus === display.FoldStatus.FOLD_STATUS_UNKNOWN) {
-      this.componentHeight = '100%'
-    } else {
-      if (this.isLayoutFullScreen) {
-        let height = (this.getUIContext().px2vp(screenWidth) - 32) * 9 / 16
-        this.componentHeight = height.toString() + 'vp'
-      } else {
-        this.componentHeight = '100%'
-      }
     }
   }
 
@@ -150,7 +125,6 @@ export struct PlayerComponent {
           this.playerVM.windowStatusType = this.windowStatusType
           this.isLayoutFullScreen = false
           this.setR(1)
-          this.setFullScreen(false)
         }
         currentWindow.on('windowStatusChange', (windowStatusType) => {
           this.windowStatusType = windowStatusType
@@ -158,7 +132,6 @@ export struct PlayerComponent {
           if (windowStatusType === 5) {
             this.isLayoutFullScreen = false
             this.setR(1)
-            this.setFullScreen(false)
           }
         });
       } catch (error) {
@@ -169,6 +142,7 @@ export struct PlayerComponent {
       hilog.error(this.domainId, this.logTag,
         `Error occurred. errCode is ${error.code}, errMessage is ${error.message}`);
     })
+
     emitter.on('playerPause', (event: emitter.EventData) => {
       let isPlaying = event.data!.isPlaying as boolean
       if (isPlaying) {
@@ -201,6 +175,7 @@ export struct PlayerComponent {
         PipManager.getInstance().player.release();
       }
     })
+
     try {
       if (display.isFoldable()) {
         this.regDisplayListener();
@@ -210,9 +185,6 @@ export struct PlayerComponent {
       hilog.error(this.domainId, this.logTag,
         `Error occurred. errCode is ${error.code}, errMessage is ${error.message}`);
     }
-
-    this.setComponentHeight()
-
     this.getUIContext().getUIObserver().on('navDestinationSwitch', this.releaseResource);
   }
 
@@ -224,41 +196,25 @@ export struct PlayerComponent {
    * 页面导航切换时释放播放器相关资源以及回调
    */
   releaseResource = (info: uiObserver.NavDestinationSwitchInfo) => {
-    emitter.off('playerPause')
-    emitter.off('autoStartPip')
-    emitter.off('chapterDetailBack')
+    if (info.to.name === 'VideoPlayPage') {
+      return
+    }
+
+    emitter.off('exitFullScreen')
 
     this.playerVM.movieItem.movieUrl = 'null'
     this.isLayoutFullScreen = false
     this.setR(this.isLayoutFullScreen ? 2 : 1)
-    this.setFullScreen(this.isLayoutFullScreen)
+    this.fullScreenEvent(false)
+
+    this.windowClass.setWindowSystemBarProperties({
+      statusBarColor: '#FFFFFF',
+      statusBarContentColor: '#000000',
+    })
+
 
     PipManager.getInstance().player.isCreate = true
     PipManager.getInstance().player.release()
-  }
-
-  @Builder
-  xComponentView() {
-    Column() {
-      XComponent({
-        type: XComponentType.SURFACE,
-        controller: PipManager.getInstance().getXComponentController()
-      })
-        .id('XComponent01')
-        .layoutWeight(1)
-        .onLoad(() => {
-          this.surfaceId = PipManager.getInstance().getXComponentController().getXComponentSurfaceId();
-          // 将surfaceId设置给媒体源
-          PipManager.getInstance().getXComponentController().onSurfaceCreated(this.surfaceId)
-          PipManager.getInstance().player.init(this.playerVM.movieItem.movieUrl, this.playerVM.movieItem.learnProgress)
-          PipManager.getInstance().player.callbackTimeUpdate = (vol: number, total: number) => {
-            this.callbackTimeUpdate(vol, total)
-            this.playerVM.movieItem.learnProgress = Math.floor(vol / total * 100)
-          }
-        })
-    }
-    .width('100%')
-    .height('100%')
   }
 
   getSpeed(selectItem: string): number {
@@ -284,74 +240,50 @@ export struct PlayerComponent {
   }
 
   build() {
-    Column() {
-      Stack((PipManager.getInstance().player.isLoading || PipManager.getInstance().player.isLoadError) ?
-        { alignContent: Alignment.Center } :
-        { alignContent: Alignment.Center }) {
-        
-        this.xComponentView()
-        
-        if (PipManager.getInstance().player.isLoading || PipManager.getInstance().player.isLoadError) {
-          // 加载页面
-          Column() {
-            LoadingProgress()
-              .color($r('sys.color.icon_on_primary'))
-              .width(72)
-              .height(72)
-            Text('加载中')
-              .fontSize(16)
-              .fontColor(Color.White)
-          }
-          .justifyContent(FlexAlign.Center)
-          .zIndex(2)
-          .visibility(PipManager.getInstance().player.isLoading ? Visibility.Visible : Visibility.Hidden)
-
-          Column() {
-            Text('加载失败')
-              .fontSize(16)
-              .fontColor(Color.White)
-          }
-          .justifyContent(FlexAlign.Center)
-          .zIndex(2)
-          .visibility(PipManager.getInstance().player.isLoadError ? Visibility.Visible : Visibility.Hidden)
-          .onClick(() => {
-            PipManager.getInstance()
-              .player
-              .changePlay(this.playerVM.movieItem.movieUrl, this.playerVM.movieItem.learnProgress)
-          })
-        } else {
-          // 控制层
-          PlayerControl({
-            playerIndex: this.playerIndex,
-            isLayoutFullScreen: this.isLayoutFullScreen,
-            fullScreen: (isLayoutFullScreen: boolean) => {
-              this.isLayoutFullScreen = isLayoutFullScreen
-              this.setR(this.isLayoutFullScreen ? 2 : 1)
-              this.setFullScreen(this.isLayoutFullScreen)
-            },
-            selectionEvent: (item: MovieItem) => {
-              let idx = this.playerVM.movieItemList.indexOf(item)
-              this.selectionEvent(idx)
-            },
-            exitEvent: () => {
-              this.isLayoutFullScreen = false
-              this.setR(this.isLayoutFullScreen ? 2 : 1)
-              this.setFullScreen(this.isLayoutFullScreen)
-              this.exitEvent()
-            },
-            shareEvent: () => {
-              this.isLayoutFullScreen = false
-              this.setR(this.isLayoutFullScreen ? 2 : 1)
-              this.setFullScreen(this.isLayoutFullScreen)
-              this.shareEvent()
-            }
-          })
-            .width('100%')
-            .height('100%')
+    Stack({ alignContent: Alignment.Center }) {
+      // 视频层
+      PlayerView({
+        videoRatio: 16 / 9,
+        showMaskLayer: this.showMaskLayer,
+        callbackTimeUpdate: this.callbackTimeUpdate,
+        customBuilderParam: this.customBuilderParam,
+        stateChange:(state:string) => {
+          this.stateChange(state);
         }
-      }
-      .width('100%')
-      .backgroundColor('#000000')
+      })
+        .width('100%')
+        .height('100%')
+
+
+      // 控制层
+      PlayerControl({
+        playerIndex: this.playerIndex,
+        isLayoutFullScreen: this.isLayoutFullScreen,
+        fullScreen: (isLayoutFullScreen: boolean) => {
+          this.isLayoutFullScreen = isLayoutFullScreen
+          this.fullScreenEvent(this.isLayoutFullScreen)
+        },
+        selectionEvent: (item: MovieItem) => {
+          let idx = this.playerVM.movieItemList.indexOf(item)
+          this.selectionEvent(idx)
+        },
+        exitEvent: () => {
+          this.isLayoutFullScreen = false
+          this.setR(this.isLayoutFullScreen ? 2 : 1)
+          this.fullScreenEvent(this.isLayoutFullScreen)
+          this.exitEvent()
+        },
+        shareEvent: () => {
+          this.isLayoutFullScreen = false
+          this.setR(this.isLayoutFullScreen ? 2 : 1)
+          this.fullScreenEvent(this.isLayoutFullScreen)
+          this.shareEvent()
+        }
+      })
+        .visibility(this.showMaskLayer ? Visibility.Hidden : Visibility.Visible)
+        .width('100%')
     }
+    .width('100%')
   }
 }
+

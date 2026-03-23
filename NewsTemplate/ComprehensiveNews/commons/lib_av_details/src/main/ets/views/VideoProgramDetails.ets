@@ -1,41 +1,52 @@
 import { ValueType } from '@kit.ArkData';
 import { AppStorageV2, uiObserver, window } from '@kit.ArkUI';
+import { AVCastPicker } from '@kit.AVSessionKit';
+import { BusinessError } from '@kit.BasicServicesKit';
 import {
-  BreakpointModel,
+  CircleButtonModifier,
   CommonConstants,
   GridRowColSetting,
+  Logger,
   RouterMap,
   RouterUtils,
-  WindowModel,
 } from 'lib_common';
 import { AvModel, AvSection, HomeServiceApi } from 'lib_news_api';
-import { PiPWindowModel, VideoCard, VideoNetworkModel, VideoNetworkSetting } from 'module_swipeplayer';
+import {
+  PageNameEnum,
+  PiPWindowModel,
+  VideoCard,
+  VideoNetworkModel,
+  VideoNetworkSetting,
+} from 'module_swipeplayer';
 import { VideoData } from '../model/VideoModel';
 import { VideoVM } from '../viewmodel/VideoViewModel';
 import { VideoPipViewModel } from '../viewmodel/VideoPipViewModel';
 import { VideoAxisList } from '../components/VideoAxisList';
 import { AvViewModel } from '../viewmodel/AvViewModel';
-
+import { membershipOverlayBuilder } from '../components/MembershipOverlay';
+import { AVSessionUtils } from '../utils/AVSessionUtils';
 
 @Builder
 export function VideoProgramDetailsBuilder() {
   VideoProgramDetails()
 }
 
+const TAG = '[VideoProgramDetails]';
+
 @ComponentV2
 export struct VideoProgramDetails {
   @Local detailData: VideoData | undefined
   @Local videoDetails: AvModel | undefined
   @Local seek: number = 0
+  @Local currentProgress: number = 0;
   @Local videoPipModel: VideoPipViewModel = new VideoPipViewModel()
-  @Local windowModel: WindowModel = AppStorageV2.connect(WindowModel, () => new WindowModel())!;
-  @Local breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
   @Local pipWindowModel: PiPWindowModel = AppStorageV2.connect(PiPWindowModel, () => new PiPWindowModel())!;
   @Local sectionIndex: number = -1
   @Local isHideSlide: boolean = true
   @Local videoId: string = ''
-  videoVM: VideoVM = new VideoVM()
+  videoVM: VideoVM = new VideoVM(this.getUIContext())
   avViewModel: AvViewModel = new AvViewModel()
+  buttonModifier: CircleButtonModifier = new CircleButtonModifier();
   private landscapeListener = (info: uiObserver.NavDestinationInfo) => {
     this.pipWindowModel.navDestinationUpdateListeners.forEach((callback, key) => {
       if (key === 'landscapeListener') {
@@ -46,7 +57,29 @@ export struct VideoProgramDetails {
 
   @Monitor('sectionIndex')
   sectionIndexChange() {
-    this.detailData = new VideoData(this.videoDetails!.section[this.sectionIndex])
+    this.detailData = new VideoData(this.videoDetails!.section[this.sectionIndex], this.detailData?.title)
+  }
+
+  @Monitor('canPlay')
+  handlePlayAndPause() {
+    // 处理视频播放暂停
+    if (!this.canPlay) {
+      this.videoPipModel.getVideoCardPlayerController().pause();
+    }
+    this.videoPipModel.getVideoCardPlayerController().setMembershipOverlay(!this.canPlay);
+
+    // 更新画中画
+    this.videoPipModel.updatePip(this.canPlay);
+
+    // 停留在详情页时，不能播放的场景需要屏蔽自由横竖屏旋转
+    const lastName = RouterUtils.getLastPathName();
+    if (lastName !== PageNameEnum.VIDEO_LANDSCAPE_PAGE) {
+      if (this.canPlay) {
+        this.videoVM.setOrientation();
+      } else {
+        this.videoVM.resetOrientation();
+      }
+    }
   }
 
   // WindowStage生命周期变化的监听回调函数
@@ -54,36 +87,75 @@ export struct VideoProgramDetails {
     const allPathStack = RouterUtils.getStack().getAllPathName()
     const lastPathName = allPathStack[allPathStack.length - 1];
     if (lastPathName === RouterMap.VIDEO_PROGRAM_DETAILS) {
-      // 不展示画中画时，保持原有逻辑
-      if (!this.videoVM.settingInfo.network.enableLivePiP) {
+      // 展示画中画时，判断是否是回到后台
+      if (this.videoVM.settingInfo.network.enableLivePiP) {
+        if (type === window.WindowStageEventType.RESUMED || type === window.WindowStageEventType.SHOWN) {
+          this.pipWindowModel.isBackgroundPip = false;
+          this.pipWindowModel.pipController?.setAutoStartEnabled(this.pipWindowModel.isEnablePiP);
+          this.pipWindowModel.pipController?.stopPiP().catch((e: BusinessError) => {
+            Logger.error(TAG, `Failed to stopPiP. Code: ${e.code}, message: ${e.message}`);
+          });
+          Logger.debug(TAG, 'WindowStageEventType.SHOWN');
+        } else if (type === window.WindowStageEventType.PAUSED || type === window.WindowStageEventType.HIDDEN) {
+          this.pipWindowModel.isBackgroundPip = true;
+          this.pipWindowModel.isPipStop = false;
+          this.pipWindowModel.pipController?.setAutoStartEnabled(this.pipWindowModel.isEnablePiP);
+          Logger.debug(TAG, 'WindowStageEventType.HIDDEN, setAutoStartEnabled: ' + this.pipWindowModel.isEnablePiP);
+        }
+      } else {
+        // 不展示画中画时，保持原有逻辑
         if (type === window.WindowStageEventType.RESUMED || type === window.WindowStageEventType.SHOWN) {
           this.videoPipModel.getVideoCardPlayerController().play()
-          this.pipWindowModel.isBackgroundPip = false;
         } else if (type === window.WindowStageEventType.PAUSED || type === window.WindowStageEventType.HIDDEN) {
           this.videoPipModel.getVideoCardPlayerController().pause()
-          this.pipWindowModel.isBackgroundPip = true;
         }
       }
     }
   }
 
-  aboutToAppear(): void {
+  async aboutToAppear(): Promise<void> {
     // 无感监听路由变化
     uiObserver.on('navDestinationUpdate', this.landscapeListener);
     this.videoPipModel.setContext(this.getUIContext().getHostContext() as Context)
     this.videoVM.windowStageModel.windowStageEventListeners.delete('VideoProgramDetails');
     this.videoVM.windowStageModel.windowStageEventListeners.set('VideoProgramDetails', (type) => {
       this.windowStageEventCallback(type)
-    })
+    });
+    // 销毁应用中其他AVSession
+    await AVSessionUtils.destroyAudioSession();
+    await AVSessionUtils.destroyReaderSession();
   }
 
   aboutToDisappear(): void {
+    Logger.debug(TAG, 'aboutToDisappear');
     uiObserver.off('navDestinationUpdate', this.landscapeListener)
   }
 
   backIntercept() {
-    this.videoPipModel.enableVideoPip(this.videoDetails!.id, false)
+    this.videoPipModel.enableVideoPip(this.videoDetails!.id);
     RouterUtils.pop(this.videoDetails);
+  }
+
+  @Computed
+  get canPlay() {
+    // 隐藏进度条表示电视直播的场景
+    if (this.isHideSlide) {
+      return true;
+    }
+    // 非vip视频
+    if (!this.detailData?.needVip) {
+      return true;
+    }
+    // 登录且开通了会员
+    if (this.videoVM.userInfoModel.isLogin && this.videoVM.userInfoModel.isMembership) {
+      return true;
+    }
+    // 免费看前30s
+    if (this.currentProgress <= 30 * 1000) {
+      return true;
+    }
+
+    return false;
   }
 
   @Builder
@@ -135,6 +207,54 @@ export struct VideoProgramDetails {
   }
 
   @Builder
+  customCastBuilder() {
+    Button() {
+      SymbolGlyph($r('sys.symbol.wireless_projection'))
+        .fontColor([$r('sys.color.font_on_primary')])
+        .fontWeight(FontWeight.Normal)
+        .fontSize(24)
+    }
+    .attributeModifier(this.buttonModifier)
+    .backgroundColor($r('app.color.circle_btn_bg'))
+    .accessibilityText('投屏')
+  }
+
+  @Builder
+  titleBar() {
+    Row({ space: CommonConstants.SPACE_S }) {
+      Row({ space: 2 }) {
+        Button() {
+          SymbolGlyph($r('sys.symbol.chevron_backward'))
+            .fontColor([$r('sys.color.font_on_primary')])
+            .fontWeight(FontWeight.Normal)
+            .fontSize(24 * this.videoVM.settingInfo.fontSizeRatio)
+        }
+        .attributeModifier(this.buttonModifier)
+        .backgroundColor($r('app.color.circle_btn_bg'))
+        .accessibilityText('返回')
+        .onClick(() => {
+          this.backIntercept()
+        })
+      }
+
+      Blank()
+
+      AVCastPicker({
+        customPicker: () => this.customCastBuilder(),
+      })
+        .width(40)
+        .height(40)
+        .visibility(this.canPlay ? Visibility.Visible : Visibility.Hidden)
+    }
+    .padding({
+      left: CommonConstants.PADDING_L,
+      right: CommonConstants.PADDING_L,
+      top: CommonConstants.PADDING_S,
+    })
+    .width(CommonConstants.FULL_PERCENT)
+  }
+
+  @Builder
   ContentBuilder() {
     Column() {
       GridRow(GridRowColSetting.DEFAULT_GRID_ROW_OPTIONS) {
@@ -150,15 +270,21 @@ export struct VideoProgramDetails {
                     index: 0,
                     videoData: this.detailData,
                     isShown: true,
+                    isLandscape: this.videoVM.displayModel.isLandscape,
                     videoNetwork: this.videoVM.networkModel as VideoNetworkModel,
                     videoNetworkSetting: this.videoVM.settingInfo.network as VideoNetworkSetting,
                     currentBreakpoint: this.videoVM.breakPointModel.currentBreakpoint,
                     videoCardPlayerController: this.videoPipModel.getVideoCardPlayerController(),
+                    membershipBuilder: wrapBuilder(membershipOverlayBuilder),
                     isFromDetailCard: true,
                     canChangeSlide: true,
                     isHideSlide: this.isHideSlide,
                     pathStack: RouterUtils.getStack(),
-                    fullScreenIcon: $r('sys.symbol.full_screen'),
+                    themeColor: $r('app.color.app_theme'),
+                    enableAVSession: true,
+                    enableCastPlay: true,
+                    canPlay: this.canPlay,
+                    fullScreenIcon: $r('app.media.ic_sys_full_screen'),
                     isNeedMuteIcon: true,
                     isMute: this.videoVM.isMute,
                     onMute: (value) => {
@@ -167,51 +293,42 @@ export struct VideoProgramDetails {
                     playerStateCallback: (state: string, id: string) => {
                       if (id === this.detailData?.id && state === 'prepared') {
                         if (this.seek) {
-                          this.videoPipModel.videoCardPlayerController.seek(this.seek)
+                          this.videoPipModel.videoCardPlayerController.seek(this.seek);
+                          this.currentProgress = this.seek;
                         }
                       }
+                    },
+                    timeUpdateCallback: (timeMs: number) => {
+                      this.currentProgress = timeMs;
                     },
                     xComponentReadyCallback: (controller: XComponentController) => {
                       this.videoPipModel.setMXComponentController(controller)
                       this.videoPipModel.handlePip()
                     },
                   })
-                    .clip(true)
                 }
               }
-              .width('100%')
+              .width(CommonConstants.FULL_PERCENT)
+              .height(this.videoVM.videoBoxHeight)
+              .aspectRatio(this.videoVM.videoBoxAspectRatio)
               .justifyContent(FlexAlign.Center)
               .alignItems(HorizontalAlign.Center)
               .backgroundColor(Color.Black)
-              .height(this.videoVM.videoBoxHeight)
-              .backgroundColor(Color.Black)
 
-              Row({ space: CommonConstants.SPACE_S }) {
-                Row({ space: 2 }) {
-                  Button() {
-                    SymbolGlyph($r('sys.symbol.chevron_backward'))
-                      .fontColor([$r('sys.color.font_on_primary')])
-                      .fontWeight(FontWeight.Normal)
-                      .fontSize(24 * this.videoVM.settingInfo.fontSizeRatio)
-                  }
-                  .width(40)
-                  .height(40)
-                  .type(ButtonType.Circle)
-                  .backgroundColor($r('sys.color.comp_background_tertiary'))
-                  .accessibilityText('返回')
-                  .onClick(() => {
-                    this.backIntercept()
+              if (!this.canPlay) {
+                Column() {
+                  membershipOverlayBuilder(() => {
+                    this.currentProgress = 0;
+                    this.videoPipModel.getVideoCardPlayerController().seek(0);
+                    this.videoPipModel.getVideoCardPlayerController().play();
                   })
                 }
-                .padding({
-                  left: 8,
-                  top: 3,
-                  right: 8,
-                  bottom: 3,
-                })
-                .borderRadius(4)
+                .width(CommonConstants.FULL_PERCENT)
+                .height(this.videoVM.videoBoxHeight)
+                .aspectRatio(this.videoVM.videoBoxAspectRatio)
               }
-              .padding({ left: CommonConstants.PADDING_L, top: CommonConstants.PADDING_L })
+
+              this.titleBar()
             }
             .priorityGesture(
               GestureGroup(GestureMode.Exclusive,
@@ -255,13 +372,14 @@ export struct VideoProgramDetails {
               }
               .onClick(() => {
                 this.videoPipModel.videoCardPlayerController.pause()
-                let params: Record<string, ValueType> = {
+                const params: Record<string, ValueType> = {
                   'videoId': this.videoDetails!.id,
                   'sectionIndex': this.sectionIndex,
                 }
                 RouterUtils.pushPathByName(RouterMap.VIDEO_PROGRAM_HISTORY, params, (popInfo: PopInfo) => {
-                  const result = popInfo.result as AvSection
-                  this.videoPipModel.videoCardPlayerController.videoUrlChange(result.sectionUrl)
+                  const result = popInfo.result as AvSection;
+                  const videoData = new VideoData(result, this.videoDetails?.title);
+                  this.videoPipModel.videoCardPlayerController.videoUrlChange(videoData);
                   this.sectionIndex = this.videoDetails?.section.findIndex(val => val.id === result.id) ?? -1
                 })
               })
@@ -274,8 +392,9 @@ export struct VideoProgramDetails {
               isTvDetails: true,
               sectionIndex: this.sectionIndex!!,
               onVideoChange: (item: AvSection) => {
-                this.videoPipModel.videoCardPlayerController.videoUrlChange(item.sectionUrl)
-                this.isHideSlide = false
+                const videoData = new VideoData(item, this.videoDetails?.title);
+                this.videoPipModel.videoCardPlayerController.videoUrlChange(videoData);
+                this.isHideSlide = false;
               },
             })
           }
@@ -294,26 +413,29 @@ export struct VideoProgramDetails {
       this.ContentBuilder()
     }
     .hideTitleBar(true)
-    .onReady((context) => {
-      let params = context.pathStack.getParamByName('VideoProgramDetails')[0] as Record<string, ValueType>
+    .onReady(async (context) => {
+      const params = context.pathStack.getParamByName('VideoProgramDetails')[0] as Record<string, ValueType>
       this.videoId = params.avId as string
       this.seek = params.seek as number
+      const videoDetails = await HomeServiceApi.queryHomeTelevisionDetails(this.videoId) as AvModel
+      this.videoDetails = new AvModel(videoDetails)
+      this.detailData = new VideoData(this.videoDetails.section[0], this.videoDetails.title)
+      this.videoPipModel.initVideoPip()
     })
     .onBackPressed(() => {
       this.backIntercept()
       return true
     })
     .padding({
-      top: this.windowModel.windowTopPadding,
+      top: this.videoVM.windowModel.windowTopPadding,
     })
     .onWillShow(() => {
       this.pipWindowModel.isBackPiP = false;
-    })
-    .onShown(async () => {
-      const videoDetails = await HomeServiceApi.queryHomeTelevisionDetails(this.videoId) as AvModel
-      this.videoDetails = new AvModel(videoDetails)
-      this.detailData = new VideoData(this.videoDetails.section[0])
-      this.videoPipModel.initVideoPip()
+      if (this.canPlay) {
+        this.videoVM.setOrientation();
+      } else {
+        this.videoVM.resetOrientation();
+      }
     })
     .onWillDisappear(() => {
       if (!this.videoVM.settingInfo.network.enableLivePiP) {
@@ -321,6 +443,7 @@ export struct VideoProgramDetails {
         this.pipWindowModel.pipController?.setAutoStartEnabled(false);
       }
       this.pipWindowModel.isBackPiP = true;
+      this.videoVM.resetOrientation();
     })
   }
 }

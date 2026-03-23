@@ -1,4 +1,7 @@
-import { Course1, CourseContent, COURSE_CONTENT, COURSE_DATA1, RouterMap, RouterUtils } from 'lib_common';
+import {
+  BreakpointModel,
+  BreakpointNameEnum,
+  Course1, CourseContent, COURSE_CONTENT, COURSE_DATA1, RouterMap, RouterUtils } from 'lib_common';
 import { NavHeaderBar } from 'lib_widget';
 import { CoursePageVM } from '../viewmodels/CoursePageVM';
 import { addDialog, addPlanDialog, cancelDialog, DateDialog, explain,
@@ -7,11 +10,17 @@ import { emitter } from '@kit.BasicServicesKit';
 import { calendarManager } from '@kit.CalendarKit';
 import { abilityAccessCtrl, common, PermissionRequestResult, Permissions } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { promptAction } from '@kit.ArkUI';
+import { AppStorageV2, promptAction } from '@kit.ArkUI';
 
 @Builder
 export function CourseDetailPageBuilder() {
   CourseDetailPage()
+}
+
+interface GridSettingInfo {
+  template: string;
+  colGap: number;
+  rowGap: number;
 }
 
 @ComponentV2
@@ -39,6 +48,7 @@ struct CourseDetailPage {
   @Local calendar: calendarManager.Calendar | undefined = undefined;
   @Local calendarMgr: calendarManager.CalendarManager | null = null;
   @Local titleList: string[] = []
+  @Local breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
 
   buildDateList(): string[] {
     let planDateList: string[] = [];
@@ -95,7 +105,7 @@ struct CourseDetailPage {
   };
 
   public getCalendarPermission(): Promise<string> {
-    let context = getContext(this) as common.UIAbilityContext;
+    let context = this.getUIContext().getHostContext() as common.UIAbilityContext;
 
     const permissions: Permissions[] = ['ohos.permission.READ_CALENDAR', 'ohos.permission.WRITE_CALENDAR'];
     let atManager = abilityAccessCtrl.createAtManager();
@@ -163,12 +173,11 @@ struct CourseDetailPage {
           let coursePlan: string[] = (AppStorage.get(date) ?? []) as string[]
           if (!coursePlan.includes(this.courseId) && this.planList.includes(Number(date))) {
             coursePlan = [...coursePlan, this.courseId];
-            // coursePlan.push(this.courseId);
           }
           AppStorage.setOrCreate<string[]>(date, coursePlan)
           courseList.push(coursePlan)
         })
-        getContext().eventHub.emit('calculateData', courseList);
+        this.getUIContext().getHostContext()?.eventHub.emit('calculateData', courseList);
         this.isShowAddPlanDialog = false;
         if(this.planList.length !== 0) {
           this.addPlanDialogController.open();
@@ -205,7 +214,8 @@ struct CourseDetailPage {
           let permission = await this.getCalendarPermission()
 
           if (permission === 'success') {
-            this.calendarMgr = calendarManager.getCalendarManager(getContext() as common.UIAbilityContext);
+            this.calendarMgr =
+              calendarManager.getCalendarManager(this.getUIContext().getHostContext() as common.UIAbilityContext);
 
             for (let i = 0; i < this.dateList.length; i++) {
               if (this.dateList[i]) {
@@ -246,7 +256,7 @@ struct CourseDetailPage {
 
             this.addDialogController.open();
           }else {
-            promptAction.showToast({message: '没有日历权限，请去设置页面授权'});
+            this.getUIContext().getPromptAction().showToast({message: '没有日历权限，请去设置页面授权'});
           }
         }
       })
@@ -262,6 +272,7 @@ struct CourseDetailPage {
       Scroll() {
         explain(titleList[index])
       }
+      .scrollBar(BarState.Off)
 
       Column() {
         Row({ space: 16 }) {
@@ -289,11 +300,14 @@ struct CourseDetailPage {
               this.isShowExplain[index+1] = true;
             })
         }
+        .width('100%')
+        .justifyContent(FlexAlign.Center)
       }
+      .justifyContent(FlexAlign.Center)
       .alignItems(HorizontalAlign.Center)
       .width('100%')
       .height(64)
-      .padding({ left: 16, right: 16, top: 12, bottom: 12 })
+      .padding({ top: 12, bottom: 12 })
       .position({ y: '85%' }) // 关键定位属性
       .alignSelf(ItemAlign.Center)
     }
@@ -339,6 +353,160 @@ struct CourseDetailPage {
     .height('100%')
   }
 
+  @Builder courseIntroduction() {
+    Column() {
+      Stack({ alignContent: Alignment.BottomEnd }) {
+        Image(this.course.cover)
+          .width('100%')
+          .aspectRatio(1.8)
+          .objectFit(ImageFit.Cover)
+          .borderRadius(16)
+
+        Image(this.isStar ? $r('app.media.star') : $r('app.media.no_star'))
+          .width(40)
+          .height(40)
+          .margin({ right: 12, bottom: 12 })
+          .onClick(() => {
+            if (!this.isStar) {
+              if (this.vm.saveAction(this.label)) {
+                this.isStar = true;
+                AppStorage.setOrCreate<boolean>(this.courseId, true)
+              }
+            } else {
+              if (this.vm.deleteAction(this.label)) {
+                this.isStar = false;
+                AppStorage.setOrCreate<boolean>(this.courseId, false)
+              }
+            }
+          })
+      }
+      .width('100%')
+      .margin({ bottom: 12 })
+
+      Column() {
+        Text(this.course.courseTitle)
+          .fontWeight(FontWeight.Medium)
+          .fontSize(18)
+        Text(`难度：${this.courseContent.difficulty}`)
+          .fontWeight(FontWeight.Medium)
+          .fontSize($r('sys.float.Body_M'))
+          .margin({ top: 12, bottom: 12 })
+        Text(`预计时长：${this.courseContent.duration}分钟`)
+          .fontWeight(FontWeight.Medium)
+          .fontSize($r('sys.float.Body_M'))
+        Text('课程介绍')
+          .fontWeight(FontWeight.Medium)
+          .fontSize($r('sys.float.Body_M'))
+          .margin({ top: 25, bottom: 4 })
+        Text(this.course.description)
+          .fontWeight(FontWeight.Medium)
+          .fontColor('rgba(0, 0, 0, 0.6)')
+          .fontSize($r('sys.float.Body_M'))
+        Text('注意事项')
+          .fontWeight(FontWeight.Medium)
+          .fontSize($r('sys.float.Body_M'))
+          .margin({ top: 25, bottom: 4 })
+        Column() {
+          ForEach(this.courseContent.careAbout, (item: string) => {
+            Text(item)
+              .fontWeight(FontWeight.Medium)
+              .fontColor('rgba(0, 0, 0, 0.6)')
+              .fontSize($r('sys.float.Body_M'))
+              .margin({ bottom: 8 })
+              .width('100%')
+              .textAlign(TextAlign.Start)
+          })
+        }
+      }
+      .alignItems(HorizontalAlign.Start)
+      .width('100%')
+      .padding(12)
+      .borderRadius(16)
+      .backgroundColor(Color.White)
+    }
+  }
+
+  @Computed
+  get buttonWidth() {
+    if ([BreakpointNameEnum.SM].includes(this.breakPointModel.currentBreakpoint)) {
+      return 223;
+    }
+    return 448;
+  }
+
+  @Computed
+  get gridSetting() {
+    const gridSettingInfo: GridSettingInfo  = {
+      template: '1fr',
+      colGap: 12,
+      rowGap: 16,
+    }
+    if ([BreakpointNameEnum.LG, BreakpointNameEnum.XL].includes((this.breakPointModel.currentBreakpoint))) {
+      gridSettingInfo.template = '1fr 1fr'
+    }
+    return gridSettingInfo
+  }
+
+  @Builder courseContentDetail() {
+    Column() {
+      Column() {
+        Text('课程内容')
+          .fontWeight(FontWeight.Medium)
+          .fontSize(18)
+      }
+      .width('100%')
+      .height(24)
+      .alignItems(HorizontalAlign.Start)
+      .margin({ bottom: 8 })
+
+      Column() {
+        ForEach(this.courseContent.contentCategory, (item: string, index) => {
+          Row() {
+            Row() {
+              Text(item)
+                .fontWeight(FontWeight.Medium)
+                .fontSize($r('sys.float.Body_L'))
+                .margin({ right: 8 })
+              Text(this.courseContent.contentDuration[index])
+                .fontWeight(FontWeight.Medium)
+                .fontSize($r('sys.float.Body_M'))
+            }
+
+            Text('查看讲解')
+              .fontColor(Color.White)
+              .backgroundColor($r('app.color.app_theme'))
+              .width(80)
+              .height(28)
+              .borderRadius(14)
+              .textAlign(TextAlign.Center)
+              .onClick(() => {
+                this.isShowExplain[index] = true;
+              })
+              .bindSheet(this.isShowExplain[index], (!this.vm.isVIP() && this.isVIPCourse()) ?
+                this.explainVIPBuilder(index, this.titleList) : this.explainBuilder(index, this.titleList), {
+                height: '90%',
+                dragBar: false,
+                showClose: true,
+                preferType: SheetType.CENTER,
+                backgroundColor: '#fff',
+                onDisappear: () => {
+                  this.isShowExplain[index] = false;
+                }
+              })
+          }
+          .width('100%')
+          .padding({ top: 12, bottom: 12 })
+          .justifyContent(FlexAlign.SpaceBetween)
+        })
+      }
+      .backgroundColor(Color.White)
+      .borderRadius(12)
+      .padding({ left: 12, right: 12 })
+      .width('100%')
+    }
+
+  }
+
   build() {
     NavDestination() {
       Column() {
@@ -348,134 +516,29 @@ struct CourseDetailPage {
 
         Scroll(this.scroller) {
           Column() {
-            Stack() {
-              Image(this.course.cover)
-                .width(328)
-                .height(184)
-                .borderRadius(16)
-
-              Image(this.isStar ? $r('app.media.star') : $r('app.media.no_star'))
-                .position({ x: 276, y: 132 }) // 基于图片左上角的坐标
-                .width(40)
-                .height(40)
-                .onClick(() => {
-                  if (!this.isStar) {
-                    if (this.vm.saveAction(this.label)) {
-                      this.isStar = true;
-                      AppStorage.setOrCreate<boolean>(this.courseId, true)
-                    }
-                  } else {
-                    if (this.vm.deleteAction(this.label)) {
-                      this.isStar = false;
-                      AppStorage.setOrCreate<boolean>(this.courseId, false)
-                    }
-                  }
-                })
-            }
-            .margin({ top: 12, bottom: 12 })
-
-            Column() {
-              Text(this.course.courseTitle)
-                .fontWeight(FontWeight.Medium)
-                .fontSize(18)
-              Text(`难度：${this.courseContent.difficulty}`)
-                .fontWeight(FontWeight.Medium)
-                .fontSize($r('sys.float.Body_M'))
-                .margin({ top: 12, bottom: 12 })
-              Text(`预计时长：${this.courseContent.duration}分钟`)
-                .fontWeight(FontWeight.Medium)
-                .fontSize($r('sys.float.Body_M'))
-              Text('课程介绍')
-                .fontWeight(FontWeight.Medium)
-                .fontSize($r('sys.float.Body_M'))
-                .margin({ top: 25, bottom: 4 })
-              Text(this.course.description)
-                .fontWeight(FontWeight.Medium)
-                .fontColor('rgba(0, 0, 0, 0.6)')
-                .fontSize($r('sys.float.Body_M'))
-              Text('注意事项')
-                .fontWeight(FontWeight.Medium)
-                .fontSize($r('sys.float.Body_M'))
-                .margin({ top: 25, bottom: 4 })
-              Column() {
-                ForEach(this.courseContent.careAbout, (item: string) => {
-                  Text(item)
-                    .fontWeight(FontWeight.Medium)
-                    .fontColor('rgba(0, 0, 0, 0.6)')
-                    .fontSize($r('sys.float.Body_M'))
-                    .margin({ bottom: 8 })
-                    .width('90%')
-                    .textAlign(TextAlign.Start)
-                })
+            Grid() {
+              GridItem() {
+                this.courseIntroduction()
+              }
+              GridItem() {
+                this.courseContentDetail()
               }
             }
-            .alignItems(HorizontalAlign.Start)
-            .width(332)
-            .padding(12)
-            .borderRadius(16)
-            .backgroundColor(Color.White)
-
-
-            Column() {
-              Text('课程内容')
-                .fontWeight(FontWeight.Medium)
-                .fontSize(18)
-            }
-            .width(316)
-            .height(24)
-            .alignItems(HorizontalAlign.Start)
-            .margin({ top: 12, bottom: 8 })
-
-            Column() {
-              ForEach(this.courseContent.contentCategory, (item: string, index) => {
-                Row() {
-                  Row() {
-                    Text(item)
-                      .fontWeight(FontWeight.Medium)
-                      .fontSize($r('sys.float.Body_L'))
-                      .margin({ right: 8 })
-                    Text(this.courseContent.contentDuration[index])
-                      .fontWeight(FontWeight.Medium)
-                      .fontSize($r('sys.float.Body_M'))
-                  }
-
-                  Text('查看讲解')
-                    .fontColor(Color.White)
-                    .backgroundColor($r('app.color.app_theme'))
-                    .width(80)
-                    .height(28)
-                    .borderRadius(14)
-                    .textAlign(TextAlign.Center)
-                    .onClick(() => {
-                      this.isShowExplain[index] = true;
-                    })
-                    .bindSheet(this.isShowExplain[index], (!this.vm.isVIP() && this.isVIPCourse()) ?
-                      this.explainVIPBuilder(index, this.titleList) : this.explainBuilder(index, this.titleList), {
-                      height: '90%',
-                      dragBar: false,
-                      showClose: true,
-                      preferType: SheetType.BOTTOM,
-                      backgroundColor: '#fff',
-                      onDisappear: () => {
-                        this.isShowExplain[index] = false;
-                      }
-                    })
-                }
-                .width(304)
-                .padding({ top: 12, bottom: 12 })
-                .justifyContent(FlexAlign.SpaceBetween)
-              })
-            }
-            .backgroundColor(Color.White)
-            .borderRadius(12)
-            .padding({ left: 12, right: 12 })
-            .width(328)
+            .columnsTemplate(this.gridSetting.template)
+            .columnsGap(this.gridSetting.colGap)
+            .rowsGap(this.gridSetting.rowGap)
           }
         }
         .layoutWeight(1)
+        .align(Alignment.Top)
         .scrollBar(BarState.Off)
         .scrollable(ScrollDirection.Vertical)
         .edgeEffect(EdgeEffect.Spring)
+        .padding({
+          left: this.vm.breakPointModel.pagePadding,
+          right: this.vm.breakPointModel.pagePadding,
+          bottom: 24
+        })
         .width('100%')
 
         Column() {
@@ -491,6 +554,7 @@ struct CourseDetailPage {
                   .fontSize($r('sys.float.Body_L'))
               }
               .padding({ left: 16, right: 16, top: 9, bottom: 9 })
+              .margin({ top: 4 })
               .justifyContent(FlexAlign.Center)
               .width(328)
               .height(40)
@@ -501,64 +565,71 @@ struct CourseDetailPage {
               })
           } else {
             Row() {
-              Column() {
-                Image(this.planList.includes(new Date().getDate()) ? $r('app.media.ic_plan_on')
-                : $r('app.media.ic_plan_off'))
-                  .width(24)
-                  .height(24)
-                  .margin({ bottom: 2 })
-                Text(this.planList.includes(new Date().getDate()) ? '已加计划' : '加计划')
-                  .width(40)
-                  .fontWeight(FontWeight.Medium)
-                  .fontSize(10)
-              }
-              .width(54)
-              .height(48)
-              .padding({ top: 4, left: 12, right: 12, bottom: 4 })
-              .onClick(() => {
-                this.isShowAddPlanDialog = true;
-              })
-              .bindSheet($$this.isShowAddPlanDialog, this.addPlanDialogBuilder(), {
-                height: '40%',
-                dragBar: false,
-                showClose: true,
-                title: { title: '添加计划' },
-                backgroundColor: '#fff',
-                preferType: SheetType.BOTTOM,
-                onDisappear: () => {
-                  this.isShowAddPlanDialog = false;
+              Row() {
+                Column() {
+                  Image(this.planList.includes(new Date().getDate()) ? $r('app.media.ic_plan_on')
+                    : $r('app.media.ic_plan_off'))
+                    .width(24)
+                    .height(24)
+                    .margin({ bottom: 2 })
+                  Text(this.planList.includes(new Date().getDate()) ? '已加计划' : '加计划')
+                    .width(54)
+                    .fontWeight(FontWeight.Medium)
+                    .fontSize(10)
+                    .textAlign(TextAlign.Center)
                 }
-              })
+                .alignItems(HorizontalAlign.Center)
+                .justifyContent(FlexAlign.Center)
+                .width(54)
+                .height(48)
+                .padding({ top: 4, left: 12, right: 12, bottom: 4 })
+                .onClick(() => {
+                  this.isShowAddPlanDialog = true;
+                })
+                .bindSheet($$this.isShowAddPlanDialog, this.addPlanDialogBuilder(), {
+                  height: '40%',
+                  dragBar: false,
+                  showClose: true,
+                  title: { title: '添加计划' },
+                  backgroundColor: '#fff',
+                  preferType: SheetType.CENTER,
+                  onDisappear: () => {
+                    this.isShowAddPlanDialog = false;
+                  }
+                })
 
-              Column() {
-                Image(this.dateList.includes(String(new Date().getDate())) ? $r('app.media.ic_date_on')
-                  : $r('app.media.ic_date_off'))
-                  .width(24)
-                  .height(24)
-                  .margin({ bottom: 2 })
-                Text(this.dateList.includes(String(new Date().getDate())) ? '已加日程' : '加日程')
-                  .width(40)
-                  .fontWeight(FontWeight.Medium)
-                  .fontSize(10)
-              }
-              .width(50)
-              .height(48)
-              .padding({ top: 4, left: 8, right: 12, bottom: 4 })
-              .onClick(() => {
-                this.isShowAddDateDialog = true;
-              })
-              .bindSheet($$this.isShowAddDateDialog, this.addDateDialogBuilder(), {
-                height: '70%',
-                dragBar: false,
-                showClose: true,
-                preferType: SheetType.BOTTOM,
-                title: { title: '添加日历' },
-                backgroundColor: '#fff',
-                onDisappear: () => {
-                  this.isShowAddDateDialog = false;
+                Column() {
+                  Image(this.dateList.includes(String(new Date().getDate())) ? $r('app.media.ic_date_on')
+                    : $r('app.media.ic_date_off'))
+                    .width(24)
+                    .height(24)
+                    .margin({ bottom: 2 })
+                  Text(this.dateList.includes(String(new Date().getDate())) ? '已加日程' : '加日程')
+                    .width(50)
+                    .fontWeight(FontWeight.Medium)
+                    .fontSize(10)
+                    .textAlign(TextAlign.Center)
                 }
-              })
-
+                .alignItems(HorizontalAlign.Center)
+                .justifyContent(FlexAlign.Center)
+                .width(50)
+                .height(48)
+                .padding({ top: 4, left: 8, right: 12, bottom: 4 })
+                .onClick(() => {
+                  this.isShowAddDateDialog = true;
+                })
+                .bindSheet($$this.isShowAddDateDialog, this.addDateDialogBuilder(), {
+                  height: '70%',
+                  dragBar: false,
+                  showClose: true,
+                  preferType: SheetType.CENTER,
+                  title: { title: '添加日历' },
+                  backgroundColor: '#fff',
+                  onDisappear: () => {
+                    this.isShowAddDateDialog = false;
+                  }
+                })
+              }
               Row() {
                 Text('准备好了吗？')
                   .fontColor(Color.White)
@@ -571,12 +642,18 @@ struct CourseDetailPage {
               }
               .justifyContent(FlexAlign.Center)
               .padding({ left: 16, right: 16, top: 9, bottom: 9 })
-              .width(223)
+              .width(this.buttonWidth)
               .height(40)
               .borderRadius(20)
               .backgroundColor($r('app.color.app_theme'))
               .onClick(() => RouterUtils.pushPathByName(RouterMap.COURSE_VIDEO, this.courseId))
             }
+            .width('100%')
+            .padding({
+              left: this.vm.breakPointModel.pagePadding,
+              right: this.vm.breakPointModel.pagePadding,
+            })
+            .justifyContent(FlexAlign.SpaceBetween)
           }
         }
         .width('100%')

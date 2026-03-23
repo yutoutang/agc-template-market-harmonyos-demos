@@ -50,7 +50,7 @@ export class BreakpointType<T> {
 
 export class BreakpointSystem {
   private static instance: BreakpointSystem;
-  private currentBreakpoint: BreakpointTypeEnum = BreakpointTypeEnum.MD;
+  public  currentBreakpoint: BreakpointTypeEnum = BreakpointTypeEnum.MD;
 
   private constructor() {
   }
@@ -62,15 +62,15 @@ export class BreakpointSystem {
     return BreakpointSystem.instance;
   }
 
-  public onWindowSizeChange(window: window.Window): void {
-    this.updateWidthBp(window);
+  public onWindowSizeChange(windowStage: window.WindowStage, window: window.Window): void {
+    this.updateWidthBp(windowStage, window);
   }
 
-  public updateWidthBp(window: window.Window): void {
+  public updateWidthBp(windowStage: window.WindowStage,window: window.Window): void {
     try {
       const mainWindow: window.WindowProperties = window.getWindowProperties();
       const windowWidth: number = mainWindow.windowRect.width;
-      const windowWidthVp = px2vp(windowWidth);
+      const windowWidthVp = windowStage.getMainWindowSync().getUIContext().px2vp(windowWidth);
       let widthBp: BreakpointTypeEnum = BreakpointTypeEnum.MD;
       if (windowWidthVp >= 320 && windowWidthVp < 600) {
         widthBp = BreakpointTypeEnum.SM;

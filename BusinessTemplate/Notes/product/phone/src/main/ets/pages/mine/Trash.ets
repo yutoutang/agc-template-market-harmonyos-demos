@@ -4,6 +4,7 @@ import { NoteSearchController } from '../../controller/NoteSearchController';
 import { EmptyTrash } from '../../components/EmptyTrash';
 import { Note } from 'richeditor';
 import { AppStorageV2 } from '@kit.ArkUI';
+import { KVStore, SerializeUtil } from 'serializer';
 
 @Builder
 export function TrashBuilder() {
@@ -13,8 +14,10 @@ export function TrashBuilder() {
 @ComponentV2
 export struct Trash {
   @Consumer('appPathStack') appPathStack: NavPathStack = new NavPathStack();
+  @Consumer() kvStore: KVStore | undefined = undefined;
   noteService: NoteService = NoteService.instance;
   @Local noteList: Note[] = this.noteService.getDumpstersData();
+  uiContext: UIContext = this.getUIContext() as UIContext;
   private currentNote: Note | undefined = undefined;
   private searchCtrl: NoteSearchController = NoteSearchController.instance;
   private scroller: ListScroller = new ListScroller();

@@ -4,7 +4,7 @@
 
 - [简介](#简介)
 - [约束与限制](#约束与限制)
-- [快速入门](#快速入门)
+- [使用](#使用)
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
@@ -27,7 +27,7 @@
 
 - 网络权限：ohos.permission.INTERNET
 
-## 快速入门
+## 使用
 
 1. 安装组件。
 
@@ -143,7 +143,7 @@
 3. 引入组件。
 
    ```
-   import { CardLongTakeDelegate,ImageLongTakeDelegate } from 'module_transition';
+   import { CardLongTakeDelegate } from 'module_transition';
    ```
 
 4. 调用组件，详细组件调用参见[示例代码](#示例代码)。
@@ -582,81 +582,6 @@ struct Home {
       .columnsTemplate('1fr '.repeat(3))
       .columnsGap(8)
     }
-  }
-}
-```
-
-```ts
-import {
-  ImageLongTakeDelegate} from 'module_transition';
-
-@Builder
-export function ImageLongTakePageTwoBuilder() {
-  ImageLongTakePageTwo();
-}
-
-@ComponentV2
-export struct ImageLongTakePageTwo {
-  @Local componentId:string = ''
-  @Local imageList:string[] = []
-  @Local pageInfos: NavPathStack = new NavPathStack();
-  private onIndexChange: (index: number) => void = (_index: number) => {}
-  @Local selectedIndex: number = 0;
-  private onFirstPageShow: () => void = () => {};
-  backToFirstPage: () => void = () => {
-    animateTo({
-      duration: 200,
-      curve: Curve.EaseIn,
-    }, () => {
-      this.onFirstPageShow();
-      this.pageInfos.pop(false);
-    })
-  }
-
-  build() {
-    NavDestination() {
-      Swiper() {
-        ForEach(this.imageList, (item: string, index: number) => {
-          ImageLongTakeDelegate({
-            componentId: this.componentId,
-            imageUrl: item,
-            backToFirstPage: () => {
-              this.backToFirstPage()
-            },
-          })
-        }, (item: string) => item)
-      }
-      .transition(TransitionEffect.opacity(0.99))
-      .width('100%')
-      .height('100%')
-      .clip(false)
-      .index(this.selectedIndex)
-      .onChange((index: number) => {
-        this.selectedIndex = index;
-        this.onIndexChange(index);
-      })
-      .onAnimationStart((_: number, targetIndex: number) => {
-        this.onIndexChange(targetIndex);
-      })
-      .indicator(false)
-    }
-    .mode(NavDestinationMode.DIALOG)
-    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP,SafeAreaEdge.BOTTOM])
-    .hideTitleBar(true)
-    .onBackPressed(() => {
-      this.backToFirstPage();
-      return true;
-    })
-    .transition(TransitionEffect.opacity(0.99))
-    .onReady((navDestContext: NavDestinationContext) => {
-      this.pageInfos = navDestContext.pathStack;
-      let param = navDestContext.pathInfo?.param as Record<string, Object>;
-      this.componentId = param.componentId as string
-      this.imageList = param.imageList as string[]
-      this.selectedIndex = param.selectedIndex as number
-      this.onFirstPageShow = param.onBackToFirstPage as () => void;
-      this.onIndexChange = param.onIndexChange as (index: number) => void;
-    })
   }
 }
 ```

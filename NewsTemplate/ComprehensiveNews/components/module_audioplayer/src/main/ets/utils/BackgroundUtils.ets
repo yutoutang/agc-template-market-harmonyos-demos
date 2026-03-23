@@ -3,6 +3,8 @@ import { backgroundTaskManager } from '@kit.BackgroundTasksKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { UtilLog } from '@hw-agconnect/util-log';
 
+const TAG = '[BackgroundUtils]';
+
 export class BackgroundUtils {
   /**
    * 开启后台播放
@@ -12,8 +14,8 @@ export class BackgroundUtils {
     if (!context) {
       UtilLog.error('this avPlayer: ', `context undefined`);
       return;
-    };
-    let wantAgentInfo: wantAgent.WantAgentInfo = {
+    }
+    const wantAgentInfo: wantAgent.WantAgentInfo = {
       wants: [
         {
           bundleName: context.abilityInfo.bundleName,
@@ -50,16 +52,11 @@ export class BackgroundUtils {
    */
   public static stopContinuousTask(context: common.UIAbilityContext): void {
     if (canIUse('SystemCapability.ResourceSchedule.BackgroundTaskManager.ContinuousTask')) {
-      try {
-        backgroundTaskManager.stopBackgroundRunning(context).then(() => {
-          UtilLog.info('this avPlayer: ', 'stopBackgroundRunning succeeded');
-        }).catch((error: BusinessError) => {
-          UtilLog.error('this avPlayer: ', `stopBackgroundRunning failed Cause: code ${error.code}`);
-        });
-      } catch (error) {
-        UtilLog.error('this avPlayer: ',
-          `stopBackgroundRunning failed. code ${(error as BusinessError).code} message ${(error as BusinessError).message}`);
-      }
+      backgroundTaskManager.stopBackgroundRunning(context).then(() => {
+        UtilLog.info(TAG, 'stopBackgroundRunning succeeded');
+      }).catch((error: BusinessError) => {
+        UtilLog.error(TAG, `stopBackgroundRunning failed Cause: code ${error.code}, message: ${error.message}`);
+      });
     }
   };
 }

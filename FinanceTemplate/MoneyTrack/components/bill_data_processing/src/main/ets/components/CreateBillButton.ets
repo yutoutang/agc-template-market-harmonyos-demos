@@ -3,6 +3,8 @@ import { FloatingButton } from './FloatingButton';
 
 @ComponentV2
 export struct CreateBillButton {
+  @Param @Require
+  accountId: number;
   @Param
   assetId: number | undefined = undefined;
   @Event
@@ -11,7 +13,7 @@ export struct CreateBillButton {
   build() {
     FloatingButton({
       handleClick: () => {
-        BillManageUtil.manageBill(undefined, this.assetId, this.handleCreateSuccess);
+        BillManageUtil.manageBill(undefined, this.assetId, this.accountId, this.handleCreateSuccess);
       },
     });
   }

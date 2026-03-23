@@ -86,11 +86,13 @@ export struct BookListPage {
         Text(item)
           .textAlign(TextAlign.Center)
           .fontSize($r('sys.float.Body_L'))
-          .fontColor(this.currentIndex === index ? Color.White : $r('sys.color.font_primary'))
+          .fontColor(this.currentIndex === index ? $r('sys.color.ohos_id_color_background') :
+            $r('sys.color.font_primary'))
           .fontWeight(FontWeight.Medium)
           .height(36)
           .width(96)
-          .backgroundColor(this.currentIndex === index ? Color.Black : '#0d000000')
+          .backgroundColor(this.currentIndex === index ? $r('sys.color.comp_foreground_primary') :
+            ($r('sys.color.comp_background_tertiary')))
           .borderRadius(21)
           .onClick(async () => {
             this.currentIndex = index
@@ -160,6 +162,6 @@ export struct BookListPage {
     }
     .width(Constants.FULL_SIZE)
     .height(Constants.FULL_SIZE)
-    .backgroundColor('#F1F3F5')
+    .backgroundColor($r('sys.color.ohos_id_color_sub_background'))
   }
 }

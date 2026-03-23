@@ -1,6 +1,7 @@
-import { promptAction } from '@kit.ArkUI';
-import { BalanceChangeType, BillCardItem } from 'bill_base';
+import { BalanceChangeType, BillCardItem, Logger } from 'bill_base';
 import { BillDetail } from '../components/BillDetail';
+
+const TAG = '[BillDetailExample1]'
 
 const MOCK_BILL_ITEM: BillCardItem =
   {
@@ -28,16 +29,27 @@ struct BillDetailExample1 {
         bill: this.bill,
         amountFontColor: Color.Pink,
         handleEdit: () => {
-          promptAction.showToast({
-            message: '触发了账单的编辑事件，随机生成一个金额',
-            alignment: Alignment.Top,
-          });
+          try {
+            this.getUIContext().getPromptAction().showToast({
+              message: '触发了账单的编辑事件，随机生成一个金额',
+              alignment: Alignment.Top
+            });
+          } catch (err) {
+            Logger.error(TAG, 'show toast failed. error:' + JSON.stringify(err));
+          }
           const newBill = JSON.parse(JSON.stringify(MOCK_BILL_ITEM)) as BillCardItem;
           newBill.amount = new Date().getSeconds();
           this.bill = newBill;
         },
         handleDelete: () => {
-          promptAction.showToast({ message: '触发了账单的删除事件', alignment: Alignment.Top });
+          try {
+            this.getUIContext().getPromptAction().showToast({
+              message: '触发了账单的删除事件',
+              alignment: Alignment.Top
+            });
+          } catch (err) {
+            Logger.error(TAG, 'show toast failed. error:' + JSON.stringify(err));
+          }
         },
       });
     }

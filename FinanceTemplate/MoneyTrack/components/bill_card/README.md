@@ -2,7 +2,7 @@
 
 - [简介](#简介)
 - [约束与限制](#约束与限制)
-- [快速入门](#快速入门)
+- [使用](#使用)
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
@@ -40,7 +40,7 @@
 无
 
 
-## 快速入门
+## 使用
 
 1. 安装组件。
 
@@ -258,7 +258,7 @@ struct BillCardExample2 {
             date: '2025-05-30',
             transactionId: new Date().getTime(),
             resource: 100,
-            icon: $r('app.media.ic_expense_0'), // 图片需自行替换
+            icon: $r('app.media.ic_expense_0'),
             title: '餐饮',
             note: '黄焖鸡',
             amount: 30,
@@ -279,7 +279,7 @@ struct BillCardExample2 {
     }
     .padding(16)
     .backgroundColor('#eee');
-  };
+  }
 }
 ```
 
@@ -339,7 +339,7 @@ struct BillSummaryCardExample1 {
     }
     .padding(16)
     .backgroundColor('#eee');
-  };
+  }
 }
 ```
 
@@ -350,9 +350,10 @@ struct BillSummaryCardExample1 {
 ### 示例3（账单详情展示与编辑、删除事件使用）
 
 ```ts
-import { BalanceChangeType, BillCardItem } from 'bill_base';
+import { BalanceChangeType, BillCardItem, Logger } from 'bill_base';
 import { BillDetail } from 'bill_card';
-import { promptAction } from '@kit.ArkUI';
+
+const TAG = '[BillDetailExample1]'
 
 const MOCK_BILL_ITEM: BillCardItem =
   {
@@ -380,22 +381,33 @@ struct BillDetailExample1 {
         bill: this.bill,
         amountFontColor: Color.Pink,
         handleEdit: () => {
-          promptAction.showToast({
-            message: '触发了账单的编辑事件，随机生成一个金额',
-            alignment: Alignment.Top,
-          });
+          try {
+            this.getUIContext().getPromptAction().showToast({
+              message: '触发了账单的编辑事件，随机生成一个金额',
+              alignment: Alignment.Top
+            });
+          } catch (err) {
+            Logger.error(TAG, 'show toast failed. error:' + JSON.stringify(err));
+          }
           const newBill = JSON.parse(JSON.stringify(MOCK_BILL_ITEM)) as BillCardItem;
-          newBill.amount = (Math.random() * 100);
+          newBill.amount = new Date().getSeconds();
           this.bill = newBill;
         },
         handleDelete: () => {
-          promptAction.showToast({ message: '触发了账单的删除事件', alignment: Alignment.Top });
+          try {
+            this.getUIContext().getPromptAction().showToast({
+              message: '触发了账单的删除事件',
+              alignment: Alignment.Top
+            });
+          } catch (err) {
+            Logger.error(TAG, 'show toast failed. error:' + JSON.stringify(err));
+          }
         },
       });
     }
     .padding(16)
     .backgroundColor('#eee');
-  };
+  }
 }
 ```
 

@@ -12,11 +12,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import { RouterModule } from '../utils/RouterModule'
 
 @ObservedV2
 export class GlobalInfoModel {
+  private static _instance: GlobalInfoModel;
   @Trace currentBreakpoint: BreakpointTypeEnum = BreakpointTypeEnum.MD;
+  @Trace navStack: NavPathStack = RouterModule.getStack();
+
+  public static get instance() {
+    if (!GlobalInfoModel._instance) {
+      GlobalInfoModel._instance = new GlobalInfoModel();
+    }
+    return GlobalInfoModel._instance;
+  }
 }
 
 

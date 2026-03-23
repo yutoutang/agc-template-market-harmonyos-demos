@@ -2,7 +2,10 @@ import { FunctionalButton, functionalButtonComponentManager } from '@kit.Scenari
 import { UserInfo } from '../model/UserInfo';
 import { rightArrow } from '../components/RightArrow';
 import { promptAction } from '@kit.ArkUI';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 
+const DOMAIN = 0xff00;
+const TAG = '[UserInfoPage]';
 
 @Builder
 export function UserInfoBuilder() {
@@ -86,6 +89,7 @@ export struct UserInfoPage {
             controller: new functionalButtonComponentManager.FunctionalButtonController()
               .onChooseAvatar((error, data) => {
                 if (error) {
+                  hilog.error(DOMAIN, TAG, 'onChooseAvatar failed, error: ' + JSON.stringify(error));
                   return;
                 }
                 this.userInfo.userAvatar = data.avatarUri ? data.avatarUri : this.userInfo.userAvatar;

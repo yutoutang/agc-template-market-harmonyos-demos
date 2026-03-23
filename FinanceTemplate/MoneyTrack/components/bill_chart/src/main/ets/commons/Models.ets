@@ -4,8 +4,6 @@ import dayjs from 'dayjs';
 export class CalendarBillItemModel {
   // dayjs时间
   @Trace dayjsObj: dayjs.Dayjs;
-  // 是否当前月
-  @Trace isCurMonth: boolean;
   //
   @Trace dateStr: string;
   // 日期
@@ -17,14 +15,12 @@ export class CalendarBillItemModel {
 
   constructor(
     dayjsObj: dayjs.Dayjs,
-    isCurMonth: boolean,
     dateStr: string,
     day: number,
     lunarDay: string,
     lunarColor: ResourceColor,
   ) {
     this.dayjsObj = dayjsObj;
-    this.isCurMonth = isCurMonth;
     this.dateStr = dateStr;
     this.day = day;
     this.lunarDay = lunarDay;

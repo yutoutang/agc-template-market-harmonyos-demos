@@ -183,9 +183,11 @@ struct RecordPage {
             Row({ space: 10 }) {
               ForEach(this.textItems, (item: string, index: number) => {
                 Button(item)
+                  .width('30%')
                   .type(ButtonType.Capsule)
-                  .backgroundColor(this.textSelectedIndex === index ? '#007DFF' : '#F5F5F5')
-                  .fontColor(this.textSelectedIndex === index ? Color.White : '#666666')
+                  .backgroundColor(this.textSelectedIndex === index ? $r('app.color.app_theme') :
+                    'rgba(0, 0, 0, 0.05)')
+                  .fontColor(this.textSelectedIndex === index ? Color.White : $r('sys.color.font_on_primary'))
                   .onClick(() => {
                     this.textSelectedIndex = index
                   })
@@ -281,7 +283,7 @@ struct RecordPage {
         Image($r('app.media.ic_chart_left'))
           .width(24)
           .height(24)
-        Text(`${this.weekdayList[0]}-${this.weekdayList[6]}`)
+        Text(`${this.weekdayList[0]}~${this.weekdayList[6]}`)
           .fontWeight(FontWeight.Medium)
           .fontSize($r('sys.float.Body_L'))
         Image($r('app.media.ic_chart_right'))
@@ -498,10 +500,10 @@ struct RecordPage {
 function noop() {
 }
 
-@Component
+@ComponentV2
 export struct VCard {
-  @Prop
-  title: ResourceStr;
+  @Local
+  title: ResourceStr = '';
   @BuilderParam
   content: () => void = noop;
 

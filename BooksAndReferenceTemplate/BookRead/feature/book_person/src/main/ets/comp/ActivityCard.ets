@@ -63,7 +63,7 @@ export struct ActivityCard {
     .width(Constants.FULL_SIZE)
     .height(72)
     .borderRadius(16)
-    .backgroundColor($r('sys.color.background_primary'))
+    .backgroundColor($r('sys.color.comp_background_list_card'))
     .padding({
       left:12,
       right:12,

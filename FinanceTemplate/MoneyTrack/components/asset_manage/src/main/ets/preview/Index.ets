@@ -1,7 +1,8 @@
-import { AssetRecordItemModel, AssetDisplayTypeItem, AssetRecordItem, AssetType } from 'asset_base';
+import { AssetRecordItemModel, AssetDisplayTypeItem, AssetRecordItem, AssetType, Logger } from 'asset_base';
 import { assetCreateSheetBuilder } from '../components/AssetCreateSheet';
-import { promptAction } from '@kit.ArkUI';
 import { assetInfoManageSheetBuilder } from '../components/AssetInfoManageSheet';
+
+const TAG = '[PreviewPage]'
 
 const MOCK_ASSET_TYPE_LIST: AssetDisplayTypeItem[] = [
   {
@@ -149,7 +150,11 @@ struct PreviewPage {
     if (typeof idx === 'number') {
       this.assetList.splice(idx, 1);
     }
-    promptAction.showToast({ message: '删除成功' });
+    try {
+      this.getUIContext().getPromptAction().showToast({ message: '删除成功' });
+    } catch (err) {
+      Logger.error(TAG, 'show toast failed. error:' + JSON.stringify(err));
+    }
     this.showManageSheet = false;
   }
 }

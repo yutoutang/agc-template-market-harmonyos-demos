@@ -50,7 +50,7 @@ export struct NavHeaderBar {
               .fontSize(this.isSubTitle ? $r('sys.float.Title_S') : $r('sys.float.Title_M'))
               .fontColor($r('sys.color.font_primary'))
               .fontWeight(FontWeight.Bold)
-              .margin({ left: CommonConstants.SPACE_S })
+              .margin({ left: this.isSubTitle ? CommonConstants.SPACE_S : 0 })
               .id('nav_title')
           }
         }

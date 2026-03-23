@@ -1,10 +1,21 @@
 import { HotCourse } from 'course';
 import { RouterMap, RouterUtils, DateUtil, CommonConstants, Course1, COURSE_DATA1,
-  COURSE_CONTENT, CourseContent} from 'lib_common';
+  COURSE_CONTENT, CourseContent,
+  BreakpointNameEnum,
+  BreakpointModel} from 'lib_common';
 import { NavHeaderBar } from 'lib_widget';
+import { AppStorageV2, display } from '@kit.ArkUI';
+import { preferences } from '@kit.ArkData';
+import { common } from '@kit.AbilityKit';
 
 class Plan {
   coursePlan: Course1[] = []
+}
+
+interface GridSettingInfo {
+  template: string;
+  colGap: number;
+  rowGap: number;
 }
 
 @Builder
@@ -12,25 +23,27 @@ export function PlanPageBuilder() {
   PlanPage()
 }
 
-@Component
+@ComponentV2
 export struct PlanPage {
   scroller: Scroller = new Scroller()
   private weekNameList: string[] = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
-  @State dateList: Date[] = [];
-  @State dateSelectIndex: number = 0;
-  @State planList: string[] = [];
-  @State coursePlan: Course1[] = []
-  @State courseContent: CourseContent[] = []
-  @State loss: number = 0
-  @State target: number = 0
-  @State days: number = 0
-  @State energy: number = 0
+  @Local context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext
+  @Local dateList: Date[] = [];
+  @Local dateSelectIndex: number = 0;
+  @Local planList: string[] = [];
+  @Local coursePlan: Course1[] = []
+  @Local courseContent: CourseContent[] = []
+  @Local loss: number = 0
+  @Local target: number = 0
+  @Local days: number = 0
+  @Local energy: number = 0
+  @Local breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
   private listScroller: ListScroller = new ListScroller();
   private month: number = new Date().getMonth();
 
   aboutToAppear() {
     this.dateList = this.buildDateList();
-    getContext().eventHub.on('calculateData', (courseList: string[][]) => {
+    this.getUIContext().getHostContext()?.eventHub.on('calculateData', (courseList: string[][]) => {
       this.days = 0
       this.energy = 0
       this.calculateData(courseList)
@@ -44,7 +57,7 @@ export struct PlanPage {
   }
 
   aboutToDisappear(): void {
-    getContext().eventHub.off('calculateData')
+    this.getUIContext().getHostContext()?.eventHub.off('calculateData')
   }
 
   calculateData(coursePlan: string[][]) {
@@ -59,8 +72,9 @@ export struct PlanPage {
         this.energy += Number(COURSE_CONTENT[index].energy)
       })
     })
+    const pref = preferences.getPreferencesSync(this.context, { name: 'prefData' });
     this.loss = Number((this.energy / 7700).toFixed(2))
-    this.target = Number(AppStorage.get('userWeight')) - this.loss
+    this.target = Number(pref.getSync('userWeight', '')) - this.loss
   }
 
   private buildPlanList(): Course1[] {
@@ -100,6 +114,36 @@ export struct PlanPage {
     this.coursePlan = this.buildPlanList()
   }
 
+  @Computed
+  get dateWidth() {
+    if ([BreakpointNameEnum.SM, BreakpointNameEnum.MD].includes(this.breakPointModel.currentBreakpoint)) {
+      return 0;
+    }
+    return 32;
+  }
+
+  @Computed
+  get gridSetting() {
+    // 获取当前屏幕旋转角度（0-3 分别对应 0°、90°、180°、270°）
+    let rotation: number = display.getDefaultDisplaySync().rotation;
+    const gridSettingInfo: GridSettingInfo  = {
+      template: '1fr',
+      colGap: 8,
+      rowGap: 8,
+    }
+    if (BreakpointNameEnum.MD === this.breakPointModel.currentBreakpoint) {
+      gridSettingInfo.template = '1fr 1fr'
+    }
+    if ([BreakpointNameEnum.LG, BreakpointNameEnum.XL].includes((this.breakPointModel.currentBreakpoint))) {
+      if (rotation === 1 || rotation === 3) {
+        gridSettingInfo.template = '1fr 1fr 1fr'
+        gridSettingInfo.colGap = 24
+        gridSettingInfo.rowGap = 11
+      }
+    }
+    return gridSettingInfo
+  }
+
   @Builder
   planBuilder() {
     // 日期选择
@@ -124,113 +168,137 @@ export struct PlanPage {
         .height(43)
         .width(24)
 
-        List({ space: 8, scroller: this.listScroller }) {
+        Row() {
           ForEach(this.dateList, (item: Date, index: number) => {
-            ListItem() {
-              Column() {
-                Text(this.weekNameList[item.getDay()])
-                  .fontSize($r('sys.float.Body_M'))
-                  .fontColor(index === this.dateSelectIndex ? '#FFFFFF' :
-                    '#333333')
-                Text((item.getMonth() + 1 < 10 ? '0' + (item.getMonth() + 1) :
-                  item.getMonth() + 1 + '') + '.' +
-                  (item.getDate() < 10 ? '0' + item.getDate() : item.getDate() + ''))
-                  .fontSize(10)
-                  .fontColor(index === this.dateSelectIndex ? '#FFFFFF' :
-                    '#333333')
-              }
-              .backgroundColor(index === this.dateSelectIndex ? $r('app.color.app_theme') :
-                '#FFFFFF')
-              .height(43)
-              .width(36)
-              .padding(4)
-              .justifyContent(FlexAlign.SpaceAround)
-              .borderRadius(8)
-              .onClick(() => {
-                this.dateSelectIndex = index;
-                this.getPlanList(item.getDate())
-              })
+            Column() {
+              Text(this.weekNameList[item.getDay()])
+                .fontSize($r('sys.float.Body_M'))
+                .fontColor(index === this.dateSelectIndex ? '#FFFFFF' :
+                  '#333333')
+              Text((item.getMonth() + 1 < 10 ? '0' + (item.getMonth() + 1) :
+                item.getMonth() + 1 + '') + '.' +
+                (item.getDate() < 10 ? '0' + item.getDate() : item.getDate() + ''))
+                .fontSize(10)
+                .fontColor(index === this.dateSelectIndex ? '#FFFFFF' :
+                  '#333333')
             }
+            .backgroundColor(index === this.dateSelectIndex ? $r('app.color.app_theme') :
+              '#FFFFFF')
+            .height(43)
+            .width(36)
+            .padding(4)
+            .justifyContent(FlexAlign.SpaceAround)
+            .borderRadius(8)
+            .onClick(() => {
+              this.dateSelectIndex = index;
+              this.getPlanList(item.getDate())
+            })
           }, (item: Date) => DateUtil.formatDate(item))
         }
-        .listDirection(Axis.Horizontal)
-        .alignListItem(ListItemAlign.Center)
-        .scrollBar(BarState.Off)
-        .width(300)
-        .height(43)
+        .layoutWeight(1)
+        .justifyContent(FlexAlign.SpaceBetween)
       }
       .width(CommonConstants.FULL_PERCENT)
       .padding({ left: 16, top: 12, right: 16, bottom: 12 })
     }
-    .width(CommonConstants.FULL_PERCENT)
+    .width(`calc(100% - ${2 * this.dateWidth}vp)`)
     .height(67)
     .backgroundColor(Color.White)
     .justifyContent(FlexAlign.SpaceBetween)
     .margin({ top: 8, bottom: 12 })
   }
 
+  @Computed
+  get buttonWidth() {
+    if ([BreakpointNameEnum.SM].includes(this.breakPointModel.currentBreakpoint)) {
+      return 216;
+    }
+    return 448;
+  }
+
+  @Computed
+  get borderPadding() {
+    if ([BreakpointNameEnum.SM].includes(this.breakPointModel.currentBreakpoint)) {
+      return 16;
+    }
+    if ([BreakpointNameEnum.MD].includes(this.breakPointModel.currentBreakpoint)) {
+      return 24;
+    }
+    return 32;
+  }
+
   @Builder
   courseBuilder(plan: Plan) {
     Column() {
-      ForEach(plan.coursePlan, (course: Course1, index: number) => {
-        Row() {
-          Image(course.cover)
-            .width(96)
-            .height(54)
-            .margin({ top: 19, right: 12 })
-          Column() {
+      Grid() {
+        ForEach(plan.coursePlan, (course: Course1, index: number) => {
+          GridItem() {
             Row() {
-              Image(this.dateList[this.dateSelectIndex].getDate() === new Date().getDate() &&
-              AppStorage.get(course.label) ? $r('app.media.ic_finish') : $r('app.media.ic_unfinish'))
-                .margin({ right: 2 })
-                .width(12)
-                .height(12)
-              Text(this.dateList[this.dateSelectIndex].getDate() === new Date().getDate() &&
-              AppStorage.get(course.label) ? '课程已完成' : '课程未完成')
-                .fontWeight(FontWeight.Medium)
-                .fontSize($r('sys.float.Body_S'))
-                .fontColor('rgba(0, 0, 0, 0.4)')
+              Image(course.cover)
+                .width(96)
+                .height(54)
+                .borderRadius(8)
+                .margin({ top: 19, right: 12 })
+              Column() {
+                Row() {
+                  Image(this.dateList[this.dateSelectIndex].getDate() === new Date().getDate() &&
+                  AppStorage.get(course.label) ? $r('app.media.ic_finish') : $r('app.media.ic_unfinish'))
+                    .margin({ right: 2 })
+                    .width(12)
+                    .height(12)
+                  Text(this.dateList[this.dateSelectIndex].getDate() === new Date().getDate() &&
+                  AppStorage.get(course.label) ? '课程已完成' : '课程未完成')
+                    .fontWeight(FontWeight.Medium)
+                    .fontSize($r('sys.float.Body_S'))
+                    .fontColor('rgba(0, 0, 0, 0.4)')
+                }
+                .width('100%')
+                .padding({ right: 12 })
+                .justifyContent(FlexAlign.End)
+                Text(course.courseTitle)
+                  .fontSize($r('sys.float.Body_L'))
+                  .margin({ bottom:2 })
+                  .fontWeight(FontWeight.Medium)
+                Row() {
+                  Text(`难度：${this.courseContent[index].difficulty}`)
+                    .fontSize($r('sys.float.Body_S'))
+                    .fontColor('rgba(0, 0, 0, 0.4)')
+                    .margin({ right: 12 })
+                    .fontWeight(FontWeight.Medium)
+                  Image($r('app.media.ic_time'))
+                    .margin({ right: 2 })
+                    .width(12)
+                    .height(12)
+                  Text(`${this.courseContent[index].duration}分钟`)
+                    .fontWeight(FontWeight.Medium)
+                    .fontSize($r('sys.float.Body_S'))
+                    .fontColor('rgba(0, 0, 0, 0.4)')
+                }
+                Text(`预计消耗热量：${this.courseContent[index].energy}kcal`)
+                  .fontSize($r('sys.float.Body_S'))
+                  .fontColor('rgba(0, 0, 0, 0.4)')
+                  .margin({ right: 12 })
+                  .fontWeight(FontWeight.Medium)
+              }
+              .width('66%')
+              .padding({ top: 16, bottom: 16 })
+              .alignItems(HorizontalAlign.Start)
             }
-            .width(196)
-            .justifyContent(FlexAlign.End)
-            Text(course.courseTitle)
-              .fontSize($r('sys.float.Body_L'))
-              .margin({ bottom:2 })
-              .fontWeight(FontWeight.Medium)
-            Row() {
-              Text(`难度：${this.courseContent[index].difficulty}`)
-                .fontSize($r('sys.float.Body_S'))
-                .fontColor('rgba(0, 0, 0, 0.4)')
-                .margin({ right: 12 })
-                .fontWeight(FontWeight.Medium)
-              Image($r('app.media.ic_time'))
-                .margin({ right: 2 })
-                .width(12)
-                .height(12)
-              Text(`${this.courseContent[index].duration}分钟`)
-                .fontWeight(FontWeight.Medium)
-                .fontSize($r('sys.float.Body_S'))
-                .fontColor('rgba(0, 0, 0, 0.4)')
-            }
-            Text(`预计消耗热量：${this.courseContent[index].energy}kcal`)
-              .fontSize($r('sys.float.Body_S'))
-              .fontColor('rgba(0, 0, 0, 0.4)')
-              .margin({ right: 12 })
-              .fontWeight(FontWeight.Medium)
+            .justifyContent(FlexAlign.SpaceBetween)
+            .width('100%')
+            .onClick(() => RouterUtils.pushPathByName(RouterMap.COURSE_DETAIL_PAGE, course.id))
           }
-          .width(196)
-          .padding({ top: 16, bottom: 16 })
-          .alignItems(HorizontalAlign.Start)
-        }
-        .width('100%')
-        .onClick(() => RouterUtils.pushPathByName(RouterMap.COURSE_DETAIL_PAGE, course.id))
-      })
+        })
+      }
+      .columnsTemplate(this.gridSetting.template)
+      .columnsGap(this.gridSetting.colGap)
+      .rowsGap(this.gridSetting.rowGap)
 
       if (this.dateList[this.dateSelectIndex].getDate() < new Date().getDate() &&
         this.dateList[this.dateSelectIndex].getMonth() === new Date().getMonth()) {
         Row() {
           Image($r('app.media.addplan'))
-            .margin({ top: 4, bottom: 4 })
+            .margin({ top: 4, bottom: 4, right: 2 })
             .width(16)
             .height(16)
           Text('添加计划')
@@ -241,7 +309,7 @@ export struct PlanPage {
             .fontColor('rgba(0, 0, 0, 0.4)')
             .margin({ top: 1.5, bottom: 1.5 })
         }
-        .width(216)
+        .width(this.buttonWidth)
         .height(40)
         .padding({ top: 8, left: 24, right: 24, bottom: 8 })
         .borderRadius(24)
@@ -250,7 +318,7 @@ export struct PlanPage {
       } else {
         Row() {
           Image($r('app.media.addplan'))
-            .margin({ top: 4, bottom: 4 })
+            .margin({ top: 4, bottom: 4, right: 2 })
             .width(16)
             .height(16)
           Text('添加计划')
@@ -261,7 +329,7 @@ export struct PlanPage {
             .fontColor(Color.White)
             .margin({ top: 1.5, bottom: 1.5 })
         }
-        .width(216)
+        .width(this.buttonWidth)
         .height(40)
         .onClick(() => RouterUtils.pushPathByName(RouterMap.COURSE_PAGE_PLAN))
         .padding({ top: 8, left: 24, right: 24, bottom: 8 })
@@ -270,7 +338,7 @@ export struct PlanPage {
         .justifyContent(FlexAlign.Center)
       }
     }
-    .width('90%')
+    .width('100%')
     .padding(12)
     .borderRadius(16)
     .backgroundColor(Color.White)
@@ -289,12 +357,13 @@ export struct PlanPage {
         .fontColor('rgba(0, 0, 0, 0.6)')
         .margin({ top: 8, bottom: 8 })
 
-      if (this.dateList[this.dateSelectIndex].getDate() < new Date().getDate()) {
+      if (this.dateList[this.dateSelectIndex].getDate() < new Date().getDate() &&
+        this.dateList[this.dateSelectIndex].getMonth() === new Date().getMonth()) {
         Row() {
           Image($r('app.media.addplan'))
             .width(16)
             .height(16)
-            .margin({ top: 4, bottom: 4 })
+            .margin({ top: 4, bottom: 4, right: 2 })
           Text('添加计划')
             .width(64)
             .height(21)
@@ -303,7 +372,7 @@ export struct PlanPage {
             .fontWeight(FontWeight.Regular)
             .margin({ top: 1.5, bottom: 1.5 })
         }
-        .width(216)
+        .width(this.buttonWidth)
         .height(40)
         .borderRadius(24)
         .justifyContent(FlexAlign.Center)
@@ -314,7 +383,7 @@ export struct PlanPage {
           Image($r('app.media.addplan'))
             .width(16)
             .height(16)
-            .margin({ top: 4, bottom: 4 })
+            .margin({ top: 4, bottom: 4, right: 2 })
           Text('添加计划')
             .fontSize($r('sys.float.Body_L'))
             .width(64)
@@ -327,7 +396,7 @@ export struct PlanPage {
         .justifyContent(FlexAlign.Center)
         .backgroundColor($r('app.color.app_theme'))
         .padding({ top: 8, left: 24, right: 24, bottom: 8 })
-        .width(216)
+        .width(this.buttonWidth)
         .height(40)
         .borderRadius(24)
       }
@@ -335,7 +404,7 @@ export struct PlanPage {
     .backgroundColor(Color.White)
     .borderRadius(16)
     .padding(12)
-    .width('90%')
+    .width('100%')
     .height(219)
   }
 
@@ -346,17 +415,17 @@ export struct PlanPage {
         Image($r('app.media.purpose'))
           .width(16)
           .height(16)
-          .margin({ top: 2.5, bottom: 2.5, right: 8 })
+          .margin({ right: 8 })
         Text('本周目标')
           .fontSize($r('sys.float.Body_L'))
           .fontWeight(FontWeight.Regular)
           .fontColor('rgba(0, 0, 0, 0.9)')
+        Blank()
       }
-      .width(88)
-      .height(21)
+      .width('100%')
       .margin({ bottom: 12 })
 
-      Row({space: 8}) {
+      Row() {
         Column() {
           Row() {
             Text(String(this.loss))
@@ -375,7 +444,7 @@ export struct PlanPage {
             .fontColor('#999999')
         }
         .justifyContent(FlexAlign.Center)
-        .width(76)
+        .layoutWeight(1)
         .height(48)
 
         Column() {
@@ -396,7 +465,7 @@ export struct PlanPage {
             .fontColor('#999999')
         }
         .justifyContent(FlexAlign.Center)
-        .width(76)
+        .layoutWeight(1)
         .height(48)
 
         Column() {
@@ -413,7 +482,7 @@ export struct PlanPage {
             .fontColor('#999999')
         }
         .justifyContent(FlexAlign.Center)
-        .width(76)
+        .layoutWeight(1)
         .height(48)
 
         Column() {
@@ -434,17 +503,17 @@ export struct PlanPage {
             .fontColor('#999999')
         }
         .justifyContent(FlexAlign.Center)
-        .width(76)
+        .layoutWeight(1)
         .height(48)
       }
+      .width('100%')
+      .justifyContent(FlexAlign.SpaceBetween)
     }
-    .alignItems(HorizontalAlign.Start)
     .backgroundColor(Color.White)
     .padding(12)
     .margin({ top: 12 })
     .borderRadius(16)
-    .width('90%')
-    .height(105)
+    .width('100%')
   }
 
   @Builder
@@ -465,13 +534,13 @@ export struct PlanPage {
       .justifyContent(FlexAlign.SpaceBetween)
       .width('100%')
     }
-    .width('90%')
+    .width('100%')
     .padding({ top: 24, bottom: 8 })
 
     Column() {
       HotCourse()
     }
-    .margin({ left: 16, right: 16 })
+    .margin({ bottom: 20 })
   }
 
   build() {
@@ -481,13 +550,12 @@ export struct PlanPage {
           title: '计划',
           isSubTitle: false,
         })
-
+        // 日期
+        this.planBuilder()
         Scroll(this.scroller) {
           Column() {
-            // 日期
-            this.planBuilder()
             // 计划
-            if (this.coursePlan) {
+            if (this.coursePlan.length !== 0) {
               this.courseBuilder({ coursePlan: this.coursePlan })
             } else {
               this.noCoursebuild()
@@ -499,6 +567,8 @@ export struct PlanPage {
           }
         }
         .layoutWeight(1)
+        .align(Alignment.Top)
+        .padding({ left: this.borderPadding, right: this.borderPadding })
         .scrollBar(BarState.Off)
         .scrollable(ScrollDirection.Vertical)
         .edgeEffect(EdgeEffect.Spring)

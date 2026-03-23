@@ -8,6 +8,7 @@ import {
   UserTablePredicateParams,
 } from '../utils/accountingdb/Types';
 import { DBOperator } from '../utils/basedb/Constants';
+import { AccountProcessingModel } from './AccountProcessingModel';
 import { AssetProcessingModel } from './AssetProcessingModel';
 
 @ObservedV2
@@ -16,6 +17,14 @@ export class BillProcessingModel {
   @Trace bill: TransactionReportRsp | null = null;
   @Trace list: DailyBillGroup[] | null = null;
   @Trace assetProcessing: AssetProcessingModel = new AssetProcessingModel();
+  @Trace accountProcessing: AccountProcessingModel = new AccountProcessingModel();
+  @Trace billStartDate: string = '';
+  @Trace billEndDate: string = '';
+
+  @Computed
+  public get currentAccountId(): number {
+    return this.accountProcessing.getCurrentAccountId();
+  }
 
   @Computed
   public get dateLabel() {
@@ -49,13 +58,44 @@ export class BillProcessingModel {
       this.changeMonth(date);
     }
 
+    const currentAccount = this.accountProcessing.currentAccount;
+    // 获取当前账本的结算日，默认为01
+    const settlementDayStr = currentAccount?.date || '01';
+    const settlementDay = parseInt(settlementDayStr);
+
+    // 计算查询的起止日期
+    const selectedMonth = dayjs(this.date);
+    const startDate = selectedMonth.date(settlementDay).format('YYYY-MM-DD');
+    const nextMonth = selectedMonth.add(1, 'month');
+    const endDate = nextMonth.date(settlementDay).subtract(1, 'day').format('YYYY-MM-DD');
+    this.billStartDate = startDate;
+    this.billEndDate = endDate;
+
+    const currentId = this.accountProcessing.getCurrentAccountId();
+
     let conditions: UserTablePredicateParams[] = [];
-    const dateCondition: UserTablePredicateParams = {
-      field: TransactionTableFields.DATE,
-      value: this.date,
-      operator: DBOperator.BEGIN_WITH,
+
+    // 账本ID条件
+    const accountCondition: UserTablePredicateParams = {
+      field: TransactionTableFields.ACCOUNT_ID,
+      value: currentId,
+      operator: DBOperator.EQUAL,
     };
-    conditions.push(dateCondition);
+    conditions.push(accountCondition);
+
+    // 日期范围条件
+    conditions.push({
+      field: TransactionTableFields.DATE,
+      value: startDate,
+      operator: DBOperator.GREATER_OR_EQUAL,
+    });
+
+    conditions.push({
+      field: TransactionTableFields.DATE,
+      value: endDate,
+      operator: DBOperator.LESS_OR_EQUAL,
+    });
+
     if (checkedResource !== -1) {
       const resourceCondition: UserTablePredicateParams = {
         field: TransactionTableFields.RESOURCE,
@@ -64,6 +104,7 @@ export class BillProcessingModel {
       };
       conditions.push(resourceCondition);
     }
+
     this.bill = await AccountingDB.getTransactions(conditions);
     await this._setBillGroup(this.bill);
   }
@@ -81,7 +122,6 @@ export class BillProcessingModel {
   private async _setBillGroup(res: TransactionReportRsp) {
     const map: Map<string, BillCardItem[]> = new Map();
 
-    // 使用map创建Promise数组
     const promises = res.transactions.map(async (item) => {
       const resourceItem = ResourceUtil.getResourceItem(item.resource);
       const card: BillCardItem = {

@@ -1,6 +1,7 @@
 import { NoteService } from '@ohos_agcit/notes_datasource';
 import { Note } from 'richeditor';
 import { ThemeController } from '../controller/ThemeController';
+import { KVStore } from 'serializer';
 
 @Builder
 export function CompleteDeleteNoteDialogBuilder() {
@@ -13,6 +14,7 @@ export function CompleteDeleteNoteDialogBuilder() {
 @ComponentV2
 export struct CompleteDeleteNoteDialog {
   @Consumer('appPathStack') appPathStack: NavPathStack = new NavPathStack();
+  @Consumer() kvStore: KVStore | undefined = undefined;
   private themeController: ThemeController = ThemeController.instance
   private noteService: NoteService = NoteService.instance;
 
@@ -52,7 +54,7 @@ export struct CompleteDeleteNoteDialog {
             .width('50%')
             .onClick(() => {
               if (this.currentNote) {
-                this.noteService.deletePermanently(this.currentNote.id);
+                this.noteService.deletePermanently(this.currentNote.id, this.kvStore);
               }
               this.appPathStack.pop();
             })

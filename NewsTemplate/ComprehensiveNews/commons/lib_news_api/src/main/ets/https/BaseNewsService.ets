@@ -1,6 +1,6 @@
 import request from '../common/BaseRequest';
 import { NewsResponse } from '../params/response/NewsResponse';
-import { RequestListData } from '../params/response/LayoutResponse';
+import { AbstractRequestListData, RequestListData } from '../params/response/LayoutResponse';
 import { NewsRequest } from '../params/request/CommonRequest';
 
 /**
@@ -38,7 +38,7 @@ export class BaseNewsService {
    * @param search
    * @returns
    */
-  public querySearchResultList(search: string): Promise<RequestListData[]> {
+  public querySearchResultList(search: string): Promise<AbstractRequestListData> {
     return request.get('/news/search/list', { params: { search } });
   }
 

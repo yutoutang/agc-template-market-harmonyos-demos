@@ -1,5 +1,5 @@
-import { BusinessError } from '@kit.BasicServicesKit';
-import { CommonConfirmDialog, GlobalContextUtils, Logger, RouterUtils, WX_APPID } from 'lib_common';
+import { BusinessError, emitter } from '@kit.BasicServicesKit';
+import { CommonConfirmDialog, EventEnum, GlobalContextUtils, Logger, RouterUtils, WX_APPID } from 'lib_common';
 import { MineServiceApi } from 'lib_news_api';
 import {
   Channel,
@@ -32,6 +32,7 @@ export class LoginParam {
       }
     }
     this.controller.clearLoginInfo();
+    emitter.emit(EventEnum.LOGIN_SUCCESS);
   }
 
   private huaweiLogin = async (loginParams: LoginParams): Promise<void> => {
@@ -64,7 +65,7 @@ export class LoginParam {
           primaryTitle: '温馨提示',
           content: errorMsg + '是否先模拟登录成功？',
           confirm: () => {
-            this.huaweiLogin({});
+            this.huaweiLogin({ anonymousPhone: '183******12' });
           },
         });
         break;

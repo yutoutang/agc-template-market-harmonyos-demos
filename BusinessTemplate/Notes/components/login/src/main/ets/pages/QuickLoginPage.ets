@@ -29,11 +29,11 @@ export struct QuickLoginPage {
     type: loginComponentManager.TextType.RICH_TEXT,
     // Change the link to that of your own privacy policy.
     // ...
-    tag: '',
+    tag: this.getProtocolUrl(),
   }, {
     text: '《隐私政策》',
     type: loginComponentManager.TextType.RICH_TEXT,
-    tag: '',
+    tag: this.getProtocolUrl(),
   }, {
     text: '和',
     type: loginComponentManager.TextType.PLAIN_TEXT,
@@ -94,7 +94,13 @@ export struct QuickLoginPage {
         this.showPopUp = true;
       } else {
         this.getUIContext().getPromptAction().showToast({
-          message: JSON.stringify(error)
+          message: (() => {
+            try {
+              return JSON.stringify(error);
+            } catch (e) {
+              return '登录失败';
+            }
+          })()
         })
       }
       this.enableStatus = true;
@@ -121,8 +127,14 @@ export struct QuickLoginPage {
       hilog.error(this.domainId, this.logTag,
         `Failed to login with LoginWithHuaweiIDButton. errCode is ${error.code}, errMessage is ${error.message}`);
 
-      promptAction.showToast({
-        message: JSON.stringify(error)
+      this.getUIContext().getPromptAction().showToast({
+        message: (() => {
+          try {
+            return JSON.stringify(error);
+          } catch (e) {
+            return '登录失败';
+          }
+        })()
       })
     } finally {
       this.enableStatus = true;
@@ -140,7 +152,7 @@ export struct QuickLoginPage {
     }
     if (privacyText.tag && privacyText.tag !== '') {
       // Obtain the multi-language environment information of the system.
-      const systemLanguage: string = (getContext() as common.UIExtensionContext).config.language ?? '';
+      const systemLanguage: string = (this.getUIContext().getHostContext() as common.UIExtensionContext).config.language ?? '';
       hilog.info(this.domainId, this.logTag, `systemLanguage is ${systemLanguage}`);
       const params: Record<string, Object> = { 'protocolUrl': privacyText.tag + systemLanguage };
       // Concatenate link parameters.
@@ -150,7 +162,7 @@ export struct QuickLoginPage {
 
   // Obtain the privacy policy address from rawfile.
   getProtocolUrl(): string {
-    let privacyUrl = readDataFromRawFile<string>('data.json', 'privacy_url');
+    let privacyUrl = readDataFromRawFile<string>(this.getUIContext(),'data.json', 'privacy_url');
     return privacyUrl ? privacyUrl : '';
   }
 

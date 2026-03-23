@@ -13,9 +13,12 @@ export enum AVPlayerState {
 export interface VideoPlayerData {
   getVideoId: () => string;
   getVideoUrl: () => string;
-  getCoverUrl: () => ResourceStr | undefined;
+  getCoverUrl: () => string | undefined;
   getVideoTitle: () => string;
   getVideoDuration: () => number;
+  getAuthorName: () => string;
+  isNeedVip: () => boolean;
+  setVideoDuration: (duration: number) => void;
 }
 
 /**
@@ -30,4 +33,5 @@ export enum BreakpointNameEnum {
 
 export enum PageNameEnum {
   VIDEO_LANDSCAPE_PAGE = 'LandscapeVideo',
+  REMOTE_CONTROL_PAGE = 'PageCastControl',
 }

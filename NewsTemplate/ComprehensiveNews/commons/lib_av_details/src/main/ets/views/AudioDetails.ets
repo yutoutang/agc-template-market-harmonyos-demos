@@ -1,9 +1,10 @@
 import { common } from '@kit.AbilityKit';
 import { ValueType } from '@kit.ArkData';
-import { RouterMap, RouterUtils, VideoType } from 'lib_common';
-import { AvModel, HomeServiceApi } from 'lib_news_api';
+import { MembershipUtils } from 'lib_account';
+import { RouterMap, RouterUtils } from 'lib_common';
+import { AvModel, AvSection, HomeServiceApi } from 'lib_news_api';
 import { NavHeaderBar, Share } from 'lib_widget';
-import { AudioConstants, SubUtils } from 'module_audioplayer';
+import { AudioConstants, AudioService } from 'module_audioplayer';
 import { CardLongTakeDelegate, LongTakeAnimationProperties } from 'module_transition';
 import { AudioIntroduce } from '../components/AudioIntroduce';
 import { AudioListSelect } from '../components/AudioListSelect';
@@ -37,11 +38,10 @@ export struct AudioDetails {
     })
   }
 
-
   backIntercept() {
     if (this.audioVM.settingInfo.network.enableAudioSub) {
       if (!this.audioVM.isVideoTab() && this.isCreateSubWindow) {
-        SubUtils.createSubWindow(this.getUIContext())
+        AudioService.createSubWindow(this.getUIContext())
       }
     }
     RouterUtils.pop(this.curAudioInfo)
@@ -72,8 +72,14 @@ export struct AudioDetails {
       AudioListSelect({
         curAudioInfo: this.curAudioInfo,
         isCurrentPlay: this.audioVM.isCurrentPlay,
-        onAudioCard: (index: number) => {
-          let params: Record<string, AvModel | ValueType> = {
+        onAudioCard: async (item: AvSection, index: number) => {
+          if (item.needVip && (!this.audioVM.userInfoModel.isLogin || !this.audioVM.userInfoModel.isMembership)) {
+            MembershipUtils.openSheet();
+            return;
+          }
+
+          await this.audioVM.destroyOtherSession();
+          const params: Record<string, AvModel | ValueType> = {
             'audioIndex': index,
             'canRedirect': false,
             'curPlayAudioInfo': this.curAudioInfo,
@@ -100,7 +106,7 @@ export struct AudioDetails {
     }
     .hideTitleBar(true)
     .backgroundColor(this.longTakeSession.navDestinationBgColor)
-    .onSizeChange((oldValue: SizeOptions, newValue: SizeOptions) => {
+    .onSizeChange((_oldValue: SizeOptions, newValue: SizeOptions) => {
       this.longTakeSession.setNewSize(newValue);
     })
     .onReady(async (context) => {
@@ -112,7 +118,7 @@ export struct AudioDetails {
       }
       if (params.subWindow) {
         this.subWindow = params.subWindow as boolean
-        SubUtils.destroySubWindow(AudioConstants.AUDIO_SUB_NAME)
+        AudioService.destroySubWindow(AudioConstants.AUDIO_SUB_NAME)
       }
       this.isCreateSubWindow = params.isCreateSubWindow as boolean
       this.avViewModel.registerCustomTransition(context, this.longTakeSession)
@@ -128,7 +134,7 @@ export struct AudioDetails {
     })
     .onShown(() => {
       this.audioVM.enableContinue(this.getUIContext().getHostContext() as common.UIAbilityContext);
-      SubUtils.destroySubWindow(AudioConstants.AUDIO_SUB_NAME)
+      AudioService.destroySubWindow(AudioConstants.AUDIO_SUB_NAME)
     })
   }
 }

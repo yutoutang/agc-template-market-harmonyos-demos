@@ -5,7 +5,8 @@
     "description": "$string:module_desc",
     "mainElement": "PhoneAbility",
     "deviceTypes": [
-      "phone"
+      "phone",
+      "tablet"
     ],
     "deliveryWithInstall": true,
     "installationFree": false,
@@ -54,9 +55,6 @@
       },
       {
         "name": "ohos.permission.GET_NETWORK_INFO"
-      },
-      {
-        "name": "ohos.permission.GET_WIFI_INFO"
       }
     ],
     "metadata": [

@@ -57,7 +57,7 @@ export struct RechargeRecordPage {
             .layoutWeight(1)
             .width(this.curBreakpoint.value === BreakpointTypeEnum.LG ? '70%' : '100%')
             .height('100%')
-            .backgroundColor($r('sys.color.background_primary'))
+            .backgroundColor($r('sys.color.comp_background_list_card'))
             .borderRadius(16)
           } else {
             // 充值记录列表
@@ -73,7 +73,7 @@ export struct RechargeRecordPage {
             .layoutWeight(1)
             .scrollBar(BarState.Off)
             .edgeEffect(EdgeEffect.Spring)
-            .backgroundColor($r('sys.color.background_primary'))
+            .backgroundColor($r('sys.color.comp_background_list_card'))
             .borderRadius(16)
             .divider({
               strokeWidth: 1,

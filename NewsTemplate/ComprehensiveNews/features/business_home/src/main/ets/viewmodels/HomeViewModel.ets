@@ -1,5 +1,6 @@
 import { common } from '@kit.AbilityKit';
 import { AppStorageV2, curves, PersistenceV2 } from '@kit.ArkUI';
+import { image } from '@kit.ImageKit';
 import { notificationManager } from '@kit.NotificationKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import {
@@ -26,6 +27,11 @@ const TAG = '[HomeViewModel]';
 @ObservedV2
 export class HomeViewModel extends BaseViewModel {
   searchHistory: SearchHistory = PersistenceV2.connect(SearchHistory, () => new SearchHistory())!;
+  @Trace searchAbstractResult: string = '';
+  @Trace heightControl: number | string = 150;
+  @Trace maxHeight: number = 150;
+  @Trace historyHeight: number = 0;
+  @Trace isExpand: boolean = false;
   @Trace searchResultList: RequestListData[] = []
   @Trace settingInfo: SettingModel = PersistenceV2.connect(SettingModel, () => new SettingModel())!;
   @Trace breakpointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
@@ -37,7 +43,13 @@ export class HomeViewModel extends BaseViewModel {
   }
 
   async getSearchResultList(searchValue: string) {
-    this.searchResultList = await BaseNewsServiceApi.querySearchResultList(searchValue)
+    if (searchValue.trim() === '') {
+      this.searchResultList = []
+      return
+    }
+    let abstractSearchResult = await BaseNewsServiceApi.querySearchResultList(searchValue)
+    this.searchResultList = abstractSearchResult.list;
+    this.searchAbstractResult = abstractSearchResult.abstract
   }
 
   // 预加载图片
@@ -49,7 +61,8 @@ export class HomeViewModel extends BaseViewModel {
     list.forEach((v) => {
       // 下载解码成PixelMap，并将其缓存
       FileUtils.downloadImage(v.newsImg)
-        .then((pixelMap) => {
+        .then((buffer) => {
+          const pixelMap = image.createImageSource(buffer).createPixelMapSync();
           this.eNewsMap.set(v.newsImg, pixelMap);
         })
     })
@@ -61,7 +74,30 @@ export class HomeViewModel extends BaseViewModel {
       if (this.searchHistory.historyList.includes(searchValue) || searchValue.trim() === '') {
         return
       }
-      this.searchHistory.historyList.push(searchValue)
+      this.searchHistory.historyList.unshift(searchValue)
+    })
+  }
+
+  expandOperation() {
+    if (this.heightControl === this.maxHeight) {
+      this.expandAnimateTo(() => {
+        this.heightControl = '100%';
+        this.isExpand = true;
+      })
+    } else {
+      this.expandAnimateTo(() => {
+        this.heightControl = this.maxHeight;
+        this.isExpand = false;
+      })
+    }
+  }
+
+  private expandAnimateTo(cb: () => void) {
+    this.contextModel.globalUIContext.animateTo({
+      duration: 300,
+      curve: Curve.EaseOut,
+    }, () => {
+      cb()
     })
   }
 
@@ -80,6 +116,7 @@ export class HomeViewModel extends BaseViewModel {
       notificationManager.requestEnableNotification(context).then(() => {
         this.settingInfo.pushSwitch = true;
         this.sendPushMessage();
+        Logger.info(TAG, 'requestEnableNotification success');
       }).catch((error: BusinessError) => {
         this.settingInfo.pushSwitch = false;
         Logger.error(TAG, 'requestEnableNotification fail, error: ' + JSON.stringify(error));

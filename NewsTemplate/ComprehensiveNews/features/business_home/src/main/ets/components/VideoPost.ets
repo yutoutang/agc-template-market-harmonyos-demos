@@ -110,6 +110,7 @@ export struct VideoPost {
           text: $$this.body,
         })
           .fontSize(16 * this.fontSizeRatio)
+          .fontColor($r('sys.color.font_primary'))
           .placeholderColor($r('sys.color.font_tertiary'))
           .placeholderFont({ size: 16 * this.fontSizeRatio })
           .backgroundColor(Color.Transparent)

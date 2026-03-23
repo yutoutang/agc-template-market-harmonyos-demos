@@ -1,4 +1,5 @@
 import { common } from '@kit.AbilityKit';
+import { contextUtil } from '../ContextUtil';
 
 export enum EventKey {
   GLOBAL_REFRESH_EVENT = 'globalRefreshEvent',
@@ -6,7 +7,7 @@ export enum EventKey {
 
 export class EventBus {
   private _eventHub: common.EventHub = (
-    getContext(this) as common.UIAbilityContext
+    contextUtil.getContext() as common.UIAbilityContext
   ).eventHub;
   private static _instance: EventBus;
 

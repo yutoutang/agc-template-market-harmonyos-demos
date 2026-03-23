@@ -1,6 +1,6 @@
 @Builder
 export function Title(text: string | Resource) {
-  Row() {
+  Row() { 
     Text(text)
       .maxLines(1)
       .textOverflow({ overflow: TextOverflow.Ellipsis })

@@ -1,5 +1,7 @@
-import { CommonConstants } from 'lib_common';
+import { BreakpointModel, BreakpointNameEnum, CommonConstants } from 'lib_common';
 import { SafePageVM } from '../viewmodels/SafePageVM';
+import { common } from '@kit.AbilityKit';
+import { AppStorageV2 } from '@kit.ArkUI';
 
 @Builder
 export function AgreePrivacyPageBuilder() {
@@ -9,6 +11,15 @@ export function AgreePrivacyPageBuilder() {
 @ComponentV2
 struct AgreePrivacyPage {
   vm: SafePageVM = new SafePageVM();
+  @Local breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
+
+  @Computed
+  get dialogWidth() {
+    if ([BreakpointNameEnum.SM].includes(this.breakPointModel.currentBreakpoint)) {
+      return 328;
+    }
+    return 400;
+  }
 
   build() {
     NavDestination() {
@@ -41,7 +52,7 @@ struct AgreePrivacyPage {
               .height(40)
               .layoutWeight(1)
               .onClick(() => {
-                this.vm.quitApp();
+                this.vm.quitApp(this.getUIContext().getHostContext() as common.UIAbilityContext);
               })
             Button('同意并继续')
               .height(40)
@@ -54,7 +65,7 @@ struct AgreePrivacyPage {
           .margin({ top: 24 })
         }
         .backgroundColor(Color.White)
-        .width(CommonConstants.FULL_PERCENT)
+        .width(this.dialogWidth)
         .borderRadius($r('app.float.xxl_radius'))
         .padding(CommonConstants.PADDING_L)
       }

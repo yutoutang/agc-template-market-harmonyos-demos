@@ -10,6 +10,7 @@ export class NavInfo {
  */
 export interface PostImgList {
   picVideoUrl: string
+  movingVideoUrl?: string
   id?: string
   surfaceUrl: string
   type?: number

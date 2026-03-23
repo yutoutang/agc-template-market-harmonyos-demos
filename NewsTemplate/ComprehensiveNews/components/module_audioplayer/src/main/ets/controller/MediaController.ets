@@ -1,8 +1,8 @@
 import { window } from '@kit.ArkUI';
+import { common } from '@kit.AbilityKit';
 import { media } from '@kit.MediaKit';
 import { AudioItem } from '../model/AudioData';
 import { MediaViewModel } from '../viewmodel/MediaViewModel';
-import { common } from '@kit.AbilityKit';
 
 @ObservedV2
 export class MediaController {
@@ -35,6 +35,16 @@ export class MediaController {
    */
   public static setAudioList(list: AudioItem[]) {
     MediaViewModel.getInstance().setAudioList(list)
+  }
+
+  /**
+   * 更新当前在播放的index
+   */
+  public static updateCurrentAudioIndex() {
+    const index = MediaViewModel.getInstance().audioList.findIndex(v => v.audioId === MediaController.playingId);
+    if (index !== -1) {
+      MediaViewModel.getInstance().audioIndex = index;
+    }
   }
 
   /**

@@ -24,10 +24,11 @@
 | 通用朗读组件（module_text_reader）        | 支持文本朗读                                      | [使用指导](components/module_text_reader/README.md)       |
 | 通用个人信息组件（module_personal_info）    | 支持编辑头像、昵称、姓名、性别、手机号、生日、个人简介等                | [使用指导](components/module_personal_info/README.md)     |
 | 通用隐私同意弹窗组件（module_consent_dialog） | 支持全屏、弹窗、半模态等形式的隐私弹窗                         | [使用指导](components/module_consent_dialog/README.md)    |
+| 通用会员组件（module_membership）         | 支持应用内支付进行会员开通                               | [使用指导](components/module_membership/README.md)        |
+| 通用图片预览组件（module_imagepreview）     | 支持预览图片、双指放大、缩小，滑动预览                         | [使用指导](components/module_imagepreview/README.md)      |
 | 新闻广告组件（module_advertisement）      | 支持全屏广告、横幅广告                                 | [使用指导](components/module_advertisement/README.md)     |
 | 频道编辑组件（module_channeledit）        | 支持频道添加、删除、拖拽排序                              | [使用指导](components/module_channeledit/README.md)       |
 | 高亮组件（module_highlight）            | 支持根据关键字高亮显示文本中命中关键词的部分                      | [使用指导](components/module_highlight/README.md)         |
-| 图片预览组件（module_imagepreview）       | 支持预览图片、双指放大、缩小，滑动预览                         | [使用指导](components/module_imagepreview/README.md)      |
 | 发帖组件（module_post）                 | 支持编辑互动发帖                                    | [使用指导](components/module_post/README.md)              |
 | 字体大小调节组件（module_setfontsize）      | 支持实时查看字体大小调整效果                              | [使用指导](components/module_setfontsize/README.md)       |
 | 短视频滑动组件（module_swipeplayer）       | 支持短视频上下滑动、横竖屏切换、长按倍速、播放进度条拖动等能力             | [使用指导](components/module_swipeplayer/README.md)       |
@@ -35,7 +36,7 @@
 | 新闻发布组件（module_articlepost）        | 支持富文本发表新闻                                   | [使用指导](components/module_articlepost/README.md)       |
 | 动态布局组件（module_flexlayout）         | 支持根据描述文件动态布局                                | [使用指导](components/module_flexlayout/README.md)        |
 | 数字报纸组件（module_digital_newspaper）  | 支持浏览传统报纸                                    | [使用指导](components/module_digital_newspaper/README.md) |
-| 音频广播组件（module_audioplayer）        | 音频广播组件                                      | [使用指导](components/module_audioplayer/README.md) |
+| 音频广播组件（module_audioplayer）        | 音频广播组件                                      | [使用指导](components/module_audioplayer/README.md)       |
 
 本模板为新闻类应用提供了常用功能的开发样例，模板主要分首页、视频、互动和我的四大模块：
 
@@ -122,7 +123,11 @@
       │   ├── 微信登录                                                   
       │   ├── 账密登录
       │   └── 用户隐私协议同意                       
-      │         
+      │  
+      ├──会员中心
+      │   ├── 开通会员
+      │   └── 会员管理
+      │       
       ├──个人主页         
       │   ├── 头像、昵称、简介
       │   ├── 关注、粉丝、获赞
@@ -225,10 +230,6 @@ ComprehensiveNews
 │  │    │   └──RecommendArea.ets                          // 相关推荐                  
 │  │    └──views  
 │  │        └──ArticleFeedDetails.ets                     // 新闻详情页      
-│  │
-│  ├──lib_preview_page/src/main/ets                       // 预览模块             
-│  │    └───components
-│  │        └──ImagePreviewPage.ets                       // 图片预览视图                  
 │  │ 
 │  └──lib_widget/src/main/ets                             // 通用UI模块             
 │       └──components
@@ -255,6 +256,7 @@ ComprehensiveNews
 │  ├──module_highlight                                    // 高亮组件
 │  ├──module_imagepreview                                 // 图片预览组件
 │  ├──module_login                                        // 登录组件
+│  ├──module_membership                                   // 会员组件
 │  ├──module_newsfeed                                     // 动态卡片组件
 │  ├──module_personal_info                                // 个人信息组件
 │  ├──module_post                                         // 发帖组件
@@ -327,6 +329,7 @@ ComprehensiveNews
 │  │    └──pages
 │  │        ├──FollowerPage.ets                           // 粉丝页面
 │  │        ├──PersonalHomePage.ets                       // 个人主页
+│  │        ├──SubscribePage.ets                          // 订阅页面
 │  │        └──WatchPage.ets                              // 关注页面  
 │  │
 │  ├──business_setting/src/main/ets                       // 设置模块             
@@ -339,6 +342,7 @@ ComprehensiveNews
 │  │ 
 │  └──business_video/src/main/ets                         // 视频模块             
 │       ├──components
+│       │   ├──BroadcastLikeView.ets                      // 广播推荐列表视图 
 │       │   ├──CommentView.ets                            // 评论视图
 │       │   ├──LiveHighlightsView.ets                     // 直播回放视图
 │       │   ├──LiveNoticePreview.ets                      // 直播公告视图
@@ -346,7 +350,9 @@ ComprehensiveNews
 │       │   ├──LivestreamFooterView.ets                   // 直播底部视图
 │       │   ├──Sidebar.ets                                // 侧边栏视图
 │       │   ├──TabHeaderView.ets                          // 顶部Tab视图
-│       │   └──VideoLayerView.ets                         // 视频外层操作层视图
+│       │   ├──TelevisionLikeView.ets                     // 电视猜你喜欢视图
+│       │   ├──VideoLayerView.ets                         // 视频外层操作层视图
+│       │   └──VideoProgramBuilder.ets                    // 电视节目单视图
 │       ├──pages
 │       │   ├──CommentViewPage.ets                        // 评论页面
 │       │   ├──LivestreamDetailPage.ets                   // 直播详情页面
@@ -392,10 +398,10 @@ ComprehensiveNews
 
 ### 环境
 
-- DevEco Studio版本：DevEco Studio 6.0.1 Release及以上
-- HarmonyOS SDK版本：HarmonyOS 6.0.1 Release SDK及以上
+- DevEco Studio版本：DevEco Studio 6.0.2 Release及以上
+- HarmonyOS SDK版本：HarmonyOS 6.0.2 Release SDK及以上
 - 设备类型：华为手机（包括双折叠和阔折叠）、平板
-- 系统版本：HarmonyOS 5.1.1(19)及以上
+- 系统版本：HarmonyOS 6.0.0(20)及以上
 
 ### 权限
 
@@ -415,7 +421,11 @@ ComprehensiveNews
 2. 碰一碰分享，使用约束如下，详细参考：[手机与手机碰一碰分享](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/knock-share-between-phones-overview#section184317615456)
    - 任意一端设备不支持碰一碰能力时，轻碰无任何响应
 
-3. 暂不支持模拟器的功能：小艺朗读
+3. 使用隔空传送功能前，需要先打开隔空传送开关，开启路径：设置 > 系统 > 快捷启动和手势 > 隔空传送。详细参考：[打开设备侧隔空传送开关](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/gestures-share-open)
+
+4. 暂不支持模拟器的功能：小艺朗读、隔空传送
+
+5. 小艺智能体的相关功能暂不支持模拟器，您可以前往commons/lib_widget/src/main/ets/components/BaseAgent.ets中取消相关代码注释后在真机调试使用。
 
 ## 快速入门
 
@@ -430,6 +440,8 @@ ComprehensiveNews
    b. 返回应用列表页面，查看应用的包名。
 
    c. 将模板工程根目录下AppScope/app.json5文件中的bundleName替换为创建应用的包名。
+
+   d. 将products/phone/src/main/resources/base/profile/shortcuts_config.json中的bundleName替换为创建应用的包名。
 
 2. 配置华为账号服务。
 
@@ -447,13 +459,35 @@ ComprehensiveNews
 
    c. [端云调试](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/push-server)。
 
-5. 配置广告服务。
+5. 配置App Linking服务。
+
+   a. [开通App Linking服务](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/applinking-enable-applinking)
+
+   b. [在开发者网站上关联应用](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/app-linking-startupapp#section6903241628)
+
+   c. [在AGC为应用创建关联的网址域名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/app-linking-startupapp#section1101111611317)
+   
+   d. 在products/phone/src/main路径下的module.json5中配置关联的网址域名，详细参考：[在module.json5中配置关联的网址域名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/app-linking-startupapp#section13808113610362)
+
+   e. 在products/phone/src/main/ets/common/WantUtils.ets#WantUtils.handleAppLinkingWant方法中处理传入的链接，详细参考：[处理传入的链接](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/app-linking-startupapp#section1620481746)
+
+6. 配置广告服务。
 
    a. 如果仅调测广告，可使用测试广告位ID：开屏广告：testd7c5cewoj6、横幅广告：testw6vs28auh3。
 
    b. 申请正式的广告位ID。登录[鲸鸿动能媒体服务平台](https://developer.huawei.com/consumer/cn/service/ads/publisher/html/index.html?lang=zh)进行申请，具体操作详情请参见[展示位创建](https://developer.huawei.com/consumer/cn/doc/distribution/monetize/zhanshiweichuangjian-0000001132700049)。
 
-6. 配置预加载服务。
+7. 配置应用内支付服务。
+
+   a. 您需[开通商户服务](https://developer.huawei.com/consumer/cn/doc/start/merchant-service-0000001053025967)才能开启应用内购买服务。商户服务里配置的银行卡账号、币种，用于接收华为分成收益。
+
+   b. 使用应用内购买服务前，需要打开应用内购买服务(HarmonyOS NEXT) 开关，此开关是应用级别的，即所有使用IAP Kit功能的应用均需执行此步骤，详情请参考[打开应用内购买服务API开关](https://developer.huawei.com/consumer/cn/doc/app/switch-0000001958955097)。
+
+   c. 开启应用内购买服务(HarmonyOS NEXT) 开关后，开发者需进一步激活应用内购买服务 (HarmonyOS NEXT)，具体请参见[激活服务和配置事件通知](https://developer.huawei.com/consumer/cn/doc/app/parameters-0000001931995692)。
+
+8. 配置会员商品信息，详情请参考[配置商品信息](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/iap-config-product)。
+
+9. 配置预加载服务。
 
    a. [开通预加载](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/cloudfoundation-enable-prefetch)。
 
@@ -476,15 +510,21 @@ ComprehensiveNews
 
     <img src="./screenshots/preload.png" width="1200">
 
-7. 接入微信SDK。
+10. 在小艺智能平台创建智能体并上架，并将智能体ID配置到模板中。
+
+   a. 参考[快速创建智能体](https://developer.huawei.com/consumer/cn/doc/service/quick-start-0000002469548009)创建新闻智能体，将智能体与应用进行关联，并上架智能体。
+
+   b. 将智能体的智能体ID配置为lib_common模块下src/main/ets/constants/AppConstants.ets中AGENT_ID的值。
+
+11. 接入微信SDK。
    前往微信开放平台申请AppID并配置鸿蒙应用信息，详情参考：[鸿蒙接入指南](https://developers.weixin.qq.com/doc/oplatform/Mobile_App/Access_Guide/ohos.html)。
 
-8. 接入QQ。
+12. 接入QQ。
    前往QQ开放平台申请AppID并配置鸿蒙应用信息，详情参考：[鸿蒙接入指南](https://wiki.connect.qq.com/sdk%e4%b8%8b%e8%bd%bd)。
 
-9. 对应用进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing#section297715173233)。
+13. 对应用进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing#section297715173233)。
 
-10. 添加手工签名所用证书对应的公钥指纹，详细参考：[配置公钥指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-cert-fingerprint-0000002278002933)
+14. 添加手工签名所用证书对应的公钥指纹，详细参考：[配置公钥指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-cert-fingerprint-0000002278002933)
 
 ### 运行调试工程
 
@@ -506,6 +546,7 @@ ComprehensiveNews
 10. [折叠屏-悬停态播放视频](./screenshots/videofold.mp4)
 11. [跨设备同步新闻浏览进度](./screenshots/syncnews.mp4)
 12. [一镜到底动效](./screenshots/longtake.mp4)
+13. [新闻智能体](./screenshots/agent.mp4)
 
 ## 开源许可协议
 
@@ -523,5 +564,5 @@ ComprehensiveNews
 | 数据分析 | [神策分析](https://developer.huawei.com/consumer/cn/market/prod-detail/a629e0eeab9c44f9a6f15e0727bc92ca/PLATFORM) / [友盟common SDK ](https://developer.huawei.com/consumer/cn/market/prod-detail/14d21b00a4d34ff3be00dec7597ab5d7/0277100bd59f45e38d8a0de52e1119b2)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | 数据收集、处理、分析、运用 |
 | 性能监控 | [腾讯Bugly ](https://developer.huawei.com/consumer/cn/market/prod-detail/94a9ca3772a745dbb4992ffb9fd44f49/PLATFORM)/ [听云SDK](https://developer.huawei.com/consumer/cn/market/prod-detail/2acb6ccef6a04820a230627ab1ee87b9/03d0f883f0c54f1aa97cb895ac68fb3a)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | 异常上报和运营统计     |
 | 推送   | [阿里推送SDK](https://developer.huawei.com/consumer/cn/market/prod-detail/bacc457d60bf4daf9def11e1e5ddc1c6/PLATFORM) / [极光推送](https://developer.huawei.com/consumer/cn/market/prod-detail/eb15c8034a7540c7a62ea765c4baae2b/88795a04fdac4c0a903c893bde1c9b4a) / [个推 (每日互动)](https://developer.huawei.com/consumer/cn/market/prod-detail/5e5944b551ca462993d58dad106c5700/f3c76ca47db845f0b8cdf53af50aa74c)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | 消息推送          |
-| 媒体   | [阿里云视频播放器SDK](https://developer.huawei.com/consumer/cn/market/prod-detail/56a72aaa18b94e6aaa78b88150d18207/PLATFORM)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | 音视频           |
+| 媒体   | [阿里云视频播放器SDK](https://developer.huawei.com/consumer/cn/market/prod-detail/56a72aaa18b94e6aaa78b88150d18207/PLATFORM)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | 音视频           |
 | 地图   | [高德地图SDK](https://lbs.amap.com/api/harmonyos-sdk/summary)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | 地图            |

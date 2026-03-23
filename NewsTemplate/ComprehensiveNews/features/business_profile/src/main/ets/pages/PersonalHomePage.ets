@@ -22,6 +22,11 @@ struct PersonalHomePage {
 
   aboutToAppear(): void {
     this.vm.init();
+    this.vm.onRefreshPost()
+  }
+
+  aboutToDisappear(): void {
+    this.vm.offRefreshPost()
   }
 
   build() {

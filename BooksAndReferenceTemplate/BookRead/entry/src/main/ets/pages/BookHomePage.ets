@@ -12,14 +12,14 @@ export struct BookHomePage {
   @Builder
   tabBuilder(title: string, index: number, selectedImg: Resource, normalImg: Resource) {
     Column() {
-      Image(this.currentIndexTab === index ? selectedImg : normalImg)
-        .width(24)
-        .height(24)
-        .objectFit(ImageFit.Contain)
+      SymbolGlyph(selectedImg)
+        .fontSize(24)
+        .fontColor(this.currentIndexTab === index ? [$r('app.color.font_overdue')] :
+          [$r('sys.color.icon_secondary')])
       Text(title)
         .margin({ top: 4 })
         .fontSize(10)
-        .fontColor(this.currentIndexTab === index ? $r('app.color.font_overdue') : '#E6000000')
+        .fontColor(this.currentIndexTab === index ? $r('app.color.font_overdue') : $r('app.color.tab_color_default'))
     }
     .justifyContent(FlexAlign.Center)
     .height(this.isTablet ? 100 : undefined)
@@ -52,7 +52,7 @@ export struct BookHomePage {
       }
       .clip(false)
       .height('100%')
-      .backgroundColor('#fff')
+      .backgroundColor($r('sys.color.ohos_id_color_sub_background'))
       .padding({ bottom: 18 })
       .animationDuration(0)
       .scrollable(false)

@@ -59,8 +59,8 @@ export default class PhoneAbility extends UIAbility {
       }
       Logger.info(TAG, 'Succeeded in loading the content.');
       AppUtils.setAppTheme();
-      AppUtils.setColorMode();
-      BundleUtils.getBundleInfo();
+      AppUtils.setColorMode(this.context);
+      BundleUtils.getBundleInfo(this.context);
       LoneTakeAnimationsTransition.init(windowStage);
     });
   }

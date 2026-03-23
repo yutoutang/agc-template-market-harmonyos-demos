@@ -1,37 +1,21 @@
 import { media } from '@kit.MediaKit'
-import { AppStorageV2, display, window } from '@kit.ArkUI'
 import { BusinessError } from '@kit.BasicServicesKit'
-import { LoneTakeAnimationsTransition, LongTakeTransitionParam } from 'module_transition'
 import { AVPlayerState, BreakpointNameEnum, PageNameEnum, VideoPlayerData } from '../type/Index'
-import { secondToTime, setOrientation, toast } from '../utils/Util'
+import { handleSandboxVideoUrl, secondToTime, toast } from '../utils/Util'
 import { Constants } from '../constants/Constants'
 import { VideoProgressBar } from './VideoProgressBar'
-import { AVPlayerManager, AVPlayerSession } from '../controller/AVPlayerManager'
+import { AVPlayerManager } from '../controller/AVPlayerManager'
+import { AVPlayerController } from '../controller/AVPlayerController'
+import { VideoCardPlayerController } from '../controller/VideoCardPlayerController'
 import { VideoCardModel } from '../viewmodel/VideoCardModel'
 import { VideoNetworkModel, VideoNetworkSetting } from '../models/VideoNetworkModel'
 import { BreakpointModel } from '../models/BreakpointModel'
 import { BaseImage } from './BaseImage'
-import { PiPWindowModel } from '../models/PiPWindowModel'
 import { Logger } from '../utils/Logger';
-
-@ObservedV2
-export class VideoCardPlayerController {
-  pause: () => void = () => {
-  }
-  play: () => void = () => {
-  }
-  switchPlayPause: () => void = () => {
-  }
-  videoUrlChange: (url: string) => void = () => {
-  }
-  seek: (seekTime: number) => void = () => {
-  }
-  getAvplayer: () => media.AVPlayer | undefined = () => undefined;
-}
 
 const TAG = '[VideoCard]';
 
-@ComponentV2({ freezeWhenInactive: true })
+@ComponentV2
 export struct VideoCard {
   // 列表视频信息
   @Param @Require videoData: VideoPlayerData
@@ -43,6 +27,8 @@ export struct VideoCard {
   @Param isShown: boolean = false
   // 是否是详情页的视频卡片
   @Param isFromDetailCard: boolean = false
+  // 是否支持pip
+  @Param enablePip: boolean = true;
   // 是否可以滑动进度条
   @Param canChangeSlide: boolean = false
   // 是否隐藏进度条
@@ -54,32 +40,49 @@ export struct VideoCard {
   @Param videoNetworkSetting: VideoNetworkSetting | undefined = undefined
   // 一多适配的断点
   @Param currentBreakpoint: BreakpointNameEnum = BreakpointNameEnum.SM;
+  // 主题色
+  @Param themeColor: string | Resource = $r('sys.color.brand');
   // 路由栈
-  @Param pathStack: NavPathStack | undefined = undefined
+  @Param pathStack: NavPathStack = new NavPathStack();
+  // 是否横屏
+  @Param isLandscape: boolean = false;
+  // 是否接入播控中心
+  @Param enableAVSession: boolean = false;
+  // 是否支持投屏播放
+  @Param enableCastPlay: boolean = false;
+  // 是否允许播放
+  @Param canPlay: boolean = true;
   // 全屏自定义图标
   @Param fullScreenIcon: Resource | undefined = undefined
   // 是否隐藏静音图标
   @Param isNeedMuteIcon: boolean = false
-  // 路由变化的监听事件
-  @Local pipWindowModel: PiPWindowModel = AppStorageV2.connect(PiPWindowModel, () => new PiPWindowModel())!;
+  // 是否受画中画影响，释放播放器
+  @Param isNeedRelease: boolean = true
   // 视频信息view
   @BuilderParam videoInfoViewBuilder: CustomBuilder;
   @BuilderParam videoProgressBar: CustomBuilder;
   // 视频播放完后，界面展示的内容
-  @Param completedBtnBuilder: WrappedBuilder<[AVPlayerSession]> | undefined = undefined;
+  @Param completedBtnBuilder: WrappedBuilder<[AVPlayerController]> | undefined = undefined;
+  // 提示开通会员的内容
+  @Param membershipBuilder: WrappedBuilder<[() => void]> | undefined = undefined;
+  @Param isMute: boolean = false
   // 点击title，回调事件
-  @Event onClickEvent: (playerSession: AVPlayerSession | undefined, callback: () => void) => void;
+  @Event onClickEvent: (avPlayerController: AVPlayerController | undefined, callback: () => void) => void;
   // 播放list某个item的视频
   @Event onPlayItem: (playIndex: number) => void
   // 在移动网络下点击播放按钮，默认为是同意使用流量播放
   @Event setUseMobileData: () => void
   // 播放状态回调
-  @Event playerStateCallback: (state: string, id: string) => void = (state: string, id: string) => {
+  @Event playerStateCallback: (state: string, id: string) => void = () => {
   }
-  @Param isMute: boolean = false
+  // 播放进度回调
+  @Event timeUpdateCallback: (timeMs: number) => void = () => {
+  };
   // xComponent ready回调
   @Event xComponentReadyCallback: (controller: XComponentController) => void;
-  @Event onMute: (value: boolean) => void = () => {};
+  @Event onMute: (value: boolean) => void = () => {
+  };
+  @Provider() showMembershipOverlay: boolean = false;
   // XComponent控制器
   private xComponentController: XComponentController = new XComponentController();
   vm: VideoCardModel = new VideoCardModel(this.getUIContext(), this.index)
@@ -104,9 +107,11 @@ export struct VideoCard {
   private playerStateListener = (state: string) => {
     if (this.index === this.currentIndex && this.videoNetwork) {
       // 播放时，才能使用画中画
-      if (this.isFromDetailCard && this.videoNetworkSetting?.enableLivePiP) {
-        this.pipWindowModel.isEnablePiP = state === AVPlayerState.PLAYING
-        this.pipWindowModel.videoPlayerStatus = state;
+      if (this.enablePip && this.isFromDetailCard && this.videoNetworkSetting?.enableLivePiP) {
+        this.vm.pipWindowModel.isEnablePiP = state === AVPlayerState.PLAYING
+        this.vm.pipWindowModel.videoPlayerStatus = state;
+        Logger.debug(TAG, 'this.vm.pipWindowModel.isEnablePiP: ' + this.vm.pipWindowModel.isEnablePiP,
+          'this.vm.pipWindowModel.videoPlayerStatus: ' + this.vm.pipWindowModel.videoPlayerStatus);
       }
     }
   }
@@ -114,10 +119,10 @@ export struct VideoCard {
   private preparedListener = () => {
     // 自动播放开关打开，才会播放
     if (this.index === this.currentIndex && this.isShown &&
-      this.videoNetworkSetting?.autoPlayTabRecommend
+      (this.videoNetworkSetting?.autoPlayTabRecommend || this.isFromDetailCard)
     ) {
       this.playerStateCallback && this.playerStateCallback(AVPlayerState.PREPARED, this.videoData.getVideoId())
-      this.vm.playerSession.play()
+      this.vm.avPlayerController.play()
     }
   }
   // 播放状态监听
@@ -128,6 +133,10 @@ export struct VideoCard {
       this.playerStateCallback && this.playerStateCallback(AVPlayerState.PLAYING, this.videoData.getVideoId())
     }
   }
+  // 播放进度监听
+  private timeUpdateListener = (timeMs: number) => {
+    this.timeUpdateCallback(timeMs);
+  };
   // 播放完成状态监听事件
   private completedListeners = () => {
     if (this.isFromDetailCard) {
@@ -136,13 +145,13 @@ export struct VideoCard {
     // 设置自动播放下一个，且推荐视频自动播放开关打开，则当前视频播放完之后，继续播放下一个
     if (this.videoNetworkSetting?.autoPlayNext && this.videoNetworkSetting?.autoPlayTabRecommend) {
       this.vm.isPause = true;
-      this.vm.playerSession.avPlayer!.seek(0, media.SeekMode.SEEK_CLOSEST);
+      this.vm.avPlayerController.avPlayer!.seek(0, media.SeekMode.SEEK_CLOSEST);
       this.onPlayItem?.(this.currentIndex + 1)
       this.playAVPlayer(this.vm.avPlayerManager.getAVPlayer(this.currentIndex + 1))
       return
     }
     // 其他情况，重头开始播放
-    this.vm.playerSession.play()
+    this.vm.avPlayerController.play()
   }
   // 视频播放错误事件监听
   private errorListener = () => {
@@ -160,7 +169,7 @@ export struct VideoCard {
   private buffingUpdateListener = (infoType: media.BufferingInfoType) => {
     if (this.currentIndex === this.index) {
       if (infoType === media.BufferingInfoType.BUFFERING_START) {
-        if (this.videoNetworkSetting?.autoPlayTabRecommend) {
+        if (this.videoNetworkSetting?.autoPlayTabRecommend || this.isFromDetailCard) {
           this.vm.isPause = false;
         }
         this.vm.isBuffering = true;
@@ -168,7 +177,7 @@ export struct VideoCard {
       if (infoType === media.BufferingInfoType.BUFFERING_END) {
         this.vm.isBuffering = false;
         if (!this.isShown) {
-          this.vm.playerSession.pause();
+          this.vm.avPlayerController.pause();
         }
       }
     }
@@ -179,7 +188,7 @@ export struct VideoCard {
     this.onChangeListIndex();
   }
 
-  @Monitor('videoNetwork.isNetworkAvailable','currentIndex')
+  @Monitor('videoNetwork.isNetworkAvailable', 'currentIndex')
   onCellularChange(monitor: IMonitor) {
     let isNetworkAvailable = monitor.value()?.now as boolean
     if (this.videoNetworkSetting?.remindWithoutWlan === 1) {
@@ -197,7 +206,7 @@ export struct VideoCard {
         return
       }
       if (this.videoNetwork && this.videoNetwork.hasNet) {
-        this.playAVPlayer(this.vm.playerSession.getAVPlayer())
+        this.playAVPlayer(this.vm.avPlayerController.getAVPlayer())
       }
     }
   }
@@ -205,9 +214,9 @@ export struct VideoCard {
   @Monitor('videoNetwork.hasNet')
   onNetworkChange(monitor: IMonitor) {
     let hasNet = monitor.value()?.now as boolean;
-    let playerState = this.vm.playerSession.avPlayer?.state
+    let playerState = this.vm.avPlayerController.avPlayer?.state
     if (this.currentIndex === this.index && playerState === 'idle' && hasNet) {
-      this.vm.playerSession.avPlayer!.url = this.videoData.getVideoUrl()
+      this.vm.avPlayerController.avPlayer!.url = this.videoData.getVideoUrl()
     }
   }
 
@@ -215,14 +224,69 @@ export struct VideoCard {
   onCurrentBreakpointChange(monitor: IMonitor) {
     // 设置断点
     let breakpoint = monitor.value()?.now as BreakpointNameEnum;
-    this.vm.currentBreakpoint = breakpoint;
+    this.vm.breakpointModel.currentBreakpoint = breakpoint;
   }
 
-  @Monitor('pipWindowModel.isReleaseVideoPlayer')
+  @Monitor('vm.pipWindowModel.isReleaseVideoPlayer')
   onReleaseVideoPlayer() {
-    if (this.pipWindowModel.isReleaseVideoPlayer) {
-      this.vm.handlerDisappear()
+    Logger.debug(TAG, 'onReleaseVideoPlayer this.vm.pipWindowModel.isReleaseVideoPlayer: ' +
+    this.vm.pipWindowModel.isReleaseVideoPlayer,
+      'this.isNeedRelease:' + this.isNeedRelease);
+    if (this.vm.pipWindowModel.isReleaseVideoPlayer && this.isNeedRelease) {
+      Logger.debug(TAG, 'onReleaseVideoPlayer handlerDisappear')
+      this.vm.handlerDisappear();
     }
+  }
+
+  @Monitor('vm.pipWindowModel.isPipStop', 'vm.pipWindowModel.isBackgroundPip')
+  onPipStop() {
+    if (this.vm.pipWindowModel.isPipStop && this.vm.pipWindowModel.isBackgroundPip) {
+      Logger.debug(TAG, 'pause the avplayer, when stop the pip in background');
+      this.pause();
+    }
+  }
+
+  @Monitor('enableCastPlay', 'vm.pipWindowModel.isPipStop', 'vm.pipWindowModel.currentPiPVideoId')
+  onPipStart() {
+    if (!this.enableCastPlay) {
+      return;
+    }
+    if (!this.vm.pipWindowModel.isPipStop && this.vm.pipWindowModel.currentPiPVideoId) {
+      // 存在画中画时，禁用投屏功能
+      this.vm.avSessionController.disableCast();
+    } else {
+      // 不存在画中画时，启用投屏功能
+      this.vm.avSessionController.supportCast();
+    }
+  }
+
+  @Monitor('isLandscape')
+  onChangeOrientation(monitor: IMonitor) {
+    const isLandscape = (monitor.value()?.now) as boolean;
+    if (!isLandscape) {
+      this.vm.isClickFullScreenBtn = false;
+      return
+    }
+    // 自动横屏：组件处于显示状态、横屏、当前索引视频、不是通过点击全屏按钮的横屏、直板机状态下
+    if (isLandscape && this.isShown && !this.vm.isClickFullScreenBtn &&
+      this.vm.breakpointModel.currentBreakpoint === BreakpointNameEnum.SM
+    ) {
+      this.handleFullScreen(false);
+    }
+  }
+
+  @Monitor('canPlay')
+  onAccessPlayChange() {
+    if (this.canPlay) {
+      this.vm.avSessionController.setListener({ play: this.vm.sessionListener.play })
+    } else {
+      this.vm.avSessionController.releasePlayListener();
+    }
+  }
+
+  @Monitor('isHideSlide')
+  onHideSlideChange() {
+    this.vm.isHideSlide = this.isHideSlide;
   }
 
   @Computed
@@ -235,6 +299,13 @@ export struct VideoCard {
     if (this.isFromDetailCard) {
       this.vm.avPlayerManager = new AVPlayerManager()
     }
+    this.vm.globalConfigModel.themeColor = this.themeColor;
+    this.vm.breakpointModel.currentBreakpoint = this.currentBreakpoint
+    this.vm.videoNetwork = this.videoNetwork
+    this.vm.enableAVSession = this.enableAVSession
+    this.vm.enableCastPlay = this.enableCastPlay
+    this.vm.isHideSlide = this.isHideSlide
+    this.vm.setPathStack(this.pathStack);
     this.vm.initPlayerManager(this.videoData)
     this.vm.initXComponentId()
     // 播放器状态监听
@@ -242,13 +313,15 @@ export struct VideoCard {
     // 准备状态监听事件
     this.vm.onPreparedListener(this.preparedListener);
     // 视频播放状态监听事件
-    this.vm.onPlayingListener(this.playingListener)
+    this.vm.onPlayingListener(this.playingListener);
+    // 视频进度监听
+    this.vm.onTimeUpdateListener(this.timeUpdateListener);
     // 完成状态监听事件
     this.vm.onCompletionListener(this.completedListeners);
     // 播放错误状态监听事件
-    this.vm.onErrorListener(this.errorListener)
+    this.vm.onErrorListener(this.errorListener);
     // 缓存事件监听
-    this.vm.onBuffingUpdateListener(this.buffingUpdateListener)
+    this.vm.onBuffingUpdateListener(this.buffingUpdateListener);
     // 监听首帧事件
     this.vm.onStartRenderFrameListener(() => {
       if (this.index === this.currentIndex) {
@@ -262,34 +335,37 @@ export struct VideoCard {
 
     // 网络是否可用
     this.handlerNetwork()
-    this.vm.videoNetwork = this.videoNetwork
+    this.vm.handleAVSession(this.getUIContext().getHostContext() as Context);
 
     // 绑定控制器
+    this.vm.videoCardPlayerController = this.videoCardPlayerController;
     this.videoCardPlayerController.pause = (): void => this.pause();
     this.videoCardPlayerController.play = (): void => this.play();
+    this.videoCardPlayerController.reset = (): void => {
+      this.vm.avPlayerController?.reset();
+    };
     this.videoCardPlayerController.seek = (seekTime: number): void => this.seek(seekTime);
     this.videoCardPlayerController.switchPlayPause = (): void => this.switchPlayPause();
-    this.videoCardPlayerController.videoUrlChange = (url: string): void => this.videoUrlChange(url);
-    this.videoCardPlayerController.getAvplayer = (): media.AVPlayer | undefined => this.vm.playerSession.avPlayer
+    this.videoCardPlayerController.videoUrlChange =
+      (videoData: VideoPlayerData): void => this.videoUrlChange(videoData);
+    this.videoCardPlayerController.getAvplayer = (): media.AVPlayer | undefined => this.vm.avPlayerController.avPlayer
   }
 
-
   aboutToDisappear(): void {
-    if (this.pipWindowModel.isReleaseVideoPlayer) {
-      this.vm.handlerDisappear()
-    }
+    Logger.debug(TAG, 'aboutToDisappear');
+    this.vm.handlerDisappear();
   }
 
   pause() {
-    this.vm.playerSession?.pause()
+    this.vm.avPlayerController?.pause()
   }
 
   seek(seekTime: number) {
-    this.vm.playerSession?.seek(seekTime)
+    this.vm.avPlayerController?.seek(seekTime)
   }
 
   play() {
-    this.vm.playerSession?.play()
+    this.vm.avPlayerController?.play()
   }
 
   // 处理无网络情况
@@ -310,24 +386,24 @@ export struct VideoCard {
     let disabledPlay = this.videoNetwork && this.videoNetwork.isCellular && !this.videoNetwork.canUseMobileData
     if (this.index !== this.currentIndex || disabledPlay) {
       this.vm.isPause = true;
-      this.vm.playerSession.pause();
+      this.vm.avPlayerController.pause();
       return;
     }
     this.vm.isPause = false;
-    if (this.vm.playerSession.getAVPlayer()) {
+    if (this.vm.avPlayerController.getAVPlayer()) {
       let canPlayStates = [
         AVPlayerState.PREPARED,
         AVPlayerState.PAUSED,
         AVPlayerState.COMPLETED,
       ] as media.AVPlayerState[]
-      if (canPlayStates.includes(this.vm.playerSession.avPlayer?.state!)) {
-        this.vm.playerSession.avPlayer?.setSpeed(1);
-        this.vm.playerSession.play();
+      if (canPlayStates.includes(this.vm.avPlayerController.avPlayer?.state!)) {
+        this.vm.avPlayerController.avPlayer?.setSpeed(1);
+        this.vm.avPlayerController.play();
         return
       }
       // 有网络
       if (this.videoNetwork?.hasNet) {
-        this.vm.playerSession.avPlayer!.url = this.videoData.getVideoUrl();
+        this.vm.avPlayerController.avPlayer!.url = this.videoData.getVideoUrl();
       }
     }
   }
@@ -345,14 +421,14 @@ export struct VideoCard {
       this.pauseAVPlayer(this.vm.avPlayerManager.getAVPlayer(this.currentIndex))
       this.onPlayItem?.(this.index);
 
-      if (this.vm.playerSession.getAVPlayer()) {
-        let playerState = this.vm.playerSession.avPlayer?.state;
+      if (this.vm.avPlayerController.getAVPlayer()) {
+        let playerState = this.vm.avPlayerController.avPlayer?.state;
         // idle状态
         if (playerState === AVPlayerState.IDLE) {
-          this.vm.playerSession.avPlayer!.url = this.videoData.getVideoUrl();
+          this.vm.avPlayerController.avPlayer!.url = this.videoData.getVideoUrl();
           return;
         }
-        await this.vm.playerSession.play()
+        await this.vm.avPlayerController.play()
       } else {
         await this.vm.initAVPlayer();
       }
@@ -361,21 +437,21 @@ export struct VideoCard {
 
   // 跳转详情页
   pushToVideoDetailPage() {
-    let avPlayer = this.vm.playerSession?.avPlayer;
+    let avPlayer = this.vm.avPlayerController?.avPlayer;
     let callback = async () => {
       if (this.index === this.currentIndex) {
         avPlayer!.surfaceId = this.vm.surfaceId;
-        this.vm.playerSession!.avPlayer = avPlayer
+        this.vm.avPlayerController!.avPlayer = avPlayer
         this.vm.showCover = false;
         this.vm.isPause = false;
         this.vm.onCompletionListener(this.completedListeners);
-        this.vm.initPlayerListener(this.vm.playerSession.avPlayer!)
+        this.vm.initPlayerListener(this.vm.avPlayerController.avPlayer!)
         // 退出详情页时，推荐页面需要播放视频
-        await this.vm.playerSession?.pause();
-        await this.vm.playerSession?.play();
+        await this.vm.avPlayerController?.pause();
+        await this.vm.avPlayerController?.play();
       }
     }
-    this.onClickEvent?.(this.vm.playerSession, callback)
+    this.onClickEvent?.(this.vm.avPlayerController, callback)
   }
 
   // 处理点击卡片title
@@ -386,19 +462,24 @@ export struct VideoCard {
 
   switchPlayPause() {
     if (!this.vm.isBuffering && this.isFromDetailCard) {
-      let playerState = this.vm.playerSession.avPlayer?.state;
+      let playerState = this.vm.avPlayerController.avPlayer?.state;
       if (playerState === AVPlayerState.PLAYING) {
-        this.vm.playerSession.pause()
+        this.vm.avPlayerController.pause()
       } else {
         this.onClickVideo()
       }
     }
   }
 
-  videoUrlChange(url: string) {
-    if (this.vm.playerSession.avPlayer) {
-      this.vm.playerSession.avPlayer!.reset().then(() => {
-        this.vm.playerSession.avPlayer!.url = url
+  videoUrlChange(videoData: VideoPlayerData) {
+    if (this.vm.avPlayerController.avPlayer) {
+      this.vm.avPlayerController.avPlayer!.reset().then(() => {
+        if (videoData.getVideoUrl().startsWith('http')) {
+          this.vm.avPlayerController.avPlayer!.url = videoData.getVideoUrl();
+        } else {
+          this.vm.avPlayerController.avPlayer!.url = 'fd://' + handleSandboxVideoUrl(videoData.getVideoUrl());
+        }
+        this.vm.setVideoData(videoData);
       }).catch((e: BusinessError) => {
         Logger.error(TAG, 'reset fail, error: ' + JSON.stringify(e));
       });
@@ -406,59 +487,37 @@ export struct VideoCard {
   }
 
   // 处理横屏按钮事件
-  async handleFullScreen() {
-    let param: Record<string, Object | AVPlayerSession | BreakpointModel | boolean> = {};
-    param.playerSession = this.vm.playerSession;
+  async handleFullScreen(isSetOrientation: boolean = true) {
+    let param: Record<string, Object | VideoCardPlayerController | AVPlayerController
+      | BreakpointModel | boolean | WrappedBuilder<[() => void]>> = {};
+    param.avPlayerController = this.vm.avPlayerController;
     param.surfaceId = this.vm.surfaceId;
     param.videoWidth = this.vm.videoWidth;
     param.videoHeight = this.vm.videoHeight;
     param.videoTitle = this.videoData.getVideoTitle();
-    let breakpointModel = new BreakpointModel()
-    breakpointModel.currentBreakpoint = this.currentBreakpoint;
-    param.breakpointModel = breakpointModel
-    param.isMute = this.isMute
+    param.breakpointModel = this.vm.breakpointModel;
+    param.isMute = this.isMute;
     param.isHideSlide = this.isHideSlide;
+    param.videoCardPlayerController = this.videoCardPlayerController;
+    if (this.membershipBuilder) {
+      param.membershipBuilder = this.membershipBuilder;
+    }
     // 视频播放，跨页面流转
-    this.pipWindowModel.navDestinationUpdateListeners.clear();
-    this.pipWindowModel.navDestinationUpdateListeners.set('landscapeListener', (info) => {
+    this.vm.pipWindowModel.navDestinationUpdateListeners.clear();
+    this.vm.pipWindowModel.navDestinationUpdateListeners.set('landscapeListener', (info) => {
       if (info.name === PageNameEnum.VIDEO_LANDSCAPE_PAGE && info.state === 3) {
-        let avPlayer = (param.playerSession as AVPlayerSession).getAVPlayer() as media.AVPlayer;
+        let avPlayer = (param.avPlayerController as AVPlayerController).getAVPlayer() as media.AVPlayer;
         if (avPlayer) {
           avPlayer.surfaceId = param.surfaceId as string;
         }
       }
     })
-
-    try {
-      // 窗口旋转
-      let displayClass = display.getDefaultDisplaySync();
-      let orientation = displayClass.orientation;
-      if (orientation === display.Orientation.LANDSCAPE) {
-        await setOrientation(this.getUIContext(), window.Orientation.USER_ROTATION_LANDSCAPE_INVERTED)
-      } else if (orientation === display.Orientation.LANDSCAPE_INVERTED) {
-        await setOrientation(this.getUIContext(), window.Orientation.USER_ROTATION_LANDSCAPE)
-      } else if (orientation === display.Orientation.PORTRAIT) {
-        await setOrientation(this.getUIContext(), window.Orientation.USER_ROTATION_LANDSCAPE)
-      } else if (orientation === display.Orientation.PORTRAIT_INVERTED) {
-        await setOrientation(this.getUIContext(), window.Orientation.USER_ROTATION_LANDSCAPE_INVERTED)
-      }
+    if (isSetOrientation) {
+      await this.vm.handleOrientation();
       this.vm.isClickFullScreenBtn = true;
-      this.pushToLandscapePage(param)
-    } catch (e) {
-      Logger.error(TAG, 'handleFullScreen fail, error: ' + JSON.stringify(e));
     }
-  }
-
-  // 跳转到横屏页
-  pushToLandscapePage(
-    param: Record<string, Object | AVPlayerSession | BreakpointModel | LongTakeTransitionParam | undefined>,
-  ) {
-    let longTakeTransitionParam: LongTakeTransitionParam | undefined =
-      LoneTakeAnimationsTransition.generateLongTakeParam(this.getUIContext(), 'videoCard' + this.index, 9);
-    if (longTakeTransitionParam) {
-      param.longTakeTransitionParam = longTakeTransitionParam;
-    }
-    this.pathStack?.pushPathByName(PageNameEnum.VIDEO_LANDSCAPE_PAGE, param);
+    this.vm.breakpointModel.isLandscapeAuto = !isSetOrientation;
+    this.vm.pushToLandscapePage(param, 'videoCard' + this.index);
   }
 
   build() {
@@ -488,12 +547,12 @@ export struct VideoCard {
             videoNetworkSetting: this.videoNetworkSetting,
           })
             .width(Constants.FULL_PERCENT)
-            .onAreaChange((ov: Area, nv: Area) => {
+            .onAreaChange((_ov: Area, nv: Area) => {
               this.vm.coverImgHeight = nv.height
             })
         }
         if (this.isFromDetailCard && this.vm.isCompleted) {
-          this.completedBtnBuilder?.builder(this.vm.playerSession)
+          this.completedBtnBuilder?.builder(this.vm.avPlayerController)
         } else {
           if (this.vm.isPause) {
             Image($r('app.media.ic_paused'))
@@ -505,9 +564,9 @@ export struct VideoCard {
         if (this.vm.isBuffering && this.index === this.currentIndex) {
           Column() {
             LoadingProgress()
-              .width(50)
-              .height(50)
-              .color(Color.White);
+              .width(40)
+              .height(40)
+              .color($r('sys.color.icon_on_primary'));
             Text('缓冲中...')
               .fontSize(12)
               .fontColor(Color.White)
@@ -519,7 +578,7 @@ export struct VideoCard {
           Column() {
             // 视频的进度控制器
             VideoProgressBar({
-              playerSession: this.vm.playerSession,
+              avPlayerController: this.vm.avPlayerController,
               canChangeSlide: this.canChangeSlide,
               isHideSlide: this.isHideSlide,
               isProgressFullWidth: !this.isFromDetailCard,
@@ -533,7 +592,7 @@ export struct VideoCard {
               fullScreenIcon: this.fullScreenIcon,
               isNeedMuteIcon: this.isNeedMuteIcon,
               isMute: this.isMute,
-              onMute:(value) => {
+              onMute: (value) => {
                 this.onMute(value)
               },
               onSwitchPlayCallback: () => {
@@ -569,7 +628,7 @@ export struct VideoCard {
         }
         .aspectRatio(Number(this.vm.videoWidth) / Number(this.vm.videoHeight))
         .onClick(() => {
-          let playerState = this.vm.playerSession.avPlayer?.state;
+          let playerState = this.vm.avPlayerController.avPlayer?.state;
           if (playerState === AVPlayerState.PLAYING) {
             this.pushToVideoDetailPage()
           } else {

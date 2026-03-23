@@ -102,13 +102,24 @@ export struct ContactItem {
       .width('94%')
       .onClick(() => {
         // 如果设备支持呼叫能力，则继续跳转到拨号界面，并显示拨号的号码
-        call.makeCall('000000', (err: BusinessError) => {
-          if (!err) {
-            console.log('make call success.');
-          } else {
-            console.log('make call fail, err is:' + JSON.stringify(err));
-          }
-        });
+        try {
+          call.makeCall('000000', (err: BusinessError) => {
+            if (!err) {
+              console.log('make call success.');
+            } else {
+              let errMsg: string;
+              try {
+                errMsg = JSON.stringify(err);
+              } catch (e) {
+                errMsg = 'unknown error';
+              }
+              console.log('make call fail, err is:' + errMsg);
+            }
+          });
+        } catch (error) {
+          const e = error as BusinessError;
+          console.log('make call throw error, code:' + e.code + ', message:' + e.message);
+        }
       })
 
       Button('取消')

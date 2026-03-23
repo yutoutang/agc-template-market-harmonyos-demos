@@ -1,15 +1,23 @@
 import { Location } from '../common/CustomTypes';
 
-export interface CheckinStatusDTO {
-  isCheckedIn: boolean;
-  checkinInfo?: CheckinInfoDTO;
+export interface ApiResponseBase {
+  code?: number;
+  message?: string;
 }
 
-export interface CheckinInfoDTO {
-  studentId: string;
+export interface CheckinRequest {
   courseId: string;
   checkinCode: string;
   location: Location;
-  courseName?: string;
+}
+
+export interface CheckinResponse extends ApiResponseBase {
   checkinTime?: number;
+}
+
+export interface GetCheckinInfoResponse extends ApiResponseBase {
+  courseId: string;
+  courseName: string;
+  checkinCode: string;
+  isCheckedIn: boolean;
 }

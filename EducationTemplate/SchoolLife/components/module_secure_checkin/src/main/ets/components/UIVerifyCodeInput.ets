@@ -1,6 +1,8 @@
-import { NumberUtil } from '../utils/NumberUtil';
-import { componentUtils, curves } from '@kit.ArkUI';
+import { curves } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
+import { NumberUtil } from '../utils/NumberUtil';
+import { Logger } from '../utils/Logger';
+import { NormalizedError } from '../utils/NormalizedError';
 
 export enum VerifyCodeType {
   NUMBER_AND_CHAR, // 数字+字母
@@ -44,7 +46,8 @@ export struct UIVerifyCodeInput {
   private readonly _GUIDELINE_SUFFIX = 'guideline_';
   private readonly _TEXT_INPUT_SUFFIX = 'text_input_';
 
-  private _context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+  private uiContext: UIContext = this.getUIContext();
+  private abilityContext: common.UIAbilityContext = this.uiContext.getHostContext() as common.UIAbilityContext;
 
   aboutToAppear(): void {
     NumberUtil.range(this.codeCount).forEach(() => {
@@ -54,17 +57,17 @@ export struct UIVerifyCodeInput {
 
     // 设置底部亮标闪烁
     setInterval(() => {
-      animateTo({ curve: Curve.Sharp, duration: 100 }, () => {
+      this.uiContext.animateTo({ curve: Curve.Sharp, duration: 100 }, () => {
         this.flashFlag = !this.flashFlag;
       });
     }, 500);
 
     // 事件监听注册
-    this._context.eventHub.on(VerifyEventType.CODE_ERROR, this.verifyCodeError.bind(this));
+    this.abilityContext.eventHub.on(VerifyEventType.CODE_ERROR, (): void => this.verifyCodeError());
   }
 
   aboutToDisappear(): void {
-    this._context.eventHub.off(VerifyEventType.CODE_ERROR);
+    this.abilityContext.eventHub.off(VerifyEventType.CODE_ERROR);
   }
 
   build() {
@@ -181,15 +184,19 @@ export struct UIVerifyCodeInput {
 
   // 初始化验证码宽高及定位
   computeGuidelineAndSize() {
-    const codeBgInfo = componentUtils.getRectangleById(`${this._CODE_BG_SUFFIX}0`);
-    this.codeBgWidth = px2vp(codeBgInfo.size.width);
-    NumberUtil.range(this.codeCount).forEach((index: number) => {
-      this.verticalGuidelines.push({
-        id: `${this._GUIDELINE_SUFFIX}${index}`,
-        direction: Axis.Vertical,
-        position: { start: this.codeBgWidth / 2 + index * (this.codeBgWidth + this.inputSpace) },
+    try {
+      const codeBgInfo = this.uiContext.getComponentUtils().getRectangleById(`${this._CODE_BG_SUFFIX}0`);
+      this.codeBgWidth = this.uiContext.px2vp(codeBgInfo.size.width);
+      NumberUtil.range(this.codeCount).forEach((index: number) => {
+        this.verticalGuidelines.push({
+          id: `${this._GUIDELINE_SUFFIX}${index}`,
+          direction: Axis.Vertical,
+          position: { start: this.codeBgWidth / 2 + index * (this.codeBgWidth + this.inputSpace) },
+        });
       });
-    });
+    } catch (e) {
+      Logger.error(NormalizedError.from(e).toLogLine());
+    }
   }
 
   // 校验输入字符合法性
@@ -211,7 +218,7 @@ export struct UIVerifyCodeInput {
     setTimeout(() => {
       // 晃动动画
       this.springTranslationX = -2;
-      animateTo({
+      this.uiContext.animateTo({
         duration: 800,
         // 弹簧曲线：初始速度100，质量1，刚度80，阻尼10
         curve: curves.springCurve(100, 1, 80, 10)

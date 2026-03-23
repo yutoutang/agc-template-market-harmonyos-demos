@@ -3,6 +3,10 @@
     {
       "name": "comment_input_bg",
       "value": "#393a3d"
+    },
+    {
+      "name": "common_sheet_bg",
+      "value": "#202224"
     }
   ]
 }

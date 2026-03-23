@@ -2,6 +2,7 @@ import { FunctionalButton, functionalButtonComponentManager } from '@kit.Scenari
 import { CommonConstants, GridRowColSetting } from 'lib_common';
 import { NavHeaderBar } from 'lib_widget'
 import { SettingPersonalVM } from '../viewmodels/SettingPersonalVM';
+import { common } from '@kit.AbilityKit';
 
 @Builder
 export function SettingPersonalBuilder() {
@@ -55,6 +56,7 @@ export struct CustomButton {
 @ComponentV2
 struct SettingPersonal {
   @Local vm: SettingPersonalVM = new SettingPersonalVM();
+  @Local context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext
   private genderPicker: string[] = ['男', '女'];
   private ageOptions: number[] = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,
     26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,
@@ -203,7 +205,7 @@ struct SettingPersonal {
                 return;
               }
               if (data) {
-                this.vm.saveUserIcon(data.avatarUri!);
+                this.vm.saveUserIcon(this.getUIContext().getHostContext() as common.UIAbilityContext, data.avatarUri!);
               }
             }),
           })
@@ -270,7 +272,8 @@ struct SettingPersonal {
         .fontColor($r('sys.color.font_primary'))
         .fontWeight(FontWeight.Medium)
       Row({ space: CommonConstants.SPACE_XS }) {
-        Text(AppStorage.get<string[]>('userPurpose')?.join(',') ? AppStorage.get<string[]>('userPurpose')?.join(',') : this.vm.userInfoModel.purpose.join(','))
+        Text(this.vm.getPurpose(this.context).join(',') ? this.vm.getPurpose(this.context).join(',') :
+          this.vm.userInfoModel.purpose.join(','))
           .fontSize(14 * this.vm.settingInfo.fontSizeRatio)
           .fontColor($r('sys.color.font_secondary'))
           .constraintSize({ maxWidth: '80%' })
@@ -310,7 +313,8 @@ struct SettingPersonal {
         .fontColor($r('sys.color.font_primary'))
         .fontWeight(FontWeight.Medium)
       Row({ space: CommonConstants.SPACE_XS }) {
-        Text(AppStorage.get<string[]>('userBody')?.join(',') ? AppStorage.get<string[]>('userBody')?.join(',') : this.vm.userInfoModel.body.join(','))
+        Text(this.vm.getBody(this.context).join(',') ? this.vm.getBody(this.context).join(',') :
+          this.vm.userInfoModel.body.join(','))
           .fontSize(14 * this.vm.settingInfo.fontSizeRatio)
           .fontColor($r('sys.color.font_secondary'))
           .constraintSize({ maxWidth: '80%' })
@@ -350,7 +354,8 @@ struct SettingPersonal {
         .fontColor($r('sys.color.font_primary'))
         .fontWeight(FontWeight.Medium)
       Row({ space: CommonConstants.SPACE_XS }) {
-        Text(AppStorage.get<string>('userGender') ? AppStorage.get<string>('userGender') : this.vm.userInfoModel.authorGender)
+        Text(this.vm.getGender(this.context) ? this.vm.getGender(this.context) as string :
+          this.vm.userInfoModel.authorGender)
           .fontSize(14 * this.vm.settingInfo.fontSizeRatio)
           .fontColor($r('sys.color.font_secondary'))
           .constraintSize({ maxWidth: '80%' })
@@ -389,7 +394,8 @@ struct SettingPersonal {
         .fontColor($r('sys.color.font_primary'))
         .fontWeight(FontWeight.Medium)
       Row({ space: CommonConstants.SPACE_XS }) {
-        Text(AppStorage.get<string>('userAge') ? AppStorage.get<string>('userAge') : this.vm.userInfoModel.authorAge)
+        Text(this.vm.getAge(this.context) ? this.vm.getAge(this.context) as string :
+          this.vm.userInfoModel.authorAge)
           .fontSize(14 * this.vm.settingInfo.fontSizeRatio)
           .fontColor($r('sys.color.font_secondary'))
           .constraintSize({ maxWidth: '80%' })
@@ -428,7 +434,8 @@ struct SettingPersonal {
         .fontColor($r('sys.color.font_primary'))
         .fontWeight(FontWeight.Medium)
       Row({ space: CommonConstants.SPACE_XS }) {
-        Text(AppStorage.get<string>('userHeight') ? AppStorage.get<string>('userHeight') : this.vm.userInfoModel.authorHeight + 'cm')
+        Text(this.vm.getHeight(this.context) ? this.vm.getHeight(this.context) as string :
+          this.vm.userInfoModel.authorHeight + 'cm')
           .fontSize(14 * this.vm.settingInfo.fontSizeRatio)
           .fontColor($r('sys.color.font_secondary'))
         Image($r('app.media.ic_right'))
@@ -466,7 +473,8 @@ struct SettingPersonal {
         .fontColor($r('sys.color.font_primary'))
         .fontWeight(FontWeight.Medium)
       Row({ space: CommonConstants.SPACE_XS }) {
-        Text(AppStorage.get<string>('userWeight') ? AppStorage.get<string>('userWeight') : this.vm.userInfoModel.authorWeight + 'kg')
+        Text(this.vm.getWeight(this.context) ? this.vm.getWeight(this.context) as string :
+          this.vm.userInfoModel.authorWeight + 'kg')
           .fontSize(14 * this.vm.settingInfo.fontSizeRatio)
           .fontColor($r('sys.color.font_secondary'))
         Image($r('app.media.ic_right'))
@@ -622,7 +630,7 @@ struct SettingPersonal {
             })
 
           Column() {
-            Row({ space: 8 }) {
+            Row({ space: 2 }) {
               CustomButton({ class: 'purpose', label: '增肌塑形' })
 
               CustomButton({ class: 'purpose', label: '减重瘦身' })
@@ -633,7 +641,7 @@ struct SettingPersonal {
             }
             .margin({ top: 4, bottom: 8 })
 
-            Row({ space: 8 }) {
+            Row({ space: 2 }) {
               CustomButton({ class: 'purpose', label: '力量训练' })
 
               CustomButton({ class: 'purpose', label: '马甲线' })
@@ -645,7 +653,8 @@ struct SettingPersonal {
             .margin({ bottom: 4 })
           }
         }
-        .width(328)
+        .width('100%')
+        .justifyContent(FlexAlign.Start)
         .alignItems(HorizontalAlign.Start)
 
         Column() {
@@ -667,7 +676,6 @@ struct SettingPersonal {
     .height(CommonConstants.FULL_PERCENT)
     .padding({
       left: CommonConstants.PADDING_L,
-      right: CommonConstants.PADDING_L,
       bottom: this.vm.getSheetPaddingBottom(),
     })
   }
@@ -687,7 +695,7 @@ struct SettingPersonal {
             })
 
           Column() {
-            Row({ space: 8 }) {
+            Row({ space: 2 }) {
               CustomButton({ class: 'body', label: '手臂' })
 
               CustomButton({ class: 'body', label: '大腿' })
@@ -698,7 +706,7 @@ struct SettingPersonal {
             }
             .margin({ top: 4, bottom: 8 })
 
-            Row({ space: 8 }) {
+            Row({ space: 2 }) {
               CustomButton({ class: 'body', label: '胸肌' })
 
               CustomButton({ class: 'body', label: '背部' })
@@ -710,8 +718,9 @@ struct SettingPersonal {
             .margin({ bottom: 4 })
           }
         }
+        .justifyContent(FlexAlign.Start)
         .alignItems(HorizontalAlign.Start)
-        .width(328)
+        .width('100%')
 
         Column() {
           Button('确定')
@@ -732,7 +741,6 @@ struct SettingPersonal {
     .height(CommonConstants.FULL_PERCENT)
     .padding({
       left: CommonConstants.PADDING_L,
-      right: CommonConstants.PADDING_L,
       bottom: this.vm.getSheetPaddingBottom(),
     })
   }
@@ -745,7 +753,7 @@ struct SettingPersonal {
           .canLoop(false)  // 禁用循环滚动
           .height(150)     // 设置选择器高度.textStyle({ color: Color.Black, font: { size: 20, weight: FontWeight.Normal } })
           .textStyle({ color: Color.Black, font: { size: 16, weight: FontWeight.Normal } })
-          .selectedTextStyle({ color: $r('app.color.app_theme'), font: { size: 20, weight: FontWeight.Bolder } })
+          .selectedTextStyle({ color: '#0A59F7', font: { size: 20, weight: FontWeight.Bolder } })
           .margin({ top: 12 })
           .onChange((value: string | string[], index: number | number[]) => {
             this.selectedGender = index as number
@@ -783,7 +791,7 @@ struct SettingPersonal {
           .canLoop(false)  // 禁用循环滚动
           .height(200)     // 设置选择器高度.textStyle({ color: Color.Black, font: { size: 20, weight: FontWeight.Normal } })
           .textStyle({ color: Color.Black, font: { size: 16, weight: FontWeight.Normal } })
-          .selectedTextStyle({ color: $r('app.color.app_theme'), font: { size: 20, weight: FontWeight.Bolder } })
+          .selectedTextStyle({ color: '#0A59F7', font: { size: 20, weight: FontWeight.Bolder } })
           .margin({ top: 12 })
           .onChange((value: string | string[], index: number | number[]) => {
             this.selectedIndex = index as number

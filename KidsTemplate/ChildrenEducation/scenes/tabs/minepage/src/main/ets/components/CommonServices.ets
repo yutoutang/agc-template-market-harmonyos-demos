@@ -1,10 +1,18 @@
 import { CommonServiceModel, mineCommonService } from '@ohos_agcit/children_education_datasource';
-import { CommonConstants, rightArrow } from '@ohos_agcit/children_education_utils';
+import {
+  BreakpointType,
+  BreakpointTypeEnum,
+  CommonConstants,
+  GlobalInfoModel,
+  rightArrow
+} from '@ohos_agcit/children_education_utils';
 import { DialPanel } from 'dial_panel';
+import { AppStorageV2 } from '@kit.ArkUI';
 
 @ComponentV2
 export struct CommonServices {
-  @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
+  @Local globalInfo: GlobalInfoModel =
+    AppStorageV2.connect<GlobalInfoModel>(GlobalInfoModel, () => new GlobalInfoModel())!;
   private uiContext: UIContext = this.getUIContext();
   private mineCommonService: Array<CommonServiceModel> = mineCommonService;
   private dialPanel: DialPanel = new DialPanel(this.uiContext)
@@ -24,48 +32,90 @@ export struct CommonServices {
     }
   }
 
-  build() {
-    Row() {
-      Column({ space: 20 }) {
-        Text($r('app.string.common_service'))
-          .padding({ top: 25 })
-          .fontColor($r('sys.color.black'))
-          .fontWeight(FontWeight.Bold)
-          .fontSize(18);
-        ForEach(this.mineCommonService, (item: CommonServiceModel, index: number) => {
-          Row() {
-            SymbolGlyph($r(item.symbol)).padding({ right: 16 });
-            Text($r(item.serviceName)).fontSize(16).fontWeight(FontWeight.Medium).fontFamily('鸿蒙黑体');
-            Blank();
-            rightArrow()
-          }
-          .width(CommonConstants.FULL_PERCENT)
-          .padding({ bottom: index !== mineCommonService.length - 1 ? 0 :25 })
-          .onClick(() => {
-            if (item.pageName === 'ContactUs') {
-              this.dialPanel
-                .setTitle('联系客服')
-                .setPhoneNumber('12345678901')
-                .setAutoClosePanel(true)
-                .open();
-              return
-            }
-            
-            this.appPathStack.pushPathByName(item.pageName, undefined);
-          });
+  private getHeight() {
+    let col = new BreakpointType<number>({
+      sm: 1,
+      md: 1,
+      lg: 2,
+    }).getValue(this.globalInfo.currentBreakpoint)
 
-          if (index !== mineCommonService.length - 1) {
-            Divider().width('85%').alignSelf(ItemAlign.End);
+    return 56 * Math.ceil(this.mineCommonService.length / col) + (this.mineCommonService.length - 1)
+  }
+
+  build() {
+    Column({ space: 20 }) {
+      Text($r('app.string.common_service'))
+        .padding({ top: 25 })
+        .fontColor($r('sys.color.black'))
+        .fontWeight(FontWeight.Bold)
+        .fontSize(18)
+
+      Grid() {
+        ForEach(this.mineCommonService, (item: CommonServiceModel, index: number) => {
+          GridItem() {
+            Column() {
+              Row() {
+                SymbolGlyph($r(item.symbol)).padding({ right: 16 });
+                Text($r(item.serviceName)).fontSize(16).fontWeight(FontWeight.Medium).fontFamily('鸿蒙黑体');
+                Blank();
+                rightArrow()
+              }
+              .height(56)
+              .width(CommonConstants.FULL_PERCENT)
+              .alignItems(VerticalAlign.Center)
+              .onClick(() => {
+                if (item.pageName === 'ContactUs') {
+                  this.dialPanel
+                    .setTitle('联系客服')
+                    .setPhoneNumber('12345678901')
+                    .setAutoClosePanel(true)
+                    .open();
+                  return
+                }
+                this.globalInfo.navStack.pushPathByName(item.pageName, undefined);
+              });
+
+
+              if (this.globalInfo.currentBreakpoint !== BreakpointTypeEnum.LG) {
+                if (index !== mineCommonService.length - 1) {
+                  Divider().width('100%').alignSelf(ItemAlign.End);
+                }
+              } else {
+                if (index !== mineCommonService.length - 1 && index !== mineCommonService.length - 2) {
+                  Divider().width('100%').alignSelf(ItemAlign.End);
+                }
+              }
+            }
           }
-        }, (item:CommonServiceModel) => JSON.stringify(item));
+        }, (item: CommonServiceModel) => JSON.stringify(item));
       }
-      .alignItems(HorizontalAlign.Start)
+      .height(this.getHeight())
       .width(CommonConstants.FULL_PERCENT)
-      .padding({ right: '4%', left: '4%' });
+      .rowsGap(0)
+      .columnsGap(40)
+      .columnsTemplate('1fr '.repeat(new BreakpointType<number>({
+        sm: 1,
+        md: 1,
+        lg: 2,
+      }).getValue(this.globalInfo.currentBreakpoint)))
     }
+    .padding({
+      right: new BreakpointType<number>({
+        sm: 16,
+        md: 24,
+        lg: 32,
+      }).getValue(this.globalInfo.currentBreakpoint),
+      left: new BreakpointType<number>({
+        sm: 16,
+        md: 24,
+        lg: 32,
+      }).getValue(this.globalInfo.currentBreakpoint)
+    })
+    .alignItems(HorizontalAlign.Start)
     .width(CommonConstants.FULL_PERCENT)
     .backgroundColor($r('sys.color.white'))
-    .borderRadius(16);
+    .borderRadius(16)
+    .padding({ left: 12, right: 12 })
   }
 }
 

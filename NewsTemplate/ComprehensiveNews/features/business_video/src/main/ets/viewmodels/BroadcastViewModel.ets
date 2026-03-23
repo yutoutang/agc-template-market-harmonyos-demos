@@ -1,9 +1,9 @@
-import { TextReader } from '@kit.SpeechKit';
+import { common } from '@kit.AbilityKit';
 import { emitter } from '@kit.BasicServicesKit';
-import { AudioUtils, broadcastSize, CardSizeConstants } from 'lib_av_details';
+import { AudioUtils, AVSessionUtils, broadcastSize, CardSizeConstants } from 'lib_av_details';
 import { BaseViewModel, GlobalContextUtils } from 'lib_common';
 import { AvModel, HomeServiceApi } from 'lib_news_api';
-import { AudioConstants, AudioPlayerState, MediaController, SubUtils } from 'module_audioplayer';
+import { AudioConstants, MediaController, AudioService } from 'module_audioplayer';
 import { BroadcastExtra, BroadcastExtraModel } from '../models/BroadcastModel';
 
 @ObservedV2
@@ -37,7 +37,16 @@ export class BroadcastViewModel extends BaseViewModel {
   enableAudioSubChange() {
     if (!this.settingInfo.network.enableAudioSub) {
       this.pause()
-      SubUtils.destroySubWindow(AudioConstants.AUDIO_SUB_NAME)
+      this.destroySubWindow()
+    }
+  }
+
+  @Monitor('userInfoModel.isLogin')
+  loginStatusChange() {
+    if (!this.userInfoModel.isLogin) {
+      this.pause()
+      this.destroySubWindow()
+      AudioService.destroySession(this.context.getHostContext() as common.UIAbilityContext)
     }
   }
 
@@ -64,12 +73,10 @@ export class BroadcastViewModel extends BaseViewModel {
         await HomeServiceApi.queryBroadcastRecommend()
   }
 
-  public async enableSession() {
-    setTimeout(async () => {
-      SubUtils.destroySubWindow(AudioConstants.AUDIO_SUB_NAME)
-      await TextReader.release()
-      SubUtils.createSession()
-    }, this.DESTROY_TIME)
+  // 销毁应用中其他AVSession
+  public async destroyOtherSession(): Promise<void> {
+    await AVSessionUtils.destroyVideoSession()
+    await AVSessionUtils.destroyReaderSession()
   }
 
   public setIndex(index: number) {
@@ -90,8 +97,12 @@ export class BroadcastViewModel extends BaseViewModel {
     return this.broadcastList[this.broadcastIndex].id
   }
 
+  public destroySubWindow() {
+    AudioService.destroySubWindow(AudioConstants.AUDIO_SUB_NAME)
+  }
+
   public createSubWindow() {
-    SubUtils.createSubWindow(this.context)
+    AudioService.createSubWindow(this.context)
   }
 
   public pause() {

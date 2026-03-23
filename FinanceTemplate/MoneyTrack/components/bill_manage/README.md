@@ -2,7 +2,7 @@
 
 - [简介](#简介)
 - [约束与限制](#约束与限制)
-- [快速入门](#快速入门)
+- [使用](#使用)
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
@@ -36,7 +36,7 @@
 无
 
 
-## 快速入门
+## 使用
 
 1. 安装组件。
 
@@ -169,8 +169,10 @@
 ### 示例1 （新增、编辑账单）
 
 ```ts
+import { Logger } from 'bill_base';
 import { BillManageModel, billManageSheetBuilder } from 'bill_manage';
-import { promptAction } from '@kit.ArkUI';
+
+const TAG = '[BillManageSheetExample1]'
 
 @Entry
 @ComponentV2
@@ -189,7 +191,11 @@ struct BillManageSheetExample1 {
           Button('删除账单')
             .onClick(() => {
               this.bill = undefined;
-              promptAction.showToast({ message: '删除账单成功！' });
+              try {
+                this.getUIContext().getPromptAction().showToast({ message: '删除账单成功！' });
+              } catch (err) {
+                Logger.error(TAG, 'show toast failed. error:' + JSON.stringify(err));
+              }
             });
         }
       };
@@ -213,7 +219,11 @@ struct BillManageSheetExample1 {
           this.showSheet = false;
         },
         handleResourceManage: () => {
-          promptAction.showToast({ message: '详见ResourceManageSheet组件' });
+          try {
+            this.getUIContext().getPromptAction().showToast({ message: '详见ResourceManageSheet组件' });
+          } catch (err) {
+            Logger.error(TAG, 'show toast failed. error:' + JSON.stringify(err));
+          }
         },
       }), {
         title: { title: '选择资产类型' },
@@ -233,9 +243,10 @@ struct BillManageSheetExample1 {
 ### 示例2 （新增账单来源分类，删除分类）
 
 ```ts
-import { promptAction } from '@kit.ArkUI';
 import { BillManageModel, billManageSheetBuilder, resourceManageSheetBuilder } from 'bill_manage';
-import { ResourceUtil } from 'bill_base';
+import { Logger, ResourceUtil } from 'bill_base';
+
+const TAG = '[ResourceManageSheetExample1]'
 
 @Entry
 @ComponentV2
@@ -264,7 +275,11 @@ struct ResourceManageSheetExample1 {
           Button('删除账单')
             .onClick(() => {
               this.bill = undefined;
-              promptAction.showToast({ message: '删除账单成功！' });
+              try {
+                this.getUIContext().getPromptAction().showToast({ message: '删除账单成功！' });
+              } catch (err) {
+                Logger.error(TAG, 'show toast failed. error:' + JSON.stringify(err));
+              }
             });
         }
       };
@@ -281,7 +296,7 @@ struct ResourceManageSheetExample1 {
       Column()
         .bindSheet($$this.showResourceSheet,
           resourceManageSheetBuilder({
-            handleDeleteSuccess: (key) => {
+            handleDeleteSuccess: async(key) => {
               if (this.bill?.resource === key) {
                 this.bill = undefined;
               }
@@ -291,7 +306,6 @@ struct ResourceManageSheetExample1 {
             title: { title: '分类管理' },
             detents: [SheetSize.FIT_CONTENT],
             backgroundColor: '#fff',
-            preferType:SheetType.CENTER,
           },
         );
     }
@@ -306,8 +320,7 @@ struct ResourceManageSheetExample1 {
           this.showResourceSheet = true;
         },
       }), {
-        title: { title: '账单类型' },
-        preferType:SheetType.BOTTOM,
+        title: { title: '选择资产类型' },
         detents: [SheetSize.FIT_CONTENT],
       });
   }

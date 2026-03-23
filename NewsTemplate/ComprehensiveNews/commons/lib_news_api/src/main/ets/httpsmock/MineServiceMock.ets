@@ -36,6 +36,10 @@ export class MineServiceMock {
       mineUserInfo.myLikes.splice(0, 0, data.newsId);
 
       const news = this.baseNewsMock.queryRawNews(data.newsId);
+      if(news) {
+        news.likeCount++
+        news.isLiked = true
+      }
       const author = this.authorMock.queryAuthorRaw(news?.authorId);
       if (author?.likeNum) {
         author.likeNum++;
@@ -55,6 +59,7 @@ export class MineServiceMock {
       const news = this.baseNewsMock.queryRawNews(data.newsId);
       if (news) {
         news.isLiked = false;
+        news.likeCount--
       }
 
       const author = this.authorMock.queryAuthorRaw(news?.authorId);
@@ -156,6 +161,11 @@ export class MineServiceMock {
     adapter.onPost('/my/mark/add').reply((config: AxiosRequestConfig) => {
       const data = JSON.parse(config.data) as NewsRequest;
       const mineUserInfo = this.authorMock.queryAuthorRaw() as MyAuthor;
+      const news = this.baseNewsMock.queryRawNews(data.newsId);
+      if (news) {
+        news.isMarked = true;
+        news.markCount++
+      }
       mineUserInfo?.myMarks.splice(0, 0, data.newsId);
       return [HttpStatusCode.Ok];
     });
@@ -173,6 +183,7 @@ export class MineServiceMock {
       const news = this.baseNewsMock.queryRawNews(data.newsId);
       if (news) {
         news.isMarked = false;
+        news.markCount--
       }
       return [HttpStatusCode.Ok];
     });

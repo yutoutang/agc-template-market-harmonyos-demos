@@ -14,8 +14,6 @@ export class VideoNetworkModel {
   @Trace hasUseMobileDataTip: boolean = false;
   // 当前网络是否可用
   @Trace isNetworkAvailable: boolean = true;
-  // 当前是否是弱网环境
-  @Trace isWeekNetwork: boolean = false;
 }
 
 @ObservedV2

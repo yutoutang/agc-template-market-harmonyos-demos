@@ -127,7 +127,7 @@ export struct PreferencePage {
           .backgroundColor('#E84026')
           .fontColor($r('sys.color.font_on_primary'))
           .fontSize($r('sys.float.Body_L'))
-          .opacity(this.isGenderSelected === false && this.selectedTypeNum === 0 ? 0.4 : 1)
+          .enabled(this.isGenderSelected === false && this.selectedTypeNum === 0 ? false : true)
           .align(Alignment.Bottom)
           .onClick(() => {
             if (!(this.isGenderSelected === false && this.selectedTypeNum === 0)) {
@@ -167,7 +167,8 @@ export struct PreferencePage {
             .width(28)
             .height(19)
             .textAlign(TextAlign.Center)
-            .fontColor(this.isGenderSelected === false && this.selectedTypeNum === 0 ? '#66000000' : '#000000')
+            .fontColor(this.isGenderSelected === false && this.selectedTypeNum === 0 ? $r('sys.color.font_tertiary') :
+              $r('sys.color.font_primary'))
         }
         .padding({
           top: 8,
@@ -269,7 +270,7 @@ export struct PreferencePage {
             Text(item.type)
               .fontSize(12)
               .fontWeight('medium')
-              .fontColor(item.selected ? $r('app.color.pure_white') : '#000000')
+              .fontColor(item.selected ? $r('app.color.pure_white') : $r('sys.color.font_primary'))
               .textAlign(TextAlign.Center)
           }
           .onClick(() => {
@@ -287,7 +288,7 @@ export struct PreferencePage {
           .width(76)
           .height(28)
           .borderRadius(14)
-          .backgroundColor(item.selected ? '#E84026' : '#0D000000')
+          .backgroundColor(item.selected ? '#E84026' : $r('sys.color.comp_background_tertiary'))
         }
       }, (item: NovelTypeItem) => `${item.type}+${new Date().toString()}`)
     }

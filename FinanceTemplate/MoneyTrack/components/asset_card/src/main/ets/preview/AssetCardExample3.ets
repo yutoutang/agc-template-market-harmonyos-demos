@@ -1,6 +1,7 @@
-import { AssetCategory, AssetGroupModel, AssetRecordItem, AssetType } from 'asset_base';
+import { AssetCategory, AssetGroupModel, AssetRecordItem, AssetType, Logger } from 'asset_base';
 import { AssetCard } from '../components/AssetCard';
-import { promptAction } from '@kit.ArkUI';
+
+const TAG = '[AssetCardExample3]'
 
 const MOCK_FUND_LIST: AssetRecordItem[] = [
   {
@@ -47,10 +48,14 @@ struct AssetCardExample3 {
       AssetCard({
         assetData: this.assetData,
         handleClick: (item) => {
-          promptAction.showToast({
-            message: `点击了资产账户${item.name},余额为${item.amount}元`,
-            alignment:Alignment.Center,
-          });
+          try {
+            this.getUIContext().getPromptAction().showToast({
+              message: `点击了资产账户${item.name},余额为${item.amount}元`,
+              alignment: Alignment.Center,
+            });
+          } catch (err) {
+            Logger.error(TAG, 'show toast failed. error:' + JSON.stringify(err));
+          }
         },
         handleDelete: (id) => {
           const idx = this.assetData.fund.findIndex((item) => item.assetId === id);

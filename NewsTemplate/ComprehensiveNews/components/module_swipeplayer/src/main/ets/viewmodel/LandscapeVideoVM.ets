@@ -1,15 +1,16 @@
 import { media } from '@kit.MediaKit';
-import { window } from '@kit.ArkUI';
+import { display, window } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { LongTakeAnimationProperties, LongTakeTransitionParam } from 'module_transition';
 import { Constants } from '../constants/Constants'
-import { AVPlayerSession } from '../controller/AVPlayerManager';
-import { isDisplayModeFull, pauseVideo, playVideo, setOrientation } from '../utils/Util';
+import { AVPlayerController } from '../controller/AVPlayerController';
+import { VideoCardPlayerController } from '../controller/VideoCardPlayerController';
+import { isDisplayModeFull, pauseVideo, playVideo, setOrientation, isDevicePlaceFlat } from '../utils/Util';
 import { VolumeAndBright } from '../utils/VolumeAndBright';
 import { AVPlayerState, BreakpointNameEnum, PageNameEnum } from '../type/Index';
 import { ProgressController } from '../components/VideoProgressBar';
 import { BreakpointModel } from '../models/BreakpointModel';
-import { LongTakeAnimationProperties, LongTakeTransitionParam } from 'module_transition';
 import { Logger } from '../utils/Logger';
 
 const TAG = '[LandscapeVideoVM]';
@@ -25,8 +26,8 @@ export class LandscapeVideoVM {
   @Trace pathStack: NavPathStack = new NavPathStack()
   // 当前视频的标题
   @Trace videoTitle: string = ''
-  // 当前视频播放会话
-  @Trace playerSession: AVPlayerSession | undefined = undefined;
+  // 当前视频播放avplayer控制器
+  @Trace avPlayerController: AVPlayerController | undefined = undefined;
   // 定时隐藏
   @Trace showBar: boolean = true
   @Trace time: number = 0
@@ -54,16 +55,24 @@ export class LandscapeVideoVM {
   @Trace isMute: boolean = true
   // 是否隐藏进度条
   @Trace isHideSlide = false;
+  // 是否显示开通会员的内容
+  @Trace showMembershipOverlay: boolean = false;
+  @Trace disableUpdateBrightAndVolume: boolean = false;
   positionX: number = 0;
   positionY: number = 0;
   progressController: ProgressController = new ProgressController();
   uiContext?: UIContext
   windowClass?: window.Window
+  videoCardPlayerController: VideoCardPlayerController = new VideoCardPlayerController();
+  xComponentController: XComponentController = new XComponentController();
+  @Trace longTakeSession: LongTakeAnimationProperties = new LongTakeAnimationProperties();
+  membershipBuilder: WrappedBuilder<[() => void]> | undefined = undefined;
+  systemBarProperty: window.SystemBarProperties = {};
 
   constructor(uiContext: UIContext) {
     try {
-      this.uiContext = uiContext
-      const context: common.UIAbilityContext = uiContext.getHostContext() as common.UIAbilityContext
+      this.uiContext = uiContext;
+      const context: common.UIAbilityContext = uiContext.getHostContext() as common.UIAbilityContext;
       this.windowClass = context.windowStage!.getMainWindowSync();
 
       AppStorage.setAndRef('windowClass', this.windowClass)
@@ -83,26 +92,144 @@ export class LandscapeVideoVM {
       this.xComponentHeight = this.uiContext!.px2vp(size.height);
       // 判断是否是大折叠、阔折叠外屏、小折叠内屏
       this.isFullMode = isDisplayModeFull();
-      if (!this.isBackFlag && size.width < size.height &&
+      Logger.debug(TAG, 'this.isFullMode' + this.isFullMode);
+      if (!this.isBackFlag && size.width < size.height && !this.isFullMode &&
       this.pathStack.getAllPathName().includes(PageNameEnum.VIDEO_LANDSCAPE_PAGE)
       ) {
-        this.pathStack.pop();
+        Logger.debug(TAG, 'on windowSizeChange quitFullScreen');
+        this.quitFullScreen();
       }
     })
     this.showOrHiddenBar()
   }
 
+  private onStateChange: (state: AVPlayerState) => void = (state) => {
+    Logger.debug(TAG, 'stateChange: ' + state);
+    // 横屏时，播放完之后会重头播放，需要保持播放状态
+    this.isPlaying = state === AVPlayerState.PLAYING || state === AVPlayerState.COMPLETED;
+  }
+  private onBufferingUpdate: (infoType: media.BufferingInfoType) => void = (infoType) => {
+    if (infoType === media.BufferingInfoType.BUFFERING_START) {
+      this.isBuffering = true;
+    }
+    if (infoType === media.BufferingInfoType.BUFFERING_END) {
+      this.isBuffering = false
+    }
+  }
+
+  // 处理NavDestination上下文和路由参数
+  handleContextInfo(context: NavDestinationContext) {
+    this.pathStack = context.pathStack
+    let param = context.pathInfo?.param as Record<string, Object | AVPlayerController | BreakpointNameEnum>;
+    this.avPlayerController = (param.avPlayerController as AVPlayerController)
+    this.player = (param.avPlayerController as AVPlayerController).getAVPlayer() as media.AVPlayer;
+    this.videoWidth = param.videoWidth as number
+    this.videoHeight = param.videoHeight as number
+    this.videoTitle = param.videoTitle as string
+    this.breakpointModel = param.breakpointModel as BreakpointModel
+    this.isMute = param.isMute as boolean
+    this.isHideSlide = param.isHideSlide as boolean
+    if (param.videoCardPlayerController) {
+      this.videoCardPlayerController = param.videoCardPlayerController as VideoCardPlayerController;
+      this.videoCardPlayerController.setMembershipOverlay = (value) => {
+        this.showMembershipOverlay = value;
+        if (this.showMembershipOverlay) {
+          this.showBar = false;
+          this.showLock = false;
+          this.isLockScreen = false;
+        }
+      }
+    }
+    this.membershipBuilder = param.membershipBuilder as WrappedBuilder<[() => void]>;
+    // 音量初始化
+    this.volumeUtil.init()
+    this.setMute()
+    // 设置亮度
+    this.volumeUtil.updateBrightness(this.uiContext!.getHostContext() as Context)
+    // 状态监听
+    this.avPlayerController?.onEvent('stateChange', this.onStateChange);
+    this.avPlayerController?.onEvent('bufferingUpdate', this.onBufferingUpdate);
+    this.registerCustomTransition(context, this.longTakeSession)
+  }
+
+  // 窗口等系统设置
+  async setSystemConfig() {
+    try {
+      // 导航条、状态栏等设置
+      await this.windowClass!.setSpecificSystemBarEnabled('navigationIndicator', false);
+      await this.windowClass!.setSpecificSystemBarEnabled('status', true);
+      this.systemBarProperty = this.windowClass!.getWindowSystemBarProperties();
+      await this.windowClass!.setWindowSystemBarProperties({
+        statusBarContentColor: '#FFFFFF',
+      });
+      // 窗口方向设置
+      if (this.breakpointModel.isLandscapeAuto && display.isFoldable()) {
+        Logger.debug(TAG, 'isLandscapeAuto set AUTO_ROTATION');
+        const orientation = window.Orientation.AUTO_ROTATION;
+        setOrientation(this.uiContext, orientation);
+      }
+    } catch (e) {
+      Logger.error(TAG, `Failed to setSystemConfig, code: ${e.code}, message: ${e.message}`);
+    }
+  }
+
+  // 还原状态栏、亮度等系统配置
+  async resetSystemConfig() {
+    try {
+      await this.windowClass!.setSpecificSystemBarEnabled('navigationIndicator', true);
+      await this.windowClass!.setSpecificSystemBarEnabled('status', true);
+      await this.windowClass!.setWindowSystemBarProperties(this.systemBarProperty);
+      await this.windowClass!.setWindowBrightness(-1);
+    } catch (e) {
+      Logger.error(TAG, `Failed to resetSystemConfig, code: ${e.code}, message: ${e.message}`);
+    }
+  }
+
   disappear() {
-    this.windowClass!.off('windowSizeChange')
+    // 清理窗口监听器
+    this.windowClass!.off('windowSizeChange');
+    // 清理avPlayerController的事件监听器
+    this.avPlayerController?.offEvent('stateChange', this.onStateChange);
+    this.avPlayerController?.offEvent('bufferingUpdate', this.onBufferingUpdate);
+    this.videoCardPlayerController.setMembershipOverlay = () => {
+    };
+    // 清空本地引用（不影响共享的 avPlayerController 实例）
+    this.avPlayerController = undefined;
+    this.player = undefined;
+    // 清理音量监听器
+    this.volumeUtil.destroy();
+    // 清理定时器
+    if (this.time) {
+      clearTimeout(this.time);
+      this.time = 0;
+    }
   }
 
   async onBack() {
     this.isBackFlag = true;
-    // 退出横屏时，设置横竖屏  平板等大屏设备跟随传感器自动旋转，其他设置为竖屏
-    let orientation = this.isTablet ? window.Orientation.AUTO_ROTATION : window.Orientation.USER_ROTATION_PORTRAIT
-    setOrientation(this.uiContext, orientation).then(() => {
-      this.pathStack.pop();
+    this.quitFullScreen();
+  }
+
+  quitFullScreen() {
+    isDevicePlaceFlat((isFlat) => {
+      // 默认是跟随桌面
+      let orientation = window.Orientation.FOLLOW_DESKTOP;
+      if (isFlat) {
+        // 如果设备平放在桌面，设置为临时竖屏
+        orientation = window.Orientation.USER_ROTATION_PORTRAIT;
+      }
+      setOrientation(this.uiContext, orientation).then(() => {
+        this.pathStack.pop();
+      })
     })
+  }
+
+  async setSystemBarEnabled(enabled: boolean) {
+    try {
+      await this.windowClass?.setSpecificSystemBarEnabled('status', enabled);
+    } catch (e) {
+      Logger.error(TAG, `Failed to setSpecificSystemBarEnabled, code: ${e.code}, message: ${e.message}`);
+    }
   }
 
   showOrHiddenBar() {
@@ -111,6 +238,7 @@ export class LandscapeVideoVM {
       this.time = setTimeout(() => {
         this.showBar = false
         this.showLock = false
+        this.setSystemBarEnabled(false)
       }, 4000)
     } else {
       this.time && clearTimeout(this.time)
@@ -179,25 +307,27 @@ export class LandscapeVideoVM {
     if (this.isPlaying) {
       this.showOrHiddenBar()
     }
+    this.setSystemBarEnabled(this.showBar);
   }
 
   // 长按加速
   onLongPress(event: GestureEvent) {
-    if (this.playerSession?.avPlayer?.state === 'playing') {
+    if (this.avPlayerController?.avPlayer?.state === 'playing') {
       // 快进图标显隐变化
       this.leftRateOpacity = 1;
       this.rightRateOpacity = 0;
       if (event?.repeat) {
         this.isAccelerate = true;
-        this.playerSession.avPlayer.setSpeed(media.PlaybackSpeed.SPEED_FORWARD_2_00_X)
+        this.avPlayerController.avPlayer.setSpeed(media.PlaybackSpeed.SPEED_FORWARD_2_00_X)
       }
     }
   }
+
   // 取消长按
   offLongPress() {
-    if (this.playerSession?.avPlayer?.state === 'playing') {
+    if (this.avPlayerController?.avPlayer?.state === 'playing') {
       this.isAccelerate = false;
-      this.playerSession.avPlayer.setSpeed(media.PlaybackSpeed.SPEED_FORWARD_1_00_X)
+      this.avPlayerController.avPlayer.setSpeed(media.PlaybackSpeed.SPEED_FORWARD_1_00_X)
     }
   }
 
@@ -213,6 +343,15 @@ export class LandscapeVideoVM {
     if (!event.fingerList[0]) {
       return
     }
+
+    // 避免下拉状态栏时，误触发音量或亮度调节
+    if (event.fingerList[0].localY <= 56 || event.fingerList[0].localY >= (this.xComponentHeight as number) - 48) {
+      this.disableUpdateBrightAndVolume = true;
+      return
+    }
+
+    this.disableUpdateBrightAndVolume = false;
+
     if (event.fingerList[0].localX >= (this.xComponentWidth as number) / 2) {
       this.volumeUtil.playerSliderModel.showVolumeProgress = true
     } else {
@@ -233,7 +372,9 @@ export class LandscapeVideoVM {
     if (!event.fingerList[0]) {
       return
     }
-
+    if (this.disableUpdateBrightAndVolume) {
+      return
+    }
     if (event.fingerList[0].displayX >= (this.xComponentWidth as number) / 2) {
       this.onVolumeActionUpdate(event)
     } else {

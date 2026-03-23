@@ -1,6 +1,6 @@
 import { CommonConstants, CommonBreakpoint } from 'lib_common'
 import { LoadMoreFooter } from 'lib_flex_layout';
-import { NewsResponse } from 'lib_news_api'
+import { NewsResponse } from 'lib_news_api';
 import { TabEnum, TabItem } from '../common/Constants';
 import { InteractionViewModel } from '../viewmodels/InteractionViewModel';
 import { InteractionFeedCard } from './InteractionFeedCard'
@@ -9,6 +9,7 @@ import { NoWatcher } from './NoWatcher';
 @ComponentV2
 export struct InterActionTabContent {
   @Param @Require resource: TabItem
+  @Param @Require selectedId: number
   @Local vm: InteractionViewModel = new InteractionViewModel(this.getUIContext());
   @Local lanesCount: CommonBreakpoint<number> = new CommonBreakpoint<number>({
     sm: 1,
@@ -16,6 +17,12 @@ export struct InterActionTabContent {
     lg: 3,
     xl: 3,
   });
+
+  @Monitor('selectedId')
+  setSelectId() {
+    this.vm.setSelectId(this.selectedId)
+    this.vm.refresh()
+  }
 
   aboutToAppear(): void {
     this.vm.init(this.resource.id)
@@ -42,20 +49,23 @@ export struct InterActionTabContent {
       }
       Refresh({ refreshing: $$this.vm.isRefreshing }) {
         WaterFlow({ footer: this.loadMoreFooter }) {
-          ForEach(this.vm.interactionList, (item: NewsResponse, index: number) => {
-            FlowItem() {
-              InteractionFeedCard({
-                resource: this.resource,
-                cardInfo: item,
-                index: index,
-              })
-            }
-            .id('action_flow' + this.resource.id + index)
-            .backgroundColor($r('sys.color.background_primary'))
-            .borderRadius(16)
-            .clip(true)
-            .padding(CommonConstants.PADDING_M)
-          }, (item: NewsResponse, index: number) => index + JSON.stringify(item.id))
+          Repeat(this.vm.interactionList)
+            .each((repeatItem: RepeatItem<NewsResponse>) => {
+              FlowItem() {
+                InteractionFeedCard({
+                  resource: this.resource,
+                  cardInfo: repeatItem.item,
+                  index: repeatItem.index,
+                })
+              }
+              .id('action_flow' + this.resource.id + repeatItem.index)
+              .backgroundColor($r('sys.color.background_primary'))
+              .borderRadius(16)
+              .clip(true)
+              .padding(CommonConstants.PADDING_M)
+            })
+            .key((item: NewsResponse, index: number) => index + this.vm.getEachId(item))
+            .virtualScroll()
         }
         .onReachEnd(() => {
           // 滚动到列表底部时触发加载

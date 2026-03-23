@@ -12,6 +12,8 @@ struct BillBarChartExample {
           month: '2025-05',
           data: MOCK_BAR_CHART_LIST,
           typeLabel:'支出',
+          startDate: '',
+          endDate: ''
         },
       });
     };

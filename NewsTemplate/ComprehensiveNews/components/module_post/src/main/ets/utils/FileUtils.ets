@@ -1,7 +1,7 @@
-import fs from '@ohos.file.fs';
 import { util } from '@kit.ArkTS';
-import { fileUri } from '@kit.CoreFileKit';
+import { fileUri, fileIo as fs } from '@kit.CoreFileKit';
 import { image } from '@kit.ImageKit';
+import { photoAccessHelper } from '@kit.MediaLibraryKit';
 import { UtilLog } from '@hw-agconnect/util-log';
 
 const TAG = '[FileUtils]';
@@ -64,6 +64,25 @@ export class FileUtils {
       } catch (e) {
         UtilLog.error(TAG, 'fs.closeSync error: ' + JSON.stringify(e));
       }
+    }
+  }
+
+  /**
+   * 动态图片写入沙箱
+   * @param context
+   * @param movingPhoto
+   * @returns
+   */
+  public static async saveMovingPhotoToSandbox(context: Context, movingPhoto: photoAccessHelper.MovingPhoto) {
+    try {
+      const imageFileUri: string = context.cacheDir + `/${util.generateRandomUUID(false)}.jpg`;
+      const videoFileUri: string = context.cacheDir + `/${util.generateRandomUUID(false)}.mp4`;
+
+      await movingPhoto.requestContent(imageFileUri, videoFileUri);
+      return [fileUri.getUriFromPath(imageFileUri), fileUri.getUriFromPath(videoFileUri)];
+    } catch (e) {
+      UtilLog.error(TAG, 'requestContent error: ' + JSON.stringify(e));
+      return [];
     }
   }
 

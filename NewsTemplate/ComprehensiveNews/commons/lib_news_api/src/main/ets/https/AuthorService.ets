@@ -1,5 +1,10 @@
 import request from '../common/BaseRequest';
-import { SendCodeRequest, SignInRequest, VerifyCodeRequest } from '../params/request/CommonRequest';
+import {
+  MemberExpireTimeRequest,
+  SendCodeRequest,
+  SignInRequest,
+  VerifyCodeRequest,
+} from '../params/request/CommonRequest';
 import { AuthorResponse } from '../params/response/AuthorResponse';
 
 /**
@@ -31,6 +36,27 @@ export class AuthorService {
       nickPhone,
     };
     return request.post('/sign/in', data);
+  }
+
+  /**
+   * 查询非续期会员到期时间
+   * @param productId
+   * @returns
+   */
+  public queryMemExpireTime(): Promise<string> {
+    return request.get('/membership/expire/time/query');
+  }
+
+  /**
+   * 设置非续期会员到期时间
+   * @param productId
+   * @returns
+   */
+  public setMemExpireTime(productId: string): Promise<void> {
+    const data: MemberExpireTimeRequest = {
+      productId,
+    };
+    return request.post('/membership/expire/time/set', data);
   }
 
   /**

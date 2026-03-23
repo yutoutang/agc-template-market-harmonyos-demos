@@ -15,6 +15,10 @@ export function MinePageBuilder() {
 struct MinePage {
   @Local vm: MineViewModel = new MineViewModel();
 
+  aboutToAppear(): void {
+    this.vm.queryMembershipStatus();
+  }
+
   build() {
     NavDestination() {
       Column() {
@@ -53,42 +57,96 @@ struct MinePage {
   loginCard() {
     Column() {
       if (this.vm.userInfoModel.isLogin) {
-        Row({ space: CommonConstants.SPACE_L }) {
-          Image(this.vm.userIcon)
-            .width($r('app.float.user_icon_width'))
-            .clipShape(new CircleShape({ width: 48, height: 48 }))
-            .draggable(false)
-          Column({ space: CommonConstants.SPACE_XXS }) {
-            Text(this.vm.userInfoModel.authorNickName)
-              .fontSize(18 * this.vm.settingInfo.fontSizeRatio)
-              .fontColor($r('sys.color.font_primary'))
-              .fontWeight(FontWeight.Medium)
-            Row({ space: CommonConstants.SPACE_XS }) {
-              Image($r('app.media.ic_phone'))
-                .width($r('app.float.medium_img_width'))
-                .draggable(false)
-                .fillColor($r('sys.color.icon_secondary'))
-              Text(this.vm.userInfoModel.authorPhone)
-                .fontSize(12 * this.vm.settingInfo.fontSizeRatio)
-                .fontColor($r('sys.color.font_secondary'))
-            }
-          }
-          .layoutWeight(1)
-          .alignItems(HorizontalAlign.Start)
+        Column() {
+          Row({ space: CommonConstants.SPACE_L }) {
+            Image(this.vm.userIcon)
+              .width($r('app.float.user_icon_width'))
+              .clipShape(new CircleShape({ width: 48, height: 48 }))
+              .draggable(false)
+            Column({ space: CommonConstants.SPACE_XXS }) {
+              Row() {
+                Text(this.vm.userInfoModel.authorNickName)
+                  .fontSize(18 * this.vm.settingInfo.fontSizeRatio)
+                  .fontColor($r('sys.color.font_primary'))
+                  .fontWeight(FontWeight.Medium)
+                  .constraintSize({
+                    maxWidth: 'calc(100% - 50vp)',
+                  })
+                SymbolGlyph($r('sys.symbol.v_diamond_fill'))
+                  .fontColor([this.vm.userInfoModel.isMembership ? $r('app.color.membership') :
+                    $r('sys.color.font_tertiary')])
+                  .fontWeight(FontWeight.Normal)
+                  .fontSize(16)
+                  .margin({
+                    left: CommonConstants.PADDING_S,
+                  })
+                Text('会员')
+                  .fontSize(12 * this.vm.settingInfo.fontSizeRatio)
+                  .fontColor(this.vm.userInfoModel.isMembership ? $r('sys.color.font_primary') :
+                    $r('sys.color.font_tertiary'))
+                  .fontWeight(FontWeight.Regular)
+                  .margin({
+                    left: CommonConstants.PADDING_XXS,
+                  })
+              }
 
-          Image($r('app.media.ic_right'))
-            .width($r('app.float.arrow_right_w'))
-            .draggable(false)
+              Row({ space: CommonConstants.SPACE_XS }) {
+                Image($r('app.media.ic_phone'))
+                  .width($r('app.float.medium_img_width'))
+                  .draggable(false)
+                  .fillColor($r('sys.color.icon_secondary'))
+                Text(this.vm.userInfoModel.authorPhone)
+                  .fontSize(12 * this.vm.settingInfo.fontSizeRatio)
+                  .fontColor($r('sys.color.font_secondary'))
+              }
+            }
+            .layoutWeight(1)
+            .alignItems(HorizontalAlign.Start)
+
+            Image($r('app.media.ic_right'))
+              .width($r('app.float.arrow_right_w'))
+              .draggable(false)
+          }
+          .borderRadius($r('app.float.large_radius'))
+          .padding(CommonConstants.PADDING_S)
+          .stateStyles({
+            normal: this.normalStyles,
+            pressed: this.pressedStyles,
+          })
+          .onClick(() => {
+            this.vm.jumpProfile();
+          })
+
+          Divider().width(CommonConstants.FULL_PERCENT).margin({
+            left: CommonConstants.PADDING_S,
+            right: CommonConstants.PADDING_S,
+            top: CommonConstants.PADDING_XS,
+            bottom: CommonConstants.PADDING_XS,
+          })
+
+          Row() {
+            Text(this.vm.userInfoModel.isMembership ? '请查看您的会员权益' : '开通会员享受更多权益')
+              .fontSize(14 * this.vm.settingInfo.fontSizeRatio)
+              .fontColor($r('sys.color.font_primary'))
+              .fontWeight(FontWeight.Regular)
+            Button('会员中心')
+              .fontSize($r('sys.float.Body_M'))
+              .fontColor($r('sys.color.font_primary'))
+              .backgroundColor($r('app.color.membership'))
+              .height(28)
+              .onClick(() => {
+                this.vm.jumpMembership();
+              })
+          }
+          .width(CommonConstants.FULL_PERCENT)
+          .justifyContent(FlexAlign.SpaceBetween)
+          .padding({
+            left: CommonConstants.PADDING_S,
+            right: CommonConstants.PADDING_S,
+            top: CommonConstants.PADDING_S,
+            bottom: CommonConstants.PADDING_S,
+          })
         }
-        .borderRadius($r('app.float.large_radius'))
-        .padding(CommonConstants.PADDING_S)
-        .stateStyles({
-          normal: this.normalStyles,
-          pressed: this.pressedStyles,
-        })
-        .onClick(() => {
-          this.vm.jumpProfile();
-        })
       } else {
         Row({ space: CommonConstants.SPACE_L }) {
           Image($r('app.media.ic_user_unlogin'))
@@ -120,7 +178,6 @@ struct MinePage {
           this.vm.jumpLogin();
         })
       }
-
     }
     .backgroundColor($r('sys.color.comp_background_primary'))
     .width(CommonConstants.FULL_PERCENT)

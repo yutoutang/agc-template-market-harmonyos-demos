@@ -1,17 +1,16 @@
-import { AppStorageV2 } from '@kit.ArkUI';
 import { AbilityConstant, common } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { BaseViewModel, BreakpointModel, GlobalContextUtils, Logger, TimeUtils, VideoType } from 'lib_common';
+import { BaseViewModel, GlobalContextUtils, Logger, TimeUtils, VideoType } from 'lib_common';
 import { AvModel } from 'lib_news_api';
 import { MediaController } from 'module_audioplayer';
 import { broadcastLikeLanes, broadcastSize, CardSizeConstants, Constants } from '../constants/Constants';
+import { AVSessionUtils } from '../utils/AVSessionUtils';
 
 const TAG = '[AudioDetails]'
 
 @ObservedV2
 export class AudioVM extends BaseViewModel {
   @Trace curAudioInfo: AvModel = new AvModel()
-  @Trace breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
 
   @Computed
   get isCurrentPlay(): boolean {
@@ -26,6 +25,12 @@ export class AudioVM extends BaseViewModel {
     if (!MediaController.getAvplayer()) {
       MediaController.initAudioList(GlobalContextUtils.globalUIAbilityContext)
     }
+  }
+
+  // 销毁应用中其他AVSession
+  public async destroyOtherSession(): Promise<void> {
+    await AVSessionUtils.destroyVideoSession()
+    await AVSessionUtils.destroyReaderSession()
   }
 
   public enableContinue(context: common.UIAbilityContext) {

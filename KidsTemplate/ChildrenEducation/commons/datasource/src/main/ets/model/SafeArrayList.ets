@@ -1,9 +1,8 @@
-import { ArrayList } from '@kit.ArkTS';
 
 export class SafeArrayList<T> {
-  private list: ArrayList<T>;
+  private list: Array<T>;
   
-  constructor(list: ArrayList<T>) {
+  constructor(list: T[]) {
     this.list = list
   }
 
@@ -17,7 +16,7 @@ export class SafeArrayList<T> {
 
   add(item: T) {
     try {
-      this.list.add(item);
+      this.list.push(item);
     } catch (e) {
       console.error('add failed', e);
     }
@@ -26,7 +25,7 @@ export class SafeArrayList<T> {
   removeByIndex(index: number) {
     try {
       if (index >= 0 && index < this.list.length) {
-        this.list.removeByIndex(index);
+        this.list.splice(index, 1);
       }
     } catch (e) {
       console.error('remove failed', e);
@@ -35,7 +34,7 @@ export class SafeArrayList<T> {
 
   getCapacity(): number {
     try {
-      return this.list.getCapacity();
+      return this.list.length;
     } catch {
       return 0;
     }

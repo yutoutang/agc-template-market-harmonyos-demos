@@ -2,7 +2,7 @@
 
 ## 目录
 - [功能介绍](#功能介绍)
-- [约束和限制](#约束和限制)
+- [约束与限制](#约束与限制)
 - [快速入门](#快速入门)
 - [示例效果](#示例效果)
 - [开源许可协议](#开源许可协议)
@@ -14,10 +14,12 @@
 
 此模板提供如下组件，所有组件存放在工程根目录的components下，如果您仅需使用组件，可参考对应组件的指导链接；如果您使用此模板，请参考本文档。
 
-| 组件                            | 描述    | 使用指导                                             |
-|-------------------------------|-------|--------------------------------------------------|
-| 应用密码设置组件（secretlock）          | 应用密码设置 | [使用指导](components/secretlock/README.md)      |
-| 富文本组件_属性字符串（richeditor）       | 富文本编辑 | [使用指导](components/richeditor/README.md)    |
+| 组件                         | 描述    | 使用指导                                              |
+|----------------------------|-------|---------------------------------------------------|
+| 应用密码设置组件（secretlock）       | 应用密码设置 | [使用指导](components/secretlock/README.md)           |
+| 富文本编辑组件（richeditor）        | 富文本编辑 | [使用指导](components/richeditor/README.md)           |
+| 广告组件（aggregated_ads）       | 平台展示开屏广告的能力 | [使用指导](components/aggregated_ads/README.md) |
+| 检测应用更新组件（check_app_update） | 检测应用是否存在新版本 | [使用指导](components/check_app_update/README.md)     |
 
 本模板为笔记类应用提供了常用功能的开发样例，模板主要分首页、我的两大模块：
 
@@ -150,7 +152,7 @@ Notes
   |   |    └- utils  
   |   |          ReadDataUtil.ets                  // 读取数据工具类
   |   |      
-  |   |- richeditor/src/main/ets/                  // 富文本组件_属性字符串
+  |   |- richeditor/src/main/ets/                  // 富文本编辑组件
   |   |    |- common 
   |   |    |     Constants.ets                     // 公共常量         
   |   |    |- components                           
@@ -224,17 +226,18 @@ Notes
                Index.ets                           // 入口页面
 ```
 
-## 约束和限制
+## 约束与限制
 ### 环境
-- DevEco Studio版本：DevEco Studio 5.0.3 Release及以上
-- HarmonyOS SDK版本：HarmonyOS 5.0.3 Release SDK及以上
+- DevEco Studio版本：DevEco Studio 6.0.2 Release及以上
+- HarmonyOS SDK版本：HarmonyOS 6.0.2 Release SDK及以上
 - 设备类型：华为手机（包括双折叠和阔折叠）
-- 系统版本：HarmonyOS 5.0.3(15)及以上
+- 系统版本：HarmonyOS 6.0.0(20)及以上
 ### 权限
 - 网络权限：ohos.permission.INTERNET
 - 获取网络信息: ohos.permission.GET_NETWORK_INFO
 - 身份认证权限: ohos.permission.ACCESS_BIOMETRIC
-
+### 调试
+- 本模板不支持模拟器调试，请使用真机进行调试
 
 ## 快速入门
 ### 配置工程

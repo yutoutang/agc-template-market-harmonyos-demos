@@ -24,14 +24,18 @@ export struct FullScreenReport {
    * @returns {void}
    */
   regDisplayListener(): void {
-    display.on('foldStatusChange', async (curFoldStatus: display.FoldStatus) => {
-      // 同一个状态重复触发不做处理
-      if (this.curFoldStatus === curFoldStatus) {
-        return;
-      }
-      this.curFoldStatus = curFoldStatus;
-      this.setCurFoldHeight()
-    })
+    try {
+      display.on('foldStatusChange', async (curFoldStatus: display.FoldStatus) => {
+        // 同一个状态重复触发不做处理
+        if (this.curFoldStatus === curFoldStatus) {
+          return;
+        }
+        this.curFoldStatus = curFoldStatus;
+        this.setCurFoldHeight()
+      })
+    } catch (e) {
+      console.error(`display on foldStatusChange failed. error: ${JSON.stringify(e)}`)
+    }
   }
 
   setCurFoldHeight() {
