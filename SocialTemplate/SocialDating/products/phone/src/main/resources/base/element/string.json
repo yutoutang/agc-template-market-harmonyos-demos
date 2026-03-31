@@ -19,7 +19,10 @@
     {
       "name": "network_info",
       "value": "NetWork Info Permission Request"
+    },
+    {
+      "name": "agcit_huawei_social_dating",
+      "value": "1.0.0"
     }
-
   ]
 }

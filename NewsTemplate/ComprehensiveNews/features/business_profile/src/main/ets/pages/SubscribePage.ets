@@ -1,6 +1,6 @@
 import { AvModel } from 'lib_news_api'
 import { NavHeaderBar } from 'lib_widget'
-import { MediaController, SubUtils } from 'module_audioplayer'
+import { MediaController, AudioService } from 'module_audioplayer'
 import { SubscribeList } from '../components/SubscribeList'
 import { SubscribeViewModel } from '../viewmodels/SubscribeVM'
 
@@ -15,23 +15,16 @@ export struct SubscribePage {
 
   @Builder
   rightPartBuilder() {
-    Column() {
-      Button('一键取消')
-        .fontColor($r('sys.color.font_primary'))
-        .fontWeight(FontWeight.Medium)
-        .fontSize(16 * this.vm.settingInfo.fontSizeRatio)
-    }
-    .padding({
-      top: 10,
-      bottom: 10,
-      left: 16,
-      right: 16,
-    })
-    .borderRadius(20)
-    .backgroundColor($r('sys.color.comp_background_tertiary'))
-    .onClick(() => {
-      this.vm.cancelSubscribeAll()
-    })
+    Button('一键取消')
+      .fontColor(this.vm.hasSubscribe ? $r('sys.color.font_primary') : $r('sys.color.font_tertiary'))
+      .fontWeight(FontWeight.Medium)
+      .fontSize(16 * this.vm.settingInfo.fontSizeRatio)
+      .backgroundColor($r('sys.color.comp_background_tertiary'))
+      .height(40)
+      .enabled(this.vm.hasSubscribe)
+      .onClick(() => {
+        this.vm.cancelSubscribeAll()
+      })
   }
 
   build() {
@@ -59,7 +52,7 @@ export struct SubscribePage {
     })
     .onShown(() => {
       if (this.vm.settingInfo.network.enableAudioSub) {
-        SubUtils.createSubWindow(this.getUIContext())
+        AudioService.createSubWindow(this.getUIContext())
       } else {
         MediaController.pause()
       }

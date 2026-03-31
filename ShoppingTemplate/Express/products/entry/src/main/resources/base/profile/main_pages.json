@@ -1,9 +1,0 @@
-{
-  "src": [
-    "pages/Index"
-  ],
-  "window": {
-    "designWidth": 720,
-    "autoDesignWidth": false
-  }
-}

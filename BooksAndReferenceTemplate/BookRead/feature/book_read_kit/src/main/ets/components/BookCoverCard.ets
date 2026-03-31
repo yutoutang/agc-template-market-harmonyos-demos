@@ -117,7 +117,7 @@ export struct BookCoverCard {
             .lineHeight(19)
             .fontFamily('HarmonyHeiTi')
             .fontWeight(FontWeight.Medium)
-            .fontColor('#E5000000')
+            .fontColor($r('sys.color.font_primary'))
             .maxLines(2)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
             .width('100%')
@@ -126,7 +126,7 @@ export struct BookCoverCard {
           Row({ space: 4 }) {
             Text(this.book.author + ' ' + '著')
               .fontSize(12)
-              .fontColor('#99000000')
+              .fontColor($r('sys.color.font_secondary'))
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
           }
@@ -137,7 +137,7 @@ export struct BookCoverCard {
           Row({ space: 4 }) {
             Text(this.getStatusText(this.book.status))
               .fontSize(12)
-              .fontColor('#99000000')
+              .fontColor($r('sys.color.font_secondary'))
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
           }
@@ -156,50 +156,50 @@ export struct BookCoverCard {
           Row() {
             Text(this.book.rate)
               .fontSize(16)
-              .fontColor('#E5000000')
+              .fontColor($r('sys.color.font_primary'))
             Text(' ')
             Text($r('app.string.rating_point'))
               .fontSize(12)
-              .fontColor('#99000000')
+              .fontColor($r('sys.color.font_secondary'))
           }
 
           Text($r('app.string.rating'))
             .fontSize(12)
-            .fontColor('#99000000')
+            .fontColor($r('sys.color.font_secondary'))
         }
 
         Column({ space: 5 }) {
           Row() {
             Text(this.book.count)
               .fontSize(16)
-              .fontColor('#E5000000')
+              .fontColor($r('sys.color.font_primary'))
             Text(' ')
             Text($r('app.string.ten_thousand_words'))
               .fontSize(12)
-              .fontColor('#99000000')
+              .fontColor($r('sys.color.font_secondary'))
           }
 
           Text($r('app.string.publishing_house'))
             .fontSize(12)
-            .fontColor('#99000000')
+            .fontColor($r('sys.color.font_secondary'))
         }
 
         Column({ space: 5 }) {
           Row() {
             Text(this.book.popular)
               .fontSize(16)
-              .fontColor('#E5000000')
+              .fontColor($r('sys.color.font_primary'))
             Text(' ')
               .fontSize(12)
-              .fontColor('#99000000')
+              .fontColor($r('sys.color.font_secondary'))
             Text($r('app.string.ten_thousand'))
               .fontSize(12)
-              .fontColor('#99000000')
+              .fontColor($r('sys.color.font_secondary'))
           }
 
           Text($r('app.string.popular'))
             .fontSize(12)
-            .fontColor('#99000000')
+            .fontColor($r('sys.color.font_secondary'))
         }
       }
       .width('100%')
@@ -208,7 +208,7 @@ export struct BookCoverCard {
     }
     .width('100%')
     .height(233)
-    .backgroundColor('#FFFFFF')
+    .backgroundColor($r('sys.color.comp_background_list_card'))
     .borderRadius(16)
     .padding(16)
     .alignItems(HorizontalAlign.Start)
@@ -222,7 +222,7 @@ export struct BookCoverCard {
         .lineHeight(21)
         .fontFamily('HarmonyHeiTi')
         .fontWeight(FontWeight.Medium)
-        .fontColor('#E5000000')
+        .fontColor($r('sys.color.font_primary'))
         .margin({ bottom: 12 })
         .width('100%')
         .textAlign(TextAlign.Start)
@@ -234,7 +234,7 @@ export struct BookCoverCard {
       Text(this.book.description || $r('app.string.no_briefly'))
         .fontSize(12)
         .lineHeight(20)
-        .fontColor('#E5000000')
+        .fontColor($r('sys.color.font_primary'))
         .maxLines(3)
         .textOverflow({ overflow: TextOverflow.Ellipsis })
         .width('100%')
@@ -248,19 +248,19 @@ export struct BookCoverCard {
           .fontWeight(400)
           .letterSpacing(0)
           .textAlign(TextAlign.Center)
-          .fontColor('rgba(0, 0, 0, 0.9)')
+          .fontColor($r('sys.color.font_primary'))
           .padding({ left: 12, right: 12 })
       }
       .width(76)
       .height(28)
-      .backgroundColor('rgba(0, 0, 0, 0.05)')
+      .backgroundColor($r('sys.color.comp_background_tertiary'))
       .borderRadius(14)
       .justifyContent(FlexAlign.Center)
     }
     .width('100%')
     .height(this.curBreakpoint.value === BreakpointTypeEnum.SM ? 161 : 233)
     .justifyContent(FlexAlign.SpaceBetween)
-    .backgroundColor('#FFFFFF')
+    .backgroundColor($r('sys.color.comp_background_list_card'))
     .borderRadius(16)
     .padding(16)
     .alignItems(HorizontalAlign.Start)
@@ -276,19 +276,19 @@ export struct BookCoverCard {
           .lineHeight(21)
           .fontFamily('HarmonyHeiTi')
           .fontWeight(FontWeight.Medium)
-          .fontColor('#E5000000')
+          .fontColor($r('sys.color.font_primary'))
 
         Blank()
 
         Row({ space: 4 }) {
           Text($r('app.string.more_book_reviews'))
             .fontSize(12)
-            .fontColor('#99000000')
+            .fontColor($r('sys.color.font_secondary'))
 
           Image($r('app.media.ic_public_right_arrow'))
             .width(16)
             .height(16)
-            .fillColor('#99000000')
+            .fillColor($r('sys.color.font_secondary'))
         }
         .onClick(() => {
           TCRouter.push(Constants.WONDERFUL_REVIEW_ROUTE, {
@@ -314,7 +314,7 @@ export struct BookCoverCard {
                 Text(review.content.toString())
                   .fontSize(12)
                   .lineHeight(18)
-                  .fontColor('#E5000000')
+                  .fontColor($r('sys.color.font_primary'))
                   .maxLines(2)
                   .textOverflow({ overflow: TextOverflow.Ellipsis })
                   .layoutWeight(1)
@@ -332,20 +332,20 @@ export struct BookCoverCard {
           }, (review: ReviewInfo) => review.id)
         }
         .width('100%')
-        .backgroundColor('#FFFFFF')
+        .backgroundColor($r('sys.color.comp_background_list_card'))
         .borderRadius(16)
         .padding(16)
       } else {
         Column() {
           Text('暂无评论')
             .fontSize(14)
-            .fontColor('#99000000')
+            .fontColor($r('sys.color.font_secondary'))
             .layoutWeight(1)
             .textAlign(TextAlign.Center)
         }
         .width('100%')
         .height(100)
-        .backgroundColor('#FFFFFF')
+        .backgroundColor($r('sys.color.comp_background_list_card'))
         .borderRadius(16)
         .padding(20)
       }
@@ -396,7 +396,7 @@ export struct BookCoverCard {
 
       Text($r('app.string.start_reading'))
         .fontSize(14)
-        .fontColor('#99000000')
+        .fontColor($r('sys.color.font_secondary'))
         .margin({ top: 12, bottom: 24 })
         .textAlign(TextAlign.Center)
         .padding({
@@ -405,13 +405,11 @@ export struct BookCoverCard {
           top: 12,
           bottom: 12
         })
-        .backgroundColor('rgba(0, 0, 0, 0.05)')
+        .backgroundColor($r('sys.color.comp_background_tertiary'))
         .borderRadius(14)
-
-
     }
     .width(Constants.FULL_SIZE)
     .height(Constants.FULL_SIZE)
-    .backgroundColor('#F3F4F5')
+    .backgroundColor($r('sys.color.ohos_id_color_sub_background'))
   }
 }

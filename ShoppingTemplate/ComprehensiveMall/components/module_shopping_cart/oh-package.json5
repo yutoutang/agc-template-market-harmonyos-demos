@@ -6,8 +6,8 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "@ohos/axios": "^2.2.4",
-    "@hw-agconnect/axios-mock-adapter": "^1.0.0",
-    "module_ui_base": "file:../module_ui_base"
+    "lib_foundation": "file:../../commons/lib_foundation",
+    "lib_widget": "file:../../commons/lib_widget",
+    "lib_network": "file:../../commons/lib_network"
   }
 }

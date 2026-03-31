@@ -38,17 +38,8 @@ export struct RechargePage {
   build() {
     NavDestination() {
       Stack() {
-        Image($r('app.media.rbg'))
-          .width('100%')
-          .height(350)
-          .backgroundColor('#F0F2F5');
-
-        Image($r('app.media.rbg2'))
-          .width(140)
-          .height(120)
-          .position({ x: '100%', y: 100 })
-          .translate({ x: -140, y: 0 })
-          .objectFit(ImageFit.Fill);
+        Image($r('app.media.welfare_bg'))
+          .width(Constants.FULL_SIZE)
 
         Column() {
           NavHeaderBar({
@@ -111,7 +102,8 @@ export struct RechargePage {
                       }
                       .width(Constants.FULL_SIZE)
                       .height(130)
-                      .backgroundColor(this.vm.selectId === item.id ? '#FFF8F0' : $r('sys.color.background_primary'))
+                      .backgroundColor(this.vm.selectId === item.id ? $r('sys.color.comp_background_tertiary') :
+                        $r('sys.color.background_primary'))
                       .border({
                         width: this.vm.selectId === item.id ? 2 : 1,
                         color: this.vm.selectId === item.id ? '#E39331' : '#E5E5E5',
@@ -176,7 +168,7 @@ export struct RechargePage {
 
               Column().height(140)
             }
-            .backgroundColor('#ffffff')
+            .backgroundColor($r('sys.color.background_primary'))
             .width('100%')
             .layoutWeight(1)
 
@@ -244,7 +236,7 @@ export struct RechargePage {
               });
             })
         }
-        .backgroundColor('#ffffff')
+        .backgroundColor($r('sys.color.background_primary'))
         .padding({
           left: 16,
           right: 16,

@@ -20,23 +20,22 @@ import {
   SecondItemModel,
   ItemDetail,
   SecondParam
-} from '../model/SelectModel'
+} from '../model/SelectModel';
 
 @ComponentV2
 struct BaseSelect {
-  @Param @Require modelList: SelectItemModel[] = []
-  @Local modelContentList: ContentItemModel[] = []
+  @Param @Require modelList: SelectItemModel[] = [];
+  @Local modelContentList: ContentItemModel[] = [];
   @Local selectedLeft: number = 0;
   @Event selectIndex: (x: number) => void = () => {
   };
   @Event goSecond: (x: SecondParam) => void = () => {
   };
-  @Param selectLeftBgc: ResourceStr = $r('sys.color.background_primary');
-  @Param defaultLeftBgc: ResourceStr = $r('sys.color.comp_background_gray');
+  @Param defaultLeftBgc: ResourceStr = $r('sys.color.background_secondary');
   @Param contentIcon: ResourceStr = $r('app.media.icon_right');
 
   aboutToAppear(): void {
-    this.modelContentList = this.modelList[this.selectedLeft].list
+    this.modelContentList = this.modelList[this.selectedLeft].list;
   }
 
   build() {
@@ -47,10 +46,13 @@ struct BaseSelect {
       }
       .alignItems(VerticalAlign.Top)
       .justifyContent(FlexAlign.Start)
-      .layoutWeight(1)
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
+      .width('100%')
+      .height('100%');
     }
-    .width('100%')
-    .height('100%')
+    .backgroundColor($r('sys.color.comp_background_primary'))
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
+    .layoutWeight(1);
   }
 
   @Builder
@@ -67,7 +69,7 @@ struct BaseSelect {
               .margin({ right: $r('app.float.vp_25') })
               .borderWidth({ left: this.selectedLeft === idx ? 4 : 0 })
               .borderColor('#4B5CC4')
-              .borderRadius({ topRight: $r('app.float.vp_4'), bottomRight: $r('app.float.vp_4') })
+              .borderRadius({ topRight: $r('app.float.vp_4'), bottomRight: $r('app.float.vp_4') });
 
               Text(leftTab.title)
                 .textAlign(TextAlign.Start)
@@ -77,28 +79,30 @@ struct BaseSelect {
                 .fontColor($r('sys.color.font_primary'))
                 .fontWeight(FontWeight.Regular)
                 .fontSize($r('sys.float.Caption_L'))
-                .layoutWeight(1)
-                .onClick(() => {
-                  this.refreshRightDate(leftTab, idx)
-                  // 抛出选中索引
-                  this.selectIndex(this.selectedLeft)
-                });
+                .layoutWeight(1);
             }
             .width('100%')
             .height($r('app.float.vp_40'))
-            .backgroundColor(this.selectedLeft === idx ? this.selectLeftBgc : this.defaultLeftBgc
-            )
+            .backgroundColor(this.selectedLeft === idx ?
+              $r('sys.color.comp_background_primary') : this.defaultLeftBgc)
             .justifyContent(FlexAlign.Start)
             .alignItems(VerticalAlign.Center)
+            .onClick(() => {
+              this.refreshRightDate(leftTab, idx);
+              // 抛出选中索引
+              this.selectIndex(this.selectedLeft);
+            });
           }
           .width('100%');
         }, (leftTab: SelectItemModel, idx: number) => leftTab.title + idx);
       }
-      .listDirection(Axis.Vertical) // 排列方向
+      .listDirection(Axis.Vertical)
       .scrollBar(BarState.Off)
       .width('30%')
       .height('100%')
       .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
+      .backgroundColor($r('sys.color.background_secondary'))
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM]);
     }
   }
 
@@ -113,7 +117,7 @@ struct BaseSelect {
                 .fontColor($r('sys.color.font_primary'))
                 .margin({ top: $r('app.float.vp_10'), left: $r('app.float.vp_10'), bottom: $r('app.float.vp_10') })
                 .fontWeight(FontWeight.Medium)
-                .fontSize($r('sys.float.Body_L'))
+                .fontSize($r('sys.float.Body_L'));
 
               ForEach(leftTabContent.list, (secondItem: SecondItemModel) => {
                 Row() {
@@ -123,7 +127,7 @@ struct BaseSelect {
                     .fontWeight(FontWeight.Regular)
                     .maxLines(2)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
-                    .textAlign(TextAlign.Start)
+                    .textAlign(TextAlign.Start);
 
                   Image(this.contentIcon)
                     .width($r('app.float.vp_16'))
@@ -131,7 +135,7 @@ struct BaseSelect {
                     .objectFit(ImageFit.Cover)
                     .margin({ left: $r('app.float.vp_4'), right: $r('app.float.vp_12') });
                 }
-                .backgroundColor($r('sys.color.comp_background_gray'))
+                .backgroundColor($r('sys.color.comp_background_tertiary'))
                 .borderRadius($r('app.float.vp_10'))
                 .width('100%')
                 .padding($r('app.float.vp_12'))
@@ -139,15 +143,14 @@ struct BaseSelect {
                 .margin({ bottom: $r('app.float.vp_12') })
                 .onClick(() => {
                   // 跳转二级列表页
-                  let list: string[] = []
-                  list.push(this.modelList[this.selectedLeft].title)
-                  list.push(leftTabContent.title)
-                  list.push(secondItem.title)
-                  let secondParamObj: SecondParam = new SecondParam(list, secondItem)
-                  this.goSecond(secondParamObj)
-                })
-              },
-                (secondItem: SecondItemModel) => secondItem.id)
+                  let list: string[] = [];
+                  list.push(this.modelList[this.selectedLeft].title);
+                  list.push(leftTabContent.title);
+                  list.push(secondItem.title);
+                  let secondParamObj: SecondParam = new SecondParam(list, secondItem);
+                  this.goSecond(secondParamObj);
+                });
+              }, (secondItem: SecondItemModel) => secondItem.id);
             }
             .padding({
               left: $r('app.float.vp_8'),
@@ -156,7 +159,7 @@ struct BaseSelect {
               bottom: $r('app.float.vp_2')
             })
             .width('100%')
-            .alignItems(HorizontalAlign.Start)
+            .alignItems(HorizontalAlign.Start);
           }
           .width('100%');
         }, (leftTabContent: ContentItemModel, idx: number) => leftTabContent.title + idx);
@@ -168,10 +171,11 @@ struct BaseSelect {
         bottomRight: $r('app.float.vp_16'),
         bottomLeft: $r('app.float.vp_16'),
       })
-      .backgroundColor($r('sys.color.background_primary'))
+      .backgroundColor($r('sys.color.comp_background_primary'))
       .width('auto')
       .height('auto')
       .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM]);
     }
   }
 
@@ -182,4 +186,4 @@ struct BaseSelect {
   }
 }
 
-export { BaseSelect, ContentItemModel, SelectItemModel, ThirdItemModel, SecondItemModel, ItemDetail, SecondParam }
+export { BaseSelect, ContentItemModel, SelectItemModel, ThirdItemModel, SecondItemModel, ItemDetail, SecondParam };

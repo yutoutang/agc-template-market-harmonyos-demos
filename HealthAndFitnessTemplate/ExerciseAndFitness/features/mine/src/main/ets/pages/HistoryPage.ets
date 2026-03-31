@@ -1,12 +1,13 @@
 import dayjs from 'dayjs';
 import { MineServiceApi } from 'lib_api';
-import { COURSE_DATA } from 'lib_common';
+import { BreakpointModel, BreakpointNameEnum, COURSE_DATA } from 'lib_common';
 import { NavHeaderBar } from 'lib_widget';
 import { CourseItemComponent } from '../components/CourseItemComponent';
 import { LeftSwipeComponent } from '../components/LeftSwipeComponent';
 import { CollectionModel } from '../viewmodels/CollectionModel';
 import { DeleteDialog } from '../viewmodels/DeleteDialog';
 import { HistoryPageVM } from '../viewmodels/HistoryPageVM';
+import { AppStorageV2 } from '@kit.ArkUI';
 
 @Builder
 export function HistoryPageBuilder() {
@@ -24,6 +25,7 @@ struct HistoryPage {
   @Local isLeftSwipe: boolean = false
   // 选中计数
   @Local selectCount: number = 0
+  @Local breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
   // 左滑删除下标
   @Provider() swipeIndex: number = 0
   // 删除弹框
@@ -36,6 +38,17 @@ struct HistoryPage {
 
   aboutToDisappear(): void {
     this.saveHistoryData()
+  }
+
+  @Computed
+  get gapSetting() {
+    if (BreakpointNameEnum.MD === this.breakPointModel.currentBreakpoint) {
+      return false
+    }
+    if ([BreakpointNameEnum.LG, BreakpointNameEnum.XL].includes((this.breakPointModel.currentBreakpoint))) {
+      return false
+    }
+    return true
   }
 
   @Builder
@@ -149,7 +162,7 @@ struct HistoryPage {
           this.historyList.push(courseModel)
           break;
 
-        case '”你真的会跑步吗？“关于跑步机的正确使用训练课程':
+        case '你真的会跑步吗？关于跑步机的正确使用训练课程':
           courseModel.id = COURSE_DATA[8].id
           courseModel.time = dayjs(COURSE_DATA[8].time).format('YYYY-MM-DD')
           courseModel.isDelete = false
@@ -322,6 +335,10 @@ struct HistoryPage {
               })
             }), (item: CollectionModel, index: number) => item.id + index)
           }
+          .scrollBar(BarState.Off)
+          .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+          .width('100%')
+          .lanes(this.listLanes)
           // 无数据时显示
           Text('当前暂无足迹记录。')
             .fontSize($r('sys.float.Body_S'))
@@ -329,6 +346,7 @@ struct HistoryPage {
             .height('100%')
             .visibility(this.historyList.length === 0 ? Visibility.Visible : Visibility.None)
         }
+        .padding({ left: this.gapSetting ? 0 : 18 })
         .layoutWeight(1)
       }
       .backgroundColor($r('app.color.mine_background'))
@@ -336,6 +354,16 @@ struct HistoryPage {
       .width('100%')
     }
     .hideTitleBar(true)
+  }
+
+  @Computed
+  get listLanes() {
+    if ([BreakpointNameEnum.SM].includes(this.breakPointModel.currentBreakpoint)) {
+      return 1;
+    } else if ([BreakpointNameEnum.MD].includes(this.breakPointModel.currentBreakpoint)) {
+      return 2;
+    }
+    return 3;
   }
 
   /**

@@ -5,8 +5,8 @@
       {
         "name": "default",
         "signingConfig": "default",
-        "targetSdkVersion": "6.0.1(21)",
-        "compatibleSdkVersion": "5.1.1(19)",
+        "targetSdkVersion": "6.0.2(22)",
+        "compatibleSdkVersion": "6.0.0(20)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
           "strictMode": {
@@ -91,10 +91,6 @@
       "srcPath": "./commons/lib_news_feed_details"
     },
     {
-      "name": "lib_preview_page",
-      "srcPath": "./commons/lib_preview_page"
-    },
-    {
       "name": "lib_av_details",
       "srcPath": "./commons/lib_av_details"
     },
@@ -173,6 +169,10 @@
     {
       "name": "module_consent_dialog",
       "srcPath": "./components/module_consent_dialog"
+    },
+    {
+      "name": "module_membership",
+      "srcPath": "./components/module_membership"
     },
     {
       "name": "module_text_reader",

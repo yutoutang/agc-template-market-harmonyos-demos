@@ -94,59 +94,6 @@ class ActionSheet {
   private uiContext: UIContext | null = null
   private contentNodeMap: Map<string, contentNodeMapVal> = new Map()
 
-  /*
-   * 展示actionSheet
-   */
-  public async show(option: ActionSheetOption) {
-    let key = option.id ?? this.getUniKey()
-    if (this.uiContext === null) {
-      let windowClass: window.Window = await window.getLastWindow(getContext())
-      this.uiContext = windowClass.getUIContext()
-    }
-    let params = new ActionSheetParams(option)
-    params.id = key
-    params.close = (id: string): Promise<void> => this.close(id)
-    let contentNode = new ComponentContent(this.uiContext, wrapBuilder(defaultBuilder), params)
-    let sheetOption: SheetOptions = {
-      keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
-      height: params.height,
-      detents: params.detents,
-      preferType: params.preferType,
-      backgroundColor: params.backgroundColor ? params.backgroundColor : ($r('sys.color.background_primary')),
-      showClose: params.showClose,
-      onWillDismiss: async (dismissSheetAction: DismissSheetAction) => {
-        // 0: 点击三键back、左滑/右滑、键盘ESC 1 点击蒙层  3: 跟手拖拽
-        let reason = dismissSheetAction.reason
-        if (reason === DismissReason.SLIDE_DOWN) {
-          return
-        }
-        dismissSheetAction.dismiss()
-      },
-      onDisappear: () => {
-        params.onClose?.()
-      },
-      onWillAppear:() => {
-        params.onWillAppear?.()
-      }
-    }
-    if (params.title) {
-      sheetOption.title = params.title
-    }
-    if (params.detents) {
-      sheetOption.detents = params.detents
-    }
-    if (params.backgroundColor) {
-      sheetOption.backgroundColor = params.backgroundColor
-    }
-    this.contentNodeMap.set(key, {
-      content: contentNode,
-      params: params,
-    })
-    await this.uiContext.openBindSheet(contentNode, sheetOption)
-    params.onOpen?.()
-    return key
-  }
-
   /**
    * 关闭actionSheet
    */
@@ -184,9 +131,9 @@ const baseActionSheet = new ActionSheet()
 
 export { baseActionSheet }
 
-@Component
+@ComponentV2
 struct defaultContent {
-  @Prop option: ActionSheetParams
+  @BuilderParam option: ActionSheetParams
 
   build() {
     customContent({ customBuilder: this.option.customContent })

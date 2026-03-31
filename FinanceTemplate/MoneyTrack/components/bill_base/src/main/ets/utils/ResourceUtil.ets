@@ -1,4 +1,5 @@
-import { PersistenceV2, promptAction } from '@kit.ArkUI';
+import { ToastDialog } from '@hw-agconnect/ui-toast';
+import { PersistenceV2 } from '@kit.ArkUI';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { BillConstants } from '../commons/BillConstants';
 import { BalanceChangeType } from '../commons/Enums';
@@ -104,10 +105,10 @@ class ResourceUtil {
       } else {
         this._resource.expense.push(item);
       }
-      promptAction.showToast({ message: '自定义分类添加成功~' });
+      ToastDialog.showToast({ message: '自定义分类添加成功~' });
       return true;
     } catch {
-      promptAction.showToast({ message: '自定义分类添加失败' });
+      ToastDialog.showToast({ message: '自定义分类添加失败' });
       return false;
     }
   }

@@ -1,5 +1,3 @@
-import { intl } from '@kit.LocalizationKit';
-
 export class DateUtils {
   static ONE_YEAR_MILLI_SEC = 365 * 24 * 60 * 60 * 1000;
 
@@ -10,17 +8,17 @@ export class DateUtils {
   }
 
   static formatDateToMinutes(date: Date): string {
-    let dateFormat2 = new intl.DateTimeFormat('zh-CN', { dateStyle: 'short', timeStyle: 'short', hourCycle: 'h24' });
+    let dateFormat2 = new Intl.DateTimeFormat('zh-CN', { dateStyle: 'short', timeStyle: 'short', hourCycle: 'h24' });
     return dateFormat2.format(date);
   }
 
   static formatDateToDay(date: Date): string {
-    let dateFormat = new intl.DateTimeFormat('zh-CN', { dateStyle: 'short'});
+    let dateFormat = new Intl.DateTimeFormat('zh-CN', { dateStyle: 'short'});
     return dateFormat.format(date);
   }
 
   static formatDateToMmDd(date: Date): string {
-    let dateFormat4 = new intl.DateTimeFormat('zh-CN', {month: 'short', day: 'long'});
+    let dateFormat4 = new Intl.DateTimeFormat('zh-CN', {month: 'short', day: 'numeric'});
     return dateFormat4.format(date);
   }
 

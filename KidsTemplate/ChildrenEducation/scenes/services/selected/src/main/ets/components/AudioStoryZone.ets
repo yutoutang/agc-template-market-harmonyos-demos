@@ -1,43 +1,53 @@
-import { DataGenerator, VideoCard, VideoDetail } from '@ohos_agcit/children_education_datasource';
-import { CommonConstants, IconAndCount } from '@ohos_agcit/children_education_utils';
+import { DataGenerator, VideoCard, VideoCollection } from '@ohos_agcit/children_education_datasource';
+import {
+  BreakpointType,
+  CommonConstants,
+  GlobalInfoModel,
+  VideoCover
+} from '@ohos_agcit/children_education_utils';
+import { AppStorageV2 } from '@kit.ArkUI';
 
 @ComponentV2
 export struct AudioStoryZone {
   @Param audioStoryArray: Array<VideoCard> = [];
-  @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
+  @Local globalInfo: GlobalInfoModel =
+    AppStorageV2.connect<GlobalInfoModel>(GlobalInfoModel, () => new GlobalInfoModel())!;
 
   build() {
-    List() {
+    Grid() {
       ForEach(this.audioStoryArray, (item: VideoCard) => {
-        ListItem() {
-          Column() {
-            RelativeContainer() {
-              Image(item.imageUrl)
-                .borderRadius(8)
-                .id(CommonConstants.IMAGE);
-              IconAndCount(CommonConstants.IMAGE, item.isVip, item.updateCount, item.totalCount, '30%', '50%', '70%');
-            }
-            .height('auto')
-            .width('auto');
-          };
+        GridItem() {
+          VideoCover({
+            imageUrl: item.imageUrl,
+            isVip: item.isVip,
+            updateCount: item.updateCount,
+            totalCount: item.totalCount,
+            ratio: 1
+          })
         }
-        .padding({
-          left: '5%',
-          right: '5%',
-        })
+        .aspectRatio(1)
         .onClick(() => {
-          let detail: VideoDetail = DataGenerator.getAudioDetail(this.getUIContext());
+          let detail: VideoCollection = DataGenerator.getAudioDetail(this.getUIContext());
           detail.videoCard = item;
-          this.appPathStack.pushPathByName('AudioDetailListView', detail);
+          this.globalInfo.navStack.pushPathByName('AudioDetailListView', detail);
         });
       }, (item: VideoCard) => JSON.stringify(item));
     }
-    .lanes(3)
+    .rowsGap(new BreakpointType<number>({
+      sm: 8,
+      md: 12,
+      lg: 16,
+    }).getValue(this.globalInfo.currentBreakpoint))
+    .columnsGap(new BreakpointType<number>({
+      sm: 8,
+      md: 12,
+      lg: 16,
+    }).getValue(this.globalInfo.currentBreakpoint))
+    .columnsTemplate('1fr '.repeat(new BreakpointType<number>({
+      sm: 3,
+      md: 4,
+      lg: 5,
+    }).getValue(this.globalInfo.currentBreakpoint)))
     .width(CommonConstants.FULL_PERCENT)
-    .padding({
-      top: '10vp',
-      left: '3.4%',
-      right: '3.4%'
-    })
   }
 }

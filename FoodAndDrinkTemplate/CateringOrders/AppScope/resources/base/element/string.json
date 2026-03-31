@@ -146,7 +146,7 @@
     },
     {
       "name": "agcit_huawei_catering_orders",
-      "value": "1.0.3"
+      "value": "1.0.4"
     },
     {
       "name": "agcittype_huawei_catering_orders",
@@ -162,7 +162,7 @@
     },
     {
       "name": "agcitkid_huawei_catering_orders",
-      "value": "agcit_huawei_catering_orders_goods_detail/1.0.2,agcit_huawei_catering_orders_my_wallet/1.0.2,agcit_huawei_tea_drink_orders_select_store/1.0.3,agcit_huawei_catering_orders_snack_sized_deal/1.0.1,agcit_huawei_home_decoration_module_city_select/1.0.2,agcit_huawei_common_search/1.0.0"
+      "value": "agcit_huawei_catering_orders_goods_detail/1.0.3,agcit_huawei_catering_orders_my_wallet/1.0.2,agcit_huawei_tea_drink_orders_select_store/1.0.2,agcit_huawei_catering_orders_snack_sized_deal/1.0.2,agcit_huawei_home_decoration_module_city_select/1.0.2,agcit_huawei_common_search/1.0.0"
     }
   ]
 }

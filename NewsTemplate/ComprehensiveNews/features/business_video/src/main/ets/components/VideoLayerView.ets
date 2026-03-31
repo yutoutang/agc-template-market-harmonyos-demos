@@ -11,7 +11,7 @@ import {
   WindowModel,
 } from 'lib_common';
 import { LoginSheetUtils } from 'lib_account';
-import { AVPlayerSession, PlayerLayoutSize, SwipePlayerController, VideoProgressBar } from 'module_swipeplayer';
+import { AVPlayerController, PlayerLayoutSize, SwipePlayerController, VideoProgressBar } from 'module_swipeplayer';
 import { Sidebar } from './Sidebar';
 import { CommentController } from '../controller/CommentController';
 
@@ -22,7 +22,7 @@ export struct VideoLayerView {
   // 视频数据
   @Param @Require videoData: ESObject;
   // 播放会话
-  @Param @Require playerSession: AVPlayerSession;
+  @Param @Require avPlayerController: AVPlayerController;
   // 滑动播放控制器
   @Param @Require swipePlayerController: SwipePlayerController
   // 评论页面出现时，改变播放页面的尺寸
@@ -90,7 +90,7 @@ export struct VideoLayerView {
         Column({ space: CommonConstants.SPACE_M }) {
           // 视频的进度控制器
           VideoProgressBar({
-            playerSession: this.playerSession,
+            avPlayerController: this.avPlayerController,
             onSlideChange: (flag) => {
               this.isSliderMoving = flag;
               this.playerLayoutSize.updateSlideMovingFlag(flag)
@@ -181,13 +181,13 @@ export struct VideoLayerView {
 @Builder
 export function VideoLayerViewBuilder(
   videoData: ESObject,
-  playerSession: AVPlayerSession,
+  avPlayerController: AVPlayerController,
   swipePlayerController: SwipePlayerController,
   playerLayoutSize: PlayerLayoutSize,
 ) {
   VideoLayerView({
     videoData,
-    playerSession,
+    avPlayerController,
     swipePlayerController,
     playerLayoutSize,
   })

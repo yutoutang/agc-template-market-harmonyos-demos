@@ -1,4 +1,4 @@
-import { BaseViewModel, RouterMap, RouterUtils } from 'lib_common';
+import { BaseViewModel, BreakpointType, RouterMap, RouterUtils } from 'lib_common';
 import { MineGridItem } from '../types/Types';
 
 @ObservedV2
@@ -23,6 +23,17 @@ export class MineViewModel extends BaseViewModel {
     this.userInfoModel.isVIP = true
   }
 
+  isNotVIP() {
+    this.userInfoModel.isVIP = false
+  }
+
+  columnOptions: BreakpointType<number> = new BreakpointType<number>({
+    sm: 2,
+    md: 4,
+    lg: 6,
+    xl: 6,
+  });
+
   @Computed
   get userIcon() {
     return this.userInfoModel.authorIcon || $r('app.media.ic_user_default');
@@ -33,5 +44,10 @@ export class MineViewModel extends BaseViewModel {
       return this.windowModel.windowBottomPadding;
     }
     return 0;
+  }
+
+  @Computed
+  get gridCount() {
+    return this.columnOptions.getValue(this.breakPointModel.currentBreakpoint);
   }
 }

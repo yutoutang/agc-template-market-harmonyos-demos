@@ -1,8 +1,10 @@
-import { BaseViewModel, RouterMap, RouterUtils } from 'lib_common';
-import { LoginSheetUtils } from 'lib_account';
+import { BaseViewModel, Logger, RouterMap, RouterUtils } from 'lib_common';
+import { LoginSheetUtils, MembershipUtils } from 'lib_account';
 import { FeedbackModel } from 'module_feedback';
 import { IRouterParams, SettingGroup, SettingItem, SettingType } from 'module_app_setting';
 import { MineGridItem } from '../types/Types';
+
+const TAG = '[MineViewModel]';
 
 @ObservedV2
 export class MineViewModel extends BaseViewModel {
@@ -31,6 +33,19 @@ export class MineViewModel extends BaseViewModel {
   ];
   @Trace group: SettingGroup = new SettingGroup().setList(this.list)
 
+  async queryMembershipStatus() {
+    try {
+      if (!this.userInfoModel.isLogin) {
+        this.userInfoModel.isMembership = false;
+        return;
+      }
+      const isMem = await MembershipUtils.queryMembershipStatus();
+      this.userInfoModel.isMembership = isMem;
+    } catch (e) {
+      Logger.error(TAG, `Failed to queryMemStatus, code: ${e.code}, message: ${e.message}`);
+    }
+  }
+
   @Monitor('settingInfo.fontSizeRatio')
   onFontRatioChange() {
     this.feedbackItem.setRouterParam(this.feedbackRouterParam);
@@ -54,6 +69,10 @@ export class MineViewModel extends BaseViewModel {
 
   jumpProfile() {
     RouterUtils.pushPathByName(RouterMap.PROFILE_HOME);
+  }
+
+  jumpMembership() {
+    MembershipUtils.jumpMembershipPage();
   }
 
   gridClick(v: MineGridItem) {

@@ -1,4 +1,6 @@
-import { Style, cache, routerStack, RouterMap } from 'lib_foundation';
+import {
+  routerStack, RouterMap, ProductInfoPageParam, ProductSearchResultsPageParam,
+} from 'lib_foundation';
 import { CommonSymbol, NavTitleBar } from 'lib_widget';
 import { FilterSelectionItem, ProductFilter } from 'module_product_filter';
 import { SearchBar } from 'module_product_search';
@@ -9,15 +11,17 @@ import { SortBar } from '../components/SortBar';
 @ComponentV2
 struct ProductSearchResultsPage {
   @Local
-  keywords: string = '';
+  keywords?: string;
   @Local
-  vertical: boolean = false
+  searchImg?: PixelMap
+  @Local
+  slotId?: string
+  @Local
+  isGrid: boolean = false
   @Local
   sortType: SortTypeMap = SortTypeMap.DEFAULT
   @Local
   filterList: FilterSelectionItem[] = []
-  @Local
-  searchImg: PixelMap | undefined
 
   build() {
     NavDestination() {
@@ -48,7 +52,7 @@ struct ProductSearchResultsPage {
             handleConfirm: (res) => {
               this.filterList = res
             },
-          })
+          }, this.getUIContext())
         })
       }
       .width($r('app.string.size_percent_full'))
@@ -56,19 +60,22 @@ struct ProductSearchResultsPage {
         bottom: $r('app.float.space_m'),
         left: $r('app.float.space_m'),
       })
-      .backgroundColor($r('app.color.background_color_white'))
+      .backgroundColor($r('app.color.background_color_primary'))
 
       Column() {
         ProductWaterFlow({
-          keywords: this.keywords,
+          keyword: this.keywords,
+          slotId: this.slotId,
           sortType: this.sortType,
           filterList: this.filterList,
-          showInitLoading: true,
-          isVertical: this.vertical,
+          isGrid: this.isGrid,
           handleProductClick: (id) => {
             routerStack.pushPath({
               name: RouterMap.PRODUCT_INFO,
-              param: id,
+              param: {
+                productId: id,
+                slotId: this.slotId,
+              } as ProductInfoPageParam,
             });
           },
         })
@@ -82,26 +89,24 @@ struct ProductSearchResultsPage {
         top: $r('app.float.space_l'),
       })
       .layoutWeight(1)
-      .backgroundColor(Style.BACKGROUND_COLOR_GREY)
+      .backgroundColor($r('app.color.background_color_grey'))
       .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM]);
     }
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background_color_grey'))
     .expandSafeArea([SafeAreaType.SYSTEM, SafeAreaType.CUTOUT], [SafeAreaEdge.BOTTOM, SafeAreaEdge.TOP])
     .onReady((context) => {
-      const param = context.pathInfo.param as PixelMap | undefined
-      if (param) {
-        this.searchImg = param;
-      } else {
-        this.keywords = cache.search.lastSubmit;
-      }
+      const param = context.pathInfo.param as ProductSearchResultsPageParam
+      this.keywords = param.keywords;
+      this.searchImg = param.searchImg
+      this.slotId = param.slotId
     })
   }
 
   @Builder
   buildHeader() {
     if (this.searchImg) {
-      NavTitleBar({ title: '相关商品', bgColor: $r('app.color.background_color_white') })
+      NavTitleBar({ title: '相关商品', bgColor: $r('app.color.background_color_primary') })
       Row() {
         Image(this.searchImg)
           .width(40)
@@ -116,7 +121,7 @@ struct ProductSearchResultsPage {
       .width($r('app.string.size_percent_full'))
       .justifyContent(FlexAlign.Start)
       .alignItems(VerticalAlign.Center)
-      .backgroundColor($r('app.color.background_color_white'))
+      .backgroundColor($r('app.color.background_color_primary'))
       .padding($r('app.float.space_l'))
     } else {
       Row() {
@@ -129,13 +134,13 @@ struct ProductSearchResultsPage {
         })
           .layoutWeight(1)
 
-        CommonSymbol({ src: this.vertical ? $r('sys.symbol.list_bullet') : $r('sys.symbol.grid') })
+        CommonSymbol({ src: this.isGrid ? $r('sys.symbol.list_bullet') : $r('sys.symbol.grid') })
           .onClick(() => {
-            this.vertical = !this.vertical;
+            this.isGrid = !this.isGrid;
           })
           .margin({ right: $r('app.float.space_l') })
       }
-      .backgroundColor($r('app.color.background_color_white'))
+      .backgroundColor($r('app.color.background_color_primary'))
       .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
       .padding({ bottom: $r('app.float.space_l') })
 

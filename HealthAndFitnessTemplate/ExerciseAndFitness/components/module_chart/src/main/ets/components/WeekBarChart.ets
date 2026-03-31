@@ -16,7 +16,6 @@ import {
   XAxisPosition,
 } from '@ohos/mpchart';
 import { WeekBarChartData, BarItem } from '../commons/Types';
-import dayjs from 'dayjs';
 
 @ComponentV2
 export struct WeekBarChart {
@@ -74,9 +73,18 @@ export struct WeekBarChart {
     },
   };
 
+  dataIsEmpty() : boolean {
+    for (let index = 0; index < this.chartData.data.length; index++) {
+      if (this.chartData.data[index].value !== 0) {
+        return false
+      }
+    }
+    return true
+  }
+
   build() {
     Column() {
-      if (this.chartData.data.length) {
+      if (!this.dataIsEmpty()) {
         Text() {
           if (this.selectedData) {
             Span(this.selectedData.date as string);

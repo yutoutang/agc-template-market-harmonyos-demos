@@ -1,9 +1,7 @@
-import { AppUtil, BreakpointType, GlobalInfoModel, DialogUtil} from '@ohos_agcit/notes_utils';
-import { MergeArrow,
-  DarkModeToggle,
-  NoticeToggle, SingleArrow } from '../../components/SettingComponents';
-import { AppStorageV2, ComponentContent } from '@kit.ArkUI';
-import { checkUpdate, findNewVersion, Params } from 'check_app_update';
+import { BreakpointType, GlobalInfoModel } from '@ohos_agcit/notes_utils';
+import { DarkModeToggle, MergeArrow, NoticeToggle, SingleArrow } from '../../components/SettingComponents';
+import { AppStorageV2 } from '@kit.ArkUI';
+import { checkUpdateAndShowDialog } from 'check_app_update';
 import { ThemeController } from '../../controller/ThemeController';
 import { UserInfo } from 'login';
 
@@ -47,7 +45,7 @@ export struct Setting {
             MergeArrow({
               text1: '检测版本',
               text1Click: () => {
-                checkUpdateFunc();
+                checkUpdateAndShowDialog(this.getUIContext());
               },
               text2: '关于我们',
               text2Click: () => {
@@ -102,31 +100,4 @@ export struct Setting {
   }
 }
 
-/**
- * 发现新版本
- * @param ctx
- */
-export function checkUpdateFunc() {
-  checkUpdate(AppUtil.getContext())
-    .then(version => {
-      // 0 不存在新版本， 1 存在新版本
-      if (version === 1) {
-        showNewVersionDialog(version);
-      } else {
-        // mock 新版本
-        showNewVersionDialog(version);
-      }
-    });
-}
 
-/**
- * 发现新版本弹窗
- * @param version
- */
-export function showNewVersionDialog(version: number) {
-  let contentNode: ComponentContent<object> =
-    new ComponentContent(AppUtil.getUIContext(), wrapBuilder(findNewVersion),
-      new Params(version, themeController.dialogBgWhite));
-  DialogUtil.setOptions({ alignment: DialogAlignment.Center, offset: { dx: 0, dy: 100 } });
-  DialogUtil.openDialog(AppUtil.getUIContext(), contentNode);
-}

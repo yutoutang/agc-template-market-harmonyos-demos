@@ -1,5 +1,4 @@
-import { AssetSummary } from 'asset_base';
-
+import { AssetSummary, BreakpointSystem, BreakpointTypeEnum  } from 'asset_base';
 
 @ComponentV2
 export struct AssetSummaryCard {
@@ -62,9 +61,8 @@ export struct AssetSummaryCard {
             .fontColor(this.amountTextColor)
             .fontWeight(FontWeight.Medium)
             .fontSize(14)
-        }
-        .labelTextStyle()
-        .margin({ right: 24 });
+        }.labelTextStyle()
+        .layoutWeight(1);
 
         Text() {
           Span('负债');
@@ -73,7 +71,8 @@ export struct AssetSummaryCard {
             .fontColor(this.amountTextColor)
             .fontWeight(FontWeight.Medium)
             .fontSize(14)
-        }.labelTextStyle();
+        }.labelTextStyle()
+        .layoutWeight(1);
       };
 
     }
@@ -81,8 +80,12 @@ export struct AssetSummaryCard {
     .height(this.cardHeight)
     .alignItems(HorizontalAlign.Start)
     .padding(16)
+    .backgroundColor(Color.White)
     .backgroundImage(this.bgImage)
-    .backgroundImageSize(ImageSize.FILL);
+    .borderRadius(16)
+    .backgroundImageSize(BreakpointSystem.currentBreakpoint.value === BreakpointTypeEnum.SM
+      ? ImageSize.FILL : ImageSize.Contain)
+    .backgroundImagePosition(Alignment.TopEnd);
   }
 }
 

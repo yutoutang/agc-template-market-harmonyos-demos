@@ -26,6 +26,11 @@
       "buildFunction": "ConfigPageBuilder"
     },
     {
+      "name": "PersonalInfoPage",
+      "pageSourceFile": "src/main/ets/pages/PersonalInfoPage.ets",
+      "buildFunction": "PersonalInfoPageBuilder"
+    },
+    {
       "name": "RealNameAuthPage",
       "pageSourceFile": "src/main/ets/pages/RealNameAuthPage.ets",
       "buildFunction": "RealNameAuthPageBuilder"
@@ -39,7 +44,7 @@
       "name": "MateCriteriaPage",
       "pageSourceFile": "src/main/ets/pages/MateCriteriaPage.ets",
       "buildFunction": "MateCriteriaPageBuilder"
-    },
+    }
 
   ]
 }

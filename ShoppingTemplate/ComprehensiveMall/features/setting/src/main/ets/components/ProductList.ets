@@ -1,5 +1,5 @@
-import { BreakpointSystem, BreakpointTypeEnum, RouterMap, routerStack } from 'lib_foundation'
-import { LabelItem, ProductCardItem } from 'lib_network'
+import { BreakpointSystem, BreakpointTypeEnum, ProductInfoPageParam, RouterMap, routerStack } from 'lib_foundation'
+import { ProductCardLabel, ProductCardItem } from 'lib_network'
 import { CommonLoading } from 'lib_widget'
 
 enum LabelPresetType {
@@ -51,6 +51,7 @@ export struct ProductList {
         .onReachEnd(() => {
           this.onReachEnd()
         })
+        .expandSafeArea()
       } else if (this.isLoading) {
         CommonLoading()
       } else {
@@ -86,7 +87,7 @@ export struct ProductList {
         }
         .width('100%')
         .justifyContent(FlexAlign.Start)
-        .padding({ top: $r('app.float.space_s') })
+        .padding({ top: $r('app.float.space_s'), bottom: $r('app.float.space_l') })
       }
     }
     .layoutWeight(1)
@@ -141,18 +142,24 @@ export struct ProductList {
       .height(80)
     }
     .onClick(() => {
-      routerStack.pushPath({ name: RouterMap.PRODUCT_INFO, param: product.productId })
+      routerStack.pushPath({
+        name: RouterMap.PRODUCT_INFO,
+        param: {
+          productId: product.productId,
+          slotId: product.slotId,
+        } as ProductInfoPageParam,
+      });
     })
-    .backgroundColor($r('app.color.background_color_white'))
+    .backgroundColor($r('app.color.background_color_primary'))
     .borderRadius($r('app.float.border_radius_l'))
     .padding($r('app.float.space_m'))
   }
 
   @Builder
-  buildLabel(labels: LabelItem[]) {
+  buildLabel(labels: ProductCardLabel[]) {
     if (labels.length) {
       Text() {
-        ForEach(labels, (label: LabelItem, index: number) => {
+        ForEach(labels, (label: ProductCardLabel, index: number) => {
           if (label.preset === LabelPresetType.PRIMARY) {
             Span(label.data).fontColor($r('app.color.label_color_primary'));
           } else if (label.preset === LabelPresetType.SECONDARY) {
@@ -161,7 +168,7 @@ export struct ProductList {
           if (index < labels.length - 1) {
             Span(' | ').fontColor($r('app.color.font_color_level3'));
           }
-        }, (label: LabelItem, index: number) => index + label.data);
+        }, (label: ProductCardLabel, index: number) => index + label.data);
       }
       .fontSize(12)
       .maxLines(1)
@@ -174,7 +181,7 @@ export struct ProductList {
     Row() {
       Row() {
         SymbolGlyph($r('sys.symbol.trash_fill'))
-          .fontColor([$r('app.color.background_color_white')])
+          .fontColor([$r('app.color.background_color_primary')])
           .fontSize(20)
       }
       .backgroundColor($r('sys.color.warning'))

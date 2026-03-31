@@ -35,36 +35,42 @@ export struct MyOrderPage {
         .fontColor(this.selectedIndex === index ? $r('sys.color.multi_color_08') : $r('sys.color.font_primary'))
         .fontSize($r('sys.float.Subtitle_M'))
         .fontWeight(this.selectedIndex === index ? FontWeight.Medium : FontWeight.Regular)
-        .margin({ top: 17, bottom: 7 })
+        .margin({ top: 17, bottom: 7 });
       Divider()
         .strokeWidth(2)
         .width(20)
         .color($r('sys.color.multi_color_08'))
-        .opacity(this.selectedIndex === index ? 1 : 0)
+        .opacity(this.selectedIndex === index ? 1 : 0);
     }
     .width('100%')
-    .height(44)
+    .height(44);
   }
 
   build() {
     Column() {
       Header({ title: '我的订单' })
+        .width('100%')
+        .height($r('app.float.vp_56'));
       Tabs({ barPosition: BarPosition.Start, index: this.currentIndex, controller: this.controller }) {
         TabContent() {
-          OrderListPage({ orderType: OrderListType.All, currentIndex: this.currentIndex })
+          OrderListPage({ orderType: OrderListType.All, currentIndex: this.currentIndex });
         }.tabBar(this.tabBuilder(0, '全部'))
+        .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM]);
 
         TabContent() {
-          OrderListPage({ orderType: OrderListType.WaitToPay, currentIndex: this.currentIndex })
+          OrderListPage({ orderType: OrderListType.WaitToPay, currentIndex: this.currentIndex });
         }.tabBar(this.tabBuilder(1, '待支付'))
+        .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM]);
 
         TabContent() {
-          OrderListPage({ orderType: OrderListType.Paid, currentIndex: this.currentIndex })
+          OrderListPage({ orderType: OrderListType.Paid, currentIndex: this.currentIndex });
         }.tabBar(this.tabBuilder(2, '已支付'))
+        .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM]);
 
         TabContent() {
-          OrderListPage({ orderType: OrderListType.Cancelled, currentIndex: this.currentIndex })
+          OrderListPage({ orderType: OrderListType.Cancelled, currentIndex: this.currentIndex });
         }.tabBar(this.tabBuilder(3, '已取消'))
+        .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM]);
       }
       .vertical(false)
       .barMode(BarMode.Fixed) //超过总宽度后可滑动
@@ -75,8 +81,12 @@ export struct MyOrderPage {
         this.currentIndex = index;
         this.selectedIndex = index;
       })
+      .layoutWeight(1)
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM]);
     }
     .width('100%')
     .height('100%')
+    .backgroundColor($r('sys.color.comp_background_primary'))
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM]);
   }
 }

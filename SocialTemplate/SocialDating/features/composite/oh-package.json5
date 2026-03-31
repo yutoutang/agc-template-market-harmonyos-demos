@@ -11,6 +11,9 @@
     "member": "file:../member",
     "feed": "file:../feed",
     "user": "file:../user",
-    "activity": "file:../activity"
+    "activity": "file:../activity",
+    "atomicservice_login": "file:../../components/atomicservice_login",
+    "dial_panel": "file:../../components/dial_panel",
+    "membership": "file:../../components/membership"
   }
 }

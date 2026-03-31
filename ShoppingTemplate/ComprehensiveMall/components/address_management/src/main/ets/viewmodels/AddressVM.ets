@@ -45,9 +45,9 @@ export class AddressVM {
   public updatedAt: number = 0;
 
   @Trace
-  latitude: number = 0
+  latitude: number = 0;
   @Trace
-  longitude: number = 0
+  longitude: number = 0;
 
   @Computed
   public get title(): string {

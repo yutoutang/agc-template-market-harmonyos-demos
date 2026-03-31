@@ -13,6 +13,10 @@ export struct BillCalendar {
   calendarHeight: Length = 360;
   @Param
   bgColor: ResourceColor = Color.White;
+  @Param
+  startDate: string = '';
+  @Param
+  endDate: string = '';
   @Local
   dateList: CalendarBillItemModel[] = [];
   @Event
@@ -25,6 +29,16 @@ export struct BillCalendar {
 
   aboutToAppear(): void {
     this.getDateList();
+  }
+
+  private isDateInRange(dateStr: string): boolean {
+    if (!this.startDate || !this.endDate) {
+      return true;
+    }
+    const date = dayjs(dateStr);
+    const start = dayjs(this.startDate);
+    const end = dayjs(this.endDate);
+    return date.isSame(start) || date.isSame(end) || (date.isAfter(start) && date.isBefore(end));
   }
 
   build() {
@@ -60,7 +74,8 @@ export struct BillCalendar {
               Text(item.day?.toString() ?? '')
                 .fontSize(14)
                 .fontWeight(FontWeight.Bold)
-                .fontColor(item.isCurMonth ? Constants.FONT_COLOR_LEVEL1 : Constants.FONT_COLOR_LEVEL3);
+                .fontColor(this.isDateInRange(item.dateStr) ?
+                  Constants.FONT_COLOR_LEVEL1 : Constants.FONT_COLOR_LEVEL3);
               Text(item.lunarDay)
                 .fontSize(10)
                 .fontWeight(FontWeight.Regular)
@@ -102,11 +117,10 @@ export struct BillCalendar {
         }
         .padding(4)
         .onClick(() => {
-          if (item.isCurMonth) {
+          if (this.isDateInRange(item.dateStr)) {
             this.handleDateClick?.(item.dateStr);
           }
         });
-
       }, (item: CalendarBillItemModel, index: number) => index + '__' + item.dateStr);
     }
     .height(this.calendarHeight)
@@ -118,26 +132,14 @@ export struct BillCalendar {
 
   getDateList() {
     let dateList: CalendarBillItemModel[] = [];
-    let firstDate = dayjs(this.month).startOf('month'); // 当月的第一天
-    let afterDate = dayjs(this.month).endOf('month'); // 当月的最后一天
-    let frontDay = 0; // 显示日历的第一天需要向前的天数
-    if (firstDate.day() === 0) {
-      frontDay = 6;
-    } else {
-      frontDay = firstDate.day() - 1;
-    }
-    let showFirstDay = firstDate.subtract(frontDay, 'day'); // 显示日历的第一天
+    let startDay = this.startDate ? dayjs(this.startDate) : dayjs(this.month).startOf('month');
+    let gridStartDay = startDay.startOf('week');
     for (let i = 0; i < 42; i++) {
-      let dayjsObj = showFirstDay.add(i, 'day');
+      let dayjsObj = gridStartDay.add(i, 'day');
       let day = dayjsObj.date();
       let lunarDay = '';
       let lunarColor = Constants.FONT_COLOR_LEVEL1;
       let lunarDate = Lunar.fromDate(dayjsObj.toDate());
-      let isCurMonth = true;
-      if (dayjsObj.isBefore(firstDate) || dayjsObj.isAfter(afterDate)) {
-        isCurMonth = false;
-        lunarColor = Constants.FONT_COLOR_LEVEL2;
-      }
       if (lunarDate.getFestivals().length !== 0) { // 显示节日
         lunarDay = lunarDate.getFestivals()[0];
         lunarColor = Constants.THEME_COLOR;
@@ -147,8 +149,14 @@ export struct BillCalendar {
       } else { // 显示农历日期
         lunarDay = lunarDate.getDayInChinese();
       }
-      dateList.push(new CalendarBillItemModel(dayjsObj, isCurMonth, dayjsObj.format('YYYY-MM-DD'), day, lunarDay,
-        lunarColor));
+
+      dateList.push(new CalendarBillItemModel(
+        dayjsObj,
+        dayjsObj.format('YYYY-MM-DD'),
+        day,
+        lunarDay,
+        lunarColor
+      ));
     }
     this.dateList = dateList;
   }

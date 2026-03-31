@@ -1,4 +1,5 @@
 import { webview } from '@kit.ArkWeb';
+import { emitter } from '@kit.BasicServicesKit';
 import { PersistenceV2 } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
 import { FeedComment, CommentOperation } from 'module_feedcomment';
@@ -14,7 +15,7 @@ import {
   loadingPage,
 } from 'lib_common';
 import { CommentResponse, NewsResponse } from 'lib_news_api';
-import { NavHeaderBar, Share } from 'lib_widget';
+import { BaseAgent, NavHeaderBar, Share } from 'lib_widget';
 import { FeedCard } from 'module_newsfeed';
 import { TextRead } from 'module_text_reader';
 import { CardLongTakeDelegate, LongTakeAnimationProperties } from 'module_transition';
@@ -33,6 +34,7 @@ export function ArticleFeedDetailsBuilder() {
 
 @ComponentV2
 export struct ArticleFeedDetails {
+  @Local isShow: boolean = true;
   @Local articleId: string = ''
   @Local pixelMap: PixelMap | null = null
   @Local settingInfo: SettingModel = PersistenceV2.connect(SettingModel, () => new SettingModel())!
@@ -47,8 +49,8 @@ export struct ArticleFeedDetails {
     let params = RouterUtils.getParamByName<RouterParams<NewsResponse>>(RouterMap.ARTICLE_FEED_DETAILS)
     let newsData = params?.cardData as NewsFeedInfo
     let isQueryCardData = params?.isQueryCardData as boolean
-    // 需要销毁广播创建的AvSession实例
-    await this.newsFeedVM.destroyAvSession()
+    // 销毁应用中其他AVSession
+    await this.newsFeedVM.destroyAVSession()
     if (isQueryCardData) {
       this.articleId = newsData.id
       this.newsFeedVM.setCardData(newsData)
@@ -63,6 +65,11 @@ export struct ArticleFeedDetails {
     this.bundleInfo = AppStorage.get('appInfo') as BundleInfo
     this.newsFeedVM.addHistory()
     this.newsFeedVM.setContinueData()
+    this.newsFeedVM.onGestureShare()
+  }
+
+  aboutToDisappear(): void {
+    this.newsFeedVM.offGestureShare()
   }
 
   readBody() {
@@ -166,6 +173,9 @@ export struct ArticleFeedDetails {
                     },
                     onComment: () => {
                       this.newsFeedVM.scrollToComment()
+                    },
+                    onQuestionExpand: (isShow) => {
+                      this.isShow = !isShow;
                     },
                   })
                 }
@@ -305,6 +315,10 @@ export struct ArticleFeedDetails {
         }
         .layoutWeight(1)
 
+        Flex({ justifyContent: FlexAlign.Center }) {
+          BaseAgent({ queryText: '' });
+        }.width('100%').position({ bottom: 108 }).visibility(this.isShow ? Visibility.Visible: Visibility.None);
+
         Column() {
           CommentOperation({
             commentCount: this.newsFeedVM.articleDetails.commentCount,
@@ -324,6 +338,7 @@ export struct ArticleFeedDetails {
             },
             onComment: (commentContent: string) => {
               this.newsFeedVM.addNewsComment(commentContent)
+              emitter.emit('recommendRefresh')
             },
           })
         }
@@ -333,7 +348,6 @@ export struct ArticleFeedDetails {
           right: this.newsBreakPoint.breakpointModel.pagePadding,
         })
       }
-
     }
     .backgroundColor($r('sys.color.comp_background_primary'))
   }

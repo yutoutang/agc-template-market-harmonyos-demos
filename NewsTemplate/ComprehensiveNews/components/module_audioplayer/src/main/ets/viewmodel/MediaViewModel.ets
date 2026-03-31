@@ -99,11 +99,12 @@ export class MediaViewModel {
         this.controlState.totalTime = AudioUtils.msToCountdownTime(this.getDuration())
         this.controlState.progressMax = this.getDuration()
         if (this.avPlayer && this.isNeedPlay) {
-          this.avPlayer.play().catch((e: BusinessError) => {
+          this.avPlayer.play().then(() => {
+            this.createSession();
+          }).catch((e: BusinessError) => {
             UtilLog.error(TAG, 'play fail, error: ' + JSON.stringify(e));
           });
         }
-        this.setAVMetadata();
         this.isNeedPlay = true;
         UtilLog.info(TAG, 'AVPlayer prepared succeeded.');
         break;
@@ -119,7 +120,7 @@ export class MediaViewModel {
       case 'completed':
         UtilLog.info(TAG, 'AVPlayer state completed called.');
         this.state = AudioPlayerState.COMPLETED;
-        this.playNext();
+        this.playNext(true);
         break;
       case 'stopped':
         UtilLog.info(TAG, 'AVPlayer state stopped called.');
@@ -219,7 +220,6 @@ export class MediaViewModel {
       if (avPlayer !== null) {
         this.avPlayer = avPlayer;
         this.setAVPlayerCallback();
-        this.createSession();
       }
     } catch (e) {
       UtilLog.error(TAG, 'this avPlayer: ', `catch error happened,error code is ${e.code}`);
@@ -241,27 +241,11 @@ export class MediaViewModel {
     this.avPlayer.on('volumeChange', this.volumeChangeCall);
   }
 
-  async createSession() {
+  setLaunchAbility() {
     if (!this.context) {
       return;
     }
-    try {
-      let session: avSession.AVSession = AppStorage.get('avSession') as avSession.AVSession
-      if (session) {
-        this.session = session
-      } else {
-        this.session = await avSession.createAVSession(this.context, 'SESSION_NAME', 'audio');
-        AppStorage.setOrCreate('avSession', this.session)
-      }
-      UtilLog.info(TAG, `session create done : sessionId : ${this.session.sessionId}`);
-      this.session.activate().catch((e: BusinessError) => {
-        UtilLog.error(TAG, 'activate fail, error: ' + JSON.stringify(e));
-      });
-    } catch (error) {
-      UtilLog.error(TAG, `${error.code} + ${error.message}`);
-    }
-    this.setAVMetadata();
-    let wantAgentInfo: wantAgent.WantAgentInfo = {
+    const wantAgentInfo: wantAgent.WantAgentInfo = {
       wants: [
         {
           bundleName: this.context.abilityInfo.bundleName,
@@ -272,17 +256,44 @@ export class MediaViewModel {
       requestCode: 0,
       wantAgentFlags: [wantAgent.WantAgentFlags.UPDATE_PRESENT_FLAG],
     };
-    wantAgent.getWantAgent(wantAgentInfo).then((agent) => {
-      if (this.session) {
-        this.session.setLaunchAbility(agent).catch((e: BusinessError) => {
-          UtilLog.error(TAG, 'setLaunchAbility fail, error: ' + JSON.stringify(e));
-        });
+    wantAgent.getWantAgent(wantAgentInfo)
+      .then((agent) => {
+        if (this.session) {
+          this.session.setLaunchAbility(agent).catch((e: BusinessError) => {
+            UtilLog.error(TAG, 'setLaunchAbility fail, error: ' + JSON.stringify(e));
+          });
+        }
+      }).catch((err: BusinessError) => {
+      UtilLog.error(TAG,
+        `getWantAgent failed, code: ${JSON.stringify(err.code)}, message: ${JSON.stringify(err.message)}`);
+    });
+  }
+
+  async createSession() {
+    if (!this.context) {
+      return;
+    }
+    try {
+      const session: avSession.AVSession = AppStorage.get('avSession') as avSession.AVSession;
+      if (session) {
+        this.session = session;
+        UtilLog.info(TAG, `session exist: sessionId : ${this.session.sessionId}`);
+      } else {
+        this.session = await avSession.createAVSession(this.context, 'SESSION_AUDIO', 'audio');
+        AppStorage.setOrCreate('avSession', this.session);
+        BackgroundUtils.startContinuousTask(this.context);
+        this.setLaunchAbility();
+        UtilLog.info(TAG, `session create done : sessionId : ${this.session.sessionId}`);
       }
-    })
-      .catch((err: BusinessError) => {
-        UtilLog.error(`getWantAgent failed, code: ${JSON.stringify(err.code)}, message: ${JSON.stringify(err.message)}`);
+      this.setAVMetadata();
+      this.updateIsPlay(true);
+      this.setListenerForMesFromController();
+      this.session.activate().catch((e: BusinessError) => {
+        UtilLog.error(TAG, 'activate fail, error: ' + JSON.stringify(e));
       });
-    this.setListenerForMesFromController();
+    } catch (error) {
+      UtilLog.error(TAG, `Failed to createAVSession, code: ${error.code}, message: ${error.message}`);
+    }
   }
 
   async setListenerForMesFromController() {
@@ -354,7 +365,6 @@ export class MediaViewModel {
       UtilLog.error(TAG, `current musicIndex ${audioIndex}`);
       return;
     }
-    BackgroundUtils.startContinuousTask(this.context);
     this.updateMusicIndex(audioIndex);
     if (this.isFirst && this.avPlayer) {
       this.isFirst = false;
@@ -442,6 +452,9 @@ export class MediaViewModel {
     }
   }
 
+  public checkPlayPrevious: (currentIndex: number) => boolean = () => true;
+  public checkPlayNext: (currentIndex: number, isAutoNext: boolean) => boolean = () => true;
+
   /**
    * 播放音频
    */
@@ -450,14 +463,13 @@ export class MediaViewModel {
       return
     }
     UtilLog.info(TAG, 'AVPlayer play() isPrepared:' + this.isPrepared + ', state:' + this.state);
-    BackgroundUtils.startContinuousTask(this.context);
     if (!this.isPrepared) {
       this.start(0);
     } else if (this.avPlayer) {
-      this.avPlayer.play().then(() => {
+      this.avPlayer.play().then(async () => {
         UtilLog.info(TAG, 'progressTime play() current time:' + this.getCurrentTime());
         this.seek(this.getCurrentTime());
-        this.updateIsPlay(true);
+        await this.createSession();
         this.state = AudioPlayerState.PLAY;
       }).catch((e: BusinessError) => {
         UtilLog.error(TAG, 'play fail, error: ' + JSON.stringify(e));
@@ -483,8 +495,12 @@ export class MediaViewModel {
     }
   }
 
-  public playNext() {
+  public playNext(isAutoNext: boolean = false) {
     UtilLog.info(TAG, 'playNext Index:' + this.audioIndex + ', length-1:' + (this.audioList.length - 1));
+    const canPlayNext = this.checkPlayNext(this.audioIndex, isAutoNext);
+    if (!canPlayNext) {
+      return;
+    }
     if (this.audioIndex === this.audioList.length - 1) {
       this.loadAssent(0);
     } else {
@@ -496,6 +512,10 @@ export class MediaViewModel {
    * 播放上一首
    */
   public playPrevious() {
+    const canPlayPrevious = this.checkPlayPrevious(this.audioIndex);
+    if (!canPlayPrevious) {
+      return;
+    }
     switch (this.playMode) {
       case AudioPlayMode.ORDER:
       case AudioPlayMode.SINGLE_CYCLE:

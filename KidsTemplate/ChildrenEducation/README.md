@@ -196,9 +196,9 @@ ChildrenEducation
 
 ## 约束与限制
 ### 环境
-* DevEco Studio版本：DevEco Studio 6.0.1 Release及以上
-* HarmonyOS SDK版本：HarmonyOS 6.0.1 Release SDK及以上
-* 设备类型：华为手机（包括双折叠和阔折叠）
+* DevEco Studio版本：DevEco Studio 6.0.2 Release及以上
+* HarmonyOS SDK版本：HarmonyOS 6.0.2 Release SDK及以上
+* 设备类型：华为手机（包括双折叠和阔折叠）、华为平板
 * HarmonyOS版本：HarmonyOS 6.0.1(21) 及以上
 
 ### 权限
@@ -268,6 +268,7 @@ ChildrenEducation
 7. 对应用进行[手工签名](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-signing#section297715173233)。
 
 8. 添加手工签名所用证书对应的公钥指纹，详细参考：[配置应用证书指纹](https://developer.huawei.com/consumer/cn/doc/app/agc-help-cert-fingerprint-0000002278002933)。
+9. 配置App Linking，详细参考：[App Lingking](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/applinking-introduction)。
 
 ### 运行调试工程
 1. 连接调试手机和PC。

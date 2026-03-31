@@ -1,7 +1,9 @@
 
-
 @ComponentV2
 export struct TitleBar {
+
+  @Param
+  public title: string | Resource = '';
 
   @Param
   public hideBackButton: boolean = false;
@@ -12,19 +14,10 @@ export struct TitleBar {
   @Param
   public barExpandSafeArea: boolean = true;
 
-  @Param
-  public barPadding: Padding = {};
-
   @Event
   public onBackButtonClick: () => void = () => {};
 
-  @BuilderParam
-  private titleContentBuilder: () => void = buildEmptyComponent;
-
-  // 在 ArkUI Inspector 中查看到元服务胶囊的宽度为 80.92
-  private atomicServiceBarWidth: number = this.getUIContext().getAtomicServiceBar()?.getBarRect().width ?? 80.92;
-
-  build() {
+  public build(): void {
     Row() {
       Row() {
         if (!this.hideBackButton) {
@@ -40,14 +33,14 @@ export struct TitleBar {
           .justifyContent(FlexAlign.Center)
           .onClick(this.onBackButtonClick)
         }
-        Column() {
-          this.titleContentBuilder();
-        }
-        .layoutWeight(1)
-        .height(56)
-        .alignItems(HorizontalAlign.Start)
-        .justifyContent(FlexAlign.Center)
-        .padding(this.barPadding)
+        Text(this.title)
+          .fontSize($r('sys.float.Title_S'))
+          .fontColor($r('sys.color.font_primary'))
+          .fontWeight(FontWeight.Bold)
+          .margin({ left: 8 })
+          .layoutWeight(1)
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
       }
       .width('100%')
       .height('100%')
@@ -55,14 +48,8 @@ export struct TitleBar {
       .justifyContent(FlexAlign.Start)
       .backgroundColor(this.barColor)
       .expandSafeArea([SafeAreaType.SYSTEM, SafeAreaType.CUTOUT], this.barExpandSafeArea ? [SafeAreaEdge.TOP] : [])
-      .padding({ right: this.atomicServiceBarWidth + 8 })
     }
     .width('100%')
     .height(56)
   }
-}
-
-@Builder
-function buildEmptyComponent() {
-  // No need to do anything
 }

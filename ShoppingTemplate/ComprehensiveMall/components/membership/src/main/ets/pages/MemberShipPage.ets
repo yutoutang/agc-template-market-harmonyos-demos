@@ -18,6 +18,7 @@ export struct MemberShipPage {
     ResourceColor,
     number
   ]> = [['#FFFFFF', 0.0], ['#E5EDF5', 0.5], ['#0A59F7', 1.0]];
+  @Local showBlur: boolean = false
   @Param themeColor: ResourceStr = $r('app.color.theme_color');
   @Param routerModule: NavPathStack = new NavPathStack();
   @Param isSheet: boolean = false;
@@ -32,6 +33,7 @@ export struct MemberShipPage {
   });
   private privacyCheckNode?: ComponentContent<Object>;
   private uiContext: UIContext = this.getUIContext();
+  private scroller: Scroller = new Scroller()
 
   @Computed
   get memberStatus() {
@@ -91,11 +93,28 @@ export struct MemberShipPage {
   Operation() {
     if (!this.isSheet) {
       Row({ space: 8 }) {
-        Image($r('app.media.membership_back')).size({ width: 40, height: 40 }).onClick(() => {
-          this.routerModule.pop();
-        });
+        Button() {
+          SymbolGlyph($r('sys.symbol.chevron_backward'))
+            .fontSize(24)
+            .fontColor([$r('sys.color.icon_primary')])
+            .fontWeight(FontWeight.Normal);
+        }
+        .width(40)
+        .height(40)
+        .margin({ right: 8 })
+        .type(ButtonType.Circle)
+        .backgroundColor($r('sys.color.comp_background_tertiary'))
+        .onClick(() => this.routerModule.pop());
+
         Text('会员中心').fontSize(20).fontWeight(FontWeight.Bold).fontColor($r('sys.color.font_primary'));
-      }.position({ left: 16 }).zIndex(2);
+      }
+      .position({ left: 0, right: 0 })
+      .padding({ bottom: 12, left: 16 })
+      .zIndex(2)
+      .backgroundBlurStyle(this.showBlur ? BlurStyle.Thin : BlurStyle.NONE,
+        { colorMode: ThemeColorMode.LIGHT, adaptiveColor: AdaptiveColor.DEFAULT, scale: 1.0 })
+      .width('100%')
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP]);
     }
   }
 
@@ -300,7 +319,10 @@ export struct MemberShipPage {
       .backgroundColor($r('sys.color.comp_background_primary'))
       .borderRadius(16)
       .scrollBar(BarState.Off)
-      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+      .nestedScroll({
+        scrollForward: NestedScrollMode.PARENT_FIRST,
+        scrollBackward: NestedScrollMode.SELF_FIRST,
+      })
     }
     .margin({ top: 24 })
     .width('100%')
@@ -382,7 +404,7 @@ export struct MemberShipPage {
         this.Operation();
 
         Column() {
-          Scroll() {
+          Scroll(this.scroller) {
             Column() {
               if (!this.isSheet) {
                 this.Owned();
@@ -400,6 +422,16 @@ export struct MemberShipPage {
           .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
           .scrollBar(BarState.Off)
           .edgeEffect(EdgeEffect.Spring)
+          .onWillScroll((xOffset: number, yOffset: number) => {
+            if (yOffset > 0) {
+              this.showBlur = true;
+            }
+          })
+          .onScrollEdge((side: Edge) => {
+            if (side === Edge.Top) {
+              this.showBlur = false;
+            }
+          });
 
           if (this.renewMemberSubscribedStatus && this.vm.enablePurchase) {
             this.Activation();

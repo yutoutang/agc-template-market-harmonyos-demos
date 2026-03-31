@@ -1,4 +1,4 @@
-import { RouterModule } from 'router_module';
+import { RouterModule } from 'commonlib';
 
 @Builder
 export function AuthenticationPageBuilder() {
@@ -10,7 +10,9 @@ export struct AuthenticationPage {
   build() {
     Column() {
       Row() {
-        Image($r('app.media.ic_backward')).size({ width: 40, height: 40 })
+        Image($r('app.media.ic_back'))
+          .size({ width: $r('app.float.vp_40'), height: $r('app.float.vp_40') })
+          .borderRadius($r('app.float.vp_20'))
           .margin({ left: 16 })
           .onClick(() => {
             RouterModule.pop();
@@ -18,7 +20,6 @@ export struct AuthenticationPage {
         Blank();
       }
       .justifyContent(FlexAlign.Start)
-      .backgroundColor($r('sys.color.background_primary'))
       .size({ width: '100%', height: 56 });
 
       Scroll() {
@@ -82,6 +83,8 @@ export struct AuthenticationPage {
     }
     .alignItems(HorizontalAlign.Start)
     .width('100%')
-    .height('100%');
+    .height('100%')
+    .backgroundColor($r('sys.color.background_secondary'))
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM]);
   }
 }

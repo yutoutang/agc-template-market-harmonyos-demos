@@ -6,6 +6,6 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "asset_base": "file:../asset_base"
+    "asset_base": "file:../asset_base",
   }
 }

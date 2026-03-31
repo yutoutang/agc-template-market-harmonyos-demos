@@ -1,9 +1,0 @@
-{
-  "module": {
-    "name": "add_address",
-    "type": "har",
-    "deviceTypes": [
-      "default"
-    ]
-  }
-}

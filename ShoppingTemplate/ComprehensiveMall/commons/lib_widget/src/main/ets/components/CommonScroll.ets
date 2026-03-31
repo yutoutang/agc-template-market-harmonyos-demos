@@ -1,7 +1,7 @@
 @ComponentV2
 export struct CommonScroll {
   @Param
-  bgColor: ResourceColor = $r('app.color.background_color_white')
+  bgColor: ResourceColor = $r('app.color.background_color_primary')
   @BuilderParam
   contentBuilder: () => void = this.buildEmpty;
 

@@ -25,12 +25,18 @@ export struct FeedCard {
   @Param searchKey: string = ''
   @Param isNeedFollow: boolean = false
   @BuilderParam shareBuilder: () => void
-  @Event onArticle: (type?: string) => void = () => {}
-  @Event onVideo: (type?: string) => void = () => {}
-  @Event onWatch: () => void = () => {}
-  @Event onLike: () => void = () => {}
-  @Event onComment: () => void = () => {}
-  @Event onGoUserInfo: (authorId: string) => void = () => {}
+  @Event onArticle: (type?: string) => void = () => {
+  }
+  @Event onVideo: (type?: string) => void = () => {
+  }
+  @Event onWatch: () => void = () => {
+  }
+  @Event onLike: () => void = () => {
+  }
+  @Event onComment: () => void = () => {
+  }
+  @Event onGoUserInfo: (authorId: string) => void = () => {
+  }
   controller: VideoController = new VideoController()
   @Local userInfoModel: UserInfoModel = PersistenceV2.connect(UserInfoModel, () => new UserInfoModel())!;
 
@@ -74,7 +80,7 @@ export struct FeedCard {
     .borderRadius(14)
     .justifyContent(FlexAlign.Center)
     .visibility(!this.isNeedFollow && !this.isFeedSelf ?
-    Visibility.Visible : Visibility.None)
+      Visibility.Visible : Visibility.None)
   }
 
   build() {
@@ -97,7 +103,7 @@ export struct FeedCard {
         followBuilderParam: () => {
           this.followBuilder()
         },
-        onVideo:() => {
+        onVideo: () => {
           this.onVideo()
         },
         publishCustomTimeBuilder: () => {

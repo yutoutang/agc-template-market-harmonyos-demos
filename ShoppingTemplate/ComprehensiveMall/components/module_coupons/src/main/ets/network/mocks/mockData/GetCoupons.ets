@@ -34,7 +34,7 @@ class CommonRules {
     discountMode: '0',
     discountType: '1',
     fullAmount: '',
-    discountAmount: '15',
+    discountAmount: '5',
     discountCoefficient: '',
   };
   // 折扣

@@ -8,8 +8,9 @@ export interface Course {
   cover?: ResourceStr; // 封面
   courseDuration?: number; // 课程时长 单位为秒
   learnProgress?: number; //进度
-  time: number; // 发布时间
+  time?: number; // 发布时间
   courseCatalog?: CourseCatalog[]; // 课程章节
+  difficultyLevel?: string,
 }
 
 export interface CourseCatalog {

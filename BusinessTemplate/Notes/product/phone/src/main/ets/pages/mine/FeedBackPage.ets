@@ -31,13 +31,15 @@ export struct FeedBackPage {
               num: 3,
               butOnClick: (val: FeedbackItemType) => {
                 this.feedList = val;
-                let info = PreferenceUtil.getInstance().get(PreferConstant.FEEDBACK_RECORD, []) as FeedbackItemType[]
+                const context = this.getUIContext().getHostContext() as Context;
+                const preferenceUtil = PreferenceUtil.getInstance(context);
+                let info = preferenceUtil.get(PreferConstant.FEEDBACK_RECORD, []) as FeedbackItemType[]
                 let arr: FeedbackItemType[] = []
                 info.forEach((model: FeedbackItemType) => {
                   arr.push(model)
                 })
                 arr.push(this.feedList)
-                PreferenceUtil.getInstance().put(PreferConstant.FEEDBACK_RECORD, arr)
+                PreferenceUtil.getInstance(context).put(PreferConstant.FEEDBACK_RECORD, arr)
                 this.getUIContext().getPromptAction().showToast({ message: '提交成功', duration: 2000 });
                 this.appPathStack.pop();
               }

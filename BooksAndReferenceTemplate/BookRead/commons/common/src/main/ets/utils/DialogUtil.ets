@@ -28,7 +28,6 @@ export class DialogUtil {
     try {
       if (!DialogUtil.uiContext) {
         DialogUtil.uiContext = await getUIContext()
-
       }
       DialogUtil.contentNode = new ComponentContent(DialogUtil.uiContext, dialogBuilder, params)
       let options: promptAction.BaseDialogOptions = {

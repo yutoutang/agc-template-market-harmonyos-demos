@@ -71,6 +71,8 @@ export class BookVM {
   @Trace tableWares: string[] = [];
   // 备注
   @Trace tips: string = '';
+  // 缓存输入的内容
+  @Trace tipTemps: string = '';
   // 排号结果订单
   @Trace order: BookOrderDetail | undefined;
   // 添加日程
@@ -119,6 +121,7 @@ export class BookVM {
     this.decoration = '';
     this.tableWares.length = 0;
     this.tips = '';
+    this.tipTemps = '';
   }
 
   // 确定时间选择

@@ -4,7 +4,8 @@ import { display } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { PlayerLayoutSize } from '../controller/PlayerLayoutSize';
 import { VideoPlayerModel } from './VideoPlayerModel';
-import { AVPlayerManager, AVPlayerSession } from '../controller/AVPlayerManager';
+import { AVPlayerManager } from '../controller/AVPlayerManager';
+import { AVPlayerController } from '../controller/AVPlayerController';
 import { VideoPlayerData } from '../type/Index';
 import { Logger } from '../utils/Logger';
 
@@ -15,7 +16,7 @@ export class SwipePlayerModel extends VideoPlayerModel {
   // AVPlayer管理器
   avPlayerManager: AVPlayerManager = new AVPlayerManager()
   // 视频播放会话
-  playerSession: AVPlayerSession = new AVPlayerSession();
+  avPlayerController: AVPlayerController = new AVPlayerController();
   componentId: string = ''
   xComponentId: string = ''
   // 视频渲染尺寸
@@ -37,14 +38,14 @@ export class SwipePlayerModel extends VideoPlayerModel {
     return this.checkVideoSize() && !this.isAccelerate && !this.playerLayoutSize.getSlideMovingFlag()
   }
 
-  initPlayerManager(data: VideoPlayerData, videoItemPlayerSession?: AVPlayerSession) {
+  initPlayerManager(data: VideoPlayerData, avPlayerController?: AVPlayerController) {
     // 设置视频数据
     this.setVideoData(data);
     this.playerId = 'player_' + data.getVideoId() + util.generateRandomUUID();
 
-    if (this.index === 0 && videoItemPlayerSession) {
+    if (this.index === 0 && avPlayerController) {
       this.isFromList = true;
-      this.itemAVPlayer = videoItemPlayerSession!.avPlayer
+      this.itemAVPlayer = avPlayerController!.avPlayer
       this.itemAVPlayer?.pause().catch((e: BusinessError) => {
         Logger.error(TAG, 'initPlayerManager fail, error: ' + JSON.stringify(e));
       }).finally(() => {
@@ -52,42 +53,40 @@ export class SwipePlayerModel extends VideoPlayerModel {
       })
     }
     this.avPlayerManager.setPlayerId(this.index, this.playerId);
-    this.avPlayerManager.setSession(this.playerId, this.playerSession!);
+    this.avPlayerManager.setAVPlayerController(this.playerId, this.avPlayerController!);
   }
 
-  async initAVPlayer() {
+  async initAVPlayer(enableSession: boolean) {
     try {
       // 从视频推荐页或新闻详情页进入的短视频滑动页
       if (this.isFromList && this.index === 0 && this.itemAVPlayer) {
         this.showCover = false
         this.isPause = false
         this.itemAVPlayer!.surfaceId = this.surfaceId
-        this.playerSession.setAVPlayer(this.itemAVPlayer);
-        this.initPlayerListener(this.itemAVPlayer)
+        this.avPlayerController.setAVPlayer(this.itemAVPlayer);
+        if (enableSession) {
+          this.onAVPlayerChangeBySession();
+        }
+        this.initPlayerListener(this.itemAVPlayer);
         await this.itemAVPlayer.play();
         return
       }
       // 创建播放器
       const avPlayer = await media.createAVPlayer();
       if (avPlayer) {
-        this.playerSession.setAVPlayer(avPlayer);
+        this.avPlayerController.setAVPlayer(avPlayer);
         // 设置视频url
         this.setDataSource();
+        // 配置播控中心
+        if (enableSession) {
+          this.onAVPlayerChangeBySession();
+        }
         // 初始化监听事件
-        this.initPlayerListener(avPlayer)
+        this.initPlayerListener(avPlayer);
       }
     } catch (e) {
       Logger.error(TAG, 'createAVPlayer fail, error: ' + JSON.stringify(e));
     }
-  }
-
-  initPlayerListener(avPlayer: media.AVPlayer) {
-    // 设置状态监听
-    this.onStateChangeListener(avPlayer);
-    // 设置播放器事件回调
-    this.setAVPlayerCallback(avPlayer);
-    // 设置音频事件回调
-    this.setAVPlayerInterruptCallback(avPlayer)
   }
 
   initXComponentId() {
@@ -98,9 +97,9 @@ export class SwipePlayerModel extends VideoPlayerModel {
   async playOrPause() {
     try {
       if (this.isPause) {
-        await this.playerSession?.avPlayer?.play();
+        await this.avPlayerController?.avPlayer?.play();
       } else {
-        await this.playerSession?.avPlayer?.pause();
+        await this.avPlayerController?.avPlayer?.pause();
       }
     } catch (e) {
       Logger.error(TAG, 'playOrPause fail, error: ' + JSON.stringify(e));
@@ -152,13 +151,13 @@ export class SwipePlayerModel extends VideoPlayerModel {
 
   // 长按加速
   onLongPress(event: GestureEvent) {
-    if (this.playerSession?.avPlayer?.state === 'playing' && !this.isBuffering) {
+    if (this.avPlayerController?.avPlayer?.state === 'playing' && !this.isBuffering) {
       // 快进图标显隐变化
       this.leftRateOpacity = 1;
       this.rightRateOpacity = 0;
       if (event?.repeat) {
         this.isAccelerate = true;
-        this.playerSession.avPlayer.setSpeed(media.PlaybackSpeed.SPEED_FORWARD_2_00_X)
+        this.avPlayerController.avPlayer.setSpeed(media.PlaybackSpeed.SPEED_FORWARD_2_00_X)
       }
     }
   }
@@ -166,6 +165,6 @@ export class SwipePlayerModel extends VideoPlayerModel {
   // 取消长按
   offLongPress() {
     this.isAccelerate = false;
-    this.playerSession?.avPlayer?.setSpeed(media.PlaybackSpeed.SPEED_FORWARD_1_00_X)
+    this.avPlayerController?.avPlayer?.setSpeed(media.PlaybackSpeed.SPEED_FORWARD_1_00_X)
   }
 }

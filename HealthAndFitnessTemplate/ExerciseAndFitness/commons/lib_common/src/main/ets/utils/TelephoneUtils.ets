@@ -11,13 +11,17 @@ export class TelephoneUtils {
    */
   public static callPhone(tel: string) {
     if (canIUse('SystemCapability.Applications.Contacts')) {
-      call.makeCall(tel, (err: BusinessError) => {
-        if (!err) {
-          Logger.info(TAG, 'make call success.');
-        } else {
-          Logger.info(TAG, 'make call fail, err is:' + JSON.stringify(err));
-        }
-      });
+      try {
+        call.makeCall(tel, (err: BusinessError) => {
+          if (!err) {
+            Logger.info(TAG, 'make call success.');
+          } else {
+            Logger.info(TAG, 'make call fail, err is:' + JSON.stringify(err));
+          }
+        });
+      } catch (e) {
+        console.error(`Failed to make call. error: ${JSON.stringify(e)}`)
+      }
     } else {
       Logger.error(TAG, 'Contacts not available by this device.');
     }

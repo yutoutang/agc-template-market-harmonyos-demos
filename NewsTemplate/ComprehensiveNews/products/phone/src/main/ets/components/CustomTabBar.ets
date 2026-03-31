@@ -1,6 +1,6 @@
 import { AppStorageV2 } from '@kit.ArkUI';
-import { CommonConstants, TabModel } from 'lib_common';
-import { PhoneConstants, TabBarItem, TabBarType } from '../common/Constants';
+import { CommonConstants, TabModel, TabBarType } from 'lib_common';
+import { PhoneConstants, TabBarItem } from '../common/Constants';
 
 @ComponentV2
 export struct CustomTabBar {

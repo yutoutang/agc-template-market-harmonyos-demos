@@ -2,7 +2,7 @@
 
 - [简介](#简介)
 - [约束与限制](#约束与限制)
-- [快速入门](#快速入门)
+- [使用](#使用)
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
@@ -36,7 +36,7 @@
 无
 
 
-## 快速入门
+## 使用
 
 1. 安装组件。
 
@@ -287,9 +287,10 @@ struct Example1 {
 ### 示例2 （资产数据刷新，点击、删除事件的使用）
 
 ```ts
-import { AssetCategory, AssetGroupModel, AssetRecordItem, AssetType } from 'asset_base';
+import { AssetCategory, AssetGroupModel, AssetRecordItem, AssetType, Logger } from 'asset_base';
 import { AssetCard } from 'asset_card';
-import { promptAction } from '@kit.ArkUI';
+
+const TAG = '[AssetCardExample3]'
 
 const MOCK_FUND_LIST: AssetRecordItem[] = [
   {
@@ -306,7 +307,9 @@ const MOCK_FUND_LIST: AssetRecordItem[] = [
 
 @Entry
 @ComponentV2
-struct Example2 {
+struct AssetCardExample3 {
+  @Local
+  anonymous: boolean = false;
   @Local
   assetData: AssetGroupModel = new AssetGroupModel();
 
@@ -316,7 +319,7 @@ struct Example2 {
 
   build() {
     Column({ space: 16 }) {
-      Button('新增资产').onClick(() => {
+      Button('添加资产').onClick(() => {
         const assetId = this.assetData.fund.length;
         const newItem: AssetRecordItem = {
           assetId: assetId,
@@ -334,7 +337,14 @@ struct Example2 {
       AssetCard({
         assetData: this.assetData,
         handleClick: (item) => {
-          promptAction.showToast({ message: `点击了资产账户${item.name},余额为${item.amount}元` });
+          try {
+            this.getUIContext().getPromptAction().showToast({
+              message: `点击了资产账户${item.name},余额为${item.amount}元`,
+              alignment: Alignment.Center,
+            });
+          } catch (err) {
+            Logger.error(TAG, 'show toast failed. error:' + JSON.stringify(err));
+          }
         },
         handleDelete: (id) => {
           const idx = this.assetData.fund.findIndex((item) => item.assetId === id);

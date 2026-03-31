@@ -25,15 +25,15 @@ class CouponApiMock {
   public start(adapter: AxiosMockAdapter) {
     adapter.onGet(RequestUrl.URL_COUPONS_GET)
       .reply((config: AxiosRequestConfig) => {
-        const params = config.params as GetCouponsRequest
-        let res = getCouponsMockNull
+        const params = config.params as GetCouponsRequest;
+        let res = getCouponsMockNull;
         if (params.status === '2') {
           res = getCouponsMock1;
         } else if (params.status === '3' && params.couponStatus === '1') {
           res = getCouponsMock2;
         }
-        return [HttpStatusCode.Ok, res]
-      })
+        return [HttpStatusCode.Ok, res];
+      });
   }
 }
 export const adapter = new AxiosMockAdapter(request, {

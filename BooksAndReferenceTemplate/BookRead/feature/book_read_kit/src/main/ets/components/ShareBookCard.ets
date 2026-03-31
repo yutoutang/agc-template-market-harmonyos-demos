@@ -11,6 +11,7 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 export struct ShareBookCard {
   @Param @Require book: BookInfo;
   @Param isShelf?: boolean = false;
+  @Param shareImage?: ResourceStr = $r('app.media.ic_share')
   setShareData() {
     const contextFaker: Context = this.getUIContext().getHostContext() as Context;
     let bookUri = `${this.book.id}.png`
@@ -58,7 +59,7 @@ export struct ShareBookCard {
 
   build() {
     if (this.isShelf) {
-      Column({space:5}){
+      Column({ space: 5 }) {
         Image($r('app.media.ic_share'))
           .height(24)
           .width(24)
@@ -69,19 +70,16 @@ export struct ShareBookCard {
           .fontColor($r('sys.color.font_primary'))
           .fontWeight(FontWeight.Regular)
       }
-      .onClick(()=>{
+      .onClick(() => {
         this.setShareData()
       })
     } else {
-      Image($r('app.media.ic_share'))
+      Image(this.shareImage)
         .width(35)
         .height(35)
         .onClick(() => {
           this.setShareData()
         })
     }
-
-
-
   }
 }

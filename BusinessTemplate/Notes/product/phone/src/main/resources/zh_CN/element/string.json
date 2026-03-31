@@ -13,6 +13,14 @@
       "value": "笔记模板"
     },
     {
+      "name": "notecard_desc",
+      "value": "显示最近的笔记"
+    },
+    {
+      "name": "notecard_display_name",
+      "value": "笔记卡片"
+    },
+    {
       "name": "avatar",
       "value": "头像"
     },
@@ -130,7 +138,7 @@
     },
     {
       "name": "agcit_huawei_notes",
-      "value": "1.0.2"
+      "value": "1.0.4"
     }
   ]
 }

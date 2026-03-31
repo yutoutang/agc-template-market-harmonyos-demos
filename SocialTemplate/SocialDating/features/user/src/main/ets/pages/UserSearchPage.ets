@@ -1,7 +1,7 @@
 import { SearchCondition } from '../model/SearchCondition';
-import { UserFullInfo, BasicUserInfo, CommonUtils, NavigationTitleBuilder, Constants } from 'commons';
+import { UserFullInfo, BasicUserInfo, CommonUtils, NavigationTitleBuilder, Constants, LoginState } from 'commons';
 import Logger from 'commons/src/main/ets/utils/Logger';
-import { PromptAction, UIContext } from '@kit.ArkUI';
+import { AppStorageV2, PromptAction, UIContext } from '@kit.ArkUI';
 import { RangeField } from '../model/RangeField';
 import { EnumField } from '../model/EnumField';
 import { resourceManager } from '@kit.LocalizationKit';
@@ -12,16 +12,17 @@ export function UserSearchPageBuilder() {
   UserSearchPage()
 }
 
-@Component
+@ComponentV2
 export struct UserSearchPage {
-  @Consume('pageStack') pageStack: NavPathStack;
+  @Consumer('pageStack') pageStack: NavPathStack = new NavPathStack();
   private scroller: Scroller = new Scroller();
-  @State searchCondition: SearchCondition = new SearchCondition();
-  @State selectedCity: string = Constants.PLEASE_CHOOSE;
-  @State originFrom: string = Constants.PLEASE_CHOOSE;
-  @State ethnicGroup: string = Constants.PLEASE_CHOOSE;
+  @Local searchCondition: SearchCondition = new SearchCondition();
+  @Local selectedCity: string = Constants.PLEASE_CHOOSE;
+  @Local originFrom: string = Constants.PLEASE_CHOOSE;
+  @Local ethnicGroup: string = Constants.PLEASE_CHOOSE;
+  @Local loginStateStorage : LoginState = AppStorageV2.connect(LoginState, 'LoginState', () =>new LoginState())!
   private promptAction: PromptAction = this.getUIContext().getPromptAction();
-  @State member: boolean = true;
+  @Local member: boolean = true;
 
   aboutToAppear(): void {
     let currentUser: BasicUserInfo | undefined = AppStorage.get(Constants.CURRENT_USER_BASIC);
@@ -32,7 +33,7 @@ export struct UserSearchPage {
 
   build() {
     NavDestination() {
-      Stack() {
+      Column() {
         Scroll(this.scroller) {
           Column() {
             this.buildSearchInputRow()
@@ -47,7 +48,7 @@ export struct UserSearchPage {
             } else {
               this.buildMemberSearchArea(false, 20)
             }
-            Blank().height(50)
+            this.buildButtonRow()
           }
         }
         .scrollable(ScrollDirection.Vertical)
@@ -55,51 +56,6 @@ export struct UserSearchPage {
         .scrollBarColor(0xFFF8F6F6)
         .scrollBarWidth(5)
         .edgeEffect(EdgeEffect.Spring)
-
-        Row() {
-          Column() {
-            Image($r('app.media.ic_arrow_clockwise')).width(20).height(20).margin({ bottom: 2 })
-            Text('重置')
-              .fontSize($r('sys.float.Body_S'))
-              .fontWeight(FontWeight.Regular)
-              .fontFamily('HarmonyHeiTi')
-              .fontColor($r('app.color.title_font_color'))
-          }
-          .onClick(() => {
-            this.searchCondition = new SearchCondition();
-            this.selectedCity = Constants.PLEASE_CHOOSE;
-            this.originFrom = Constants.PLEASE_CHOOSE;
-            this.ethnicGroup = Constants.PLEASE_CHOOSE;
-          })
-          .width('18%')
-          .justifyContent(FlexAlign.Center)
-          .alignItems(HorizontalAlign.Center)
-          .margin({ top: 12, bottom: 12 })
-
-          Column() {
-            Button('确定')
-              .width('90%')
-              .margin({ right: 16 })
-              .backgroundColor($r('app.color.button_background_color'))
-              .fontSize($r('sys.float.Body_L'))
-              .onClick(() => {
-                Logger.debug('--------searchCondition=' + JSON.stringify(this.searchCondition))
-                if (this.checkSearchCondition()) {
-                  UserService.searchUsers(this.searchCondition).then((data: UserFullInfo[] | null) => {
-                    Logger.debug('--------search result=' + JSON.stringify(data))
-                    this.pageStack.pushPathByName('UserListPage', data);
-                  })
-                }
-              })
-          }.width('82%').margin({ top: 12, bottom: 12 })
-        }
-        .position({ y: '92%' })
-        .width('100%')
-        .height(90)
-        .justifyContent(FlexAlign.Center)
-        .alignItems(VerticalAlign.Center)
-        .backgroundColor(Color.White)
-        .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
       }
     }.onReady((context: NavDestinationContext) => {
       this.pageStack = context.pathStack
@@ -126,6 +82,50 @@ export struct UserSearchPage {
   }
 
   @Builder
+  buildButtonRow() {
+    Row() {
+      Column() {
+        Image($r('app.media.ic_arrow_clockwise')).width(20).height(20).margin({ bottom: 2 })
+        Text('重置')
+          .fontSize($r('sys.float.Body_S'))
+          .fontWeight(FontWeight.Regular)
+          .fontFamily('HarmonyHeiTi')
+          .fontColor($r('app.color.title_font_color'))
+      }
+      .onClick(() => {
+        this.searchCondition = new SearchCondition();
+        this.selectedCity = Constants.PLEASE_CHOOSE;
+        this.originFrom = Constants.PLEASE_CHOOSE;
+        this.ethnicGroup = Constants.PLEASE_CHOOSE;
+      })
+      .width('18%')
+      .justifyContent(FlexAlign.Center)
+      .alignItems(HorizontalAlign.Center)
+      .margin({ top: 12, bottom: 30 })
+
+      Column() {
+        Button('确定')
+          .width('90%')
+          .margin({ right: 16 })
+          .backgroundColor($r('app.color.button_background_color'))
+          .fontSize($r('sys.float.Body_L'))
+          .onClick(() => {
+            Logger.debug('--------searchCondition=' + JSON.stringify(this.searchCondition))
+            if (this.checkSearchCondition()) {
+              UserService.searchUsers(this.searchCondition).then((data: UserFullInfo[] | null) => {
+                Logger.debug('--------search result=' + JSON.stringify(data))
+                this.pageStack.pushPathByName('UserListPage', data);
+              })
+            }
+          })
+      }.width('82%').margin({ top: 12, bottom: 30 })
+    }
+    .width('100%')
+    .justifyContent(FlexAlign.Center)
+    .alignItems(VerticalAlign.Center)
+  }
+
+  @Builder
   buildMemberSubscribeRow() {
     if (!this.member) {
       Row() {
@@ -145,12 +145,16 @@ export struct UserSearchPage {
           .fontWeight(FontWeight.Regular)
           .margin({ right: 12 })
           .onClick(() => {
-            this.pageStack.pushPathByName('Member', null, (popInfo: PopInfo) => {
-              let basicUserInfo = popInfo.result as BasicUserInfo;
-              if (basicUserInfo != null && basicUserInfo.isVip != null) {
-                this.member = basicUserInfo.isVip === Constants.YES
-              }
-            });
+            if (!this.loginStateStorage.loginState) {
+              this.getUIContext().getPromptAction().showToast({ message: '请先关联账号' })
+            } else {
+              this.pageStack.pushPathByName('Member', null, (popInfo: PopInfo) => {
+                let basicUserInfo = popInfo.result as BasicUserInfo;
+                if (basicUserInfo != null && basicUserInfo.isVip != null) {
+                  this.member = basicUserInfo.isVip === Constants.YES
+                }
+              });
+            }
           })
       }
       .backgroundImage($r('app.media.member_search'))
@@ -182,7 +186,7 @@ export struct UserSearchPage {
   checkSearchCondition(): boolean {
     if (!checkAgeRangeAndHeightRange(this.searchCondition.ageStart, this.searchCondition.ageEnd,
       this.searchCondition.heightStart, this.searchCondition.heightEnd, this.promptAction,
-      getContext(this).resourceManager)) {
+      this.getUIContext().getHostContext()!.resourceManager)) {
       return false
     }
     return true;
@@ -245,7 +249,8 @@ export struct UserSearchPage {
 
       Image($r('app.media.ic_right_arrow')).width('5%').margin({ left: 10 })
     }.width('92%').height('6%').onClick(() => {
-      TextPickerDialog.show(buildTextPickerDialogOption(Constants.ETHNIC_GROUPS, (result: TextPickerResult) => {
+      this.getUIContext().showTextPickerDialog(buildTextPickerDialogOption(Constants.ETHNIC_GROUPS,
+        (result: TextPickerResult) => {
         if (typeof result.value === 'string') {
           this.ethnicGroup = result.value
           this.searchCondition.ethnicGroup = result.value
@@ -263,7 +268,8 @@ export struct UserSearchPage {
 
       Image($r('app.media.ic_right_arrow')).width('5%').margin({ left: 10 })
     }.width('92%').height('6%').onClick(() => {
-      TextPickerDialog.show(buildTextPickerDialogOption(Constants.CITY_PICKER, (result: TextPickerResult) => {
+      this.getUIContext().showTextPickerDialog(buildTextPickerDialogOption(Constants.CITY_PICKER,
+        (result: TextPickerResult) => {
         let selectedVal = this.getSelectedCity(result);
         this.searchCondition.originFrom = selectedVal;
         this.originFrom = selectedVal;
@@ -294,7 +300,8 @@ export struct UserSearchPage {
 
       Image($r('app.media.ic_right_arrow')).width('5%').margin({ left: 10 })
     }.width('92%').height('6%').onClick(() => {
-      TextPickerDialog.show(buildTextPickerDialogOption(Constants.CITY_PICKER, (result: TextPickerResult) => {
+      this.getUIContext().showTextPickerDialog(buildTextPickerDialogOption(Constants.CITY_PICKER,
+        (result: TextPickerResult) => {
         let selectedVal = this.getSelectedCity(result);
         this.searchCondition.currentResidence = selectedVal;
         this.selectedCity = selectedVal;
@@ -348,9 +355,9 @@ export struct UserSearchPage {
         .letterSpacing(0)
         .backgroundColor($r('app.color.light_grey_bg'))
         .placeholderColor($r('sys.color.font_secondary'))
-        .placeholderFont({ size: 14, weight: FontWeight.Regular, family: Constants.HARMONY_HEITI })
-        .fontColor($r('app.color.text_font_color_black'))
-        .textFont({ size: 12, weight: FontWeight.Regular, family: Constants.HARMONY_HEITI })
+        .placeholderFont({ size: $r('sys.float.Body_L'), weight: FontWeight.Regular, family: Constants.HARMONY_HEITI })
+        .fontColor($r('sys.color.font_primary'))
+        .textFont({ size: $r('sys.float.Body_L'), weight: FontWeight.Regular, family: Constants.HARMONY_HEITI })
         .onSubmit((value: string) => {
           value = value.trim();
           if (CommonUtils.isDigit(value)) {
@@ -605,7 +612,7 @@ export struct RangeRow {
       })
         .type(InputType.Number)
         .placeholderColor($r('sys.color.font_secondary'))
-        .placeholderFont({ size: 14, weight: 400 })
+        .placeholderFont({ size: $r('sys.float.Body_L'), weight: 400 })
         .caretColor($r('sys.color.font_emphasize'))
         .fontColor($r('app.color.text_font_color_black'))
         .height(32)
@@ -641,7 +648,7 @@ export struct RangeRow {
       })
         .type(InputType.Number)
         .placeholderColor($r('sys.color.font_secondary'))
-        .placeholderFont({ size: 14, weight: FontWeight.Regular })
+        .placeholderFont({ size: $r('sys.float.Body_L'), weight: FontWeight.Regular })
         .caretColor($r('sys.color.font_emphasize'))
         .height(32)
         .maxLength(3)

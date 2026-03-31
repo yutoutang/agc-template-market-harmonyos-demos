@@ -5,6 +5,7 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { geoLocationManager } from '@kit.LocationKit';
 import { Constants } from '../constants/Common';
 import { WindowUtil } from './WindowUtil';
+import { site } from '@kit.MapKit';
 
 class PermissionUtil {
   private static instance?: PermissionUtil
@@ -49,6 +50,37 @@ class PermissionUtil {
         reject(error)
       });
     })
+  }
+
+  async getCurrentCityInfo(): Promise<string> {
+    try {
+      const requestInfo: geoLocationManager.CurrentLocationRequest = {
+        priority: geoLocationManager.LocationRequestPriority.FIRST_FIX,
+        timeoutMs: 1000,
+      };
+      const currentLocation = await geoLocationManager.getCurrentLocation(requestInfo);
+      const reverseGeoCodeReq: site.ReverseGeocodeParams = {
+        location: currentLocation,
+        language: 'zh_CN',
+      };
+      const reverseGeocodeResult = await site.reverseGeocode(reverseGeoCodeReq);
+      return reverseGeocodeResult.addressComponent.city?.cityName ?? '';
+    } catch (e) {
+      return '';
+    }
+  }
+
+  async applyAddresses(): Promise<string> {
+    try {
+      if (!await this.initPermission()) {
+        promptAction.showToast({ message: '权限获取失败' })
+        return '';
+      }
+      let city = await this.getCurrentCityInfo()
+      return city
+    } catch (e) {
+      return '';
+    }
   }
 }
 

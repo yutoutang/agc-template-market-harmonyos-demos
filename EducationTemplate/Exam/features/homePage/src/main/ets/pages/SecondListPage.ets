@@ -13,25 +13,24 @@
  * limitations under the License.
  */
 
-import { RouterMap, RouterModule } from 'router_module';
-import { SelectCategory, ThirdParam, ThirdItemModel } from 'select_category'
-import { SecondParam } from 'base_select'
-import { TopTabsBuilder } from 'commonlib';
+import { SelectCategory, ThirdParam, ThirdItemModel } from 'select_category';
+import { SecondParam } from 'base_select';
+import { TopTabsBuilder, RouterMap, RouterModule } from 'commonlib';
 
 @ComponentV2
 export struct SecondListPage {
   @Local secondParamObj?: SecondParam;
 
   aboutToAppear(): void {
-    this.secondParamObj = RouterModule.getNavParam({ url: RouterMap.Level_TWO_PAGE }) as SecondParam
+    this.secondParamObj = RouterModule.getNavParam({ url: RouterMap.Level_TWO_PAGE }) as SecondParam;
   }
 
   build() {
     Column() {
       // 标题组件
-      TopTabsBuilder({ showBackButton: true, bgColor: $r('sys.color.background_primary') })
-        .padding({ left: $r('app.float.vp_16'), right: $r('app.float.vp_16') })
-      Divider().color($r('sys.color.comp_divider'))
+      TopTabsBuilder({ showBackButton: true, bgColor: $r('sys.color.comp_background_primary') })
+        .padding({ left: $r('app.float.vp_16'), right: $r('app.float.vp_16') });
+      Divider().color($r('sys.color.comp_divider'));
       // 次级分类组件
       SelectCategory({
         secondParamObj: this.secondParamObj,
@@ -41,24 +40,26 @@ export struct SecondListPage {
         },
         goThird: (val: ThirdItemModel) => {
           // 跳转三级列表页
-          let list: string[] = []
+          let list: string[] = [];
           if (this.secondParamObj) {
-            list.push(...this.secondParamObj?.list)
-            list.push(val.title)
-            let thirdParamObj: ThirdParam = new ThirdParam(list, val)
-            RouterModule.push({ url: RouterMap.Level_THREE_PAGE, param: thirdParamObj })
+            list.push(...this.secondParamObj?.list);
+            list.push(val.title);
+            let thirdParamObj: ThirdParam = new ThirdParam(list, val);
+            RouterModule.push({ url: RouterMap.Level_THREE_PAGE, param: thirdParamObj });
           }
         }
-      })
+      });
     }
     .height('100%')
     .width('100%')
     .alignItems(HorizontalAlign.Start)
     .justifyContent(FlexAlign.Start)
+    .backgroundColor($r('sys.color.comp_background_primary'))
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM]);
   }
 }
 
 @Builder
 export function SecondListBuilder() {
-  SecondListPage()
+  SecondListPage();
 }

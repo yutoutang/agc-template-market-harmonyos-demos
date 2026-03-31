@@ -1,6 +1,4 @@
-import {
-  RouterMap, routerStack, LazyDataSource, ObservedArray, PopViewUtil,
-} from 'lib_foundation';
+import { RouterMap, routerStack } from 'lib_foundation';
 import { OrderApis, OrderItem } from 'lib_network';
 import { ORDER_TAB_LIST } from '../common/Constants';
 import { OrderActionMap, OrderStatusMap, OrderTabsMap } from '../common/Enums';
@@ -16,7 +14,7 @@ export class OrderListPageVM {
   @Trace
   currentIndex: number = 0;
   @Trace
-  orderList: LazyDataSource<OrderItem> = new LazyDataSource();
+  orderList: OrderItem[] = [];
   @Trace
   curPage: number = 1;
   @Trace
@@ -41,7 +39,7 @@ export class OrderListPageVM {
 
   public async changeTab(index: number) {
     this.currentIndex = index;
-    this.orderList.clear();
+    this.orderList = [];
     this.refreshOrderList();
   }
 
@@ -73,11 +71,10 @@ export class OrderListPageVM {
     const res = await OrderApis.getList(this.curPage, status, keywords);
     if (res.code === 0) {
       this.totalNum = res.total;
-      const newOrders = new ObservedArray(res.orderList);
       if (isRefresh) {
-        this.orderList.clear();
+        this.orderList = [];
       }
-      this.orderList.appendArrayData(newOrders);
+      this.orderList.push(...res.orderList);
       if (this.curPage * 6 >= this.totalNum) {
         this.reachEnd = true;
       }

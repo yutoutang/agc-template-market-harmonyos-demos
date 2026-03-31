@@ -20,6 +20,8 @@ export { showToast } from './src/main/ets/constants/ShowToast';
 
 export { dealAllError,ErrorCode } from './src/main/ets/constants/Constants';
 
+export { PreferencesUtil } from './src/main/ets/utils/PreferencesUtil'
+
 
 export * from './src/main/ets/constants/CommonEnums';
 

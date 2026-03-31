@@ -86,6 +86,7 @@ export class IndexVM extends BaseViewModel {
         // 横屏
         let landscapeType = [display.Orientation.LANDSCAPE, display.Orientation.LANDSCAPE_INVERTED]
         this.displayModel.isLandscape = landscapeType.includes(displayClass.orientation);
+        Logger.debug(TAG, 'this.displayModel.isLandscape: ' + this.displayModel.isLandscape);
       })
     } catch (e) {
       Logger.error(TAG, 'displayOrientationListener fail, error: ' + JSON.stringify(e));

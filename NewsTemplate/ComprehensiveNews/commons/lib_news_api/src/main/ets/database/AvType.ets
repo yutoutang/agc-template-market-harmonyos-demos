@@ -17,7 +17,8 @@ export interface AvSection {
   duration: number
   updateTime: string
   sectionUrl: string
-  coverUrl?:string
+  coverUrl?: string
+  needVip: boolean
 }
 
 export interface BaseProgram {

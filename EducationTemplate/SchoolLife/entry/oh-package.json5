@@ -6,12 +6,11 @@
   "author": "",
   "license": "",
   "dependencies": {
-    commonlib: "file:../commons/commonLib",
-    componentlib: "file:../commons/componentLib",
-    network: "file:../commons/network",
-    home: "file:../features/tab/home",
-    mine: "file:../features/tab/mine",
-    courseschedule: "file:../features/service/courseSchedule"
+    "foundation": "file:../common/foundation",
+    "network": "file:../common/network",
+    "school_timetable": "file:../features/school_timetable",
+    "module_course_schedule": "file:../components/module_course_schedule",
+    "module_secure_checkin": "file:../components/module_secure_checkin",
+    "atomicservice_login": "file:../components/atomicservice_login"
   }
 }
-

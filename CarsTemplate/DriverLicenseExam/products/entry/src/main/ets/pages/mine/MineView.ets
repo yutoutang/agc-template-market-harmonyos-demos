@@ -56,9 +56,11 @@ export struct MineView {
     Row() {
       Text('切换题库：')
         .fontSize(14)
+        .maxFontScale(1)
       Text( this.guideService.guideData.licenseType !== undefined?licenseTypeName[this.guideService.guideData.licenseType]:'')
         .fontSize(14)
         .fontColor('#64BB5C')
+        .maxFontScale(1)
       Image($r('app.media.right_triangle'))
         .width(16)
         .height(16)
@@ -82,6 +84,7 @@ export struct MineView {
           .fontFamily('鸿蒙黑体')
           .fontWeight(FontWeight.Medium)
           .fontColor('rgba(0,0,0,0.9)')
+          .maxFontScale(1)
         Text(String(this.didCount))
           .fontSize(24)
           .fontFamily('鸿蒙黑体')
@@ -89,11 +92,13 @@ export struct MineView {
           .fontColor('rgba(0,0,0,0.9)')
           .height(32)
           .textAlign(TextAlign.Center)
+          .maxFontScale(1)
         Text(`正确率${this.accuracyRate}%`)
           .fontSize(12)
           .fontFamily('鸿蒙黑体')
           .fontWeight(FontWeight.Regular)
           .fontColor('rgba(0,0,0,0.6)')
+          .maxFontScale(1)
       }
       .width(78)
       .height(99)
@@ -110,6 +115,7 @@ export struct MineView {
           .fontFamily('鸿蒙黑体')
           .fontWeight(FontWeight.Medium)
           .fontColor('rgba(0,0,0,0.9)')
+          .maxFontScale(1)
         Text(String(this.averageScore))
           .fontSize(24)
           .fontFamily('鸿蒙黑体')
@@ -117,11 +123,13 @@ export struct MineView {
           .fontColor('rgba(0,0,0,0.9)')
           .height(32)
           .textAlign(TextAlign.Center)
+          .maxFontScale(1)
         Text(`累计考试 ${this.examService.mockExamCount} 次`)
           .fontSize(12)
           .fontFamily('鸿蒙黑体')
           .fontWeight(FontWeight.Regular)
           .fontColor('rgba(0,0,0,0.6)')
+          .maxFontScale(1)
       }
       .width(122)
       .height(99)
@@ -164,6 +172,7 @@ export struct MineView {
           .fontSize(16)
           .fontWeight(FontWeight.Medium)
           .margin({ left: 16 })
+          .maxFontScale(1)
         Blank()
         Image($r('app.media.ic_right_arrow_lined'))
           .width(7)
@@ -189,6 +198,7 @@ export struct MineView {
         .fontSize(16)
         .fontWeight(FontWeight.Medium)
         .margin({ left: 16 })
+        .maxFontScale(1)
       Blank()
       Image($r('app.media.ic_right_arrow_lined'))
         .width(7)
@@ -234,6 +244,7 @@ export struct MineView {
                   .fontSize(18)
                   .fontFamily('鸿蒙黑体')
                   .fontWeight(FontWeight.Medium)
+                  .maxFontScale(1)
 
                 if (AccountUtil.getUserInfo().phone) {
                   Row() {
@@ -250,6 +261,7 @@ export struct MineView {
                       .fontSize(12)
                       .fontWeight(400)
                       .lineHeight(16)
+                      .maxFontScale(1)
                   }
                 }
               }
@@ -293,6 +305,7 @@ export struct MineView {
                 .fontColor('#fff')
                 .backgroundColor('rgba(100, 187, 92, 1)')
                 .textAlign(TextAlign.Center)
+                .maxFontScale(1)
                 .onClick(() => {
                   if (AccountUtil.getAccountInfo().idToken === '') {
                     // 真实登录，mock场景先注释
@@ -384,6 +397,7 @@ export struct MineView {
         .fontSize(24)
         .fontWeight(FontWeight.Medium)
         .fontColor('rgba(0,0,0,0.9)')
+        .maxFontScale(1)
     }
     .width(CommonConstants.FULL_PERCENT)
     .padding({

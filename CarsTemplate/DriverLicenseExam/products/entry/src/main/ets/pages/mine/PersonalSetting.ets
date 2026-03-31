@@ -1,4 +1,4 @@
-import { CustomContentDialog } from '@kit.ArkUI';
+import { AppStorageV2, CustomContentDialog, window } from '@kit.ArkUI';
 import { AccountUtil, CommonModel } from '@ohos_agcit/driver_license_exam_commonlib';
 import { CommonConstants } from '@ohos_agcit/driver_license_exam_guide';
 import {
@@ -9,9 +9,12 @@ import {
   SettingView,
   SupportedSetting,
   WebModel,
+  IFontModel,
 } from 'app_setting'
 import { checkUpdateAndShowDialog } from 'check_app_update';
 import { common } from '@kit.AbilityKit';
+import { FontModel } from 'app_setting'
+import { ExamController} from 'exam'
 
 @Builder
 export function PersonalSettingBuilder() {
@@ -24,6 +27,9 @@ struct PersonalSetting {
   topRectHeight: number = AppStorage.get('topRectHeight') || 0;
   bottomRectHeight: number = AppStorage.get('bottomRectHeight') || 0;
   vm: CommonModel = CommonModel.instance;
+  examController:ExamController = ExamController.instance;
+  @Local fontModel: FontModel = AppStorageV2.connect(FontModel, () => new FontModel())!;
+  @Local followSys:boolean = AppStorage.get('followSys') || false;
 
   @Local group1: SettingGroup = new SettingGroup()
     .setList([
@@ -42,6 +48,22 @@ struct PersonalSetting {
 
   @Local group2: SettingGroup = new SettingGroup()
     .setList([
+      new SettingItem()
+        .setSupportedType(SupportedSetting.FONT_SIZE)
+        .setExtraParams({
+          followSystem: this.followSys,
+          fontSizeRatio: this.examController.fontSizeRatio,
+          onChange: (followSystem: boolean, fontSizeRatio: number, sysFontSizeScale: number) => {
+            // 回调调整后的字体大小设置值
+            AppStorage.setOrCreate('followSys', followSystem)
+            // this.followSys = followSystem;
+            const follow = !followSystem;
+            (AppStorage.get('windowStage') as window.WindowStage).setDefaultDensityEnabled(follow);
+             this.examController.fontSizeRatio = fontSizeRatio;
+             this.examController.sysFontSizeScale = sysFontSizeScale;
+
+          },
+        } as IFontModel),
       new SettingItem()
         .setSupportedType(SupportedSetting.PUSH_SWITCH)
         .setOnChange((isOn) => {
@@ -74,7 +96,7 @@ struct PersonalSetting {
         SettingView({
           isLogin: true,
           pathStack: this.vm.navStack,
-          settingList: [this.group1, this.group3, this.group2],
+          settingList: [this.group1, this.group2,this.group3],
           signOutApi:() => {
             return new Promise(() => {
               AccountUtil.loginOut();

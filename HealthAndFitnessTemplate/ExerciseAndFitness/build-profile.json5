@@ -5,7 +5,8 @@
       {
         "name": "default",
         "signingConfig": "default",
-        "compatibleSdkVersion": "5.0.3(15)",
+        "compatibleSdkVersion": "5.0.5(17)",
+        "targetSdkVersion": "6.0.2(22)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
           "strictMode": {
@@ -78,12 +79,8 @@
       "srcPath": "./commons/lib_api"
     },
     {
-      "name": "module_feedback",
-      "srcPath": "./components/module_feedback"
-    },
-    {
-      "name": "module_imagepreview",
-      "srcPath": "./components/module_imagepreview"
+      "name": "feedback",
+      "srcPath": "./components/feedback"
     },
     {
       "name": "module_chart",
@@ -98,8 +95,8 @@
       "srcPath": "./components/module_player"
     },
     {
-      "name": "aggregated_payment",
-      "srcPath": "./components/aggregated_payment"
+      "name": "membership",
+      "srcPath": "./components/membership"
     }
   ]
 }

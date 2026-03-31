@@ -15,7 +15,7 @@ export struct TelevisionPage {
   @Param currentTabIndex: VideoType = VideoType.TELEVISION;
   @Local vm: TelevisionViewModel = new TelevisionViewModel(this.getUIContext())
 
-  @Monitor('currentTabIndex','vm.tabModel.selectedIndex')
+  @Monitor('currentTabIndex', 'vm.tabModel.selectedIndex')
   async selectedIndexChange() {
     emitter.emit('stop_video_play')
   }
@@ -99,10 +99,13 @@ export struct TelevisionPage {
                   currentBreakpoint: this.vm.breakPointModel.currentBreakpoint,
                   videoCardPlayerController: this.vm.videoCardPlayerController,
                   isFromDetailCard: true,
+                  enablePip: false,
                   isHideSlide: true,
+                  isLandscape: false,
                   pathStack: RouterUtils.getStack(),
-                  fullScreenIcon: $r('sys.symbol.full_screen'),
+                  fullScreenIcon: $r('app.media.ic_sys_full_screen'),
                   isNeedMuteIcon: true,
+                  isNeedRelease: false,
                   isMute: this.vm.isMute,
                   onMute: (value) => {
                     this.vm.setMute(value)
@@ -113,11 +116,16 @@ export struct TelevisionPage {
                     }
                   },
                 })
-                  .borderRadius(16)
-                  .clip(true)
-                this.televisionList()
               }
             }
+            .width(CommonConstants.FULL_PERCENT)
+            .aspectRatio(this.vm.videoBoxAspectRatio)
+            .borderRadius(16)
+            .clip(true)
+          }
+
+          ListItem() {
+            this.televisionList()
           }
 
           ListItem() {

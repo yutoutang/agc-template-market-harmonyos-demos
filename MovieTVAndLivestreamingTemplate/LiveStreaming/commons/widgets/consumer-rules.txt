@@ -1,6 +1,0 @@
--keep-file-name
-Index.ets
-
--keep
-.\Index.ets
-

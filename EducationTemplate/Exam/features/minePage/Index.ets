@@ -19,8 +19,6 @@ export { EditPersonalCenterBuilder } from './src/main/ets/views/EditPersonalCent
 
 export { SetUpPageBuilder } from './src/main/ets/views/SetupPage';
 
-export { FeedbackPageBuilder } from './src/main/ets/views/FeedbackPage';
-
 export { PracticeRecordsBuilder } from './src/main/ets/views/PracticeRecordsPage';
 
 export { PracticeDetailsBuilder } from './src/main/ets/views/PracticeDetailsPage';
@@ -38,8 +36,6 @@ export { PrivacyStatementPageBuilder } from './src/main/ets/views/PrivacyStateme
 export { PrivacyAgreementBuilder, PrivacyUseAlertBuilder } from './src/main/ets/views/PrivacyAgreementPage';
 
 export { MessageCenterBuilder } from './src/main/ets/views/MessageCenterPage';
-
-export { FeedbackRecordPageBuilder } from './src/main/ets/views/FeedbackRecordPage';
 
 export { AboutPageBuilder } from './src/main/ets/views/AboutPage';
 

@@ -18,6 +18,7 @@ export class MockBroadcast {
           duration: 425386,
           updateTime: '2025/10/03',
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2F124-Mark-Humble-Free-Happy-Birthday(chosic.com).mp3',
+          needVip: false,
         },
         {
           id: 'section_2',
@@ -25,6 +26,7 @@ export class MockBroadcast {
           updateTime: '2025/10/02',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fpower.wav',
+          needVip: false,
         },
         {
           id: 'section_3',
@@ -32,6 +34,7 @@ export class MockBroadcast {
           updateTime: '2025/10/01',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fworld.wav',
+          needVip: true,
         },
         {
           id: 'section_4',
@@ -39,6 +42,7 @@ export class MockBroadcast {
           updateTime: '2025/9/28',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fboisterous.wav',
+          needVip: true,
         },
         {
           id: 'section_5',
@@ -46,6 +50,7 @@ export class MockBroadcast {
           updateTime: '2025/9/27',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fboisterous.wav',
+          needVip: true,
         },
         {
           id: 'section_6',
@@ -53,6 +58,7 @@ export class MockBroadcast {
           updateTime: '2025/9/26',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fboisterous.wav',
+          needVip: true,
         },
         {
           id: 'section_7',
@@ -60,6 +66,7 @@ export class MockBroadcast {
           updateTime: '2025/9/25',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fboisterous.wav',
+          needVip: true,
         },
         {
           id: 'section_8',
@@ -67,6 +74,7 @@ export class MockBroadcast {
           updateTime: '2025/9/24',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fboisterous.wav',
+          needVip: true,
         },
         {
           id: 'section_9',
@@ -74,6 +82,7 @@ export class MockBroadcast {
           updateTime: '2025/9/23',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fboisterous.wav',
+          needVip: true,
         },
         {
           id: 'section_10',
@@ -81,6 +90,7 @@ export class MockBroadcast {
           updateTime: '2025/9/22',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fboisterous.wav',
+          needVip: true,
         },
       ],
     },
@@ -99,6 +109,7 @@ export class MockBroadcast {
           updateTime: '2025/10/03',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2FDelacey%20-%20Dream%20It%20Possible.flac',
+          needVip: false,
         },
         {
           id: 'section_2',
@@ -106,6 +117,7 @@ export class MockBroadcast {
           updateTime: '2025/10/02',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fboisterous.wav',
+          needVip: false,
         },
         {
           id: 'section_3',
@@ -113,6 +125,7 @@ export class MockBroadcast {
           updateTime: '2025/10/01',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fpower.wav',
+          needVip: true,
         },
         {
           id: 'section_4',
@@ -120,6 +133,7 @@ export class MockBroadcast {
           updateTime: '2025/9/28',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fworld.wav',
+          needVip: true,
         },
         {
           id: 'section_5',
@@ -127,6 +141,7 @@ export class MockBroadcast {
           updateTime: '2025/9/27',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fworld.wav',
+          needVip: true,
         },
         {
           id: 'section_6',
@@ -134,6 +149,7 @@ export class MockBroadcast {
           updateTime: '2025/9/26',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fworld.wav',
+          needVip: true,
         },
         {
           id: 'section_7',
@@ -141,6 +157,7 @@ export class MockBroadcast {
           updateTime: '2025/9/25',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fworld.wav',
+          needVip: true,
         },
         {
           id: 'section_8',
@@ -148,6 +165,7 @@ export class MockBroadcast {
           updateTime: '2025/9/24',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fworld.wav',
+          needVip: true,
         },
         {
           id: 'section_9',
@@ -155,6 +173,7 @@ export class MockBroadcast {
           updateTime: '2025/9/23',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fworld.wav',
+          needVip: true,
         },
         {
           id: 'section_10',
@@ -162,6 +181,7 @@ export class MockBroadcast {
           updateTime: '2025/9/22',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fworld.wav',
+          needVip: true,
         },
       ],
     },
@@ -180,6 +200,7 @@ export class MockBroadcast {
           updateTime: '2025/10/03',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2FDelacey%20-%20Dream%20It%20Possible.flac',
+          needVip: false,
         },
         {
           id: 'section_2',
@@ -187,6 +208,7 @@ export class MockBroadcast {
           updateTime: '2025/10/02',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fboisterous.wav',
+          needVip: false,
         },
         {
           id: 'section_3',
@@ -194,6 +216,7 @@ export class MockBroadcast {
           updateTime: '2025/10/01',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fpower.wav',
+          needVip: true,
         },
         {
           id: 'section_4',
@@ -201,6 +224,7 @@ export class MockBroadcast {
           updateTime: '2025/9/28',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fworld.wav',
+          needVip: true,
         },
         {
           id: 'section_5',
@@ -208,6 +232,7 @@ export class MockBroadcast {
           updateTime: '2025/9/27',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fworld.wav',
+          needVip: true,
         },
       ],
     },
@@ -226,6 +251,7 @@ export class MockBroadcast {
           updateTime: '2025/9/26',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2FAmberlight-chosic.com_.mp3',
+          needVip: false,
         },
         {
           id: 'section_2',
@@ -233,6 +259,7 @@ export class MockBroadcast {
           updateTime: '2025/9/25',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fworld.wav',
+          needVip: false,
         },
         {
           id: 'section_3',
@@ -240,6 +267,7 @@ export class MockBroadcast {
           updateTime: '2025/9/24',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fworld.wav',
+          needVip: true,
         },
         {
           id: 'section_4',
@@ -247,6 +275,7 @@ export class MockBroadcast {
           updateTime: '2025/9/23',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fworld.wav',
+          needVip: true,
         },
         {
           id: 'section_5',
@@ -254,6 +283,7 @@ export class MockBroadcast {
           updateTime: '2025/9/22',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fworld.wav',
+          needVip: true,
         },
       ],
     },
@@ -272,6 +302,7 @@ export class MockBroadcast {
           updateTime: '2025/10/03',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2FDelacey%20-%20Dream%20It%20Possible.flac',
+          needVip: false,
         },
         {
           id: 'section_2',
@@ -279,6 +310,7 @@ export class MockBroadcast {
           updateTime: '2025/10/02',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2FSimpleSadness-320bit(chosic.com).mp3',
+          needVip: false,
         },
         {
           id: 'section_3',
@@ -286,6 +318,7 @@ export class MockBroadcast {
           updateTime: '2025/10/01',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fpower.wav',
+          needVip: true,
         },
         {
           id: 'section_4',
@@ -293,6 +326,7 @@ export class MockBroadcast {
           updateTime: '2025/9/28',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fworld.wav',
+          needVip: true,
         },
       ],
     },
@@ -311,6 +345,7 @@ export class MockBroadcast {
           updateTime: '2025/9/27',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fworld.wav',
+          needVip: false,
         },
         {
           id: 'section_2',
@@ -318,6 +353,7 @@ export class MockBroadcast {
           updateTime: '2025/9/26',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fworld.wav',
+          needVip: false,
         },
         {
           id: 'section_3',
@@ -325,6 +361,7 @@ export class MockBroadcast {
           updateTime: '2025/9/25',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fworld.wav',
+          needVip: true,
         },
         {
           id: 'section_4',
@@ -332,6 +369,7 @@ export class MockBroadcast {
           updateTime: '2025/9/24',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fworld.wav',
+          needVip: true,
         },
         {
           id: 'section_5',
@@ -339,6 +377,7 @@ export class MockBroadcast {
           updateTime: '2025/9/23',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fworld.wav',
+          needVip: true,
         },
         {
           id: 'section_6',
@@ -346,6 +385,7 @@ export class MockBroadcast {
           updateTime: '2025/9/22',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fworld.wav',
+          needVip: true,
         },
       ],
     },
@@ -364,6 +404,7 @@ export class MockBroadcast {
           updateTime: '2025/10/03',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2FDelacey%20-%20Dream%20It%20Possible.flac',
+          needVip: false,
         },
         {
           id: 'section_2',
@@ -371,6 +412,7 @@ export class MockBroadcast {
           updateTime: '2025/10/02',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fboisterous.wav',
+          needVip: false,
         },
         {
           id: 'section_3',
@@ -378,6 +420,7 @@ export class MockBroadcast {
           updateTime: '2025/10/01',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fpower.wav',
+          needVip: true,
         },
         {
           id: 'section_4',
@@ -385,6 +428,7 @@ export class MockBroadcast {
           updateTime: '2025/9/28',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fworld.wav',
+          needVip: true,
         },
         {
           id: 'section_5',
@@ -392,6 +436,7 @@ export class MockBroadcast {
           updateTime: '2025/9/27',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fworld.wav',
+          needVip: true,
         },
       ],
     },
@@ -410,6 +455,7 @@ export class MockBroadcast {
           updateTime: '2025/10/03',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2FDelacey%20-%20Dream%20It%20Possible.flac',
+          needVip: false,
         },
         {
           id: 'section_2',
@@ -417,6 +463,7 @@ export class MockBroadcast {
           updateTime: '2025/10/02',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fboisterous.wav',
+          needVip: false,
         },
       ],
     },
@@ -435,6 +482,7 @@ export class MockBroadcast {
           updateTime: '2025/10/03',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2FDelacey%20-%20Dream%20It%20Possible.flac',
+          needVip: false,
         },
         {
           id: 'section_2',
@@ -442,6 +490,7 @@ export class MockBroadcast {
           updateTime: '2025/10/02',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fboisterous.wav',
+          needVip: false,
         },
         {
           id: 'section_3',
@@ -449,6 +498,7 @@ export class MockBroadcast {
           updateTime: '2025/10/01',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fpower.wav',
+          needVip: true,
         },
         {
           id: 'section_4',
@@ -456,6 +506,7 @@ export class MockBroadcast {
           updateTime: '2025/9/23',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fworld.wav',
+          needVip: true,
         },
         {
           id: 'section_5',
@@ -463,6 +514,7 @@ export class MockBroadcast {
           updateTime: '2025/9/22',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fworld.wav',
+          needVip: true,
         },
       ],
     },
@@ -481,6 +533,7 @@ export class MockBroadcast {
           updateTime: '2025/10/03',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2FDelacey%20-%20Dream%20It%20Possible.flac',
+          needVip: false,
         },
         {
           id: 'section_2',
@@ -488,6 +541,7 @@ export class MockBroadcast {
           updateTime: '2025/10/02',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fboisterous.wav',
+          needVip: false,
         },
         {
           id: 'section_3',
@@ -495,6 +549,7 @@ export class MockBroadcast {
           updateTime: '2025/10/01',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fpower.wav',
+          needVip: true,
         },
       ],
     },
@@ -513,6 +568,7 @@ export class MockBroadcast {
           updateTime: '2025/10/03',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2FDelacey%20-%20Dream%20It%20Possible.flac',
+          needVip: false,
         },
         {
           id: 'section_2',
@@ -520,6 +576,7 @@ export class MockBroadcast {
           updateTime: '2025/10/02',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fboisterous.wav',
+          needVip: false,
         },
         {
           id: 'section_3',
@@ -527,6 +584,7 @@ export class MockBroadcast {
           updateTime: '2025/10/01',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fpower.wav',
+          needVip: true,
         },
         {
           id: 'section_4',
@@ -534,6 +592,7 @@ export class MockBroadcast {
           updateTime: '2025/9/28',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fworld.wav',
+          needVip: true,
         },
         {
           id: 'section_5',
@@ -541,6 +600,7 @@ export class MockBroadcast {
           updateTime: '2025/9/27',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fworld.wav',
+          needVip: true,
         },
         {
           id: 'section_6',
@@ -548,6 +608,7 @@ export class MockBroadcast {
           updateTime: '2025/9/26',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fworld.wav',
+          needVip: true,
         },
         {
           id: 'section_7',
@@ -555,6 +616,7 @@ export class MockBroadcast {
           updateTime: '2025/9/25',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fworld.wav',
+          needVip: true,
         },
         {
           id: 'section_8',
@@ -562,6 +624,7 @@ export class MockBroadcast {
           updateTime: '2025/9/24',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fworld.wav',
+          needVip: true,
         },
         {
           id: 'section_9',
@@ -569,6 +632,7 @@ export class MockBroadcast {
           updateTime: '2025/9/23',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fworld.wav',
+          needVip: true,
         },
         {
           id: 'section_10',
@@ -576,6 +640,7 @@ export class MockBroadcast {
           updateTime: '2025/9/22',
           duration: 425386,
           sectionUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/audio%2Fworld.wav',
+          needVip: true,
         },
       ],
     },

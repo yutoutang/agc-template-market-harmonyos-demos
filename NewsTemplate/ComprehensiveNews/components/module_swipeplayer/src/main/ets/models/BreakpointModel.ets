@@ -6,4 +6,6 @@ import { BreakpointNameEnum } from '../type/Index';
 @ObservedV2
 export class BreakpointModel {
   @Trace currentBreakpoint: BreakpointNameEnum = BreakpointNameEnum.SM;
+  // 是否通过设备旋转自动横屏
+  @Trace isLandscapeAuto: boolean = false;
 }

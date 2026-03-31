@@ -4,6 +4,7 @@ export enum TabIndexMap {
   HOME,
   STATISTICS,
   ASSETS,
+  MINE,
 }
 
 @ObservedV2

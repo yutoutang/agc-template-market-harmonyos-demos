@@ -5,8 +5,8 @@
      */
     "bundleName": "etjy.1.xxxxxx",
     "vendor": "example",
-    "versionCode": 1000038,
-    "versionName": "1.0.2",
+    "versionCode": 1000039,
+    "versionName": "1.0.3",
     "icon": "$media:layered_image",
     "label": "$string:app_name"
   }

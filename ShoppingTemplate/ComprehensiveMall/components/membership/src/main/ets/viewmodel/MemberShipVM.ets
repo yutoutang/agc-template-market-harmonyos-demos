@@ -34,7 +34,7 @@ export class MemberShipVM {
   @Trace productInfoList: iap.Product[] = [];
   @Trace selectedProductIndex: number = 0;
   @Trace isMemberPrivacyChecked: boolean = false;
-  @Trace enablePurchase: boolean = true
+  @Trace enablePurchase: boolean = true;
   @Trace pathStack: NavPathStack = new NavPathStack();
   subscribeCallBack: (params: MemberParams) => Promise<void> = () => new Promise(() => {
   });
@@ -218,7 +218,7 @@ export class MemberShipVM {
       })
         .catch((err: BusinessError) => {
           hilog.info(0xFF00, 'MemberShip', `failed to finish purchase.` + JSON.stringify(err));
-        })
+        });
       // 购买完成刷新页面
       this.queryPurchase();
       hilog.info(0xFF00, 'MemberShip', `Succeeded in finishing purchase.`);
@@ -263,7 +263,7 @@ export class MemberShipVM {
         if (item.productIds.length) {
           const promise = iap.queryProducts(this.uiContext?.getHostContext() as common.UIAbilityContext, item)
             .catch((err: BusinessError) => {
-              return Promise.reject(err)
+              return Promise.reject(err);
             });
           promiseList.push(promise);
         }
@@ -280,7 +280,7 @@ export class MemberShipVM {
         })
         .catch((err: BusinessError) => {
           this.loading = false;
-          WindowUtil.toast(`查询会员商品失败，错误码为${err.code}，请排查后重试~`)
+          WindowUtil.toast(`查询会员商品失败，错误码为${err.code}，请排查后重试~`);
           this.enablePurchase = false;
           hilog.error(0xFF00, 'MemberShip', `Failed to query products. Code is ${err.code}, message is ${err.message}`);
         });

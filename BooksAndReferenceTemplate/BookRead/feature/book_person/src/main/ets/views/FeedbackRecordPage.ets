@@ -89,7 +89,7 @@ export struct FeedbackRecordPage {
                   .alignItems(HorizontalAlign.Start)
                   .width(Constants.FULL_SIZE)
                 }
-                .backgroundColor($r('sys.color.background_primary'))
+                .backgroundColor($r('sys.color.comp_background_primary'))
                 .padding(12)
                 .margin({ bottom: 12 })
                 .width('100%')

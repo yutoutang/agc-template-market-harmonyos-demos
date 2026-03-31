@@ -1,18 +1,26 @@
-export { VideoSwipePlayer } from './src/main/ets/views/VideoSwipePlayer'
+export { VideoSwipePlayer, SwipePlayerOptions, SwiperCallback } from './src/main/ets/views/VideoSwipePlayer'
 
 export { VideoProgressBar } from './src/main/ets/components/VideoProgressBar'
 
-export { VideoCard, VideoCardPlayerController } from './src/main/ets/components/VideoCard'
+export { VideoCard } from './src/main/ets/components/VideoCard'
+
+export { VideoCardPlayerController } from './src/main/ets/controller/VideoCardPlayerController'
 
 export { PlayerDataSource } from './src/main/ets/datasource/PlayerDataSource'
 
-export { VideoPlayerData } from './src/main/ets/type/Index'
+export { VideoPlayerData, AVPlayerState, PageNameEnum, BreakpointNameEnum } from './src/main/ets/type/Index'
+
+export { EventKey } from './src/main/ets/constants/EventKey'
 
 export { SwipePlayerController } from './src/main/ets/controller/SwipePlayerController'
 
-export { AVPlayerManager, AVPlayerSession, registerAVPlayerCallback } from './src/main/ets/controller/AVPlayerManager'
+export { AVPlayerManager } from './src/main/ets/controller/AVPlayerManager'
+
+export { AVPlayerController } from './src/main/ets/controller/AVPlayerController'
 
 export { PlayerLayoutSize } from './src/main/ets/controller/PlayerLayoutSize'
+
+export { VideoPlayService } from './src/main/ets/service/VideoPlayService'
 
 // 横屏页面
 export { LandscapeVideoBuilder } from './src/main/ets/views/LandscapeVideo';
@@ -23,4 +31,5 @@ export { VideoNetworkModel, VideoNetworkSetting } from './src/main/ets/models/Vi
 // 画中画
 export { PiPWindowModel } from './src/main/ets/models/PiPWindowModel';
 
-export { secondToTime } from './src/main/ets/utils/Util'
+// 工具方法
+export { secondToTime, setOrientation, isDisplayModeFull } from './src/main/ets/utils/Util';

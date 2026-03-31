@@ -1,20 +1,22 @@
 import { DataGenerator } from '@ohos_agcit/children_education_datasource';
-import { CommonConstants, FeedTitle, NoMoreTab, TwoColumn } from '@ohos_agcit/children_education_utils';
+import { CommonConstants, FeedTitle, NoMoreTab, CompactCardComponent, GlobalInfoModel, BreakpointType } from '@ohos_agcit/children_education_utils';
+import { AppStorageV2 } from '@kit.ArkUI';
 
 @ComponentV2
 export struct EnglishZonePage {
   private englishChildrenSongsData = DataGenerator.getEnglishChildrenSongsData(this.getUIContext());
-  @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
+  @Local globalInfo: GlobalInfoModel =
+    AppStorageV2.connect<GlobalInfoModel>(GlobalInfoModel, () => new GlobalInfoModel())!;
 
   build() {
     Column() {
-      List({ space: 16 }) {
+      List() {
         ListItemGroup({
           header: FeedTitle('app.media.feed_head_video', '原版英文儿歌', () => {
-            this.appPathStack.pushPathByName('HotAnimationListView', undefined);
+            this.globalInfo.navStack.pushPathByName('HotAnimationListView', '原版英文儿歌');
           })
         }) {
-          TwoColumn({
+          CompactCardComponent({
             videoCardArray: this.englishChildrenSongsData
           })
         }
@@ -27,7 +29,18 @@ export struct EnglishZonePage {
       .layoutWeight(1)
       .height(CommonConstants.FULL_PERCENT)
       .width(CommonConstants.FULL_PERCENT)
-
+      .padding({
+        left: new BreakpointType<number>({
+          sm: 16,
+          md: 24,
+          lg: 32,
+        }).getValue(this.globalInfo.currentBreakpoint),
+        right: new BreakpointType<number>({
+          sm: 16,
+          md: 24,
+          lg: 32,
+        }).getValue(this.globalInfo.currentBreakpoint)
+      })
     }
   }
 }

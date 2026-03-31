@@ -50,8 +50,6 @@ export struct Feedback {
       // 提交按钮
       this.submitButton()
     }
-    .width('100%')
-    .height('100%')
     .padding({
       left: 16,
       right: 16,

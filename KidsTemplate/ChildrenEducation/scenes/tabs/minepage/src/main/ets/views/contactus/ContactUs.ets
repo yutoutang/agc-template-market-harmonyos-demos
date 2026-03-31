@@ -1,4 +1,5 @@
-import { CommonConstants, Title } from '@ohos_agcit/children_education_utils';
+import { CommonConstants, GlobalInfoModel, Title } from '@ohos_agcit/children_education_utils';
+import { AppStorageV2 } from '@kit.ArkUI';
 
 @Builder
 export function ContactUsBuilder() {
@@ -7,7 +8,8 @@ export function ContactUsBuilder() {
 
 @ComponentV2
 export struct ContactUs {
-  @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
+  @Local globalInfo: GlobalInfoModel =
+    AppStorageV2.connect<GlobalInfoModel>(GlobalInfoModel, () => new GlobalInfoModel())!;
 
   build() {
     NavDestination() {
@@ -54,7 +56,7 @@ export struct ContactUs {
     }
     .title(Title($r('app.string.contact_us')))
     .onBackPressed(() => {
-      this.appPathStack.pop();
+      this.globalInfo.navStack.pop();
       return true;
     });
   }

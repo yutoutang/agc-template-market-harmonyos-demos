@@ -32,7 +32,8 @@ export struct FeedbackRecordPage {
    * 数据初始化
    */
   initData() {
-    const rawData = PreferenceUtil.getInstance().get(PreferConstant.FEEDBACK_RECORD, []);
+    const context = this.getUIContext().getHostContext() as Context;
+    const rawData = PreferenceUtil.getInstance(context).get(PreferConstant.FEEDBACK_RECORD, []);
 
     this.feedbackList = (Array.isArray(rawData) ? rawData : []);
   }

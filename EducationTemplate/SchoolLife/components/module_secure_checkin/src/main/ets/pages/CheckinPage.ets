@@ -1,5 +1,5 @@
-import { CheckinContext, ViewModelState } from '../common/CustomTypes';
-import { CheckinMgrVM } from '../viewmodels/CheckinMgrVM';
+import { ViewModelState } from '../common/CustomTypes';
+import { CheckinPageVM } from '../viewmodels/CheckinPageVM';
 import { TitleBar } from '../components/TitleBar';
 import { UIVerifyCodeInput } from '../components/UIVerifyCodeInput';
 import { MOCK_CHECKIN_CODE } from '../http/Api';
@@ -7,15 +7,7 @@ import { MOCK_CHECKIN_CODE } from '../http/Api';
 @ComponentV2
 export struct CheckinPage {
 
-  @Param @Require
-  public checkinContext: CheckinContext = {
-    studentId: '',
-    courseId: '',
-    courseName: ''
-  };
-
-  @Local
-  private checkinMgr: CheckinMgrVM = new CheckinMgrVM(this.checkinContext, this.getUIContext());
+  private checkinMgr: CheckinPageVM = new CheckinPageVM(this.getUIContext());
 
   private navPathStack: NavPathStack = new NavPathStack();
 
@@ -35,14 +27,9 @@ export struct CheckinPage {
           .expandSafeArea([SafeAreaType.SYSTEM, SafeAreaType.CUTOUT], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
         Column() {
           TitleBar({
-            onBackButtonClick: () => this.navPathStack.pop(),
-            barPadding: { left: 8 }
-          }) {
-            Text('课堂签到')
-              .fontSize($r('sys.float.Title_S'))
-              .fontColor('#E6000000')
-              .fontWeight(FontWeight.Bold)
-          }
+            title: '课堂签到',
+            onBackButtonClick: () => this.navPathStack.pop()
+          })
           Stack({ alignContent: Alignment.TopStart }) {
             Scroll() {
               this.buildMainContent()
@@ -80,7 +67,7 @@ export struct CheckinPage {
         Button() {
           Text('确定')
             .fontSize($r('sys.float.Body_M'))
-            .fontColor(Color.White)
+            .fontColor($r('sys.color.font_on_primary'))
         }
         .height(40)
         .padding({ top: 8, bottom: 8 })
@@ -242,4 +229,9 @@ export struct CheckinPage {
     .hitTestBehavior(HitTestMode.Block)
     .expandSafeArea([SafeAreaType.SYSTEM, SafeAreaType.CUTOUT], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
   }
+}
+
+@Builder
+export function buildCheckinPage(): void {
+  CheckinPage();
 }

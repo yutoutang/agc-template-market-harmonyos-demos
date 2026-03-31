@@ -3,7 +3,7 @@ import { cloudResPrefetch } from '@kit.CloudFoundationKit';
 import { HomeApis, HomeConfigResp } from 'lib_network';
 import { UtilLog as Logger } from '@hw-agconnect/util-log';
 
-const TAG: string = '[PreloadUtil]'
+const TAG: string = '[PreloadUtil]';
 
 export class PreloadUtil {
   /**
@@ -11,7 +11,7 @@ export class PreloadUtil {
    * 预加载指南：https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/cloudfoundation-prefetch-overview
    */
   public static async getPreloadData(): Promise<HomeConfigResp | undefined> {
-    let res: HomeConfigResp | undefined = undefined
+    let res: HomeConfigResp | undefined = undefined;
     try {
       await cloudResPrefetch.getPrefetchResult(cloudResPrefetch.PrefetchMode.INSTALL_PREFETCH)
         .then((data: cloudResPrefetch.PrefetchResult) => {
@@ -26,7 +26,7 @@ export class PreloadUtil {
     }
     if (!res) {
       // 使用原有方式获取应用数据
-      res = await HomeApis.getHomeConfig()
+      res = await HomeApis.getHomeConfig();
     }
     return res;
   }

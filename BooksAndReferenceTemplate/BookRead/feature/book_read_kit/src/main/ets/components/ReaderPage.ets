@@ -8,7 +8,17 @@ import { Logger } from '@hw-agconnect/ui-base';
 import { ReaderToolBar } from 'reader_tool_bar';
 import { baseActionSheet, UserInfo } from 'base_common';
 import { ReviewDataUtil } from '../utils/ReviewDataUtil';
-import { BookApi, BookInfo, BreakpointSystem, Constants, EpubUtils, ReadSet, TCRouter, WindowUtils } from 'common';
+import {
+  BookApi,
+  BookInfo,
+  BreakpointSystem,
+  ColorModeClass,
+  Constants,
+  EpubUtils,
+  ReadSet,
+  TCRouter,
+  WindowUtils
+} from 'common';
 import { ReaderTopCard } from './ReaderTopCard';
 import { BookCoverCard } from './BookCoverCard';
 
@@ -39,7 +49,9 @@ export struct ReaderPage {
   @Local isNavigatingToReview: boolean = false;
   @Local isLastPage: boolean = false;
   @Local hasTriggeredReviewNavigation: boolean = false;
-  @Local swiperIndex:number = 0
+  @Local swiperIndex: number = 0
+  @Local nightCurrentMode: ColorModeClass = AppStorageV2.connect(ColorModeClass, () => new ColorModeClass())!
+  @Provider('nightMode') nightMode: boolean = AppStorage.get<boolean>('bookNightMode') ?? false;
   private lastSwipeTime: number = 0;
   private swipeThreshold: number = 50;
   private swipeStartX: number = 0;
@@ -60,6 +72,15 @@ export struct ReaderPage {
     width: 328,
     backgroundColor: Color.White,
   })
+
+  @Monitor('nightCurrentMode.currentMode')
+  onColorModeChange() {
+    if (this.pageData) {
+      this.readerSetting.nightMode =
+        this.nightCurrentMode.currentMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK
+      this.readerComponentController.setPageConfig(this.readerSetting)
+    }
+  }
 
   onWindowsAppear(): void {
     WindowUtils.onWindowSizeChange(() => {
@@ -196,7 +217,6 @@ export struct ReaderPage {
   }
 
   private async preprocess() {
-
     let context = this.getUIContext().getHostContext() as common.UIAbilityContext;
     let initPromise: Promise<void> = this.readerComponentController.init(context);
     let defaultHandlerPromise: Promise<bookParser.BookParserHandler> =
@@ -381,8 +401,12 @@ export struct ReaderPage {
         domPos = this.pageData.startDomPos
       }
       if (this.bookParserHandler) {
-        this.readerSetting.viewPortWidth = WindowUtils.getWindowWidth()
-        this.readerSetting.viewPortHeight = WindowUtils.getWindowHeight()
+        this.readerSetting.viewPortWidth = WindowUtils.getWindowWidth();
+        this.readerSetting.viewPortHeight = WindowUtils.getWindowHeight();
+        this.readerSetting.nightMode = AppStorage.get<boolean>('bookNightMode') ??
+          this.context.config.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK;
+        this.readerSetting.fontColor = this.readerSetting.nightMode ? 'rgba(255,255,255,0.60)' : 'rgba(0,0,0,0.90)'
+        this.readerSetting.themeColor = this.readerSetting.nightMode ? '#000000' : 'rgba(251, 240, 219, 1)';
         this.readerComponentController.registerBookParser(this.bookParserHandler);
         this.readerComponentController.setPageConfig(this.readerSetting)
         this.readerComponentController.startPlay(spineIndex, domPos);
@@ -390,7 +414,6 @@ export struct ReaderPage {
     } catch (err) {
       hilog.error(0x0000, 'testTag', `failed to startPlay, Code is ${err.code}, message is ${err.message}`);
     }
-
   }
 
   onWillHide(): void {
@@ -405,7 +428,6 @@ export struct ReaderPage {
     AppStorage.set('userInfo', this.userInfo)
     this.readerComponentController.off('resourceRequest');
     this.readerComponentController.off('pageShow');
-    this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT)
 
     // 如果是跳转到精彩书评页面，则不释放阅读器实例
     if (!this.isNavigatingToReview) {

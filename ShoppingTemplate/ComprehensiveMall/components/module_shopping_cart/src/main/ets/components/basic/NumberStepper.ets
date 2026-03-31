@@ -1,5 +1,4 @@
-import { calcAdd, calcSub } from '../../commons/uitls';
-
+import { calcAdd, calcSub } from '../../commons/utils';
 
 type StepperBtnType = 'increase' | 'decrease';
 
@@ -91,6 +90,7 @@ export struct NumberStepper {
 
       TextInput({ text: $$this.inputNum })
         .fontSize(12)
+        .fontColor($r('app.color.font_color_level1'))
         .type(InputType.Number)
         .width(this.inputWidth)
         .height(this.buttonSize)
@@ -113,7 +113,7 @@ export struct NumberStepper {
     }
     .border({
       width: 1,
-      color: '#E6E6E6',
+      color: $r('sys.color.comp_divider'),
       style: BorderStyle.Solid,
       radius: this.buttonSize,
     })
@@ -124,12 +124,12 @@ export struct NumberStepper {
     Button() {
       Image(type === 'decrease' ? $r('app.media.ic_minus') : $r('app.media.ic_plus'))
         .scale({ x: 0.6, y: 0.6 })
-        .fillColor(this.getBtnDisabled(type) ? '#838485' : '#191919')
+        .fillColor(this.getBtnDisabled(type) ? $r('app.color.font_color_level3') : $r('app.color.font_color_level1'))
     }
     .type(this.buttonType)
     .width(this.buttonSize)
     .height(this.buttonSize)
-    .backgroundColor(this.disabled ? '#f7f8fa' : '#0d000000')
+    .backgroundColor(this.disabled ? $r('app.color.background_color_grey_light') : $r('app.color.background_color_grey'))
     .opacity(this.getBtnDisabled(type) ? 0.6 : 1)
     .onClick(() => {
       this.handleClickStepperBtn(type);

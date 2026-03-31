@@ -15,9 +15,10 @@
 
 import { AppStorageV2 } from '@kit.ArkUI';
 import { pasteboard } from '@kit.BasicServicesKit';
-import { RouterMap, RouterModule } from 'router_module'
 import { Header } from '../components/Header';
-import { OrderInfo, OrderState, SampleOrderInfo } from 'commonlib';
+import {
+  GlobalContextUtils, OrderInfo, OrderState, SampleOrderInfo, RouterMap, RouterModule
+} from 'commonlib';
 import { MyInfo } from './OrderListPage';
 
 @Builder
@@ -28,9 +29,9 @@ export function OrderDetailBuilder() {
 @ComponentV2
 export struct OrderDetailPage {
   textTimerController: TextTimerController = new TextTimerController();
-  @Local info: OrderInfo = new OrderInfo('', false, OrderState.WaitToPay, '', '', false)
+  @Local info: OrderInfo = new OrderInfo('', false, OrderState.WaitToPay, '', '', false);
   refreshCallback: () => void = () => {
-  }
+  };
 
   @Builder
   infoItem(title: string, content: string, image?: Resource) {
@@ -39,39 +40,39 @@ export struct OrderDetailPage {
         .fontSize($r('sys.float.Body_S'))
         .fontWeight(FontWeight.Regular)
         .fontColor($r('sys.color.font_primary'))
-        .lineHeight(22)
+        .lineHeight(22);
       Text(content)
         .fontSize($r('sys.float.Body_S'))
         .fontWeight(FontWeight.Medium)
         .fontColor($r('sys.color.font_secondary'))
         .margin({ left: 12 })
-        .lineHeight(20)
-      Blank()
+        .lineHeight(20);
+      Blank();
       if (image) {
         Image(image)
           .width(12).height(12)
           .onClick(() => {
             if (title === '订单编号') {
               try {
-                let paste: string = pasteboard.MIMETYPE_TEXT_PLAIN
+                let paste: string = pasteboard.MIMETYPE_TEXT_PLAIN;
                 let orderNo: string = this.info.orderNo;
                 let pasteData: pasteboard.PasteData = pasteboard.createData(paste, orderNo);
                 let sysPaste: pasteboard.SystemPasteboard = pasteboard.getSystemPasteboard();
                 sysPaste.setData(pasteData, (err) => {
                   if (err) {
-                    this.showToast('复制失败');
+                    GlobalContextUtils.showToast({ message: '复制失败' });
                     return;
                   }
-                  this.showToast(this.info.orderNo + '复制成功');
+                  GlobalContextUtils.showToast({ message: '复制成功' });
                 });
-              }catch (e) {
+              } catch (e) {
               }
             }
-          })
+          });
       }
     }
     .width('100%')
-    .margin({ top: 12 })
+    .margin({ top: 12 });
   }
 
   @Builder
@@ -81,13 +82,13 @@ export struct OrderDetailPage {
         (this.info.orderState === OrderState.Paid ? '已完成' : '已取消'))
         .fontSize($r('sys.float.Title_M'))
         .fontWeight(FontWeight.Medium)
-        .fontColor($r('sys.color.font_primary'))
+        .fontColor($r('sys.color.font_primary'));
       if (this.info.orderState === OrderState.WaitToPay) {
         Row() {
           Text('订单将在 ')
             .fontSize($r('sys.float.Body_M'))
             .fontWeight(FontWeight.Regular)
-            .fontColor($r('sys.color.font_secondary'))
+            .fontColor($r('sys.color.font_secondary'));
           // 计时器
           TextTimer({
             isCountDown: true,
@@ -100,8 +101,8 @@ export struct OrderDetailPage {
             .fontColor($r('sys.color.multi_color_08'))
             .onTimer((_utc: number, elapsedTime: number) => {
               if (elapsedTime >= (this.info.startTime + 30 * 60 * 1000 - Date.now()) / 100) {
-                this.info.orderState = OrderState.Cancelled
-                this.showToast('订单已取消');
+                this.info.orderState = OrderState.Cancelled;
+                GlobalContextUtils.showToast({ message: '订单已取消' });
               }
             })
             .onAppear(() => {
@@ -109,19 +110,19 @@ export struct OrderDetailPage {
             })
             .onDisAppear(() => {
               this.textTimerController.reset();
-            })
+            });
           Text(' 后自动取消')
             .fontSize($r('sys.float.Body_M'))
             .fontWeight(FontWeight.Regular)
-            .fontColor($r('sys.color.font_secondary'))
+            .fontColor($r('sys.color.font_secondary'));
         }
         .height(19)
-        .margin({ top: 6 })
+        .margin({ top: 6 });
       }
     }
     .width('100%')
     .alignItems(HorizontalAlign.Start)
-    .margin({ left: 8, top: 24 })
+    .margin({ left: 8, top: 24 });
   }
 
   @Builder
@@ -130,52 +131,52 @@ export struct OrderDetailPage {
       Text('商品信息')
         .fontSize($r('sys.float.Body_L'))
         .fontWeight(FontWeight.Medium)
-        .fontColor($r('sys.color.font_primary'))
+        .fontColor($r('sys.color.font_primary'));
       Row() {
         Image($r('app.media.avatar'))
           .width(24)
           .height(24)
-          .borderRadius(12)
+          .borderRadius(12);
         Text(this.info.userName)
           .fontSize($r('sys.float.Body_L'))
           .fontWeight(FontWeight.Regular)
           .fontColor($r('sys.color.font_primary'))
-          .margin({ left: 12 })
+          .margin({ left: 12 });
       }
       .width('100%')
-      .margin({ top: 12 })
+      .margin({ top: 12 });
 
       Text(this.info.content)
         .fontSize($r('sys.float.Body_M'))
         .fontWeight(FontWeight.Medium)
         .fontColor($r('sys.color.font_primary'))
-        .margin({ left: 12, right: 12, top: 8 })
+        .margin({ left: 12, right: 12, top: 8 });
       Divider()
         .strokeWidth(2)
         .color($r('sys.color.comp_divider'))
-        .margin({ top: 12 })
+        .margin({ top: 12 });
       Row() {
         Text('实际金额：')
           .fontSize($r('sys.float.Caption_L'))
           .fontWeight(FontWeight.Medium)
-          .fontColor($r('sys.color.font_primary'))
+          .fontColor($r('sys.color.font_primary'));
         Text('￥' + this.info.price)
           .fontSize($r('sys.float.Body_L'))
           .fontWeight(FontWeight.Medium)
-          .fontColor($r('sys.color.multi_color_08'))
+          .fontColor($r('sys.color.multi_color_08'));
       }
       .alignItems(VerticalAlign.Bottom)
       .justifyContent(FlexAlign.End)
       .width('100%')
-      .margin({ top: 12 })
+      .margin({ top: 12 });
     }
     .alignItems(HorizontalAlign.Start)
     .height(154)
     .borderRadius($r('app.float.vp_16'))
-    .backgroundColor($r('sys.color.background_primary'))
+    .backgroundColor($r('sys.color.comp_background_list_card'))
     .padding(12)
     .margin({ left: $r('app.float.vp_16'), right: $r('app.float.vp_16'), top: 24 })
-    .width('100%')
+    .width('100%');
   }
 
   @Builder
@@ -184,22 +185,22 @@ export struct OrderDetailPage {
       Text('订单信息')
         .fontSize($r('sys.float.Body_L'))
         .fontWeight(FontWeight.Medium)
-        .fontColor($r('sys.color.font_primary'))
+        .fontColor($r('sys.color.font_primary'));
       Divider()
         .strokeWidth(2)
         .color($r('sys.color.comp_divider'))
-        .margin({ top: 12 })
-      this.infoItem('支付方式', '华为支付', $r('app.media.iconRight'))
-      this.infoItem('订单编号', this.info.orderNo, $r('app.media.copy'))
-      this.infoItem('下单时间', '2025-02-12  14:20:50', undefined)
+        .margin({ top: 12 });
+      this.infoItem('支付方式', '华为支付', $r('app.media.iconRight'));
+      this.infoItem('订单编号', this.info.orderNo, $r('app.media.copy'));
+      this.infoItem('下单时间', '2025-02-12  14:20:50', undefined);
     }
     .alignItems(HorizontalAlign.Start)
     .height(157)
     .borderRadius($r('app.float.vp_16'))
-    .backgroundColor($r('sys.color.background_primary'))
+    .backgroundColor($r('sys.color.comp_background_list_card'))
     .padding(12)
     .margin({ left: $r('app.float.vp_16'), right: $r('app.float.vp_16'), top: 12 })
-    .width('100%')
+    .width('100%');
   }
 
   @Builder
@@ -210,17 +211,16 @@ export struct OrderDetailPage {
           .fontSize($r('sys.float.Body_M'))
           .fontWeight(FontWeight.Medium)
           .fontColor($r('sys.color.font_primary'))
-          .margin({ left: 21 })
+          .margin({ left: 21 });
         Text('￥' + this.info.price)
           .fontSize($r('sys.float.Body_L'))
           .fontWeight(FontWeight.Medium)
           .fontColor($r('sys.color.multi_color_08'))
-          .margin({ left: 2 })
+          .margin({ left: 2 });
       }
-      Blank()
+      Blank();
       Button(this.info.orderState === OrderState.WaitToPay ? '立即支付' :
         (this.info.orderState === OrderState.Paid ? '立即学习' : '重新下单'))
-        .padding(0)
         .backgroundColor($r('sys.color.multi_color_08'))
         .fontSize($r('sys.float.Body_L'))
         .fontWeight(FontWeight.Medium)
@@ -232,68 +232,67 @@ export struct OrderDetailPage {
             let sampleOrderInfo = AppStorageV2.connect(SampleOrderInfo, () => new SampleOrderInfo())!;
             sampleOrderInfo.orderInfos.forEach((orderInfo: OrderInfo) => {
               if (orderInfo.orderNo === this.info.orderNo) {
-                orderInfo.orderState = OrderState.Paid
+                orderInfo.orderState = OrderState.Paid;
               }
-            })
-            sampleOrderInfo.orderInfos = sampleOrderInfo.orderInfos
-            this.refreshCallback()
-            RouterModule.pop(true)
+            });
+            sampleOrderInfo.orderInfos = sampleOrderInfo.orderInfos;
+            this.refreshCallback();
+            RouterModule.pop(true);
           } else if (this.info.orderState === OrderState.WaitToPay) {
             let sampleOrderInfo = AppStorageV2.connect(SampleOrderInfo, () => new SampleOrderInfo())!;
             sampleOrderInfo.orderInfos.forEach((orderInfo: OrderInfo) => {
               if (orderInfo.orderNo === this.info.orderNo) {
-                orderInfo.orderState = OrderState.Paid
+                orderInfo.orderState = OrderState.Paid;
               }
-            })
-            sampleOrderInfo.orderInfos = sampleOrderInfo.orderInfos
-            this.refreshCallback()
-            RouterModule.pop(true)
+            });
+            sampleOrderInfo.orderInfos = sampleOrderInfo.orderInfos;
+            this.refreshCallback();
+            RouterModule.pop(true);
           } else if (this.info.orderState === OrderState.Paid) {
             RouterModule.push({ url: RouterMap.COURSE_INTRODUCTION_PAGE });
           }
         })
-        .margin({ right: $r('app.float.vp_16') })
+        .margin({ right: $r('app.float.vp_16') });
     }
     .width('100%')
     .height(56)
-    .backgroundColor($r('sys.color.background_primary'))
+    .alignItems(VerticalAlign.Bottom)
+    .backgroundColor($r('sys.color.comp_background_primary'));
   }
 
   aboutToAppear(): void {
-    let temp = RouterModule.getNavParam({ url: RouterMap.Order_Detail_PAGE }) as MyInfo
+    let temp = RouterModule.getNavParam({ url: RouterMap.Order_Detail_PAGE }) as MyInfo;
     if (temp) {
-      this.info = temp.info
-      this.refreshCallback = temp.refreshCallback
-    }
-  }
-
-  showToast(message: string) {
-    try {
-      this.getUIContext().getPromptAction().showToast({
-        message: message,
-        duration: 2000
-      });
-    } catch (error) {
+      this.info = temp.info;
+      this.refreshCallback = temp.refreshCallback;
     }
   }
 
   build() {
     Column() {
       Header({ title: '订单详情' })
+        .width('100%')
+        .height(56);
+
       Column() {
-        this.goodsTipInfo()
-        this.goodsDetailInfo()
-        this.orderInfo()
+        this.goodsTipInfo();
+        this.goodsDetailInfo();
+        this.orderInfo();
       }
       .padding({ left: $r('app.float.vp_16'), right: $r('app.float.vp_16') })
       .width('100%')
+      .backgroundColor($r('sys.color.background_secondary'));
 
       Blank()
-      this.orderBottomInfo()
+        .layoutWeight(1)
+        .backgroundColor($r('sys.color.background_secondary'));
+
+      this.orderBottomInfo();
     }
     .alignItems(HorizontalAlign.Start)
-    .backgroundColor($r('sys.color.background_secondary'))
     .width('100%')
     .height('100%')
+    .backgroundColor($r('sys.color.comp_background_primary'))
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM]);
   }
 }

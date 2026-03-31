@@ -126,6 +126,6 @@ export class WeiboLogger {
 
 export class Utility {
   getSign(a14?: boolean): Promise<string> {
-    return Promise.resolve('')
+    return Promise.resolve('');
   };
 }

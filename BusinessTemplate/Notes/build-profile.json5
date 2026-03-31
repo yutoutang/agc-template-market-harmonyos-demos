@@ -5,8 +5,8 @@
       {
         "name": "default",
         "signingConfig": "default",
-        "compatibleSdkVersion": "5.0.3(15)",
-        "targetSdkVersion": "5.0.3(15)",
+        "compatibleSdkVersion": "6.0.0(20)",
+        "targetSdkVersion": "6.0.2(22)",
         "runtimeOS": "HarmonyOS"
       }
     ],
@@ -25,10 +25,6 @@
       "srcPath": "./common/datasource"
     },
     {
-      "name": "utils",
-      "srcPath": "./common/utils"
-    },
-    {
       "name": "phone",
       "srcPath": "./product/phone",
       "targets": [
@@ -41,6 +37,10 @@
       ]
     },
     {
+      "name": "utils",
+      "srcPath": "./common/utils"
+    },
+    {
       "name": "secretlock",
       "srcPath": "./components/secretlock"
     },
@@ -49,16 +49,32 @@
       "srcPath": "./components/richeditor"
     },
     {
-      "name": "check_app_update",
-      "srcPath": "./components/check_app_update"
-    },
-    {
       "name": "login",
       "srcPath": "./components/login"
     },
     {
+      "name": "check_app_update",
+      "srcPath": "./components/check_app_update"
+    },
+    {
       "name": "feed_back",
       "srcPath": "./components/feed_back"
+    },
+    {
+      "name": "serializer",
+      "srcPath": "./components/serializer"
+    },
+    {
+      "name": "grabthransfer",
+      "srcPath": "./common/grabthransfer"
+    },
+    {
+      "name": "continue",
+      "srcPath": "./common/continue"
+    },
+    {
+      "name": "aggregated_ads",
+      "srcPath": "./components/aggregated_ads"
     }
   ]
 }

@@ -1,8 +1,9 @@
-import { promptAction } from '@kit.ArkUI';
-import { ResourceUtil } from 'bill_base';
+import { Logger, ResourceUtil } from 'bill_base';
 import { BillManageModel } from '../commons/Models';
 import { billManageSheetBuilder } from '../components/BillManageSheet';
 import { resourceManageSheetBuilder } from '../components/ResourceManageSheet';
+
+const TAG = '[ResourceManageSheetExample1]'
 
 @Entry
 @ComponentV2
@@ -31,7 +32,11 @@ struct ResourceManageSheetExample1 {
           Button('删除账单')
             .onClick(() => {
               this.bill = undefined;
-              promptAction.showToast({ message: '删除账单成功！' });
+              try {
+                this.getUIContext().getPromptAction().showToast({ message: '删除账单成功！' });
+              } catch (err) {
+                Logger.error(TAG, 'show toast failed. error:' + JSON.stringify(err));
+              }
             });
         }
       };

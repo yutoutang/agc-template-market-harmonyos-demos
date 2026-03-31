@@ -1,7 +1,9 @@
 import { AppStorageV2, PiPWindow } from '@kit.ArkUI';
 import { audio } from '@kit.AudioKit';
-import { BaseViewModel, Logger } from 'lib_common';
-import { PiPWindowModel, VideoCardPlayerController } from 'module_swipeplayer';
+import { BusinessError } from '@kit.BasicServicesKit';
+import { AppConstants, BaseViewModel, Logger } from 'lib_common';
+import { AVPlayerState, PiPWindowModel, VideoCardPlayerController } from 'module_swipeplayer';
+import { PipUINodeController } from '../utils/PipUINodeController';
 
 const TAG = '[VideoPipViewModel]'
 
@@ -12,27 +14,41 @@ export class VideoPipViewModel extends BaseViewModel {
   videoCardPlayerController: VideoCardPlayerController = new VideoCardPlayerController();
   @Trace mXComponentController: XComponentController | undefined = undefined;
   @Trace curState: string = '';
-  @Trace videoId: string = ''
+  @Trace videoId: string = '';
+  @Trace pipUINodeController: PipUINodeController = new PipUINodeController();
 
   @Monitor('pipWindowModel.isEnablePiP')
   onEnablePiPChange() {
-    // 如果出现了画中画，则在画中画中的暂停不处理
+    // 处理画中画控制面板控件功能状态  视频播放控制面板中播放/暂停控件。
+    const controlType: PiPWindow.PiPControlType = PiPWindow.PiPControlType.VIDEO_PLAY_PAUSE;
+    const status: PiPWindow.PiPControlStatus =
+      this.pipWindowModel.videoPlayerStatus === AVPlayerState.PLAYING ? PiPWindow.PiPControlStatus.PLAY :
+        PiPWindow.PiPControlStatus.PAUSE;
+    this.pipWindowModel.pipController?.updatePiPControlStatus(controlType, status);
+
     if (this.pipWindowModel.isBackPiP || this.pipWindowModel.isBackgroundPip) {
       return;
     }
     // 播放状态时才能使用画中画，其他状态不展示画中画;
     this.pipWindowModel.pipController?.setAutoStartEnabled(this.pipWindowModel.isEnablePiP);
-    // 处理画中画控制面板控件功能状态  视频播放控制面板中播放/暂停控件。
-    let controlType: PiPWindow.PiPControlType = PiPWindow.PiPControlType.VIDEO_PLAY_PAUSE;
-    if (this.pipWindowModel.videoPlayerStatus === 'playing') {
-      let status: PiPWindow.PiPControlStatus = PiPWindow.PiPControlStatus.PLAY;
-      this.pipWindowModel.pipController?.updatePiPControlStatus(controlType, status);
-    } else if (this.pipWindowModel.videoPlayerStatus === 'paused') {
-      let status: PiPWindow.PiPControlStatus = PiPWindow.PiPControlStatus.PAUSE;
-      this.pipWindowModel.pipController?.updatePiPControlStatus(controlType, status);
+  }
+
+  @Monitor('userInfoModel.isLogin')
+  onLogin() {
+    if (this.pipWindowModel.pipController) {
+      this.pipUINodeController.setMessage(this.userInfoModel.isLogin ? '请开通会员后继续观看' :
+        '请登录/开通会员后继续观看');
+      this.pipUINodeController.update();
     }
   }
 
+  updatePip(canPlay: boolean) {
+    if (this.pipWindowModel.pipController) {
+      this.pipWindowModel.pipController.setPiPControlEnabled(PiPWindow.PiPControlType.VIDEO_PLAY_PAUSE, canPlay);
+      this.pipUINodeController.setVisible(!canPlay);
+      this.pipUINodeController.update();
+    }
+  }
 
   initVideoPip() {
     if (this.mXComponentController && this.pipWindowModel.videoPlayerStatus === 'playing') {
@@ -44,6 +60,9 @@ export class VideoPipViewModel extends BaseViewModel {
     if (this.settingInfo.network.enableLivePiP) {
       if (this.pipWindowModel.isEnablePiP) {
         this.pipWindowModel.isBackPiP = isBackPiP;
+        if (this.pipWindowModel.isBackPiP) {
+          this.pipWindowModel.isReleaseVideoPlayer = false;
+        }
         this.videoId = videoId
         this.startPip();
       } else {
@@ -65,7 +84,7 @@ export class VideoPipViewModel extends BaseViewModel {
     try {
       await this.pipWindowModel.pipController.startPiP();
     } catch (error) {
-      Logger.error('livestreamDetail', 'Failed to startPiP Cause: %{public}s', JSON.stringify(error) ?? '');
+      Logger.error(TAG, 'Failed to startPiP Cause: %{public}s', JSON.stringify(error) ?? '');
     }
     this.audioInterrupt()
   }
@@ -73,20 +92,23 @@ export class VideoPipViewModel extends BaseViewModel {
   private async createPipController() {
     this.pipWindowModel.pipController = undefined;
     try {
+      this.pipUINodeController.setMessage(this.userInfoModel.isLogin ? '请开通会员后继续观看' :
+        '请登录/开通会员后继续观看');
       this.pipWindowModel.pipController = await PiPWindow.create({
         context: this.context,
         componentController: this.mXComponentController,
-        navigationId: 'navigationId',
+        navigationId: AppConstants.NAVIGATION_ID,
         templateType: PiPWindow.PiPTemplateType.VIDEO_PLAY,
+        customUIController: this.pipUINodeController,
       });
-      this.pipWindowModel.pipController.on('stateChange', (state: PiPWindow.PiPState, reason: string) => {
-        this.onStateChange(state, reason);
+      this.pipWindowModel.pipController.on('stateChange', (state: PiPWindow.PiPState) => {
+        this.onStateChange(state);
       });
       this.pipWindowModel.pipController.on('controlEvent', (control) => {
         this.onActionEvent(control);
       });
     } catch (e) {
-      console.log('create pipController error' + e)
+      Logger.error(TAG, 'create pipController error' + e)
     }
     this.pipWindowModel.pipController?.setAutoStartEnabled(true);
   }
@@ -110,15 +132,17 @@ export class VideoPipViewModel extends BaseViewModel {
     this.pipWindowModel.isReleaseVideoPlayer = true;
     this.pipWindowModel.pipController?.setAutoStartEnabled(false);
     this.pipWindowModel.pipController = undefined;
+    Logger.debug('isReleaseVideoPlayer destroy')
   }
 
-  private onStateChange(state: PiPWindow.PiPState, reason: string) {
+  private onStateChange(state: PiPWindow.PiPState) {
     switch (state) {
       case PiPWindow.PiPState.ABOUT_TO_START:
         // 返回时出现的画中画，不需要销毁播放器对象
         if (this.pipWindowModel.isBackPiP) {
           this.pipWindowModel.isReleaseVideoPlayer = false;
         }
+        this.pipWindowModel.isPipStop = false;
         this.curState = 'ABOUT_TO_START';
         break;
       case PiPWindow.PiPState.STARTED:
@@ -128,6 +152,7 @@ export class VideoPipViewModel extends BaseViewModel {
         break;
       case PiPWindow.PiPState.ABOUT_TO_STOP:
         this.curState = 'ABOUT_TO_STOP';
+        this.pipUINodeController.dispose();
         break;
       case PiPWindow.PiPState.STOPPED:
         this.pipWindowModel.currentPiPVideoId = '';
@@ -135,7 +160,7 @@ export class VideoPipViewModel extends BaseViewModel {
         if (this.pipWindowModel.isBackPiP) {
           this.pipWindowModel.isReleaseVideoPlayer = true;
         }
-        this.pipWindowModel.pipController = undefined;
+        this.pipWindowModel.isPipStop = true;
         this.curState = 'STOPPED';
         break;
       case PiPWindow.PiPState.ABOUT_TO_RESTORE:
@@ -173,7 +198,7 @@ export class VideoPipViewModel extends BaseViewModel {
       await this.pipWindowModel.pipController.stopPiP();
       this.cancelAudioInterrupt()
     } catch (error) {
-      Logger.error('livestreamDetail', 'Failed to stopPiP Cause: %{public}s', JSON.stringify(error) ?? '');
+      Logger.error(TAG, `Failed to stopPiP Cause: ${JSON.stringify(error)}`);
     }
   }
 
@@ -192,6 +217,7 @@ export class VideoPipViewModel extends BaseViewModel {
         this.pipWindowModel.pipController.off('stateChange');
         this.pipWindowModel.pipController.off('controlEvent');
         this.pipWindowModel.pipController = undefined;
+        Logger.debug('isReleaseVideoPlayer isRestPipController')
       }
     }
   }
@@ -214,10 +240,12 @@ export class VideoPipViewModel extends BaseViewModel {
   public audioInterrupt() {
     let avPlayer = this.videoCardPlayerController.getAvplayer()
     if (avPlayer) {
-      avPlayer!.on('audioInterrupt', (info: audio.InterruptEvent) => {
+      avPlayer.on('audioInterrupt', (info: audio.InterruptEvent) => {
         if (info.forceType === audio.InterruptForceType.INTERRUPT_FORCE) {
           this.pipWindowModel.isBackPiP = false;
-          this.pipWindowModel.pipController?.stopPiP()
+          this.pipWindowModel.pipController?.stopPiP().catch((e: BusinessError) => {
+            Logger.error(TAG, `Failed to stopPiP. Code: ${e.code}, message: ${e.message}`);
+          })
         }
       });
     }
@@ -229,7 +257,7 @@ export class VideoPipViewModel extends BaseViewModel {
   public cancelAudioInterrupt() {
     let avPlayer = this.videoCardPlayerController.getAvplayer()
     if (avPlayer) {
-      avPlayer!.off('audioInterrupt');
+      avPlayer.off('audioInterrupt');
     }
   }
 }

@@ -1,4 +1,4 @@
-import { RequestUrlMap } from '../../constants/Enums';
+import { RequestUrlMap } from '../../constants/RequestUrlMap';
 import {
   CategoryProductListResp,
   HomeConfigResp,

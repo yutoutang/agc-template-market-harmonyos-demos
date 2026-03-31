@@ -1,6 +1,7 @@
 import { AggregatedLogin } from '../components/AggregatedLogin';
 import { LoginInfoOptions } from '../utils/LoginSheetUtils';
 
+@Entry
 @ComponentV2
 struct AggregatedLoginPage {
   @Local routerModule: NavPathStack = new NavPathStack();
@@ -12,7 +13,6 @@ struct AggregatedLoginPage {
         Column() {
           // 登录使用
           AggregatedLogin({
-            wxApi: this.params.wxApi,
             routerModule: this.routerModule,
             icon: this.params.icon,
             themeColor: this.params.themeColor,

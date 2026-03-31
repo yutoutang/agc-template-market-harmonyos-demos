@@ -130,7 +130,23 @@
     },
     {
       "name": "agcit_huawei_notes",
-      "value": "1.0.2"
+      "value": "1.0.4"
+    },
+    {
+      "name": "noteCardAbility_desc",
+      "value": "form_description"
+    },
+    {
+      "name": "noteCardAbility_label",
+      "value": "noteCard"
+    },
+    {
+      "name": "notecard_desc",
+      "value": "This is a service widget."
+    },
+    {
+      "name": "notecard_display_name",
+      "value": "notecard"
     }
   ]
 }

@@ -1,5 +1,5 @@
 import { AssetSummary } from 'asset_base';
-import { AccountID, BalanceChangeType } from 'bill_base';
+import { BalanceChangeType, AccountType } from 'bill_base';
 import { TablePredicateParams } from '../basedb/Types';
 import {
   AccountTableFields,
@@ -29,16 +29,13 @@ export interface AccountingResource {
 }
 
 export interface AccountTableBasis {
-  accountId: AccountID;
-  name: string;
-  type: string;
-}
-
-export interface Account {
   accountId: number;
   name: string;
-  type: string;
-  balance: number;
+  type: AccountType;
+  date: string;
+  accountIncome: number;
+  accountExpense: number;
+  transactionCount?: number;
 }
 
 export interface TransactionTableBasis extends UserTransaction {
@@ -68,8 +65,23 @@ export interface AssetTableBasis extends UserAsset {
   assetId: number;
   note: string;
 }
-//
+
+export interface BudgetTableBasis {
+  id: number;
+  accountId: number;
+  month: string;
+  amount: number;
+}
 
 export interface AssetReport extends AssetSummary {
   assets: AssetTableBasis[];
+}
+
+export interface BillInfo {
+  totalDays: number;
+  totalBills: number;
+}
+
+export interface MinAccountId {
+  minAccountId: number;
 }

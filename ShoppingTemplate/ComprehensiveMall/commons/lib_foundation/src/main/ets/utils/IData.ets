@@ -24,10 +24,10 @@ class IData {
       GlobalStateMgr,
       'GlobalStateMgr',
       () => new GlobalStateMgr(),
-    )!
+    )!;
   }
 }
 
-const iData = new IData()
+const iData = new IData();
 
 export { iData };

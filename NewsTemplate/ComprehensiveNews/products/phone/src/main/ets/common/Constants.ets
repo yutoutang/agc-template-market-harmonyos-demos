@@ -1,16 +1,9 @@
-import { RouterMap } from 'lib_common';
+import { RouterMap, TabBarType } from 'lib_common';
 
 export interface TabBarItem {
   id: TabBarType;
   title: ResourceStr;
   activeIcon: ResourceStr;
-}
-
-export enum TabBarType {
-  HOME = 0,
-  VIDEO,
-  COMMUNITY,
-  MINE
 }
 
 export const TABS_INFO: TabBarItem[] = [

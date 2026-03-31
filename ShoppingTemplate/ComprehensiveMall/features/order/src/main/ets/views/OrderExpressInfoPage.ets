@@ -1,8 +1,9 @@
 import { MapComponent } from '@kit.MapKit';
-import { routerStack } from 'lib_foundation';
-import { LogisticsItem, OrderItem } from 'lib_network';
+import { routerStack, TelUtil } from 'lib_foundation';
+import { LogisticsItem, LogisticsItemDetail, OrderItem } from 'lib_network';
+import { TextSegment } from '../common/Types';
 import { OrderUtil } from '../utils/OrderUtil';
-import { OrderExpressInfoVM } from '../viewModels/OrderExpressInfoVM';
+import { OrderExpressInfoVM } from '../viewmodels/OrderExpressInfoVM';
 
 @Builder
 export function buildOrderExpressInfoPage() {
@@ -12,10 +13,8 @@ export function buildOrderExpressInfoPage() {
 @ComponentV2
 export struct OrderExpressInfoPage {
   @Local
-  showExpress:boolean = true
-
+  showExpress: boolean = true
   vm: OrderExpressInfoVM = new OrderExpressInfoVM(this.getUIContext())
-
 
   aboutToAppear(): void {
     this.vm.initMap(
@@ -44,11 +43,12 @@ export struct OrderExpressInfoPage {
         preferType: SheetType.BOTTOM,
         showClose: false,
         dragBar: false,
-        backgroundColor:$r('app.color.background_color_white'),
+        scrollSizeMode: ScrollSizeMode.CONTINUOUS,
         enableOutsideInteractive: true,
-        detents: [200, SheetSize.MEDIUM],
+        backgroundColor: $r('app.color.background_color_transparent'),
+        detents: [SheetSize.MEDIUM, SheetSize.LARGE],
         onWillDismiss: (action) => {
-          if(action.reason === DismissReason.PRESS_BACK){
+          if (action.reason === DismissReason.PRESS_BACK) {
             routerStack.pop()
           }
         },
@@ -80,91 +80,150 @@ export struct OrderExpressInfoPage {
   buildLogisticInfoSheet() {
     Column() {
       if (this.vm.expressInfo) {
-        Row() {
-          Text(this.vm.expressInfo.expressName + ' ' + this.vm.expressInfo.expressNo)
-            .fontSize(14)
-            .fontColor($r('app.color.font_color_level1'))
-            .margin({
-              top: 12,
-              bottom: 16,
-            })
-          Text('复制')
-            .fontSize($r('app.float.font_size_10'))
-            .borderWidth(1)
-            .borderColor($r('app.color.theme_color'))
-            .fontColor($r('app.color.theme_color'))
-            .borderRadius($r('app.float.border_radius_capsule'))
-            .padding({
-              left: 8,
-              right: 8,
-              top: 4,
-              bottom: 4,
-            })
-            .backgroundColor($r('app.color.background_color_white'))
-            .onClick(() => {
-              OrderUtil.copyOrderNumber(this.vm.expressInfo!.expressNo)
-            })
-        }
-        .width('100%')
-        .justifyContent(FlexAlign.SpaceBetween)
-      }
+        if (this.vm.courierInfo) {
+          Row() {
+            Image($r('app.media.ic_courier'))
+              .width(48)
+              .height(48)
+              .margin({ right: $r('app.float.space_s') })
 
-      if (this.vm.orderItem?.logisticInfo) {
-        Column() {
-          ForEach(this.vm.orderItem.logisticInfo, (node: LogisticsItem, index: number) => {
-            Flex({ alignItems: ItemAlign.Start }) {
-              Column() {
-                Circle()
-                  .width(12)
-                  .height(12)
-                  .fill(index === 0 ? $r('app.color.theme_color') : $r('app.color.background_color_white'))
-                  .stroke(index === 0 ? $r('app.color.theme_color') : $r('sys.color.comp_divider'))
-
-                if (index !== this.vm.orderItem!.logisticInfo.length - 1) {
-                  Column()
-                    .width(2)
-                    .height(48)
-                    .borderWidth({ right: 1 })
-                    .borderColor($r('sys.color.comp_divider'))
-                    .borderStyle(BorderStyle.Dashed)
-                    .margin({ left: -1 })
-                }
-              }
-
-              Column() {
-                Row() {
-                  Text(OrderUtil.getLogisticStatusLabel(node.status))
-                    .fontSize(14)
-                    .fontWeight(FontWeight.Medium)
-                    .fontColor(index === 0 ? $r('app.color.theme_color') : $r('sys.color.font_primary'))
-                    .margin({ right: 12 })
-                  Text(node.time)
-                    .fontSize(12)
-                    .fontWeight(FontWeight.Regular)
-                    .fontColor(index === 0 ? $r('app.color.theme_color') : $r('app.color.font_color_level3'))
-                }
-                .margin({ bottom: 4 })
-
-                Text(node.desc)
-                  .fontSize(12)
-                  .fontWeight(FontWeight.Regular)
-                  .fontColor($r('app.color.font_color_level2'))
-              }
-              .alignItems(HorizontalAlign.Start)
-              .margin({ left: 8 })
-              .flexGrow(1)
+            Column({ space: 4 }) {
+              Text(this.vm.courierInfo.name)
+                .fontSize(14)
+                .fontColor($r('app.color.font_color_level1'))
+              Text(this.vm.expressInfo.expressName)
+                .fontSize(12)
+                .fontColor($r('app.color.font_color_level2'))
             }
-            .width('100%')
-          }, (item: LogisticsItem) => JSON.stringify(item))
+            .layoutWeight(1)
+            .alignItems(HorizontalAlign.Start)
+
+            Image($r('app.media.ic_express_phone'))
+              .width(32)
+              .height(32)
+              .onClick(() => {
+                TelUtil.callPhone(this.vm.courierInfo!.contactPhone)
+              })
+
+          }
+          .padding($r('app.float.space_l'))
+          .backgroundColor($r('app.color.background_color_primary'))
+          .borderRadius($r('app.float.border_radius_l'))
+          .margin($r('app.float.space_l'))
         }
-        .padding({
-          bottom: $r('app.float.space_xl'),
+
+        Column() {
+          Row() {
+            Text(this.vm.expressInfo.expressName + ' ' + this.vm.expressInfo.expressNo)
+              .fontSize(14)
+              .fontColor($r('app.color.font_color_level1'))
+              .margin({
+                top: 12,
+                bottom: 16,
+              })
+            Text('复制')
+              .fontSize($r('app.float.font_size_12'))
+              .borderWidth(1)
+              .borderColor($r('app.color.theme_color'))
+              .fontColor($r('app.color.theme_color'))
+              .borderRadius($r('app.float.border_radius_capsule'))
+              .padding({
+                left: 12,
+                right: 12,
+                top: 6,
+                bottom: 6,
+              })
+              .backgroundColor($r('app.color.background_color_primary'))
+              .onClick(() => {
+                OrderUtil.copyOrderNumber(this.vm.expressInfo!.expressNo)
+              })
+          }
+          .width('100%')
+          .justifyContent(FlexAlign.SpaceBetween)
+
+          if (this.vm.orderItem?.logisticInfo) {
+            ForEach(this.vm.orderItem.logisticInfo, (node: LogisticsItem, index: number) => {
+              Column() {
+                Row({ space: 8 }) {
+                  Circle()
+                    .width(12)
+                    .height(12)
+                    .fill(index === 0 ? $r('app.color.theme_color') : $r('app.color.background_color_primary'))
+                    .stroke(index === 0 ? $r('app.color.theme_color') : $r('sys.color.comp_divider'))
+                  Row() {
+                    Text(OrderUtil.getLogisticStatusLabel(node.status))
+                      .fontSize(14)
+                      .fontWeight(FontWeight.Medium)
+                      .fontColor(index === 0 ? $r('app.color.theme_color') : $r('sys.color.font_primary'))
+                      .margin({ right: 12 })
+                    Text(OrderUtil.getLogisticStatusTime(node))
+                      .fontSize(10)
+                      .fontWeight(FontWeight.Regular)
+                      .fontColor(index === 0 ? $r('app.color.theme_color') : $r('app.color.font_color_level3'))
+                  }
+                  .layoutWeight(1)
+                  .margin({ bottom: $r('app.float.space_xs') })
+                }
+
+                Row() {
+                  Column() {
+                    ForEach(node.details, (detail: LogisticsItemDetail, index: number) => {
+                      if (index !== 0) {
+                        Text(detail.time)
+                          .fontSize(10)
+                          .fontColor($r('app.color.font_color_level3'))
+                      }
+
+                      Text() {
+                        ForEach(this.vm.splitTextByPhone(detail.desc), (item: TextSegment) => {
+                          Span(item.text)
+                            .fontColor(item.isPhone ? $r('sys.color.font_emphasize') :
+                              $r('app.color.font_color_level2'))
+                            .decoration({
+                              type: item.isPhone ? TextDecorationType.Underline : TextDecorationType.None,
+                              color: item.isPhone ? $r('sys.color.font_emphasize') : $r('app.color.font_color_level2'),
+                            })
+                            .onClick(() => {
+                              if (item.isPhone) {
+                                TelUtil.callPhone(item.text)
+                              }
+                            });
+                        }, (_item: TextSegment, index) => index.toString());
+                      }
+                      .fontSize(10)
+                      .margin({ bottom: $r('app.float.space_m') })
+                    }, (detail: LogisticsItemDetail, index: number) => index + detail.desc)
+                  }
+                  .border({
+                    style: {
+                      left: BorderStyle.Dashed,
+                    },
+                    width: {
+                      left: index < node.details.length - 1 ? 1 : 0,
+                    },
+                    color: $r('app.color.font_color_level3'),
+                  })
+                  .padding({ left: 12, bottom: 4 })
+                  .alignItems(HorizontalAlign.Start)
+                }
+                .padding({ left: 6 })
+                .width($r('app.string.size_percent_full'))
+                .justifyContent(FlexAlign.Start)
+              }
+            }, (node: LogisticsItem) => node.status + JSON.stringify(node.details))
+          }
+        }
+        .layoutWeight(1)
+        .padding($r('app.float.space_l'))
+        .backgroundColor($r('app.color.background_color_primary'))
+        .borderRadius({
+          topLeft: 32,
+          topRight: 32,
         })
+        .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
       }
     }
-    .padding($r('app.float.space_l'))
-    .backgroundColor($r('app.color.background_color_white'))
-    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
+    .margin({ top: 56 })
   }
 
   @Builder

@@ -27,7 +27,7 @@ export class ComponentAttrUtils {
       width: widthValue,
       height: heightValue,
       cornerRadius: cornerRadius ?? 0
-    }
+    };
   }
 }
 

@@ -110,9 +110,9 @@ export class UserService extends BaseService {
     return rsp;
   }
 
-  async deleteUser(userFullInfo: UserFullInfo): Promise<CommonRsp | null> {
+  async deleteUser(context: UIContext, userFullInfo: UserFullInfo): Promise<CommonRsp | null> {
     if (this.serviceConfig.isMock) {
-      return MockService.deleteCurrentUser();
+      return MockService.deleteCurrentUser(context);
     }
     let rsp =
       await this.doRequest<CommonRsp>('/user/' + userFullInfo?.userInfo?.hwUnionId, http.RequestMethod.DELETE, null);

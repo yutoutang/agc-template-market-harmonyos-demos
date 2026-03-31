@@ -1,3 +1,4 @@
+import { window } from '@kit.ArkUI';
 import {
   BalanceChangeType,
   BalanceResourceItem,
@@ -5,12 +6,13 @@ import {
   BreakpointStorage,
   BreakpointSystem,
   BreakpointTypeEnum,
+  Logger,
 } from 'bill_base';
 import { BillManageModel } from '../commons/Models';
-
 import { AddBillVM } from '../viewmodels/AddBillVM';
 import { CustomKeyboard } from './CustomKeyboard';
-import { window } from '@kit.ArkUI';
+
+const TAG = '[BillManageSheet]';
 
 export class BillManageSheetOptions {
   initBill?: BillManageModel;
@@ -63,20 +65,32 @@ export struct BillManageSheet {
 
   async aboutToAppear() {
     this.initData();
-    BreakpointSystem.register(this.getUIContext())
-    this.windowClass = await window.getLastWindow(getContext());
+    BreakpointSystem.register(this.getUIContext());
+    try {
+      this.windowClass = await window.getLastWindow(this.getUIContext().getHostContext()!);
+    } catch (error) {
+      Logger.error(TAG, 'get window failed.error:' + JSON.stringify(error));
+    }
     if (this.windowClass) {
-      const type = this.windowClass.getWindowStatus();
-      this.getGridHeight(type);
-      this.windowClass.on('windowStatusChange', (type) => {
+      try {
+        const type = this.windowClass.getWindowStatus();
         this.getGridHeight(type);
-      });
+        this.windowClass.on('windowStatusChange', (type) => {
+          this.getGridHeight(type);
+        });
+      } catch (error) {
+        Logger.error(TAG, 'on windowStatusChange failed.error:' + JSON.stringify(error));
+      }
     }
   }
 
   aboutToDisappear(): void {
     if (this.windowClass) {
-      this.windowClass.off('windowStatusChange');
+      try {
+        this.windowClass.off('windowStatusChange');
+      } catch (error) {
+        Logger.error(TAG, 'off windowStatusChange failed.error:' + JSON.stringify(error));
+      }
     }
   }
 

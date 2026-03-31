@@ -131,7 +131,11 @@ export class NetworkUtil {
 
   registerNet() {
     this.netCon.register((error: BusinessError) => {
-      Logger.error(TAG, `network register error: ${JSON.stringify(error)}`)
+      if (error) {
+        Logger.error(TAG, `network register error: ${JSON.stringify(error)}`);
+      } else {
+        Logger.info(TAG, 'Succeed to connection.NetConnection register');
+      }
     });
     // 订阅网络可用事件。调用register后，才能接收到此事件通知。
     this.netCon.on('netAvailable', (data: connection.NetHandle) => {

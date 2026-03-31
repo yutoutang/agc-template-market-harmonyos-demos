@@ -8,18 +8,26 @@ import {
   RouterParams,
   RouterToNews,
   RouterUtils,
+  TabBarType,
+  VideoType,
+  ShortcutKey,
 } from 'lib_common';
 import { AccountApi } from 'lib_account';
 import { BaseNewsServiceApi } from 'lib_news_api';
-import { FormCardRouter } from '../common/Types';
-import { NEWS_DETAIL_PAGE, PhoneConstants, TabBarType, TABS_INFO } from '../common/Constants';
+import { AppLinkingRouter, FormCardRouter, ShortcutRouter } from '../common/Types';
+import { NEWS_DETAIL_PAGE, PhoneConstants, TABS_INFO } from '../common/Constants';
 
 @ObservedV2
 export class IndexPageViewModel extends BaseViewModel {
   @Trace translateY: string | number = '';
   @Trace firstBackTime: number = 0;
   @Trace formCardModel: FormCardRouter = AppStorageV2.connect(FormCardRouter, () => new FormCardRouter())!;
+  @Trace appLinkRouter: AppLinkingRouter = AppStorageV2.connect(AppLinkingRouter, () => new AppLinkingRouter())!;
+  @Trace shortcutRouter: ShortcutRouter = AppStorageV2.connect(ShortcutRouter, () => new ShortcutRouter())!;
   @Trace continueModel: ContinueModel = AppStorageV2.connect(ContinueModel, () => new ContinueModel())!;
+  @Trace assignedVideoTabIndex: number = VideoType.CHOICE;
+  private changeTabIndex: (index: number) => void = () => {
+  };
 
   @Monitor('tabModel.showTabBar')
   onChangeShowTabBar(monitor: IMonitor) {
@@ -53,6 +61,20 @@ export class IndexPageViewModel extends BaseViewModel {
     this.checkContinueScene();
   }
 
+  @Monitor('appLinkRouter.id')
+  onAppLinkingClick() {
+    this.checkAppLinkingScene();
+  }
+
+  @Monitor('shortcutRouter.pageName')
+  onShortcutClick() {
+    this.checkShortcutScene();
+  }
+
+  setTabChangeFunc(func: (index: number) => void) {
+    this.changeTabIndex = func;
+  }
+
   refreshUserInfo() {
     new AccountApi().queryUserInfo();
   }
@@ -68,9 +90,16 @@ export class IndexPageViewModel extends BaseViewModel {
     })
   }
 
+  backToHomePage() {
+    const currentPage = RouterUtils.getStack().getAllPathName().pop();
+    if (currentPage !== RouterMap.INDEX_PAGE) {
+      RouterUtils.popToName(RouterMap.INDEX_PAGE, undefined, false);
+    }
+  }
+
   checkJumpNewsDetail() {
     if (this.formCardModel.id && this.formCardModel.newsId && this.formCardModel.pageUrl === NEWS_DETAIL_PAGE) {
-      RouterUtils.popToName(RouterMap.INDEX_PAGE, undefined, false);
+      this.backToHomePage();
       let routerParams: RouterParams<null> = {
         'type': this.formCardModel.newsType,
         'newsId': this.formCardModel.newsId,
@@ -88,13 +117,50 @@ export class IndexPageViewModel extends BaseViewModel {
         this.contextModel.showToast({ message: '新闻内容不存在，无法流转' });
         return;
       }
-      RouterUtils.popToName(RouterMap.INDEX_PAGE, undefined, false);
+      this.backToHomePage();
       let routerParams: RouterParams<null> = {
         'type': this.continueModel.newsType,
         'newsId': this.continueModel.newsId,
       };
       RouterToNews.pushToNewsDetails(routerParams);
       this.continueModel.id = 0;
+    }
+  }
+
+  checkAppLinkingScene() {
+    if (this.appLinkRouter.id && this.appLinkRouter.newsId) {
+      this.backToHomePage();
+      let routerParams: RouterParams<null> = {
+        newsId: this.appLinkRouter.newsId,
+        type: this.appLinkRouter.newsType,
+      };
+      RouterToNews.pushToNewsDetails(routerParams);
+      this.appLinkRouter.id = 0;
+    }
+  }
+
+  checkShortcutScene() {
+    if (this.shortcutRouter.pageName) {
+      this.backToHomePage();
+      switch (this.shortcutRouter.pageName) {
+        case ShortcutKey.TV:
+          // 针对视频页面未初始化的场景
+          this.assignedVideoTabIndex = VideoType.TELEVISION;
+          // 切换到视频Tab
+          this.changeTabIndex(TabBarType.VIDEO);
+          // 处理视频页面已经初始化的场景
+          emitter.emit('changeVideoTab', { data: { pageName: ShortcutKey.TV } });
+          break;
+        case ShortcutKey.AUDIO:
+          this.assignedVideoTabIndex = VideoType.BROADCAST;
+          this.changeTabIndex(TabBarType.VIDEO);
+          emitter.emit('changeVideoTab', { data: { pageName: ShortcutKey.AUDIO } });
+          break;
+        case ShortcutKey.DIGITAL_NEWS:
+          RouterUtils.pushPathByName(RouterMap.DIGITAL_NEWSPAPER, null, undefined, false);
+          break;
+      }
+      this.shortcutRouter.pageName = '';
     }
   }
 
@@ -164,13 +230,13 @@ export class IndexPageViewModel extends BaseViewModel {
   @Computed
   get hideTabScene() {
     return this.tabModel.selectedIndex === TabBarType.VIDEO &&
-      (this.tabModel.videoCurrentTabIndex === 0 || this.tabModel.videoCurrentTabIndex === 1);
+    [VideoType.FOLLOW, VideoType.CHOICE].includes(this.tabModel.videoCurrentTabIndex);
   }
 
   @Computed
   get barBgColor() {
     if ([TabBarType.HOME, TabBarType.COMMUNITY].includes(this.tabModel.selectedIndex) ||
-    [4, 5].includes(this.tabModel.videoCurrentTabIndex)) {
+    [VideoType.TELEVISION, VideoType.BROADCAST].includes(this.tabModel.videoCurrentTabIndex)) {
       return $r('sys.color.background_secondary');
     }
     if (this.hideTabScene) {

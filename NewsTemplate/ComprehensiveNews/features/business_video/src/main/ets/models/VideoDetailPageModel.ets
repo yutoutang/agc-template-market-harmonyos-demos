@@ -1,9 +1,13 @@
 import { AbilityConstant, common } from '@kit.AbilityKit';
 import { AppStorageV2 } from '@kit.ArkUI';
+import { harmonyShare, systemShare } from '@kit.ShareKit';
+import { uniformTypeDescriptor as utd } from '@kit.ArkData';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { ContinueModel, Logger, RouterMap, RouterUtils } from 'lib_common';
+import { AppConstants, ContinueModel, FileUtils, Logger, RouterMap, RouterUtils } from 'lib_common';
 import { MineServiceApi, NewsEnum } from 'lib_news_api';
-import { AVPlayerManager, AVPlayerSession, SwipePlayerController } from 'module_swipeplayer';
+import { ShareUtils } from 'lib_widget';
+import { AVSessionUtils } from 'lib_av_details';
+import { AVPlayerManager, AVPlayerController, SwipePlayerController, VideoPlayerData } from 'module_swipeplayer';
 import { LongTakeAnimationProperties, LongTakeTransitionParam } from 'module_transition';
 import { VideoService } from '../services/VideoService';
 import { BaseParamType } from '../types/Index';
@@ -16,11 +20,11 @@ export class VideoDetailPageModel extends VideoSwipePageVM {
   // 滑动播放控制器
   swipePlayerController: SwipePlayerController = new SwipePlayerController();
   avPlayerManager: AVPlayerManager = new AVPlayerManager();
-  videoItemPlayerSession: AVPlayerSession | undefined;
+  videoItemAVPlayerController: AVPlayerController | undefined;
   // 用户
   userId: string = '';
   // 视频列表总数
-  totalCount: number = 0;
+  @Trace totalCount: number = 0;
   // 是否需要无限滚动
   isInfiniteScroll: boolean = false;
   // 页面上手势滑动距离
@@ -31,11 +35,19 @@ export class VideoDetailPageModel extends VideoSwipePageVM {
   // 页面是否显示
   @Trace isShown: boolean = false;
   @Trace needLongTake: boolean = true;
+  videoData: VideoPlayerData | undefined = undefined;
+  uiContext: UIContext | undefined = undefined;
+  shareUtils: ShareUtils = new ShareUtils();
+  videoCoverUri: string = '';
 
-  initAVPlayerMgr(param: Record<string, string | number | AVPlayerSession | undefined | Object>) {
-    let playerSession = param.playerSession as AVPlayerSession
-    if (playerSession) {
-      this.videoItemPlayerSession = playerSession
+  public setUIContext(uiContext: UIContext) {
+    this.uiContext = uiContext
+  }
+
+  initAVPlayerMgr(param: Record<string, string | number | AVPlayerController | undefined | Object>) {
+    let avPlayerController = param.avPlayerController as AVPlayerController
+    if (avPlayerController) {
+      this.videoItemAVPlayerController = avPlayerController
       this.needReleasePlayer = false
       this.needLongTake = false;
     }
@@ -45,7 +57,7 @@ export class VideoDetailPageModel extends VideoSwipePageVM {
     this.swipePlayerController.setAVPlayerMgr(this.avPlayerManager)
   }
 
-  async initVideoListDataSource(param: Record<string, string | number | AVPlayerSession | undefined | Object>) {
+  async initVideoListDataSource(param: Record<string, string | number | AVPlayerController | undefined | Object>) {
     const videoId = param.newsId as string;
     this.userId = param.authorId as string;
     this.isInfiniteScroll = !this.userId;
@@ -79,7 +91,7 @@ export class VideoDetailPageModel extends VideoSwipePageVM {
   // 处理从右向左滑的手势事件
   handleSwiperRightAction() {
     if (this.offsetX < 0) {
-      const idx = this.swipePlayerController.curentIndex;
+      const idx = this.swipePlayerController.getCurrentIndex();
       const data = this.videoDataSources.getData(idx);
       const userId = data?.author?.authorId;
       if (userId) {
@@ -124,20 +136,65 @@ export class VideoDetailPageModel extends VideoSwipePageVM {
   }
 
   // 设置流转数据
-  setContinueData(id: string, progress: number) {
+  setContinueData(video: VideoPlayerData, progress: number) {
     if (this.continueModel.isTargetDevice) {
       return;
     }
     // 源端保存参数
-    this.continueModel.newsId = id;
+    this.continueModel.newsId = video.getVideoId();
     this.continueModel.newsType = NewsEnum.Video;
     this.continueModel.playerProgress = progress;
     this.continueModel.breakpoint = this.breakPointModel.currentBreakpoint;
     Logger.debug(TAG, 'continueModel avPlayer progress: ' + this.continueModel.playerProgress);
   }
 
+  async setVideoData(video: VideoPlayerData) {
+    this.videoData = video;
+    const coverImg = this.videoData.getCoverUrl();
+    if (coverImg?.startsWith('file')) {
+      this.videoCoverUri = coverImg;
+    } else if (coverImg?.startsWith('http')) {
+      const buf = await FileUtils.downloadImage(coverImg);
+      this.videoCoverUri = FileUtils.saveBufferToSandbox(buf);
+    } else {
+      this.videoCoverUri = '';
+    }
+  }
+
+  private gestureCallback: Callback<harmonyShare.SharableTarget> = (target: harmonyShare.SharableTarget) => {
+    // 构造分享数据
+    const shareData: systemShare.SharedData = new systemShare.SharedData({
+      utd: utd.UniformDataType.HYPERLINK,
+      // 设置为AppLinking链接
+      content: `${AppConstants.APP_LINKING_URL}/newsDetail?id=${this.videoData?.getVideoId()}&type=1`,
+      title: this.videoData?.getVideoTitle(),
+      description: this.videoData?.getAuthorName?.(),
+      thumbnailUri: this.videoCoverUri,
+    });
+    target.share(shareData);
+  }
+
+  public onGestureShare() {
+    const context = this.uiContext?.getHostContext();
+    if (context) {
+      this.shareUtils.registerGestureShareListener(context, this.gestureCallback);
+    }
+  }
+
+  public offGestureShare() {
+    const context = this.uiContext?.getHostContext();
+    if (context) {
+      this.shareUtils.unRegisterGestureShareListener(context, this.gestureCallback);
+    }
+  }
+
+  async destroyAVSession() {
+    await AVSessionUtils.destroyAudioSession();
+    await AVSessionUtils.destroyReaderSession();
+  }
+
   // 初始化一镜到底参数
-  registerCustomTransition(param: Record<string, AVPlayerSession | BaseParamType | Object>,
+  registerCustomTransition(param: Record<string, AVPlayerController | BaseParamType | Object>,
     longTakeSession: LongTakeAnimationProperties, context: NavDestinationContext) {
     let longTakeTransitionParam: LongTakeTransitionParam | undefined = undefined;
     longTakeTransitionParam = param.longTakeTransitionParam as LongTakeTransitionParam;

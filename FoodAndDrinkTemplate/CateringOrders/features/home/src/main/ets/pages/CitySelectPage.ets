@@ -1,6 +1,7 @@
 import { CitySearchController, UICitySelect } from 'module_city_select';
 import { AppInfoModel, RouterModule, WindowModel } from 'common/Index';
 import { AppStorageV2 } from '@kit.ArkUI';
+import { UtilLog } from '@hw-agconnect/util-log';
 
 @Builder
 export function CitySelectPageBuilder() {
@@ -15,6 +16,10 @@ struct CitySelectPage {
 
   onBackPress(): boolean | void {
     return this.controller.onBackPressed();
+  }
+
+  aboutToAppear(): void {
+    UtilLog.info(`CitySelectPage.`);
   }
 
   build() {

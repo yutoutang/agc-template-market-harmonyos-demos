@@ -2,6 +2,9 @@ export enum AccountTableFields {
   ACCOUNT_ID = 'accountId',
   NAME = 'name',
   TYPE = 'type',
+  DATE = 'date',
+  ACCOUNT_INCOME = 'accountIncome',
+  ACCOUNT_EXPENSE = 'accountExpense',
 }
 
 export enum TransactionTableFields {

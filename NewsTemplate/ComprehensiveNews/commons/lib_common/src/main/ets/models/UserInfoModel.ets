@@ -17,4 +17,5 @@ export class UserInfoModel {
   @Trace subscribe: string[] = [];
   @Trace likeNum: number = 0;
   @Trace loginChannel: string = '';
+  @Trace isMembership: boolean = false;
 }

@@ -1,5 +1,5 @@
 import { UtilLog } from '@hw-agconnect/util-log';
-import { BreakpointSystem } from 'lib_foundation';
+import { BreakpointSystem, MotionUtil } from 'lib_foundation';
 import { TAB_LIST } from '../commons/Constants';
 import { TabListItem } from '../commons/Types';
 import { MainEntryVM } from '../viewmodels/MainEntryVM';
@@ -37,7 +37,7 @@ struct MainEntry {
       .scrollable(false)
       .height($r('app.string.size_percent_full'))
       .animationDuration(0)
-      .divider({ strokeWidth: 0.5, color: $r('app.color.background_color_grey') })
+      .divider({ strokeWidth: '1px' })
       .barMode(BreakpointSystem.isTablet ? BarMode.Scrollable : BarMode.Fixed)
       .vertical(BreakpointSystem.isTablet)
       .barWidth(BreakpointSystem.isTablet ? 96 : '100%')
@@ -46,9 +46,7 @@ struct MainEntry {
       })
       .expandSafeArea([SafeAreaType.SYSTEM],
         [SafeAreaEdge.BOTTOM, SafeAreaEdge.TOP, SafeAreaEdge.START, SafeAreaEdge.END])
-      .barBackgroundColor(BreakpointSystem.isTablet ?
-        $r('app.color.background_color_grey') :
-        $r('app.color.background_color_white'))
+      .barOverlap(!BreakpointSystem.isTablet)
     }
     .hideTitleBar(true)
     .backgroundColor(BreakpointSystem.isTablet ?
@@ -68,6 +66,12 @@ struct MainEntry {
         }
         return true;
       }
+    })
+    .onShown(() => {
+      MotionUtil.registerHoldingHandEvent()
+    })
+    .onHidden(() => {
+      MotionUtil.unregisterHoldingHandEvent()
     })
   }
 

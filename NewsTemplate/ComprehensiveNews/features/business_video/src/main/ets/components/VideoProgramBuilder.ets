@@ -54,7 +54,7 @@ struct videoProgramList {
               .borderRadius(14)
               .onClick(async () => {
                 PopViewUtils.closeSheet()
-                await this.videoPipViewModel.isRestPipController('')
+                await this.videoPipViewModel.isRestPipController(this.videoId)
                 let params: Record<string, ValueType> = {
                   'avId': this.videoId,
                   'seek': item.duration,

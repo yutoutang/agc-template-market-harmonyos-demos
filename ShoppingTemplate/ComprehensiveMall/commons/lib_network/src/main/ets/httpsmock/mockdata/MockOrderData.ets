@@ -1,12 +1,7 @@
-import { CLOUD_STORAGE_DOMAIN } from '../../constants/Enums';
-import {
-  AddressInfo,
-  DiscountItem,
-  LogisticsItem,
-  OrderExpressInfo,
-  OrderItem,
-  OrderSkuItem,
-} from '../../types/responses/OrderResponse';
+import { MockImageData, MockImageMap } from './MockImageMap';
+import { PriceType } from '../../types/EnumTypes';
+import { OrderSkuItem, AddressInfo, LogisticsItem, OrderExpressInfo, OrderItem } from '../../types/OrderTypes';
+import { DiscountItem } from '../../types/ProductTypes';
 
 const mockSku1: OrderSkuItem = {
   productId: 'product_10001',
@@ -14,11 +9,12 @@ const mockSku1: OrderSkuItem = {
   skuDesc: '粉色;160/80A',
   count: 1,
   stock: 10,
-  banner: CLOUD_STORAGE_DOMAIN + 'mock_spec_pink.jpg',
+  banner: MockImageData.getImageResource(MockImageMap.PRODUCT_10001_PINK),
   title: '时尚轻商务系列针织打底纯羊毛内搭',
   serviceDesc: '运费险｜7天无理由',
   price: 200,
   dashPrice: 200,
+  priceType: PriceType.NORMAL,
 };
 
 const mockSku2: OrderSkuItem = {
@@ -27,18 +23,19 @@ const mockSku2: OrderSkuItem = {
   skuDesc: '白色;160/80A',
   stock: 10,
   count: 2,
-  banner: CLOUD_STORAGE_DOMAIN + 'mock_spec_white.jpg',
+  banner: MockImageData.getImageResource(MockImageMap.PRODUCT_10001_STRIPE),
   title: '时尚轻商务系列针织打底纯羊毛内搭',
   serviceDesc: '运费险｜7天无理由',
   price: 200,
   dashPrice: 200,
+  priceType: PriceType.NORMAL,
 };
 
 const mockDiscountItem: DiscountItem = {
   type: 1,
   discountPrice: 20,
   label: '活动优惠',
-}
+};
 
 const mockAddress: AddressInfo = {
   name: '张三',
@@ -50,39 +47,86 @@ const mockAddress: AddressInfo = {
 };
 
 
-const mockLogistic1: LogisticsItem = {
+const mockLogistic101: LogisticsItem = {
   icon: $r('app.media.ic_car'),
-  status: 1,
-  desc: '您提交了订单，请等待商家确认',
-  time: '2025-03-01 09:00:00',
+  status: 101,
+  details: [{
+    desc: '您提交了订单，请等待商家确认',
+    time: '2025-03-01 09:00:00',
+  }],
 };
 
-const mockLogistic2: LogisticsItem = {
+const mockLogistic102: LogisticsItem = {
   icon: $r('app.media.ic_car'),
-  status: 2,
-  desc: '快递员已取包裹，即将开始运输',
-  time: '2025-03-01 17:00:00',
+  status: 102,
+  details: [{
+    desc: '订单已进入商家仓库，正在打包中',
+    time: '2025-03-01 10:00:00',
+  }],
 };
 
-const mockLogistic3: LogisticsItem = {
+const mockLogistic201: LogisticsItem = {
   icon: $r('app.media.ic_car'),
-  status: 3,
-  desc: '您的包裹正在快马加鞭运输中',
-  time: '2025-03-02 10:00:00',
+  status: 201,
+  details: [{
+    desc: '商家已发货',
+    time: '2025-03-01 16:00:00',
+  }],
 };
 
-const mockLogistic4: LogisticsItem = {
+const mockLogistic202: LogisticsItem = {
   icon: $r('app.media.ic_car'),
-  status: 3,
-  desc: '派件交给【华为快递员，联系电话：10000000000】，正在派送途中（如 有任何问题可优先联系我！）',
-  time: '2025-03-02 20:00:00',
+  status: 202,
+  details: [{
+    desc: '【南京市】快递员已收取包裹，即将开始运输',
+    time: '2025-03-01 18:00:00',
+  }],
 };
 
-const mockLogistic5: LogisticsItem = {
+const mockLogistic203: LogisticsItem = {
   icon: $r('app.media.ic_car'),
-  status: 4,
-  desc: '您的商品已签收，如有疑问请电话联系快递员。',
-  time: '2025-03-03 10:00:00',
+  status: 203,
+  details: [
+    {
+      desc: '【北京市】已到达 北京市海淀区分拨交付中心 (如遇物流问题，请联系专属客服电话： 010-00000000 为您解决)',
+      time: '2025-03-03 10:00:00',
+    },
+    {
+      desc: '【南京市】已离开 江苏南京分拨交付中心 发往 北京市海淀区分拨交付中心(如遇物流问题，请联系专属客服电话： 021-00000000 为您解决)',
+      time: '2025-03-02 10:00:00',
+    },
+  ],
+};
+
+const mockLogistic204: LogisticsItem = {
+  icon: $r('app.media.ic_car'),
+  status: 204,
+  details: [{
+    desc: '【北京市】北京市海淀区分拨交付中心 派件交给【华为快递员，联系电话： 12345678910 ，正在派送途中（有事呼叫我，勿找平台，少一次投诉，多一份感恩）',
+    time: '2025-03-03 20:00:00',
+  }],
+  courier: '华为快递员',
+  contactPhone: '12345678910',
+};
+
+const mockLogistic205: LogisticsItem = {
+  icon: $r('app.media.ic_car'),
+  status: 205,
+  details: [{
+    desc: '【代收点】您的快递已暂存至XX小区快递点，请及时领取签收，如有疑问请联系： 10000000000 ',
+    time: '2025-03-04 08:00:00',
+  }],
+  courier: '华为快递员',
+  contactPhone: '12345678910',
+};
+
+const mockLogistic301: LogisticsItem = {
+  icon: $r('app.media.ic_car'),
+  status: 301,
+  details: [{
+    desc: '您的商品已签收。',
+    time: '2025-03-04 18:00:00',
+  }],
 };
 
 export const mockExpress: OrderExpressInfo = {
@@ -104,10 +148,10 @@ export const mockExpress: OrderExpressInfo = {
     { longitude: 118.79, latitude: 31.985 },
     { longitude: 118.80, latitude: 31.978 },
   ],
-}
+};
 
 export class MockOrderData {
-  static orderList: OrderItem[] = [
+  private static orderList: OrderItem[] = [
     {
       orderInfo: {
         status: 1, // 已取消
@@ -135,7 +179,7 @@ export class MockOrderData {
         receivingMethod: 0,
         discounts: [mockDiscountItem],
       },
-      logisticInfo: [mockLogistic1],
+      logisticInfo: [mockLogistic102, mockLogistic101],
       skuInfo: [mockSku1],
     },
     {
@@ -150,7 +194,15 @@ export class MockOrderData {
         finalPrice: 180,
         discounts: [mockDiscountItem],
       },
-      logisticInfo: [mockLogistic3, mockLogistic2, mockLogistic1],
+      logisticInfo: [
+        mockLogistic205,
+        mockLogistic204,
+        mockLogistic203,
+        mockLogistic202,
+        mockLogistic201,
+        mockLogistic102,
+        mockLogistic101,
+      ],
       skuInfo: [mockSku1],
     },
     {
@@ -166,11 +218,14 @@ export class MockOrderData {
         discounts: [mockDiscountItem],
       },
       logisticInfo: [
-        mockLogistic5,
-        mockLogistic4,
-        mockLogistic3,
-        mockLogistic2,
-        mockLogistic1,
+        mockLogistic301,
+        mockLogistic205,
+        mockLogistic204,
+        mockLogistic203,
+        mockLogistic202,
+        mockLogistic201,
+        mockLogistic102,
+        mockLogistic101,
       ],
       skuInfo: [mockSku1],
     },
@@ -187,11 +242,14 @@ export class MockOrderData {
         discounts: [mockDiscountItem],
       },
       logisticInfo: [
-        mockLogistic5,
-        mockLogistic4,
-        mockLogistic3,
-        mockLogistic2,
-        mockLogistic1,
+        mockLogistic301,
+        mockLogistic205,
+        mockLogistic204,
+        mockLogistic203,
+        mockLogistic202,
+        mockLogistic201,
+        mockLogistic102,
+        mockLogistic101,
       ],
       skuInfo: [mockSku1, mockSku2],
     },
@@ -211,9 +269,11 @@ export class MockOrderData {
       logisticInfo: [
         {
           icon: $r('app.media.ic_car'),
-          status: 4,
-          desc: '您的商品已由本人到店领取。',
-          time: '2025-03-03 10:00:00',
+          status: 301,
+          details: [{
+            desc: '您的商品已由本人到店领取。',
+            time: '2025-03-03 10:00:00',
+          }],
         },
       ],
       skuInfo: [mockSku1],
@@ -232,15 +292,19 @@ export class MockOrderData {
         refundTime: '2023-10-13 10:00:00',
       },
       logisticInfo: [
-        mockLogistic5,
-        mockLogistic4,
-        mockLogistic3,
-        mockLogistic2,
-        mockLogistic1,
+        mockLogistic301,
+        mockLogistic204,
+        mockLogistic203,
+        mockLogistic202,
+        mockLogistic101,
       ],
       skuInfo: [mockSku1],
     },
   ];
-  static DEFAULT_LATITUDE = 31.97;
-  static DEFAULT_LONGITUDE = 118.75;
+  public static DEFAULT_LATITUDE = 31.97;
+  public static DEFAULT_LONGITUDE = 118.75;
+
+  public static getOrderList() {
+    return MockOrderData.orderList;
+  }
 }

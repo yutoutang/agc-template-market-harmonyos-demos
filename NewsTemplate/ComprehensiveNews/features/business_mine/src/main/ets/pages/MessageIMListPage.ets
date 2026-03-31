@@ -15,6 +15,7 @@ struct MsgIMPage {
   @Local vm: MsgIMViewModel = new MsgIMViewModel();
 
   aboutToAppear(): void {
+    this.vm.queryList();
     this.vm.createWeb(this.getUIContext());
   }
 
@@ -42,7 +43,7 @@ struct MsgIMPage {
               .onClick(() => {
                 this.vm.jumpChatPage(v);
               })
-            }, (v: BriefIMModel) => JSON.stringify(v))
+            }, (v: BriefIMModel) => v.chatAuthor.authorId)
           }
           .width(CommonConstants.FULL_PERCENT)
           .height(CommonConstants.FULL_PERCENT)

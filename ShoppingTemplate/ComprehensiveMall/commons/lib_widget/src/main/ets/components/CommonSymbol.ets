@@ -4,17 +4,24 @@ export struct CommonSymbol{
   src:Resource
   @Param
   color:ResourceColor = $r('sys.color.font_primary')
+  @Param
+  fontSize:Length = 24
 
   build() {
     Row(){
       SymbolGlyph(this.src)
-        .fontSize(24)
+        .fontSize(this.fontSize)
         .fontColor([this.color])
     }
     .width(40)
     .height(40)
     .borderRadius(20)
-    .backgroundColor($r('sys.color.comp_background_tertiary'))
     .justifyContent(FlexAlign.Center)
+    .stateStyles({
+      normal: { .backgroundColor($r('sys.color.comp_background_tertiary'))
+      },
+      pressed: { .backgroundColor($r('sys.color.interactive_pressed'))
+      },
+    })
   }
 }

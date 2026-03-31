@@ -1,6 +1,7 @@
-import { AssetDisplayTypeItem } from 'asset_base';
+import { AssetDisplayTypeItem, Logger } from 'asset_base';
 import { AssetInfoManageSheet, assetInfoManageSheetBuilder } from '../components/AssetInfoManageSheet';
-import { promptAction } from '@kit.ArkUI';
+
+const TAG = '[AssetInfoManageSheetExample1]'
 
 const MOCK_ASSET_ITEM: AssetDisplayTypeItem = {
   name: '现金',
@@ -21,7 +22,11 @@ struct AssetInfoManageSheetExample1 {
       AssetInfoManageSheet({
         assetTypeItem: MOCK_ASSET_ITEM,
         handleConfirm: () => {
-          promptAction.showToast({ message: '保存成功~' });
+          try {
+            this.getUIContext().getPromptAction().showToast({ message: '保存成功~' });
+          } catch (err) {
+            Logger.error(TAG, 'show toast failed. error:' + JSON.stringify(err));
+          }
         },
       }).height(300);
       Text('使用方式2：使用bindSheet拉起半模态弹框');

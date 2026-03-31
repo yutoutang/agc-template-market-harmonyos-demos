@@ -6,11 +6,13 @@ import {
   dealQuickLoginError,
   QuickLoginErrorCode,
   showToast,
-  ResourceUtil
+  ResourceUtil,
+  GlobalInfoModel
 } from '@ohos_agcit/children_education_utils';
 import { connection } from '@kit.NetworkKit';
 import { common } from '@kit.AbilityKit';
 import { buffer } from '@kit.ArkTS';
+import { AppStorageV2 } from '@kit.ArkUI';
 
 @Builder
 export function QuickLoginPageBuilder() {
@@ -26,24 +28,27 @@ export struct QuickLoginPage {
   message: string = ''
   // File used to configure the link to the HUAWEI ID User Authentication Agreement.
   private readonly srcPath = 'data.json';
+  @Local globalInfo: GlobalInfoModel =
+    AppStorageV2.connect<GlobalInfoModel>(GlobalInfoModel, () => new GlobalInfoModel())!;
   // params?: Record<string, Object>;
   privacyText: loginComponentManager.PrivacyText[] = [
     {
       text: $r('app.string.read_and_agree'),
       type: loginComponentManager.TextType.PLAIN_TEXT,
+      tag: this.getProtocolUrl(PRIVACY_URL),
     },
     {
       text: $r('app.string.app_user_agreement'),
       type: loginComponentManager.TextType.RICH_TEXT,
       // Change the link to that of your own privacy policy.
       // ...
-      tag: '',
+      tag: this.getProtocolUrl(PRIVACY_URL),
     }, {
     text: $r('app.string.app_privacy_policy'),
     type: loginComponentManager.TextType.RICH_TEXT,
     // Change the link to that of your own privacy policy.
     // ...
-    tag: '',
+    tag: this.getProtocolUrl(PRIVACY_URL),
   }, {
     text: $r('app.string.and'),
     type: loginComponentManager.TextType.PLAIN_TEXT,
@@ -81,7 +86,7 @@ export struct QuickLoginPage {
             };
             emitter.emit(CommonConstants.USER_INFO, userInfo);
 
-            this.appPathStack.pop();
+            this.globalInfo.navStack.pop();
           } else {
             // If the agreements are not accepted, a pop-up message is displayed.
             this.showPopUp = true;
@@ -100,7 +105,6 @@ export struct QuickLoginPage {
   @Local showPopUp: boolean = false;
   // Variable that determines whether the agreement and checkbox are unavailable for tapping during the sign-in process.
   @Local enableStatus: boolean = true;
-  @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
 
   aboutToAppear(): void {
     try {
@@ -138,7 +142,6 @@ export struct QuickLoginPage {
           // After sign-in on the server is successful, the data to be displayed on the main screen is returned.
           // ...
           // In this example, after a successful sign-in, the personal information screen is displayed.
-          // this.appPathStack?.pushPathByName('PersonalInfoPage', null, true);
 
 
           let userInfo: emitter.EventData = {
@@ -150,7 +153,7 @@ export struct QuickLoginPage {
           };
           emitter.emit(CommonConstants.USER_INFO, userInfo);
 
-          this.appPathStack.pop();
+          this.globalInfo.navStack.pop();
         }
       } else {
         // If the agreements are not accepted, a pop-up message is displayed.
@@ -188,7 +191,7 @@ export struct QuickLoginPage {
       hilog.info(this.domainId, this.logTag, `systemLanguage is ${systemLanguage}`);
       const params: Record<string, Object> = { 'protocolUrl': privacyText.tag + systemLanguage };
       // Concatenate link parameters.
-      this.appPathStack?.pushPathByName('PrivacyAgreement', params);
+      this.globalInfo.navStack?.pushPathByName('PrivacyAgreement', privacyText.tag);
     }
   }
 
@@ -343,7 +346,6 @@ export struct QuickLoginPage {
                           hilog.info(this.domainId, this.logTag, 'Click protocol url');
                           if (this.enableStatus) {
                             try {
-                              // this.appPathStack?.pushPathByName('PrivacyAgreement', undefined);
                               this.jumpToPrivacyWebView(item);
                             } catch (error) {
                               const code: number = error.code;
@@ -385,7 +387,7 @@ export struct QuickLoginPage {
       }
     })
     .onBackPressed(() => {
-      this.appPathStack.pop();
+      this.globalInfo.navStack.pop();
       return true;
     })
     .hideTitleBar(true);

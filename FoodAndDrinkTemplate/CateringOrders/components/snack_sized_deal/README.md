@@ -161,7 +161,6 @@ closeDialog(callback: (addGoodsList: [Goods](#Goods对象说明)[]) => void)
 ## 示例代码
 
 ```typescript
-import { promptAction } from '@kit.ArkUI';
 import { Goods, SnackSizedDeal } from 'snack_sized_deal';
 
 @Entry
@@ -213,7 +212,7 @@ struct Index {
          SnackSizedDeal({
             goodsList: this.goodsList,
             closeDialog: (addGoodsList?: Goods[]) => {
-               promptAction.showToast({ message: '带参数跳转页面' })
+               this.getUIContext().getPromptAction().showToast({ message: '带参数跳转页面' })
             },
          })
       }

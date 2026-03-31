@@ -1,10 +1,18 @@
-import { RouterMap, RouterUtils } from 'lib_common';
+import { BreakpointModel, BreakpointNameEnum, Course, KNOWLEDGE_DRAW_DATA, RouterMap, RouterUtils } from 'lib_common';
 import { NavHeaderBar } from 'lib_widget';
 import { AdvancedCourse, HotCourse } from 'course'
+import { AppStorageV2, display } from '@kit.ArkUI';
+
 
 @Builder
 export function HomePageBuilder() {
   HomePage()
+}
+
+interface SwiperSettingInfo {
+  displayCount: number;
+  nextMargin: number;
+  itemSpace: number;
 }
 
 interface SwiperItem {
@@ -16,12 +24,55 @@ interface SwiperItem {
 
 @ComponentV2
 export struct HomePage {
+  @Local breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
   scroller: Scroller = new Scroller()
-  homeSwiperImageList: SwiperItem[] = [{ img: $r('app.media.swiperImage1'), text: '“你真的会跑步吗？”关于跑步机的正确使用训练课程', url: RouterMap.COURSE_DETAIL_PAGE, id: '0003' },
+  homeSwiperImageList: SwiperItem[] = [{ img: $r('app.media.swiperImage1'), text: '你真的会跑步吗？关于跑步机的正确使用训练课程', url: RouterMap.COURSE_DETAIL_PAGE, id: '0003' },
     { img: $r('app.media.swiperImage2'), text: '居家健身的优质动作一览', url: RouterMap.COURSE_DETAIL_PAGE, id: '0002' },
     { img: $r('app.media.swiperImage3'), text: '舒缓腰部，促进血液循环', url: RouterMap.COURSE_DETAIL_PAGE, id: '0005' },
     { img: $r('app.media.swiperImage4'), text: '背部舒展，提高内脏健康活力度', url: RouterMap.COURSE_DETAIL_PAGE, id: '0001' },
     { img: $r('app.media.swiperImage5'), text: '暴汗自重力量训练', url: RouterMap.COURSE_DETAIL_PAGE, id: '0004' }];
+  knowledgeList: Course[] = KNOWLEDGE_DRAW_DATA;
+
+  @Computed
+  get swiperInfo() {
+    // 获取当前屏幕旋转角度（0-3 分别对应 0°、90°、180°、270°）
+    let rotation: number = display.getDefaultDisplaySync().rotation;
+    const swiperInfo: SwiperSettingInfo  = {
+      displayCount: 1,
+      nextMargin: 16,
+      itemSpace: 8,
+    }
+    if (BreakpointNameEnum.MD === this.breakPointModel.currentBreakpoint) {
+      swiperInfo.displayCount = 2
+      swiperInfo.nextMargin = 24
+      swiperInfo.itemSpace = 12
+    }
+    if ([BreakpointNameEnum.LG, BreakpointNameEnum.XL].includes((this.breakPointModel.currentBreakpoint))) {
+      if (rotation === 1 || rotation === 3) {
+        swiperInfo.displayCount = 3
+        swiperInfo.nextMargin = 32
+        swiperInfo.itemSpace = 16
+      }
+    }
+    return swiperInfo;
+  }
+
+  @Computed
+  get displayCount() {
+    // 获取当前屏幕旋转角度（0-3 分别对应 0°、90°、180°、270°）
+    let rotation: number = display.getDefaultDisplaySync().rotation;
+    if (BreakpointNameEnum.SM === this.breakPointModel.currentBreakpoint) {
+      return 2
+    }
+    if ([BreakpointNameEnum.MD].includes((this.breakPointModel.currentBreakpoint))) {
+      return 4
+    }
+    if (rotation === 1 || rotation === 3) {
+      return 5;
+    } else {
+      return 2
+    }
+  }
 
   @Builder
   homeAdvBuilder() {
@@ -31,11 +82,12 @@ export struct HomePage {
           Image(item.img)
             .width('100%')
             .height('100%')
+            .borderRadius(16)
           Column() {
             Text(item.text)  // 主标题
               .fontSize($r('sys.float.Body_L'))
               .width(196)
-              .position({ left: 106, top: 101 })
+              .position({ left: 86, top: 101 })
               .fontColor(Color.White)
           }
         }
@@ -48,7 +100,9 @@ export struct HomePage {
     .autoPlay(true)
     .height(184)
     .width('100%')
-    .borderRadius(16)
+    .displayCount(this.swiperInfo.displayCount)
+    .nextMargin(this.swiperInfo.nextMargin)
+    .itemSpace(this.swiperInfo.itemSpace)
     .curve(Curve.Smooth)
   }
 
@@ -73,42 +127,33 @@ export struct HomePage {
     }
     .width('100%')
     .padding({ top: 24, bottom: 8 })
-
-    Row({ space: 8 }) {
-      Column() {
-        Image($r('app.media.common_knowledge1'))
-          .width(144)
-          .height(144)
-          .padding({ top: 8 })
-        Text('普通瑜伽与普拉提的区别其实并不大')
-          .fontWeight(FontWeight.Medium)
-          .fontSize($r('sys.float.Body_S'))
-          .padding({ top: 8, left:8, right: 8 })
-      }
-      .backgroundColor($r('sys.color.white'))
-      .borderRadius(16)
-      .width(160)
-      .height(200)
-      .onClick(() => RouterUtils.pushPathByName(RouterMap.COMMON_KNOWLEDGE_YOGA))
-
-      Column() {
-        Image($r('app.media.common_knowledge4'))
-          .width(144)
-          .height(144)
-          .padding({ top: 8 })
-        Text('你知道如何在跑后有效拉伸吗？')
-          .fontWeight(FontWeight.Medium)
-          .fontSize($r('sys.float.Body_S'))
-          .padding({ top: 8, left:8, right: 8 })
-      }
-      .width(160)
-      .height(200)
-      .backgroundColor($r('sys.color.white'))
-      .borderRadius(16)
-      .onClick(() => RouterUtils.pushPathByName(RouterMap.COMMON_KNOWLEDGE_DRAW))
+    Swiper() {
+      ForEach(this.knowledgeList, (item: Course) => {
+        Column() {
+          Image(item.cover)
+            .width('100%')
+            .aspectRatio(1)
+            .borderRadius(8)
+          Text(item.courseTitle)
+            .fontWeight(FontWeight.Medium)
+            .fontSize($r('sys.float.Body_S'))
+            .padding({ top: 8 })
+        }
+        .width('100%')
+        .backgroundColor($r('sys.color.white'))
+        .padding({ top: 8, bottom: 8, left: 12, right: 12 })
+        .borderRadius(8)
+        .alignItems(HorizontalAlign.Center)
+        .onClick(() => RouterUtils.pushPathByName(RouterMap.COMMON_KNOWLEDGE_DETAIL, item.id))
+      })
     }
     .width('100%')
-    .justifyContent(FlexAlign.Center)
+    .indicator(false)
+    .loop(true)
+    .displayCount(this.displayCount)
+    .nextMargin(this.swiperInfo.nextMargin)
+    .itemSpace(this.swiperInfo.itemSpace)
+    .curve(Curve.Smooth)
   }
 
   @Builder
@@ -182,10 +227,10 @@ export struct HomePage {
             // 进阶课程
             this.advancedCourseListBuilder()
           }
-          .margin({ left: 16, right: 16 })
+          .margin({ left: 16, right: 16, bottom: 20 })
         }
         .edgeEffect(EdgeEffect.Spring)
-        .margin({ bottom: 100 })
+        .layoutWeight(1)
         .scrollBar(BarState.Off)
       }
       .height('100%')

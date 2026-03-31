@@ -2,12 +2,18 @@ import {
   BreakpointStorage,
   BreakpointSystem,
   BreakpointTypeEnum,
+  iData,
   RouterMap,
   routerStack,
-  Style,
 } from 'lib_foundation';
 import { CategoryItem } from 'lib_network';
 import { ProductWaterFlow } from 'product';
+import { LengthMetrics } from '@kit.ArkUI';
+
+enum ActivityType {
+  CHECKIN = '签到',
+  SECKILL = '秒杀'
+}
 
 @ComponentV2
 export struct HomePageContent {
@@ -17,19 +23,9 @@ export struct HomePageContent {
   categoryList: CategoryItem[] = [];
   @Param
   scroller: Scroller = new Scroller();
-  @Local
-  categoryDisplayList: CategoryItem[][] = [];
   @Event
   handleClickCategory: (id: string) => void;
   @Local curBreakpoint: BreakpointStorage = BreakpointSystem.currentBreakpoint
-
-  @Computed
-  get waterFlowTemplate() {
-    if (this.curBreakpoint.value === BreakpointTypeEnum.SM) {
-      return '1fr 1fr'
-    }
-    return '1fr 1fr 1fr'
-  }
 
   @Computed
   get bannerAspectRatio() {
@@ -42,16 +38,12 @@ export struct HomePageContent {
     return 5
   }
 
-  aboutToAppear(): void {
-    this.getCategoryDisplayList();
-  }
-
   build() {
     Column({ space: 12 }) {
+      Blank().height(0)
       this.bannerBuilder();
-      this.categoryBuilder();
+      this.buildCategory();
       ProductWaterFlow({
-        preId: 'home/',
         openSwiper: true,
         handleProductClick: (id) => {
           routerStack.pushPath({
@@ -68,9 +60,8 @@ export struct HomePageContent {
     .padding({
       left: $r('app.float.space_l'),
       right: $r('app.float.space_l'),
-      top: $r('app.float.space_l'),
     })
-    .backgroundColor(Style.BACKGROUND_COLOR_GREY)
+    .backgroundColor($r('app.color.background_color_grey'))
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
   }
 
@@ -92,10 +83,10 @@ export struct HomePageContent {
   }
 
   @Builder
-  categoryBuilder() {
-    Column() {
-      if (this.curBreakpoint.value === BreakpointTypeEnum.LG) {
-        Row() {
+  buildCategory() {
+    Column({ space: 12 }) {
+      Scroll() {
+        Row({ space: 16 }) {
           ForEach(this.categoryList, (category: CategoryItem) => {
             Column() {
               Image(category.iconUrl)
@@ -104,63 +95,53 @@ export struct HomePageContent {
                 .margin({ bottom: 4 });
               Text(category.label)
                 .fontSize(12)
-                .fontColor(Style.FONT_COLOR_LEVEL3);
+                .fontColor($r('app.color.font_color_level3'));
             }
+            .width(60)
             .onClick(() => {
               this.handleClickCategory?.(category.id)
             })
-          },(category:CategoryItem)=>category.id)
+          }, (category: CategoryItem) => category.id)
         }
-        .width($r('app.string.size_percent_full'))
-        .justifyContent(FlexAlign.SpaceBetween)
-        .padding({ left: $r('app.float.space_m'), right: $r('app.float.space_m') })
-      } else {
-        Scroll() {
-          Row({ space: 16 }) {
-            ForEach(this.categoryDisplayList, (list: CategoryItem[]) => {
-              Column({ space: 16 }) {
-                ForEach(list, (category: CategoryItem) => {
-                  Column() {
-                    Image(category.iconUrl)
-                      .width(48)
-                      .height(48)
-                      .margin({ bottom: 4 });
-                    Text(category.label)
-                      .fontSize(12)
-                      .fontColor(Style.FONT_COLOR_LEVEL3);
-                  }
-                  .constraintSize({ minWidth: 70 })
-                  .onClick(() => {
-                    this.handleClickCategory?.(category.id)
-                  })
-                }, (item: CategoryItem) => item.id)
-              }
-            }, (_item: CategoryItem[], index: number) => index + '__')
-          }
-          .constraintSize({ minWidth: '100%' })
-          .justifyContent(
-            this.curBreakpoint.value === BreakpointTypeEnum.SM ?
-              FlexAlign.SpaceBetween :
-              FlexAlign.SpaceAround,
-          )
-        }
-        .scrollable(ScrollDirection.Horizontal)
-        .scrollBar(BarState.Off)
-        .edgeEffect(EdgeEffect.Spring)
+        .constraintSize({ minWidth: '100%' })
+        .padding($r('app.float.space_l'))
+        .justifyContent(BreakpointSystem.isTablet ? FlexAlign.SpaceBetween : FlexAlign.Start)
       }
-
+      .scrollable(ScrollDirection.Horizontal)
+      .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring)
     }
-    .backgroundColor(Style.BACKGROUND_COLOR)
-    .padding({ top: 16, bottom: 16 })
-    .borderRadius(Style.BORDER_RADIUS_16)
+    .backgroundColor($r('app.color.background_color_primary'))
+    .borderRadius($r('app.float.border_radius_l'))
+
+    Flex({ space: { main: LengthMetrics.vp(12) } }) {
+      this.buildActivityCard($r('app.media.ic_checkin'), ActivityType.CHECKIN)
+      this.buildActivityCard($r('app.media.ic_seckill'), ActivityType.SECKILL)
+    }
   }
 
-  getCategoryDisplayList() {
-    if (this.categoryList.length) {
-      for (let i = 0; i < this.categoryList.length; i += 2) {
-        const chunk = this.categoryList.slice(i, i + 2);
-        this.categoryDisplayList.push(chunk);
-      }
+  @Builder
+  buildActivityCard(icon: ResourceStr, type: ActivityType) {
+    Row() {
+      Image(icon)
+        .width(40)
+        .margin({ right: $r('app.float.space_s') })
+      Text(type)
+        .fontSize($r('app.float.font_size_14'))
+        .fontColor($r('app.color.font_color_level2'))
     }
+    .padding($r('app.float.space_m'))
+    .justifyContent(FlexAlign.Center)
+    .backgroundColor($r('app.color.background_color_primary'))
+    .borderRadius($r('app.float.border_radius_l'))
+    .onClick(() => {
+      if (type === ActivityType.CHECKIN) {
+        routerStack.pushPath({ name: iData.global.isLogin ? RouterMap.USER_MEMBER_BENEFITS : RouterMap.USER_LOGIN })
+      } else {
+        routerStack.pushPath({ name: RouterMap.PRODUCT_SECKILL })
+
+      }
+    })
+    .flexGrow(1)
   }
 }

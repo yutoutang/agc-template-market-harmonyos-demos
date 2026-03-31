@@ -1,8 +1,7 @@
 import { HashSet } from '@kit.ArkTS';
-import {
-  GlobalStateMgr, iData, CartCardModel,
-} from 'lib_foundation';
-import { CartApi } from 'module_shopping_cart';
+import { GlobalStateMgr, iData } from 'lib_foundation';
+import { ShoppingCartApis } from 'lib_network';
+import { CartCardModel } from '../models/CartCardModel';
 
 export enum CartStatus {
   NOT_LOGGED_IN, // 未登录
@@ -12,7 +11,7 @@ export enum CartStatus {
 }
 
 @ObservedV2
-export class CartPageVM {
+export class ShoppingCartVM {
   public readonly global: GlobalStateMgr = iData.global;
   private selectedSkuCodes: HashSet<string> = new HashSet();
   @Trace
@@ -34,7 +33,7 @@ export class CartPageVM {
   @Trace
   public totalPrice: number = 0;
 
-  @Monitor('global.rootPageActiveTabId','global.isNavPathStackEmpty')
+  @Monitor('global.rootPageActiveTabId', 'global.isNavPathStackEmpty')
   public onGlobalStateChange(iMonitor: IMonitor): void {
     if (this.isSubPage) {
       // class 很可能没有被垃圾回收，因此多个 Class 持续触发监听, 影响 Index 页的购物车逻辑
@@ -43,7 +42,7 @@ export class CartPageVM {
     let needRefresh: boolean = false;
 
     class Temp {
-      now: boolean | string = ''
+      now: boolean | string = '';
     }
 
     for (let k of iMonitor.dirty) {
@@ -105,8 +104,9 @@ export class CartPageVM {
     let v: string = '';
     let total: number = 0;
     try {
-      const cartDto = await CartApi.getCartData();
-      if (cartDto) {
+      const res = await ShoppingCartApis.getCartData();
+      if (res.code === 0) {
+        const cartDto = res.data;
         v = cartDto.version;
         total = cartDto.total;
         for (let card of cartDto.cards) {

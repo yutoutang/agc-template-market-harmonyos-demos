@@ -26,3 +26,15 @@ export * from './src/main/ets/viewModel/PracticeRecordModel';
 export * from './src/main/ets/viewModel/BrowsingHistoryModel';
 
 export * from './src/main/ets/viewModel/OrderInfo';
+
+export { BaseViewModel } from './src/main/ets/models/BaseViewModel';
+
+export { BreakpointType, BreakpointModel } from './src/main/ets/models/BreakpointModel';
+
+export { BreakpointUtils } from './src/main/ets/utils/BreakpointUtils';
+
+export { GlobalContextUtils } from './src/main/ets/utils/ContextUtils';
+
+export { Banner } from './src/main/ets/components/Banner';
+
+export { RouterModule, RouterMap } from './src/main/ets/utils/RouterModule';

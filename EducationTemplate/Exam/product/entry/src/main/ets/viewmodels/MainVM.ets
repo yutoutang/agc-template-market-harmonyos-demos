@@ -13,20 +13,33 @@
  * limitations under the License.
  */
 
+import { BaseViewModel, BreakpointUtils } from 'commonlib';
 import { TabListItem, TAB_CONFIG } from '../model/TabListItem';
+import { window } from '@kit.ArkUI';
 
 @ObservedV2
-export class MainVM {
+export class MainVM extends BaseViewModel {
   // 页签索引
   @Trace curIndex: number = 0;
   public controller: TabsController = new TabsController();
   public tabList: TabListItem[] = TAB_CONFIG;
   private static _instance: MainVM;
-
+  breakpoint: BreakpointUtils | null = null;
+  public uiContext?: UIContext;
+  public mainWindow?: window.Window;
   public static get instance() {
     if (!MainVM._instance) {
       MainVM._instance = new MainVM();
     }
     return MainVM._instance;
+  }
+
+  registerBreakpointListener(mainWindow: window.Window) {
+    this.breakpoint = new BreakpointUtils(mainWindow);
+    this.breakpoint?.register();
+  }
+
+  unregisterBreakpointListener() {
+    this.breakpoint?.unRegister();
   }
 }

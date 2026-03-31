@@ -72,10 +72,10 @@
 
 ### ProductFilter工具说明
 
-| 名称                                                                | 描述           |
-|:------------------------------------------------------------------|:-------------|
-| show(options?: [ProductFilterOptions](#ProductFilterOptions对象说明)) | 控制商品筛选器打开的事件 |
-| hide()                                                            | 控制商品筛选器关闭的事件 |
+| 名称                                                         | 描述                     |
+| :----------------------------------------------------------- | :----------------------- |
+| show(options: [ProductFilterOptions](#ProductFilterOptions对象说明), uiContext: [UIContext](https://developer.huawei.com/consumer/cn/doc/harmonyos-references/arkts-apis-uicontext-uicontext)) | 控制商品筛选器打开的事件 |
+| hide()                                                       | 控制商品筛选器关闭的事件 |
 
 ### ProductFilterOptions对象说明
 
@@ -126,7 +126,7 @@ struct ProductFilterDemo {
             handleConfirm: (res) => {
               this.filterList = res
             },
-          })
+          }, this.getUIContext())
         })
       Text('选择结果:')
       ForEach(this.filterList, (item: FilterSelectionItem) => {

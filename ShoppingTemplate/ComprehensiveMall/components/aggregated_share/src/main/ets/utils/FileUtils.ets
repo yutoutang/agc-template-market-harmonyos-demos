@@ -3,24 +3,21 @@ import { fileUri, fileIo as fs } from '@kit.CoreFileKit';
 import { image } from '@kit.ImageKit';
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
 import { http } from '@kit.NetworkKit';
-import { Logger, WindowUtil } from 'module_ui_base';
-import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast'
-import { LOG_TAG } from '../common/Constants';
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
+import { UtilLog as Logger } from '@hw-agconnect/util-log';
 
 const TAG = 'FileUtils';
 
 /**
  * 写入数据到沙箱
+ * @param uiContext
  * @param buffer
  * @returns 沙箱文件对应的uri
  */
-export async function saveToSandbox(buffer: ArrayBuffer): Promise<string> {
+export async function saveToSandbox(uiContext: UIContext, buffer: ArrayBuffer): Promise<string> {
   let file: fs.File | null = null;
-  if (!WindowUtil.context) {
-    return '';
-  }
   try {
-    const savePath = `${WindowUtil.context.cacheDir}/${new Date().getTime()}.png`;
+    const savePath = `${uiContext.getHostContext()?.cacheDir}/${new Date().getTime()}.png`;
     file = fs.openSync(savePath, fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE);
     fs.writeSync(file.fd, buffer);
 
@@ -28,6 +25,7 @@ export async function saveToSandbox(buffer: ArrayBuffer): Promise<string> {
     const files: string[] = AppStorage.get('cacheFiles') ?? [];
     files.push(savePath);
     AppStorage.set('cacheFiles', files);
+
     return fileUri.getUriFromPath(savePath);
   } catch (e) {
     return '';
@@ -36,25 +34,26 @@ export async function saveToSandbox(buffer: ArrayBuffer): Promise<string> {
       try {
         fs.closeSync(file);
       } catch (err) {
-        Logger.error(LOG_TAG, 'close file failed. error: ' + JSON.stringify(err))
-      }
+        Logger.error(TAG, `PoPViewUtils close sync failed. Code is ${err.code}, message is ${err.message}`);
+      };
     }
   }
 }
 
 /**
  * 写入图片到沙箱
+ * @param uiContext
  * @param img
  * @returns 沙箱文件对应的uri
  */
-export async function saveImgToSandbox(img: PixelMap): Promise<string> {
+export async function saveImgToSandbox(uiContext: UIContext, img: PixelMap): Promise<string> {
   try {
     // pixel转换成buffer
     const buf = await image.createImagePacker().packToData(img, {
       format: 'image/jpeg',
       quality: 100,
     });
-    return saveToSandbox(buf);
+    return saveToSandbox(uiContext, buf);
   } catch (e) {
     return '';
   }
@@ -63,12 +62,13 @@ export async function saveImgToSandbox(img: PixelMap): Promise<string> {
 
 /**
  * 保存图片到相册
+ * @param uiContext
  * @param img
  */
-export async function saveImgToAlbum(img: PixelMap): Promise<void> {
+export async function saveImgToAlbum(uiContext: UIContext, img: PixelMap): Promise<void> {
   return new Promise(async (resolve, reject) => {
-    const uri = await saveImgToSandbox(img);
-    const phAccessHelper = photoAccessHelper.getPhotoAccessHelper(WindowUtil.context);
+    const uri = await saveImgToSandbox(uiContext, img);
+    const phAccessHelper = photoAccessHelper.getPhotoAccessHelper(uiContext.getHostContext());
     let srcFile: fs.File | null = null;
     let desFile: fs.File | null = null;
     try {
@@ -130,8 +130,8 @@ export function downloadImage(url: string): Promise<ArrayBuffer> {
       .catch((err: BusinessError) => {
         Logger.error(TAG, `downloadImage fail, url: ${url}, err: ${JSON.stringify(err)}`);
         reject();
-      })
-  })
+      });
+  });
 }
 
 /**
@@ -147,11 +147,12 @@ export async function compressImage(buf: ArrayBuffer): Promise<ArrayBuffer> {
       image.createImagePacker().packToData(pixel, packOpts).then((data: ArrayBuffer) => {
         resolve(data);
       }).catch((err: BusinessError) => {
-        Logger.error(TAG, 'create image packer failed. error: ' + JSON.stringify(err));
-      })
-    })
+        Logger.error(TAG, `packToData fail, err: ${JSON.stringify(err)}`);
+      });
+    });
   } catch (err) {
-    return Promise.reject(err)
+    Logger.error(TAG, `createImageSource fail, err: ${JSON.stringify(err)}`);
+    return new ArrayBuffer(0); // 返回空的 ArrayBuffer 表示失败
   }
 }
 
@@ -164,7 +165,7 @@ export function clearCache(files: string[]) {
     Logger.info(TAG, 'to delete cache files: ' + files);
     files.forEach((file: string) => {
       fs.unlinkSync(file);
-    })
+    });
     Logger.info(TAG, 'delete cache files success');
   } catch (err) {
     Logger.error(TAG, `delete cache files failed, error:` + err);

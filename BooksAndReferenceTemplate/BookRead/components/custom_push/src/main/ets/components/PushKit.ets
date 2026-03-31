@@ -87,8 +87,6 @@ export struct PushKit {
             .fontWeight(FontWeight.Bold)
         }
 
-
-
         Image($r('app.media.ic_public_read'))
           .height('40vp')
           .width('40vp')
@@ -118,7 +116,7 @@ export struct PushKit {
                   .height(22)
 
                   Row() {
-                    Text(item.time).fontSize(12).fontColor($r('app.color.time_gray'))
+                    Text(item.time).fontSize(12).fontColor($r('sys.color.font_tertiary')                              )
                     if (!item.read) {
                       Image($r('app.media.red_dot')).width(8).height(8).margin({ left: 4 })
                     }
@@ -138,7 +136,6 @@ export struct PushKit {
               Row() {
                 Text(item.pushContent)
                   .fontSize(16)
-                  .fontColor($r('app.color.message_content_font_color'))
                   .fontWeight(400)
                   .maxLines(3)
                   .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -168,7 +165,7 @@ export struct PushKit {
     }
     .margin({ top: this.windowTopHeight })
     .padding({ bottom: 32 + this.windowTopHeight, left: 12, right: 12 })
-    .backgroundColor($r('app.color.pure_white'))
+    .backgroundColor($r('sys.color.comp_background_list_card'))
     .width('100%')
   }
 }

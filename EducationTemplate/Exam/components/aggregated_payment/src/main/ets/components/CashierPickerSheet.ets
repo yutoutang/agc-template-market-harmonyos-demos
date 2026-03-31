@@ -130,7 +130,7 @@ export struct CashierPickerSheet {
                 Text(this.content.tradeSummary)
                   .width('80%')
                   .fontSize($r('sys.float.Body_S'))
-                  .fontColor($r('sys.color.mask_secondary'))
+                  .fontColor($r('sys.color.font_secondary'))
                   .fontWeight(FontWeight.Regular)
                   .maxLines(1)
                   .textAlign(TextAlign.Center)

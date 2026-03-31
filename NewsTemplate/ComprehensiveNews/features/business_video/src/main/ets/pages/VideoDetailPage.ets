@@ -1,7 +1,7 @@
 import { common } from '@kit.AbilityKit';
 import { uiObserver, window } from '@kit.ArkUI'
 import { util } from '@kit.ArkTS';
-import { BusinessError } from '@kit.BasicServicesKit';
+import { BusinessError, emitter } from '@kit.BasicServicesKit';
 import {
   CircleButtonModifier,
   CommonConstants,
@@ -16,7 +16,12 @@ import {
 import { NewsResponse } from 'lib_news_api';
 import { NetworkExceptionView, NewsSearchTransition } from 'lib_widget';
 import {
-  AVPlayerSession, VideoNetworkModel, VideoNetworkSetting, VideoSwipePlayer,
+  AVPlayerController,
+  EventKey,
+  VideoNetworkModel,
+  VideoNetworkSetting,
+  VideoPlayerData,
+  VideoSwipePlayer,
 } from 'module_swipeplayer';
 import { CardLongTakeDelegate, LongTakeAnimationProperties } from 'module_transition';
 import { VideoNewsData } from '../models/VideoModel';
@@ -47,13 +52,19 @@ export struct VideoDetailPage {
     if (lastPathName === RouterMap.VIDEO_DETAIL_PAGE) {
       if (type === window.WindowStageEventType.RESUMED || type === window.WindowStageEventType.SHOWN) {
         this.vm.swipePlayerController.play();
+        emitter.emit(EventKey.ENABLE_PREVIOUS_NEXT);
       } else if (type === window.WindowStageEventType.PAUSED || type === window.WindowStageEventType.HIDDEN) {
         this.vm.swipePlayerController.pause();
+        emitter.emit(EventKey.DISABLE_PREVIOUS_NEXT);
       }
     }
   }
 
   aboutToAppear(): void {
+    this.vm.setUIContext(this.getUIContext());
+    this.vm.onGestureShare();
+    // 销毁应用中其他AVSession
+    this.vm.destroyAVSession();
     // 模拟首次进入页面时，判断是否展示网络异常页面
     this.vm.showExceptionPage = !this.vm.networkModel.isNetworkAvailable
     // 监听 windowStageEvent
@@ -84,6 +95,10 @@ export struct VideoDetailPage {
         }
       }
     });
+  }
+
+  aboutToDisappear(): void {
+    this.vm.offGestureShare();
   }
 
   @Builder
@@ -121,10 +136,11 @@ export struct VideoDetailPage {
               VideoSwipePlayer({
                 datasource: this.vm.videoDataSources,
                 swipePlayerController: this.vm.swipePlayerController,
-                videoItemPlayerSession: this.vm.videoItemPlayerSession,
+                videoItemAVPlayerController: this.vm.videoItemAVPlayerController,
                 videoLayerBuilder: wrapBuilder(VideoLayerViewBuilder),
                 videoNetwork: this.vm.networkModel as VideoNetworkModel,
                 videoNetworkSetting: this.vm.settingInfo.network as VideoNetworkSetting,
+                enableAVSession: true,
                 pathStack: this.pathStack,
                 isShown: this.vm.isShown,
                 isLandscape: this.vm.displayModel.isLandscape,
@@ -132,8 +148,9 @@ export struct VideoDetailPage {
                 playerStateCallback: (state: string, id: string) => {
                   this.vm.onPlayerStateListen(state, id)
                 },
-                playerTimeUpdateCallback: (id: string, timeMs: number) => {
-                  this.vm.setContinueData(id, timeMs)
+                playerTimeUpdateCallback: (video: VideoPlayerData, timeMs: number) => {
+                  this.vm.setVideoData(video)
+                  this.vm.setContinueData(video, timeMs)
                 },
                 options: {
                   autoPlay: true,
@@ -281,7 +298,7 @@ export struct VideoDetailPage {
     .backgroundColor(this.longTakeSession.navDestinationBgColor)
     .onReady((context: NavDestinationContext) => {
       this.pathStack = context.pathStack
-      let param = context.pathInfo?.param as Record<string, AVPlayerSession | BaseParamType | Object>
+      let param = context.pathInfo?.param as Record<string, AVPlayerController | BaseParamType | Object>
       // 初始化播放管理
       this.vm.initAVPlayerMgr(param)
       // 获取数据
@@ -293,7 +310,7 @@ export struct VideoDetailPage {
     })
     .onDisAppear(() => {
       if (this.vm.needReleasePlayer ||
-        (!this.vm.needReleasePlayer && this.vm.swipePlayerController.curentIndex !== 0)
+        (!this.vm.needReleasePlayer && this.vm.swipePlayerController.getCurrentIndex() !== 0)
       ) {
         this.vm.swipePlayerController.getAVPlayer()?.release().catch((e: BusinessError) => {
           Logger.error(TAG, 'release fail, error: ' + JSON.stringify(e));

@@ -4,21 +4,80 @@ import { RichEditorController } from '../controller/RichEditorController';
 import { SnapShotController } from '../controller/SnapShotController';
 import { SnapshotPreview } from './SnapshotPreview';
 import { LengthMetrics } from '@kit.ArkUI';
+import { HandwriteController, HandwriteComponent, PenHspInfo, PenType } from '@kit.Penkit';
+import common from '@ohos.app.ability.common';
 
 @ComponentV2
 export struct RichEditorArea {
   @Consumer('appPathStack') appPathStack: NavPathStack = new NavPathStack();
   private richEditorController: RichEditorController = RichEditorController.instance;
-  @Param snapShotController: SnapShotController = new SnapShotController('', new Scroller());
-  // 需要分享截图时设为0，否则设为1即可
+  @Param snapShotController: SnapShotController = new SnapShotController('', new Scroller(), this.getUIContext());
   @Local richEditorLayoutWeight: number = 0;
   @Param @Once @Require noteTitle: string;
   @Param @Once @Require noteContent: MutableStyledString;
+  @Param @Once @Require noteId: string;
   @Event titleChange: (title: string) => void = () => {
   };
 
-  // 是否处于编辑状态
   @Local isEditing: boolean = false;
+  private readonly MAX_TEXT_LENGTH: number = 20000;
+
+  // 手写相关状态
+  @Local isHandwriteMode: boolean = false;
+  @Local penWidth: number = 5;
+  @Local penColor: ResourceColor = Color.Black;
+  ballpointPenWidth: number = 6;
+
+  /** 由外部传入时与编辑页共用同一控制器，便于保存笔记时一并保存画布 */
+  @Param handwriteController: HandwriteController = new HandwriteController();
+  private handwritePath: string = '';
+  private uiContext: UIContext = this.getUIContext() as UIContext;
+  private hostContext: common.Context = this.uiContext.getHostContext() as Context;
+  @Local private isHandwriteDirty: boolean = false;
+
+  aboutToAppear(): void {
+    this.handwritePath = this.hostContext.filesDir + '/' + `handwrite_${this.noteId}`;
+  }
+
+  // 保存手写内容
+  private async saveHandwriteData(): Promise<void> {
+    if (!this.handwriteController) {
+      return;
+    }
+    try {
+      await this.handwriteController.save(this.handwritePath);
+      console.info(`手写内容已保存到: ${this.handwritePath}`);
+      this.setHandwriteDirty(false);
+    } catch (error) {
+      console.error('保存手写内容失败:', error);
+    }
+  }
+
+  // 加载手写内容（手写数据文件）
+  private async loadHandwriteData(): Promise<void> {
+    if (!this.handwriteController) {
+      return;
+    }
+    try {
+      if (this.handwritePath) {
+        await this.handwriteController.load(this.handwritePath);
+        console.info(`手写内容已从 ${this.handwritePath} 加载`);
+      }
+      this.setHandwriteDirty(false);
+    } catch (error) {
+      console.info('无手写历史记录或文件不存在，将创建新手写数据');
+      this.setHandwriteDirty(false);
+    }
+  }
+
+  private setHandwriteDirty(dirty: boolean): void {
+    if (this.isHandwriteDirty === dirty) {
+      return;
+    }
+    this.isHandwriteDirty = dirty;
+    AppStorage.setOrCreate('handwrite_dirty_note_id', this.noteId);
+    AppStorage.setOrCreate('handwrite_dirty', dirty);
+  }
 
   // 调色盘选项栏
   @Builder
@@ -97,7 +156,6 @@ export struct RichEditorArea {
               fontColor: COLOR_LIST[this.richEditorController.currentColor],
               fontSize: this.richEditorController.fontSize
             }));
-
           });
         }, (color: ResourceColor) => JSON.stringify(color));
       }
@@ -115,19 +173,17 @@ export struct RichEditorArea {
       justifyContent: FlexAlign.SpaceAround,
       alignItems: ItemAlign.Center,
     }) {
-      // 调色盘图标
       Image($r('app.media.font_color_size'))
         .width(24)
         .fillColor(COLOR_LIST[this.richEditorController.currentColor])
-      .onClick(() => {
-        if (this.richEditorController.showToolBarIndex !== 1) {
-          this.richEditorController.showToolBarIndex = 1;
-        } else {
-          this.richEditorController.showToolBarIndex = 0;
-        }
-      });
+        .onClick(() => {
+          if (this.richEditorController.showToolBarIndex !== 1) {
+            this.richEditorController.showToolBarIndex = 1;
+          } else {
+            this.richEditorController.showToolBarIndex = 0;
+          }
+        });
 
-      // 段落对齐图标
       Image(this.richEditorController.paragraphAlignments[this.richEditorController.currentAlignment].icon)
         .width(24)
         .onClick(() => {
@@ -138,13 +194,11 @@ export struct RichEditorArea {
           }
         });
 
-      // 文本加粗图标
       Image($r('app.media.ic_bold'))
         .width(24)
-        .colorFilter(this.richEditorController.currentBold ? HIGHLIGHT_COLOR_FILTER : ORIGIN_COLOR_FILTER)// 当前图标高亮
+        .colorFilter(this.richEditorController.currentBold ? HIGHLIGHT_COLOR_FILTER : ORIGIN_COLOR_FILTER)
         .onClick(() => {
           this.richEditorController.currentBold = !this.richEditorController.currentBold;
-
           this.richEditorController.onSelectionStyleChange(StyledStringKey.FONT, new TextStyle({
             fontWeight: this.richEditorController.currentBold ? FontWeight.Bold : FontWeight.Normal,
             fontStyle: this.richEditorController.currentItalics ? FontStyle.Italic : FontStyle.Normal,
@@ -153,13 +207,11 @@ export struct RichEditorArea {
           }));
         });
 
-      // 文本斜体图标
       Image($r('app.media.ic_notepad_texttilt'))
         .width(24)
-        .colorFilter(this.richEditorController.currentItalics ? HIGHLIGHT_COLOR_FILTER : ORIGIN_COLOR_FILTER)// 当前图标高亮
+        .colorFilter(this.richEditorController.currentItalics ? HIGHLIGHT_COLOR_FILTER : ORIGIN_COLOR_FILTER)
         .onClick(() => {
           this.richEditorController.currentItalics = !this.richEditorController.currentItalics;
-
           this.richEditorController.onSelectionStyleChange(StyledStringKey.FONT, new TextStyle({
             fontWeight: this.richEditorController.currentBold ? FontWeight.Bold : FontWeight.Normal,
             fontStyle: this.richEditorController.currentItalics ? FontStyle.Italic : FontStyle.Normal,
@@ -168,14 +220,12 @@ export struct RichEditorArea {
           }));
         });
 
-      // 文本下划线图标
       Image($r('app.media.ic_underline'))
         .width(24)
         .colorFilter(this.richEditorController.currentDecoration === TextDecorationType.Underline ?
           HIGHLIGHT_COLOR_FILTER : ORIGIN_COLOR_FILTER)
         .onClick(() => {
           let isUnderline = this.richEditorController.currentDecoration === TextDecorationType.Underline;
-
           this.richEditorController.onSelectionStyleChange(StyledStringKey.DECORATION,
             new DecorationStyle({
               type: this.richEditorController.currentDecoration =
@@ -183,14 +233,12 @@ export struct RichEditorArea {
             }));
         });
 
-      // 文本删除线图标
       Image($r('app.media.ic_deleteline'))
         .width(24)
         .colorFilter(this.richEditorController.currentDecoration === TextDecorationType.LineThrough ?
           HIGHLIGHT_COLOR_FILTER : ORIGIN_COLOR_FILTER)
         .onClick(() => {
           let isLineThrough = this.richEditorController.currentDecoration === TextDecorationType.LineThrough;
-
           this.richEditorController.onSelectionStyleChange(StyledStringKey.DECORATION,
             new DecorationStyle({
               type: this.richEditorController.currentDecoration =
@@ -198,17 +246,32 @@ export struct RichEditorArea {
             }));
         });
 
-      // 文本阴影图标
       Image($r('app.media.ic_shadow'))
         .width(24)
-        .colorFilter(this.richEditorController.currentShadow ? HIGHLIGHT_COLOR_FILTER : ORIGIN_COLOR_FILTER)// 当前图标高亮
+        .colorFilter(this.richEditorController.currentShadow ? HIGHLIGHT_COLOR_FILTER : ORIGIN_COLOR_FILTER)
         .onClick(() => {
           this.richEditorController.currentShadow = !this.richEditorController.currentShadow;
-
           this.richEditorController.onSelectionStyleChange(StyledStringKey.TEXT_SHADOW,
             this.richEditorController.currentShadow ?
               new TextShadowStyle({ radius: 2, type: ShadowType.BLUR, offsetX: 3, offsetY: 3, }) :
               new TextShadowStyle({ radius: 0 }));
+        });
+
+      Image(this.isHandwriteMode ? $r('app.media.ic_keyboard') : $r('app.media.ic_handwrite'))
+        .width(24)
+        .height(24)
+        .colorFilter(this.isHandwriteMode ? HIGHLIGHT_COLOR_FILTER : ORIGIN_COLOR_FILTER)
+        .onClick(async () => {
+          this.richEditorController.showMoreFunction = false;
+          if (this.isHandwriteMode) {
+            await this.saveHandwriteData();
+            this.showToast('手写内容已保存');
+            this.isHandwriteMode = false;
+            this.richEditorController.showToolBarIndex = 0;
+          } else {
+            this.handwritePath = this.hostContext.filesDir + '/' + `handwrite_${this.noteId}`;
+            this.isHandwriteMode = true;
+          }
         });
 
       // 选择图片图标
@@ -234,10 +297,20 @@ export struct RichEditorArea {
     .backgroundColor('#EDEFF5');
   }
 
+  // 显示提示
+  private showToast(message: string): void {
+    this.uiContext.getPromptAction().showToast({
+      message: message,
+      alignment: Alignment.Center,
+      duration: 1500
+    });
+  }
+
   @Builder
   previewWindowComponent() {
     Column() {
       SnapshotPreview({
+        context: this.getUIContext().getHostContext(),
         mergedImage: this.snapShotController.mergedImage,
         snapPopupPosition: this.snapShotController.snapPopupPosition,
         isLargePreview: this.snapShotController.isLargePreview,
@@ -269,7 +342,7 @@ export struct RichEditorArea {
         Image(item.icon)
           .width(24)
           .colorFilter(this.richEditorController.currentAlignment === index ? HIGHLIGHT_COLOR_FILTER :
-            ORIGIN_COLOR_FILTER)// 当前段落样式高亮
+            ORIGIN_COLOR_FILTER)
           .onClick(item.click);
       }, (item: AlignmentInfo) => JSON.stringify(item));
     }
@@ -280,125 +353,173 @@ export struct RichEditorArea {
   // 文本内容变化回调
   contentChangedListener: StyledStringChangedListener = {
     onWillChange: (value: StyledStringChangeValue) => {
-      // this.range = '[ ' + value.range.start + ' , ' + value.range.end + ' ]';
-      // this.replaceString = value.replacementString.getString();
       return true;
     },
     onDidChange: (rangeBefore, rangeAfter) => {
       this.richEditorController.onDidChange(rangeAfter.start, rangeAfter.end);
+      const styledString = this.richEditorController.controller.getStyledString();
+      const content = styledString.getString();
+      if (content.length > this.MAX_TEXT_LENGTH) {
+        const extraLength = content.length - this.MAX_TEXT_LENGTH;
+        styledString.removeString(this.MAX_TEXT_LENGTH, extraLength);
+        this.richEditorController.controller.setStyledString(styledString);
+        this.richEditorController.controller.setCaretOffset(this.MAX_TEXT_LENGTH);
+        this.showToast(`已超出最大字数限制（${this.MAX_TEXT_LENGTH}字）`);
+      }
     }
   }
 
   build() {
     Column() {
-      Column() {
-        Scroll(this.snapShotController.scroller) {
-          Column() {
-            TextInput({
-              placeholder: '标题',
-              text: this.noteTitle,
-              controller: this.richEditorController.textInputController
-            })
-              .placeholderColor($r('sys.color.font_secondary'))
-              .placeholderFont({ size: $r('sys.float.Body_L'), weight: FontWeight.Bold })
-              .fontSize(20)
-              .fontWeight(FontWeight.Medium)
-              .fontColor($r('sys.color.font_primary'))
-              .fontWeight(FontWeight.Bold)
-              .width('100%')
-              .height(40)
-              // 设置透明背景色
-              .backgroundColor(Color.Transparent)
-              .borderRadius(0)
-              .onChange((value: string) => {
-                this.noteTitle = value;
-                this.titleChange(value);
+      Stack() {
+        // 富文本编辑区（标题+正文）
+        Column() {
+          Scroll(this.snapShotController.scroller) {
+            Column() {
+              // 标题
+              TextInput({
+                placeholder: '标题',
+                text: this.noteTitle,
+                controller: this.richEditorController.textInputController
               })
-              .margin({ top: 12, })
-              .onClick(() => {
-                this.richEditorController.showMoreFunction = false;
-              })
+                .placeholderColor($r('sys.color.font_secondary'))
+                .placeholderFont({ size: $r('sys.float.Body_L'), weight: FontWeight.Bold })
+                .fontSize(20)
+                .fontWeight(FontWeight.Medium)
+                .fontColor($r('sys.color.font_primary'))
+                .fontWeight(FontWeight.Bold)
+                .width('100%')
+                .height(40)
+                .backgroundColor(Color.Transparent)
+                .borderRadius(0)
+                .onChange((value: string) => {
+                  this.noteTitle = value;
+                  this.titleChange(value);
+                })
+                .margin({ top: 12 })
+                .onClick(() => {
+                  this.richEditorController.showMoreFunction = false;
+                })
 
-            RichEditor(this.richEditorController.options)
-              .placeholder('开始书写你的笔记', { fontColor: $r('sys.color.font_tertiary'), font: { size: 14 } })
-              .barState(BarState.Off)
-              .id(RICH_ID)
-              .onReady(() => {
-                // 注册文本变化回调
-                this.richEditorController.controller.onContentChanged(this.contentChangedListener);
-                // 设定组件展示的属性字符串
-                this.richEditorController.controller.setStyledString(this.noteContent)
-              })
-              .width('100%')
-              .onEditingChange((editingStatus) => {
-                this.isEditing = editingStatus;
-                this.richEditorController.showMoreFunction = false;
-                if (editingStatus) {
-                  this.richEditorLayoutWeight = 1;
-                } else {
-                  this.richEditorLayoutWeight = 0;
-                }
-              })
-              .layoutWeight(this.richEditorLayoutWeight)
-              .onSelectionChange((range) => {
-                // 光标移动时，更新编辑栏状态显示
-
-                let content = this.richEditorController.controller.getStyledString().getString();
-                if (content === '' || range.end === content.length) {
-                  return;
-                }
-                if (range.start === undefined || range.end === undefined){
-                  return;
-                }
-
-                // 更新段落样式
-                setTimeout(() => {
-                  let styleString = this.richEditorController.controller
-                    .getStyledString().subStyledString(range.start, 1);
-                  let styles = styleString.getStyles(0, 1, StyledStringKey.PARAGRAPH_STYLE)
-                  if (styles.length > 0) {
-                    let paragraphStyle = styles[0].styledValue as ParagraphStyle;
-                    let textAlign = paragraphStyle.textAlign;
-                    switch (textAlign) {
-                      case TextAlign.Center:
-                        this.richEditorController.currentAlignment = 1;
-                        break;
-                      case TextAlign.End:
-                        this.richEditorController.currentAlignment = 2;
-                        break;
-                      case TextAlign.JUSTIFY:
-                        this.richEditorController.currentAlignment = 3;
-                        break;
-                      case TextAlign.Start:
-                        this.richEditorController.currentAlignment = 0;
-                    }
+              // 正文
+              RichEditor(this.richEditorController.options)
+                .placeholder('开始书写你的笔记', { fontColor: $r('sys.color.font_tertiary'), font: { size: 14 } })
+                .barState(BarState.Off)
+                .id(RICH_ID)
+                .onReady(() => {
+                  this.richEditorController.controller.onContentChanged(this.contentChangedListener);
+                  this.richEditorController.controller.setStyledString(this.noteContent)
+                })
+                .width('100%')
+                .onEditingChange((editingStatus) => {
+                  this.isEditing = editingStatus;
+                  this.richEditorController.showMoreFunction = false;
+                  if (editingStatus) {
+                    this.richEditorLayoutWeight = 1;
+                    // 键盘弹出后延迟滚动，使光标所在内容上移、不被键盘遮挡
+                    setTimeout(() => {
+                      const scroller = this.snapShotController.scroller;
+                      const cur = scroller.currentOffset();
+                      const liftVp = 220;
+                      scroller.scrollTo({
+                        xOffset: cur.xOffset,
+                        yOffset: cur.yOffset + liftVp,
+                        animation: { duration: 250, curve: Curve.EaseOut }
+                      });
+                    }, 280);
+                  } else {
+                    this.richEditorLayoutWeight = 0;
                   }
-                }, 100);
-              })
+                })
+                .layoutWeight(this.richEditorLayoutWeight)
+                .onSelectionChange((range) => {
+                  let content = this.richEditorController.controller.getStyledString().getString();
+                  if (content === '' || range.end === content.length) {
+                    return;
+                  }
+                  if (range.start === undefined || range.end === undefined) {
+                    return;
+                  }
+                  setTimeout(() => {
+                    let styleString = this.richEditorController.controller
+                      .getStyledString().subStyledString(range.start, 1);
+                    let styles = styleString.getStyles(0, 1, StyledStringKey.PARAGRAPH_STYLE);
+                    if (styles.length > 0) {
+                      let paragraphStyle = styles[0].styledValue as ParagraphStyle;
+                      let textAlign = paragraphStyle.textAlign;
+                      switch (textAlign) {
+                        case TextAlign.Center:
+                          this.richEditorController.currentAlignment = 1;
+                          break;
+                        case TextAlign.End:
+                          this.richEditorController.currentAlignment = 2;
+                          break;
+                        case TextAlign.JUSTIFY:
+                          this.richEditorController.currentAlignment = 3;
+                          break;
+                        case TextAlign.Start:
+                          this.richEditorController.currentAlignment = 0;
+                      }
+                    }
+                  }, 100);
+                })
+                .onClick(() => {
+                  // 手写模式下不允许编辑笔记，这里点击时直接退出手写模式
+                  if (this.isHandwriteMode) {
+                    this.isHandwriteMode = false;
+                  }
+                })
+            }
+            .width('100%')
           }
+          .scrollBar(BarState.Off)
+          .id(this.snapShotController.snapShotId)
+          .align(Alignment.Top)
           .width('100%')
+          .height('100%')
+          .onAreaChange((oldValue, newValue) => {
+            this.snapShotController.listComponentWidth = newValue.width as number;
+            this.snapShotController.listComponentHeight = newValue.height as number;
+            this.snapShotController.scrollHeight = newValue.height as number;
+          })
+          .onDidScroll(() => {
+            this.snapShotController.curYOffset = this.snapShotController.scroller.currentOffset().yOffset;
+          });
         }
-        .scrollBar(BarState.Off)
-        .id(this.snapShotController.snapShotId)
-        .align(Alignment.Top)
-        .width('100%')
-        .height('100%')
-        .onAreaChange((oldValue, newValue) => {
-          this.snapShotController.listComponentWidth = newValue.width as number;
-          this.snapShotController.listComponentHeight = newValue.height as number;
-          this.snapShotController.scrollHeight = newValue.height as number;
+        .layoutWeight(1)
+        .zIndex(this.isHandwriteMode ? 0 : 1)
+
+        // 手写层：编辑模式下在底层仅展示；手写模式下在上层可画画
+        HandwriteComponent({
+          handwriteController: this.handwriteController,
+          defaultPenType: PenType.PEN,
+          defaultPenInfo: [{ penType: PenType.PEN, penWidth: this.penWidth },
+            { penType: PenType.BALLPOINT_PEN, penWidth: this.ballpointPenWidth }] as PenHspInfo[],
+          widthRatio: 1,
+          heightRatio: 1,
+          onInit: () => {
+            this.loadHandwriteData();
+          }
         })
-        .onDidScroll(() => {
-          this.snapShotController.curYOffset = this.snapShotController.scroller.currentOffset().yOffset;
-        })
-        .onClick(() => {
-          // 点击空白出RichEditor自动聚焦
-          this.getUIContext().getFocusController().requestFocus(RICH_ID);
-        });
+          .backgroundColor(Color.Transparent)
+          .width('100%')
+          .height('100%')
+          .zIndex(this.isHandwriteMode ? 1 : 0)
+          .onTouch((event) => {
+            if (!this.isHandwriteMode) {
+              return;
+            }
+            this.setHandwriteDirty(true);
+          })
       }
       .layoutWeight(1)
 
-      if (this.isEditing){
+      // 底部工具栏
+      if (this.isHandwriteMode) {
+        // 手写笔模式：只显示当前工具栏（含切回键盘按钮），不能编辑文本
+        this.toolBar();
+      } else {
+        // 编辑模式：正常的文本编辑工具栏
         if (this.richEditorController.showToolBarIndex === 1) {
           this.colorPalette();
         } else if (this.richEditorController.showToolBarIndex === 2) {

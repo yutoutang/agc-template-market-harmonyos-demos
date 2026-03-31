@@ -70,7 +70,7 @@ export struct Feedback {
 
   // 选择图像
   async selectImage() {
-    let uris = await fileSelect(this.stageImageUris, this.num - this.feedList.stageImageUris.length)
+    let uris = await fileSelect(this.getUIContext(),this.stageImageUris, this.num - this.feedList.stageImageUris.length)
     this.imageUris.push(...uris)
     this.feedList.stageImageUris = this.imageUris
   }

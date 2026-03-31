@@ -120,6 +120,16 @@ export class RouterUtils {
   }
 
   /**
+   * 获取栈中当前页面名称
+   * @param stackName
+   * @returns
+   */
+  public static getLastPathName(stackName: string = StackEnum.Main) {
+    const allPathNames = RouterUtils.getStack(stackName).getAllPathName();
+    return allPathNames.length > 0 ? allPathNames[allPathNames.length - 1] : '';
+  }
+
+  /**
    * 清空栈
    */
   public static clearStack(animated?: boolean, stackName: string = StackEnum.Main) {

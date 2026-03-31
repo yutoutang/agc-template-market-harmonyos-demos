@@ -1,12 +1,14 @@
-import { DataGenerator, VideoCard, VideoDetail } from '@ohos_agcit/children_education_datasource';
+import { DataGenerator, VideoCard, VideoCollection } from '@ohos_agcit/children_education_datasource';
 import { BreakpointType, CommonConstants, GlobalInfoModel, TagLabelCard } from '@ohos_agcit/children_education_utils';
 import { AppStorageV2 } from '@kit.ArkUI';
 
 
 @ComponentV2
 export struct PremiumVideo {
-  @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
   @Param premiumArray: Array<VideoCard> = [];
+  stackWidth: number = 96
+  @Local dividerWidth: number = 0
+  @Local rowWidth: number = 0
   @Local globalInfo: GlobalInfoModel =
     AppStorageV2.connect<GlobalInfoModel>(GlobalInfoModel, () => new GlobalInfoModel())!;
 
@@ -19,15 +21,14 @@ export struct PremiumVideo {
               Stack({ alignContent: Alignment.TopStart }) {
                 Image(item.imageUrl)
                   .height(54)
-                  .width(96)
                   .borderRadius(10)
-                  .id(CommonConstants.IMAGE);
+                  .aspectRatio(16 / 9)
                 Image($r('app.media.icon_vip_top_start'))
                   .width(32)
                   .height(16)
               }
 
-              Column({ space: 10 }) {
+              Column() {
                 Text(item.title)
                   .fontWeight(FontWeight.Medium)
                   .fontSize(14)
@@ -42,42 +43,46 @@ export struct PremiumVideo {
                 }
                 .align(Alignment.BottomStart);
               }
-              .alignSelf(ItemAlign.Center)
+              .layoutWeight(1)
               .alignItems(HorizontalAlign.Start)
+              .justifyContent(FlexAlign.SpaceBetween)
               .height(56)
-              .width('63%')
-              .margin({ left: 10 });
+              .margin({ left: 10 })
             }
             .width('100%')
+            .onAreaChange((_, area) => {
+              this.rowWidth = Number(area.width)
+              this.calcDividerWidth()
+            })
 
-            Blank().height(16)
-
-            Divider()
-              .width('64%')
-              .alignSelf(ItemAlign.End)
-
-            if (index !== this.premiumArray.length - 1) {
-              Blank().height(16)
+            Row() {
+              Divider().width(this.dividerWidth).strokeWidth('1px')
             }
-          };
+            .justifyContent(FlexAlign.End)
+            .height(16)
+            .width('100%')
+          }
+          .justifyContent(FlexAlign.Center)
+          .height(88)
         }
         .onClick(() => {
-          let detail: VideoDetail = DataGenerator.getVideoDetail(this.getUIContext());
+          let detail: VideoCollection = DataGenerator.getVideoDetail(this.getUIContext());
           detail.videoCard = item;
-          this.appPathStack.pushPathByName('VideoDetailListView', detail);
+          this.globalInfo.navStack.pushPathByName('VideoDetailListView', detail);
         });
       }, (item: VideoCard) => JSON.stringify(item));
     }
+    .width('100%')
+    .columnsGap(new BreakpointType<number>({
+      sm: 8,
+      md: 12,
+      lg: 16,
+    }).getValue(this.globalInfo.currentBreakpoint))
     .columnsTemplate('1fr '.repeat(new BreakpointType<number>({
       sm: 1,
       md: 2,
       lg: 3,
     }).getValue(this.globalInfo.currentBreakpoint)))
-    .padding({
-      top: '12vp',
-      left: '4%',
-      right: '4%',
-    });
   }
 
   private getMaxDisplayCount(): number {
@@ -88,7 +93,7 @@ export struct PremiumVideo {
         return 6;
       case 'lg':
         return 9;
-      default: 
+      default:
         return 3;
     }
   }
@@ -96,5 +101,18 @@ export struct PremiumVideo {
   private get displayPremiumArray(): VideoCard[] {
     const maxCount = this.getMaxDisplayCount();
     return this.premiumArray.slice(0, maxCount);
+  }
+
+  private calcDividerWidth() {
+    if (this.rowWidth <= 0 || this.stackWidth <= 0) {
+      return
+    }
+
+    const margin = 12
+    const width = this.rowWidth - this.stackWidth - margin
+
+    if (Math.abs(width - this.dividerWidth) > 1) {
+      this.dividerWidth = width
+    }
   }
 }

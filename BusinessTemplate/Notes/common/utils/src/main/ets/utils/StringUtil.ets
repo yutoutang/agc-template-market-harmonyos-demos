@@ -203,7 +203,12 @@ export class StringUtil {
    * @returns
    */
   static strToHex(hexStr: string): Uint8Array {
-    return new Uint8Array(buffer.from(hexStr, 'hex').buffer);
+    try {
+      return new Uint8Array(buffer.from(hexStr, 'hex').buffer);
+    } catch (e) {
+      console.error('strToHex invalid hex string:', hexStr, e);
+      return new Uint8Array();
+    }
   }
 
   /**
@@ -212,7 +217,12 @@ export class StringUtil {
    * @returns
    */
   static hexToStr(arr: Uint8Array): string {
-    return buffer.from(arr).toString('hex');
+    try {
+      return buffer.from(arr).toString('hex');
+    } catch (err) {
+      console.error(`hexToStr失败: ${(err as Error).message}`);
+      return '';
+    }
   }
 
 
@@ -249,8 +259,13 @@ export class StringUtil {
    * @returns
    */
   static strToBuffer(src: string, encoding: buffer.BufferEncoding = 'utf-8'): ArrayBuffer {
-    const buf = buffer.from(src, encoding);
-    return buf.buffer;
+    try {
+      const buf = buffer.from(src, encoding);
+      return buf.buffer;
+    } catch (err) {
+      console.error(`strToBuffer失败: ${(err as Error).message}`);
+      return new ArrayBuffer(0);
+    }
   }
 
   /**
@@ -259,9 +274,13 @@ export class StringUtil {
    * @returns
    */
   static bufferToStr(src: ArrayBuffer, encoding: buffer.BufferEncoding = 'utf-8'): string {
-    const buf = buffer.from(src);
-    const result = buf.toString(encoding);
-    return result;
+    try {
+      const buf = buffer.from(src);
+      return buf.toString(encoding);
+    } catch (error) {
+      console.error('bufferToStr error:', JSON.stringify(error));
+      return '';
+    }
   }
 
 
@@ -280,7 +299,6 @@ export class StringUtil {
    * @returns
    */
   static unit8ArrayToBuffer(src: Uint8Array): ArrayBuffer {
-    // return buffer.from(src).buffer;
     return src.buffer as ArrayBuffer;
   }
 

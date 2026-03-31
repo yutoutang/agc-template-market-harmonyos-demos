@@ -1,15 +1,16 @@
 import { AvResponse, AvSection } from 'lib_news_api'
 import { VideoVM } from '../viewmodel/VideoViewModel'
+import { VipBadge } from './VipBadge'
 
 @ComponentV2
 export struct VideoAxisList {
   @Param videoDetails: AvResponse | undefined = undefined
   @Param sectionIndex: number = 0
   @Param fontSizeRatio: number = 1
-  @Param isTvDetails:boolean = false
+  @Param isTvDetails: boolean = false
   @Event $sectionIndex: (index: number) => void = () => {
   }
-  videoVM: VideoVM = new VideoVM()
+  videoVM: VideoVM = new VideoVM(this.getUIContext())
   @Event onVideoChange: (item: AvSection) => void = () => {
   }
 
@@ -18,12 +19,19 @@ export struct VideoAxisList {
       ForEach(this.videoDetails?.section, (item: AvSection, index: number) => {
         ListItem() {
           Column({ space: 4 }) {
-            Image(item.coverUrl)
-              .objectFit(ImageFit.Cover)
-              .borderRadius(8)
-              .clip(true)
-              .width('100%')
-              .height(this.videoVM.geVideoHeight())
+            Stack() {
+              Image(item.coverUrl)
+                .objectFit(ImageFit.Cover)
+                .borderRadius(8)
+                .clip(true)
+                .width('100%')
+                .height(this.videoVM.geVideoHeight())
+              if (item.needVip) {
+                VipBadge({ isSquareStyle: false, customRadius: 8 })
+              }
+            }
+            .alignContent(Alignment.TopEnd)
+
             Text(item.title)
               .fontSize(14 * this.fontSizeRatio)
               .fontWeight(FontWeight.Medium)

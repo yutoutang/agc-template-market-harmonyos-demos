@@ -15,17 +15,19 @@
 
 import { speechRecognizer } from '@kit.CoreSpeechKit';
 import { BusinessError, pasteboard } from '@kit.BasicServicesKit';
-import { abilityAccessCtrl, common } from '@kit.AbilityKit';
-import { camera, cameraPicker as picker } from '@kit.CameraKit'
-import { fileIo } from '@kit.CoreFileKit'
+import { abilityAccessCtrl } from '@kit.AbilityKit';
+import { camera, cameraPicker as picker } from '@kit.CameraKit';
+import { fileIo } from '@kit.CoreFileKit';
 import { image } from '@kit.ImageKit';
 import { textRecognition } from '@kit.CoreVisionKit';
+import { UtilLog } from '@hw-agconnect/util-log';
+
+const TAG = '[SearchQuestionPage]';
 
 @ComponentV2
 export struct SearchQuestionPage {
   @Local textInput: string = ''
   textInputPre: string = ''
-  private context: Context = getContext(this) as common.UIAbilityContext
   @Local sessionId: string = '123456';
   asrEngine: speechRecognizer.SpeechRecognitionEngine | null = null
   private atManager = abilityAccessCtrl.createAtManager();
@@ -61,6 +63,8 @@ export struct SearchQuestionPage {
     })
     .width('100%')
     .height('100%')
+    .backgroundColor($r('sys.color.comp_background_primary'))
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
   }
 
   /**
@@ -77,8 +81,8 @@ export struct SearchQuestionPage {
           .textAlign(TextAlign.Center)
       }
       .justifyContent(FlexAlign.Center)
-      .width(304)
-      .height(40)
+      .width('80%')
+      .height(45)
       .padding({ right: '8vp' })
       .onClick(() => {
         if (this.textInput) {
@@ -86,7 +90,7 @@ export struct SearchQuestionPage {
         }
       })
     }
-    .backgroundColor($r('sys.color.background_secondary'))
+    .backgroundColor($r('sys.color.comp_background_tertiary'))
     .margin({ top: '24vp' })
   }
 
@@ -100,6 +104,8 @@ export struct SearchQuestionPage {
       this.voiceBuilder()
       // 拍照
       this.photoBuilder()
+      Blank()
+        .layoutWeight(1)
       // 粘贴
       this.pasteBuilder()
       // 清除
@@ -130,6 +136,7 @@ export struct SearchQuestionPage {
         this.textInput = ''
       })
     }
+    .margin({right:'28vp'})
     .backgroundColor($r('sys.color.background_secondary'))
   }
 
@@ -232,7 +239,8 @@ export struct SearchQuestionPage {
       .padding({ left: '8vp', right: '8vp' })
       .onTouch(async (event) => {
         if (event.type === TouchType.Down) {
-          this.atManager.requestPermissionsFromUser(this.context, ['ohos.permission.MICROPHONE'])
+          this.atManager.requestPermissionsFromUser(this.getUIContext().getHostContext(),
+            ['ohos.permission.MICROPHONE'])
             .then(async (data) => {
               if (data.authResults[0] === 0) {
                 await this.createSREngine()
@@ -264,6 +272,7 @@ export struct SearchQuestionPage {
       .height('154vp')
       .width('100%')
       .backgroundColor($r('sys.color.background_primary'))
+      .borderColor($r('sys.color.comp_divider'))
       .borderWidth(1)
       .margin({ bottom: '12vp' })
       .onChange((value) => {
@@ -289,11 +298,11 @@ export struct SearchQuestionPage {
   topBarBuilder() {
     Row() {
       Row() {
-        Image($r('app.media.ic_backward')).height('40vp').width('40vp').margin({ right: '8vp' })
+        Image($r('app.media.ic_back')).height('40vp').width('40vp').margin({ right: '8vp' })
           .onClick(() => {
             this.back()
           })
-        Text('一键搜题')
+        Text('搜题')
           .fontSize($r('sys.float.Title_S'))
           .fontWeight(FontWeight.Bold)
       }
@@ -322,7 +331,7 @@ export struct SearchQuestionPage {
       this.asrEngine = await speechRecognizer.createEngine(initParamsInfo)
       this.setListener()
     } catch (e) {
-      //在此处进行异常处理
+      UtilLog.error(TAG, `Failed to speechRecognizer.createEngine, Code is ${e.code}, message is ${e.message}`);
     }
   }
 
@@ -341,7 +350,11 @@ export struct SearchQuestionPage {
       audioInfo: audioParam,
       extraParams: extraParam
     };
-    this.asrEngine?.startListening(recognizerParams)
+    try {
+      this.asrEngine?.startListening(recognizerParams)
+    } catch (e) {
+      UtilLog.error(TAG, `Failed to asrEngine.startListening, Code is ${e.code}, message is ${e.message}`);
+    }
   };
 
   // 设置回调
@@ -387,11 +400,19 @@ export struct SearchQuestionPage {
       audioInfo: audioParam,
       extraParams: extraParam
     };
-    this.asrEngine?.startListening(recognizerParams)
+    try {
+      this.asrEngine?.startListening(recognizerParams)
+    } catch (e) {
+      UtilLog.error(TAG, `Failed to asrEngine.startListening, Code is ${e.code}, message is ${e.message}`);
+    }
   }
 
   finishListener(sessionId: string) {
-    this.asrEngine?.finish(sessionId)
+    try {
+      this.asrEngine?.finish(sessionId)
+    } catch (e) {
+      UtilLog.error(TAG, `Failed to asrEngine?.finish, Code is ${e.code}, message is ${e.message}`);
+    }
   }
 
   // 拍照识别
@@ -400,7 +421,8 @@ export struct SearchQuestionPage {
       cameraPosition: camera.CameraPosition.CAMERA_POSITION_BACK,
     };
     let result: picker.PickerResult =
-      await picker.pick(getContext(), [picker.PickerMediaType.PHOTO, picker.PickerMediaType.VIDEO],
+      await picker.pick(this.getUIContext()?.getHostContext(),
+        [picker.PickerMediaType.PHOTO, picker.PickerMediaType.VIDEO],
         pickerProfile);
     let uri = result.resultUri;
     let imageSource: image.ImageSource;
@@ -420,12 +442,16 @@ export struct SearchQuestionPage {
         let textConfiguration: textRecognition.TextRecognitionConfiguration = {
           isDirectionDetectionSupported: true
         };
-        await textRecognition.recognizeText(visionInfo, textConfiguration).then((textRecognitionResult) => {
-          if (textRecognitionResult.value !== '') {
-            this.search(textRecognitionResult.value)
-          }
-        })
-      }catch (e) {
+        await textRecognition.recognizeText(visionInfo, textConfiguration)
+          .then((textRecognitionResult) => {
+            if (textRecognitionResult.value !== '') {
+              this.search(textRecognitionResult.value)
+            }
+          }).catch(() => {
+            UtilLog.error(TAG, 'Failed to recognizeText');
+          });
+      } catch (e) {
+        UtilLog.error(TAG, `Failed to startCameraPicker, Code is ${e.code}, message is ${e.message}`);
       }
     }, 100)
   }

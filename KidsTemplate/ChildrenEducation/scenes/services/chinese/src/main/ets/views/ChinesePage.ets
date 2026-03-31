@@ -1,18 +1,27 @@
 import { DataGenerator } from '@ohos_agcit/children_education_datasource';
-import { CommonConstants, FeedTitle, NoMoreTab, TwoColumn } from '@ohos_agcit/children_education_utils';
+import {
+  BreakpointType,
+  CommonConstants,
+  CompactCardComponent,
+  FeedTitle,
+  GlobalInfoModel,
+  NoMoreTab
+} from '@ohos_agcit/children_education_utils';
 import { SingStory } from '../components/SingStory';
+import { AppStorageV2 } from '@kit.ArkUI';
 
 @ComponentV2
 export struct ChinesePage {
   private chinesePageData = DataGenerator.getChinesePageData(this.getUIContext());
-  @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
+  @Local globalInfo: GlobalInfoModel =
+    AppStorageV2.connect<GlobalInfoModel>(GlobalInfoModel, () => new GlobalInfoModel())!;
 
   build() {
     Column() {
-      List({ space: 30 }) {
+      List() {
         ListItemGroup({
           header: FeedTitle('app.media.feed_head_premium', '听故事 学叙事', () => {
-            this.appPathStack.pushPathByName('PremiumInteractiveVideoListView', undefined);
+            this.globalInfo.navStack.pushPathByName('PremiumInteractiveVideoListView', '听故事 学叙事');
           }),
         }) {
           SingStory({
@@ -21,12 +30,13 @@ export struct ChinesePage {
         };
 
         ListItemGroup({
-          header: FeedTitle('app.media.feed_head_premium', '三字经 磨耳朵', () => {
-            this.appPathStack.pushPathByName('PremiumInteractiveVideoListView', undefined);
+          header: FeedTitle('app.media.feed_head_video', '三字经 磨耳朵', () => {
+            this.globalInfo.navStack.pushPathByName('PremiumInteractiveVideoListView', '三字经 磨耳朵');
           }),
         }) {
-          TwoColumn({
+          CompactCardComponent({
             videoCardArray: this.chinesePageData.threeCharacter,
+            showVideoType: true
           });
         };
 
@@ -37,6 +47,18 @@ export struct ChinesePage {
       .scrollBar(BarState.Off);
     }
     .width(CommonConstants.FULL_PERCENT)
-    .height(CommonConstants.FULL_PERCENT);
+    .height(CommonConstants.FULL_PERCENT)
+    .padding({
+      left: new BreakpointType<number>({
+        sm: 16,
+        md: 24,
+        lg: 32,
+      }).getValue(this.globalInfo.currentBreakpoint),
+      right: new BreakpointType<number>({
+        sm: 16,
+        md: 24,
+        lg: 32,
+      }).getValue(this.globalInfo.currentBreakpoint)
+    })
   }
 }

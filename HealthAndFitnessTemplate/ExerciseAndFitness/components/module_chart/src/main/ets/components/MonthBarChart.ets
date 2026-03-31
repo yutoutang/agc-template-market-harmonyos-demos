@@ -75,7 +75,7 @@ export struct MonthBarChart {
 
   build() {
     Column() {
-      if (this.chartData.data.length) {
+      if (this.chartData.data.length !== 0) {
         Text() {
           if (this.selectedData) {
             Span(dayjs(this.selectedData.date as string).format('M月D日'));

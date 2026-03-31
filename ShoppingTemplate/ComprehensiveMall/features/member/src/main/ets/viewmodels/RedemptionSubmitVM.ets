@@ -11,7 +11,7 @@ export class RedemptionSubmitVM {
   @Trace
   customerPhone: string = '';
   @Trace
-  product: UserPointRedemptionSku | undefined
+  product: UserPointRedemptionSku | undefined;
 
   @Computed
   get displayAddress() {
@@ -21,7 +21,7 @@ export class RedemptionSubmitVM {
   @Computed
   get displayCustomerInfo() {
     if (!this.customerName && !this.customerPhone) {
-      return '请填写收件人信息'
+      return '请填写收件人信息';
     }
     return this.customerName + ' ' + this.customerPhone;
   }
@@ -45,10 +45,10 @@ export class RedemptionSubmitVM {
       WindowUtil.toast('请填写正确的收件信息');
       return;
     }
-    const res = await UserApis.redeemPointsForProducts(this.product)
+    const res = await UserApis.redeemPointsForProducts(this.product);
     if (res.code === 0) {
-      WindowUtil.toast('兑换成功！')
-      routerStack.pop(1)
+      WindowUtil.toast('兑换成功！');
+      routerStack.pop(1);
     }
   }
 }

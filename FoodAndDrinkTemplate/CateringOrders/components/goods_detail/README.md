@@ -190,7 +190,6 @@ getSelectSpec(callback: (item: [SpecItemResp](#SpecItemResp对象说明), index:
 
 ```typescript
 import { Goods, GoodsDetail, GoodsSpecResp, PackageSpecResp, SpecCatalogResp, SpecItemResp } from 'goods_detail';
-import { promptAction } from '@kit.ArkUI';
 
 @Entry
 @ComponentV2
@@ -229,10 +228,10 @@ struct Index {
             goodSinglePrice: this.goodSinglePrice,
             selectSpecArr: this.selectSpecArr,
             clickAddCarCb: (goodNum: number) => {
-               promptAction.showToast({ message: '添加购物车~' })
+               this.getUIContext().getPromptAction().showToast({ message: '添加购物车~' })
             },
             getSelectSpec: (item: SpecItemResp, index: number) => {
-               promptAction.showToast({ message: '切换规格查询~' })
+               this.getUIContext().getPromptAction().showToast({ message: '切换规格查询~' })
             },
          })
       }
@@ -249,7 +248,6 @@ struct Index {
 
 ```typescript
 import { Goods, GoodsDetail, GoodsSpecResp, PackageSpecResp, SpecCatalogResp, SpecItemResp } from 'goods_detail';
-import { promptAction } from '@kit.ArkUI';
 
 @Entry
 @ComponentV2
@@ -348,10 +346,9 @@ struct Index {
             goodSinglePrice: this.goodSinglePrice,
             selectSpecArr: this.selectSpecArr,
             clickAddCarCb: (goodNum: number) => {
-               promptAction.showToast({ message: '添加购物车~' })
+               this.getUIContext().getPromptAction().showToast({ message: '添加购物车~' })
             },
             getSelectSpec: (item: SpecItemResp, index: number) => {
-
                this.getSelectSpec(item, index)
             },
          })
@@ -367,7 +364,7 @@ struct Index {
          specNum: Number(item.specValNum),
       };
       this.selectSpecArr[index] = pkgSpec;
-      promptAction.showToast({ message: '切换规格~' })
+      this.getUIContext().getPromptAction().showToast({ message: '切换规格~' })
    }
 }
 ```
@@ -378,7 +375,6 @@ struct Index {
 
 ```typescript
 import { Goods, GoodsDetail, GoodsSpecResp, PackageSpecResp, SpecCatalogResp, SpecItemResp } from 'goods_detail';
-import { promptAction } from '@kit.ArkUI';
 
 @Entry
 @ComponentV2
@@ -497,10 +493,9 @@ struct Index {
             goodSinglePrice: this.goodSinglePrice,
             selectSpecArr: this.selectSpecArr,
             clickAddCarCb: (goodNum: number) => {
-               promptAction.showToast({ message: '添加购物车~' })
+               this.getUIContext().getPromptAction().showToast({ message: '添加购物车~' })
             },
             getSelectSpec: (item: SpecItemResp, index: number) => {
-
                this.getSelectSpec(item, index)
             },
          })
@@ -516,7 +511,7 @@ struct Index {
          specNum: Number(item.specValNum),
       };
       this.selectSpecArr[index] = pkgSpec;
-      promptAction.showToast({ message: '切换规格~' })
+      this.getUIContext().getPromptAction().showToast({ message: '切换规格~' })
    }
 }
 ```

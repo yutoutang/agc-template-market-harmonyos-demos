@@ -1,6 +1,7 @@
-import { AssetDisplayTypeItem, AssetType } from 'asset_base';
+import { AssetDisplayTypeItem, AssetType, Logger } from 'asset_base';
 import { AssetCreateSheet, assetCreateSheetBuilder } from '../components/AssetCreateSheet';
-import { promptAction } from '@kit.ArkUI';
+
+const TAG = '[AssetCreateSheetExample1]'
 
 const MOCK_ASSET_TYPE_LIST: AssetDisplayTypeItem[] = [
   {
@@ -37,9 +38,13 @@ struct AssetCreateSheetExample1 {
       AssetCreateSheet({
         assetTypeList: MOCK_ASSET_TYPE_LIST,
         handleClick: (type: AssetType, subType?: number) => {
-          promptAction.showToast({
-            message: '点击了类型为' + type + '子类型为' + subType + '的资产按钮',
-          });
+          try {
+            this.getUIContext().getPromptAction().showToast({
+              message: '点击了类型为' + type + '子类型为' + subType + '的资产按钮',
+            });
+          } catch (err) {
+            Logger.error(TAG, 'show toast failed. error:' + JSON.stringify(err));
+          }
         },
       }).height(300);
       Text('使用方式2：使用bindSheet拉起半模态弹框使用');

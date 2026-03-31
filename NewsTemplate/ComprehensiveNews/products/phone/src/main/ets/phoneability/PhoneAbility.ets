@@ -6,6 +6,7 @@ import { ShareService } from 'lib_widget';
 import { LoneTakeAnimationsTransition } from 'module_transition';
 import { WXLoginService } from 'module_login';
 import { MediaController } from 'module_audioplayer';
+import { PreviewUtils } from 'module_imagepreview';
 import { WantUtils } from '../common/WantUtils';
 import { CloudPrefetchUtils } from '../common/CloudPrefetchUtils';
 import { NetworkUtils } from '../common/NetworkUtils';
@@ -32,6 +33,8 @@ export default class PhoneAbility extends UIAbility {
     this.setNeedLoadContent(true);
     ContinueUtils.disableContinue(this.context);
     this.handleWeChatCallIfNeed(want);
+    WantUtils.handleAppLinkingWant(want);
+    WantUtils.handleShortcutWant(want);
     WantUtils.handlePushCall(want);
     WantUtils.handleFormCardCall(want);
     WantUtils.handleRestoreCall(want, launchParam);
@@ -42,6 +45,8 @@ export default class PhoneAbility extends UIAbility {
     Logger.info(TAG, 'Ability onNewWant');
     this.setNeedLoadContent(false);
     this.handleWeChatCallIfNeed(want);
+    WantUtils.handleAppLinkingWant(want);
+    WantUtils.handleShortcutWant(want);
     WantUtils.handlePushWant(want);
     WantUtils.handleFormCardCall(want);
     WantUtils.handleRestoreCall(want, launchParam);
@@ -97,6 +102,7 @@ export default class PhoneAbility extends UIAbility {
       BundleUtils.getBundleInfo(this.context);
       MediaController.setWindowStage(windowStage)
       LoneTakeAnimationsTransition.init(windowStage);
+      PreviewUtils.initStage(windowStage)
       // 判断是否是模拟器
       let productMode = deviceInfo.productModel;
       if (productMode !== 'emulator') {

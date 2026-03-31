@@ -1,4 +1,4 @@
-import { WindowUtil } from 'module_ui_base';
+import { WindowUtil } from 'lib_foundation';
 import { ProductModel } from '../commons/Model';
 import { NumberStepper } from './basic/NumberStepper';
 
@@ -19,13 +19,13 @@ export struct CartCard {
   };
 
   build() {
-    Row({ space: 12 }) {
+    Row({ space: 8 }) {
       this.checkboxBuilder();
       this.cardImgBuilder();
       this.cardInfoBuilder();
     }
     .alignItems(VerticalAlign.Top)
-    .backgroundColor(Color.White)
+    .backgroundColor($r('app.color.background_color_primary'))
     .width('100%')
     .padding({
       left: 12,
@@ -33,7 +33,7 @@ export struct CartCard {
       top: 16,
       bottom: 16,
     })
-    .borderRadius(8)
+    .borderRadius(16)
     .onClick(() => {
       this.onCardClick && this.onCardClick();
     })
@@ -44,6 +44,8 @@ export struct CartCard {
     Row() {
       Checkbox({ group: 'checkboxGroup', name: this.data.skuCode })
         .selectedColor('#FFE64566')
+        .unselectedColor($r('app.color.font_color_level2'))
+        .size({ width: 20, height: 20 })
         .shape(CheckBoxShape.CIRCLE)
         .select(this.data.isSelected)
         .onChange((value: boolean) => {
@@ -67,27 +69,39 @@ export struct CartCard {
   @Builder
   cardInfoBuilder() {
     Column() {
-      Text(this.data.title)
-        .width('100%')
-        .maxLines(1)
-        .textOverflow({ overflow: TextOverflow.Ellipsis })
-        .fontSize(14)
-        .fontColor('#E6000000')
+      Row() {
+        if (this.data.slotId) {
+          Text(' 秒杀 ')
+            .fontSize(10)
+            .fontColor($r('app.color.font_color_level1_invert'))
+            .backgroundColor($r('app.color.theme_color'))
+            .padding(2)
+            .borderRadius(2)
+            .margin({ right: 2 })
+        }
+        Text(this.data.title)
+          .width('100%')
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .fontSize(14)
+          .fontColor($r('app.color.font_color_level1'))
+          .layoutWeight(1)
+      }
 
       Text(this.data.serviceDesc)
-        .fontColor($r('sys.color.mask_tertiary'))
+        .fontColor($r('app.color.font_color_level2'))
         .fontSize(12)
         .margin({ top: 2 })
 
       Row({ space: 4 }) {
         Text(this.data.skuDesc)
-          .fontColor($r('sys.color.mask_tertiary'))
+          .fontColor($r('app.color.font_color_level2'))
           .fontSize(10)
         Image($r('app.media.ic_left_arrow'))
           .height(11)
           .objectFit(ImageFit.Contain)
           .rotate({ angle: -90 })
-          .fillColor($r('sys.color.mask_tertiary'))
+          .fillColor($r('app.color.font_color_level2'))
           .draggable(false)
       }
       .borderRadius(4)
@@ -98,29 +112,29 @@ export struct CartCard {
         left: 8,
         right: 8,
       })
-      .backgroundColor('#0D000000')
+      .backgroundColor($r('app.color.background_color_grey_light'))
 
       Row() {
         Text() {
-          Span('¥').fontSize(10).fontColor('#FFE84026')
-          Span(this.data.price.toString()).fontSize(16).fontColor('#FFE84026')
+          Span('¥').fontSize(10).fontColor($r('app.color.theme_color'))
+          Span(this.data.price.toString()).fontSize(16).fontColor($r('app.color.theme_color'))
 
           if (this.data.dashPrice) {
             Span(' ').letterSpacing(2)
             Span('¥')
               .decoration({
                 type: TextDecorationType.LineThrough,
-                color: '#66000000',
+                color: $r('app.color.font_color_level3'),
               })
             Span(this.data.dashPrice.toString())
               .decoration({
                 type: TextDecorationType.LineThrough,
-                color: '#66000000',
+                color: $r('app.color.font_color_level3'),
               })
           }
         }
         .fontSize(10)
-        .fontColor('#66000000')
+        .fontColor($r('app.color.font_color_level3'))
 
         if (this.isEdit) {
           Button({ type: ButtonType.Normal, stateEffect: true }) {
@@ -135,7 +149,7 @@ export struct CartCard {
         } else {
           NumberStepper({
             value: this.data.count,
-            max: this.data.stock,
+            max: this.data.slotId ? 1 : this.data.stock,
             buttonType: ButtonType.Circle,
             onChange: (value) => {
               if (value <= 0) {

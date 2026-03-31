@@ -21,3 +21,7 @@ export { ResolutionSheet } from './src/main/ets/components/ResolutionSheet';
 
 export { MovieItem } from './src/main/ets/models/Type';
 
+export { AVPlayerState } from './src/main/ets/tools/AVPlayer'
+
+export { PipManager } from './src/main/ets/tools/PipManager'
+

@@ -3,7 +3,15 @@ export { CommonConstants } from './src/main/ets/constants/CommonConstants';
 
 export { EventEnum } from './src/main/ets/constants/EventEnum';
 
+export { TabBarType } from './src/main/ets/constants/TabEnum';
+
+export { VideoType } from './src/main/ets/constants/VideoEnum';
+
+export { ShortcutKey } from './src/main/ets/constants/ShortcutEnum';
+
 export { GlobalKey } from './src/main/ets/constants/GlobalKey';
+
+export { AppConstants } from './src/main/ets/constants/AppConstants';
 
 export { RouterMap } from './src/main/ets/constants/RouterMap';
 
@@ -47,8 +55,6 @@ export { CloudRecommendListResult } from './src/main/ets/models/PreloadModel'
 export { ContinueModel } from './src/main/ets/models/ContinueModel';
 
 export { VideoExtraInfoModel } from './src/main/ets/models/VideoExtraInfoModel';
-
-export { VideoType } from './src/main/ets/constants/VideoEnum'
 
 export { DisplayModel } from './src/main/ets/models/DisplayModel';
 
@@ -94,8 +100,6 @@ export { PushUtils } from './src/main/ets/push/PushUtils';
 export { PushActionParams } from './src/main/ets/push/Model';
 
 export { BundleUtils } from './src/main/ets/utils/BundleUtils';
-
-export { SafeRandomGenerate } from './src/main/ets/utils/SafeRandomNumer';
 
 export { BreakpointUtils } from './src/main/ets/utils/BreakpointUtils';
 

@@ -1,6 +1,7 @@
 import { webview } from '@kit.ArkWeb';
-import { CommonConstants } from '@ohos_agcit/children_education_utils';
+import { CommonConstants, GlobalInfoModel } from '@ohos_agcit/children_education_utils';
 import { common } from '@kit.AbilityKit';
+import { AppStorageV2 } from '@kit.ArkUI';
 
 @Builder
 export function PrivacyAgreementBuilder() {
@@ -10,10 +11,11 @@ export function PrivacyAgreementBuilder() {
 @ComponentV2
 export struct PrivacyAgreement {
   topRectHeight: number = 0;
-  @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack()
   controller: webview.WebviewController = new webview.WebviewController();
   hostContext: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
-  privacyAgreementPath: string = ''
+  @Local privacyAgreementPath : string = '';
+  @Local globalInfo: GlobalInfoModel =
+    AppStorageV2.connect<GlobalInfoModel>(GlobalInfoModel, () => new GlobalInfoModel())!;
 
   build() {
     NavDestination() {
@@ -23,15 +25,15 @@ export struct PrivacyAgreement {
         .geolocationAccess(false)
     }
     .hideTitleBar(true)
-    .margin({
-      top: this.getUIContext().px2vp(this.topRectHeight)
+    .padding({
+      top: this.getUIContext().px2vp(this.topRectHeight+50)
     })
     .onReady((cxt: NavDestinationContext) => {
       let param = cxt.pathInfo.param as string;
       this.privacyAgreementPath = param
     })
     .onBackPressed(() => {
-      this.appPathStack.pop();
+      this.globalInfo.navStack.pop();
       return true;
     })
   }

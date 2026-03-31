@@ -5,6 +5,7 @@ export class TabNav {
   id: string = ''
   name: string = ''
   activeColor: ResourceColor = ''
+
   constructor(id: string, name: string, activeColor: ResourceColor = Color.White) {
     this.id = id;
     this.name = name;
@@ -65,6 +66,26 @@ export class VideoNewsData implements NewsResponse, VideoPlayerData {
 
   getVideoDuration(): number {
     return this.videoDuration;
+  }
+
+  getAuthorName(): string {
+    return this.author.authorNickName;
+  }
+
+  /**
+   * 视频资源是否需要vip会员解锁观看
+   * @returns
+   */
+  isNeedVip() {
+    return false;
+  }
+
+  /**
+   * 设置视频时长
+   * @param duration
+   */
+  setVideoDuration(duration: number) {
+    this.videoDuration = duration;
   }
 
   constructor(data: NewsResponse) {

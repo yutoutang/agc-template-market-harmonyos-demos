@@ -1,8 +1,9 @@
 import { ValueType } from '@kit.ArkData';
+import { MembershipUtils } from 'lib_account';
 import { RouterMap } from 'lib_common';
 import { AvModel } from 'lib_news_api';
 import { NavHeaderBar, Share } from 'lib_widget';
-import { MediaController, AudioPlayer, AudioPlayerState, SubUtils, AudioConstants } from 'module_audioplayer';
+import { MediaController, AudioPlayer, AudioPlayerState } from 'module_audioplayer';
 import { AudioMightLike } from '../components/AudioMightLike';
 import { AudioUtils } from '../utils/AudioAdaptationUtils';
 import { AudioVM } from '../viewmodel/AudioViewModel';
@@ -51,6 +52,27 @@ export struct AudioPlayingDetails {
               hasOperation: true,
               fontSizeRatio: this.audioVM.settingInfo.fontSizeRatio,
               canRedirect: this.canRedirect,
+              checkPlayPrevious: (currentIndex) => {
+                const index = currentIndex - 1 <= 0 ? 0 : currentIndex - 1;
+                if (this.curPlayAudioInfo.section[index]?.needVip &&
+                  (!this.audioVM.userInfoModel.isLogin || !this.audioVM.userInfoModel.isMembership)) {
+                  MembershipUtils.openSheet();
+                  return false;
+                }
+                return true;
+              },
+              checkPlayNext: (currentIndex, isAutoNext) => {
+                const total = this.curPlayAudioInfo.section.length - 1;
+                const index = currentIndex + 1 >= total ? total : currentIndex + 1;
+                if (this.curPlayAudioInfo.section[index]?.needVip &&
+                  (!this.audioVM.userInfoModel.isLogin || !this.audioVM.userInfoModel.isMembership)) {
+                  if (!isAutoNext) {
+                    MembershipUtils.openSheet();
+                  }
+                  return false;
+                }
+                return true;
+              },
               onAudioStateChange: (state: AudioPlayerState) => {
                 if (state === AudioPlayerState.PLAY) {
                   this.videoPipModel.stopPip()

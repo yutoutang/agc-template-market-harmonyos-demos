@@ -1,4 +1,4 @@
-import { RouterModule } from 'router_module';
+import { RouterModule } from 'commonlib';
 
 @Builder
 export function PrivacyPageBuilder() {
@@ -10,7 +10,9 @@ export struct PrivacyPage {
   build() {
     Column() {
       Row() {
-        Image($r('app.media.ic_backward')).size({ width: 40, height: 40 })
+        Image($r('app.media.ic_back'))
+          .size({ width: $r('app.float.vp_40'), height: $r('app.float.vp_40') })
+          .borderRadius($r('app.float.vp_20'))
           .margin({ left: 16 })
           .onClick(() => {
             RouterModule.pop();
@@ -18,8 +20,8 @@ export struct PrivacyPage {
         Blank();
       }
       .justifyContent(FlexAlign.Start)
-      .backgroundColor($r('sys.color.background_primary'))
       .size({ width: '100%', height: 56 });
+
       Column() {
         Row() {
           Text('隐私协议')
@@ -36,6 +38,9 @@ export struct PrivacyPage {
           .lineHeight(24);
       }.layoutWeight(1).padding(16);
     }
-    .height('100%').width('100%');
+    .height('100%')
+    .width('100%')
+    .backgroundColor($r('sys.color.background_secondary'))
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM]);
   }
 }

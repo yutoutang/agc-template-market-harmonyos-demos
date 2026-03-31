@@ -5,12 +5,20 @@
       "value": "#5C79D9"
     },
     {
+      "name": "membership",
+      "value": "#D3B685"
+    },
+    {
       "name": "gradient_start",
       "value": "#DFE8FB"
     },
     {
       "name": "common_page_bg",
       "value": "#FFFFFF"
+    },
+    {
+      "name": "common_sheet_bg",
+      "value": "#F1F3F5"
     },
     {
       "name": "comment_input_bg",

@@ -6,11 +6,15 @@
     },
     {
       "name": "agcit_huawei_social_dating",
-      "value": "1.0.0"
+      "value": "1.0.1"
     },
     {
       "name": "agcittype_huawei_social_dating",
       "value": "industryTemplate"
+    },
+    {
+      "name": "agcitkid_huawei_social_dating",
+      "value": "agcit_huawei_common_atomicservice_login/1.0.0,agcit_huawei_common_collect_personal_info/1.0.0,agcit_huawei_common_dial_panel/1.0.0,agcit_huawei_common_membership/1.0.2"
     }
   ]
 }

@@ -37,10 +37,12 @@ struct ChapterListView {
                   .borderRadius('50%')
                   .backgroundColor(item.serialBgColor)
                   .textAlign(TextAlign.Center)
+                  .maxFontScale(1)
 
                 Text(item.title)
                   .fontSize(14)
                   .fontColor('rgba(0,0,0,0.9)')
+                  .maxFontScale(1)
               }
               .width(CommonConstants.FULL_WIDTH)
               .margin({
@@ -64,9 +66,11 @@ struct ChapterListView {
                       left: 8,
                       right: 16
                     })
+                    .maxFontScale(1)
                   Text(`正确率 ${item.calAccuracyRate()}%`)
                     .fontSize(10)
                     .fontColor('rgba(0,0,0,0.6)')
+                    .maxFontScale(1)
                 }
                 .layoutWeight(1)
 
@@ -79,6 +83,7 @@ struct ChapterListView {
                   .fontSize(12)
                   .borderRadius(8)
                   .textAlign(TextAlign.Center)
+                  .maxFontScale(1)
                   .onClick(() => {
                     const param:ROUTE_PARAM = {
                       title: item.title,

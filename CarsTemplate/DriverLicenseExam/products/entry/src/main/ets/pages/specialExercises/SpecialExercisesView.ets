@@ -72,10 +72,12 @@ struct SpecialExercisesView {
         .fontSize(12)
         .fontColor('rgba(0,0,0,0.9)')
         .fontWeight(FontWeight.Medium)
+        .maxFontScale(1)
       Row() {
         Text(String(number))
           .fontSize(10)
           .fontColor('rgba(0,0,0,0.6)')
+          .maxFontScale(1)
         Image($r('app.media.ic_right_arrow_lined'))
           .height(12)
           .width(12)
@@ -126,11 +128,13 @@ struct SpecialExercisesView {
                 .fontSize(14)
                 .fontColor('rgba(0,0,0,0.9)')
                 .fontWeight(FontWeight.Medium)
+                .maxFontScale(1)
             }
             Row() {
               Text(`共${this.chapterCount}章`)
                 .fontSize(14)
                 .fontColor('rgba(0,0,0,0.4)')
+                .maxFontScale(1)
                 .margin({
                   right:8
                 })
@@ -161,11 +165,13 @@ struct SpecialExercisesView {
                 .fontSize(14)
                 .fontColor('rgba(0,0,0,0.9)')
                 .fontWeight(FontWeight.Medium)
+                .maxFontScale(1)
             }
             Row() {
               Text(String(this.totalCount))
                 .fontSize(14)
                 .fontColor('rgba(0,0,0,0.4)')
+                .maxFontScale(1)
                 .margin({
                   right:8
                 })
@@ -192,6 +198,7 @@ struct SpecialExercisesView {
               .fontSize(14)
               .fontColor('rgba(0,0,0,0.9)')
               .fontWeight(FontWeight.Medium)
+              .maxFontScale(1)
             Flex({wrap: FlexWrap.Wrap}) {
               ForEach(CLASSIFY_DATA, (item:CLASSIFY_BY_TYPE) => {
                 this.classifyQuestion(item.name, item.quantity, item.type)
@@ -213,6 +220,7 @@ struct SpecialExercisesView {
               .fontSize(14)
               .fontColor('rgba(0,0,0,0.9)')
               .fontWeight(FontWeight.Medium)
+              .maxFontScale(1)
             Flex({wrap: FlexWrap.Wrap}) {
               ForEach(DATA_BY_QUESTION_TYPE, (item:CLASSIFY_BY_TYPE) => {
                 this.classifyQuestion(item.name, item.quantity, item.type)

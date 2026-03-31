@@ -35,11 +35,15 @@ export struct QueueResPage {
       Column({ space: 24 }) {
         CommonShow({ title: '排队成功！' })
         Column() {
-          Text(`当前叫号：${this.vm.type + this.vm.order!.now}号`)
+          Text(`当前叫号：${this.vm.type +
+          this.vm.order!.now}号 \n我的号码：${this.vm.type}${this.vm.order!.mine}号`)
             .fontColor($r('sys.color.font_primary'))
             .fontWeight(FontWeight.Bold)
             .fontSize($r('sys.float.Title_S'))
-        }.width(Constants.FULL_SIZE).padding({ top: 12, bottom: 12 })
+            .lineHeight(30)
+        }
+        .width(Constants.FULL_SIZE)
+        .padding({ top: 12, bottom: 12 })
 
         Column() {
           Row() {
@@ -67,18 +71,6 @@ export struct QueueResPage {
   @Builder
   queueInfoBuilder() {
     Column() {
-      // 刷新排号,不使用简单类型的带参Builder
-      Row() {
-        Text('我的号码')
-          .layoutWeight(1)
-          .fontSize($r('sys.float.Subtitle_M'))
-          .fontColor($r('sys.color.font_primary'))
-          .fontWeight(FontWeight.Medium)
-        Text(this.vm.type + this.vm.order!.mine + '号')
-          .fontSize($r('sys.float.Body_M'))
-          .fontColor($r('sys.color.font_secondary'))
-      }.height(54)
-
       Row() {
         Text('等待桌数')
           .layoutWeight(1)

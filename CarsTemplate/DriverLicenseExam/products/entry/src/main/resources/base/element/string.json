@@ -257,8 +257,24 @@
       "value": "no question"
     },
     {
+      "name": "EntryFormAbility_desc",
+      "value": "form_description"
+    },
+    {
+      "name": "EntryFormAbility_label",
+      "value": "form_label"
+    },
+    {
+      "name": "widget_desc",
+      "value": "This is a service widget."
+    },
+    {
+      "name": "widget_display_name",
+      "value": "widget"
+    },
+    {
       "name": "agcit_huawei_driver_license_exam",
-      "value": "1.0.5"
+      "value": "1.0.6"
     }
   ]
 }

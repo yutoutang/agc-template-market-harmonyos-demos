@@ -1,13 +1,14 @@
+import { FunctionalButton, functionalButtonComponentManager } from '@kit.ScenarioFusionKit';
 import { AppStorageV2 } from '@kit.ArkUI';
+import { fileIo as fs } from '@kit.CoreFileKit';
 import { util } from '@kit.ArkTS';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { fileIo as fs } from '@kit.CoreFileKit';
-import { FunctionalButton, functionalButtonComponentManager } from '@kit.ScenarioFusionKit';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { Constants } from '../common/Constant';
 import { ConfigInfo } from '../common/ConfigModel';
 import { ERROR_MSG_MAP } from '../common/ErrorMsgMap';
-import { Logger } from 'module_ui_base';
 
+const DOMAIN = 0xff00;
 const TAG = '[ChooseAvatar]';
 
 @ComponentV2
@@ -36,7 +37,7 @@ export struct ChooseAvatar {
             .type(ButtonType.Normal)
             .backgroundImage(this.url)
             .backgroundImageSize(ImageSize.Cover)
-            .backgroundColor(Color.Transparent)
+            .backgroundColor(Color.White)
             .width(this.avatarH)
             .height(this.avatarH)
             .borderRadius(Constants.HALF_PERCENT),
@@ -55,8 +56,6 @@ export struct ChooseAvatar {
             this.getUIContext().getHostContext()?.cacheDir + `/${util.generateRandomUUID(false)}.png`;
           fs.copyFileSync(avatarFile.fd, newPath);
           url = 'file://' + newPath;
-        } catch (err) {
-          Logger.error(TAG, 'handle avatar file failed, error: ' + JSON.stringify(err));
         } finally {
           if (avatarFile) {
             fs.closeSync(avatarFile);
@@ -69,7 +68,7 @@ export struct ChooseAvatar {
   }
 
   handleError(error: BusinessError) {
-    Logger.error(TAG, 'onChooseAvatar failed, error: ' + JSON.stringify(error));
+    UtilLog.error(DOMAIN, TAG, 'onChooseAvatar failed, error: ' + JSON.stringify(error));
     const errorMsg: string = ERROR_MSG_MAP[error.code] ?? '';
     if (errorMsg) {
       this.getUIContext().getPromptAction().showDialog({
@@ -78,8 +77,8 @@ export struct ChooseAvatar {
         buttons: [
           { text: '确定', color: this.configInfo.themeColor },
         ],
-      }).catch((error: BusinessError) => {
-        Logger.error(TAG, 'open dialog failed, error: ' + JSON.stringify(error));
+      }).catch(() => {
+        UtilLog.error(DOMAIN, TAG, 'onChooseAvatar show dialog failed, error: ' + JSON.stringify(error));
       })
     }
   }

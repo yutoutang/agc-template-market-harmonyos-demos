@@ -15,4 +15,4 @@ export const MY_TAB_BAR = ['全部', '待使用', '已使用', '已过期'];
 
 export const SELECT_TAB_BAR = ['可用', '不可用'];
 
-export const LOG_TAG: string = '[Coupons]'
+export const LOG_TAG: string = '[Coupons]';

@@ -1,8 +1,9 @@
 import { AppUtil, BreakpointType, GlobalInfoModel } from '@ohos_agcit/notes_utils';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { call } from '@kit.TelephonyKit';
-import { checkUpdateFunc } from './Setting';
 import { AppStorageV2 } from '@kit.ArkUI';
+import { checkUpdateAndShowDialog } from 'check_app_update';
+import { common } from '@kit.AbilityKit';
 
 /**
  * 关于我们
@@ -45,13 +46,24 @@ export struct AboutUs {
       .width('94%')
       .onClick(() => {
         // 如果设备支持呼叫能力，则继续跳转到拨号界面，并显示拨号的号码
-        call.makeCall('000000', (err: BusinessError) => {
-          if (!err) {
-            console.log('make call success.');
-          } else {
-            console.log('make call fail, err is:' + JSON.stringify(err));
-          }
-        });
+        try {
+          call.makeCall('000000', (err: BusinessError) => {
+            if (!err) {
+              console.log('make call success.');
+            } else {
+              let errMsg: string;
+              try {
+                errMsg = JSON.stringify(err);
+              } catch (e) {
+                errMsg = 'unknown error';
+              }
+              console.log('make call fail, err is:' + errMsg);
+            }
+          });
+        } catch (error) {
+          const e = error as BusinessError;
+          console.log('make call throw error, code:' + e.code + ', message:' + e.message);
+        }
       })
 
       Button('取消')
@@ -174,7 +186,7 @@ export struct AboutUs {
       .height(74)
       .padding({ top: 16, left: 12, right: 12, bottom: 10 })
       .onClick(() => {
-        checkUpdateFunc()
+        checkUpdateAndShowDialog(this.getUIContext());
       })
 
       Divider()

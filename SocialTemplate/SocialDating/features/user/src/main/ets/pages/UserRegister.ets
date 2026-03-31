@@ -6,7 +6,8 @@ import {
   Constants,
   DateUtils,
   UiUtils,
-  getPicResult
+  getPicResult,
+  MockService
 } from 'commons';
 import Logger from 'commons/src/main/ets/utils/Logger';
 import UserService from '../service/UserService';
@@ -20,18 +21,18 @@ export function UserRegisterPageBuilder() {
   UserRegisterPage()
 }
 
-@Component
+@ComponentV2
 export struct UserRegisterPage {
-  @Consume('pageStack') pageStack: NavPathStack;
-  @State searchCondition: SearchCondition = new SearchCondition();
-  @State inputValue: string = '';
-  @State birth: string = FIELD_TO_SET;
-  @State marriageStatus: string = FIELD_TO_SET;
-  @State monthlyIncome: string = FIELD_TO_SET;
-  @State edu: string = FIELD_TO_SET;
-  @State selectedCity: string = FIELD_TO_SET;
-  @State gender: string = FIELD_TO_SET;
-  @State member: boolean = false;
+  @Consumer('pageStack') pageStack: NavPathStack = new NavPathStack();
+  @Local searchCondition: SearchCondition = new SearchCondition();
+  @Local inputValue: string = '';
+  @Local birth: string = FIELD_TO_SET;
+  @Local marriageStatus: string = FIELD_TO_SET;
+  @Local monthlyIncome: string = FIELD_TO_SET;
+  @Local edu: string = FIELD_TO_SET;
+  @Local selectedCity: string = FIELD_TO_SET;
+  @Local gender: string = FIELD_TO_SET;
+  @Local member: boolean = false;
   private createUserRequest: CreateUserRequest = new CreateUserRequest();
 
   aboutToAppear(): void {
@@ -53,15 +54,15 @@ export struct UserRegisterPage {
       Stack() {
         Column() {
           this.buildGenderRow()
-          Divider().strokeWidth(1).width('92%')
+          Divider().strokeWidth('1px').width('92%')
           this.buildBirthDateRow()
-          Divider().strokeWidth(1).width('92%')
+          Divider().strokeWidth('1px').width('92%')
           this.buildMarriageStatus()
-          Divider().strokeWidth(1).width('92%')
+          Divider().strokeWidth('1px').width('92%')
           this.buildEdu()
-          Divider().strokeWidth(1).width('92%')
+          Divider().strokeWidth('1px').width('92%')
           this.buildMonthlyIncome()
-          Divider().strokeWidth(1).width('92%')
+          Divider().strokeWidth('1px').width('92%')
           this.buildCurrentResidence()
         }.backgroundColor(Color.White).borderRadius(16).width('92%').margin({ top: 20 })
 
@@ -132,7 +133,7 @@ export struct UserRegisterPage {
         Text(`${this.birth}`).fontSize($r('sys.float.Body_M')).width('55%').textAlign(TextAlign.End)
         Image($r('app.media.ic_right_arrow')).width('6%').margin({ left: 16, right: 16 })
       }.onClick(() => {
-        DatePickerDialog.show({
+        this.getUIContext().showDatePickerDialog({
           start: DateUtils.getYearsBefore(Constants.MAX_AGE),
           end: DateUtils.getYearsBefore(Constants.ADULT_AGE),
           selected: DateUtils.getYearsBefore(Constants.DATE_PICKER_DEFAULT),
@@ -152,6 +153,7 @@ export struct UserRegisterPage {
             // 通过Date的setFullYear方法设置按下确定按钮时的日期，这样当弹窗再次弹出时显示选中的是上一次确定的日期
             this.birth = DateUtils.formatDateStr(value);
             this.createUserRequest.birth = this.birth;
+            MockService.account.birthday = new Date(this.birth)
           }
         })
       })
@@ -167,9 +169,10 @@ export struct UserRegisterPage {
         Text(`${this.gender}`).fontSize($r('sys.float.Body_M')).width('55%').textAlign(TextAlign.End)
         Image($r('app.media.ic_right_arrow')).width('6%').margin({ left: 16, right: 16 })
       }.onClick(() => {
-        TextPickerDialog.show(buildTextPickerDialogOption(Constants.GENDER_DISPLAY_VALUES,
+        this.getUIContext().showTextPickerDialog(buildTextPickerDialogOption(Constants.GENDER_DISPLAY_VALUES,
           (result: TextPickerResult) => {
             this.gender = result.value as string
+            MockService.account.sex = this.gender === '男' ? 0 : 1
             this.createUserRequest.gender =
               Constants.getIndex(this.gender, Constants.GENDER_DISPLAY_VALUES);
           }, false))
@@ -186,7 +189,8 @@ export struct UserRegisterPage {
         Text(`${this.selectedCity}`).fontSize($r('sys.float.Body_M')).width('55%').textAlign(TextAlign.End)
         Image($r('app.media.ic_right_arrow')).width('6%').margin({ left: 16, right: 16 })
       }.onClick(() => {
-        TextPickerDialog.show(buildTextPickerDialogOption(Constants.CITY_PICKER, (result: TextPickerResult) => {
+        this.getUIContext().showTextPickerDialog(buildTextPickerDialogOption(Constants.CITY_PICKER,
+          (result: TextPickerResult) => {
           this.selectedCity = getPicResult(result);
           this.createUserRequest.currentResidence = this.selectedCity;
         }))
@@ -203,7 +207,7 @@ export struct UserRegisterPage {
         Text(`${this.monthlyIncome}`).fontSize($r('sys.float.Body_M')).width('55%').textAlign(TextAlign.End)
         Image($r('app.media.ic_right_arrow')).width('6%').margin({ left: 16, right: 16 })
       }.onClick(() => {
-        TextPickerDialog.show(buildTextPickerDialogOption(Constants.MONTHLY_INCOME_DISPLAY_VALUES,
+        this.getUIContext().showTextPickerDialog(buildTextPickerDialogOption(Constants.MONTHLY_INCOME_DISPLAY_VALUES,
           (result: TextPickerResult) => {
             this.monthlyIncome = result.value as string
             this.createUserRequest.monthlyIncome =
@@ -227,7 +231,7 @@ export struct UserRegisterPage {
           .fontColor($r('app.color.text_font_color_black'))
         Image($r('app.media.ic_right_arrow')).width('6%').margin({ left: 16, right: 16 })
       }.onClick(() => {
-        TextPickerDialog.show(buildTextPickerDialogOption(Constants.MARRIAGE_STATUS_DISPLAY_VALUES,
+        this.getUIContext().showTextPickerDialog(buildTextPickerDialogOption(Constants.MARRIAGE_STATUS_DISPLAY_VALUES,
           (result: TextPickerResult) => {
             this.marriageStatus = result.value as string
             this.createUserRequest.maritalStatus =
@@ -262,7 +266,7 @@ export struct UserRegisterPage {
         Text(`${this.edu}`).fontSize($r('sys.float.Body_M')).width('55%').textAlign(TextAlign.End)
         Image($r('app.media.ic_right_arrow')).width('6%').margin({ left: 16, right: 16 })
       }.onClick(() => {
-        TextPickerDialog.show(buildTextPickerDialogOption(Constants.EDUCATION_DISPLAY_VALUES,
+        this.getUIContext().showTextPickerDialog(buildTextPickerDialogOption(Constants.EDUCATION_DISPLAY_VALUES,
           (result: TextPickerResult) => {
             this.edu = result.value as string
             this.createUserRequest.education =

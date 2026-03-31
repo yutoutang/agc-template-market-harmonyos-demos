@@ -1,4 +1,4 @@
-import { RouterMap, routerStack, Style } from 'lib_foundation';
+import { ProductInfoPageParam, RouterMap, routerStack } from 'lib_foundation';
 import { FilterSelectionItem, ProductSummaryItem } from 'lib_network';
 import { ProductWaterFlow } from 'product';
 import { SortTypeMap } from '../commons/Enums';
@@ -16,7 +16,7 @@ export struct SubCategoryPage {
   @Local
   curCategoryId: string = ''
   @Local
-  vertical: boolean = false
+  isGrid: boolean = false
   @Local
   sortType: SortTypeMap = SortTypeMap.DEFAULT
   @Local
@@ -33,18 +33,20 @@ export struct SubCategoryPage {
       }
       .width($r('app.string.size_percent_full'))
       .padding($r('app.float.space_m'))
-      .backgroundColor($r('app.color.background_color_white'))
+      .backgroundColor($r('app.color.background_color_primary'))
 
       Column() {
         ProductWaterFlow({
-          bgColor: Style.BACKGROUND_COLOR_GREY,
+          bgColor: $r('app.color.background_color_grey'),
           categoryId: this.curCategoryId,
           sortType: this.sortType,
           filterList: this.filterList,
-          showInitLoading: true,
-          isVertical: this.vertical,
+          isGrid: this.isGrid,
           handleProductClick: (id: string) => {
-            routerStack.pushPath({ name: RouterMap.PRODUCT_INFO, param: id });
+            routerStack.pushPath({
+              name: RouterMap.PRODUCT_INFO,
+              param: { productId: id } as ProductInfoPageParam,
+            });
           },
         })
           .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
@@ -54,7 +56,7 @@ export struct SubCategoryPage {
         right: $r('app.float.space_l'),
         top: $r('app.float.space_l'),
       })
-      .backgroundColor(Style.BACKGROUND_COLOR_GREY)
+      .backgroundColor($r('app.color.background_color_grey'))
       .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
     }
     .title(this.title)

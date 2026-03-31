@@ -4,7 +4,7 @@
 import hilog from '@ohos.hilog';
 
 export class SafeJson {
-  private static TAG = 'SafeJson'
+  private static TAG = 'SafeJson';
 
   /**
    * 主动捕获JSON.parse异常，防止crash

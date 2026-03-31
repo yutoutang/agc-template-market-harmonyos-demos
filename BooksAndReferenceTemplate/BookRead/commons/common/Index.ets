@@ -22,7 +22,7 @@ export { UserInfoModel } from './src/main/ets/model/UserInfoModel';
 
 export { MemberPackage, RechargePackage, RechargeRecord } from './src/main/ets/model/Member';
 
-export { ReadSet } from './src/main/ets/model/ReadSet';
+export * from './src/main/ets/model/ReadSet';
 
 export { EpubUtils } from './src/main/ets/utils/EpubUtils';
 

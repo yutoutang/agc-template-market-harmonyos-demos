@@ -1,5 +1,4 @@
 import { BusinessError } from '@kit.BasicServicesKit';
-import { promptAction } from '@kit.ArkUI';
 import { Constants } from './Constants';
 
 export class UiUtils {
@@ -25,9 +24,9 @@ export class UiUtils {
     };
   }
 
-  static showToast(error: BusinessError | string) {
+  static showToast(context: UIContext, error: BusinessError | string) {
     const message: string = typeof error === 'string' ? error : error.message
-    promptAction.showToast({
+    context.getPromptAction().showToast({
       message,
       duration: 2000
     });

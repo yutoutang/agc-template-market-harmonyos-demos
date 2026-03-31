@@ -6,8 +6,7 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "@ohos/mpchart": "3.0.22",
-    "lunar": "^1.0.0",
+    "@ohos/mpchart": "3.0.25",
     "dayjs": "1.11.13"
   }
 }

@@ -39,6 +39,7 @@ export struct BaseCell {
   /**
    * 右侧侧插槽点击事件
    */
+
   @Event onRightCellClick: () => void = () => {
   }
 
@@ -80,8 +81,7 @@ export struct BaseCell {
         }
       }
     }
-    .backgroundColor(this.bgColor)
-    .padding(8)
-    .borderRadius(16)
+    // TODO 需要根据不同的屏幕进行适配
+    .padding(24)
   }
 }

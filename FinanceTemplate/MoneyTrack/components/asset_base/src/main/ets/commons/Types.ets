@@ -37,3 +37,23 @@ export interface AssetTypeItem {
 export interface AssetDisplayTypeItem extends AssetTypeItem {
   icon: ResourceStr;
 }
+
+export interface AssetTrendItem {
+  date: string; // 格式 YYYY-MM-DD
+  value: number; // 当天的总资产
+}
+
+export interface AssetFilterState {
+  selectedIds: Set<number>;
+  isAllSelected: boolean;
+}
+
+export interface TransactionImpact {
+  assetId: number;
+  impact: number;
+}
+
+export interface AddAssetParam {
+  type: AssetType;
+  subType?: number;
+}

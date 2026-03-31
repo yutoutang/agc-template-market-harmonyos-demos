@@ -1,10 +1,8 @@
 import { common } from '@kit.AbilityKit';
 import * as wxopensdk from '@tencent/wechat_open_sdk';
-import { WindowUtil } from 'module_ui_base';
-import { ToastDialog as promptAction, ToastDialog } from '@hw-agconnect/ui-toast'
-import { UtilLog as Logger, UtilLog } from '@hw-agconnect/util-log';
-import { downloadImage, compressImage, saveImgToSandbox } from './FileUtils';
-import { LOG_TAG } from '../common/Constants';
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
+import { UtilLog } from '@hw-agconnect/util-log';
+import { compressImage, downloadImage, saveImgToSandbox } from './FileUtils';
 import { ShareAppType } from '../common/ShareEnum';
 import { ShareViewData } from '../common/ShareParams';
 import { OnWXResp } from '../model/WXApiWrap';
@@ -35,9 +33,9 @@ export class WXShareUtils {
    * 判断微信是否安装
    * @param callback
    */
-  private isWXAPPCallback(callback: Function) {
+  private isWXAPPCallback(uiContext: UIContext, callback: Function) {
     if (!this.shareService.wxApi.isWXAppInstalled()) {
-      ToastDialog.showToast({ message: '请先安装微信' });
+      uiContext.showAlertDialog({ message: '请先安装微信' });
     } else {
       callback();
     }
@@ -48,10 +46,10 @@ export class WXShareUtils {
    * @param type
    * @param image
    */
-  shareImage(image: PixelMap, type: ShareAppType) {
-    this.isWXAPPCallback(async () => {
+  shareImage(uiContext: UIContext, image: PixelMap, type: ShareAppType) {
+    this.isWXAPPCallback(uiContext, async () => {
       const imageObject = new wxopensdk.WXImageObject();
-      imageObject.uri = await saveImgToSandbox(image);
+      imageObject.uri = await saveImgToSandbox(uiContext, image);
 
       const mediaMessage = new wxopensdk.WXMediaMessage();
       mediaMessage.mediaObject = imageObject;
@@ -65,8 +63,8 @@ export class WXShareUtils {
         req.scene = wxopensdk.SendMessageToWXReq.WXSceneTimeline;
       }
 
-      this.shareService.wxApi.sendReq(WindowUtil.context as common.UIAbilityContext, req);
-    })
+      this.shareService.wxApi.sendReq(uiContext.getHostContext() as common.UIAbilityContext, req);
+    });
   }
 
   /**
@@ -74,8 +72,9 @@ export class WXShareUtils {
    * @param data
    * @param type
    */
-  shareWebpage(data: ShareViewData, type: ShareAppType) {
-    this.isWXAPPCallback(async () => {
+  shareWebpage(uiContext: UIContext, data: ShareViewData, type: ShareAppType) {
+    const context = uiContext.getHostContext() as Context;
+    this.isWXAPPCallback(uiContext, async () => {
       const webpageObject = new wxopensdk.WXWebpageObject();
       webpageObject.webpageUrl = data.landingPageUrl;
 
@@ -83,27 +82,23 @@ export class WXShareUtils {
       mediaMessage.title = data.title;
       mediaMessage.description = data.subTitle;
       mediaMessage.mediaObject = webpageObject;
-
-      if (data.thumbUrl) {
-        let thumbBuffer = new ArrayBuffer(100);
-        if (typeof data.thumbUrl === 'string') {
-          const thumbRawData = await downloadImage(data.thumbUrl);
-          thumbBuffer = await compressImage(thumbRawData);
-        } else {
-          if (WindowUtil.context) {
-            try {
-              const thumbRawData = WindowUtil.context.resourceManager.getMediaContentSync(data.thumbUrl.id);
-              thumbBuffer = await compressImage(thumbRawData.buffer as ArrayBuffer);
-            } catch (err) {
-              UtilLog.error(LOG_TAG, 'get media content failed. error: ' + JSON.stringify(err))
-            }
+      try {
+        if (data.thumbUrl) {
+          let thumbBuffer = new ArrayBuffer(100);
+          if (typeof data.thumbUrl === 'string') {
+            const thumbRawData = await downloadImage(data.thumbUrl);
+            thumbBuffer = await compressImage(thumbRawData);
+          } else {
+            const thumbRawData = await context.resourceManager.getMediaContent(data.thumbUrl.id);
+            thumbBuffer = await compressImage(thumbRawData.buffer as ArrayBuffer);
           }
+          if (thumbBuffer.byteLength / 1024 > 64) {
+            UtilLog.error(TAG, `thumbData is over 64K, buffer length: ${thumbBuffer.byteLength / 1024}K`);
+          }
+          mediaMessage.thumbData = new Uint8Array(thumbBuffer);
         }
-        if (thumbBuffer.byteLength / 1024 > 64) {
-          Logger.error(TAG, `thumbData is over 64K, buffer length: ${thumbBuffer.byteLength / 1024}K`);
-        }
-
-        mediaMessage.thumbData = new Uint8Array(thumbBuffer);
+      } catch (error) {
+        UtilLog.error(TAG, `Failed to get media content, errCode: ${error.code}, errMessage: ${error.message}`);
       }
 
       const req = new wxopensdk.SendMessageToWXReq();
@@ -115,8 +110,8 @@ export class WXShareUtils {
         req.scene = wxopensdk.SendMessageToWXReq.WXSceneTimeline;
       }
 
-      this.shareService.wxApi.sendReq(WindowUtil.context as common.UIAbilityContext, req);
-    })
+      this.shareService.wxApi.sendReq(context as common.UIAbilityContext, req);
+    });
   }
 
   /**
@@ -153,5 +148,5 @@ export class WXShareUtils {
         promptAction.showToast({ message: '分享失败: ' + err.errStr });
         break;
     }
-  }
+  };
 }

@@ -26,15 +26,15 @@ export class MemberStatusUtil {
     }
     let emptyResult: iap.QueryPurchaseResult = {
       purchaseDataList: [],
-    }
+    };
     let autoRenewPromise = iap.queryPurchases(uiContext, autoRenewParam).catch(() => {
-      return emptyResult
+      return emptyResult;
     });
     let nonRenewPromise = iap.queryPurchases(uiContext, nonRenewParam).catch(() => {
-      return emptyResult
+      return emptyResult;
     });
     let nonConsumePromise = iap.queryPurchases(uiContext, nonConsumeParam).catch(() => {
-      return emptyResult
+      return emptyResult;
     });
     return Promise.all([autoRenewPromise, nonRenewPromise, nonConsumePromise]).then((res) => {
       let autoRenewPurchasedList = res[0]?.purchaseDataList ?? [];

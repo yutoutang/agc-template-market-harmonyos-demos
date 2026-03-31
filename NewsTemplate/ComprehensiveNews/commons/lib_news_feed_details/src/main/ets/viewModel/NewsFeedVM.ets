@@ -1,11 +1,14 @@
 import { AbilityConstant, common } from '@kit.AbilityKit'
 import { AppStorageV2, UIUtils } from '@kit.ArkUI'
-import { avSession } from '@kit.AVSessionKit'
+import { harmonyShare, systemShare } from '@kit.ShareKit'
+import { uniformTypeDescriptor as utd } from '@kit.ArkData'
 import {
+  AppConstants,
   BaseViewModel,
   BundleInfo,
   CommonConfirmDialog,
   ContinueModel,
+  FileUtils,
   GridRowColSetting,
   Logger,
   RouterParams,
@@ -19,10 +22,11 @@ import {
   NewsResponse,
   PublishCommentRequest,
 } from 'lib_news_api'
+import { ShareUtils } from 'lib_widget'
 import { LoginSheetUtils } from 'lib_account'
-import { AudioConstants, MediaController, SubUtils } from 'module_audioplayer'
+import { AVSessionUtils } from 'lib_av_details'
 import { LoneTakeAnimationsTransition, LongTakeAnimationProperties, LongTakeTransitionParam } from 'module_transition'
-import { CommentInfo, NewsFeedInfo } from '../model/Model'
+import { CommentInfo, KeyWordPair, NewsFeedInfo } from '../model/Model'
 import { MakeObCommentServed } from '../utils/Utils'
 import { FeedBreakPointVM } from './FeedBreakPointVM'
 
@@ -37,8 +41,11 @@ export class NewsFeedVM extends BaseViewModel {
   @Trace continueModel: ContinueModel = AppStorageV2.connect(ContinueModel, () => new ContinueModel())!;
   @Trace feedBreakPointVM: FeedBreakPointVM = new FeedBreakPointVM()
   @Trace loading: boolean = true
+  @Trace keyword: string = '';
   feedCommentScroller: Scroller = new Scroller()
-  uiContext: UIContext | undefined = undefined
+  shareUtils: ShareUtils = new ShareUtils();
+  uiContext: UIContext | undefined = undefined;
+  newsImageUri: string = '';
 
   @Computed
   get isFeedSelf() {
@@ -52,6 +59,7 @@ export class NewsFeedVM extends BaseViewModel {
   public async initArticle(articleId: string) {
     let articleRes = await BaseNewsServiceApi.queryNews(articleId) as NewsFeedInfo
     this.articleDetails = UIUtils.makeObserved(articleRes);
+    this.getNewsImageUri();
     this.loading = false;
   }
 
@@ -62,6 +70,20 @@ export class NewsFeedVM extends BaseViewModel {
     }) ?? [];
   }
 
+  async getNewsImageUri() {
+    if (this.articleDetails.postImgList.length > 0) {
+      const firstImg = this.articleDetails.postImgList[0].picVideoUrl;
+      if (firstImg.startsWith('file')) {
+        this.newsImageUri = firstImg;
+      } else if (firstImg.startsWith('http')) {
+        const buf = await FileUtils.downloadImage(firstImg);
+        this.newsImageUri = FileUtils.saveBufferToSandbox(buf);
+      } else {
+        this.newsImageUri = '';
+      }
+    }
+  }
+
   public newsLike() {
     if (!this.userInfoModel.isLogin) {
       LoginSheetUtils.open()
@@ -69,12 +91,10 @@ export class NewsFeedVM extends BaseViewModel {
     }
     this.articleDetails.isLiked = !this.articleDetails.isLiked
     if (this.articleDetails.isLiked) {
-      CommentServiceApi.addPosterLike(this.articleDetails.id)
       MineServiceApi.addLike(this.articleDetails.id)
       this.articleDetails.likeCount++
       return
     }
-    CommentServiceApi.cancelPosterLike(this.articleDetails.id)
     MineServiceApi.cancelLike(this.articleDetails.id)
     this.articleDetails.likeCount--
   }
@@ -169,12 +189,10 @@ export class NewsFeedVM extends BaseViewModel {
     }
     this.articleDetails.isMarked = isMark
     if (isMark) {
-      BaseNewsServiceApi.addMark(this.articleDetails.id)
       MineServiceApi.addMark(this.articleDetails.id)
       this.articleDetails.markCount += 1
       return
     }
-    BaseNewsServiceApi.cancelMark(this.articleDetails.id)
     MineServiceApi.cancelMark(this.articleDetails.id)
     this.articleDetails.markCount -= 1
   }
@@ -195,6 +213,7 @@ export class NewsFeedVM extends BaseViewModel {
 
   public setCardData(cardData: NewsFeedInfo) {
     this.articleDetails = UIUtils.makeObserved(cardData);
+    this.getNewsImageUri();
     this.loading = false
   }
 
@@ -253,9 +272,21 @@ export class NewsFeedVM extends BaseViewModel {
         <body id="body" class="news-body">
           ${this.articleDetails.richContent}
           <script>
+           function callNativeKeywordClick(keyword) {
+               native.keywordExplain(keyword);
+           }
            function callNativePreview(srcList, index) {
                 native.preview(srcList, index);
             }
+           function setKeywordColor() {
+                let ele = document.querySelectorAll(".content-keyword")
+                ele.forEach((element,index) => {
+                  element.style.color = 'blue'
+                  element.addEventListener('click', function () {
+                    callNativeKeywordClick(element.textContent)
+                })
+                });
+           }
            function setWebFontColor(isDark) {
               if(isDark) {
                 document.getElementById('body').style.color = 'white';
@@ -275,7 +306,12 @@ export class NewsFeedVM extends BaseViewModel {
         </script>
       </body>
     </html>
-   `
+   `;
+  }
+
+  public findKeywordExplain() {
+    let target = this.articleDetails.keywordPairs.find((item)=> item.keyword === this.keyword)
+    return target?.explain ?? '';
   }
 
   public scrollToComment(isSplit?: boolean) {
@@ -355,6 +391,33 @@ export class NewsFeedVM extends BaseViewModel {
     }
   }
 
+  private gestureCallback: Callback<harmonyShare.SharableTarget> = (target: harmonyShare.SharableTarget) => {
+    // 构造分享数据
+    let shareData: systemShare.SharedData = new systemShare.SharedData({
+      utd: utd.UniformDataType.HYPERLINK,
+      // 设置为AppLinking链接
+      content: `${AppConstants.APP_LINKING_URL}/newsDetail?id=${this.articleDetails.id}&type=0`,
+      title: this.articleDetails.title,
+      description: this.articleDetails.author.authorNickName,
+      thumbnailUri: this.newsImageUri,
+    });
+    target.share(shareData);
+  }
+
+  public onGestureShare() {
+    const context = this.uiContext?.getHostContext();
+    if (context) {
+      this.shareUtils.registerGestureShareListener(context, this.gestureCallback);
+    }
+  }
+
+  public offGestureShare() {
+    const context = this.uiContext?.getHostContext();
+    if (context) {
+      this.shareUtils.unRegisterGestureShareListener(context, this.gestureCallback);
+    }
+  }
+
   /*
   * cardData 数据源
   * formType 跳转来源，判断是否是从首页点击评论进入
@@ -380,21 +443,12 @@ export class NewsFeedVM extends BaseViewModel {
     RouterToNews.pushToNewsDetails<NewsResponse>(params)
   }
 
-  /*
-   * 需要释放AvSession
-   * */
-  async destroyAvSession() {
-    SubUtils.destroySubWindow(AudioConstants.AUDIO_SUB_NAME)
-    MediaController.pause()
-    let avSession: avSession.AVSession = AppStorage.get('avSession') as avSession.AVSession
-    if (avSession) {
-      try {
-        await avSession.destroy()
-      } catch (e) {
-        Logger.error(TAG, `avSession.destroy fail. Code: ${e.code}, message: ${e.message}`)
-      }
-      AppStorage.setOrCreate('avSession', '')
-    }
+  /**
+   * 释放AVSession
+   */
+  async destroyAVSession() {
+    await AVSessionUtils.destroyVideoSession();
+    await AVSessionUtils.destroyAudioSession();
   }
 }
 

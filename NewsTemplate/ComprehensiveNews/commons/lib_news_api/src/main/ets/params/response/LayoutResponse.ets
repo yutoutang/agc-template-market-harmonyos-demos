@@ -28,6 +28,12 @@ export interface FlexLayoutModel {
 }
 
 @ObservedV2
+export class AbstractRequestListData {
+  abstract: string = ''
+  list: RequestListData[] = [];
+}
+
+@ObservedV2
 export class RequestListData<T = NewsResponse> {
   navInfo: NavInfo = new NavInfo()
   @Trace articles: T[] = []

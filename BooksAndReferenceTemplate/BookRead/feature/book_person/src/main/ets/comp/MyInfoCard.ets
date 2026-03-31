@@ -195,7 +195,7 @@ export struct MyInfoCard {
     }
     .height(150)
     .justifyContent(FlexAlign.SpaceBetween)
-    .backgroundColor($r('sys.color.background_primary'))
+    .backgroundColor($r('sys.color.comp_background_list_card'))
     .borderRadius(16)
     .padding({
       left: 12,

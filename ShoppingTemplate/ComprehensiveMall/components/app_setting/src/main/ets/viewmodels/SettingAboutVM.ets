@@ -1,8 +1,8 @@
 import { common, Want, bundleManager } from '@kit.AbilityKit';
 import { LayeredDrawableDescriptor } from '@kit.ArkUI';
-import { BusinessError } from '@kit.BasicServicesKit'
+import { BusinessError } from '@kit.BasicServicesKit';
 import { Logger, WindowUtil } from 'module_ui_base';
-import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast'
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
 import { AppGalleryUtils } from '../common/AppGalleryUtils';
 import { TelephoneUtils } from '../common/TelephoneUtils';
 import { LOG_TAG } from '../constants/CommonConstants';
@@ -48,7 +48,7 @@ export class SettingAboutVM extends BaseViewModel {
         );
       }
     } catch (err) {
-      Logger.error(LOG_TAG, 'get bundle info failed. error: ' + JSON.stringify(err))
+      Logger.error(LOG_TAG, 'get bundle info failed. error: ' + JSON.stringify(err));
     }
   }
 
@@ -82,7 +82,7 @@ export class SettingAboutVM extends BaseViewModel {
       uri: 'https://beian.miit.gov.cn/#/home',
     };
     context.startAbility(want).catch((err: BusinessError) => {
-      Logger.error(LOG_TAG, 'start ability failed. error:' + JSON.stringify(err))
-    })
+      Logger.error(LOG_TAG, 'start ability failed. error:' + JSON.stringify(err));
+    });
   }
 }

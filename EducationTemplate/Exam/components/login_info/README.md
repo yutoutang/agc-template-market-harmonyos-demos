@@ -5,7 +5,7 @@
 - [简介](#简介)
 - [约束与限制](#约束与限制)
 - [添加配置](#添加配置)
-- [快速入门](#快速入门)
+- [使用](#使用)
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
@@ -21,6 +21,9 @@
 * HarmonyOS SDK版本：HarmonyOS 5.0.3 Release SDK及以上
 * 设备类型：华为手机（直板机）
 * 系统版本：HarmonyOS 5.0.1(13)及以上
+
+### 权限
+- 网络权限：ohos.permission.INTERNET
 
 ## 添加配置
 
@@ -44,7 +47,7 @@
 
    c. [申请账号权限](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/account-config-permissions) 。
 
-## 快速入门
+## 使用
 
 1. 安装组件。
 
@@ -96,19 +99,19 @@
            appName: "xxx",
            // 登录回调方法
            onLoginWithHuaweiID: () => {
-             promptAction.showToast({ message: '登录成功', duration: 2000 });
+             this.getUIContext().getPromptAction().showToast({ message: '登录成功', duration: 2000 });
            },
            // 隐私协议方法
            onPrivacyPolicy: () => {
-             promptAction.showToast({ message: '隐私协议点击事件', duration: 2000 });
+             this.getUIContext().getPromptAction().showToast({ message: '隐私协议点击事件', duration: 2000 });
            },
            // 服务协议方法
            onServicePolicy: () => {
-             promptAction.showToast({ message: '服务协议点击事件', duration: 2000 });
+             this.getUIContext().getPromptAction().showToast({ message: '服务协议点击事件', duration: 2000 });
            },
            // 华为账号用户认证协议
            onHYAccountRouter: () => {
-             promptAction.showToast({ message: '华为账号用户认证协议点击事件', duration: 2000 });
+             this.getUIContext().getPromptAction().showToast({ message: '华为账号用户认证协议点击事件', duration: 2000 });
            },
          })
        }
@@ -187,19 +190,19 @@ onHYAccountRouter: () => void = () => {}
            appName: "xxx",
            // 登录回调方法
            onLoginWithHuaweiID: () => {
-             promptAction.showToast({ message: '登录成功', duration: 2000 });
+             this.getUIContext().getPromptAction().showToast({ message: '登录成功', duration: 2000 });
            },
            // 隐私协议方法
            onPrivacyPolicy: () => {
-             promptAction.showToast({ message: '隐私协议点击事件', duration: 2000 });
+             this.getUIContext().getPromptAction().showToast({ message: '隐私协议点击事件', duration: 2000 });
            },
            // 服务协议方法
            onServicePolicy: () => {
-             promptAction.showToast({ message: '服务协议点击事件', duration: 2000 });
+             this.getUIContext().getPromptAction().showToast({ message: '服务协议点击事件', duration: 2000 });
            },
            // 华为账号用户认证协议
            onHYAccountRouter: () => {
-             promptAction.showToast({ message: '华为账号用户认证协议点击事件', duration: 2000 });
+             this.getUIContext().getPromptAction().showToast({ message: '华为账号用户认证协议点击事件', duration: 2000 });
            },
          })
        }

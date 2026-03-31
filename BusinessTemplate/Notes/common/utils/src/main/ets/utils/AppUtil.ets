@@ -25,7 +25,6 @@ import { common } from '@kit.AbilityKit';
  * since: 2024/05/01
  */
 export class AppUtil {
-
   private static context: common.UIAbilityContext; //common.UIAbilityContext，上下文
 
 
@@ -44,7 +43,6 @@ export class AppUtil {
    */
   static getContext(): common.UIAbilityContext {
     if (!AppUtil.context) {
-      AppUtil.context = getContext() as common.UIAbilityContext; //兜底
       LogUtil.error('请在UIAbility的onCreate方法中调用AppUtil的init方法初始化！');
     }
     return AppUtil.context;
@@ -232,14 +230,26 @@ export class AppUtil {
    * 获取当前应用的BundleInfo
    */
   static async getBundleInfo(): Promise<bundleManager.BundleInfo> {
-    return bundleManager.getBundleInfoForSelf(bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_APPLICATION);
+    try {
+      return await bundleManager.getBundleInfoForSelf(bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_APPLICATION);
+    } catch (err) {
+      let error = err as BusinessError;
+      console.error(`AppUtil-getBundleInfo-异常 ~ code: ${error.code} -·- message: ${error.message}`);
+      throw new Error(`获取BundleInfo失败: ${error.message}`);
+    }
   }
 
   /**
    * 获取当前应用的BundleInfo
    */
   static getBundleInfoSync(): bundleManager.BundleInfo {
-    return bundleManager.getBundleInfoForSelfSync(bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_APPLICATION);
+    try {
+      return bundleManager.getBundleInfoForSelfSync(bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_APPLICATION);
+    } catch (err) {
+      let error = err as BusinessError;
+      console.error(`AppUtil-getBundleInfoSync-异常 ~ code: ${error.code} -·- message: ${error.message}`);
+      throw new Error(`同步获取BundleInfo失败: ${error.message}`);
+    }
   }
 
 
@@ -296,6 +306,4 @@ export class AppUtil {
     AppUtil.getContext().terminateSelf();
     AppUtil.getContext().getApplicationContext().killAllProcesses();
   }
-
-
 }

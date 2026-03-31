@@ -2,7 +2,7 @@ import { CommonScroll, ContainerColumn, NavTitleBar } from 'lib_widget';
 import { buildButtonList, buildOrderInfoCard } from '../components/OrderInfoCard';
 import { buildNoOrderCard } from '../components/NoOrderCard';
 import { OrderItem } from 'lib_network';
-import { OrderListPageVM } from '../viewModels/OrderListPageVM';
+import { OrderListPageVM } from '../viewmodels/OrderListPageVM';
 
 @ComponentV2
 struct OrderSearchPage {
@@ -21,20 +21,22 @@ struct OrderSearchPage {
           LoadingProgress().width($r('app.float.loading_icon_size'))
         } else {
           Column() {
-            if (!this.vm.orderList.totalCount()) {
-              buildNoOrderCard()
-            } else {
+            if ( this.vm.keywords) {
+              if(!this.vm.orderList.length){
+                buildNoOrderCard()
+              }
               List() {
-                LazyForEach(this.vm.orderList, (order: OrderItem) => {
-                  ListItem() {
-                    ContainerColumn() {
-                      buildOrderInfoCard(order)
-                      buildButtonList(order.orderInfo, ControlSize.SMALL, (actionType) => {
-                        this.vm.handleOrderItem(order, actionType)
-                      })
+                Repeat(this.vm.orderList)
+                  .each((ri: RepeatItem<OrderItem>) => {
+                    ListItem() {
+                      ContainerColumn() {
+                        buildOrderInfoCard(ri.item)
+                        buildButtonList(ri.item.orderInfo, ControlSize.SMALL, (actionType) => {
+                          this.vm.handleOrderItem(ri.item, actionType)
+                        })
+                      }
                     }
-                  }
-                }, (item: OrderItem, index: number) => index + '__' + item.orderInfo.orderNo + item.orderInfo.status)
+                  })
               }
               .cachedCount(4)
               .layoutWeight(1)
@@ -62,10 +64,10 @@ struct OrderSearchPage {
         placeholder: '输入商品名称',
       })
         .width('100%')
-        .backgroundColor($r('app.color.background_color_white'))
+        .backgroundColor($r('app.color.background_color_primary'))
         .borderColor($r('sys.color.font_fourth'))
         .defaultFocus(true)
-        .placeholderColor($r('sys.color.mask_secondary'))
+        .placeholderColor($r('app.color.font_color_level2'))
         .caretStyle({ color: $r('app.color.theme_color') })
         .onSubmit((value) => {
           this.vm.searchOrder(value);

@@ -1,3 +1,9 @@
-export { imagePreview as ImagePreview, PreviewVerticalAlign } from './src/main/ets/views/ImagePreview'
+export { ComInfoType } from './src/main/ets/models/PreviewModel'
 
-export { ComInfoType } from './src/main/ets/utils/Utils'
+export { ImagePreview } from './src/main/ets/views/ImagePreview'
+
+export { ImagePreviewOptions } from './src/main/ets/models/ImagePreviewOptions'
+
+export { SourceImageModel } from './src/main/ets/models/PreviewModel'
+
+export { PreviewUtils } from './src/main/ets/utils/PreviewUtils'

@@ -1,4 +1,4 @@
-import { AssetRecordItem, AssetType, Constants } from 'asset_base';
+import { AssetRecordItem, Constants } from 'asset_base';
 
 @ComponentV2
 export struct AssetCardItem {

@@ -16,19 +16,14 @@
       "buildFunction": "buildCustomServicePage"
     },
     {
-      "name": "ProductInfoPageNew",
-      "pageSourceFile": "src/main/ets/views/ProductInfoPage.ets",
-      "buildFunction": "buildProductInfoNewPage"
-    },
-    {
-      "name": "OrderSubmitPage",
-      "pageSourceFile": "src/main/ets/views/OrderSubmitPage.ets",
-      "buildFunction": "buildOrderSubmitPage"
-    },
-    {
       "name": "SubCategoryPage",
       "pageSourceFile": "src/main/ets/views/SubCategoryPage.ets",
       "buildFunction": "buildSubCategoryPage"
+    },
+    {
+      "name": "SeckillListPage",
+      "pageSourceFile": "src/main/ets/views/SeckillListPage.ets",
+      "buildFunction": "buildSeckillListPage"
     }
   ]
 }

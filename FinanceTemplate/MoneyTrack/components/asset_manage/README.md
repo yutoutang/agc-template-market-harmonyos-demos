@@ -2,7 +2,7 @@
 
 - [简介](#简介)
 - [约束与限制](#约束与限制)
-- [快速入门](#快速入门)
+- [使用](#使用)
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
@@ -36,7 +36,7 @@
 无
 
 
-## 快速入门
+## 使用
 
 1. 安装组件。
 
@@ -200,9 +200,10 @@
 ### 示例1（资产创建）
 
 ```ts
-import { AssetDisplayTypeItem, AssetType } from 'asset_base';
+import { AssetDisplayTypeItem, AssetType, Logger } from 'asset_base';
 import { AssetCreateSheet, assetCreateSheetBuilder } from 'asset_manage';
-import { promptAction } from '@kit.ArkUI';
+
+const TAG = '[AssetCreateSheetExample1]'
 
 const MOCK_ASSET_TYPE_LIST: AssetDisplayTypeItem[] = [
   {
@@ -239,9 +240,13 @@ struct AssetCreateSheetExample1 {
       AssetCreateSheet({
         assetTypeList: MOCK_ASSET_TYPE_LIST,
         handleClick: (type: AssetType, subType?: number) => {
-          promptAction.showToast({
-            message: '点击了类型为' + type + '子类型为' + subType + '的资产按钮',
-          });
+          try {
+            this.getUIContext().getPromptAction().showToast({
+              message: '点击了类型为' + type + '子类型为' + subType + '的资产按钮',
+            });
+          } catch (err) {
+            Logger.error(TAG, 'show toast failed. error:' + JSON.stringify(err));
+          }
         },
       }).height(300);
       Text('使用方式2：使用bindSheet拉起半模态弹框使用');
@@ -255,7 +260,6 @@ struct AssetCreateSheetExample1 {
           }), {
             title: { title: '选择资产类型' },
             detents: [SheetSize.MEDIUM],
-            preferType: SheetType.CENTER,
           });
     }
     .backgroundColor('#eee')
@@ -271,9 +275,10 @@ struct AssetCreateSheetExample1 {
 ### 示例2（资产信息管理）
 
 ```ts
-import { AssetDisplayTypeItem } from 'asset_base';
+import { AssetDisplayTypeItem, Logger } from 'asset_base';
 import { AssetInfoManageSheet, assetInfoManageSheetBuilder } from 'asset_manage';
-import { promptAction } from '@kit.ArkUI';
+
+const TAG = '[AssetInfoManageSheetExample1]'
 
 const MOCK_ASSET_ITEM: AssetDisplayTypeItem = {
   name: '现金',
@@ -294,7 +299,11 @@ struct AssetInfoManageSheetExample1 {
       AssetInfoManageSheet({
         assetTypeItem: MOCK_ASSET_ITEM,
         handleConfirm: () => {
-          promptAction.showToast({ message: '保存成功~' });
+          try {
+            this.getUIContext().getPromptAction().showToast({ message: '保存成功~' });
+          } catch (err) {
+            Logger.error(TAG, 'show toast failed. error:' + JSON.stringify(err));
+          }
         },
       }).height(300);
       Text('使用方式2：使用bindSheet拉起半模态弹框');
@@ -306,7 +315,11 @@ struct AssetInfoManageSheetExample1 {
           assetInfoManageSheetBuilder({}), {
             title: { title: '编辑资产' },
             detents: [SheetSize.MEDIUM],
-            preferType: SheetType.CENTER,
+            onWillDismiss:(action)=> {
+              if (action.reason !== DismissReason.TOUCH_OUTSIDE) {
+                action.dismiss();
+              }
+            },
           });
     }
     .backgroundColor('#eee')
@@ -320,9 +333,10 @@ struct AssetInfoManageSheetExample1 {
 ### 示例3（新增、编辑、删除资产）
 
 ```ts
-import { AssetRecordItemModel, AssetDisplayTypeItem, AssetRecordItem, AssetType } from 'asset_base';
+import { AssetRecordItemModel, AssetDisplayTypeItem, AssetRecordItem, AssetType, Logger } from 'asset_base';
 import { assetCreateSheetBuilder, assetInfoManageSheetBuilder } from 'asset_manage';
-import { promptAction } from '@kit.ArkUI';
+
+const TAG = '[PreviewPage]'
 
 const MOCK_ASSET_TYPE_LIST: AssetDisplayTypeItem[] = [
   {
@@ -371,7 +385,6 @@ struct PreviewPage {
             },
           }), {
             title: { title: '选择资产类型' },
-            preferType:SheetType.CENTER,
           });
 
       List({ space: 12 }) {
@@ -397,7 +410,7 @@ struct PreviewPage {
               });
             };
           };
-        });
+        }, (item: AssetRecordItemModel) => JSON.stringify(item));
       }
       .width('100%')
       .layoutWeight(1);
@@ -411,14 +424,13 @@ struct PreviewPage {
         initAsset: this.initAsset,
         type: this.manageItem?.type,
         handleConfirm: (data) => {
-          this.confirmManage(data)
+          this.confirmManage(data);
         },
         handleDelete: (id) => {
           this.deleteAsset(id);
         },
       }), {
         title: { title: '新增资产' },
-        preferType:SheetType.CENTER,
         onWillDismiss: (action) => {
           this.initAsset = undefined;
           action.dismiss();
@@ -439,7 +451,6 @@ struct PreviewPage {
   }
 
   confirmManage(data: AssetRecordItemModel) {
-    console.log(JSON.stringify(data));
     if (data.assetId) {
       let idx = this.assetList.findIndex((item) => item.assetId === data.assetId);
       this.assetList[idx] = data;
@@ -470,11 +481,14 @@ struct PreviewPage {
 
   deleteAsset(id: number) {
     const idx = this.assetList.findIndex((item) => item.assetId === id);
-    console.log('index' + idx);
     if (typeof idx === 'number') {
       this.assetList.splice(idx, 1);
     }
-    promptAction.showToast({ message: '删除成功' });
+    try {
+      this.getUIContext().getPromptAction().showToast({ message: '删除成功' });
+    } catch (err) {
+      Logger.error(TAG, 'show toast failed. error:' + JSON.stringify(err));
+    }
     this.showManageSheet = false;
   }
 }

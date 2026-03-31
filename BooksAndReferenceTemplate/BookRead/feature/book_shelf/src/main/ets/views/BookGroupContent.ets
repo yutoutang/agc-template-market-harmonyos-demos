@@ -14,7 +14,6 @@ import {
 import { SearchResultCard } from 'book_home';
 import { ManageGroupBottomCard } from '../comps/ManageGroupBottomCard';
 import { SymbolGlyphModifier } from '@kit.ArkUI'
-import { loginComponentManager } from '@hms.core.account.LoginComponent';
 
 let customDialogId: number = 0
 
@@ -186,28 +185,64 @@ export struct BookGroupContent {
               Image($r('app.media.ic_back')).height('40vp').width('40vp')
                 .margin({ top: 16 + this.windowTopHeight, right: '8vp' })
                 .onClick(() => {
-                  TCRouter.pop();
+                  if (this.isDeleteGroup) {
+                    // 退出选择
+                    this.isDeleteGroup = false;
+                  } else {
+                    TCRouter.pop();
+                  }
                 })
 
-              Text(this.groupName)
-                .fontSize($r('sys.float.Title_S'))
-                .fontWeight(FontWeight.Medium)
-                .fontColor($r('sys.color.font_primary'))
-                .margin({ left: 10, top: 16 + this.windowTopHeight })
+              if (this.isDeleteGroup) {
+                Text(this.manageBooksSet.size ? `已选择${this.manageBooksSet.size}本` : '未选择')
+                  .fontSize($r('sys.float.Title_S'))
+                  .fontWeight(FontWeight.Medium)
+                  .fontColor($r('sys.color.font_primary'))
+                  .margin({ left: 10, top: 16 + this.windowTopHeight })
+              } else {
+                Text(this.groupName)
+                  .fontSize($r('sys.float.Title_S'))
+                  .fontWeight(FontWeight.Medium)
+                  .fontColor($r('sys.color.font_primary'))
+                  .margin({ left: 10, top: 16 + this.windowTopHeight })
+              }
             }
 
-            Image($r('app.media.icon_select_all_off'))
-              .height(40)
-              .width(40)
-              .margin({ top: 16 + this.windowTopHeight })
-              .onClick(() => {
-                this.isShown = true
-              })
-              .bindContextMenu(this.isShown, this.selectMenu(), {
-                aboutToDisappear: () => {
-                  this.isShown = false
-                }
-              })
+            if (this.isDeleteGroup) {
+              // 管理分组时的全选按钮
+              Image(this.fBooks.length === this.manageBooksSet.size ? $r('app.media.icon_select_all') :
+                $r('app.media.icon_select_all_off'))
+                .height(40)
+                .width(40)
+                .margin({ top: 16 + this.windowTopHeight })
+                .onClick(() => {
+                  if (this.fBooks.length === this.manageBooksSet.size) {
+                    this.manageBooksSet.clear()
+                  } else {
+                    for (let i = 0; i < this.fBooks.length; i++) {
+                      this.manageBooksSet.add(this.fBooks[i].name as string);
+                    }
+                  }
+                })
+            } else {
+              SymbolGlyph($r('sys.symbol.dot_grid_2x2'))
+                .fontSize($r('sys.float.Title_M'))
+                .fontColor([$r('sys.color.icon_primary')])
+                .width(40)
+                .height(40)
+                .borderRadius(1000)
+                .padding(8)
+                .backgroundColor($r('sys.color.comp_background_tertiary'))
+                .margin({ top: 16 + this.windowTopHeight })
+                .onClick(() => {
+                  this.isShown = true
+                })
+                .bindContextMenu(this.isShown, this.selectMenu(), {
+                  aboutToDisappear: () => {
+                    this.isShown = false
+                  }
+                })
+            }
           }
           .padding({ left: '16vp', right: '16vp' }).justifyContent(FlexAlign.SpaceBetween)
           .width('100%')
@@ -217,7 +252,16 @@ export struct BookGroupContent {
               ListItem() {
                 if (this.isDeleteGroup) {
                   GroupBookCheckCard({
-                    info: item, manageGroupEvent: (book: BookInfo, isShowM: boolean) => {
+                    info: item,
+                    isSelect: this.manageBooksSet.has(item.name),
+                    changeSelect: (val: boolean) => {
+                      if (val) {
+                        this.manageBooksSet.add(item.name);
+                      } else {
+                        this.manageBooksSet.delete(item.name);
+                      }
+                    },
+                    manageGroupEvent: (book: BookInfo, isShowM: boolean) => {
                       if (isShowM) {
                         this.manageBooksSet.add(book.name as string);
                       } else {
@@ -238,8 +282,8 @@ export struct BookGroupContent {
           .layoutWeight(1)
 
           if (this.isDeleteGroup) {
-
             ManageGroupBottomCard({
+              isIconLight: this.manageBooksSet.size !== 0,
               delete: () => { //删除
                 let promptAction = this.getUIContext().getPromptAction();
                 if (this.manageBooksSet.size !== 0) {
@@ -269,14 +313,12 @@ export struct BookGroupContent {
                   this.isShowBind = true;
                 }
               }
-
             }).margin({ bottom: 20 }).position({ bottom: 0 })
           }
         }
         .width(Constants.FULL_SIZE)
         .height(Constants.FULL_SIZE)
         .alignItems(HorizontalAlign.Start)
-
         .bindSheet($$this.isShowBind, this.newGroupEdit(), {
           detents: [SheetSize.MEDIUM, SheetSize.LARGE, 800],
           height: this.isShowBind ? SheetSize.FIT_CONTENT : SheetSize.MEDIUM,

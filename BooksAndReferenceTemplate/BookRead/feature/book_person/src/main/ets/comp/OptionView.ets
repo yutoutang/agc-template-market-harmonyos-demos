@@ -20,7 +20,7 @@ export struct OptionView {
 
       .width(Constants.FULL_SIZE)
       .height(61)
-      .backgroundColor('#FFFFFF')
+      .backgroundColor($r('sys.color.comp_background_list_card'))
       .borderRadius(16)
       .justifyContent(FlexAlign.SpaceBetween)
       .padding({

@@ -105,6 +105,8 @@ export struct BillDetail {
       }
       .padding(8);
     }
+    .borderRadius(16)
+    .padding(24)
     .backgroundColor(this.bgColor);
   }
 
@@ -114,7 +116,7 @@ export struct BillDetail {
       Text($$.title)
         .fontColor(BillConstants.FONT_COLOR_LEVEL2)
         .fontSize(this.contentFontSize)
-        .width('20%');
+        .width('25%');
       Row() {
         Text($$.content)
           .fontColor(this.contentFontColor)

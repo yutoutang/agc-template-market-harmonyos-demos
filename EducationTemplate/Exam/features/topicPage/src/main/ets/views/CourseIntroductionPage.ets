@@ -13,8 +13,16 @@
  * limitations under the License.
  */
 
-import { PreferenceUtil, PreferConstant, TopTabsBuilder } from 'commonlib';
-import { RouterModule, RouterMap } from 'router_module';
+import {
+  PreferenceUtil,
+  PreferConstant,
+  TopTabsBuilder,
+  GlobalContextUtils,
+  Banner,
+  BreakpointType,
+  RouterModule,
+  RouterMap
+} from 'commonlib';
 import {
   PracticeDataSource,
   PRACTICE_LIST_DATA,
@@ -24,15 +32,16 @@ import {
 } from '../viewModel/PracticeMode';
 import { MyDataSource } from '../viewModel/CourseHomeModel';
 import { QuestionsRouterModel, TopicItemType } from 'answer_questions';
+import { TopicVM } from '../viewModel/TopicVM';
 
 @ComponentV2
 export struct CourseIntroductionPage {
-  private swiperController: SwiperController = new SwiperController();
-  private data: MyDataSource = new MyDataSource([]);
+  data: MyDataSource = new MyDataSource([]);
   private listData: PracticeMode[] = PRACTICE_LIST_DATA;
   private dataSource: PracticeDataSource = new PracticeDataSource(this.listData);
   private subExercisesListData: SubjectExercises[] = SUB_EXERCISES_DATA;
   @Local currentIndex: number = 0;
+  topicVM: TopicVM = TopicVM.instance;
 
   aboutToAppear(): void {
     let list: string[] = [];
@@ -46,7 +55,7 @@ export struct CourseIntroductionPage {
 
   build() {
     Column() {
-      TopTabsBuilder({ showBackButton: true, bgColor: $r('sys.color.background_primary') })
+      TopTabsBuilder({ showBackButton: true, bgColor: $r('sys.color.comp_background_primary') })
         .padding({ left: $r('app.float.vp_16'), right: $r('app.float.vp_16') });
       Scroll() {
         Column() {
@@ -56,46 +65,29 @@ export struct CourseIntroductionPage {
           this.toolBuilder();
           // 练习模式/学习资料
           this.customTabBuilder();
+          Blank()
+            .layoutWeight(1)
         }
+        .alignItems(HorizontalAlign.Center)
         .padding({ left: $r('app.float.vp_12'), right: $r('app.float.vp_12') })
-        .layoutWeight(1)
-        .backgroundColor($r('sys.color.background_secondary'));
+        .backgroundColor($r('sys.color.background_secondary'))
+        .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM]);
       }
+      .backgroundColor($r('sys.color.background_secondary'))
       .layoutWeight(1)
       .scrollBar(BarState.Off)
-      .edgeEffect(EdgeEffect.Spring);
+      .edgeEffect(EdgeEffect.Spring)
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM]);
     }
     .width('100%')
-    .height('100%');
+    .height('100%')
+    .backgroundColor($r('sys.color.comp_background_primary'))
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM]);
   }
 
   @Builder
   bannerBuilder() {
-    Swiper(this.swiperController) {
-      LazyForEach(this.data, (item: string) => {
-        Image($r(item)).width('100%').height(190)
-          .interpolation(ImageInterpolation.High)
-          .objectFit(ImageFit.Fill);
-      }, (item: string, index: number) => item + index);
-    }
-    .cachedCount(2)
-    .margin({ top: $r('app.float.vp_12') })
-    .index(1)
-    .autoPlay(true)
-    .interval(3000)
-    .loop(true)
-    .duration(1000)
-    .itemSpace(0)
-    .indicator( // 设置圆点导航点样式
-      new DotIndicator()
-        .itemWidth($r('app.float.vp_6'))
-        .itemHeight($r('app.float.vp_6'))
-        .selectedItemWidth($r('app.float.vp_12'))
-        .selectedItemHeight($r('app.float.vp_6'))
-        .color($r('sys.color.comp_background_secondary'))
-        .selectedColor($r('sys.color.comp_background_emphasize'))
-        .maxDisplayCount(9))
-    .curve(Curve.Linear);
+    Banner();
   }
 
   // 业务选项
@@ -176,12 +168,12 @@ export struct CourseIntroductionPage {
         RouterModule.push({ url: RouterMap.MY_NOTE_PAGE });
       });
     }
-    .justifyContent(FlexAlign.Center)
+    .justifyContent(FlexAlign.SpaceAround)
     .width('100%')
     .height($r('app.float.vp_72'))
     .borderRadius($r('app.float.vp_16'))
     .margin({ top: $r('app.float.vp_10') })
-    .backgroundColor(Color.White);
+    .backgroundColor($r('sys.color.comp_background_primary'));
   }
 
   // 练习tab
@@ -193,9 +185,6 @@ export struct CourseIntroductionPage {
           GridItem() {
             ReusableFlowItem({ item: item });
           }
-          .width('100%')
-          .height($r('app.float.vp_40'))
-          .backgroundColor(Color.White)
           .onClick(() => {
             if (item.name === '每日一练') {
               RouterModule.push({ url: RouterMap.ANSWER_QUESTIONS_PAGE });
@@ -210,15 +199,17 @@ export struct CourseIntroductionPage {
           });
         }, (item: PracticeMode, index: number) => item.name + index);
       }
-      .cachedCount(2)
-      .columnsTemplate('1fr 1fr')
-      .columnsGap($r('app.float.vp_8'))
-      .rowsGap($r('app.float.vp_8'))
-      .width('100%')
-      .height($r('app.float.vp_112'))
-      .borderRadius($r('app.float.vp_16'))
       .padding($r('app.float.vp_12'))
-      .backgroundColor($r('sys.color.background_primary'));
+      .backgroundColor($r('sys.color.comp_background_primary'))
+      .columnsTemplate('1fr '.repeat(new BreakpointType<number>({
+        sm: 2,
+        md: 4,
+        lg: 4,
+        xl: 4
+      }).getValue(this.topicVM.breakPointModel.currentBreakpoint)))
+      .columnsGap($r('app.float.vp_6'))
+      .rowsGap($r('app.float.vp_6'))
+      .borderRadius($r('app.float.vp_16'));
 
       Text('练习模式')
         .fontSize($r('sys.float.Subtitle_L'))
@@ -238,10 +229,15 @@ export struct CourseIntroductionPage {
         }, (item: SubjectExercises, index: number) => item.name + index);
       }
       .width('100%')
-      .height(this.subExercisesListData.length * 82)
-      .layoutWeight(1)
+      .height('auto')
       .margin({ bottom: $r('app.float.vp_8') })
       .scrollBar(BarState.Off)
+      .lanes(new BreakpointType<number>({
+        sm: 1,
+        md: 2,
+        lg: 3,
+        xl: 3
+      }).getValue(this.topicVM.breakPointModel.currentBreakpoint), 12)
       .nestedScroll({
         scrollForward: NestedScrollMode.PARENT_FIRST,
         scrollBackward: NestedScrollMode.SELF_FIRST
@@ -249,8 +245,7 @@ export struct CourseIntroductionPage {
 
       Blank();
     }
-    .backgroundColor($r('sys.color.background_secondary'))
-    .layoutWeight(1);
+    .backgroundColor($r('sys.color.background_secondary'));
   }
 
   // 学习资料
@@ -264,11 +259,16 @@ export struct CourseIntroductionPage {
           };
         }, (item: SubjectExercises, index: number) => item.name + index);
       }
+      .width('100%')
       .height('auto')
-      .width('auto')
       .scrollBar(BarState.Off)
-      .layoutWeight(1)
       .margin({ bottom: $r('app.float.vp_8') })
+      .lanes(new BreakpointType<number>({
+        sm: 1,
+        md: 2,
+        lg: 3,
+        xl: 3
+      }).getValue(this.topicVM.breakPointModel.currentBreakpoint), 12)
       .nestedScroll({
         scrollForward: NestedScrollMode.PARENT_FIRST,
         scrollBackward: NestedScrollMode.SELF_FIRST
@@ -299,8 +299,7 @@ export struct CourseIntroductionPage {
       Blank();
     }
     .backgroundColor($r('sys.color.background_secondary'))
-    .alignItems(HorizontalAlign.Center)
-    .layoutWeight(1);
+    .alignItems(HorizontalAlign.Center);
   }
 
   @Builder
@@ -339,7 +338,8 @@ export struct CourseIntroductionPage {
       .borderRadius($r('app.float.vp_20'))
       .justifyContent(FlexAlign.Center)
       .alignItems(VerticalAlign.Center)
-      .backgroundColor(this.currentIndex === 0 ? Color.White : Color.Transparent)
+      .backgroundColor(this.currentIndex === 0 ? $r('sys.color.comp_background_primary_contrary_secondary')
+        : Color.Transparent)
       .onClick(() => {
         this.currentIndex = 0;
       });
@@ -355,13 +355,14 @@ export struct CourseIntroductionPage {
       .borderRadius($r('app.float.vp_20'))
       .justifyContent(FlexAlign.Center)
       .alignItems(VerticalAlign.Center)
-      .backgroundColor(this.currentIndex === 1 ? Color.White : Color.Transparent)
+      .backgroundColor(this.currentIndex === 1 ? $r('sys.color.comp_background_primary_contrary_secondary')
+        : Color.Transparent)
       .onClick(() => {
         this.currentIndex = 1;
       });
     }
     .backgroundColor($r('sys.color.comp_background_tertiary'))
-    .width('100%')
+    .width('70%')
     .height($r('app.float.vp_40'))
     .borderRadius($r('app.float.vp_20'))
     .justifyContent(FlexAlign.SpaceBetween)
@@ -381,7 +382,7 @@ export struct CourseIntroductionPage {
     let arr: TopicItemType[] =
       PreferenceUtil.getInstance().get(PreferConstant.ERROR_RECORDS, []) as TopicItemType[];
     if (arr.length <= 0) {
-      this.getUIContext().getPromptAction().showToast({ message: '无错题数据' });
+      GlobalContextUtils.showToast({ message: '无错题数据' });
       return;
     }
     arr.sort((a, b) => b.jlStamp - a.jlStamp);
@@ -421,16 +422,16 @@ struct ReusableFlowItem {
       Image(this.item.imageSrc)
         .interpolation(ImageInterpolation.High)
         .objectFit(ImageFit.Fill)
-        .width($r('app.float.QuestionModel_ICON_SIZE'))
-        .height($r('app.float.QuestionModel_ICON_SIZE'))
+        .width('32vp')
+        .height('32vp')
         .clip(true)
-        .margin({ left: $r('app.float.vp_5'), right: $r('app.float.vp_5') });
+        .margin({ left: $r('app.float.vp_4'), right: $r('app.float.vp_4') });
     }
-    .backgroundColor('#F1F3F5')
+    .backgroundColor($r('sys.color.comp_background_tertiary'))
     .justifyContent(FlexAlign.SpaceBetween)
-    .height($r('app.float.vp_40'))
+    .height($r('app.float.vp_56'))
     .width('100%')
-    .padding({ left: $r('app.float.vp_12'), right: $r('app.float.vp_15') })
+    .padding({ left: $r('app.float.vp_12'), right: $r('app.float.vp_16') })
     .borderRadius($r('app.float.vp_12'));
   }
 }
@@ -488,7 +489,7 @@ struct SubjectItem {
       .width('100%')
       .height('100%');
     }
-    .backgroundColor(Color.White)
+    .backgroundColor($r('sys.color.comp_background_list_card'))
     .alignItems(HorizontalAlign.Start)
     .width('100%')
     .height($r('app.float.vp_82'))
@@ -540,7 +541,7 @@ struct InfoItem {
 
         Blank();
         Row() {
-          Image($r('app.media.ic_public_share_arrow'))
+          Image($r('app.media.ic_share'))
             .width($r('app.float.vp_16'))
             .height($r('app.float.vp_16'))
             .margin({ right: $r('app.float.vp_5') });
@@ -561,9 +562,8 @@ struct InfoItem {
         .borderRadius($r('sys.float.corner_radius_level7'))
 
         .onClick(() => {
-          this.getUIContext().getPromptAction().showToast({ message: '暂不支持分享' });
+          GlobalContextUtils.showToast({ message: '暂不支持分享' });
         });
-
 
         Row() {
           Image($r('app.media.ic_public_down'))
@@ -594,7 +594,7 @@ struct InfoItem {
       .height($r('app.float.vp_32'))
       .justifyContent(FlexAlign.SpaceBetween);
     }
-    .backgroundColor(Color.White)
+    .backgroundColor($r('sys.color.comp_background_list_card'))
     .width('100%')
     .height($r('app.float.vp_115'))
     .padding($r('app.float.vp_12'))

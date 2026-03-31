@@ -1,6 +1,8 @@
 import { audio } from '@kit.AudioKit';
 import { media } from '@kit.MediaKit';
 import { COURSE_CONTENT, COURSE_DATA1, Record } from 'lib_common';
+import { UIContext } from '@kit.ArkUI';
+import { emitter } from '@kit.BasicServicesKit';
 
 // AVPlayer的状态机
 enum AVPlayerState {
@@ -44,8 +46,8 @@ export class AVPlayer {
   isResetPause: boolean = false;
   courseId: string = '';
 
-  showEndDialog() {
-    AlertDialog.show({
+  showEndDialog(context: UIContext) {
+    context.showAlertDialog({
       title: '恭喜你！',
       message: '已完成本次训练课程',
       alignment: DialogAlignment.Center,
@@ -70,25 +72,36 @@ export class AVPlayer {
           record.energy += Number(COURSE_CONTENT[index].energy)
           AppStorage.setOrCreate<Record>(String(`${year}-${month}-${day}`),
             { duration: record.duration, energy: record.energy })
-          getContext().eventHub.emit('todayRecord', record);
+          let eventData: emitter.EventData = {
+            data: { 'todayRecord': record }
+          }
+          try {
+            emitter.emit('todayRecord', eventData)
+          } catch (e) {
+            console.error(`emitter emit todayRecord failed. error: ${JSON.stringify(e)}`)
+          }
         }
       }
     });
   }
 
-  async init(courseId: string, url: string, seekTime: number): Promise<void> {
+  async init(context: UIContext, courseId: string, url: string, seekTime: number): Promise<void> {
     await this.release();
     // 创建avPlayer实例对象
-    this.avPlayer = await media.createAVPlayer();
-    this.courseId = courseId;
-    // 创建状态机变化回调函数
-    await this.setStateChangeCallback();
-    await this.setSourceInfoCallback();
-    this.isCreate = true;
-    this.isResetPause = false;
-    this.avPlayer.url = url;
-    this.isLoading = true;
-    this.seekTime = seekTime;
+    try {
+      this.avPlayer = await media.createAVPlayer();
+      this.courseId = courseId;
+      // 创建状态机变化回调函数
+      await this.setStateChangeCallback(context);
+      await this.setSourceInfoCallback();
+      this.isCreate = true;
+      this.isResetPause = false;
+      this.avPlayer.url = url;
+      this.isLoading = true;
+      this.seekTime = seekTime;
+    } catch (e) {
+      console.error(`Failed to create av player. error: ${JSON.stringify(e)}`)
+    }
   }
 
   getPlay() {
@@ -228,7 +241,7 @@ export class AVPlayer {
   }
 
   // 状态机
-  async setStateChangeCallback(): Promise<void> {
+  async setStateChangeCallback(context: UIContext): Promise<void> {
     this.avPlayer.on('stateChange', async (state: string, reason: media.StateChangeReason) => {
       if (this.avPlayer == null) {
         return;
@@ -274,8 +287,7 @@ export class AVPlayer {
         // 播放至结尾状态
         case AVPlayerState.COMPLETED:
           this.isPlaying = false
-          this.showEndDialog()
-          // this.cancelDialogController.open()
+          this.showEndDialog(context)
           this.callbackComplete();
           break;
         // 停止状态

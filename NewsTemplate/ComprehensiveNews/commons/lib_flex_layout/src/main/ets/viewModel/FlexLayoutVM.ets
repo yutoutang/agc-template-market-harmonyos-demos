@@ -4,7 +4,7 @@ import { Permissions } from '@kit.AbilityKit';
 import emitter from '@ohos.events.emitter';
 import { TabInfo } from 'module_channeledit';
 import { BaseViewModel, CommonDataSource, LocationUtils, Logger, PermissionUtils, SettingModel } from 'lib_common';
-import { AudioConstants, SubUtils } from 'module_audioplayer';
+import { AudioConstants, AudioService } from 'module_audioplayer';
 import { HomeServiceApi, RequestListData } from 'lib_news_api';
 import { RendNewsInfo } from '../model/Model';
 import { channelList } from '../constants/ChannelList';
@@ -55,6 +55,7 @@ export class FlexLayoutVM extends BaseViewModel {
         $r('sys.color.background_primary')
 
     // 未获取位置权限且没有申请过授权时，监听tabIndex切换
+    this.localTabIdx = this.channelsList.findIndex((tab: TabInfo) => tab.id === 'location');
     if (!this.isApplied && !this.isGranted && this.currentIndex === this.localTabIdx) {
       this.requestLocPermission().then((isGranted) => {
         this.isGranted = isGranted

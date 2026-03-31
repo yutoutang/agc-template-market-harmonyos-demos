@@ -86,7 +86,7 @@ export struct SignComp {
                 }
               }
             })
-          },(item:SliderModel)=>new Date().toString())
+          }, (item: SliderModel) => new Date().toString())
         }
         .layoutWeight(1)
         .padding({
@@ -151,7 +151,7 @@ export struct SignComp {
                 }
               }
             })
-          },(item:SliderModel)=>new Date().toString())
+          }, (item: SliderModel) => new Date().toString())
         }
         .width(Constants.FULL_WIDTH)
         .padding({
@@ -167,7 +167,7 @@ export struct SignComp {
       top: 20,
       bottom: 12
     })
-    .backgroundColor($r('sys.color.comp_background_list_card'))
+    .backgroundColor($r('sys.color.comp_background_primary'))
   }
 }
 
@@ -188,8 +188,8 @@ export struct CustomSlider {
           .fontSize(8)
           .fontWeight(FontWeight.Normal)
           .margin({ top: 2 })
-          .fontColor(this.sliderModel.isClick ? $r('sys.color.comp_background_list_card') :
-            '#99000000')
+          .fontColor(this.sliderModel.isClick ? $r('sys.color.font_on_primary') :
+            $r('sys.color.font_secondary'))
       }
       .width(40)
       .height(40)
@@ -199,7 +199,8 @@ export struct CustomSlider {
       .linearGradient({
         direction: GradientDirection.Bottom,
         angle: 0,
-        colors: this.sliderModel.isClick ? [[0xFDEDD0, 0.0], [0xFFAA15, 1.0]] : [[0xF1F1F1, 0.0], [0xD8D8D8, 1.0]]
+        colors: this.sliderModel.isClick ? [[0xFDEDD0, 0.0], [0xFFAA15, 1.0]] :
+          [[$r('app.color.sign_card_bottom'), 0.0], [$r('app.color.sign_card_top'), 1.0]]
       })
 
       Text(this.sliderModel.isClick ? '已签' : '未签')
@@ -207,7 +208,7 @@ export struct CustomSlider {
         .width(40)
         .textAlign(TextAlign.Center)
         .fontColor(this.sliderModel.isClick ? $r('app.color.sign_day_color_on') :
-          $r('app.color.sign_day_color_off'))
+          $r('sys.color.font_secondary'))
     }
     .width(Constants.CUSTOM_SLIDER_WIDTH)
     .height(Constants.CUSTOM_SLIDER_HEIGHT)

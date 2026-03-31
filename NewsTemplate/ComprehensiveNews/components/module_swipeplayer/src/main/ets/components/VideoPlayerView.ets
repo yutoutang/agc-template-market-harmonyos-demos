@@ -1,10 +1,8 @@
 import { media } from '@kit.MediaKit';
 import { emitter } from '@kit.BasicServicesKit';
-import { AppStorageV2, display, window } from '@kit.ArkUI';
-import { LongTakeTransitionParam } from 'module_transition';
-import { LoneTakeAnimationsTransition } from 'module_transition';
+import { AppStorageV2 } from '@kit.ArkUI';
 import { AVPlayerState, BreakpointNameEnum, PageNameEnum, VideoPlayerData } from '../type/Index';
-import { AVPlayerSession } from '../controller/AVPlayerManager';
+import { AVPlayerController } from '../controller/AVPlayerController';
 import { SwipePlayerController } from '../controller/SwipePlayerController';
 import { PlayerLayoutSize } from '../controller/PlayerLayoutSize';
 import { VideoProgressBar } from './VideoProgressBar';
@@ -12,9 +10,10 @@ import { Constants } from '../constants/Constants';
 import { SwipePlayerModel } from '../viewmodel/SwipePlayerModel';
 import { PlayerSpeedRateView } from './PlayerSpeedRateView';
 import { DownloadWithoutWlanEnum, VideoNetworkModel, VideoNetworkSetting } from '../models/VideoNetworkModel';
-import { handleSandboxVideoUrl, setOrientation, toast } from '../utils/Util';
+import { handleSandboxVideoUrl, toast } from '../utils/Util';
 import { BreakpointModel } from '../models/BreakpointModel';
 import { PiPWindowModel } from '../models/PiPWindowModel';
+import { EventKey } from '../constants/EventKey';
 import { Logger } from '../utils/Logger';
 
 const TAG = '[VideoPlayerView]';
@@ -33,23 +32,18 @@ export struct VideoPlayerView {
   @Param @Require swipePlayerController: SwipePlayerController;
   // 视频播放的外层交互组件
   @Param videoLayerBuilder:
-  WrappedBuilder<[Object, AVPlayerSession, SwipePlayerController, PlayerLayoutSize]> | undefined = undefined;
+  WrappedBuilder<[Object, AVPlayerController, SwipePlayerController, PlayerLayoutSize]> | undefined = undefined;
   // 全屏按钮
   @BuilderParam fullBtnBuilder: () => CustomBuilder
   // 是否自动播放
   @Param autoPlay: boolean = true;
+  // 是否接入播控中心
+  @Param enableAVSession: boolean = false;
   // 点击列表页的视频卡片对应的视频
-  @Param videoItemPlayerSession: AVPlayerSession | undefined = undefined
+  @Param videoItemAVPlayerController: AVPlayerController | undefined = undefined
   // 网络
   @Param videoNetwork: VideoNetworkModel | undefined = undefined
   @Param videoNetworkSetting: VideoNetworkSetting | undefined = undefined
-  // 底部tab高度
-  @Consumer() bottomTabHeight: Length | undefined;
-  // 播放状态回调
-  @Event playerStateCallback: (state: string, id: string) => void = () => {
-  }
-  // 路由变化的监听事件
-  @Local pipWindowModel: PiPWindowModel = AppStorageV2.connect(PiPWindowModel, () => new PiPWindowModel())!;
   // 路由栈
   @Param @Require pathStack: NavPathStack
   // 是否横屏
@@ -58,48 +52,37 @@ export struct VideoPlayerView {
   @Param isShown: boolean = false;
   // 一多适配的断点
   @Param breakpointModel: BreakpointModel = new BreakpointModel();
-  // 播放进度变化的回调
-  @Event playerTimeUpdateCallback: (id: string, timeMs: number) => void = () => {
+  // 播放状态回调
+  @Event playerStateCallback: (state: string, id: string) => void = () => {
   }
+  // 播放进度变化的回调
+  @Event playerTimeUpdateCallback: (videoData: VideoPlayerData, timeMs: number) => void = () => {
+  }
+  // 底部tab高度
+  @Consumer() bottomTabHeight: Length | undefined;
+  // 路由变化的监听事件
+  @Local pipWindowModel: PiPWindowModel = AppStorageV2.connect(PiPWindowModel, () => new PiPWindowModel())!;
   private xComponentController = new XComponentController();
-  vm: SwipePlayerModel = new SwipePlayerModel(this.getUIContext(), this.index)
+  private vm: SwipePlayerModel = new SwipePlayerModel(this.getUIContext(), this.index)
   // 准备状态监听事件
   private preparedListener = () => {
     if (this.index === this.currentIndex && this.autoPlay) {
       const isShown = AppStorage.get<boolean>('isShown');
       if (isShown) {
-        this.vm.playerSession.play()
+        this.vm.avPlayerController.play()
       }
     } else {
       // 没有封面图时，取视频的 2ms 的位置帧作为封面
       if (!this.videoData.getCoverUrl()) {
-        this.vm.playerSession.avPlayer?.seek(2)
+        this.vm.avPlayerController.avPlayer?.seek(2)
       }
     }
-  }
-  // 资源初始化状态
-  private initializedListener = (avPlayer: media.AVPlayer) => {
-    let timer = setInterval(async () => {
-      try {
-        if (this.index !== this.currentIndex) {
-          if (this.vm.avPlayerManager.getAVPlayer(this.currentIndex)?.state === 'playing') {
-            await avPlayer!.prepare();
-            clearInterval(timer);
-          }
-        } else {
-          await avPlayer!.prepare();
-        }
-      } catch (e) {
-        clearInterval(timer);
-        Logger.error(TAG, 'prepare fail, error: ' + JSON.stringify(e));
-      }
-    }, 100);
   }
   // 播放时监听
   private playingListeners = () => {
     if (this.index === this.currentIndex) {
       this.playerStateCallback && this.playerStateCallback(AVPlayerState.PLAYING, this.videoData.getVideoId())
-      emitter.emit('swipeVideoPlayerState', {
+      emitter.emit(EventKey.SWIPER_VIDEO_PLAYER_STATE, {
         data: {
           state: AVPlayerState.PLAYING,
           index: this.currentIndex,
@@ -111,20 +94,20 @@ export struct VideoPlayerView {
   private completedListeners = () => {
     // 横屏时，播放完成后，重头开始播放
     if (this.isLandscape) {
-      this.vm.playerSession.play();
+      this.vm.avPlayerController.play();
       return
     }
     // 设置自动播放下一个
     if (this.videoNetworkSetting?.autoPlayNext) {
       if (!this.totalCount || this.currentIndex + 1 < this.totalCount) {
         this.vm.isPause = true;
-        this.vm.playerSession.avPlayer!.seek(0, media.SeekMode.SEEK_CLOSEST);
+        this.vm.avPlayerController.avPlayer!.seek(0, media.SeekMode.SEEK_CLOSEST);
         this.swipePlayerController.changeIndex(this.currentIndex + 1);
         return
       }
     }
     // 其他情况，重头开始播放
-    this.vm.playerSession.play()
+    this.vm.avPlayerController.play()
   }
   // 视频播放错误事件监听
   private errorListener = () => {
@@ -159,12 +142,13 @@ export struct VideoPlayerView {
   @Monitor('videoNetwork.isNetworkAvailable')
   onListenNetwork(monitor: IMonitor) {
     let hasNet = monitor.value()?.now as boolean
-    let playerState = this.vm.playerSession?.avPlayer?.state
+    let playerState = this.vm.avPlayerController?.avPlayer?.state
     if (this.index === this.currentIndex && playerState === 'idle' && hasNet) {
       if (this.videoData.getVideoUrl().startsWith('http')) {
-        this.vm.playerSession.avPlayer!.url = this.videoData.getVideoUrl()
+        this.vm.avPlayerController.avPlayer!.url = this.videoData.getVideoUrl()
       } else {
-        this.vm.playerSession.avPlayer!.url = handleSandboxVideoUrl(this.videoData.getVideoUrl())
+        this.vm.videoFileFD = handleSandboxVideoUrl(this.videoData.getVideoUrl())
+        this.vm.avPlayerController.avPlayer!.url = 'fd://' + this.vm.videoFileFD;
       }
     }
   }
@@ -184,20 +168,39 @@ export struct VideoPlayerView {
     }
   }
 
+  // 是否当前在页面中心的视频
+  @Computed
+  get isCurrent() {
+    return this.index === this.currentIndex;
+  }
+
   aboutToAppear(): void {
     let isDisabled = this.videoNetworkSetting?.downloadWithoutWlan === DownloadWithoutWlanEnum.downloadDisable;
     let isCellular = this.videoNetwork?.isNetworkAvailable && this.videoNetwork?.isCellular;
     // 移动网络下，设置不下载图
     let imageUrl = isCellular && isDisabled ? $r('app.media.ic_default_bg') : this.videoData.getCoverUrl();
     this.vm.imageUrl = imageUrl || $r('app.media.ic_default_bg');
+    this.vm.setPathStack(this.pathStack);
     // 初始化
     this.vm.avPlayerManager = this.swipePlayerController.getAVPlayerMgr()!
-    this.vm.initPlayerManager(this.videoData, this.videoItemPlayerSession)
+    this.vm.initPlayerManager(this.videoData, this.videoItemAVPlayerController)
     this.vm.initXComponentId()
+    // 注册监听
+    this.registerListeners();
+  }
+
+  aboutToDisappear(): void {
+    Logger.debug(TAG, 'aboutToDisappear, this.vm.isFromList: ' + this.vm.isFromList);
+    // 从列表页跳转过来的，不需要销毁播放对象，由列表页负责销毁
+    if (!this.vm.isFromList) {
+      this.vm.releaseAVPlayer();
+    }
+    this.pipWindowModel.navDestinationUpdateListeners.delete('fullScreenListener');
+  }
+
+  registerListeners() {
     // 准备状态监听事件
     this.vm.onPreparedListener(this.preparedListener);
-    // 资源初始化状态
-    this.vm.onInitializedListener(this.initializedListener);
     // 播放状态
     this.vm.onPlayingListener(this.playingListeners)
     // 完成状态监听事件
@@ -220,57 +223,43 @@ export struct VideoPlayerView {
     // 视频进度监听
     this.vm.onTimeUpdateListener((timeMs: number) => {
       if (this.index === this.currentIndex) {
-        this.playerTimeUpdateCallback && this.playerTimeUpdateCallback(this.videoData.getVideoId(), timeMs)
+        this.playerTimeUpdateCallback && this.playerTimeUpdateCallback(this.videoData, timeMs)
       }
     })
   }
 
-  aboutToDisappear(): void {
-    // 从列表页跳转过来的，不需要销毁播放对象
-    if (this.index !== this.currentIndex && !this.vm.isFromList) {
-      this.vm.handlerDisappear()
-    }
-  }
-
   onChangeSwiperIndex() {
-    this.swipePlayerController!.curentIndex = this.currentIndex;
+    this.swipePlayerController.setCurrentIndex(this.currentIndex);
     if (this.index !== this.currentIndex) {
+      this.vm.offAVPlayerChangeBySession();
       this.vm.isPause = true;
-      this.vm.playerSession.pause();
+      this.vm.avPlayerController.pause();
       return;
     }
+
+    if (this.enableAVSession) {
+      this.vm.onAVPlayerChangeBySession();
+    }
     this.vm.isPause = false;
-    if (this.vm.playerSession.avPlayer?.state! === AVPlayerState.IDLE) {
+    if (this.vm.avPlayerController.avPlayer?.state! === AVPlayerState.IDLE) {
       if (this.videoData.getVideoUrl().startsWith('http')) {
-        this.vm.playerSession.avPlayer!.url = this.videoData.getVideoUrl()
+        this.vm.avPlayerController.avPlayer!.url = this.videoData.getVideoUrl()
       } else {
-        this.vm.playerSession.avPlayer!.url = handleSandboxVideoUrl(this.videoData.getVideoUrl())
+        this.vm.avPlayerController.avPlayer!.url = 'fd://' + handleSandboxVideoUrl(this.videoData.getVideoUrl())
       }
       return
     }
     let canPlayStates = [AVPlayerState.PREPARED, AVPlayerState.PAUSED, AVPlayerState.COMPLETED] as media.AVPlayerState[]
-    if (canPlayStates.includes(this.vm.playerSession.avPlayer?.state!)) {
-      this.vm.playerSession.avPlayer?.setSpeed(1);
-      this.vm.playerSession.play();
+    if (canPlayStates.includes(this.vm.avPlayerController.avPlayer?.state!)) {
+      this.vm.avPlayerController.avPlayer?.setSpeed(1);
+      this.vm.avPlayerController.play();
     }
-  }
-
-  // 跳转到横屏页
-  pushToLandscapePage(
-    param: Record<string, Object | AVPlayerSession | BreakpointModel | LongTakeTransitionParam | undefined>,
-  ) {
-    let longTakeTransitionParam: LongTakeTransitionParam | undefined =
-      LoneTakeAnimationsTransition.generateLongTakeParam(this.getUIContext(), 'player', 9);
-    if (longTakeTransitionParam) {
-      param.longTakeTransitionParam = longTakeTransitionParam;
-    }
-    this.pathStack.pushPathByName(PageNameEnum.VIDEO_LANDSCAPE_PAGE, param);
   }
 
   // 处理横屏按钮事件
   async handleFullScreen(isSetOrientation: boolean = true) {
-    let param: Record<string, Object | AVPlayerSession | BreakpointModel> = {};
-    param.playerSession = this.vm.playerSession;
+    let param: Record<string, Object | AVPlayerController | BreakpointModel> = {};
+    param.avPlayerController = this.vm.avPlayerController;
     param.surfaceId = this.vm.surfaceId;
     param.videoWidth = this.vm.videoWidth;
     param.videoHeight = this.vm.videoHeight;
@@ -280,35 +269,18 @@ export struct VideoPlayerView {
     this.pipWindowModel.navDestinationUpdateListeners.clear();
     this.pipWindowModel.navDestinationUpdateListeners.set('fullScreenListener', (info) => {
       if (info.name === PageNameEnum.VIDEO_LANDSCAPE_PAGE && info.state === 3) {
-        let avPlayer = (param.playerSession as AVPlayerSession).getAVPlayer() as media.AVPlayer;
+        let avPlayer = (param.avPlayerController as AVPlayerController).getAVPlayer() as media.AVPlayer;
         if (avPlayer) {
           avPlayer.surfaceId = param.surfaceId as string;
         }
       }
     })
-
-    try {
-      if (isSetOrientation) {
-        // 窗口旋转
-        let displayClass = display.getDefaultDisplaySync();
-        let orientation = displayClass.orientation;
-        if (orientation === display.Orientation.LANDSCAPE) {
-          await setOrientation(this.getUIContext(), window.Orientation.USER_ROTATION_LANDSCAPE_INVERTED)
-        } else if (orientation === display.Orientation.LANDSCAPE_INVERTED) {
-          await setOrientation(this.getUIContext(), window.Orientation.USER_ROTATION_LANDSCAPE)
-        } else if (orientation === display.Orientation.PORTRAIT) {
-          await setOrientation(this.getUIContext(), window.Orientation.USER_ROTATION_LANDSCAPE)
-        } else if (orientation === display.Orientation.PORTRAIT_INVERTED) {
-          await setOrientation(this.getUIContext(), window.Orientation.USER_ROTATION_LANDSCAPE_INVERTED)
-        }
-        this.vm.isClickFullScreenBtn = true;
-        this.pushToLandscapePage(param)
-      } else {
-        this.pushToLandscapePage(param)
-      }
-    } catch (e) {
-      Logger.error(TAG, 'getDefaultDisplaySync fail, error: ' + JSON.stringify(e));
+    if (isSetOrientation) {
+      await this.vm.handleOrientation();
+      this.vm.isClickFullScreenBtn = true;
     }
+    this.breakpointModel.isLandscapeAuto = !isSetOrientation;
+    this.vm.pushToLandscapePage(param, 'player');
   }
 
   build() {
@@ -347,7 +319,7 @@ export struct VideoPlayerView {
                   // 设置视频窗口ID
                   this.vm.setSurfaceId(surfaceId)
                   // 初始化
-                  this.vm.initAVPlayer();
+                  this.vm.initAVPlayer(this.enableAVSession && this.isCurrent);
                 })
 
               Column() {
@@ -385,7 +357,7 @@ export struct VideoPlayerView {
             Column() {
               this.videoLayerBuilder?.builder(
                 this.videoData,
-                this.vm.playerSession,
+                this.vm.avPlayerController,
                 this.swipePlayerController,
                 this.vm.playerLayoutSize,
               )
@@ -446,7 +418,7 @@ export struct VideoPlayerView {
   defaultVideoProgressBar() {
     Column() {
       VideoProgressBar({
-        playerSession: this.vm.playerSession,
+        avPlayerController: this.vm.avPlayerController,
       })
     }
     .zIndex(2)

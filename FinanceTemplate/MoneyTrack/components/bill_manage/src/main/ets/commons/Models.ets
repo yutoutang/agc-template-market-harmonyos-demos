@@ -1,8 +1,8 @@
-import { AccountID, BalanceChangeType } from 'bill_base';
+import { BalanceChangeType } from 'bill_base';
 
 @ObservedV2
 export class BillManageModel {
-  @Trace accountId: number = AccountID.DEFAULT;
+  @Trace accountId: number = 0;
   @Trace type: BalanceChangeType = BalanceChangeType.EXPENSE;
   @Trace transactionId?: number | undefined = undefined;
   @Trace resource: number = 101;

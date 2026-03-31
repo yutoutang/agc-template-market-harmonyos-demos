@@ -55,7 +55,7 @@ export function BookCover(image?: PixelMap | ResourceStr | DrawableDescriptor, i
 @Builder
 export function BookLikeCover(image?: PixelMap | ResourceStr | DrawableDescriptor, isFree?: string) {
 
-  Stack() {
+  Stack({ alignContent: Alignment.TopEnd }) {
     Image($r(image?.toString()))
       .height(120)
       .width(88)
@@ -71,7 +71,7 @@ export function BookLikeCover(image?: PixelMap | ResourceStr | DrawableDescripto
         .backgroundColor(getFreeColor(isFree))
         .borderRadius(10)
     }
-    .padding({ bottom: 110, left: 45 })
+    .padding(8)
   }
 }
 
@@ -93,23 +93,13 @@ export function BookGroupCover(image?: PixelMap | ResourceStr | DrawableDescript
 @ComponentV2
 export struct ReturnButton {
   build() {
-    Button() {
-      SymbolGlyph($r('sys.symbol.chevron_backward'))
-        .fontSize(24)
-    }
-    .width(40)
-    .height(40)
-    .padding({
-      top: 8,
-      left: 8,
-      right: 8,
-      bottom: 8
-    })
-    .borderRadius(1000)
-    .backgroundColor('#0D000000')
-    .onClick(() => {
-      TCRouter.pop();
-    })
+    Image($r('app.media.ic_back'))
+      .width(40)
+      .height(40)
+      .margin({ right: 12 })
+      .onClick(() => {
+        TCRouter.pop();
+      })
   }
 }
 
@@ -202,9 +192,14 @@ export struct NavHeaderBar {
             TSearch({ widthLength: '100%' })
               .margin({ left: 24, right: 8 })
               .layoutWeight(1)
-            Image($r('app.media.icon_history'))
-              .height(40)
+            SymbolGlyph($r('sys.symbol.clock'))
+              .fontSize($r('sys.float.Title_M'))
+              .fontColor([$r('sys.color.icon_primary')])
               .width(40)
+              .height(40)
+              .borderRadius(1000)
+              .padding(8)
+              .backgroundColor($r('sys.color.comp_background_tertiary'))
               .onClick(() => {
                 this.currentIndexTab = 0;
                 this.tabsController.changeIndex(0)
@@ -216,16 +211,26 @@ export struct NavHeaderBar {
         }
         if (this.isShelf) {
           Row() {
-            Image($r('app.media.icon_shelf_search'))
-              .height(40)
-              .width(40)
+            SymbolGlyph($r('sys.symbol.magnifyingglass'))
+              .fontSize($r('sys.float.Title_M'))
+              .fontColor([$r('sys.color.icon_primary')])
               .margin({ right: 8 })
+              .width(40)
+              .height(40)
+              .borderRadius(1000)
+              .padding(8)
+              .backgroundColor($r('sys.color.comp_background_tertiary'))
               .onClick(() => {
                 TCRouter.push(Constants.SEARCH_ROUTE);
               })
-            Image($r('app.media.icon_filled'))
-              .height(40)
+            SymbolGlyph($r('sys.symbol.bookshelf'))
+              .fontSize($r('sys.float.Title_M'))
+              .fontColor([$r('sys.color.icon_primary')])
               .width(40)
+              .height(40)
+              .borderRadius(1000)
+              .padding(8)
+              .backgroundColor($r('sys.color.comp_background_tertiary'))
               .onClick(() => {
                 this.isShown = true
               })
@@ -242,15 +247,14 @@ export struct NavHeaderBar {
       .height(Constants.FULL_SIZE)
       .justifyContent(FlexAlign.SpaceBetween)
     }
-    .margin({ top: this.windowTopHeight })
     .padding({
-      top: 8,
+      top: 8 + this.windowTopHeight,
       bottom: 8,
       left: 16,
       right: 16
     })
     .width(Constants.FULL_SIZE)
-    .height(56)
+    .height(56 + this.windowTopHeight)
     .backgroundColor(this.hasBgColor ? $r('sys.color.background_primary') : '#00000000')
   }
 }
@@ -265,7 +269,7 @@ export function dialogView(params: DialogParams) {
     Column() {
       Text(params.title)
         .fontSize(20)
-        .fontColor('#323233')
+        .fontColor($r('sys.color.font_primary'))
         .width(263)
         .textAlign(TextAlign.Center)
 
@@ -281,20 +285,18 @@ export function dialogView(params: DialogParams) {
         Text(params.content)
           .fontSize(14)
           .width('100%')
-          .fontColor('#969799')
+          .fontColor($r('sys.color.font_secondary'))
           .textAlign(TextAlign.Center)
           .margin({ top: 27, bottom: 12 })
       }
-
     }
 
     Row() {
-
       Button(params.leftButtonText)
         .fontSize($r('sys.float.Body_L'))
         .fontWeight(FontWeight.Medium)
-        .fontColor($r('sys.color.font_primary'))
-        .backgroundColor($r('sys.color.white'))
+        .fontColor($r('sys.color.font_secondary'))
+        .backgroundColor($r('sys.color.comp_background_tertiary'))
         .padding({
           left: 50,
           right: 50,
@@ -338,6 +340,7 @@ export function dialogView(params: DialogParams) {
     right: 12,
     left: 12
   })
-  .backgroundColor($r('sys.color.white'))
+  .backgroundColor($r('sys.color.comp_background_tertiary'))
+  .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
   .borderRadius(16);
 }

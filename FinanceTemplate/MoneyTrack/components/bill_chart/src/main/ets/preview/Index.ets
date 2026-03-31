@@ -28,6 +28,8 @@ struct PreviewPage {
     return {
       month: '2025-05',
       data: list,
+      startDate: '',
+      endDate: ''
     };
   }
 

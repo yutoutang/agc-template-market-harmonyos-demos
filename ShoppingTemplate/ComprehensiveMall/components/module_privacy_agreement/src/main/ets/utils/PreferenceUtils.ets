@@ -22,7 +22,7 @@ export class PreferenceUtils {
         `PreferenceUtil: ${fileName} init: ${this.dataPreferences !== null}`,
       );
     } catch (err) {
-      Logger.error(TAG, 'init preference utils failed. error:' + JSON.stringify(err))
+      Logger.error(TAG, 'init preference utils failed. error:' + JSON.stringify(err));
     }
   }
 

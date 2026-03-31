@@ -9,6 +9,14 @@ export struct Screenshot {
   @Local w: Length = CommonConstants.FULL_PERCENT;
   @Local h: Length = CommonConstants.FULL_PERCENT;
 
+  @Computed
+  get qrCodeValue() {
+    if (this.data.landingPageUrl) {
+      return this.data.landingPageUrl;
+    }
+    return JSON.stringify({ newsId: this.data.recordId, type: this.data.type });
+  }
+
   build() {
     Column({ space: CommonConstants.PADDING_M }) {
       Column() {
@@ -62,7 +70,7 @@ export struct Screenshot {
         Text('长按二维码查看详情')
           .fontSize($r('sys.float.Body_S'))
           .fontColor($r('sys.color.font_tertiary'))
-        QRCode(this.data.landingPageUrl).width(64).height(64)
+        QRCode(this.qrCodeValue).width(64).height(64)
       }
       .width(CommonConstants.FULL_PERCENT)
       .justifyContent(FlexAlign.SpaceBetween)

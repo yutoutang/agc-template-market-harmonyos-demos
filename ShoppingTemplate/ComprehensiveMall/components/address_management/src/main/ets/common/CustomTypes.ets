@@ -1,4 +1,4 @@
-
+import { AddressDTO } from '../models/AddressDTO';
 
 export enum Operation {
   CREATE,
@@ -22,4 +22,10 @@ export enum ShippingAddressErrorCode {
   PERMISSION_CHECK_ERROR = 1008100005,
   USER_CANCELED = 1008100006,
   UNSUPPORTED = 1008100007
+}
+
+export interface AddressManagementOptions {
+  onAddressSelected?: Callback<AddressDTO>;
+  updateAddress?: Callback<AddressDTO>;
+  deleteAddress?: Callback<AddressDTO>;
 }

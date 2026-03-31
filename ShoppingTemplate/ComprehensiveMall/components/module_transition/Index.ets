@@ -14,10 +14,10 @@ export { LoneTakeAnimationsTransition } from './src/main/ets/utils/LoneTakeAnima
 
 export { LongTakeTransitionParam } from './src/main/ets/utils/LongTakeTransitionParam';
 
-export { ImageLongTakeDelegate } from './src/main/ets/customtransition/ImageLongTakeDelegate'
+export { ImageLongTakeDelegate } from './src/main/ets/customtransition/ImageLongTakeDelegate';
 
 export { LongTakeTransitionConstants,
-  LongTakeTransitionType } from './src/main/ets/constants/LongTakeTransitionConstants'
+  LongTakeTransitionType } from './src/main/ets/constants/LongTakeTransitionConstants';
 
 
 

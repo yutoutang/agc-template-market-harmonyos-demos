@@ -13,9 +13,17 @@
  * limitations under the License.
  */
 
-import { BROWSING_HISTORY_DATA, BrowsingHistoryModel, Logger, TopBar } from 'commonlib';
+import {
+  BROWSING_HISTORY_DATA,
+  BrowsingHistoryModel,
+  Logger,
+  TopBar,
+  BreakpointType,
+  RouterMap,
+  RouterModule
+} from 'commonlib';
 import { UserInfo } from 'login_info';
-import { RouterMap, RouterModule } from 'router_module';
+import { MineVM } from '../viewModel/MineVM';
 
 const TAG = 'BrowsingHistoryPage';
 
@@ -24,17 +32,18 @@ export struct BrowsingHistoryPage {
   @Local browsingHistoryModels: BrowsingHistoryModel[] = [];
   @Local historyModels: HistoryModel[] = [];
   @Local isSelectDelete: boolean = false;
-  @Local swipeDelete: boolean = false
-  @Local isSelectAll: boolean = false
-  @Local selectCount: number = 0
+  @Local swipeDelete: boolean = false;
+  @Local isSelectAll: boolean = false;
+  @Local selectCount: number = 0;
   // 获取用户信息
-  private userInfo?: UserInfo = RouterModule.getNavParam({ url: RouterMap.BROWSING_HISTORY_PAGE })
+  private userInfo?: UserInfo = RouterModule.getNavParam({ url: RouterMap.BROWSING_HISTORY_PAGE });
+  mineVM: MineVM = MineVM.instance;
 
   aboutToAppear(): void {
-    Logger.info(TAG, 'aboutToAppear')
+    Logger.info(TAG, 'aboutToAppear');
     this.browsingHistoryModels = BROWSING_HISTORY_DATA;
     //按照时间顺序由近及远
-    this.browsingHistoryModels.sort((a, b) => b.browseTime - a.browseTime)
+    this.browsingHistoryModels.sort((a, b) => b.browseTime - a.browseTime);
     this.browsingHistoryModels.forEach((item: BrowsingHistoryModel) => {
       let historyModel: HistoryModel = new HistoryModel();
       historyModel.keyID = item.keyID;
@@ -42,38 +51,41 @@ export struct BrowsingHistoryPage {
       historyModel.routerRouter = item.routerRouter;
       historyModel.courseName = item.courseName;
       historyModel.isDelete = false;
-      this.historyModels.push(historyModel)
-    })
+      this.historyModels.push(historyModel);
+    });
   }
 
   aboutToDisappear(): void {
-    Logger.info(TAG, 'aboutToDisappear')
+    Logger.info(TAG, 'aboutToDisappear');
   }
 
   build() {
     Column() {
       // 顶部
       this.topBuilder();
-      Divider().color($r('sys.color.comp_divider'))
+      Divider().color($r('sys.color.comp_divider'));
       Column() {
         if (this.historyModels.length > 0) {
           // 浏览列表
-          this.browseListBuilder()
+          this.browseListBuilder();
           // 删除按钮
-          this.deleteButtonBuilder()
+          this.deleteButtonBuilder();
         } else {
           Text('当前暂无课程的浏览记录。')
             .fontSize($r('sys.float.Body_S'))
             .fontColor($r('sys.color.icon_secondary'))
-            .height('100%')
+            .height('100%');
         }
       }
       .width('100%')
-      .height('100%')
+      .layoutWeight(1)
       .backgroundColor($r('sys.color.background_secondary'))
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM]);
     }
     .width('100%')
     .height('100%')
+    .backgroundColor($r('sys.color.comp_background_primary'))
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP,SafeAreaEdge.BOTTOM]);
   }
 
   /**
@@ -85,12 +97,12 @@ export struct BrowsingHistoryPage {
       Row() {
         Image($r('app.media.icon_delete'))
           .width($r('app.float.vp_24'))
-          .height($r('app.float.vp_24'))
+          .height($r('app.float.vp_24'));
         Text('删除')
           .fontSize($r('sys.float.Body_L'))
           .fontColor($r('sys.color.font_on_primary'))
           .fontWeight(FontWeight.Medium)
-          .margin({ left: $r('app.float.vp_8') })
+          .margin({ left: $r('app.float.vp_8') });
       }
       .width($r('app.float.vp_312'))
       .borderRadius(20)
@@ -101,16 +113,16 @@ export struct BrowsingHistoryPage {
       .onClick(() => {
         if (this.selectCount > 0) {
           // 删除选中
-          this.deleteSelectData()
+          this.deleteSelectData();
         }
-      })
+      });
     }
   }
 
   // 移除所选中的
   deleteSelectData() {
-    this.historyModels = this.historyModels.filter((it: HistoryModel) => it.isDelete === false)
-    this.isSelectDelete = false
+    this.historyModels = this.historyModels.filter((it: HistoryModel) => it.isDelete === false);
+    this.isSelectDelete = false;
   }
 
   // 是否全选
@@ -118,15 +130,15 @@ export struct BrowsingHistoryPage {
     if (!this.isSelectAll) {
       this.historyModels.forEach((item: HistoryModel) => {
         item.isDelete = true;
-      })
-      this.isSelectAll = true
+      });
+      this.isSelectAll = true;
       this.selectCount = this.historyModels.length;
     } else {
       this.historyModels.forEach((item: HistoryModel) => {
         item.isDelete = false;
-      })
-      this.isSelectAll = false
-      this.selectCount = 0
+      });
+      this.isSelectAll = false;
+      this.selectCount = 0;
     }
   }
 
@@ -142,85 +154,86 @@ export struct BrowsingHistoryPage {
             Row() {
               Row() {
                 Image((this.userInfo?.avatar && this.userInfo.avatar !== '') ? this.userInfo.avatar :
-                $r('app.media.path2x'))
+                  $r('app.media.path2x'))
                   .width($r('app.float.vp_24'))
                   .height($r('app.float.vp_24'))
-                  .borderRadius($r('app.float.vp_24'))
+                  .borderRadius($r('app.float.vp_24'));
                 Text(this.userInfo?.name)
                   .fontSize($r('sys.float.Body_M'))
                   .fontWeight(FontWeight.Regular)
                   .fontColor($r('sys.color.font_primary'))
-                  .margin({ left: $r('app.float.vp_12') })
-              }
+                  .margin({ left: $r('app.float.vp_12') });
+              };
 
               // 父组件 点击右上角删除按钮显示  否则不显示
               if (this.isSelectDelete) {
                 Row() {
                   Image(item.isDelete ? $r('app.media.icon_Checked') : $r('app.media.icon_ans_common'))
                     .width($r('app.float.vp_20'))
-                    .height($r('app.float.vp_20'))
+                    .height($r('app.float.vp_20'));
                 }
                 .height($r('app.float.vp_24'))
                 .onClick(() => {
-                  item.isDelete = !item.isDelete
+                  item.isDelete = !item.isDelete;
                   if (item.isDelete) {
                     this.selectCount++;
                   } else {
                     this.selectCount--;
                   }
                   if (this.selectCount < this.historyModels.length) {
-                    this.isSelectAll = false
+                    this.isSelectAll = false;
                   } else {
-                    this.isSelectAll = true
+                    this.isSelectAll = true;
                   }
-                })
+                });
               }
             }
             .padding({ top: $r('app.float.vp_4') })
             .justifyContent(FlexAlign.SpaceBetween)
-            .width('100%')
+            .width('100%');
 
             Text(item.courseName)
               .fontWeight(FontWeight.Medium)
               .fontSize($r('sys.float.Body_M'))
               .fontColor($r('sys.color.font_primary'))
               .padding({ left: $r('app.float.vp_12'), top: $r('app.float.vp_12') })
-              .width('100%')
+              .width('100%');
           }
           .width('100%')
           .padding($r('app.float.vp_12'))
-          .borderRadius(16)
-          .backgroundColor($r('sys.color.background_primary'))
+          .borderRadius($r('app.float.vp_16'))
+          .backgroundColor($r('sys.color.comp_background_list_card'))
           .onClick(() => {
             if (!this.isSelectDelete) {
-              RouterModule.push({ url: item.routerRouter, param: item.courseName })
+              RouterModule.push({ url: item.routerRouter, param: item.courseName });
             }
-          })
+          });
         }
+        .clip(true)
         .transition({ type: TransitionType.Delete, opacity: 0 })
         .swipeAction({
           edgeEffect: SwipeEdgeEffect.None,
           end: {
             builder: () => {
-              this.itemEnd(item, index)
+              this.itemEnd(item, index);
             },
             actionAreaDistance: 26,
             onStateChange: (state: SwipeActionState) => {
               if (state === SwipeActionState.EXPANDED) {
-                this.isSelectAll = false
-                this.selectCount = 0
-                this.isSelectDelete = false
-                this.swipeDelete = true
+                this.isSelectAll = false;
+                this.selectCount = 0;
+                this.isSelectDelete = false;
+                this.swipeDelete = true;
                 this.historyModels.forEach((item: HistoryModel) => {
                   item.isDelete = false;
-                })
+                });
               } else if (state === SwipeActionState.COLLAPSED) {
-                this.swipeDelete = false
+                this.swipeDelete = false;
               }
             },
           }
-        })
-      }), (item: HistoryModel, index: number) => item.keyID + index)
+        });
+      }), (item: HistoryModel, index: number) => item.keyID + index);
     }
     .width('100%')
     .height('auto')
@@ -232,20 +245,26 @@ export struct BrowsingHistoryPage {
       bottom: $r('app.float.vp_46')
     })
     .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
+    .lanes(new BreakpointType<number>({
+      sm: 1,
+      md: 2,
+      lg: 3,
+      xl: 3
+    }).getValue(this.mineVM.breakPointModel.currentBreakpoint), 12);
   }
 
   @Builder
   itemEnd(_item: HistoryModel, index: number) {
     Row() {
       Image($r('app.media.ic_public_trash_red'))
-        .height($r('app.float.vp_24'))
-        .width($r('app.float.vp_24'))
+        .height($r('app.float.vp_40'))
+        .width($r('app.float.vp_40'))
         .margin({ left: $r('app.float.vp_12') })
         .onClick(() => {
-          this.historyModels.splice(index, 1)
-          this.swipeDelete = false
-        })
-    }.padding($r('app.float.vp_4')).justifyContent(FlexAlign.SpaceEvenly)
+          this.historyModels.splice(index, 1);
+          this.swipeDelete = false;
+        });
+    }.padding($r('app.float.vp_4')).justifyContent(FlexAlign.SpaceEvenly);
   }
 
   /**
@@ -257,60 +276,61 @@ export struct BrowsingHistoryPage {
       // 浏览记录
       TopBar({
         onClickBack: () => {
-          RouterModule.pop()
+          RouterModule.pop();
         },
         title: $r('app.string.browsing_history')
-      })
+      });
       Row() {
         Image(this.isSelectAll ? $r('app.media.icon_select_all') : $r('app.media.icon_select_all_off'))
           .height($r('app.float.vp_40'))
           .width($r('app.float.vp_40'))
           .onClick(() => {
-            this.isSelectAllClick()
+            this.isSelectAllClick();
           })
-          .visibility(this.isSelectDelete ? Visibility.Visible : Visibility.Hidden)
+          .visibility(this.isSelectDelete ? Visibility.Visible : Visibility.Hidden);
         Image($r('app.media.ic_public_trash'))
           .height($r('app.float.vp_40'))
           .width($r('app.float.vp_40'))
           .opacity(this.historyModels.length === 0 || this.swipeDelete ? 0.4 : 1)
-          .margin({ left: $r('app.float.vp_8') })
+          .margin({ left: $r('app.float.vp_8') });
       }
       .onClick(() => {
         if (!this.swipeDelete && this.historyModels.length > 0) {
-          this.isSelectDelete = !this.isSelectDelete
+          this.isSelectDelete = !this.isSelectDelete;
           if (!this.isSelectDelete) {
-            this.selectCount = 0
-            this.isSelectAll = false
+            this.selectCount = 0;
+            this.isSelectAll = false;
             this.historyModels.forEach((item: HistoryModel) => {
               item.isDelete = false;
-            })
+            });
           }
         }
-      })
+      });
     }
     .width('100%')
     .height($r('app.float.vp_56'))
     .padding({ left: $r('app.float.vp_16'), right: $r('app.float.vp_16') })
     .justifyContent(FlexAlign.SpaceBetween)
+    .backgroundColor($r('sys.color.comp_background_primary'))
   }
 }
 
 @Builder
 export function BrowsingHistoryBuilder() {
-  BrowsingHistoryPage()
+  BrowsingHistoryPage();
 }
 
 @ObservedV2
 class HistoryModel {
   // 记录ID
-  keyID: string = ''
+  keyID: string = '';
   // 浏览时间
-  browseTime: number = 0
+  browseTime: number = 0;
   // 课程路由
-  routerRouter: string = ''
+  routerRouter: string = '';
   // 课程名称
-  courseName: string = ''
+  courseName: string = '';
   // 是否删除
-  @Trace isDelete: boolean = false
+  @Trace isDelete: boolean = false;
 }
 

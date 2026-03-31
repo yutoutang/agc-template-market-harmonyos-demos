@@ -54,7 +54,7 @@ export struct ChatView {
           .onSubmit(() => this.vm.sendTextMessage())
       }
       .padding($r('app.string.space_l'))
-      .backgroundColor($r('app.color.background_color_white'))
+      .backgroundColor($r('app.color.background_color_primary'))
       .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
     }
     .width($r('app.string.size_percent_full'))
@@ -84,7 +84,7 @@ export struct ChatView {
           .fontSize(12)
           .padding(12)
           .backgroundColor(message.sender === SenderType.USER ? $r('app.color.background_color_theme') :
-            $r('app.color.background_color_white'))
+            $r('app.color.background_color_primary'))
           .borderRadius(8)
 
         // 时间戳

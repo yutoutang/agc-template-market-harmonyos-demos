@@ -1,5 +1,6 @@
 import { BaseViewModel, PreferenceUtils, RouterMap, RouterUtils } from 'lib_common';
 import { agreePrivacyKey, skipGuide } from '../common/Constants';
+import { common } from '@kit.AbilityKit';
 
 @ObservedV2
 export class SafePageVM extends BaseViewModel {
@@ -27,7 +28,7 @@ export class SafePageVM extends BaseViewModel {
     RouterUtils.pushPathByName(RouterMap.AGREE_PRIVACY_PAGE);
   }
 
-  quitApp() {
-    getContext().getApplicationContext().killAllProcesses();
+  quitApp(context: common.UIAbilityContext) {
+    context.getApplicationContext().killAllProcesses();
   }
 }

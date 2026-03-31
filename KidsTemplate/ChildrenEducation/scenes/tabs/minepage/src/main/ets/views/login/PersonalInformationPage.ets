@@ -1,7 +1,8 @@
-import { CommonConstants, Title, DateUtil } from '@ohos_agcit/children_education_utils';
+import { AvoidArea, CommonConstants, DateUtil, GlobalInfoModel, Title } from '@ohos_agcit/children_education_utils';
 import { User } from '@ohos_agcit/children_education_datasource';
 import { ApiHandler, DataType, GenderType, PersonalInfo, PersonalInfoView, SwitchInfo } from 'collect_personal_info';
 import { emitter } from '@kit.BasicServicesKit';
+import { AppStorageV2 } from '@kit.ArkUI';
 
 @Builder
 export function PersonalInformationBuilder() {
@@ -10,8 +11,10 @@ export function PersonalInformationBuilder() {
 
 @ComponentV2
 export struct PersonalInformationPage {
-  @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
   @Consumer(CommonConstants.USER_INFO) user: User = new User();
+  @Local avoidArea: AvoidArea = AppStorageV2.connect(AvoidArea, () => new AvoidArea(0, 0))!;
+  @Local globalInfo: GlobalInfoModel =
+    AppStorageV2.connect<GlobalInfoModel>(GlobalInfoModel, () => new GlobalInfoModel())!;
   @Local switchInfo: SwitchInfo = {
     showAvatar: true,
     showNickName: true,
@@ -86,11 +89,14 @@ export struct PersonalInformationPage {
     }
     .title(Title($r('app.string.personalInformation')))
     .backgroundColor($r('sys.color.background_secondary'))
+    .padding({
+      top: this.getUIContext().px2vp(this.avoidArea.topRectHeight),
+    })
     .onReady(() => {
 
     })
     .onBackPressed(() => {
-      this.appPathStack.pop();
+      this.globalInfo.navStack.pop();
       return true;
     })
   }

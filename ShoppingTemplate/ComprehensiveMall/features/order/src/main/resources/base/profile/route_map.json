@@ -1,6 +1,11 @@
 {
   "routerMap": [
     {
+      "name": "OrderSubmitPage",
+      "pageSourceFile": "src/main/ets/views/OrderSubmitPage.ets",
+      "buildFunction": "buildOrderSubmitPage"
+    },
+    {
       "name": "OrderSearchPage",
       "pageSourceFile": "src/main/ets/views/OrderSearchPage.ets",
       "buildFunction": "buildOrderSearchPage"

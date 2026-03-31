@@ -30,11 +30,11 @@ export struct QuickLogin {
   // 参考华为账号开发指南获取匿名手机号
   @Local quickLoginAnonymousPhone: string = '';
   //传入的图标按钮
-  @Param @Require icon: ResourceStr
+  @Param @Require icon: ResourceStr;
   //自定义登录颜色
-  @Param @Require loginBtnBgColor: string | ResourceStr
+  @Param @Require loginBtnBgColor: string | ResourceStr;
   //app名字
-  @Param @Require appName: string = ''
+  @Param @Require appName: string = '';
   // 展示用户服务协议、隐私协议和华为账号用户认证协议
   privacyText: loginComponentManager.PrivacyText[] = [{
     text: '已阅读并同意',
@@ -59,37 +59,37 @@ export struct QuickLogin {
 * 华为一键登录点击事件
 * */
   @Event onLoginWithHuaweiID: (flag: boolean, phone?: string) => void = () => {
-  }
+  };
   /*
    * 隐私协议点击事件
    * */
   @Event onPrivacyPolicy: () => void = () => {
-  }
+  };
   /*
    * 服务协议点击事件
    * */
   @Event onServicePolicy: () => void = () => {
-  }
+  };
   /*
    * 华为用户账号认证点击事件
    * */
   @Event onHYAccountRouter: () => void = () => {
-  }
+  };
   /*
   * 模态弹窗消失事件
   * */
   @Event shouldDismiss: () => void = () => {
-  }
+  };
   private static USER_AUTHENTICATION_TAG = '华为账号用户认证协议';
   private static USER_SERVICE_TAG = '用户服务协议';
   private static USER_PRIVACY_TAG = '隐私协议';
   // 构造LoginWithHuaweiIDButton组件的控制器
   controller: loginComponentManager.LoginWithHuaweiIDButtonController =
     new loginComponentManager.LoginWithHuaweiIDButtonController()
-      /**
-       * 当应用使用自定义的登录页时，如果用户未同意协议，需要设置协议状态为NOT_ACCEPTED，当用户同意协议后再设置
-       * 协议状态为ACCEPTED，才可以使用华为账号一键登录功能
-       */
+    /**
+     * 当应用使用自定义的登录页时，如果用户未同意协议，需要设置协议状态为NOT_ACCEPTED，当用户同意协议后再设置
+     * 协议状态为ACCEPTED，才可以使用华为账号一键登录功能
+     */
       .setAgreementStatus(loginComponentManager.AgreementStatus.NOT_ACCEPTED)
       .onClickLoginWithHuaweiIDButton((error: BusinessError, response: loginComponentManager.HuaweiIDCredential) => {
         this.handleLoginWithHuaweiIDButton(error, response);
@@ -113,16 +113,16 @@ export struct QuickLogin {
         // 设置协议状态为ACCEPTED
         this.controller.setAgreementStatus(loginComponentManager.AgreementStatus.ACCEPTED);
         this.controller.continueLogin((error: BusinessError) => {
-        })
+        });
       },
       clickHyperlinkText: (tag) => {
         this.agreementDialog.close();
         if (tag === QuickLogin.USER_AUTHENTICATION_TAG) {
           this.onHYAccountRouter();
         } else if (tag === QuickLogin.USER_SERVICE_TAG) {
-          this.onServicePolicy()
+          this.onServicePolicy();
         } else if (tag === QuickLogin.USER_PRIVACY_TAG) {
-          this.onPrivacyPolicy()
+          this.onPrivacyPolicy();
         }
       }
     }),
@@ -154,7 +154,7 @@ export struct QuickLogin {
         this.agreementDialog.open();
       } else {
         // 模拟登录成功后回调
-        this.onLoginWithHuaweiID(false)
+        this.onLoginWithHuaweiID(false);
       }
       return;
     }
@@ -162,11 +162,11 @@ export struct QuickLogin {
       // 配置好可用的调试证书和client_id后需要处理response
       if (response.idToken && response.idToken.length > 0) {
         // 登录成功后回调
-        this.onLoginWithHuaweiID(true, this.quickLoginAnonymousPhone)
-        return
+        this.onLoginWithHuaweiID(true, this.quickLoginAnonymousPhone);
+        return;
       }
       // 模拟登录成功后回调
-      this.onLoginWithHuaweiID(false)
+      this.onLoginWithHuaweiID(false);
     } else {
       this.agreementDialog.open();
     }
@@ -199,7 +199,7 @@ export struct QuickLogin {
   }
 
   aboutToAppear(): void {
-    this.getQuickLoginAnonymousPhone()
+    this.getQuickLoginAnonymousPhone();
   }
 
   @Builder
@@ -215,32 +215,32 @@ export struct QuickLogin {
             .onComplete(() => {
             })
             .onError(() => {
-            })
+            });
           Column() {
             Text(this.quickLoginAnonymousPhone)
+              .fontSize($r('sys.float.Title_L'))
               .fontColor($r('sys.color.ohos_id_color_text_primary'))
               .fontFamily($r('sys.string.ohos_id_text_font_family_medium'))
-              .fontSize(36)
-              .lineHeight(48)
               .fontWeight(FontWeight.Bold)
               .maxLines(1)
               .constraintSize({ maxWidth: '100%', minHeight: 48 })
               .textAlign(TextAlign.Center)
+              .height(40);
+
             Text('华为账号绑定号码')
-              .fontSize($r('sys.float.ohos_id_text_size_body2'))
+              .fontSize($r('sys.float.Body_S'))
               .fontColor($r('sys.color.ohos_id_color_text_secondary'))
               .fontFamily($r('sys.string.ohos_id_text_font_family_regular'))
-              .fontWeight(FontWeight.Regular)
-              .lineHeight(19)
+              .fontWeight(FontWeight.Medium)
               .textAlign(TextAlign.Center)
               .maxLines(1)
               .constraintSize({ maxWidth: '100%' })
               .margin({
                 top: 8
-              })
+              });
           }.margin({
             top: 64
-          })
+          });
 
           Column() {
             LoginWithHuaweiIDButton({
@@ -266,14 +266,14 @@ export struct QuickLogin {
                 verifyPhoneNumber: true
               },
               controller: this.controller
-            })
+            });
           }
           .height(40)
           .width('100%')
           .margin({
             top: 56
-          })
-        }.width('100%')
+          });
+        }.width('100%');
 
         Row() {
           Row() {
@@ -291,8 +291,8 @@ export struct QuickLogin {
                   this.controller.setAgreementStatus(loginComponentManager.AgreementStatus.NOT_ACCEPTED);
                   this.isSelected = false;
                 }
-              })
-          }
+              });
+          };
 
           Row() {
             Text() {
@@ -301,7 +301,7 @@ export struct QuickLogin {
                   Span(item?.text)
                     .fontColor($r('sys.color.font_secondary'))
                     .fontWeight(FontWeight.Regular)
-                    .fontSize($r('sys.float.Body_S'))
+                    .fontSize($r('sys.float.Body_S'));
                 } else if (item?.type === loginComponentManager.TextType.RICH_TEXT && item?.text) {
                   Span(item?.text)
                     .fontColor($r('sys.color.font_primary'))
@@ -312,41 +312,42 @@ export struct QuickLogin {
                     .onClick(() => {
                       // 应用需要根据item.tag实现协议页面的跳转逻辑
                       if (item.tag === QuickLogin.USER_SERVICE_TAG) {
-                        this.onServicePolicy()
+                        this.onServicePolicy();
                       }
                       if (item.tag === QuickLogin.USER_PRIVACY_TAG) {
-                        this.onPrivacyPolicy()
+                        this.onPrivacyPolicy();
                       }
                       if (item.tag === QuickLogin.USER_AUTHENTICATION_TAG) {
-                        this.onHYAccountRouter()
+                        this.onHYAccountRouter();
                       }
-                    })
+                    });
                 }
-              }, (item: loginComponentManager.PrivacyText) => item.text.toString())
+              }, (item: loginComponentManager.PrivacyText) => item.text.toString());
             }
-            .width('100%')
+            .width('100%');
           }
           .margin({ left: 12 })
           .layoutWeight(1)
-          .constraintSize({ minHeight: 24 })
+          .constraintSize({ minHeight: 24 });
         }
         .alignItems(VerticalAlign.Top)
         .margin({
           top: 16,
           bottom: 16
-        })
+        });
       }
       .justifyContent(FlexAlign.SpaceBetween)
       .constraintSize({ minHeight: '100%' })
       .margin({
         left: 16,
         right: 16
-      })
+      });
     }
-    .backgroundColor(Color.White)
     .width('100%')
     .height('100%')
     .padding({ top: '154vp' })
+    .backgroundColor($r('sys.color.background_secondary'))
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM]);
   }
 
   @Builder
@@ -362,7 +363,7 @@ export struct QuickLogin {
             .onComplete(() => {
             })
             .onError(() => {
-            })
+            });
           Column() {
             Text(this.quickLoginAnonymousPhone)
               .fontSize(36)
@@ -372,7 +373,7 @@ export struct QuickLogin {
               .lineHeight(48)
               .fontWeight(FontWeight.Bold)
               .maxLines(1)
-              .textAlign(TextAlign.Center)
+              .textAlign(TextAlign.Center);
             Text('华为账号绑定号码')
               .fontWeight(FontWeight.Regular)
               .maxLines(1)
@@ -384,11 +385,11 @@ export struct QuickLogin {
               .textAlign(TextAlign.Center)
               .margin({
                 top: 8
-              })
+              });
           }.margin({ top: 48 });
-        }.width('100%')
+        }.width('100%');
 
-        Column().layoutWeight(1)
+        Column().layoutWeight(1);
         Column() {
           LoginWithHuaweiIDButton({
             params: {
@@ -415,7 +416,7 @@ export struct QuickLogin {
             controller: this.controller
           })
             .height(40)
-            .width('100%')
+            .width('100%');
           Row() {
             Row() {
               Checkbox({ name: 'privacyCheckbox', group: 'privacyCheckboxGroup' })
@@ -432,8 +433,8 @@ export struct QuickLogin {
                     this.controller.setAgreementStatus(loginComponentManager.AgreementStatus.NOT_ACCEPTED);
                     this.isSelected = false;
                   }
-                })
-            }
+                });
+            };
 
             Row() {
               Text() {
@@ -442,7 +443,7 @@ export struct QuickLogin {
                     Span(item?.text)
                       .fontColor($r('sys.color.font_secondary'))
                       .fontWeight(FontWeight.Regular)
-                      .fontSize($r('sys.float.Body_S'))
+                      .fontSize($r('sys.float.Body_S'));
                   } else if (item?.type === loginComponentManager.TextType.RICH_TEXT && item?.text) {
                     Span(item?.text)
                       .fontColor($r('sys.color.font_primary'))
@@ -453,27 +454,27 @@ export struct QuickLogin {
                       .onClick(() => {
                         // 应用需要根据item.tag实现协议页面的跳转逻辑
                         if (item.tag === QuickLogin.USER_SERVICE_TAG) {
-                          this.onServicePolicy()
+                          this.onServicePolicy();
                         }
                         if (item.tag === QuickLogin.USER_PRIVACY_TAG) {
-                          this.onPrivacyPolicy()
+                          this.onPrivacyPolicy();
                         }
                         if (item.tag === QuickLogin.USER_AUTHENTICATION_TAG) {
-                          this.onHYAccountRouter()
+                          this.onHYAccountRouter();
                         }
-                      })
+                      });
                   }
-                }, (item: loginComponentManager.PrivacyText) => item.text.toString())
+                }, (item: loginComponentManager.PrivacyText) => item.text.toString());
               }
-              .width('100%')
+              .width('100%');
             }
             .margin({ left: 12 })
             .layoutWeight(1)
-            .constraintSize({ minHeight: 24 })
+            .constraintSize({ minHeight: 24 });
           }
           .alignItems(VerticalAlign.Top)
-          .margin({ top: 20, bottom: 16 })
-        }
+          .margin({ top: 20, bottom: 16 });
+        };
       }
       .justifyContent(FlexAlign.SpaceBetween)
       .margin({
@@ -484,7 +485,7 @@ export struct QuickLogin {
       });
     }
     .width('100%')
-    .height(500)
+    .height(500);
   }
 
   build() {
@@ -492,27 +493,31 @@ export struct QuickLogin {
       if (this.isBindContentCover) {
         Text()
           .bindContentCover(true, this.CoverLogin(), {
-            backgroundColor: Color.White,
+            backgroundColor: $r('sys.color.comp_background_gray'),
             onWillDisappear: () => {
               this.shouldDismiss();
             }
-          })
+          });
       } else {
         Text()
           .bindSheet(true, this.DefaultLogin(), {
             // Text绑定半模态转场
             height: SheetSize.FIT_CONTENT, // 半模态高度
             dragBar: true, // 是否显示控制条
-            backgroundColor: Color.White,
+            backgroundColor: $r('sys.color.comp_background_secondary'),
             showClose: true, // 是否显示关闭图标
+            maskColor:$r('sys.color.ohos_id_color_mask_thin'),
+            blurStyle: BlurStyle.Regular,
+            preferType: SheetType.CENTER,
             shouldDismiss: ((sheetDismiss: SheetDismiss) => { // 半模态页面交互式关闭回调函数
               this.shouldDismiss();
               sheetDismiss.dismiss();
             })
-          })
+          });
       }
     }
     .width('100%')
     .height('100%')
+    //.backgroundColor(Color.Transparent)
   }
 }

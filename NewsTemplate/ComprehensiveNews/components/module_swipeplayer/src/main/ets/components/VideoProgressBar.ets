@@ -1,6 +1,7 @@
 import { emitter } from '@kit.BasicServicesKit';
 import { Constants } from '../constants/Constants';
-import { AVPlayerSession } from '../controller/AVPlayerManager';
+import { EventKey } from '../constants/EventKey';
+import { AVPlayerController } from '../controller/AVPlayerController';
 import { AVPlayerState } from '../type/Index';
 import { Logger } from '../utils/Logger';
 import { playVideo, setSeek } from '../utils/Util';
@@ -10,9 +11,8 @@ const TAG = '[VideoProgressBar]'
 
 @ObservedV2
 export class ProgressController {
-  sliderOnChange: (value: number, mode: SliderChangeMode) => void =
-    (value: number, mode: SliderChangeMode) => {
-    };
+  sliderOnChange: (value: number, mode: SliderChangeMode) => void = () => {
+  };
   @Trace currentTime: number = 0
   @Trace durationTime: number = 0
   @Trace progressWidth: number = 0
@@ -20,10 +20,10 @@ export class ProgressController {
 
 @ComponentV2
 export struct VideoProgressBar {
-  // 视频播放会话
-  @Param @Require playerSession: AVPlayerSession;
+  // 视频播放avplayer控制器
+  @Param @Require avPlayerController: AVPlayerController;
   // 进度条回调事件
-  @Event onSlideChange: (sliderFlag: boolean) => void = (sliderFlag: boolean) => {
+  @Event onSlideChange: (sliderFlag: boolean) => void = () => {
   };
   // 进度条左边区域
   @Param showProgressBarLeft: boolean = false;
@@ -63,20 +63,59 @@ export struct VideoProgressBar {
   @Local trackThicknessSize: number = Constants.TRACK_SIZE_MIN;
   @Local isPlaying: boolean = true;
   @Param isMute: boolean = false
-  @Event onMute: (value: boolean) => void = () => {};
+  @Event onMute: (value: boolean) => void = () => {
+  };
   private duration: number = 0;
   private isSliderMoving: boolean = false;
 
   @Monitor('isMute')
   async muteChange(monitor: IMonitor) {
-    this.playerSession.avPlayer!.setVolume(monitor.value('isMute')?.now ? Constants.VOLUME_LOW : Constants.VOLUME_HIGH)
+    this.avPlayerController.avPlayer!.setVolume(monitor.value('isMute')?.now ? Constants.VOLUME_LOW :
+      Constants.VOLUME_HIGH)
+  }
+
+  private onSystemVolumeChange: (eventData: emitter.EventData) => void = (eventData) => {
+    this.onMute((eventData.data!.volume || Constants.VOLUME_LOW) === Constants.VOLUME_LOW);
+  };
+  private onStateChange: (state: AVPlayerState) => void = (state) => {
+    Logger.debug(TAG, 'stateChange: ' + state);
+    let avPlayer = this.avPlayerController.getAVPlayer();
+    if (avPlayer && avPlayer.duration > 0) {
+      this.duration = avPlayer.duration;
+      this.durationTime = this.duration / 1000
+      this.durationStringTime = secondToTime(Math.floor(this.duration / 1000));
+    }
+    if (this.isNeedMuteIcon) {
+      this.avPlayerController.avPlayer!.setVolume(Constants.VOLUME_LOW)
+    }
+
+    // 是否播放
+    this.isPlaying = state === AVPlayerState.PLAYING;
+    // 暂停状态
+    if (state === AVPlayerState.PAUSED) {
+      this.trackThicknessSize = Constants.TRACK_SIZE_MAX;
+    } else {
+      this.trackThicknessSize = Constants.TRACK_SIZE_MIN;
+    }
+
+    if (this.isPlaying) {
+      this.avPlayerController.avPlayer!.setVolume(this.isMute ? Constants.VOLUME_LOW : Constants.VOLUME_HIGH)
+    }
+    emitter.on(EventKey.SYSTEM_VOLUME_CHANGE, this.onSystemVolumeChange);
+  }
+  private timeUpdate: (time: number) => void = (time) => {
+    if (!this.isSliderMoving) {
+      this.currentTime = time / 1000;
+      this.currentStringTime = secondToTime(Math.floor(time / 1000));
+      this.progressController.currentTime = this.currentTime
+    }
   }
 
   aboutToAppear(): void {
     // 绑定滑动事件
     this.progressController.sliderOnChange =
       (value: number, mode: SliderChangeMode): void => this.sliderOnChange(value, mode)
-    let avPlayer = this.playerSession.getAVPlayer();
+    let avPlayer = this.avPlayerController.getAVPlayer();
     if (avPlayer) {
       this.duration = avPlayer.duration;
       this.durationTime = this.duration / 1000
@@ -87,47 +126,18 @@ export struct VideoProgressBar {
         avPlayer!.setVolume(Constants.VOLUME_LOW)
       }
     }
-    this.playerSession?.onEvent('stateChange', (state: string) => {
-      let avPlayer = this.playerSession.getAVPlayer();
-      Logger.info(TAG, 'avPlayer state is ' + state)
-      if (avPlayer && avPlayer.duration > 0) {
-        this.duration = avPlayer.duration;
-        this.durationTime = this.duration / 1000
-        this.durationStringTime = secondToTime(Math.floor(this.duration / 1000));
-      }
-      if (this.isNeedMuteIcon) {
-        this.playerSession.avPlayer!.setVolume(Constants.VOLUME_LOW)
-      }
-      Logger.info(TAG, 'stateChange player durationTime is ' + this.durationTime)
+    this.avPlayerController?.onEvent('stateChange', this.onStateChange);
+    this.avPlayerController?.onEvent('timeUpdate', this.timeUpdate);
+  }
 
-      // 是否播放
-      this.isPlaying = state === AVPlayerState.PLAYING;
-      // 暂停状态
-      if (state === AVPlayerState.PAUSED) {
-        this.trackThicknessSize = Constants.TRACK_SIZE_MAX;
-      } else {
-        this.trackThicknessSize = Constants.TRACK_SIZE_MIN;
-      }
-
-      if (this.isPlaying) {
-        this.playerSession.avPlayer!.setVolume(this.isMute ? Constants.VOLUME_LOW : Constants.VOLUME_HIGH)
-      }
-      emitter.on('systemVolumeChange', (eventData: emitter.EventData) => {
-        this.onMute((eventData.data!.volume || Constants.VOLUME_LOW) === Constants.VOLUME_LOW)
-      })
-    });
-
-    this.playerSession?.onEvent('timeUpdate', (time: number) => {
-      if (!this.isSliderMoving) {
-        this.currentTime = time / 1000;
-        this.currentStringTime = secondToTime(Math.floor(time / 1000));
-        this.progressController.currentTime = this.currentTime
-      }
-    });
+  aboutToDisappear(): void {
+    emitter.off(EventKey.SYSTEM_VOLUME_CHANGE, this.onSystemVolumeChange);
+    this.avPlayerController?.offEvent('stateChange', this.onStateChange);
+    this.avPlayerController?.offEvent('timeUpdate', this.timeUpdate);
   }
 
   sliderOnChange(value: number, mode: SliderChangeMode) {
-    let avPlayer = this.playerSession.getAVPlayer();
+    let avPlayer = this.avPlayerController.getAVPlayer();
     if (!avPlayer) {
       return
     }
@@ -147,7 +157,7 @@ export struct VideoProgressBar {
       this.trackThicknessSize = Constants.TRACK_SIZE_MIN;
       this.isSliderMoving = false;
       if (!this.isPlaying) {
-        let avPlayer = this.playerSession.getAVPlayer()
+        let avPlayer = this.avPlayerController.getAVPlayer()
         playVideo(avPlayer)
       }
     }
@@ -238,7 +248,7 @@ export struct VideoProgressBar {
             .onChange((value: number, mode: SliderChangeMode) => {
               this.sliderOnChange(value, mode);
             })
-            .onAreaChange((ov: Area, nv: Area) => {
+            .onAreaChange((_ov: Area, nv: Area) => {
               this.progressController.progressWidth = nv.width as number
             })
         }
@@ -260,11 +270,11 @@ export struct VideoProgressBar {
                   this.onMute(!this.isMute)
                 })
             }
-            if (!!this.fullScreenIcon) {
-              SymbolGlyph(this.fullScreenIcon)
-                .fontColor([$r('sys.color.font_on_primary')])
-                .fontWeight(FontWeight.Normal)
-                .fontSize(24)
+            if (this.fullScreenIcon) {
+              Image(this.fullScreenIcon)
+                .width(24)
+                .aspectRatio(1)
+                .fillColor($r('sys.color.font_on_primary'))
                 .accessibilityText(this.isFullScreen ? '退出全屏' : '进入全屏')
                 .onClick(() => {
                   this.onSwitchFullScreenCallback && this.onSwitchFullScreenCallback()

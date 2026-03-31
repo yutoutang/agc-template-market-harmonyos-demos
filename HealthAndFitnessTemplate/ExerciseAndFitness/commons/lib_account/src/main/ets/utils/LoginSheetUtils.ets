@@ -1,6 +1,7 @@
 import { PopViewUtils, RouterMap, RouterUtils } from 'lib_common';
 import { Constants } from '../constants/Constants';
 import { LoginRouterParams, LoginSheetParams } from '../constants/Types';
+import { AppStorageV2, display, UIContext } from '@kit.ArkUI';
 
 @Builder
 function loginSheetBuilder() {
@@ -41,6 +42,8 @@ export class LoginSheetUtils {
   static sheetParams: LoginSheetParams = new LoginSheetParams();
 
   static open() {
+    let context = AppStorageV2.connect(UIContext, 'uiContext', () => new UIContext());
+
     PopViewUtils.showSheet(wrapBuilder(loginSheetBuilder), {
       showClose: true,
       height: Constants.DEFAULT_LOGIN_SHEET_HEIGHT,
@@ -48,7 +51,7 @@ export class LoginSheetUtils {
       dragBar: true,
       scrollSizeMode: ScrollSizeMode.CONTINUOUS,
       onHeightDidChange: (height: number) => {
-        LoginSheetUtils.sheetParams.height = px2vp(height);
+        LoginSheetUtils.sheetParams.height = context!.px2vp(height);
       },
       onTypeDidChange: (type: SheetType) => {
         LoginSheetUtils.sheetParams.sheetType = type;

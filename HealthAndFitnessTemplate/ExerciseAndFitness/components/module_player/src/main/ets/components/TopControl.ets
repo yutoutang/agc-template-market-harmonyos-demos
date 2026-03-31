@@ -38,8 +38,8 @@ struct quitDialog {
         Button('确定退出')
           .width(140)
           .height(40)
-          .borderRadius(20)
-          .fontColor($r('sys.color.font_on_primary'))
+          .borderRadius($r('sys.float.corner_radius_level10'))
+          .fontColor('rgba(0, 0, 0, 0.9)')
           .backgroundColor('rgba(0, 0, 0, 0.05)')
           .onClick(() => {
             RouterUtils.pop()
@@ -51,7 +51,7 @@ struct quitDialog {
         Button('继续训练')
           .width(140)
           .height(40)
-          .borderRadius(20)
+          .borderRadius($r('sys.float.corner_radius_level10'))
           .backgroundColor($r('app.color.app_theme'))
           .onClick(() => {
             if (this.controller !== undefined) {
@@ -326,14 +326,15 @@ export struct TopControl {
     return $r('app.media.icon_speed_100percent');
   }
 
-  aboutToAppear(): void {
+  async aboutToAppear(): Promise<void> {
     try {
       commonEventManager.createSubscriber(subscribeInfo, createCB);
     } catch (error) {
     }
     getBatteryInfo()
     this.speedIcon = this.setSpeedIcon(this.playerVM.speed)
-    window.getLastWindow(getContext(this)).then((currentWindow: window.Window) => {
+    try {
+      let currentWindow = await window.getLastWindow(this.getUIContext().getHostContext()!)
       currentWindow.on('avoidAreaChange', data => {
         if (data.type === window.AvoidAreaType.TYPE_KEYBOARD) {
           if (data.area.bottomRect.height === 0) {
@@ -343,9 +344,9 @@ export struct TopControl {
           }
         }
       })
-    })
-
-
+    } catch (e) {
+      console.error(`Failed to get last window. error: ${JSON.stringify(e)}`)
+    }
   }
 
   build() {

@@ -16,12 +16,12 @@ export function NewFeedPageBuilder() {
   NewFeedPage()
 }
 
-@Component
+@ComponentV2
 struct NewFeedPage {
-  @Consume('pageStack') pageStack: NavPathStack;
+  @Consumer('pageStack') pageStack: NavPathStack = new NavPathStack();
   private textInputController: TextInputController = new TextInputController()
-  @State feedMsg: string | null = null;
-  @State selectUris: Array<string> = [];
+  @Local feedMsg: string | null = null;
+  @Local selectUris: Array<string> = [];
 
   aboutToAppear(): void {
   }

@@ -1,13 +1,16 @@
 import { AvModel, AvSection } from 'lib_news_api';
 import { MediaController } from 'module_audioplayer';
 import { secondToTime } from 'module_swipeplayer';
+import { AudioUtils } from '../utils/AudioAdaptationUtils';
 import { AudioVM } from '../viewmodel/AudioViewModel';
+import { VipBadge } from './VipBadge';
 
 @ComponentV2
 export struct AudioListSelect {
   @Param curAudioInfo: AvModel = new AvModel()
   @Param isCurrentPlay: boolean = false
-  @Event onAudioCard: (index: number) => void = () => {}
+  @Event onAudioCard: (item: AvSection, index: number) => void = () => {
+  }
   @Local sortFlag: boolean = false
   audioVM: AudioVM = new AudioVM()
 
@@ -29,6 +32,8 @@ export struct AudioListSelect {
         .onClick(() => {
           this.audioVM.audioListSort(this.curAudioInfo, this.sortFlag)
           this.sortFlag = !this.sortFlag
+          MediaController.setAudioList(AudioUtils.adaptation(this.curAudioInfo))
+          MediaController.updateCurrentAudioIndex();
         })
     }
   }
@@ -36,12 +41,31 @@ export struct AudioListSelect {
   @Builder
   sectionCard(item: AvSection, index: number) {
     Column({ space: 4 }) {
-      Text(item.title)
-        .fontWeight(FontWeight.Medium)
-        .fontSize(14 * this.audioVM.settingInfo.fontSizeRatio)
-        .fontColor(this.isCurrentPlay &&
-          item.id === MediaController.playingId ? '#5C79D9' :
-          $r('sys.color.font_primary'))
+      Row() {
+        if (item.needVip) {
+          VipBadge()
+        } else {
+          Text('免费')
+            .fontSize($r('sys.float.Caption_M'))
+            .fontColor($r('sys.color.font_primary'))
+            .fontWeight(FontWeight.Regular)
+            .backgroundColor($r('sys.color.comp_background_tertiary'))
+            .borderRadius(4)
+            .width(28)
+            .height(16)
+            .textAlign(TextAlign.Center)
+        }
+        Text(item.title)
+          .fontWeight(FontWeight.Medium)
+          .fontSize(14 * this.audioVM.settingInfo.fontSizeRatio)
+          .fontColor(this.isCurrentPlay &&
+            item.id === MediaController.playingId ? '#5C79D9' :
+            $r('sys.color.font_primary'))
+          .margin({
+            left: item.needVip ? 8 : 4,
+          })
+      }
+
       Row({ space: 12 }) {
         Row({ space: 4 }) {
           SymbolGlyph($r('sys.symbol.time_inerval'))
@@ -59,7 +83,7 @@ export struct AudioListSelect {
     }
     .width('100%')
     .onClick(() => {
-      this.onAudioCard(index)
+      this.onAudioCard(item, index)
     })
     .alignItems(HorizontalAlign.Start)
     .padding({ top: 8, bottom: 8 })

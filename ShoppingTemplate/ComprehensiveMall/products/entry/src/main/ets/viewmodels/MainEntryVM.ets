@@ -1,7 +1,8 @@
 import { common } from '@kit.AbilityKit';
 import { iData, routerStack, WindowUtil } from 'lib_foundation';
+import { ShoppingCartApis } from 'lib_network';
 import { MemberStatusUtil } from 'membership';
-import { CartApi } from 'module_shopping_cart';
+import { SetupUtil } from '../utils/SetupUtil';
 
 @ObservedV2
 export class MainEntryVM {
@@ -13,15 +14,18 @@ export class MainEntryVM {
 
   public initData() {
     if (iData.global.isLogin) {
-      CartApi.getCartData().then((cartDto) => {
-        iData.global.cartVersion = cartDto.version;
-        iData.global.cartTotal = cartDto.total;
+      ShoppingCartApis.getCartData().then((res) => {
+        if(res.code === 0){
+          iData.global.cartVersion = res.data.version;
+          iData.global.cartTotal = res.data.total;
+        }
       });
       MemberStatusUtil.queryPurchase(WindowUtil.globalContext as common.UIAbilityContext).then((list) => {
         if (list.nonRenewList.length) {
-          iData.global.userInfo.isMember = true
+          iData.global.userInfo.isMember = true;
         }
-      })
+      });
     }
+    SetupUtil.jumpToTarget();
   }
 }

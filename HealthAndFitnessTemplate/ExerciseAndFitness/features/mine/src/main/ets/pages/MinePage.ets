@@ -1,13 +1,21 @@
-import { CircleShape } from '@kit.ArkUI';
-import { CommonConstants, Record } from 'lib_common';
+import { AppStorageV2, CircleShape } from '@kit.ArkUI';
+import { BreakpointModel, BreakpointNameEnum, CommonConstants, Record } from 'lib_common';
 import { NavHeaderBar } from 'lib_widget';
 import { mineGridList } from '../constants/Constants';
 import { MineGridItem } from '../types/Types';
 import { MineViewModel } from '../viewmodels/MineVM';
+import { emitter } from '@kit.BasicServicesKit';
+import  EventData  from '@ohos.events.emitter';
 
 @Builder
 export function MinePageBuilder() {
   MinePage()
+}
+
+interface GridSettingInfo {
+  template: string;
+  colGap: number;
+  rowGap: number;
 }
 
 @ComponentV2
@@ -16,16 +24,28 @@ struct MinePage {
   @Local todayRecord: Record = { duration: 0, energy: 0 }
   @Local totalRecord: Record = { duration: 0, energy: 0 }
   @Local totalDays: number = 0
+  @Local breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
 
   aboutToAppear() {
-    getContext().eventHub.on('todayRecord', (record: Record) => {
-      this.todayRecord = record
-    })
+    try {
+      emitter.on('todayRecord', (data: EventData.EventData) => {
+        if(data.data){
+          let todayRecord: Record = data.data.todayRecord
+          this.todayRecord = todayRecord
+        }
+      })
+    } catch (e) {
+      console.error(`emitter on failed. error: ${JSON.stringify(e)}`)
+    }
     this.calculateYearToDateSum()
   }
 
   aboutToDisappear(): void {
-    getContext().eventHub.off('todayRecord')
+    try {
+      emitter.off('todayRecord')
+    } catch (e) {
+      console.error(`emitter off failed. error: ${JSON.stringify(e)}`)
+    }
   }
 
   private getDateRangeFromStartOfYear(): string[] {
@@ -59,6 +79,24 @@ struct MinePage {
     });
   }
 
+  @Computed
+  get gridSetting() {
+    const gridSettingInfo: GridSettingInfo  = {
+      template: '1fr',
+      colGap: 12,
+      rowGap: 12,
+    }
+    if (BreakpointNameEnum.MD === this.breakPointModel.currentBreakpoint) {
+      gridSettingInfo.template = '1fr 1fr'
+      gridSettingInfo.colGap = 24
+    }
+    if ([BreakpointNameEnum.LG, BreakpointNameEnum.XL].includes((this.breakPointModel.currentBreakpoint))) {
+      gridSettingInfo.template = '1fr 1fr'
+      gridSettingInfo.colGap = 16
+    }
+    return gridSettingInfo
+  }
+
   build() {
     NavDestination() {
       Column() {
@@ -71,8 +109,17 @@ struct MinePage {
           Column({ space: CommonConstants.SPACE_M }) {
             this.loginCard()
             this.gridCard()
-            this.todayCard()
-            this.recordCard()
+            Grid() {
+              GridItem() {
+                this.todayCard()
+              }
+              GridItem() {
+                this.recordCard()
+              }
+            }
+            .columnsTemplate(this.gridSetting.template)
+            .columnsGap(this.gridSetting.colGap)
+            .rowsGap(this.gridSetting.rowGap)
           }
         }
         .layoutWeight(1)
@@ -192,10 +239,13 @@ struct MinePage {
             .textAlign(TextAlign.Center)
         }
       }
-      .backgroundImage($r('app.media.background_vip'))
-      .backgroundImageSize(ImageSize.Cover)
-      .borderRadius({ topLeft: 0, topRight: 0, bottomLeft: 12, bottomRight: 12  })
+      .backgroundImage(this.vm.gridCount === 2 ? $r('app.media.background_vip') :
+        (this.vm.gridCount === 4 ? $r('app.media.background_vip_middle') : $r('app.media.background_vip_large')))
+      .backgroundImageSize(ImageSize.FILL)
+      .borderRadius(12)
       .padding(12)
+      .width('100%')
+      .height(64)
       .margin({ top: 12 })
       .onClick(() => {
         this.vm.jumpVIP();
@@ -267,8 +317,10 @@ struct MinePage {
           .fontSize(16 * this.vm.settingInfo.fontSizeRatio)
           .fontColor($r('sys.color.font_primary'))
           .fontWeight(FontWeight.Medium)
+        Blank()
       }
-      .width(328)
+      .width('100%')
+      .height(24)
       .margin({ bottom: 12 })
       .justifyContent(FlexAlign.Start)
 
@@ -291,8 +343,7 @@ struct MinePage {
             .fontColor('rgba(0, 0, 0, 0.6)')
             .fontWeight(FontWeight.Medium)
         }
-        .width(152)
-        .height(48)
+        .layoutWeight(1)
 
         Column() {
           Row() {
@@ -312,21 +363,21 @@ struct MinePage {
             .fontColor($r('sys.color.font_primary'))
             .fontWeight(FontWeight.Medium)
         }
-        .width(152)
-        .height(48)
+        .layoutWeight(1)
       }
+      .width('100%')
+      .justifyContent(FlexAlign.SpaceBetween)
     }
     .backgroundColor(Color.White)
     .borderRadius(16)
     .padding(12)
     .width('100%')
-    .height(105)
   }
 
   @Builder
   recordCard() {
     Column() {
-      Row({ space: CommonConstants.SPACE_L }) {
+      Row() {
         Row() {
           Image($r('app.media.ic_record'))
             .width(16)
@@ -336,8 +387,10 @@ struct MinePage {
             .fontSize(16 * this.vm.settingInfo.fontSizeRatio)
             .fontColor($r('sys.color.font_primary'))
             .fontWeight(FontWeight.Medium)
+          Blank()
         }
-
+        .justifyContent(FlexAlign.Start)
+        Blank()
         Image($r('app.media.ic_right'))
           .width($r('app.float.arrow_right_w'))
           .draggable(false)
@@ -347,7 +400,7 @@ struct MinePage {
       }
       .margin({ bottom: 12 })
       .justifyContent(FlexAlign.SpaceBetween)
-      .width(328)
+      .width('100%')
       .height(24)
 
       Row() {
@@ -370,8 +423,7 @@ struct MinePage {
             .fontWeight(FontWeight.Medium)
         }
         .justifyContent(FlexAlign.Center)
-        .width(101.33)
-        .height(48)
+        .layoutWeight(1)
 
         Column() {
           Row() {
@@ -392,8 +444,7 @@ struct MinePage {
             .fontWeight(FontWeight.Medium)
         }
         .justifyContent(FlexAlign.Center)
-        .width(101.33)
-        .height(48)
+        .layoutWeight(1)
 
         Column() {
           Row() {
@@ -414,15 +465,13 @@ struct MinePage {
             .fontWeight(FontWeight.Medium)
         }
         .justifyContent(FlexAlign.Center)
-        .width(101.33)
-        .height(48)
+        .layoutWeight(1)
       }
     }
     .backgroundColor(Color.White)
     .borderRadius(16)
     .padding(12)
     .width('100%')
-    .height(108)
   }
 
   @Styles

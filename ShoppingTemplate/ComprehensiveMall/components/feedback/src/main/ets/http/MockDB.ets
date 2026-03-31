@@ -21,13 +21,13 @@ class MockDB {
       return this.data;
     }
     return FileUtils.readJsonFromCache(DB_FILE).then((res:MockData)=>{
-      this.data = res
-      return this.data
+      this.data = res;
+      return this.data;
     }).catch(async ()=>{
       this.data = { feedbacks: [] };
       await this.save();
       return this.data;
-    })
+    });
   }
 }
 

@@ -1,10 +1,11 @@
 {
   "app": {
-    "bundleName": "com.atomicservice.xxx", // todo: 填写正确的 bundleName
+// todo: 填写正确的 bundleName
+    "bundleName": "com.atomicservice.xxxxxx",
     "bundleType": "atomicService",
     "vendor": "example",
     "versionCode": 1000000,
-    "versionName": "1.0.0",
+    "versionName": "1.0.2",
     "icon": "$media:app_icon",
     "label": "$string:app_name"
   }

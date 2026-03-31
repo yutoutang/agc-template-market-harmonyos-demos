@@ -27,6 +27,7 @@ export struct loginSheet {
     .hideNavBar(true)
     .hideTitleBar(true)
     .height(this.sheetParams.height)
+    .constraintSize({ maxHeight: Constants.FULL_PERCENT })
   }
 }
 
@@ -71,6 +72,8 @@ export class LoginSheetViewUtils {
       detents: [Constants.DEFAULT_LOGIN_SHEET_HEIGHT, SheetSize.LARGE],
       preferType: SheetType.CENTER,
       dragBar: true,
+      enableHoverMode: true,
+      hoverModeArea: HoverModeAreaType.BOTTOM_SCREEN,
       scrollSizeMode: ScrollSizeMode.CONTINUOUS,
       onHeightDidChange: (height: number) => {
         if (params.uiContext) {

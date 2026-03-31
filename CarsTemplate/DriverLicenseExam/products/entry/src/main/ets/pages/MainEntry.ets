@@ -2,12 +2,19 @@ import { TAB_LIST } from '../constants/Constants';
 import { HomeView } from './home/HomeView';
 import { MineView } from './mine/MineView';
 import { TabListItem } from '../types/Types';
-import { CommonModel, CommonConstants } from '@ohos_agcit/driver_license_exam_commonlib';
+import { CommonModel, CommonConstants, PreferencesUtil } from '@ohos_agcit/driver_license_exam_commonlib';
 import { GuideService } from '@ohos_agcit/driver_license_exam_guide';
 import { ExamService } from '@ohos_agcit/driver_license_exam_datasource'
 import { notificationManager } from '@kit.NotificationKit';
 import { PushUtils , PushActionParams } from '@ohos_agcit/driver_license_exam_commonlib'
 import common from '@ohos.app.ability.common';
+import { formBindingData, FormExtensionAbility, formInfo , formProvider} from '@kit.FormKit';
+
+interface GeneratedObjectLiteralInterface_1 {
+  index: number;
+  didCount: number;
+  totalCount: number;
+}
 
 @Entry
 @ComponentV2
@@ -20,11 +27,39 @@ struct MainEntry {
   @Local didCount: number = 0;
   @Local accuracyRate: number = 0;
   @Local averageScore: number = 0;
+  @Local projectIndex: number  = 0;
 
   aboutToAppear(): void {
     this.bottomRectHeight = AppStorage.get('bottomRectHeight') || 0;
     this.vm.navStack.pushPathByName('splashPage', true);
     this.sendPushNotice();
+    this.updateForm(0);
+
+  }
+
+
+  updateForm(index:number) {
+    const newData: GeneratedObjectLiteralInterface_1 = {
+      index: index,
+      didCount: this.didCount,
+      totalCount: this.totalCount
+    };
+
+    const preferencesUtil = PreferencesUtil.getInstance();
+    const preference = preferencesUtil.getPreferences(this.getUIContext().getHostContext() as Context)
+    const formIds  = preferencesUtil.getFormIds(preference);
+    preferencesUtil.preferencesPut(preference, 'tabIndex', index);
+    preferencesUtil.preferencesPut(preference, 'didCount', this.didCount)
+    preferencesUtil.preferencesPut(preference, 'totalCount', this.totalCount)
+
+    // 3. 封装并更新卡片
+    const formInfo = formBindingData.createFormBindingData(newData);
+
+    formIds.forEach((id:string) => {
+      formProvider.updateForm(id, formInfo)
+        .then(() => console.info('更新成功'))
+        .catch((err:ESObject) => console.error('更新失败', err));
+    })
   }
 
   sendPushMessage() {
@@ -51,7 +86,11 @@ struct MainEntry {
             TabContent() {
               HomeView({
                 didCount: this.didCount,
-                totalCount: this.totalCount
+                totalCount: this.totalCount,
+                tabChange:(index:number) => {
+                  this.updateForm(index);
+                  this.projectIndex = index;
+                }
               });
             }
             .tabBar(this.tabBarBuilder(TAB_LIST[0], 0));
@@ -88,6 +127,7 @@ struct MainEntry {
         this.didCount = this.examService.getDidCount();
         this.accuracyRate = this.examService.calAccuracyRate();
         this.averageScore = this.examService.calculateAverageScore();
+        this.updateForm(this.projectIndex)
       })
     };
 

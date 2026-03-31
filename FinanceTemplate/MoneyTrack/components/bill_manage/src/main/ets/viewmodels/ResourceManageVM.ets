@@ -1,4 +1,4 @@
-import { promptAction } from '@kit.ArkUI';
+import { ToastDialog } from '@hw-agconnect/ui-toast';
 import { BalanceChangeType, BalanceResourceItem, BalanceResourceModel, ResourceUtil } from 'bill_base';
 
 @ObservedV2
@@ -26,7 +26,7 @@ export class ResourceManageVM {
       (item) => item.name === this.customResourceName,
     );
     if (isExist) {
-      promptAction.showToast({ message: '类型名称已存在~' });
+      ToastDialog.showToast({ message: '类型名称已存在~' });
       return false;
     }
     if (!this.selectedItem) {
@@ -53,17 +53,15 @@ export class ResourceManageVM {
 
   public async deleteResource(
     key: number,
-    dialogId: number,
     callback?: (key: number) => void,
   ) {
     const res = ResourceUtil.deleteCustomResource(key);
     if (res) {
       callback?.(key);
-      promptAction.showToast({ message: '自定义类型删除成功~' });
-      promptAction.closeCustomDialog(dialogId);
+      ToastDialog.showToast({ message: '自定义类型删除成功~' });
       return;
     }
-    promptAction.showToast({ message: '自定义类型删除失败，请稍后重试' });
+    ToastDialog.showToast({ message: '自定义类型删除失败，请稍后重试' });
   }
 
   public customSortResource(index1: number, index2: number) {

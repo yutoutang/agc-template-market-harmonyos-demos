@@ -4,6 +4,7 @@ import { NavHeaderBar } from 'lib_widget';
 import { AgreePrivacyBox } from '../components/AgreePrivacyBox';
 import { Constants } from '../constants/Constants';
 import { LoginRouterParams } from '../constants/Types';
+import { ContextUtils } from '../utils/ContextUtils';
 import { LoginVM } from '../viewmodels/LoginVM'
 
 @Builder
@@ -14,6 +15,10 @@ export function HuaweiLoginPageBuilder() {
 @ComponentV2
 struct HuaweiLoginPage {
   @Local vm: LoginVM = LoginVM.getInstance(false);
+
+  aboutToAppear(): void {
+    ContextUtils.setUIContext(this.getUIContext());
+  }
 
   build() {
     NavDestination() {

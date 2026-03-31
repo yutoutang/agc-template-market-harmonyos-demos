@@ -2,6 +2,7 @@ import { NoteService } from '@ohos_agcit/notes_datasource';
 import { Note } from 'richeditor';
 import { SelectedController } from '../controller/SelectedController';
 import { ThemeController } from '../controller/ThemeController';
+import { KVStore, SerializeUtil } from 'serializer';
 
 @Builder
 export function DeleteNoteDialogBuilder() {
@@ -14,11 +15,12 @@ export function DeleteNoteDialogBuilder() {
 @ComponentV2
 export struct DeleteNoteDialog {
   @Consumer('appPathStack') appPathStack: NavPathStack = new NavPathStack();
+  @Consumer() kvStore: KVStore | undefined = undefined;
+  uiContext: UIContext = this.getUIContext() as UIContext;
   private themeController: ThemeController = ThemeController.instance
   private noteService: NoteService = NoteService.instance;
   private selectedController: SelectedController = SelectedController.instance;
-
-  @Local tempArray: Note[] = [];
+  @Local deleteNoteList: Note[] = [];
 
   /**
    * 关闭转场动画
@@ -66,7 +68,7 @@ export struct DeleteNoteDialog {
             .justifyContent(FlexAlign.Center)
             .width('50%')
             .onClick(() => {
-              this.noteService.deleteNotes(this.tempArray);
+              this.noteService.deleteNotesToTrash(this.deleteNoteList, this.kvStore, this.uiContext);
               this.selectedController.recoverInitState();
               this.appPathStack.pop();
             })
@@ -87,7 +89,7 @@ export struct DeleteNoteDialog {
     .onReady((cxt: NavDestinationContext) => {
       let params = cxt.pathInfo.param as Record<string, Object>;
       if (params && params !== null) {
-        this.tempArray = params.noteList as Note[];
+        this.deleteNoteList = params.noteList as Note[];
       }
     })
     .backgroundColor($r('sys.color.mask_fourth'))

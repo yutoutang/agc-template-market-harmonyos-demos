@@ -17,8 +17,8 @@ export {
   BreakpointType,
 } from './src/main/ets/utils/BreakpointSystem';
 
-export { WindowUtil } from './src/main/ets/utils/WindowUtil'
+export { WindowUtil } from './src/main/ets/utils/WindowUtil';
 
-export { Logger } from './src/main/ets/utils/Logger'
+export { Logger } from './src/main/ets/utils/Logger';
 
-export { SafeJson } from './src/main/ets/utils/SafeJson'
+export { SafeJson } from './src/main/ets/utils/SafeJson';

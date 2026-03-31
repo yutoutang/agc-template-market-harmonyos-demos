@@ -1,5 +1,5 @@
-import { PopViewUtil } from 'module_ui_base';
 import { ShareViewData, ShareRecordData, ShareOptions, QQShareData } from './common/ShareParams';
+import { PopViewUtils } from './utils/PopViewUtils';
 import { shareViewBuilder } from './views/ShareView';
 
 /**
@@ -47,18 +47,18 @@ export class SharePicker {
    * 拉起分享半模态弹窗
    * @param options
    */
-  public show(options?: ShareOptions): void {
+  public show(uiContext: UIContext, options?: ShareOptions): void {
     if (options) {
       this.data.setShareOptions(options);
     }
 
-    PopViewUtil.openSheet<ShareViewData>(wrapBuilder(shareViewBuilder), this.sheetOptions, this.data);
+    PopViewUtils.showSheet<ShareViewData>(wrapBuilder(shareViewBuilder), uiContext, this.sheetOptions, this.data);
   }
 
   /**
    * 关闭分享半模态弹窗
    */
   public close(): void {
-    PopViewUtil.closeSheet();
+    PopViewUtils.closeSheet();
   }
 }

@@ -36,4 +36,6 @@ export interface MyAuthor extends BaseAuthor {
   myComments: string[]
   // 阅读历史
   myHistory: string[]
+  // 会员到期时间
+  memExpireTime: number
 }

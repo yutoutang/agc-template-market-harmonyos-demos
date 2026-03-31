@@ -1,5 +1,5 @@
-import { CommonConfirmDialog } from 'module_ui_base';
-import { CartPrice, DiscountItem } from '../commons/Types';
+import { CartPrice, DiscountItem } from 'lib_network';
+import { CommonConfirmDialog } from 'lib_widget';
 import { PopupSheet } from './PopupSheet';
 
 @ComponentV2
@@ -36,14 +36,15 @@ export struct CartControlPanel {
         Row() {
           CheckboxGroup({ group: 'checkboxGroup' })
             .selectedColor('#FFE64566')
+            .unselectedColor($r('app.color.font_color_level2'))
             .checkboxShape(CheckBoxShape.CIRCLE)
             .onChange(() => {
               this.visible = false;
               this.onSelectAll && this.onSelectAll();
             })
           Text('全选')
-            .fontColor($r('sys.color.mask_secondary'))
-            .fontSize(13)
+            .fontColor($r('app.color.font_color_level1'))
+            .fontSize(14)
             .baselineOffset(-1)
             .margin({ left: 8, right: 8 })
         }
@@ -70,14 +71,14 @@ export struct CartControlPanel {
       .height(60)
       .borderWidth(this.isChildRoute ? { top: 0.1 } : {})
       .borderColor('#30000000')
-      .backgroundColor(Color.White)
+      .backgroundColor($r('app.color.background_color_primary'))
+      .margin({ bottom: this.isChildRoute ? 0 : 56 })
       .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
       .justifyContent(FlexAlign.SpaceBetween)
       .padding({ left: 16, right: 16 })
 
       PopupSheet({
         visible: this.visible!!,
-        cornerRadius: 32,
         maskHeight: this.popupMaskHeight,
         customContentBuilder: () => {
           this.PopupContentBuilder();
@@ -86,7 +87,7 @@ export struct CartControlPanel {
       })
     }
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
-    .backgroundColor(Color.White)
+    .backgroundColor($r('app.color.background_color_primary'))
     .onAreaChange((_ov, nv) => {
       if (nv.globalPosition.y) {
         this.popupMaskHeight = nv.globalPosition.y;
@@ -98,7 +99,8 @@ export struct CartControlPanel {
   DeleteBtn() {
     Button('删除')
       .width(80)
-      .backgroundColor($r('app.color.theme_color'))
+      .fontColor(this.quantity ? $r('app.color.theme_color') : $r('app.color.font_color_level2'))
+      .backgroundColor($r('sys.color.comp_background_tertiary'))
       .margin({ left: 16 })
       .onClick(() => {
         CommonConfirmDialog.show({
@@ -108,6 +110,7 @@ export struct CartControlPanel {
           },
         })
       })
+      .transition(TransitionEffect.OPACITY.animation({ duration: 200, curve: Curve.Ease }))
   }
 
   @Builder
@@ -115,7 +118,7 @@ export struct CartControlPanel {
     Row() {
       Text('合计: ')
         .fontSize(12)
-        .fontColor('#E6000000')
+        .fontColor($r('app.color.font_color_level1'))
       Text('¥')
         .fontSize(12)
         .fontColor($r('app.color.theme_color'))
@@ -165,22 +168,15 @@ export struct CartControlPanel {
 
   @Builder
   CheckoutBtn() {
-    Button() {
-      Text('结算')
-        .fontSize(13)
-        .fontColor(Color.White)
-        .fontWeight(500)
-    }
-    .width(80)
-    .height(32)
-    .type(ButtonType.Normal)
-    .backgroundColor('#FFE64566')
-    .borderRadius(21)
-    .margin({ left: 16 })
-    .onClick(() => {
-      this.onCheckout && this.onCheckout();
-      this.visible = false;
-    })
+    Button('结算')
+      .width(80)
+      .backgroundColor($r('app.color.theme_color'))
+      .margin({ left: 16 })
+      .onClick(() => {
+        this.onCheckout && this.onCheckout();
+        this.visible = false;
+      })
+      .transition(TransitionEffect.OPACITY.animation({ duration: 1000, curve: Curve.Ease }))
   }
 
   @Builder
@@ -198,7 +194,7 @@ export struct CartControlPanel {
       Row() {
         Text('合计')
           .fontSize(16)
-          .fontColor($r('sys.color.ohos_id_color_text_primary'))
+          .fontColor($r('app.color.font_color_level1'))
           .fontWeight(FontWeight.Medium)
 
         Text() {
@@ -214,7 +210,7 @@ export struct CartControlPanel {
     }
     .width('100%')
     .alignItems(HorizontalAlign.Start)
-    .backgroundColor($r('sys.color.white'))
+    .backgroundColor($r('app.color.background_color_primary'))
   }
 
   @Builder
@@ -222,7 +218,7 @@ export struct CartControlPanel {
     Row() {
       Text(label)
         .fontSize(14)
-        .fontColor($r('sys.color.ohos_id_color_text_tertiary'))
+        .fontColor($r('app.color.font_color_level2'))
         .fontWeight(FontWeight.Regular)
 
       Text() {
@@ -232,7 +228,7 @@ export struct CartControlPanel {
         Span(`¥${value}`)
       }
       .fontSize(14)
-      .fontColor($r('sys.color.ohos_id_color_text_primary'))
+      .fontColor($r('app.color.font_color_level2'))
       .fontWeight(FontWeight.Medium)
     }
     .width('100%')

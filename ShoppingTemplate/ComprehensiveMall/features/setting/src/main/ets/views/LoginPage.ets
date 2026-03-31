@@ -15,15 +15,11 @@ export function buildLoginPage() {
 
 @ComponentV2
 struct LoginPage {
-  // todo 需要传入应用申请到的AppID
-  wxApi = wxopensdk.WXAPIFactory.createWXAPI('xxx')
-
   build() {
     NavDestination() {
       Column() {
         // 登录使用
         AggregatedLogin({
-          wxApi: this.wxApi,
           routerModule: routerStack,
           icon: $r('app.media.app_icon'),
           themeColor: $r('app.color.theme_color'),

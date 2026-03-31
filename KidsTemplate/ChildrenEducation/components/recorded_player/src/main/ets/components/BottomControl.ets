@@ -16,6 +16,7 @@
 import { PipManager } from '../tools/PipManager';
 import { getTimeString } from '../tools/TimeTools';
 import { PlayerVM } from '../viewModels/PlayerVM';
+import { emitter } from '@kit.BasicServicesKit';
 
 const TAKE_SURPLUS = 100;
 
@@ -30,6 +31,18 @@ export struct BottomControl {
   @Param nextSelectionsEvent: () => void = () => {
   };
   @Local playerVM: PlayerVM = PlayerVM.instance;
+  
+  aboutToAppear(): void {
+    emitter.on('exitFullScreen', (event: emitter.EventData) => {
+      if (this.isLayoutFullScreen) {
+        this.fullScreen(!this.isLayoutFullScreen);
+      }
+    })
+  }
+
+  aboutToDisappear(): void {
+    emitter.off('exitFullScreen')
+  }
 
   @Builder
   landscapeBottom() {
@@ -208,7 +221,7 @@ export struct BottomControl {
             this.getUIContext().getPromptAction().showToast({ message: '分屏下不支持切换' });
             return;
           }
-          this.fullScreen(this.isLayoutFullScreen ? false : true);
+          this.fullScreen(!this.isLayoutFullScreen);
         });
     }
     .alignItems(this.isLayoutFullScreen ? VerticalAlign.Top : VerticalAlign.Bottom)

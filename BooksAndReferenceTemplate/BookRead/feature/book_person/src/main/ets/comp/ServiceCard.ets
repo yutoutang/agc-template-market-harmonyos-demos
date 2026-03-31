@@ -1,5 +1,4 @@
 import { call } from '@kit.TelephonyKit';
-import { BusinessError } from '@kit.BasicServicesKit';
 import { baseActionSheet } from 'base_common';
 import { BreakpointStorage, BreakpointSystem, BreakpointTypeEnum, Constants, TCRouter } from 'common'
 
@@ -42,7 +41,8 @@ export struct ServiceCard {
               id: 'PhoneSheetBuilder',
               title: { title: '联系客服' },
               height: SheetSize.FIT_CONTENT,
-              backgroundColor: $r('app.color.pure_white'),
+              preferType: SheetType.CENTER,
+              backgroundColor: $r('sys.color.ohos_id_color_toolbar_bg'),
               customContent: () => {
                 this.PhoneSheetBuilder()
               },
@@ -71,7 +71,7 @@ export struct ServiceCard {
                 title: { title: '联系客服' },
                 height: SheetSize.FIT_CONTENT,
                 preferType: SheetType.CENTER,
-                backgroundColor: $r('app.color.pure_white'),
+                backgroundColor: $r('sys.color.ohos_id_color_toolbar_bg'),
                 customContent: () => {
                   this.PhoneSheetBuilder()
                 },
@@ -92,17 +92,19 @@ export struct ServiceCard {
       Image($r(iconUrl))
         .height(24)
         .width(24)
+        .fillColor([$r('sys.color.icon_primary')])
         .objectFit(ImageFit.Contain)
         .margin({
           right: 12
         })
 
       Text($r(serviceText))
+        .fontColor($r('sys.color.font_primary'))
     }
     .layoutWeight(isSM ? 0 : 1)
     .height(47)
     .width(isSM ? Constants.FULL_SIZE : 'auto')
-    .backgroundColor('#ffffff')
+    .backgroundColor($r('sys.color.comp_background_list_card'))
     .borderRadius(16)
     .padding({
       left: 12,
@@ -165,7 +167,7 @@ export struct ServiceCard {
       top: 16
     })
     .margin({ bottom: 40, left: 16, right: 16 })
-    .backgroundColor($r('app.color.pure_white'))
+    .backgroundColor($r('sys.color.ohos_id_color_toolbar_bg'))
     .borderRadius(16)
   }
 }

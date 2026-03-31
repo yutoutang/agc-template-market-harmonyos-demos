@@ -20,16 +20,16 @@ const ID_CARD_PIC_NAME_1 = '头像面';
 const ID_CARD_PIC_NAME_2 = '国徽面';
 const ID_CARD_PIC_NAME_3 = '手持 身份证 照片';
 
-@Component
+@ComponentV2
 export struct RealNameAuthPage {
-  @Consume('pageStack') pageStack: NavPathStack;
-  @State isShowIdCard1Sheet: boolean = false;
-  @State isShowIdCard2Sheet: boolean = false;
-  @State isShowIdCard3Sheet: boolean = false;
-  @State idCardPic1: string = 'app.media.id_card_pic_1';
-  @State idCardPic2: string = 'app.media.id_card_pic_2';
-  @State idCardPic3: string = 'app.media.id_card_pic_3';
-  @State currentIdx: number | null = null;
+  @Consumer('pageStack') pageStack: NavPathStack = new NavPathStack();
+  @Local isShowIdCard1Sheet: boolean = false;
+  @Local isShowIdCard2Sheet: boolean = false;
+  @Local isShowIdCard3Sheet: boolean = false;
+  @Local idCardPic1: string = 'app.media.id_card_pic_1';
+  @Local idCardPic2: string = 'app.media.id_card_pic_2';
+  @Local idCardPic3: string = 'app.media.id_card_pic_3';
+  @Local currentIdx: number | null = null;
   private userFullInfo: UserFullInfo | null = null;
 
   build() {
@@ -183,7 +183,7 @@ export struct RealNameAuthPage {
           .fontSize($r('sys.float.Body_L'))
           .onClick(
             async () => {
-              let pathDir = getContext().filesDir;
+              let pathDir = this.getUIContext().getHostContext()?.filesDir;
               let fileName = `${new Date().getTime()}`
               let filePath = pathDir + `/${fileName}.tmp`
               fileIo.open(filePath, fileIo.OpenMode.CREATE);
@@ -191,7 +191,7 @@ export struct RealNameAuthPage {
                 cameraPosition: camera.CameraPosition.CAMERA_POSITION_FRONT,
               };
               let result: picker.PickerResult =
-                await picker.pick(getContext(), [picker.PickerMediaType.PHOTO],
+                await picker.pick(this.getUIContext().getHostContext(), [picker.PickerMediaType.PHOTO],
                   pickerProfile);
               if (result.resultCode === 0) {
                 if (result.mediaType === picker.PickerMediaType.PHOTO) {

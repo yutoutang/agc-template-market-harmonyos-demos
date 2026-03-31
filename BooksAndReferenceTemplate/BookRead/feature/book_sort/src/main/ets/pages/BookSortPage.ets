@@ -45,13 +45,15 @@ export struct BookSortPage {
           Row() {
             Text(item)
               .fontSize($r('sys.float.Body_L'))
-              .fontColor(this.currentSortIndex === index ? Color.White : $r('sys.color.font_primary'))
+              .fontColor(this.currentSortIndex === index ? $r('sys.color.ohos_id_color_background') :
+                $r('sys.color.font_primary'))
               .fontWeight(FontWeight.Medium)
           }
           .height(40)
           .width(92)
           .justifyContent(FlexAlign.Center)
-          .backgroundColor(this.currentSortIndex === index ? Color.Black : '#0d000000')
+          .backgroundColor(this.currentSortIndex === index ? $r('sys.color.comp_foreground_primary') :
+            $r('sys.color.comp_background_tertiary'))
           .borderRadius(20)
           .onClick(async () => {
             this.currentSortIndex = index
@@ -74,7 +76,7 @@ export struct BookSortPage {
     .width('100%')
     .height(56)
     .padding({ left: 8 })
-    .backgroundColor($r('sys.color.white'))
+    .backgroundColor($r('sys.color.ohos_id_color_background'))
   }
 
   listChange(index: number, isGoods: boolean) {
@@ -101,8 +103,8 @@ export struct BookSortPage {
                   .height(56)
                   .fontSize(this.currentTitleId === index ? 16 : 14)
                   .textAlign(TextAlign.Center)
-                  .fontColor(this.currentTitleId === index ? '#ffffff' : '#000000')
-                  .opacity(this.currentTitleId === index ? 1 : 0.6)
+                  .fontColor(this.currentTitleId === index ? $r('sys.color.ohos_id_color_text_primary_contrary') :
+                    ($r('sys.color.font_primary')))
                   .fontWeight(this.currentTitleId === index ? FontWeight.Bold :
                     FontWeight.Normal)
                   .onClick(() => {
@@ -123,7 +125,7 @@ export struct BookSortPage {
         .height('100%')
         .edgeEffect(EdgeEffect.Spring)
         .scrollBar(BarState.Off)
-        .backgroundColor('#F1F3F5')
+        .backgroundColor($r('sys.color.ohos_id_color_sub_background'))
         .padding({ top: 12 })
 
         List({ scroller: this.bookListScroller }) {
@@ -147,7 +149,7 @@ export struct BookSortPage {
         .sticky(StickyStyle.Header)
         .edgeEffect(EdgeEffect.Spring)
         .padding({ left: 8, right: 12 })
-        .backgroundColor('#ffffff')
+        .backgroundColor($r('sys.color.ohos_id_color_background'))
         .onScrollIndex((index: number) => {
           this.listChange(index, false)
         })

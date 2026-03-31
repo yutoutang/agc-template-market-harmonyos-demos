@@ -1,6 +1,7 @@
 import { NoteService } from '@ohos_agcit/notes_datasource';
 import { Note } from 'richeditor';
 import { ThemeController } from '../controller/ThemeController';
+import { KVStore } from 'serializer';
 
 @Builder
 export function RecoveryNoteDialogBuilder() {
@@ -13,9 +14,10 @@ export function RecoveryNoteDialogBuilder() {
 @ComponentV2
 export struct RecoveryNoteDialog {
   @Consumer('appPathStack') appPathStack: NavPathStack = new NavPathStack();
+  @Consumer() kvStore: KVStore | undefined = undefined;
   private themeController: ThemeController = ThemeController.instance
   private noteService: NoteService = NoteService.instance;
-
+  private uiContext: UIContext = this.getUIContext() as UIContext;
   @Local currentNote: Note | undefined;
 
   build() {
@@ -52,7 +54,7 @@ export struct RecoveryNoteDialog {
             .width('50%')
             .onClick(() => {
               if (this.currentNote) {
-                this.noteService.recoverNote(this.currentNote.id);
+                this.noteService.recoverNote(this.currentNote.id, this.kvStore, this.uiContext);
               }
               this.appPathStack.pop();
             })

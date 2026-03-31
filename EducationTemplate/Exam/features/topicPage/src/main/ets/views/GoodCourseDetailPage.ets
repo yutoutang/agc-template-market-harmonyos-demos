@@ -14,16 +14,24 @@
  */
 
 import { AppStorageV2, PromptAction } from '@kit.ArkUI';
-import { OrderInfo, OrderState, SampleOrderInfo, SampleCollectInfo, TopTabsBuilder } from 'commonlib';
-import { RouterMap, RouterModule } from 'router_module';
+import {
+  OrderInfo,
+  OrderState,
+  SampleOrderInfo,
+  SampleCollectInfo,
+  TopTabsBuilder,
+  GlobalContextUtils,
+  Banner
+} from 'commonlib';
+import { RouterMap, RouterModule } from 'commonlib';
 import { MyDataSource, GoodCourse } from '../viewModel/CourseHomeModel';
 import { aggregatedPaymentService, CashierPicker, PaymentType } from 'aggregated_payment';
 import { UserInfo } from 'login_info';
+import { UtilLog } from '@hw-agconnect/util-log';
 
 @ComponentV2
 export struct GoodCourseDetailPage {
-  private swiperController: SwiperController = new SwiperController();
-  private data: MyDataSource = new MyDataSource([]);
+  data: MyDataSource = new MyDataSource([]);
   @Local goodCourse: GoodCourse =
     new GoodCourse('111', false, '一级建造师精华题库中级班', $r('app.media.ic_avatar'), '华为用户',
       '更新时间：2025-04-16',
@@ -38,7 +46,6 @@ export struct GoodCourseDetailPage {
     .onRealPayment(async (type: PaymentType) => {
       // mock场景
       this.cashierPicker.close();
-      this.paySuccess();
       if (type === PaymentType.WECHAT) {
         const isWeChatOpenSuccess: boolean =
           await aggregatedPaymentService.requestPaymentByWeChat(this.uiContext, {
@@ -48,24 +55,23 @@ export struct GoodCourseDetailPage {
             timeStamp: '',
             sign: ''
           });
-        if (!isWeChatOpenSuccess) {
-          this.promptAction.showToast({ message: 'Test: 微信拉起失败' });
-        }
+        this.payFailed();
       } else if (type === PaymentType.ALIPAY) {
         // 以 Mock 数据测试时，不推荐 orderInfo 使用空字符串，会导致跳转行为仅仅是跳转，无法在支付宝中触发相关交互
+        this.paySuccess();
         aggregatedPaymentService.requestPaymentByAliPay({ orderInfo: 'ORDER_INFO' }, RouterModule.stack);
       } else if (type === PaymentType.HUAWEI) {
+        this.paySuccess();
         aggregatedPaymentService.requestPaymentByHuawei(this.uiContext, { orderStr: '' });
       }
-
     })
-    .onWillDismiss((reason: DismissReason) => {
+    .onWillDismiss(() => {
       this.cashierPicker.close();
     });
 
   aboutToAppear(): void {
     aggregatedPaymentService.registerPaymentCallback((type: PaymentType, isSuccess: boolean) => {
-      // mock场景
+      UtilLog.info(type,isSuccess);
     });
     let list: string[] = [];
     list.push('app.media.ic_questionDetail_banner');
@@ -97,7 +103,11 @@ export struct GoodCourseDetailPage {
     Row() {
       Row() {
         Row() {
-          Image($r('app.media.ic_backward')).width(30).height(30).margin({ right: 10 })
+          Image($r('app.media.ic_back'))
+            .width($r('app.float.vp_40'))
+            .height($r('app.float.vp_40'))
+            .borderRadius($r('app.float.vp_20'))
+            .margin({ right: 10 })
             .onClick(() => {
               RouterModule.pop();
             });
@@ -119,36 +129,12 @@ export struct GoodCourseDetailPage {
     .width('100%')
     .padding({ left: 16, right: 16 })
     .height(56)
-    .backgroundColor($r('sys.color.background_primary'));
+    .backgroundColor($r('sys.color.comp_background_primary'));
   }
 
   @Builder
   swiperBuilder() {
-    Swiper(this.swiperController) {
-      LazyForEach(this.data, (item: string) => {
-        Image($r(item)).width('100%').height(190)
-          .interpolation(ImageInterpolation.High)
-          .objectFit(ImageFit.Fill);
-      }, (item: string) => item);
-    }
-    .cachedCount(2)
-    .margin({ top: $r('app.float.vp_12'), bottom: $r('app.float.vp_12') })
-    .index(1)
-    .autoPlay(true)
-    .interval(3000)
-    .loop(true)
-    .duration(1000)
-    .itemSpace(0)
-    .indicator( // 设置圆点导航点样式
-      new DotIndicator()
-        .itemWidth($r('app.float.vp_6'))
-        .itemHeight($r('app.float.vp_6'))
-        .selectedItemWidth($r('app.float.vp_12'))
-        .selectedItemHeight($r('app.float.vp_6'))
-        .color($r('sys.color.comp_background_secondary'))
-        .selectedColor($r('sys.color.comp_background_emphasize'))
-        .maxDisplayCount(9))
-    .curve(Curve.Linear);
+    Banner();
   }
 
   @Builder
@@ -197,8 +183,9 @@ export struct GoodCourseDetailPage {
     }
     .width('100%')
     .padding($r('app.float.vp_12'))
+    .margin({ top: $r('app.float.vp_12') })
     .borderRadius($r('app.float.vp_16'))
-    .backgroundColor($r('sys.color.background_primary'))
+    .backgroundColor($r('sys.color.comp_background_list_card'))
     .justifyContent(FlexAlign.Start)
     .alignItems(HorizontalAlign.Start);
   }
@@ -216,9 +203,12 @@ export struct GoodCourseDetailPage {
             .fontColor($r('sys.color.font_primary'))
             .fontSize($r('sys.float.Caption_M'))
             .fontWeight(FontWeight.Medium);
-        }.margin({ right: $r('app.float.vp_8') })
+        }
+        .width($r('app.float.vp_30'))
+        .height($r('app.float.vp_30'))
+        .margin({ right: $r('app.float.vp_6') })
         .onClick(() => {
-          this.showToast('暂不支持分享');
+          GlobalContextUtils.showToast({ message: '暂不支持分享' });
         });
 
         Column() {
@@ -230,7 +220,10 @@ export struct GoodCourseDetailPage {
             .fontColor($r('sys.color.font_primary'))
             .fontSize($r('sys.float.Caption_M'))
             .fontWeight(FontWeight.Medium);
-        }.onClick(() => {
+        }
+        .width($r('app.float.vp_30'))
+        .height($r('app.float.vp_30'))
+        .onClick(() => {
           if (!this.logoUser.isLogin) {
             RouterModule.push({ url: RouterMap.LOGIN_PAGE });
             return;
@@ -243,12 +236,12 @@ export struct GoodCourseDetailPage {
             let orderInfo =
               new OrderInfo(this.goodCourse.id, this.goodCourse.isCollect, OrderState.All, orderNo, content, false);
             this.propCollect.orderInfos.unshift(orderInfo);
-            this.showToast('收藏成功~');
+            GlobalContextUtils.showToast({ message: '收藏成功' });
           } else {
             this.propCollect.orderInfos = this.propCollect.orderInfos.filter((it: OrderInfo) => {
               return it.id !== this.goodCourse.id;
             });
-            this.showToast('取消收藏~');
+            GlobalContextUtils.showToast({ message: '取消收藏' });
           }
         });
       }.justifyContent(FlexAlign.SpaceBetween)
@@ -261,7 +254,7 @@ export struct GoodCourseDetailPage {
           top: $r('app.float.vp_8'),
           bottom: $r('app.float.vp_8')
         })
-        .width('80%')
+        .width('70%')
         .textAlign(TextAlign.Center)
         .borderRadius($r('app.float.vp_20'))
         .fontColor($r('sys.color.font_on_primary'))
@@ -273,7 +266,7 @@ export struct GoodCourseDetailPage {
             this.cashierPicker
               .reset()
               .setAmount(28800)
-              .setTradeSummary('购买课程')
+              .setTradeSummary('精华题库中级班')
               .open();
           } else {
             RouterModule.push({ url: RouterMap.LOGIN_PAGE });
@@ -290,7 +283,7 @@ export struct GoodCourseDetailPage {
     })
     .width('100%')
     .height($r('app.float.vp_56'))
-    .backgroundColor($r('sys.color.background_primary'));
+    .backgroundColor($r('sys.color.comp_background_primary'));
   }
 
   // 课程详情
@@ -320,26 +313,27 @@ export struct GoodCourseDetailPage {
     let orderInfo =
       new OrderInfo(this.goodCourse.id, this.goodCourse.isCollect, OrderState.Paid, orderNo, content, false);
     sampleOrderInfo.orderInfos.unshift(orderInfo);
-    this.showToast('支付成功~');
+    GlobalContextUtils.showToast({ message: '支付成功' });
     RouterModule.pop();
   }
 
-  showToast(message: string) {
-    try {
-      this.getUIContext().getPromptAction().showToast({
-        message: message,
-        duration: 2000
-      });
-    } catch (error) {
-      //在此处进行异常处理
-    }
+  payFailed() {
+    let sampleOrderInfo = AppStorageV2.connect(SampleOrderInfo, () => new SampleOrderInfo())!;
+    let orderNo = '202506' + Date.now();
+    let content = this.courseName;
+    let orderInfo =
+      new OrderInfo(this.goodCourse.id, this.goodCourse.isCollect, OrderState.WaitToPay, orderNo, content, false);
+    orderInfo.startTime =  Date.now()
+    sampleOrderInfo.orderInfos.unshift(orderInfo);
+    GlobalContextUtils.showToast({ message: '支付失败' });
+    RouterModule.pop();
   }
 
   build() {
     Column() {
       Flex({ direction: FlexDirection.Column }) {
         // 标题
-        TopTabsBuilder({ bgColor: $r('sys.color.background_primary'), showBackButton: true })
+        TopTabsBuilder({ bgColor: $r('sys.color.comp_background_primary'), showBackButton: true })
           .padding({ left: $r('app.float.vp_16'), right: $r('app.float.vp_16'), bottom: $r('app.float.vp_12') });
         // 滚动详情页
         Scroll() {
@@ -355,7 +349,7 @@ export struct GoodCourseDetailPage {
           .justifyContent(FlexAlign.Start)
           .alignItems(HorizontalAlign.Start);
         }
-        .backgroundColor($r('sys.color.comp_background_gray'))
+        .backgroundColor($r('sys.color.background_secondary'))
         .scrollBar(BarState.Off)
         .scrollable(ScrollDirection.Vertical)
         .edgeEffect(EdgeEffect.Spring);
@@ -366,7 +360,8 @@ export struct GoodCourseDetailPage {
     }
     .width('100%')
     .height('100%')
-    .backgroundColor($r('sys.color.background_primary'));
+    .backgroundColor($r('sys.color.comp_background_primary'))
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP,SafeAreaEdge.BOTTOM]);
   }
 }
 

@@ -64,6 +64,7 @@ struct InteractionPage {
             TabContent() {
               InterActionTabContent({
                 resource: v,
+                selectedId: this.selectedId,
               })
             }
           }, (v: TabItem) => v.id + v.label)

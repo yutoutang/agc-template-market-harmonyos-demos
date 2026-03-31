@@ -22,9 +22,9 @@ const EMPTY_CONTENT_HEIGHT = 50;
 const SELF_INTRO_MARGIN = 18;
 const SELF_INTRO_TITLE_TEXT_HEIGHT = 34;
 
-@Component
+@ComponentV2
 export struct UserListPage {
-  @Consume('pageStack') pageStack: NavPathStack;
+  @Consumer('pageStack') pageStack: NavPathStack = new NavPathStack();
   private scroller: Scroller = new Scroller();
   private userInfos: UserInfo[] | null = null;
 

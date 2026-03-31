@@ -41,7 +41,7 @@ export class OrderInfoPageVM {
   @Computed
   get enableExpressPage() {
     if (!this.orderItem || this.orderItem.orderInfo.receivingMethod === OrderShipmentMap.SELF_PICK_UP) {
-      return false
+      return false;
     }
     const enableArr = [
       OrderStatusMap.PENDING_RECEIPT,
@@ -49,17 +49,17 @@ export class OrderInfoPageVM {
       OrderStatusMap.REVIEWED,
       OrderStatusMap.REFUND_IN_PROGRESS,
       OrderStatusMap.REFUNDED,
-    ]
-    return enableArr.includes(this.orderItem.orderInfo.status)
+    ];
+    return enableArr.includes(this.orderItem.orderInfo.status);
   }
 
   @Computed
   get logisticInfo() {
-    const len = this.orderItem?.logisticInfo?.length
+    const len = this.orderItem?.logisticInfo?.length;
     if (this.orderItem && len) {
-      return this.orderItem.logisticInfo[0]
+      return this.orderItem.logisticInfo[0];
     }
-    return undefined
+    return undefined;
   }
 
   getGapTime(remainingTime: number) {
@@ -162,7 +162,7 @@ export class OrderInfoPageVM {
       routerStack.pushPath({
         name: RouterMap.ORDER_EXPRESS_INFO,
         param: this.orderItem,
-      })
+      });
     }
   }
 }

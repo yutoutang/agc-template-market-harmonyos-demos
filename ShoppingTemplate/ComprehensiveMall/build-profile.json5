@@ -6,8 +6,8 @@
       {
         "name": "default",
         "signingConfig": "default",
-        "compatibleSdkVersion": "5.0.4(16)",
-        "targetSdkVersion": "5.0.4(16)",
+        "compatibleSdkVersion": "6.0.0(20)",
+        "targetSdkVersion": "6.0.2(22)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
           "strictMode": {
@@ -46,10 +46,6 @@
     {
       "name": "order",
       "srcPath": "./features/order"
-    },
-    {
-      "name": "module_product_detail",
-      "srcPath": "./components/module_product_detail"
     },
     {
       "name": "lib_foundation",
@@ -158,6 +154,10 @@
     {
       "name": "aggregated_payment",
       "srcPath": "./components/aggregated_payment"
+    },
+    {
+      "name": "image_preview",
+      "srcPath": "./components/image_preview"
     }
   ]
 }

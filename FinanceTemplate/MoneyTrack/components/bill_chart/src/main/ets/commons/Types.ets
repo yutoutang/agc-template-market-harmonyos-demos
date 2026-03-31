@@ -6,6 +6,8 @@ export interface BillBarItem {
 export interface BillBarChartData {
   data: BillBarItem[];
   month: string;
+  startDate: string;
+  endDate: string;
   typeLabel?: string;
 }
 

@@ -1,6 +1,7 @@
-import { WindowUtil } from 'module_ui_base';
+import { AppStorageV2 } from '@kit.ArkUI';
 import { Constants } from '../common/Constant';
 import { ConfirmButtonModifier, InnerTitleModifier, SheetColumnModifier } from '../common/CustomModifier';
+import { WindowModel } from '../common/WindowModel';
 
 @ComponentV2
 export struct EnterTextArea {
@@ -19,14 +20,15 @@ export struct EnterTextArea {
   @Local sheetColumnModifier: SheetColumnModifier = new SheetColumnModifier();
   @Local innerTitleModifier: InnerTitleModifier = new InnerTitleModifier();
   @Local confirmButtonModifier: ConfirmButtonModifier = new ConfirmButtonModifier();
+  @Local windowModel: WindowModel = AppStorageV2.connect(WindowModel, () => new WindowModel())!;
 
   aboutToAppear(): void {
     this.tempValue = this.value;
-    WindowUtil.registerKeyboardListener(this.onKeyBoardCB);
+    this.windowModel.registerKeyboardListener(this.onKeyBoardCB);
   }
 
   aboutToDisappear(): void {
-    WindowUtil.unRegisterKeyboardListener(this.onKeyBoardCB);
+    this.windowModel.unRegisterKeyboardListener(this.onKeyBoardCB);
   }
 
   onKeyBoardCB: (height: number) => void = (height: number) => {
@@ -47,10 +49,10 @@ export struct EnterTextArea {
             .fontSize(this.valueFg)
             .fontColor($r('sys.color.font_primary'))
             .backgroundColor($r('sys.color.comp_background_tertiary'))
-            .caretColor(Constants.THEME_COLOR)
-            .selectedBackgroundColor(Constants.THEME_COLOR)
             .placeholderColor($r('sys.color.font_tertiary'))
             .placeholderFont({ size: this.valueFg })
+            .caretColor($r('sys.color.multi_color_07'))
+            .selectedBackgroundColor($r('sys.color.multi_color_07'))
             .maxLength(this.maxLength)
             .showCounter(true)
             .defaultFocus(true)

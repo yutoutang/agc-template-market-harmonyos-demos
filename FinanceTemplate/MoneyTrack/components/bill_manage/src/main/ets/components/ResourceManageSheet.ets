@@ -1,4 +1,4 @@
-import { promptAction } from '@kit.ArkUI';
+import { UIDialog } from '@hw-agconnect/ui-dialog';
 import {
   BalanceChangeType,
   BalanceResourceItem,
@@ -71,8 +71,10 @@ export struct ResourceManageSheet {
       .layoutWeight(1);
     }
     .layoutWeight(1)
+    .width('100%')
+    .constraintSize({ maxWidth: 805 })
     .justifyContent(FlexAlign.Start)
-    .backgroundColor(Color.White);
+    .backgroundColor($r('sys.color.comp_background_focus'));
   }
 
   @Builder
@@ -112,16 +114,11 @@ export struct ResourceManageSheet {
             }
           };
         }
-        .onClick(() => {
+        .onClick(async () => {
           if (item.isCustom) {
-            promptAction.openCustomDialog({
-              builder: () => this.editCustomDialog(item),
-              width: '90%',
-              alignment: DialogAlignment.Bottom,
+            this.dialogId = await UIDialog.open({
+              contentBuilder: (): void => this.editCustomDialog(item),
             })
-              .then((id) => {
-                this.dialogId = id;
-              });
           }
         });
       }, (item: BalanceResourceItem) => item.key + '__' + item.name);
@@ -192,7 +189,7 @@ export struct ResourceManageSheet {
               this.openSheet = false;
               this.handleAddSuccess?.();
               this.vm.selectedItem = undefined;
-              promptAction.closeCustomDialog(this.dialogId);
+              UIDialog.close(this.dialogId);
             }
           });
       }
@@ -212,7 +209,7 @@ export struct ResourceManageSheet {
 
   @Builder
   editCustomDialog(item: BalanceResourceItem) {
-    Column({ space: 16 }) {
+    Column({ space: 24 }) {
       Text('修改')
         .dialogTextStyle()
         .onClick(() => {
@@ -225,31 +222,30 @@ export struct ResourceManageSheet {
         .dialogTextStyle()
         .fontColor(BillConstants.WARNING_COLOR)
         .onClick(() => {
-          promptAction.showDialog({
-            message: '删除类型会同时删除该类型下的所有记账数据，并且无法恢复。请确认是否删除？',
-            buttons: [
-              {
-                text: '取消',
-                color: BillConstants.FONT_COLOR_LEVEL1,
-
-              },
-              {
-                text: '删除',
-                color: BillConstants.WARNING_COLOR,
-              },
-            ],
-            alignment: DialogAlignment.Bottom,
+          UIDialog.close(this.dialogId);
+          UIDialog.open({
+            contentOptions: {
+              content: '删除后将无法恢复，是否确认删除？',
+              contentFontWeight: FontWeight.Regular,
+            },
+            confirmButtonOptions: {
+              button: '删除',
+              buttonFontColor: BillConstants.WARNING_COLOR,
+            },
+            cancelButtonOptions: {
+              buttonFontColor: BillConstants.FONT_COLOR_LEVEL1,
+            },
+            showConfirmButton: true,
+            showCancelButton: true,
+            onConfirm: () => {
+              this.vm.deleteResource(item.key, this.handleDeleteSuccess);
+            },
           })
-            .then(data => {
-              if (data.index === 1) {
-                this.vm.deleteResource(item.key, this.dialogId, this.handleDeleteSuccess);
-              }
-            });
         });
       Text('取消')
         .dialogTextStyle()
         .onClick(() => {
-          promptAction.closeCustomDialog(this.dialogId);
+          UIDialog.close(this.dialogId);
         });
     }
     .padding(16);

@@ -1,5 +1,5 @@
-import { MediaViewModel } from '../viewmodel/MediaViewModel';
 import { AppStorageV2 } from '@kit.ArkUI';
+import { MediaViewModel } from '../viewmodel/MediaViewModel';
 import { ControlStateModel } from '../model/ControlStateModel';
 
 @ComponentV2

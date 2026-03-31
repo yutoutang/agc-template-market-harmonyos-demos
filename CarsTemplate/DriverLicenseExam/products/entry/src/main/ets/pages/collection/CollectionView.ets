@@ -84,6 +84,7 @@ struct CollectionView {
             .backgroundColor(this.typeStatus === WRONG_COLLECT.WRONG?'#64BB5C':'#E6E8E9')
             .borderRadius(16)
             .textAlign(TextAlign.Center)
+            .maxFontScale(1)
             .margin({
               right:12
             })
@@ -98,6 +99,7 @@ struct CollectionView {
             .backgroundColor(this.typeStatus === WRONG_COLLECT.COLLECT?'#64BB5C':'#E6E8E9')
             .borderRadius(16)
             .textAlign(TextAlign.Center)
+            .maxFontScale(1)
             .onClick(() => {
               this.toggleWrongOrCollect(WRONG_COLLECT.COLLECT)
             })
@@ -111,6 +113,7 @@ struct CollectionView {
             .fontColor('rgba(0,0,0,0.9)')
             .width(CommonConstants.FULL_WIDTH)
             .textAlign(TextAlign.Start)
+            .maxFontScale(1)
             .margin({
               bottom:8
             })
@@ -120,12 +123,14 @@ struct CollectionView {
               Text(this.typeStatus === WRONG_COLLECT.WRONG?'错题总数':'收藏总数')
                 .fontSize(14)
                 .fontColor('rgba(0,0,0,0.9)')
+                .maxFontScale(1)
 
               Row() {
                 Text(String(this.totalCount))
                   .fontSize(24)
                   .fontColor('#64BB5C')
                   .fontWeight(FontWeight.Bold)
+                  .maxFontScale(1)
                   .margin({
                     right:8
                   })
@@ -163,6 +168,7 @@ struct CollectionView {
             .textAlign(TextAlign.Start)
             .fontSize(14)
             .fontColor('rgba(0,0,0,0.9)')
+            .maxFontScale(1)
             .margin({
               bottom:8
             })
@@ -183,18 +189,21 @@ struct CollectionView {
                           .fontSize(10)
                           .fontColor(Color.White)
                           .borderRadius('50%')
+                          .maxFontScale(1)
                           .backgroundColor(item.serialBgColor)
                           .textAlign(TextAlign.Center)
 
                         Text(item.title)
                           .fontSize(14)
                           .fontColor('rgba(0,0,0,0.9)')
+                          .maxFontScale(1)
                       }
 
                       Row() {
                         Text(String(item.examManger.total))
                           .fontSize(14)
                           .fontColor('rgba(0,0,0,0.6)')
+                          .maxFontScale(1)
                           .margin({
                             right: 4
                           })

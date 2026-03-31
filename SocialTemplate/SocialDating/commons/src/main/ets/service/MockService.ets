@@ -1,7 +1,9 @@
 import { BasicUserInfo } from '../model/BasicUserInfo';
 import { Comment, CreateFeedRequest, Feed, FollowType, LikeOperType, QueryFeedResponse } from '../model/Feed';
 import {
+  Account,
   CreateUserRequest,
+  GenderType,
   GetUserResponse,
   QueryUserResponse,
   UserActionSummary,
@@ -14,6 +16,7 @@ import { BaseService, getCurrentUid, getRawFile } from './BaseService';
 import { Page } from '../model/Page';
 import { CommonUtils } from '../utils/CommonUtils';
 import Logger from '../utils/Logger';
+import { preferences } from '@kit.ArkData';
 
 const DEFAULT_COMMON_RSP = new CommonRsp(Constants.RET_SUCCESS_CODE, '');
 
@@ -31,47 +34,69 @@ export class MockService {
   static recommendUsers: Map<number, UserFullInfo[]> = new Map();
   static allUser: Map<number, UserFullInfo> = new Map();
   static userUnionIdAndUid: Map<string, number> = new Map();
+  static account: Account = {
+    avatar: '',
+    nickname: '',
+    phone: '12345678901',
+    sex: 0,
+    birthday: new Date(),
+    marital: ''
+  };
+  static dataPreferences: preferences.Preferences;
 
-  static init() {
-    getRawFile<QueryUserResponse>('query.user.1.json').then((rsp: QueryUserResponse) => {
+  static init(context: UIContext) {
+    MockService.dataPreferences = preferences.getPreferencesSync(context.getHostContext(), { name: 'myStore' })
+    getRawFile<QueryUserResponse>(context, 'query.user.1.json').then((rsp: QueryUserResponse) => {
       MockService.searchUsersMap.set(Constants.GENDER_MALE, rsp.users);
       MockService.addUserToMap(rsp.users);
     })
-    getRawFile<QueryUserResponse>('query.user.json').then((rsp: QueryUserResponse) => {
+    getRawFile<QueryUserResponse>(context, 'query.user.json').then((rsp: QueryUserResponse) => {
       MockService.searchUsersMap.set(Constants.GENDER_FEMALE, rsp.users);
       MockService.addUserToMap(rsp.users);
     })
-    getRawFile<QueryUserResponse>('get.recommend.user.1.json').then((rsp: QueryUserResponse) => {
+    getRawFile<QueryUserResponse>(context, 'get.recommend.user.1.json').then((rsp: QueryUserResponse) => {
       MockService.recommendUsers.set(Constants.GENDER_MALE, rsp.users);
       MockService.addUserToMap(rsp.users);
     })
-    getRawFile<QueryUserResponse>('get.recommend.user.2.json').then((rsp: QueryUserResponse) => {
+    getRawFile<QueryUserResponse>(context, 'get.recommend.user.2.json').then((rsp: QueryUserResponse) => {
       MockService.recommendUsers.set(Constants.GENDER_FEMALE, rsp.users);
       MockService.addUserToMap(rsp.users);
     })
-    getRawFile<QueryUserResponse>('get.recommend.user.2.json').then((rsp: QueryUserResponse) => {
+    getRawFile<QueryUserResponse>(context, 'get.recommend.user.2.json').then((rsp: QueryUserResponse) => {
       MockService.recommendUsers.set(Constants.GENDER_FEMALE, rsp.users);
       MockService.addUserToMap(rsp.users);
     })
-    getRawFile<QueryUserResponse>('feed.users.json').then((rsp: QueryUserResponse) => {
+    getRawFile<QueryUserResponse>(context, 'feed.users.json').then((rsp: QueryUserResponse) => {
       MockService.addUserToMap(rsp.users);
     })
-    getRawFile<QueryFeedResponse>('query.recommend.feed.json').then((rsp: QueryFeedResponse) => {
+    getRawFile<QueryFeedResponse>(context, 'query.recommend.feed.json').then((rsp: QueryFeedResponse) => {
       MockService.recommendFeeds = rsp.list;
       MockService.addFeed(rsp.list);
     })
-    getRawFile<QueryFeedResponse>('query.feed.by.user.100001.json').then((rsp: QueryFeedResponse) => {
+    getRawFile<QueryFeedResponse>(context, 'query.feed.by.user.100001.json').then((rsp: QueryFeedResponse) => {
       MockService.addFeed(rsp.list);
     })
-    getRawFile<QueryFeedResponse>('query.feed.by.user.100091.json').then((rsp: QueryFeedResponse) => {
+    getRawFile<QueryFeedResponse>(context, 'query.feed.by.user.100091.json').then((rsp: QueryFeedResponse) => {
       MockService.addFeed(rsp.list);
     })
-    getRawFile<QueryFeedResponse>('query.feed.by.user.100204.json').then((rsp: QueryFeedResponse) => {
+    getRawFile<QueryFeedResponse>(context, 'query.feed.by.user.100204.json').then((rsp: QueryFeedResponse) => {
       MockService.addFeed(rsp.list);
     })
-    getRawFile<QueryFeedResponse>('query.feed.by.user.100003.json').then((rsp: QueryFeedResponse) => {
+    getRawFile<QueryFeedResponse>(context, 'query.feed.by.user.100003.json').then((rsp: QueryFeedResponse) => {
       MockService.addFeed(rsp.list);
     })
+    let account = MockService.getPreferences<Account>('account')
+    if (account) {
+      MockService.account = account
+    }
+  }
+
+  static getPreferences<T>(key: string): T | undefined {
+    let value = MockService.dataPreferences.getSync(key, '');
+    if (value.toString().length > 0) {
+      return JSON.parse(value.toString()) as T;
+    }
+    return undefined;
   }
 
   private static addFeed(rspFeeds: Feed[]) {
@@ -434,7 +459,7 @@ export class MockService {
     return [];
   }
 
-  static deleteCurrentUser(): CommonRsp {
+  static deleteCurrentUser(context: UIContext): CommonRsp {
     AppStorage.delete(Constants.CURRENT_USER_FULL)
     MockService.currentUserLikeFeeds = [];
     MockService.currentUserComments = [];
@@ -449,7 +474,7 @@ export class MockService {
     MockService.allUser = new Map();
     MockService.userUnionIdAndUid = new Map();
     MockService.currentUserFullInfo = new UserFullInfo();
-    MockService.init();
+    MockService.init(context);
     return DEFAULT_COMMON_RSP
   }
 
@@ -491,6 +516,18 @@ export class MockService {
     return DEFAULT_COMMON_RSP;
   }
 
+  static saveAccountInfo(nickname: string, phone: string, sex: GenderType, birthday: Date, avatar: ResourceStr,
+    marital: string) {
+    MockService.account.nickname = nickname
+    MockService.account.phone = phone
+    MockService.account.sex = sex
+    MockService.account.birthday = birthday
+    MockService.account.avatar = avatar
+    MockService.account.marital = marital
+    MockService.dataPreferences.putSync('account', JSON.stringify(MockService.account))
+    MockService.dataPreferences.flush()
+  }
+
   private static addUserToMap(users: UserFullInfo[]) {
     users.forEach((value, index, tmp) => {
       if (value != null && value.userInfo != null && value.userInfo.uid != null) {
@@ -502,7 +539,7 @@ export class MockService {
     });
   }
 
-  static subscribeMember(uid: number, fee: number, membershipStartTime: number): CommonRsp {
+  static subscribeMember(uid: number): CommonRsp {
     if (MockService.currentUserFullInfo != null && MockService.currentUserFullInfo.userInfo != null) {
       MockService.currentUserFullInfo.userInfo.isVip = Constants.YES;
     }

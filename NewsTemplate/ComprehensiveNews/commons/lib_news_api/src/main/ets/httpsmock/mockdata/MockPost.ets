@@ -5,7 +5,107 @@ import { RequestListData } from '../../params/response/LayoutResponse';
 export class MockPost {
   static mineList: BaseNews[] = [
     {
+      id: 'post_mine_0',
+      type: NewsEnum.Post,
+      likeCount: 12,
+      commentCount: 15,
+      isLiked: false,
+      isMarked: false,
+      recommends: [{
+        newsId: 'article_11',
+        newsType: 1,
+      }, {
+        newsId: 'article_12',
+        newsType: 1,
+      }],
+      shareCount: 120,
+      markCount: 45,
+      articleFrom: '',
+      title: '假期的旅行碎片已加载完毕～。旅行哪里是逃离呀',
+      richContent: '',
+      authorId: '001',
+      createTime: 1751076002000,
+      postImgList: [
+        {
+          picVideoUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/new%2Fmoving_1.jpg',
+          surfaceUrl: '',
+          movingVideoUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/new%2Fmoving_1.mp4',
+        },
+        {
+          picVideoUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/new%2Fmoving_2.jpg',
+          surfaceUrl: '',
+          movingVideoUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/new%2Fmoving_2.mp4',
+        },
+      ],
+      navInfo: {
+        setting: '{"type":"view","children":[{"type":"view","children":[{"type":"List","children":[{"type":"native","showType":"FeedDetailsCard","name":"帖子详情"}],"style":{"backgroundColor":"#FFFFFF","padding-bottom":"12","padding-top":"12"}}]}]}',
+      },
+    },
+    {
       id: 'post_mine_1',
+      type: NewsEnum.Post,
+      likeCount: 12,
+      commentCount: 15,
+      isLiked: false,
+      isMarked: false,
+      recommends: [{
+        newsId: 'article_11',
+        newsType: 1,
+      }, {
+        newsId: 'article_12',
+        newsType: 1,
+      }],
+      shareCount: 120,
+      markCount: 45,
+      articleFrom: '',
+      title: '假期的旅行碎片已加载完毕～。旅行哪里是逃离呀',
+      richContent: '',
+      authorId: '001',
+      createTime: 1751076002000,
+      postImgList: [
+        {
+          picVideoUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/suo%2F1.jpg',
+          surfaceUrl: '',
+        },
+        {
+          picVideoUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/suo%2F11.jpg',
+          surfaceUrl: '',
+        },
+        {
+          picVideoUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/suo%2F3.jpg',
+          surfaceUrl: '',
+        },
+        {
+          picVideoUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/suo%2F4.jpg',
+          surfaceUrl: '',
+        },
+        {
+          picVideoUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/suo%2F5.jpg',
+          surfaceUrl: '',
+        },
+        {
+          picVideoUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/suo%2F6.jpg',
+          surfaceUrl: '',
+        },
+        {
+          picVideoUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/suo%2F10.jpg',
+          surfaceUrl: '',
+        },
+        {
+          picVideoUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/suo%2F12.jpg',
+          surfaceUrl: '',
+        },
+        {
+          picVideoUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/suo%2F11.jpg',
+          surfaceUrl: '',
+        },
+      ],
+      navInfo: {
+        setting: '{"type":"view","children":[{"type":"view","children":[{"type":"List","children":[{"type":"native","showType":"FeedDetailsCard","name":"帖子详情"}],"style":{"backgroundColor":"#FFFFFF","padding-bottom":"12","padding-top":"12"}}]}]}',
+      },
+    },
+    {
+      id: 'post_mine_2',
       type: NewsEnum.Post,
       likeCount: 12,
       commentCount: 15,
@@ -68,7 +168,7 @@ export class MockPost {
       },
     },
     {
-      id: 'post_mine_2',
+      id: 'post_mine_3',
       type: NewsEnum.Post,
       likeCount: 36,
       commentCount: 175,

@@ -19,9 +19,8 @@ export class AppUtils {
   /**
    * 设置应用深浅色
    */
-  public static setColorMode() {
+  public static setColorMode(context: common.UIAbilityContext) {
     Logger.info(TAG, 'setColorMode PersistenceV2 keys: ' + JSON.stringify(PersistenceV2.keys()));
-    const context = getContext() as common.UIAbilityContext;
     const settingInfo: SettingModel = PersistenceV2.connect(SettingModel, () => new SettingModel())!;
     const mode = settingInfo.darkSwitch ? ConfigurationConstant.ColorMode.COLOR_MODE_DARK :
     ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT;

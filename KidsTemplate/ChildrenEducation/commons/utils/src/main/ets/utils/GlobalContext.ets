@@ -12,8 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import { PreferencesUtil } from './PreferencesUtil'
 export class GlobalContext {
+  public  context:Context | null = null;
   private constructor() {
   }
 
@@ -28,25 +29,33 @@ export class GlobalContext {
   }
 
   getObject(value: string): Object | undefined {
-    return this._objects.get(value);
+    const preferencesUtil = PreferencesUtil.getInstance();
+    const preference = preferencesUtil.getPreferences(this.context as Context)
+    return preferencesUtil.getPreferencesValue(preference, value) || undefined;
   }
 
   setObject(key: string, objectClass: Object): void {
-    this._objects.set(key, objectClass);
+    const preferencesUtil = PreferencesUtil.getInstance();
+    const preference = preferencesUtil.getPreferences(this.context as Context)
+    preferencesUtil.preferencesPut(preference, key, objectClass)
   }
 
   /**
    * 将数据存入缓存中
    */
   public put(key: string, value: Object): void {
-    this._objects.set(key, value);
+    const preferencesUtil = PreferencesUtil.getInstance();
+    const preference = preferencesUtil.getPreferences(this.context as Context)
+    preferencesUtil.preferencesPut(preference, key, value)
   }
 
   /**
    * 获取缓存中的数据
    */
   public get<T>(key: string): T {
-    return this._objects.get(key) as T;
+    const preferencesUtil = PreferencesUtil.getInstance();
+    const preference = preferencesUtil.getPreferences(this.context as Context)
+    return preferencesUtil.getPreferencesValue(preference, key) as T;
   }
 
 
@@ -54,7 +63,9 @@ export class GlobalContext {
    * 缓存中的数据是否存在
    */
   public has(key: string): boolean {
-    return this._objects.has(key);
+    const preferencesUtil = PreferencesUtil.getInstance();
+    const preference = preferencesUtil.getPreferences(this.context as Context)
+    return preferencesUtil.hasPreferencesKey(preference, key);
   }
 
 
@@ -62,13 +73,16 @@ export class GlobalContext {
    * 移除缓存
    */
   public remove(key: string) {
-    this._objects.delete(key);
+    const preferencesUtil = PreferencesUtil.getInstance();
+    const preference = preferencesUtil.getPreferences(this.context as Context)
+    return preferencesUtil.deletePreferencesByKey(preference, key);    // this._objects.delete(key);
   }
 
   /**
    * 清除缓存数据
    */
   public clear() {
-    return this._objects.clear();
+    const preferencesUtil = PreferencesUtil.getInstance();
+    return preferencesUtil.removePreferencesFromCache(this.context as Context)
   }
 }

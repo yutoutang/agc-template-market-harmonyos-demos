@@ -1,4 +1,6 @@
+import { UtilLog } from '@hw-agconnect/util-log';
 import { CommonButton, CommonPage, Constants, CONTAINER_STYLE } from 'common';
+import { BookInputSheetCom } from '../../components/book/BookInputSheetCom';
 import { BookOrderInfoCom } from '../../components/book/BookOrderInfoCom';
 import { BookSpecialServiceCom } from '../../components/book/BookSpecialServiceCom';
 import { BookVM } from '../../viewmodels/BookVM';
@@ -6,6 +8,7 @@ import { BookVM } from '../../viewmodels/BookVM';
 @ComponentV2
 export struct BookOrderPage {
   vm: BookVM = BookVM.instance;
+  @Local isShowRemarkSheet: boolean = false;
 
   aboutToAppear(): void {
     this.vm.resetBookOrderParams();
@@ -66,7 +69,9 @@ export struct BookOrderPage {
 
       Column() {
         Row() {
-          SymbolGlyph($r('sys.symbol.calendar_fill')).fontSize(24).fontColor([$r('sys.color.icon_secondary'), '#000000'])
+          SymbolGlyph($r('sys.symbol.calendar_fill'))
+            .fontSize(24)
+            .fontColor([$r('sys.color.icon_secondary'), '#000000'])
           Text('预约时间').primaryTextStyle().layoutWeight(1).margin({ left: $r('app.string.margin_16') })
           Text(this.vm.timeStr).secondaryTextStyle()
         }
@@ -74,7 +79,9 @@ export struct BookOrderPage {
         Divider().margin({ left: 40, top: 12, bottom: 12 })
 
         Row() {
-          SymbolGlyph($r('sys.symbol.person_2_fill')).fontSize(24).fontColor([$r('sys.color.icon_secondary'), '#000000'])
+          SymbolGlyph($r('sys.symbol.person_2_fill'))
+            .fontSize(24)
+            .fontColor([$r('sys.color.icon_secondary'), '#000000'])
           Text('就餐人数').primaryTextStyle().layoutWeight(1).margin({ left: $r('app.string.margin_16') })
           Text(`${this.vm.headCount}人`).secondaryTextStyle()
         }
@@ -99,11 +106,12 @@ export struct BookOrderPage {
   tipsBuilder() {
     Column() {
       Text('备注').titleTextStyle()
-      Column({ space: 8 }) {
+      Stack() {
         TextArea({ text: $$this.vm.tips, placeholder: '请填写备注信息' })
+          .enabled(false)
           .placeholderColor($r('sys.color.font_secondary'))
           .placeholderFont({ size: $r('sys.float.Body_L') })
-          .maxLength(100)
+          .maxLength(50)
           .showCounter(true)
           .width(Constants.FULL_SIZE)
           .height(84)
@@ -111,8 +119,33 @@ export struct BookOrderPage {
           .backgroundColor($r('sys.color.comp_background_primary'))
       }
       .attributeModifier(CONTAINER_STYLE)
+      .bindSheet($$this.isShowRemarkSheet, this.remarkSheet(), {
+        height: 500,
+        backgroundColor: $r('sys.color.background_secondary'),
+        showClose: false,
+        preferType:SheetType.BOTTOM,
+        blurStyle: BlurStyle.Regular,
+      })
+      .onClick(() => {
+        this.isShowRemarkSheet = true;
+      })
     }
+  }
 
+  @Builder
+  remarkSheet() {
+    BookInputSheetCom({
+      remark: this.vm.tipTemps,
+      confirmRemarks: (remark) => {
+        this.isShowRemarkSheet = false;
+        this.vm.tips = remark;
+        this.vm.tipTemps = remark;
+      },
+      close: (remark) => {
+        this.vm.tipTemps = remark;
+        this.isShowRemarkSheet = false;
+      }
+    });
   }
 }
 

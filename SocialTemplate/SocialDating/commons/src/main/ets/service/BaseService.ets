@@ -8,6 +8,7 @@ import { UiUtils } from '../utils/UiUtils';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { BufferUtil } from '../utils/BufferUtil';
 import { BasicUserInfo } from '../model/BasicUserInfo';
+import { GlobalContextUtils } from '../utils/ContextUtils';
 
 export class ServiceConfig {
   baseUrl: string | null = null;
@@ -26,10 +27,11 @@ export class BaseService {
     this.httpUtil = new HttpUtil();
   }
 
-  public async doRequest<T>(url: string, reqMethod: http.RequestMethod, data: string | null): Promise<T> {
+  public async doRequest<T>(url: string, reqMethod: http.RequestMethod,
+    data: string | null): Promise<T> {
     Logger.debug('doRequest,url=' + url + ', reqData=' + data);
     if (this.serviceConfig.isMock) {
-      return mockResult(this.serviceConfig.baseUrl + url, reqMethod);
+      return mockResult(GlobalContextUtils.globalUIContext, this.serviceConfig.baseUrl + url, reqMethod);
     }
     let resStr = '';
     await this.httpUtil.doRequest(url, reqMethod, data).then((rsp: string) => {
@@ -56,14 +58,14 @@ export class BaseService {
   }
 }
 
-export function getRawFile<T>(filePath: string): Promise<T> {
-  return getContext().resourceManager.getRawFileContent(filePath)
+export function getRawFile<T>(context: UIContext, filePath: string): Promise<T> {
+  return context.getHostContext()!.resourceManager.getRawFileContent(filePath)
     .then((value: Uint8Array) => {
       let res: string = BufferUtil.bufferToString(value);
       return JSON.parse(res) as T;
     }).catch((e: BusinessError) => {
       Logger.error(`getRawFileContent failed, error code: ${e.code}, message: ${e.message}.`);
-      UiUtils.showToast(e.message);
+      UiUtils.showToast(context, e.message);
       return Promise.reject(e);
     });
 }
@@ -76,7 +78,7 @@ export function getCurrentUid():number |null{
   return null;
 }
 
-function mockResult<T>(url: string, reqMethod: http.RequestMethod): Promise<T> {
+function mockResult<T>(context: UIContext, url: string, reqMethod: http.RequestMethod): Promise<T> {
   let filePath = 'oper.common.rsp.json';
   if (reqMethod === http.RequestMethod.GET) {
     if (url.indexOf('user') > 0) {
@@ -102,7 +104,7 @@ function mockResult<T>(url: string, reqMethod: http.RequestMethod): Promise<T> {
     }
   }
   Logger.debug('mockResult filePath=' + filePath + ', url=' + url);
-  return getRawFile<T>(filePath)
+  return getRawFile<T>(context, filePath)
 }
 
 function getMockFilePathForFeed(inputUrl: string): string {

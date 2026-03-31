@@ -7,9 +7,9 @@ export function MyActivitiesPageBuilder() {
   MyActivitiesPage()
 }
 
-@Component
+@ComponentV2
 export struct MyActivitiesPage {
-  @Consume('pageStack') pageStack: NavPathStack;
+  @Consumer('pageStack') pageStack: NavPathStack = new NavPathStack();
   private scroller: Scroller = new Scroller();
   private enrolledActivities: EnrolledActivity[] | null = null;
 

@@ -1,11 +1,11 @@
 import { BusinessError } from '@kit.BasicServicesKit';
 import { pushService } from '@kit.PushKit';
-import axios, { AxiosError, AxiosResponse } from '@ohos/axios'
+import axios, { AxiosError, AxiosResponse } from '@ohos/axios';
 import { UtilLog as Logger } from '@hw-agconnect/util-log';
 import { PushModel } from './Model';
 
 export class PushUtil {
-  private static token: string = ''
+  private static token: string = '';
 
   /**
    * 获取push推送token
@@ -36,11 +36,11 @@ export class PushUtil {
         },
       })
       .then((resp: AxiosResponse) => {
-        Logger.info('push success', JSON.stringify(resp))
+        Logger.info('push success', JSON.stringify(resp));
       })
       .catch((err: AxiosError) => {
-        Logger.info('push err' + err)
-      })
+        Logger.info('push err' + err);
+      });
   }
 
   /**
@@ -70,6 +70,6 @@ export class PushUtil {
       pushOptions: {
         'testMessage': true,
       },
-    }
+    };
   }
 }

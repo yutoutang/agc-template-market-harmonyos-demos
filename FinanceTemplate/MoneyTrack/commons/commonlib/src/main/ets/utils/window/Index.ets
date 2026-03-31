@@ -1,5 +1,6 @@
 import { display, UIContext, window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { contextUtil } from '../ContextUtil';
 import { Logger } from '../logger/Index';
 
 const TAG = '[WindowUtil]';
@@ -37,7 +38,11 @@ export class WindowUtil {
   }
 
   public static updateDisplay() {
-    WindowUtil._display = display.getDefaultDisplaySync();
+    try {
+      WindowUtil._display = display.getDefaultDisplaySync();
+    } catch (error) {
+      WindowUtil.dealAllError(error);
+    }
   }
 
   public static async initWindowUtil() {
@@ -54,30 +59,34 @@ export class WindowUtil {
           Logger.info(TAG, 'set full window success');
         })
         .catch((error: BusinessError) => {
-          WindowUtil._dealAllError(error);
+          WindowUtil.dealAllError(error);
         });
     }
   }
 
   private static _getContext() {
     if (WindowUtil._currentWindow) {
-      WindowUtil._context = getContext();
-      WindowUtil._uiContext = WindowUtil._currentWindow.getUIContext();
+      WindowUtil._context = contextUtil.getContext()!;
+      try {
+        WindowUtil._uiContext = WindowUtil._currentWindow.getUIContext();
+      } catch (error) {
+        WindowUtil.dealAllError(error);
+      }
     }
   }
 
   private static async _getCurrentWindow() {
     return window
-      .getLastWindow(getContext())
+      .getLastWindow(contextUtil.getContext())
       .then((win) => {
         WindowUtil._currentWindow = win;
       })
       .catch((error: BusinessError) => {
-        WindowUtil._dealAllError(error);
+        WindowUtil.dealAllError(error);
       });
   }
 
-  private static _dealAllError(error: BusinessError): void {
+  public static dealAllError(error: BusinessError): void {
     Logger.error(TAG, `errorCode: ${error.code}, errorMsg: ${error.message}`);
   }
 }

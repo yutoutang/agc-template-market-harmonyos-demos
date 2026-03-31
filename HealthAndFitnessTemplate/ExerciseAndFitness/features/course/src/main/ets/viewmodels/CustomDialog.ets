@@ -52,11 +52,13 @@ export struct addPlanDialog {
         .width(244)
         .height(192)
         .margin({ bottom: 20 })
-      Button('好的，我知道了')
+      Text('好的，我知道了')
         .width(216)
         .height(40)
+        .fontColor(Color.White)
+        .textAlign(TextAlign.Center)
         .borderRadius(24)
-        .backgroundColor($r('sys.color.comp_background_emphasize'))
+        .backgroundColor($r('app.color.app_theme'))
         .padding({ top: 8, bottom: 8, left: 24, right: 24 })
         .onClick(() => {
           if (this.controller !== undefined) {
@@ -91,7 +93,7 @@ export struct cancelDialog {
         Button('确认取消')
           .width(140)
           .height(40)
-          .borderRadius(20)
+          .borderRadius($r('sys.float.corner_radius_level10'))
           .fontColor($r('sys.color.font_on_primary'))
           .backgroundColor('rgba(0, 0, 0, 0.05)')
           .onClick(() => {
@@ -103,7 +105,7 @@ export struct cancelDialog {
         Button('我再想想')
           .width(140)
           .height(40)
-          .borderRadius(20)
+          .borderRadius($r('sys.float.corner_radius_level10'))
           .backgroundColor($r('sys.color.comp_background_emphasize'))
           .onClick(() => {
             if (this.controller !== undefined) {
@@ -196,7 +198,9 @@ export function explain(title: string) {
           .backgroundColor($r('sys.color.comp_background_tertiary'))
       }
     }
+    .scrollBar(BarState.Off)
     .scrollable(ScrollDirection.Horizontal)
+    .edgeEffect(EdgeEffect.Spring)
     .width('100%')  // 设置滚动区域宽度
 
     Column() {
@@ -214,20 +218,22 @@ export function explain(title: string) {
         .fontWeight(FontWeight.Medium)
         .fontSize($r('sys.float.Body_M'))
         .fontColor('rgba(0, 0, 0, 0.6)')
+        .textAlign(TextAlign.Start)
 
       Text('·收紧核心肌群，肩胛骨微收，手臂自然屈曲90°前后摆动，减少躯干晃动。')
         .fontWeight(FontWeight.Medium)
         .fontSize($r('sys.float.Body_M'))
         .fontColor('rgba(0, 0, 0, 0.6)')
+        .textAlign(TextAlign.Start)
 
       Text('·全脚掌滚动式着地（脚跟→前掌），步频建议保持180步/分钟以减少关节冲击。')
         .fontWeight(FontWeight.Medium)
         .fontSize($r('sys.float.Body_M'))
         .fontColor('rgba(0, 0, 0, 0.6)')
+        .textAlign(TextAlign.Start)
     }
-    .height(114)
     .width('100%')
-    .justifyContent(FlexAlign.Start)
+    .alignItems(HorizontalAlign.Start)
 
     Column() {
       Text('训练要点')
@@ -244,10 +250,10 @@ export function explain(title: string) {
         .fontWeight(FontWeight.Medium)
         .fontSize($r('sys.float.Body_M'))
         .fontColor('rgba(0, 0, 0, 0.6)')
+        .textAlign(TextAlign.Start)
     }
-    .height(57)
     .width('100%')
-    .justifyContent(FlexAlign.Start)
+    .alignItems(HorizontalAlign.Start)
 
     Column() {
       Text('常见错误')
@@ -264,20 +270,23 @@ export function explain(title: string) {
         .fontWeight(FontWeight.Medium)
         .fontSize($r('sys.float.Body_M'))
         .fontColor('rgba(0, 0, 0, 0.6)')
+        .textAlign(TextAlign.Start)
       Text('·落地脚踝不稳导致受伤风险提高；')
         .fontWeight(FontWeight.Medium)
         .fontSize($r('sys.float.Body_M'))
         .fontColor('rgba(0, 0, 0, 0.6)')
+        .textAlign(TextAlign.Start)
       Text('·开合跳没有收紧腹部导致肠胃不适；')
         .fontWeight(FontWeight.Medium)
         .fontSize($r('sys.float.Body_M'))
         .fontColor('rgba(0, 0, 0, 0.6)')
+        .textAlign(TextAlign.Start)
       Text('·快跑阶段没有控制时速。')
         .fontWeight(FontWeight.Medium)
         .fontSize($r('sys.float.Body_M'))
         .fontColor('rgba(0, 0, 0, 0.6)')
+        .textAlign(TextAlign.Start)
     }
-    .height(76)
     .width('100%')
     .alignItems(HorizontalAlign.Start)
   }
@@ -429,6 +438,7 @@ export struct CustomFilterButton {
     Button(this.label)
       .width(80)
       .height(28)
+      .margin({ right: 8, bottom: 12 })
       .borderRadius(14)
       .fontSize($r('sys.float.Body_S'))
       .fontColor(this.isOn ? Color.White : this.foreColor)
@@ -448,7 +458,12 @@ export struct CustomFilterButton {
 @ComponentV2
 export struct CourseFilterDialog {
   @Param filter: String[] = []
-
+  targetList: string[] = ['增肌塑形', '减重瘦身', '强化心肺', '保持健康', '力量训练', '马甲线', '增加柔韧', '随便练练']
+  bodyPartsList: string[] = ['手臂', '大腿', '腹部', '臀部', '胸肌', '背部', '肩部', '随便练练']
+  difficultLevel: string[] = ['零基础', '初级', '中级', '高级']
+  sportTypeList: string[] = ['燃脂', '普拉提', '瑜伽', '力量训练']
+  courseType: string[] = ['免费', '会员']
+  durationList: string[] = ['30以下', '31-50', '51-100', '100以上']
   build() {
     Column() {
       Column() {
@@ -462,31 +477,15 @@ export struct CourseFilterDialog {
           })
 
         Column() {
-          Row({ space: 8 }) {
-            CustomFilterButton({label: '增肌塑形', filter: this.filter})
-
-            CustomFilterButton({label: '减重瘦身', filter: this.filter})
-
-            CustomFilterButton({label: '强化心肺', filter: this.filter})
-
-            CustomFilterButton({label: '保持健康', filter: this.filter})
+          Flex({ wrap: FlexWrap.Wrap, justifyContent: FlexAlign.Start }) {
+            ForEach(this.targetList, (item: string) => {
+              CustomFilterButton({label: item, filter: this.filter})
+            })
           }
-          .margin({ top: 4, bottom: 8 })
-
-          Row({ space: 8 }) {
-            CustomFilterButton({label: '力量训练', filter: this.filter})
-
-            CustomFilterButton({label: '马甲线', filter: this.filter})
-
-            CustomFilterButton({label: '增加柔韧', filter: this.filter})
-
-            CustomFilterButton({label: '随便练练', filter: this.filter})
-          }
-          .margin({ bottom: 4 })
         }
       }
       .alignItems(HorizontalAlign.Start)
-      .width(328)
+      .width('100%')
 
       Column() {
         Text('身体部位')
@@ -499,31 +498,15 @@ export struct CourseFilterDialog {
           })
 
         Column() {
-          Row({ space: 8 }) {
-            CustomFilterButton({label: '手臂', filter: this.filter})
-
-            CustomFilterButton({label: '大腿', filter: this.filter})
-
-            CustomFilterButton({label: '腹部', filter: this.filter})
-
-            CustomFilterButton({label: '臀部', filter: this.filter})
+          Flex({ wrap: FlexWrap.Wrap, justifyContent: FlexAlign.Start }) {
+            ForEach(this.bodyPartsList, (item: string) => {
+              CustomFilterButton({label: item, filter: this.filter})
+            })
           }
-          .margin({ top: 4, bottom: 8 })
-
-          Row({ space: 8 }) {
-            CustomFilterButton({label: '胸肌', filter: this.filter})
-
-            CustomFilterButton({label: '背部', filter: this.filter})
-
-            CustomFilterButton({label: '肩部', filter: this.filter})
-
-            CustomFilterButton({label: '随便练练', filter: this.filter})
-          }
-          .margin({ bottom: 4 })
         }
       }
       .alignItems(HorizontalAlign.Start)
-      .width(328)
+      .width('100%')
 
       Column() {
         Text('难度')
@@ -536,20 +519,15 @@ export struct CourseFilterDialog {
           })
 
         Column() {
-          Row({ space: 8 }) {
-            CustomFilterButton({label: '零基础', filter: this.filter})
-
-            CustomFilterButton({label: '初级', filter: this.filter})
-
-            CustomFilterButton({label: '中级', filter: this.filter})
-
-            CustomFilterButton({label: '高级', filter: this.filter})
+          Flex({ wrap: FlexWrap.Wrap, justifyContent: FlexAlign.Start }) {
+            ForEach(this.difficultLevel, (item: string) => {
+              CustomFilterButton({label: item, filter: this.filter})
+            })
           }
-          .margin({ top: 4, bottom: 4 })
         }
       }
       .alignItems(HorizontalAlign.Start)
-      .width(328)
+      .width('100%')
 
       Column() {
         Text('种类')
@@ -562,20 +540,15 @@ export struct CourseFilterDialog {
           })
 
         Column() {
-          Row({ space: 8 }) {
-            CustomFilterButton({label: '燃脂', filter: this.filter})
-
-            CustomFilterButton({label: '普拉提', filter: this.filter})
-
-            CustomFilterButton({label: '瑜伽', filter: this.filter})
-
-            CustomFilterButton({label: '力量训练', filter: this.filter})
+          Flex({ wrap: FlexWrap.Wrap, justifyContent: FlexAlign.Start }) {
+            ForEach(this.sportTypeList, (item: string) => {
+              CustomFilterButton({label: item, filter: this.filter})
+            })
           }
-          .margin({ top: 4, bottom: 4 })
         }
       }
       .alignItems(HorizontalAlign.Start)
-      .width(328)
+      .width('100%')
 
       Column() {
         Text('课程性质')
@@ -588,16 +561,15 @@ export struct CourseFilterDialog {
           })
 
         Column() {
-          Row({ space: 8 }) {
-            CustomFilterButton({label: '免费', filter: this.filter})
-
-            CustomFilterButton({label: '会员', filter: this.filter})
+          Flex({ wrap: FlexWrap.Wrap, justifyContent: FlexAlign.Start }) {
+            ForEach(this.courseType, (item: string) => {
+              CustomFilterButton({label: item, filter: this.filter})
+            })
           }
-          .margin({ top: 4, bottom: 4 })
         }
       }
       .alignItems(HorizontalAlign.Start)
-      .width(328)
+      .width('100%')
 
       Column() {
         Text('课程时长（分钟）')
@@ -610,20 +582,15 @@ export struct CourseFilterDialog {
           })
 
         Column() {
-          Row({ space: 8 }) {
-            CustomFilterButton({label: '30以下', filter: this.filter})
-
-            CustomFilterButton({label: '31-50', filter: this.filter})
-
-            CustomFilterButton({label: '51-100', filter: this.filter})
-
-            CustomFilterButton({label: '100以上', filter: this.filter})
+          Flex({ wrap: FlexWrap.Wrap, justifyContent: FlexAlign.Start }) {
+            ForEach(this.durationList, (item: string) => {
+              CustomFilterButton({label: item, filter: this.filter})
+            })
           }
-          .margin({ top: 4, bottom: 4 })
         }
       }
       .alignItems(HorizontalAlign.Start)
-      .width(328)
+      .width('100%')
     }
     .width('100%')
   }
@@ -695,7 +662,7 @@ export struct PlanDialog {
                 .fontWeight(FontWeight.Medium)
                 .fontSize($r('sys.float.Body_S'))
             }
-            .width(59.2)
+            .width('18%')
             .height(47)
             .borderRadius(8)
             .backgroundColor(Color.White)
@@ -713,7 +680,7 @@ export struct PlanDialog {
                 .fontWeight(FontWeight.Medium)
                 .fontSize($r('sys.float.Body_S'))
             }
-            .width(59.2)
+            .width('18%')
             .height(47)
             .borderRadius(8)
             .backgroundColor(this.clickedStates[0] ? $r('app.color.app_theme') : Color.White)
@@ -742,7 +709,7 @@ export struct PlanDialog {
                 .fontWeight(FontWeight.Medium)
                 .fontSize($r('sys.float.Body_S'))
             }
-            .width(59.2)
+            .width('18%')
             .height(47)
             .borderRadius(8)
             .backgroundColor(Color.White)
@@ -760,7 +727,7 @@ export struct PlanDialog {
                 .fontWeight(FontWeight.Medium)
                 .fontSize($r('sys.float.Body_S'))
             }
-            .width(59.2)
+            .width('18%')
             .height(47)
             .borderRadius(8)
             .backgroundColor(this.clickedStates[1] ? $r('app.color.app_theme') : Color.White)
@@ -789,7 +756,7 @@ export struct PlanDialog {
                 .fontWeight(FontWeight.Medium)
                 .fontSize($r('sys.float.Body_S'))
             }
-            .width(59.2)
+            .width('18%')
             .height(47)
             .borderRadius(8)
             .backgroundColor(Color.White)
@@ -807,7 +774,7 @@ export struct PlanDialog {
                 .fontWeight(FontWeight.Medium)
                 .fontSize($r('sys.float.Body_S'))
             }
-            .width(59.2)
+            .width('18%')
             .height(47)
             .borderRadius(8)
             .backgroundColor(this.clickedStates[2] ? $r('app.color.app_theme') : Color.White)
@@ -836,7 +803,7 @@ export struct PlanDialog {
                 .fontWeight(FontWeight.Medium)
                 .fontSize($r('sys.float.Body_S'))
             }
-            .width(59.2)
+            .width('18%')
             .height(47)
             .borderRadius(8)
             .backgroundColor(Color.White)
@@ -854,7 +821,7 @@ export struct PlanDialog {
                 .fontWeight(FontWeight.Medium)
                 .fontSize($r('sys.float.Body_S'))
             }
-            .width(59.2)
+            .width('18%')
             .height(47)
             .borderRadius(8)
             .backgroundColor(this.clickedStates[3] ? $r('app.color.app_theme') : Color.White)
@@ -883,7 +850,7 @@ export struct PlanDialog {
                 .fontWeight(FontWeight.Medium)
                 .fontSize($r('sys.float.Body_S'))
             }
-            .width(59.2)
+            .width('18%')
             .height(47)
             .borderRadius(8)
             .backgroundColor(Color.White)
@@ -901,7 +868,7 @@ export struct PlanDialog {
                 .fontWeight(FontWeight.Medium)
                 .fontSize($r('sys.float.Body_S'))
             }
-            .width(59.2)
+            .width('18%')
             .height(47)
             .borderRadius(8)
             .backgroundColor(this.clickedStates[4] ? $r('app.color.app_theme') : Color.White)
@@ -916,6 +883,7 @@ export struct PlanDialog {
             })
           }
         }
+        .justifyContent(FlexAlign.Center)
         .margin({ bottom: 12 })
 
         Row({ space: 8 }) {
@@ -933,7 +901,7 @@ export struct PlanDialog {
                 .fontWeight(FontWeight.Medium)
                 .fontSize($r('sys.float.Body_S'))
             }
-            .width(59.2)
+            .width('18%')
             .height(47)
             .borderRadius(8)
             .backgroundColor(Color.White)
@@ -951,7 +919,7 @@ export struct PlanDialog {
                 .fontWeight(FontWeight.Medium)
                 .fontSize($r('sys.float.Body_S'))
             }
-            .width(59.2)
+            .width('18%')
             .height(47)
             .borderRadius(8)
             .backgroundColor(this.clickedStates[5] ? $r('app.color.app_theme') : Color.White)
@@ -980,7 +948,7 @@ export struct PlanDialog {
                 .fontWeight(FontWeight.Medium)
                 .fontSize($r('sys.float.Body_S'))
             }
-            .width(59.2)
+            .width('18%')
             .height(47)
             .borderRadius(8)
             .backgroundColor(Color.White)
@@ -998,7 +966,7 @@ export struct PlanDialog {
                 .fontWeight(FontWeight.Medium)
                 .fontSize($r('sys.float.Body_S'))
             }
-            .width(59.2)
+            .width('18%')
             .height(47)
             .borderRadius(8)
             .backgroundColor(this.clickedStates[6] ? $r('app.color.app_theme') : Color.White)
@@ -1013,11 +981,12 @@ export struct PlanDialog {
             })
           }
         }
+        .justifyContent(FlexAlign.Center)
       }
       .alignItems(HorizontalAlign.Start)
     }
     .backgroundColor(Color.White)
-    .padding({ top: 8, left: 16, right: 16 })
+    .padding({ top: 8, right: 16 })
     .width('100%')
     .height(139)
   }
@@ -1047,7 +1016,7 @@ export struct DateDialog {
           .fontWeight(FontWeight.Medium)
           .fontSize($r('sys.float.Body_L'))
       }
-      .width(294)
+      .width('100%')
       .height(36)
       .justifyContent(FlexAlign.Start)
 
@@ -1061,7 +1030,7 @@ export struct DateDialog {
               .height(18)
           })
         }
-        .width(294)
+        .width('95%')
         .height(19)
         .margin({ top: 4, bottom: 3 })
         .justifyContent(FlexAlign.SpaceBetween)
@@ -1084,7 +1053,7 @@ export struct DateDialog {
                 })
               }
               .height(42)
-              .width(294)
+              .width('100%')
               .justifyContent(FlexAlign.SpaceBetween)
             })
           }
@@ -1094,14 +1063,15 @@ export struct DateDialog {
         .alignItems(HorizontalAlign.Center)
         .backgroundColor('rgb(255, 255, 255, 0.4)')
         .borderRadius(12)
-        .width(328)
+        .width('100%')
         .height(334)
       }
     }
     .alignItems(HorizontalAlign.Center)
     .backgroundColor('rgb(255, 255, 255, 0.4)')
     .borderRadius(12)
-    .width(328)
+    .width('100%')
+    .padding({ left: 24 })
     .height(334)
   }
 }

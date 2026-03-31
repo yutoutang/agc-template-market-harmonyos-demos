@@ -117,6 +117,7 @@ export class FeedCardInfoModel {
 
 export class PostImgList {
   picVideoUrl: string = ''
+  movingVideoUrl?: string = ''
   id?: string = ''
   surfaceUrl: string = ''
   type?: number = 0

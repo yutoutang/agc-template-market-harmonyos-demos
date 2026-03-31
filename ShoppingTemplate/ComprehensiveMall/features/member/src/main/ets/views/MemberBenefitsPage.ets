@@ -16,7 +16,7 @@ struct MemberBenefitsPage {
   build() {
     NavDestination() {
       NavTitleBar({
-        title: '积分商城',
+        title: '签到福利',
       })
       Scroll() {
         Column({ space: 12 }) {
@@ -40,11 +40,12 @@ struct MemberBenefitsPage {
       .edgeEffect(EdgeEffect.Spring)
       .scrollBar(BarState.Off)
       .layoutWeight(1)
+      .align(Alignment.Top)
       .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
     }
     .hideTitleBar(true)
     .linearGradient({
-      colors: [['#33e64566', 0], ['#f1f3f5', 0.3]],
+      colors: [['#33e64566', 0], [$r('app.color.background_color_grey'), 0.3]],
     })
     .onReady(() => {
       this.vm.getUserPoints()
@@ -68,9 +69,8 @@ struct MemberBenefitsPage {
         .fontWeight(FontWeight.Medium)
         .margin({ right: $r('app.float.space_s') })
 
-        Image($r('app.media.ic_arrow_right'))
-          .width(16)
-          .height(16)
+        SymbolGlyph($r('sys.symbol.chevron_right'))
+          .fontColor([$r('app.color.font_color_level2')])
       }
       .onClick(() => {
         routerStack.pushPath({ name: RouterMap.USER_POINTS_RECORD })
@@ -115,8 +115,11 @@ struct MemberBenefitsPage {
                 Button(this.vm.isProductValid(product.price) ? '立即兑换' : '积分不足')
                   .controlSize(ControlSize.SMALL)
                   .backgroundColor($r('app.color.theme_color'))
-                  .enabled(this.vm.isProductValid(product.price))
+                  .opacity(this.vm.isProductValid(product.price) ? 1 : 0.6)
                   .onClick(() => {
+                    if (!this.vm.isProductValid(product.price)) {
+                      return;
+                    }
                     routerStack.pushPath({
                       name: RouterMap.USER_REDEMPTION_SUBMIT,
                       param: product,
@@ -131,7 +134,7 @@ struct MemberBenefitsPage {
             }
             .padding($r('app.float.space_m'))
           }
-          .backgroundColor($r('app.color.background_color_white'))
+          .backgroundColor($r('app.color.background_color_primary'))
           .borderRadius($r('app.float.border_radius_l'))
         }
       }, (product: UserPointRedemptionSku) => product.skuCode)

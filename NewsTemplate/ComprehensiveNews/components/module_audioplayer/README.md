@@ -4,7 +4,7 @@
 
 - [简介](#简介)
 - [约束与限制](#约束与限制)
-- [快速入门](#快速入门)
+- [使用](#使用)
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
@@ -18,16 +18,16 @@
 
 ### 环境
 
-- DevEco Studio版本：DevEco Studio 5.0.3 Release及以上
-- HarmonyOS SDK版本：HarmonyOS 5.0.3 Release SDK及以上
+- DevEco Studio版本：DevEco Studio 6.0.0 Release及以上
+- HarmonyOS SDK版本：HarmonyOS 6.0.0 Release SDK及以上
 - 设备类型：华为手机（包括双折叠和阔折叠）、平板
-- 系统版本：HarmonyOS 5.0.1(13)及以上
+- 系统版本：HarmonyOS 6.0.0(20)及以上
 
 ### 权限
 
 - 网络权限：ohos.permission.INTERNET
 
-## 快速入门
+## 使用
 
 1. 安装组件。
 
@@ -310,7 +310,7 @@ onWindowStageCreate(windowStage: window.WindowStage): void {
 
 ```
 import { common } from '@kit.AbilityKit';
-import { AudioItem, AudioPlayer, AudioPlayerState, MediaController, SubUtils } from 'module_audioplayer';
+import { AudioItem, AudioPlayer, AudioPlayerState, MediaController, AudioService } from 'module_audioplayer';
 
 
 @Entry
@@ -362,7 +362,7 @@ struct Index {
       })
       Button('点击唤醒小窗')
         .onClick(() => {
-          SubUtils.createSubWindow(this.getUIContext())
+          AudioService.createSubWindow(this.getUIContext())
         })
     }
   }

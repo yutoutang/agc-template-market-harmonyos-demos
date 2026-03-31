@@ -7,9 +7,9 @@ export class UserInfoModel {
   @Trace
   public avatar: ResourceStr = '';
   @Trace
-  public anonymousPhone: string = ''
+  public anonymousPhone: string = '';
   @Trace
-  public isMember: boolean = false
+  public isMember: boolean = false;
 
   public reset(): void {
     this.nickname = '';

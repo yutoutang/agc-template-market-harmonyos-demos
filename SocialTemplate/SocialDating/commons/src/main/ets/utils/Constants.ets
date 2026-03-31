@@ -37,8 +37,7 @@ export class Constants {
   static ENUM_ALL_NUMBER: number = -1;
   static PAGE_INDEX_HOME = 0;
   static PAGE_INDEX_FEED = 1;
-  static PAGE_INDEX_MEMBER = 2;
-  static PAGE_INDEX_PERSONAL = 3;
+  static PAGE_INDEX_PERSONAL = 2;
   static FEED_IMAGE_SIZE = 100;
   static NO = 0;
   static YES = 1;

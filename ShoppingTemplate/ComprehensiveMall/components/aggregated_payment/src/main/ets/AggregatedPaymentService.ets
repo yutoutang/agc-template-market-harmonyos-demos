@@ -1,11 +1,11 @@
 import { Pay } from '@cashier_alipay/cashiersdk';
-import { UtilLog } from '@hw-agconnect/util-log';
 
 import { common, bundleManager, Want } from '@kit.AbilityKit';
 import { util, HashMap } from '@kit.ArkTS';
 import { UIContext } from '@kit.ArkUI';
 import { paymentService } from '@kit.PaymentKit';
 import * as wxopensdk from '@tencent/wechat_open_sdk';
+import { UtilLog } from '@hw-agconnect/util-log';
 
 import { Config } from './common/Config';
 import { PaymentCallback, PaymentType } from './common/CustomTypes';
@@ -16,7 +16,7 @@ import { WechatPaymentInfo } from './models/WechatPaymentInfo';
 
 const wechat: wxopensdk.WXApi = wxopensdk.WXAPIFactory.createWXAPI(Config.WECHAT_APP_ID);
 
-const TAG: string = '[AggregatedPaymentService]'
+const TAG: string = '[AggregatedPaymentService]';
 
 class AggregatedPaymentService {
   private paymentCallbacks: HashMap<string, PaymentCallback> = new HashMap();
@@ -27,7 +27,7 @@ class AggregatedPaymentService {
         cb(type, isSuccess);
       });
     } catch (error) {
-      UtilLog.error(TAG, 'handle payment callbacks failed. error: ' + JSON.stringify(error))
+      UtilLog.error(TAG, 'handle payment callbacks failed. error: ' + JSON.stringify(error));
     }
   }
 
@@ -163,8 +163,8 @@ class AggregatedPaymentService {
     try {
       return bundleManager.canOpenLink(Config.ALIPAY_SCHEME);
     } catch (error) {
-      UtilLog.error(TAG, 'query link status failed. error: ' + JSON.stringify(error))
-      return false
+      UtilLog.error(TAG, 'query link status failed. error: ' + JSON.stringify(error));
+      return false;
     }
   }
 
@@ -184,7 +184,7 @@ class AggregatedPaymentService {
     try {
       this.paymentCallbacks.set(id, cb);
     } catch (error) {
-      UtilLog.error(TAG, 'register payment callbacks failed. error: ' + JSON.stringify(error))
+      UtilLog.error(TAG, 'register payment callbacks failed. error: ' + JSON.stringify(error));
     }
     return id;
   }
@@ -198,7 +198,7 @@ class AggregatedPaymentService {
     try {
       this.paymentCallbacks.remove(callbackId);
     } catch (error) {
-      UtilLog.error(TAG, 'remove payment callbacks failed. error: ' + JSON.stringify(error))
+      UtilLog.error(TAG, 'remove payment callbacks failed. error: ' + JSON.stringify(error));
     }
   }
 
@@ -209,7 +209,7 @@ class AggregatedPaymentService {
     try {
       this.paymentCallbacks.clear();
     } catch (error) {
-      UtilLog.error(TAG, 'clear payment callbacks failed. error: ' + JSON.stringify(error))
+      UtilLog.error(TAG, 'clear payment callbacks failed. error: ' + JSON.stringify(error));
     }
   }
 

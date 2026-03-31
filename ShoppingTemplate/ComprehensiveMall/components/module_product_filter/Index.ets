@@ -4,4 +4,4 @@ export {
   ProductFilterOptions,
 } from './src/main/ets/commons/Types';
 
-export { ProductFilter } from './src/main/ets/utils/ProductFilter'
+export { ProductFilter } from './src/main/ets/utils/ProductFilter';

@@ -12,39 +12,83 @@ import {
   CommonUtils,
   Constants,
   QueryFeedType,
-  QueryFollowUserType
+  QueryFollowUserType,
+  LoginState,
+  MockService
 } from 'commons';
 import Logger from 'commons/src/main/ets/utils/Logger';
 import UserService from 'user/src/main/ets/service/UserService';
 import FeedService from 'feed/src/main/ets/service/FeedService';
 import ActivityService from 'activity/src/main/ets/service/ActivityService';
 import { ActionSummaryPageParam, ActionSummaryPageType } from '../model/ActionSummaryPageParam';
+import { ApiController, AtomicserviceLogin, PersonalInfo } from 'atomicservice_login';
+import { DialPanel } from 'dial_panel';
+import { BusinessError } from '@kit.BasicServicesKit';
+import { AppStorageV2 } from '@kit.ArkUI';
+import { MemberShipVM } from 'membership';
 
 @Builder
 export function PersonalPageBuilder() {
   Personal()
 }
 
-@Component
+@ComponentV2
 export struct Personal {
-  @Consume('pageStack') pageStack: NavPathStack;
-  @State userFullInfo: UserFullInfo | null = null;
-  @State userInfo: UserInfo | null = null;
-  @State userActionSummary: UserActionSummary = new UserActionSummary();
-  @Prop @Watch('onChange') index: number = 0;
+  vm: MemberShipVM = MemberShipVM.instance;
+  @Local personalInfo: PersonalInfo = new PersonalInfo()
+  @Local isLink: boolean = false
+  @Local controller: ApiController = new ApiController()
+  @Consumer('pageStack') pageStack: NavPathStack = new NavPathStack()
+  @Local loginStateStorage : LoginState = AppStorageV2.connect(LoginState, 'LoginState', () => new LoginState())!
+  @Local userFullInfo: UserFullInfo | null = null;
+  @Local userInfo: UserInfo | null = null;
+  @Local userActionSummary: UserActionSummary = new UserActionSummary();
+  @Param index: number = 0;
+  private uiContext: UIContext = this.getUIContext();
+  private dialPanel: DialPanel = new DialPanel(this.uiContext)
+    .onMakeCall((e: BusinessError<void>): void => {
+      if (e.code) {
+        this.showToast(`拨号页面跳转失败 -> code: ${e.code}, msg: ${e.message}`);
+      }
+    })
+    .onWillDismiss((reason: DismissReason): void => {
+      if (reason === DismissReason.TOUCH_OUTSIDE) {
+        this.showToast('已拦截点击其它区域进行关闭的交互方式');
+      } else if (reason === DismissReason.SLIDE_DOWN) {
+        this.showToast('已拦截下拉模态窗进行关闭的交互方式');
+      } else {
+        this.dialPanel.close();
+      }
+    });
 
+  @Monitor('index')
   onChange() {
     if (this.index === Constants.PAGE_INDEX_PERSONAL) {
       this.getUserInfo();
     }
   }
 
+  unBindPhone = async (): Promise<void> => {
+    this.isLink = false
+    this.loginStateStorage.loginState = false
+    this.personalInfo = new PersonalInfo()
+  }
+
   build() {
     NavDestination() {
       Column() {
         this.buildBasicInfo()
+
         this.buildActionHistoryArea()
-        this.buildMemberArea()
+
+        Column() {
+          this.buildContactMatchmaker()
+        }
+        .width('92%')
+        .backgroundColor(Color.White)
+        .borderRadius(16)
+        .margin({ bottom: 12 })
+
         Column() {
           this.buildMyMateCriteria()
           Divider().strokeWidth('1px').width('92%')
@@ -53,72 +97,81 @@ export struct Personal {
           this.buildMyOrderRow()
           Divider().strokeWidth('1px').width('92%')
           this.buildConfigRow()
-        }.width('92%').backgroundColor(Color.White).borderRadius(16)
+        }
+        .width('92%')
+        .backgroundColor(Color.White)
+        .borderRadius(16)
       }
     }.hideTitleBar(true).backgroundColor($r('app.color.page_background_color'))
   }
 
   @Builder
   buildBasicInfo() {
-    Row() {
-      Row() {
-        Column() {
-          Image(this.userInfo?.profilePictureUrl == null ? $r('app.media.head_image_default') :
-            (this.userInfo?.profilePictureUrl.startsWith('app.media') ?
-            $r(this.userInfo?.profilePictureUrl) : this.userInfo?.profilePictureUrl))
-            .width(72)
-            .height(72)
-            .clipShape(new Circle({ width: '72', height: '72' }))
-            .objectFit(ImageFit.Cover)
-            .margin({ left: '5vp', top: '5vp' })
-            .borderRadius(16)
-        }.overlay(this.EditIconBuilder(), { align: Alignment.BottomEnd })
-
-        Column() {
-          Text(this.userInfo?.nickName)
-            .fontSize($r('sys.float.Body_M')).fontWeight(FontWeight.Medium).fontFamily(Constants.HARMONY_HEITI)
-            .margin({ left: '16vp', right: '5vp', bottom: '5vp' })
-          Text('ID: ' + this.userInfo?.userNo)
-            .margin({ left: '16vp', right: '5vp', bottom: '5vp' })
-            .fontSize($r('sys.float.Body_S')).fontFamily(Constants.HARMONY_HEITI)
-        }.alignItems(HorizontalAlign.Start)
-      }
-
+    Column() {
       Column() {
-        if (this.userInfo?.realNameAuthFlag == null ||
-          this.userInfo?.realNameAuthFlag === Constants.REAL_NAME_AUTH_NO) {
-          Button('去实名')
-            .backgroundColor($r('app.color.light_grey_bg'))
-            .fontColor($r('sys.color.font_primary'))
+        AtomicserviceLogin({
+          userInfo: this.personalInfo,
+          isLink: this.isLink,
+          controller: this.controller,
+          vip: this.vm.isMember,
+          bindPhone: (code: string | undefined) => {
+            this.isLink = true
+            this.personalInfo.userName = MockService.account.nickname !== '' ? MockService.account.nickname : '大王'
+            this.personalInfo.avatar = MockService.account.avatar !== '' ? MockService.account.avatar :
+              $r('app.media.avatar_login')  // todo 替换为开发者需要的资源
+            MockService.saveAccountInfo(this.personalInfo.userName, MockService.account.phone, MockService.account.sex,
+              MockService.account.birthday, this.personalInfo.avatar, '');
+            this.getUIContext().getPromptAction().showToast({message: '请通过临时关联账号凭证获取真实手机号'})
+          },
+          onGetPhoneError: (err) => {
+            if (err.code === 1001502014 || err.code === 801) {
+              this.getUIContext().getPromptAction().showToast({message: '元服务未获取phone权限或用户授权，此为模拟关联。'})
+              this.isLink = true
+              this.loginStateStorage.loginState = true
+              this.personalInfo.phoneNumber = MockService.account.phone ?? '130****0000'
+              this.personalInfo.userName = MockService.account.nickname !== '' ? MockService.account.nickname : '大王'
+              this.personalInfo.avatar = MockService.account.avatar !== '' ? MockService.account.avatar :
+                $r('app.media.avatar_login')  // todo 替换为开发者需要的资源
+              MockService.saveAccountInfo(this.personalInfo.userName, this.personalInfo.phoneNumber,
+                MockService.account.sex, MockService.account.birthday, this.personalInfo.avatar, '');
+            }
+          },
+          unBindPhone: this.unBindPhone,
+        })
+
+        Divider()
+          .margin({ top: 12, bottom: 12 })
+
+        Column() {
+          Button('会员中心')
+            .backgroundColor($r('app.color.button_background_color'))
             .fontSize($r('sys.float.Body_M'))
-            .fontFamily(Constants.HARMONY_HEITI)
-            .width(80)
-            .height(40)
-            .borderRadius('20vp')
+            .width(90)
+            .height(28)
             .onClick(() => {
-              this.pageStack.pushPathByName('RealNameAuthPage', null, (pop: PopInfo) => {
-                this.refreshUserInfo(pop);
-              });
+              if (!this.loginStateStorage.loginState) {
+                this.getUIContext().getPromptAction().showToast({ message: '请先关联账号' })
+              } else {
+                this.pageStack.pushPathByName('Member', new MemberPageParam(this.isVip()), (popInfo: PopInfo) => {
+                  let basicUserInfo = popInfo.result as BasicUserInfo;
+                  Logger.debug('userInfo after member=' + JSON.stringify(basicUserInfo))
+                  if (basicUserInfo != null && this.userInfo != null) {
+                    this.userInfo.isVip = basicUserInfo.isVip
+                  }
+                });
+              }
             })
-        } else {
-          Text('已实名')
-            .backgroundColor($r('app.color.user_realname_auth_bg'))
-            .borderRadius(16)
-            .fontFamily(Constants.HARMONY_HEITI)
-            .width(60)
-            .height(36)
-            .fontSize($r('sys.float.Body_M'))
-            .textAlign(TextAlign.Center)
         }
+        .width('92%')
+        .margin({ bottom: 12 })
+        .alignItems(HorizontalAlign.End)
       }
-    }.onClick(() => {
-      this.pageStack.pushPathByName('MyDetailPage', null, (popInfo: PopInfo) => {
-        this.userFullInfo = popInfo.result as UserFullInfo;
-        this.userInfo = this.userFullInfo.userInfo;
-      });
-    })
+      .backgroundColor(Color.White)
+      .borderRadius(16)
+    }
     .justifyContent(FlexAlign.SpaceBetween)
-    .width('92%').margin({ bottom: 12 })
+    .width('92%')
+    .margin({ bottom: 12 })
   }
 
   private refreshUserInfo(pop: PopInfo) {
@@ -244,49 +297,41 @@ export struct Personal {
     }.width('92%').margin({ bottom: 12 })
   }
 
-  @Builder
-  buildMemberArea() {
-    Column() {
-      Row() {
-        Column() {
-          Text('开通会员即可使用更多功能')
-            .fontSize($r('sys.float.Body_M'))
-            .margin({ left: 12 })
-            .fontFamily(Constants.HARMONY_HEITI)
-            .fontWeight(FontWeight.Regular)
-            .fontColor(Color.White)
-            .textAlign(TextAlign.Start)
-            .width('100%')
-        }.width('70%').alignItems(HorizontalAlign.Start)
-
-        Column() {
-          Button(this.isVip() ? '去续费' : '开通')
-            .backgroundColor($r('app.color.button_background_color'))
-            .fontSize($r('sys.float.Body_M'))
-            .width(76)
-            .height(32)
-            .margin({ left: 12, right: 12 })
-            .onClick(() => {
-              this.pageStack.pushPathByName('Member', new MemberPageParam(this.isVip()), (popInfo: PopInfo) => {
-                let basicUserInfo = popInfo.result as BasicUserInfo;
-                Logger.debug('userInfo after member=' + JSON.stringify(basicUserInfo))
-                if (basicUserInfo != null && this.userFullInfo != null && this.userFullInfo.userInfo != null) {
-                  this.userInfo = this.userFullInfo.userInfo;
-                }
-              });
-            })
-        }.width('30%').alignItems(HorizontalAlign.End)
-      }
-      .width('92%')
-      .height(50)
-      .backgroundImage($r('app.media.member_search'))
-      .backgroundImageSize(ImageSize.FILL)
-      .margin({ bottom: 12 })
-    }
-  }
-
   private isVip(): boolean {
     return this.userInfo != null && this.userInfo.isVip != null && this.userInfo.isVip === Constants.YES;
+  }
+
+  private showToast(msg: string): void {
+    this.uiContext.getPromptAction().showToast({ message: msg });
+  }
+
+  @Builder
+  buildContactMatchmaker() {
+    Row() {
+      Image($r('app.media.service_fill')).width(24).height(24).margin(12)
+
+      Text('联系专属红娘')
+        .fontSize($r('sys.float.Body_M'))
+        .width('75%')
+        .textAlign(TextAlign.Start)
+        .margin({ top: 12, bottom: 12 })
+
+      Image($r('app.media.ic_right_arrow'))
+        .width(24)
+        .height(24)
+        .margin({ left: 12, right: 12 })
+        .objectFit(ImageFit.Fill)
+    }
+    .width('100%')
+    .height(48)
+    .alignItems(VerticalAlign.Center)
+    .onClick(() => {
+      this.dialPanel
+        .setTitle('联系专属红娘')
+        .setPhoneNumber('12345678901')
+        .setAutoClosePanel(false) // 成功跳转后不自动关闭模态窗
+        .open();
+    });
   }
 
   @Builder
@@ -393,6 +438,18 @@ export struct Personal {
 
   aboutToAppear(): void {
     this.getUserInfo();
+    this.personalInfo.avatar = MockService.account.avatar
+    this.personalInfo.phoneNumber = MockService.account.phone
+    this.personalInfo.userName = MockService.account.nickname
+    this.getUIContext().getHostContext()?.eventHub.on('refreshUserInfo', () => {
+      this.personalInfo.avatar = MockService.account.avatar
+      this.personalInfo.phoneNumber = MockService.account.phone
+      this.personalInfo.userName = MockService.account.nickname
+    })
+  }
+
+  aboutToDisappear(): void {
+    this.getUIContext().getHostContext()?.eventHub.off('refreshUserInfo')
   }
 
   private getUserInfo() {

@@ -1,5 +1,13 @@
-import { DataGenerator, VideoCard, VideoDetail } from '@ohos_agcit/children_education_datasource';
-import { CommonConstants, IconAndCount, Title } from '@ohos_agcit/children_education_utils';
+import { DataGenerator, VideoCard, VideoCollection } from '@ohos_agcit/children_education_datasource';
+import {
+  AvoidArea,
+  BreakpointType,
+  CommonConstants,
+  GlobalInfoModel,
+  Title,
+  VideoCover
+} from '@ohos_agcit/children_education_utils';
+import { AppStorageV2 } from '@kit.ArkUI';
 
 @Builder
 export function AudioSectionListBuilder() {
@@ -9,7 +17,9 @@ export function AudioSectionListBuilder() {
 
 @ComponentV2
 export struct AudioSectionListView {
-  @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
+  @Local avoidArea: AvoidArea = AppStorageV2.connect(AvoidArea, () => new AvoidArea(0, 0))!;
+  @Local globalInfo: GlobalInfoModel =
+    AppStorageV2.connect<GlobalInfoModel>(GlobalInfoModel, () => new GlobalInfoModel())!;
   private audioList: Array<VideoCard> = [];
 
   aboutToAppear(): void {
@@ -18,9 +28,9 @@ export struct AudioSectionListView {
 
   build() {
     NavDestination() {
-      List({ space: 12 }) {
+      Grid() {
         ForEach(this.audioList, (item: VideoCard) => {
-          ListItem() {
+          GridItem() {
             AudioSectionListItem({
               imageUrl: item.imageUrl,
               isVip: item.isVip,
@@ -30,26 +40,51 @@ export struct AudioSectionListView {
               describe: item.describe,
             })
               .onClick(() => {
-                let detail: VideoDetail = DataGenerator.getAudioDetail(this.getUIContext());
+                let detail: VideoCollection = DataGenerator.getAudioDetail(this.getUIContext());
                 detail.videoCard = item;
-                this.appPathStack.pushPathByName('AudioDetailListView', detail);
+                this.globalInfo.navStack.pushPathByName('AudioDetailListView', detail);
               });
           };
         }, (item: VideoCard) => JSON.stringify(item));
       }
+      .rowsGap(new BreakpointType<number>({
+        sm: 8,
+        md: 12,
+        lg: 16,
+      }).getValue(this.globalInfo.currentBreakpoint))
+      .columnsGap(new BreakpointType<number>({
+        sm: 8,
+        md: 12,
+        lg: 16,
+      }).getValue(this.globalInfo.currentBreakpoint))
+      .columnsTemplate('1fr '.repeat(new BreakpointType<number>({
+        sm: 1,
+        md: 2,
+        lg: 3,
+      }).getValue(this.globalInfo.currentBreakpoint)))
+      .padding({
+        left: new BreakpointType<number>({
+          sm: 16,
+          md: 24,
+          lg: 32,
+        }).getValue(this.globalInfo.currentBreakpoint),
+        right: new BreakpointType<number>({
+          sm: 16,
+          md: 24,
+          lg: 32,
+        }).getValue(this.globalInfo.currentBreakpoint)
+      })
       .scrollBar(BarState.Off)
       .width(CommonConstants.FULL_PERCENT)
-      .padding({
-        top: 8,
-        right: 16,
-        left: 16
-      })
     }
     .title(Title('音频故事专区'))
     .onBackPressed(() => {
-      this.appPathStack.pop();
+      this.globalInfo.navStack.pop();
       return true;
-    });
+    })
+    .padding({
+      top: this.getUIContext().px2vp(this.avoidArea.topRectHeight),
+    })
   }
 }
 
@@ -64,16 +99,15 @@ struct AudioSectionListItem {
 
   build() {
     Row() {
-      Column() {
-        RelativeContainer() {
-          Image(this.imageUrl)
-            .borderRadius(8)
-            .id(CommonConstants.IMAGE);
-          IconAndCount(CommonConstants.IMAGE, this.isVip, this.updateCount, this.totalCount, '30%', '45%', '50%');
-        }
-        .width(104)
-        .height(104)
-      }
+      Row() {
+        VideoCover({
+          imageUrl: this.imageUrl,
+          isVip: this.isVip,
+          updateCount: this.updateCount,
+          totalCount: this.totalCount,
+          ratio: 1,
+        })
+      }.width(104)
 
       Blank().width(12)
 
@@ -93,6 +127,6 @@ struct AudioSectionListItem {
       }
       .layoutWeight(1)
       .alignItems(HorizontalAlign.Start)
-    };
+    }
   }
 }

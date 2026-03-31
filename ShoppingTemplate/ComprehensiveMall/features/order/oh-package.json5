@@ -11,6 +11,9 @@
     "lib_network": "file:../../commons/lib_network",
     "module_product_review": "file:../../components/module_product_review",
     "module_shopping_cart": "file:../../components/module_shopping_cart",
-    "address_management": "file:../../components/address_management"
+    "address_management": "file:../../components/address_management",
+    "aggregated_payment": "file:../../components/aggregated_payment",
+    "module_coupons": "file:../../components/module_coupons",
+    "image_preview": "file:../../components/image_preview"
   }
 }

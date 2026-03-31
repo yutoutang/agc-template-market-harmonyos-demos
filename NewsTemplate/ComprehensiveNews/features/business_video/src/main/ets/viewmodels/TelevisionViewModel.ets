@@ -29,6 +29,7 @@ export class TelevisionViewModel extends BaseViewModel {
   @Trace title: string = '猜你喜欢'
   @Trace loading: boolean = true
   @Trace isRefreshing: boolean = false
+  @Trace videoAspectRatio: number = 1920 / 1080;
   private landscapeListener = (info: uiObserver.NavDestinationInfo) => {
     this.pipWindowModel.navDestinationUpdateListeners.forEach((callback, key) => {
       if (key === 'landscapeListener') {
@@ -77,8 +78,9 @@ export class TelevisionViewModel extends BaseViewModel {
   }
 
   public setIndex(index: number, item: AvModel) {
-    this.televisionIndex = index
-    this.videoCardPlayerController.videoUrlChange(item.section[this.sectionIndex]?.sectionUrl)
+    this.televisionIndex = index;
+    const videoData = new VideoData(item.section[this.sectionIndex], item.title);
+    this.videoCardPlayerController.videoUrlChange(videoData);
   }
 
   public setMute(value: boolean) {
@@ -107,6 +109,10 @@ export class TelevisionViewModel extends BaseViewModel {
     this.isRefreshing = false
   }
 
+  @Computed
+  get videoBoxAspectRatio() {
+    return this.videoAspectRatio;
+  }
 
   @Computed
   get pagePaddingBottom() {

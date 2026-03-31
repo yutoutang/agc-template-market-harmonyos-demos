@@ -43,7 +43,7 @@ export class HuaweiAuthUtils {
     // 默认值为true，若账号未登录则强制拉起账号登录页
     loginRequest.forceLogin = true;
     loginRequest.state = util.generateRandomUUID();
-    const controller = new authentication.AuthenticationController(getContext());
+    const controller = new authentication.AuthenticationController();
     return new Promise((resolve, reject) => {
       controller.executeRequest(loginRequest).then((resp: authentication.AuthorizationWithHuaweiIDResponse) => {
         Logger.info(TAG, 'login huawei success, response: ' + JSON.stringify(resp));

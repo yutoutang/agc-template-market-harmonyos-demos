@@ -3,9 +3,8 @@ import { ArrayList } from '@kit.ArkTS';
 import { AppStorageV2 } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { IWBAPI, MultiImageObject, TextObject, UiError, WBAPI, WbASListener, WeiboMultiMessage } from 'core';
-import { WindowUtil } from 'module_ui_base';
-import {ToastDialog as promptAction} from '@hw-agconnect/ui-toast'
-import { UtilLog as Logger } from '@hw-agconnect/util-log';
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
+import { UtilLog } from '@hw-agconnect/util-log';
 import { saveImgToSandbox } from './FileUtils';
 import { ShareViewData } from '../common/ShareParams';
 import { ShareConfigModel } from '../model/ShareConfigModel';
@@ -18,23 +17,23 @@ const TAG = 'WeiboShareUtils';
 export class WeiboShareUtils {
   private static _instance: WeiboShareUtils;
   private mWBAPI: IWBAPI | null = null;
-  private context: common.UIAbilityContext = WindowUtil.context as common.UIAbilityContext;
+  private uiContext: UIContext | undefined = undefined;
   private configModel: ShareConfigModel = AppStorageV2.connect(ShareConfigModel, () => new ShareConfigModel())!;
   private shareData: ShareViewData = new ShareViewData();
   private listener: WbASListener = {
     onComplete: () => {
-      this.configModel.restoreWindowLayout();
+      this.configModel.restoreWindowLayout(this.uiContext);
       promptAction.showToast({ message: '分享成功', duration: 2000 });
       if (this.shareData.autoClose) {
         this.shareData.closeSheet();
       }
     },
     onError: (error: UiError) => {
-      this.configModel.restoreWindowLayout();
+      this.configModel.restoreWindowLayout(this.uiContext);
       promptAction.showToast({ message: '分享失败: ' + error.errorMessage, duration: 2000 });
     },
     onCancel: () => {
-      this.configModel.restoreWindowLayout();
+      this.configModel.restoreWindowLayout(this.uiContext);
       promptAction.showToast({ message: '分享取消', duration: 2000 });
     },
   };
@@ -60,7 +59,8 @@ export class WeiboShareUtils {
    * @param url
    * @param img
    */
-  async share(data: ShareViewData, img?: PixelMap) {
+  async share(uiContext: UIContext, data: ShareViewData, img?: PixelMap) {
+    this.uiContext = uiContext;
     this.shareData = data;
     const message: WeiboMultiMessage = new WeiboMultiMessage();
     const textObject: TextObject = new TextObject();
@@ -71,19 +71,19 @@ export class WeiboShareUtils {
     if (img) {
       const multiImage: MultiImageObject = new MultiImageObject();
       try {
-        const uri = await saveImgToSandbox(img);
+        const uri = await saveImgToSandbox(uiContext, img);
         const uris = new ArrayList<string>();
         uris.add(uri);
         multiImage.uriStrs = uris.convertToArray();
       } catch (e) {
         const err = e as BusinessError;
-        Logger.error(TAG, 'multi image file operation failed, error msg = ' + err.message);
+        UtilLog.error(TAG, 'multi image file operation failed, error msg = ' + err.message);
       }
       message.multiImageObject = multiImage;
     }
 
     if (this.mWBAPI != null) {
-      this.mWBAPI.shareMessage(this.context, message, this.listener);
+      this.mWBAPI.shareMessage(uiContext.getHostContext() as common.UIAbilityContext, message, this.listener);
     }
   }
 

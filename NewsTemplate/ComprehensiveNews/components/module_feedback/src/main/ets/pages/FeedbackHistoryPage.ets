@@ -1,6 +1,6 @@
-import { AppStorageV2 } from '@kit.ArkUI';
-import { ImagePreview, PreviewVerticalAlign } from 'module_imagepreview';
+import { AppStorageV2, window } from '@kit.ArkUI';
 import { FeedbackRecordDTO } from '../models/FeedbackRecordDTO';
+import { ImagePreview, ImagePreviewOptions, SourceImageModel } from 'module_imagepreview';
 import { FeedbackRecordVM } from '../viewmodels/FeedbackRecordVM';
 import { BreakpointType } from '../common/CustomTypes';
 import { Api } from '../http/Api';
@@ -160,13 +160,13 @@ struct FeedbackHistoryPage {
                 .objectFit(ImageFit.Contain)
                 .draggable(false)
                 .onClick(() => {
-                  ImagePreview.show(this.getUIContext(), feedback.images, {
-                    startIndex: index,
-                    showIndex: true,
-                    loop: false,
-                    isBasicMode: true,
-                    indexPosition: PreviewVerticalAlign.Top,
-                  })
+                  const options = new ImagePreviewOptions()
+                  options
+                    .setImageList(feedback.images.map(v => new SourceImageModel({ imageUrl: v })))
+                    .setInitIndex(index)
+                    .setLoop(true)
+                    .setLongTake(false)
+                  ImagePreview.open(this.getUIContext(), options)
                 })
             }
             .width('100%')

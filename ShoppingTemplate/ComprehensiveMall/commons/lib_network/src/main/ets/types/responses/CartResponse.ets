@@ -1,25 +1,22 @@
 import { BaseResponse } from './BaseResponse';
+import { CartDto, CartPrice, CartProductInfo } from '../ProductTypes';
 
-export interface CartListResp extends BaseResponse {
+/** 购物车完整数据响应 */
+export interface CartDataResp extends BaseResponse {
   data: CartDto;
 }
 
-export interface CartDto {
-  version: string;
-  total: number;
-  cards: CartSkuItem[];
+/** 购物车列表数据响应 */
+export interface CartListResp extends BaseResponse {
+  data: CartProductInfo[];
 }
 
-export interface CartSkuItem {
-  productId: string;
-  skuCode: string;
-  skuDesc: string;
-  stock: number;
-  count: number;
-  banner: string;
-  title: string;
-  serviceDesc: string;
-  price: number;
-  dashPrice?: number;
-  isSelected: boolean;
+/** 购物车操作响应（增删改） */
+export interface CartUpdateResp extends BaseResponse {
+  data: number;
+}
+
+/** 购物车价格计算响应 */
+export interface CartPriceResp extends BaseResponse {
+  data: CartPrice;
 }

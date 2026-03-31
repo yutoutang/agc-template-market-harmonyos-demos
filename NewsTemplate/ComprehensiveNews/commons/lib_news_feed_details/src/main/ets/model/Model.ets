@@ -30,50 +30,62 @@ export class AuthorInfo implements AuthorResponse {
   }
 }
 
+export class KeyWordPair {
+  keyword: string = ''
+  explain: string = ''
+}
+
+export class QuestionAndAnswer {
+  question: string = ''
+  answer: string = ''
+}
+
 @ObservedV2
 export class NewsFeedInfo implements NewsResponse {
   // 内容id
-  id: string = ''
+  id: string = '';
   // 新闻类型
-  type: NewsEnum = NewsEnum.Article
+  type: NewsEnum = NewsEnum.Article;
   // 标题
-  title: string = ''
+  title: string = '';
   // 作者
-  author: AuthorInfo = new AuthorInfo()
+  author: AuthorInfo = new AuthorInfo();
   // 创建时间
-  createTime: number = 0
+  createTime: number = 0;
   // 相对时间
-  relativeTime: string = ''
+  relativeTime: string = '';
   // 评论列表
-  @Trace comments: CommentResponse[] = []
+  @Trace comments: CommentResponse[] = [];
   // 收藏数量
-  markCount: number = 0
+  markCount: number = 0;
   // 评论数量
-  commentCount: number = 0
+  commentCount: number = 0;
   // 点赞数量
-  likeCount: number = 0
+  likeCount: number = 0;
   // 分享数量
-  shareCount: number = 0
+  shareCount: number = 0;
   // 是否被点赞
-  isLiked: boolean = false
+  isLiked: boolean = false;
   // 是否被收藏
-  isMarked: boolean = false
+  isMarked: boolean = false;
   // 富文本
-  @Trace richContent?: string = ''
+  @Trace richContent?: string = '';
   // 相关推荐
-  recommends?: NewsFeedInfo[] = []
+  recommends?: NewsFeedInfo[] = [];
   // 视频url
-  videoUrl: string = ''
+  videoUrl: string = '';
   // 封面图
-  coverImg: string = ''
+  coverImg: string = '';
   // 视频类型
-  videoType: VideoEnum = VideoEnum.Portrait
+  videoType: VideoEnum = VideoEnum.Portrait;
   // 正文
-  postBody: string = ''
+  postBody: string = '';
   // 图片链接
-  postImgList: PostImgList[] = []
-  articleFrom: string = ''
-  publishTime: string = ''
+  postImgList: PostImgList[] = [];
+  articleFrom: string = '';
+  publishTime: string = '';
+  questionAndAnswer: QuestionAndAnswer = new QuestionAndAnswer();
+  keywordPairs: KeyWordPair[] = [];
 }
 
 

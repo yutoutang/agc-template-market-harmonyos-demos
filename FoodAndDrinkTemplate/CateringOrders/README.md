@@ -30,7 +30,7 @@
 - 订单：支持对不同状态下订单的管理。
 - 我的：展示账号相关信息，支持钱包查看与充值、优惠券管理和积分展示，以及帮助中心。
 
-本模板已集成预加载、华为账号、地图、华为支付、通话等服务，只需做少量配置和定制即可快速实现页面的快速加载、华为账号的登录、商家位置定位导航、购买餐饮和联系商家等功能。
+本模板已集成预加载、华为账号、地图、华为支付、通话等服务，只需做少量配置和定制即可快速实现页面的快速加载、实现元服务关联账号、商家位置定位导航、购买餐饮和联系商家等功能。
 
 | 首页                                                                | 点餐                                                                 | 订单                                                                | 我的                                                                |
 |-------------------------------------------------------------------|--------------------------------------------------------------------|-------------------------------------------------------------------|-------------------------------------------------------------------|
@@ -392,10 +392,10 @@ CateringOrders
 
 ### 环境
 
-* DevEco Studio版本：DevEco Studio 6.0.0 Release及以上
-* HarmonyOS SDK版本：HarmonyOS 6.0.0 Release SDK及以上
+* DevEco Studio版本：DevEco Studio 6.0.2 Release及以上
+* HarmonyOS SDK版本：HarmonyOS 6.0.2 Release SDK及以上
 * 设备类型：华为手机（包括双折叠和阔折叠）
-* 系统版本：HarmonyOS 6.0.0(20)及以上
+* 系统版本：HarmonyOS 6.0.2(22)及以上
 
 ### 权限
 
@@ -461,6 +461,63 @@ CateringOrders
    a. 打开CateringOrders\network\src\main\ets\constants\Index.ets文件，将BASE_URL修改为请求服务器的地址。
 
    b. 打开CateringOrders\network\src\main\ets\apis\HttpRequest.ets文件，将config.params配置为请求中的固定参数列表。
+10. （可选）智能填充服务，需要[申请接入智能填充服务](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/scenario-fusion-introduction-to-smart-fill#section1167564853816)。
+
+11. AppLink（扫码直达）服务接入。
+
+   a. 参考[使用App Linking实现元服务跳转](https://developer.huawei.com/consumer/cn/doc/atomic-guides/atomic-applinking)
+
+   b. 拉起元服务的方式：[通过openLink接口拉起](https://developer.huawei.com/consumer/cn/doc/atomic-guides/atomic-applinking#section4402128111710) 、[通过系统浏览器或ArkWeb拉起](https://developer.huawei.com/consumer/cn/doc/atomic-guides/atomic-applinking#section151221828161112) 、通过系统扫码拉起。 想要通过扫码拉起元服务，需要在[创建元服务链接](https://developer.huawei.com/consumer/cn/doc/atomic-guides/atomic-applinking#section48651523147) 的时候关联二维码，并配置跳转元服务的二维码链接，参考示例链接：
+   https://linking.xxx.cn/cateringOrders?action=order&sid=2&tid=2。
+
+   c. 客户端代码开发：扫码直达由系统提供能力，需要在EntryAbility的onCreate和onNewWant方法中根据链接的参数进行页面跳转处理。 当前模板的代码实现如下：
+
+```typescript
+
+export default class EntryAbility extends UIAbility {
+   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
+       ...
+       this.handleAppLink(want);
+       ...
+   }
+   onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): void {
+         ...
+       this.handleAppLink(want);
+       ...
+  }
+   handleAppLink(want: Want) {
+      let uri = want?.uri
+      if (uri) {
+         // 从链接中解析query参数，拿到参数后，开发者可根据自己的业务需求进行后续的处理。
+         try {
+            let pageUrl =  want.parameters?.action as string;
+            const linkScanRouter: LinkScanModel = AppStorageV2.connect(LinkScanModel, () => new LinkScanModel())!;
+            linkScanRouter.id = new Date().getTime().toString();
+            linkScanRouter.pageUrl = pageUrl;
+         } catch (error) {
+            UtilLog.error(TAG, 'Failed to parse url. error: ' + JSON.stringify(error));
+         }
+      }
+   }
+}
+
+```
+
+需要在入口文件中进行页面跳转处理，主要代码如下：
+
+```typescript
+  // MainIndex.ets
+  // 扫码直达跳转
+    async formAppLinkJumpPage() {
+       if (this.linkScanRouter.pageUrl === 'order') {
+          let pathNames: string[] = RouterModule.getStack().getAllPathName();
+          for (let i = pathNames.length - 1; i > 0; i--) {
+             RouterModule.getStack().removeByName(pathNames[i])
+          }
+          this.currentIndex = 1;
+       }
+    }
+```
 
 ### 运行调试工程
 

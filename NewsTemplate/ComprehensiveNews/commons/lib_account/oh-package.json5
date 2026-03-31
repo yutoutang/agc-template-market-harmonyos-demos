@@ -9,5 +9,6 @@
     "lib_common": "file:../lib_common",
     "lib_news_api": "file:../lib_news_api",
     "module_login": "file:../../components/module_login",
+    "module_membership": "file:../../components/module_membership",
   }
 }

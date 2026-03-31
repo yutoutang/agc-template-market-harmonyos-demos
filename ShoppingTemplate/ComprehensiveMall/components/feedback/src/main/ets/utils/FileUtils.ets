@@ -1,13 +1,13 @@
 import { common, contextConstant } from '@kit.AbilityKit';
-import { fileUri, fileIo as fs } from '@kit.CoreFileKit';
-import { UIContext } from '@kit.ArkUI';
 import { util } from '@kit.ArkTS';
-import { StandardCharsets } from '../common/CustomTypes';
+import { UIContext } from '@kit.ArkUI';
+import { fileUri, fileIo as fs } from '@kit.CoreFileKit';
 import { UtilLog } from '@hw-agconnect/util-log';
 import { LOG_TAG } from '../common/Config';
+import { StandardCharsets } from '../common/CustomTypes';
 
 export class FileUtils {
-  private static _context: common.UIAbilityContext
+  private static _context: common.UIAbilityContext;
 
   public static setUIAbilityContext(uiContext: UIContext) {
     const context: common.Context | undefined = uiContext.getHostContext();
@@ -70,7 +70,7 @@ export class FileUtils {
       fs.copyFileSync(srcFile.fd, destFile.fd);
       return new fileUri.FileUri(destPath);
     } catch (err) {
-      UtilLog.error(LOG_TAG, 'save file to cache failed. error:' + JSON.stringify(err))
+      UtilLog.error(LOG_TAG, 'save file to cache failed. error:' + JSON.stringify(err));
     } finally {
       FileUtils.safeClose(destFile);
       FileUtils.safeClose(srcFile);
@@ -106,7 +106,7 @@ export class FileUtils {
       fs.writeSync(destFile.fd, jsonStr);
       return new fileUri.FileUri(destPath);
     } catch (err) {
-      UtilLog.error(LOG_TAG, 'save file to json failed. error:' + JSON.stringify(err))
+      UtilLog.error(LOG_TAG, 'save file to json failed. error:' + JSON.stringify(err));
     } finally {
       FileUtils.safeClose(destFile);
     }
@@ -143,7 +143,7 @@ export class FileUtils {
       buffer = new ArrayBuffer(stat.size);
       fs.readSync(file.fd, buffer);
     } catch (err) {
-      UtilLog.error(LOG_TAG, 'read file from json failed. error:' + JSON.stringify(err))
+      UtilLog.error(LOG_TAG, 'read file from json failed. error:' + JSON.stringify(err));
     } finally {
       FileUtils.safeClose(file);
     }
@@ -153,7 +153,7 @@ export class FileUtils {
       );
       return JSON.parse(decoder.decodeToString(new Uint8Array(buffer)));
     }
-    return Promise.reject()
+    return Promise.reject();
   }
 
   private static safeClose(file: fs.File | null): void {

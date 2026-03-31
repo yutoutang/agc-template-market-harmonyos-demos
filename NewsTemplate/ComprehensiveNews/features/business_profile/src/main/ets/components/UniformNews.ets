@@ -1,4 +1,4 @@
-import { CommonConstants, RouterMap, RouterParams, RouterToNews, TimeUtils } from 'lib_common';
+import { CommonConstants, RouterParams, RouterToNews, TimeUtils } from 'lib_common';
 import { NewsEnum, NewsResponse } from 'lib_news_api';
 
 @ComponentV2
@@ -77,6 +77,7 @@ export struct UniformNews {
         'type': this.newsInfo.type,
         'newsId': this.newsInfo.id,
         'authorId': this.newsInfo.author.authorId,
+        'surfaceUrl': this.videoUrl,
       }
       RouterToNews.pushToNewsDetails(routerParams)
     })

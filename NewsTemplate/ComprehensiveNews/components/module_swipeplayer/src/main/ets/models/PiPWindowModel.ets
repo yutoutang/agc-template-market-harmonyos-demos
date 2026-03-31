@@ -15,6 +15,8 @@ export class PiPWindowModel {
   @Trace isBackgroundPip: boolean = false;
   // 是否销毁播放器对象
   @Trace isReleaseVideoPlayer: boolean = true;
+  // 是否已结束画中画
+  @Trace isPipStop: boolean = false;
   // 是否可以进行画中画
   @Trace isEnablePiP: boolean = true;
   // 当前画中画的视频状态

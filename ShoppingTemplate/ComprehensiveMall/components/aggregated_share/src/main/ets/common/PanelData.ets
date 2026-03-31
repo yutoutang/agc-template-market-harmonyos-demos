@@ -18,6 +18,11 @@ export const unifiedShareList: ShareKinds[][] = [
       icon: $r('app.media.ic_qq'),
       label: 'QQ',
     },
+    {
+      kindId: ShareAppType.WEIBO,
+      icon: $r('app.media.ic_weibo'),
+      label: '微博',
+    },
   ],
   [
     {
@@ -36,7 +41,7 @@ export const unifiedShareList: ShareKinds[][] = [
       label: '系统分享',
     },
   ],
-]
+];
 
 export const posterShareList: ShareKinds[] = [
   {
@@ -63,4 +68,4 @@ export const posterShareList: ShareKinds[] = [
     label: '保存图片',
     isPoster: true,
   },
-]
+];

@@ -53,7 +53,7 @@ export class AppPrivacyUtils {
         return appPrivacyResults.every(v => v.result === privacyManager.AppPrivacyResultType.FULL_MODE_AGREED);
       }
       // todo 兼容本地调试和云调试，协议列表为空时，作同意处理
-      return true;
+      return false;
     } catch (error) {
       UtilLog.error(TAG,
         'GetAppPrivacyResultPublic exception code: ' + error.code + ', exception message: ' + error.message);

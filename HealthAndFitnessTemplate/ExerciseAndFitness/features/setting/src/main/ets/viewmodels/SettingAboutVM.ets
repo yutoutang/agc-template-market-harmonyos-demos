@@ -1,6 +1,6 @@
 import { common, Want } from '@kit.AbilityKit';
-import { promptAction } from '@kit.ArkUI';
 import { BaseViewModel, TelephoneUtils, AppGalleryUtils, BundleInfo } from 'lib_common';
+import { ContextUtils } from '../components/ContextUtils';
 
 @ObservedV2
 export class SettingAboutVM extends BaseViewModel {
@@ -23,7 +23,7 @@ export class SettingAboutVM extends BaseViewModel {
   }
 
   checkUpdate() {
-    const context = getContext(this) as common.UIAbilityContext;
+    const context = ContextUtils.globalUIAbilityContext as common.UIAbilityContext;
     this.loading = true;
     AppGalleryUtils.checkAppUpdate(context).then((resp: boolean) => {
       this.hasNewVersion = resp;
@@ -31,7 +31,7 @@ export class SettingAboutVM extends BaseViewModel {
       if (this.hasNewVersion) {
         AppGalleryUtils.showUpdateDialog(context);
       } else {
-        promptAction.showToast({ message: this.updateLabel });
+        this.contextModel.showToast({ message: this.updateLabel });
       }
     }).finally(() => {
       this.loading = false;
@@ -43,7 +43,7 @@ export class SettingAboutVM extends BaseViewModel {
   }
 
   goWebsite() {
-    const context = getContext(this) as common.UIAbilityContext
+    const context = ContextUtils.globalUIAbilityContext as common.UIAbilityContext
     let want: Want = {
       action: 'ohos.want.action.viewData',
       entities: ['entity.system.browsable'],

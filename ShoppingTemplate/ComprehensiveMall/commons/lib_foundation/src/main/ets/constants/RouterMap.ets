@@ -23,12 +23,14 @@ export enum RouterMap {
   USER_REDEMPTION_SUBMIT = 'RedemptionSubmitPage',
 
   PRODUCT_SWIPER = 'ProductSwiperPage',
+  PRODUCT_REVIEW = 'ProductReviewPage',
   PRODUCT_SEARCH = 'ProductSearchPage',
   PRODUCT_SEARCH_RESULTS = 'ProductSearchResultsPage',
-  PRODUCT_INFO = 'ProductInfoPageNew',
+  PRODUCT_INFO = 'ProductInfoPage',
   PRODUCT_CATEGORY = 'CategoryPage',
   PRODUCT_SUBCATEGORY = 'SubCategoryPage',
   PRODUCT_CART = 'CartPage',
+  PRODUCT_SECKILL = 'SeckillListPage',
 
   ORDER_SUBMIT = 'OrderSubmitPage',
   ORDER_SEARCH = 'OrderSearchPage',

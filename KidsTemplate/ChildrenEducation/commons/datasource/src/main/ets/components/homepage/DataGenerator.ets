@@ -12,20 +12,20 @@ export interface SelectedPageData {
   classicStory: Array<VideoCard>; //音频故事专区
 }
 
-export interface VideoDetail {
+export interface VideoCollection {
   videoCard: VideoCard,
   videoCardDetailList: Array<VideoCardDetail>
 }
 
 interface ChinesePageData {
-  singStory: Array<VideoDetail>; // 听故事 学叙事
+  singStory: Array<VideoCard>; // 听故事 学叙事
   threeCharacter: Array<VideoCard>; // 三字经 磨耳朵
 }
 
 interface CartoonPageData {
-  superCar: VideoDetail,
-  domiParadise: VideoDetail,
-  funEncyclopedia: Array<VideoCard>, // 趣味百科
+  videoType1: Array<VideoCard> // 超级汽车
+  videoType2: Array<VideoCard> // 多米
+  videoType3: Array<VideoCard> // 趣味大百科
 }
 
 export class DataGenerator {
@@ -77,7 +77,7 @@ export class DataGenerator {
         {
           id: '0011',
           title: '零基础英语，26字母加200+高频单词',
-          describe: '',
+          describe: '零基础英语，26字母加200+高频单词，零基础英语，26字母加200+高频单词',
           tags: ['0-3岁', '英语蒙1', '认知'],
           updateCount: 26,
           videoType: 0,
@@ -89,7 +89,7 @@ export class DataGenerator {
         {
           id: '0012',
           title: '零基础语文，拼音字母唐诗三百首',
-          describe: '',
+          describe: '零基础语文，拼音字母唐诗三百首，零基础语文，拼音字母唐诗三百首',
           tags: ['0-3岁', '英语蒙2', '认知'],
           videoType: 0,
           updateCount: 26,
@@ -304,7 +304,7 @@ export class DataGenerator {
       ],
       audioStory: [
         {
-          id: '00010',
+          id: 'audioStory00001',
           title: '神秘海洋探索记',
           describe: '深海寻宝，利用海洋知识破解谜案',
           tags: [],
@@ -316,7 +316,7 @@ export class DataGenerator {
           isVip: true,
         },
         {
-          id: '00011',
+          id: 'audioStory00002',
           title: '百科知识大全',
           describe: '深海寻宝，利用海洋知识破解谜案',
           tags: [],
@@ -328,7 +328,7 @@ export class DataGenerator {
           isVip: true,
         },
         {
-          id: '00012',
+          id: 'audioStory00003',
           title: '天空飞翔记',
           describe: '深海寻宝，利用海洋知识破解谜案',
           tags: [],
@@ -339,6 +339,30 @@ export class DataGenerator {
             'v0/children-education-kqxc3/common_1%2Fpicture_14.PNG?token=02e2ec85-e6de-47c3-972e-a34a2dd78794',
           isVip: true,
         },
+        {
+          id: 'audioStory00004',
+          title: '神秘海洋探索记',
+          describe: '深海寻宝，利用海洋知识破解谜案',
+          tags: [],
+          videoType: 1,
+          updateCount: 144,
+          totalCount: 144,
+          imageUrl: cloudUrl +
+            'v0/children-education-kqxc3/common%2F%E7%9F%A9%E5%BD%A2%203416(15).png?token=f4457e7c-5a6b-4662-9681-57d5c90b2ecb',
+          isVip: true,
+        },
+        {
+          id: 'audioStory00005',
+          title: '百科知识大全',
+          describe: '深海寻宝，利用海洋知识破解谜案',
+          tags: [],
+          videoType: 1,
+          updateCount: 26,
+          totalCount: 26,
+          imageUrl: cloudUrl +
+            'v0/children-education-kqxc3/common%2F%E7%9F%A9%E5%BD%A2%203416(12).png?token=49764103-5df1-4659-b517-5f3ed06c17fc',
+          isVip: true,
+        }
       ],
       classicStory: [
         {
@@ -476,8 +500,8 @@ export class DataGenerator {
   /**
    * 热门动画榜-更多
    */
-  static getHotAnimationData(uiContext: UIContext): Array<VideoCard> {
-    let context = uiContext.getHostContext() as common.UIAbilityContext;
+  static getHotAnimationData(context: common.UIAbilityContext): Array<VideoCard> {
+    // let context = uiContext.getHostContext() as common.UIAbilityContext;
     let cloudUrl = DataGenerator.getString(context, 'cloud_datastore')
     return [
       {
@@ -652,7 +676,7 @@ export class DataGenerator {
   /**
    * 视频播放详情
    */
-  static getVideoDetail(uiContext: UIContext): VideoDetail {
+  static getVideoDetail(uiContext: UIContext): VideoCollection {
     let context = uiContext.getHostContext() as common.UIAbilityContext;
     let cloudUrl = DataGenerator.getString(context, 'cloud_datastore')
     let videoUrl = DataGenerator.getString(context, 'videoUrlOne')
@@ -765,7 +789,7 @@ export class DataGenerator {
   /**
    * 音频播放详情
    */
-  static getAudioDetail(uiContext: UIContext): VideoDetail {
+  static getAudioDetail(uiContext: UIContext): VideoCollection {
     let context = uiContext.getHostContext() as common.UIAbilityContext;
     let cloudUrl = DataGenerator.getString(context, 'cloud_datastore')
     let audioUrl = DataGenerator.getString(context, 'audioUrl')
@@ -1056,54 +1080,101 @@ export class DataGenerator {
     return {
       singStory: [
         {
-          videoCard: {
-            id: '',
-            title: '世界名人故事',
-            describe: '儿歌 经典音乐视频',
-            tags: ['3-6岁', '人文表达'],
-            plateType: '互动',
-            videoType: 0,
-            updateCount: 47,
-            totalCount: 52,
-            imageUrl: cloudUrl +
-              'v0/children-education-kqxc3/common%2F1756539491_huge.png?token=451028ba-72e5-4a8d-a4af-0aa54e5a761a',
-            isVip: true,
-          },
-          videoCardDetailList: [],
+          id: 'singStory-01',
+          title: '世界名人故事',
+          describe: '儿歌 经典音乐视频',
+          tags: ['3-6岁', '人文表达'],
+          plateType: '互动',
+          videoType: 0,
+          updateCount: 47,
+          totalCount: 52,
+          imageUrl: cloudUrl +
+            'v0/children-education-kqxc3/common%2F1756539491_huge.png?token=451028ba-72e5-4a8d-a4af-0aa54e5a761a',
+          isVip: false,
         },
         {
-          videoCard: {
-            id: '',
-            title: '听Alex老师讲故事，轻松学习200+高频词',
-            describe: '互动视频',
-            tags: ['3-6岁', '高频词汇'],
-            videoType: 0,
-            plateType: '互动',
-            updateCount: 47,
-            totalCount: 52,
-            imageUrl: cloudUrl +
-              'v0/children-education-kqxc3/common%2F1756539491_huge.png?token=451028ba-72e5-4a8d-a4af-0aa54e5a761a',
-            isVip: true,
-          },
-          videoCardDetailList: [],
+          id: 'singStory-02',
+          title: '听Alex老师讲故事，轻松学习200+高频词',
+          describe: '互动视频',
+          tags: ['3-6岁', '高频词汇'],
+          videoType: 0,
+          plateType: '互动',
+          updateCount: 47,
+          totalCount: 52,
+          imageUrl: cloudUrl +
+            'v0/children-education-kqxc3/common%2F1756539491_huge.png?token=451028ba-72e5-4a8d-a4af-0aa54e5a761a',
+          isVip: true,
         },
+        {
+          id: 'singStory-03',
+          title: '听Alex老师讲故事，轻松学习200+高频词',
+          describe: '互动视频',
+          tags: ['3-6岁', '高频词汇'],
+          videoType: 0,
+          plateType: '互动',
+          updateCount: 47,
+          totalCount: 52,
+          imageUrl: cloudUrl +
+            'v0/children-education-kqxc3/common%2F1756539491_huge.png?token=451028ba-72e5-4a8d-a4af-0aa54e5a761a',
+          isVip: true,
+        },
+        {
+          id: 'singStory-04',
+          title: '听Alex老师讲故事，轻松学习200+高频词',
+          describe: '互动视频',
+          tags: ['3-6岁', '高频词汇'],
+          videoType: 0,
+          plateType: '互动',
+          updateCount: 47,
+          totalCount: 52,
+          imageUrl: cloudUrl +
+            'v0/children-education-kqxc3/common%2F1756539491_huge.png?token=451028ba-72e5-4a8d-a4af-0aa54e5a761a',
+          isVip: true,
+        },
+        {
+          id: 'singStory-05',
+          title: '听Alex老师讲故事，轻松学习200+高频词',
+          describe: '互动视频',
+          tags: ['3-6岁', '高频词汇'],
+          videoType: 0,
+          plateType: '互动',
+          updateCount: 47,
+          totalCount: 52,
+          imageUrl: cloudUrl +
+            'v0/children-education-kqxc3/common%2F1756539491_huge.png?token=451028ba-72e5-4a8d-a4af-0aa54e5a761a',
+          isVip: true,
+        },
+        {
+          id: 'singStory-06',
+          title: '听Alex老师讲故事，轻松学习200+高频词',
+          describe: '互动视频',
+          tags: ['3-6岁', '高频词汇'],
+          videoType: 0,
+          plateType: '互动',
+          updateCount: 47,
+          totalCount: 52,
+          imageUrl: cloudUrl +
+            'v0/children-education-kqxc3/common%2F1756539491_huge.png?token=451028ba-72e5-4a8d-a4af-0aa54e5a761a',
+          isVip: true,
+        }
       ],
-      threeCharacter: [{
-        id: '',
-        title: '两只老虎',
-        describe: '',
-        tags: ['儿歌', '儿童', '音乐'],
-        videoType: 0,
-        updateCount: 47,
-        totalCount: 52,
-        plateType: '视频',
-        imageUrl: cloudUrl + 'v0/children-education-kqxc3/common%2F9.png?token=9bb42244-316a-4a34-873e-5e918bb95d53',
-        isVip: true,
+      threeCharacter: [
+        {
+          id: '',
+          title: '人之初 性本善',
+          describe: '',
+          tags: ['儿歌', '儿童', '音乐'],
+          videoType: 0,
+          updateCount: 47,
+          totalCount: 52,
+          plateType: '视频',
+          imageUrl: cloudUrl + 'v0/children-education-kqxc3/common%2F9.png?token=9bb42244-316a-4a34-873e-5e918bb95d53',
+          isVip: true,
 
-      },
+        },
         {
           id: '',
-          title: '宝贝多米',
+          title: '昔孟母 择邻处',
           describe: '',
           tags: ['儿歌', '儿童', '音乐'],
           videoType: 0,
@@ -1115,7 +1186,7 @@ export class DataGenerator {
         },
         {
           id: '',
-          title: '好宝宝',
+          title: '养不教 父之过',
           describe: '',
           tags: ['儿歌', '儿童', '音乐'],
           videoType: 0,
@@ -1127,7 +1198,7 @@ export class DataGenerator {
         },
         {
           id: '',
-          title: '春天在哪里',
+          title: '玉不琢 不成器',
           describe: '',
           tags: ['儿歌', '儿童', '音乐'],
           videoType: 0,
@@ -1203,8 +1274,20 @@ export class DataGenerator {
     let context = uiContext.getHostContext() as common.UIAbilityContext;
     let cloudUrl = DataGenerator.getString(context, 'cloud_datastore')
     return {
-      superCar: {
-        videoCard: {
+      videoType1: [
+        {
+          id: '',
+          title: '超级汽车第三季',
+          describe: '超级汽车，守护正义与美好',
+          tags: ['变身', '救援', '勇敢正义'],
+          videoType: 0,
+          updateCount: 46,
+          totalCount: 52,
+          imageUrl: cloudUrl +
+            'v0/children-education-kqxc3/common%2Fhellorf_2239162006.jpg?token=cbaaca3d-e3b7-4005-8c27-36fa87224b86',
+          isVip: true,
+        },
+        {
           id: '',
           title: '超级汽车第四季',
           describe: '超级汽车，守护正义与美好',
@@ -1215,11 +1298,23 @@ export class DataGenerator {
           imageUrl: cloudUrl +
             'v0/children-education-kqxc3/common%2Fhellorf_2239162006.jpg?token=cbaaca3d-e3b7-4005-8c27-36fa87224b86',
           isVip: true,
+        }
+      ],
+      videoType2: [
+        {
+          id: '',
+          title: '宝贝多米益智乐园第一季',
+          describe: '多米与朋友们的精彩生活',
+          plateType: '动画',
+          tags: ['童趣', '快乐成长'],
+          videoType: 0,
+          updateCount: 46,
+          totalCount: 52,
+          imageUrl: cloudUrl +
+            'v0/children-education-kqxc3/common%2F%E7%9F%A9%E5%BD%A2%203416(27).png?token=25b8be8c-b6b8-453b-9be1-da347fb07619',
+          isVip: true,
         },
-        videoCardDetailList: [],
-      },
-      domiParadise: {
-        videoCard: {
+        {
           id: '',
           title: '宝贝多米益智乐园第二季',
           describe: '多米与朋友们的精彩生活',
@@ -1232,9 +1327,21 @@ export class DataGenerator {
             'v0/children-education-kqxc3/common%2F%E7%9F%A9%E5%BD%A2%203416(27).png?token=25b8be8c-b6b8-453b-9be1-da347fb07619',
           isVip: true,
         },
-        videoCardDetailList: [],
-      },
-      funEncyclopedia: [
+        {
+          id: '',
+          title: '宝贝多米益智乐园第三季',
+          describe: '多米与朋友们的精彩生活',
+          plateType: '动画',
+          tags: ['童趣', '快乐成长'],
+          videoType: 0,
+          updateCount: 46,
+          totalCount: 52,
+          imageUrl: cloudUrl +
+            'v0/children-education-kqxc3/common%2F%E7%9F%A9%E5%BD%A2%203416(27).png?token=25b8be8c-b6b8-453b-9be1-da347fb07619',
+          isVip: true,
+        }
+      ],
+      videoType3: [
         {
           id: '',
           title: '长城的作用是什么',
@@ -1280,7 +1387,7 @@ export class DataGenerator {
           imageUrl: cloudUrl + 'v0/children-education-kqxc3/common%2F7.png?token=b08b5509-18b6-4902-881a-006f3cdc35c9',
           isVip: true,
         },
-      ],
+      ]
     }
   }
 

@@ -1,2 +1,1 @@
-export { CheckinContext } from './src/main/ets/common/CustomTypes';
-export { goToCheckinPage } from './src/main/ets/RouterHelper';
+export { CHECKIN_PAGE_NAME } from './src/main/ets/common/RouterConst';

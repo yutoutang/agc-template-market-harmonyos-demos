@@ -313,6 +313,7 @@ struct VideoListView {
                   Text(item.time)
                     .fontSize(10)
                     .fontColor(Color.White)
+                    .maxFontScale(1)
                     .alignRules({
                       bottom:{anchor:'__container__', align: VerticalAlign.Bottom},
                       right: {anchor:'__container__',align: HorizontalAlign.End}
@@ -336,6 +337,7 @@ struct VideoListView {
                       })
                       .ellipsisMode(EllipsisMode.END)
                       .maxLines(1)
+                      .maxFontScale(1)
                       .layoutWeight(1)
 
                     if (item.needVip) {
@@ -349,6 +351,7 @@ struct VideoListView {
                     .fontSize(14)
                     .fontColor('rgba(0,0,0,0.6)')
                     .fontWeight(FontWeight.Regular)
+                    .maxFontScale(1)
                     .textOverflow({
                       overflow:TextOverflow.Ellipsis
                     })

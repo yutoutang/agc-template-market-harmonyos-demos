@@ -9,6 +9,8 @@ export class VideoData implements VideoPlayerData {
   updateTime: string = ''
   sectionUrl: string = ''
   coverUrl: string = ''
+  authorNickName: string = ''
+  @Trace needVip: boolean = false;
 
   getVideoId(): string {
     return this.id;
@@ -30,11 +32,34 @@ export class VideoData implements VideoPlayerData {
     return this.duration;
   }
 
-  constructor(data: AvSection) {
+  getAuthorName() {
+    return this.authorNickName;
+  }
+
+  /**
+   * 视频资源是否需要vip会员解锁观看
+   * @returns
+   */
+  public isNeedVip() {
+    return this.needVip;
+  }
+
+  /**
+   * 设置视频时长
+   * @param duration
+   */
+  public setVideoDuration(duration: number) {
+    this.duration = duration;
+  }
+
+  constructor(data: AvSection, authorName?: string) {
     this.id = data.id
     this.title = data.title
     this.sectionUrl = data.sectionUrl!
+    this.coverUrl = data.coverUrl
     this.duration = data.duration!
+    this.needVip = data.needVip;
     this.updateTime = data.updateTime!
+    this.authorNickName = authorName ?? '';
   }
 }

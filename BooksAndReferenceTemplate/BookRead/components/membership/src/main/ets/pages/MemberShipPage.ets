@@ -99,7 +99,7 @@ export struct MemberShipPage {
         Image($r('app.media.membership_back')).size({ width: 40, height: 40 }).onClick(() => {
           this.routerModule.pop();
         });
-        Text('会员中心').fontSize(20).fontWeight(FontWeight.Bold).fontColor($r('sys.color.font_primary'));
+        Text('会员中心').fontSize(20).fontWeight(FontWeight.Bold).fontColor(Color.Black);
       }.position({ left: 16 }).zIndex(2).padding({ top: this.windowTopHeight});
     }
   }
@@ -253,7 +253,7 @@ export struct MemberShipPage {
               this.vm.selectedProductIndex = index;
             });
           };
-        });
+        }, (item: iap.Product) => item.id);
       }
       .width('100%')
       .height(124)
@@ -288,7 +288,7 @@ export struct MemberShipPage {
               }.alignItems(HorizontalAlign.Start).width('calc(100% - 48vp)');
             }.width('100%');
           };
-        });
+        }, (item: MemberShipPrivilege) => item.id);
       }
       .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
       .padding(12)

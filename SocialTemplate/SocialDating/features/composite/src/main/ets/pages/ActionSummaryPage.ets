@@ -23,16 +23,16 @@ export function ActionSummaryPageBuilder() {
 /**
  * 操作汇总页面
  */
-@Component
+@ComponentV2
 export struct ActionSummaryPage {
-  @Consume('pageStack') pageStack: NavPathStack;
-  @State userFullInfos: UserFullInfo[] | null = null;
-  @State feeds: Feed[] | null = null;
-  @State pageType: ActionSummaryPageType = ActionSummaryPageType.FollowUser;
-  @State currentIndex: number = 0;
-  @State currentUserBasic: BasicUserInfo | null | undefined = null;
-  @State noMoreFeedFlag: boolean = false;
-  @State noFeedAtAll: boolean = false;
+  @Consumer('pageStack') pageStack: NavPathStack = new NavPathStack();
+  @Local userFullInfos: UserFullInfo[] | null = null;
+  @Local feeds: Feed[] | null = null;
+  @Local pageType: ActionSummaryPageType = ActionSummaryPageType.FollowUser;
+  @Local currentIndex: number = 0;
+  @Local currentUserBasic: BasicUserInfo | null | undefined = null;
+  @Local noMoreFeedFlag: boolean = false;
+  @Local noFeedAtAll: boolean = false;
   private scroller: Scroller = new Scroller();
   private tab1Content: string[] = [];
   private tab2Content: string[] = [];

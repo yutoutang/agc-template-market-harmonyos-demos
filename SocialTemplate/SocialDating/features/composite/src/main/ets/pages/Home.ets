@@ -10,16 +10,18 @@ import {
   UiUtils,
   FollowType
 } from 'commons';
-import { Matchmaker, contactMatchmakerBuilder, bindSheetTitleBuilder } from 'member';
+import { Matchmaker } from 'member';
 import { FeedListPageRouteParam } from 'feed';
 import { UserSelfIntro, UserLabels } from 'user';
 import { GridShowImage } from 'feed';
 
+import { BusinessError } from '@kit.BasicServicesKit';
 import MatchMakerService from 'member/src/main/ets/service/MatchMakerService';
 import FeedService from 'feed/src/main/ets/service/FeedService';
 import Logger from 'commons/src/main/ets/utils/Logger';
 import UserService from 'user/src/main/ets/service/UserService';
 import ActivityService from 'activity/src/main/ets/service/ActivityService';
+import { DialPanel } from 'dial_panel';
 
 const HOME_OPER_DRAG_MIN_RIGHT = 20;
 const HOME_OPER_DRAG_MAX_RIGHT = 320;
@@ -32,33 +34,54 @@ export function HomePageBuilder() {
   Home()
 }
 
-@Component
+@ComponentV2
 export struct Home {
-  @State currentIndex: number = 0
-  @Consume('pageStack') pageStack: NavPathStack;
-  @State selectedCity: string = '南京';
+  @Local currentIndex: number = 0
+  @Consumer('pageStack') pageStack: NavPathStack = new NavPathStack();
+  @Local selectedCity: string = '南京';
   private selectCityIdx: number = 0
   private activitiesScroller: Scroller = new Scroller();
-  @State arr: Array<ActivityInfo> = [];
-  @State selectedActivity: ActivityInfo | null = null;
-  @State recommendUserFullInfo: UserFullInfo | null = null;
-  @State followClicked: boolean = false;
+  @Local arr: Array<ActivityInfo> = [];
+  @Local selectedActivity: ActivityInfo | null = null;
+  @Local recommendUserFullInfo: UserFullInfo | null = null;
+  @Local followClicked: boolean = false;
   private userInfoScroller: Scroller = new Scroller();
   private recommendNumber = 1;
   private matchMaker: Matchmaker | null = null;
-  @State ta: string = 'TA';
-  @State currentUser: BasicUserInfo | null = null;
-  @State isShowContactMatchmaker: boolean = false;
-  @State operButtonsRight: number = 20;
-  @State operButtonsBottom: number = 50;
-  @State offsetRight: number = 20;
-  @State offsetBottom: number = 50;
-  @State userContentHeight: number = 0;
-  @State userContainerHeight: number = 0;
-  @State getNextFlag: boolean = false;
-  @State getLastFlag: boolean = false;
-  @Prop @Watch('onChange') index: number = 0;
+  @Local ta: string = 'TA';
+  @Local currentUser: BasicUserInfo | null = null;
+  @Local isShowContactMatchmaker: boolean = false;
+  @Local operButtonsRight: number = 20;
+  @Local operButtonsBottom: number = 50;
+  @Local offsetRight: number = 20;
+  @Local offsetBottom: number = 50;
+  @Local userContentHeight: number = 0;
+  @Local userContainerHeight: number = 0;
+  @Local getNextFlag: boolean = false;
+  @Local getLastFlag: boolean = false;
+  @Param index: number = 0;
+  private uiContext: UIContext = this.getUIContext();
+  private dialPanel: DialPanel = new DialPanel(this.uiContext)
+    .onMakeCall((e: BusinessError<void>): void => {
+      if (e.code) {
+        this.showToast(`拨号页面跳转失败 -> code: ${e.code}, msg: ${e.message}`);
+      }
+    })
+    .onWillDismiss((reason: DismissReason): void => {
+      if (reason === DismissReason.TOUCH_OUTSIDE) {
+        this.showToast('已拦截点击其它区域进行关闭的交互方式');
+      } else if (reason === DismissReason.SLIDE_DOWN) {
+        this.showToast('已拦截下拉模态窗进行关闭的交互方式');
+      } else {
+        this.dialPanel.close();
+      }
+    });
 
+  private showToast(msg: string): void {
+    this.uiContext.getPromptAction().showToast({ message: msg });
+  }
+
+  @Monitor('index')
   onChange() {
     if (this.index === Constants.PAGE_INDEX_HOME) {
       if (this.currentUser == null) {
@@ -246,7 +269,7 @@ export struct Home {
               .fontWeight(FontWeight.Regular);
           }.justifyContent(FlexAlign.Center)
 
-          Divider().strokeWidth(1).margin({ top: 7, bottom: 16 }).width('92%');
+          Divider().strokeWidth('1px').margin({ top: 7, bottom: 16 }).width('92%');
           ForEach(getHistoryActivities(this.arr), (item: ActivityInfo) => {
             this.ActivityImageButton(item)
           }, (item: ActivityInfo) => item.activityId.toString())
@@ -370,10 +393,10 @@ export struct Home {
         .value('活动地区： ' + this.selectedCity)
         .arrowPosition(ArrowPosition.END)
         .menuAlign(MenuAlignType.START, { dx: 0, dy: -8 })
-        .font({ size: 12, family: Constants.HARMONY_HEITI, weight: FontWeight.Medium })
-        .fontColor($r('app.color.title_font_color'))
-        .optionFont({ size: 16, family: Constants.HARMONY_HEITI, weight: FontWeight.Medium })
-        .optionFontColor($r('app.color.text_font_color_black'))
+        .font({ size: $r('sys.float.Body_M'), family: Constants.HARMONY_HEITI, weight: FontWeight.Medium })
+        .fontColor($r('sys.color.font_primary'))
+        .optionFont({ size: $r('sys.float.Body_L'), family: Constants.HARMONY_HEITI, weight: FontWeight.Medium })
+        .optionFontColor($r('sys.color.font_primary'))
         .optionHeight(190)
         .optionWidth(224)
         .onSelect((index: number, text?: string | undefined) => {
@@ -416,13 +439,13 @@ export struct Home {
               });
             }
           })
-          .bindSheet($$this.isShowContactMatchmaker, contactMatchmakerBuilder(this.matchMaker, () => {
-            this.isShowContactMatchmaker = !this.isShowContactMatchmaker;
-          }), {
-            detents: [360],
-            preferType: SheetType.BOTTOM,
-            title: bindSheetTitleBuilder('联系红娘')
-          })
+          .onClick(() => {
+            this.dialPanel
+              .setTitle('联系专属红娘')
+              .setPhoneNumber('12345678901')
+              .setAutoClosePanel(false) // 成功跳转后不自动关闭模态窗
+              .open();
+          });
 
         Image(this.followClicked ? $r('app.media.icon_follow') : $r('app.media.icon_followed'))
           .width(40)
@@ -815,7 +838,8 @@ export struct Home {
 
   buildCitySelectOptions(): SelectOption[] {
     let selectOptions: SelectOption[] = [];
-    let cities: string[] = getContext(this).resourceManager.getStringArrayByNameSync('activity_supported_cities');
+    let cities: string[] = this.getUIContext().getHostContext()?.resourceManager
+      .getStringArrayByNameSync('activity_supported_cities') as string[];
     for (let i = 0; i < cities.length; i++) {
       selectOptions[i] = { value: cities[i] }
     }

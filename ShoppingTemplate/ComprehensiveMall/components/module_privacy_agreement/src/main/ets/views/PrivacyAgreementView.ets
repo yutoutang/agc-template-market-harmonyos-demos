@@ -152,7 +152,7 @@ export struct PrivacyAgreementView {
         })
       }
       .padding($r('app.string.space_m'))
-      .backgroundColor($r('app.color.background_color_white'))
+      .backgroundColor($r('app.color.background_color_primary'))
       .borderRadius($r('app.string.border_radius_32'))
     }
     .height($r('app.string.size_percent_full'))

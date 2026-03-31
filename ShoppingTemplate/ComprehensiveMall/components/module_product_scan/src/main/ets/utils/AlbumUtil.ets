@@ -14,8 +14,8 @@ class AlbumUtil {
       .then((result) => {
         callback(result);
       }).catch((err: BusinessError) => {
-      Logger.error(LOG_TAG, 'select photo failed. error:' + JSON.stringify(err))
-    })
+      Logger.error(LOG_TAG, 'select photo failed. error:' + JSON.stringify(err));
+    });
   }
 }
 

@@ -1,10 +1,10 @@
-# 富文本组件_属性字符串快速入门
+# 富文本编辑组件快速入门
 
 ## 目录
 
 - [简介](#简介)
 - [约束与限制](#约束与限制)
-- [快速入门](#快速入门)
+- [使用](#使用)
 - [API参考](#API参考)
 - [示例代码](#示例代码)
 
@@ -19,13 +19,15 @@
 
 ## 约束与限制
 ### 环境
-* DevEco Studio版本：DevEco Studio 5.0.3 Release及以上
-* HarmonyOS SDK版本：HarmonyOS 5.0.3 Release SDK及以上
+* DevEco Studio版本：DevEco Studio 6.0.0 Release及以上
+* HarmonyOS SDK版本：HarmonyOS 6.0.0 Release SDK及以上
 * 设备类型：华为手机（包括双折叠和阔折叠）
-* 系统版本：HarmonyOS 5.0.3(15)及以上
+* 系统版本：HarmonyOS 6.0.0(20)及以上
 
+### 权限
+无
 
-## 快速入门
+## 使用
 
 1. 安装组件。
 
@@ -86,13 +88,13 @@ import { RichEditorController, RichEditorArea, ChangeRecord, MORE_ACTION_LIST,
 
 RichEditorArea(options: RichEditorAreaOptions)
 
-富文本编辑组件_属性字符串。
+富文本编辑组件。
 
 **参数：**
 
-| 参数名  | 类型                                                         | 必填 | 说明                |
-| ------- | ------------------------------------------------------------ | ---- |-------------------|
-| options | [RichEditorAreaOptions](#RichEditorAreaOptions对象说明) | 否   | 富文本编辑组件_属性字符串的参数。 |
+| 参数名  | 类型                                                         | 必填 | 说明              |
+| ------- | ------------------------------------------------------------ | ---- |-----------------|
+| options | [RichEditorAreaOptions](#RichEditorAreaOptions对象说明) | 否   | 富文本编辑组件的参数。 |
 
 ### RichEditorAreaOptions对象说明
 
@@ -184,7 +186,7 @@ struct EditNotes {
   @Consumer('appPathStack') appPathStack: NavPathStack = new NavPathStack();
   private scroller: Scroller = new Scroller();
   richEditorController: RichEditorController = RichEditorController.instance;
-  snapShotController: SnapShotController = new SnapShotController(SNAPSHOT_ID, this.scroller);
+  snapShotController: SnapShotController = new SnapShotController(SNAPSHOT_ID, this.scroller, this.getUIContext());
   @Local noteTitle: string = '';
   @Local isEditNote: boolean = false;
   @Local currentNote: Note = new Note(new MutableStyledString(''));

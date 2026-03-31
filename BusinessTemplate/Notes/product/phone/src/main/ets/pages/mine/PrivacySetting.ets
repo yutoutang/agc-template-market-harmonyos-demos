@@ -24,7 +24,7 @@ export struct PrivacySetting {
             MergeArrow({
               text1: '用户协议',
               text1Click: () => {
-                let privacyUrl = readDataFromRawFile<string>('data.json', 'privacy_url');
+                let privacyUrl = readDataFromRawFile<string>(this.getUIContext(),'data.json', 'privacy_url');
                 if (privacyUrl !== undefined) {
                   const params: Record<string, Object> = { 'protocolUrl':  privacyUrl};
                   this.appPathStack.pushPathByName('PrivacyAgreement', params);
@@ -32,7 +32,7 @@ export struct PrivacySetting {
               },
               text2: '隐私政策',
               text2Click: () => {
-                let privacyUrl = readDataFromRawFile<string>('data.json', 'privacy_url');
+                let privacyUrl = readDataFromRawFile<string>(this.getUIContext(),'data.json', 'privacy_url');
                 if (privacyUrl !== undefined) {
                   const params: Record<string, Object> = { 'protocolUrl':  privacyUrl};
                   this.appPathStack.pushPathByName('PrivacyAgreement', params);
@@ -43,7 +43,7 @@ export struct PrivacySetting {
             MergeArrow({
               text1: '第三方信息共享清单',
               text1Click: () => {
-                let privacyUrl = readDataFromRawFile<string>('data.json', 'privacy_url');
+                let privacyUrl = readDataFromRawFile<string>(this.getUIContext(),'data.json', 'privacy_url');
                 if (privacyUrl !== undefined) {
                   const params: Record<string, Object> = { 'protocolUrl':  privacyUrl};
                   this.appPathStack.pushPathByName('PrivacyAgreement', params);
@@ -51,7 +51,7 @@ export struct PrivacySetting {
               },
               text2: '个人信息收集清单',
               text2Click: () => {
-                let privacyUrl = readDataFromRawFile<string>('data.json', 'privacy_url');
+                let privacyUrl = readDataFromRawFile<string>(this.getUIContext(),'data.json', 'privacy_url');
                 if (privacyUrl !== undefined) {
                   const params: Record<string, Object> = { 'protocolUrl':  privacyUrl};
                   this.appPathStack.pushPathByName('PrivacyAgreement', params);

@@ -65,10 +65,10 @@ export class NoticeMockApis {
     adapter
       .onDelete(RequestUrlMap.NOTICE_DETAIL)
       .reply((config: AxiosRequestConfig) => {
-        const id = config.params.id as string
-        this._mockList = this._mockList.filter((message) => message.id !== id)
-        return [HttpStatusCode.Ok, 0]
-      })
+        const id = config.params.id as string;
+        this._mockList = this._mockList.filter((message) => message.id !== id);
+        return [HttpStatusCode.Ok, 0];
+      });
   }
 }
 

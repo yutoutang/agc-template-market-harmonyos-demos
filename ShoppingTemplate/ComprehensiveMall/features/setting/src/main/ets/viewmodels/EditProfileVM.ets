@@ -26,7 +26,7 @@ export class EditProfileVM {
       const res = await UserApis.updateUserInfo({
         type: UserInfoType.AVATAR,
         value: param as string,
-      })
+      });
       if (res.code === 0) {
         this.avatarItem.value = param as string;
       }
@@ -47,12 +47,12 @@ export class EditProfileVM {
       const res = await UserApis.updateUserInfo({
         type: UserInfoType.NICKNAME,
         value: param as string,
-      })
+      });
       if (res.code === 0) {
         this.nickNameItem.value = param as string;
       }
     },
-  })
+  });
   @Trace phoneItem: ObservedInfoItem = new ObservedInfoItem({
     type: FormType.PHONE_INPUT,
     label: '手机号码',
@@ -62,28 +62,28 @@ export class EditProfileVM {
       sendCode: (_phone: string) => {
         return new Promise((resolve) => {
           setTimeout(() => {
-            resolve()
-          }, 1000)
-        })
+            resolve();
+          }, 1000);
+        });
       },
       verifyCode: (_phone: string, _code: string) => {
         return new Promise((resolve) => {
           setTimeout(() => {
-            resolve()
-          }, 1000)
-        })
+            resolve(true);
+          }, 1000);
+        });
       },
     },
     onChange: async (param?: Object) => {
       const res = await UserApis.updateUserInfo({
         type: UserInfoType.PHONE,
         value: param as string,
-      })
+      });
       if (res.code === 0) {
         this.phoneItem.value = param as string;
       }
     },
-  })
+  });
   @Trace list: FormGroup[] = [
     {
       list: [this.avatarItem],

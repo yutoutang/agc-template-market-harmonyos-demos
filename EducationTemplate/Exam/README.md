@@ -19,7 +19,7 @@
 | 多级分栏组件（select_category） | 多级别选项样式           | [使用指导](components/select_category/README.md)    |
 | 搜索组件（search）         | 本组件提供了搜索的相关功能     | [使用指导](components/search/README.md)         |
 | 一键搜题组件（search_question） | 多功能搜题组件           | [使用指导](components/search_question/README.md)       |
-| 意见反馈组件（feed_back）    | 意见反馈组件            | [使用指导](components/feed_back/README.md)       |
+| 通用问题反馈组件（feedback）    | 问题反馈组件            | [使用指导](components/feedback/README.md)       |
 | 通用支付组件（aggregated_payment） | 支持华为支付，微信支付，支付宝支付 | [使用指导](components/aggregated_payment/README.md)  |
 
 
@@ -64,11 +64,12 @@
       |-- 我的收藏
       |-- 练习记录
       |-- 浏览记录
+      |-- 意见反馈
       └-- 设置
            |-- 个人信息
-           |-- 意见反馈
-           |-- 反馈记录
+           |-- 夜间模式
            |-- 隐私协议
+           |-- 关于
            |-- 清除缓存
            └-- 退出登录
     
@@ -84,7 +85,16 @@ Exam
   │  │  ├─components
   │  │  │      CommonHeader.ets                 // 一级页面标题组件
   │  │  │      TopBar.ets                       // 标题菜单内容组件
+  │  │  │      Banner.ets                       // banner组件
+  │  │  ├─constants
+  │  │  │      RouterMap.ets                    // 路由
+  │  │  ├─models
+  │  │  │      BaseViewModel.ets                // base模型  
+  │  │  │      BreakpointModel.ets              // 断点模型    
   │  │  ├─utils
+  │  │  │      BreakpointUtils.ets              // 断点工具
+  │  │  │      ContextUtils.ets                 // 上下文
+  │  │  │      RouterModule.ets                 // 路由工具
   │  │  │      Logger.ets                       // 日志
   │  │  │      PreferenceUtil.ets               // 首选项
   │  │  ├─viewModel
@@ -92,83 +102,14 @@ Exam
   │  │  │      OrderInfo.ets                    // 订单数据模型
   │  │  │      PracticeRecordModel.ets          // 练习数据模型
   │  └─resources
-  ├─commons/router_module/src/main
-  │  ├─ets
-  │  │  ├─routerModule
-  │  │  │  │    RouterModule.ets                // 路由
-  │  │  │  │  ├─constants
-  │  │  │  │  │  │ RouterMap.ets                // 路由Key
-  │  └─resources  
-  │─components/aggregated_payment/src/main   
-  │  ├─ets
-  │  │  ├─common
-  │  │  │      Constant.ets                     // 常量类
-  │  │  ├─components
-  │  │  │      AggregatedPaymentPicker.ets      // 支付组件
-  │  │  ├─model
-  │  │  │      Index.ets                        // 数据类型
-  │  │  │      WXApiWrap.ets                    // 微信支付数据类型
-  │  │  └─viewmodel
-  │  │         AggregatedPaymentVM.ets          // 支付组件数据模型
-  │  └─resources
-  │─components/answer_questions/src/main   
-  │  ├─ets
-  │  │  ├─components
-  │  │  │      AnswerQuestionsPage.ets           // 答题组件
-  │  │  │      AddNotePage.ets                   // 添加笔记组件
-  │  │  │      AnswerSheetPage.ets               // 答题卡组件
-  │  │  ├─dialog
-  │  │  │      AddNoteDialog.ets                 // 添加笔记弹框
-  │  │  │      AnswerSheetDialog.ets             // 答题卡弹框
-  │  │  └─viewModel
-  │  │         TopicItemModel.ets                // 答题选项模型
-  │  │         TopicPageModel.ets                // 答题模型
-  │  └─resources
-  │─components/feed_back/src/main   
-  │  ├─ets
-  │  │  ├─components
-  │  │  │      Feedback.ets                      // 意见反馈功能组件
-  │  │  ├─model
-  │  │  │      FeedbackRecordModel.ets           // 数据类型
-  │  │  ├─utils
-  │  │  │      FileSelect.ets                    // 意见反馈功工具类
-  │  └─resources
-  │─components/select_category/src/main   
-  │  ├─ets
-  │  │  ├─components
-  │  │  │      MainPage.ets                      // 二级分类组件
-  │  │  │      ThirdcatePage.ets                 // 三级分类组件
-  │  │  ├─model
-  │  │  │      SelectCateModel.ets               // 数据类型     
-  │  └─resources
-  │─components/login_info/src/main   
-  │  ├─ets
-  │  │  ├─components
-  │  │  │      AgreementDialog.ets               // 同意协议弹窗组件
-  │  │  │      QuickLogin.ets                    // 一键登录组件
-  │  │  ├─model
-  │  │  │      ErrorCode.ets                     // 错误码类型
-  │  │  │      UserInfo.ets                      // 用户类型
-  │  │  └─utils
-  │  │         AccountUtil.ets                   // 账户工具类
-  │  └─resources
-  │─components/search/src/main   
-  │  ├─ets
-  │  │  ├─components
-  │  │  │      SearchPage.ets                    // 搜索组件
-  │  └─resources
-  │─components/search_question/src/main   
-  │  ├─ets
-  │  │  ├─components
-  │  │  │      SearchQuestionPage.ets            // 一键搜题组件
-  │  └─resources
-  │─components/base_select/src/main   
-  │  ├─ets
-  │  │  ├─components
-  │  │  │      MainPage.ets                      // 基础通用组件
-  │  │  ├─model
-  │  │  │      SelectModel.ets                   // 选项数据模型
-  │  └─resources  
+  │─components   
+  │  ├─answer_questions
+  │  ├─select_category
+  │  ├─search_question
+  │  ├─search
+  │  ├─login_info
+  │  ├─feed_back
+  │  └─aggregated_payment  
   │─features/homePage/src/main   
   │  ├─ets
   │  │  ├─components                             // 封装组件
@@ -194,7 +135,8 @@ Exam
   │  │  │      SecondListPage.ets                // 2级分类
   │  │  │      ThirdListPage.ets                 // 3级分类
   │  │  │      TopicHomePage.ets                 // 1级分类  
-  │  │
+  │  │  ├─viewmodels
+  │  │  │      HomeVM.ets                        // 数据模型   
   │  └─resources
   │─features/topicPage/src/main   
   │  ├─ets
@@ -215,14 +157,18 @@ Exam
   │  │  │      CourseHomeModel.ets               // 课程页面数据模型
   │  │  │      PracticeMode.ets                  // 科目数据模型
   │  │  │      SecondListModel.ets               // 选项类型数据模型
+  │  │  │      TopicVM.ets                       // 数据模型 
   │─features/minePage/src/main   
   │  ├─ets
   │  │  ├─components
   │  │  │      Header.ets                        // Header组件
+  │  │  │      DarkColorDialog.ets               // 深色模式弹框  
   │  │  ├─viewModel                              // 数据类型
   │  │  │      MessageModel.ets             
   │  │  │      setUpModel.ets                    // 设置相关模型数据模型
   │  │  │      MineModel.ets                     // 用户资料信息数据模型
+  │  │  │      SettingSelectPop.ets              // pop弹框  
+  │  │  │      MineVM.ets                        // 数据模型  
   │  │  ├─views
   │  │  │      AboutPage.ets                     // 关于页面
   │  │  │      AuthenticationPage.ets            // 用户认证协议页面
@@ -230,8 +176,6 @@ Exam
   │  │  │      CollectionPage.ets                // 课程收藏页面
   │  │  │      CoursePage.ets                    // 课程精选页面
   │  │  │      EditPersonalCenterPage.ets        // 个人信息详情页面
-  │  │  │      FeedbackPage.ets                  // 意见反馈页面
-  │  │  │      FeedbackRecordPage.ets            // 反馈记录页面
   │  │  │      MessageCenterPage.ets             // 消息页面
   │  │  │      MinePage.ets                      // 我的页面
   │  │  │      MyOrderPage.ets                   // 订单首页页面
@@ -268,10 +212,10 @@ Exam
 
 ### 环境
 
-* DevEco Studio版本：DevEco Studio 5.0.3 Release及以上
-* HarmonyOS SDK版本：HarmonyOS 5.0.3 Release SDK及以上
-* 设备类型：华为手机（直板机）
-* 系统版本：HarmonyOS 5.0.1(13)及以上
+* DevEco Studio版本：DevEco  Studio 6.0.2 Release及以上
+* HarmonyOS SDK版本：HarmonyOS 6.0.2 Release SDK及以上
+* 设备类型：华为手机（包括双折叠和阔折叠）、平板
+* 系统版本：HarmonyOS 5.0.5(17)及以上
 
 
 ## 权限
@@ -279,7 +223,7 @@ Exam
 - 网络权限：ohos.permission.INTERNET
 
 ### 调试
-本模板不支持使用模拟器调试，请使用真机进行调试。
+由于当前模拟器无法兼容支付宝SDK，若您需要在模拟器环境下进行相关测试，请参考支付组件中的[使用说明](components/aggregated_payment/README.md)
 
 ## 快速入门
 

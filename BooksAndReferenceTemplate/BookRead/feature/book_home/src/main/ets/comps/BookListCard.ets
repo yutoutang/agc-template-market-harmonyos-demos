@@ -1,11 +1,10 @@
 import {
   BookHomeCard,
-  BookInfo, BookLittleCard, BookLittleCardHome, BreakpointStorage,
+  BookInfo, BreakpointStorage,
   BreakpointSystem,
   BreakpointTypeEnum,
   Constants, TCRouter } from 'common';
 import { LazyDataVM } from 'swiper_card'
-import { LengthMetrics } from '@kit.ArkUI';
 
 @ComponentV2
 export struct BookListCard {
@@ -64,10 +63,10 @@ export struct BookListCard {
 
       Row() {
         Text('换一批')
-          .fontColor($r('sys.color.black'))
+          .fontColor($r('sys.color.font_primary'))
           .fontWeight(FontWeight.Bold)
       }
-      .backgroundColor('#0d000000')
+      .backgroundColor($r('sys.color.comp_background_tertiary'))
       .height(28)
       .width('100%')
       .justifyContent(FlexAlign.Center)

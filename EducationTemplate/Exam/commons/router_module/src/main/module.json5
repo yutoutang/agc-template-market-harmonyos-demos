@@ -1,9 +1,0 @@
-{
-  "module": {
-    "name": "router_module",
-    "type": "har",
-    "deviceTypes": [
-      "phone"
-    ]
-  }
-}

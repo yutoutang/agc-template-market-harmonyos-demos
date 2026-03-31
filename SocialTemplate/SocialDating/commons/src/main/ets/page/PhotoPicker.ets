@@ -19,7 +19,7 @@ export function PhotoPickerBuilder() {
 
 @Component
 export struct PhotoPicker {
-  @Consume('pageStack') pageStack: NavPathStack;
+  pageStack: NavPathStack = new NavPathStack();
   pickerOptions: PickerOptions = new PickerOptions();
   @State pickerController: PickerController = new PickerController();
   @State selectUris: Array<string> = [];

@@ -1,4 +1,4 @@
-import { CommonConstants, DateConstants, DateUtil } from '@ohos_agcit/children_education_utils';
+import { AvoidArea, CommonConstants, DateConstants, DateUtil } from '@ohos_agcit/children_education_utils';
 import { iap } from '@kit.IAPKit';
 import {
   FinishStatus,
@@ -10,6 +10,7 @@ import {
 } from 'membership';
 import { emitter } from '@kit.BasicServicesKit';
 import { VipRecord } from '@ohos_agcit/children_education_datasource';
+import { AppStorageV2 } from '@kit.ArkUI';
 
 @Builder
 export function MemberShipBuilder() {
@@ -20,30 +21,28 @@ export function MemberShipBuilder() {
 export struct MemberShipCenterPage {
   @Consumer(CommonConstants.APP_PATH_STACK) navPathStack: NavPathStack = new NavPathStack();
   @Consumer(CommonConstants.VIP_RECORD) vipRecord: VipRecord = new VipRecord();
+  @Local avoidArea: AvoidArea = AppStorageV2.connect(AvoidArea, () => new AvoidArea(0, 0))!;
   // 购买会员商品结果回调函数
   subscribeEvent = async (params: MemberParams): Promise<void> => {
     this.getUIContext().getPromptAction().showToast({ message: this.getSubscribeMsg(params) });
     if (params.type === iap.ProductType.NONRENEWABLE && params.status === FinishStatus.FINISHED) {
-
-      let validTimeTmp = DateUtil.getTodayStr(DateConstants.DATE_FORMAT4);
-
+      // mock计算商品到期时间
+      let today = DateUtil.getTodayStr(DateConstants.DATE_FORMAT4);
+      let validDate = '';
       if (params.productId === '20254') {
-        validTimeTmp = DateUtil.getAmountDayStr(validTimeTmp, 365, DateConstants.DATE_FORMAT4);
+        validDate = DateUtil.getAmountDayStr(today, 365, DateConstants.DATE_FORMAT4);
       } else if (params.productId === '20253') {
-        validTimeTmp = DateUtil.getAmountDayStr(validTimeTmp, 92, DateConstants.DATE_FORMAT4);
+        validDate = DateUtil.getAmountDayStr(today, 92, DateConstants.DATE_FORMAT4);
       } else {
-        validTimeTmp = DateUtil.getAmountDayStr(validTimeTmp, 31, DateConstants.DATE_FORMAT4);
+        validDate = DateUtil.getAmountDayStr(today, 31, DateConstants.DATE_FORMAT4);
       }
 
-      let vipRecord: emitter.EventData = {
+      emitter.emit(CommonConstants.VIP_RECORD, {
         data: {
           'isVip': true,
-          'validTime': validTimeTmp,
+          'validTime': validDate,
         },
-      };
-      emitter.emit(CommonConstants.VIP_RECORD, vipRecord);
-
-      this.queryExpireTime(params.productId, params.purchaseTime, validTimeTmp);
+      });
     }
   };
   // 查询用户开通的会员种类列表，沙盒场景下，已发货状态的非消耗型商品订单信息不返回
@@ -86,7 +85,7 @@ export struct MemberShipCenterPage {
         queryExpireTime: this.queryExpireTime,
         ownedMemberCallBack: this.ownedMemberEvent,
         productsInfo: PRODUCTS_INFO,
-      });
+      })
     }
     .hideTitleBar(true)
     .onReady((ctx) => {

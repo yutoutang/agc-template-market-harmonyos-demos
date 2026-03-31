@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import { RouterModule } from 'router_module';
+import { RouterModule } from 'commonlib';
 
 @ComponentV2
 export struct Header {
@@ -24,7 +24,9 @@ export struct Header {
 
   build() {
     Row() {
-      Image($r('app.media.ic_backward')).size({ width: 40, height: 40 })
+      Image($r('app.media.ic_back'))
+        .size({ width: 40, height: 40 })
+        .borderRadius(20)
         .margin({ left: 16, right: '8vp' })
         .onClick(() => {
           RouterModule.pop()
@@ -41,7 +43,6 @@ export struct Header {
       }
     }
     .justifyContent(FlexAlign.Start)
-    .backgroundColor($r('sys.color.background_primary'))
     .size({ width: '100%', height: 56 })
   }
 }

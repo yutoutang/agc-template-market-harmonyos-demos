@@ -103,7 +103,7 @@ struct DrawLock {
       let status = AuthUtil.getAvailableStatus(userAuth.UserAuthType.FINGERPRINT, userAuth.AuthTrustLevel.ATL2) &&
       this.secretLock.fingerprint;
       if (status) {
-        AuthUtil.onStartEasy(true, (result: userAuth.UserAuthResult) => {
+        AuthUtil.onStartEasy(this.getUIContext(),true, (result: userAuth.UserAuthResult) => {
           if (result.result === 12500000) {
             this.appPathStack.pop();
           }

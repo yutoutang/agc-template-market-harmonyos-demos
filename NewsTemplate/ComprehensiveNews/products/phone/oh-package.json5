@@ -17,6 +17,7 @@
     "module_transition": "file:../../components/module_transition",
     "module_consent_dialog": "file:../../components/module_consent_dialog",
     "module_audioplayer": "file:../../components/module_audioplayer",
+    "module_imagepreview": "file:../../components/module_imagepreview",
     "business_home": "file:../../features/business_home",
     "business_video": "file:../../features/business_video",
     "business_interaction": "file:../../features/business_interaction",

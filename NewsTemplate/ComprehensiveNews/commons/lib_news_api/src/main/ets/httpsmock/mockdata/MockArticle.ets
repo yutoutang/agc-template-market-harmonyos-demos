@@ -307,6 +307,14 @@ export class MockArticle {
       shareCount: 12000,
       isLiked: false,
       isMarked: false,
+      questionAndAnswer: {
+        question: '2025年社会物流总额及增长趋势怎么样？',
+        answer: '2025年前五个月，全国社会物流总额已达138.7万亿元，同比增长5.3%，增速较去年同期有所加快，全年社会物流总额有望突破360万亿元大关，展现出物流行业的强劲增长态势。',
+      },
+      keywordPairs: [{
+        keyword: '全国社会物流总额',
+        explain: '全国社会物流总额是反映全社会物流需求总规模的核心宏观经济指标，指报告期内（通常为年度）第一次进入国内需求领域，产生从供应地向接受地实体流动的物品的价值总额，由中国物流与采购联合会联合国家统计局发布，是衡量经济运行活跃度与物流行业发展水平的重要依据。',
+      }],
       postImgList: [
         {
           picVideoUrl: 'https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/new_4.jpg',
@@ -316,7 +324,7 @@ export class MockArticle {
       richContent: `
                     <div class="content">
                       <p style="line-height:35px;">中国物流与采购联合会：2024年社会物流总额将超360万亿元</p>
-                      <p style="line-height:35px;">2月11日，中国物流与采购联合会公布 2024 年全年物流运行数据。物流市场规模优势进一步巩固，与产业链协同体系逐步构建，物流需求规模持续扩张，全年全国社会物流总额超 360 万亿元。</p>
+                      <p style="line-height:35px;">2月11日，中国物流与采购联合会公布 2024 年全年物流运行数据。物流市场规模优势进一步巩固，与产业链协同体系逐步构建，物流需求规模持续扩张，全年<span class="content-keyword">全国社会物流总额</span>超 360 万亿元。</p>
                     <div style="display: flex; justify-content: center;">
                       <image class="image-preview"
                       src="https://agc-storage-drcn.platform.dbankcloud.cn/v0/news-hnp2d/new_4.jpg" />
@@ -1054,7 +1062,7 @@ export class MockArticle {
         setting: '{"type":"view","children":[{"type":"view","children":[{"type":"List","children":[{"type":"native","showType":"TopTextBottomImageCard","name":"上文下图"}],"style":{"backgroundColor":"#FFFFFF","padding-bottom":"12","margin-top":"12"}}]}]}',
       },
     },
-  ]
+  ];
   static default: BaseNews = {
     id: '',
     type: NewsEnum.Post,
@@ -1079,5 +1087,5 @@ export class MockArticle {
     navInfo: {
       setting: '',
     },
-  }
+  };
 }

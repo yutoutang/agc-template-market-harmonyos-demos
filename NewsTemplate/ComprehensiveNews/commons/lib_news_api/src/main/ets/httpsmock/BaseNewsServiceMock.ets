@@ -4,7 +4,7 @@ import { MockArticle } from './mockdata/MockArticle';
 import { MockVideo } from './mockdata/MockVideo';
 import { MockPost } from './mockdata/MockPost';
 import { NewsResponse } from '../params/response/NewsResponse';
-import { RequestListData } from '../params/response/LayoutResponse';
+import { AbstractRequestListData, RequestListData } from '../params/response/LayoutResponse';
 import { AuthorRequest, NewsRequest, SearchRequest } from '../params/request/CommonRequest';
 import { BaseNews, SimpleNews } from '../database/NewsType';
 import { Utils } from '../utils/Utils';
@@ -13,6 +13,7 @@ import { CommentServiceMock } from './CommentServiceMock';
 import { MockBroadcast } from './mockdata/MockBroadcast';
 import { MockTelevision } from './mockdata/MockTelevision';
 import { AvResponse } from '../params/response/AvResponse';
+import { PRESET_KEYWORD, PRESET_KEYWORD_CONTENT } from '../constants/Constants';
 
 /**
  * 新闻基础Mock
@@ -34,25 +35,29 @@ export class BaseNewsServiceMock {
       const params = config.params as AuthorRequest;
       const list = [...MockArticle.list, ...MockVideo.list, ...MockPost.list]
         .filter(v => v.authorId === params.authorId)
-        .map(v => this.handleRawNews(v, true))
+        .map(v => this.handleRawNews(v, true));
       return [HttpStatusCode.Ok, list];
     });
 
     // 查询所有文章、动态、详情
     adapter.onGet('/all/news/list').reply(() => {
       const list = [...MockArticle.list, ...MockVideo.list, ...MockPost.list]
-        .map(v => this.handleRawNews(v, true))
+        .map(v => this.handleRawNews(v, true));
       return [HttpStatusCode.Ok, list];
     });
 
     // 查询搜索结果列表
     adapter.onGet('/news/search/list').reply((config: AxiosRequestConfig) => {
       const params = config.params as SearchRequest;
-      const list = [...MockArticle.list, ...MockVideo.list, ...MockPost.list]
+      let abstractList = new AbstractRequestListData();
+      abstractList.list = [...MockArticle.list, ...MockVideo.list, ...MockPost.list]
         .filter(v => v.title.includes(params.search))
         .map(v => this.handleRawNews(v))
         .map(v => this.layoutTrans(v));
-      return [HttpStatusCode.Ok, list];
+      if (params.search === PRESET_KEYWORD && abstractList.list.length) {
+        abstractList.abstract = PRESET_KEYWORD_CONTENT;
+      }
+      return [HttpStatusCode.Ok, abstractList];
     });
 
     // 查询用户发布的文章
@@ -71,7 +76,7 @@ export class BaseNewsServiceMock {
       const params = config.params as AuthorRequest;
       const list = MockVideo.list.filter(v => v.authorId === params.authorId)
         .map(v => this.handleRawNews(v))
-        .map(v => this.layoutTrans(v))
+        .map(v => this.layoutTrans(v));
       list.sort((a, b) => b.articles[0]?.createTime - a.articles[0]?.createTime);
       return [HttpStatusCode.Ok, list];
     });
@@ -82,7 +87,7 @@ export class BaseNewsServiceMock {
       const list = MockPost.list
         .filter(v => v.authorId === params.authorId)
         .map(v => this.handleRawNews(v))
-        .map(v => this.layoutTrans(v))
+        .map(v => this.layoutTrans(v));
       list.sort((a, b) => b.articles[0]?.createTime - a.articles[0]?.createTime);
       return [HttpStatusCode.Ok, list];
     });
@@ -92,8 +97,8 @@ export class BaseNewsServiceMock {
       const params = JSON.parse(config?.data ?? '{}') as NewsRequest;
       const news = this.queryRawNews(params.newsId);
       if (news) {
-        news.isMarked = true
-        news.markCount += 1
+        news.isMarked = true;
+        news.markCount += 1;
       }
       return [HttpStatusCode.Ok];
     });
@@ -103,8 +108,8 @@ export class BaseNewsServiceMock {
       const params = JSON.parse(config?.data ?? '{}') as NewsRequest;
       const news = this.queryRawNews(params.newsId);
       if (news) {
-        news.isMarked = false
-        news.markCount -= 1
+        news.isMarked = false;
+        news.markCount -= 1;
       }
       return [HttpStatusCode.Ok];
     });
@@ -145,14 +150,14 @@ export class BaseNewsServiceMock {
    * @returns
    */
   public queryRawAv(newsId: string, authorId?: string): AvResponse | undefined {
-    let list = [...MockBroadcast.list, ...MockTelevision.list]
+    let list = [...MockBroadcast.list, ...MockTelevision.list];
     const authorInfo = this.authorMock.queryAuthorInfo(authorId);
     const avInfo = list.find(v => v.id === newsId);
-    const copy = JSON.parse(JSON.stringify(avInfo)) as AvResponse
+    const copy = JSON.parse(JSON.stringify(avInfo)) as AvResponse;
     if (copy) {
-      copy.isFollow = authorInfo?.subscribe?.includes(avInfo?.id ?? '') ?? false
+      copy.isFollow = authorInfo?.subscribe?.includes(avInfo?.id ?? '') ?? false;
     }
-    return copy
+    return copy;
   }
 
   /**
@@ -169,7 +174,7 @@ export class BaseNewsServiceMock {
 
     copyItem.commentCount = this.commentMock.queryRawCommentList(item.id).length;
     copyItem.comments = [];
-    copyItem.relativeTime = Utils.getDateDiff(copyItem.createTime)
+    copyItem.relativeTime = Utils.getDateDiff(copyItem.createTime);
     if (copyItem.recommends?.length && !ignoreRec) {
       copyItem.recommends = (item?.recommends || [])
         .map((news: SimpleNews) => {

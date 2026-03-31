@@ -34,9 +34,12 @@ export class AppUtils {
    */
   public static listenConfigurationUpdate(newConfig: Configuration) {
     const settingInfo: SettingModel = PersistenceV2.connect(SettingModel, () => new SettingModel())!;
+    const oldValue = settingInfo.darkSwitch;
     settingInfo.darkSwitch = newConfig.colorMode === 0;
-    SystemBarOperation.setWindowSystemBarProp({
-      statusBarContentColor: settingInfo.darkSwitch ? '#ffffff' : '#ff090909',
-    });
+    if (settingInfo.darkSwitch !== oldValue) {
+      SystemBarOperation.setWindowSystemBarProp({
+        statusBarContentColor: settingInfo.darkSwitch ? '#ffffff' : '#ff090909',
+      });
+    }
   }
 }

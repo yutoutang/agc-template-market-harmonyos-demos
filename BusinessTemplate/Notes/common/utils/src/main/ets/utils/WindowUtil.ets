@@ -28,8 +28,8 @@ export class WindowUtil {
         return;
       }
       try {
-        BreakpointSystem.getInstance().updateWidthBp(data);
-        data.on('windowSizeChange', () => WindowUtil.onWindowSizeChange(data));
+        BreakpointSystem.getInstance().updateWidthBp(windowStage, data);
+        data.on('windowSizeChange', () => WindowUtil.onWindowSizeChange(windowStage, data));
       } catch (e) {
         const error = e as BusinessError;
         LogUtil.error(TAG, `getWindowAvoidArea failed. code: ${error.code}, message: ${error.message}`);
@@ -37,7 +37,7 @@ export class WindowUtil {
     });
   }
 
-  public static onWindowSizeChange(window: window.Window) {
-    BreakpointSystem.getInstance().onWindowSizeChange(window);
+  public static onWindowSizeChange(windowStage: window.WindowStage, window: window.Window) {
+    BreakpointSystem.getInstance().onWindowSizeChange(windowStage, window);
   }
 }

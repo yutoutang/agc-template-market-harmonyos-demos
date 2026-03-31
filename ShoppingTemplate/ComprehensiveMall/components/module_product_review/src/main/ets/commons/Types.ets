@@ -12,8 +12,14 @@ export interface ProductReviewItem {
   mediaList: ReviewMediaItem[];
 }
 
+export interface MovingPhotoUri {
+  imageUri: string
+  videoUri: string
+}
+
 export interface ReviewMediaItem {
   uri: ResourceStr;
+  movingPhotoUri?: MovingPhotoUri
   type: ReviewMediaType;
 }
 

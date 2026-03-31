@@ -1,10 +1,12 @@
 import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import { router, window } from '@kit.ArkUI';
-import { BookApi, Constants, GlobalContext, TCRouter, UserInfoUtil, WindowUtils } from 'common';
+import { window } from '@kit.ArkUI';
+import { BookApi, ColorModeClass, Constants, GlobalContext, TCRouter, UserInfoUtil, WindowUtils } from 'common';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { pushService } from '@kit.PushKit';
 import { notificationManager } from '@kit.NotificationKit';
+import { Configuration } from '@ohos.app.ability.Configuration';
+import { AppStorageV2 } from '@kit.ArkUI';
 
 interface PushData {
   pushContent: string
@@ -15,10 +17,12 @@ interface PushData {
 const DOMAIN_NUMBER: number = 0xFF00;
 
 export default class EntryAbility extends UIAbility {
+  private isDark: boolean = false;
+
   async onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): Promise<void> {
 
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onCreate');
-    this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT);
+    // this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT);
     GlobalContext.initContext(this.context);
     TCRouter.init();
     BookApi.init('data.json');
@@ -45,6 +49,10 @@ export default class EntryAbility extends UIAbility {
       }
       AppStorage.setOrCreate('pushData', pushData)
     }
+
+    let currentColorMode = this.context.config.colorMode;
+    this.isDark = currentColorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK;
+    AppStorage.setOrCreate<boolean>('currentColorMode', this.isDark)
   }
 
   onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): void {
@@ -77,11 +85,11 @@ export default class EntryAbility extends UIAbility {
           case window.WindowStageEventType.ACTIVE: // 获焦状态
             if (AppStorage.get('takeMessage') === 1 &&
               AppStorage.get('coldBoot') === 1 &&
-              AppStorage.get('inMessagePage')!==1) {
+              AppStorage.get('inMessagePage') !== 1) {
               TCRouter.push(Constants.MESSAGE_PAGE_ROUTE)
               AppStorage.setOrCreate('takeMessage', 0)
               AppStorage.setOrCreate('coldBoot', 0)
-              AppStorage.setOrCreate('inMessagePage',1)
+              AppStorage.setOrCreate('inMessagePage', 1)
             }
             hilog.info(DOMAIN_NUMBER, 'testTag', `windowStage active.`);
             break;
@@ -123,6 +131,14 @@ export default class EntryAbility extends UIAbility {
           `[ANS] requestEnableNotification failed, code is ${err.code}, message is ${err.message}`);
       });
     });
+  }
+
+  onConfigurationUpdate(newConfig: Configuration): void {
+    let currentColorMode = newConfig.colorMode;
+    this.isDark = currentColorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK;
+    let sysColor = AppStorageV2.connect(ColorModeClass, () => new ColorModeClass())!;
+    sysColor.currentMode = newConfig.colorMode;
+    AppStorage.setOrCreate<boolean>('currentColorMode', this.isDark);
   }
 
   onWindowStageDestroy(): void {

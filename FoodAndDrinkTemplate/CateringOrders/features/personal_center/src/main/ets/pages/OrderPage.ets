@@ -200,12 +200,13 @@ export struct OrderPage {
       ForEach(this.vm.queueList, (order: QueueOrderDetail) => {
         ListItem() {
           Column({ space: 24 }) {
-            Column({ space: 24 }) {
-              Text(`当前叫号：${order.now}`)
+            Column({ space: 4 }) {
+              Text(`当前叫号：${order.now}\n我的号码：${order.mine}`)
                 .fontSize($r('sys.float.Title_S'))
                 .fontWeight(FontWeight.Bold)
                 .fontColor($r('sys.color.font_primary'))
-                .margin({ top: 24, bottom: 12 })
+                .lineHeight(30)
+                .margin({ top: 20})
               Column() {
                 Row() {
                   Image(`${this.vm.appInfoModel.imgBaseUrl}${order.store.logo}`).width(32).borderRadius(8)
@@ -235,11 +236,6 @@ export struct OrderPage {
                   Divider().margin({ top: 12, bottom: 12 })
                   CommonListItem({
                     pic: $r('app.media.ic_queue_order_tips'),
-                    desc: '我的号码',
-                    value: order.mine + '号',
-                  }).height(56)
-                  CommonListItem({
-                    pic: $r('app.media.ic_queue_order_tips'),
                     desc: '等待桌数',
                     value: order.wait.toString(),
                   }).height(56).margin({ top: 2 })
@@ -249,7 +245,6 @@ export struct OrderPage {
             .onClick(() => {
               RouterModule.push(RouterMap.QUEUE_RES_PAGE, order.orderId);
             })
-
             Row({ space: 16 }) {
               Button('取消')
                 .fontColor($r('sys.color.font_primary'))

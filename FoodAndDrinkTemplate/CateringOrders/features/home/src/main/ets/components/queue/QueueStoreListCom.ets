@@ -81,7 +81,7 @@ export struct QueueStoreListCom {
       }.width(Constants.FULL_SIZE).justifyContent(FlexAlign.SpaceBetween)
 
       Row(){
-        Button(store.needQueue ? '排号' : '无需排号', { controlSize: ControlSize.SMALL })
+        Button(store.needQueue ? '去排号' : '无需排号', { controlSize: ControlSize.SMALL })
           .fontColor($r('sys.color.font_on_primary'))
           .backgroundColor(store.needQueue ? $r('app.color.brand_red') : $r('sys.color.font_secondary'))
           .constraintSize({minWidth:28})

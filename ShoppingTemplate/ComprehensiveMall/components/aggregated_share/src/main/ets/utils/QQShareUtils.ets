@@ -1,5 +1,5 @@
 import { ShareResultType, ShareData } from '@tencent/qq-open-sdk';
-import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast'
+import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
 import { QQShareContent, ShareViewData } from '../common/ShareParams';
 import { ShareService } from '../ShareService';
 
@@ -26,9 +26,9 @@ export class QQShareUtils {
    * 分享到qq
    * @param data
    */
-  public async share(data: ShareViewData) {
+  public async share(uiContext: UIContext, data: ShareViewData) {
     if (!this.shareService.qqOpenApi.isQQInstalled()) {
-      promptAction.showToast({ message: '请先安装QQ' });
+      uiContext.showAlertDialog({ message: '请先安装QQ' });
       return;
     }
     const shareData: QQShareContent = {
@@ -37,7 +37,7 @@ export class QQShareUtils {
       summary: '',
       brief: '',
       url: data.landingPageUrl,
-      picture_url: data.coverUrl as string,
+      picture_url: data.coverUrl,
     };
     const signedShareData = await data.extraInfo.signQQShareData(JSON.stringify(shareData));
     let result = await this.shareService.qqOpenApi.share(2, signedShareData as ShareData);

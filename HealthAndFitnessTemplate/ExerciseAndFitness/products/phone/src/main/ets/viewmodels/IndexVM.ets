@@ -44,11 +44,15 @@ export class IndexVM extends BaseViewModel {
   // 监听NavDestination组件的状态变化
   navDestinationListener() {
     // 无感监听路由变化
-    uiObserver.on('navDestinationUpdate', (info: uiObserver.NavDestinationInfo) => {
-      this.navRouteModel.navDestinationUpdateListeners.forEach((callback) => {
-        callback(info)
+    try {
+      uiObserver.on('navDestinationUpdate', (info: uiObserver.NavDestinationInfo) => {
+        this.navRouteModel.navDestinationUpdateListeners.forEach((callback) => {
+          callback(info)
+        })
       })
-    })
+    } catch (e) {
+      console.error(`uiObserver on navDestinationUpdate failed. error: ${JSON.stringify(e)}`)
+    }
   }
 
   // 监听WindowStage生命周期变化
@@ -63,12 +67,16 @@ export class IndexVM extends BaseViewModel {
 
   // 监听设备屏幕方向改变
   displayOrientationListener() {
-    this.displayModel.isFoldable = display.isFoldable();
-    display.on('change', (type: number) => {
-      let displayClass = display.getDisplayByIdSync(type);
-      // 横屏
-      let landscapeType = [display.Orientation.LANDSCAPE, display.Orientation.LANDSCAPE_INVERTED]
-      this.displayModel.isLandscape = landscapeType.includes(displayClass.orientation);
-    })
+    try {
+      this.displayModel.isFoldable = display.isFoldable();
+      display.on('change', (type: number) => {
+        let displayClass = display.getDisplayByIdSync(type);
+        // 横屏
+        let landscapeType = [display.Orientation.LANDSCAPE, display.Orientation.LANDSCAPE_INVERTED]
+        this.displayModel.isLandscape = landscapeType.includes(displayClass.orientation);
+      })
+    } catch (e) {
+      console.error(`display on change failed. error: ${JSON.stringify(e)}`)
+    }
   }
 }

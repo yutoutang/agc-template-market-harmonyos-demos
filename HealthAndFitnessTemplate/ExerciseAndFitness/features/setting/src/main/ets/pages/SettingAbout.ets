@@ -1,6 +1,8 @@
-import { CommonConstants, GridRowColSetting } from 'lib_common'
+import { BreakpointModel, BreakpointNameEnum, CommonConstants, GridRowColSetting } from 'lib_common'
 import { NavHeaderBar } from 'lib_widget'
 import { SettingAboutVM } from '../viewmodels/SettingAboutVM';
+import { ContextUtils } from '../components/ContextUtils';
+import { AppStorageV2 } from '@kit.ArkUI';
 
 @Builder
 export function SettingAboutBuilder() {
@@ -10,6 +12,21 @@ export function SettingAboutBuilder() {
 @ComponentV2
 struct SettingAbout {
   vm: SettingAboutVM = new SettingAboutVM();
+  @Local breakPointModel: BreakpointModel = AppStorageV2.connect(BreakpointModel, () => new BreakpointModel())!;
+
+  aboutToAppear(): void {
+    ContextUtils.setUIContext(this.getUIContext());
+  }
+
+  @Computed
+  get gridWidth() {
+    if ([BreakpointNameEnum.MD].includes(this.breakPointModel.currentBreakpoint)) {
+      return 516;
+    } else if ([BreakpointNameEnum.LG, BreakpointNameEnum.XL].includes(this.breakPointModel.currentBreakpoint)) {
+      return 755;
+    }
+    return '100%';
+  }
 
   build() {
     NavDestination() {
@@ -134,7 +151,7 @@ struct SettingAbout {
       }
       .width(CommonConstants.FULL_PERCENT)
     }
-    .width(CommonConstants.FULL_PERCENT)
+    .width(this.gridWidth)
     .backgroundColor($r('sys.color.comp_background_primary'))
     .borderRadius($r('app.float.xxl_radius'))
     .padding({

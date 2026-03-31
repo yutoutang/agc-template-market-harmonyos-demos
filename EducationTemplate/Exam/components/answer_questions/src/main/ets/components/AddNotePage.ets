@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-import { window } from '@kit.ArkUI';
-
 @ComponentV2
 export struct AddNotePage {
   bottomHeight: number = 0;
@@ -23,15 +21,13 @@ export struct AddNotePage {
   };
   @Param confirmAddNote: (note: string) => void = () => {
   }
-
+  inputId: string = 'noteInput';
   aboutToAppear(): void {
     try {
-      // 获取导航条高度，手动进行避让
-      window.getLastWindow(getContext(), (_err, data) => {
-        const avoidAreaBottom = data.getWindowAvoidArea(window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR);
-        this.bottomHeight = avoidAreaBottom.bottomRect.height;
-      })
-    }catch (e) {
+      setTimeout(() => {
+        this.getUIContext().getFocusController().requestFocus(this.inputId);
+      }, 50);
+    } catch (e) {
     }
   }
 
@@ -44,21 +40,25 @@ export struct AddNotePage {
       // 添加笔记输入框
       this.inputBoxBuilder()
     }
-    .backgroundColor(Color.White)
+    .backgroundColor($r('app.color.answer_sheet_bg'))
     .layoutWeight(1)
     .height('100%')
     .padding({ left: $r('app.float.vp_16'), right: $r('app.float.vp_16') })
-    .borderRadius({ topLeft: $r('sys.float.corner_radius_level16'),
-      topRight: $r('sys.float.corner_radius_level16') })
+    .borderRadius({
+      topLeft: $r('sys.float.corner_radius_level16'),
+      topRight: $r('sys.float.corner_radius_level16')
+    })
   }
 
   // 添加笔记输入框
   @Builder
   inputBoxBuilder() {
     TextArea({ placeholder: '输入笔记内容', text: this.note })
+      .id(this.inputId)
       .height($r('app.float.vp_152'))
       .maxLength(200)
       .showCounter(true)
+      .backgroundColor($r('sys.color.comp_background_tertiary'))
       .onChange((value: string) => {
         this.note = value;
       })

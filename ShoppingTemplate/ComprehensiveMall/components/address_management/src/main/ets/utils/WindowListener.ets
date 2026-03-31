@@ -31,7 +31,7 @@ export class WindowListener {
       this.mainWindow?.on('avoidAreaChange', this.onAvoidAreaChange);
       this.mainWindow?.on('windowSizeChange', this.onWindowSizeChange);
     } catch (err) {
-      UtilLog.error(LOG_TAG, 'get window properties failed. error: ' + JSON.stringify(err))
+      UtilLog.error(LOG_TAG, 'get window properties failed. error: ' + JSON.stringify(err));
     }
   }
 
@@ -49,7 +49,7 @@ export class WindowListener {
         });
       }
     } catch (err) {
-      UtilLog.error(LOG_TAG, 'get window avoid areas failed. error: ' + JSON.stringify(err))
+      UtilLog.error(LOG_TAG, 'get window avoid areas failed. error: ' + JSON.stringify(err));
     }
   }
 
@@ -57,7 +57,7 @@ export class WindowListener {
     try {
       this.mainWindow = ctx.windowStage.getMainWindowSync();
     } catch (err) {
-      UtilLog.error(LOG_TAG, 'get main window failed. error: ' + JSON.stringify(err))
+      UtilLog.error(LOG_TAG, 'get main window failed. error: ' + JSON.stringify(err));
     }
   }
 }

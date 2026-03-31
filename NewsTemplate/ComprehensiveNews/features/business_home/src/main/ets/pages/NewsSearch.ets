@@ -4,7 +4,9 @@ import { HomeServiceApi, NewsResponse, RequestListData } from 'lib_news_api';
 import { Highlight } from 'module_highlight';
 import { BreakpointModel, CircleButtonModifier, CommonConstants, SettingModel, WindowModel } from 'lib_common';
 import { LongTakeAnimationProperties } from 'module_transition';
+import { BaseAgent } from 'lib_widget';
 import { HomeViewModel } from '../viewmodels/HomeViewModel';
+import { Constants } from '../constants/NewsConstants';
 
 @Builder
 export function NewsSearchBuilder() {
@@ -63,15 +65,31 @@ export struct NewsSearch {
         Text('历史搜索')
           .fontSize(14 * this.settingInfo.fontSizeRatio)
           .fontColor($r('sys.color.font_secondary'))
-        Row({ space: 4 }) {
-          Image($r('app.media.clear')).width(16).height(16)
-          Text('清空')
-            .fontSize(14 * this.settingInfo.fontSizeRatio)
-            .fontColor($r('sys.color.font_secondary'))
+
+        Row({ space: 12 }) {
+          Row({ space: 4 }) {
+            Text(this.homeViewVM.isExpand ? '收起' : '展开')
+              .fontSize(14 * this.settingInfo.fontSizeRatio)
+              .fontColor($r('app.color.app_theme'))
+            SymbolGlyph(this.homeViewVM.isExpand ? $r('sys.symbol.chevron_up') : $r('sys.symbol.chevron_down'))
+              .fontColor([$r('app.color.app_theme')])
+              .fontWeight(FontWeight.Normal)
+              .fontSize($r('app.float.small_img_width'))
+          }
+          .onClick(() => {
+            this.homeViewVM.expandOperation()
+          })
+
+          Row({ space: 4 }) {
+            Image($r('app.media.clear')).width(16).height(16)
+            Text('清空')
+              .fontSize(14 * this.settingInfo.fontSizeRatio)
+              .fontColor($r('sys.color.font_secondary'))
+          }
+          .onClick(() => {
+            this.homeViewVM.clearHistory()
+          })
         }
-        .onClick(() => {
-          this.homeViewVM.clearHistory()
-        })
       }
 
       Flex({ justifyContent: FlexAlign.Start, wrap: FlexWrap.Wrap }) {
@@ -84,7 +102,7 @@ export struct NewsSearch {
         .width('100%')
         .justifyContent(FlexAlign.Center)
 
-        ForEach(this.homeViewVM.searchHistory.historyList, (item: string) => {
+        ForEach(this.homeViewVM.searchHistory.historyList.slice(0, Constants.MAX_HISTORY_COUNT), (item: string) => {
           Row() {
             Text(item)
               .fontSize(14 * this.settingInfo.fontSizeRatio)
@@ -110,6 +128,8 @@ export struct NewsSearch {
         }, (item: string) => item)
       }
       .margin({ top: 12, bottom: 12 })
+      .constraintSize({ maxHeight: this.homeViewVM.heightControl })
+      .clip(true)
     }
     .padding({
       left: this.breakPointModel.pagePadding,
@@ -154,6 +174,26 @@ export struct NewsSearch {
     .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
     .padding({ left: CommonConstants.PADDING_L, right: CommonConstants.PADDING_L })
     .visibility(this.isSearchCommit ? Visibility.Visible : Visibility.None)
+  }
+
+  @Builder
+  searchAbstractBuilder() {
+    Column({ space: 12 }) {
+      Text('摘要：')
+        .fontWeight(FontWeight.Bold)
+        .fontColor($r('sys.color.font_primary'))
+        .width('100%')
+        .textAlign(TextAlign.Start);
+      Text(this.homeViewVM.searchAbstractResult).fontSize(14).lineHeight(20);
+      BaseAgent({ queryText: this.searchValue });
+    }
+    .visibility(this.isSearchCommit && this.homeViewVM.searchAbstractResult.length ? Visibility.Visible :
+      Visibility.None)
+    .padding(12)
+    .margin({ top: 16 })
+    .width('calc(100% - 32vp)')
+    .borderRadius(16)
+    .backgroundColor($r('sys.color.comp_background_tertiary'));
   }
 
   @Builder
@@ -284,6 +324,7 @@ export struct NewsSearch {
         .height(50)
 
         if (this.searchValue.trim() !== '') {
+          this.searchAbstractBuilder();
           this.searchListBuilder()
           this.searchResultListBuilder()
         } else {

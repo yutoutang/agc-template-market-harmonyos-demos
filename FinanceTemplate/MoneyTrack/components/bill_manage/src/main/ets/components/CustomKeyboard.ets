@@ -1,4 +1,4 @@
-import { promptAction } from '@kit.ArkUI';
+import { ToastDialog } from '@hw-agconnect/ui-toast';
 import dayjs from 'dayjs';
 import { BillConstants } from 'bill_base';
 import { CustomKeyboardButtonType } from '../commons/Enums';
@@ -262,9 +262,9 @@ export struct CustomKeyboard {
     } else if (!(btn.text === '0' && lastAmount === '')) {
       let temp = lastAmount.split('.');
       if (temp.length === 2 && temp[1].length >= 2) {
-        promptAction.showToast({ message: '最多两位小数~' });
+        ToastDialog.showToast({ message: '最多两位小数~' });
       } else if (temp[0].length >= 6 && !lastAmount.includes('.')) {
-        promptAction.showToast({ message: '输入金额过大~' });
+        ToastDialog.showToast({ message: '输入金额过大~' });
       } else {
         lastAmount += btn.text;
       }

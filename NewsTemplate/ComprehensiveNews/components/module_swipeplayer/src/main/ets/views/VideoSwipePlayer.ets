@@ -1,16 +1,18 @@
 import { deviceInfo, emitter } from '@kit.BasicServicesKit';
 import { AppStorageV2, display, uiObserver, window } from '@kit.ArkUI';
+import { SessionListener, VideoSessionController } from '../controller/VideoSessionController';
 import { SwipePlayerController } from '../controller/SwipePlayerController';
+import { AVPlayerController } from '../controller/AVPlayerController';
+import { PlayerLayoutSize } from '../controller/PlayerLayoutSize';
 import { PlayerDataSource } from '../datasource/PlayerDataSource';
-import { AVPlayerSession } from '../controller/AVPlayerManager';
 import { VideoPlayerView } from '../components/VideoPlayerView';
 import { AVPlayerState, BreakpointNameEnum, PageNameEnum, VideoPlayerData } from '../type/Index';
 import { isDisplayModeFull, setOrientation, toast } from '../utils/Util';
-import { PlayerLayoutSize } from '../controller/PlayerLayoutSize';
 import { VideoNetworkModel, VideoNetworkSetting } from '../models/VideoNetworkModel';
 import { BreakpointModel } from '../models/BreakpointModel';
 import { PiPWindowModel } from '../models/PiPWindowModel';
 import { Logger } from '../utils/Logger';
+import { EventKey } from '../constants/EventKey';
 
 const TAG = '[VideoSwipePlayer]';
 
@@ -24,7 +26,7 @@ export struct VideoSwipePlayer {
   @Param datasource: PlayerDataSource<VideoPlayerData> = new PlayerDataSource<VideoPlayerData>();
   // 视频播放的外层交互组件
   @Param videoLayerBuilder:
-  WrappedBuilder<[Object, AVPlayerSession, SwipePlayerController, PlayerLayoutSize]> | undefined = undefined;
+  WrappedBuilder<[Object, AVPlayerController, SwipePlayerController, PlayerLayoutSize]> | undefined = undefined;
   // 全屏按钮
   @BuilderParam fullBtnBuilder: () => void = this.defaultFullBtnBuilder
   // 配置项信息
@@ -32,12 +34,14 @@ export struct VideoSwipePlayer {
   // 底部tab的高度
   @Provider() bottomTabHeight: Length | undefined = this.options?.bottomTabHeight;
   // 点击列表页的视频卡片对应的视频
-  @Param videoItemPlayerSession: AVPlayerSession | undefined = undefined
+  @Param videoItemAVPlayerController: AVPlayerController | undefined = undefined
   // 网络
   @Param videoNetwork: VideoNetworkModel | undefined = undefined
   @Param videoNetworkSetting: VideoNetworkSetting | undefined = undefined
   // 路由栈
   @Param @Require pathStack: NavPathStack
+  // 是否接入播控中心
+  @Param enableAVSession: boolean = false;
   // 当前组件所在的页面是否显示
   @Param isShown: boolean = false;
   // 是否横屏
@@ -48,10 +52,12 @@ export struct VideoSwipePlayer {
   @Event playerStateCallback: (state: string, id: string) => void = () => {
   }
   // 播放进度变化的回调
-  @Event playerTimeUpdateCallback: (id: string, timeMs: number) => void = () => {
+  @Event playerTimeUpdateCallback: (videoData: VideoPlayerData, timeMs: number) => void = () => {
   }
   // 滑动控制器
   swiperController: SwiperController = new SwiperController();
+  // 播控中心控制器
+  avSessionController: VideoSessionController = VideoSessionController.instance;
   @Local videoState: AVPlayerState = AVPlayerState.IDLE;
   @Local videoStateIndex: number = 0
   @Provider() navDestinationUpdateListeners: Map<string, (info: uiObserver.NavDestinationInfo) => void> = new Map();
@@ -73,7 +79,7 @@ export struct VideoSwipePlayer {
     return this.swipePlayerController.getAVPlayerMgr()!
   }
 
-  @Monitor('videoNetwork.isCellular','videoState','videoStateIndex')
+  @Monitor('videoNetwork.isCellular', 'videoState', 'videoStateIndex')
   onNetworkChange() {
     let videoState = this.avPlayerManager.getAVPlayer(this.currentIndex)?.state
     if (this.videoNetworkSetting?.remindWithoutWlan === 1) {
@@ -103,31 +109,88 @@ export struct VideoSwipePlayer {
     AppStorage.setOrCreate('isShown', this.isShown)
   }
 
+  private fullScreenListener = (info: uiObserver.NavDestinationInfo) => {
+    this.pipWindowModel.navDestinationUpdateListeners.forEach((callback, key) => {
+      if (key === 'fullScreenListener') {
+        callback(info)
+      }
+    })
+  }
+
   aboutToAppear(): void {
     // 设置断点
     this.breakpointModel.currentBreakpoint = this.currentBreakpoint;
     this.swipePlayerController?.setSwiperController(this.swiperController);
     // 网络
     this.handleNetwork()
+    this.createAVSession();
     // 当前视频的状态
-    emitter.on('swipeVideoPlayerState', (eventData: emitter.EventData) => {
+    emitter.on(EventKey.SWIPER_VIDEO_PLAYER_STATE, (eventData: emitter.EventData) => {
       let state = eventData.data!.state as AVPlayerState;
       let index = eventData.data!.index as number;
       this.videoState = state;
       this.videoStateIndex = index
     })
 
-    // 无感监听路由变化
-    uiObserver.on('navDestinationUpdate', (info: uiObserver.NavDestinationInfo) => {
-      this.pipWindowModel.navDestinationUpdateListeners.forEach((callback, key) => {
-        if (key === 'fullScreenListener') {
-          callback(info)
-        }
-      })
+    emitter.on(EventKey.DISABLE_PREVIOUS_NEXT, () => {
+      this.avSessionController.releaseNextPreviousListener();
     })
+
+    emitter.on(EventKey.ENABLE_PREVIOUS_NEXT, () => {
+      this.avSessionController.setListener({
+        playNext: this.sessionListener.playNext,
+        playPrevious: this.sessionListener.playPrevious,
+      });
+    });
+
+    // 无感监听路由变化
+    uiObserver.on('navDestinationUpdate', this.fullScreenListener);
 
     AppStorage.setOrCreate('isShown', this.isShown)
   }
+
+  aboutToDisappear(): void {
+    this.avSessionController.destroy(this.getUIContext().getHostContext() as Context);
+    emitter.off(EventKey.DISABLE_PREVIOUS_NEXT);
+    emitter.off(EventKey.ENABLE_PREVIOUS_NEXT);
+    emitter.off(EventKey.SWIPER_VIDEO_PLAYER_STATE);
+    uiObserver.off('navDestinationUpdate', this.fullScreenListener);
+  }
+
+  async createAVSession() {
+    if (!this.enableAVSession) {
+      return;
+    }
+
+    if (!this.avSessionController.getSession()) {
+      await this.avSessionController.create(this.getUIContext().getHostContext() as Context);
+    }
+    this.avSessionController.setListener(this.sessionListener);
+    this.avSessionController.activate();
+  }
+
+  sessionListener: SessionListener = {
+    play: () => {
+      this.swipePlayerController.play();
+    },
+    pause: () => {
+      this.swipePlayerController.pause();
+    },
+    playNext: () => {
+      if (!this.options?.totalCount || this.currentIndex + 1 < this.options?.totalCount) {
+        this.swipePlayerController.changeIndex(this.currentIndex + 1);
+      }
+    },
+    playPrevious: () => {
+      if (this.currentIndex <= 0) {
+        // 重新播放
+        this.swipePlayerController.seek(0);
+        this.swipePlayerController.play();
+        return;
+      }
+      this.swipePlayerController.changeIndex(this.currentIndex - 1);
+    },
+  };
 
   handleNetwork() {
     if (this.videoNetwork && !this.videoNetwork.hasNet) {
@@ -147,10 +210,11 @@ export struct VideoSwipePlayer {
             videoData: item,
             index: index,
             autoPlay: this.options?.autoPlay,
+            enableAVSession: this.enableAVSession,
             currentIndex: this.currentIndex,
             totalCount: this.options?.totalCount,
             swipePlayerController: this.swipePlayerController,
-            videoItemPlayerSession: this.videoItemPlayerSession,
+            videoItemAVPlayerController: this.videoItemAVPlayerController,
             videoNetwork: this.videoNetwork,
             videoNetworkSetting: this.videoNetworkSetting,
             videoLayerBuilder: this.videoLayerBuilder,
@@ -208,7 +272,7 @@ export struct VideoSwipePlayer {
         let allPathNames = this.pathStack.getAllPathName();
         let lastName = allPathNames[allPathNames.length - 1]
         if (lastName !== PageNameEnum.VIDEO_LANDSCAPE_PAGE) {
-          setOrientation(this.getUIContext(), window.Orientation.FOLLOW_DESKTOP)
+          setOrientation(this.getUIContext(), window.Orientation.FOLLOW_DESKTOP);
         }
         try {
           display.off('foldStatusChange', this.displayFoldStatusChangeCallback);

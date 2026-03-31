@@ -10,7 +10,7 @@
     "deliveryWithInstall": true,
     "installationFree": true,
     "pages": "$profile:main_pages",
-    "routerMap": '$profile:route_map',
+    "routerMap": "$profile:route_map",
     "abilities": [
       {
         "name": "PhoneAbility",
@@ -21,7 +21,9 @@
         "startWindowIcon": "$media:startIcon",
         "startWindowBackground": "$color:start_window_background",
         "exported": true,
-        "supportWindowMode": ["fullscreen"],
+        "supportWindowMode": [
+          "fullscreen"
+        ],
         "skills": [
           {
             "entities": [
@@ -36,8 +38,9 @@
     ],
     "metadata": [
       {
+// TODO: 替换Client ID
         "name": "client_id",
-        "value": "XXX"
+        "value": "******"
       }
     ],
     "requestPermissions": [

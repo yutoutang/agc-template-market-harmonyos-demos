@@ -1,11 +1,12 @@
 import { AxiosRequestConfig, HttpStatusCode } from '@ohos/axios';
 import AxiosMockAdapter from '@hw-agconnect/axios-mock-adapter';
-import { CLOUD_STORAGE_DOMAIN, RequestUrlMap } from '../../constants/Enums';
+import { RequestUrlMap } from '../../constants/RequestUrlMap';
 import {
   CategoryItem, CategoryProductListResp, HomeConfigResp,
   ProductSummaryItem,
 } from '../../types/responses/HomeConfigResponse';
 import { MockHomeConfig } from '../mockdata/MockHomeData';
+import { MockImageData } from '../mockdata/MockImageMap';
 
 export class HomeMockApis {
   public start(adapter: AxiosMockAdapter) {
@@ -14,14 +15,14 @@ export class HomeMockApis {
       const categoryBarList = MockHomeConfig.categoryBarList.map((category) => ({
         id: category.id,
         label: category.label,
-        iconUrl: CLOUD_STORAGE_DOMAIN + category.iconUrl,
+        iconUrl: MockImageData.getImageResource(category.iconUrl),
         subCategory: category.subCategory,
-      } as CategoryItem))
+      } as CategoryItem));
       const res: HomeConfigResp = {
         code: 0,
         categoryList: categoryBarList,
         searchList: MockHomeConfig.searchList,
-        bannerList: MockHomeConfig.bannerList.map((item) => CLOUD_STORAGE_DOMAIN + item),
+        bannerList: MockHomeConfig.bannerList.map((item) => MockImageData.getImageResource(item) ),
       };
       return [HttpStatusCode.Ok, res];
     });
@@ -32,7 +33,7 @@ export class HomeMockApis {
       .reply((config: AxiosRequestConfig) => {
         const subId = config.params.subId as string;
         let list = MockHomeConfig.categoryDataList.map((data)=>({
-          banner: CLOUD_STORAGE_DOMAIN+data.banner,
+          banner: MockImageData.getImageResource(data.banner),
           title:data.title,
           id: data.id,
           subCategoryId: data.subCategoryId,

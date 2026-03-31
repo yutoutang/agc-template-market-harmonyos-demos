@@ -171,11 +171,13 @@ export struct Exam {
     Column() {
       Text('考试尚未结束')
         .dialogTitleStyle()
+        .maxFontScale(1)
 
       Blank().height(12)
       
       Text('是否确认立即退出考试?')
         .dialogInfoStyle()
+        .maxFontScale(1)
 
       Blank().height(28)
 
@@ -183,6 +185,7 @@ export struct Exam {
         Text('继续考试')
           .dialogChooseStyle()
           .fontColor('#64BB5C')
+          .maxFontScale(1)
           .onClick(() => {
             this.examExitDialog.close()
             this.isStop = false;
@@ -203,6 +206,7 @@ export struct Exam {
         Text('确认退出')
           .dialogChooseStyle()
           .fontColor('rgba(0,0,0,0.40)')
+          .maxFontScale(1)
           .onClick(() => {
             this.examExitDialog.close()
             this.examSubmitDialog.open();
@@ -231,6 +235,7 @@ export struct Exam {
   submitExamBuilder() {
     Column() {
       Text(this.calcExamScore() ? '成绩合格' : '成绩不合格')
+        .maxFontScale(1)
         .dialogTitleStyle()
 
       Blank().height(12)
@@ -238,6 +243,7 @@ export struct Exam {
       Text('未答题数: ' + (this.examManager.total - this.examManager.correctNumber - this.examManager.errorNumber) +
         '           ' + '考试成绩: ' + this.examManager.correctNumber + '分')
         .dialogInfoStyle()
+        .maxFontScale(1)
 
       Blank().height(28)
       
@@ -245,6 +251,7 @@ export struct Exam {
         Text('重新考试')
           .dialogChooseStyle()
           .fontColor('#64BB5C')
+          .maxFontScale(1)
           .onClick(() => {
             this.isStop = false;
             this.examSubmitDialog.close();
@@ -270,6 +277,7 @@ export struct Exam {
         Text('我知道了')
           .dialogChooseStyle()
           .fontColor('rgba(0,0,0,0.40)')
+          .maxFontScale(1)
           .onClick(() => {
             this.isStop = false;
             this.examSubmitDialog.close();
@@ -304,7 +312,8 @@ export struct Exam {
           right: '1%',
         });
 
-      Text(String(this.examManager.correctNumber));
+      Text(String(this.examManager.correctNumber))
+        .maxFontScale(1)
 
       Image($r('app.media.error'))
         .width(16)
@@ -315,6 +324,7 @@ export struct Exam {
         });
 
       Text(String(this.examManager.errorNumber))
+        .maxFontScale(1)
         .margin({
           right: '7%',
         });
@@ -326,7 +336,8 @@ export struct Exam {
           .margin({
             right: '1%',
           });
-        Text(`${this.currentIndex}/${this.examManager.total}`);
+        Text(`${this.currentIndex}/${this.examManager.total}`)
+          .maxFontScale(1)
       }
       .onClick(() => {
         this.isShowProblemListSheet = !this.isShowProblemListSheet;
@@ -353,7 +364,8 @@ export struct Exam {
 
         Text('收藏')
           .fontSize(12)
-          .fontColor('rgba(0,0,0,0.90)');
+          .fontColor('rgba(0,0,0,0.90)')
+          .maxFontScale(1)
       }
       .onClick(() => {
         this.examManager.examDetails[this.currentIndex-1].isCollect =
@@ -366,7 +378,8 @@ export struct Exam {
           .height(16);
         Text('交卷')
           .fontColor(Color.White)
-          .fontSize(12);
+          .fontSize(12)
+          .maxFontScale(1)
       }
       .justifyContent(FlexAlign.Center)
       .backgroundColor('#64BB5C')
@@ -540,6 +553,7 @@ export function showSettingSheet() {
     Row() {
       Text('答对自动下一题')
         .fontSize(16)
+        .maxFontScale(1)
         .fontColor('rgba(0,0,0,0.90)');
       Blank();
       Toggle({ type: ToggleType.Switch, isOn: examController.showNext })
@@ -560,6 +574,7 @@ export function showSettingSheet() {
     Row() {
       Text('字体大小')
         .fontSize(10)
+        .maxFontScale(1)
         .fontColor('rgba(0,0,0,0.90)');
       Blank();
       Row() {
@@ -586,6 +601,7 @@ export function showSettingSheet() {
 
       Text('字体大小')
         .fontSize(16)
+        .maxFontScale(1)
         .fontColor('rgba(0,0,0,0.90)');
     }
     .width('100%');

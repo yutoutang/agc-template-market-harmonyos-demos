@@ -12,7 +12,7 @@ export class HttpCode {
 
 export class RequestUrl {
   // 接口请求超时时间
-  static readonly REQUEST_TIME_OUT = 3 * 1000
+  static readonly REQUEST_TIME_OUT = 500
   // todo 网络请求base url，真实网络请求可以替换请求地址
   static readonly BASE_URL = 'https://xxxxxxxxx/catering/v1/app';
   // 获取应用基础信息

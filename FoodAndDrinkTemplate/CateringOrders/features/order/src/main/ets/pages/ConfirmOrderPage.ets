@@ -1,4 +1,5 @@
 import { ToastDialog as promptAction } from '@hw-agconnect/ui-toast';
+import { autoFillManager } from '@kit.AbilityKit';
 import { UtilLog } from '@hw-agconnect/util-log';
 import { Decimal } from '@kit.ArkTS';
 import { AppStorageV2, componentUtils, PersistenceV2 } from '@kit.ArkUI';
@@ -30,6 +31,7 @@ import {
 import { AddDnOrderReq } from 'network';
 import * as API from '../api/Index';
 import { Goods, PreorderLabel } from '../models/Index';
+
 
 const TAG = '[ConfirmOrderPage]'
 
@@ -880,6 +882,8 @@ struct ConfirmOrderPage {
       Row() {
         TextInput({ text: $$this.preorderPhoneTemp, placeholder: '请填写号码' })
           .backgroundColor('#FFFFFF')
+          .contentType(ContentType.PHONE_NUMBER)
+          .selectionMenuHidden(true)
           .maxLength(11)
           .cancelButton({
             style: CancelButtonStyle.CONSTANT,
@@ -899,6 +903,12 @@ struct ConfirmOrderPage {
         .onClick(() => {
           this.preorderPhone = this.preorderPhoneTemp;
           this.preorderSheetShow = false;
+          try {
+            autoFillManager.requestAutoSave(this.getUIContext())
+          } catch (err) {
+            let e: BusinessError = err as BusinessError;
+            UtilLog.error(0x0000, 'DemoTest', 'error: %{public}d %{public}s', e.code, e.message);
+          }
         });
     }.padding(16).height('100%')
     .justifyContent(FlexAlign.SpaceBetween);

@@ -1,8 +1,8 @@
 export { AudioPlayer } from './src/main/ets/AudioPlayer';
 
-export { AudioItem } from './src/main/ets/model/AudioData'
+export { AudioService } from './src/main/ets/AudioService'
 
-export { SubUtils } from './src/main/ets/utils/SubUtils'
+export { AudioItem } from './src/main/ets/model/AudioData'
 
 export { MediaController } from './src/main/ets/controller/MediaController'
 

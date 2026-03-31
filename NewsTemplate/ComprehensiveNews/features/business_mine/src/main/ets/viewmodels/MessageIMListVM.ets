@@ -10,11 +10,6 @@ import { WebIdMap } from '../constants/Constants';
 export class MsgIMViewModel extends BaseViewModel {
   @Trace chatList: BriefIMModel[] = [];
 
-  constructor() {
-    super();
-    this.queryList();
-  }
-
   // 查询聊天列表
   queryList() {
     MessageServiceApi.queryAllIMList().then((resp) => {
@@ -22,10 +17,25 @@ export class MsgIMViewModel extends BaseViewModel {
     })
   }
 
+  // 刷新单个聊天内容
+  refreshChatItem(v: BriefIMModel) {
+    MessageServiceApi.queryAllIMList().then((list) => {
+      const imResp = list.find(item => item.chatAuthor.authorId === v.chatAuthor.authorId);
+      if (imResp) {
+        const imModel = new BriefIMModel(imResp);
+        v.chatAuthor = imModel.chatAuthor;
+        v.allUnreadCount = imModel.allUnreadCount;
+        v.receiveTime = imModel.receiveTime;
+        v.latestNews = imModel.latestNews;
+        v.chatList = imModel.chatList;
+      }
+    })
+  }
+
   // 一键已读
   setAllRead() {
     MessageServiceApi.setIMAllRead().then(() => {
-      this.queryList();
+      this.chatList.forEach(v => v.allUnreadCount = 0);
     })
   }
 
@@ -68,7 +78,8 @@ export class MsgIMViewModel extends BaseViewModel {
   // 跳转聊天详情页
   jumpChatPage(v: BriefIMModel) {
     RouterUtils.pushPathByName(RouterMap.MINE_MSG_IM_CHAT, v.chatAuthor, () => {
-      this.queryList();
+      // 只刷新对应的聊天，避免整个列表重绘
+      this.refreshChatItem(v);
     });
   }
 

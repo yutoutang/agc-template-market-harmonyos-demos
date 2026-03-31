@@ -1,9 +1,0 @@
-{
-  "routerMap": [
-    {
-      "name": "ProductReviewPage",
-      "pageSourceFile": "src/main/ets/views/ProductReviewList.ets",
-      "buildFunction": "buildProductReview"
-    }
-  ]
-}

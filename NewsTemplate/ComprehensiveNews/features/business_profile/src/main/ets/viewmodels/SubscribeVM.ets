@@ -20,6 +20,11 @@ export class SubscribeViewModel extends BaseViewModel {
     xl: 3,
   });
 
+  @Computed
+  get hasSubscribe() {
+    return !!this.dataSource.getAllData().length &&  this.dataSource.getAllData().every(v => v.isFollow)
+  }
+
   async init() {
     this.userId = RouterUtils.getParamByName(RouterMap.SETTING_SUBSCRIBE) as string;
     this.querySubscribe();
@@ -62,12 +67,7 @@ export class SubscribeViewModel extends BaseViewModel {
   }
 
   cancelSubscribeAll() {
-    if (this.dataSource.totalCount() <= 0) {
-      this.contextModel.showToast({
-        message: '暂无订阅',
-        alignment: Alignment.Center,
-        textColor: Color.Black,
-      })
+    if (!this.hasSubscribe) {
       return
     }
     MineServiceApi.cancelAllSubscribe()

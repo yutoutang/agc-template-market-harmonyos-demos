@@ -1,7 +1,8 @@
 import { AdServicePage, AdType, ChannelType } from 'aggregated_ads';
 import {
-  CommonConstants
+  CommonConstants, GlobalInfoModel
 } from '@ohos_agcit/children_education_utils';
+import { AppStorageV2 } from '@kit.ArkUI';
 
 
 @Builder
@@ -11,7 +12,8 @@ export function SplashAdPageBuilder() {
 
 @ComponentV2
 struct SplashAdPage {
-  @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
+  @Local globalInfo: GlobalInfoModel =
+    AppStorageV2.connect<GlobalInfoModel>(GlobalInfoModel, () => new GlobalInfoModel())!;
 
   build() {
     NavDestination() {
@@ -21,7 +23,7 @@ struct SplashAdPage {
           adId: 'testq6zq98hecj',
           adType: AdType.SPLASH_AD,
           closeCallBack: () => {
-            this.appPathStack.pop();
+            this.globalInfo.navStack.pop();
           },
         })
       }

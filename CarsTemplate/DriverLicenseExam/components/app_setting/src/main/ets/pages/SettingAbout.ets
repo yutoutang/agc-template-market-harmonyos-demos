@@ -21,25 +21,29 @@ struct SettingAbout {
 
   build() {
     NavDestination() {
-      Column() {
-        if (this.vm.configInfo.isSheet) {
-          this.coreView()
-        } else {
-          GridRow(GridRowColSetting.DEFAULT_GRID_ROW_OPTIONS) {
-            GridCol({
-              span: GridRowColSetting.DEFAULT_CENTER_COL_SPAN,
-              offset: GridRowColSetting.DEFAULT_CENTER_COL_OFFSET,
-            }) {
+      Scroll() {
+        Column() {
+          Column() {
+            if (this.vm.configInfo.isSheet) {
               this.coreView()
+            } else {
+              GridRow(GridRowColSetting.DEFAULT_GRID_ROW_OPTIONS) {
+                GridCol({
+                  span: GridRowColSetting.DEFAULT_CENTER_COL_SPAN,
+                  offset: GridRowColSetting.DEFAULT_CENTER_COL_OFFSET,
+                }) {
+                  this.coreView()
+                }
+              }
             }
           }
-          .layoutWeight(1)
+
         }
+        .padding({
+          left:16,
+          right:16
+        })
       }
-      .padding({
-        left:16,
-        right:16
-      })
     }
     .title('关于')
     .padding({
@@ -51,7 +55,6 @@ struct SettingAbout {
 
   @Builder
   coreView() {
-    Scroll() {
       Column() {
         this.appInfo()
         this.cardInfo()
@@ -59,10 +62,7 @@ struct SettingAbout {
         this.otherInfo()
       }
       .width(CommonConstants.FULL_PERCENT)
-      .height(CommonConstants.FULL_PERCENT)
       .padding({ bottom: CommonConstants.PADDING_M })
-    }
-    .attributeModifier(this.vm.scrollModifier)
   }
 
   @Builder
@@ -181,7 +181,7 @@ struct SettingAbout {
       left: CommonConstants.PADDING_M,
       right: CommonConstants.PADDING_M,
     })
-    .margin({ top: CommonConstants.PADDING_L })
+    // .margin({ top: CommonConstants.PADDING_L })
   }
 
   @Builder

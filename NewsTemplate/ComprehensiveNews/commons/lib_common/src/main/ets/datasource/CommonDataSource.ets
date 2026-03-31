@@ -1,6 +1,7 @@
+@ObservedV2
 export class CommonDataSource<T> implements IDataSource {
   private listeners: DataChangeListener[] = [];
-  originDataArray: T[] = [];
+  @Trace originDataArray: T[] = [];
 
   totalCount(): number {
     return this.originDataArray.length;

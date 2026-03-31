@@ -8,7 +8,10 @@
   "dependencies": {
     "dayjs": "1.11.13",
     "lib_common": "file:../../commons/lib_common",
+    "lib_news_api": "file:../../commons/lib_news_api",
+    "lib_widget": "file:../../commons/lib_widget",
     "module_imagepreview": "file:../module_imagepreview",
     "module_highlight": "file:../module_highlight",
+    "module_transition": "file:../module_transition",
   }
 }

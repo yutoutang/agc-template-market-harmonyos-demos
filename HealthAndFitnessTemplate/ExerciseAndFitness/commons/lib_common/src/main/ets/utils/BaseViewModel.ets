@@ -9,6 +9,7 @@ import { BreakpointModel } from '../models/BreakpointModel';
 import { NetworkModel } from '../models/NetworkModel';
 import { VideoExtraInfoModel } from '../models/VideoExtraInfoModel';
 import { DisplayModel } from '../models/DisplayModel';
+import { ContextUtils, GlobalContextUtils } from './ContextUtils';
 
 /**
  * 所有ViewModel的基类，支持UI动态观测
@@ -26,4 +27,5 @@ export abstract class BaseViewModel {
   @Trace videoExtraInfoModel: VideoExtraInfoModel =
     AppStorageV2.connect(VideoExtraInfoModel, () => VideoExtraInfoModel.getInstance())!;
   @Trace displayModel: DisplayModel = AppStorageV2.connect(DisplayModel, () => new DisplayModel())!;
+  @Trace contextModel: ContextUtils = GlobalContextUtils;
 }

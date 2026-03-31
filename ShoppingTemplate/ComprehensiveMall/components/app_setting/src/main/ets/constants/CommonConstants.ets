@@ -26,4 +26,4 @@ export class CommonConstants {
   public static readonly DIALOG_MAX_WIDTH: number = 400;
 }
 
-export const LOG_TAG: string = '[Setting]'
+export const LOG_TAG: string = '[Setting]';

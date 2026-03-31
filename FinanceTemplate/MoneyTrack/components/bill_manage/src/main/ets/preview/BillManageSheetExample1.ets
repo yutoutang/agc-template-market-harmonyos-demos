@@ -1,6 +1,8 @@
-import { promptAction } from '@kit.ArkUI';
+import { Logger } from 'bill_base';
 import { BillManageModel } from '../commons/Models';
 import { billManageSheetBuilder } from '../components/BillManageSheet';
+
+const TAG = '[BillManageSheetExample1]'
 
 @Entry
 @ComponentV2
@@ -19,7 +21,11 @@ struct BillManageSheetExample1 {
           Button('删除账单')
             .onClick(() => {
               this.bill = undefined;
-              promptAction.showToast({ message: '删除账单成功！' });
+              try {
+                this.getUIContext().getPromptAction().showToast({ message: '删除账单成功！' });
+              } catch (err) {
+                Logger.error(TAG, 'show toast failed. error:' + JSON.stringify(err));
+              }
             });
         }
       };
@@ -43,7 +49,11 @@ struct BillManageSheetExample1 {
           this.showSheet = false;
         },
         handleResourceManage: () => {
-          promptAction.showToast({ message: '详见ResourceManageSheet组件' });
+          try {
+            this.getUIContext().getPromptAction().showToast({ message: '详见ResourceManageSheet组件' });
+          } catch (err) {
+            Logger.error(TAG, 'show toast failed. error:' + JSON.stringify(err));
+          }
         },
       }), {
         title: { title: '选择资产类型' },

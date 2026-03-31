@@ -1,27 +1,20 @@
 import { AxiosRequestConfig, HttpStatusCode } from '@ohos/axios';
 import AxiosMockAdapter from '@hw-agconnect/axios-mock-adapter';
-import { RequestUrlMap } from '../../constants/Enums';
+import { RequestUrlMap } from '../../constants/RequestUrlMap';
+import { PriceType } from '../../types/EnumTypes';
+import { OrderItem, OrderSkuItem, OrderExpressInfo } from '../../types/OrderTypes';
 import {
   OrderCreateReq, OrderReviewReq, OrderUpdateReq, PreOrderInfoReq,
 } from '../../types/RequestTypes';
 import { BaseResponse } from '../../types/responses/BaseResponse';
-import {
-  OrderCreateResp,
-  OrderExpressInfo,
-  OrderExpressResp,
-  OrderItem,
-  OrderListResp,
-  OrderSkuItem,
-  PreOrderResp,
-} from '../../types/responses/OrderResponse';
+import { PreOrderResp, OrderListResp, OrderExpressResp, OrderCreateResp } from '../../types/responses/OrderResponse';
 import { mockExpress, MockOrderData } from '../mockdata/MockOrderData';
 import { MockProductData } from '../mockdata/MockProductData';
+import { MockSeckillData } from '../mockdata/MockSeckillData';
 
 export class OrderMockApis {
   private readonly PAGE_SIZE = 6;
-  private _orderList: OrderItem[] = JSON.parse(
-    JSON.stringify(MockOrderData.orderList),
-  );
+  private _orderList: OrderItem[] = MockOrderData.getOrderList();
 
   public start(adapter: AxiosMockAdapter) {
     // 获取预支付商品信息
@@ -46,7 +39,14 @@ export class OrderMockApis {
               serviceDesc: skuItem.serviceDesc,
               dashPrice: skuItem.dashPrice ?? skuItem.price,
               price: skuItem.price,
+              priceType: skuItem.priceType,
             };
+            // 若为秒杀商品 获取秒杀价格
+            if (item.priceType === PriceType.SECKILL && item.seckillInfo) {
+              const seckillPrice = MockSeckillData.getSeckillPrice(item.seckillInfo.productId);
+              orderSku.price = seckillPrice ?? skuItem.price;
+              orderSku.slotId = item.seckillInfo.slotId;
+            }
             skuList.push(orderSku);
           }
         });
@@ -123,9 +123,9 @@ export class OrderMockApis {
     adapter
       .onGet(RequestUrlMap.ORDER_EXPRESS)
       .reply((config: AxiosRequestConfig) => {
-        const orderId = config.params.orderId as string
-        const express = JSON.parse(JSON.stringify(mockExpress)) as OrderExpressInfo
-        express.orderId = orderId
+        const orderId = config.params.orderId as string;
+        const express = JSON.parse(JSON.stringify(mockExpress)) as OrderExpressInfo;
+        express.orderId = orderId;
         const order = this._orderList.find(
           (item) => item.orderInfo.orderNo === orderId,
         );
@@ -133,15 +133,15 @@ export class OrderMockApis {
           express.destination = {
             latitude: order.orderInfo.addressInfo.latitude ?? MockOrderData.DEFAULT_LATITUDE,
             longitude: order.orderInfo.addressInfo.longitude ?? MockOrderData.DEFAULT_LONGITUDE,
-          }
-          express.getPosition = order.orderInfo.addressInfo.city ?? ''
+          };
+          express.getPosition = order.orderInfo.addressInfo.city ?? '';
         }
         const res: OrderExpressResp = {
           code: 0,
           info: express,
-        }
-        return [HttpStatusCode.Ok, res]
-      })
+        };
+        return [HttpStatusCode.Ok, res];
+      });
 
     // 创建订单
     adapter
@@ -173,6 +173,7 @@ export class OrderMockApis {
           msg: '创建成功',
           orderNo,
           orderStr: orderNo,
+          detail: orderItem,
         };
         return [HttpStatusCode.Ok, res];
       });

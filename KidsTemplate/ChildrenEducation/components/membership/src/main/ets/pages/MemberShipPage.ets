@@ -1,5 +1,5 @@
 import { iap } from '@kit.IAPKit';
-import { ComponentContent } from '@kit.ArkUI';
+import { AppStorageV2, ComponentContent } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
 import { HintParam, MemberList, MemberParams, MemberShipPrivilege, Privacy, ProductInfo } from '../model/Index';
 import { MemberShipVM } from '../viewmodel/MemberShipVM';
@@ -12,7 +12,8 @@ export struct MemberShipPage {
   vm: MemberShipVM = MemberShipVM.instance;
   @Local privacy: Privacy = new Privacy();
   @Local cardWidth: number = 0;
-  @Local avoidHeight: number = 0;
+  @Local bottomAvoidHeight: number = 0;
+  @Local topAvoidHeight: number = 0;
   @Param linearColors: Array<[
     ResourceColor,
     number
@@ -87,8 +88,10 @@ export struct MemberShipPage {
         { node: this.privacyCheckNode!!, uiContext: this.uiContext } as HintParam);
     this.vm.uiContext = this.uiContext;
     this.vm.setEvent(this.subscribeCallBack, this.queryExpireTime, this.ownedMemberCallBack);
-    this.avoidHeight =
-      await this.vm.getWindowAvoidArea(this.getUIContext().getHostContext() as common.UIAbilityContext);
+    this.bottomAvoidHeight =
+      await this.vm.getBottomWindowAvoidArea(this.getUIContext().getHostContext() as common.UIAbilityContext);
+    this.topAvoidHeight =
+      await this.vm.getBottomWindowAvoidArea(this.getUIContext().getHostContext() as common.UIAbilityContext);
   }
 
   @Builder
@@ -99,7 +102,9 @@ export struct MemberShipPage {
           this.routerModule.pop();
         });
         Text('会员中心').fontSize(20).fontWeight(FontWeight.Bold).fontColor($r('sys.color.font_primary'));
-      }.position({ left: 16 }).zIndex(2);
+      }
+      .position({ left: 16, top: this.topAvoidHeight + 15})
+      .zIndex(2)
     }
   }
 
@@ -337,7 +342,7 @@ export struct MemberShipPage {
         });
     }
     .width('100%')
-    .padding({ top: 12, bottom: this.isSheet ? this.avoidHeight : 0 })
+    .padding({ top: 12, bottom: this.bottomAvoidHeight })
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
     .backgroundColor($r('sys.color.background_primary'));
   }
@@ -349,7 +354,7 @@ export struct MemberShipPage {
           LoadingProgress().size({ width: 72, height: 72 });
         }.width('100%').height('100%').justifyContent(FlexAlign.Center).alignItems(HorizontalAlign.Center);
       } else {
-        this.Operation();
+        this.Operation()
 
         Column() {
           Scroll() {
@@ -384,14 +389,14 @@ export struct MemberShipPage {
         .justifyContent(FlexAlign.SpaceBetween)
         .onSizeChange((oldValue: SizeOptions, newValue: SizeOptions) => {
           this.cardWidth = Math.floor((newValue.width as number - 48) / 3);
-        });
+        })
       }
     }
     .hideTitleBar(true)
-    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
     .onReady((context: NavDestinationContext) => {
       this.vm.pathStack = context.pathStack;
-    });
+    })
   }
 }
 

@@ -136,6 +136,7 @@ export class MockUser {
     authorDesc: '在自己的小世界里，做一个快乐的普通人，把节奏放慢，享受生活！十六岁的青春张扬 十八岁的未来可期，携零零碎碎的美好奔赴未知的将来！',
     authorPhone: '177******96',
     authorIp: '南京',
+    memExpireTime: new Date().getTime(),
     watchers: ['author_1', 'author_2', 'author_6', 'author_7'],
     followers: ['author_1', 'author_2', 'author_3', 'author_4', 'author_5'],
     subscribe: [],

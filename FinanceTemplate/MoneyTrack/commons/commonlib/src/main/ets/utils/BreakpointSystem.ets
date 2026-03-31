@@ -1,4 +1,6 @@
 import { AppStorageV2, window } from '@kit.ArkUI';
+import { BusinessError } from '@kit.BasicServicesKit';
+import { WindowUtil } from './window/Index';
 import { Logger } from '../utils/logger/Index';
 
 export enum BreakpointTypeEnum {
@@ -52,6 +54,11 @@ class BreakpointSystem {
   private _uiContext: UIContext | undefined
   private _windowClass: window.Window | undefined
 
+  @Computed
+  get isTablet() {
+    return this.currentBreakpoint.value === BreakpointTypeEnum.LG;
+  }
+
   public register(uiContext: UIContext) {
     this._uiContext = uiContext
     if (this._uiContext) {
@@ -61,6 +68,8 @@ class BreakpointSystem {
         this._windowClass.on('windowSizeChange', () => {
           this.updateBreakpoint()
         })
+      }).catch((error: BusinessError) => {
+        WindowUtil.dealAllError(error);
       })
     }
   }

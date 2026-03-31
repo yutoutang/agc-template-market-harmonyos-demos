@@ -1,6 +1,14 @@
-import { DataGenerator, VideoCard, VideoDetail } from '@ohos_agcit/children_education_datasource';
-import { CommonConstants, TagLabelCard, Title } from '@ohos_agcit/children_education_utils';
-import { VideoCover } from '../../components/VideoCover';
+import { DataGenerator, VideoCard, VideoCollection } from '@ohos_agcit/children_education_datasource';
+import {
+  AvoidArea,
+  BreakpointType,
+  CommonConstants,
+  GlobalInfoModel,
+  TagLabelCard,
+  Title,
+  VideoCover
+} from '@ohos_agcit/children_education_utils';
+import { AppStorageV2 } from '@kit.ArkUI';
 
 @Builder
 export function PremiumInteractiveVideoListBuilder() {
@@ -10,7 +18,10 @@ export function PremiumInteractiveVideoListBuilder() {
 
 @ComponentV2
 export struct PremiumInteractiveVideoListView {
-  @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
+  @Local title: string = '';
+  @Local avoidArea: AvoidArea = AppStorageV2.connect(AvoidArea, () => new AvoidArea(0, 0))!;
+  @Local globalInfo: GlobalInfoModel =
+    AppStorageV2.connect<GlobalInfoModel>(GlobalInfoModel, () => new GlobalInfoModel())!;
   private videoArray: Array<VideoCard> = [];
 
   aboutToAppear(): void {
@@ -19,33 +30,57 @@ export struct PremiumInteractiveVideoListView {
 
   build() {
     NavDestination() {
-      List({ space: 16 }) {
+      Grid() {
         ForEach(this.videoArray, (item: VideoCard) => {
-          ListItem() {
-            Row() {
-              PremiumInteractiveVideoListItem({
-                videoCard: item,
-              })
-            }
-            .width('100%')
-            .justifyContent(FlexAlign.Center)
+          GridItem() {
+            PremiumInteractiveVideoListItem({
+              videoCard: item,
+            })
           }
-          .align(Alignment.Center)
         }, (item: VideoCard) => JSON.stringify(item));
       }
-      .width(CommonConstants.FULL_PERCENT)
-      .scrollBar(BarState.Off)
-      .layoutWeight(1)
       .padding({
-        right: 16,
-        left: 16
+        top: 8,
+        left: new BreakpointType<number>({
+          sm: 16,
+          md: 24,
+          lg: 32,
+        }).getValue(this.globalInfo.currentBreakpoint),
+        right: new BreakpointType<number>({
+          sm: 17,
+          md: 24,
+          lg: 32,
+        }).getValue(this.globalInfo.currentBreakpoint)
       })
+      .width(CommonConstants.FULL_PERCENT)
+      .rowsGap(new BreakpointType<number>({
+        sm: 8,
+        md: 12,
+        lg: 16,
+      }).getValue(this.globalInfo.currentBreakpoint))
+      .columnsGap(new BreakpointType<number>({
+        sm: 8,
+        md: 12,
+        lg: 16,
+      }).getValue(this.globalInfo.currentBreakpoint))
+      .columnsTemplate('1fr '.repeat(new BreakpointType<number>({
+        sm: 1,
+        md: 2,
+        lg: 3,
+      }).getValue(this.globalInfo.currentBreakpoint)))
     }
-    .title(Title($r('app.string.interactive_section')))
+    .title(Title(this.title))
+    .onReady((cxt: NavDestinationContext) => {
+      this.title = cxt.pathInfo.param as string
+    })
     .onBackPressed(() => {
-      this.appPathStack.pop();
+      this.globalInfo.navStack.pop();
       return true;
-    });
+    })
+    .padding({
+      top: this.getUIContext().px2vp(this.avoidArea.topRectHeight),
+      bottom: this.getUIContext().px2vp(this.avoidArea.bottomRectHeight),
+    })
   }
 }
 
@@ -53,30 +88,32 @@ export struct PremiumInteractiveVideoListView {
 @ComponentV2
 struct PremiumInteractiveVideoListItem {
   @Param @Once @Require videoCard: VideoCard;
-  @Consumer(CommonConstants.APP_PATH_STACK) appPathStack: NavPathStack = new NavPathStack();
+  @Local globalInfo: GlobalInfoModel =
+    AppStorageV2.connect<GlobalInfoModel>(GlobalInfoModel, () => new GlobalInfoModel())!;
 
   build() {
-    Column({ space: 10 }) {
+    Column() {
       VideoCover({
         imageUrl: this.videoCard.imageUrl,
         isVip: this.videoCard.isVip,
         updateCount: this.videoCard.updateCount,
         totalCount: this.videoCard.totalCount,
-        imageWidth: 328,
-        imageHeight: 186
+        ratio: 16 / 9
       })
         .onClick(() => {
-          let detail: VideoDetail = DataGenerator.getVideoDetail(this.getUIContext());
+          let detail: VideoCollection = DataGenerator.getVideoDetail(this.getUIContext());
           detail.videoCard = this.videoCard;
-          this.appPathStack.pushPathByName('VideoDetailListView', detail);
-        });
+          this.globalInfo.navStack.pushPathByName('VideoDetailListView', detail);
+        })
+
+      Blank().height(8)
 
       Column() {
         Text(this.videoCard.title)
-          .height(21)
+          .fontSize(16)
           .lineHeight(21)
           .width('100%')
-        
+
         Blank().height(2)
 
         Row() {
@@ -85,12 +122,10 @@ struct PremiumInteractiveVideoListItem {
           }, (item: string) => item);
         }
       }
+      .justifyContent(FlexAlign.Start)
       .alignItems(HorizontalAlign.Start)
-      .height(41)
       .width(CommonConstants.FULL_PERCENT)
     }
-    .width(328)
-    .height(235)
     .alignItems(HorizontalAlign.Start)
     .borderRadius($r('sys.float.corner_radius_level8'))
     .backgroundColor($r('sys.color.comp_background_list_card'))

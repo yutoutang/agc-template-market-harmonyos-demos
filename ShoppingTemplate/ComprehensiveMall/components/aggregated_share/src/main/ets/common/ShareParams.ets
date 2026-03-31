@@ -9,7 +9,7 @@ export interface ShareRecordData {
   recordId?: string;
   title: string;
   subTitle?: string;
-  coverUrl?: ResourceStr;
+  coverUrl?: string;
   thumbUrl?: ResourceStr;
   landingPageUrl?: string;
   createTime?: number;
@@ -40,7 +40,7 @@ export class ShareViewData {
   @Trace recordId: string = util.generateRandomUUID();
   @Trace title: string = '';
   @Trace subTitle: string = '';
-  @Trace coverUrl: ResourceStr = '';
+  @Trace coverUrl: string = '';
   @Trace thumbUrl: ResourceStr = '';
   @Trace landingPageUrl: string = '';
   @Trace createTime: number = 0;

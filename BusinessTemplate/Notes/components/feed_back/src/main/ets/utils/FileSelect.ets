@@ -42,7 +42,8 @@ export function getDateStringWithTimeStamp(): string {
  * @param num 选择最大图片数量
  * @returns
  */
-export async function fileSelect(preselectedUris: Array<string>, num: number): Promise<Array<string>> {
+export async function fileSelect(uiContext: UIContext,
+  preselectedUris: Array<string>, num: number): Promise<Array<string>> {
   // 设置打开picker的选项
   let photoSelectOptions = new photoAccessHelper.PhotoSelectOptions();
   photoSelectOptions.MIMEType = photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE; // 类型
@@ -60,7 +61,7 @@ export async function fileSelect(preselectedUris: Array<string>, num: number): P
       let imgUris = photoSelectResult.photoUris;
       for (let imgUri of imgUris) {
         if (imgUri.indexOf('media/Photo') < 0) {
-          promptAction.showToast({ message: '请选择图片进行上传' })
+          uiContext.getPromptAction().showToast({ message: '请选择图片进行上传' })
           return [];
         }
       }

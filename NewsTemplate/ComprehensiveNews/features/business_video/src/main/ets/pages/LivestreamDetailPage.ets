@@ -8,13 +8,13 @@ import {
   RouterMap,
   RouterUtils,
   GridRowColSetting,
+  Logger,
 } from 'lib_common'
-import { VideoPipViewModel } from 'lib_av_details';
+import { AVSessionUtils, VideoPipViewModel } from 'lib_av_details';
 import {
-  AVPlayerSession,
+  AVPlayerController,
   PiPWindowModel,
   VideoCard,
-  VideoCardPlayerController,
   VideoNetworkModel,
   VideoNetworkSetting,
 } from 'module_swipeplayer';
@@ -38,9 +38,9 @@ const TAG = '[LivestreamDetailPage]';
 export struct LivestreamDetailPage {
   @Local detailData: VideoNewsData | undefined = undefined;
   @Local isLivestream: boolean = false;
+  @Local videoAspectRatio: number = 1920 / 1080;
   // 路由栈
   pathStack = new NavPathStack()
-  videoCardPlayerController: VideoCardPlayerController = new VideoCardPlayerController();
   @Local pipWindowModel: PiPWindowModel = AppStorageV2.connect(PiPWindowModel, () => new PiPWindowModel())!;
   // 评论的懒加载数据源
   @Provider() commentListDataSource: CommonDataSource<CommentInfo> = new CommonDataSource<CommentInfo>();
@@ -48,7 +48,7 @@ export struct LivestreamDetailPage {
   @Local commentListScroller: LivestreamCommentListScroller = new LivestreamCommentListScroller()
   vm: LivestreamDetailPageVM = new LivestreamDetailPageVM();
   @Local buttonModifier: CircleButtonModifier = new CircleButtonModifier();
-  @Local videoPipModel:VideoPipViewModel = new VideoPipViewModel()
+  @Local videoPipModel: VideoPipViewModel = new VideoPipViewModel()
   private landscapeListener = (info: uiObserver.NavDestinationInfo) => {
     this.pipWindowModel.navDestinationUpdateListeners.forEach((callback, key) => {
       if (key === 'landscapeListener') {
@@ -61,19 +61,29 @@ export struct LivestreamDetailPage {
     const allPathStack = RouterUtils.getStack().getAllPathName()
     const lastPathName = allPathStack[allPathStack.length - 1];
     if (lastPathName === RouterMap.LIVESTREAM_DETAIL_PAGE) {
-      // 不展示画中画时，保持原有逻辑
-      if (!this.vm.settingInfo.network.enableLivePiP) {
+      // 展示画中画时，判断是否是回到后台
+      if (this.vm.settingInfo.network.enableLivePiP) {
         if (type === window.WindowStageEventType.RESUMED || type === window.WindowStageEventType.SHOWN) {
-          this.videoCardPlayerController.play()
           this.pipWindowModel.isBackgroundPip = false;
+          this.pipWindowModel.pipController?.setAutoStartEnabled(this.pipWindowModel.isEnablePiP);
+          this.pipWindowModel.pipController?.stopPiP().catch((e: BusinessError) => {
+            Logger.error(TAG, 'stopPiP fail, error: ' + JSON.stringify(e));
+          });
         } else if (type === window.WindowStageEventType.PAUSED || type === window.WindowStageEventType.HIDDEN) {
-          this.videoCardPlayerController.pause()
           this.pipWindowModel.isBackgroundPip = true;
+          this.pipWindowModel.isPipStop = false;
+          this.pipWindowModel.pipController?.setAutoStartEnabled(this.pipWindowModel.isEnablePiP);
+        }
+      } else {
+        // 不展示画中画时，保持原有逻辑
+        if (type === window.WindowStageEventType.RESUMED || type === window.WindowStageEventType.SHOWN) {
+          this.videoPipModel.getVideoCardPlayerController().play()
+        } else if (type === window.WindowStageEventType.PAUSED || type === window.WindowStageEventType.HIDDEN) {
+          this.videoPipModel.getVideoCardPlayerController().pause()
         }
       }
     }
   }
-
 
   @Computed
   get isTablet() {
@@ -83,12 +93,20 @@ export struct LivestreamDetailPage {
   @Computed
   get videoBoxHeight() {
     if ([BreakpointNameEnum.LG, BreakpointNameEnum.XL].includes(this.vm.breakPointModel.currentBreakpoint)) {
-      return '100%'
+      return '100%';
     }
-    return this.vm.breakPointModel.currentBreakpoint === BreakpointNameEnum.SM ? 200 : 400
+    return 'auto';
   }
 
-  aboutToAppear(): void {
+  @Computed
+  get videoBoxAspectRatio() {
+    if ([BreakpointNameEnum.LG, BreakpointNameEnum.XL].includes(this.vm.breakPointModel.currentBreakpoint)) {
+      return -1;
+    }
+    return this.videoAspectRatio;
+  }
+
+  async aboutToAppear(): Promise<void> {
     // 无感监听路由变化
     uiObserver.on('navDestinationUpdate', this.landscapeListener);
     this.videoPipModel.setContext(this.getUIContext().getHostContext() as Context)
@@ -96,6 +114,9 @@ export struct LivestreamDetailPage {
     this.vm.windowStageModel.windowStageEventListeners.set('livestreamDetailPage', (type) => {
       this.windowStageEventCallback(type)
     })
+    // 销毁应用中其他AVSession
+    await AVSessionUtils.destroyAudioSession();
+    await AVSessionUtils.destroyReaderSession();
   }
 
   aboutToDisappear(): void {
@@ -119,14 +140,14 @@ export struct LivestreamDetailPage {
       // 头部
       this.headerBuilderView();
       GridRow({
-        columns: GridRowColSetting.GRID_ROW_OPTIONS_COLUMNS
+        columns: GridRowColSetting.GRID_ROW_OPTIONS_COLUMNS,
       }) {
         GridCol({
           span: {
             sm: 4,
             md: 8,
             lg: 8,
-          }
+          },
         }) {
           Column() {
             Stack({ alignContent: Alignment.TopStart }) {
@@ -136,6 +157,7 @@ export struct LivestreamDetailPage {
                   index: 0,
                   videoData: this.detailData,
                   isShown: true,
+                  enableAVSession: true,
                   videoNetwork: this.vm.networkModel as VideoNetworkModel,
                   videoNetworkSetting: this.vm.settingInfo.network as VideoNetworkSetting,
                   currentBreakpoint: this.vm.breakPointModel.currentBreakpoint,
@@ -151,10 +173,10 @@ export struct LivestreamDetailPage {
                     this.videoPipModel.handlePip()
                   },
                 })
-                  .clip(true)
               }
               .width('100%')
               .height(this.videoBoxHeight)
+              .aspectRatio(this.videoBoxAspectRatio)
               .justifyContent(FlexAlign.Center)
               .alignItems(HorizontalAlign.Center)
               .backgroundColor(Color.Black)
@@ -175,7 +197,7 @@ export struct LivestreamDetailPage {
                   })
                 }
                 .height(56)
-                .padding({left: CommonConstants.PADDING_L})
+                .padding({ left: CommonConstants.PADDING_L })
                 .alignItems(VerticalAlign.Center)
                 .visibility(this.isTablet ? Visibility.Visible : Visibility.None)
 
@@ -248,11 +270,12 @@ export struct LivestreamDetailPage {
             bottom: this.isTablet ? this.vm.windowModel.windowBottomPadding : 0,
           })
         }
+
         if (this.isTablet) {
           GridCol({
             span: {
               lg: 4,
-            }
+            },
           }) {
             Column() {
               // tab页签
@@ -419,7 +442,7 @@ export struct LivestreamDetailPage {
 }
 
 @Builder
-export function completedBtnView(playerSession: AVPlayerSession) {
+export function completedBtnView(avPlayerController: AVPlayerController) {
   Row({ space: 8 }) {
     Image($r('app.media.ic_replay')).width(12).height(12)
     Text('重新播放')
@@ -437,12 +460,12 @@ export function completedBtnView(playerSession: AVPlayerSession) {
   .backgroundColor('#1b1a1b')
   .zIndex(9)
   .onClick(() => {
-    playerSession.play()
+    avPlayerController.play()
   })
 }
 
 @Builder
-export function liveCompletedBtnView(playerSession: AVPlayerSession) {
+export function liveCompletedBtnView(avPlayerController: AVPlayerController) {
   Row({ space: 8 }) {
     Image($r('app.media.ic_replay')).width(12).height(12)
     Text('查看回放')
@@ -460,7 +483,7 @@ export function liveCompletedBtnView(playerSession: AVPlayerSession) {
   .backgroundColor('#1b1a1b')
   .zIndex(9)
   .onClick(() => {
-    playerSession.play()
+    avPlayerController.play()
   })
 }
 

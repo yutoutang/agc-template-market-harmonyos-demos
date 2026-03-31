@@ -1,4 +1,35 @@
-import { FormType, InfoItem, ISelectOption, PhoneApiInfo } from './Types';
+import { ISelectOption, PhoneApiInfo } from './DataModel';
+
+// 支持的表单类型枚举
+export enum FormType {
+  CHOOSE_AVATAR = 'choose_avatar',
+  TEXT_INPUT = 'text_input',
+  PHONE_INPUT = 'phone_input',
+  TEXTAREA = 'textarea',
+  DROP_SELECT = 'drop_select',
+  DATE_SELECT = 'date_select',
+}
+
+// 表单模型
+export interface InfoItem {
+  type: FormType;
+  value?: ResourceStr | Date | number | Object;
+  label: ResourceStr;
+  subLabel?: ResourceStr;
+  placeholderText?: ResourceStr;
+  validMessageText?: ResourceStr;
+  minLength?: number;
+  maxLength?: number;
+  showValue?: boolean;
+  showRightArrow?: boolean;
+  selectOptions?: ISelectOption[];
+  sheetTitle?: string;
+  sheetOptions?: SheetOptions;
+  invocation?: (param: Object) => Promise<void>;
+  phoneInfo?: PhoneApiInfo;
+  onChange?: (param?: Object) => void;
+  onClick?: () => void;
+}
 
 // 表单状态模型
 @ObservedV2
@@ -26,7 +57,7 @@ export class ObservedInfoItem implements InfoItem {
   @Trace phoneInfo: PhoneApiInfo = {
     codeLength: 6,
     sendCode: (phone: string) => Promise.resolve(),
-    verifyCode: (phone: string, code: string) => Promise.resolve(),
+    verifyCode: (phone: string, code: string) => Promise.resolve(false),
   };
 
   constructor(item?: InfoItem) {

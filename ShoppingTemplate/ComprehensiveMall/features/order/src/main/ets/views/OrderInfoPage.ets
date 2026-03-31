@@ -1,10 +1,10 @@
-import { CommonLoading, CommonScroll, ContainerColumn, CustomServiceSheet } from 'lib_widget'
+import { CommonLoading, CommonScroll, ContainerColumn, CustomServiceSheet, NavTitleBar } from 'lib_widget'
 import { DiscountItem, OrderInfo, OrderItem, OrderSkuItem } from 'lib_network'
 import { Formatter } from 'lib_foundation'
 import { OrderFormItem } from '../components/OrderFormItem'
 import { buildButtonList, buildOrderBaseInfoCard } from '../components/OrderInfoCard'
 import { OrderUtil } from '../utils/OrderUtil'
-import { OrderInfoPageVM } from '../viewModels/OrderInfoPageVM'
+import { OrderInfoPageVM } from '../viewmodels/OrderInfoPageVM'
 import { buildAddressInfo } from '../components/AddressInfoCard';
 import { OrderActionMap, OrderStatusMap } from '../common/Enums';
 
@@ -19,6 +19,7 @@ export struct OrderInfoPageNew {
 
   build() {
     NavDestination() {
+      NavTitleBar({title:'订单详情',bgColor:$r('app.color.background_color_primary')})
       CommonScroll({ bgColor: $r('app.color.background_color_grey') }) {
         if (this.vm.isLoading) {
           CommonLoading()
@@ -40,7 +41,7 @@ export struct OrderInfoPageNew {
       }
 
     }
-    .title('订单详情')
+    .hideTitleBar(true)
     .onReady((context) => {
       const param = context.pathInfo.param as string | undefined
       if (param) {
@@ -96,7 +97,7 @@ export struct OrderInfoPageNew {
             .fontSize(14)
             .fontWeight(FontWeight.Medium)
             .fontColor($r('app.color.theme_color'))
-          Text(this.vm.logisticInfo.desc)
+          Text(this.vm.logisticInfo.details[0]?.desc ?? '')
             .fontSize(14)
             .fontWeight(FontWeight.Medium)
             .fontColor($r('app.color.font_color_level1'))
@@ -160,9 +161,8 @@ export struct OrderInfoPageNew {
           bottom: $r('app.float.space_l'),
         })
       Row() {
-        Image($r('app.media.tel'))
-          .width(16)
-          .height(16)
+        SymbolGlyph($r('sys.symbol.service'))
+          .fontColor([$r('app.color.font_color_level2')])
           .margin({ right: $r('app.float.space_s') })
 
         Text('联系客服')
@@ -221,7 +221,7 @@ export struct OrderInfoPageNew {
               top: 4,
               bottom: 4,
             })
-            .backgroundColor($r('app.color.background_color_white'))
+            .backgroundColor($r('app.color.background_color_primary'))
             .onClick(() => {
               OrderUtil.copyOrderNumber(orderItem.orderInfo.orderNo)
             })
@@ -249,7 +249,8 @@ export struct OrderInfoPageNew {
       }
     }
     .width($r('app.string.size_percent_full'))
-    .backgroundColor($r('app.color.background_color_white'))
+    .backgroundColor($r('app.color.background_color_primary'))
+    .expandSafeArea()
     .padding({
       left: $r('app.float.space_m'),
       right: $r('app.float.space_m'),

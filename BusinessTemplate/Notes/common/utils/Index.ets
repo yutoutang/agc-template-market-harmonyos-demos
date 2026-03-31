@@ -24,4 +24,4 @@ export { NotificationBasicOptions } from './src/main/ets/model/NotificationOptio
 
 export { GlobalInfoModel, BreakpointTypeEnum } from './src/main/ets/model/GlobalInfoModel';
 
-export { BreakpointType } from './src/main/ets/utils/BreakpointSystem';
+export { BreakpointType,BreakpointSystem } from './src/main/ets/utils/BreakpointSystem';

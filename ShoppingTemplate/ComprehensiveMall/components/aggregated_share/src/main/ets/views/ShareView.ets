@@ -1,17 +1,16 @@
 import { AppStorageV2 } from '@kit.ArkUI';
 import { image } from '@kit.ImageKit';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { WindowUtil } from 'module_ui_base';
-import { UtilLog as Logger } from '@hw-agconnect/util-log';
-import { ShareViewData } from '../common/ShareParams';
-import { CommonConstants } from '../common/Constants';
-import { posterShareList, unifiedShareList } from '../common/PanelData';
-import { PosterSharePanel } from '../components/PosterSharePanel'
 import { UnifiedSharePanel } from '../components/UnifiedSharePanel'
-import { ShareConfigModel } from '../model/ShareConfigModel';
+import { PosterSharePanel } from '../components/PosterSharePanel'
 import { Screenshot } from '../screenshot/Screenshot';
 import { SystemShareUtils } from '../utils/SystemShareUtils';
 import { WXShareUtils } from '../utils/WXShareUtils';
+import { ShareViewData } from '../common/ShareParams';
+import { CommonConstants } from '../common/Constants';
+import { posterShareList, unifiedShareList } from '../common/PanelData';
+import { Logger } from '../common/Logger';
+import { ShareConfigModel } from '../model/ShareConfigModel';
 import { clearCache } from '../utils/FileUtils';
 
 @Builder
@@ -34,17 +33,16 @@ export struct ShareView {
 
   aboutToAppear(): void {
     AppStorage.setOrCreate('cacheFiles', []);
-    WindowUtil.initWindowUtil(this.getUIContext())
-    this.systemShare.init(this.data);
+    this.systemShare.init(this.getUIContext(), this.data);
     this.systemShare.onKnockShare();
     this.wxShare.registerOnWXRespCallback(this.data);
-    this.configModel.registerWindowBottomPadding();
+    this.configModel.registerWindowBottomPadding(this.getUIContext());
   }
 
   aboutToDisappear(): void {
     this.systemShare.offKnockShare();
     this.wxShare.unregisterOnWXRespCallback();
-    this.configModel.unRegisterWindowBottomPadding();
+    this.configModel.unRegisterWindowBottomPadding(this.getUIContext());
     this.clearCacheFiles();
   }
 
@@ -55,14 +53,12 @@ export struct ShareView {
 
   generatePixelmap() {
     const id = this.data.extComponentId ? this.data.extComponentId : CommonConstants.DEFAULT_SNAPSHOT_ID;
-    WindowUtil.uiContext.getComponentSnapshot().get(id, ((err: BusinessError, pixmap: image.PixelMap) => {
-      if (err) {
-        Logger.error(TAG, `componentSnapshot get ${id} fail, error: ` + JSON.stringify(err));
-        return;
-      }
+    this.getUIContext().getComponentSnapshot().get(id).then((pixmap => {
       this.pixmap = pixmap;
       this.sharePosterShow = true;
-    }))
+    })).catch((err: BusinessError) => {
+      Logger.error(TAG, `componentSnapshot get ${id} fail, error: ` + JSON.stringify(err));
+    })
   }
 
   clearCacheFiles() {
@@ -97,6 +93,7 @@ export struct ShareView {
       Row() {
         Text(this.sheetTitle)
           .fontSize($r('sys.float.Title_S'))
+          .fontColor($r('sys.color.font_primary'))
           .fontWeight(FontWeight.Bold)
           .maxLines(1)
       }

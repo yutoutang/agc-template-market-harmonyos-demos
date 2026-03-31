@@ -156,6 +156,13 @@ export interface UserRequest {
 }
 
 /**
+ * 设置会员到期时间
+ */
+export interface MemberExpireTimeRequest {
+  productId: string;
+}
+
+/**
  * 删除评论请求
  */
 export interface DeleteCommentRequest {

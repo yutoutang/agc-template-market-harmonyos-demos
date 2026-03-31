@@ -87,7 +87,7 @@ export class ChatWebSocketService extends BaseChatService {
         type: type,
         content: content,
         timestamp: Date.now(),
-      }
+      };
 
       await this.webSocket.send(JSON.stringify(messageData));
       return true;
@@ -117,8 +117,8 @@ export class ChatWebSocketService extends BaseChatService {
   disconnect(): void {
     if (this.webSocket) {
       this.webSocket.close().catch((err: BusinessError) => {
-        Logger.error('close websocket failed. error: ' + JSON.stringify(err))
-      })
+        Logger.error('close websocket failed. error: ' + JSON.stringify(err));
+      });
       this.webSocket = null;
     }
   }

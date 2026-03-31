@@ -152,8 +152,7 @@ export class SystemShareUtils {
    */
   public async copy(uiContext: UIContext, data: ShareViewData) {
     try {
-      const pasteboardData =
-        pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, `${data.title} | ${data.landingPageUrl}`);
+      const pasteboardData = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, this.getContent(data));
       const systemPasteboard = pasteboard.getSystemPasteboard();
       await systemPasteboard.setData(pasteboardData);
       showToast(uiContext, { message: '复制成功' });
